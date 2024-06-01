@@ -1,0 +1,87 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#    https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
+bigtop:
+  manager:
+    orm:
+      # hibernate/eclipselink(default=eclipselink)
+      type: eclipselink
+
+spring:
+  application:
+    name: bigtop-manager-server
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/bigtop_manager
+    username: postgres
+    password: postgres
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      auto-commit: true
+      connection-test-query: select 1
+      connection-timeout: 30000
+      idle-timeout: 600000
+      initialization-fail-timeout: 1
+      leak-detection-threshold: 0
+      maximum-pool-size: 50
+      minimum-idle: 5
+      pool-name: BigtopManagerHikariCP
+      validation-timeout: 3000
+
+
+  jackson:
+    default-property-inclusion: non-null
+
+  jpa:
+    show-sql: true
+    properties:
+      eclipselink:
+        ddl-generation: create-or-extend-tables
+        weaving: false
+        persistence-context:
+          persist-on-commit: false
+        cache:
+          shared:
+            default: false
+        logging:
+          connection: false
+          logger: org.eclipse.persistence.logging.slf4j.SLF4JLogger
+          parameters: true
+          session: false
+          thread: false
+          timestamp: false
+          level:
+            connection: FINE
+            sql: FINEST
+            jpa: FINER
+
+  messages:
+    basename: i18n/messages
+
+  thymeleaf:
+    cache: false
+
+springdoc:
+  packages-to-scan: org.apache.bigtop.manager.server
+  swagger-ui:
+    defaultModelsExpandDepth: -1
+
+monitoring:
+  prometheus-host: "http://localhost:9090"
+  agent-host-job-name: "bm-agent-host"
