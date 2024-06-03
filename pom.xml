@@ -176,6 +176,7 @@
                         <exclude>**/*.ftl</exclude>
                         <exclude>**/*.log</exclude>
                         <exclude>pnpm-lock.yaml</exclude>
+                        <exclude>**/banner.txt</exclude>
                     </excludes>
                 </configuration>
             </plugin>
