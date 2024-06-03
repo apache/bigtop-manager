@@ -44,8 +44,8 @@
         <fileSet>
             <directory>${basedir}/src/main/resources/stacks</directory>
             <outputDirectory>stacks</outputDirectory>
-            <fileMode>0755</fileMode>
-            <directoryMode>0755</directoryMode>
+            <fileMode>0644</fileMode>
+            <directoryMode>0644</directoryMode>
         </fileSet>
         <fileSet>
             <directory>${basedir}/../bigtop-manager-ui/dist</directory>
