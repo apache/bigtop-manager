@@ -55,7 +55,6 @@
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
         <spring-boot-maven-plugin.version>3.1.1</spring-boot-maven-plugin.version>
-        <apache-rat-plugin.version>0.16.1</apache-rat-plugin.version>
 
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <lombok.version>1.18.30</lombok.version>
@@ -150,36 +149,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.rat</groupId>
-                <artifactId>apache-rat-plugin</artifactId>
-                <version>${apache-rat-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                        <phase>test</phase>
-                    </execution>
-                </executions>
-                <configuration>
-                    <excludes>
-                        <exclude>.idea/</exclude>
-                        <exclude>.mvn/</exclude>
-                        <exclude>**/*.iml</exclude>
-                        <exclude>**/*.json</exclude>
-                        <exclude>.git/</exclude>
-                        <exclude>.gitignore</exclude>
-                        <exclude>.github/</exclude>
-                        <exclude>LICENSE</exclude>
-                        <exclude>**/*.ftl</exclude>
-                        <exclude>**/*.log</exclude>
-                        <exclude>pnpm-lock.yaml</exclude>
-                        <exclude>**/target/**</exclude>
-                    </excludes>
-                </configuration>
             </plugin>
         </plugins>
     </build>

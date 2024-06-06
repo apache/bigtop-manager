@@ -2,7 +2,7 @@ on: [push, pull_request]
 
 jobs:
   license:
-    name: "Check License"
+    name: "Check license header"
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
