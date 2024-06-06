@@ -39,9 +39,3 @@ header:
     - '**/*.proto'
 
   comment: on-failure
-
-  language:
-    Vue:
-      extensions:
-        - ".vue"
-      comment_style_id: AngleBracket
