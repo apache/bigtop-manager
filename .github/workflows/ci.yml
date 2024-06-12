@@ -16,7 +16,12 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - run: ./mvnw spotless:check
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'maven'
+      - run: ./mvnw clean spotless:check
 
   build:
     runs-on: ubuntu-latest
