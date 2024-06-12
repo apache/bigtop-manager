@@ -18,6 +18,9 @@
  */
 package org.apache.bigtop.manager.agent.monitoring;
 
+import org.apache.bigtop.manager.common.constants.CacheFiles;
+import org.apache.bigtop.manager.common.constants.Constants;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -26,10 +29,13 @@ import io.micrometer.core.instrument.MultiGauge;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Tags;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.bigtop.manager.common.constants.CacheFiles;
-import org.apache.bigtop.manager.common.constants.Constants;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -41,11 +47,11 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @Slf4j
 public class ZookeeperHealthyMonitoring {
 
-    private final static int STATUS_FOLLOWER = 2;
-    private final static int STATUS_LEADER = 1;
-    private final static int ZOOKEEPER_UNHEALTHY = 0;
+    private static final int STATUS_FOLLOWER = 2;
+    private static final int STATUS_LEADER = 1;
+    private static final int ZOOKEEPER_UNHEALTHY = 0;
 
-    private final static String ZOOKEEPER_HEALTHY_MONITORING_NAME = "zookeeper_monitoring";
+    private static final String ZOOKEEPER_HEALTHY_MONITORING_NAME = "zookeeper_monitoring";
 
     public static void zookeeperUpdateStatus(MultiGauge multiGauge) {
         Socket sock = null;
@@ -104,7 +110,8 @@ public class ZookeeperHealthyMonitoring {
     public static MultiGauge registerZookeeperHealthyGauge(MeterRegistry registry) {
         return MultiGauge.builder(ZOOKEEPER_HEALTHY_MONITORING_NAME)
                 .description("BigTop Manager Zookeeper Healthy Monitoring, 0:unhealthy, 1:leader, 2:follower")
-                .baseUnit("healthy").register(registry);
+                .baseUnit("healthy")
+                .register(registry);
     }
 
     private static Properties getZooCFG(JsonNode hostComponent) {

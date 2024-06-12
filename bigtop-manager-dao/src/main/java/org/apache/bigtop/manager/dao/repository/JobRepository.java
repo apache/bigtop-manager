@@ -20,11 +20,11 @@ package org.apache.bigtop.manager.dao.repository;
 
 import org.apache.bigtop.manager.dao.entity.Job;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
 
 public interface JobRepository extends JpaRepository<Job, Long> {
 

@@ -18,12 +18,12 @@
  */
 package org.apache.bigtop.manager.server.config;
 
-import jakarta.validation.Validation;
-import jakarta.validation.ValidatorFactory;
-
 import org.hibernate.validator.HibernateValidator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import jakarta.validation.Validation;
+import jakarta.validation.ValidatorFactory;
 
 @Configuration
 public class ValidatorConfig {

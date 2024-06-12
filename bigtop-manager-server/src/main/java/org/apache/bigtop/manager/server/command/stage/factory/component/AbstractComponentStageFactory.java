@@ -36,10 +36,9 @@ import org.apache.bigtop.manager.server.model.dto.OSSpecificDTO;
 import org.apache.bigtop.manager.server.model.dto.ScriptDTO;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 
+import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
-
-import jakarta.annotation.Resource;
 
 public abstract class AbstractComponentStageFactory extends AbstractStageFactory {
 
@@ -79,8 +78,7 @@ public abstract class AbstractComponentStageFactory extends AbstractStageFactory
             task.setCustomCommands(JsonUtils.writeAsString(componentDTO.getCustomCommands()));
             task.setCommandScript(JsonUtils.writeAsString(componentDTO.getCommandScript()));
 
-            CommandRequestMessage commandRequestMessage =
-                    getMessage(serviceDTO, componentDTO, hostname, command);
+            CommandRequestMessage commandRequestMessage = getMessage(serviceDTO, componentDTO, hostname, command);
             task.setContent(JsonUtils.writeAsString(commandRequestMessage));
             task.setMessageId(commandRequestMessage.getMessageId());
 
@@ -92,8 +90,8 @@ public abstract class AbstractComponentStageFactory extends AbstractStageFactory
 
     protected abstract Command getCommand();
 
-    private CommandRequestMessage getMessage(ServiceDTO serviceDTO, ComponentDTO componentDTO,
-                                             String hostname, Command command) {
+    private CommandRequestMessage getMessage(
+            ServiceDTO serviceDTO, ComponentDTO componentDTO, String hostname, Command command) {
         CommandPayload commandPayload = new CommandPayload();
         commandPayload.setServiceName(serviceDTO.getServiceName());
         commandPayload.setCommand(command);
@@ -105,8 +103,7 @@ public abstract class AbstractComponentStageFactory extends AbstractStageFactory
         commandPayload.setRoot(cluster.getRoot());
         commandPayload.setHostname(hostname);
 
-        commandPayload.setCustomCommands(
-                convertCustomCommandInfo(componentDTO.getCustomCommands()));
+        commandPayload.setCustomCommands(convertCustomCommandInfo(componentDTO.getCustomCommands()));
         commandPayload.setOsSpecifics(convertOSSpecificInfo(serviceDTO.getOsSpecifics()));
         commandPayload.setCommandScript(convertScriptInfo(componentDTO.getCommandScript()));
 
@@ -147,8 +144,7 @@ public abstract class AbstractComponentStageFactory extends AbstractStageFactory
         return osSpecificInfos;
     }
 
-    private List<CustomCommandInfo> convertCustomCommandInfo(
-                                                             List<CustomCommandDTO> customCommandDTOs) {
+    private List<CustomCommandInfo> convertCustomCommandInfo(List<CustomCommandDTO> customCommandDTOs) {
         if (customCommandDTOs == null) {
             return new ArrayList<>();
         }
@@ -157,8 +153,7 @@ public abstract class AbstractComponentStageFactory extends AbstractStageFactory
         for (CustomCommandDTO customCommandDTO : customCommandDTOs) {
             CustomCommandInfo customCommandInfo = new CustomCommandInfo();
             customCommandInfo.setName(customCommandDTO.getName());
-            customCommandInfo.setCommandScript(
-                    convertScriptInfo(customCommandDTO.getCommandScript()));
+            customCommandInfo.setCommandScript(convertScriptInfo(customCommandDTO.getCommandScript()));
             customCommandInfos.add(customCommandInfo);
         }
 

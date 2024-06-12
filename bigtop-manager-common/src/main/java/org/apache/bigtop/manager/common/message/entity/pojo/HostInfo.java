@@ -18,10 +18,10 @@
  */
 package org.apache.bigtop.manager.common.message.entity.pojo;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
-
-import lombok.Data;
 
 @Data
 public class HostInfo implements Serializable {

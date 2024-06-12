@@ -22,9 +22,9 @@ import org.apache.bigtop.manager.common.enums.JobState;
 import org.apache.bigtop.manager.dao.entity.Stage;
 import org.apache.bigtop.manager.dao.entity.Task;
 
-import java.util.List;
-
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
 
 public interface TaskRepository extends JpaRepository<Task, Long> {
 
@@ -35,5 +35,4 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findAllByJobIdAndState(Long jobId, JobState state);
 
     List<Task> findAllByJobIdAndHostnameAndState(Long jobId, String hostname, JobState state);
-
 }

@@ -27,11 +27,11 @@ import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 import org.apache.bigtop.manager.server.model.dto.CommandDTO;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class JobRunners {
@@ -49,7 +49,9 @@ public class JobRunners {
         CommandDTO commandDTO = jobContext.getCommandDTO();
         CommandIdentifier identifier = new CommandIdentifier(commandDTO.getCommandLevel(), commandDTO.getCommand());
         if (!JOB_RUNNERS.containsKey(identifier)) {
-            throw new ApiException(ApiExceptionEnum.COMMAND_NOT_SUPPORTED, identifier.getCommand().name().toLowerCase(),
+            throw new ApiException(
+                    ApiExceptionEnum.COMMAND_NOT_SUPPORTED,
+                    identifier.getCommand().name().toLowerCase(),
                     identifier.getCommandLevel().toLowerCase());
         }
 
@@ -66,7 +68,8 @@ public class JobRunners {
             return;
         }
 
-        for (Map.Entry<String, JobRunner> entry : SpringContextHolder.getJobRunners().entrySet()) {
+        for (Map.Entry<String, JobRunner> entry :
+                SpringContextHolder.getJobRunners().entrySet()) {
             String beanName = entry.getKey();
             JobRunner jobRunner = entry.getValue();
             if (JOB_RUNNERS.containsKey(jobRunner.getCommandIdentifier())) {
@@ -75,7 +78,9 @@ public class JobRunners {
             }
 
             JOB_RUNNERS.put(jobRunner.getCommandIdentifier(), beanName);
-            log.info("Load JobRunner: {} with identifier: {}", jobRunner.getClass().getName(),
+            log.info(
+                    "Load JobRunner: {} with identifier: {}",
+                    jobRunner.getClass().getName(),
                     jobRunner.getCommandIdentifier());
         }
 

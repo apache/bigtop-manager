@@ -22,7 +22,6 @@ import lombok.Getter;
 
 @Getter
 public enum AgentExceptionStatus {
-
     AGENT_MONITORING_ERROR(10001, "Get agent host monitoring info failed"),
 
     COMMAND_FAILED(10002, "Run command failed"),

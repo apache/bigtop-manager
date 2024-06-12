@@ -26,13 +26,12 @@ import org.apache.bigtop.manager.server.model.mapper.HostComponentMapper;
 import org.apache.bigtop.manager.server.model.vo.HostComponentVO;
 import org.apache.bigtop.manager.server.service.HostComponentService;
 
-import java.util.List;
-
-import jakarta.annotation.Resource;
-
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
+
+import jakarta.annotation.Resource;
+import java.util.List;
 
 @Slf4j
 @Service

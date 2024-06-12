@@ -18,7 +18,6 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
-import jakarta.annotation.Resource;
 import org.apache.bigtop.manager.dao.entity.Job;
 import org.apache.bigtop.manager.dao.repository.JobRepository;
 import org.apache.bigtop.manager.server.model.mapper.JobMapper;
@@ -28,10 +27,13 @@ import org.apache.bigtop.manager.server.model.vo.PageVO;
 import org.apache.bigtop.manager.server.service.JobService;
 import org.apache.bigtop.manager.server.utils.ClusterUtils;
 import org.apache.bigtop.manager.server.utils.PageUtils;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import jakarta.annotation.Resource;
 
 @Service
 public class JobServiceImpl implements JobService {

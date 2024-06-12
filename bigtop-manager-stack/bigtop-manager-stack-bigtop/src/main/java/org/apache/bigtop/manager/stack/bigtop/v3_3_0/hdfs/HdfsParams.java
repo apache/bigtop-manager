@@ -25,13 +25,13 @@ import org.apache.bigtop.manager.stack.common.utils.LocalSettings;
 
 import org.apache.commons.lang3.StringUtils;
 
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 
 @Getter
 @Slf4j
@@ -98,7 +98,9 @@ public class HdfsParams extends BaseParams {
         Map<String, Object> hdfsSite = LocalSettings.configurations(serviceName(), "hdfs-site");
         dfsDataDir = (String) hdfsSite.get("dfs.datanode.data.dir");
         dfsNameNodeDir = (String) hdfsSite.get("dfs.namenode.name.dir");
-        nameNodeFormattedDirs = Arrays.stream(dfsNameNodeDir.split(",")).map(x -> x + "/namenode-formatted/").toList();
+        nameNodeFormattedDirs = Arrays.stream(dfsNameNodeDir.split(","))
+                .map(x -> x + "/namenode-formatted/")
+                .toList();
 
         String dfsDomainSocketPath = (String) hdfsSite.get("dfs.domain.socket.path");
         if (StringUtils.isNotBlank(dfsDomainSocketPath)) {
@@ -139,5 +141,4 @@ public class HdfsParams extends BaseParams {
     public String hdfsExec() {
         return stackBinDir() + "/hdfs";
     }
-
 }

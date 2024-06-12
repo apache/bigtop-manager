@@ -50,7 +50,8 @@ public class CaseUtils {
             if (i == 0 && !capitalizeFirstLetter) {
                 parts[i] = parts[i].toLowerCase();
             } else {
-                parts[i] = parts[i].substring(0, 1).toUpperCase() + parts[i].substring(1).toLowerCase();
+                parts[i] = parts[i].substring(0, 1).toUpperCase()
+                        + parts[i].substring(1).toLowerCase();
             }
         }
 

@@ -32,5 +32,4 @@ public class RepoVO {
     private String os;
 
     private String arch;
-
 }

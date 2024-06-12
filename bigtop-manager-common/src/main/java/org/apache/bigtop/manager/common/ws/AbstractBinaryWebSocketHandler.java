@@ -18,17 +18,19 @@
  */
 package org.apache.bigtop.manager.common.ws;
 
-import jakarta.annotation.Resource;
-import lombok.extern.slf4j.Slf4j;
+import org.apache.bigtop.manager.common.message.entity.BaseMessage;
 import org.apache.bigtop.manager.common.message.entity.BaseRequestMessage;
 import org.apache.bigtop.manager.common.message.entity.BaseResponseMessage;
 import org.apache.bigtop.manager.common.message.serializer.MessageDeserializer;
 import org.apache.bigtop.manager.common.message.serializer.MessageSerializer;
-import org.apache.bigtop.manager.common.message.entity.BaseMessage;
+
 import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.BinaryWebSocketHandler;
 
+import lombok.extern.slf4j.Slf4j;
+
+import jakarta.annotation.Resource;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -44,7 +46,6 @@ public class AbstractBinaryWebSocketHandler extends BinaryWebSocketHandler {
     private final ConcurrentHashMap<String, BaseRequestMessage> requests = new ConcurrentHashMap<>();
 
     private final ConcurrentHashMap<String, BaseResponseMessage> responses = new ConcurrentHashMap<>();
-
 
     protected void sendMessage(WebSocketSession session, BaseMessage message) {
         try {

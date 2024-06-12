@@ -24,11 +24,11 @@ import org.apache.bigtop.manager.server.command.stage.factory.StageContext;
 import org.apache.bigtop.manager.server.command.stage.factory.StageType;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class StageRunners {
@@ -58,7 +58,8 @@ public class StageRunners {
             return;
         }
 
-        for (Map.Entry<String, StageRunner> entry : SpringContextHolder.getStageRunners().entrySet()) {
+        for (Map.Entry<String, StageRunner> entry :
+                SpringContextHolder.getStageRunners().entrySet()) {
             String beanName = entry.getKey();
             StageRunner stageRunner = entry.getValue();
             if (STAGE_RUNNERS.containsKey(stageRunner.getStageType())) {
@@ -67,7 +68,9 @@ public class StageRunners {
             }
 
             STAGE_RUNNERS.put(stageRunner.getStageType(), beanName);
-            log.info("Load StageLifecycle: {} with type: {}", stageRunner.getClass().getName(),
+            log.info(
+                    "Load StageLifecycle: {} with type: {}",
+                    stageRunner.getClass().getName(),
                     stageRunner.getStageType());
         }
 

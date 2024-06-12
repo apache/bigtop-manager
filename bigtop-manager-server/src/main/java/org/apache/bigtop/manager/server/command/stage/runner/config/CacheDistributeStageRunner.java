@@ -18,8 +18,6 @@
  */
 package org.apache.bigtop.manager.server.command.stage.runner.config;
 
-import static org.apache.bigtop.manager.common.constants.Constants.ALL_HOST_KEY;
-
 import org.apache.bigtop.manager.common.constants.Constants;
 import org.apache.bigtop.manager.common.message.entity.command.CommandMessageType;
 import org.apache.bigtop.manager.common.message.entity.command.CommandRequestMessage;
@@ -57,6 +55,13 @@ import org.apache.bigtop.manager.server.utils.StackUtils;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import lombok.extern.slf4j.Slf4j;
+
+import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -65,14 +70,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import jakarta.annotation.Resource;
-
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-
-import lombok.extern.slf4j.Slf4j;
+import static org.apache.bigtop.manager.common.constants.Constants.ALL_HOST_KEY;
 
 @Slf4j
 @org.springframework.stereotype.Component
@@ -153,10 +151,8 @@ public class CacheDistributeStageRunner extends AbstractStageRunner {
         String stackVersion = cluster.getStack().getStackVersion();
 
         List<Service> services = serviceRepository.findAllByClusterId(clusterId);
-        List<ServiceConfig> serviceConfigList =
-                serviceConfigRepository.findAllByClusterAndSelectedIsTrue(cluster);
-        List<HostComponent> hostComponents =
-                hostComponentRepository.findAllByComponentClusterId(clusterId);
+        List<ServiceConfig> serviceConfigList = serviceConfigRepository.findAllByClusterAndSelectedIsTrue(cluster);
+        List<HostComponent> hostComponents = hostComponentRepository.findAllByComponentClusterId(clusterId);
         List<Repo> repos = repoRepository.findAllByCluster(cluster);
         Iterable<Setting> settings = settingRepository.findAll();
         List<Host> hostList = hostRepository.findAllByClusterId(clusterId);
@@ -174,20 +170,18 @@ public class CacheDistributeStageRunner extends AbstractStageRunner {
         for (ServiceConfig serviceConfig : serviceConfigList) {
             for (TypeConfig typeConfig : serviceConfig.getConfigs()) {
                 List<PropertyDTO> properties =
-                        JsonUtils.readFromString(typeConfig.getPropertiesJson(), new TypeReference<>() {
-                        });
-                String configMapStr =
-                        JsonUtils.writeAsString(StackConfigUtils.extractConfigMap(properties));
+                        JsonUtils.readFromString(typeConfig.getPropertiesJson(), new TypeReference<>() {});
+                String configMapStr = JsonUtils.writeAsString(StackConfigUtils.extractConfigMap(properties));
 
                 if (serviceConfigMap.containsKey(serviceConfig.getService().getServiceName())) {
-                    serviceConfigMap.get(serviceConfig.getService().getServiceName())
+                    serviceConfigMap
+                            .get(serviceConfig.getService().getServiceName())
                             .put(typeConfig.getTypeName(), configMapStr);
                 } else {
                     Map<String, Object> hashMap = new HashMap<>();
                     hashMap.put(typeConfig.getTypeName(), configMapStr);
                     serviceConfigMap.put(serviceConfig.getService().getServiceName(), hashMap);
                 }
-
             }
         }
 
@@ -203,8 +197,7 @@ public class CacheDistributeStageRunner extends AbstractStageRunner {
             hostMap.get(x.getComponent().getComponentName()).add(x.getHost().getHostname());
         });
 
-        Set<String> hostNameSet =
-                hostList.stream().map(Host::getHostname).collect(Collectors.toSet());
+        Set<String> hostNameSet = hostList.stream().map(Host::getHostname).collect(Collectors.toSet());
         hostMap.put(ALL_HOST_KEY, hostNameSet);
 
         repoList = new ArrayList<>();
@@ -240,8 +233,7 @@ public class CacheDistributeStageRunner extends AbstractStageRunner {
         userMap = new HashMap<>();
         settingsMap = new HashMap<>();
 
-        String fullStackName =
-                StackUtils.fullStackName(stageContext.getStackName(), stageContext.getStackVersion());
+        String fullStackName = StackUtils.fullStackName(stageContext.getStackName(), stageContext.getStackVersion());
         ImmutablePair<StackDTO, List<ServiceDTO>> immutablePair =
                 StackUtils.getStackKeyMap().get(fullStackName);
         StackDTO stackDTO = immutablePair.getLeft();

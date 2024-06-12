@@ -18,14 +18,13 @@
  */
 package org.apache.bigtop.manager.common.utils;
 
-import java.io.File;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import lombok.extern.slf4j.Slf4j;
+
+import java.io.File;
 
 @Slf4j
 public class JsonUtils {
@@ -50,8 +49,7 @@ public class JsonUtils {
     }
 
     public static <T> T readFromFile(String fileName) {
-        return readFromFile(new File(fileName), new TypeReference<>() {
-        });
+        return readFromFile(new File(fileName), new TypeReference<>() {});
     }
 
     public static <T> T readFromFile(String fileName, TypeReference<T> typeReference) {
@@ -60,8 +58,7 @@ public class JsonUtils {
 
     public static <T> T readFromFile(File file) {
         try {
-            return OBJECTMAPPER.readValue(file, new TypeReference<>() {
-            });
+            return OBJECTMAPPER.readValue(file, new TypeReference<>() {});
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -77,8 +74,7 @@ public class JsonUtils {
 
     public static <T> T readFromString(String json) {
         try {
-            return OBJECTMAPPER.readValue(json, new TypeReference<>() {
-            });
+            return OBJECTMAPPER.readValue(json, new TypeReference<>() {});
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -115,5 +111,4 @@ public class JsonUtils {
             throw new RuntimeException(e);
         }
     }
-
 }

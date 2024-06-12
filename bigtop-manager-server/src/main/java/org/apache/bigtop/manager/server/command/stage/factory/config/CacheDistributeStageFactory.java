@@ -25,15 +25,14 @@ import org.apache.bigtop.manager.dao.repository.HostRepository;
 import org.apache.bigtop.manager.server.command.stage.factory.AbstractStageFactory;
 import org.apache.bigtop.manager.server.command.stage.factory.StageType;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import jakarta.annotation.Resource;
-
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 
 import lombok.extern.slf4j.Slf4j;
+
+import jakarta.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @org.springframework.stereotype.Component
@@ -55,8 +54,9 @@ public class CacheDistributeStageFactory extends AbstractStageFactory {
             hostnames.addAll(context.getHostnames());
         } else {
             hostnames.addAll(context.getHostnames() == null ? List.of() : context.getHostnames());
-            hostnames.addAll(
-                    hostRepository.findAllByClusterId(context.getClusterId()).stream().map(Host::getHostname).toList());
+            hostnames.addAll(hostRepository.findAllByClusterId(context.getClusterId()).stream()
+                    .map(Host::getHostname)
+                    .toList());
         }
 
         stage.setName("Distribute Caches");

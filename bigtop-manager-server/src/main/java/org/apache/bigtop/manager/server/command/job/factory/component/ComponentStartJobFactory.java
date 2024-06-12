@@ -38,7 +38,5 @@ public class ComponentStartJobFactory extends AbstractComponentJobFactory {
     }
 
     @Override
-    public void createStagesAndTasks() {
-
-    }
+    public void createStagesAndTasks() {}
 }

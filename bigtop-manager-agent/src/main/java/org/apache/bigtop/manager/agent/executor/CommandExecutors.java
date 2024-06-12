@@ -21,11 +21,11 @@ package org.apache.bigtop.manager.agent.executor;
 import org.apache.bigtop.manager.agent.holder.SpringContextHolder;
 import org.apache.bigtop.manager.common.message.entity.command.CommandMessageType;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class CommandExecutors {
@@ -48,7 +48,8 @@ public class CommandExecutors {
             return;
         }
 
-        for (Map.Entry<String, CommandExecutor> entry : SpringContextHolder.getCommandExecutors().entrySet()) {
+        for (Map.Entry<String, CommandExecutor> entry :
+                SpringContextHolder.getCommandExecutors().entrySet()) {
             String beanName = entry.getKey();
             CommandExecutor commandExecutor = entry.getValue();
             if (COMMAND_EXECUTORS.containsKey(commandExecutor.getCommandMessageType())) {
@@ -57,7 +58,9 @@ public class CommandExecutors {
             }
 
             COMMAND_EXECUTORS.put(commandExecutor.getCommandMessageType(), beanName);
-            log.info("Load JobRunner: {} with identifier: {}", commandExecutor.getClass().getName(),
+            log.info(
+                    "Load JobRunner: {} with identifier: {}",
+                    commandExecutor.getClass().getName(),
                     commandExecutor.getCommandMessageType());
         }
 

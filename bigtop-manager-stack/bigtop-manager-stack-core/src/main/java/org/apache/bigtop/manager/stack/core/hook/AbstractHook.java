@@ -18,11 +18,12 @@
  */
 package org.apache.bigtop.manager.stack.core.hook;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.spi.stack.Hook;
 import org.apache.bigtop.manager.stack.common.log.TaskLogWriter;
 import org.apache.bigtop.manager.stack.common.utils.LocalSettings;
 import org.apache.bigtop.manager.stack.common.utils.linux.LinuxAccountUtils;
+
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 import java.util.Set;

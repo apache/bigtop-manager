@@ -36,5 +36,4 @@ public class RepoDTO {
     private String os;
 
     private String arch;
-
 }

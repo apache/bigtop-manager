@@ -33,5 +33,4 @@ public final class MessageConstants {
      * default fail code
      */
     public static final int FAIL_CODE = -1;
-
 }

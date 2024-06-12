@@ -18,6 +18,8 @@
  */
 package org.apache.bigtop.manager.common.shell;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -29,8 +31,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
-
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * shell command executor.
@@ -91,8 +91,8 @@ public class ShellExecutor {
      *                   If 0, the command will not be timed out.
      * @param consumer   the consumer to consume the output of the executed command.
      */
-    private ShellExecutor(String[] execString, File dir, Map<String, String> env, long timeout,
-                          Consumer<String> consumer) {
+    private ShellExecutor(
+            String[] execString, File dir, Map<String, String> env, long timeout, Consumer<String> consumer) {
         this.command = execString.clone();
         this.dir = dir;
         this.environment = env;
@@ -109,8 +109,7 @@ public class ShellExecutor {
      * @throws IOException errors
      */
     public static ShellResult execCommand(List<String> builderParameters) throws IOException {
-        return execCommand(builderParameters, s -> {
-        });
+        return execCommand(builderParameters, s -> {});
     }
 
     /**
@@ -122,8 +121,8 @@ public class ShellExecutor {
      * @return the output of the executed command.
      * @throws IOException errors
      */
-    public static ShellResult execCommand(List<String> builderParameters,
-                                          Consumer<String> consumer) throws IOException {
+    public static ShellResult execCommand(List<String> builderParameters, Consumer<String> consumer)
+            throws IOException {
         return execCommand(null, builderParameters, 0L, consumer);
     }
 
@@ -138,8 +137,7 @@ public class ShellExecutor {
      * @throws IOException errors
      */
     public static ShellResult execCommand(Map<String, String> env, List<String> builderParameters) throws IOException {
-        return execCommand(env, builderParameters, s -> {
-        });
+        return execCommand(env, builderParameters, s -> {});
     }
 
     /**
@@ -153,8 +151,8 @@ public class ShellExecutor {
      * @return the output of the executed command.
      * @throws IOException errors
      */
-    public static ShellResult execCommand(Map<String, String> env, List<String> builderParameters,
-                                          Consumer<String> consumer) throws IOException {
+    public static ShellResult execCommand(
+            Map<String, String> env, List<String> builderParameters, Consumer<String> consumer) throws IOException {
         return execCommand(env, builderParameters, 0L, consumer);
     }
 
@@ -169,10 +167,9 @@ public class ShellExecutor {
      * @return the output of the executed command.
      * @throws IOException errors
      */
-    public static ShellResult execCommand(Map<String, String> env, List<String> builderParameters,
-                                          long timeout) throws IOException {
-        return execCommand(env, builderParameters, timeout, s -> {
-        });
+    public static ShellResult execCommand(Map<String, String> env, List<String> builderParameters, long timeout)
+            throws IOException {
+        return execCommand(env, builderParameters, timeout, s -> {});
     }
 
     /**
@@ -187,8 +184,9 @@ public class ShellExecutor {
      * @return the output of the executed command.
      * @throws IOException errors
      */
-    public static ShellResult execCommand(Map<String, String> env, List<String> builderParameters, long timeout,
-                                          Consumer<String> consumer) throws IOException {
+    public static ShellResult execCommand(
+            Map<String, String> env, List<String> builderParameters, long timeout, Consumer<String> consumer)
+            throws IOException {
         String[] cmd = builderParameters.toArray(new String[0]);
 
         ShellExecutor shellExecutor = new ShellExecutor(cmd, null, env, timeout, consumer);
@@ -328,22 +326,24 @@ public class ShellExecutor {
 
     private void scheduleTimeoutTimer() {
         this.timeoutTimer = new Timer();
-        timeoutTimer.schedule(new TimerTask() {
+        timeoutTimer.schedule(
+                new TimerTask() {
 
-            @Override
-            public void run() {
-                try {
-                    process.exitValue();
-                } catch (Exception e) {
-                    // Process has not terminated.
-                    // So check if it has completed
-                    // if not just destroy it.
-                    if (process != null && !completed.get()) {
-                        isTimeout.set(true);
-                        process.destroy();
+                    @Override
+                    public void run() {
+                        try {
+                            process.exitValue();
+                        } catch (Exception e) {
+                            // Process has not terminated.
+                            // So check if it has completed
+                            // if not just destroy it.
+                            if (process != null && !completed.get()) {
+                                isTimeout.set(true);
+                                process.destroy();
+                            }
+                        }
                     }
-                }
-            }
-        }, timeoutInterval);
+                },
+                timeoutInterval);
     }
 }

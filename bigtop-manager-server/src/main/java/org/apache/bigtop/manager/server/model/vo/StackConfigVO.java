@@ -18,9 +18,9 @@
  */
 package org.apache.bigtop.manager.server.model.vo;
 
-import java.util.List;
-
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class StackConfigVO {

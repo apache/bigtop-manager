@@ -27,9 +27,9 @@ import org.apache.bigtop.manager.server.model.vo.LoginVO;
 import org.apache.bigtop.manager.server.service.LoginService;
 import org.apache.bigtop.manager.server.utils.JWTUtils;
 
-import jakarta.annotation.Resource;
-
 import org.springframework.stereotype.Service;
+
+import jakarta.annotation.Resource;
 
 @Service
 public class LoginServiceImpl implements LoginService {

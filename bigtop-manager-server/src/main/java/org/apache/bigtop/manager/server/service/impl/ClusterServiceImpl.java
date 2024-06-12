@@ -18,8 +18,6 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
-import jakarta.annotation.Resource;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.common.enums.MaintainState;
 import org.apache.bigtop.manager.dao.entity.Cluster;
 import org.apache.bigtop.manager.dao.entity.Repo;
@@ -38,6 +36,9 @@ import org.apache.bigtop.manager.server.service.ClusterService;
 import org.apache.bigtop.manager.server.service.HostService;
 import org.apache.bigtop.manager.server.utils.StackUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
+import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,12 +75,14 @@ public class ClusterServiceImpl implements ClusterService {
         Stack stack =
                 stackRepository.findByStackNameAndStackVersion(clusterDTO.getStackName(), clusterDTO.getStackVersion());
         StackDTO stackDTO = StackUtils.getStackKeyMap()
-                .get(StackUtils.fullStackName(clusterDTO.getStackName(), clusterDTO.getStackVersion())).getLeft();
+                .get(StackUtils.fullStackName(clusterDTO.getStackName(), clusterDTO.getStackVersion()))
+                .getLeft();
         Cluster cluster = ClusterMapper.INSTANCE.fromDTO2Entity(clusterDTO, stackDTO, stack);
         cluster.setSelected(clusterRepository.count() == 0);
         cluster.setState(MaintainState.UNINSTALLED);
 
-        Cluster oldCluster = clusterRepository.findByClusterName(clusterDTO.getClusterName()).orElse(new Cluster());
+        Cluster oldCluster =
+                clusterRepository.findByClusterName(clusterDTO.getClusterName()).orElse(new Cluster());
         if (oldCluster.getId() != null) {
             cluster.setId(oldCluster.getId());
         }
@@ -119,5 +122,4 @@ public class ClusterServiceImpl implements ClusterService {
 
         return ClusterMapper.INSTANCE.fromEntity2VO(cluster);
     }
-
 }

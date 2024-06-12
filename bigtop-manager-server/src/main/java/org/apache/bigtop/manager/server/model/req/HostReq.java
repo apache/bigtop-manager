@@ -18,17 +18,16 @@
  */
 package org.apache.bigtop.manager.server.model.req;
 
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 @Data
 public class HostReq {
 
-    @NotNull
-    @Schema(example = "1")
+    @NotNull @Schema(example = "1")
     private Long clusterId;
 
     @NotEmpty

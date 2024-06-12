@@ -65,5 +65,4 @@ public final class DateUtils {
     private static LocalDateTime date2LocalDateTime(Date date, ZoneId zoneId) {
         return LocalDateTime.ofInstant(Instant.ofEpochMilli(date.getTime()), zoneId);
     }
-
 }

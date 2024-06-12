@@ -25,11 +25,10 @@ import org.apache.bigtop.manager.stack.common.utils.LocalSettings;
 import org.apache.bigtop.manager.stack.common.utils.PackageUtils;
 import org.apache.bigtop.manager.stack.common.utils.template.BaseTemplate;
 
-import java.util.List;
-
 import com.google.auto.service.AutoService;
-
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
 
 /**
  * obtain agent execute command
@@ -46,9 +45,10 @@ public class InstallHook extends AbstractHook {
         String repoTemplate = LocalSettings.cluster().getRepoTemplate();
 
         for (RepoInfo repo : repos) {
-            if (OSDetection.getOS().equals(repo.getOs()) && OSDetection.getArch().equals(repo.getArch())) {
-                BaseTemplate.writeCustomTemplate("/etc/yum.repos.d/" + repo.getRepoId().replace(".", "_") + ".repo",
-                        repo, repoTemplate);
+            if (OSDetection.getOS().equals(repo.getOs())
+                    && OSDetection.getArch().equals(repo.getArch())) {
+                BaseTemplate.writeCustomTemplate(
+                        "/etc/yum.repos.d/" + repo.getRepoId().replace(".", "_") + ".repo", repo, repoTemplate);
             }
         }
 
@@ -57,8 +57,7 @@ public class InstallHook extends AbstractHook {
     }
 
     @Override
-    public void doAfter() {
-    }
+    public void doAfter() {}
 
     @Override
     public String getName() {

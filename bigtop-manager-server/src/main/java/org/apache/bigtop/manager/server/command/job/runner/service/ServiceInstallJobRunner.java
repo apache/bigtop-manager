@@ -43,14 +43,13 @@ import org.apache.bigtop.manager.server.model.mapper.ServiceMapper;
 import org.apache.bigtop.manager.server.service.ConfigService;
 import org.apache.bigtop.manager.server.utils.StackUtils;
 
-import java.util.List;
-
-import jakarta.annotation.Resource;
-
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 
 import lombok.extern.slf4j.Slf4j;
+
+import jakarta.annotation.Resource;
+import java.util.List;
 
 @Slf4j
 @org.springframework.stereotype.Component
@@ -91,8 +90,7 @@ public class ServiceInstallJobRunner extends AbstractJobRunner {
         // Persist service, component and hostComponent metadata to database
         for (ServiceCommandDTO serviceCommand : serviceCommands) {
             String serviceName = serviceCommand.getServiceName();
-            Service service =
-                    serviceRepository.findByClusterIdAndServiceName(clusterId, serviceName);
+            Service service = serviceRepository.findByClusterIdAndServiceName(clusterId, serviceName);
             upsertService(service, serviceCommand);
         }
     }
@@ -120,11 +118,9 @@ public class ServiceInstallJobRunner extends AbstractJobRunner {
             String componentName = componentHostDTO.getComponentName();
 
             // 3. Persist component
-            Component component =
-                    componentRepository.findByClusterIdAndComponentName(clusterId, componentName);
+            Component component = componentRepository.findByClusterIdAndComponentName(clusterId, componentName);
             if (component == null) {
-                ComponentDTO componentDTO =
-                        StackUtils.getComponentDTO(stackName, stackVersion, componentName);
+                ComponentDTO componentDTO = StackUtils.getComponentDTO(stackName, stackVersion, componentName);
                 component = ComponentMapper.INSTANCE.fromDTO2Entity(componentDTO, service, cluster);
                 component = componentRepository.save(component);
             }
@@ -132,8 +128,7 @@ public class ServiceInstallJobRunner extends AbstractJobRunner {
             // 4. Persist hostComponent
             for (String hostname : componentHostDTO.getHostnames()) {
                 HostComponent hostComponent =
-                        hostComponentRepository.findByComponentComponentNameAndHostHostname(
-                                componentName, hostname);
+                        hostComponentRepository.findByComponentComponentNameAndHostHostname(componentName, hostname);
                 if (hostComponent == null) {
                     Host host = hostRepository.findByHostname(hostname);
 

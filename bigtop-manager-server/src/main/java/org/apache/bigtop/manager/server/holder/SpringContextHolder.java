@@ -25,15 +25,14 @@ import org.apache.bigtop.manager.server.command.stage.factory.StageFactory;
 import org.apache.bigtop.manager.server.command.stage.runner.StageRunner;
 import org.apache.bigtop.manager.server.ws.ServerWebSocketHandler;
 
-import java.util.Map;
-
-import jakarta.annotation.Nonnull;
-
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 import lombok.Getter;
+
+import jakarta.annotation.Nonnull;
+import java.util.Map;
 
 @Component
 public class SpringContextHolder implements ApplicationContextAware {

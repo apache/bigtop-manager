@@ -18,9 +18,9 @@
  */
 package org.apache.bigtop.manager.common.message.entity.pojo;
 
-import java.util.List;
-
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class OSSpecificInfo {

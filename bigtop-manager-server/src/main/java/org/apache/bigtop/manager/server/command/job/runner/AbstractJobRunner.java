@@ -30,11 +30,10 @@ import org.apache.bigtop.manager.server.command.stage.runner.StageRunner;
 import org.apache.bigtop.manager.server.command.stage.runner.StageRunners;
 import org.apache.bigtop.manager.server.model.dto.CommandDTO;
 
+import jakarta.annotation.Resource;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
-
-import jakarta.annotation.Resource;
 
 public abstract class AbstractJobRunner implements JobRunner {
 

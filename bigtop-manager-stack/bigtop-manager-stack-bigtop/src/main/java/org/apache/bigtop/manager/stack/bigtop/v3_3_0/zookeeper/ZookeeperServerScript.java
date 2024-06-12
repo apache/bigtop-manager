@@ -25,12 +25,11 @@ import org.apache.bigtop.manager.stack.common.exception.StackException;
 import org.apache.bigtop.manager.stack.common.utils.PackageUtils;
 import org.apache.bigtop.manager.stack.common.utils.linux.LinuxOSUtils;
 
+import com.google.auto.service.AutoService;
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.text.MessageFormat;
-
-import com.google.auto.service.AutoService;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @AutoService(Script.class)
@@ -75,5 +74,4 @@ public class ZookeeperServerScript implements Script {
         ZookeeperParams zookeeperParams = (ZookeeperParams) params;
         return LinuxOSUtils.checkProcess(zookeeperParams.getZookeeperPidFile());
     }
-
 }

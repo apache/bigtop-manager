@@ -19,7 +19,6 @@
 package org.apache.bigtop.manager.server.command.stage.factory;
 
 public enum StageType {
-
     HOST_CHECK,
 
     CACHE_DISTRIBUTE,

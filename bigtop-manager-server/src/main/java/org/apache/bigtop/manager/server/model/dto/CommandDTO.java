@@ -27,11 +27,11 @@ import org.apache.bigtop.manager.server.model.dto.command.ServiceCommandDTO;
 
 import org.apache.commons.text.CaseUtils;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.List;
-
-import lombok.Data;
 
 @Data
 public class CommandDTO implements Serializable {
@@ -60,9 +60,8 @@ public class CommandDTO implements Serializable {
         if (command == null) {
             return MessageFormat.format("{0} for {1}", customCommand, commandLevel.toLowerCase());
         } else {
-            return MessageFormat.format("{0} for {1}", CaseUtils.toCamelCase(command.name(), true),
-                    commandLevel.toLowerCase());
+            return MessageFormat.format(
+                    "{0} for {1}", CaseUtils.toCamelCase(command.name(), true), commandLevel.toLowerCase());
         }
     }
-
 }

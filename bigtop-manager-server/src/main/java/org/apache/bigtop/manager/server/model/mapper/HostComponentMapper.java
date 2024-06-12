@@ -20,6 +20,7 @@ package org.apache.bigtop.manager.server.model.mapper;
 
 import org.apache.bigtop.manager.dao.entity.HostComponent;
 import org.apache.bigtop.manager.server.model.vo.HostComponentVO;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -40,6 +41,4 @@ public interface HostComponentMapper {
     HostComponentVO fromEntity2VO(HostComponent hostComponent);
 
     List<HostComponentVO> fromEntity2VO(List<HostComponent> hostComponents);
-
-
 }

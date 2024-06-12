@@ -18,6 +18,12 @@
  */
 package org.apache.bigtop.manager.stack.common.enums;
 
+import org.apache.bigtop.manager.common.enums.OSType;
+
+import lombok.Getter;
+
+import java.util.List;
+
 import static org.apache.bigtop.manager.common.enums.OSType.CENTOS7;
 import static org.apache.bigtop.manager.common.enums.OSType.DEBIAN10;
 import static org.apache.bigtop.manager.common.enums.OSType.DEBIAN11;
@@ -26,21 +32,13 @@ import static org.apache.bigtop.manager.common.enums.OSType.ROCKY8;
 import static org.apache.bigtop.manager.common.enums.OSType.UBUNTU20;
 import static org.apache.bigtop.manager.common.enums.OSType.UBUNTU22;
 
-import org.apache.bigtop.manager.common.enums.OSType;
-
-import java.util.List;
-
-import lombok.Getter;
-
 @Getter
 public enum PackageManagerType {
-
     YUM(List.of(CENTOS7)),
 
     DNF(List.of(ROCKY8, FEDORA36)),
 
     APT(List.of(UBUNTU20, UBUNTU22, DEBIAN10, DEBIAN11)),
-
     ;
 
     /**
@@ -51,5 +49,4 @@ public enum PackageManagerType {
     PackageManagerType(List<OSType> osTypes) {
         this.osTypes = osTypes;
     }
-
 }

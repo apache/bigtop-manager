@@ -22,11 +22,11 @@ import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.server.model.dto.PropertyDTO;
 import org.apache.bigtop.manager.server.model.vo.PropertyVO;
 
-import java.util.List;
-
 import org.mapstruct.Named;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+
+import java.util.List;
 
 public class TypeConvert {
 
@@ -37,19 +37,16 @@ public class TypeConvert {
 
     @Named("json2List")
     public List<String> json2List(String json) {
-        return JsonUtils.readFromString(json, new TypeReference<>() {
-        });
+        return JsonUtils.readFromString(json, new TypeReference<>() {});
     }
 
     @Named("json2PropertyDTOList")
     public List<PropertyDTO> json2PropertyDTOList(String json) {
-        return JsonUtils.readFromString(json, new TypeReference<>() {
-        });
+        return JsonUtils.readFromString(json, new TypeReference<>() {});
     }
 
     @Named("json2PropertyVOList")
     public List<PropertyVO> json2PropertyVOList(String json) {
-        return JsonUtils.readFromString(json, new TypeReference<>() {
-        });
+        return JsonUtils.readFromString(json, new TypeReference<>() {});
     }
 }

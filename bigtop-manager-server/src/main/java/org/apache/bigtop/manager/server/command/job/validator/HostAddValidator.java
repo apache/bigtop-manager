@@ -29,11 +29,10 @@ import org.apache.bigtop.manager.server.model.dto.command.HostCommandDTO;
 
 import org.apache.commons.collections4.CollectionUtils;
 
-import java.util.List;
+import org.springframework.stereotype.Component;
 
 import jakarta.annotation.Resource;
-
-import org.springframework.stereotype.Component;
+import java.util.List;
 
 @Component
 public class HostAddValidator implements CommandValidator {
@@ -48,8 +47,9 @@ public class HostAddValidator implements CommandValidator {
 
     @Override
     public void validate(ValidatorContext context) {
-        List<String> hostnames =
-                context.getCommandDTO().getHostCommands().stream().map(HostCommandDTO::getHostname).toList();
+        List<String> hostnames = context.getCommandDTO().getHostCommands().stream()
+                .map(HostCommandDTO::getHostname)
+                .toList();
 
         List<Host> hosts = hostRepository.findAllByHostnameIn(hostnames);
         if (CollectionUtils.isNotEmpty(hosts)) {
@@ -57,5 +57,4 @@ public class HostAddValidator implements CommandValidator {
             throw new ApiException(ApiExceptionEnum.HOST_ASSIGNED, String.join(",", existsHostnames));
         }
     }
-
 }

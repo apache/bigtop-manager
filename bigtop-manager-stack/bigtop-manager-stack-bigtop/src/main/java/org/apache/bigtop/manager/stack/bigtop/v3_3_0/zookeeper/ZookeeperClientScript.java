@@ -25,7 +25,6 @@ import org.apache.bigtop.manager.spi.stack.Script;
 import org.apache.bigtop.manager.stack.common.utils.PackageUtils;
 
 import com.google.auto.service.AutoService;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -41,5 +40,4 @@ public class ZookeeperClientScript implements ClientScript {
     public ShellResult configure(Params params) {
         return ZookeeperSetup.config(params);
     }
-
 }

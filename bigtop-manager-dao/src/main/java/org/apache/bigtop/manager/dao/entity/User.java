@@ -18,6 +18,9 @@
  */
 package org.apache.bigtop.manager.dao.entity;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -25,9 +28,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
-
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -52,5 +52,4 @@ public class User extends BaseEntity {
 
     @Column(name = "status")
     private Boolean status;
-
 }

@@ -18,11 +18,11 @@
  */
 package org.apache.bigtop.manager.server.stack.pojo;
 
+import lombok.Data;
+
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
-
-import lombok.Data;
 
 @Data
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -37,5 +37,4 @@ public class PropertyModel {
 
     @XmlElement(name = "description")
     private String desc;
-
 }

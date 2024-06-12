@@ -20,14 +20,13 @@ package org.apache.bigtop.manager.server.stack.xml;
 
 import org.apache.bigtop.manager.server.stack.pojo.PropertyModel;
 
-import java.util.List;
+import lombok.Data;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
-
-import lombok.Data;
+import java.util.List;
 
 @Data
 @XmlRootElement(name = "configuration")

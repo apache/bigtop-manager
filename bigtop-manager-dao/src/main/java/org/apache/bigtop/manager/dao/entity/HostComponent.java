@@ -20,6 +20,9 @@ package org.apache.bigtop.manager.dao.entity;
 
 import org.apache.bigtop.manager.common.enums.MaintainState;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
@@ -33,16 +36,20 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "host_component", indexes = {
-        @Index(name = "idx_hc_component_id", columnList = "component_id"),
-        @Index(name = "idx_hc_host_id", columnList = "host_id")})
-@TableGenerator(name = "host_component_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
+@Table(
+        name = "host_component",
+        indexes = {
+            @Index(name = "idx_hc_component_id", columnList = "component_id"),
+            @Index(name = "idx_hc_host_id", columnList = "host_id")
+        })
+@TableGenerator(
+        name = "host_component_generator",
+        table = "sequence",
+        pkColumnName = "seq_name",
+        valueColumnName = "seq_count")
 public class HostComponent extends BaseEntity {
 
     @Id

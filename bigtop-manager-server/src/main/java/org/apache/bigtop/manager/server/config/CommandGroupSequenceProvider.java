@@ -22,10 +22,10 @@ import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.server.enums.CommandLevel;
 import org.apache.bigtop.manager.server.model.req.CommandReq;
 
+import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
 public class CommandGroupSequenceProvider implements DefaultGroupSequenceProvider<CommandReq> {
 
@@ -55,23 +55,17 @@ public class CommandGroupSequenceProvider implements DefaultGroupSequenceProvide
                     defaultGroupSequence.add(ClusterCommandGroup.class);
                     break;
             }
-
         }
         return defaultGroupSequence;
     }
 
-    public interface ServiceCommandGroup {
-    }
+    public interface ServiceCommandGroup {}
 
-    public interface HostCommandGroup {
-    }
+    public interface HostCommandGroup {}
 
-    public interface ComponentCommandGroup {
-    }
+    public interface ComponentCommandGroup {}
 
-    public interface ServiceInstallCommandGroup {
-    }
+    public interface ServiceInstallCommandGroup {}
 
-    public interface ClusterCommandGroup {
-    }
+    public interface ClusterCommandGroup {}
 }

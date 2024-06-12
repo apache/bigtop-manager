@@ -20,7 +20,9 @@ package org.apache.bigtop.manager.dao.entity;
 
 import org.apache.bigtop.manager.common.enums.JobState;
 
-import java.util.List;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
@@ -38,16 +40,17 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
-
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "stage", indexes = {@Index(name = "idx_stage_cluster_id", columnList = "cluster_id"),
-        @Index(name = "idx_stage_job_id", columnList = "job_id")})
+@Table(
+        name = "stage",
+        indexes = {
+            @Index(name = "idx_stage_cluster_id", columnList = "cluster_id"),
+            @Index(name = "idx_stage_job_id", columnList = "job_id")
+        })
 @TableGenerator(name = "stage_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
 public class Stage extends BaseEntity {
 

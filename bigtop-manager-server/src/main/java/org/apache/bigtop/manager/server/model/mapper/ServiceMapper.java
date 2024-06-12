@@ -24,12 +24,12 @@ import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.model.vo.ServiceVO;
 import org.apache.bigtop.manager.server.stack.pojo.ServiceModel;
 
-import java.util.List;
-
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
+
+import java.util.List;
 
 @Mapper(uses = {ComponentMapper.class, TypeConvert.class})
 public interface ServiceMapper {
@@ -57,5 +57,4 @@ public interface ServiceMapper {
     ServiceVO fromEntity2VO(Service service);
 
     List<ServiceVO> fromEntity2VO(List<Service> services);
-
 }

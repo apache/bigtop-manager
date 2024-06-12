@@ -20,11 +20,11 @@ package org.apache.bigtop.manager.common.shell;
 
 import org.apache.bigtop.manager.common.constants.MessageConstants;
 
-import java.text.MessageFormat;
-
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+
+import java.text.MessageFormat;
 
 @Data
 @ToString

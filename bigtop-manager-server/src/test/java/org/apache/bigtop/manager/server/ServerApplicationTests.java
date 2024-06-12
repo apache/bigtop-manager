@@ -28,15 +28,17 @@ import reactor.core.publisher.Mono;
 class ServerApplicationTests {
 
     @Test
-    void contextLoads() {
-    }
+    void contextLoads() {}
 
     @Test
     public void queryMonitoring() {
-        WebClient webClient = WebClient.builder().baseUrl("http://localhost:9090").build();
-        Mono<String> body = webClient.get().uri("/api/v1/query?query=absent(up{job=bm-agent-host}==1)", "").retrieve()
+        WebClient webClient =
+                WebClient.builder().baseUrl("http://localhost:9090").build();
+        Mono<String> body = webClient
+                .get()
+                .uri("/api/v1/query?query=absent(up{job=bm-agent-host}==1)", "")
+                .retrieve()
                 .bodyToMono(String.class);
         System.out.println(body.block());
     }
-
 }

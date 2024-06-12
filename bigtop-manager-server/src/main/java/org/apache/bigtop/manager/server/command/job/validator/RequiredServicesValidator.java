@@ -34,11 +34,10 @@ import org.apache.bigtop.manager.server.utils.StackUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 
-import java.util.List;
+import org.springframework.stereotype.Component;
 
 import jakarta.annotation.Resource;
-
-import org.springframework.stereotype.Component;
+import java.util.List;
 
 @Component
 public class RequiredServicesValidator implements CommandValidator {
@@ -64,7 +63,8 @@ public class RequiredServicesValidator implements CommandValidator {
         String stackName = cluster.getStack().getStackName();
         String stackVersion = cluster.getStack().getStackVersion();
 
-        List<String> serviceNames = serviceCommands.stream().map(ServiceCommandDTO::getServiceName).toList();
+        List<String> serviceNames =
+                serviceCommands.stream().map(ServiceCommandDTO::getServiceName).toList();
         for (ServiceCommandDTO serviceCommand : serviceCommands) {
             String serviceName = serviceCommand.getServiceName();
             ServiceDTO serviceDTO = StackUtils.getServiceDTO(stackName, stackVersion, serviceName);
@@ -74,7 +74,8 @@ public class RequiredServicesValidator implements CommandValidator {
             }
 
             List<Service> serviceList = serviceRepository.findByClusterIdAndServiceNameIn(clusterId, requiredServices);
-            List<String> list = serviceList.stream().map(Service::getServiceName).toList();
+            List<String> list =
+                    serviceList.stream().map(Service::getServiceName).toList();
 
             requiredServices.removeAll(list);
 
@@ -82,6 +83,5 @@ public class RequiredServicesValidator implements CommandValidator {
                 throw new ApiException(ApiExceptionEnum.SERVICE_REQUIRED_NOT_FOUND, String.join(",", requiredServices));
             }
         }
-
     }
 }

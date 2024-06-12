@@ -21,7 +21,6 @@ package org.apache.bigtop.manager.stack.core.hook;
 import org.apache.bigtop.manager.spi.stack.Hook;
 
 import com.google.auto.service.AutoService;
-
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -34,12 +33,10 @@ public class RestartHook extends AbstractHook {
     public static final String NAME = "restart";
 
     @Override
-    public void doBefore() {
-    }
+    public void doBefore() {}
 
     @Override
-    public void doAfter() {
-    }
+    public void doAfter() {}
 
     @Override
     public String getName() {

@@ -20,13 +20,12 @@ package org.apache.bigtop.manager.server.model.req.command;
 
 import org.apache.bigtop.manager.server.model.req.RepoReq;
 
-import java.util.List;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
+import java.util.List;
 
 @Data
 public class ClusterCommandReq {
@@ -35,8 +34,7 @@ public class ClusterCommandReq {
     @Schema(example = "c1")
     private String clusterName;
 
-    @NotNull
-    @Schema(example = "1")
+    @NotNull @Schema(example = "1")
     private Integer clusterType;
 
     @NotEmpty

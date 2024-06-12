@@ -18,10 +18,10 @@
  */
 package org.apache.bigtop.manager.server.model.req.command;
 
-import jakarta.validation.constraints.NotBlank;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+
+import jakarta.validation.constraints.NotBlank;
 
 @Data
 public class HostCommandReq {

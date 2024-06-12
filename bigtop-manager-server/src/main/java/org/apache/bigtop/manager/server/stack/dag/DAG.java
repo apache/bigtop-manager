@@ -20,6 +20,8 @@ package org.apache.bigtop.manager.server.stack.dag;
 
 import org.apache.commons.collections4.CollectionUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,8 +34,6 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * analysis of DAG
@@ -81,7 +81,6 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
         } finally {
             lock.writeLock().unlock();
         }
-
     }
 
     /**
@@ -136,7 +135,6 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
         } finally {
             lock.writeLock().unlock();
         }
-
     }
 
     /**
@@ -240,7 +238,6 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
         } finally {
             lock.readLock().unlock();
         }
-
     }
 
     /**
@@ -256,7 +253,6 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
         } finally {
             lock.readLock().unlock();
         }
-
     }
 
     /**
@@ -489,7 +485,6 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
                 } else {
                     notZeroIndegreeNodeMap.put(subsequentNode, degree);
                 }
-
             }
         }
 

@@ -21,11 +21,11 @@ package org.apache.bigtop.manager.server.model.mapper;
 import org.apache.bigtop.manager.dao.entity.ServiceConfig;
 import org.apache.bigtop.manager.server.model.vo.ServiceConfigVO;
 
-import java.util.List;
-
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
+
+import java.util.List;
 
 @Mapper(uses = {TypeConfigMapper.class})
 public interface ServiceConfigMapper {

@@ -18,11 +18,11 @@
  */
 package org.apache.bigtop.manager.common.message.entity;
 
-import java.sql.Timestamp;
-import java.util.UUID;
-
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.sql.Timestamp;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor

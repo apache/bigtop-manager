@@ -22,6 +22,4 @@ import org.apache.bigtop.manager.dao.entity.TypeConfig;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface TypeConfigRepository extends JpaRepository<TypeConfig, Long> {
-
-}
+public interface TypeConfigRepository extends JpaRepository<TypeConfig, Long> {}

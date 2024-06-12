@@ -36,5 +36,4 @@ public class TaskVO {
     private String createTime;
 
     private String updateTime;
-
 }

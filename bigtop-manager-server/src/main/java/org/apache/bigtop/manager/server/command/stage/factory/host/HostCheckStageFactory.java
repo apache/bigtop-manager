@@ -29,15 +29,14 @@ import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.server.command.stage.factory.AbstractStageFactory;
 import org.apache.bigtop.manager.server.command.stage.factory.StageType;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import jakarta.annotation.Resource;
-
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 
 import lombok.extern.slf4j.Slf4j;
+
+import jakarta.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @org.springframework.stereotype.Component

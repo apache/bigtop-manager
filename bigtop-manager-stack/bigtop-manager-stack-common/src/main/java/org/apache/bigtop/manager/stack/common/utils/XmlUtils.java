@@ -18,11 +18,13 @@
  */
 package org.apache.bigtop.manager.stack.common.utils;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.stack.common.exception.StackException;
 import org.apache.bigtop.manager.stack.common.log.TaskLogWriter;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import lombok.extern.slf4j.Slf4j;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -94,5 +96,4 @@ public class XmlUtils {
             throw new StackException(e);
         }
     }
-
 }

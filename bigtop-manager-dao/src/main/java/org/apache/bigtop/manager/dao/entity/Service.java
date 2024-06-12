@@ -18,6 +18,9 @@
  */
 package org.apache.bigtop.manager.dao.entity;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
@@ -32,16 +35,22 @@ import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
 import jakarta.persistence.UniqueConstraint;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "service", uniqueConstraints = {
-        @UniqueConstraint(name = "uk_service_name", columnNames = {"service_name", "cluster_id"})}, indexes = {
-                @Index(name = "idx_service_cluster_id", columnList = "cluster_id")})
-@TableGenerator(name = "service_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
+@Table(
+        name = "service",
+        uniqueConstraints = {
+            @UniqueConstraint(
+                    name = "uk_service_name",
+                    columnNames = {"service_name", "cluster_id"})
+        },
+        indexes = {@Index(name = "idx_service_cluster_id", columnList = "cluster_id")})
+@TableGenerator(
+        name = "service_generator",
+        table = "sequence",
+        pkColumnName = "seq_name",
+        valueColumnName = "seq_count")
 public class Service extends BaseEntity {
 
     @Id

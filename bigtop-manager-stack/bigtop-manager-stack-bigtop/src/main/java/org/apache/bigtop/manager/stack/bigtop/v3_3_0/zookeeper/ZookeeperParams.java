@@ -23,9 +23,9 @@ import org.apache.bigtop.manager.stack.common.annotations.GlobalParams;
 import org.apache.bigtop.manager.stack.common.utils.BaseParams;
 import org.apache.bigtop.manager.stack.common.utils.LocalSettings;
 
-import java.util.Map;
-
 import lombok.Getter;
+
+import java.util.Map;
 
 @Getter
 public class ZookeeperParams extends BaseParams {

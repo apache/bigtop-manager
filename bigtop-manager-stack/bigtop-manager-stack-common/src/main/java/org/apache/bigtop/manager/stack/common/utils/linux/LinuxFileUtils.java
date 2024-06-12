@@ -18,14 +18,16 @@
  */
 package org.apache.bigtop.manager.stack.common.utils.linux;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.common.constants.Constants;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.common.utils.YamlUtils;
 import org.apache.bigtop.manager.stack.common.enums.ConfigType;
 import org.apache.bigtop.manager.stack.common.log.TaskLogWriter;
 import org.apache.bigtop.manager.stack.common.utils.template.TemplateUtils;
+
 import org.apache.commons.lang3.StringUtils;
+
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +35,11 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.*;
+import java.nio.file.attribute.GroupPrincipal;
+import java.nio.file.attribute.PosixFileAttributeView;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
+import java.nio.file.attribute.UserPrincipal;
 import java.util.Set;
 
 /**
@@ -42,9 +48,8 @@ import java.util.Set;
 @Slf4j
 public class LinuxFileUtils {
 
-    public static void toFile(ConfigType type, String filename, String owner, String group,
-                              String permissions,
-                              Object content) {
+    public static void toFile(
+            ConfigType type, String filename, String owner, String group, String permissions, Object content) {
         toFile(type, filename, owner, group, permissions, content, null);
     }
 
@@ -59,9 +64,14 @@ public class LinuxFileUtils {
      * @param content     content map
      * @param paramMap    paramMap
      */
-    public static void toFile(ConfigType type, String filename, String owner, String group,
-                              String permissions,
-                              Object content, Object paramMap) {
+    public static void toFile(
+            ConfigType type,
+            String filename,
+            String owner,
+            String group,
+            String permissions,
+            Object content,
+            Object paramMap) {
         if (type == null || StringUtils.isBlank(filename) || content == null) {
             TaskLogWriter.error("type, filename, content must not be null");
             return;
@@ -86,9 +96,8 @@ public class LinuxFileUtils {
         updatePermissions(filename, permissions, false);
     }
 
-    public static void toFileByTemplate(String template, String filename, String owner,
-                                        String group, String permissions,
-                                        Object modelMap) {
+    public static void toFileByTemplate(
+            String template, String filename, String owner, String group, String permissions, Object modelMap) {
         toFileByTemplate(template, filename, owner, group, permissions, modelMap, null);
     }
 
@@ -103,9 +112,14 @@ public class LinuxFileUtils {
      * @param template    template
      * @param paramMap    paramMap
      */
-    public static void toFileByTemplate(String template, String filename, String owner,
-                                        String group, String permissions,
-                                        Object modelMap, Object paramMap) {
+    public static void toFileByTemplate(
+            String template,
+            String filename,
+            String owner,
+            String group,
+            String permissions,
+            Object modelMap,
+            Object paramMap) {
         if (StringUtils.isBlank(filename) || modelMap == null || StringUtils.isEmpty(template)) {
             TaskLogWriter.error("type, filename, content, template must not be null");
             return;
@@ -143,8 +157,7 @@ public class LinuxFileUtils {
         if (recursive && Files.isDirectory(path)) {
             try (DirectoryStream<Path> ds = Files.newDirectoryStream(path)) {
                 for (Path subPath : ds) {
-                    updatePermissions(dir + File.separator + subPath.getFileName(), permissions,
-                            true);
+                    updatePermissions(dir + File.separator + subPath.getFileName(), permissions, true);
                 }
             } catch (IOException e) {
                 TaskLogWriter.error("[updatePermissions] error: " + e.getMessage());
@@ -176,8 +189,7 @@ public class LinuxFileUtils {
             GroupPrincipal groupPrincipal =
                     path.getFileSystem().getUserPrincipalLookupService().lookupPrincipalByGroupName(group);
 
-            PosixFileAttributeView fileAttributeView =
-                    Files.getFileAttributeView(path, PosixFileAttributeView.class);
+            PosixFileAttributeView fileAttributeView = Files.getFileAttributeView(path, PosixFileAttributeView.class);
             fileAttributeView.setOwner(userPrincipal);
             fileAttributeView.setGroup(groupPrincipal);
         } catch (IOException e) {
@@ -205,8 +217,8 @@ public class LinuxFileUtils {
      * @param permissions {@code rwxr--r--}
      * @param recursive   recursive
      */
-    public static void createDirectories(String dirPath, String owner, String group,
-                                         String permissions, boolean recursive) {
+    public static void createDirectories(
+            String dirPath, String owner, String group, String permissions, boolean recursive) {
         if (StringUtils.isBlank(dirPath)) {
             TaskLogWriter.error("dirPath must not be null");
             return;
@@ -227,5 +239,4 @@ public class LinuxFileUtils {
         updateOwner(dirPath, owner, group, recursive);
         updatePermissions(dirPath, permissions, recursive);
     }
-
 }

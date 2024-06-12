@@ -25,11 +25,10 @@ import org.apache.bigtop.manager.stack.common.exception.StackException;
 import org.apache.bigtop.manager.stack.common.utils.PackageUtils;
 import org.apache.bigtop.manager.stack.common.utils.linux.LinuxOSUtils;
 
-import java.text.MessageFormat;
-
 import com.google.auto.service.AutoService;
-
 import lombok.extern.slf4j.Slf4j;
+
+import java.text.MessageFormat;
 
 @Slf4j
 @AutoService(Script.class)
@@ -96,5 +95,4 @@ public class NameNodeScript implements Script {
             throw new StackException(e);
         }
     }
-
 }

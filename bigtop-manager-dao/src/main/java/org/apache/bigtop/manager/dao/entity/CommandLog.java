@@ -18,6 +18,9 @@
  */
 package org.apache.bigtop.manager.dao.entity;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
@@ -34,16 +37,21 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "command_log", indexes = {@Index(name = "idx_cl_job_id", columnList = "job_id"),
-        @Index(name = "idx_cl_stage_id", columnList = "stage_id"),
-        @Index(name = "idx_cl_task_id", columnList = "task_id")})
-@TableGenerator(name = "command_log_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
+@Table(
+        name = "command_log",
+        indexes = {
+            @Index(name = "idx_cl_job_id", columnList = "job_id"),
+            @Index(name = "idx_cl_stage_id", columnList = "stage_id"),
+            @Index(name = "idx_cl_task_id", columnList = "task_id")
+        })
+@TableGenerator(
+        name = "command_log_generator",
+        table = "sequence",
+        pkColumnName = "seq_name",
+        valueColumnName = "seq_count")
 public class CommandLog extends BaseEntity {
 
     @Id
@@ -70,5 +78,4 @@ public class CommandLog extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "task_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Task task;
-
 }

@@ -18,10 +18,10 @@
  */
 package org.apache.bigtop.manager.server.model.dto;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.List;
-
-import lombok.Data;
 
 @Data
 public class TypeConfigDTO implements Serializable {
@@ -29,5 +29,4 @@ public class TypeConfigDTO implements Serializable {
     private String typeName;
 
     private List<PropertyDTO> properties;
-
 }

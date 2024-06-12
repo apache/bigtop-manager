@@ -20,11 +20,6 @@ package org.apache.bigtop.manager.server.config;
 
 import org.apache.bigtop.manager.server.holder.SessionUserHolder;
 
-import java.util.concurrent.Executor;
-import java.util.concurrent.ThreadPoolExecutor;
-
-import jakarta.annotation.Nonnull;
-
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.aop.interceptor.SimpleAsyncUncaughtExceptionHandler;
 import org.springframework.context.annotation.Configuration;
@@ -33,6 +28,10 @@ import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import lombok.extern.slf4j.Slf4j;
+
+import jakarta.annotation.Nonnull;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadPoolExecutor;
 
 @Configuration
 public class AsyncThreadPoolConfig implements AsyncConfigurer {

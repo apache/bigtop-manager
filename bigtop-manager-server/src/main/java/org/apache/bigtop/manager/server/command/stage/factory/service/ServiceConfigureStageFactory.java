@@ -37,6 +37,5 @@ public class ServiceConfigureStageFactory extends AbstractStageFactory {
     }
 
     @Override
-    public void doCreateStage() {
-    }
+    public void doCreateStage() {}
 }

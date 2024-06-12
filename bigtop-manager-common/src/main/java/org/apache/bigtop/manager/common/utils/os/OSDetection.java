@@ -26,14 +26,14 @@ import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.SystemUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * This class is used for detecting the type and architecture of the operating system.
@@ -131,7 +131,6 @@ public class OSDetection {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     private static String regexOS(Pattern pattern, String content) {

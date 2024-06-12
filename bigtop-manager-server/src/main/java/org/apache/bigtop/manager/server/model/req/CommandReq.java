@@ -26,23 +26,21 @@ import org.apache.bigtop.manager.server.model.req.command.ComponentCommandReq;
 import org.apache.bigtop.manager.server.model.req.command.HostCommandReq;
 import org.apache.bigtop.manager.server.model.req.command.ServiceCommandReq;
 
-import java.util.List;
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-
 import org.hibernate.validator.group.GroupSequenceProvider;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import java.util.List;
+
 @Data
 @GroupSequenceProvider(CommandGroupSequenceProvider.class)
 public class CommandReq {
 
-    @NotNull
-    @Schema(example = "start")
+    @NotNull @Schema(example = "start")
     private Command command;
 
     @Schema(example = "custom_command")
@@ -51,24 +49,19 @@ public class CommandReq {
     @Schema(example = "1")
     private Long clusterId;
 
-    @NotNull
-    @Schema(example = "cluster")
+    @NotNull @Schema(example = "cluster")
     private CommandLevel commandLevel;
 
-    @NotNull(groups = {CommandGroupSequenceProvider.ClusterCommandGroup.class})
-    @Schema(description = "Command details for cluster level command")
+    @NotNull(groups = {CommandGroupSequenceProvider.ClusterCommandGroup.class}) @Schema(description = "Command details for cluster level command")
     private ClusterCommandReq clusterCommand;
 
-    @NotNull(groups = {CommandGroupSequenceProvider.HostCommandGroup.class})
-    @Schema(description = "Command details for host level command")
+    @NotNull(groups = {CommandGroupSequenceProvider.HostCommandGroup.class}) @Schema(description = "Command details for host level command")
     private List<@Valid HostCommandReq> hostCommands;
 
     @NotEmpty(groups = {CommandGroupSequenceProvider.ServiceCommandGroup.class})
     @Schema(description = "Command details for service level command")
     private List<@Valid ServiceCommandReq> serviceCommands;
 
-    @NotNull(groups = {CommandGroupSequenceProvider.ComponentCommandGroup.class})
-    @Schema(description = "Command details for component level command")
+    @NotNull(groups = {CommandGroupSequenceProvider.ComponentCommandGroup.class}) @Schema(description = "Command details for component level command")
     private List<@Valid ComponentCommandReq> componentCommands;
-
 }

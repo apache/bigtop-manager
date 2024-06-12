@@ -60,5 +60,4 @@ public class NetUtils {
         LOCAL_ADDRESS = InetAddress.getLocalHost();
         return LOCAL_ADDRESS;
     }
-
 }

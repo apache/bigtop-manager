@@ -18,8 +18,6 @@
  */
 package org.apache.bigtop.manager.stack.common.utils;
 
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
 import org.apache.bigtop.manager.common.message.entity.pojo.OSSpecificInfo;
@@ -28,7 +26,11 @@ import org.apache.bigtop.manager.common.utils.os.OSDetection;
 import org.apache.bigtop.manager.spi.stack.Params;
 import org.apache.bigtop.manager.stack.common.annotations.GlobalParams;
 import org.apache.bigtop.manager.stack.common.log.TaskLogWriter;
+
 import org.apache.commons.lang3.StringUtils;
+
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
@@ -127,17 +129,18 @@ public abstract class BaseParams implements Params {
     }
 
     public String user() {
-        return StringUtils.isNotBlank(this.commandPayload.getServiceUser()) ? this.commandPayload.getServiceUser()
+        return StringUtils.isNotBlank(this.commandPayload.getServiceUser())
+                ? this.commandPayload.getServiceUser()
                 : ROOT_USER;
     }
 
     public String group() {
-        return StringUtils.isNotBlank(this.commandPayload.getServiceGroup()) ? this.commandPayload.getServiceGroup()
+        return StringUtils.isNotBlank(this.commandPayload.getServiceGroup())
+                ? this.commandPayload.getServiceGroup()
                 : ROOT_USER;
     }
 
     public String serviceName() {
         return this.commandPayload.getServiceName();
     }
-
 }

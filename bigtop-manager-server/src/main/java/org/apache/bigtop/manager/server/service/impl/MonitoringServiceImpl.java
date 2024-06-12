@@ -21,13 +21,12 @@ package org.apache.bigtop.manager.server.service.impl;
 import org.apache.bigtop.manager.server.proxy.PrometheusProxy;
 import org.apache.bigtop.manager.server.service.MonitoringService;
 
-import jakarta.annotation.Resource;
-
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-
 import lombok.extern.slf4j.Slf4j;
+
+import jakarta.annotation.Resource;
 
 @Slf4j
 @Service

@@ -41,6 +41,10 @@ import org.apache.bigtop.manager.server.stack.xml.StackMetainfoXml;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
@@ -52,10 +56,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -79,14 +79,11 @@ public class StackUtils {
 
     private static final String NOP_STACK = "nop";
 
-    private static final Map<String, Map<String, List<String>>> STACK_DEPENDENCY_MAP =
-            new HashMap<>();
+    private static final Map<String, Map<String, List<String>>> STACK_DEPENDENCY_MAP = new HashMap<>();
 
-    private static final Map<String, Map<String, List<TypeConfigDTO>>> STACK_CONFIG_MAP =
-            new HashMap<>();
+    private static final Map<String, Map<String, List<TypeConfigDTO>>> STACK_CONFIG_MAP = new HashMap<>();
 
-    private static final Map<String, ImmutablePair<StackDTO, List<ServiceDTO>>> STACK_KEY_MAP =
-            new HashMap<>();
+    private static final Map<String, ImmutablePair<StackDTO, List<ServiceDTO>>> STACK_KEY_MAP = new HashMap<>();
 
     private static final Map<String, DAG<String, ComponentCommandWrapper, DagGraphEdge>> STACK_DAG_MAP =
             new HashMap<>();
@@ -114,8 +111,7 @@ public class StackUtils {
      */
     public static StackDTO parseStack(File versionFolder) {
         StackMetainfoXml stackMetainfoXml = JaxbUtils.readFromPath(
-                versionFolder.getAbsolutePath() + File.separator + META_FILE,
-                StackMetainfoXml.class);
+                versionFolder.getAbsolutePath() + File.separator + META_FILE, StackMetainfoXml.class);
         return StackMapper.INSTANCE.fromModel2DTO(stackMetainfoXml.getStack());
     }
 
@@ -136,8 +132,7 @@ public class StackUtils {
 
                 // metainfo.xml
                 ServiceMetainfoXml serviceMetainfoXml =
-                        JaxbUtils.readFromPath(file.getAbsolutePath() + "/" + META_FILE,
-                                ServiceMetainfoXml.class);
+                        JaxbUtils.readFromPath(file.getAbsolutePath() + "/" + META_FILE, ServiceMetainfoXml.class);
                 ServiceModel serviceModel = serviceMetainfoXml.getService();
                 ServiceDTO serviceDTO = ServiceMapper.INSTANCE.fromModel2DTO(serviceModel);
                 services.add(serviceDTO);
@@ -146,15 +141,13 @@ public class StackUtils {
                 List<TypeConfigDTO> serviceConfigList = new ArrayList<>();
                 File configFolder = new File(file.getAbsolutePath(), CONFIGURATION_FOLDER);
                 if (configFolder.exists()) {
-                    for (File configFile : Optional.ofNullable(configFolder.listFiles())
-                            .orElse(new File[0])) {
+                    for (File configFile :
+                            Optional.ofNullable(configFolder.listFiles()).orElse(new File[0])) {
                         String configPath = configFile.getAbsolutePath();
-                        String fileExtension =
-                                configPath.substring(configPath.lastIndexOf(".") + 1);
+                        String fileExtension = configPath.substring(configPath.lastIndexOf(".") + 1);
                         if (fileExtension.equals(CONFIGURATION_FILE_EXTENSION)) {
-                            String typeName =
-                                    configPath.substring(configPath.lastIndexOf(File.separator) + 1,
-                                            configPath.lastIndexOf("."));
+                            String typeName = configPath.substring(
+                                    configPath.lastIndexOf(File.separator) + 1, configPath.lastIndexOf("."));
 
                             List<PropertyDTO> properties = StackConfigUtils.loadConfig(configPath);
                             TypeConfigDTO typeConfigDTO = new TypeConfigDTO();
@@ -173,16 +166,17 @@ public class StackUtils {
                     Map<String, List<String>> dependencyMap =
                             STACK_DEPENDENCY_MAP.computeIfAbsent(fullStackName, k -> new HashMap<>());
 
-                    Map<String, List<String>> dependencyMapByFile =
-                            JsonUtils.readFromFile(dependencyFile);
+                    Map<String, List<String>> dependencyMapByFile = JsonUtils.readFromFile(dependencyFile);
                     for (Map.Entry<String, List<String>> entry : dependencyMapByFile.entrySet()) {
                         String blocked = entry.getKey();
-                        String fixedBlocked = blocked.split(ROLE_COMMAND_SPLIT)[0].toLowerCase() +
-                                ROLE_COMMAND_SPLIT + blocked.split(ROLE_COMMAND_SPLIT)[1];
+                        String fixedBlocked = blocked.split(ROLE_COMMAND_SPLIT)[0].toLowerCase()
+                                + ROLE_COMMAND_SPLIT
+                                + blocked.split(ROLE_COMMAND_SPLIT)[1];
                         List<String> blockers = entry.getValue();
-                        List<String> fixedBlockers = blockers.stream().map(
-                                x -> x.split(ROLE_COMMAND_SPLIT)[0].toLowerCase() + ROLE_COMMAND_SPLIT +
-                                        x.split(ROLE_COMMAND_SPLIT)[1])
+                        List<String> fixedBlockers = blockers.stream()
+                                .map(x -> x.split(ROLE_COMMAND_SPLIT)[0].toLowerCase()
+                                        + ROLE_COMMAND_SPLIT
+                                        + x.split(ROLE_COMMAND_SPLIT)[1])
                                 .toList();
 
                         dependencyMap.put(fixedBlocked, fixedBlockers);
@@ -215,8 +209,7 @@ public class StackUtils {
                 continue;
             }
 
-            File[] versionFolders =
-                    Optional.ofNullable(stackFolder.listFiles()).orElse(new File[0]);
+            File[] versionFolders = Optional.ofNullable(stackFolder.listFiles()).orElse(new File[0]);
 
             for (File versionFolder : versionFolders) {
                 String stackVersion = versionFolder.getName();
@@ -241,8 +234,8 @@ public class StackUtils {
      * Initialize the DAG for each stack
      */
     private static void initializeDag() {
-        for (Map.Entry<String, Map<String, List<String>>> mapEntry : StackUtils.getStackDependencyMap()
-                .entrySet()) {
+        for (Map.Entry<String, Map<String, List<String>>> mapEntry :
+                StackUtils.getStackDependencyMap().entrySet()) {
             String fullStackName = mapEntry.getKey();
             DAG<String, ComponentCommandWrapper, DagGraphEdge> dag = new DAG<>();
 
@@ -261,8 +254,7 @@ public class StackUtils {
         }
     }
 
-    private static void addToDagNode(DAG<String, ComponentCommandWrapper, DagGraphEdge> dag,
-                                     String roleCommand) {
+    private static void addToDagNode(DAG<String, ComponentCommandWrapper, DagGraphEdge> dag, String roleCommand) {
         String[] split = roleCommand.split(ROLE_COMMAND_SPLIT);
         String role = split[0];
         String command = split[1];
@@ -271,8 +263,7 @@ public class StackUtils {
             throw new ServerException("Unsupported command: " + command);
         }
 
-        ComponentCommandWrapper commandWrapper =
-                new ComponentCommandWrapper(role, Command.valueOf(command));
+        ComponentCommandWrapper commandWrapper = new ComponentCommandWrapper(role, Command.valueOf(command));
         dag.addNodeIfAbsent(roleCommand, commandWrapper);
     }
 
@@ -326,38 +317,29 @@ public class StackUtils {
     }
 
     public static List<ServiceDTO> getServiceDTOList(String stackName, String stackVersion) {
-        Map<String, ImmutablePair<StackDTO, List<ServiceDTO>>> stackKeyMap =
-                StackUtils.getStackKeyMap();
+        Map<String, ImmutablePair<StackDTO, List<ServiceDTO>>> stackKeyMap = StackUtils.getStackKeyMap();
         ImmutablePair<StackDTO, List<ServiceDTO>> immutablePair =
                 stackKeyMap.get(StackUtils.fullStackName(stackName, stackVersion));
-        return immutablePair.getRight()
-                .stream()
-                .toList();
+        return immutablePair.getRight().stream().toList();
     }
 
-    public static ServiceDTO getServiceDTO(String stackName, String stackVersion,
-                                           String serviceName) {
-        Map<String, ServiceDTO> serviceNameToDTO = getServiceDTOList(stackName, stackVersion)
-                .stream()
+    public static ServiceDTO getServiceDTO(String stackName, String stackVersion, String serviceName) {
+        Map<String, ServiceDTO> serviceNameToDTO = getServiceDTOList(stackName, stackVersion).stream()
                 .collect(Collectors.toMap(ServiceDTO::getServiceName, Function.identity()));
         return serviceNameToDTO.get(serviceName);
     }
 
     public static List<ComponentDTO> getComponentDTOList(String stackName, String stackVersion) {
-        Map<String, ImmutablePair<StackDTO, List<ServiceDTO>>> stackKeyMap =
-                StackUtils.getStackKeyMap();
+        Map<String, ImmutablePair<StackDTO, List<ServiceDTO>>> stackKeyMap = StackUtils.getStackKeyMap();
         ImmutablePair<StackDTO, List<ServiceDTO>> immutablePair =
                 stackKeyMap.get(StackUtils.fullStackName(stackName, stackVersion));
-        return immutablePair.getRight()
-                .stream()
+        return immutablePair.getRight().stream()
                 .flatMap(serviceDTO -> serviceDTO.getComponents().stream())
                 .toList();
     }
 
-    public static ComponentDTO getComponentDTO(String stackName, String stackVersion,
-                                               String componentName) {
-        Map<String, ComponentDTO> componentNameToDTO = getComponentDTOList(stackName, stackVersion)
-                .stream()
+    public static ComponentDTO getComponentDTO(String stackName, String stackVersion, String componentName) {
+        Map<String, ComponentDTO> componentNameToDTO = getComponentDTOList(stackName, stackVersion).stream()
                 .collect(Collectors.toMap(ComponentDTO::getComponentName, Function.identity()));
         return componentNameToDTO.get(componentName);
     }

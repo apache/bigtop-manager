@@ -30,11 +30,10 @@ import org.apache.bigtop.manager.server.model.dto.command.ClusterCommandDTO;
 
 import org.apache.commons.collections4.CollectionUtils;
 
-import java.util.List;
+import org.springframework.stereotype.Component;
 
 import jakarta.annotation.Resource;
-
-import org.springframework.stereotype.Component;
+import java.util.List;
 
 @Component
 public class ClusterHostValidator implements CommandValidator {
@@ -54,8 +53,9 @@ public class ClusterHostValidator implements CommandValidator {
 
         List<String> connectedHosts = SpringContextHolder.getServerWebSocket().getConnectedHosts();
         if (CollectionUtils.isNotEmpty(connectedHosts)) {
-            List<String> notConnectedHostnames =
-                    hostnames.stream().filter(hostname -> !connectedHosts.contains(hostname)).toList();
+            List<String> notConnectedHostnames = hostnames.stream()
+                    .filter(hostname -> !connectedHosts.contains(hostname))
+                    .toList();
             if (CollectionUtils.isNotEmpty(notConnectedHostnames)) {
                 throw new ApiException(ApiExceptionEnum.HOST_NOT_CONNECTED, String.join(",", notConnectedHostnames));
             }
@@ -67,5 +67,4 @@ public class ClusterHostValidator implements CommandValidator {
             throw new ApiException(ApiExceptionEnum.HOST_ASSIGNED, String.join(",", existsHostnames));
         }
     }
-
 }

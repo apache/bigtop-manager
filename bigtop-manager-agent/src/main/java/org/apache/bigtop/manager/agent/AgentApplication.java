@@ -18,14 +18,16 @@
  */
 package org.apache.bigtop.manager.agent;
 
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.MultiGauge;
 import org.apache.bigtop.manager.agent.monitoring.AgentHostMonitoring;
 import org.apache.bigtop.manager.agent.monitoring.ZookeeperHealthyMonitoring;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.MultiGauge;
 
 @SpringBootApplication(scanBasePackages = {"org.apache.bigtop.manager.agent", "org.apache.bigtop.manager.common"})
 public class AgentApplication {
@@ -34,27 +36,23 @@ public class AgentApplication {
         SpringApplication.run(AgentApplication.class, args);
     }
 
-    @Qualifier("diskMultiGauge")
     @Bean
-    public MultiGauge diskMultiGauge(MeterRegistry meterRegistry) {
+    @Qualifier("diskMultiGauge") public MultiGauge diskMultiGauge(MeterRegistry meterRegistry) {
         return AgentHostMonitoring.newDiskMultiGauge(meterRegistry);
     }
 
-    @Qualifier("cpuMultiGauge")
     @Bean
-    public MultiGauge cpuMultiGauge(MeterRegistry meterRegistry) {
+    @Qualifier("cpuMultiGauge") public MultiGauge cpuMultiGauge(MeterRegistry meterRegistry) {
         return AgentHostMonitoring.newCPUMultiGauge(meterRegistry);
     }
 
-    @Qualifier("memMultiGauge")
     @Bean
-    public MultiGauge memMultiGauge(MeterRegistry meterRegistry) {
+    @Qualifier("memMultiGauge") public MultiGauge memMultiGauge(MeterRegistry meterRegistry) {
         return AgentHostMonitoring.newMemMultiGauge(meterRegistry);
     }
 
-    @Qualifier("zookeeperMultiGauge")
     @Bean
-    public MultiGauge zookeeperMultiGauge(MeterRegistry meterRegistry) {
+    @Qualifier("zookeeperMultiGauge") public MultiGauge zookeeperMultiGauge(MeterRegistry meterRegistry) {
         return ZookeeperHealthyMonitoring.registerZookeeperHealthyGauge(meterRegistry);
     }
 }
