@@ -30,7 +30,7 @@
 
     <artifactId>bigtop-manager-ui</artifactId>
     <name>${project.artifactId}</name>
-    <description>Bigtop Manager Admin</description>
+    <description>Bigtop Manager UI</description>
 
     <properties>
         <node.version>v18.17.0</node.version>
