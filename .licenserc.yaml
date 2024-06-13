@@ -37,6 +37,6 @@ header:
     - 'LICENSE'
     - 'pnpm-lock.yaml'
     - '**/*.proto'
-    - '**/banner.txt'
+    - '**/*.txt'
 
   comment: on-failure
