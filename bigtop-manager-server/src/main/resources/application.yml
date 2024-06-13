@@ -24,8 +24,12 @@ bigtop:
       type: eclipselink
 
 spring:
+  banner:
+    charset: utf-8
   application:
     name: bigtop-manager-server
+  main:
+    banner-mode: log
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/bigtop_manager
