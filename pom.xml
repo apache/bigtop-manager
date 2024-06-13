@@ -177,7 +177,6 @@
                         <exclude>**/*.log</exclude>
                         <exclude>pnpm-lock.yaml</exclude>
                         <exclude>**/target/**</exclude>
-                        <exclude>**/banner.txt</exclude>
                     </excludes>
                 </configuration>
             </plugin>
