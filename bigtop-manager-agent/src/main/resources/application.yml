@@ -24,8 +24,12 @@ bigtop:
       port: 8080
 
 spring:
+  banner:
+    charset: utf-8
   application:
     name: bigtop-manager-agent
+  main:
+    banner-mode: log
 
 server:
   port: 8081
