@@ -36,5 +36,4 @@ public interface StackMapper {
     StackVO fromDTO2VO(StackDTO stackDTO);
 
     StackDTO fromModel2DTO(StackModel stackModel);
-
 }

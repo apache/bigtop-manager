@@ -22,7 +22,6 @@ import lombok.Getter;
 
 @Getter
 public enum LocaleKeys {
-
     REQUEST_SUCCESS("request.success"),
     REQUEST_FAILED("request.failed"),
     PARAMETER_ERROR("request.parameter.incorrect"),

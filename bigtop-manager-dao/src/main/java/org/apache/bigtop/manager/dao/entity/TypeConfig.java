@@ -18,6 +18,9 @@
  */
 package org.apache.bigtop.manager.dao.entity;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
@@ -33,14 +36,15 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "type_config")
-@TableGenerator(name = "type_config_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
+@TableGenerator(
+        name = "type_config_generator",
+        table = "sequence",
+        pkColumnName = "seq_name",
+        valueColumnName = "seq_count")
 public class TypeConfig extends BaseEntity {
 
     @Id

@@ -20,11 +20,11 @@ package org.apache.bigtop.manager.server.command.stage.factory;
 
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class StageFactories {
@@ -47,7 +47,8 @@ public class StageFactories {
             return;
         }
 
-        for (Map.Entry<String, StageFactory> entry : SpringContextHolder.getStageFactories().entrySet()) {
+        for (Map.Entry<String, StageFactory> entry :
+                SpringContextHolder.getStageFactories().entrySet()) {
             String beanName = entry.getKey();
             StageFactory stageFactory = entry.getValue();
             if (STAGE_FACTORIES.containsKey(stageFactory.getStageType())) {
@@ -56,7 +57,9 @@ public class StageFactories {
             }
 
             STAGE_FACTORIES.put(stageFactory.getStageType(), beanName);
-            log.info("Load StageLifecycle: {} with type: {}", stageFactory.getClass().getName(),
+            log.info(
+                    "Load StageLifecycle: {} with type: {}",
+                    stageFactory.getClass().getName(),
                     stageFactory.getStageType());
         }
 

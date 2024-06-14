@@ -20,9 +20,9 @@ package org.apache.bigtop.manager.server.model.vo;
 
 import org.apache.bigtop.manager.common.enums.JobState;
 
-import java.util.List;
-
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class JobVO {
@@ -38,5 +38,4 @@ public class JobVO {
     private String createTime;
 
     private String updateTime;
-
 }

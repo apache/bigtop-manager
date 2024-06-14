@@ -32,8 +32,7 @@ public class ResponseEntity<T> {
 
     private T data;
 
-    public ResponseEntity() {
-    }
+    public ResponseEntity() {}
 
     public ResponseEntity(ResponseStatus status) {
         this.code = status.getCode();

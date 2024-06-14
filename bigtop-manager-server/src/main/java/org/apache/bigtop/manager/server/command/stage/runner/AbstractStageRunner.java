@@ -18,8 +18,6 @@
  */
 package org.apache.bigtop.manager.server.command.stage.runner;
 
-import jakarta.annotation.Resource;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.common.constants.MessageConstants;
 import org.apache.bigtop.manager.common.enums.JobState;
 import org.apache.bigtop.manager.common.message.entity.command.CommandRequestMessage;
@@ -33,6 +31,9 @@ import org.apache.bigtop.manager.server.command.stage.factory.StageContext;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 import org.apache.bigtop.manager.server.service.CommandLogService;
 
+import lombok.extern.slf4j.Slf4j;
+
+import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -81,7 +82,8 @@ public abstract class AbstractStageRunner implements StageRunner {
 
             futures.add(CompletableFuture.supplyAsync(() -> {
                 commandLogService.onLogStarted(task.getId(), task.getHostname());
-                CommandResponseMessage res = SpringContextHolder.getServerWebSocket().sendRequestMessage(task.getHostname(), message);
+                CommandResponseMessage res =
+                        SpringContextHolder.getServerWebSocket().sendRequestMessage(task.getHostname(), message);
 
                 log.info("Execute task {} completed: {}", task.getId(), res);
                 boolean taskSuccess = res != null && res.getCode() == MessageConstants.SUCCESS_CODE;
@@ -97,14 +99,16 @@ public abstract class AbstractStageRunner implements StageRunner {
             }));
         }
 
-        List<Boolean> taskResults = futures.stream().map((future) -> {
-            try {
-                return future.get(COMMAND_MESSAGE_RESPONSE_TIMEOUT, TimeUnit.MILLISECONDS);
-            } catch (Exception e) {
-                log.error("Error running task", e);
-                return false;
-            }
-        }).toList();
+        List<Boolean> taskResults = futures.stream()
+                .map((future) -> {
+                    try {
+                        return future.get(COMMAND_MESSAGE_RESPONSE_TIMEOUT, TimeUnit.MILLISECONDS);
+                    } catch (Exception e) {
+                        log.error("Error running task", e);
+                        return false;
+                    }
+                })
+                .toList();
 
         boolean allTaskSuccess = taskResults.stream().allMatch(Boolean::booleanValue);
         if (allTaskSuccess) {

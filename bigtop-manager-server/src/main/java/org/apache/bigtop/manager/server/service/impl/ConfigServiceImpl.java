@@ -34,13 +34,12 @@ import org.apache.bigtop.manager.server.model.mapper.TypeConfigMapper;
 import org.apache.bigtop.manager.server.model.vo.ServiceConfigVO;
 import org.apache.bigtop.manager.server.service.ConfigService;
 
-import java.util.List;
-
-import jakarta.annotation.Resource;
-
 import org.springframework.data.domain.Sort;
 
 import lombok.extern.slf4j.Slf4j;
+
+import jakarta.annotation.Resource;
+import java.util.List;
 
 @Slf4j
 @org.springframework.stereotype.Service
@@ -69,8 +68,7 @@ public class ConfigServiceImpl implements ConfigService {
     @Override
     public List<ServiceConfigVO> latest(Long clusterId) {
         Cluster cluster = clusterRepository.getReferenceById(clusterId);
-        List<ServiceConfig> list =
-                serviceConfigRepository.findAllByClusterAndSelectedIsTrue(cluster);
+        List<ServiceConfig> list = serviceConfigRepository.findAllByClusterAndSelectedIsTrue(cluster);
         return ServiceConfigMapper.INSTANCE.fromEntity2VO(list);
     }
 
@@ -93,10 +91,9 @@ public class ConfigServiceImpl implements ConfigService {
         return serviceConfigRepository.findByClusterAndServiceAndSelectedIsTrue(cluster, service);
     }
 
-    private void upsertServiceConfig(Cluster cluster, Service service, ServiceConfig currentConfig,
-                                     List<TypeConfigDTO> configs) {
-        List<TypeConfigDTO> existConfigs =
-                TypeConfigMapper.INSTANCE.fromEntity2DTO(currentConfig.getConfigs());
+    private void upsertServiceConfig(
+            Cluster cluster, Service service, ServiceConfig currentConfig, List<TypeConfigDTO> configs) {
+        List<TypeConfigDTO> existConfigs = TypeConfigMapper.INSTANCE.fromEntity2DTO(currentConfig.getConfigs());
         if (shouldUpdateConfig(existConfigs, configs)) {
             // Unselect current config
             currentConfig.setSelected(false);
@@ -109,8 +106,7 @@ public class ConfigServiceImpl implements ConfigService {
         }
     }
 
-    private Boolean shouldUpdateConfig(List<TypeConfigDTO> existConfigs,
-                                       List<TypeConfigDTO> newConfigs) {
+    private Boolean shouldUpdateConfig(List<TypeConfigDTO> existConfigs, List<TypeConfigDTO> newConfigs) {
         if (existConfigs.size() != newConfigs.size()) {
             return true;
         }
@@ -134,8 +130,8 @@ public class ConfigServiceImpl implements ConfigService {
         addServiceConfig(cluster, service, configs, configDesc, version);
     }
 
-    private void addServiceConfig(Cluster cluster, Service service, List<TypeConfigDTO> configs,
-                                  String configDesc, Integer version) {
+    private void addServiceConfig(
+            Cluster cluster, Service service, List<TypeConfigDTO> configs, String configDesc, Integer version) {
         ServiceConfig serviceConfig = new ServiceConfig();
         serviceConfig.setCluster(cluster);
         serviceConfig.setService(service);

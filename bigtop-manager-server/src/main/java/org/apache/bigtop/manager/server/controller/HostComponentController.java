@@ -22,10 +22,6 @@ import org.apache.bigtop.manager.server.model.vo.HostComponentVO;
 import org.apache.bigtop.manager.server.service.HostComponentService;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
 
-import java.util.List;
-
-import jakarta.annotation.Resource;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,6 +29,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import jakarta.annotation.Resource;
+import java.util.List;
 
 @Tag(name = "Cluster Host-Component Controller")
 @RestController
@@ -56,9 +55,8 @@ public class HostComponentController {
 
     @Operation(summary = "list", description = "List host-components")
     @GetMapping("/services/{serviceId}")
-    public ResponseEntity<List<HostComponentVO>> listByService(@PathVariable Long clusterId,
-                                                               @PathVariable Long serviceId) {
+    public ResponseEntity<List<HostComponentVO>> listByService(
+            @PathVariable Long clusterId, @PathVariable Long serviceId) {
         return ResponseEntity.success(hostComponentService.listByService(clusterId, serviceId));
     }
-
 }

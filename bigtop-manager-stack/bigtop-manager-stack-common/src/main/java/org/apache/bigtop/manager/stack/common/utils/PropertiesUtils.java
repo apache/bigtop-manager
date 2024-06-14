@@ -18,11 +18,16 @@
  */
 package org.apache.bigtop.manager.stack.common.utils;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.stack.common.exception.StackException;
 import org.apache.bigtop.manager.stack.common.log.TaskLogWriter;
 
-import java.io.*;
+import lombok.extern.slf4j.Slf4j;
+
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -71,7 +76,6 @@ public class PropertiesUtils {
         } catch (Exception e) {
             TaskLogWriter.error("writeProperties error: " + e.getMessage());
         }
-
     }
 
     /**
@@ -86,8 +90,7 @@ public class PropertiesUtils {
         Properties properties = new Properties();
 
         for (Map<String, Object> map : configList) {
-            properties.setProperty(String.valueOf(map.get("name")),
-                    String.valueOf(map.get("value")));
+            properties.setProperty(String.valueOf(map.get("name")), String.valueOf(map.get("value")));
         }
 
         TaskLogWriter.info("writeProperties: " + properties);
@@ -97,6 +100,5 @@ public class PropertiesUtils {
             TaskLogWriter.error("writeProperties error: " + e.getMessage());
             throw new StackException(e);
         }
-
     }
 }

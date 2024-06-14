@@ -18,14 +18,14 @@
  */
 package org.apache.bigtop.manager.common.message.serializer;
 
-import static org.apache.bigtop.manager.common.constants.Constants.KRYO_BUFFER_SIZE;
-
 import org.apache.bigtop.manager.common.message.entity.BaseMessage;
-
-import java.io.ByteArrayOutputStream;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Output;
+
+import java.io.ByteArrayOutputStream;
+
+import static org.apache.bigtop.manager.common.constants.Constants.KRYO_BUFFER_SIZE;
 
 public class KryoMessageSerializer implements MessageSerializer {
 

@@ -28,13 +28,12 @@ import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.model.dto.CommandDTO;
 import org.apache.bigtop.manager.server.model.dto.command.ServiceCommandDTO;
 
+import org.springframework.stereotype.Component;
+
+import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import jakarta.annotation.Resource;
-
-import org.springframework.stereotype.Component;
 
 @Component
 public class ServiceHostValidator implements CommandValidator {
@@ -63,5 +62,4 @@ public class ServiceHostValidator implements CommandValidator {
             throw new ApiException(ApiExceptionEnum.HOST_NOT_FOUND);
         }
     }
-
 }

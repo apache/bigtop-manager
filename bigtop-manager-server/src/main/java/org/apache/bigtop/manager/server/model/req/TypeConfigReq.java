@@ -18,14 +18,13 @@
  */
 package org.apache.bigtop.manager.server.model.req;
 
-import java.util.List;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
+import java.util.List;
 
 @Data
 public class TypeConfigReq {
@@ -40,5 +39,4 @@ public class TypeConfigReq {
     @NotEmpty
     @Schema(example = "{\"name\":\"clientPort\",\"value\": \"2181\"}")
     private List<@Valid PropertyReq> properties;
-
 }

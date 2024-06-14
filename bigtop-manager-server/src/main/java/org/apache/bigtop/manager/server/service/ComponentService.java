@@ -37,5 +37,4 @@ public interface ComponentService {
      * @return component
      */
     ComponentVO get(Long id);
-
 }

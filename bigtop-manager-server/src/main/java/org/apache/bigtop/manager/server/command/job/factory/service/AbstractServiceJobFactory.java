@@ -41,10 +41,9 @@ import org.apache.bigtop.manager.server.utils.StackUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 
+import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
-
-import jakarta.annotation.Resource;
 
 /**
  * A Service Job can be seen as a collection of multiple Components and Hosts,
@@ -88,8 +87,9 @@ public abstract class AbstractServiceJobFactory extends AbstractJobFactory {
         try {
             List<String> orderedList = dag.topologicalSort();
             List<String> componentNames = getComponentNames();
-            List<String> componentCommandNames =
-                    new ArrayList<>(componentNames.stream().map(x -> x + "-" + command.name().toUpperCase()).toList());
+            List<String> componentCommandNames = new ArrayList<>(componentNames.stream()
+                    .map(x -> x + "-" + command.name().toUpperCase())
+                    .toList());
 
             orderedList.retainAll(componentCommandNames);
             componentCommandNames.removeAll(orderedList);
@@ -132,12 +132,16 @@ public abstract class AbstractServiceJobFactory extends AbstractJobFactory {
     }
 
     protected List<String> findHostnamesByComponentName(String componentName) {
-        List<HostComponent> hostComponents = hostComponentRepository
-                .findAllByComponentClusterIdAndComponentComponentName(cluster.getId(), componentName);
+        List<HostComponent> hostComponents =
+                hostComponentRepository.findAllByComponentClusterIdAndComponentComponentName(
+                        cluster.getId(), componentName);
         if (hostComponents == null) {
             return new ArrayList<>();
         } else {
-            return hostComponents.stream().map(HostComponent::getHost).map(Host::getHostname).toList();
+            return hostComponents.stream()
+                    .map(HostComponent::getHost)
+                    .map(Host::getHostname)
+                    .toList();
         }
     }
 
@@ -161,7 +165,8 @@ public abstract class AbstractServiceJobFactory extends AbstractJobFactory {
             }
 
             StageContext stageContext = createStageContext(serviceName, componentName, hostnames);
-            stages.add(StageFactories.getStageFactory(StageType.COMPONENT_INSTALL).createStage(stageContext));
+            stages.add(
+                    StageFactories.getStageFactory(StageType.COMPONENT_INSTALL).createStage(stageContext));
         }
     }
 
@@ -232,6 +237,8 @@ public abstract class AbstractServiceJobFactory extends AbstractJobFactory {
     }
 
     private List<String> getServiceNames() {
-        return jobContext.getCommandDTO().getServiceCommands().stream().map(ServiceCommandDTO::getServiceName).toList();
+        return jobContext.getCommandDTO().getServiceCommands().stream()
+                .map(ServiceCommandDTO::getServiceName)
+                .toList();
     }
 }

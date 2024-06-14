@@ -18,14 +18,6 @@
  */
 package org.apache.bigtop.manager.agent.executor;
 
-import static org.apache.bigtop.manager.common.constants.CacheFiles.CLUSTER_INFO;
-import static org.apache.bigtop.manager.common.constants.CacheFiles.COMPONENTS_INFO;
-import static org.apache.bigtop.manager.common.constants.CacheFiles.CONFIGURATIONS_INFO;
-import static org.apache.bigtop.manager.common.constants.CacheFiles.HOSTS_INFO;
-import static org.apache.bigtop.manager.common.constants.CacheFiles.REPOS_INFO;
-import static org.apache.bigtop.manager.common.constants.CacheFiles.SETTINGS_INFO;
-import static org.apache.bigtop.manager.common.constants.CacheFiles.USERS_INFO;
-
 import org.apache.bigtop.manager.common.constants.Constants;
 import org.apache.bigtop.manager.common.constants.MessageConstants;
 import org.apache.bigtop.manager.common.message.entity.command.CommandMessageType;
@@ -33,12 +25,20 @@ import org.apache.bigtop.manager.common.message.entity.payload.CacheMessagePaylo
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.stack.common.utils.linux.LinuxFileUtils;
 
-import java.text.MessageFormat;
-
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 
 import lombok.extern.slf4j.Slf4j;
+
+import java.text.MessageFormat;
+
+import static org.apache.bigtop.manager.common.constants.CacheFiles.CLUSTER_INFO;
+import static org.apache.bigtop.manager.common.constants.CacheFiles.COMPONENTS_INFO;
+import static org.apache.bigtop.manager.common.constants.CacheFiles.CONFIGURATIONS_INFO;
+import static org.apache.bigtop.manager.common.constants.CacheFiles.HOSTS_INFO;
+import static org.apache.bigtop.manager.common.constants.CacheFiles.REPOS_INFO;
+import static org.apache.bigtop.manager.common.constants.CacheFiles.SETTINGS_INFO;
+import static org.apache.bigtop.manager.common.constants.CacheFiles.USERS_INFO;
 
 @Slf4j
 @org.springframework.stereotype.Component
@@ -53,16 +53,14 @@ public class CacheDistributeCommandExecutor extends AbstractCommandExecutor {
     @Override
     public void doExecute() {
         CacheMessagePayload cacheMessagePayload =
-                JsonUtils.readFromString(commandRequestMessage.getMessagePayload(),
-                        CacheMessagePayload.class);
+                JsonUtils.readFromString(commandRequestMessage.getMessagePayload(), CacheMessagePayload.class);
         log.info("[agent executeTask] taskEvent is: {}", commandRequestMessage);
         String cacheDir = Constants.STACK_CACHE_DIR;
 
         LinuxFileUtils.createDirectories(cacheDir, "root", "root", "rwxr-xr-x", false);
 
         JsonUtils.writeToFile(cacheDir + SETTINGS_INFO, cacheMessagePayload.getSettings());
-        JsonUtils.writeToFile(cacheDir + CONFIGURATIONS_INFO,
-                cacheMessagePayload.getConfigurations());
+        JsonUtils.writeToFile(cacheDir + CONFIGURATIONS_INFO, cacheMessagePayload.getConfigurations());
         JsonUtils.writeToFile(cacheDir + HOSTS_INFO, cacheMessagePayload.getClusterHostInfo());
         JsonUtils.writeToFile(cacheDir + USERS_INFO, cacheMessagePayload.getUserInfo());
         JsonUtils.writeToFile(cacheDir + COMPONENTS_INFO, cacheMessagePayload.getComponentInfo());
@@ -70,7 +68,7 @@ public class CacheDistributeCommandExecutor extends AbstractCommandExecutor {
         JsonUtils.writeToFile(cacheDir + CLUSTER_INFO, cacheMessagePayload.getClusterInfo());
 
         commandResponseMessage.setCode(MessageConstants.SUCCESS_CODE);
-        commandResponseMessage.setResult(MessageFormat.format("Host [{0}] cached successful!!!",
-                commandRequestMessage.getHostname()));
+        commandResponseMessage.setResult(
+                MessageFormat.format("Host [{0}] cached successful!!!", commandRequestMessage.getHostname()));
     }
 }

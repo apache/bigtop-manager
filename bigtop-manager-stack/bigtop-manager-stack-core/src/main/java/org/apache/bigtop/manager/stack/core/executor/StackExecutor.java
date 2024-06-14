@@ -18,7 +18,6 @@
  */
 package org.apache.bigtop.manager.stack.core.executor;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
 import org.apache.bigtop.manager.common.message.entity.pojo.CustomCommandInfo;
@@ -30,6 +29,8 @@ import org.apache.bigtop.manager.spi.stack.Params;
 import org.apache.bigtop.manager.spi.stack.Script;
 import org.apache.bigtop.manager.stack.common.exception.StackException;
 import org.apache.bigtop.manager.stack.common.log.TaskLogWriter;
+
+import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -105,8 +106,8 @@ public class StackExecutor {
             String paramsClassName = script.getClass().getPackageName() + "."
                     + CaseUtils.toCamelCase(commandPayload.getServiceName()) + "Params";
             Class<?> paramsClass = Class.forName(paramsClassName);
-            Params params =
-                    (Params) paramsClass.getDeclaredConstructor(CommandPayload.class).newInstance(commandPayload);
+            Params params = (Params)
+                    paramsClass.getDeclaredConstructor(CommandPayload.class).newInstance(commandPayload);
 
             runBeforeHook(command);
 

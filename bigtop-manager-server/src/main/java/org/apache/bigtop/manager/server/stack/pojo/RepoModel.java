@@ -18,13 +18,13 @@
  */
 package org.apache.bigtop.manager.server.stack.pojo;
 
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlElement;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
 
 @Data
 @AllArgsConstructor
@@ -44,5 +44,4 @@ public class RepoModel {
     private String os;
 
     private String arch;
-
 }

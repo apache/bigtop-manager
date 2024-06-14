@@ -26,8 +26,6 @@ import org.apache.bigtop.manager.server.model.vo.CommandVO;
 import org.apache.bigtop.manager.server.service.CommandService;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
 
-import jakarta.annotation.Resource;
-
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,6 +34,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import jakarta.annotation.Resource;
 
 @Tag(name = "Command Controller")
 @RestController
@@ -53,5 +53,4 @@ public class CommandController {
         CommandVO commandVO = commandService.command(commandDTO);
         return ResponseEntity.success(commandVO);
     }
-
 }

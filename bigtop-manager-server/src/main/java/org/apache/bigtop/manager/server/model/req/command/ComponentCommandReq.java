@@ -18,13 +18,12 @@
  */
 package org.apache.bigtop.manager.server.model.req.command;
 
-import java.util.List;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
+import java.util.List;
 
 @Data
 public class ComponentCommandReq {

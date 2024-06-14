@@ -23,14 +23,14 @@ import org.apache.bigtop.manager.common.message.entity.command.CommandMessageTyp
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.common.utils.os.TimeSyncDetection;
 
-import java.util.List;
-import java.util.function.Supplier;
-
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
+import java.util.function.Supplier;
 
 @Slf4j
 @Component

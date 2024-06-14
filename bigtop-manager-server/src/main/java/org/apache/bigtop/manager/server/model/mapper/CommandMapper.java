@@ -23,10 +23,10 @@ import org.apache.bigtop.manager.server.model.dto.command.ServiceCommandDTO;
 import org.apache.bigtop.manager.server.model.req.CommandReq;
 import org.apache.bigtop.manager.server.model.req.command.ServiceCommandReq;
 
-import java.util.List;
-
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
+
+import java.util.List;
 
 @Mapper
 public interface CommandMapper {
@@ -38,5 +38,4 @@ public interface CommandMapper {
     ServiceCommandDTO fromServiceReq2DTO(ServiceCommandReq req);
 
     List<ServiceCommandDTO> fromServiceReq2DTO(List<ServiceCommandReq> reqs);
-
 }

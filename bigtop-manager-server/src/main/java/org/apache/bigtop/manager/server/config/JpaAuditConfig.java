@@ -20,12 +20,11 @@ package org.apache.bigtop.manager.server.config;
 
 import org.apache.bigtop.manager.server.holder.SessionUserHolder;
 
-import java.util.Optional;
-
-import jakarta.annotation.Nonnull;
-
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
+
+import jakarta.annotation.Nonnull;
+import java.util.Optional;
 
 @Configuration
 public class JpaAuditConfig implements AuditorAware<Long> {
@@ -39,5 +38,4 @@ public class JpaAuditConfig implements AuditorAware<Long> {
             return Optional.empty();
         }
     }
-
 }

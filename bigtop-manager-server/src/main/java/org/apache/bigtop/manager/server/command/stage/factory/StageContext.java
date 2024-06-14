@@ -26,9 +26,9 @@ import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.model.dto.command.ClusterCommandDTO;
 import org.apache.bigtop.manager.server.model.dto.command.HostCommandDTO;
 
-import java.util.List;
-
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class StageContext {
@@ -80,7 +80,8 @@ public class StageContext {
     private static void fromHostCommandPayload(StageContext context, CommandDTO commandDTO) {
         List<HostCommandDTO> hostCommands = commandDTO.getHostCommands();
 
-        List<String> hostnames = hostCommands.stream().map(HostCommandDTO::getHostname).toList();
+        List<String> hostnames =
+                hostCommands.stream().map(HostCommandDTO::getHostname).toList();
         context.setHostnames(hostnames);
     }
 

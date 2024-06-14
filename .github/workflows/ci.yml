@@ -10,6 +10,19 @@ jobs:
       - name: Check license header
         uses: apache/skywalking-eyes@v0.6.0
 
+  code-style:
+    name: "Check code style"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'maven'
+      - run: ./mvnw clean spotless:check
+
   build:
     runs-on: ubuntu-latest
     strategy:

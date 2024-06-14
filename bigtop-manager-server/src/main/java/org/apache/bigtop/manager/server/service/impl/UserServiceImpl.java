@@ -28,9 +28,9 @@ import org.apache.bigtop.manager.server.model.mapper.UserMapper;
 import org.apache.bigtop.manager.server.model.vo.UserVO;
 import org.apache.bigtop.manager.server.service.UserService;
 
-import jakarta.annotation.Resource;
-
 import org.springframework.stereotype.Service;
+
+import jakarta.annotation.Resource;
 
 @Service
 public class UserServiceImpl implements UserService {

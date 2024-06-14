@@ -22,12 +22,10 @@ import org.apache.bigtop.manager.common.utils.CaseUtils;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-
 import lombok.Getter;
 
 @Getter
 public enum MaintainState {
-
     UNINSTALLED,
 
     INSTALLED,

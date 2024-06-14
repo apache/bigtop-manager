@@ -40,5 +40,4 @@ public interface PrioritySPI extends Comparable<Integer> {
     default int compareTo(@NonNull Integer o) {
         return Integer.compare(getPriority(), o);
     }
-
 }

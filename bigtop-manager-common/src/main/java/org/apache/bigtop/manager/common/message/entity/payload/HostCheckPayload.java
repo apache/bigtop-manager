@@ -27,6 +27,4 @@ import lombok.ToString;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class HostCheckPayload extends BasePayload {
-
-}
+public class HostCheckPayload extends BasePayload {}

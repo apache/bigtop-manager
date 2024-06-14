@@ -18,13 +18,16 @@
  */
 package org.apache.bigtop.manager.stack.common.utils.linux;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.common.shell.ShellExecutor;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.stack.common.exception.StackException;
 import org.apache.bigtop.manager.stack.common.log.TaskLogWriter;
+
 import org.apache.commons.lang3.StringUtils;
+
 import org.springframework.util.CollectionUtils;
+
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -73,9 +76,7 @@ public class LinuxAccountUtils {
      * Add user
      * useradd [options] LOGIN
      */
-    public static void userAdd(String user,
-                               String group,
-                               Collection<String> groups) {
+    public static void userAdd(String user, String group, Collection<String> groups) {
         userAdd(user, group, null, groups, null, null, null, false);
     }
 
@@ -91,14 +92,15 @@ public class LinuxAccountUtils {
      * @param comment  user comment
      * @param password user password
      */
-    public static void userAdd(String user,
-                               String group,
-                               String uid,
-                               Collection<String> groups,
-                               String home,
-                               String comment,
-                               String password,
-                               Boolean system) {
+    public static void userAdd(
+            String user,
+            String group,
+            String uid,
+            Collection<String> groups,
+            String home,
+            String comment,
+            String password,
+            Boolean system) {
         Objects.requireNonNull(user);
         Objects.requireNonNull(group);
 
@@ -255,7 +257,6 @@ public class LinuxAccountUtils {
         } catch (IOException e) {
             throw new StackException(e);
         }
-
     }
 
     /**
@@ -279,7 +280,5 @@ public class LinuxAccountUtils {
         } catch (IOException e) {
             throw new StackException(e);
         }
-
     }
-
 }

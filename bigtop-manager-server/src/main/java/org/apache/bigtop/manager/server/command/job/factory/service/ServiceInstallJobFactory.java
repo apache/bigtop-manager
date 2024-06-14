@@ -24,13 +24,13 @@ import org.apache.bigtop.manager.server.enums.CommandLevel;
 import org.apache.bigtop.manager.server.model.dto.ComponentHostDTO;
 import org.apache.bigtop.manager.server.model.dto.command.ServiceCommandDTO;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @org.springframework.stereotype.Component
@@ -84,8 +84,8 @@ public class ServiceInstallJobFactory extends AbstractServiceJobFactory {
                 if (componentHost.getComponentName().equals(componentName)) {
                     List<String> hostnames = new ArrayList<>(componentHost.getHostnames());
                     List<String> existHostnames = hostComponentRepository
-                            .findAllByComponentClusterIdAndComponentComponentNameAndHostHostnameIn(cluster.getId(),
-                                    componentName, hostnames)
+                            .findAllByComponentClusterIdAndComponentComponentNameAndHostHostnameIn(
+                                    cluster.getId(), componentName, hostnames)
                             .stream()
                             .map(hostComponent -> hostComponent.getHost().getHostname())
                             .toList();

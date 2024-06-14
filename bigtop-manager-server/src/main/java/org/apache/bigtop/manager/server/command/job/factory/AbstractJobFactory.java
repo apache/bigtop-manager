@@ -29,10 +29,9 @@ import org.apache.bigtop.manager.dao.repository.JobRepository;
 import org.apache.bigtop.manager.dao.repository.StageRepository;
 import org.apache.bigtop.manager.dao.repository.TaskRepository;
 
+import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
-
-import jakarta.annotation.Resource;
 
 public abstract class AbstractJobFactory implements JobFactory {
 

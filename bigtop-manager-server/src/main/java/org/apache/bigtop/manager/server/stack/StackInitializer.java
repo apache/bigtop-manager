@@ -24,17 +24,16 @@ import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.model.dto.StackDTO;
 import org.apache.bigtop.manager.server.utils.StackUtils;
 
-import java.util.List;
-import java.util.Map;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Resource;
-
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Resource;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Initialize the stack and persist to the database.

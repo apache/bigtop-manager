@@ -18,11 +18,11 @@
  */
 package org.apache.bigtop.manager.server.utils;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 public class ServletUtils {
 

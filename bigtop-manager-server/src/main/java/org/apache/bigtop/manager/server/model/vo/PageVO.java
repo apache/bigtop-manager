@@ -20,14 +20,14 @@ package org.apache.bigtop.manager.server.model.vo;
 
 import org.apache.bigtop.manager.server.exception.ServerException;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Page;
 
 import lombok.Data;
+
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 public class PageVO<T> {

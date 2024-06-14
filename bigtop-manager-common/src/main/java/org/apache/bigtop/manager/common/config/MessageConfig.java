@@ -23,10 +23,10 @@ import org.apache.bigtop.manager.common.message.serializer.MessageSerializer;
 
 import org.apache.commons.lang3.StringUtils;
 
-import jakarta.annotation.Resource;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import jakarta.annotation.Resource;
 
 @Configuration
 public class MessageConfig {
@@ -39,7 +39,8 @@ public class MessageConfig {
         String serializerType = applicationConfig.getSerializer().getType();
         String packageName = "org.apache.bigtop.manager.common.message.serializer";
         String className = packageName + "." + StringUtils.capitalize(serializerType) + "MessageSerializer";
-        return (MessageSerializer) Class.forName(className).getDeclaredConstructor().newInstance();
+        return (MessageSerializer)
+                Class.forName(className).getDeclaredConstructor().newInstance();
     }
 
     @Bean
@@ -47,6 +48,7 @@ public class MessageConfig {
         String deserializerType = applicationConfig.getSerializer().getType();
         String packageName = "org.apache.bigtop.manager.common.message.serializer";
         String className = packageName + "." + StringUtils.capitalize(deserializerType) + "MessageDeserializer";
-        return (MessageDeserializer) Class.forName(className).getDeclaredConstructor().newInstance();
+        return (MessageDeserializer)
+                Class.forName(className).getDeclaredConstructor().newInstance();
     }
 }

@@ -25,10 +25,6 @@ import org.apache.bigtop.manager.server.model.vo.ClusterVO;
 import org.apache.bigtop.manager.server.service.ClusterService;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
 
-import java.util.List;
-
-import jakarta.annotation.Resource;
-
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,6 +35,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import jakarta.annotation.Resource;
+import java.util.List;
 
 @Tag(name = "Cluster Controller")
 @RestController
@@ -62,10 +61,8 @@ public class ClusterController {
 
     @Operation(summary = "update", description = "Update a cluster")
     @PutMapping("/{id}")
-    public ResponseEntity<ClusterVO> update(@PathVariable Long id,
-                                            @RequestBody @Validated ClusterReq clusterReq) {
+    public ResponseEntity<ClusterVO> update(@PathVariable Long id, @RequestBody @Validated ClusterReq clusterReq) {
         ClusterDTO clusterDTO = ClusterMapper.INSTANCE.fromReq2DTO(clusterReq);
         return ResponseEntity.success(clusterService.update(id, clusterDTO));
     }
-
 }

@@ -31,9 +31,9 @@ import org.apache.bigtop.manager.server.model.mapper.JobMapper;
 import org.apache.bigtop.manager.server.model.vo.CommandVO;
 import org.apache.bigtop.manager.server.service.CommandService;
 
-import jakarta.annotation.Resource;
-
 import lombok.extern.slf4j.Slf4j;
+
+import jakarta.annotation.Resource;
 
 @Slf4j
 @org.springframework.stereotype.Service

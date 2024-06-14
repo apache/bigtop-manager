@@ -18,16 +18,19 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
-import jakarta.annotation.Resource;
 import org.apache.bigtop.manager.dao.entity.CommandLog;
 import org.apache.bigtop.manager.dao.entity.Task;
 import org.apache.bigtop.manager.dao.repository.CommandLogRepository;
 import org.apache.bigtop.manager.dao.repository.TaskRepository;
 import org.apache.bigtop.manager.server.service.CommandLogService;
+
 import org.apache.commons.collections4.CollectionUtils;
+
 import org.springframework.stereotype.Service;
+
 import reactor.core.publisher.FluxSink;
 
+import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

@@ -18,12 +18,8 @@
  */
 package org.apache.bigtop.manager.server.config;
 
-import static org.apache.bigtop.manager.common.constants.Constants.WS_BINARY_MESSAGE_SIZE_LIMIT;
-
 import org.apache.bigtop.manager.server.ws.DefaultWebSocketHandler;
 import org.apache.bigtop.manager.server.ws.ServerWebSocketHandler;
-
-import jakarta.annotation.Resource;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,6 +27,10 @@ import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
+
+import jakarta.annotation.Resource;
+
+import static org.apache.bigtop.manager.common.constants.Constants.WS_BINARY_MESSAGE_SIZE_LIMIT;
 
 @Configuration
 @EnableWebSocket

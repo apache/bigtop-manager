@@ -22,11 +22,11 @@ import org.apache.bigtop.manager.dao.entity.Job;
 import org.apache.bigtop.manager.server.model.vo.CommandVO;
 import org.apache.bigtop.manager.server.model.vo.JobVO;
 
-import java.util.List;
-
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
+
+import java.util.List;
 
 @Mapper(uses = {StageMapper.class, TaskMapper.class})
 public interface JobMapper {

@@ -34,5 +34,4 @@ public class ComponentInfo {
     private String category;
 
     private String serviceName;
-
 }

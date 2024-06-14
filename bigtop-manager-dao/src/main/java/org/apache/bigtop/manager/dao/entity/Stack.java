@@ -18,6 +18,9 @@
  */
 package org.apache.bigtop.manager.dao.entity;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -27,14 +30,16 @@ import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
 import jakarta.persistence.UniqueConstraint;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "stack", uniqueConstraints = {
-        @UniqueConstraint(name = "uk_stack", columnNames = {"stack_name", "stack_version"})})
+@Table(
+        name = "stack",
+        uniqueConstraints = {
+            @UniqueConstraint(
+                    name = "uk_stack",
+                    columnNames = {"stack_name", "stack_version"})
+        })
 @TableGenerator(name = "stack_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
 public class Stack extends BaseEntity {
 
@@ -48,5 +53,4 @@ public class Stack extends BaseEntity {
 
     @Column(name = "stack_version")
     private String stackVersion;
-
 }

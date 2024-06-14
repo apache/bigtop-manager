@@ -27,11 +27,10 @@ import org.apache.bigtop.manager.server.enums.CommandLevel;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.model.dto.command.ClusterCommandDTO;
 
-import java.util.List;
+import org.springframework.stereotype.Component;
 
 import jakarta.annotation.Resource;
-
-import org.springframework.stereotype.Component;
+import java.util.List;
 
 @Component
 public class StackValidator implements CommandValidator {
@@ -55,5 +54,4 @@ public class StackValidator implements CommandValidator {
             throw new ApiException(ApiExceptionEnum.STACK_NOT_FOUND);
         }
     }
-
 }

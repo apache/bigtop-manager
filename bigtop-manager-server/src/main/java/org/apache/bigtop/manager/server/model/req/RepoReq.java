@@ -36,5 +36,4 @@ public class RepoReq {
     private String os;
 
     private String arch;
-
 }

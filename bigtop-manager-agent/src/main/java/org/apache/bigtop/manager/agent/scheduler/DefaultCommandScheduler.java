@@ -18,13 +18,15 @@
  */
 package org.apache.bigtop.manager.agent.scheduler;
 
-import jakarta.annotation.PostConstruct;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.agent.executor.CommandExecutor;
 import org.apache.bigtop.manager.agent.executor.CommandExecutors;
 import org.apache.bigtop.manager.common.message.entity.command.CommandRequestMessage;
+
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
+
+import jakarta.annotation.PostConstruct;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;

@@ -18,25 +18,28 @@
  */
 package org.apache.bigtop.manager.stack.common.utils;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import lombok.extern.slf4j.Slf4j;
+import org.apache.bigtop.manager.common.constants.CacheFiles;
+import org.apache.bigtop.manager.common.constants.Constants;
 import org.apache.bigtop.manager.common.message.entity.pojo.ClusterInfo;
 import org.apache.bigtop.manager.common.message.entity.pojo.ComponentInfo;
 import org.apache.bigtop.manager.common.message.entity.pojo.RepoInfo;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.stack.common.log.TaskLogWriter;
 
-import java.io.File;
-import java.util.*;
+import com.fasterxml.jackson.core.type.TypeReference;
+import lombok.extern.slf4j.Slf4j;
 
-import static org.apache.bigtop.manager.common.constants.CacheFiles.*;
-import static org.apache.bigtop.manager.common.constants.Constants.STACK_CACHE_DIR;
+import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 public class LocalSettings {
 
-    public static Object configurations(String service, String type, String key,
-                                        Object defaultValue) {
+    public static Object configurations(String service, String type, String key, Object defaultValue) {
         Map<String, Object> configMap = configurations(service, type);
         return configMap.getOrDefault(key, defaultValue);
     }
@@ -44,21 +47,18 @@ public class LocalSettings {
     public static Map<String, Object> configurations(String service, String type) {
 
         Map<String, Object> configDataMap = new HashMap<>();
-        File file = new File(STACK_CACHE_DIR + CONFIGURATIONS_INFO);
+        File file = new File(Constants.STACK_CACHE_DIR + CacheFiles.CONFIGURATIONS_INFO);
         try {
             if (file.exists()) {
-                Map<String, Map<String, Object>> configJson =
-                        JsonUtils.readFromFile(file, new TypeReference<>() {
-                        });
-                Object configData = configJson.getOrDefault(service, new HashMap<>()).get(type);
+                Map<String, Map<String, Object>> configJson = JsonUtils.readFromFile(file, new TypeReference<>() {});
+                Object configData =
+                        configJson.getOrDefault(service, new HashMap<>()).get(type);
                 if (configData != null) {
-                    configDataMap =
-                            JsonUtils.readFromString((String) configData, new TypeReference<>() {
-                            });
+                    configDataMap = JsonUtils.readFromString((String) configData, new TypeReference<>() {});
                 }
             }
         } catch (Exception e) {
-            TaskLogWriter.warn(CONFIGURATIONS_INFO + " parse error: " + e.getMessage());
+            TaskLogWriter.warn(CacheFiles.CONFIGURATIONS_INFO + " parse error: " + e.getMessage());
         }
 
         return configDataMap;
@@ -71,10 +71,9 @@ public class LocalSettings {
     public static Map<String, List<String>> hosts() {
 
         Map<String, List<String>> hostJson = new HashMap<>();
-        File file = new File(STACK_CACHE_DIR + HOSTS_INFO);
+        File file = new File(Constants.STACK_CACHE_DIR + CacheFiles.HOSTS_INFO);
         if (file.exists()) {
-            hostJson = JsonUtils.readFromFile(file, new TypeReference<>() {
-            });
+            hostJson = JsonUtils.readFromFile(file, new TypeReference<>() {});
         }
         return hostJson;
     }
@@ -82,10 +81,9 @@ public class LocalSettings {
     public static Map<String, Object> basicInfo() {
 
         Map<String, Object> settings = new HashMap<>();
-        File file = new File(STACK_CACHE_DIR + SETTINGS_INFO);
+        File file = new File(Constants.STACK_CACHE_DIR + CacheFiles.SETTINGS_INFO);
         if (file.exists()) {
-            settings = JsonUtils.readFromFile(file, new TypeReference<>() {
-            });
+            settings = JsonUtils.readFromFile(file, new TypeReference<>() {});
         }
         return settings;
     }
@@ -93,10 +91,9 @@ public class LocalSettings {
     public static Map<String, Set<String>> users() {
 
         Map<String, Set<String>> userMap = new HashMap<>();
-        File file = new File(STACK_CACHE_DIR + USERS_INFO);
+        File file = new File(Constants.STACK_CACHE_DIR + CacheFiles.USERS_INFO);
         if (file.exists()) {
-            userMap = JsonUtils.readFromFile(file, new TypeReference<>() {
-            });
+            userMap = JsonUtils.readFromFile(file, new TypeReference<>() {});
         }
         return userMap;
     }
@@ -109,10 +106,9 @@ public class LocalSettings {
     public static List<RepoInfo> repos() {
 
         List<RepoInfo> repoInfoList = List.of();
-        File file = new File(STACK_CACHE_DIR + REPOS_INFO);
+        File file = new File(Constants.STACK_CACHE_DIR + CacheFiles.REPOS_INFO);
         if (file.exists()) {
-            repoInfoList = JsonUtils.readFromFile(file, new TypeReference<>() {
-            });
+            repoInfoList = JsonUtils.readFromFile(file, new TypeReference<>() {});
         }
         return repoInfoList;
     }
@@ -120,10 +116,9 @@ public class LocalSettings {
     public static ClusterInfo cluster() {
 
         ClusterInfo clusterInfo = new ClusterInfo();
-        File file = new File(STACK_CACHE_DIR + CLUSTER_INFO);
+        File file = new File(Constants.STACK_CACHE_DIR + CacheFiles.CLUSTER_INFO);
         if (file.exists()) {
-            clusterInfo = JsonUtils.readFromFile(file, new TypeReference<>() {
-            });
+            clusterInfo = JsonUtils.readFromFile(file, new TypeReference<>() {});
         }
         return clusterInfo;
     }
@@ -131,10 +126,9 @@ public class LocalSettings {
     public static Map<String, ComponentInfo> components() {
 
         Map<String, ComponentInfo> componentInfo = new HashMap<>();
-        File file = new File(STACK_CACHE_DIR + COMPONENTS_INFO);
+        File file = new File(Constants.STACK_CACHE_DIR + CacheFiles.COMPONENTS_INFO);
         if (file.exists()) {
-            componentInfo = JsonUtils.readFromFile(file, new TypeReference<>() {
-            });
+            componentInfo = JsonUtils.readFromFile(file, new TypeReference<>() {});
         }
         return componentInfo;
     }

@@ -30,8 +30,12 @@ public final class Constants {
      * stack cache dir
      */
     public static final String STACK_CACHE_DIR =
-            new File(Constants.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParent()
-                    + "/../cache";
+            new File(Constants.class
+                                    .getProtectionDomain()
+                                    .getCodeSource()
+                                    .getLocation()
+                                    .getPath())
+                            .getParent() + "/../cache";
 
     /**
      * host key for all hosts

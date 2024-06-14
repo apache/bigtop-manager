@@ -23,15 +23,14 @@ import org.apache.bigtop.manager.server.command.job.runner.JobRunner;
 import org.apache.bigtop.manager.server.command.job.runner.JobRunners;
 import org.apache.bigtop.manager.server.holder.SessionUserHolder;
 
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
-
-import jakarta.annotation.PostConstruct;
-
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
+
+import jakarta.annotation.PostConstruct;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 
 @Slf4j
 @Component

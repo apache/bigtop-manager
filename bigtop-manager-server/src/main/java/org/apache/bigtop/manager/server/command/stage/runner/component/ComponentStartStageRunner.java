@@ -25,12 +25,12 @@ import org.apache.bigtop.manager.dao.repository.HostComponentRepository;
 import org.apache.bigtop.manager.server.command.stage.factory.StageType;
 import org.apache.bigtop.manager.server.command.stage.runner.AbstractStageRunner;
 
-import jakarta.annotation.Resource;
-
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 
 import lombok.extern.slf4j.Slf4j;
+
+import jakarta.annotation.Resource;
 
 @Slf4j
 @org.springframework.stereotype.Component
@@ -52,8 +52,9 @@ public class ComponentStartStageRunner extends AbstractStageRunner {
         Long clusterId = task.getCluster().getId();
         String componentName = task.getComponentName();
         String hostname = task.getHostname();
-        HostComponent hostComponent = hostComponentRepository
-                .findByComponentClusterIdAndComponentComponentNameAndHostHostname(clusterId, componentName, hostname);
+        HostComponent hostComponent =
+                hostComponentRepository.findByComponentClusterIdAndComponentComponentNameAndHostHostname(
+                        clusterId, componentName, hostname);
         hostComponent.setState(MaintainState.STARTED);
         hostComponentRepository.save(hostComponent);
     }

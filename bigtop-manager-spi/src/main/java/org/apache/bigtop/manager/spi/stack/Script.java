@@ -43,7 +43,8 @@ public interface Script extends PrioritySPI {
             return shellResult1;
         }
 
-        return new ShellResult(0,
+        return new ShellResult(
+                0,
                 StringUtils.join(shellResult.getOutput(), shellResult1.getOutput()),
                 StringUtils.join(shellResult.getErrMsg(), shellResult1.getErrMsg()));
     }

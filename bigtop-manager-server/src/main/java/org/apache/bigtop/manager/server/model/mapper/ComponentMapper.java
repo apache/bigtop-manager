@@ -25,12 +25,12 @@ import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
 import org.apache.bigtop.manager.server.model.vo.ComponentVO;
 import org.apache.bigtop.manager.server.stack.pojo.ComponentModel;
 
-import java.util.List;
-
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
+
+import java.util.List;
 
 @Mapper(uses = {TypeConvert.class})
 public interface ComponentMapper {
@@ -55,5 +55,4 @@ public interface ComponentMapper {
     ComponentVO fromEntity2VO(Component component);
 
     List<ComponentVO> fromEntity2VO(List<Component> components);
-
 }

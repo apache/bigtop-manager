@@ -18,14 +18,16 @@
  */
 package org.apache.bigtop.manager.stack.common.utils.linux;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.common.shell.ShellExecutor;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.common.utils.FileUtils;
 import org.apache.bigtop.manager.stack.common.log.TaskLogWriter;
+
 import org.apache.commons.lang3.StringUtils;
+
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
@@ -105,15 +107,16 @@ public class LinuxOSUtils {
         try {
             pid = Integer.parseInt(FileUtils.readFile2Str(file).replaceAll("\r|\n", ""));
         } catch (Exception e) {
-            TaskLogWriter.warn("Pid file " + filepath + " does not exist or does not contain a process id number, error: " + e.getMessage());
+            TaskLogWriter.warn("Pid file " + filepath
+                    + " does not exist or does not contain a process id number, error: " + e.getMessage());
             return new ShellResult(-1, "", "Component is not running");
         }
         try {
             return execCmd("kill -0 " + pid);
         } catch (IOException e) {
-            TaskLogWriter.warn("Process with pid " + pid + " is not running. Stale pid file at " + filepath + ", error: " + e.getMessage());
+            TaskLogWriter.warn("Process with pid " + pid + " is not running. Stale pid file at " + filepath
+                    + ", error: " + e.getMessage());
             return new ShellResult(-1, "", "Component is not running");
         }
     }
-
 }

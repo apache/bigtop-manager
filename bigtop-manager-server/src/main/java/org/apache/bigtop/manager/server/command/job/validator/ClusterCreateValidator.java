@@ -27,12 +27,11 @@ import org.apache.bigtop.manager.server.enums.CommandLevel;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.model.dto.command.ClusterCommandDTO;
 
-import java.util.List;
-import java.util.Optional;
+import org.springframework.stereotype.Component;
 
 import jakarta.annotation.Resource;
-
-import org.springframework.stereotype.Component;
+import java.util.List;
+import java.util.Optional;
 
 @Component
 public class ClusterCreateValidator implements CommandValidator {

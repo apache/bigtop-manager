@@ -23,11 +23,11 @@ import org.apache.bigtop.manager.server.model.dto.HostDTO;
 import org.apache.bigtop.manager.server.model.req.HostReq;
 import org.apache.bigtop.manager.server.model.vo.HostVO;
 
-import java.util.List;
-
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
+
+import java.util.List;
 
 @Mapper
 public interface HostMapper {
@@ -42,5 +42,4 @@ public interface HostMapper {
     HostVO fromEntity2VO(Host host);
 
     List<HostVO> fromEntity2VO(List<Host> hosts);
-
 }

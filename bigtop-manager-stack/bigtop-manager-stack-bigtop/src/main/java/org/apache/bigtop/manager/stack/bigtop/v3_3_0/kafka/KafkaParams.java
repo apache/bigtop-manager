@@ -23,9 +23,9 @@ import org.apache.bigtop.manager.stack.common.annotations.GlobalParams;
 import org.apache.bigtop.manager.stack.common.utils.BaseParams;
 import org.apache.bigtop.manager.stack.common.utils.LocalSettings;
 
-import java.util.Map;
-
 import lombok.Getter;
+
+import java.util.Map;
 
 @Getter
 public class KafkaParams extends BaseParams {
@@ -74,5 +74,4 @@ public class KafkaParams extends BaseParams {
         Map<String, Object> kafkaLimits = LocalSettings.configurations(serviceName(), "kafka.conf");
         return (String) kafkaLimits.get("content");
     }
-
 }

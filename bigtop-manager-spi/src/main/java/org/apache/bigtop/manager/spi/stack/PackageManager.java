@@ -30,5 +30,4 @@ public interface PackageManager extends PrioritySPI {
     ShellResult uninstallPackage(Collection<String> packages);
 
     String listPackages();
-
 }

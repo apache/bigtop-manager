@@ -18,18 +18,20 @@
  */
 package org.apache.bigtop.manager.server.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import org.apache.bigtop.manager.server.service.CommandLogService;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 
+import jakarta.annotation.Resource;
 import java.io.IOException;
 
 @Tag(name = "Sse Controller")
@@ -45,15 +47,19 @@ public class SseController {
     public SseEmitter log(@PathVariable Long id, @PathVariable Long clusterId) {
         SseEmitter emitter = new SseEmitter();
 
-        Flux<String> flux = Flux.create(sink -> commandLogService.registerSink(id, sink), FluxSink.OverflowStrategy.BUFFER);
-        flux.subscribe(s -> {
-            try {
-                emitter.send(s);
-            } catch (IOException e) {
-                commandLogService.unregisterSink(id);
-                emitter.completeWithError(e);
-            }
-        }, Throwable::printStackTrace, emitter::complete);
+        Flux<String> flux =
+                Flux.create(sink -> commandLogService.registerSink(id, sink), FluxSink.OverflowStrategy.BUFFER);
+        flux.subscribe(
+                s -> {
+                    try {
+                        emitter.send(s);
+                    } catch (IOException e) {
+                        commandLogService.unregisterSink(id);
+                        emitter.completeWithError(e);
+                    }
+                },
+                Throwable::printStackTrace,
+                emitter::complete);
 
         emitter.onTimeout(emitter::complete);
         emitter.onCompletion(() -> commandLogService.unregisterSink(id));

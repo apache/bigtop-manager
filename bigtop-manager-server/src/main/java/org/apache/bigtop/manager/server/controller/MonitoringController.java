@@ -21,16 +21,15 @@ package org.apache.bigtop.manager.server.controller;
 import org.apache.bigtop.manager.server.service.MonitoringService;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
 
-import jakarta.annotation.Resource;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.JsonNode;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import jakarta.annotation.Resource;
 
 @Tag(name = "Monitoring Controller")
 @RestController
@@ -45,5 +44,4 @@ public class MonitoringController {
     public ResponseEntity<JsonNode> agentHostsHealthyStatus() {
         return ResponseEntity.success(monitoringService.queryAgentsHealthyStatus());
     }
-
 }

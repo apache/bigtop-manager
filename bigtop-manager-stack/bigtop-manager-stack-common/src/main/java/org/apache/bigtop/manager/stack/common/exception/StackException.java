@@ -35,5 +35,4 @@ public class StackException extends RuntimeException {
     public StackException(Throwable cause) {
         super(cause);
     }
-
 }

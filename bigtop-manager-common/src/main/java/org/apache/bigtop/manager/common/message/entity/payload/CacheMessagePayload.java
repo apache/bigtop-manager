@@ -22,14 +22,14 @@ import org.apache.bigtop.manager.common.message.entity.pojo.ClusterInfo;
 import org.apache.bigtop.manager.common.message.entity.pojo.ComponentInfo;
 import org.apache.bigtop.manager.common.message.entity.pojo.RepoInfo;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Data
 @ToString(callSuper = true)
@@ -50,5 +50,4 @@ public class CacheMessagePayload extends BasePayload {
     private Map<String, Set<String>> clusterHostInfo;
 
     private Map<String, ComponentInfo> componentInfo;
-
 }

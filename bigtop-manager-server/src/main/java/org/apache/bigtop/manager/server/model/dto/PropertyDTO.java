@@ -18,9 +18,9 @@
  */
 package org.apache.bigtop.manager.server.model.dto;
 
-import java.io.Serializable;
-
 import lombok.Data;
+
+import java.io.Serializable;
 
 @Data
 public class PropertyDTO implements Serializable {
@@ -32,5 +32,4 @@ public class PropertyDTO implements Serializable {
     private String displayName;
 
     private String desc;
-
 }

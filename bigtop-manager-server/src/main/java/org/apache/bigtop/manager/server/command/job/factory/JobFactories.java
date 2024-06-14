@@ -23,11 +23,11 @@ import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class JobFactories {
@@ -42,7 +42,9 @@ public class JobFactories {
         }
 
         if (!JOB_FACTORIES.containsKey(identifier)) {
-            throw new ApiException(ApiExceptionEnum.COMMAND_NOT_SUPPORTED, identifier.getCommand().name().toLowerCase(),
+            throw new ApiException(
+                    ApiExceptionEnum.COMMAND_NOT_SUPPORTED,
+                    identifier.getCommand().name().toLowerCase(),
                     identifier.getCommandLevel().toLowerCase());
         }
 
@@ -55,7 +57,8 @@ public class JobFactories {
             return;
         }
 
-        for (Map.Entry<String, JobFactory> entry : SpringContextHolder.getJobFactories().entrySet()) {
+        for (Map.Entry<String, JobFactory> entry :
+                SpringContextHolder.getJobFactories().entrySet()) {
             String beanName = entry.getKey();
             JobFactory jobFactory = entry.getValue();
             if (JOB_FACTORIES.containsKey(jobFactory.getCommandIdentifier())) {
@@ -64,7 +67,9 @@ public class JobFactories {
             }
 
             JOB_FACTORIES.put(jobFactory.getCommandIdentifier(), beanName);
-            log.info("Load JobFactory: {} with identifier: {}", jobFactory.getClass().getName(),
+            log.info(
+                    "Load JobFactory: {} with identifier: {}",
+                    jobFactory.getClass().getName(),
                     jobFactory.getCommandIdentifier());
         }
 

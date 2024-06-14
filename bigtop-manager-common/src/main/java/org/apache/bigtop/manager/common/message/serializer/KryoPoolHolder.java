@@ -18,8 +18,6 @@
  */
 package org.apache.bigtop.manager.common.message.serializer;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.util.Pool;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.message.entity.BaseMessage;
 import org.apache.bigtop.manager.common.message.entity.BaseRequestMessage;
@@ -29,7 +27,17 @@ import org.apache.bigtop.manager.common.message.entity.command.CommandLogMessage
 import org.apache.bigtop.manager.common.message.entity.command.CommandMessageType;
 import org.apache.bigtop.manager.common.message.entity.command.CommandRequestMessage;
 import org.apache.bigtop.manager.common.message.entity.command.CommandResponseMessage;
-import org.apache.bigtop.manager.common.message.entity.pojo.*;
+import org.apache.bigtop.manager.common.message.entity.pojo.ClusterInfo;
+import org.apache.bigtop.manager.common.message.entity.pojo.ComponentInfo;
+import org.apache.bigtop.manager.common.message.entity.pojo.CustomCommandInfo;
+import org.apache.bigtop.manager.common.message.entity.pojo.HostCheckType;
+import org.apache.bigtop.manager.common.message.entity.pojo.HostInfo;
+import org.apache.bigtop.manager.common.message.entity.pojo.OSSpecificInfo;
+import org.apache.bigtop.manager.common.message.entity.pojo.RepoInfo;
+import org.apache.bigtop.manager.common.message.entity.pojo.ScriptInfo;
+
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.util.Pool;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;

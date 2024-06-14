@@ -28,14 +28,13 @@ import org.apache.bigtop.manager.server.model.mapper.ServiceMapper;
 import org.apache.bigtop.manager.server.model.vo.ServiceVO;
 import org.apache.bigtop.manager.server.service.ServiceService;
 
+import lombok.extern.slf4j.Slf4j;
+
+import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import jakarta.annotation.Resource;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @org.springframework.stereotype.Service
@@ -51,9 +50,9 @@ public class ServiceServiceImpl implements ServiceService {
     public List<ServiceVO> list(Long clusterId) {
         List<ServiceVO> res = new ArrayList<>();
         List<HostComponent> hostComponentList = hostComponentRepository.findAllByComponentClusterId(clusterId);
-        Map<Long, List<HostComponent>> serviceIdToHostComponent = hostComponentList
-                .stream()
-                .collect(Collectors.groupingBy(hostComponent -> hostComponent.getComponent().getService().getId()));
+        Map<Long, List<HostComponent>> serviceIdToHostComponent = hostComponentList.stream()
+                .collect(Collectors.groupingBy(hostComponent ->
+                        hostComponent.getComponent().getService().getId()));
 
         for (Map.Entry<Long, List<HostComponent>> entry : serviceIdToHostComponent.entrySet()) {
             List<HostComponent> hostComponents = entry.getValue();
@@ -68,9 +67,9 @@ public class ServiceServiceImpl implements ServiceService {
                     isClient = false;
                 }
 
-                MaintainState expectedState =
-                        category.equalsIgnoreCase(ComponentCategories.CLIENT) ? MaintainState.INSTALLED
-                                : MaintainState.STARTED;
+                MaintainState expectedState = category.equalsIgnoreCase(ComponentCategories.CLIENT)
+                        ? MaintainState.INSTALLED
+                        : MaintainState.STARTED;
                 if (!hostComponent.getState().equals(expectedState)) {
                     isHealthy = false;
                 }

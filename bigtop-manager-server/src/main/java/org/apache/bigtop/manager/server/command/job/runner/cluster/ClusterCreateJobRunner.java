@@ -35,12 +35,12 @@ import org.apache.bigtop.manager.server.model.dto.CommandDTO;
 import org.apache.bigtop.manager.server.model.mapper.ClusterMapper;
 import org.apache.bigtop.manager.server.service.ClusterService;
 
-import jakarta.annotation.Resource;
-
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 
 import lombok.extern.slf4j.Slf4j;
+
+import jakarta.annotation.Resource;
 
 @Slf4j
 @org.springframework.stereotype.Component
@@ -82,7 +82,8 @@ public class ClusterCreateJobRunner extends AbstractJobRunner {
         super.onSuccess();
 
         CommandDTO commandDTO = getCommandDTO();
-        Cluster cluster = clusterRepository.findByClusterName(commandDTO.getClusterCommand().getClusterName())
+        Cluster cluster = clusterRepository
+                .findByClusterName(commandDTO.getClusterCommand().getClusterName())
                 .orElse(new Cluster());
 
         // Update cluster state to installed

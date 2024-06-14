@@ -18,12 +18,6 @@
  */
 package org.apache.bigtop.manager.agent.ws;
 
-import com.sun.management.OperatingSystemMXBean;
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Resource;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.agent.holder.SpringContextHolder;
 import org.apache.bigtop.manager.agent.scheduler.CommandScheduler;
 import org.apache.bigtop.manager.common.config.ApplicationConfig;
@@ -35,6 +29,7 @@ import org.apache.bigtop.manager.common.message.entity.pojo.HostInfo;
 import org.apache.bigtop.manager.common.message.serializer.MessageDeserializer;
 import org.apache.bigtop.manager.common.utils.os.OSDetection;
 import org.apache.bigtop.manager.common.ws.AbstractBinaryWebSocketHandler;
+
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
@@ -43,6 +38,13 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 
+import com.sun.management.OperatingSystemMXBean;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Resource;
 import java.lang.management.ManagementFactory;
 import java.math.BigDecimal;
 import java.net.InetAddress;
@@ -55,7 +57,8 @@ import static org.apache.bigtop.manager.common.constants.Constants.WS_BINARY_MES
 
 @Slf4j
 @Component
-public class AgentWebSocketHandler extends AbstractBinaryWebSocketHandler implements ApplicationListener<ApplicationStartedEvent> {
+public class AgentWebSocketHandler extends AbstractBinaryWebSocketHandler
+        implements ApplicationListener<ApplicationStartedEvent> {
 
     @Resource
     private ApplicationConfig applicationConfig;
@@ -96,7 +99,8 @@ public class AgentWebSocketHandler extends AbstractBinaryWebSocketHandler implem
     }
 
     private void handleMessage(WebSocketSession session, BaseMessage baseMessage) {
-        log.info("Received message type: {}, session: {}", baseMessage.getClass().getSimpleName(), session);
+        log.info(
+                "Received message type: {}, session: {}", baseMessage.getClass().getSimpleName(), session);
 
         if (baseMessage instanceof CommandRequestMessage commandRequestMessage) {
             commandScheduler.submit(commandRequestMessage);
@@ -108,22 +112,27 @@ public class AgentWebSocketHandler extends AbstractBinaryWebSocketHandler implem
     @Override
     public void afterConnectionEstablished(@Nonnull WebSocketSession session) {
         this.setSession(session);
-        executor.scheduleAtFixedRate(() -> {
-            try {
-                HeartbeatMessage heartbeatMessage = new HeartbeatMessage();
-                heartbeatMessage.setHostInfo(hostInfo);
-                WebSocketSession innerSession = SpringContextHolder.getAgentWebSocket().getSession();
-                if (null == innerSession || !innerSession.isOpen()) {
-                    connectToServer();
-                }
-                innerSession = SpringContextHolder.getAgentWebSocket().getSession();
-                if (null != innerSession && innerSession.isOpen()) {
-                    super.sendMessage(innerSession, heartbeatMessage);
-                }
-            } catch (Exception e) {
-                log.error(MessageFormat.format("Error sending heartbeat to server: {0}", e.getMessage()));
-            }
-        }, 3, 10, TimeUnit.SECONDS);
+        executor.scheduleAtFixedRate(
+                () -> {
+                    try {
+                        HeartbeatMessage heartbeatMessage = new HeartbeatMessage();
+                        heartbeatMessage.setHostInfo(hostInfo);
+                        WebSocketSession innerSession =
+                                SpringContextHolder.getAgentWebSocket().getSession();
+                        if (null == innerSession || !innerSession.isOpen()) {
+                            connectToServer();
+                        }
+                        innerSession = SpringContextHolder.getAgentWebSocket().getSession();
+                        if (null != innerSession && innerSession.isOpen()) {
+                            super.sendMessage(innerSession, heartbeatMessage);
+                        }
+                    } catch (Exception e) {
+                        log.error(MessageFormat.format("Error sending heartbeat to server: {0}", e.getMessage()));
+                    }
+                },
+                3,
+                10,
+                TimeUnit.SECONDS);
     }
 
     @Override
@@ -181,13 +190,12 @@ public class AgentWebSocketHandler extends AbstractBinaryWebSocketHandler implem
         int retryTime = 0;
         while (true) {
             try {
-                if (retryTime >= 3)
-                    break;
+                if (retryTime >= 3) break;
                 AgentWebSocketHandler agentWebSocket = SpringContextHolder.getAgentWebSocket();
                 WebSocketSession contextSession = agentWebSocket.getSession();
                 if (null == contextSession || !contextSession.isOpen()) {
-                    WebSocketSession webSocketSession = webSocketClient
-                            .execute(this, uri).get(5, TimeUnit.SECONDS);
+                    WebSocketSession webSocketSession =
+                            webSocketClient.execute(this, uri).get(5, TimeUnit.SECONDS);
                     webSocketSession.setBinaryMessageSizeLimit(WS_BINARY_MESSAGE_SIZE_LIMIT);
                     agentWebSocket.setSession(webSocketSession);
                     log.info(MessageFormat.format("Connect to server: {0} successfully", uri));
@@ -195,8 +203,8 @@ public class AgentWebSocketHandler extends AbstractBinaryWebSocketHandler implem
                 ++retryTime;
                 break;
             } catch (Exception e) {
-                log.error(MessageFormat.format("Error connecting to server: {0}, retry time: {1}", e.getMessage(),
-                        ++retryTime));
+                log.error(MessageFormat.format(
+                        "Error connecting to server: {0}, retry time: {1}", e.getMessage(), ++retryTime));
                 // retry after 5 seconds
                 try {
                     TimeUnit.MILLISECONDS.sleep(Constants.REGISTRY_SESSION_TIMEOUT);

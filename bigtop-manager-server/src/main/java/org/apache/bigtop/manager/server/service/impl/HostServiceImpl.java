@@ -32,16 +32,15 @@ import org.apache.bigtop.manager.server.service.HostService;
 
 import org.apache.commons.collections4.CollectionUtils;
 
+import org.springframework.stereotype.Service;
+
+import lombok.extern.slf4j.Slf4j;
+
+import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import jakarta.annotation.Resource;
-
-import org.springframework.stereotype.Service;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -111,5 +110,4 @@ public class HostServiceImpl implements HostService {
         hostRepository.deleteById(id);
         return true;
     }
-
 }

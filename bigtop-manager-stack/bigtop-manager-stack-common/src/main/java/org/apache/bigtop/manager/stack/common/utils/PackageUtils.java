@@ -81,5 +81,4 @@ public class PackageUtils {
 
         return getPackageManager().installPackage(packageList);
     }
-
 }

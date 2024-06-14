@@ -21,15 +21,14 @@ package org.apache.bigtop.manager.agent.holder;
 import org.apache.bigtop.manager.agent.executor.CommandExecutor;
 import org.apache.bigtop.manager.agent.ws.AgentWebSocketHandler;
 
-import java.util.Map;
-
-import jakarta.annotation.Nonnull;
-
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 import lombok.Getter;
+
+import jakarta.annotation.Nonnull;
+import java.util.Map;
 
 @Component
 public class SpringContextHolder implements ApplicationContextAware {

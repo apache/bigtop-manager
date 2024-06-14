@@ -31,6 +31,4 @@ import java.lang.annotation.Target;
 @Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface GlobalParams {
-
-}
+public @interface GlobalParams {}

@@ -24,17 +24,16 @@ import org.apache.bigtop.manager.dao.entity.Host;
 import org.apache.bigtop.manager.dao.repository.HostRepository;
 import org.apache.bigtop.manager.server.ws.ServerWebSocketHandler;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import jakarta.annotation.Resource;
-
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
+
+import jakarta.annotation.Resource;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -78,7 +77,5 @@ public class HostHeartbeatScheduled {
                 hostRepository.save(host);
             }
         }
-
     }
-
 }

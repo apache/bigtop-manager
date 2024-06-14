@@ -21,10 +21,10 @@ package org.apache.bigtop.manager.server.model.dto.command;
 import org.apache.bigtop.manager.server.model.dto.ComponentHostDTO;
 import org.apache.bigtop.manager.server.model.dto.TypeConfigDTO;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.List;
-
-import lombok.Data;
 
 @Data
 public class ServiceCommandDTO implements Serializable {

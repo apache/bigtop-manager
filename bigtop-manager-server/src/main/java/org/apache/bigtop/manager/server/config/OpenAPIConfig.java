@@ -35,5 +35,4 @@ public class OpenAPIConfig {
                         .description("Bigtop Manager Api Docs")
                         .version("V1"));
     }
-
 }

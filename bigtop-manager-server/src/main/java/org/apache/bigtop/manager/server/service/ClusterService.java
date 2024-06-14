@@ -52,5 +52,4 @@ public interface ClusterService {
      * @return Cluster
      */
     ClusterVO update(Long id, ClusterDTO clusterDTO);
-
 }

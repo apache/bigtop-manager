@@ -26,14 +26,13 @@ import org.apache.bigtop.manager.server.model.dto.CommandDTO;
 import org.apache.bigtop.manager.server.model.dto.command.HostCommandDTO;
 import org.apache.bigtop.manager.server.service.HostService;
 
-import java.util.List;
-
-import jakarta.annotation.Resource;
-
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 
 import lombok.extern.slf4j.Slf4j;
+
+import jakarta.annotation.Resource;
+import java.util.List;
 
 @Slf4j
 @org.springframework.stereotype.Component
@@ -55,7 +54,8 @@ public class HostAddJobRunner extends AbstractJobRunner {
         CommandDTO commandDTO = getCommandDTO();
         List<HostCommandDTO> hostCommands = commandDTO.getHostCommands();
 
-        List<String> hostnames = hostCommands.stream().map(HostCommandDTO::getHostname).toList();
+        List<String> hostnames =
+                hostCommands.stream().map(HostCommandDTO::getHostname).toList();
         hostService.batchSave(job.getCluster().getId(), hostnames);
     }
 }

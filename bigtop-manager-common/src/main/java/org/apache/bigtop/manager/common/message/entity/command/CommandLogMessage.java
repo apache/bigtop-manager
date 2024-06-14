@@ -18,8 +18,13 @@
  */
 package org.apache.bigtop.manager.common.message.entity.command;
 
-import lombok.*;
 import org.apache.bigtop.manager.common.message.entity.BaseMessage;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

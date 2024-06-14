@@ -22,12 +22,12 @@ import org.apache.bigtop.manager.dao.entity.TypeConfig;
 import org.apache.bigtop.manager.server.model.dto.TypeConfigDTO;
 import org.apache.bigtop.manager.server.model.vo.TypeConfigVO;
 
-import java.util.List;
-
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
+
+import java.util.List;
 
 @Mapper(uses = {TypeConvert.class})
 public interface TypeConfigMapper {

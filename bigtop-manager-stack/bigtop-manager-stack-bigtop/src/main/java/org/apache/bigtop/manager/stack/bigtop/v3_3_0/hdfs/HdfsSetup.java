@@ -18,9 +18,7 @@
  */
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.hdfs;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.apache.bigtop.manager.common.constants.Constants;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.spi.stack.Params;
 import org.apache.bigtop.manager.stack.bigtop.v3_3_0.kafka.KafkaParams;
@@ -29,13 +27,16 @@ import org.apache.bigtop.manager.stack.common.exception.StackException;
 import org.apache.bigtop.manager.stack.common.log.TaskLogWriter;
 import org.apache.bigtop.manager.stack.common.utils.linux.LinuxFileUtils;
 import org.apache.bigtop.manager.stack.common.utils.linux.LinuxOSUtils;
+
 import org.apache.commons.lang3.StringUtils;
+
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.text.MessageFormat;
 import java.util.Map;
-
-import static org.apache.bigtop.manager.common.constants.Constants.*;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -57,65 +58,97 @@ public class HdfsSetup {
         if (StringUtils.isNotBlank(componentName)) {
             switch (componentName) {
                 case "namenode": {
-                    LinuxFileUtils.createDirectories(hdfsParams.getDfsNameNodeDir(), hdfsUser,
-                            hdfsGroup, PERMISSION_755, true);
+                    LinuxFileUtils.createDirectories(
+                            hdfsParams.getDfsNameNodeDir(), hdfsUser, hdfsGroup, Constants.PERMISSION_755, true);
                 }
                 case "secondarynamenode": {
-                    LinuxFileUtils.createDirectories(hdfsParams.getDfsNameNodeCheckPointDir(),
-                            hdfsUser, hdfsGroup, PERMISSION_755, true);
+                    LinuxFileUtils.createDirectories(
+                            hdfsParams.getDfsNameNodeCheckPointDir(),
+                            hdfsUser,
+                            hdfsGroup,
+                            Constants.PERMISSION_755,
+                            true);
                 }
                 case "datanode": {
-                    LinuxFileUtils.createDirectories(hdfsParams.getDfsDomainSocketPathPrefix(),
-                            hdfsUser, hdfsGroup, PERMISSION_755, true);
+                    LinuxFileUtils.createDirectories(
+                            hdfsParams.getDfsDomainSocketPathPrefix(),
+                            hdfsUser,
+                            hdfsGroup,
+                            Constants.PERMISSION_755,
+                            true);
                 }
             }
         }
 
         // mkdir directories
-        LinuxFileUtils.createDirectories(hdfsParams.getDfsDataDir(), hdfsUser, hdfsGroup,
-                PERMISSION_755, true);
-        LinuxFileUtils.createDirectories(hdfsParams.getHadoopLogDir(), hdfsUser, hdfsGroup,
-                PERMISSION_755, true);
-        LinuxFileUtils.createDirectories(hdfsParams.getHadoopPidDir(), hdfsUser, hdfsGroup,
-                PERMISSION_755, true);
+        LinuxFileUtils.createDirectories(
+                hdfsParams.getDfsDataDir(), hdfsUser, hdfsGroup, Constants.PERMISSION_755, true);
+        LinuxFileUtils.createDirectories(
+                hdfsParams.getHadoopLogDir(), hdfsUser, hdfsGroup, Constants.PERMISSION_755, true);
+        LinuxFileUtils.createDirectories(
+                hdfsParams.getHadoopPidDir(), hdfsUser, hdfsGroup, Constants.PERMISSION_755, true);
 
         // hdfs.limits
-        LinuxFileUtils.toFileByTemplate(hdfsParams.hdfsLimits(),
+        LinuxFileUtils.toFileByTemplate(
+                hdfsParams.hdfsLimits(),
                 MessageFormat.format("{0}/hdfs.conf", KafkaParams.LIMITS_CONF_DIR),
-                ROOT_USER,
-                ROOT_USER,
-                PERMISSION_644,
+                Constants.ROOT_USER,
+                Constants.ROOT_USER,
+                Constants.PERMISSION_644,
                 hdfsParams.getGlobalParamsMap());
 
         // hadoop-env.sh
-        LinuxFileUtils.toFileByTemplate(hadoopEnv.get("content").toString(),
+        LinuxFileUtils.toFileByTemplate(
+                hadoopEnv.get("content").toString(),
                 MessageFormat.format("{0}/hadoop-env.sh", confDir),
-                hdfsUser, hdfsGroup, PERMISSION_644, hdfsParams.getGlobalParamsMap());
+                hdfsUser,
+                hdfsGroup,
+                Constants.PERMISSION_644,
+                hdfsParams.getGlobalParamsMap());
 
         // core-site.xml
-        LinuxFileUtils.toFile(ConfigType.XML, MessageFormat.format("{0}/core-site.xml", confDir),
-                hdfsUser, hdfsGroup, PERMISSION_644, hdfsParams.coreSite());
+        LinuxFileUtils.toFile(
+                ConfigType.XML,
+                MessageFormat.format("{0}/core-site.xml", confDir),
+                hdfsUser,
+                hdfsGroup,
+                Constants.PERMISSION_644,
+                hdfsParams.coreSite());
 
         // hdfs-site.xml
-        LinuxFileUtils.toFile(ConfigType.XML, MessageFormat.format("{0}/hdfs-site.xml", confDir),
-                hdfsUser, hdfsGroup, PERMISSION_644, hdfsParams.hdfsSite());
+        LinuxFileUtils.toFile(
+                ConfigType.XML,
+                MessageFormat.format("{0}/hdfs-site.xml", confDir),
+                hdfsUser,
+                hdfsGroup,
+                Constants.PERMISSION_644,
+                hdfsParams.hdfsSite());
 
         // hdfs-policy.xml
-        LinuxFileUtils.toFile(ConfigType.XML,
+        LinuxFileUtils.toFile(
+                ConfigType.XML,
                 MessageFormat.format("{0}/hadoop-policy.xml", confDir),
-                hdfsUser, hdfsGroup, PERMISSION_644, hdfsParams.hadoopPolicy());
+                hdfsUser,
+                hdfsGroup,
+                Constants.PERMISSION_644,
+                hdfsParams.hadoopPolicy());
 
         // hdfs-policy.xml
-        LinuxFileUtils.toFileByTemplate(hdfsParams.workers(),
+        LinuxFileUtils.toFileByTemplate(
+                hdfsParams.workers(),
                 MessageFormat.format("{0}/workers", confDir),
-                hdfsUser, hdfsGroup, PERMISSION_644, hdfsParams.getGlobalParamsMap());
+                hdfsUser,
+                hdfsGroup,
+                Constants.PERMISSION_644,
+                hdfsParams.getGlobalParamsMap());
 
         // log4j
-        LinuxFileUtils.toFileByTemplate(hdfsParams.hdfsLog4j().get("content").toString(),
+        LinuxFileUtils.toFileByTemplate(
+                hdfsParams.hdfsLog4j().get("content").toString(),
                 MessageFormat.format("{0}/log4j.properties", confDir),
                 hdfsUser,
                 hdfsGroup,
-                PERMISSION_644,
+                Constants.PERMISSION_644,
                 hdfsParams.getGlobalParamsMap());
 
         return ShellResult.success("HDFS Configure success!");
@@ -123,9 +156,8 @@ public class HdfsSetup {
 
     public static void formatNameNode(HdfsParams hdfsParams) {
         if (!isNameNodeFormatted(hdfsParams)) {
-            String formatCmd =
-                    MessageFormat.format("{0} --config {1} namenode -format -nonInteractive",
-                            hdfsParams.hdfsExec(), hdfsParams.confDir());
+            String formatCmd = MessageFormat.format(
+                    "{0} --config {1} namenode -format -nonInteractive", hdfsParams.hdfsExec(), hdfsParams.confDir());
             try {
                 LinuxOSUtils.sudoExecCmd(formatCmd, hdfsParams.user());
             } catch (Exception e) {
@@ -133,11 +165,10 @@ public class HdfsSetup {
             }
 
             for (String nameNodeFormattedDir : hdfsParams.getNameNodeFormattedDirs()) {
-                LinuxFileUtils.createDirectories(nameNodeFormattedDir, hdfsParams.user(),
-                        hdfsParams.group(), PERMISSION_755, true);
+                LinuxFileUtils.createDirectories(
+                        nameNodeFormattedDir, hdfsParams.user(), hdfsParams.group(), Constants.PERMISSION_755, true);
             }
         }
-
     }
 
     public static boolean isNameNodeFormatted(HdfsParams hdfsParams) {
@@ -153,8 +184,8 @@ public class HdfsSetup {
 
         if (isFormatted) {
             for (String nameNodeFormattedDir : hdfsParams.getNameNodeFormattedDirs()) {
-                LinuxFileUtils.createDirectories(nameNodeFormattedDir, hdfsParams.user(),
-                        hdfsParams.group(), PERMISSION_755, true);
+                LinuxFileUtils.createDirectories(
+                        nameNodeFormattedDir, hdfsParams.user(), hdfsParams.group(), Constants.PERMISSION_755, true);
             }
             return true;
         }
@@ -165,12 +196,14 @@ public class HdfsSetup {
         for (String nameNodeDir : nameNodeDirs) {
             File file = new File(nameNodeDir);
             if (!file.exists()) {
-                TaskLogWriter.info("NameNode will not be formatted because the directory " + nameNodeDir + " is missing or cannot be checked for content.");
+                TaskLogWriter.info("NameNode will not be formatted because the directory " + nameNodeDir
+                        + " is missing or cannot be checked for content.");
                 return true;
             } else {
                 File[] files = file.listFiles();
                 if (files != null && files.length > 0) {
-                    TaskLogWriter.info("NameNode will not be formatted since " + nameNodeDir + " exists and contains content");
+                    TaskLogWriter.info(
+                            "NameNode will not be formatted since " + nameNodeDir + " exists and contains content");
                     return true;
                 }
             }

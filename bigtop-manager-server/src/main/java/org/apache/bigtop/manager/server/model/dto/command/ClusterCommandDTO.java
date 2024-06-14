@@ -20,9 +20,9 @@ package org.apache.bigtop.manager.server.model.dto.command;
 
 import org.apache.bigtop.manager.server.model.dto.RepoDTO;
 
-import java.util.List;
-
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class ClusterCommandDTO {
@@ -38,5 +38,4 @@ public class ClusterCommandDTO {
     private List<RepoDTO> repoInfoList;
 
     private List<String> hostnames;
-
 }

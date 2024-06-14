@@ -18,14 +18,15 @@
  */
 package org.apache.bigtop.manager.stack.common.utils.template;
 
+import org.apache.bigtop.manager.stack.common.exception.StackException;
+import org.apache.bigtop.manager.stack.common.log.TaskLogWriter;
+
 import freemarker.core.UndefinedOutputFormat;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.bigtop.manager.stack.common.exception.StackException;
-import org.apache.bigtop.manager.stack.common.log.TaskLogWriter;
 
 import java.io.FileWriter;
 import java.io.IOException;

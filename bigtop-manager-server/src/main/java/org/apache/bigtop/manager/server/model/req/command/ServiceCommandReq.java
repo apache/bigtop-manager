@@ -22,20 +22,18 @@ import org.apache.bigtop.manager.server.config.CommandGroupSequenceProvider;
 import org.apache.bigtop.manager.server.model.req.ComponentHostReq;
 import org.apache.bigtop.manager.server.model.req.TypeConfigReq;
 
-import java.util.List;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
+import java.util.List;
 
 @Data
 public class ServiceCommandReq {
 
-    @NotNull
-    @Schema(description = "Service name", example = "zookeeper")
+    @NotNull @Schema(description = "Service name", example = "zookeeper")
     private String serviceName;
 
     @Schema(description = "Config Description", example = "Initial config for zookeeper")

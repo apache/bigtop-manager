@@ -23,9 +23,6 @@ import org.apache.bigtop.manager.dao.entity.AuditLog;
 import org.apache.bigtop.manager.dao.repository.AuditLogRepository;
 import org.apache.bigtop.manager.server.holder.SessionUserHolder;
 
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -37,6 +34,9 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Slf4j
 @Aspect
@@ -92,5 +92,4 @@ public class AuditAspect {
             auditLogRepository.save(auditLog);
         }
     }
-
 }
