@@ -28,14 +28,12 @@ import org.apache.bigtop.manager.spi.stack.Hook;
 import org.apache.bigtop.manager.spi.stack.Params;
 import org.apache.bigtop.manager.spi.stack.Script;
 import org.apache.bigtop.manager.stack.common.exception.StackException;
-import org.apache.bigtop.manager.stack.common.log.TaskLogWriter;
 
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 @Slf4j
 public class StackExecutor {
@@ -83,13 +81,7 @@ public class StackExecutor {
     }
 
     public static ShellResult execute(CommandPayload commandPayload) {
-        return execute(commandPayload, s -> {});
-    }
-
-    public static ShellResult execute(CommandPayload commandPayload, Consumer<String> consumer) {
         try {
-            TaskLogWriter.setWriter(consumer);
-
             String command;
             Script script;
             if (commandPayload.getCommand().name().equals(Command.CUSTOM.name())) {
@@ -111,17 +103,15 @@ public class StackExecutor {
 
             runBeforeHook(command);
 
-            TaskLogWriter.info("Executing " + script.getName() + "::" + method.getName());
+            log.info("Executing {}::{}", script.getName(), method.getName());
             ShellResult result = (ShellResult) method.invoke(script, params);
 
             runAfterHook(command);
 
             return result;
         } catch (Exception e) {
-            TaskLogWriter.info("Error executing command, payload: " + commandPayload + ", error: " + e.getMessage());
+            log.info("Error executing command, payload: {}", commandPayload, e);
             return ShellResult.fail();
-        } finally {
-            TaskLogWriter.clearWriter();
         }
     }
 }

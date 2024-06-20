@@ -23,7 +23,6 @@ import org.apache.bigtop.manager.common.message.entity.BaseMessage;
 import org.apache.bigtop.manager.common.message.entity.BaseRequestMessage;
 import org.apache.bigtop.manager.common.message.entity.BaseResponseMessage;
 import org.apache.bigtop.manager.common.message.entity.HeartbeatMessage;
-import org.apache.bigtop.manager.common.message.entity.command.CommandLogMessage;
 import org.apache.bigtop.manager.common.message.entity.command.CommandMessageType;
 import org.apache.bigtop.manager.common.message.entity.command.CommandRequestMessage;
 import org.apache.bigtop.manager.common.message.entity.command.CommandResponseMessage;
@@ -62,7 +61,6 @@ public class KryoPoolHolder {
             kryo.register(HeartbeatMessage.class);
             kryo.register(CommandResponseMessage.class);
             kryo.register(CommandRequestMessage.class);
-            kryo.register(CommandLogMessage.class);
 
             // message pojo
             kryo.register(HostInfo.class);

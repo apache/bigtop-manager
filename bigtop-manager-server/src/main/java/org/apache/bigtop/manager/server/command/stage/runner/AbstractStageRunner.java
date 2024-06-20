@@ -89,8 +89,10 @@ public abstract class AbstractStageRunner implements StageRunner {
                 boolean taskSuccess = res != null && res.getCode() == MessageConstants.SUCCESS_CODE;
 
                 if (taskSuccess) {
+                    commandLogService.onLogReceived(task.getId(), task.getHostname(), "Success!");
                     onTaskSuccess(task);
                 } else {
+                    commandLogService.onLogReceived(task.getId(), task.getHostname(), "Failed!");
                     onTaskFailure(task);
                 }
 

@@ -25,7 +25,6 @@ import org.apache.bigtop.manager.common.utils.NetUtils;
 import org.apache.bigtop.manager.common.utils.os.OSDetection;
 import org.apache.bigtop.manager.spi.stack.Params;
 import org.apache.bigtop.manager.stack.common.annotations.GlobalParams;
-import org.apache.bigtop.manager.stack.common.log.TaskLogWriter;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -67,7 +66,7 @@ public abstract class BaseParams implements Params {
                     globalParamsMap.putAll(invoke);
                 }
             } catch (Exception e) {
-                TaskLogWriter.warn("Get " + declaredMethod + " Params error: " + e.getMessage());
+                log.warn("Get {} Params error", declaredMethod, e);
             }
         }
         globalParamsMap.remove("content");

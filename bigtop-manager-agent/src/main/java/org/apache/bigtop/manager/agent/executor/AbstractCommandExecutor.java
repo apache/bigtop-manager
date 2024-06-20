@@ -20,7 +20,6 @@ package org.apache.bigtop.manager.agent.executor;
 
 import org.apache.bigtop.manager.agent.holder.SpringContextHolder;
 import org.apache.bigtop.manager.common.constants.MessageConstants;
-import org.apache.bigtop.manager.common.message.entity.command.CommandLogMessage;
 import org.apache.bigtop.manager.common.message.entity.command.CommandRequestMessage;
 import org.apache.bigtop.manager.common.message.entity.command.CommandResponseMessage;
 import org.apache.bigtop.manager.common.shell.ShellResult;
@@ -68,15 +67,4 @@ public abstract class AbstractCommandExecutor implements CommandExecutor {
     }
 
     protected abstract void doExecute();
-
-    protected void writeBackCommandLog(String log) {
-        CommandLogMessage logMessage = new CommandLogMessage();
-        logMessage.setLog(log);
-        logMessage.setMessageId(commandRequestMessage.getMessageId());
-        logMessage.setHostname(commandRequestMessage.getHostname());
-        logMessage.setTaskId(commandRequestMessage.getTaskId());
-        logMessage.setStageId(commandRequestMessage.getStageId());
-        logMessage.setJobId(commandRequestMessage.getJobId());
-        SpringContextHolder.getAgentWebSocket().sendMessage(logMessage);
-    }
 }

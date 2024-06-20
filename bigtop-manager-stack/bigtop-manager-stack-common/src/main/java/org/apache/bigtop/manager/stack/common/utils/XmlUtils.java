@@ -19,7 +19,6 @@
 package org.apache.bigtop.manager.stack.common.utils;
 
 import org.apache.bigtop.manager.stack.common.exception.StackException;
-import org.apache.bigtop.manager.stack.common.log.TaskLogWriter;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -67,7 +66,7 @@ public class XmlUtils {
             Element configuration = document.createElement("configuration");
 
             for (Map.Entry<String, Object> entry : configMap.entrySet()) {
-                TaskLogWriter.info(entry.getKey() + " " + entry.getValue());
+                log.info("{} {}", entry.getKey(), entry.getValue());
                 Element property = document.createElement("property");
 
                 Element name = document.createElement("name");
@@ -90,9 +89,9 @@ public class XmlUtils {
             tf.setOutputProperty(OutputKeys.INDENT, "yes");
 
             tf.transform(new DOMSource(document), new StreamResult(new File(fileName)));
-            TaskLogWriter.info("writeXml " + fileName + " success");
+            log.info("writeXml {} success", fileName);
         } catch (TransformerException e) {
-            TaskLogWriter.error("writeXml error: " + e.getLocationAsString());
+            log.error("writeXml error", e);
             throw new StackException(e);
         }
     }

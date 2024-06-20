@@ -21,7 +21,6 @@ package org.apache.bigtop.manager.stack.common.utils.linux;
 import org.apache.bigtop.manager.common.shell.ShellExecutor;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.stack.common.exception.StackException;
-import org.apache.bigtop.manager.stack.common.log.TaskLogWriter;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -66,7 +65,7 @@ public class LinuxAccountUtils {
 
         try {
             ShellResult output = ShellExecutor.execCommand(builderParameters);
-            TaskLogWriter.info("[AccountGroupUtils] [userDel] output: " + output);
+            log.info("[AccountGroupUtils] [userDel] output: {}", output);
         } catch (IOException e) {
             throw new StackException(e);
         }
@@ -154,7 +153,7 @@ public class LinuxAccountUtils {
 
         try {
             ShellResult output = ShellExecutor.execCommand(builderParameters);
-            TaskLogWriter.info("[AccountGroupUtils] [userAdd] output: " + output);
+            log.info("[AccountGroupUtils] [userAdd] output: {}", output);
         } catch (IOException e) {
             throw new StackException(e);
         }
@@ -180,7 +179,7 @@ public class LinuxAccountUtils {
 
         try {
             ShellResult output = ShellExecutor.execCommand(builderParameters);
-            TaskLogWriter.info("[AccountGroupUtils] [addGroup] output: " + output);
+            log.info("[AccountGroupUtils] [addGroup] output: {}", output);
         } catch (IOException e) {
             throw new StackException(e);
         }
@@ -229,7 +228,7 @@ public class LinuxAccountUtils {
 
         try {
             ShellResult output = ShellExecutor.execCommand(builderParameters);
-            TaskLogWriter.info("[AccountGroupUtils] [addGroup] output: " + output);
+            log.info("[AccountGroupUtils] [addGroup] output: {}", output);
         } catch (IOException e) {
             throw new StackException(e);
         }
@@ -252,7 +251,7 @@ public class LinuxAccountUtils {
 
         try {
             ShellResult output = ShellExecutor.execCommand(builderParameters);
-            TaskLogWriter.info("[AccountGroupUtils] [checkIfExistsGroup] output: " + output);
+            log.info("[AccountGroupUtils] [checkIfExistsGroup] output: {}", output);
             return output.getExitCode() == 0;
         } catch (IOException e) {
             throw new StackException(e);
@@ -275,7 +274,7 @@ public class LinuxAccountUtils {
 
         try {
             ShellResult output = ShellExecutor.execCommand(builderParameters);
-            TaskLogWriter.info("[AccountGroupUtils] [checkIfExistsUser] output: " + output);
+            log.info("[AccountGroupUtils] [checkIfExistsUser] output: {}", output);
             return output.getExitCode() == 0;
         } catch (IOException e) {
             throw new StackException(e);

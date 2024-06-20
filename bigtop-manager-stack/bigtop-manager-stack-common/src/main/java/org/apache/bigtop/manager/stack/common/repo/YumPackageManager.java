@@ -23,7 +23,6 @@ import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.spi.stack.PackageManager;
 import org.apache.bigtop.manager.stack.common.enums.PackageManagerType;
 import org.apache.bigtop.manager.stack.common.exception.StackException;
-import org.apache.bigtop.manager.stack.common.log.TaskLogWriter;
 
 import com.google.auto.service.AutoService;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +48,7 @@ public class YumPackageManager implements PackageManager {
 
         try {
             ShellResult output = ShellExecutor.execCommand(builderParameters, log::info);
-            TaskLogWriter.info("[RpmPackageManager] [installPackage] output: " + output);
+            log.info("[RpmPackageManager] [installPackage] output: {}", output);
             return output;
         } catch (IOException e) {
             throw new StackException(e);
@@ -66,7 +65,7 @@ public class YumPackageManager implements PackageManager {
 
         try {
             ShellResult output = ShellExecutor.execCommand(builderParameters, log::info);
-            TaskLogWriter.info("[RpmPackageManager] [uninstallPackage] output: " + output);
+            log.info("[RpmPackageManager] [uninstallPackage] output: {}", output);
             return output;
         } catch (IOException e) {
             throw new StackException(e);
@@ -81,7 +80,7 @@ public class YumPackageManager implements PackageManager {
 
         try {
             ShellResult output = ShellExecutor.execCommand(builderParameters, log::info);
-            TaskLogWriter.info("[RpmPackageManager] [listPackages] output: " + output);
+            log.info("[RpmPackageManager] [listPackages] output: {}", output);
             return output.getOutput();
         } catch (IOException e) {
             throw new StackException(e);

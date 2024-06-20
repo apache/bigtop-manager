@@ -24,7 +24,6 @@ import org.apache.bigtop.manager.common.message.entity.pojo.ClusterInfo;
 import org.apache.bigtop.manager.common.message.entity.pojo.ComponentInfo;
 import org.apache.bigtop.manager.common.message.entity.pojo.RepoInfo;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.stack.common.log.TaskLogWriter;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.extern.slf4j.Slf4j;
@@ -58,7 +57,7 @@ public class LocalSettings {
                 }
             }
         } catch (Exception e) {
-            TaskLogWriter.warn(CacheFiles.CONFIGURATIONS_INFO + " parse error: " + e.getMessage());
+            log.warn("{} parse error", CacheFiles.CONFIGURATIONS_INFO, e);
         }
 
         return configDataMap;

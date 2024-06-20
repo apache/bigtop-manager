@@ -31,10 +31,10 @@ spring:
   main:
     banner-mode: log
   datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/bigtop_manager
-    username: postgres
-    password: postgres
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/bigtop_manager
+    username: root
+    password: root
     type: com.zaxxer.hikari.HikariDataSource
     hikari:
       auto-commit: true

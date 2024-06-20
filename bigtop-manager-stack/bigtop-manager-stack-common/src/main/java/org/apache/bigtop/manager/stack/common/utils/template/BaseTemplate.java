@@ -19,7 +19,6 @@
 package org.apache.bigtop.manager.stack.common.utils.template;
 
 import org.apache.bigtop.manager.stack.common.exception.StackException;
-import org.apache.bigtop.manager.stack.common.log.TaskLogWriter;
 
 import freemarker.core.UndefinedOutputFormat;
 import freemarker.template.Configuration;
@@ -58,7 +57,7 @@ public class BaseTemplate {
             Template template = CONFIGURATION.getTemplate(type + ".ftl");
             writeTemplate(path, dataModel, template);
         } catch (IOException e) {
-            TaskLogWriter.error("Failed to writeTemplate: " + e.getMessage());
+            log.error("Failed to writeTemplate", e);
         }
     }
 
@@ -68,7 +67,7 @@ public class BaseTemplate {
             Template template = new Template("tmpTemplate", sourceStr, CONFIGURATION);
             writeTemplate(path, dataModel, template);
         } catch (IOException e) {
-            TaskLogWriter.error("Failed to writeTemplate: " + e.getMessage());
+            log.error("Failed to writeTemplate", e);
         }
     }
 
@@ -80,7 +79,7 @@ public class BaseTemplate {
             template.process(dataModel, fileWriter);
             fileWriter.flush();
         } catch (TemplateException | IOException e) {
-            TaskLogWriter.error("Failed to writeTemplate: " + e.getMessage());
+            log.error("Failed to writeTemplate", e);
         } finally {
             try {
                 if (fileWriter != null) {
@@ -98,7 +97,7 @@ public class BaseTemplate {
             template = CONFIGURATION.getTemplate(type + ".ftl");
             return writeTemplateAsString(dataModel, template);
         } catch (IOException e) {
-            TaskLogWriter.error("Failed to writeTemplate: " + e.getMessage());
+            log.error("Failed to writeTemplate", e);
             throw new StackException(e);
         }
     }
@@ -109,7 +108,7 @@ public class BaseTemplate {
             Template template = new Template("tmpTemplate", sourceStr, CONFIGURATION);
             return writeTemplateAsString(dataModel, template);
         } catch (IOException e) {
-            TaskLogWriter.error("Failed to writeTemplate: " + e.getMessage());
+            log.error("Failed to writeTemplate", e);
             throw new StackException(e);
         }
     }
@@ -122,7 +121,7 @@ public class BaseTemplate {
             template.process(dataModel, stringWriter);
             stringWriter.flush();
         } catch (TemplateException | IOException e) {
-            TaskLogWriter.error("Failed to writeTemplate: " + e.getMessage());
+            log.error("Failed to writeTemplate", e);
         } finally {
             try {
                 if (stringWriter != null) {

@@ -22,6 +22,7 @@ import org.apache.bigtop.manager.agent.executor.CommandExecutor;
 import org.apache.bigtop.manager.agent.executor.CommandExecutors;
 import org.apache.bigtop.manager.common.message.entity.command.CommandRequestMessage;
 
+import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
@@ -45,10 +46,13 @@ public class DefaultCommandScheduler implements CommandScheduler {
     public void submit(CommandRequestMessage message) {
         queue.offer(() -> {
             try {
+                MDC.put("taskId", message.getTaskId().toString());
                 CommandExecutor commandExecutor = CommandExecutors.getCommandExecutor(message.getCommandMessageType());
                 commandExecutor.execute(message);
             } catch (Exception e) {
                 log.error("Error when running command", e);
+            } finally {
+                MDC.clear();
             }
         });
     }
