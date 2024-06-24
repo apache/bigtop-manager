@@ -21,7 +21,6 @@ package org.apache.bigtop.manager.stack.nop.v1_0_0.kafka;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.spi.stack.Params;
 import org.apache.bigtop.manager.spi.stack.Script;
-import org.apache.bigtop.manager.stack.common.log.TaskLogWriter;
 
 import com.google.auto.service.AutoService;
 import lombok.extern.slf4j.Slf4j;
@@ -32,36 +31,36 @@ public class KafkaBrokerScript implements Script {
 
     @Override
     public ShellResult install(Params params) {
-        TaskLogWriter.info("Success on dev mode");
+        log.info("Default to success in dev mode");
         return ShellResult.success();
     }
 
     @Override
     public ShellResult configure(Params params) {
-        TaskLogWriter.info("Success on dev mode");
+        log.info("Default to success in dev mode");
         return ShellResult.success();
     }
 
     @Override
     public ShellResult start(Params params) {
-        TaskLogWriter.info("Success on dev mode");
+        log.info("Default to success in dev mode");
         return ShellResult.success();
     }
 
     @Override
     public ShellResult stop(Params params) {
-        TaskLogWriter.info("Success on dev mode");
+        log.info("Default to success in dev mode");
         return ShellResult.success();
     }
 
     @Override
     public ShellResult status(Params params) {
-        TaskLogWriter.info("Success on dev mode");
+        log.info("Default to success in dev mode");
         return ShellResult.success();
     }
 
     public ShellResult test(Params params) {
-        TaskLogWriter.info("Success on dev mode");
+        log.info("Default to success in dev mode");
         return ShellResult.success();
     }
 }

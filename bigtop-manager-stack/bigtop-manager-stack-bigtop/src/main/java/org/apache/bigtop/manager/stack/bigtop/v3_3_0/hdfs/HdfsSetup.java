@@ -24,7 +24,6 @@ import org.apache.bigtop.manager.spi.stack.Params;
 import org.apache.bigtop.manager.stack.bigtop.v3_3_0.kafka.KafkaParams;
 import org.apache.bigtop.manager.stack.common.enums.ConfigType;
 import org.apache.bigtop.manager.stack.common.exception.StackException;
-import org.apache.bigtop.manager.stack.common.log.TaskLogWriter;
 import org.apache.bigtop.manager.stack.common.utils.linux.LinuxFileUtils;
 import org.apache.bigtop.manager.stack.common.utils.linux.LinuxOSUtils;
 
@@ -47,7 +46,7 @@ public class HdfsSetup {
     }
 
     public static ShellResult config(Params params, String componentName) {
-        TaskLogWriter.info("starting HDFS config");
+        log.info("starting HDFS config");
         HdfsParams hdfsParams = (HdfsParams) params;
 
         String confDir = hdfsParams.confDir();
@@ -177,7 +176,7 @@ public class HdfsSetup {
         for (String nameNodeFormattedDir : hdfsParams.getNameNodeFormattedDirs()) {
             File file = new File(nameNodeFormattedDir);
             if (file.exists() && file.isDirectory()) {
-                TaskLogWriter.info(nameNodeFormattedDir + "exists. Namenode DFS already formatted");
+                log.info("{} exists. Namenode DFS already formatted", nameNodeFormattedDir);
                 isFormatted = true;
             }
         }
@@ -196,14 +195,14 @@ public class HdfsSetup {
         for (String nameNodeDir : nameNodeDirs) {
             File file = new File(nameNodeDir);
             if (!file.exists()) {
-                TaskLogWriter.info("NameNode will not be formatted because the directory " + nameNodeDir
-                        + " is missing or cannot be checked for content.");
+                log.info(
+                        "NameNode will not be formatted because the directory {} is missing or cannot be checked for content.",
+                        nameNodeDir);
                 return true;
             } else {
                 File[] files = file.listFiles();
                 if (files != null && files.length > 0) {
-                    TaskLogWriter.info(
-                            "NameNode will not be formatted since " + nameNodeDir + " exists and contains content");
+                    log.info("NameNode will not be formatted since {} exists and contains content", nameNodeDir);
                     return true;
                 }
             }

@@ -19,40 +19,18 @@
 -->
 
 <configuration scan="true" scanPeriod="120 seconds">
-    <property name="log.base" value="./logs"/>
-    <property scope="context" name="log.base.ctx" value="${log.base}"/>
+    <property name="log.base" value="logs" />
+    <property scope="context" name="log.base.ctx" value="${log.base}" />
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>[%-5level] %date{yyyy-MM-dd HH:mm:ss.SSS Z} [%thread] %logger{96}:[%line] - %msg%n</pattern>
+            <pattern>[%-5level] %date{yyyy-MM-dd HH:mm:ss.SSS Z} [%thread] %logger{1}:[%line] - %m%n</pattern>
             <charset>UTF-8</charset>
         </encoder>
     </appender>
 
-    <appender name="WSLOGFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${log.base}/ws.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>${log.base}/ws.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-            <maxHistory>30</maxHistory>
-            <maxFileSize>200MB</maxFileSize>
-            <totalSizeCap>10GB</totalSizeCap>
-            <cleanHistoryOnStart>true</cleanHistoryOnStart>
-        </rollingPolicy>
-        <encoder>
-            <pattern>[%-5level] %date{yyyy-MM-dd HH:mm:ss.SSS Z} [%thread] %logger{96}:[%line] - %msg%n</pattern>
-            <charset>UTF-8</charset>
-        </encoder>
-    </appender>
-
-    <appender name="SERVERLOGFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <appender name="SERVER_LOG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.base}/bigtop-manager-server.log</file>
-        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
-            <evaluator>
-                <expression>logger.contains("org.apache.bigtop.manager.server.ws.ServerWebSocketHandler")</expression>
-            </evaluator>
-            <onMatch>DENY</onMatch>
-            <onMismatch>ACCEPT</onMismatch>
-        </filter>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>${log.base}/bigtop-manager-server.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <maxHistory>30</maxHistory>
@@ -61,20 +39,15 @@
             <cleanHistoryOnStart>true</cleanHistoryOnStart>
         </rollingPolicy>
         <encoder>
-            <pattern>[%-5level] %date{yyyy-MM-dd HH:mm:ss.SSS Z} [%thread] %logger{96}:[%line] - %msg%n</pattern>
+            <pattern>[%-5level] %date{yyyy-MM-dd HH:mm:ss.SSS Z} [%thread] %logger{1}:[%line] - %m%n</pattern>
             <charset>UTF-8</charset>
         </encoder>
     </appender>
 
-    <logger name="org.apache.bigtop.manager.server.ws.ServerWebSocketHandler" level="INFO" additivity="false">
-        <appender-ref ref="WSLOGFILE"/>
-        <appender-ref ref="STDOUT"/>
-    </logger>
-
-    <logger name="eclipselink.logging" level="DEBUG" additivity="true"/>
+    <logger name="eclipselink.logging" level="DEBUG" additivity="true" />
 
     <root level="INFO">
-        <appender-ref ref="SERVERLOGFILE"/>
-        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="SERVER_LOG_FILE" />
     </root>
 </configuration>

@@ -40,6 +40,7 @@ build/
 
 ### Log ###
 logs
+tasklogs
 *.log
 npm-debug.log*
 yarn-debug.log*

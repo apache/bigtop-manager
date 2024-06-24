@@ -22,7 +22,6 @@ import org.apache.bigtop.manager.common.constants.Constants;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.common.utils.YamlUtils;
 import org.apache.bigtop.manager.stack.common.enums.ConfigType;
-import org.apache.bigtop.manager.stack.common.log.TaskLogWriter;
 import org.apache.bigtop.manager.stack.common.utils.template.TemplateUtils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -73,7 +72,7 @@ public class LinuxFileUtils {
             Object content,
             Object paramMap) {
         if (type == null || StringUtils.isBlank(filename) || content == null) {
-            TaskLogWriter.error("type, filename, content must not be null");
+            log.error("type, filename, content must not be null");
             return;
         }
 
@@ -88,7 +87,7 @@ public class LinuxFileUtils {
                 JsonUtils.writeToFile(filename, content);
                 break;
             case UNKNOWN:
-                TaskLogWriter.info("no need to write");
+                log.info("no need to write");
                 break;
         }
 
@@ -121,7 +120,7 @@ public class LinuxFileUtils {
             Object modelMap,
             Object paramMap) {
         if (StringUtils.isBlank(filename) || modelMap == null || StringUtils.isEmpty(template)) {
-            TaskLogWriter.error("type, filename, content, template must not be null");
+            log.error("type, filename, content, template must not be null");
             return;
         }
         TemplateUtils.map2CustomTemplate(template, filename, modelMap, paramMap);
@@ -139,7 +138,7 @@ public class LinuxFileUtils {
      */
     public static void updatePermissions(String dir, String permissions, boolean recursive) {
         if (StringUtils.isBlank(dir)) {
-            TaskLogWriter.error("dir must not be null");
+            log.error("dir must not be null");
             return;
         }
         permissions = StringUtils.isBlank(permissions) ? Constants.PERMISSION_644 : permissions;
@@ -148,9 +147,9 @@ public class LinuxFileUtils {
         Set<PosixFilePermission> perms = PosixFilePermissions.fromString(permissions);
         try {
             Files.setPosixFilePermissions(path, perms);
-            TaskLogWriter.info("Permissions set successfully.");
+            log.info("Permissions set successfully.");
         } catch (IOException e) {
-            TaskLogWriter.error("[updatePermissions] error: " + e.getMessage());
+            log.error("[updatePermissions] error", e);
         }
 
         // When is a directory, recursive update
@@ -160,7 +159,7 @@ public class LinuxFileUtils {
                     updatePermissions(dir + File.separator + subPath.getFileName(), permissions, true);
                 }
             } catch (IOException e) {
-                TaskLogWriter.error("[updatePermissions] error: " + e.getMessage());
+                log.error("[updatePermissions] error", e);
             }
         }
     }
@@ -175,7 +174,7 @@ public class LinuxFileUtils {
      */
     public static void updateOwner(String dir, String owner, String group, boolean recursive) {
         if (StringUtils.isBlank(dir)) {
-            TaskLogWriter.error("dir must not be null");
+            log.error("dir must not be null");
             return;
         }
         owner = StringUtils.isBlank(owner) ? "root" : owner;
@@ -193,7 +192,7 @@ public class LinuxFileUtils {
             fileAttributeView.setOwner(userPrincipal);
             fileAttributeView.setGroup(groupPrincipal);
         } catch (IOException e) {
-            TaskLogWriter.error("[updateOwner] error: " + e.getMessage());
+            log.error("[updateOwner] error", e);
         }
 
         // When it is a directory, recursively set the file owner
@@ -203,7 +202,7 @@ public class LinuxFileUtils {
                     updateOwner(dir + File.separator + subPath.getFileName(), owner, group, true);
                 }
             } catch (IOException e) {
-                TaskLogWriter.error("[updateOwner] error: " + e.getMessage());
+                log.error("[updateOwner] error", e);
             }
         }
     }
@@ -220,20 +219,20 @@ public class LinuxFileUtils {
     public static void createDirectories(
             String dirPath, String owner, String group, String permissions, boolean recursive) {
         if (StringUtils.isBlank(dirPath)) {
-            TaskLogWriter.error("dirPath must not be null");
+            log.error("dirPath must not be null");
             return;
         }
         Path path = Paths.get(dirPath);
 
         if (Files.isSymbolicLink(path)) {
-            TaskLogWriter.warn("unable to create symbolic link: " + dirPath);
+            log.warn("unable to create symbolic link: {}", dirPath);
             return;
         }
 
         try {
             Files.createDirectories(path);
         } catch (IOException e) {
-            TaskLogWriter.error("[createDirectories] error: " + e.getMessage());
+            log.error("[createDirectories] error", e);
         }
 
         updateOwner(dirPath, owner, group, recursive);

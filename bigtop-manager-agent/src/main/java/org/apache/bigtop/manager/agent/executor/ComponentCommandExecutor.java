@@ -49,7 +49,7 @@ public class ComponentCommandExecutor extends AbstractCommandExecutor {
         CommandPayload commandPayload =
                 JsonUtils.readFromString(commandRequestMessage.getMessagePayload(), CommandPayload.class);
         log.info("[agent executeTask] taskEvent is: {}", commandRequestMessage);
-        ShellResult shellResult = StackExecutor.execute(commandPayload, this::writeBackCommandLog);
+        ShellResult shellResult = StackExecutor.execute(commandPayload);
 
         commandResponseMessage.setCode(shellResult.getExitCode());
         commandResponseMessage.setResult(shellResult.getResult());

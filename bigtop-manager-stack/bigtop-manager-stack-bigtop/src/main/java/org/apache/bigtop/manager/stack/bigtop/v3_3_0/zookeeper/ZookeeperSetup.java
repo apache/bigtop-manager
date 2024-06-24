@@ -22,7 +22,6 @@ import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.common.utils.NetUtils;
 import org.apache.bigtop.manager.spi.stack.Params;
 import org.apache.bigtop.manager.stack.common.enums.ConfigType;
-import org.apache.bigtop.manager.stack.common.log.TaskLogWriter;
 import org.apache.bigtop.manager.stack.common.utils.LocalSettings;
 import org.apache.bigtop.manager.stack.common.utils.linux.LinuxFileUtils;
 
@@ -43,7 +42,7 @@ import static org.apache.bigtop.manager.common.constants.Constants.PERMISSION_75
 public class ZookeeperSetup {
 
     public static ShellResult config(Params params) {
-        TaskLogWriter.info("ZookeeperSetup config");
+        log.info("ZookeeperSetup config");
         ZookeeperParams zookeeperParams = (ZookeeperParams) params;
 
         String confDir = zookeeperParams.confDir();

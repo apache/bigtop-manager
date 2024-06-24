@@ -23,7 +23,6 @@ import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.spi.stack.PackageManager;
 import org.apache.bigtop.manager.stack.common.enums.PackageManagerType;
 import org.apache.bigtop.manager.stack.common.exception.StackException;
-import org.apache.bigtop.manager.stack.common.log.TaskLogWriter;
 
 import com.google.auto.service.AutoService;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +48,7 @@ public class DnfPackageManager implements PackageManager {
 
         try {
             ShellResult output = ShellExecutor.execCommand(builderParameters, log::info);
-            TaskLogWriter.info("[DnfPackageManager] [installPackage] output: " + output);
+            log.info("[DnfPackageManager] [installPackage] output: {}", output);
             return output;
         } catch (IOException e) {
             throw new StackException(e);
@@ -66,7 +65,7 @@ public class DnfPackageManager implements PackageManager {
 
         try {
             ShellResult output = ShellExecutor.execCommand(builderParameters, log::info);
-            TaskLogWriter.info("[DnfPackageManager] [uninstallPackage] output: " + output);
+            log.info("[DnfPackageManager] [uninstallPackage] output: {}", output);
             return output;
         } catch (IOException e) {
             throw new StackException(e);
@@ -81,7 +80,7 @@ public class DnfPackageManager implements PackageManager {
 
         try {
             ShellResult output = ShellExecutor.execCommand(builderParameters, log::info);
-            TaskLogWriter.info("[DnfPackageManager] [listPackages] output: " + output);
+            log.info("[DnfPackageManager] [listPackages] output: {}", output);
             return output.getOutput();
         } catch (IOException e) {
             throw new StackException(e);

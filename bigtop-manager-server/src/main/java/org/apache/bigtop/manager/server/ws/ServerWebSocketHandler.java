@@ -21,11 +21,9 @@ package org.apache.bigtop.manager.server.ws;
 import org.apache.bigtop.manager.common.message.entity.BaseMessage;
 import org.apache.bigtop.manager.common.message.entity.BaseRequestMessage;
 import org.apache.bigtop.manager.common.message.entity.HeartbeatMessage;
-import org.apache.bigtop.manager.common.message.entity.command.CommandLogMessage;
 import org.apache.bigtop.manager.common.message.entity.command.CommandResponseMessage;
 import org.apache.bigtop.manager.common.message.entity.pojo.HostInfo;
 import org.apache.bigtop.manager.common.ws.AbstractBinaryWebSocketHandler;
-import org.apache.bigtop.manager.server.service.CommandLogService;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.BinaryMessage;
@@ -35,7 +33,6 @@ import org.springframework.web.socket.WebSocketSession;
 import lombok.extern.slf4j.Slf4j;
 
 import jakarta.annotation.Nonnull;
-import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -47,9 +44,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 @Component
 public class ServerWebSocketHandler extends AbstractBinaryWebSocketHandler {
-
-    @Resource
-    private CommandLogService commandLogService;
 
     private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
 
@@ -93,9 +87,6 @@ public class ServerWebSocketHandler extends AbstractBinaryWebSocketHandler {
             handleHeartbeatMessage(session, heartbeatMessage);
         } else if (baseMessage instanceof CommandResponseMessage commandResponseMessage) {
             super.handleResponseMessage(commandResponseMessage);
-        } else if (baseMessage instanceof CommandLogMessage commandLogMessage) {
-            commandLogService.onLogReceived(
-                    commandLogMessage.getTaskId(), commandLogMessage.getHostname(), commandLogMessage.getLog());
         } else {
             log.error("Unrecognized message type: {}", baseMessage.getClass().getSimpleName());
         }

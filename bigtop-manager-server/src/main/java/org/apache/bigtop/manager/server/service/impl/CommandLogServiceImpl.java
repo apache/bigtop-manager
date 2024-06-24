@@ -18,10 +18,6 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
-import org.apache.bigtop.manager.dao.entity.CommandLog;
-import org.apache.bigtop.manager.dao.entity.Task;
-import org.apache.bigtop.manager.dao.repository.CommandLogRepository;
-import org.apache.bigtop.manager.dao.repository.TaskRepository;
 import org.apache.bigtop.manager.server.service.CommandLogService;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -30,7 +26,6 @@ import org.springframework.stereotype.Service;
 
 import reactor.core.publisher.FluxSink;
 
-import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,12 +33,6 @@ import java.util.Map;
 
 @Service
 public class CommandLogServiceImpl implements CommandLogService {
-
-    @Resource
-    private TaskRepository taskRepository;
-
-    @Resource
-    private CommandLogRepository commandLogRepository;
 
     private final Map<Long, FluxSink<String>> taskSinks = new HashMap<>();
 
@@ -60,16 +49,7 @@ public class CommandLogServiceImpl implements CommandLogService {
             }
         } else {
             // Task already completed, get logs from database
-            CommandLog commandLog = commandLogRepository.findByTaskIdEquals(taskId);
-            if (commandLog != null && commandLog.getLog() != null) {
-                list = List.of(commandLog.getLog().split("\n"));
-                for (String log : list) {
-                    sink.next(log);
-                }
-            } else {
-                sink.next("Cannot find log for task: " + taskId + ", there might be something wrong.");
-            }
-
+            sink.next("Task finished, please check the log details on agent machine.");
             sink.complete();
         }
     }
@@ -80,15 +60,6 @@ public class CommandLogServiceImpl implements CommandLogService {
 
     @Override
     public void onLogStarted(Long taskId, String hostname) {
-        Task task = taskRepository.getReferenceById(taskId);
-
-        CommandLog commandLog = new CommandLog();
-        commandLog.setHostname(hostname);
-        commandLog.setTask(task);
-        commandLog.setStage(task.getStage());
-        commandLog.setJob(task.getJob());
-        commandLogRepository.save(commandLog);
-
         logs.put(taskId, new ArrayList<>());
     }
 
@@ -116,14 +87,5 @@ public class CommandLogServiceImpl implements CommandLogService {
         }
 
         logs.remove(taskId);
-        if (CollectionUtils.isNotEmpty(list)) {
-            CommandLog commandLog = commandLogRepository.findByTaskIdEquals(taskId);
-            commandLog.setLog(String.join("\n", list));
-            commandLogRepository.save(commandLog);
-        }
-    }
-
-    public static void sink(Long taskId, FluxSink<String> sink) {
-        sink.next("aaa");
     }
 }

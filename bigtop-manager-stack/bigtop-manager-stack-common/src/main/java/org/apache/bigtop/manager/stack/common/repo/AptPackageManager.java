@@ -23,7 +23,6 @@ import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.spi.stack.PackageManager;
 import org.apache.bigtop.manager.stack.common.enums.PackageManagerType;
 import org.apache.bigtop.manager.stack.common.exception.StackException;
-import org.apache.bigtop.manager.stack.common.log.TaskLogWriter;
 
 import com.google.auto.service.AutoService;
 import lombok.extern.slf4j.Slf4j;
@@ -50,7 +49,7 @@ public class AptPackageManager implements PackageManager {
 
         try {
             ShellResult output = ShellExecutor.execCommand(builderParameters, log::info);
-            TaskLogWriter.info("[AptPackageManager] [installPackage] output: " + output);
+            log.info("[AptPackageManager] [installPackage] output: {}", output);
             return output;
         } catch (IOException e) {
             throw new StackException(e);
@@ -67,7 +66,7 @@ public class AptPackageManager implements PackageManager {
 
         try {
             ShellResult output = ShellExecutor.execCommand(builderParameters, log::info);
-            TaskLogWriter.info("[AptPackageManager] [uninstallPackage] output: " + output);
+            log.info("[AptPackageManager] [uninstallPackage] output: {}", output);
             return output;
         } catch (IOException e) {
             throw new StackException(e);
@@ -82,7 +81,7 @@ public class AptPackageManager implements PackageManager {
 
         try {
             ShellResult output = ShellExecutor.execCommand(builderParameters, log::info);
-            TaskLogWriter.info("[AptPackageManager] [listPackages] output: " + output);
+            log.info("[AptPackageManager] [listPackages] output: {}", output);
             return output.getOutput();
         } catch (IOException e) {
             throw new StackException(e);

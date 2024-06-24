@@ -19,7 +19,6 @@
 package org.apache.bigtop.manager.stack.core.hook;
 
 import org.apache.bigtop.manager.spi.stack.Hook;
-import org.apache.bigtop.manager.stack.common.log.TaskLogWriter;
 import org.apache.bigtop.manager.stack.common.utils.LocalSettings;
 import org.apache.bigtop.manager.stack.common.utils.linux.LinuxAccountUtils;
 
@@ -53,7 +52,7 @@ public abstract class AbstractHook implements Hook {
 
         for (Map.Entry<String, Set<String>> user : users.entrySet()) {
             Set<String> groups = user.getValue();
-            TaskLogWriter.info("user: " + user.getKey() + " , groups: " + user.getValue());
+            log.info("user: {}, groups: {}", user.getKey(), user.getValue());
             for (String group : groups) {
                 LinuxAccountUtils.groupAdd(group);
             }

@@ -19,7 +19,6 @@
 package org.apache.bigtop.manager.stack.common.utils.template;
 
 import org.apache.bigtop.manager.stack.common.enums.ConfigType;
-import org.apache.bigtop.manager.stack.common.log.TaskLogWriter;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,7 +46,7 @@ public class TemplateUtils {
                 BaseTemplate.writeCustomTemplate(fileName, paramMap, paramTemplate);
             }
         } catch (Exception e) {
-            TaskLogWriter.error("writeProperties error: " + e.getMessage());
+            log.error("writeProperties error", e);
         }
     }
 
@@ -63,7 +62,7 @@ public class TemplateUtils {
                 BaseTemplate.writeCustomTemplate(fileName, paramMap, paramTemplate);
             }
         } catch (Exception e) {
-            TaskLogWriter.error("writeProperties error: " + e.getMessage());
+            log.error("writeProperties error", e);
         }
     }
 }
