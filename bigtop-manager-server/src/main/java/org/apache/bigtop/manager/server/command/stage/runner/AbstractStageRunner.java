@@ -38,9 +38,6 @@ import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-
-import static org.apache.bigtop.manager.common.constants.Constants.COMMAND_MESSAGE_RESPONSE_TIMEOUT;
 
 @Slf4j
 public abstract class AbstractStageRunner implements StageRunner {
@@ -107,7 +104,7 @@ public abstract class AbstractStageRunner implements StageRunner {
         List<Boolean> taskResults = futures.stream()
                 .map((future) -> {
                     try {
-                        return future.get(COMMAND_MESSAGE_RESPONSE_TIMEOUT, TimeUnit.MILLISECONDS);
+                        return future.get();
                     } catch (Exception e) {
                         log.error("Error running task", e);
                         return false;

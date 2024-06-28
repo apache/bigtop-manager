@@ -23,7 +23,6 @@ import org.apache.bigtop.manager.server.command.job.runner.JobRunner;
 import org.apache.bigtop.manager.server.command.job.validator.CommandValidator;
 import org.apache.bigtop.manager.server.command.stage.factory.StageFactory;
 import org.apache.bigtop.manager.server.command.stage.runner.StageRunner;
-import org.apache.bigtop.manager.server.ws.ServerWebSocketHandler;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -43,10 +42,6 @@ public class SpringContextHolder implements ApplicationContextAware {
     @Override
     public void setApplicationContext(@Nonnull ApplicationContext applicationContext) {
         SpringContextHolder.applicationContext = applicationContext;
-    }
-
-    public static ServerWebSocketHandler getServerWebSocket() {
-        return applicationContext.getBean(ServerWebSocketHandler.class);
     }
 
     public static Map<String, CommandValidator> getCommandValidators() {

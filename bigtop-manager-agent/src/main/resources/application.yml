@@ -19,9 +19,6 @@
 
 bigtop:
   manager:
-    server:
-      host: localhost
-      port: 8080
     grpc:
       port: 8835
 

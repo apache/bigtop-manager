@@ -17,28 +17,8 @@
  * under the License.
  */
 
-import { message } from 'ant-design-vue'
-import i18n from '@/locales'
-
 export const API_RETRY_TIME = 3
 export const API_EXPIRE_TIME = 3 * 1000
 export const JOB_SCHEDULE_INTERVAL = 1000
 export const MONITOR_SCHEDULE_INTERVAL = 10 * 1000
 export const DEFAULT_PAGE_SIZE = 10
-
-export const WS_URL = 'ws://' + window.location.host + '/ws/default'
-
-export const WS_DEFAULT_OPTIONS = {
-  autoReconnect: {
-    retries: API_RETRY_TIME,
-    delay: API_EXPIRE_TIME,
-    async onFailed() {
-      message.error(i18n.global.t('common.websocket_disconnected'))
-    }
-  },
-  heartbeat: {
-    message: 'ping',
-    interval: API_EXPIRE_TIME,
-    pongTimeout: API_EXPIRE_TIME
-  }
-}

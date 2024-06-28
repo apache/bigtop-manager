@@ -20,15 +20,22 @@ package org.apache.bigtop.manager.agent.service;
 
 import org.apache.bigtop.manager.agent.executor.CommandExecutor;
 import org.apache.bigtop.manager.agent.executor.CommandExecutors;
+import org.apache.bigtop.manager.common.message.entity.pojo.HostInfo;
+import org.apache.bigtop.manager.common.utils.os.OSDetection;
 import org.apache.bigtop.manager.grpc.generated.CommandReply;
 import org.apache.bigtop.manager.grpc.generated.CommandRequest;
 import org.apache.bigtop.manager.grpc.generated.CommandServiceGrpc;
 
 import org.slf4j.MDC;
 
+import com.sun.management.OperatingSystemMXBean;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
+
+import java.lang.management.ManagementFactory;
+import java.math.BigDecimal;
+import java.net.InetAddress;
 
 @Slf4j
 @GrpcService
@@ -46,6 +53,38 @@ public class CommandServiceGrpcImpl extends CommandServiceGrpc.CommandServiceImp
             log.error("Error when running command", e);
         } finally {
             MDC.clear();
+        }
+    }
+
+    private void readHostInfo() {
+        HostInfo hostInfo = new HostInfo();
+
+        try {
+            InetAddress addr = InetAddress.getLocalHost();
+            hostInfo.setHostname(addr.getHostName());
+            hostInfo.setIpv4(addr.getHostAddress());
+
+            OperatingSystemMXBean osmxb = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+            hostInfo.setOs(OSDetection.getOS());
+            hostInfo.setVersion(OSDetection.getVersion());
+            hostInfo.setArch(OSDetection.getArch());
+            hostInfo.setAvailableProcessors(osmxb.getAvailableProcessors());
+            hostInfo.setProcessCpuTime(osmxb.getProcessCpuTime());
+            hostInfo.setTotalMemorySize(osmxb.getTotalMemorySize());
+            hostInfo.setFreeMemorySize(osmxb.getFreeMemorySize());
+            hostInfo.setTotalSwapSpaceSize(osmxb.getTotalSwapSpaceSize());
+            hostInfo.setFreeSwapSpaceSize(osmxb.getFreeSwapSpaceSize());
+            hostInfo.setCommittedVirtualMemorySize(osmxb.getCommittedVirtualMemorySize());
+
+            hostInfo.setCpuLoad(new BigDecimal(String.valueOf(osmxb.getCpuLoad())));
+            hostInfo.setProcessCpuLoad(new BigDecimal(String.valueOf(osmxb.getProcessCpuLoad())));
+            hostInfo.setSystemLoadAverage(new BigDecimal(String.valueOf(osmxb.getSystemLoadAverage())));
+
+            hostInfo.setFreeDisk(OSDetection.freeDisk());
+            hostInfo.setTotalDisk(OSDetection.totalDisk());
+        } catch (Exception e) {
+            log.error("Error getting host info", e);
+            throw new RuntimeException(e);
         }
     }
 }
