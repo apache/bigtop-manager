@@ -39,17 +39,17 @@ import jakarta.annotation.Resource;
 @EnableAsync
 public class MetricsCollector {
 
-    @Qualifier("diskMultiGauge") @Resource
-    private MultiGauge diskMultiGauge;
+    @Resource
+    @Qualifier("diskMultiGauge") private MultiGauge diskMultiGauge;
 
-    @Qualifier("memMultiGauge") @Resource
-    private MultiGauge memMultiGauge;
+    @Resource
+    @Qualifier("memMultiGauge") private MultiGauge memMultiGauge;
 
-    @Qualifier("cpuMultiGauge") @Resource
-    private MultiGauge cpuMultiGauge;
+    @Resource
+    @Qualifier("cpuMultiGauge") private MultiGauge cpuMultiGauge;
 
-    @Qualifier("zookeeperMultiGauge") @Resource
-    private MultiGauge zookeeperMultiGauge;
+    @Resource
+    @Qualifier("zookeeperMultiGauge") private MultiGauge zookeeperMultiGauge;
 
     @Async
     @Scheduled(cron = "*/10 * *  * * ?")

@@ -22,6 +22,8 @@ bigtop:
     orm:
       # hibernate/eclipselink(default=eclipselink)
       type: eclipselink
+    grpc:
+      port: 8835
 
 spring:
   banner:

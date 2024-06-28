@@ -16,29 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.common.config;
-
-import org.apache.bigtop.manager.common.config.application.GrpcConfig;
-import org.apache.bigtop.manager.common.config.application.SerializerConfig;
-import org.apache.bigtop.manager.common.config.application.ServerConfig;
-
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.NestedConfigurationProperty;
-import org.springframework.context.annotation.Configuration;
+package org.apache.bigtop.manager.common.config.application;
 
 import lombok.Data;
 
 @Data
-@Configuration
-@ConfigurationProperties(prefix = "bigtop.manager")
-public class ApplicationConfig {
+public class GrpcConfig {
 
-    @NestedConfigurationProperty
-    private ServerConfig server;
-
-    @NestedConfigurationProperty
-    private GrpcConfig grpc;
-
-    @NestedConfigurationProperty
-    private SerializerConfig serializer = new SerializerConfig();
+    private Integer port;
 }

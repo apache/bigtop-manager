@@ -19,7 +19,6 @@
 package org.apache.bigtop.manager.agent.ws;
 
 import org.apache.bigtop.manager.agent.holder.SpringContextHolder;
-import org.apache.bigtop.manager.agent.scheduler.CommandScheduler;
 import org.apache.bigtop.manager.common.config.ApplicationConfig;
 import org.apache.bigtop.manager.common.constants.Constants;
 import org.apache.bigtop.manager.common.message.entity.BaseMessage;
@@ -66,9 +65,6 @@ public class AgentWebSocketHandler extends AbstractBinaryWebSocketHandler
     @Resource
     private MessageDeserializer deserializer;
 
-    @Resource
-    private CommandScheduler commandScheduler;
-
     @Getter
     @Setter
     private WebSocketSession session;
@@ -103,7 +99,7 @@ public class AgentWebSocketHandler extends AbstractBinaryWebSocketHandler
                 "Received message type: {}, session: {}", baseMessage.getClass().getSimpleName(), session);
 
         if (baseMessage instanceof CommandRequestMessage commandRequestMessage) {
-            commandScheduler.submit(commandRequestMessage);
+            //            commandScheduler.submit(commandRequestMessage);
         } else {
             log.error("Unrecognized message type: {}", baseMessage.getClass().getSimpleName());
         }

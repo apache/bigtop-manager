@@ -16,28 +16,38 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.common.message.entity.command;
+syntax = "proto3";
 
-import org.apache.bigtop.manager.common.message.entity.BaseRequestMessage;
+option java_multiple_files = true;
+option java_package = "org.apache.bigtop.manager.grpc.generated";
+option java_outer_classname = "CommandProto";
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+service CommandService {
+  rpc Exec (CommandRequest) returns (CommandReply) {}
+}
 
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-@Data
-public class CommandRequestMessage extends BaseRequestMessage {
+enum CommandType {
+  COMPONENT = 0;
+  HOST_CHECK = 1;
+  CACHE_DISTRIBUTE = 2;
+  TASK_LOG = 3;
+}
 
-    private CommandMessageType commandMessageType;
+message CommandRequest {
+  string payload = 1;
+  string hostname = 2;
+  int64 job_id = 3;
+  int64 stage_id = 4;
+  int64 task_id = 5;
+  CommandType type = 6;
+}
 
-    private String hostname;
-
-    private String payload;
-
-    private Long jobId;
-
-    private Long stageId;
-
-    private Long taskId;
+message CommandReply {
+  int32 code = 1;
+  string result = 2;
+  string hostname = 3;
+  int64 job_id = 4;
+  int64 stage_id = 5;
+  int64 task_id = 6;
+  CommandType type = 7;
 }

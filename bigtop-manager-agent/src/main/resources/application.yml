@@ -22,6 +22,8 @@ bigtop:
     server:
       host: localhost
       port: 8080
+    grpc:
+      port: 8835
 
 spring:
   banner:
@@ -30,6 +32,10 @@ spring:
     name: bigtop-manager-agent
   main:
     banner-mode: log
+
+grpc:
+  server:
+    port: ${bigtop.manager.grpc.port}
 
 server:
   port: 8081
