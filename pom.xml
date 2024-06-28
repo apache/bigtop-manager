@@ -80,7 +80,43 @@
 
             <dependency>
                 <groupId>org.apache.bigtop</groupId>
+                <artifactId>bigtop-manager-dao</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.bigtop</groupId>
+                <artifactId>bigtop-manager-grpc</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.bigtop</groupId>
                 <artifactId>bigtop-manager-spi</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.bigtop</groupId>
+                <artifactId>bigtop-manager-stack-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.bigtop</groupId>
+                <artifactId>bigtop-manager-stack-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.bigtop</groupId>
+                <artifactId>bigtop-manager-stack-bigtop</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.bigtop</groupId>
+                <artifactId>bigtop-manager-stack-nop</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

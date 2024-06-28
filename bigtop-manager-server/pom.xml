@@ -46,19 +46,15 @@
         <dependency>
             <groupId>org.apache.bigtop</groupId>
             <artifactId>bigtop-manager-common</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.bigtop</groupId>
             <artifactId>bigtop-manager-grpc</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.bigtop</groupId>
             <artifactId>bigtop-manager-dao</artifactId>
-            <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.bigtop</groupId>
             <artifactId>bigtop-manager-ui</artifactId>
