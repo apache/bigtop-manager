@@ -73,11 +73,12 @@ public abstract class AbstractStageRunner implements StageRunner {
         for (Task task : stage.getTasks()) {
             beforeRunTask(task);
 
-            CommandRequest request = ProtobufUtil.fromJson(task.getContent(), CommandRequest.class);
-            CommandRequest.Builder builder = CommandRequest.newBuilder(request);
+            CommandRequest protoRequest = ProtobufUtil.fromJson(task.getContent(), CommandRequest.class);
+            CommandRequest.Builder builder = CommandRequest.newBuilder(protoRequest);
             builder.setTaskId(task.getId());
             builder.setStageId(stage.getId());
             builder.setJobId(stage.getJob().getId());
+            CommandRequest request = builder.build();
 
             futures.add(CompletableFuture.supplyAsync(() -> {
                 commandLogService.onLogStarted(task.getId(), task.getHostname());

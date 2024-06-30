@@ -18,7 +18,7 @@
  */
 
 export const API_RETRY_TIME = 3
-export const API_EXPIRE_TIME = 3 * 1000
+export const API_EXPIRE_TIME = 30 * 1000
 export const JOB_SCHEDULE_INTERVAL = 1000
 export const MONITOR_SCHEDULE_INTERVAL = 10 * 1000
 export const DEFAULT_PAGE_SIZE = 10
