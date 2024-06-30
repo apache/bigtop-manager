@@ -16,49 +16,36 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.common.message.entity.pojo;
+syntax = "proto3";
 
-import lombok.Data;
+option java_multiple_files = true;
+option java_package = "org.apache.bigtop.manager.grpc.generated";
+option java_outer_classname = "HostInfoProto";
 
-import java.io.Serializable;
-import java.math.BigDecimal;
+service HostInfoService {
+  rpc GetHostInfo (HostInfoRequest) returns (HostInfoReply) {}
+}
 
-@Data
-public class HostInfo implements Serializable {
+message HostInfoRequest {
+}
 
-    private String hostname;
-
-    private String ipv4;
-
-    private String ipv6;
-
-    private String os;
-
-    private String version;
-
-    private String arch;
-
-    private BigDecimal cpuLoad;
-
-    private Integer availableProcessors;
-
-    private BigDecimal processCpuLoad;
-
-    private Long processCpuTime;
-
-    private Long totalMemorySize;
-
-    private Long freeMemorySize;
-
-    private Long totalSwapSpaceSize;
-
-    private Long freeSwapSpaceSize;
-
-    private Long committedVirtualMemorySize;
-
-    private BigDecimal systemLoadAverage;
-
-    private Long freeDisk;
-
-    private Long totalDisk;
+message HostInfoReply {
+  string hostname = 1;
+  string ipv4 = 2;
+  string ipv6 = 3;
+  string os = 4;
+  string version = 5;
+  string arch = 6;
+  string cpuLoad = 7;
+  int32 availableProcessors = 8;
+  string processCpuLoad = 9;
+  int64 processCpuTime = 10;
+  int64 totalMemorySize = 11;
+  int64 freeMemorySize = 12;
+  int64 totalSwapSpaceSize = 13;
+  int64 freeSwapSpaceSize = 14;
+  int64 committedVirtualMemorySize = 15;
+  string systemLoadAverage = 16;
+  int64 freeDisk = 17;
+  int64 totalDisk = 18;
 }

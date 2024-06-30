@@ -23,8 +23,6 @@ import org.apache.bigtop.manager.agent.monitoring.ZookeeperHealthyMonitoring;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -35,8 +33,6 @@ import jakarta.annotation.Resource;
 
 @Slf4j
 @Component
-@EnableScheduling
-@EnableAsync
 public class MetricsCollector {
 
     @Resource
