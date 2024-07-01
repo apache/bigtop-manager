@@ -18,10 +18,10 @@
  */
 package org.apache.bigtop.manager.agent.executor;
 
-import org.apache.bigtop.manager.common.message.entity.command.CommandMessageType;
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
+import org.apache.bigtop.manager.grpc.generated.CommandType;
 import org.apache.bigtop.manager.stack.core.executor.StackExecutor;
 
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -35,8 +35,8 @@ import lombok.extern.slf4j.Slf4j;
 public class ComponentCommandExecutor extends AbstractCommandExecutor {
 
     @Override
-    public CommandMessageType getCommandMessageType() {
-        return CommandMessageType.COMPONENT;
+    public CommandType getCommandType() {
+        return CommandType.COMPONENT;
     }
 
     @Override
@@ -46,12 +46,11 @@ public class ComponentCommandExecutor extends AbstractCommandExecutor {
 
     @Override
     public void doExecute() {
-        CommandPayload commandPayload =
-                JsonUtils.readFromString(commandRequestMessage.getMessagePayload(), CommandPayload.class);
-        log.info("[agent executeTask] taskEvent is: {}", commandRequestMessage);
+        CommandPayload commandPayload = JsonUtils.readFromString(commandRequest.getPayload(), CommandPayload.class);
+        log.info("[agent executeTask] taskEvent is: {}", commandRequest);
         ShellResult shellResult = StackExecutor.execute(commandPayload);
 
-        commandResponseMessage.setCode(shellResult.getExitCode());
-        commandResponseMessage.setResult(shellResult.getResult());
+        commandReplyBuilder.setCode(shellResult.getExitCode());
+        commandReplyBuilder.setResult(shellResult.getResult());
     }
 }

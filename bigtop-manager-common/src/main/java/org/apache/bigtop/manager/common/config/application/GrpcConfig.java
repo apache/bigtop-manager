@@ -16,23 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.common.message.serializer;
+package org.apache.bigtop.manager.common.config.application;
 
-import org.apache.bigtop.manager.common.message.entity.BaseMessage;
+import lombok.Data;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.Input;
+@Data
+public class GrpcConfig {
 
-public class KryoMessageDeserializer implements MessageDeserializer {
-
-    @Override
-    public BaseMessage deserialize(byte[] bytes) {
-        Input input = new Input(bytes);
-        Kryo kryo = KryoPoolHolder.obtainKryo();
-        BaseMessage baseMessage = (BaseMessage) kryo.readClassAndObject(input);
-        input.close();
-        KryoPoolHolder.freeKryo(kryo);
-
-        return baseMessage;
-    }
+    private Integer port;
 }

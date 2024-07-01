@@ -26,19 +26,15 @@
     </parent>
 
     <artifactId>bigtop-manager-stack-nop</artifactId>
-
-    <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+    <name>${project.artifactId}</name>
+    <description>Bigtop Manager Stack NOP</description>
 
     <dependencies>
         <dependency>
             <groupId>org.apache.bigtop</groupId>
             <artifactId>bigtop-manager-stack-common</artifactId>
-            <version>${revision}</version>
         </dependency>
+
         <dependency>
             <groupId>com.google.auto.service</groupId>
             <artifactId>auto-service</artifactId>

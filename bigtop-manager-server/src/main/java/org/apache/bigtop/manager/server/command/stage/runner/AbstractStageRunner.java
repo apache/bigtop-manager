@@ -20,15 +20,16 @@ package org.apache.bigtop.manager.server.command.stage.runner;
 
 import org.apache.bigtop.manager.common.constants.MessageConstants;
 import org.apache.bigtop.manager.common.enums.JobState;
-import org.apache.bigtop.manager.common.message.entity.command.CommandRequestMessage;
-import org.apache.bigtop.manager.common.message.entity.command.CommandResponseMessage;
-import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.entity.Stage;
 import org.apache.bigtop.manager.dao.entity.Task;
 import org.apache.bigtop.manager.dao.repository.StageRepository;
 import org.apache.bigtop.manager.dao.repository.TaskRepository;
+import org.apache.bigtop.manager.grpc.generated.CommandReply;
+import org.apache.bigtop.manager.grpc.generated.CommandRequest;
+import org.apache.bigtop.manager.grpc.generated.CommandServiceGrpc;
+import org.apache.bigtop.manager.grpc.utils.ProtobufUtil;
 import org.apache.bigtop.manager.server.command.stage.factory.StageContext;
-import org.apache.bigtop.manager.server.holder.SpringContextHolder;
+import org.apache.bigtop.manager.server.grpc.GrpcClient;
 import org.apache.bigtop.manager.server.service.CommandLogService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -37,9 +38,6 @@ import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-
-import static org.apache.bigtop.manager.common.constants.Constants.COMMAND_MESSAGE_RESPONSE_TIMEOUT;
 
 @Slf4j
 public abstract class AbstractStageRunner implements StageRunner {
@@ -75,18 +73,21 @@ public abstract class AbstractStageRunner implements StageRunner {
         for (Task task : stage.getTasks()) {
             beforeRunTask(task);
 
-            CommandRequestMessage message = JsonUtils.readFromString(task.getContent(), CommandRequestMessage.class);
-            message.setTaskId(task.getId());
-            message.setStageId(stage.getId());
-            message.setJobId(stage.getJob().getId());
+            CommandRequest protoRequest = ProtobufUtil.fromJson(task.getContent(), CommandRequest.class);
+            CommandRequest.Builder builder = CommandRequest.newBuilder(protoRequest);
+            builder.setTaskId(task.getId());
+            builder.setStageId(stage.getId());
+            builder.setJobId(stage.getJob().getId());
+            CommandRequest request = builder.build();
 
             futures.add(CompletableFuture.supplyAsync(() -> {
                 commandLogService.onLogStarted(task.getId(), task.getHostname());
-                CommandResponseMessage res =
-                        SpringContextHolder.getServerWebSocket().sendRequestMessage(task.getHostname(), message);
+                CommandServiceGrpc.CommandServiceBlockingStub stub = GrpcClient.getBlockingStub(
+                        task.getHostname(), CommandServiceGrpc.CommandServiceBlockingStub.class);
+                CommandReply reply = stub.exec(request);
 
-                log.info("Execute task {} completed: {}", task.getId(), res);
-                boolean taskSuccess = res != null && res.getCode() == MessageConstants.SUCCESS_CODE;
+                log.info("Execute task {} completed: {}", task.getId(), reply);
+                boolean taskSuccess = reply != null && reply.getCode() == MessageConstants.SUCCESS_CODE;
 
                 if (taskSuccess) {
                     commandLogService.onLogReceived(task.getId(), task.getHostname(), "Success!");
@@ -104,7 +105,7 @@ public abstract class AbstractStageRunner implements StageRunner {
         List<Boolean> taskResults = futures.stream()
                 .map((future) -> {
                     try {
-                        return future.get(COMMAND_MESSAGE_RESPONSE_TIMEOUT, TimeUnit.MILLISECONDS);
+                        return future.get();
                     } catch (Exception e) {
                         log.error("Error running task", e);
                         return false;

@@ -18,9 +18,6 @@
  */
 package org.apache.bigtop.manager.agent.monitoring;
 
-import org.apache.bigtop.manager.agent.enums.AgentExceptionStatus;
-import org.apache.bigtop.manager.agent.exception.AgentException;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -333,7 +330,7 @@ public class AgentHostMonitoring {
             Map<ArrayList<String>, Map<ArrayList<String>, Double>> diskGauge = getDiskGauge(getHostInfo());
             multiGaugeUpdateData(diskMultiGauge, diskGauge);
         } catch (UnknownHostException e) {
-            throw new AgentException(AgentExceptionStatus.AGENT_MONITORING_ERROR);
+            throw new RuntimeException("Get agent host monitoring info failed");
         }
     }
 
@@ -342,7 +339,7 @@ public class AgentHostMonitoring {
             Map<ArrayList<String>, Map<ArrayList<String>, Double>> diskGauge = getMEMGauge(getHostInfo());
             multiGaugeUpdateData(memMultiGauge, diskGauge);
         } catch (UnknownHostException e) {
-            throw new AgentException(AgentExceptionStatus.AGENT_MONITORING_ERROR);
+            throw new RuntimeException("Get agent host monitoring info failed");
         }
     }
 
@@ -351,7 +348,7 @@ public class AgentHostMonitoring {
             Map<ArrayList<String>, Map<ArrayList<String>, Double>> diskGauge = getCPUGauge(getHostInfo());
             multiGaugeUpdateData(cpuMultiGauge, diskGauge);
         } catch (UnknownHostException e) {
-            throw new AgentException(AgentExceptionStatus.AGENT_MONITORING_ERROR);
+            throw new RuntimeException("Get agent host monitoring info failed");
         }
     }
 }

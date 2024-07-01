@@ -23,8 +23,6 @@ import org.apache.bigtop.manager.agent.monitoring.ZookeeperHealthyMonitoring;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -35,21 +33,19 @@ import jakarta.annotation.Resource;
 
 @Slf4j
 @Component
-@EnableScheduling
-@EnableAsync
 public class MetricsCollector {
 
-    @Qualifier("diskMultiGauge") @Resource
-    private MultiGauge diskMultiGauge;
+    @Resource
+    @Qualifier("diskMultiGauge") private MultiGauge diskMultiGauge;
 
-    @Qualifier("memMultiGauge") @Resource
-    private MultiGauge memMultiGauge;
+    @Resource
+    @Qualifier("memMultiGauge") private MultiGauge memMultiGauge;
 
-    @Qualifier("cpuMultiGauge") @Resource
-    private MultiGauge cpuMultiGauge;
+    @Resource
+    @Qualifier("cpuMultiGauge") private MultiGauge cpuMultiGauge;
 
-    @Qualifier("zookeeperMultiGauge") @Resource
-    private MultiGauge zookeeperMultiGauge;
+    @Resource
+    @Qualifier("zookeeperMultiGauge") private MultiGauge zookeeperMultiGauge;
 
     @Async
     @Scheduled(cron = "*/10 * *  * * ?")

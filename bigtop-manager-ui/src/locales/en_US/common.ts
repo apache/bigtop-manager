@@ -52,7 +52,6 @@ export default {
   error_timeout: 'Request timeout',
   desc_404: 'Sorry, the page you visited does not exist.',
   back_home: 'Back Home',
-  websocket_disconnected: 'WebSocket disconnected, please reload the page',
   create_time: 'Create Time',
   update_time: 'Update Time',
   notification: 'Notification',

@@ -42,6 +42,7 @@
         <module>bigtop-manager-ui</module>
         <module>bigtop-manager-dao</module>
         <module>bigtop-manager-spi</module>
+        <module>bigtop-manager-grpc</module>
     </modules>
 
     <properties>
@@ -50,10 +51,19 @@
         <java.version>17</java.version>
         <flatten-maven-plugin.version>1.4.0</flatten-maven-plugin.version>
         <maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
+        <maven-assembly-plugin.version>3.6.0</maven-assembly-plugin.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
         <spring-boot-maven-plugin.version>3.1.1</spring-boot-maven-plugin.version>
         <spotless-maven-plugin.version>2.43.0</spotless-maven-plugin.version>
+
+        <!-- gRPC -->
+        <os-maven-plugin.version>1.7.0</os-maven-plugin.version>
+        <protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
+        <protobuf.version>3.24.0</protobuf.version>
+        <grpc.version>1.63.0</grpc.version>
+        <protobuf-java-util.version>3.25.3</protobuf-java-util.version>
+        <grpc-spring-boot.version>3.1.0.RELEASE</grpc-spring-boot.version>
 
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <lombok.version>1.18.30</lombok.version>
@@ -70,7 +80,43 @@
 
             <dependency>
                 <groupId>org.apache.bigtop</groupId>
+                <artifactId>bigtop-manager-dao</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.bigtop</groupId>
+                <artifactId>bigtop-manager-grpc</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.bigtop</groupId>
                 <artifactId>bigtop-manager-spi</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.bigtop</groupId>
+                <artifactId>bigtop-manager-stack-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.bigtop</groupId>
+                <artifactId>bigtop-manager-stack-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.bigtop</groupId>
+                <artifactId>bigtop-manager-stack-bigtop</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.bigtop</groupId>
+                <artifactId>bigtop-manager-stack-nop</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -114,6 +160,18 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
                     <version>${maven-assembly-plugin.version}</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>${maven-assembly-plugin.version}</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.xolstice.maven.plugins</groupId>
+                    <artifactId>protobuf-maven-plugin</artifactId>
+                    <version>${protobuf-maven-plugin.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -188,5 +246,12 @@
                 </configuration>
             </plugin>
         </plugins>
+        <extensions>
+            <extension>
+                <groupId>kr.motd.maven</groupId>
+                <artifactId>os-maven-plugin</artifactId>
+                <version>${os-maven-plugin.version}</version>
+            </extension>
+        </extensions>
     </build>
 </project>

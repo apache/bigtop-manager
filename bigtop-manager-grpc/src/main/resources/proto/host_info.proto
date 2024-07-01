@@ -16,12 +16,36 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.common.config.application;
+syntax = "proto3";
 
-import lombok.Data;
+option java_multiple_files = true;
+option java_package = "org.apache.bigtop.manager.grpc.generated";
+option java_outer_classname = "HostInfoProto";
 
-@Data
-public class SerializerConfig {
+service HostInfoService {
+  rpc GetHostInfo (HostInfoRequest) returns (HostInfoReply) {}
+}
 
-    private String type = "kryo";
+message HostInfoRequest {
+}
+
+message HostInfoReply {
+  string hostname = 1;
+  string ipv4 = 2;
+  string ipv6 = 3;
+  string os = 4;
+  string version = 5;
+  string arch = 6;
+  string cpu_load = 7;
+  int32 available_processors = 8;
+  string process_cpu_load = 9;
+  int64 process_cpu_time = 10;
+  int64 total_memory_size = 11;
+  int64 free_memory_size = 12;
+  int64 total_swap_space_size = 13;
+  int64 free_swap_space_size = 14;
+  int64 committed_virtual_memory_size = 15;
+  string system_load_average = 16;
+  int64 free_disk = 17;
+  int64 total_disk = 18;
 }

@@ -21,6 +21,7 @@ package org.apache.bigtop.manager.server.controller;
 import org.apache.bigtop.manager.server.model.dto.HostDTO;
 import org.apache.bigtop.manager.server.model.mapper.HostMapper;
 import org.apache.bigtop.manager.server.model.req.HostReq;
+import org.apache.bigtop.manager.server.model.req.HostnamesReq;
 import org.apache.bigtop.manager.server.model.vo.HostVO;
 import org.apache.bigtop.manager.server.service.HostService;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
@@ -28,6 +29,7 @@ import org.apache.bigtop.manager.server.utils.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -69,5 +71,12 @@ public class HostController {
     // @DeleteMapping("/{id}")
     public ResponseEntity<Boolean> delete(@PathVariable Long id) {
         return ResponseEntity.success(hostService.delete(id));
+    }
+
+    @Operation(summary = "Check connection", description = "Check connection for hosts")
+    @PostMapping("/check-connection")
+    public ResponseEntity<Boolean> checkConnection(
+            @PathVariable Long clusterId, @RequestBody @Validated HostnamesReq hostnamesReq) {
+        return ResponseEntity.success(hostService.checkConnection(hostnamesReq.getHostnames()));
     }
 }

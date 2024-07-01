@@ -18,8 +18,9 @@
  */
 package org.apache.bigtop.manager.agent.executor;
 
-import org.apache.bigtop.manager.common.message.entity.command.CommandMessageType;
-import org.apache.bigtop.manager.common.message.entity.command.CommandRequestMessage;
+import org.apache.bigtop.manager.grpc.generated.CommandReply;
+import org.apache.bigtop.manager.grpc.generated.CommandRequest;
+import org.apache.bigtop.manager.grpc.generated.CommandType;
 
 /**
  * Interface for executing commands on agent.
@@ -27,14 +28,14 @@ import org.apache.bigtop.manager.common.message.entity.command.CommandRequestMes
 public interface CommandExecutor {
 
     /**
-     * Get the type of the command message.
-     * @return CommandMessageType - the type of the command message.
+     * Get the type of the command.
+     * @return CommandType - the type of the command.
      */
-    CommandMessageType getCommandMessageType();
+    CommandType getCommandType();
 
     /**
      * Execute the command.
-     * @param message - the message for command that needs to be executed.
+     * @param request - the request for command that needs to be executed.
      */
-    void execute(CommandRequestMessage message);
+    CommandReply execute(CommandRequest request);
 }

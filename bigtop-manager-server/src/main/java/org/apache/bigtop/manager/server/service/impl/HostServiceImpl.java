@@ -25,6 +25,7 @@ import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.dao.repository.HostRepository;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
+import org.apache.bigtop.manager.server.grpc.GrpcClient;
 import org.apache.bigtop.manager.server.model.dto.HostDTO;
 import org.apache.bigtop.manager.server.model.mapper.HostMapper;
 import org.apache.bigtop.manager.server.model.vo.HostVO;
@@ -108,6 +109,19 @@ public class HostServiceImpl implements HostService {
     @Override
     public Boolean delete(Long id) {
         hostRepository.deleteById(id);
+        return true;
+    }
+
+    @Override
+    public Boolean checkConnection(List<String> hostnames) {
+        for (String hostname : hostnames) {
+            if (!GrpcClient.isChannelAlive(hostname)) {
+                // An api exception will throw if connection fails to establish, we don't need to handle the return
+                // value.
+                GrpcClient.createChannel(hostname);
+            }
+        }
+
         return true;
     }
 }

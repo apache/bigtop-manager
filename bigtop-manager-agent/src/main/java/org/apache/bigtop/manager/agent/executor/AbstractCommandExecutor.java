@@ -18,26 +18,25 @@
  */
 package org.apache.bigtop.manager.agent.executor;
 
-import org.apache.bigtop.manager.agent.holder.SpringContextHolder;
 import org.apache.bigtop.manager.common.constants.MessageConstants;
-import org.apache.bigtop.manager.common.message.entity.command.CommandRequestMessage;
-import org.apache.bigtop.manager.common.message.entity.command.CommandResponseMessage;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.common.utils.Environments;
+import org.apache.bigtop.manager.grpc.generated.CommandReply;
+import org.apache.bigtop.manager.grpc.generated.CommandRequest;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public abstract class AbstractCommandExecutor implements CommandExecutor {
 
-    protected CommandRequestMessage commandRequestMessage;
+    protected CommandRequest commandRequest;
 
-    protected CommandResponseMessage commandResponseMessage;
+    protected CommandReply.Builder commandReplyBuilder;
 
     @Override
-    public void execute(CommandRequestMessage message) {
-        commandRequestMessage = message;
-        commandResponseMessage = new CommandResponseMessage();
+    public CommandReply execute(CommandRequest request) {
+        commandRequest = request;
+        commandReplyBuilder = CommandReply.newBuilder();
 
         try {
             if (Environments.isDevMode()) {
@@ -46,24 +45,23 @@ public abstract class AbstractCommandExecutor implements CommandExecutor {
                 doExecute();
             }
         } catch (Exception e) {
-            commandResponseMessage.setCode(MessageConstants.FAIL_CODE);
-            commandResponseMessage.setResult(e.getMessage());
+            commandReplyBuilder.setCode(MessageConstants.FAIL_CODE);
+            commandReplyBuilder.setResult(e.getMessage());
 
-            log.error("Run command failed, {}", message, e);
+            log.error("Run command failed, {}", request, e);
         }
 
-        commandResponseMessage.setCommandMessageType(message.getCommandMessageType());
-        commandResponseMessage.setMessageId(message.getMessageId());
-        commandResponseMessage.setHostname(message.getHostname());
-        commandResponseMessage.setTaskId(message.getTaskId());
-        commandResponseMessage.setStageId(message.getStageId());
-        commandResponseMessage.setJobId(message.getJobId());
-        SpringContextHolder.getAgentWebSocket().sendMessage(commandResponseMessage);
+        commandReplyBuilder.setType(request.getType());
+        commandReplyBuilder.setHostname(request.getHostname());
+        commandReplyBuilder.setTaskId(request.getTaskId());
+        commandReplyBuilder.setStageId(request.getStageId());
+        commandReplyBuilder.setJobId(request.getJobId());
+        return commandReplyBuilder.build();
     }
 
     protected void doExecuteOnDevMode() {
-        commandResponseMessage.setCode(MessageConstants.SUCCESS_CODE);
-        commandResponseMessage.setResult(ShellResult.success().getResult());
+        commandReplyBuilder.setCode(MessageConstants.SUCCESS_CODE);
+        commandReplyBuilder.setResult(ShellResult.success().getResult());
     }
 
     protected abstract void doExecute();

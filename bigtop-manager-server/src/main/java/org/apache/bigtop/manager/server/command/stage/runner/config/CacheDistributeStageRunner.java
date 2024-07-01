@@ -19,8 +19,6 @@
 package org.apache.bigtop.manager.server.command.stage.runner.config;
 
 import org.apache.bigtop.manager.common.constants.Constants;
-import org.apache.bigtop.manager.common.message.entity.command.CommandMessageType;
-import org.apache.bigtop.manager.common.message.entity.command.CommandRequestMessage;
 import org.apache.bigtop.manager.common.message.entity.payload.CacheMessagePayload;
 import org.apache.bigtop.manager.common.message.entity.pojo.ClusterInfo;
 import org.apache.bigtop.manager.common.message.entity.pojo.ComponentInfo;
@@ -44,6 +42,9 @@ import org.apache.bigtop.manager.dao.repository.RepoRepository;
 import org.apache.bigtop.manager.dao.repository.ServiceConfigRepository;
 import org.apache.bigtop.manager.dao.repository.ServiceRepository;
 import org.apache.bigtop.manager.dao.repository.SettingRepository;
+import org.apache.bigtop.manager.grpc.generated.CommandRequest;
+import org.apache.bigtop.manager.grpc.generated.CommandType;
+import org.apache.bigtop.manager.grpc.utils.ProtobufUtil;
 import org.apache.bigtop.manager.server.command.stage.factory.StageType;
 import org.apache.bigtop.manager.server.command.stage.runner.AbstractStageRunner;
 import org.apache.bigtop.manager.server.model.dto.PropertyDTO;
@@ -135,9 +136,8 @@ public class CacheDistributeStageRunner extends AbstractStageRunner {
             genCaches();
         }
 
-        CommandRequestMessage commandRequestMessage = getMessage(task.getHostname());
-        task.setContent(JsonUtils.writeAsString(commandRequestMessage));
-        task.setMessageId(commandRequestMessage.getMessageId());
+        CommandRequest request = getMessage(task.getHostname());
+        task.setContent(ProtobufUtil.toJson(request));
 
         taskRepository.save(task);
     }
@@ -256,7 +256,7 @@ public class CacheDistributeStageRunner extends AbstractStageRunner {
         }
     }
 
-    private CommandRequestMessage getMessage(String hostname) {
+    private CommandRequest getMessage(String hostname) {
         CacheMessagePayload messagePayload = new CacheMessagePayload();
         messagePayload.setHostname(hostname);
         messagePayload.setClusterInfo(clusterInfo);
@@ -267,11 +267,11 @@ public class CacheDistributeStageRunner extends AbstractStageRunner {
         messagePayload.setUserInfo(userMap);
         messagePayload.setComponentInfo(componentInfoMap);
 
-        CommandRequestMessage commandRequestMessage = new CommandRequestMessage();
-        commandRequestMessage.setCommandMessageType(CommandMessageType.CACHE_DISTRIBUTE);
-        commandRequestMessage.setHostname(hostname);
-        commandRequestMessage.setMessagePayload(JsonUtils.writeAsString(messagePayload));
+        CommandRequest.Builder builder = CommandRequest.newBuilder();
+        builder.setType(CommandType.CACHE_DISTRIBUTE);
+        builder.setHostname(hostname);
+        builder.setPayload(JsonUtils.writeAsString(messagePayload));
 
-        return commandRequestMessage;
+        return builder.build();
     }
 }

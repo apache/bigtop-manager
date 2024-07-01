@@ -26,8 +26,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-@EnableScheduling
 @EnableAsync
+@EnableScheduling
 @EnableJpaAuditing
 @EntityScan("org.apache.bigtop.manager.dao")
 @EnableJpaRepositories("org.apache.bigtop.manager.dao")

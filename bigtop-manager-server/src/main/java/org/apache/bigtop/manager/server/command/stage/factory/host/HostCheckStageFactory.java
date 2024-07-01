@@ -19,13 +19,14 @@
 package org.apache.bigtop.manager.server.command.stage.factory.host;
 
 import org.apache.bigtop.manager.common.enums.Command;
-import org.apache.bigtop.manager.common.message.entity.command.CommandMessageType;
-import org.apache.bigtop.manager.common.message.entity.command.CommandRequestMessage;
 import org.apache.bigtop.manager.common.message.entity.payload.HostCheckPayload;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.entity.Cluster;
 import org.apache.bigtop.manager.dao.entity.Task;
 import org.apache.bigtop.manager.dao.repository.ClusterRepository;
+import org.apache.bigtop.manager.grpc.generated.CommandRequest;
+import org.apache.bigtop.manager.grpc.generated.CommandType;
+import org.apache.bigtop.manager.grpc.utils.ProtobufUtil;
 import org.apache.bigtop.manager.server.command.stage.factory.AbstractStageFactory;
 import org.apache.bigtop.manager.server.command.stage.factory.StageType;
 
@@ -76,9 +77,8 @@ public class HostCheckStageFactory extends AbstractStageFactory {
             task.setCommand(Command.CUSTOM);
             task.setCustomCommand("check_host");
 
-            CommandRequestMessage commandRequestMessage = createMessage(hostname);
-            task.setContent(JsonUtils.writeAsString(commandRequestMessage));
-            task.setMessageId(commandRequestMessage.getMessageId());
+            CommandRequest request = createMessage(hostname);
+            task.setContent(ProtobufUtil.toJson(request));
 
             tasks.add(task);
         }
@@ -86,15 +86,15 @@ public class HostCheckStageFactory extends AbstractStageFactory {
         stage.setTasks(tasks);
     }
 
-    private CommandRequestMessage createMessage(String hostname) {
+    private CommandRequest createMessage(String hostname) {
         HostCheckPayload messagePayload = new HostCheckPayload();
         messagePayload.setHostname(hostname);
 
-        CommandRequestMessage commandRequestMessage = new CommandRequestMessage();
-        commandRequestMessage.setCommandMessageType(CommandMessageType.HOST_CHECK);
-        commandRequestMessage.setHostname(hostname);
-        commandRequestMessage.setMessagePayload(JsonUtils.writeAsString(messagePayload));
+        CommandRequest.Builder builder = CommandRequest.newBuilder();
+        builder.setType(CommandType.HOST_CHECK);
+        builder.setHostname(hostname);
+        builder.setPayload(JsonUtils.writeAsString(messagePayload));
 
-        return commandRequestMessage;
+        return builder.build();
     }
 }

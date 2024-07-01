@@ -59,4 +59,12 @@ public interface HostService {
      * @return Host
      */
     Boolean delete(Long id);
+
+    /**
+     * Check hosts connection
+     *
+     * @param hostnames hostname list
+     * @return true if all hosts are able to connect
+     */
+    Boolean checkConnection(List<String> hostnames);
 }

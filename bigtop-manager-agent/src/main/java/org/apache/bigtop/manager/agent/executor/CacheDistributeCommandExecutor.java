@@ -20,9 +20,9 @@ package org.apache.bigtop.manager.agent.executor;
 
 import org.apache.bigtop.manager.common.constants.Constants;
 import org.apache.bigtop.manager.common.constants.MessageConstants;
-import org.apache.bigtop.manager.common.message.entity.command.CommandMessageType;
 import org.apache.bigtop.manager.common.message.entity.payload.CacheMessagePayload;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
+import org.apache.bigtop.manager.grpc.generated.CommandType;
 import org.apache.bigtop.manager.stack.common.utils.linux.LinuxFileUtils;
 
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -46,15 +46,15 @@ import static org.apache.bigtop.manager.common.constants.CacheFiles.USERS_INFO;
 public class CacheDistributeCommandExecutor extends AbstractCommandExecutor {
 
     @Override
-    public CommandMessageType getCommandMessageType() {
-        return CommandMessageType.CACHE_DISTRIBUTE;
+    public CommandType getCommandType() {
+        return CommandType.CACHE_DISTRIBUTE;
     }
 
     @Override
     public void doExecute() {
         CacheMessagePayload cacheMessagePayload =
-                JsonUtils.readFromString(commandRequestMessage.getMessagePayload(), CacheMessagePayload.class);
-        log.info("[agent executeTask] taskEvent is: {}", commandRequestMessage);
+                JsonUtils.readFromString(commandRequest.getPayload(), CacheMessagePayload.class);
+        log.info("[agent executeTask] taskEvent is: {}", commandRequest);
         String cacheDir = Constants.STACK_CACHE_DIR;
 
         LinuxFileUtils.createDirectories(cacheDir, "root", "root", "rwxr-xr-x", false);
@@ -67,8 +67,8 @@ public class CacheDistributeCommandExecutor extends AbstractCommandExecutor {
         JsonUtils.writeToFile(cacheDir + REPOS_INFO, cacheMessagePayload.getRepoInfo());
         JsonUtils.writeToFile(cacheDir + CLUSTER_INFO, cacheMessagePayload.getClusterInfo());
 
-        commandResponseMessage.setCode(MessageConstants.SUCCESS_CODE);
-        commandResponseMessage.setResult(
-                MessageFormat.format("Host [{0}] cached successful!!!", commandRequestMessage.getHostname()));
+        commandReplyBuilder.setCode(MessageConstants.SUCCESS_CODE);
+        commandReplyBuilder.setResult(
+                MessageFormat.format("Host [{0}] cached successful!!!", commandRequest.getHostname()));
     }
 }

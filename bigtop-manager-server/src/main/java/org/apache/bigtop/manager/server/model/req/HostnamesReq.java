@@ -16,28 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.agent.scheduler;
+package org.apache.bigtop.manager.server.model.req;
 
-import org.apache.bigtop.manager.common.message.entity.command.CommandRequestMessage;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
 
-/**
- * Interface for scheduling commands on agent.
- */
-public interface CommandScheduler {
+import jakarta.validation.constraints.NotEmpty;
+import java.util.List;
 
-    /**
-     * Submit a command request message to the scheduler.
-     * @param message - the command request message that needs to be submitted.
-     */
-    void submit(CommandRequestMessage message);
+@Data
+public class HostnamesReq {
 
-    /**
-     * Start the command scheduler.
-     */
-    void start();
-
-    /**
-     * Stop the command scheduler.
-     */
-    void stop();
+    @NotEmpty
+    @Schema(example = "[host1, host2]")
+    private List<String> hostnames;
 }

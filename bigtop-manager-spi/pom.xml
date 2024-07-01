@@ -26,12 +26,8 @@
     </parent>
 
     <artifactId>bigtop-manager-spi</artifactId>
-
-    <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+    <name>${project.artifactId}</name>
+    <description>Bigtop Manager Spi</description>
 
     <dependencyManagement>
         <dependencies>
@@ -50,6 +46,7 @@
             <groupId>org.apache.bigtop</groupId>
             <artifactId>bigtop-manager-common</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>

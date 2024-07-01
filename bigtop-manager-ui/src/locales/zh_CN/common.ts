@@ -52,7 +52,6 @@ export default {
   error_timeout: '请求超时',
   desc_404: '抱歉，您查看的页面不存在',
   back_home: '返回首页',
-  websocket_disconnected: 'WebSocket 连接异常断开，请重新加载页面',
   create_time: '创建时间',
   update_time: '更新时间',
   notification: '通知',
