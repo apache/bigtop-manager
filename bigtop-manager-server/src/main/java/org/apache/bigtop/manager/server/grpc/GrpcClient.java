@@ -29,6 +29,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.AbstractAsyncStub;
 import io.grpc.stub.AbstractBlockingStub;
+import io.grpc.stub.AbstractFutureStub;
 import io.grpc.stub.AbstractStub;
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,6 +47,7 @@ public class GrpcClient {
     // The key of outer map is hostname, inner map is stub class name
     private static final Map<String, Map<String, AbstractBlockingStub<?>>> BLOCKING_STUBS = new ConcurrentHashMap<>();
     private static final Map<String, Map<String, AbstractAsyncStub<?>>> ASYNC_STUBS = new ConcurrentHashMap<>();
+    private static final Map<String, Map<String, AbstractFutureStub<?>>> FUTURE_STUBS = new ConcurrentHashMap<>();
 
     public static ManagedChannel createChannel(String host) {
         int port = SpringContextHolder.getApplicationContext()
@@ -72,6 +74,16 @@ public class GrpcClient {
     @SuppressWarnings("unchecked")
     public static <T extends AbstractAsyncStub<T>> T getAsyncStub(String host, Class<T> clazz) {
         Map<String, AbstractAsyncStub<?>> innerMap = ASYNC_STUBS.computeIfAbsent(host, k -> new HashMap<>());
+        return (T) innerMap.computeIfAbsent(clazz.getName(), k -> {
+            T instance = T.newStub(getFactory(clazz), getChannel(host));
+            log.info("Instance: {} created.", k);
+            return instance;
+        });
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T extends AbstractFutureStub<T>> T getFutureStub(String host, Class<T> clazz) {
+        Map<String, AbstractFutureStub<?>> innerMap = FUTURE_STUBS.computeIfAbsent(host, k -> new HashMap<>());
         return (T) innerMap.computeIfAbsent(clazz.getName(), k -> {
             T instance = T.newStub(getFactory(clazz), getChannel(host));
             log.info("Instance: {} created.", k);
