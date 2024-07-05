@@ -80,6 +80,7 @@ request.interceptors.response.use(
     } else if (error.code === AxiosError.ETIMEDOUT) {
       message.error(i18n.global.t('common.error_timeout'))
     } else {
+      console.log(error)
       message.error(i18n.global.t('common.error_unknown'))
     }
 

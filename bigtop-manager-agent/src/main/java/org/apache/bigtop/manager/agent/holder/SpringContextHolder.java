@@ -19,7 +19,6 @@
 package org.apache.bigtop.manager.agent.holder;
 
 import org.apache.bigtop.manager.agent.executor.CommandExecutor;
-import org.apache.bigtop.manager.agent.ws.AgentWebSocketHandler;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -39,10 +38,6 @@ public class SpringContextHolder implements ApplicationContextAware {
     @Override
     public void setApplicationContext(@Nonnull ApplicationContext applicationContext) {
         SpringContextHolder.applicationContext = applicationContext;
-    }
-
-    public static AgentWebSocketHandler getAgentWebSocket() {
-        return applicationContext.getBean(AgentWebSocketHandler.class);
     }
 
     public static Map<String, CommandExecutor> getCommandExecutors() {

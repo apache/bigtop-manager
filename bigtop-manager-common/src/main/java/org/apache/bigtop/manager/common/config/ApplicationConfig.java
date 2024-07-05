@@ -18,8 +18,7 @@
  */
 package org.apache.bigtop.manager.common.config;
 
-import org.apache.bigtop.manager.common.config.application.SerializerConfig;
-import org.apache.bigtop.manager.common.config.application.ServerConfig;
+import org.apache.bigtop.manager.common.config.application.GrpcConfig;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
@@ -33,8 +32,5 @@ import lombok.Data;
 public class ApplicationConfig {
 
     @NestedConfigurationProperty
-    private ServerConfig server;
-
-    @NestedConfigurationProperty
-    private SerializerConfig serializer = new SerializerConfig();
+    private GrpcConfig grpc;
 }

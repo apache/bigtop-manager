@@ -49,10 +49,12 @@
         </dependency>
         <dependency>
             <groupId>org.apache.bigtop</groupId>
-            <artifactId>bigtop-manager-dao</artifactId>
-            <version>${project.version}</version>
+            <artifactId>bigtop-manager-grpc</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.apache.bigtop</groupId>
+            <artifactId>bigtop-manager-dao</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.apache.bigtop</groupId>
             <artifactId>bigtop-manager-ui</artifactId>
@@ -87,11 +89,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
 
         <dependency>
@@ -171,6 +168,11 @@
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-runtime</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>net.devh</groupId>
+            <artifactId>grpc-client-spring-boot-starter</artifactId>
         </dependency>
     </dependencies>
 

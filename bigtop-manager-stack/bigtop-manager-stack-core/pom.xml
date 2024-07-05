@@ -26,24 +26,18 @@
     </parent>
 
     <artifactId>bigtop-manager-stack-core</artifactId>
-
-    <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+    <name>${project.artifactId}</name>
+    <description>Bigtop Manager Stack Core</description>
 
     <dependencies>
         <dependency>
             <groupId>org.apache.bigtop</groupId>
             <artifactId>bigtop-manager-stack-nop</artifactId>
-            <version>${revision}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.bigtop</groupId>
             <artifactId>bigtop-manager-stack-bigtop</artifactId>
-            <version>${revision}</version>
         </dependency>
 
         <dependency>

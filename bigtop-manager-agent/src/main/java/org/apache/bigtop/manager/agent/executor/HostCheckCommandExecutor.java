@@ -19,9 +19,9 @@
 package org.apache.bigtop.manager.agent.executor;
 
 import org.apache.bigtop.manager.common.constants.MessageConstants;
-import org.apache.bigtop.manager.common.message.entity.command.CommandMessageType;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.common.utils.os.TimeSyncDetection;
+import org.apache.bigtop.manager.grpc.generated.CommandType;
 
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -38,15 +38,15 @@ import java.util.function.Supplier;
 public class HostCheckCommandExecutor extends AbstractCommandExecutor {
 
     @Override
-    public CommandMessageType getCommandMessageType() {
-        return CommandMessageType.HOST_CHECK;
+    public CommandType getCommandType() {
+        return CommandType.HOST_CHECK;
     }
 
     @Override
     public void doExecute() {
         ShellResult shellResult = runChecks(List.of(this::checkTimeSync));
-        commandResponseMessage.setCode(shellResult.getExitCode());
-        commandResponseMessage.setResult(shellResult.getResult());
+        commandReplyBuilder.setCode(shellResult.getExitCode());
+        commandReplyBuilder.setResult(shellResult.getResult());
     }
 
     private ShellResult runChecks(List<Supplier<ShellResult>> suppliers) {

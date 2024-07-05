@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.agent.executor;
 
 import org.apache.bigtop.manager.agent.holder.SpringContextHolder;
-import org.apache.bigtop.manager.common.message.entity.command.CommandMessageType;
+import org.apache.bigtop.manager.grpc.generated.CommandType;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,14 +32,14 @@ public class CommandExecutors {
 
     private static final AtomicBoolean LOADED = new AtomicBoolean(false);
 
-    private static final Map<CommandMessageType, String> COMMAND_EXECUTORS = new HashMap<>();
+    private static final Map<CommandType, String> COMMAND_EXECUTORS = new HashMap<>();
 
-    public static CommandExecutor getCommandExecutor(CommandMessageType commandMessageType) {
+    public static CommandExecutor getCommandExecutor(CommandType commandType) {
         if (!LOADED.get()) {
             load();
         }
 
-        String beanName = COMMAND_EXECUTORS.get(commandMessageType);
+        String beanName = COMMAND_EXECUTORS.get(commandType);
         return SpringContextHolder.getApplicationContext().getBean(beanName, CommandExecutor.class);
     }
 
@@ -52,16 +52,16 @@ public class CommandExecutors {
                 SpringContextHolder.getCommandExecutors().entrySet()) {
             String beanName = entry.getKey();
             CommandExecutor commandExecutor = entry.getValue();
-            if (COMMAND_EXECUTORS.containsKey(commandExecutor.getCommandMessageType())) {
-                log.error("Duplicate CommandExecutor with message type: {}", commandExecutor.getCommandMessageType());
+            if (COMMAND_EXECUTORS.containsKey(commandExecutor.getCommandType())) {
+                log.error("Duplicate CommandExecutor with message type: {}", commandExecutor.getCommandType());
                 continue;
             }
 
-            COMMAND_EXECUTORS.put(commandExecutor.getCommandMessageType(), beanName);
+            COMMAND_EXECUTORS.put(commandExecutor.getCommandType(), beanName);
             log.info(
                     "Load JobRunner: {} with identifier: {}",
                     commandExecutor.getClass().getName(),
-                    commandExecutor.getCommandMessageType());
+                    commandExecutor.getCommandType());
         }
 
         LOADED.set(true);

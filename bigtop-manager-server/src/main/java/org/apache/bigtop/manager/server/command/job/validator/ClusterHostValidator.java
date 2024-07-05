@@ -25,7 +25,7 @@ import org.apache.bigtop.manager.server.command.CommandIdentifier;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.enums.CommandLevel;
 import org.apache.bigtop.manager.server.exception.ApiException;
-import org.apache.bigtop.manager.server.holder.SpringContextHolder;
+import org.apache.bigtop.manager.server.grpc.GrpcClient;
 import org.apache.bigtop.manager.server.model.dto.command.ClusterCommandDTO;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -51,20 +51,16 @@ public class ClusterHostValidator implements CommandValidator {
         ClusterCommandDTO clusterCommand = context.getCommandDTO().getClusterCommand();
         List<String> hostnames = clusterCommand.getHostnames();
 
-        List<String> connectedHosts = SpringContextHolder.getServerWebSocket().getConnectedHosts();
-        if (CollectionUtils.isNotEmpty(connectedHosts)) {
-            List<String> notConnectedHostnames = hostnames.stream()
-                    .filter(hostname -> !connectedHosts.contains(hostname))
-                    .toList();
-            if (CollectionUtils.isNotEmpty(notConnectedHostnames)) {
-                throw new ApiException(ApiExceptionEnum.HOST_NOT_CONNECTED, String.join(",", notConnectedHostnames));
-            }
-        }
-
         List<Host> hosts = hostRepository.findAllByHostnameIn(hostnames);
         if (CollectionUtils.isNotEmpty(hosts)) {
             List<String> existsHostnames = hosts.stream().map(Host::getHostname).toList();
             throw new ApiException(ApiExceptionEnum.HOST_ASSIGNED, String.join(",", existsHostnames));
+        }
+
+        for (String hostname : hostnames) {
+            if (!GrpcClient.isChannelAlive(hostname)) {
+                GrpcClient.createChannel(hostname);
+            }
         }
     }
 }
