@@ -122,7 +122,7 @@ public class GrpcClient {
         if (isChannelAlive(host)) {
             return CHANNELS.get(host);
         } else {
-            throw new ApiException(ApiExceptionEnum.HOST_NOT_CONNECTED, host);
+            return createChannel(host);
         }
     }
 

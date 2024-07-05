@@ -16,37 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-syntax = "proto3";
+package org.apache.bigtop.manager.server.service;
 
-option java_multiple_files = true;
-option java_package = "org.apache.bigtop.manager.grpc.generated";
-option java_outer_classname = "CommandProto";
+import reactor.core.publisher.FluxSink;
 
-service CommandService {
-  rpc Exec (CommandRequest) returns (CommandReply) {}
-}
+public interface TaskLogService {
 
-enum CommandType {
-  COMPONENT = 0;
-  HOST_CHECK = 1;
-  CACHE_DISTRIBUTE = 2;
-}
-
-message CommandRequest {
-  string payload = 1;
-  string hostname = 2;
-  int64 job_id = 3;
-  int64 stage_id = 4;
-  int64 task_id = 5;
-  CommandType type = 6;
-}
-
-message CommandReply {
-  int32 code = 1;
-  string result = 2;
-  string hostname = 3;
-  int64 job_id = 4;
-  int64 stage_id = 5;
-  int64 task_id = 6;
-  CommandType type = 7;
+    void registerSink(Long taskId, FluxSink<String> sink);
 }

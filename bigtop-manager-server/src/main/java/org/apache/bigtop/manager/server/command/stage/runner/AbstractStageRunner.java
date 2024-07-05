@@ -30,7 +30,6 @@ import org.apache.bigtop.manager.grpc.generated.CommandServiceGrpc;
 import org.apache.bigtop.manager.grpc.utils.ProtobufUtil;
 import org.apache.bigtop.manager.server.command.stage.factory.StageContext;
 import org.apache.bigtop.manager.server.grpc.GrpcClient;
-import org.apache.bigtop.manager.server.service.CommandLogService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,9 +40,6 @@ import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 public abstract class AbstractStageRunner implements StageRunner {
-
-    @Resource
-    private CommandLogService commandLogService;
 
     @Resource
     protected StageRepository stageRepository;
@@ -81,7 +77,6 @@ public abstract class AbstractStageRunner implements StageRunner {
             CommandRequest request = builder.build();
 
             futures.add(CompletableFuture.supplyAsync(() -> {
-                commandLogService.onLogStarted(task.getId(), task.getHostname());
                 CommandServiceGrpc.CommandServiceBlockingStub stub = GrpcClient.getBlockingStub(
                         task.getHostname(), CommandServiceGrpc.CommandServiceBlockingStub.class);
                 CommandReply reply = stub.exec(request);
@@ -90,14 +85,11 @@ public abstract class AbstractStageRunner implements StageRunner {
                 boolean taskSuccess = reply != null && reply.getCode() == MessageConstants.SUCCESS_CODE;
 
                 if (taskSuccess) {
-                    commandLogService.onLogReceived(task.getId(), task.getHostname(), "Success!");
                     onTaskSuccess(task);
                 } else {
-                    commandLogService.onLogReceived(task.getId(), task.getHostname(), "Failed!");
                     onTaskFailure(task);
                 }
 
-                commandLogService.onLogEnded(task.getId(), task.getHostname());
                 return taskSuccess;
             }));
         }

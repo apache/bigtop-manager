@@ -60,6 +60,7 @@ public abstract class AbstractCommandExecutor implements CommandExecutor {
     }
 
     protected void doExecuteOnDevMode() {
+        log.info("Running command on dev mode");
         commandReplyBuilder.setCode(MessageConstants.SUCCESS_CODE);
         commandReplyBuilder.setResult(ShellResult.success().getResult());
     }

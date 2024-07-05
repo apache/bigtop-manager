@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.server.controller;
 
-import org.apache.bigtop.manager.server.service.CommandLogService;
+import org.apache.bigtop.manager.server.service.TaskLogService;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,7 +32,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 
 import jakarta.annotation.Resource;
-import java.io.IOException;
 
 @Tag(name = "Sse Controller")
 @RestController
@@ -40,21 +39,21 @@ import java.io.IOException;
 public class SseController {
 
     @Resource
-    private CommandLogService commandLogService;
+    private TaskLogService taskLogService;
 
     @Operation(summary = "get task log", description = "Get a task log")
     @GetMapping("/tasks/{id}/log")
     public SseEmitter log(@PathVariable Long id, @PathVariable Long clusterId) {
-        SseEmitter emitter = new SseEmitter();
+        // Default timeout to 5 minutes
+        SseEmitter emitter = new SseEmitter(5 * 60 * 1000L);
 
         Flux<String> flux =
-                Flux.create(sink -> commandLogService.registerSink(id, sink), FluxSink.OverflowStrategy.BUFFER);
+                Flux.create(sink -> taskLogService.registerSink(id, sink), FluxSink.OverflowStrategy.BUFFER);
         flux.subscribe(
                 s -> {
                     try {
                         emitter.send(s);
-                    } catch (IOException e) {
-                        commandLogService.unregisterSink(id);
+                    } catch (Exception e) {
                         emitter.completeWithError(e);
                     }
                 },
@@ -62,7 +61,6 @@ public class SseController {
                 emitter::complete);
 
         emitter.onTimeout(emitter::complete);
-        emitter.onCompletion(() -> commandLogService.unregisterSink(id));
         return emitter;
     }
 }

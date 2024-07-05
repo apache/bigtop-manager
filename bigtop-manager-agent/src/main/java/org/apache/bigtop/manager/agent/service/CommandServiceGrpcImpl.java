@@ -18,6 +18,7 @@
  */
 package org.apache.bigtop.manager.agent.service;
 
+import org.apache.bigtop.manager.agent.cache.Caches;
 import org.apache.bigtop.manager.agent.executor.CommandExecutor;
 import org.apache.bigtop.manager.agent.executor.CommandExecutors;
 import org.apache.bigtop.manager.grpc.generated.CommandReply;
@@ -39,6 +40,7 @@ public class CommandServiceGrpcImpl extends CommandServiceGrpc.CommandServiceImp
     public void exec(CommandRequest request, StreamObserver<CommandReply> responseObserver) {
         try {
             MDC.put("taskId", String.valueOf(request.getTaskId()));
+            Caches.RUNNING_TASKS.add(request.getTaskId());
             CommandExecutor commandExecutor = CommandExecutors.getCommandExecutor(request.getType());
             CommandReply reply = commandExecutor.execute(request);
             responseObserver.onNext(reply);
@@ -48,6 +50,7 @@ public class CommandServiceGrpcImpl extends CommandServiceGrpc.CommandServiceImp
             Status status = Status.UNKNOWN.withDescription(e.getMessage());
             responseObserver.onError(status.asRuntimeException());
         } finally {
+            Caches.RUNNING_TASKS.remove(request.getTaskId());
             MDC.clear();
         }
     }

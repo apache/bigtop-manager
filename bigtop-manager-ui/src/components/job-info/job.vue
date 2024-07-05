@@ -223,6 +223,7 @@
   const clickTask = (record: TaskVO) => {
     breadcrumbs.value.push(record)
     currTaskInfo.value = record
+    logTextOrigin.value = ''
     getLogsInfo(record.id)
   }
 

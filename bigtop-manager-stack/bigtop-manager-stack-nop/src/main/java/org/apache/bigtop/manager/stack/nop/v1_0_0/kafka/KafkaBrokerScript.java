@@ -31,36 +31,36 @@ public class KafkaBrokerScript implements Script {
 
     @Override
     public ShellResult install(Params params) {
-        log.info("Default to success in dev mode");
+        log.info("Default to success on dev mode");
         return ShellResult.success();
     }
 
     @Override
     public ShellResult configure(Params params) {
-        log.info("Default to success in dev mode");
+        log.info("Default to success on dev mode");
         return ShellResult.success();
     }
 
     @Override
     public ShellResult start(Params params) {
-        log.info("Default to success in dev mode");
+        log.info("Default to success on dev mode");
         return ShellResult.success();
     }
 
     @Override
     public ShellResult stop(Params params) {
-        log.info("Default to success in dev mode");
+        log.info("Default to success on dev mode");
         return ShellResult.success();
     }
 
     @Override
     public ShellResult status(Params params) {
-        log.info("Default to success in dev mode");
+        log.info("Default to success on dev mode");
         return ShellResult.success();
     }
 
     public ShellResult test(Params params) {
-        log.info("Default to success in dev mode");
+        log.info("Default to success on dev mode");
         return ShellResult.success();
     }
 }
