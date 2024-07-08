@@ -44,6 +44,7 @@ public class HostCheckCommandExecutor extends AbstractCommandExecutor {
 
     @Override
     public void doExecute() {
+        log.info("[agent executeTask] taskEvent is: {}", commandRequest);
         ShellResult shellResult = runChecks(List.of(this::checkTimeSync));
         commandReplyBuilder.setCode(shellResult.getExitCode());
         commandReplyBuilder.setResult(shellResult.getResult());

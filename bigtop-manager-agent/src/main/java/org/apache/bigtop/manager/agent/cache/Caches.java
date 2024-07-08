@@ -16,19 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.service;
+package org.apache.bigtop.manager.agent.cache;
 
-import reactor.core.publisher.FluxSink;
+import java.util.ArrayList;
+import java.util.List;
 
-public interface CommandLogService {
-
-    void registerSink(Long taskId, FluxSink<String> sink);
-
-    void unregisterSink(Long taskId);
-
-    void onLogStarted(Long taskId, String hostname);
-
-    void onLogReceived(Long taskId, String hostname, String log);
-
-    void onLogEnded(Long taskId, String hostname);
+public class Caches {
+    public static final List<Long> RUNNING_TASKS = new ArrayList<>();
 }

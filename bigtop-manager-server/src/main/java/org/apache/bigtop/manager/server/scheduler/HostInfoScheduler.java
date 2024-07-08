@@ -54,10 +54,6 @@ public class HostInfoScheduler {
     private void getHostInfo(Host host) {
         String hostname = host.getHostname();
         try {
-            if (!GrpcClient.isChannelAlive(hostname)) {
-                GrpcClient.createChannel(hostname);
-            }
-
             HostInfoServiceGrpc.HostInfoServiceBlockingStub stub =
                     GrpcClient.getBlockingStub(hostname, HostInfoServiceGrpc.HostInfoServiceBlockingStub.class);
             HostInfoReply reply = stub.getHostInfo(HostInfoRequest.newBuilder().build());

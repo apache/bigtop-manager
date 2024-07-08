@@ -62,27 +62,6 @@ CREATE UNIQUE INDEX INDEX33555701 ON "bigtop_manager"."cluster" ("cluster_name")
 CREATE INDEX "idx_cluster_stack_id" ON "bigtop_manager"."cluster" ("stack_id");
 
 
--- "bigtop_manager"."command_log" definition
-
-CREATE TABLE "bigtop_manager"."command_log" (
-	"id" BIGINT NOT NULL,
-	"create_by" BIGINT NULL,
-	"create_time" DATETIME NULL,
-	"update_by" BIGINT NULL,
-	"update_time" DATETIME NULL,
-	"hostname" VARCHAR(255) NULL,
-	"result" CLOB NULL,
-	"job_id" BIGINT NULL,
-	"stage_id" BIGINT NULL,
-	"task_id" BIGINT NULL,
-	CONSTRAINT CONS134218865 PRIMARY KEY ("id")
-);
-CREATE UNIQUE INDEX INDEX33555669 ON "bigtop_manager"."command_log" ("id");
-CREATE INDEX "idx_cl_job_id" ON "bigtop_manager"."command_log" ("job_id");
-CREATE INDEX "idx_cl_stage_id" ON "bigtop_manager"."command_log" ("stage_id");
-CREATE INDEX "idx_cl_task_id" ON "bigtop_manager"."command_log" ("task_id");
-
-
 -- "bigtop_manager"."component" definition
 
 CREATE TABLE "bigtop_manager"."component" (

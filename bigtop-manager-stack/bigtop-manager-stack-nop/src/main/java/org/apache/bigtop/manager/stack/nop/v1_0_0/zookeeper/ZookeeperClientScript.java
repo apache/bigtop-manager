@@ -32,13 +32,13 @@ public class ZookeeperClientScript implements ClientScript {
 
     @Override
     public ShellResult install(Params params) {
-        log.info("Default to success in dev mode");
+        log.info("Default to success on dev mode");
         return ShellResult.success();
     }
 
     @Override
     public ShellResult configure(Params params) {
-        log.info("Default to success in dev mode");
+        log.info("Default to success on dev mode");
         return ShellResult.success();
     }
 }
