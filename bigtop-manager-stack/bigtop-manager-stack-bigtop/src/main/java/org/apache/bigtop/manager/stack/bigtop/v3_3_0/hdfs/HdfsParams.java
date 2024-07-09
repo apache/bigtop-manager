@@ -116,11 +116,11 @@ public class HdfsParams extends BaseParams {
 
         hadoopLogDir = (String) hadoopEnv.get("hadoop_log_dir_prefix");
         hadoopPidDir = (String) hadoopEnv.get("hadoop_pid_dir_prefix");
-        nameNodePidFile = MessageFormat.format("{0}/hadoop-{1}-namenode.pid", hadoopPidDir, user());
-        dataNodePidFile = MessageFormat.format("{0}/hadoop-{1}-datanode.pid", hadoopPidDir, user());
-        sNameNodePidFile = MessageFormat.format("{0}/hadoop-{1}-secondarynamenode.pid", hadoopPidDir, user());
-        journalNodePidFile = MessageFormat.format("{0}/hadoop-{1}-journalnode.pid", hadoopPidDir, user());
-        zkfcPidFile = MessageFormat.format("{0}/hadoop-{1}-zkfc.pid", hadoopPidDir, user());
+        nameNodePidFile = MessageFormat.format("{0}/{1}/hadoop-{1}-namenode.pid", hadoopPidDir, user());
+        dataNodePidFile = MessageFormat.format("{0}/{1}/hadoop-{1}-datanode.pid", hadoopPidDir, user());
+        sNameNodePidFile = MessageFormat.format("{0}/{1}/hadoop-{1}-secondarynamenode.pid", hadoopPidDir, user());
+        journalNodePidFile = MessageFormat.format("{0}/{1}/hadoop-{1}-journalnode.pid", hadoopPidDir, user());
+        zkfcPidFile = MessageFormat.format("{0}/{1}/hadoop-{1}-zkfc.pid", hadoopPidDir, user());
         return hadoopEnv;
     }
 
