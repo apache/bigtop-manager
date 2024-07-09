@@ -18,6 +18,8 @@
  */
 package org.apache.bigtop.manager.common.shell;
 
+import org.apache.bigtop.manager.common.thread.TaskLogThreadDecorator;
+
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
@@ -305,23 +307,20 @@ public class ShellExecutor {
     }
 
     private Thread createReaderThread(BufferedReader reader, StringBuilder msg) {
-        return new Thread() {
-
-            @Override
-            public void run() {
-                try {
-                    String line = reader.readLine();
-                    while ((line != null) && !isInterrupted()) {
-                        consumer.accept(line);
-                        msg.append(line);
-                        msg.append(System.lineSeparator());
-                        line = reader.readLine();
-                    }
-                } catch (IOException ioe) {
-                    log.warn("Error reading the stream", ioe);
+        TaskLogThreadDecorator decorator = new TaskLogThreadDecorator();
+        return decorator.decorate(() -> {
+            try {
+                String line = reader.readLine();
+                while ((line != null)) {
+                    consumer.accept(line);
+                    msg.append(line);
+                    msg.append(System.lineSeparator());
+                    line = reader.readLine();
                 }
+            } catch (IOException ioe) {
+                log.warn("Error reading the stream", ioe);
             }
-        };
+        });
     }
 
     private void scheduleTimeoutTimer() {
