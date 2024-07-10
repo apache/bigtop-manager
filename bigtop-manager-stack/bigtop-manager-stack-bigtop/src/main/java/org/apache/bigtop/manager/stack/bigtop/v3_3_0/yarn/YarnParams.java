@@ -37,6 +37,7 @@ public class YarnParams extends BaseParams {
     private String yarnLogDir = "/var/log/hadoop-yarn";
     private String yarnPidDir = "/var/run/hadoop-yarn";
     private String rmNodesExcludeDir = "/etc/hadoop/conf/yarn.exclude";
+    private String tmpDir = "/tmp/hadoop-yarn";
     /* pid file */
     private String resourceManagerPidFile = yarnPidDir + "/yarn/hadoop-yarn-resourcemanager.pid";
     private String nodeManagerPidFile = yarnPidDir + "/yarn/hadoop-yarn-nodemanager.pid";
@@ -50,7 +51,10 @@ public class YarnParams extends BaseParams {
         globalParamsMap.put("java_home", "/usr/local/java");
         globalParamsMap.put("hadoop_home", serviceHome());
         globalParamsMap.put("hadoop_hdfs_home", hdfsHome());
+        globalParamsMap.put("hadoop_yarn_home", yarnHome());
         globalParamsMap.put("hadoop_conf_dir", confDir());
+
+        globalParamsMap.put("hadoop_libexec_dir", serviceHome() + "/libexec");
 
         globalParamsMap.put("exclude_hosts", excludeHosts);
     }
@@ -61,7 +65,7 @@ public class YarnParams extends BaseParams {
     }
 
     public String excludeNodesContent() {
-        Map<String, Object> excludeNodesContent = LocalSettings.configurations(serviceName(), "exclude-nodes.xml");
+        Map<String, Object> excludeNodesContent = LocalSettings.configurations(serviceName(), "exclude-nodes");
         return (String) excludeNodesContent.get("content");
     }
 
@@ -82,6 +86,7 @@ public class YarnParams extends BaseParams {
     public Map<String, Object> yarnEnv() {
         Map<String, Object> yarnEnv = LocalSettings.configurations(serviceName(), "yarn-env");
 
+        tmpDir = (String) yarnEnv.get("hadoop_java_io_tmpdir");
         yarnLogDir = (String) yarnEnv.get("yarn_log_dir_prefix");
         yarnPidDir = (String) yarnEnv.get("yarn_pid_dir_prefix");
         resourceManagerPidFile = MessageFormat.format("{0}/{1}/hadoop-{1}-resourcemanager.pid", yarnPidDir, user());
@@ -108,6 +113,6 @@ public class YarnParams extends BaseParams {
     }
 
     public String yarnHome() {
-        return stackBinDir() + "/hadoop-yarn";
+        return stackLibDir() + "/hadoop-yarn";
     }
 }

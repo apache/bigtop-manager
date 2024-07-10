@@ -73,5 +73,4 @@ public class ResourceManagerScript implements Script {
         YarnParams yarnParams = (YarnParams) params;
         return LinuxOSUtils.checkProcess(yarnParams.getResourceManagerPidFile());
     }
-
 }

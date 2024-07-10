@@ -94,6 +94,7 @@
                 <packages>
                     <package>hadoop_3_3_0-yarn</package>
                     <package>hadoop_3_3_0-hdfs</package>
+                    <package>hadoop_3_3_0-mapreduce</package>
                 </packages>
             </os-specific>
         </os-specifics>

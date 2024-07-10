@@ -55,7 +55,7 @@ public class YarnSetup {
             switch (componentName) {
                 case "resourcemanager": {
                     LinuxFileUtils.createDirectories(
-                            yarnParams.getRmNodesExcludeDir(), yarnUser, yarnGroup, Constants.PERMISSION_755, true);
+                            yarnParams.getTmpDir(), yarnUser, yarnGroup, Constants.PERMISSION_755, true);
 
                     LinuxFileUtils.toFileByTemplate(
                             yarnParams.excludeNodesContent(),
@@ -101,7 +101,6 @@ public class YarnSetup {
                 Constants.PERMISSION_644,
                 yarnParams.yarnSite());
 
-
         // log4j
         LinuxFileUtils.toFileByTemplate(
                 yarnParams.yarnLog4j().get("content").toString(),
@@ -113,5 +112,4 @@ public class YarnSetup {
 
         return ShellResult.success("YARN Configure success!");
     }
-
 }

@@ -167,11 +167,11 @@
     </property>
     <property>
         <name>fs.azure.user.agent.prefix</name>
-        <value>User-Agent: APN/1.0 Hortonworks/1.0 HDP/{{version}}</value>
+        <value/>
     </property>
     <property>
         <name>fs.gs.application.name.suffix</name>
-        <value>(GPN:Hortonworks; version 1.0) HDP/{{version}}</value>
+        <value/>
     </property>
     <property>
         <name>fs.gs.path.encoding</name>
@@ -184,6 +184,6 @@
     </property>
     <property>
         <name>fs.s3a.user.agent.prefix</name>
-        <value>User-Agent: APN/1.0 Hortonworks/1.0 HDP/{{version}}</value>
+        <value/>
     </property>
 </configuration>

@@ -34,7 +34,7 @@
         <name>content</name>
         <display-name>yarn-log4j template</display-name>
         <description>Custom log4j.properties</description>
-        <value>
+        <value><![CDATA[
             #Relative to Yarn Log Dir Prefix
             yarn.log.dir=.
             #
@@ -44,13 +44,13 @@
             # hadoop.mapreduce.jobsummary.log.file rolled daily:
             # hadoop.mapreduce.jobsummary.logger=INFO,JSA
             #
-            hadoop.mapreduce.jobsummary.logger=${hadoop.root.logger}
+            <#noparse>hadoop.mapreduce.jobsummary.logger=${hadoop.root.logger}</#noparse>
             hadoop.mapreduce.jobsummary.log.file=hadoop-mapreduce.jobsummary.log
             log4j.appender.JSA=org.apache.log4j.DailyRollingFileAppender
             # Set the ResourceManager summary log filename
             yarn.server.resourcemanager.appsummary.log.file=hadoop-mapreduce.jobsummary.log
             # Set the ResourceManager summary log level and appender
-            yarn.server.resourcemanager.appsummary.logger=${hadoop.root.logger}
+            <#noparse>yarn.server.resourcemanager.appsummary.logger=${hadoop.root.logger}</#noparse>
             #yarn.server.resourcemanager.appsummary.logger=INFO,RMSUMMARY
 
             # To enable AppSummaryLogging for the RM,
@@ -63,37 +63,38 @@
             #    - yarn.server.resourcemanager.appsummary.log.file (resource manager app summary log filename)
             #    - yarn.server.resourcemanager.appsummary.logger (resource manager app summary log level and appender)
             log4j.appender.RMSUMMARY=org.apache.log4j.RollingFileAppender
-            log4j.appender.RMSUMMARY.File=${yarn.log.dir}/${yarn.server.resourcemanager.appsummary.log.file}
-            log4j.appender.RMSUMMARY.MaxFileSize={{yarn_rm_summary_log_max_backup_size}}MB
-            log4j.appender.RMSUMMARY.MaxBackupIndex={{yarn_rm_summary_log_number_of_backup_files}}
+            <#noparse>log4j.appender.RMSUMMARY.File=${yarn.log.dir}/${yarn.server.resourcemanager.appsummary.log.file}</#noparse>
+            log4j.appender.RMSUMMARY.MaxFileSize=${yarn_rm_summary_log_max_backup_size}MB
+            log4j.appender.RMSUMMARY.MaxBackupIndex=${yarn_rm_summary_log_number_of_backup_files}
             log4j.appender.RMSUMMARY.layout=org.apache.log4j.PatternLayout
             log4j.appender.RMSUMMARY.layout.ConversionPattern=%d{ISO8601} %p %c{2}: %m%n
             log4j.appender.JSA.layout=org.apache.log4j.PatternLayout
             log4j.appender.JSA.layout.ConversionPattern=%d{yy/MM/dd HH:mm:ss} %p %c{2}: %m%n
             log4j.appender.JSA.DatePattern=.yyyy-MM-dd
             log4j.appender.JSA.layout=org.apache.log4j.PatternLayout
-            log4j.logger.org.apache.hadoop.yarn.server.resourcemanager.RMAppManager$ApplicationSummary=${yarn.server.resourcemanager.appsummary.logger}
-            log4j.additivity.org.apache.hadoop.yarn.server.resourcemanager.RMAppManager$ApplicationSummary=false
+            <#noparse>log4j.logger.org.apache.hadoop.yarn.server.resourcemanager.RMAppManager$ApplicationSummary=${yarn.server.resourcemanager.appsummary.logger}</#noparse>
+            <#noparse>log4j.additivity.org.apache.hadoop.yarn.server.resourcemanager.RMAppManager$ApplicationSummary=false</#noparse>
 
             # Audit logging for ResourceManager
-            rm.audit.logger=${hadoop.root.logger}
-            log4j.logger.org.apache.hadoop.yarn.server.resourcemanager.RMAuditLogger=${rm.audit.logger}
+            <#noparse>rm.audit.logger=${hadoop.root.logger}</#noparse>
+            <#noparse>log4j.logger.org.apache.hadoop.yarn.server.resourcemanager.RMAuditLogger=${rm.audit.logger}</#noparse>
             log4j.additivity.org.apache.hadoop.yarn.server.resourcemanager.RMAuditLogger=false
             log4j.appender.RMAUDIT=org.apache.log4j.DailyRollingFileAppender
-            log4j.appender.RMAUDIT.File=${yarn.log.dir}/rm-audit.log
+            <#noparse>log4j.appender.RMAUDIT.File=${yarn.log.dir}/rm-audit.log</#noparse>
             log4j.appender.RMAUDIT.layout=org.apache.log4j.PatternLayout
             log4j.appender.RMAUDIT.layout.ConversionPattern=%d{ISO8601} %p %c{2}: %m%n
             log4j.appender.RMAUDIT.DatePattern=.yyyy-MM-dd
 
             # Audit logging for NodeManager
-            nm.audit.logger=${hadoop.root.logger}
-            log4j.logger.org.apache.hadoop.yarn.server.nodemanager.NMAuditLogger=${nm.audit.logger}
+            <#noparse>nm.audit.logger=${hadoop.root.logger}</#noparse>
+            <#noparse>log4j.logger.org.apache.hadoop.yarn.server.nodemanager.NMAuditLogger=${nm.audit.logger}</#noparse>
             log4j.additivity.org.apache.hadoop.yarn.server.nodemanager.NMAuditLogger=false
             log4j.appender.NMAUDIT=org.apache.log4j.DailyRollingFileAppender
-            log4j.appender.NMAUDIT.File=${yarn.log.dir}/nm-audit.log
+            <#noparse>log4j.appender.NMAUDIT.File=${yarn.log.dir}/nm-audit.log</#noparse>
             log4j.appender.NMAUDIT.layout=org.apache.log4j.PatternLayout
             log4j.appender.NMAUDIT.layout.ConversionPattern=%d{ISO8601} %p %c{2}: %m%n
             log4j.appender.NMAUDIT.DatePattern=.yyyy-MM-dd
+            ]]>
         </value>
     </property>
 </configuration>
