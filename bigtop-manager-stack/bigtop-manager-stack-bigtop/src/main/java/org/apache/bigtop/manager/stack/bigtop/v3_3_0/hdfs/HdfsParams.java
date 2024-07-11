@@ -105,9 +105,9 @@ public class HdfsParams extends BaseParams {
         }
         List<String> snamenodeList = LocalSettings.hosts("secondary_namenode");
         if (!snamenodeList.isEmpty()) {
-            hdfsSite.put("dfs.namenode.secondary.http-address", MessageFormat.format("{0}:50090", snamenodeList.get(0)));
+            hdfsSite.put(
+                    "dfs.namenode.secondary.http-address", MessageFormat.format("{0}:50090", snamenodeList.get(0)));
         }
-
 
         dfsDataDir = (String) hdfsSite.get("dfs.datanode.data.dir");
         dfsNameNodeDir = (String) hdfsSite.get("dfs.namenode.name.dir");

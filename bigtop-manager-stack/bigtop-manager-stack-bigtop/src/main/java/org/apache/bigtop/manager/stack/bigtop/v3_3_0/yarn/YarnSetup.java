@@ -76,8 +76,7 @@ public class YarnSetup {
                 yarnParams.getYarnLogDir(), yarnUser, yarnGroup, Constants.PERMISSION_755, true);
         LinuxFileUtils.createDirectories(
                 yarnParams.getYarnPidDir(), yarnUser, yarnGroup, Constants.PERMISSION_755, true);
-        LinuxFileUtils.createDirectories(
-                yarnParams.getTmpDir(), yarnUser, yarnGroup, Constants.PERMISSION_755, true);
+        LinuxFileUtils.createDirectories(yarnParams.getTmpDir(), yarnUser, yarnGroup, Constants.PERMISSION_755, true);
 
         // hdfs.limits
         LinuxFileUtils.toFileByTemplate(

@@ -81,11 +81,18 @@ public class YarnParams extends BaseParams {
         List<String> resourcemanagerList = LocalSettings.hosts("resourcemanager");
         if (!resourcemanagerList.isEmpty()) {
             yarnSite.put("yarn.resourcemanager.hostname", MessageFormat.format("{0}", resourcemanagerList.get(0)));
-            yarnSite.put("yarn.resourcemanager.resource-tracker.address", MessageFormat.format("{0}:8025", resourcemanagerList.get(0)));
+            yarnSite.put(
+                    "yarn.resourcemanager.resource-tracker.address",
+                    MessageFormat.format("{0}:8025", resourcemanagerList.get(0)));
             yarnSite.put("yarn.resourcemanager.address", MessageFormat.format("{0}:8050", resourcemanagerList.get(0)));
-            yarnSite.put("yarn.resourcemanager.admin.address", MessageFormat.format("{0}:8141", resourcemanagerList.get(0)));
-            yarnSite.put("yarn.resourcemanager.webapp.address", MessageFormat.format("{0}:8088", resourcemanagerList.get(0)));
-            yarnSite.put("yarn.resourcemanager.webapp.https.address", MessageFormat.format("{0}:8090", resourcemanagerList.get(0)));
+            yarnSite.put(
+                    "yarn.resourcemanager.admin.address", MessageFormat.format("{0}:8141", resourcemanagerList.get(0)));
+            yarnSite.put(
+                    "yarn.resourcemanager.webapp.address",
+                    MessageFormat.format("{0}:8088", resourcemanagerList.get(0)));
+            yarnSite.put(
+                    "yarn.resourcemanager.webapp.https.address",
+                    MessageFormat.format("{0}:8090", resourcemanagerList.get(0)));
         }
 
         rmNodesExcludeDir = (String) yarnSite.get("yarn.resourcemanager.nodes.exclude-path");
