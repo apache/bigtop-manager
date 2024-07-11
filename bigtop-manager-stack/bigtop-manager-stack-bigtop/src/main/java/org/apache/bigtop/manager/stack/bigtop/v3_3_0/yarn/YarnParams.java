@@ -38,6 +38,8 @@ public class YarnParams extends BaseParams {
     private String yarnPidDir = "/var/run/hadoop-yarn";
     private String rmNodesExcludeDir = "/etc/hadoop/conf/yarn.exclude";
     private String tmpDir = "/tmp/hadoop-yarn";
+    private String nodemanagerLogDir = "/hadoop/yarn/log";
+    private String nodemanagerLocalDir = "/hadoop/yarn/local";
     /* pid file */
     private String resourceManagerPidFile = yarnPidDir + "/yarn/hadoop-yarn-resourcemanager.pid";
     private String nodeManagerPidFile = yarnPidDir + "/yarn/hadoop-yarn-nodemanager.pid";
@@ -52,10 +54,9 @@ public class YarnParams extends BaseParams {
         globalParamsMap.put("hadoop_home", serviceHome());
         globalParamsMap.put("hadoop_hdfs_home", hdfsHome());
         globalParamsMap.put("hadoop_yarn_home", yarnHome());
+        globalParamsMap.put("hadoop_mapred_home", mapredHome());
         globalParamsMap.put("hadoop_conf_dir", confDir());
-
         globalParamsMap.put("hadoop_libexec_dir", serviceHome() + "/libexec");
-
         globalParamsMap.put("exclude_hosts", excludeHosts);
     }
 
@@ -77,8 +78,19 @@ public class YarnParams extends BaseParams {
     @GlobalParams
     public Map<String, Object> yarnSite() {
         Map<String, Object> yarnSite = LocalSettings.configurations(serviceName(), "yarn-site");
-        rmNodesExcludeDir = (String) yarnSite.get("yarn.resourcemanager.nodes.exclude-path");
+        List<String> resourcemanagerList = LocalSettings.hosts("resourcemanager");
+        if (!resourcemanagerList.isEmpty()) {
+            yarnSite.put("yarn.resourcemanager.hostname", MessageFormat.format("{0}", resourcemanagerList.get(0)));
+            yarnSite.put("yarn.resourcemanager.resource-tracker.address", MessageFormat.format("{0}:8025", resourcemanagerList.get(0)));
+            yarnSite.put("yarn.resourcemanager.address", MessageFormat.format("{0}:8050", resourcemanagerList.get(0)));
+            yarnSite.put("yarn.resourcemanager.admin.address", MessageFormat.format("{0}:8141", resourcemanagerList.get(0)));
+            yarnSite.put("yarn.resourcemanager.webapp.address", MessageFormat.format("{0}:8088", resourcemanagerList.get(0)));
+            yarnSite.put("yarn.resourcemanager.webapp.https.address", MessageFormat.format("{0}:8090", resourcemanagerList.get(0)));
+        }
 
+        rmNodesExcludeDir = (String) yarnSite.get("yarn.resourcemanager.nodes.exclude-path");
+        nodemanagerLogDir = (String) yarnSite.get("yarn.nodemanager.log-dirs");
+        nodemanagerLocalDir = (String) yarnSite.get("yarn.nodemanager.local-dirs");
         return yarnSite;
     }
 
@@ -114,5 +126,9 @@ public class YarnParams extends BaseParams {
 
     public String yarnHome() {
         return stackLibDir() + "/hadoop-yarn";
+    }
+
+    public String mapredHome() {
+        return stackLibDir() + "/hadoop-mapreduce";
     }
 }

@@ -54,9 +54,6 @@ public class YarnSetup {
         if (StringUtils.isNotBlank(componentName)) {
             switch (componentName) {
                 case "resourcemanager": {
-                    LinuxFileUtils.createDirectories(
-                            yarnParams.getTmpDir(), yarnUser, yarnGroup, Constants.PERMISSION_755, true);
-
                     LinuxFileUtils.toFileByTemplate(
                             yarnParams.excludeNodesContent(),
                             yarnParams.getRmNodesExcludeDir(),
@@ -64,6 +61,12 @@ public class YarnSetup {
                             yarnGroup,
                             Constants.PERMISSION_644,
                             yarnParams.getGlobalParamsMap());
+                }
+                case "nodemanager": {
+                    LinuxFileUtils.createDirectories(
+                            yarnParams.getNodemanagerLogDir(), yarnUser, yarnGroup, Constants.PERMISSION_755, true);
+                    LinuxFileUtils.createDirectories(
+                            yarnParams.getNodemanagerLocalDir(), yarnUser, yarnGroup, Constants.PERMISSION_755, true);
                 }
             }
         }
@@ -73,6 +76,8 @@ public class YarnSetup {
                 yarnParams.getYarnLogDir(), yarnUser, yarnGroup, Constants.PERMISSION_755, true);
         LinuxFileUtils.createDirectories(
                 yarnParams.getYarnPidDir(), yarnUser, yarnGroup, Constants.PERMISSION_755, true);
+        LinuxFileUtils.createDirectories(
+                yarnParams.getTmpDir(), yarnUser, yarnGroup, Constants.PERMISSION_755, true);
 
         // hdfs.limits
         LinuxFileUtils.toFileByTemplate(

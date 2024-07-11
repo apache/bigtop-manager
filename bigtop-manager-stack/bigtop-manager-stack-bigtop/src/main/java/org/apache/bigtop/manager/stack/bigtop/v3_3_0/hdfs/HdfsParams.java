@@ -62,10 +62,6 @@ public class HdfsParams extends BaseParams {
         globalParamsMap.put("hadoop_hdfs_home", hdfsHome());
         globalParamsMap.put("hadoop_conf_dir", confDir());
         globalParamsMap.put("hadoop_libexec_dir", serviceHome() + "/libexec");
-        List<String> namenodeList = LocalSettings.hosts("namenode");
-        if (!namenodeList.isEmpty()) {
-            coreSite().put("fs.defaultFS", MessageFormat.format("hdfs://{0}:8020", namenodeList.get(0)));
-        }
     }
 
     public String hdfsLimits() {
@@ -85,7 +81,12 @@ public class HdfsParams extends BaseParams {
 
     @GlobalParams
     public Map<String, Object> coreSite() {
-        return LocalSettings.configurations(serviceName(), "core-site");
+        Map<String, Object> coreSite = LocalSettings.configurations(serviceName(), "core-site");
+        List<String> namenodeList = LocalSettings.hosts("namenode");
+        if (!namenodeList.isEmpty()) {
+            coreSite.put("fs.defaultFS", MessageFormat.format("hdfs://{0}:8020", namenodeList.get(0)));
+        }
+        return coreSite;
     }
 
     @GlobalParams
@@ -96,6 +97,18 @@ public class HdfsParams extends BaseParams {
     @GlobalParams
     public Map<String, Object> hdfsSite() {
         Map<String, Object> hdfsSite = LocalSettings.configurations(serviceName(), "hdfs-site");
+        List<String> namenodeList = LocalSettings.hosts("namenode");
+        if (!namenodeList.isEmpty()) {
+            hdfsSite.put("dfs.namenode.rpc-address", MessageFormat.format("{0}:8020", namenodeList.get(0)));
+            hdfsSite.put("dfs.namenode.http-address", MessageFormat.format("{0}:50070", namenodeList.get(0)));
+            hdfsSite.put("dfs.namenode.https-address", MessageFormat.format("{0}:50470", namenodeList.get(0)));
+        }
+        List<String> snamenodeList = LocalSettings.hosts("secondary_namenode");
+        if (!snamenodeList.isEmpty()) {
+            hdfsSite.put("dfs.namenode.secondary.http-address", MessageFormat.format("{0}:50090", snamenodeList.get(0)));
+        }
+
+
         dfsDataDir = (String) hdfsSite.get("dfs.datanode.data.dir");
         dfsNameNodeDir = (String) hdfsSite.get("dfs.namenode.name.dir");
         nameNodeFormattedDirs = Arrays.stream(dfsNameNodeDir.split(","))
