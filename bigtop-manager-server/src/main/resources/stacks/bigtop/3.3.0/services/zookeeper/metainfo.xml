@@ -27,7 +27,7 @@
             Apache ZooKeeper is an effort to develop and maintain an open-source server which enables highly
             reliable distributed coordination.
         </desc>
-        <version>3.6.4</version>
+        <version>3.7.2-1</version>
         <user>zookeeper</user>
         <group>zookeeper</group>
 
