@@ -26,6 +26,7 @@ export default {
   status: '状态',
   edit: '编辑',
   submit: '提交',
+  retry: '重试',
   cancel: '取消',
   confirm: '确认',
   exit_confirm: '确定要退出吗？',

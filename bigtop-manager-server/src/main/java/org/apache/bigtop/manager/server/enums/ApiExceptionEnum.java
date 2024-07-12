@@ -52,6 +52,7 @@ public enum ApiExceptionEnum {
 
     // Job Exceptions -- 16000 ~ 16999
     JOB_NOT_FOUND(16000, LocaleKeys.JOB_NOT_FOUND),
+    JOB_NOT_RETRYABLE(16001, LocaleKeys.JOB_NOT_RETRYABLE),
 
     // Configuration Exceptions -- 17000 ~ 17999
     CONFIG_NOT_FOUND(17000, LocaleKeys.CONFIG_NOT_FOUND),

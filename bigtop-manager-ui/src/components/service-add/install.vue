@@ -19,15 +19,16 @@
 
 <script setup lang="ts">
   import { useI18n } from 'vue-i18n'
-  import { getJob } from '@/api/job'
+  import { getJob, retryJob } from '@/api/job'
   import { JOB_SCHEDULE_INTERVAL } from '@/utils/constant.ts'
   import { useIntervalFn } from '@vueuse/core'
-  import { onBeforeMount, onBeforeUnmount, reactive, ref } from 'vue'
+  import { computed, onBeforeMount, onBeforeUnmount, reactive, ref } from 'vue'
   import { useClusterStore } from '@/store/cluster'
   import { storeToRefs } from 'pinia'
   import { JobVO, StageVO } from '@/api/job/types'
   import CustomProgress from '@/components/job-info/custom-progress.vue'
   import Job from '@/components/job-info/job.vue'
+  import { RedoOutlined } from '@ant-design/icons-vue'
 
   const serviceInfo = defineModel<any>('serviceInfo')
   const disableButton = defineModel<boolean>('disableButton')
@@ -43,6 +44,10 @@
   const currStage = ref<StageVO>()
   const installData = reactive([])
 
+  const canRetry = computed(() => {
+    return jobState.value === 'Failed'
+  })
+
   const installColumns = [
     {
       title: t('common.stage'),
@@ -55,6 +60,22 @@
       align: 'center'
     }
   ]
+
+  const doRetry = async () => {
+    await retryJob(serviceInfo.value.jobId, clusterId.value)
+
+    const { pause } = useIntervalFn(
+      async () => {
+        Object.assign(installData, await initData())
+        loading.value = false
+        if (!['Pending', 'Processing'].includes(jobState.value)) {
+          pause()
+        }
+      },
+      JOB_SCHEDULE_INTERVAL,
+      { immediateCallback: true }
+    )
+  }
 
   const initData = async () => {
     const res = await getJob(serviceInfo.value.jobId, clusterId.value)
@@ -76,11 +97,12 @@
 
   onBeforeMount(async () => {
     disableButton.value = true
+
     const { pause } = useIntervalFn(
       async () => {
         Object.assign(installData, await initData())
         loading.value = false
-        if (jobState.value !== 'Pending' && jobState.value !== 'Processing') {
+        if (!['Pending', 'Processing'].includes(jobState.value)) {
           pause()
         }
       },
@@ -105,6 +127,14 @@
 <template>
   <div class="container">
     <div class="title">{{ $t('common.install') }}</div>
+    <div class="retry">
+      <a-button type="link" size="small" :disabled="!canRetry" @click="doRetry">
+        <template #icon>
+          <redo-outlined />
+        </template>
+        <span class="retry-button">{{ $t('common.retry') }}</span>
+      </a-button>
+    </div>
     <a-table
       :pagination="false"
       :scroll="{ y: 400 }"
@@ -147,9 +177,17 @@
       font-size: 1.5rem;
       line-height: 2rem;
       margin-bottom: 1rem;
+    }
 
-      .progress {
-        width: 80%;
+    .retry {
+      display: flex;
+      flex-direction: row;
+      justify-content: end;
+      margin: 0 1rem 1rem 0;
+      width: 100%;
+
+      .retry-button {
+        margin-left: 3px;
       }
     }
   }

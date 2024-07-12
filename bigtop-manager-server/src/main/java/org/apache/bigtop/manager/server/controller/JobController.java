@@ -25,6 +25,7 @@ import org.apache.bigtop.manager.server.utils.ResponseEntity;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -65,5 +66,11 @@ public class JobController {
     @GetMapping("/{id}")
     public ResponseEntity<JobVO> get(@PathVariable Long id, @PathVariable Long clusterId) {
         return ResponseEntity.success(jobService.get(id));
+    }
+
+    @Operation(summary = "retry", description = "Retry a failed job")
+    @PostMapping("/{id}/retry")
+    public ResponseEntity<JobVO> retry(@PathVariable Long id, @PathVariable Long clusterId) {
+        return ResponseEntity.success(jobService.retry(id));
     }
 }

@@ -18,8 +18,16 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
+import org.apache.bigtop.manager.common.enums.JobState;
 import org.apache.bigtop.manager.dao.entity.Job;
+import org.apache.bigtop.manager.dao.entity.Stage;
+import org.apache.bigtop.manager.dao.entity.Task;
 import org.apache.bigtop.manager.dao.repository.JobRepository;
+import org.apache.bigtop.manager.dao.repository.StageRepository;
+import org.apache.bigtop.manager.dao.repository.TaskRepository;
+import org.apache.bigtop.manager.server.command.scheduler.JobScheduler;
+import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
+import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.model.mapper.JobMapper;
 import org.apache.bigtop.manager.server.model.query.PageQuery;
 import org.apache.bigtop.manager.server.model.vo.JobVO;
@@ -41,6 +49,15 @@ public class JobServiceImpl implements JobService {
     @Resource
     private JobRepository jobRepository;
 
+    @Resource
+    private StageRepository stageRepository;
+
+    @Resource
+    private TaskRepository taskRepository;
+
+    @Resource
+    private JobScheduler jobScheduler;
+
     @Override
     public PageVO<JobVO> list(Long clusterId) {
         PageQuery pageQuery = PageUtils.getPageQuery();
@@ -58,6 +75,30 @@ public class JobServiceImpl implements JobService {
     @Override
     public JobVO get(Long id) {
         Job job = jobRepository.getReferenceById(id);
+        return JobMapper.INSTANCE.fromEntity2VO(job);
+    }
+
+    @Override
+    public JobVO retry(Long id) {
+        Job job = jobRepository.getReferenceById(id);
+        if (job.getState() != JobState.FAILED) {
+            throw new ApiException(ApiExceptionEnum.JOB_NOT_RETRYABLE);
+        }
+
+        for (Stage stage : job.getStages()) {
+            for (Task task : stage.getTasks()) {
+                task.setState(JobState.PENDING);
+                taskRepository.save(task);
+            }
+
+            stage.setState(JobState.PENDING);
+            stageRepository.save(stage);
+        }
+
+        job.setState(JobState.PENDING);
+        jobRepository.save(job);
+        jobScheduler.submit(job);
+
         return JobMapper.INSTANCE.fromEntity2VO(job);
     }
 }

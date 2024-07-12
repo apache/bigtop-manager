@@ -27,6 +27,13 @@ export const getJob = (id: number, clusterId: number): Promise<JobVO> => {
   })
 }
 
+export const retryJob = (id: number, clusterId: number): Promise<JobVO> => {
+  return request({
+    method: 'post',
+    url: '/clusters/' + clusterId + '/jobs/' + id + '/retry'
+  })
+}
+
 export const getJobs = (
   clusterId: number,
   pagination: Pagination
