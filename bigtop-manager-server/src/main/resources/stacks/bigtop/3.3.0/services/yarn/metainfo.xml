@@ -21,37 +21,37 @@
 <metainfo>
     <schema-version>2.0</schema-version>
     <service>
-        <name>hdfs</name>
-        <display-name>HDFS</display-name>
-        <desc>Apache Hadoop Distributed File System.</desc>
+        <name>yarn</name>
+        <display-name>YARN</display-name>
+        <desc>Apache Hadoop NextGen MapReduce (YARN)</desc>
         <version>3.3.6-1</version>
-        <user>hdfs</user>
-        <group>hdfs</group>
+        <user>yarn</user>
+        <group>yarn</group>
 
         <components>
             <component>
-                <name>namenode</name>
-                <display-name>NameNode</display-name>
+                <name>resourcemanager</name>
+                <display-name>ResourceManager</display-name>
                 <category>master</category>
                 <cardinality>1-2</cardinality>
                 <command-script>
-                    <script-id>org.apache.bigtop.manager.stack.bigtop.v3_3_0.hdfs.NameNodeScript</script-id>
+                    <script-id>org.apache.bigtop.manager.stack.bigtop.v3_3_0.yarn.ResourceManagerScript</script-id>
                     <script-type>java</script-type>
                     <timeout>1200</timeout>
                 </command-script>
                 <custom-commands>
                     <custom-command>
-                        <name>rebalance_hdfs</name>
+                        <name>decommission</name>
                         <command-script>
-                            <script-id>org.apache.bigtop.manager.stack.bigtop.v3_3_0.hdfs.NameNodeScript</script-id>
+                            <script-id>org.apache.bigtop.manager.stack.bigtop.v3_3_0.yarn.ResourceManagerScript</script-id>
                             <script-type>java</script-type>
                             <timeout>600</timeout>
                         </command-script>
                     </custom-command>
                     <custom-command>
-                        <name>print_topology</name>
+                        <name>refreshqueues</name>
                         <command-script>
-                            <script-id>org.apache.bigtop.manager.stack.bigtop.v3_3_0.hdfs.NameNodeScript</script-id>
+                            <script-id>org.apache.bigtop.manager.stack.bigtop.v3_3_0.yarn.ResourceManagerScript</script-id>
                             <script-type>java</script-type>
                             <timeout>600</timeout>
                         </command-script>
@@ -59,34 +59,23 @@
                 </custom-commands>
             </component>
             <component>
-                <name>datanode</name>
-                <display-name>DataNode</display-name>
+                <name>nodemanager</name>
+                <display-name>NodeManager</display-name>
                 <category>slave</category>
                 <cardinality>1+</cardinality>
                 <command-script>
-                    <script-id>org.apache.bigtop.manager.stack.bigtop.v3_3_0.hdfs.DataNodeScript</script-id>
+                    <script-id>org.apache.bigtop.manager.stack.bigtop.v3_3_0.yarn.NodeManagerScript</script-id>
                     <script-type>java</script-type>
                     <timeout>1200</timeout>
                 </command-script>
             </component>
             <component>
-                <name>secondary_namenode</name>
-                <display-name>SNameNode</display-name>
-                <category>master</category>
-                <cardinality>1</cardinality>
-                <command-script>
-                    <script-id>org.apache.bigtop.manager.stack.bigtop.v3_3_0.hdfs.SNameNodeScript</script-id>
-                    <script-type>java</script-type>
-                    <timeout>1200</timeout>
-                </command-script>
-            </component>
-            <component>
-                <name>hdfs_client</name>
-                <display-name>HDFS Client</display-name>
+                <name>yarn_client</name>
+                <display-name>YARN Client</display-name>
                 <category>client</category>
                 <cardinality>1+</cardinality>
                 <command-script>
-                    <script-id>org.apache.bigtop.manager.stack.bigtop.v3_3_0.hdfs.HdfsClientScript</script-id>
+                    <script-id>org.apache.bigtop.manager.stack.bigtop.v3_3_0.yarn.YarnClientScript</script-id>
                     <script-type>java</script-type>
                     <timeout>1200</timeout>
                 </command-script>
@@ -103,15 +92,16 @@
                     <arch>x86_64</arch>
                 </architectures>
                 <packages>
-                    <package>hadoop_3_3_0</package>
-                    <package>hadoop_3_3_0-client</package>
-                    <package>hadoop_3_3_0-libhdfs</package>
+                    <package>hadoop_3_3_0-yarn</package>
+                    <package>hadoop_3_3_0-hdfs</package>
+                    <package>hadoop_3_3_0-mapreduce</package>
                 </packages>
             </os-specific>
         </os-specifics>
 
         <required-services>
             <service>zookeeper</service>
+            <service>hdfs</service>
         </required-services>
 
     </service>

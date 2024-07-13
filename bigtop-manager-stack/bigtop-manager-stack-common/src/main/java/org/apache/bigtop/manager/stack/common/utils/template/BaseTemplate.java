@@ -42,13 +42,14 @@ public class BaseTemplate {
         CONFIGURATION.setClassForTemplateLoading(BaseTemplate.class, "/templates");
         CONFIGURATION.setDefaultEncoding("UTF-8");
         CONFIGURATION.setOutputFormat(UndefinedOutputFormat.INSTANCE);
-        CONFIGURATION.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
         CONFIGURATION.setLogTemplateExceptions(false);
         CONFIGURATION.setWrapUncheckedExceptions(true);
         CONFIGURATION.setFallbackOnNullLoopVariable(false);
         CONFIGURATION.setSQLDateAndTimeTimeZone(TimeZone.getDefault());
         /* fix number_format display error */
         CONFIGURATION.setNumberFormat("0.##");
+        // Set the behavior when the attribute does not exist, IGNORE_HANDLER will ignore the error
+        CONFIGURATION.setTemplateExceptionHandler(TemplateExceptionHandler.IGNORE_HANDLER);
     }
 
     public static void writeTemplate(String path, Object dataModel, String type) {
