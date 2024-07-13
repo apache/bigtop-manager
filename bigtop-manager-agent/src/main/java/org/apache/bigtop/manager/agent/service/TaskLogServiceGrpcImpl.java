@@ -32,6 +32,7 @@ import net.devh.boot.grpc.server.service.GrpcService;
 
 import java.io.File;
 import java.io.RandomAccessFile;
+import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @GrpcService
@@ -46,6 +47,7 @@ public class TaskLogServiceGrpcImpl extends TaskLogServiceGrpc.TaskLogServiceImp
             while (file.getFilePointer() < fileLength) {
                 String line = file.readLine();
                 if (line != null) {
+                    line = new String(line.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
                     responseObserver.onNext(
                             TaskLogReply.newBuilder().setText(line).build());
                 }
@@ -76,9 +78,9 @@ public class TaskLogServiceGrpcImpl extends TaskLogServiceGrpc.TaskLogServiceImp
             if (file.readByte() != '\n') {
                 file.seek(position);
             }
-
             String line = file.readLine();
             while (line != null) {
+                line = new String(line.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
                 responseObserver.onNext(TaskLogReply.newBuilder().setText(line).build());
                 line = file.readLine();
             }
