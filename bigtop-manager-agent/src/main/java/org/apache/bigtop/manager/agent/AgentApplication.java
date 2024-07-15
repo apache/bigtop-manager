@@ -19,7 +19,6 @@
 package org.apache.bigtop.manager.agent;
 
 import org.apache.bigtop.manager.agent.monitoring.AgentHostMonitoring;
-import org.apache.bigtop.manager.agent.monitoring.ZookeeperHealthyMonitoring;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
@@ -53,10 +52,5 @@ public class AgentApplication {
     @Bean
     @Qualifier("memMultiGauge") public MultiGauge memMultiGauge(MeterRegistry meterRegistry) {
         return AgentHostMonitoring.newMemMultiGauge(meterRegistry);
-    }
-
-    @Bean
-    @Qualifier("zookeeperMultiGauge") public MultiGauge zookeeperMultiGauge(MeterRegistry meterRegistry) {
-        return ZookeeperHealthyMonitoring.registerZookeeperHealthyGauge(meterRegistry);
     }
 }

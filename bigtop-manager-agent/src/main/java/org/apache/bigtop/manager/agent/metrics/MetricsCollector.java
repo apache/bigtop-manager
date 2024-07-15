@@ -19,7 +19,6 @@
 package org.apache.bigtop.manager.agent.metrics;
 
 import org.apache.bigtop.manager.agent.monitoring.AgentHostMonitoring;
-import org.apache.bigtop.manager.agent.monitoring.ZookeeperHealthyMonitoring;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
@@ -58,6 +57,5 @@ public class MetricsCollector {
         AgentHostMonitoring.diskMultiGaugeUpdateData(diskMultiGauge);
         AgentHostMonitoring.memMultiGaugeUpdateData(memMultiGauge);
         AgentHostMonitoring.cpuMultiGaugeUpdateData(cpuMultiGauge);
-        ZookeeperHealthyMonitoring.zookeeperUpdateStatus(zookeeperMultiGauge);
     }
 }
