@@ -75,6 +75,9 @@ request.interceptors.response.use(
     }
   },
   async (error: AxiosError) => {
+    if (error.code === AxiosError.ERR_CANCELED) {
+      return
+    }
     if (error.code === AxiosError.ERR_NETWORK) {
       message.error(i18n.global.t('common.error_network'))
     } else if (error.code === AxiosError.ETIMEDOUT) {
