@@ -43,9 +43,6 @@ public class MetricsCollector {
     @Resource
     @Qualifier("cpuMultiGauge") private MultiGauge cpuMultiGauge;
 
-    @Resource
-    @Qualifier("zookeeperMultiGauge") private MultiGauge zookeeperMultiGauge;
-
     @Async
     @Scheduled(cron = "*/10 * *  * * ?")
     public void collect() {
