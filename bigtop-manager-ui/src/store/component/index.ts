@@ -18,10 +18,12 @@
  */
 
 import { defineStore, storeToRefs } from 'pinia'
-import { shallowRef, watch } from 'vue'
+import { ref, shallowRef, watch } from 'vue'
 import { useClusterStore } from '@/store/cluster'
 import { HostComponentVO } from '@/api/component/types.ts'
 import { getHostComponents } from '@/api/component'
+import { Pausable, useIntervalFn } from '@vueuse/core'
+import { MONITOR_SCHEDULE_INTERVAL } from '@/utils/constant.ts'
 
 export const useComponentStore = defineStore(
   'component',
@@ -29,6 +31,7 @@ export const useComponentStore = defineStore(
     const clusterStore = useClusterStore()
     const { clusterId } = storeToRefs(clusterStore)
     const hostComponents = shallowRef<HostComponentVO[]>([])
+    const intervalFn = ref<Pausable | undefined>()
 
     watch(clusterId, async () => {
       await loadHostComponents()
@@ -38,7 +41,23 @@ export const useComponentStore = defineStore(
       hostComponents.value = await getHostComponents(clusterId.value)
     }
 
-    return { hostComponents, loadHostComponents }
+    intervalFn.value = useIntervalFn(
+      async () => {
+        await loadHostComponents()
+      },
+      MONITOR_SCHEDULE_INTERVAL,
+      { immediate: false, immediateCallback: true }
+    )
+
+    const resumeIntervalFn = () => intervalFn.value?.resume()
+    const pauseIntervalFn = () => intervalFn.value?.pause()
+
+    return {
+      hostComponents,
+      loadHostComponents,
+      resumeIntervalFn,
+      pauseIntervalFn
+    }
   },
   { persist: false }
 )

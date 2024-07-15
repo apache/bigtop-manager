@@ -1,0 +1,41 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *    https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "org.apache.bigtop.manager.grpc.generated";
+option java_outer_classname = "ComponentStatusProto";
+
+service ComponentStatusService {
+  rpc GetComponentStatus (ComponentStatusRequest) returns (ComponentStatusReply) {}
+}
+
+message ComponentStatusRequest {
+  string service_name = 1;
+  string component_name = 2;
+  string command_script = 3;
+  // TODO Unnecessary, should be removed in the future
+  string root = 4;
+  string stack_name = 5;
+  string stack_version = 6;
+}
+
+message ComponentStatusReply {
+  int32 status = 1;
+}
