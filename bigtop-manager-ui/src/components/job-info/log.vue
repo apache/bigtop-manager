@@ -23,30 +23,57 @@
   import { message } from 'ant-design-vue'
   import { ref, watch, onBeforeUnmount } from 'vue'
   import { CopyOutlined } from '@ant-design/icons-vue'
-
-  interface Props {
-    logMeta: string
-  }
-
-  const props = withDefaults(defineProps<Props>(), {
-    logMeta: ''
-  })
+  import { AxiosProgressEvent, Canceler } from 'axios'
+  import { getLogs } from '@/api/sse'
+  import { storeToRefs } from 'pinia'
+  import { useClusterStore } from '@/store/cluster'
 
   const { t } = useI18n()
+  const clusterStore = useClusterStore()
+  const { clusterId } = storeToRefs(clusterStore)
   const logsInfoRef = ref<HTMLElement | null>(null)
   const logText = ref<string | null>(null)
+  const logMeta = ref<string>('')
+  const canceler = ref<Canceler>()
 
-  watch(
-    () => props.logMeta,
-    (val) => {
-      logText.value = val
-        .split('\n\n')
-        .map((s) => {
-          return s.substring(5)
-        })
-        .join('\n')
+  watch(logMeta, (val) => {
+    logText.value = val
+      .split('\n\n')
+      .map((s) => {
+        return s.substring(5)
+      })
+      .join('\n')
+  })
+
+  const getLogsInfo = (id: number) => {
+    const { cancel } = getLogs(clusterId.value, id, getLogProgress)
+    canceler.value = cancel
+  }
+
+  const getLogProgress = ({ event }: AxiosProgressEvent) => {
+    logMeta.value = event.target.responseText
+    // logsInfoRef.value = document.querySelector('.logsInfoRef')
+    // if (!logsInfoRef.value) {
+    //   return
+    // }
+    // ;(function smoothscroll() {
+    //   const { scrollTop, offsetHeight, scrollHeight } = logsInfoRef.value
+    //   if (scrollHeight - 10 > scrollTop + offsetHeight) {
+    //     window.requestAnimationFrame(smoothscroll)
+    //     logsInfoRef.value.scrollTo(
+    //       0,
+    //       scrollTop + (scrollHeight - scrollTop - offsetHeight) / 2
+    //     )
+    //   }
+    // })()
+  }
+
+  const cancelSseConnect = () => {
+    if (!canceler.value) {
+      return
     }
-  )
+    canceler.value()
+  }
 
   const copyLogTextContent = (text: string | null) => {
     if (!text) {
@@ -62,7 +89,13 @@
       })
   }
 
-  onBeforeUnmount(() => {})
+  onBeforeUnmount(() => {
+    cancelSseConnect()
+  })
+
+  defineExpose({
+    getLogsInfo
+  })
 </script>
 
 <template>

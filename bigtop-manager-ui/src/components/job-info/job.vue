@@ -29,15 +29,13 @@
     OuterData,
     Pagination
   } from '@/api/job/types.ts'
-  import { getLogs } from '@/api/sse'
   import { getJobs } from '@/api/job'
   import { Pausable, useIntervalFn } from '@vueuse/core'
-  import { AxiosProgressEvent, Canceler } from 'axios'
   import { MONITOR_SCHEDULE_INTERVAL } from '@/utils/constant.ts'
   import CustomProgress from './custom-progress.vue'
   import Stage from './stage.vue'
   import Task from './task.vue'
-  import Job from './log.vue'
+  import TaskLog from './log.vue'
 
   const columns = [
     {
@@ -80,14 +78,13 @@
   const emits = defineEmits(['update:visible', 'closed'])
 
   const loading = ref(false)
-  const canceler = ref<Canceler>()
   const stages = ref<StageVO[]>([])
   const tasks = ref<TaskVO[]>([])
   const breadcrumbs = ref<any[]>([{ name: 'Job Info' }])
   const currTaskInfo = ref<TaskVO>()
   const jobs = ref<JobVO[]>([])
   const intervalId = ref<Pausable | undefined>()
-  const logTextOrigin = ref<string>('')
+  const logRef = ref<InstanceType<typeof TaskLog> | null>()
   const currPage = ref<string[]>([
     'isJobTable',
     'isStageTable',
@@ -110,11 +107,7 @@
     if (val) {
       loading.value = true
       Object.assign(paginationProps, initPagedProps())
-      if (outerData.value) {
-        checkMetaOrigin(true)
-      } else {
-        checkMetaOrigin(false)
-      }
+      checkMetaOrigin(outerData.value ? true : false)
       loading.value = false
     }
   })
@@ -176,41 +169,10 @@
     }
   }
 
-  const getLogProgress = ({ event }: AxiosProgressEvent) => {
-    logTextOrigin.value = event.target.responseText
-    // logsInfoRef.value = document.querySelector('.logsInfoRef')
-    // if (!logsInfoRef.value) {
-    //   return
-    // }
-    // ;(function smoothscroll() {
-    //   const { scrollTop, offsetHeight, scrollHeight } = logsInfoRef.value
-    //   if (scrollHeight - 10 > scrollTop + offsetHeight) {
-    //     window.requestAnimationFrame(smoothscroll)
-    //     logsInfoRef.value.scrollTo(
-    //       0,
-    //       scrollTop + (scrollHeight - scrollTop - offsetHeight) / 2
-    //     )
-    //   }
-    // })()
-  }
-
-  const cancelSseConnect = () => {
-    if (!canceler.value) {
-      return
-    }
-    canceler.value()
-  }
-
-  const getLogsInfo = (id: number) => {
-    const { cancel } = getLogs(clusterId.value, id, getLogProgress)
-    canceler.value = cancel
-  }
-
   const clickTask = (record: TaskVO) => {
     breadcrumbs.value.push(record)
     currTaskInfo.value = record
-    logTextOrigin.value = ''
-    getLogsInfo(record.id)
+    logRef.value?.getLogsInfo(record.id)
   }
 
   const clickJob = (record: JobVO) => {
@@ -322,10 +284,7 @@
       <task :columns="columns" :tasks="tasks" @click-task="clickTask" />
     </template>
     <template v-if="getCurrPage == 'isTaskLogs'">
-      <job
-        :log-meta="logTextOrigin"
-        @vue:before-unmount="cancelSseConnect"
-      ></job>
+      <task-log ref="logRef"></task-log>
     </template>
   </a-modal>
 </template>
