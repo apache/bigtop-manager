@@ -195,7 +195,10 @@
   }
 
   const cancelSseConnect = () => {
-    console.log('1111 :>> ', 1111)
+    if (!canceler.value) {
+      return
+    }
+    canceler.value()
   }
 
   const getLogsInfo = (id: number) => {
@@ -321,7 +324,7 @@
     <template v-if="getCurrPage == 'isTaskLogs'">
       <job
         :log-meta="logTextOrigin"
-        @vue:beforeunmount="cancelSseConnect"
+        @vue:before-unmount="cancelSseConnect"
       ></job>
     </template>
   </a-modal>
