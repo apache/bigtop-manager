@@ -16,16 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.service;
+package org.apache.bigtop.manager.agent.utils;
 
-import org.apache.bigtop.manager.server.model.vo.JobVO;
-import org.apache.bigtop.manager.server.model.vo.PageVO;
+import org.apache.commons.lang3.SystemUtils;
 
-public interface JobService {
+import java.io.File;
 
-    PageVO<JobVO> list(Long clusterId);
+public class LogFileUtils {
 
-    JobVO get(Long id);
+    public static String getLogFilePath(Long taskId) {
+        String baseDir;
+        if (SystemUtils.IS_OS_WINDOWS) {
+            baseDir = SystemUtils.getUserDir().getPath();
+        } else {
+            File file = new File(LogFileUtils.class
+                    .getProtectionDomain()
+                    .getCodeSource()
+                    .getLocation()
+                    .getPath());
+            baseDir = file.getParentFile().getParentFile().getPath();
+        }
 
-    JobVO retry(Long id);
+        return baseDir + File.separator + "tasklogs" + File.separator + "task-" + taskId + ".log";
+    }
 }

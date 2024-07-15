@@ -26,6 +26,7 @@ export default {
   status: 'Status',
   edit: 'Edit',
   submit: 'Submit',
+  retry: 'Retry',
   cancel: 'Cancel',
   confirm: 'Confirm',
   exit_confirm: 'Are you sure you want to exit?',

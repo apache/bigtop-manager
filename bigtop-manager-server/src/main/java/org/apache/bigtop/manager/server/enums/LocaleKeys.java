@@ -50,6 +50,7 @@ public enum LocaleKeys {
     COMPONENT_NOT_FOUND("component.not.found"),
 
     JOB_NOT_FOUND("job.not.found"),
+    JOB_NOT_RETRYABLE("job.not.retryable"),
 
     CONFIG_NOT_FOUND("config.not.found"),
 

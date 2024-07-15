@@ -19,18 +19,16 @@
 package org.apache.bigtop.manager.agent.service;
 
 import org.apache.bigtop.manager.agent.cache.Caches;
+import org.apache.bigtop.manager.agent.utils.LogFileUtils;
 import org.apache.bigtop.manager.grpc.generated.TaskLogReply;
 import org.apache.bigtop.manager.grpc.generated.TaskLogRequest;
 import org.apache.bigtop.manager.grpc.generated.TaskLogServiceGrpc;
-
-import org.apache.commons.lang3.SystemUtils;
 
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 
-import java.io.File;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
 
@@ -40,7 +38,7 @@ public class TaskLogServiceGrpcImpl extends TaskLogServiceGrpc.TaskLogServiceImp
 
     @Override
     public void getLog(TaskLogRequest request, StreamObserver<TaskLogReply> responseObserver) {
-        String path = getLogFilePath(request.getTaskId());
+        String path = LogFileUtils.getLogFilePath(request.getTaskId());
         try (RandomAccessFile file = new RandomAccessFile(path, "r")) {
             // Read from beginning
             long fileLength = file.length();
@@ -85,21 +83,5 @@ public class TaskLogServiceGrpcImpl extends TaskLogServiceGrpc.TaskLogServiceImp
                 line = file.readLine();
             }
         }
-    }
-
-    private String getLogFilePath(Long taskId) {
-        String baseDir;
-        if (SystemUtils.IS_OS_WINDOWS) {
-            baseDir = SystemUtils.getUserDir().getPath();
-        } else {
-            File file = new File(this.getClass()
-                    .getProtectionDomain()
-                    .getCodeSource()
-                    .getLocation()
-                    .getPath());
-            baseDir = file.getParentFile().getParentFile().getPath();
-        }
-
-        return baseDir + File.separator + "tasklogs" + File.separator + "task-" + taskId + ".log";
     }
 }

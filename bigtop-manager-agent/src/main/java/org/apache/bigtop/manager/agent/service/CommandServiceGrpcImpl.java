@@ -21,6 +21,7 @@ package org.apache.bigtop.manager.agent.service;
 import org.apache.bigtop.manager.agent.cache.Caches;
 import org.apache.bigtop.manager.agent.executor.CommandExecutor;
 import org.apache.bigtop.manager.agent.executor.CommandExecutors;
+import org.apache.bigtop.manager.agent.utils.LogFileUtils;
 import org.apache.bigtop.manager.grpc.generated.CommandReply;
 import org.apache.bigtop.manager.grpc.generated.CommandRequest;
 import org.apache.bigtop.manager.grpc.generated.CommandServiceGrpc;
@@ -32,6 +33,10 @@ import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+
 @Slf4j
 @GrpcService
 public class CommandServiceGrpcImpl extends CommandServiceGrpc.CommandServiceImplBase {
@@ -39,6 +44,9 @@ public class CommandServiceGrpcImpl extends CommandServiceGrpc.CommandServiceImp
     @Override
     public void exec(CommandRequest request, StreamObserver<CommandReply> responseObserver) {
         try {
+            // Truncate old logs if exists, only useful when it's retry command
+            truncateLogFile(request.getTaskId());
+
             MDC.put("taskId", String.valueOf(request.getTaskId()));
             Caches.RUNNING_TASKS.add(request.getTaskId());
             CommandExecutor commandExecutor = CommandExecutors.getCommandExecutor(request.getType());
@@ -52,6 +60,18 @@ public class CommandServiceGrpcImpl extends CommandServiceGrpc.CommandServiceImp
         } finally {
             Caches.RUNNING_TASKS.remove(request.getTaskId());
             MDC.clear();
+        }
+    }
+
+    private void truncateLogFile(Long taskId) {
+        String filePath = LogFileUtils.getLogFilePath(taskId);
+        File file = new File(filePath);
+        if (file.exists()) {
+            try (RandomAccessFile rf = new RandomAccessFile(file, "rw")) {
+                rf.setLength(0);
+            } catch (IOException e) {
+                log.warn("Error when truncate file: {}", filePath, e);
+            }
         }
     }
 }
