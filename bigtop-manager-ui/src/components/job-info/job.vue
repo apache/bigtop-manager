@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { ref, watch, computed, reactive, toRaw, toRefs } from 'vue'
+  import { ref, watch, computed, reactive, toRaw, toRefs, nextTick } from 'vue'
   import { useClusterStore } from '@/store/cluster'
   import { PaginationConfig } from 'ant-design-vue/es/pagination/Pagination'
   import { storeToRefs } from 'pinia'
@@ -169,9 +169,10 @@
     }
   }
 
-  const clickTask = (record: TaskVO) => {
+  const clickTask = async (record: TaskVO) => {
     breadcrumbs.value.push(record)
     currTaskInfo.value = record
+    await nextTick()
     logRef.value?.getLogsInfo(record.id)
   }
 

@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
   import { useI18n } from 'vue-i18n'
-  import { copyText } from '../../utils/tools'
+  import { copyText, scrollToBottom } from '@/utils/tools'
   import { message } from 'ant-design-vue'
   import { ref, watch, onBeforeUnmount } from 'vue'
   import { CopyOutlined } from '@ant-design/icons-vue'
@@ -45,27 +45,14 @@
       .join('\n')
   })
 
-  const getLogsInfo = (id: number) => {
+  const getLogsInfo = async (id: number) => {
     const { cancel } = getLogs(clusterId.value, id, getLogProgress)
     canceler.value = cancel
   }
 
   const getLogProgress = ({ event }: AxiosProgressEvent) => {
     logMeta.value = event.target.responseText
-    // logsInfoRef.value = document.querySelector('.logsInfoRef')
-    // if (!logsInfoRef.value) {
-    //   return
-    // }
-    // ;(function smoothscroll() {
-    //   const { scrollTop, offsetHeight, scrollHeight } = logsInfoRef.value
-    //   if (scrollHeight - 10 > scrollTop + offsetHeight) {
-    //     window.requestAnimationFrame(smoothscroll)
-    //     logsInfoRef.value.scrollTo(
-    //       0,
-    //       scrollTop + (scrollHeight - scrollTop - offsetHeight) / 2
-    //     )
-    //   }
-    // })()
+    scrollToBottom(logsInfoRef.value)
   }
 
   const cancelSseConnect = () => {
@@ -111,8 +98,8 @@
         </a-button>
       </div>
     </div>
-    <div ref="logsInfoRef" class="logs_info">
-      <pre id="logs">{{ logText }}</pre>
+    <div class="logs_info">
+      <pre id="logs" ref="logsInfoRef">{{ logText }}</pre>
     </div>
   </div>
 </template>
@@ -136,6 +123,7 @@
     &_info {
       height: 100%;
       overflow: auto;
+      scroll-behavior: smooth;
       background-color: #f5f5f5;
       border-radius: 4px;
       position: relative;

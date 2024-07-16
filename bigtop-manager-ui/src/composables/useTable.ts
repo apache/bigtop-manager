@@ -20,6 +20,17 @@
 import { ref, onUnmounted } from 'vue'
 import type { TablePaginationConfig, TableColumnType } from 'ant-design-vue'
 
+const initPaginateConfig = (total: number): TablePaginationConfig => {
+  return {
+    current: 1,
+    pageSize: 10,
+    total: total || 0,
+    size: 'small',
+    showSizeChanger: true,
+    pageSizeOptions: ['10', '20', '30', '40', '50']
+  }
+}
+
 const useBaseTable = <T>(
   columns: TableColumnType[],
   rows?: T[],
@@ -28,14 +39,9 @@ const useBaseTable = <T>(
   const loading = ref(false)
   const dataSource = ref<T[]>(rows || [])
   const columnsProp = ref<TableColumnType[]>(columns)
-  const paginateProp = ref<TablePaginationConfig>({
-    current: 1,
-    pageSize: 10,
-    total: dataSource.value.length,
-    size: 'small',
-    showSizeChanger: true,
-    pageSizeOptions: ['10', '20', '30', '40', '50']
-  })
+  const paginateProp = ref<TablePaginationConfig>(
+    initPaginateConfig(rows?.length || 0)
+  )
 
   // merge pagination config
   if (pagination) {
@@ -49,14 +55,7 @@ const useBaseTable = <T>(
   const restState = () => {
     loading.value = false
     dataSource.value = []
-    paginateProp.value = {
-      current: 1,
-      pageSize: 10,
-      total: dataSource.value.length || 0,
-      size: 'small',
-      showSizeChanger: true,
-      pageSizeOptions: ['10', '20', '30', '40', '50']
-    }
+    paginateProp.value = initPaginateConfig(rows?.length || 0)
   }
 
   onUnmounted(() => {
