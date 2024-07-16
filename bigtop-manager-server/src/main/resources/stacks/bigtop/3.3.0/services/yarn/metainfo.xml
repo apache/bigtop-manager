@@ -57,6 +57,13 @@
                         </command-script>
                     </custom-command>
                 </custom-commands>
+                <quick-link>
+                    <display-name>ResourceManager UI</display-name>
+                    <http-port-property>yarn.resourcemanager.webapp.address</http-port-property>
+                    <http-port-default>8088</http-port-default>
+                    <https-port-property>yarn.resourcemanager.webapp.https.address</https-port-property>
+                    <https-port-default>8090</https-port-default>
+                </quick-link>
             </component>
             <component>
                 <name>nodemanager</name>

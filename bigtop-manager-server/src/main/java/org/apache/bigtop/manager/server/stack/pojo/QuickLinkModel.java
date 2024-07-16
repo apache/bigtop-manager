@@ -18,4 +18,27 @@
  */
 package org.apache.bigtop.manager.server.stack.pojo;
 
-public class QuickLinkModel {}
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import lombok.Data;
+
+@Data
+@XmlAccessorType(XmlAccessType.FIELD)
+public class QuickLinkModel {
+
+    @XmlElement(name = "display-name")
+    private String displayName;
+
+    @XmlElement(name = "http-port-property")
+    private String httpPortProperty;
+
+    @XmlElement(name = "http-port-default")
+    private String httpPortDefault;
+
+    @XmlElement(name = "https-port-property")
+    private String httpsPortProperty;
+
+    @XmlElement(name = "https-port-default")
+    private String httpsPortDefault;
+}

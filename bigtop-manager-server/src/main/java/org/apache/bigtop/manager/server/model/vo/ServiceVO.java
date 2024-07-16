@@ -46,4 +46,6 @@ public class ServiceVO {
     private Boolean isClient;
 
     private Boolean isHealthy;
+
+    private List<QuickLinkVO> quickLinks;
 }

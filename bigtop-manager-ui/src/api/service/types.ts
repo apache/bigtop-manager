@@ -28,4 +28,10 @@ export interface ServiceVO {
   serviceGroup?: string
   isClient?: boolean
   isHealthy?: boolean
+  quickLinks?: QuickLinkVO[]
+}
+
+export interface QuickLinkVO {
+  displayName: string
+  url: string
 }

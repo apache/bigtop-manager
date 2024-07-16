@@ -36,4 +36,6 @@ public class ComponentDTO {
     private ScriptDTO commandScript;
 
     private List<CustomCommandDTO> customCommands;
+
+    private QuickLinkDTO quickLink;
 }
