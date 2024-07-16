@@ -57,7 +57,7 @@
     Started: '#52c41a',
     Maintained: '#d9d9d9',
     Uninstalled: '#f0f964',
-    Stopped: 'ff4d4f'
+    Stopped: '#ff4d4f'
   }
 
   const links = [
@@ -153,6 +153,7 @@
 
   onMounted(() => {
     initServiceMeta()
+    componentStore.resumeIntervalFn()
   })
 
   watch(
