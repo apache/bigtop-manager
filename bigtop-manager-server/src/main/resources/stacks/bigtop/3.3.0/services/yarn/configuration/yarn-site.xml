@@ -26,7 +26,7 @@
     </property>
     <property>
         <name>yarn.resourcemanager.resource-tracker.address</name>
-        <value>0.0.0.0:8025</value>
+        <value>0.0.0.0:8031</value>
         <description> The address of ResourceManager. </description>
     </property>
     <property>
@@ -36,7 +36,7 @@
     </property>
     <property>
         <name>yarn.resourcemanager.address</name>
-        <value>0.0.0.0:8050</value>
+        <value>0.0.0.0:8032</value>
         <description>
             The address of the applications manager interface in the
             RM.
@@ -44,7 +44,7 @@
     </property>
     <property>
         <name>yarn.resourcemanager.admin.address</name>
-        <value>0.0.0.0:8141</value>
+        <value>0.0.0.0:8033</value>
         <description>The address of the RM admin interface.</description>
     </property>
     <property>
