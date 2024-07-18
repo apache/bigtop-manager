@@ -44,8 +44,8 @@ public class SseController {
     @Operation(summary = "get task log", description = "Get a task log")
     @GetMapping("/tasks/{id}/log")
     public SseEmitter log(@PathVariable Long id, @PathVariable Long clusterId) {
-        // Default timeout to 5 minutes
-        SseEmitter emitter = new SseEmitter(5 * 60 * 1000L);
+        // Default timeout to 30 minutes
+        SseEmitter emitter = new SseEmitter(30 * 60 * 1000L);
 
         Flux<String> flux =
                 Flux.create(sink -> taskLogService.registerSink(id, sink), FluxSink.OverflowStrategy.BUFFER);

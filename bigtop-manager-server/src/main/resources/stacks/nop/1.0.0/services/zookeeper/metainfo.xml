@@ -42,6 +42,13 @@
                     <script-type>java</script-type>
                     <timeout>1200</timeout>
                 </command-script>
+                <quick-link>
+                    <display-name>ZooKeeper UI(Test)</display-name>
+                    <http-port-property>admin.serverPort</http-port-property>
+                    <http-port-default>9393</http-port-default>
+                    <https-port-property>admin.serverPort</https-port-property>
+                    <https-port-default>9393</https-port-default>
+                </quick-link>
             </component>
 
             <component>

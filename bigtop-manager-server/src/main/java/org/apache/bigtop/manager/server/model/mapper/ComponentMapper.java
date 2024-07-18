@@ -39,6 +39,7 @@ public interface ComponentMapper {
 
     @Mapping(target = "commandScript", source = "commandScript", qualifiedByName = "obj2Json")
     @Mapping(target = "customCommands", source = "customCommands", qualifiedByName = "obj2Json")
+    @Mapping(target = "quickLink", source = "quickLink", qualifiedByName = "obj2Json")
     @Mapping(target = "service", expression = "java(service)")
     @Mapping(target = "cluster", expression = "java(cluster)")
     Component fromDTO2Entity(ComponentDTO componentDTO, @Context Service service, @Context Cluster cluster);

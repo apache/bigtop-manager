@@ -79,7 +79,7 @@ public class Service extends BaseEntity {
     @Column(name = "service_group")
     private String serviceGroup;
 
-    @Column(name = "required_service")
+    @Column(name = "required_services")
     private String requiredServices;
 
     @ManyToOne

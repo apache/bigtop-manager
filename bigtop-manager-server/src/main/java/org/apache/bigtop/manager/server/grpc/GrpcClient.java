@@ -34,7 +34,6 @@ import io.grpc.stub.AbstractStub;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Constructor;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -63,7 +62,8 @@ public class GrpcClient {
 
     @SuppressWarnings("unchecked")
     public static <T extends AbstractBlockingStub<T>> T getBlockingStub(String host, Class<T> clazz) {
-        Map<String, AbstractBlockingStub<?>> innerMap = BLOCKING_STUBS.computeIfAbsent(host, k -> new HashMap<>());
+        Map<String, AbstractBlockingStub<?>> innerMap =
+                BLOCKING_STUBS.computeIfAbsent(host, k -> new ConcurrentHashMap<>());
         return (T) innerMap.computeIfAbsent(clazz.getName(), k -> {
             T instance = T.newStub(getFactory(clazz), getChannel(host));
             log.info("Instance: {} created.", k);
@@ -73,7 +73,7 @@ public class GrpcClient {
 
     @SuppressWarnings("unchecked")
     public static <T extends AbstractAsyncStub<T>> T getAsyncStub(String host, Class<T> clazz) {
-        Map<String, AbstractAsyncStub<?>> innerMap = ASYNC_STUBS.computeIfAbsent(host, k -> new HashMap<>());
+        Map<String, AbstractAsyncStub<?>> innerMap = ASYNC_STUBS.computeIfAbsent(host, k -> new ConcurrentHashMap<>());
         return (T) innerMap.computeIfAbsent(clazz.getName(), k -> {
             T instance = T.newStub(getFactory(clazz), getChannel(host));
             log.info("Instance: {} created.", k);
@@ -83,7 +83,8 @@ public class GrpcClient {
 
     @SuppressWarnings("unchecked")
     public static <T extends AbstractFutureStub<T>> T getFutureStub(String host, Class<T> clazz) {
-        Map<String, AbstractFutureStub<?>> innerMap = FUTURE_STUBS.computeIfAbsent(host, k -> new HashMap<>());
+        Map<String, AbstractFutureStub<?>> innerMap =
+                FUTURE_STUBS.computeIfAbsent(host, k -> new ConcurrentHashMap<>());
         return (T) innerMap.computeIfAbsent(clazz.getName(), k -> {
             T instance = T.newStub(getFactory(clazz), getChannel(host));
             log.info("Instance: {} created.", k);

@@ -46,4 +46,7 @@ public class ComponentModel {
     @XmlElementWrapper(name = "custom-commands")
     @XmlElements(@XmlElement(name = "custom-command"))
     private List<CustomCommandModel> customCommands;
+
+    @XmlElement(name = "quick-link")
+    private QuickLinkModel quickLink;
 }

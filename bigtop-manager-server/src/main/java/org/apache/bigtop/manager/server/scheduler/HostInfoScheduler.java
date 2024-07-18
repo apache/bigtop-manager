@@ -34,6 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import jakarta.annotation.Resource;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
@@ -43,7 +44,7 @@ public class HostInfoScheduler {
     private HostRepository hostRepository;
 
     @Async
-    @Scheduled(cron = "0/30 * *  * * ? ")
+    @Scheduled(fixedDelay = 30, timeUnit = TimeUnit.SECONDS)
     public void execute() {
         List<Host> hosts = hostRepository.findAll();
         for (Host host : hosts) {
