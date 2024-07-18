@@ -179,7 +179,7 @@
     </property>
     <property>
         <name>dfs.namenode.rpc-address</name>
-        <value>localhost:8020</value>
+        <value>0.0.0.0:8020</value>
         <description>RPC address that handles all clients requests.</description>
     </property>
     <property>

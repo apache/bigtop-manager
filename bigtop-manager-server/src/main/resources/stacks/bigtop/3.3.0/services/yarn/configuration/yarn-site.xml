@@ -26,17 +26,17 @@
     </property>
     <property>
         <name>yarn.resourcemanager.resource-tracker.address</name>
-        <value>localhost:8025</value>
+        <value>0.0.0.0:8025</value>
         <description> The address of ResourceManager. </description>
     </property>
     <property>
         <name>yarn.resourcemanager.scheduler.address</name>
-        <value>localhost:8030</value>
+        <value>0.0.0.0:8030</value>
         <description>The address of the scheduler interface.</description>
     </property>
     <property>
         <name>yarn.resourcemanager.address</name>
-        <value>localhost:8050</value>
+        <value>0.0.0.0:8050</value>
         <description>
             The address of the applications manager interface in the
             RM.
@@ -44,7 +44,7 @@
     </property>
     <property>
         <name>yarn.resourcemanager.admin.address</name>
-        <value>localhost:8141</value>
+        <value>0.0.0.0:8141</value>
         <description>The address of the RM admin interface.</description>
     </property>
     <property>
@@ -277,14 +277,14 @@
     </property>
     <property>
         <name>yarn.resourcemanager.webapp.address</name>
-        <value>localhost:8088</value>
+        <value>0.0.0.0:8088</value>
         <description>
             The address of the RM web application.
         </description>
     </property>
     <property>
         <name>yarn.resourcemanager.webapp.https.address</name>
-        <value>localhost:8090</value>
+        <value>0.0.0.0:8090</value>
         <description>
             The https address of the RM web application.
         </description>
@@ -316,7 +316,7 @@
     <property>
         <name>manage.include.files</name>
         <value>false</value>
-        <description>If true Ambari will manage include file if
+        <description>If true this will manage include file if
             yarn.resourcemanager.nodes.include-path is configured.</description>
     </property>
     <property>
@@ -351,21 +351,21 @@
     </property>
     <property>
         <name>yarn.timeline-service.webapp.address</name>
-        <value>localhost:8188</value>
+        <value>0.0.0.0:8188</value>
         <description>
             The http address of the timeline service web application.
         </description>
     </property>
     <property>
         <name>yarn.timeline-service.webapp.https.address</name>
-        <value>localhost:8190</value>
+        <value>0.0.0.0:8190</value>
         <description>
             The http address of the timeline service web application.
         </description>
     </property>
     <property>
         <name>yarn.timeline-service.address</name>
-        <value>localhost:10200</value>
+        <value>0.0.0.0:10200</value>
         <description>
             This is default address for the timeline server to start
             the RPC server.
