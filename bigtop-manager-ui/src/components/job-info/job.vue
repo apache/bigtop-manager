@@ -35,7 +35,7 @@
   import CustomProgress from './custom-progress.vue'
   import Stage from './stage.vue'
   import Task from './task.vue'
-  import TaskLog from './log.vue'
+  import TaskLog from './task-log.vue'
 
   const columns = [
     {
@@ -285,7 +285,7 @@
       <task :columns="columns" :tasks="tasks" @click-task="clickTask" />
     </template>
     <template v-if="getCurrPage == 'isTaskLogs'">
-      <task-log ref="logRef"></task-log>
+      <task-log ref="logRef" />
     </template>
   </a-modal>
 </template>
