@@ -75,13 +75,12 @@ request.interceptors.response.use(
     }
   },
   async (error: AxiosError) => {
-    if (error.code === AxiosError.ERR_CANCELED) {
-      return
-    }
     if (error.code === AxiosError.ERR_NETWORK) {
       message.error(i18n.global.t('common.error_network'))
     } else if (error.code === AxiosError.ETIMEDOUT) {
       message.error(i18n.global.t('common.error_timeout'))
+    } else if (error.code === AxiosError.ERR_CANCELED) {
+      return
     } else {
       console.log(error)
       message.error(i18n.global.t('common.error_unknown'))
