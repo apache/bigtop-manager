@@ -79,6 +79,8 @@ request.interceptors.response.use(
       message.error(i18n.global.t('common.error_network'))
     } else if (error.code === AxiosError.ETIMEDOUT) {
       message.error(i18n.global.t('common.error_timeout'))
+    } else if (error.code === AxiosError.ERR_CANCELED) {
+      return
     } else {
       console.log(error)
       message.error(i18n.global.t('common.error_unknown'))

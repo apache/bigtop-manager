@@ -18,12 +18,10 @@
 -->
 
 <script setup lang="ts">
-  import { ref, watch, computed, reactive, toRaw, toRefs } from 'vue'
+  import { ref, watch, computed, reactive, toRaw, toRefs, nextTick } from 'vue'
   import { useClusterStore } from '@/store/cluster'
   import { PaginationConfig } from 'ant-design-vue/es/pagination/Pagination'
-  import { CopyOutlined } from '@ant-design/icons-vue'
   import { storeToRefs } from 'pinia'
-  import { message } from 'ant-design-vue'
   import {
     JobVO,
     StageVO,
@@ -31,17 +29,13 @@
     OuterData,
     Pagination
   } from '@/api/job/types.ts'
-  import { getLogs } from '@/api/sse'
   import { getJobs } from '@/api/job'
   import { Pausable, useIntervalFn } from '@vueuse/core'
-  import { AxiosProgressEvent } from 'axios'
   import { MONITOR_SCHEDULE_INTERVAL } from '@/utils/constant.ts'
   import CustomProgress from './custom-progress.vue'
   import Stage from './stage.vue'
   import Task from './task.vue'
-  import { copyText } from '@/utils/tools'
-  import { useI18n } from 'vue-i18n'
-  const { t } = useI18n()
+  import TaskLog from './task-log.vue'
 
   const columns = [
     {
@@ -69,16 +63,16 @@
   const clusterStore = useClusterStore()
   const { clusterId } = storeToRefs(clusterStore)
 
-  const props = withDefaults(
-    defineProps<{
-      visible: boolean
-      outerData?: OuterData
-    }>(),
-    {
-      visible: false,
-      outerData: undefined
-    }
-  )
+  interface Props {
+    visible: boolean
+    outerData?: OuterData
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    visible: false,
+    outerData: undefined
+  })
+
   const { visible, outerData } = toRefs(props)
 
   const emits = defineEmits(['update:visible', 'closed'])
@@ -90,8 +84,7 @@
   const currTaskInfo = ref<TaskVO>()
   const jobs = ref<JobVO[]>([])
   const intervalId = ref<Pausable | undefined>()
-  const logTextOrigin = ref<string>('')
-  const logsInfoRef = ref<HTMLElement | null>(null)
+  const logRef = ref<InstanceType<typeof TaskLog> | null>()
   const currPage = ref<string[]>([
     'isJobTable',
     'isStageTable',
@@ -110,24 +103,11 @@
     return currPage.value[breadcrumbs.value.length - 1]
   })
 
-  const logText = computed(() => {
-    return logTextOrigin.value
-      .split('\n\n')
-      .map((s) => {
-        return s.substring(5)
-      })
-      .join('\n')
-  })
-
   watch(visible, (val) => {
     if (val) {
       loading.value = true
       Object.assign(paginationProps, initPagedProps())
-      if (outerData.value) {
-        checkMetaOrigin(true)
-      } else {
-        checkMetaOrigin(false)
-      }
+      checkMetaOrigin(outerData.value ? true : false)
       loading.value = false
     }
   })
@@ -189,42 +169,11 @@
     }
   }
 
-  const getLogsInfo = (id: number) => {
-    getLogs(clusterId.value, id, ({ event }: AxiosProgressEvent) => {
-      logTextOrigin.value = event.target.responseText
-      logsInfoRef.value = document.querySelector('.logsInfoRef')
-      if (!logsInfoRef.value) {
-        return
-      }
-      ;(function smoothscroll() {
-        const { scrollTop, offsetHeight, scrollHeight } = logsInfoRef.value
-        if (scrollHeight - 10 > scrollTop + offsetHeight) {
-          window.requestAnimationFrame(smoothscroll)
-          logsInfoRef.value.scrollTo(
-            0,
-            scrollTop + (scrollHeight - scrollTop - offsetHeight) / 2
-          )
-        }
-      })()
-    })
-  }
-
-  const copyLogTextContent = (text: string) => {
-    copyText(text)
-      .then(() => {
-        message.success(`${t('common.copy_success')}`)
-      })
-      .catch((err: Error) => {
-        message.error(`${t('common.copy_fail')}`)
-        console.log('err :>> ', err)
-      })
-  }
-
-  const clickTask = (record: TaskVO) => {
+  const clickTask = async (record: TaskVO) => {
     breadcrumbs.value.push(record)
     currTaskInfo.value = record
-    logTextOrigin.value = ''
-    getLogsInfo(record.id)
+    await nextTick()
+    logRef.value?.getLogsInfo(record.id)
   }
 
   const clickJob = (record: JobVO) => {
@@ -336,26 +285,7 @@
       <task :columns="columns" :tasks="tasks" @click-task="clickTask" />
     </template>
     <template v-if="getCurrPage == 'isTaskLogs'">
-      <div class="logs">
-        <div class="logs_header">
-          <span>Task Logs</span>
-          <div class="logs_header-ops">
-            <a-button
-              type="link"
-              size="small"
-              @click="copyLogTextContent(logText)"
-            >
-              <template #icon>
-                <copy-outlined />
-              </template>
-              <span class="copy-button">{{ $t('common.copy') }}</span>
-            </a-button>
-          </div>
-        </div>
-        <div ref="logsInfoRef" class="logs_info">
-          <pre id="logs">{{ logText }}</pre>
-        </div>
-      </div>
+      <task-log ref="logRef" />
     </template>
   </a-modal>
 </template>
@@ -364,38 +294,6 @@
   .breadcrumb {
     :deep(.ant-breadcrumb) {
       margin-bottom: 16px !important;
-    }
-  }
-  .logs {
-    height: 50vh;
-    display: flex;
-    flex-direction: column;
-    &_header {
-      font-size: 16px;
-      font-weight: 600;
-      margin: 0 0 10px 0;
-      display: flex;
-      justify-content: space-between;
-
-      .copy-button {
-        margin-left: 3px;
-      }
-    }
-    &_info {
-      height: 100%;
-      overflow: auto;
-      background-color: #f5f5f5;
-      border-radius: 4px;
-      position: relative;
-      pre {
-        height: 100%;
-        margin: 0;
-        padding: 16px 14px;
-        box-sizing: border-box;
-        color: #444;
-        border-color: #eee;
-        line-height: 16px;
-      }
     }
   }
 </style>

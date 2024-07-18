@@ -17,20 +17,25 @@
  * under the License.
  */
 
+import axios, { type AxiosProgressEvent, type CancelTokenSource } from 'axios'
 import request from '@/api/request.ts'
-import { AxiosProgressEvent } from 'axios'
 
 export const getLogs = (
   clusterId: number,
   id: number,
   func: Function
-): Promise<any> => {
-  return request({
+): { promise: Promise<any>; cancel: () => void } => {
+  const source: CancelTokenSource = axios.CancelToken.source()
+
+  const promise = request({
     method: 'get',
     url: `/sse/clusters/${clusterId}/tasks/${id}/log`,
     responseType: 'stream',
     timeout: 0,
+    cancelToken: source.token,
     onDownloadProgress: (progressEvent: AxiosProgressEvent) =>
       func(progressEvent)
   })
+
+  return { promise, cancel: source.cancel }
 }
