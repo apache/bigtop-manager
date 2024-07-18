@@ -97,17 +97,6 @@ public class HdfsParams extends BaseParams {
     @GlobalParams
     public Map<String, Object> hdfsSite() {
         Map<String, Object> hdfsSite = LocalSettings.configurations(serviceName(), "hdfs-site");
-        List<String> namenodeList = LocalSettings.hosts("namenode");
-        if (!namenodeList.isEmpty()) {
-            hdfsSite.put("dfs.namenode.rpc-address", MessageFormat.format("{0}:8020", namenodeList.get(0)));
-            hdfsSite.put("dfs.namenode.http-address", MessageFormat.format("{0}:50070", namenodeList.get(0)));
-            hdfsSite.put("dfs.namenode.https-address", MessageFormat.format("{0}:50470", namenodeList.get(0)));
-        }
-        List<String> snamenodeList = LocalSettings.hosts("secondary_namenode");
-        if (!snamenodeList.isEmpty()) {
-            hdfsSite.put(
-                    "dfs.namenode.secondary.http-address", MessageFormat.format("{0}:50090", snamenodeList.get(0)));
-        }
 
         dfsDataDir = (String) hdfsSite.get("dfs.datanode.data.dir");
         dfsNameNodeDir = (String) hdfsSite.get("dfs.namenode.name.dir");

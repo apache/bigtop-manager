@@ -81,6 +81,9 @@ public class Component extends BaseEntity {
     @Column(name = "category")
     private String category;
 
+    @Column(name = "quick_link")
+    private String quickLink;
+
     @ManyToOne
     @JoinColumn(name = "service_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Service service;

@@ -18,6 +18,7 @@
  */
 package org.apache.bigtop.manager.common.utils;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -34,6 +35,7 @@ public class JsonUtils {
     static {
         OBJECTMAPPER = new ObjectMapper();
         OBJECTMAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        OBJECTMAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
     public static <T> void writeToFile(String fileName, T obj) {
@@ -73,6 +75,10 @@ public class JsonUtils {
     }
 
     public static <T> T readFromString(String json) {
+        if (json == null) {
+            return null;
+        }
+
         try {
             return OBJECTMAPPER.readValue(json, new TypeReference<>() {});
         } catch (Exception e) {
@@ -81,6 +87,10 @@ public class JsonUtils {
     }
 
     public static <T> T readFromString(String json, TypeReference<T> typeReference) {
+        if (json == null) {
+            return null;
+        }
+
         try {
             return OBJECTMAPPER.readValue(json, typeReference);
         } catch (Exception e) {
@@ -89,6 +99,10 @@ public class JsonUtils {
     }
 
     public static <T> T readFromString(String json, Class<T> clazz) {
+        if (json == null) {
+            return null;
+        }
+
         try {
             return OBJECTMAPPER.readValue(json, clazz);
         } catch (Exception e) {
@@ -105,6 +119,10 @@ public class JsonUtils {
     }
 
     public static <T> String writeAsString(T obj) {
+        if (obj == null) {
+            return null;
+        }
+
         try {
             return OBJECTMAPPER.writeValueAsString(obj);
         } catch (Exception e) {

@@ -18,6 +18,8 @@
  */
 package org.apache.bigtop.manager.agent.utils;
 
+import org.apache.bigtop.manager.common.utils.Environments;
+
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
@@ -26,7 +28,7 @@ public class LogFileUtils {
 
     public static String getLogFilePath(Long taskId) {
         String baseDir;
-        if (SystemUtils.IS_OS_WINDOWS) {
+        if (Environments.isDevMode()) {
             baseDir = SystemUtils.getUserDir().getPath();
         } else {
             File file = new File(LogFileUtils.class

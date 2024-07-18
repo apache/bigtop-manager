@@ -20,13 +20,27 @@ package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.common.constants.ComponentCategories;
 import org.apache.bigtop.manager.common.enums.MaintainState;
+import org.apache.bigtop.manager.common.utils.JsonUtils;
+import org.apache.bigtop.manager.dao.entity.Cluster;
+import org.apache.bigtop.manager.dao.entity.Component;
+import org.apache.bigtop.manager.dao.entity.Host;
 import org.apache.bigtop.manager.dao.entity.HostComponent;
 import org.apache.bigtop.manager.dao.entity.Service;
+import org.apache.bigtop.manager.dao.entity.ServiceConfig;
+import org.apache.bigtop.manager.dao.entity.TypeConfig;
 import org.apache.bigtop.manager.dao.repository.HostComponentRepository;
+import org.apache.bigtop.manager.dao.repository.ServiceConfigRepository;
 import org.apache.bigtop.manager.dao.repository.ServiceRepository;
+import org.apache.bigtop.manager.server.model.dto.PropertyDTO;
+import org.apache.bigtop.manager.server.model.dto.QuickLinkDTO;
+import org.apache.bigtop.manager.server.model.dto.TypeConfigDTO;
 import org.apache.bigtop.manager.server.model.mapper.ServiceMapper;
+import org.apache.bigtop.manager.server.model.mapper.TypeConfigMapper;
+import org.apache.bigtop.manager.server.model.vo.QuickLinkVO;
 import org.apache.bigtop.manager.server.model.vo.ServiceVO;
 import org.apache.bigtop.manager.server.service.ServiceService;
+
+import org.apache.commons.lang3.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,6 +60,9 @@ public class ServiceServiceImpl implements ServiceService {
     @Resource
     private HostComponentRepository hostComponentRepository;
 
+    @Resource
+    private ServiceConfigRepository serviceConfigRepository;
+
     @Override
     public List<ServiceVO> list(Long clusterId) {
         List<ServiceVO> res = new ArrayList<>();
@@ -58,11 +75,20 @@ public class ServiceServiceImpl implements ServiceService {
             List<HostComponent> hostComponents = entry.getValue();
             Service service = hostComponents.get(0).getComponent().getService();
             ServiceVO serviceVO = ServiceMapper.INSTANCE.fromEntity2VO(service);
+            serviceVO.setQuickLinks(new ArrayList<>());
 
             boolean isHealthy = true;
             boolean isClient = true;
             for (HostComponent hostComponent : hostComponents) {
-                String category = hostComponent.getComponent().getCategory();
+                Component component = hostComponent.getComponent();
+
+                String quickLink = component.getQuickLink();
+                if (StringUtils.isNotBlank(quickLink)) {
+                    QuickLinkVO quickLinkVO = resolveQuickLink(hostComponent, quickLink);
+                    serviceVO.getQuickLinks().add(quickLinkVO);
+                }
+
+                String category = component.getCategory();
                 if (!category.equalsIgnoreCase(ComponentCategories.CLIENT)) {
                     isClient = false;
                 }
@@ -87,5 +113,39 @@ public class ServiceServiceImpl implements ServiceService {
     public ServiceVO get(Long id) {
         Service service = serviceRepository.findById(id).orElse(new Service());
         return ServiceMapper.INSTANCE.fromEntity2VO(service);
+    }
+
+    private QuickLinkVO resolveQuickLink(HostComponent hostComponent, String quickLinkJson) {
+        QuickLinkVO quickLinkVO = new QuickLinkVO();
+
+        QuickLinkDTO quickLinkDTO = JsonUtils.readFromString(quickLinkJson, QuickLinkDTO.class);
+        quickLinkVO.setDisplayName(quickLinkDTO.getDisplayName());
+
+        Component component = hostComponent.getComponent();
+        Cluster cluster = component.getCluster();
+        Host host = hostComponent.getHost();
+        Service service = component.getService();
+        ServiceConfig serviceConfig =
+                serviceConfigRepository.findByClusterAndServiceAndSelectedIsTrue(cluster, service);
+        List<TypeConfig> typeConfigs = serviceConfig.getConfigs();
+
+        // Use HTTP for now, need to handle https in the future
+        for (TypeConfig typeConfig : typeConfigs) {
+            TypeConfigDTO typeConfigDTO = TypeConfigMapper.INSTANCE.fromEntity2DTO(typeConfig);
+            for (PropertyDTO propertyDTO : typeConfigDTO.getProperties()) {
+                if (propertyDTO.getName().equals(quickLinkDTO.getHttpPortProperty())) {
+                    String port = propertyDTO.getValue().contains(":")
+                            ? propertyDTO.getValue().split(":")[1]
+                            : propertyDTO.getValue();
+                    String url = "http://" + host.getHostname() + ":" + port;
+                    quickLinkVO.setUrl(url);
+                    return quickLinkVO;
+                }
+            }
+        }
+
+        String url = "http://" + host.getHostname() + ":" + quickLinkDTO.getHttpPortDefault();
+        quickLinkVO.setUrl(url);
+        return quickLinkVO;
     }
 }

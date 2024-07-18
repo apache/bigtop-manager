@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { onMounted, ref, watch } from 'vue'
+  import { computed, onMounted, ref, watch } from 'vue'
   import { useRoute } from 'vue-router'
   import type { SelectProps, MenuProps } from 'ant-design-vue'
   import {
@@ -32,6 +32,8 @@
   import { useComponentStore } from '@/store/component'
   import { HostComponentVO } from '@/api/component/types.ts'
   import DotState from '@/components/dot-state/index.vue'
+  import { useServiceStore } from '@/store/service'
+  import { ServiceVO } from '@/api/service/types.ts'
 
   const menuOps = [
     {
@@ -60,18 +62,18 @@
     Stopped: '#ff4d4f'
   }
 
-  const links = [
-    'NameNode UINameNode UINameNode',
-    'NameNode Logs',
-    'NameNode JMX',
-    'Thread Stacks'
-  ]
-
   const route = useRoute()
   const configStore = useConfigStore()
   const { allConfigs } = storeToRefs(configStore)
   const componentStore = useComponentStore()
   const { hostComponents } = storeToRefs(componentStore)
+  const serviceStore = useServiceStore()
+  const { installedServices } = storeToRefs(serviceStore)
+  const selectedService = computed(() => {
+    return installedServices.value.filter(
+      (service: ServiceVO) => service.serviceName === serviceName.value
+    )[0]
+  })
 
   const serviceName = ref<string>(route.params.serviceName as string)
 
@@ -217,13 +219,18 @@
           </div>
         </div>
         <div class="right-section">
-          <h2>{{ $t('service.quicklinks') }}</h2>
-          <ul v-if="links.length > 0">
-            <li v-for="link in links" :key="link">
-              <a>{{ link }}</a>
+          <h2>{{ $t('service.quick_links') }}</h2>
+          <ul
+            v-if="
+              selectedService.quickLinks &&
+              selectedService.quickLinks.length > 0
+            "
+          >
+            <li v-for="link in selectedService.quickLinks" :key="link.url">
+              <a :href="link.url" target="_blank">{{ link.displayName }}</a>
             </li>
           </ul>
-          <a-empty v-else />
+          <div v-else class="no-link-text">{{ $t('service.no_link') }}</div>
         </div>
       </a-layout-content>
     </a-tab-pane>
@@ -296,6 +303,11 @@
       padding: 0 1rem;
       box-sizing: border-box;
       min-height: 33.75rem;
+
+      .no-link-text {
+        color: #999999;
+        padding: 0.25rem;
+      }
 
       ul {
         list-style: none;

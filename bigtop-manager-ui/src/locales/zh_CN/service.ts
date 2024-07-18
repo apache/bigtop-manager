@@ -37,5 +37,6 @@ export default {
   summary: '总览',
   config: '配置',
   components: '组件',
-  quicklinks: '快速链接'
+  quick_links: '快速链接',
+  no_link: '无'
 }
