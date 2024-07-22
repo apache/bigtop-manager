@@ -18,9 +18,10 @@
  */
 package org.apache.bigtop.manager.agent.executor;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.agent.holder.SpringContextHolder;
 import org.apache.bigtop.manager.grpc.generated.CommandType;
+
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 import java.util.Map;
