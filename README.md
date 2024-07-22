@@ -23,7 +23,7 @@ Bigtop-Manager is a platform for managing Bigtop components. Inspired by Apache 
 ## Prerequisites
 
 JDK: Requires JDK 17 or 21  
-Metadata DB: Mariadb or Mysql
+Metadata DB: Mariadb or Mysql(8 or above)
 
 ### API-DOCS
 [swagger-ui](http://localhost:8080/swagger-ui/index.html)
