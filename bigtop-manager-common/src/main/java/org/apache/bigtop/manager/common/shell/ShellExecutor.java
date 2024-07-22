@@ -18,9 +18,8 @@
  */
 package org.apache.bigtop.manager.common.shell;
 
-import org.apache.bigtop.manager.common.thread.TaskLogThreadDecorator;
-
 import lombok.extern.slf4j.Slf4j;
+import org.apache.bigtop.manager.common.thread.TaskLogThreadDecorator;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -59,8 +58,6 @@ public class ShellExecutor {
      */
     private final long timeoutInterval;
 
-    private final Consumer<String> consumer;
-
     /**
      * Whether script timed out
      */
@@ -91,15 +88,12 @@ public class ShellExecutor {
      * @param timeout    Specifies the time in milliseconds, after which the
      *                   command will be killed and the status marked as timedout.
      *                   If 0, the command will not be timed out.
-     * @param consumer   the consumer to consume the output of the executed command.
      */
-    private ShellExecutor(
-            String[] execString, File dir, Map<String, String> env, long timeout, Consumer<String> consumer) {
+    private ShellExecutor(String[] execString, File dir, Map<String, String> env, long timeout) {
         this.command = execString.clone();
         this.dir = dir;
         this.environment = env;
         this.timeoutInterval = timeout;
-        this.consumer = consumer;
     }
 
     /**
@@ -111,21 +105,7 @@ public class ShellExecutor {
      * @throws IOException errors
      */
     public static ShellResult execCommand(List<String> builderParameters) throws IOException {
-        return execCommand(builderParameters, s -> {});
-    }
-
-    /**
-     * Static method to execute a shell command.
-     * Covers most of the simple cases for user.
-     *
-     * @param builderParameters shell command to execute.
-     * @param consumer the consumer to consume the output of the executed command.
-     * @return the output of the executed command.
-     * @throws IOException errors
-     */
-    public static ShellResult execCommand(List<String> builderParameters, Consumer<String> consumer)
-            throws IOException {
-        return execCommand(null, builderParameters, 0L, consumer);
+        return execCommand(null, builderParameters, 0L);
     }
 
     /**
@@ -139,23 +119,7 @@ public class ShellExecutor {
      * @throws IOException errors
      */
     public static ShellResult execCommand(Map<String, String> env, List<String> builderParameters) throws IOException {
-        return execCommand(env, builderParameters, s -> {});
-    }
-
-    /**
-     * Static method to execute a shell command.
-     * Covers most of the simple cases without requiring the user to implement
-     * the <code>AbstractShell</code> interface.
-     *
-     * @param env the map of environment key=value
-     * @param builderParameters shell command to execute.
-     * @param consumer the consumer to consume the output of the executed command.
-     * @return the output of the executed command.
-     * @throws IOException errors
-     */
-    public static ShellResult execCommand(
-            Map<String, String> env, List<String> builderParameters, Consumer<String> consumer) throws IOException {
-        return execCommand(env, builderParameters, 0L, consumer);
+        return execCommand(env, builderParameters, 0L);
     }
 
     /**
@@ -171,27 +135,10 @@ public class ShellExecutor {
      */
     public static ShellResult execCommand(Map<String, String> env, List<String> builderParameters, long timeout)
             throws IOException {
-        return execCommand(env, builderParameters, timeout, s -> {});
-    }
-
-    /**
-     * Static method to execute a shell command.
-     * Covers most of the simple cases without requiring the user to implement
-     * the <code>AbstractShell</code> interface.
-     *
-     * @param env     the map of environment key=value
-     * @param builderParameters shell command to execute.
-     * @param timeout time in milliseconds after which script should be marked timeout
-     * @param consumer the consumer to consume the output of the executed command.
-     * @return the output of the executed command.
-     * @throws IOException errors
-     */
-    public static ShellResult execCommand(
-            Map<String, String> env, List<String> builderParameters, long timeout, Consumer<String> consumer)
-            throws IOException {
         String[] cmd = builderParameters.toArray(new String[0]);
+        log.info("Running shell: {}", String.join(" ", builderParameters));
 
-        ShellExecutor shellExecutor = new ShellExecutor(cmd, null, env, timeout, consumer);
+        ShellExecutor shellExecutor = new ShellExecutor(cmd, null, env, timeout);
         return shellExecutor.execute();
     }
 
@@ -224,11 +171,11 @@ public class ShellExecutor {
         // free the error stream buffer
         BufferedReader errReader = createBufferedReader(process.getErrorStream());
         StringBuilder errMsg = new StringBuilder();
-        Thread errThread = createReaderThread(errReader, errMsg);
+        Thread errThread = createReaderThread(errReader, errMsg, log::error);
 
         BufferedReader inReader = createBufferedReader(process.getInputStream());
         StringBuilder inMsg = new StringBuilder();
-        Thread inThread = createReaderThread(inReader, inMsg);
+        Thread inThread = createReaderThread(inReader, inMsg, log::info);
 
         try {
             errThread.start();
@@ -306,7 +253,7 @@ public class ShellExecutor {
         return new BufferedReader(new InputStreamReader(inputStream));
     }
 
-    private Thread createReaderThread(BufferedReader reader, StringBuilder msg) {
+    private Thread createReaderThread(BufferedReader reader, StringBuilder msg, Consumer<String> consumer) {
         TaskLogThreadDecorator decorator = new TaskLogThreadDecorator();
         return decorator.decorate(() -> {
             try {

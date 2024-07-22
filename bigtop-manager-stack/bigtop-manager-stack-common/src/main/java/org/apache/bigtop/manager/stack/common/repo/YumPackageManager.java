@@ -47,9 +47,7 @@ public class YumPackageManager implements PackageManager {
         builderParameters.addAll(packages);
 
         try {
-            ShellResult output = ShellExecutor.execCommand(builderParameters, log::info);
-            log.info("[RpmPackageManager] [installPackage] output: {}", output);
-            return output;
+            return ShellExecutor.execCommand(builderParameters);
         } catch (IOException e) {
             throw new StackException(e);
         }
@@ -64,9 +62,7 @@ public class YumPackageManager implements PackageManager {
         builderParameters.addAll(packages);
 
         try {
-            ShellResult output = ShellExecutor.execCommand(builderParameters, log::info);
-            log.info("[RpmPackageManager] [uninstallPackage] output: {}", output);
-            return output;
+            return ShellExecutor.execCommand(builderParameters);
         } catch (IOException e) {
             throw new StackException(e);
         }
@@ -79,8 +75,7 @@ public class YumPackageManager implements PackageManager {
         builderParameters.add("list");
 
         try {
-            ShellResult output = ShellExecutor.execCommand(builderParameters, log::info);
-            log.info("[RpmPackageManager] [listPackages] output: {}", output);
+            ShellResult output = ShellExecutor.execCommand(builderParameters);
             return output.getOutput();
         } catch (IOException e) {
             throw new StackException(e);

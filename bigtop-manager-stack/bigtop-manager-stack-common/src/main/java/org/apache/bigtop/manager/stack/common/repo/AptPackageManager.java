@@ -48,9 +48,7 @@ public class AptPackageManager implements PackageManager {
         builderParameters.addAll(packages);
 
         try {
-            ShellResult output = ShellExecutor.execCommand(builderParameters, log::info);
-            log.info("[AptPackageManager] [installPackage] output: {}", output);
-            return output;
+            return ShellExecutor.execCommand(builderParameters);
         } catch (IOException e) {
             throw new StackException(e);
         }
@@ -65,9 +63,7 @@ public class AptPackageManager implements PackageManager {
         builderParameters.addAll(packages);
 
         try {
-            ShellResult output = ShellExecutor.execCommand(builderParameters, log::info);
-            log.info("[AptPackageManager] [uninstallPackage] output: {}", output);
-            return output;
+            return ShellExecutor.execCommand(builderParameters);
         } catch (IOException e) {
             throw new StackException(e);
         }
@@ -80,8 +76,7 @@ public class AptPackageManager implements PackageManager {
         builderParameters.add("list");
 
         try {
-            ShellResult output = ShellExecutor.execCommand(builderParameters, log::info);
-            log.info("[AptPackageManager] [listPackages] output: {}", output);
+            ShellResult output = ShellExecutor.execCommand(builderParameters);
             return output.getOutput();
         } catch (IOException e) {
             throw new StackException(e);
