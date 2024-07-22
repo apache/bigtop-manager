@@ -25,17 +25,20 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
 public class CommandExecutors {
 
-    static {
-        load();
-    }
+    private static final AtomicBoolean LOADED = new AtomicBoolean(false);
 
     private static final Map<CommandType, String> COMMAND_EXECUTORS = new HashMap<>();
 
     public static CommandExecutor getCommandExecutor(CommandType commandType) {
+        if (!LOADED.get()) {
+            load();
+        }
+
         String beanName = COMMAND_EXECUTORS.get(commandType);
         return SpringContextHolder.getApplicationContext().getBean(beanName, CommandExecutor.class);
     }
@@ -51,10 +54,8 @@ public class CommandExecutors {
             }
 
             COMMAND_EXECUTORS.put(commandExecutor.getCommandType(), beanName);
-            log.info(
-                    "Load JobRunner: {} with identifier: {}",
-                    commandExecutor.getClass().getName(),
-                    commandExecutor.getCommandType());
         }
+
+        LOADED.set(true);
     }
 }
