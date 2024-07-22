@@ -21,10 +21,13 @@ package org.apache.bigtop.manager.common.utils.os;
 import org.apache.bigtop.manager.common.shell.ShellExecutor;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class TimeSyncDetection {
 
     public static ShellResult checkTimeSync() {
@@ -34,18 +37,27 @@ public class TimeSyncDetection {
         params.add("chronyd");
         ShellResult shellResult;
         try {
+            log.info("Checking service chronyd status");
             shellResult = ShellExecutor.execCommand(params);
-
-            if (shellResult.getExitCode() != 0) {
-                params.remove(params.size() - 1);
-                params.add("ntpd");
-                shellResult = ShellExecutor.execCommand(params);
+            if (shellResult.getExitCode() == 0) {
+                log.info("Service chronyd is enabled");
+                return shellResult;
             }
 
+            log.info("Service chronyd is not enabled, checking ntpd status");
+            params.remove(params.size() - 1);
+            params.add("ntpd");
+            shellResult = ShellExecutor.execCommand(params);
+            if (shellResult.getExitCode() == 0) {
+                log.info("Service ntpd is enabled");
+                return shellResult;
+            }
+
+            log.info("Service ntpd is not enabled");
         } catch (IOException e) {
             shellResult = new ShellResult();
             shellResult.setExitCode(-1);
-            shellResult.setErrMsg("Neither chronyd nor ntpd check failed.");
+            shellResult.setErrMsg("Neither chronyd nor ntpd check failed");
         }
 
         return shellResult;

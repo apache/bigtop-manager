@@ -42,7 +42,7 @@ import static org.apache.bigtop.manager.common.constants.Constants.PERMISSION_75
 public class ZookeeperSetup {
 
     public static ShellResult config(Params params) {
-        log.info("ZookeeperSetup config");
+        log.info("Setting zookeeper config");
         ZookeeperParams zookeeperParams = (ZookeeperParams) params;
 
         String confDir = zookeeperParams.confDir();

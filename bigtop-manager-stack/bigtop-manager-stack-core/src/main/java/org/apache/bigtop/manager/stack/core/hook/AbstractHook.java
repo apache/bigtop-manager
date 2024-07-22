@@ -52,10 +52,16 @@ public abstract class AbstractHook implements Hook {
 
         for (Map.Entry<String, Set<String>> user : users.entrySet()) {
             Set<String> groups = user.getValue();
-            log.info("user: {}, groups: {}", user.getKey(), user.getValue());
             for (String group : groups) {
+                log.info("Adding group: {}", group);
                 LinuxAccountUtils.groupAdd(group);
             }
+
+            log.info(
+                    "Adding user: {} to group: {} and groups: [{}]",
+                    user.getKey(),
+                    userGroup,
+                    String.join(",", groups));
             LinuxAccountUtils.userAdd(user.getKey(), userGroup, groups);
         }
     }

@@ -48,7 +48,7 @@ public class AptPackageManager implements PackageManager {
         builderParameters.addAll(packages);
 
         try {
-            return ShellExecutor.execCommand(builderParameters);
+            return ShellExecutor.execCommand(builderParameters, true);
         } catch (IOException e) {
             throw new StackException(e);
         }
@@ -63,7 +63,7 @@ public class AptPackageManager implements PackageManager {
         builderParameters.addAll(packages);
 
         try {
-            return ShellExecutor.execCommand(builderParameters);
+            return ShellExecutor.execCommand(builderParameters, true);
         } catch (IOException e) {
             throw new StackException(e);
         }

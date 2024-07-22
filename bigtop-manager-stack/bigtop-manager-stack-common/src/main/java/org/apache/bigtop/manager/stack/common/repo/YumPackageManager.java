@@ -47,7 +47,7 @@ public class YumPackageManager implements PackageManager {
         builderParameters.addAll(packages);
 
         try {
-            return ShellExecutor.execCommand(builderParameters);
+            return ShellExecutor.execCommand(builderParameters, true);
         } catch (IOException e) {
             throw new StackException(e);
         }
@@ -62,7 +62,7 @@ public class YumPackageManager implements PackageManager {
         builderParameters.addAll(packages);
 
         try {
-            return ShellExecutor.execCommand(builderParameters);
+            return ShellExecutor.execCommand(builderParameters, true);
         } catch (IOException e) {
             throw new StackException(e);
         }
