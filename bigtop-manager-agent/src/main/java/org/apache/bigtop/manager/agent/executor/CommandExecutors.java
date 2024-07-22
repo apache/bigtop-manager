@@ -18,10 +18,9 @@
  */
 package org.apache.bigtop.manager.agent.executor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.agent.holder.SpringContextHolder;
 import org.apache.bigtop.manager.grpc.generated.CommandType;
-
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,6 +43,10 @@ public class CommandExecutors {
     }
 
     private static synchronized void load() {
+        if (LOADED.get()) {
+            return;
+        }
+
         for (Map.Entry<String, CommandExecutor> entry :
                 SpringContextHolder.getCommandExecutors().entrySet()) {
             String beanName = entry.getKey();
