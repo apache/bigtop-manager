@@ -35,6 +35,7 @@ public abstract class AbstractCommandExecutor implements CommandExecutor {
 
     @Override
     public CommandReply execute(CommandRequest request) {
+        log.info("Running task: {}", request.getTaskId());
         commandRequest = request;
         commandReplyBuilder = CommandReply.newBuilder();
 

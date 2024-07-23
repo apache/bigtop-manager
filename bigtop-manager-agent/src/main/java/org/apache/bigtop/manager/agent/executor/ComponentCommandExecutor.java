@@ -47,7 +47,6 @@ public class ComponentCommandExecutor extends AbstractCommandExecutor {
     @Override
     public void doExecute() {
         CommandPayload commandPayload = JsonUtils.readFromString(commandRequest.getPayload(), CommandPayload.class);
-        log.info("[agent executeTask] taskEvent is: {}", commandRequest);
         ShellResult shellResult = StackExecutor.execute(commandPayload);
 
         commandReplyBuilder.setCode(shellResult.getExitCode());

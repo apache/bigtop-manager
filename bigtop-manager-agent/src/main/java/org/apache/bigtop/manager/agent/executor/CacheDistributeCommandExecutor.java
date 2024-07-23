@@ -54,7 +54,6 @@ public class CacheDistributeCommandExecutor extends AbstractCommandExecutor {
     public void doExecute() {
         CacheMessagePayload cacheMessagePayload =
                 JsonUtils.readFromString(commandRequest.getPayload(), CacheMessagePayload.class);
-        log.info("[agent executeTask] taskEvent is: {}", commandRequest);
         String cacheDir = Constants.STACK_CACHE_DIR;
 
         LinuxFileUtils.createDirectories(cacheDir, "root", "root", "rwxr-xr-x", false);
