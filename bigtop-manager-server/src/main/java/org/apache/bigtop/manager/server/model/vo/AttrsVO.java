@@ -16,26 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.stack.xml;
-
-import org.apache.bigtop.manager.server.stack.model.PropertyModel;
+package org.apache.bigtop.manager.server.model.vo;
 
 import lombok.Data;
 
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
-import java.util.List;
-
 @Data
-@XmlRootElement(name = "configuration")
-@XmlAccessorType(XmlAccessType.FIELD)
-public class ConfigurationXml {
+public class AttrsVO {
 
-    @XmlElement(name = "schema-version")
-    private String schemaVersion;
-
-    @XmlElement(name = "property")
-    private List<PropertyModel> propertyModels;
+    private String type;
 }

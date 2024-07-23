@@ -22,7 +22,6 @@
   import { storeToRefs } from 'pinia'
   import { useStackStore } from '@/store/stack'
   import { execCommand } from '@/api/command'
-  import { QuestionCircleOutlined } from '@ant-design/icons-vue'
   import _ from 'lodash'
 
   const serviceInfo = defineModel<any>('serviceInfo')
@@ -99,14 +98,16 @@
               <div class="config-item-key">
                 {{ property.displayName ?? property.name }}
               </div>
-              <div class="config-item-value">
-                <a-input v-model:value="property.value" />
-              </div>
-              <a-tooltip>
+              <a-tooltip class="config-item-value">
                 <template #title>
                   {{ property.desc }}
                 </template>
-                <question-circle-outlined class="config-item-desc" />
+                <a-textarea
+                  v-if="property.attrs && property.attrs.type === 'longtext'"
+                  v-model:value="property.value"
+                  :rows="10"
+                />
+                <a-input v-else v-model:value="property.value" />
               </a-tooltip>
             </div>
           </a-collapse-panel>
@@ -153,12 +154,7 @@
           }
 
           .config-item-value {
-            width: 60%;
-          }
-
-          .config-item-desc {
-            cursor: pointer;
-            margin-left: 1rem;
+            width: 75%;
           }
         }
       }

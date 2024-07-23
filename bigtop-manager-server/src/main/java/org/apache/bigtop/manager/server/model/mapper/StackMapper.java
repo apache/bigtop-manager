@@ -21,7 +21,7 @@ package org.apache.bigtop.manager.server.model.mapper;
 import org.apache.bigtop.manager.dao.entity.Stack;
 import org.apache.bigtop.manager.server.model.dto.StackDTO;
 import org.apache.bigtop.manager.server.model.vo.StackVO;
-import org.apache.bigtop.manager.server.stack.pojo.StackModel;
+import org.apache.bigtop.manager.server.stack.model.StackModel;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;

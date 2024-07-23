@@ -17,11 +17,16 @@
  * under the License.
  */
 
+export interface AttrsVO {
+  type: string
+}
+
 export interface PropertyVO {
   name: string
   value: string
   displayName: string
   desc: string
+  attrs: AttrsVO
 }
 
 export interface TypeConfigVO {

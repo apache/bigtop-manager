@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.stack.pojo;
+package org.apache.bigtop.manager.server.stack.model;
 
 import lombok.Data;
 
@@ -29,17 +29,25 @@ import java.util.List;
 
 @Data
 @XmlAccessorType(XmlAccessType.FIELD)
-public class OSSpecificModel {
+public class StackModel {
 
-    @XmlElementWrapper(name = "operating-systems")
-    @XmlElements(@XmlElement(name = "os"))
-    private List<String> os;
+    @XmlElement(name = "stack-name")
+    private String stackName;
 
-    @XmlElementWrapper(name = "architectures")
-    @XmlElements(@XmlElement(name = "arch"))
-    private List<String> arch;
+    @XmlElement(name = "stack-version")
+    private String stackVersion;
 
-    @XmlElementWrapper(name = "packages")
-    @XmlElements(@XmlElement(name = "package"))
-    private List<String> packages;
+    private String root;
+
+    @XmlElement(name = "user-group")
+    private String userGroup;
+
+    private String packages;
+
+    @XmlElement(name = "repo-template")
+    private String repoTemplate;
+
+    @XmlElementWrapper(name = "repos")
+    @XmlElements(@XmlElement(name = "repo"))
+    private List<RepoModel> repos;
 }

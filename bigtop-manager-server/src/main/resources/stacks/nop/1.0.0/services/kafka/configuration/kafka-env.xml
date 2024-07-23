@@ -23,13 +23,13 @@
         <name>logDir</name>
         <display-name>Kafka Log directory</display-name>
         <value>/var/log/kafka</value>
-        <description />
+        <description/>
     </property>
     <property>
         <name>pidDir</name>
         <value>/var/run/kafka</value>
         <display-name>Kafka PID dir</display-name>
-        <description />
+        <description/>
     </property>
     <property>
         <name>kafkaUserNofileLimit</name>
@@ -63,6 +63,9 @@ export KAFKA_OPTS={{kafka_kerberos_params}}
 </#if>
 export CLASSPATH=$CLASSPATH:${CONF_DIR}
 ]]>
-      </value>
+        </value>
+        <attrs>
+            <type>longtext</type>
+        </attrs>
     </property>
 </configuration>

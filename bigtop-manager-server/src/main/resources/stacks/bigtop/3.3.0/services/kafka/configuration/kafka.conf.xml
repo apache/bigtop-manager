@@ -47,5 +47,8 @@ ${kafka_group}   - nproc    ${kafka_user_nproc_limit}
 
 ]]>
         </value>
+        <attrs>
+            <type>longtext</type>
+        </attrs>
     </property>
 </configuration>

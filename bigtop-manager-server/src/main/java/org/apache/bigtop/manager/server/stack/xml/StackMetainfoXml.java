@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.server.stack.xml;
 
-import org.apache.bigtop.manager.server.stack.pojo.StackModel;
+import org.apache.bigtop.manager.server.stack.model.StackModel;
 
 import lombok.Data;
 

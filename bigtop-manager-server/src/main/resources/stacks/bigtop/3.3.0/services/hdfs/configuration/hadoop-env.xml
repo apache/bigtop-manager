@@ -117,5 +117,8 @@ export HADOOP_LIBEXEC_DIR=${hadoop_libexec_dir}
 
 ]]>
         </value>
+        <attrs>
+            <type>longtext</type>
+        </attrs>
     </property>
 </configuration>

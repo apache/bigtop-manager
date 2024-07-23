@@ -47,5 +47,8 @@ ${yarn_group}   - nproc    ${yarn_user_nproc_limit}
 
 ]]>
         </value>
+        <attrs>
+            <type>longtext</type>
+        </attrs>
     </property>
 </configuration>
