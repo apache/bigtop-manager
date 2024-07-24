@@ -19,21 +19,18 @@
 
 <script lang="ts" setup>
   import { StageVO } from '@/api/job/types.ts'
-  import { ref, reactive, watch, computed } from 'vue'
-  import { PaginationConfig } from 'ant-design-vue/es/pagination/Pagination'
+  import { watch } from 'vue'
   import CustomProgress from './custom-progress.vue'
+  import useBaseTable from '@/composables/useBaseTable'
 
   interface StageProps {
     stages: StageVO[]
     columns: any
   }
 
-  const props = withDefaults(defineProps<StageProps>(), {})
-  const loading = ref(false)
-  const pagedList = computed(() => {
-    return props.stages
-  })
-
+  const props = defineProps<StageProps>()
+  const baseTable = useBaseTable<StageVO>(props.columns, props.stages)
+  const { dataSource, columnsProp, loading, paginateProp, onChange } = baseTable
   watch(
     () => props.stages,
     (val) => {
@@ -48,26 +45,6 @@
       deep: true
     }
   )
-
-  const handlePageChange = (page: number) => {
-    paginationProps.current = page
-  }
-
-  const handlePageSizeChange = (_current: number, size: number) => {
-    paginationProps.pageSize = size
-  }
-
-  const paginationProps = reactive<PaginationConfig>({
-    current: 1,
-    pageSize: 10,
-    size: 'small',
-    showSizeChanger: true,
-    pageSizeOptions: ['10', '20', '30', '40', '50'],
-    total: pagedList.value.length,
-    onChange: handlePageChange,
-    onShowSizeChange: handlePageSizeChange
-  })
-
   const emits = defineEmits(['clickStage'])
   const clickStage = (record: StageVO) => {
     emits('clickStage', record)
@@ -77,11 +54,12 @@
 <template>
   <div class="stage-info">
     <a-table
-      :pagination="paginationProps"
-      :data-source="pagedList"
-      :columns="props.columns"
-      :loading="loading"
       :scroll="{ y: 500 }"
+      :loading="loading"
+      :columns="columnsProp"
+      :data-source="dataSource"
+      :pagination="paginateProp"
+      @change="onChange"
     >
       <template #headerCell="{ column }">
         <span>{{ $t(column.title) }}</span>

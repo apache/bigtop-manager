@@ -18,9 +18,8 @@
 -->
 
 <script setup lang="ts">
-  import { computed, reactive, ref } from 'vue'
-  import { PaginationConfig } from 'ant-design-vue/es/pagination/Pagination'
   import { TaskVO, State } from '@/api/job/types.ts'
+  import useBaseTable from '@/composables/useBaseTable'
 
   import {
     CheckCircleTwoTone,
@@ -33,28 +32,10 @@
     tasks: TaskVO[]
     columns: any
   }
-  const props = withDefaults(defineProps<TaskProps>(), {})
 
-  const pagedList = ref(computed(() => props.tasks))
-
-  const handlePageChange = (page: number) => {
-    paginationProps.current = page
-  }
-
-  const handlePageSizeChange = (_current: number, size: number) => {
-    paginationProps.pageSize = size
-  }
-
-  const paginationProps = reactive<PaginationConfig>({
-    current: 1,
-    pageSize: 10,
-    size: 'small',
-    showSizeChanger: true,
-    pageSizeOptions: ['10', '20', '30', '40', '50'],
-    total: pagedList.value.length,
-    onChange: handlePageChange,
-    onShowSizeChange: handlePageSizeChange
-  })
+  const props = defineProps<TaskProps>()
+  const baseTable = useBaseTable<TaskVO>(props.columns, props.tasks)
+  const { dataSource, columnsProp, loading, paginateProp, onChange } = baseTable
 
   const emits = defineEmits(['clickTask'])
   const clickTask = (record: TaskVO) => {
@@ -65,10 +46,12 @@
 <template>
   <div class="task-info">
     <a-table
-      :pagination="paginationProps"
-      :data-source="pagedList"
-      :columns="props.columns"
       :scroll="{ y: 500 }"
+      :loading="loading"
+      :columns="columnsProp"
+      :data-source="dataSource"
+      :pagination="paginateProp"
+      @change="onChange"
     >
       <template #headerCell="{ column }">
         <span>{{ $t(column.title) }}</span>
