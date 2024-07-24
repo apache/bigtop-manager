@@ -78,6 +78,8 @@
   const emits = defineEmits(['update:visible', 'closed'])
 
   const loading = ref(false)
+  const showLogAwaitMsg = ref(false)
+  const isComplete = ref(false)
   const stages = ref<StageVO[]>([])
   const tasks = ref<TaskVO[]>([])
   const breadcrumbs = ref<any[]>([{ name: 'Job Info' }])
@@ -173,7 +175,7 @@
     breadcrumbs.value.push(record)
     currTaskInfo.value = record
     await nextTick()
-    logRef.value?.getLogsInfo(record.id)
+    logRef.value?.getLogInfo(record.id)
   }
 
   const clickJob = (record: JobVO) => {
@@ -229,14 +231,35 @@
     })
     emits('update:visible', false)
   }
+
+  const setShowLogAwaitMsg = (status: boolean) => {
+    showLogAwaitMsg.value = status
+  }
+
+  const onLogCompalete = (status: boolean) => {
+    isComplete.value = status
+  }
 </script>
 
 <template>
   <a-modal :open="props.visible" width="95%" @cancel="handleClose">
     <template #footer>
-      <a-button key="back" type="primary" @click="handleClose">
-        {{ $t('common.confirm') }}
-      </a-button>
+      <div :class="{ 'footer-btns': showLogAwaitMsg }">
+        <div
+          v-if="showLogAwaitMsg"
+          class="logs_wait_msg"
+          :class="{ 'loading-dot': !isComplete }"
+        >
+          {{
+            isComplete
+              ? $t('job.log_complete_message')
+              : $t('job.log_await_message')
+          }}
+        </div>
+        <a-button key="back" type="primary" @click="handleClose">
+          {{ $t('common.confirm') }}
+        </a-button>
+      </div>
     </template>
 
     <div class="breadcrumb">
@@ -285,12 +308,56 @@
       <task :columns="columns" :tasks="tasks" @click-task="clickTask" />
     </template>
     <template v-if="getCurrPage == 'isTaskLogs'">
-      <task-log ref="logRef" />
+      <task-log
+        ref="logRef"
+        @vue:before-unmount="setShowLogAwaitMsg"
+        @on-log-receive="setShowLogAwaitMsg"
+        @on-log-compalete="onLogCompalete"
+      />
     </template>
   </a-modal>
 </template>
 
 <style lang="scss" scoped>
+  .footer-btns {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .logs_wait_msg {
+    margin: 0;
+    padding: 0;
+  }
+
+  .loading-dot {
+    &::after {
+      content: '';
+      animation: wait 5s 0s infinite;
+    }
+  }
+
+  @keyframes wait {
+    16% {
+      content: '.';
+    }
+    32% {
+      content: '..';
+    }
+    48% {
+      content: '...';
+    }
+    64% {
+      content: '....';
+    }
+    80% {
+      content: '.....';
+    }
+    96% {
+      content: '......';
+    }
+  }
   .breadcrumb {
     :deep(.ant-breadcrumb) {
       margin-bottom: 16px !important;

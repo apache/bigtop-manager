@@ -52,6 +52,7 @@ export const scrollToBottom = (container: HTMLElement | null) => {
   if (!container) {
     return
   }
-  const { clientHeight, scrollHeight } = container
-  container.scrollTop = scrollHeight - clientHeight
+  requestAnimationFrame(() => {
+    container.scrollTop = container.scrollHeight
+  })
 }
