@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
   import { TaskVO, State } from '@/api/job/types.ts'
-  import useBaseTable from '@/composables/useBaseTable'
+  import useBaseTable from '@/composables/use-base-table'
   import type { TableColumnType } from 'ant-design-vue'
 
   import {
@@ -36,7 +36,8 @@
 
   const props = defineProps<TaskProps>()
   const baseTable = useBaseTable<TaskVO>(props.columns, props.tasks)
-  const { dataSource, columnsProp, loading, paginateProp, onChange } = baseTable
+  const { dataSource, columnsProp, loading, paginationProps, onChange } =
+    baseTable
 
   const emits = defineEmits(['clickTask'])
   const clickTask = (record: TaskVO) => {
@@ -51,7 +52,7 @@
       :loading="loading"
       :columns="columnsProp"
       :data-source="dataSource"
-      :pagination="paginateProp"
+      :pagination="paginationProps"
       @change="onChange"
     >
       <template #headerCell="{ column }">

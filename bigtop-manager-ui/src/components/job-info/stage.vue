@@ -21,7 +21,7 @@
   import { StageVO } from '@/api/job/types.ts'
   import { watch } from 'vue'
   import CustomProgress from './custom-progress.vue'
-  import useBaseTable from '@/composables/useBaseTable'
+  import useBaseTable from '@/composables/use-base-table'
   import type { TableColumnType } from 'ant-design-vue'
 
   interface StageProps {
@@ -31,7 +31,8 @@
 
   const props = defineProps<StageProps>()
   const baseTable = useBaseTable<StageVO>(props.columns, props.stages)
-  const { dataSource, columnsProp, loading, paginateProp, onChange } = baseTable
+  const { dataSource, columnsProp, loading, paginationProps, onChange } =
+    baseTable
   watch(
     () => props.stages,
     (val) => {
@@ -59,7 +60,7 @@
       :loading="loading"
       :columns="columnsProp"
       :data-source="dataSource"
-      :pagination="paginateProp"
+      :pagination="paginationProps"
       @change="onChange"
     >
       <template #headerCell="{ column }">

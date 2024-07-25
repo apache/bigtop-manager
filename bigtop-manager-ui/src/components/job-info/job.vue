@@ -35,7 +35,7 @@
   import Stage from './stage.vue'
   import Task from './task.vue'
   import TaskLog from './task-log.vue'
-  import useBaseTable from '@/composables/useBaseTable'
+  import useBaseTable from '@/composables/use-base-table'
   import type { TableColumnType, TablePaginationConfig } from 'ant-design-vue'
 
   const columns: TableColumnType[] = [
@@ -97,9 +97,9 @@
     loading,
     columnsProp,
     dataSource: jobs,
-    paginateProp,
+    paginationProps,
     onChange,
-    restState
+    resetState
   } = useBaseTable<JobVO>(columns, [])
 
   const getCurrPage = computed(() => {
@@ -108,7 +108,7 @@
 
   watch(visible, (val) => {
     if (val) {
-      restState()
+      resetState()
       loading.value = true
       checkDataOrigin(outerData.value ? true : false)
     }
@@ -159,8 +159,8 @@
   const getJobsList = async () => {
     try {
       const params = {
-        pageNum: paginateProp.value.current,
-        pageSize: paginateProp.value.pageSize,
+        pageNum: paginationProps.value.current,
+        pageSize: paginationProps.value.pageSize,
         sort: 'desc'
       } as Pagination
       const { content } = await getJobs(clusterId.value, params)
@@ -202,7 +202,7 @@
   const handleClose = () => {
     intervalId.value?.pause()
     breadcrumbs.value = [{ name: 'Job Info' }]
-    restState()
+    resetState()
     emits('update:visible', false)
   }
 
@@ -227,7 +227,7 @@
       <div :class="{ 'footer-btns': showLogAwaitMsg }">
         <div
           v-if="showLogAwaitMsg"
-          class="logs_wait_msg"
+          class="logs-wait-msg"
           :class="{ 'loading-dot': !isComplete }"
         >
           {{
@@ -259,7 +259,7 @@
       :loading="loading"
       :data-source="jobs"
       :columns="columnsProp"
-      :pagination="paginateProp"
+      :pagination="paginationProps"
       destroy-on-close
       @change="onTableChange"
     >
@@ -306,7 +306,7 @@
     flex-wrap: wrap;
   }
 
-  .logs_wait_msg {
+  .logs-wait-msg {
     margin: 0;
     padding: 0;
   }

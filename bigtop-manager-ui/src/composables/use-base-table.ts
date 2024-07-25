@@ -28,7 +28,7 @@ const useBaseTable = <T>(
   const loading = ref(false)
   const dataSource = ref<T[]>(rows || [])
   const columnsProp = ref<TableColumnType[]>(columns)
-  const paginateProp = ref<TablePaginationConfig>({
+  const paginationProps = ref<TablePaginationConfig>({
     current: 1,
     pageSize: 10,
     total: dataSource.value.length,
@@ -39,17 +39,17 @@ const useBaseTable = <T>(
 
   // merge pagination config
   if (pagination) {
-    paginateProp.value = Object.assign(paginateProp.value, pagination)
+    paginationProps.value = Object.assign(paginationProps.value, pagination)
   }
 
   const onChange = (pagination: TablePaginationConfig) => {
-    paginateProp.value = Object.assign(paginateProp.value, pagination)
+    paginationProps.value = Object.assign(paginationProps.value, pagination)
   }
 
-  const restState = () => {
+  const resetState = () => {
     loading.value = false
     dataSource.value = []
-    paginateProp.value = {
+    paginationProps.value = {
       current: 1,
       pageSize: 10,
       total: dataSource.value.length || 0,
@@ -60,16 +60,16 @@ const useBaseTable = <T>(
   }
 
   onUnmounted(() => {
-    restState()
+    resetState()
   })
 
   return {
     columnsProp,
     dataSource,
     loading,
-    paginateProp,
+    paginationProps,
     onChange,
-    restState
+    resetState
   }
 }
 
