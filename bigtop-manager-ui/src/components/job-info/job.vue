@@ -85,7 +85,7 @@
   const breadcrumbs = ref<any[]>([{ name: 'Job Info' }])
   const currTaskInfo = ref<TaskVO>()
   const intervalId = ref<Pausable | undefined>()
-  const logRef = ref<InstanceType<typeof TaskLog> | null>()
+  const logRef = ref<InstanceType<typeof TaskLog> | null>(null)
   const currPage = ref<string[]>([
     'isJobTable',
     'isStageTable',
@@ -94,9 +94,9 @@
   ])
 
   const {
-    dataSource: jobs,
-    columnsProp,
     loading,
+    columnsProp,
+    dataSource: jobs,
     paginateProp,
     onChange,
     restState
@@ -108,9 +108,9 @@
 
   watch(visible, (val) => {
     if (val) {
-      loading.value = true
       restState()
-      checkMetaOrigin(outerData.value ? true : false)
+      loading.value = true
+      checkDataOrigin(outerData.value ? true : false)
     }
   })
 
@@ -129,12 +129,13 @@
     }
   })
 
-  const checkMetaOrigin = (isOuter = false) => {
+  const checkDataOrigin = (isOuter = false) => {
     if (isOuter) {
       const { meta, currItem } = outerData.value as OuterData
       jobs.value = meta
       clickJob(meta[0])
       clickStage(currItem as StageVO)
+      loading.value = false
       return
     }
     getJobsList()
@@ -157,13 +158,12 @@
 
   const getJobsList = async () => {
     try {
-      const { current: pageNum, pageSize } = paginateProp.value
       const params = {
-        pageNum,
-        pageSize,
+        pageNum: paginateProp.value.current,
+        pageSize: paginateProp.value.pageSize,
         sort: 'desc'
-      }
-      const { content } = await getJobs(clusterId.value, params as Pagination)
+      } as Pagination
+      const { content } = await getJobs(clusterId.value, params)
       jobs.value = content.map((v) => {
         return {
           ...v
