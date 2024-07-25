@@ -20,6 +20,7 @@
 <script setup lang="ts">
   import { TaskVO, State } from '@/api/job/types.ts'
   import useBaseTable from '@/composables/useBaseTable'
+  import type { TableColumnType } from 'ant-design-vue'
 
   import {
     CheckCircleTwoTone,
@@ -30,7 +31,7 @@
 
   interface TaskProps {
     tasks: TaskVO[]
-    columns: any
+    columns: TableColumnType[]
   }
 
   const props = defineProps<TaskProps>()

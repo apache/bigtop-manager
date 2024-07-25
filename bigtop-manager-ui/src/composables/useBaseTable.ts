@@ -34,7 +34,7 @@ const useBaseTable = <T>(
     total: dataSource.value.length,
     size: 'small',
     showSizeChanger: true,
-    pageSizeOptions: ['1', '20', '30', '40', '50']
+    pageSizeOptions: ['10', '20', '30', '40', '50']
   })
 
   // merge pagination config

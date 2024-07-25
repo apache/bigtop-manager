@@ -22,10 +22,11 @@
   import { watch } from 'vue'
   import CustomProgress from './custom-progress.vue'
   import useBaseTable from '@/composables/useBaseTable'
+  import type { TableColumnType } from 'ant-design-vue'
 
   interface StageProps {
     stages: StageVO[]
-    columns: any
+    columns: TableColumnType[]
   }
 
   const props = defineProps<StageProps>()
