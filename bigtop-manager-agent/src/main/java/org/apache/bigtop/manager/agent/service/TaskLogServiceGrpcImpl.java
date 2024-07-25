@@ -58,6 +58,8 @@ public class TaskLogServiceGrpcImpl extends TaskLogServiceGrpc.TaskLogServiceImp
                 readNewLogs(file, responseObserver);
                 Thread.sleep(1000);
             }
+
+            responseObserver.onCompleted();
         } catch (Exception e) {
             String errMsg = "Error when reading task log: " + e.getMessage() + ", please fix it";
             responseObserver.onNext(TaskLogReply.newBuilder().setText(errMsg).build());
