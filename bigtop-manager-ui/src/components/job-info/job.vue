@@ -323,19 +323,19 @@
       content: '.';
     }
     32% {
-      content: '..';
+      content: '. .';
     }
     48% {
-      content: '...';
+      content: '. . .';
     }
     64% {
-      content: '....';
+      content: '. . . .';
     }
     80% {
-      content: '.....';
+      content: '. . . . .';
     }
     96% {
-      content: '......';
+      content: '. . . . . .';
     }
   }
   .breadcrumb {
