@@ -210,7 +210,7 @@
     showLogAwaitMsg.value = status
   }
 
-  const onLogCompalete = (status: boolean) => {
+  const onLogComplete = (status: boolean) => {
     isComplete.value = status
   }
 
@@ -292,7 +292,7 @@
         ref="logRef"
         @vue:before-unmount="setShowLogAwaitMsg"
         @on-log-receive="setShowLogAwaitMsg"
-        @on-log-compalete="onLogCompalete"
+        @on-log-complete="onLogComplete"
       />
     </template>
   </a-modal>

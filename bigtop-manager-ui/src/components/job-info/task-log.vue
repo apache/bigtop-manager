@@ -36,7 +36,7 @@
   const logMeta = ref<string>('')
   const canceler = ref<Canceler>()
 
-  const emit = defineEmits(['onLogReceive', 'onLogCompalete'])
+  const emit = defineEmits(['onLogReceive', 'onLogComplete'])
 
   watch(logMeta, (val) => {
     logText.value = val
@@ -61,7 +61,7 @@
 
   const onLogComplete = (res: string | undefined) => {
     cancelSseConnect()
-    emit('onLogCompalete', res != undefined)
+    emit('onLogComplete', res != undefined)
   }
 
   const cancelSseConnect = () => {
@@ -88,7 +88,7 @@
   onBeforeUnmount(() => {
     cancelSseConnect()
     emit('onLogReceive', false)
-    emit('onLogCompalete', false)
+    emit('onLogComplete', false)
   })
 
   defineExpose({
