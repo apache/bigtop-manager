@@ -36,6 +36,8 @@
   const logMeta = ref<string>('')
   const canceler = ref<Canceler>()
 
+  const emit = defineEmits(['onLogReceive', 'onLogComplete'])
+
   watch(logMeta, (val) => {
     logText.value = val
       .split('\n\n')
@@ -45,14 +47,21 @@
       .join('\n')
   })
 
-  const getLogsInfo = async (id: number) => {
-    const { cancel } = getLogs(clusterId.value, id, getLogProgress)
+  const getLogInfo = async (id: number) => {
+    const { cancel, promise } = getLogs(clusterId.value, id, onLogReceive)
     canceler.value = cancel
+    promise.then(onLogComplete)
+    emit('onLogReceive', true)
   }
 
-  const getLogProgress = ({ event }: AxiosProgressEvent) => {
+  const onLogReceive = ({ event }: AxiosProgressEvent) => {
     logMeta.value = event.target.responseText
     scrollToBottom(logsInfoRef.value)
+  }
+
+  const onLogComplete = (res: string | undefined) => {
+    cancelSseConnect()
+    emit('onLogComplete', res != undefined)
   }
 
   const cancelSseConnect = () => {
@@ -78,10 +87,12 @@
 
   onBeforeUnmount(() => {
     cancelSseConnect()
+    emit('onLogReceive', false)
+    emit('onLogComplete', false)
   })
 
   defineExpose({
-    getLogsInfo
+    getLogInfo
   })
 </script>
 
@@ -98,8 +109,10 @@
         </a-button>
       </div>
     </div>
-    <div class="logs_info">
-      <pre id="logs" ref="logsInfoRef">{{ logText }}</pre>
+    <div ref="logsInfoRef" class="logs_info">
+      <div id="logs">
+        <pre>{{ logText }}</pre>
+      </div>
     </div>
   </div>
 </template>
@@ -127,14 +140,17 @@
       background-color: #f5f5f5;
       border-radius: 4px;
       position: relative;
-      pre {
+      & > div {
         height: 100%;
         margin: 0;
         padding: 16px 14px;
         box-sizing: border-box;
-        color: #444;
         border-color: #eee;
-        line-height: 16px;
+        box-sizing: border-box;
+        pre {
+          line-height: 20px;
+          color: #444;
+        }
       }
     }
   }
