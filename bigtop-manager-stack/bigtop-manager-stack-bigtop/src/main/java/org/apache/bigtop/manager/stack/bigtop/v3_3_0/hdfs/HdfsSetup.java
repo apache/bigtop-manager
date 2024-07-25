@@ -46,7 +46,7 @@ public class HdfsSetup {
     }
 
     public static ShellResult config(Params params, String componentName) {
-        log.info("starting HDFS config");
+        log.info("Setting hdfs config");
         HdfsParams hdfsParams = (HdfsParams) params;
 
         String confDir = hdfsParams.confDir();

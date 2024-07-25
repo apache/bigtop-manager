@@ -58,10 +58,6 @@ public class CommandExecutors {
             }
 
             COMMAND_EXECUTORS.put(commandExecutor.getCommandType(), beanName);
-            log.info(
-                    "Load JobRunner: {} with identifier: {}",
-                    commandExecutor.getClass().getName(),
-                    commandExecutor.getCommandType());
         }
 
         LOADED.set(true);

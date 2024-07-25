@@ -64,8 +64,7 @@ public class LinuxAccountUtils {
         builderParameters.add(user);
 
         try {
-            ShellResult output = ShellExecutor.execCommand(builderParameters);
-            log.info("[AccountGroupUtils] [userDel] output: {}", output);
+            ShellExecutor.execCommand(builderParameters);
         } catch (IOException e) {
             throw new StackException(e);
         }
@@ -152,8 +151,7 @@ public class LinuxAccountUtils {
         builderParameters.add(user);
 
         try {
-            ShellResult output = ShellExecutor.execCommand(builderParameters);
-            log.info("[AccountGroupUtils] [userAdd] output: {}", output);
+            ShellExecutor.execCommand(builderParameters);
         } catch (IOException e) {
             throw new StackException(e);
         }
@@ -178,8 +176,7 @@ public class LinuxAccountUtils {
         builderParameters.add(group);
 
         try {
-            ShellResult output = ShellExecutor.execCommand(builderParameters);
-            log.info("[AccountGroupUtils] [addGroup] output: {}", output);
+            ShellExecutor.execCommand(builderParameters);
         } catch (IOException e) {
             throw new StackException(e);
         }
@@ -227,8 +224,7 @@ public class LinuxAccountUtils {
         builderParameters.add(group);
 
         try {
-            ShellResult output = ShellExecutor.execCommand(builderParameters);
-            log.info("[AccountGroupUtils] [addGroup] output: {}", output);
+            ShellExecutor.execCommand(builderParameters);
         } catch (IOException e) {
             throw new StackException(e);
         }
@@ -251,7 +247,6 @@ public class LinuxAccountUtils {
 
         try {
             ShellResult output = ShellExecutor.execCommand(builderParameters);
-            log.info("[AccountGroupUtils] [checkIfExistsGroup] output: {}", output);
             return output.getExitCode() == 0;
         } catch (IOException e) {
             throw new StackException(e);
@@ -274,7 +269,6 @@ public class LinuxAccountUtils {
 
         try {
             ShellResult output = ShellExecutor.execCommand(builderParameters);
-            log.info("[AccountGroupUtils] [checkIfExistsUser] output: {}", output);
             return output.getExitCode() == 0;
         } catch (IOException e) {
             throw new StackException(e);

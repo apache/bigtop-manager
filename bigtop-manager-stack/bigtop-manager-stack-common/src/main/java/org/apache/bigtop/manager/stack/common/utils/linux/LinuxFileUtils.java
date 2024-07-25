@@ -146,10 +146,10 @@ public class LinuxFileUtils {
         Path path = Paths.get(dir);
         Set<PosixFilePermission> perms = PosixFilePermissions.fromString(permissions);
         try {
+            log.info("Changing permissions to [{}] for [{}]", permissions, dir);
             Files.setPosixFilePermissions(path, perms);
-            log.info("Permissions set successfully.");
         } catch (IOException e) {
-            log.error("[updatePermissions] error", e);
+            log.error("Error when change permissions", e);
         }
 
         // When is a directory, recursive update
@@ -159,7 +159,7 @@ public class LinuxFileUtils {
                     updatePermissions(dir + File.separator + subPath.getFileName(), permissions, true);
                 }
             } catch (IOException e) {
-                log.error("[updatePermissions] error", e);
+                log.error("Error when change permissions", e);
             }
         }
     }
@@ -182,6 +182,7 @@ public class LinuxFileUtils {
 
         Path path = Paths.get(dir);
         try {
+            log.info("Changing owner to [{}:{}] for [{}]", owner, group, dir);
             UserPrincipal userPrincipal =
                     path.getFileSystem().getUserPrincipalLookupService().lookupPrincipalByName(owner);
 
@@ -192,7 +193,7 @@ public class LinuxFileUtils {
             fileAttributeView.setOwner(userPrincipal);
             fileAttributeView.setGroup(groupPrincipal);
         } catch (IOException e) {
-            log.error("[updateOwner] error", e);
+            log.error("Error when change owner", e);
         }
 
         // When it is a directory, recursively set the file owner
@@ -202,7 +203,7 @@ public class LinuxFileUtils {
                     updateOwner(dir + File.separator + subPath.getFileName(), owner, group, true);
                 }
             } catch (IOException e) {
-                log.error("[updateOwner] error", e);
+                log.error("Error when change owner", e);
             }
         }
     }
@@ -225,14 +226,15 @@ public class LinuxFileUtils {
         Path path = Paths.get(dirPath);
 
         if (Files.isSymbolicLink(path)) {
-            log.warn("unable to create symbolic link: {}", dirPath);
+            log.warn("unable to create symbolic link: [{}]", dirPath);
             return;
         }
 
         try {
+            log.info("Creating directory: [{}]", path);
             Files.createDirectories(path);
         } catch (IOException e) {
-            log.error("[createDirectories] error", e);
+            log.error("Error when create directory", e);
         }
 
         updateOwner(dirPath, owner, group, recursive);
