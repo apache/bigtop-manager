@@ -23,7 +23,7 @@ import org.apache.bigtop.manager.dao.entity.Component;
 import org.apache.bigtop.manager.dao.entity.Service;
 import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
 import org.apache.bigtop.manager.server.model.vo.ComponentVO;
-import org.apache.bigtop.manager.server.stack.pojo.ComponentModel;
+import org.apache.bigtop.manager.server.stack.model.ComponentModel;
 
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;

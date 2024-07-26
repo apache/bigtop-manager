@@ -33,8 +33,8 @@ import org.apache.bigtop.manager.server.model.mapper.StackMapper;
 import org.apache.bigtop.manager.server.stack.dag.ComponentCommandWrapper;
 import org.apache.bigtop.manager.server.stack.dag.DAG;
 import org.apache.bigtop.manager.server.stack.dag.DagGraphEdge;
-import org.apache.bigtop.manager.server.stack.pojo.ServiceModel;
-import org.apache.bigtop.manager.server.stack.pojo.StackModel;
+import org.apache.bigtop.manager.server.stack.model.ServiceModel;
+import org.apache.bigtop.manager.server.stack.model.StackModel;
 import org.apache.bigtop.manager.server.stack.xml.ServiceMetainfoXml;
 import org.apache.bigtop.manager.server.stack.xml.StackMetainfoXml;
 

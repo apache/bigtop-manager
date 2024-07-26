@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.stack.pojo;
+package org.apache.bigtop.manager.server.stack.model;
 
 import lombok.Data;
 

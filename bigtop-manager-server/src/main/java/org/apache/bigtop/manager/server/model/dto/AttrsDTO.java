@@ -16,20 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.stack.pojo;
+package org.apache.bigtop.manager.server.model.dto;
 
 import lombok.Data;
 
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlElement;
+import java.io.Serializable;
 
 @Data
-@XmlAccessorType(XmlAccessType.FIELD)
-public class CustomCommandModel {
+public class AttrsDTO implements Serializable {
 
-    private String name;
-
-    @XmlElement(name = "command-script")
-    private ScriptModel commandScript;
+    private String type;
 }

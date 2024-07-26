@@ -204,6 +204,9 @@ HADOOP_OPTS="$HADOOP_OPTS -Djava.io.tmpdir=${hadoop_java_io_tmpdir}"
 HADOOP_OPTS="$HADOOP_OPTS --add-opens java.base/java.lang=ALL-UNNAMED"
 ]]>
         </value>
+        <attrs>
+            <type>longtext</type>
+        </attrs>
     </property>
     <property>
         <name>service_check.queue.name</name>

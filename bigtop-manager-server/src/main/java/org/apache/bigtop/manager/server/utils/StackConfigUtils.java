@@ -18,8 +18,10 @@
  */
 package org.apache.bigtop.manager.server.utils;
 
+import org.apache.bigtop.manager.server.model.dto.AttrsDTO;
 import org.apache.bigtop.manager.server.model.dto.PropertyDTO;
-import org.apache.bigtop.manager.server.stack.pojo.PropertyModel;
+import org.apache.bigtop.manager.server.stack.model.AttrsModel;
+import org.apache.bigtop.manager.server.stack.model.PropertyModel;
 import org.apache.bigtop.manager.server.stack.xml.ConfigurationXml;
 
 import java.util.ArrayList;
@@ -41,15 +43,27 @@ public class StackConfigUtils {
 
         List<PropertyDTO> propertyDTOList = new ArrayList<>();
         for (PropertyModel propertyModel : propertyModels) {
-            PropertyDTO propertyDTO = new PropertyDTO();
-            propertyDTO.setDisplayName(propertyModel.getDisplayName());
-            propertyDTO.setDesc(propertyModel.getDesc());
-            propertyDTO.setName(propertyModel.getName());
-            propertyDTO.setValue(propertyModel.getValue());
+            PropertyDTO propertyDTO = getPropertyDTO(propertyModel);
             propertyDTOList.add(propertyDTO);
         }
 
         return propertyDTOList;
+    }
+
+    private static PropertyDTO getPropertyDTO(PropertyModel propertyModel) {
+        PropertyDTO propertyDTO = new PropertyDTO();
+        propertyDTO.setDisplayName(propertyModel.getDisplayName());
+        propertyDTO.setDesc(propertyModel.getDesc());
+        propertyDTO.setName(propertyModel.getName());
+        propertyDTO.setValue(propertyModel.getValue());
+        if (propertyModel.getAttrs() != null) {
+            AttrsModel attrsModel = propertyModel.getAttrs();
+            AttrsDTO attrsDTO = new AttrsDTO();
+            attrsDTO.setType(attrsModel.getType());
+            propertyDTO.setAttrs(attrsDTO);
+        }
+
+        return propertyDTO;
     }
 
     /**

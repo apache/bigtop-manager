@@ -30,4 +30,6 @@ public class PropertyVO {
     private String displayName;
 
     private String desc;
+
+    private AttrsVO attrs;
 }

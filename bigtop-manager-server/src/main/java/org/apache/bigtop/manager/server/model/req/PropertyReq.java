@@ -33,4 +33,6 @@ public class PropertyReq {
     private String displayName;
 
     private String desc;
+
+    private AttrsReq attrs;
 }

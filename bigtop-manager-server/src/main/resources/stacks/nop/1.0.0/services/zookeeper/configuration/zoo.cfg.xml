@@ -121,5 +121,8 @@ kerberos.removeRealmFromPrincipal=true
 </#noparse>
 ]]>
         </value>
+        <attrs>
+            <type>longtext</type>
+        </attrs>
     </property>
 </configuration>

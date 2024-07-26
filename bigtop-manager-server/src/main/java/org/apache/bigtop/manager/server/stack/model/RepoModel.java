@@ -16,43 +16,32 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.stack.pojo;
+package org.apache.bigtop.manager.server.stack.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlElementWrapper;
-import jakarta.xml.bind.annotation.XmlElements;
-import java.util.List;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ServiceModel {
+public class RepoModel {
 
-    private String name;
+    @XmlElement(name = "repo-id")
+    private String repoId;
 
-    @XmlElement(name = "display-name")
-    private String displayName;
+    @XmlElement(name = "repo-name")
+    private String repoName;
 
-    private String desc;
+    @XmlElement(name = "base-url")
+    private String baseUrl;
 
-    private String version;
+    private String os;
 
-    private String user;
-
-    private String group;
-
-    @XmlElementWrapper(name = "os-specifics")
-    @XmlElements(@XmlElement(name = "os-specific"))
-    private List<OSSpecificModel> osSpecifics;
-
-    @XmlElementWrapper(name = "components")
-    @XmlElements(@XmlElement(name = "component"))
-    private List<ComponentModel> components;
-
-    @XmlElementWrapper(name = "required-services")
-    @XmlElements(@XmlElement(name = "service"))
-    private List<String> requiredServices;
+    private String arch;
 }

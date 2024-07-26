@@ -16,25 +16,37 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.stack.pojo;
+package org.apache.bigtop.manager.server.stack.model;
 
 import lombok.Data;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
+import jakarta.xml.bind.annotation.XmlElements;
+import java.util.List;
 
 @Data
 @XmlAccessorType(XmlAccessType.FIELD)
-public class PropertyModel {
+public class ComponentModel {
 
     private String name;
-
-    private String value;
 
     @XmlElement(name = "display-name")
     private String displayName;
 
-    @XmlElement(name = "description")
-    private String desc;
+    private String category;
+
+    private String cardinality;
+
+    @XmlElement(name = "command-script")
+    private ScriptModel commandScript;
+
+    @XmlElementWrapper(name = "custom-commands")
+    @XmlElements(@XmlElement(name = "custom-command"))
+    private List<CustomCommandModel> customCommands;
+
+    @XmlElement(name = "quick-link")
+    private QuickLinkModel quickLink;
 }

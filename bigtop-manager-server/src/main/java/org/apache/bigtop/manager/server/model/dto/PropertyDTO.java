@@ -32,4 +32,6 @@ public class PropertyDTO implements Serializable {
     private String displayName;
 
     private String desc;
+
+    private AttrsDTO attrs;
 }

@@ -46,5 +46,8 @@ ${kafkaUser}    - nofile   ${kafkaUserNofileLimit}
 ${kafkaGroup}   - nproc    ${kafkaUserNprocLimit}
 ]]>
         </value>
+        <attrs>
+            <type>longtext</type>
+        </attrs>
     </property>
 </configuration>
