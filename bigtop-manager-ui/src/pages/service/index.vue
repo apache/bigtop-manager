@@ -21,11 +21,7 @@
   import { computed, onMounted, ref, watch } from 'vue'
   import { useRoute } from 'vue-router'
   import type { SelectProps, MenuProps } from 'ant-design-vue'
-  import {
-    QuestionCircleOutlined,
-    DownOutlined,
-    UserOutlined
-  } from '@ant-design/icons-vue'
+  import { DownOutlined, UserOutlined } from '@ant-design/icons-vue'
   import { useConfigStore } from '@/store/config'
   import { storeToRefs } from 'pinia'
   import { ServiceConfigVO, TypeConfigVO } from '@/api/config/types.ts'
@@ -265,14 +261,16 @@
             <div class="config-item-key">
               {{ property.displayName ?? property.name }}
             </div>
-            <div class="config-item-value">
-              <a-input v-model:value="property.value" />
-            </div>
-            <a-tooltip>
+            <a-tooltip class="config-item-value">
               <template #title>
                 {{ property.desc }}
               </template>
-              <question-circle-outlined class="config-item-desc" />
+              <a-textarea
+                v-if="property.attrs && property.attrs.type === 'longtext'"
+                v-model:value="property.value"
+                :rows="10"
+              />
+              <a-input v-else v-model:value="property.value" />
             </a-tooltip>
           </div>
         </a-collapse-panel>
@@ -408,12 +406,7 @@
           }
 
           .config-item-value {
-            width: 60%;
-          }
-
-          .config-item-desc {
-            cursor: pointer;
-            margin-left: 1rem;
+            width: 75%;
           }
         }
       }

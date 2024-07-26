@@ -20,6 +20,8 @@ package org.apache.bigtop.manager.common.shell;
 
 import org.apache.bigtop.manager.common.thread.TaskLogThreadDecorator;
 
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
@@ -36,7 +38,7 @@ import java.util.function.Consumer;
 
 /**
  * shell command executor.
- *
+ * <br />
  * <code>ShellExecutor</code> should be used in cases where the output
  * of the command needs no explicit parsing and where the command, working
  * directory and the environment remains unchanged. The output of the command
@@ -59,7 +61,10 @@ public class ShellExecutor {
      */
     private final long timeoutInterval;
 
-    private final Consumer<String> consumer;
+    /**
+     * Whether we should append log to log file
+     */
+    private final Boolean appendLog;
 
     /**
      * Whether script timed out
@@ -91,15 +96,13 @@ public class ShellExecutor {
      * @param timeout    Specifies the time in milliseconds, after which the
      *                   command will be killed and the status marked as timedout.
      *                   If 0, the command will not be timed out.
-     * @param consumer   the consumer to consume the output of the executed command.
      */
-    private ShellExecutor(
-            String[] execString, File dir, Map<String, String> env, long timeout, Consumer<String> consumer) {
+    private ShellExecutor(String[] execString, File dir, Map<String, String> env, long timeout, Boolean appendLog) {
         this.command = execString.clone();
         this.dir = dir;
         this.environment = env;
         this.timeoutInterval = timeout;
-        this.consumer = consumer;
+        this.appendLog = appendLog;
     }
 
     /**
@@ -111,7 +114,7 @@ public class ShellExecutor {
      * @throws IOException errors
      */
     public static ShellResult execCommand(List<String> builderParameters) throws IOException {
-        return execCommand(builderParameters, s -> {});
+        return execCommand(null, builderParameters, 0L, false);
     }
 
     /**
@@ -119,43 +122,27 @@ public class ShellExecutor {
      * Covers most of the simple cases for user.
      *
      * @param builderParameters shell command to execute.
-     * @param consumer the consumer to consume the output of the executed command.
+     * @param appendLog append stream log to log file if true.
      * @return the output of the executed command.
      * @throws IOException errors
      */
-    public static ShellResult execCommand(List<String> builderParameters, Consumer<String> consumer)
+    public static ShellResult execCommand(List<String> builderParameters, Boolean appendLog) throws IOException {
+        return execCommand(null, builderParameters, 0L, appendLog);
+    }
+
+    /**
+     * Static method to execute a shell command.
+     * Covers most of the simple cases without requiring the user to implement
+     * the <code>AbstractShell</code> interface.
+     *
+     * @param env the map of environment key=value
+     * @param builderParameters shell command to execute.
+     * @return the output of the executed command.
+     * @throws IOException errors
+     */
+    public static ShellResult execCommand(Map<String, String> env, List<String> builderParameters, Boolean appendLog)
             throws IOException {
-        return execCommand(null, builderParameters, 0L, consumer);
-    }
-
-    /**
-     * Static method to execute a shell command.
-     * Covers most of the simple cases without requiring the user to implement
-     * the <code>AbstractShell</code> interface.
-     *
-     * @param env the map of environment key=value
-     * @param builderParameters shell command to execute.
-     * @return the output of the executed command.
-     * @throws IOException errors
-     */
-    public static ShellResult execCommand(Map<String, String> env, List<String> builderParameters) throws IOException {
-        return execCommand(env, builderParameters, s -> {});
-    }
-
-    /**
-     * Static method to execute a shell command.
-     * Covers most of the simple cases without requiring the user to implement
-     * the <code>AbstractShell</code> interface.
-     *
-     * @param env the map of environment key=value
-     * @param builderParameters shell command to execute.
-     * @param consumer the consumer to consume the output of the executed command.
-     * @return the output of the executed command.
-     * @throws IOException errors
-     */
-    public static ShellResult execCommand(
-            Map<String, String> env, List<String> builderParameters, Consumer<String> consumer) throws IOException {
-        return execCommand(env, builderParameters, 0L, consumer);
+        return execCommand(env, builderParameters, 0L, appendLog);
     }
 
     /**
@@ -169,30 +156,25 @@ public class ShellExecutor {
      * @return the output of the executed command.
      * @throws IOException errors
      */
-    public static ShellResult execCommand(Map<String, String> env, List<String> builderParameters, long timeout)
-            throws IOException {
-        return execCommand(env, builderParameters, timeout, s -> {});
-    }
-
-    /**
-     * Static method to execute a shell command.
-     * Covers most of the simple cases without requiring the user to implement
-     * the <code>AbstractShell</code> interface.
-     *
-     * @param env     the map of environment key=value
-     * @param builderParameters shell command to execute.
-     * @param timeout time in milliseconds after which script should be marked timeout
-     * @param consumer the consumer to consume the output of the executed command.
-     * @return the output of the executed command.
-     * @throws IOException errors
-     */
     public static ShellResult execCommand(
-            Map<String, String> env, List<String> builderParameters, long timeout, Consumer<String> consumer)
+            Map<String, String> env, List<String> builderParameters, long timeout, Boolean appendLog)
             throws IOException {
         String[] cmd = builderParameters.toArray(new String[0]);
+        ShellExecutor shellExecutor = new ShellExecutor(cmd, null, env, timeout, appendLog);
 
-        ShellExecutor shellExecutor = new ShellExecutor(cmd, null, env, timeout, consumer);
-        return shellExecutor.execute();
+        if (appendLog) {
+            log.info(StringUtils.EMPTY);
+            log.info("********** Running: {} **********", String.join(" ", builderParameters));
+        }
+
+        ShellResult result = shellExecutor.execute();
+
+        if (appendLog) {
+            log.info("********** Finished: {} **********", String.join(" ", builderParameters));
+            log.info(StringUtils.EMPTY);
+        }
+
+        return result;
     }
 
     /**
@@ -224,11 +206,11 @@ public class ShellExecutor {
         // free the error stream buffer
         BufferedReader errReader = createBufferedReader(process.getErrorStream());
         StringBuilder errMsg = new StringBuilder();
-        Thread errThread = createReaderThread(errReader, errMsg);
+        Thread errThread = createReaderThread(errReader, errMsg, log::error);
 
         BufferedReader inReader = createBufferedReader(process.getInputStream());
         StringBuilder inMsg = new StringBuilder();
-        Thread inThread = createReaderThread(inReader, inMsg);
+        Thread inThread = createReaderThread(inReader, inMsg, log::info);
 
         try {
             errThread.start();
@@ -306,13 +288,16 @@ public class ShellExecutor {
         return new BufferedReader(new InputStreamReader(inputStream));
     }
 
-    private Thread createReaderThread(BufferedReader reader, StringBuilder msg) {
+    private Thread createReaderThread(BufferedReader reader, StringBuilder msg, Consumer<String> consumer) {
         TaskLogThreadDecorator decorator = new TaskLogThreadDecorator();
         return decorator.decorate(() -> {
             try {
                 String line = reader.readLine();
                 while ((line != null)) {
-                    consumer.accept(line);
+                    if (appendLog) {
+                        consumer.accept(line);
+                    }
+
                     msg.append(line);
                     msg.append(System.lineSeparator());
                     line = reader.readLine();

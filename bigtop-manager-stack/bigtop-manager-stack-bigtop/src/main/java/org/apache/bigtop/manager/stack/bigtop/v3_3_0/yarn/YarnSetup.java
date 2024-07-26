@@ -43,7 +43,7 @@ public class YarnSetup {
     }
 
     public static ShellResult config(Params params, String componentName) {
-        log.info("starting YARN config");
+        log.info("Setting yarn config");
         YarnParams yarnParams = (YarnParams) params;
 
         String confDir = yarnParams.confDir();

@@ -23,6 +23,7 @@ import user from '@/locales/zh_CN/user.ts'
 import cluster from '@/locales/zh_CN/cluster.ts'
 import hosts from '@/locales/zh_CN/hosts.ts'
 import service from '@/locales/zh_CN/service.ts'
+import job from '@/locales/zh_CN/job.ts'
 
 export default {
   common,
@@ -30,5 +31,6 @@ export default {
   user,
   cluster,
   hosts,
-  service
+  service,
+  job
 }

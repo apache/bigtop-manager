@@ -16,38 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.stack.pojo;
+package org.apache.bigtop.manager.server.stack.model;
 
 import lombok.Data;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlElementWrapper;
-import jakarta.xml.bind.annotation.XmlElements;
-import java.util.List;
 
 @Data
 @XmlAccessorType(XmlAccessType.FIELD)
-public class StackModel {
+public class ScriptModel {
 
-    @XmlElement(name = "stack-name")
-    private String stackName;
+    @XmlElement(name = "script-id")
+    private String scriptId;
 
-    @XmlElement(name = "stack-version")
-    private String stackVersion;
+    @XmlElement(name = "script-type")
+    private String scriptType;
 
-    private String root;
-
-    @XmlElement(name = "user-group")
-    private String userGroup;
-
-    private String packages;
-
-    @XmlElement(name = "repo-template")
-    private String repoTemplate;
-
-    @XmlElementWrapper(name = "repos")
-    @XmlElements(@XmlElement(name = "repo"))
-    private List<RepoModel> repos;
+    private Long timeout;
 }

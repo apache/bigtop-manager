@@ -136,5 +136,8 @@ log4j.logger.state.change.logger=TRACE, stateChangeAppender
 log4j.additivity.state.change.logger=false
 ]]>
         </value>
+        <attrs>
+            <type>longtext</type>
+        </attrs>
     </property>
 </configuration>

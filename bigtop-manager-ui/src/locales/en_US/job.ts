@@ -16,23 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.stack.pojo;
 
-import lombok.Data;
-
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlElement;
-
-@Data
-@XmlAccessorType(XmlAccessType.FIELD)
-public class ScriptModel {
-
-    @XmlElement(name = "script-id")
-    private String scriptId;
-
-    @XmlElement(name = "script-type")
-    private String scriptType;
-
-    private Long timeout;
+export default {
+  log_await_message: 'Waiting for more logs',
+  log_complete_message: 'Done!'
 }

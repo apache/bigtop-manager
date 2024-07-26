@@ -19,12 +19,13 @@
 
 import axios, { type AxiosProgressEvent, type CancelTokenSource } from 'axios'
 import request from '@/api/request.ts'
+import type { LogsRes } from './types'
 
 export const getLogs = (
   clusterId: number,
   id: number,
   func: Function
-): { promise: Promise<any>; cancel: () => void } => {
+): LogsRes => {
   const source: CancelTokenSource = axios.CancelToken.source()
 
   const promise = request({

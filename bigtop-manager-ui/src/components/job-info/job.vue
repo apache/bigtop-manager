@@ -18,9 +18,8 @@
 -->
 
 <script setup lang="ts">
-  import { ref, watch, computed, reactive, toRaw, toRefs, nextTick } from 'vue'
+  import { ref, watch, computed, toRefs, nextTick } from 'vue'
   import { useClusterStore } from '@/store/cluster'
-  import { PaginationConfig } from 'ant-design-vue/es/pagination/Pagination'
   import { storeToRefs } from 'pinia'
   import {
     JobVO,
@@ -36,8 +35,10 @@
   import Stage from './stage.vue'
   import Task from './task.vue'
   import TaskLog from './task-log.vue'
+  import useBaseTable from '@/composables/use-base-table'
+  import type { TableColumnType, TablePaginationConfig } from 'ant-design-vue'
 
-  const columns = [
+  const columns: TableColumnType[] = [
     {
       title: 'common.name',
       dataIndex: 'name',
@@ -77,14 +78,14 @@
 
   const emits = defineEmits(['update:visible', 'closed'])
 
-  const loading = ref(false)
+  const showLogAwaitMsg = ref(false)
+  const isComplete = ref(false)
   const stages = ref<StageVO[]>([])
   const tasks = ref<TaskVO[]>([])
   const breadcrumbs = ref<any[]>([{ name: 'Job Info' }])
   const currTaskInfo = ref<TaskVO>()
-  const jobs = ref<JobVO[]>([])
   const intervalId = ref<Pausable | undefined>()
-  const logRef = ref<InstanceType<typeof TaskLog> | null>()
+  const logRef = ref<InstanceType<typeof TaskLog> | null>(null)
   const currPage = ref<string[]>([
     'isJobTable',
     'isStageTable',
@@ -92,12 +93,14 @@
     'isTaskLogs'
   ])
 
-  const paginationProps = reactive<PaginationConfig>({})
-  const jobsPageState = reactive<Pagination>({
-    pageNum: 1,
-    pageSize: 10,
-    sort: 'desc'
-  })
+  const {
+    loading,
+    columnsProp,
+    dataSource: jobs,
+    paginationProps,
+    onChange,
+    resetState
+  } = useBaseTable<JobVO>(columns, [])
 
   const getCurrPage = computed(() => {
     return currPage.value[breadcrumbs.value.length - 1]
@@ -105,10 +108,9 @@
 
   watch(visible, (val) => {
     if (val) {
+      resetState()
       loading.value = true
-      Object.assign(paginationProps, initPagedProps())
-      checkMetaOrigin(outerData.value ? true : false)
-      loading.value = false
+      checkDataOrigin(outerData.value ? true : false)
     }
   })
 
@@ -127,12 +129,13 @@
     }
   })
 
-  const checkMetaOrigin = (isOuter = false) => {
+  const checkDataOrigin = (isOuter = false) => {
     if (isOuter) {
       const { meta, currItem } = outerData.value as OuterData
       jobs.value = meta
       clickJob(meta[0])
       clickStage(currItem as StageVO)
+      loading.value = false
       return
     }
     getJobsList()
@@ -155,16 +158,21 @@
 
   const getJobsList = async () => {
     try {
-      const params = { ...toRaw(jobsPageState) }
-      const { content, total } = await getJobs(clusterId.value, params)
+      const params = {
+        pageNum: paginationProps.value.current,
+        pageSize: paginationProps.value.pageSize,
+        sort: 'desc'
+      } as Pagination
+      const { content } = await getJobs(clusterId.value, params)
       jobs.value = content.map((v) => {
         return {
           ...v
         }
       })
-      paginationProps.total = total
       loading.value = false
     } catch (error) {
+      console.log('error :>> ', error)
+    } finally {
       loading.value = false
     }
   }
@@ -173,7 +181,7 @@
     breadcrumbs.value.push(record)
     currTaskInfo.value = record
     await nextTick()
-    logRef.value?.getLogsInfo(record.id)
+    logRef.value?.getLogInfo(record.id)
   }
 
   const clickJob = (record: JobVO) => {
@@ -191,52 +199,47 @@
     breadcrumbs.value.splice(idx + 1, len)
   }
 
-  const handlePageChange = (page: number) => {
-    paginationProps.current = page
-    jobsPageState.pageNum = page
-    loading.value = true
-    getJobsList()
-  }
-
-  const handlePageSizeChange = (_current: number, size: number) => {
-    paginationProps.pageSize = size
-    jobsPageState.pageSize = size
-    loading.value = true
-    getJobsList()
-  }
-
-  const initPagedProps = () => {
-    return {
-      current: 1,
-      pageSize: 10,
-      size: 'small',
-      showSizeChanger: true,
-      pageSizeOptions: ['10', '20', '30', '40', '50'],
-      total: 0,
-      onChange: handlePageChange,
-      onShowSizeChange: handlePageSizeChange
-    }
-  }
-
   const handleClose = () => {
     intervalId.value?.pause()
     breadcrumbs.value = [{ name: 'Job Info' }]
-    jobs.value = []
-    Object.assign(jobsPageState, {
-      pageNum: 1,
-      pageSize: 10,
-      sort: 'desc'
-    })
+    resetState()
     emits('update:visible', false)
+  }
+
+  const setShowLogAwaitMsg = (status: boolean) => {
+    showLogAwaitMsg.value = status
+  }
+
+  const onLogComplete = (status: boolean) => {
+    isComplete.value = status
+  }
+
+  const onTableChange = (pagination: TablePaginationConfig) => {
+    onChange(pagination)
+    loading.value = true
+    getJobsList()
   }
 </script>
 
 <template>
   <a-modal :open="props.visible" width="95%" @cancel="handleClose">
     <template #footer>
-      <a-button key="back" type="primary" @click="handleClose">
-        {{ $t('common.confirm') }}
-      </a-button>
+      <div :class="{ 'footer-btns': showLogAwaitMsg }">
+        <div
+          v-if="showLogAwaitMsg"
+          class="logs-wait-msg"
+          :class="{ 'loading-dot': !isComplete }"
+        >
+          {{
+            isComplete
+              ? $t('job.log_complete_message')
+              : $t('job.log_await_message')
+          }}
+        </div>
+        <a-button key="back" type="primary" @click="handleClose">
+          {{ $t('common.confirm') }}
+        </a-button>
+      </div>
     </template>
 
     <div class="breadcrumb">
@@ -250,15 +253,15 @@
         </a-breadcrumb-item>
       </a-breadcrumb>
     </div>
-
     <a-table
       v-show="getCurrPage == 'isJobTable'"
       :scroll="{ y: 500 }"
-      :pagination="paginationProps"
       :loading="loading"
       :data-source="jobs"
-      :columns="columns"
+      :columns="columnsProp"
+      :pagination="paginationProps"
       destroy-on-close
+      @change="onTableChange"
     >
       <template #headerCell="{ column }">
         <span>{{ $t(column.title) }}</span>
@@ -285,12 +288,56 @@
       <task :columns="columns" :tasks="tasks" @click-task="clickTask" />
     </template>
     <template v-if="getCurrPage == 'isTaskLogs'">
-      <task-log ref="logRef" />
+      <task-log
+        ref="logRef"
+        @vue:before-unmount="setShowLogAwaitMsg"
+        @on-log-receive="setShowLogAwaitMsg"
+        @on-log-complete="onLogComplete"
+      />
     </template>
   </a-modal>
 </template>
 
 <style lang="scss" scoped>
+  .footer-btns {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .logs-wait-msg {
+    margin: 0;
+    padding: 0;
+  }
+
+  .loading-dot {
+    &::after {
+      content: '';
+      animation: wait 5s 0s infinite;
+    }
+  }
+
+  @keyframes wait {
+    16% {
+      content: '.';
+    }
+    32% {
+      content: '. .';
+    }
+    48% {
+      content: '. . .';
+    }
+    64% {
+      content: '. . . .';
+    }
+    80% {
+      content: '. . . . .';
+    }
+    96% {
+      content: '. . . . . .';
+    }
+  }
   .breadcrumb {
     :deep(.ant-breadcrumb) {
       margin-bottom: 16px !important;

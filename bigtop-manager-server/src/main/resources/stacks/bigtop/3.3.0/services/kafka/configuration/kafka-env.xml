@@ -64,5 +64,8 @@ export KAFKA_OPTS={{kafka_kerberos_params}}
 export CLASSPATH=$CLASSPATH:${kafka_conf_dir}
 ]]>
       </value>
+        <attrs>
+            <type>longtext</type>
+        </attrs>
     </property>
 </configuration>

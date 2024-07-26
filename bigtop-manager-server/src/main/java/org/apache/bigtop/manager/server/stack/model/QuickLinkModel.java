@@ -16,26 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.stack.xml;
-
-import org.apache.bigtop.manager.server.stack.model.PropertyModel;
+package org.apache.bigtop.manager.server.stack.model;
 
 import lombok.Data;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
-import java.util.List;
 
 @Data
-@XmlRootElement(name = "configuration")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ConfigurationXml {
+public class QuickLinkModel {
 
-    @XmlElement(name = "schema-version")
-    private String schemaVersion;
+    @XmlElement(name = "display-name")
+    private String displayName;
 
-    @XmlElement(name = "property")
-    private List<PropertyModel> propertyModels;
+    @XmlElement(name = "http-port-property")
+    private String httpPortProperty;
+
+    @XmlElement(name = "http-port-default")
+    private String httpPortDefault;
+
+    @XmlElement(name = "https-port-property")
+    private String httpsPortProperty;
+
+    @XmlElement(name = "https-port-default")
+    private String httpsPortDefault;
 }

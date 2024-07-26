@@ -16,26 +16,43 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.stack.xml;
-
-import org.apache.bigtop.manager.server.stack.model.PropertyModel;
+package org.apache.bigtop.manager.server.stack.model;
 
 import lombok.Data;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
+import jakarta.xml.bind.annotation.XmlElements;
 import java.util.List;
 
 @Data
-@XmlRootElement(name = "configuration")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ConfigurationXml {
+public class ServiceModel {
 
-    @XmlElement(name = "schema-version")
-    private String schemaVersion;
+    private String name;
 
-    @XmlElement(name = "property")
-    private List<PropertyModel> propertyModels;
+    @XmlElement(name = "display-name")
+    private String displayName;
+
+    private String desc;
+
+    private String version;
+
+    private String user;
+
+    private String group;
+
+    @XmlElementWrapper(name = "os-specifics")
+    @XmlElements(@XmlElement(name = "os-specific"))
+    private List<OSSpecificModel> osSpecifics;
+
+    @XmlElementWrapper(name = "components")
+    @XmlElements(@XmlElement(name = "component"))
+    private List<ComponentModel> components;
+
+    @XmlElementWrapper(name = "required-services")
+    @XmlElements(@XmlElement(name = "service"))
+    private List<String> requiredServices;
 }

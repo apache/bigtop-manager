@@ -51,5 +51,8 @@ export CLIENT_JVMFLAGS="$CLIENT_JVMFLAGS -Djava.security.auth.login.config=${zk_
 </#if>
 ]]>
         </value>
+        <attrs>
+            <type>longtext</type>
+        </attrs>
     </property>
 </configuration>
