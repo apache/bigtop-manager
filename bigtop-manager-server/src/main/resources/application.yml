@@ -58,7 +58,7 @@ spring:
     show-sql: true
     properties:
       eclipselink:
-        ddl-generation: create-tables
+        ddl-generation: none
         weaving: false
         persistence-context:
           persist-on-commit: false
