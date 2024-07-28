@@ -85,7 +85,7 @@ CREATE TABLE `cluster`
 (
     `id`            BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
     `cluster_name`  VARCHAR(255) DEFAULT NULL COMMENT 'Cluster Name',
-    `cluster_desc`  VARCHAR(255) DEFAULT NULL COMMENT 'Cluster Name',
+    `cluster_desc`  VARCHAR(255) DEFAULT NULL COMMENT 'Cluster Description',
     `cluster_type`  SMALLINT UNSIGNED DEFAULT 1 COMMENT '1-Physical Machine, 2-Kubernetes',
     `selected`      BIT(1)       DEFAULT 1 COMMENT '0-Disable, 1-Enable',
     `create_time`   DATETIME     DEFAULT NULL,
@@ -327,3 +327,21 @@ CREATE TABLE `stage`
     KEY              `idx_cluster_id` (`cluster_id`),
     KEY              `idx_job_id` (`job_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Initialize sequence table.
+INSERT INTO sequence(seq_name, seq_count)
+VALUES ('audit_log_generator', 0),
+       ('cluster_generator', 0),
+       ('stack_generator', 0),
+       ('service_generator', 0),
+       ('task_generator', 0),
+       ('host_generator', 0),
+       ('user_generator', 0),
+       ('repo_generator', 0),
+       ('host_component_generator', 0),
+       ('service_config_generator', 0),
+       ('job_generator', 0),
+       ('type_config_generator', 0),
+       ('component_generator', 0),
+       ('stage_generator', 0),
+       ('settings_generator', 0);
