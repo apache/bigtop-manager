@@ -21,7 +21,7 @@
   import { computed, onMounted, ref, watch } from 'vue'
   import { useRoute } from 'vue-router'
   import type { SelectProps, MenuProps } from 'ant-design-vue'
-  import { DownOutlined, UserOutlined } from '@ant-design/icons-vue'
+  import { DownOutlined } from '@ant-design/icons-vue'
   import { useConfigStore } from '@/store/config'
   import { storeToRefs } from 'pinia'
   import { ServiceConfigVO, TypeConfigVO } from '@/api/config/types.ts'
@@ -34,15 +34,18 @@
   const menuOps = [
     {
       key: '1',
-      dicText: 'Start'
+      iconName: 'start',
+      dicText: 'service.start_all'
     },
     {
       key: '2',
-      dicText: 'Stop'
+      iconName: 'stop',
+      dicText: 'service.stop_all'
     },
     {
       key: '3',
-      dicText: 'Restart'
+      iconName: 'restart',
+      dicText: 'service.restart_all'
     }
   ]
 
@@ -166,12 +169,12 @@
 <template>
   <a-tabs>
     <template #rightExtra>
-      <a-dropdown>
+      <a-dropdown placement="bottomRight">
         <template #overlay>
           <a-menu @click="handleMenuClick">
             <a-menu-item v-for="item in menuOps" :key="item.key">
-              <UserOutlined />
-              <span>{{ item.dicText }}</span>
+              <svg-icon :name="item.iconName"></svg-icon>
+              <span>{{ $t(item.dicText) }}</span>
             </a-menu-item>
           </a-menu>
         </template>

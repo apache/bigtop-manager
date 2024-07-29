@@ -20,6 +20,7 @@
 export default {
   start_all: '启动所有',
   stop_all: '停止所有',
+  restart_all: '重启所有',
   add: '新增服务',
   service: '服务',
   service_name: '服务名称',

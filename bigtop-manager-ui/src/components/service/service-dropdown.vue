@@ -19,10 +19,7 @@
 
 <script setup lang="ts">
   import { ref } from 'vue'
-  import { PlusOutlined, CaretRightOutlined } from '@ant-design/icons-vue'
-  import SquareFilled from '@/components/icons/square-filled.vue'
   import ServiceAdd from '@/components/service-add/index.vue'
-
   const addWindowOpened = ref(false)
 </script>
 
@@ -32,16 +29,16 @@
     <template #overlay>
       <a-menu>
         <a-menu-item key="start">
-          <caret-right-outlined />
+          <svg-icon name="start" />
           {{ $t('service.start_all') }}
         </a-menu-item>
         <a-menu-item key="stop">
-          <square-filled />
+          <svg-icon name="stop" />
           {{ $t('service.stop_all') }}
         </a-menu-item>
         <a-menu-divider />
         <a-menu-item key="add" @click="() => (addWindowOpened = true)">
-          <plus-outlined />
+          <svg-icon name="plus" />
           {{ $t('service.add') }}
         </a-menu-item>
       </a-menu>

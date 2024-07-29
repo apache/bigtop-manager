@@ -10,12 +10,17 @@
     ],
     "baseUrl": "./",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": [
+        "src/*"
+      ]
     },
     "skipLibCheck": true,
-    "types": ["vite/client"],
+    "types": [
+      "vite/client",
+      "vite-plugin-svg-icons/client"
+    ],
     /* Bundler mode */
-//     "moduleResolution": "Bundler",
+    //     "moduleResolution": "Bundler",
     "moduleResolution": "Node",
     "allowImportingTsExtensions": true,
     "allowSyntheticDefaultImports": true,

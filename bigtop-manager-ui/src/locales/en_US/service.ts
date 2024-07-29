@@ -20,6 +20,7 @@
 export default {
   start_all: 'Start All',
   stop_all: 'Stop All',
+  restart_all: 'Restart All',
   add: 'Add service',
   service: 'Service',
   service_name: 'Service Name',
