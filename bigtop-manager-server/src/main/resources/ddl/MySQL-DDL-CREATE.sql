@@ -18,32 +18,20 @@
  */
 
 
---
--- DROP DATABASE IF EXISTS `ambari`;
--- DROP USER `ambari`;
+# delimiter ;
 
+# CREATE DATABASE `bigtop_manager` /*!40100 DEFAULT CHARACTER SET utf8 */;
 #
-delimiter ;
+# CREATE USER 'bigtop_manager' IDENTIFIED BY 'bigdata';
 
-# CREATE
-DATABASE `bigtop_manager` /*!40100 DEFAULT CHARACTER SET utf8 */;
-#
-# CREATE
-USER 'bigtop_manager' IDENTIFIED BY 'bigdata';
-
-#
-USE @schema;
+# USE @schema;
 
 -- Set default_storage_engine to InnoDB
 -- storage_engine variable should be used for versions prior to MySQL 5.6
-set
-@version_short = substring_index(@@version, '.', 2);
-set
-@major = cast(substring_index(@version_short, '.', 1) as SIGNED);
-set
-@minor = cast(substring_index(@version_short, '.', -1) as SIGNED);
-set
-@engine_stmt = IF((@major >= 5 AND @minor>=6) or @major >= 8, 'SET default_storage_engine=INNODB', 'SET storage_engine=INNODB');
+set @version_short = substring_index(@@version, '.', 2);
+set @major = cast(substring_index(@version_short, '.', 1) as SIGNED);
+set @minor = cast(substring_index(@version_short, '.', -1) as SIGNED);
+set @engine_stmt = IF((@major >= 5 AND @minor>=6) or @major >= 8, 'SET default_storage_engine=INNODB', 'SET storage_engine=INNODB');
 prepare statement from @engine_stmt;
 execute statement;
 DEALLOCATE PREPARE statement;
