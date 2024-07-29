@@ -27,7 +27,7 @@ import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.grpc.GrpcClient;
 import org.apache.bigtop.manager.server.model.dto.HostDTO;
-import org.apache.bigtop.manager.server.model.mapper.HostMapper;
+import org.apache.bigtop.manager.server.model.converter.HostConverter;
 import org.apache.bigtop.manager.server.model.vo.HostVO;
 import org.apache.bigtop.manager.server.service.HostService;
 
@@ -60,7 +60,7 @@ public class HostServiceImpl implements HostService {
             throw new ApiException(ApiExceptionEnum.HOST_NOT_FOUND);
         }
 
-        return HostMapper.INSTANCE.fromEntity2VO(hosts);
+        return HostConverter.INSTANCE.fromEntity2VO(hosts);
     }
 
     @Override
@@ -87,23 +87,23 @@ public class HostServiceImpl implements HostService {
 
         hostRepository.saveAll(hosts);
 
-        return HostMapper.INSTANCE.fromEntity2VO(hosts);
+        return HostConverter.INSTANCE.fromEntity2VO(hosts);
     }
 
     @Override
     public HostVO get(Long id) {
         Host host = hostRepository.findById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.HOST_NOT_FOUND));
 
-        return HostMapper.INSTANCE.fromEntity2VO(host);
+        return HostConverter.INSTANCE.fromEntity2VO(host);
     }
 
     @Override
     public HostVO update(Long id, HostDTO hostDTO) {
-        Host host = HostMapper.INSTANCE.fromDTO2Entity(hostDTO);
+        Host host = HostConverter.INSTANCE.fromDTO2Entity(hostDTO);
         host.setId(id);
         hostRepository.save(host);
 
-        return HostMapper.INSTANCE.fromEntity2VO(host);
+        return HostConverter.INSTANCE.fromEntity2VO(host);
     }
 
     @Override

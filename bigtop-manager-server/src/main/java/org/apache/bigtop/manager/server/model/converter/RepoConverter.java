@@ -16,25 +16,33 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.mapper;
+package org.apache.bigtop.manager.server.model.converter;
 
-import org.apache.bigtop.manager.dao.entity.ServiceConfig;
-import org.apache.bigtop.manager.server.model.vo.ServiceConfigVO;
+import org.apache.bigtop.manager.common.message.entity.pojo.RepoInfo;
+import org.apache.bigtop.manager.dao.entity.Cluster;
+import org.apache.bigtop.manager.dao.entity.Repo;
+import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
+import org.apache.bigtop.manager.server.model.dto.RepoDTO;
 
+import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper(uses = {TypeConfigMapper.class})
-public interface ServiceConfigMapper {
+@Mapper(config = MapStructSharedConfig.class)
+public interface RepoConverter {
 
-    ServiceConfigMapper INSTANCE = Mappers.getMapper(ServiceConfigMapper.class);
+    RepoConverter INSTANCE = Mappers.getMapper(RepoConverter.class);
 
-    @Mapping(target = "serviceName", source = "service.serviceName")
-    @Mapping(target = "configs", source = "configs", qualifiedByName = "fromEntity2VO")
-    ServiceConfigVO fromEntity2VO(ServiceConfig serviceConfig);
+    @Mapping(target = "cluster", expression = "java(cluster)")
+    Repo fromDTO2Entity(RepoDTO repoDTO, @Context Cluster cluster);
 
-    List<ServiceConfigVO> fromEntity2VO(List<ServiceConfig> serviceConfigs);
+    @Mapping(target = "cluster", expression = "java(cluster)")
+    List<Repo> fromDTO2Entity(List<RepoDTO> repoDTOList, @Context Cluster cluster);
+
+    RepoInfo fromEntity2Message(Repo repo);
+
+    List<RepoInfo> fromDTO2Message(List<RepoDTO> repoDTOs);
 }

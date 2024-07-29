@@ -16,25 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.mapper;
+package org.apache.bigtop.manager.server.config;
 
-import org.apache.bigtop.manager.dao.entity.User;
-import org.apache.bigtop.manager.server.model.dto.UserDTO;
-import org.apache.bigtop.manager.server.model.req.UserReq;
-import org.apache.bigtop.manager.server.model.vo.UserVO;
+import org.mapstruct.MapperConfig;
+import org.mapstruct.ReportingPolicy;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
-
-@Mapper
-public interface UserMapper {
-
-    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
-
-    @Mapping(target = "createTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
-    @Mapping(target = "updateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
-    UserVO fromEntity2VO(User user);
-
-    UserDTO fromReq2DTO(UserReq userReq);
-}
+@MapperConfig(unmappedTargetPolicy = ReportingPolicy.IGNORE)
+public class MapStructSharedConfig {}

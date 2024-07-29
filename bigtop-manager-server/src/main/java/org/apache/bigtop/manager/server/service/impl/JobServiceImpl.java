@@ -28,7 +28,7 @@ import org.apache.bigtop.manager.dao.repository.TaskRepository;
 import org.apache.bigtop.manager.server.command.scheduler.JobScheduler;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
-import org.apache.bigtop.manager.server.model.mapper.JobMapper;
+import org.apache.bigtop.manager.server.model.converter.JobConverter;
 import org.apache.bigtop.manager.server.model.query.PageQuery;
 import org.apache.bigtop.manager.server.model.vo.JobVO;
 import org.apache.bigtop.manager.server.model.vo.PageVO;
@@ -75,7 +75,7 @@ public class JobServiceImpl implements JobService {
     @Override
     public JobVO get(Long id) {
         Job job = jobRepository.getReferenceById(id);
-        return JobMapper.INSTANCE.fromEntity2VO(job);
+        return JobConverter.INSTANCE.fromEntity2VO(job);
     }
 
     @Override
@@ -99,6 +99,6 @@ public class JobServiceImpl implements JobService {
         jobRepository.save(job);
         jobScheduler.submit(job);
 
-        return JobMapper.INSTANCE.fromEntity2VO(job);
+        return JobConverter.INSTANCE.fromEntity2VO(job);
     }
 }

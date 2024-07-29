@@ -20,7 +20,7 @@ package org.apache.bigtop.manager.server.controller;
 
 import org.apache.bigtop.manager.server.annotations.Audit;
 import org.apache.bigtop.manager.server.model.dto.CommandDTO;
-import org.apache.bigtop.manager.server.model.mapper.CommandMapper;
+import org.apache.bigtop.manager.server.model.converter.CommandConverter;
 import org.apache.bigtop.manager.server.model.req.CommandReq;
 import org.apache.bigtop.manager.server.model.vo.CommandVO;
 import org.apache.bigtop.manager.server.service.CommandService;
@@ -49,7 +49,7 @@ public class CommandController {
     @Operation(summary = "command", description = "Command for component by [host,component,service,cluster]")
     @PostMapping
     public ResponseEntity<CommandVO> command(@RequestBody @Validated CommandReq commandReq) {
-        CommandDTO commandDTO = CommandMapper.INSTANCE.fromReq2DTO(commandReq);
+        CommandDTO commandDTO = CommandConverter.INSTANCE.fromReq2DTO(commandReq);
         CommandVO commandVO = commandService.command(commandDTO);
         return ResponseEntity.success(commandVO);
     }

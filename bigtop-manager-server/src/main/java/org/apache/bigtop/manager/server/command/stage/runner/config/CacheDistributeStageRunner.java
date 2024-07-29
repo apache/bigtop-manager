@@ -50,7 +50,7 @@ import org.apache.bigtop.manager.server.command.stage.runner.AbstractStageRunner
 import org.apache.bigtop.manager.server.model.dto.PropertyDTO;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.model.dto.StackDTO;
-import org.apache.bigtop.manager.server.model.mapper.RepoMapper;
+import org.apache.bigtop.manager.server.model.converter.RepoConverter;
 import org.apache.bigtop.manager.server.utils.StackConfigUtils;
 import org.apache.bigtop.manager.server.utils.StackUtils;
 
@@ -202,7 +202,7 @@ public class CacheDistributeStageRunner extends AbstractStageRunner {
 
         repoList = new ArrayList<>();
         repos.forEach(repo -> {
-            RepoInfo repoInfo = RepoMapper.INSTANCE.fromEntity2Message(repo);
+            RepoInfo repoInfo = RepoConverter.INSTANCE.fromEntity2Message(repo);
             repoList.add(repoInfo);
         });
 
@@ -239,7 +239,7 @@ public class CacheDistributeStageRunner extends AbstractStageRunner {
         StackDTO stackDTO = immutablePair.getLeft();
         List<ServiceDTO> serviceDTOList = immutablePair.getRight();
 
-        repoList = RepoMapper.INSTANCE.fromDTO2Message(stageContext.getRepoInfoList());
+        repoList = RepoConverter.INSTANCE.fromDTO2Message(stageContext.getRepoInfoList());
         clusterInfo = new ClusterInfo();
         clusterInfo.setClusterName(stageContext.getClusterName());
         clusterInfo.setStackName(stageContext.getStackName());

@@ -16,26 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.mapper;
+package org.apache.bigtop.manager.server.model.converter;
 
-import org.apache.bigtop.manager.server.model.dto.CommandDTO;
-import org.apache.bigtop.manager.server.model.dto.command.ServiceCommandDTO;
-import org.apache.bigtop.manager.server.model.req.CommandReq;
-import org.apache.bigtop.manager.server.model.req.command.ServiceCommandReq;
+import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
+import org.apache.bigtop.manager.server.model.dto.PropertyDTO;
+import org.apache.bigtop.manager.server.model.vo.PropertyVO;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper
-public interface CommandMapper {
+@Mapper(config = MapStructSharedConfig.class)
+public interface PropertyConverter {
 
-    CommandMapper INSTANCE = Mappers.getMapper(CommandMapper.class);
+    PropertyConverter INSTANCE = Mappers.getMapper(PropertyConverter.class);
 
-    CommandDTO fromReq2DTO(CommandReq commandReq);
+    PropertyVO fromDTO2VO(PropertyDTO propertyDTO);
 
-    ServiceCommandDTO fromServiceReq2DTO(ServiceCommandReq req);
-
-    List<ServiceCommandDTO> fromServiceReq2DTO(List<ServiceCommandReq> reqs);
+    List<PropertyVO> fromDTO2VO(List<PropertyDTO> propertyDTOList);
 }

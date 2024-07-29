@@ -27,7 +27,7 @@ import org.apache.bigtop.manager.server.command.job.validator.ValidatorContext;
 import org.apache.bigtop.manager.server.command.job.validator.ValidatorExecutionChain;
 import org.apache.bigtop.manager.server.command.scheduler.JobScheduler;
 import org.apache.bigtop.manager.server.model.dto.CommandDTO;
-import org.apache.bigtop.manager.server.model.mapper.JobMapper;
+import org.apache.bigtop.manager.server.model.converter.JobConverter;
 import org.apache.bigtop.manager.server.model.vo.CommandVO;
 import org.apache.bigtop.manager.server.service.CommandService;
 
@@ -61,6 +61,6 @@ public class CommandServiceImpl implements CommandService {
         // Submit job
         jobScheduler.submit(job);
 
-        return JobMapper.INSTANCE.fromEntity2CommandVO(job);
+        return JobConverter.INSTANCE.fromEntity2CommandVO(job);
     }
 }

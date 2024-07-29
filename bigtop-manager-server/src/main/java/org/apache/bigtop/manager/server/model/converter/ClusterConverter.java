@@ -16,10 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.mapper;
+package org.apache.bigtop.manager.server.model.converter;
 
 import org.apache.bigtop.manager.dao.entity.Cluster;
 import org.apache.bigtop.manager.dao.entity.Stack;
+import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.dto.ClusterDTO;
 import org.apache.bigtop.manager.server.model.dto.StackDTO;
 import org.apache.bigtop.manager.server.model.dto.command.ClusterCommandDTO;
@@ -31,10 +32,10 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-@Mapper
-public interface ClusterMapper {
+@Mapper(config = MapStructSharedConfig.class)
+public interface ClusterConverter {
 
-    ClusterMapper INSTANCE = Mappers.getMapper(ClusterMapper.class);
+    ClusterConverter INSTANCE = Mappers.getMapper(ClusterConverter.class);
 
     ClusterDTO fromReq2DTO(ClusterReq clusterReq);
 

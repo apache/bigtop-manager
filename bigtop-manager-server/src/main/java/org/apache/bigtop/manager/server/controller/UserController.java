@@ -20,7 +20,7 @@ package org.apache.bigtop.manager.server.controller;
 
 import org.apache.bigtop.manager.server.annotations.Audit;
 import org.apache.bigtop.manager.server.model.dto.UserDTO;
-import org.apache.bigtop.manager.server.model.mapper.UserMapper;
+import org.apache.bigtop.manager.server.model.converter.UserConverter;
 import org.apache.bigtop.manager.server.model.req.UserReq;
 import org.apache.bigtop.manager.server.model.vo.UserVO;
 import org.apache.bigtop.manager.server.service.UserService;
@@ -56,7 +56,7 @@ public class UserController {
     @Operation(summary = "update", description = "Update a user")
     @PutMapping
     public ResponseEntity<UserVO> update(@RequestBody @Validated UserReq userReq) {
-        UserDTO userDTO = UserMapper.INSTANCE.fromReq2DTO(userReq);
+        UserDTO userDTO = UserConverter.INSTANCE.fromReq2DTO(userReq);
         return ResponseEntity.success(userService.update(userDTO));
     }
 }

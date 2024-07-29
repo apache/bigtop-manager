@@ -23,7 +23,7 @@ import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.holder.SessionUserHolder;
 import org.apache.bigtop.manager.server.model.dto.LoginDTO;
-import org.apache.bigtop.manager.server.model.mapper.LoginMapper;
+import org.apache.bigtop.manager.server.model.converter.LoginConverter;
 import org.apache.bigtop.manager.server.model.req.LoginReq;
 import org.apache.bigtop.manager.server.model.vo.LoginVO;
 import org.apache.bigtop.manager.server.service.LoginService;
@@ -55,7 +55,7 @@ public class LoginController {
             throw new ApiException(ApiExceptionEnum.USERNAME_OR_PASSWORD_REQUIRED);
         }
 
-        LoginDTO loginDTO = LoginMapper.INSTANCE.fromReq2DTO(loginReq);
+        LoginDTO loginDTO = LoginConverter.INSTANCE.fromReq2DTO(loginReq);
         return ResponseEntity.success(loginService.login(loginDTO));
     }
 

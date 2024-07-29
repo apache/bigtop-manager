@@ -28,8 +28,8 @@ import org.apache.bigtop.manager.server.model.dto.PropertyDTO;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.model.dto.StackDTO;
 import org.apache.bigtop.manager.server.model.dto.TypeConfigDTO;
-import org.apache.bigtop.manager.server.model.mapper.ServiceMapper;
-import org.apache.bigtop.manager.server.model.mapper.StackMapper;
+import org.apache.bigtop.manager.server.model.converter.ServiceConverter;
+import org.apache.bigtop.manager.server.model.converter.StackConverter;
 import org.apache.bigtop.manager.server.stack.dag.ComponentCommandWrapper;
 import org.apache.bigtop.manager.server.stack.dag.DAG;
 import org.apache.bigtop.manager.server.stack.dag.DagGraphEdge;
@@ -112,7 +112,7 @@ public class StackUtils {
     public static StackDTO parseStack(File versionFolder) {
         StackMetainfoXml stackMetainfoXml = JaxbUtils.readFromPath(
                 versionFolder.getAbsolutePath() + File.separator + META_FILE, StackMetainfoXml.class);
-        return StackMapper.INSTANCE.fromModel2DTO(stackMetainfoXml.getStack());
+        return StackConverter.INSTANCE.fromModel2DTO(stackMetainfoXml.getStack());
     }
 
     /**
@@ -134,7 +134,7 @@ public class StackUtils {
                 ServiceMetainfoXml serviceMetainfoXml =
                         JaxbUtils.readFromPath(file.getAbsolutePath() + "/" + META_FILE, ServiceMetainfoXml.class);
                 ServiceModel serviceModel = serviceMetainfoXml.getService();
-                ServiceDTO serviceDTO = ServiceMapper.INSTANCE.fromModel2DTO(serviceModel);
+                ServiceDTO serviceDTO = ServiceConverter.INSTANCE.fromModel2DTO(serviceModel);
                 services.add(serviceDTO);
 
                 // configurations

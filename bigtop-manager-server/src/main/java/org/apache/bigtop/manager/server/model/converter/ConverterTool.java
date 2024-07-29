@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.mapper;
+package org.apache.bigtop.manager.server.model.converter;
 
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.server.model.dto.PropertyDTO;
@@ -28,7 +28,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 
 import java.util.List;
 
-public class TypeConvert {
+public class ConverterTool {
 
     @Named("obj2Json")
     public <T> String obj2Json(T obj) {
