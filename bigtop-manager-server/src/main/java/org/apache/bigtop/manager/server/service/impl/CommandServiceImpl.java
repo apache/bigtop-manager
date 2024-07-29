@@ -26,8 +26,8 @@ import org.apache.bigtop.manager.server.command.job.factory.JobFactory;
 import org.apache.bigtop.manager.server.command.job.validator.ValidatorContext;
 import org.apache.bigtop.manager.server.command.job.validator.ValidatorExecutionChain;
 import org.apache.bigtop.manager.server.command.scheduler.JobScheduler;
-import org.apache.bigtop.manager.server.model.dto.CommandDTO;
 import org.apache.bigtop.manager.server.model.converter.JobConverter;
+import org.apache.bigtop.manager.server.model.dto.CommandDTO;
 import org.apache.bigtop.manager.server.model.vo.CommandVO;
 import org.apache.bigtop.manager.server.service.CommandService;
 

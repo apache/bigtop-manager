@@ -19,8 +19,8 @@
 package org.apache.bigtop.manager.server.controller;
 
 import org.apache.bigtop.manager.server.annotations.Audit;
-import org.apache.bigtop.manager.server.model.dto.UserDTO;
 import org.apache.bigtop.manager.server.model.converter.UserConverter;
+import org.apache.bigtop.manager.server.model.dto.UserDTO;
 import org.apache.bigtop.manager.server.model.req.UserReq;
 import org.apache.bigtop.manager.server.model.vo.UserVO;
 import org.apache.bigtop.manager.server.service.UserService;
