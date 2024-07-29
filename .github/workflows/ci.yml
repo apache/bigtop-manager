@@ -36,23 +36,12 @@ jobs:
       - run: ./mvnw clean test
 
   build:
+    name: "Build project"
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         java: ['17', '21']
-    services:
-      db:
-        image: postgres
-        ports:
-          - 5432:5432
-        env:
-          POSTGRES_DB: bigtop_manager
-          POSTGRES_PASSWORD: postgres
-      prom:
-        image: prom/prometheus
-        ports:
-          - 9090:9090
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
