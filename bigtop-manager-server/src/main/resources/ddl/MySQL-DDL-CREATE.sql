@@ -22,20 +22,28 @@
 -- DROP DATABASE IF EXISTS `ambari`;
 -- DROP USER `ambari`;
 
-# delimiter ;
-
-# CREATE DATABASE `bigtop_manager` /*!40100 DEFAULT CHARACTER SET utf8 */;
 #
-# CREATE USER 'bigtop_manager' IDENTIFIED BY 'bigdata';
+delimiter ;
 
-# USE @schema;
+# CREATE
+DATABASE `bigtop_manager` /*!40100 DEFAULT CHARACTER SET utf8 */;
+#
+# CREATE
+USER 'bigtop_manager' IDENTIFIED BY 'bigdata';
+
+#
+USE @schema;
 
 -- Set default_storage_engine to InnoDB
 -- storage_engine variable should be used for versions prior to MySQL 5.6
-set @version_short = substring_index(@@version, '.', 2);
-set @major = cast(substring_index(@version_short, '.', 1) as SIGNED);
-set @minor = cast(substring_index(@version_short, '.', -1) as SIGNED);
-set @engine_stmt = IF((@major >= 5 AND @minor>=6) or @major >= 8, 'SET default_storage_engine=INNODB', 'SET storage_engine=INNODB');
+set
+@version_short = substring_index(@@version, '.', 2);
+set
+@major = cast(substring_index(@version_short, '.', 1) as SIGNED);
+set
+@minor = cast(substring_index(@version_short, '.', -1) as SIGNED);
+set
+@engine_stmt = IF((@major >= 5 AND @minor>=6) or @major >= 8, 'SET default_storage_engine=INNODB', 'SET storage_engine=INNODB');
 prepare statement from @engine_stmt;
 execute statement;
 DEALLOCATE PREPARE statement;
@@ -345,3 +353,7 @@ VALUES ('audit_log_generator', 0),
        ('component_generator', 0),
        ('stage_generator', 0),
        ('settings_generator', 0);
+
+-- Adding default admin user
+INSERT INTO bigtop_manager.user (id, create_time, update_time, nickname, password, status, username)
+VALUES (1, now(), now(), 'Administrator', '21232f297a57a5a743894a0e4a801fc3', true, 'admin');
