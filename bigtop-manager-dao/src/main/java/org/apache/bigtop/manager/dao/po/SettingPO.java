@@ -18,9 +18,6 @@
  */
 package org.apache.bigtop.manager.dao.po;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -31,6 +28,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -41,7 +40,7 @@ import jakarta.persistence.TableGenerator;
         table = "sequence",
         pkColumnName = "seq_name",
         valueColumnName = "seq_count")
-public class Setting extends BasePO {
+public class SettingPO extends BasePO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "settings_generator")

@@ -18,8 +18,8 @@
  */
 package org.apache.bigtop.manager.dao.repository;
 
-import org.apache.bigtop.manager.dao.po.Setting;
+import org.apache.bigtop.manager.dao.po.SettingPO;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface SettingRepository extends JpaRepository<Setting, Long> {}
+public interface SettingRepository extends JpaRepository<SettingPO, Long> {}

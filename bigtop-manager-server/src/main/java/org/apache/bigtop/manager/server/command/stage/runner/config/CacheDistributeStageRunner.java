@@ -146,7 +146,7 @@ public class CacheDistributeStageRunner extends AbstractStageRunner {
         List<ServiceConfigPO> serviceConfigPOList = serviceConfigRepository.findAllByClusterAndSelectedIsTrue(clusterPO);
         List<HostComponentPO> hostComponentPOList = hostComponentRepository.findAllByComponentClusterId(clusterId);
         List<RepoPO> repoPOList = repoRepository.findAllByCluster(clusterPO);
-        Iterable<Setting> settings = settingRepository.findAll();
+        Iterable<SettingPO> settings = settingRepository.findAll();
         List<HostPO> hostPOList = hostRepository.findAllByClusterId(clusterId);
 
         clusterInfo = new ClusterInfo();
