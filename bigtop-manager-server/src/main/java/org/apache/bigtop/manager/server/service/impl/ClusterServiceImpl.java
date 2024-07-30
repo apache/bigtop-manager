@@ -27,10 +27,10 @@ import org.apache.bigtop.manager.dao.repository.RepoRepository;
 import org.apache.bigtop.manager.dao.repository.StackRepository;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
+import org.apache.bigtop.manager.server.model.converter.ClusterConverter;
+import org.apache.bigtop.manager.server.model.converter.RepoConverter;
 import org.apache.bigtop.manager.server.model.dto.ClusterDTO;
 import org.apache.bigtop.manager.server.model.dto.StackDTO;
-import org.apache.bigtop.manager.server.model.mapper.ClusterMapper;
-import org.apache.bigtop.manager.server.model.mapper.RepoMapper;
 import org.apache.bigtop.manager.server.model.vo.ClusterVO;
 import org.apache.bigtop.manager.server.service.ClusterService;
 import org.apache.bigtop.manager.server.service.HostService;
@@ -62,7 +62,7 @@ public class ClusterServiceImpl implements ClusterService {
     public List<ClusterVO> list() {
         List<ClusterVO> clusterVOList = new ArrayList<>();
         clusterRepository.findAll().forEach(cluster -> {
-            ClusterVO clusterVO = ClusterMapper.INSTANCE.fromEntity2VO(cluster);
+            ClusterVO clusterVO = ClusterConverter.INSTANCE.fromEntity2VO(cluster);
             clusterVOList.add(clusterVO);
         });
 
@@ -77,7 +77,7 @@ public class ClusterServiceImpl implements ClusterService {
         StackDTO stackDTO = StackUtils.getStackKeyMap()
                 .get(StackUtils.fullStackName(clusterDTO.getStackName(), clusterDTO.getStackVersion()))
                 .getLeft();
-        Cluster cluster = ClusterMapper.INSTANCE.fromDTO2Entity(clusterDTO, stackDTO, stack);
+        Cluster cluster = ClusterConverter.INSTANCE.fromDTO2Entity(clusterDTO, stackDTO, stack);
         cluster.setSelected(clusterRepository.count() == 0);
         cluster.setState(MaintainState.UNINSTALLED);
 
@@ -91,7 +91,7 @@ public class ClusterServiceImpl implements ClusterService {
         hostService.batchSave(cluster.getId(), clusterDTO.getHostnames());
 
         // Save repo
-        List<Repo> repos = RepoMapper.INSTANCE.fromDTO2Entity(clusterDTO.getRepoInfoList(), cluster);
+        List<Repo> repos = RepoConverter.INSTANCE.fromDTO2Entity(clusterDTO.getRepoInfoList(), cluster);
         List<Repo> oldRepos = repoRepository.findAllByCluster(cluster);
 
         for (Repo repo : repos) {
@@ -103,7 +103,7 @@ public class ClusterServiceImpl implements ClusterService {
         }
 
         repoRepository.saveAll(repos);
-        return ClusterMapper.INSTANCE.fromEntity2VO(cluster);
+        return ClusterConverter.INSTANCE.fromEntity2VO(cluster);
     }
 
     @Override
@@ -111,15 +111,15 @@ public class ClusterServiceImpl implements ClusterService {
         Cluster cluster =
                 clusterRepository.findById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.CLUSTER_NOT_FOUND));
 
-        return ClusterMapper.INSTANCE.fromEntity2VO(cluster);
+        return ClusterConverter.INSTANCE.fromEntity2VO(cluster);
     }
 
     @Override
     public ClusterVO update(Long id, ClusterDTO clusterDTO) {
-        Cluster cluster = ClusterMapper.INSTANCE.fromDTO2Entity(clusterDTO);
+        Cluster cluster = ClusterConverter.INSTANCE.fromDTO2Entity(clusterDTO);
         cluster.setId(id);
         clusterRepository.save(cluster);
 
-        return ClusterMapper.INSTANCE.fromEntity2VO(cluster);
+        return ClusterConverter.INSTANCE.fromEntity2VO(cluster);
     }
 }

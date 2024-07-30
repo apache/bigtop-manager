@@ -16,11 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.mapper;
+package org.apache.bigtop.manager.server.model.converter;
 
 import org.apache.bigtop.manager.dao.entity.Cluster;
 import org.apache.bigtop.manager.dao.entity.Component;
 import org.apache.bigtop.manager.dao.entity.Service;
+import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
 import org.apache.bigtop.manager.server.model.vo.ComponentVO;
 import org.apache.bigtop.manager.server.stack.model.ComponentModel;
@@ -32,10 +33,12 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper(uses = {TypeConvert.class})
-public interface ComponentMapper {
+@Mapper(
+        uses = {ConverterTool.class},
+        config = MapStructSharedConfig.class)
+public interface ComponentConverter {
 
-    ComponentMapper INSTANCE = Mappers.getMapper(ComponentMapper.class);
+    ComponentConverter INSTANCE = Mappers.getMapper(ComponentConverter.class);
 
     @Mapping(target = "commandScript", source = "commandScript", qualifiedByName = "obj2Json")
     @Mapping(target = "customCommands", source = "customCommands", qualifiedByName = "obj2Json")

@@ -16,22 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.mapper;
+package org.apache.bigtop.manager.server.model.converter;
 
-import org.apache.bigtop.manager.server.model.dto.PropertyDTO;
-import org.apache.bigtop.manager.server.model.vo.PropertyVO;
+import org.apache.bigtop.manager.dao.entity.Task;
+import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
+import org.apache.bigtop.manager.server.model.vo.TaskVO;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-import java.util.List;
+@Mapper(config = MapStructSharedConfig.class)
+public interface TaskConverter {
 
-@Mapper
-public interface PropertyMapper {
+    TaskConverter INSTANCE = Mappers.getMapper(TaskConverter.class);
 
-    PropertyMapper INSTANCE = Mappers.getMapper(PropertyMapper.class);
-
-    PropertyVO fromDTO2VO(PropertyDTO propertyDTO);
-
-    List<PropertyVO> fromDTO2VO(List<PropertyDTO> propertyDTOList);
+    @Mapping(target = "createTime", source = "createTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
+    @Mapping(target = "updateTime", source = "updateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
+    TaskVO fromEntity2VO(Task task);
 }

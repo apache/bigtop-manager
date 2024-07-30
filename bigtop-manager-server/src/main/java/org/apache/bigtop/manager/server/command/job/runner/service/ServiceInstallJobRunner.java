@@ -33,13 +33,13 @@ import org.apache.bigtop.manager.dao.repository.ServiceRepository;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
 import org.apache.bigtop.manager.server.command.job.runner.AbstractJobRunner;
 import org.apache.bigtop.manager.server.enums.CommandLevel;
+import org.apache.bigtop.manager.server.model.converter.ComponentConverter;
+import org.apache.bigtop.manager.server.model.converter.ServiceConverter;
 import org.apache.bigtop.manager.server.model.dto.CommandDTO;
 import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
 import org.apache.bigtop.manager.server.model.dto.ComponentHostDTO;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.model.dto.command.ServiceCommandDTO;
-import org.apache.bigtop.manager.server.model.mapper.ComponentMapper;
-import org.apache.bigtop.manager.server.model.mapper.ServiceMapper;
 import org.apache.bigtop.manager.server.service.ConfigService;
 import org.apache.bigtop.manager.server.utils.StackUtils;
 
@@ -107,7 +107,7 @@ public class ServiceInstallJobRunner extends AbstractJobRunner {
         // 1. Persist service
         if (service == null) {
             ServiceDTO serviceDTO = StackUtils.getServiceDTO(stackName, stackVersion, serviceName);
-            service = ServiceMapper.INSTANCE.fromDTO2Entity(serviceDTO, cluster);
+            service = ServiceConverter.INSTANCE.fromDTO2Entity(serviceDTO, cluster);
             service = serviceRepository.save(service);
         }
 
@@ -121,7 +121,7 @@ public class ServiceInstallJobRunner extends AbstractJobRunner {
             Component component = componentRepository.findByClusterIdAndComponentName(clusterId, componentName);
             if (component == null) {
                 ComponentDTO componentDTO = StackUtils.getComponentDTO(stackName, stackVersion, componentName);
-                component = ComponentMapper.INSTANCE.fromDTO2Entity(componentDTO, service, cluster);
+                component = ComponentConverter.INSTANCE.fromDTO2Entity(componentDTO, service, cluster);
                 component = componentRepository.save(component);
             }
 

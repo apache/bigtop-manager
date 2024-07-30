@@ -16,10 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.mapper;
+package org.apache.bigtop.manager.server.model.converter;
 
 import org.apache.bigtop.manager.dao.entity.Cluster;
 import org.apache.bigtop.manager.dao.entity.Service;
+import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.model.vo.ServiceVO;
 import org.apache.bigtop.manager.server.stack.model.ServiceModel;
@@ -31,10 +32,12 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper(uses = {ComponentMapper.class, TypeConvert.class})
-public interface ServiceMapper {
+@Mapper(
+        uses = {ComponentConverter.class, ConverterTool.class},
+        config = MapStructSharedConfig.class)
+public interface ServiceConverter {
 
-    ServiceMapper INSTANCE = Mappers.getMapper(ServiceMapper.class);
+    ServiceConverter INSTANCE = Mappers.getMapper(ServiceConverter.class);
 
     @Mapping(target = "osSpecifics", source = "osSpecifics", qualifiedByName = "obj2Json")
     @Mapping(target = "requiredServices", source = "requiredServices", qualifiedByName = "obj2Json")

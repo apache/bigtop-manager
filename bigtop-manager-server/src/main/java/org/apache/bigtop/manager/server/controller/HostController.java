@@ -18,8 +18,8 @@
  */
 package org.apache.bigtop.manager.server.controller;
 
+import org.apache.bigtop.manager.server.model.converter.HostConverter;
 import org.apache.bigtop.manager.server.model.dto.HostDTO;
-import org.apache.bigtop.manager.server.model.mapper.HostMapper;
 import org.apache.bigtop.manager.server.model.req.HostReq;
 import org.apache.bigtop.manager.server.model.req.HostnamesReq;
 import org.apache.bigtop.manager.server.model.vo.HostVO;
@@ -63,7 +63,7 @@ public class HostController {
     @Operation(summary = "update", description = "Update a host")
     // @PutMapping("/{id}")
     public ResponseEntity<HostVO> update(@PathVariable Long id, @RequestBody @Validated HostReq hostReq) {
-        HostDTO hostDTO = HostMapper.INSTANCE.fromReq2DTO(hostReq);
+        HostDTO hostDTO = HostConverter.INSTANCE.fromReq2DTO(hostReq);
         return ResponseEntity.success(hostService.update(id, hostDTO));
     }
 

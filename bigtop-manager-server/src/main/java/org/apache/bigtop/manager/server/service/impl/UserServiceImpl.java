@@ -23,8 +23,8 @@ import org.apache.bigtop.manager.dao.repository.UserRepository;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.holder.SessionUserHolder;
+import org.apache.bigtop.manager.server.model.converter.UserConverter;
 import org.apache.bigtop.manager.server.model.dto.UserDTO;
-import org.apache.bigtop.manager.server.model.mapper.UserMapper;
 import org.apache.bigtop.manager.server.model.vo.UserVO;
 import org.apache.bigtop.manager.server.service.UserService;
 
@@ -42,7 +42,7 @@ public class UserServiceImpl implements UserService {
     public UserVO current() {
         Long id = SessionUserHolder.getUserId();
         User user = userRepository.findById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.NEED_LOGIN));
-        return UserMapper.INSTANCE.fromEntity2VO(user);
+        return UserConverter.INSTANCE.fromEntity2VO(user);
     }
 
     @Override
@@ -51,6 +51,6 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.NEED_LOGIN));
         user.setNickname(userDTO.getNickname());
         userRepository.save(user);
-        return UserMapper.INSTANCE.fromEntity2VO(user);
+        return UserConverter.INSTANCE.fromEntity2VO(user);
     }
 }

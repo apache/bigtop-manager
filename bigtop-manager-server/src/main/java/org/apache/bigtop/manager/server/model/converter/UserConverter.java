@@ -16,24 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.mapper;
+package org.apache.bigtop.manager.server.model.converter;
 
-import org.apache.bigtop.manager.dao.entity.Stack;
-import org.apache.bigtop.manager.server.model.dto.StackDTO;
-import org.apache.bigtop.manager.server.model.vo.StackVO;
-import org.apache.bigtop.manager.server.stack.model.StackModel;
+import org.apache.bigtop.manager.dao.entity.User;
+import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
+import org.apache.bigtop.manager.server.model.dto.UserDTO;
+import org.apache.bigtop.manager.server.model.req.UserReq;
+import org.apache.bigtop.manager.server.model.vo.UserVO;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-@Mapper
-public interface StackMapper {
+@Mapper(config = MapStructSharedConfig.class)
+public interface UserConverter {
 
-    StackMapper INSTANCE = Mappers.getMapper(StackMapper.class);
+    UserConverter INSTANCE = Mappers.getMapper(UserConverter.class);
 
-    StackVO fromEntity2VO(Stack stack);
+    @Mapping(target = "createTime", source = "createTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
+    @Mapping(target = "updateTime", source = "updateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
+    UserVO fromEntity2VO(User user);
 
-    StackVO fromDTO2VO(StackDTO stackDTO);
-
-    StackDTO fromModel2DTO(StackModel stackModel);
+    UserDTO fromReq2DTO(UserReq userReq);
 }

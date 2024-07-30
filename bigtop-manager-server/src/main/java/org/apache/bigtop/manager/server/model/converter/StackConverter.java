@@ -16,18 +16,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.mapper;
+package org.apache.bigtop.manager.server.model.converter;
 
-import org.apache.bigtop.manager.server.model.dto.LoginDTO;
-import org.apache.bigtop.manager.server.model.req.LoginReq;
+import org.apache.bigtop.manager.dao.entity.Stack;
+import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
+import org.apache.bigtop.manager.server.model.dto.StackDTO;
+import org.apache.bigtop.manager.server.model.vo.StackVO;
+import org.apache.bigtop.manager.server.stack.model.StackModel;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-@Mapper
-public interface LoginMapper {
+@Mapper(config = MapStructSharedConfig.class)
+public interface StackConverter {
 
-    LoginMapper INSTANCE = Mappers.getMapper(LoginMapper.class);
+    StackConverter INSTANCE = Mappers.getMapper(StackConverter.class);
 
-    LoginDTO fromReq2DTO(LoginReq loginReq);
+    StackVO fromEntity2VO(Stack stack);
+
+    StackVO fromDTO2VO(StackDTO stackDTO);
+
+    StackDTO fromModel2DTO(StackModel stackModel);
 }
