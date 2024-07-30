@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.server.aop;
 
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.po.AuditLog;
+import org.apache.bigtop.manager.dao.po.AuditLogPO;
 import org.apache.bigtop.manager.dao.repository.AuditLogRepository;
 import org.apache.bigtop.manager.server.holder.SessionUserHolder;
 
@@ -51,8 +51,8 @@ public class AuditAspect {
     @Before(value = POINT_CUT)
     public void before(JoinPoint joinPoint) {
         MethodSignature ms = (MethodSignature) joinPoint.getSignature();
-        AuditLog auditLog = new AuditLog();
-        auditLog.setUserId(SessionUserHolder.getUserId());
+        AuditLogPO auditLogPO = new AuditLogPO();
+        auditLogPO.setUserId(SessionUserHolder.getUserId());
 
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (attributes != null) {
@@ -79,17 +79,17 @@ public class AuditAspect {
                 operationDesc = operation.description();
             }
 
-            auditLog.setUri(uri);
-            auditLog.setTagName(apiName);
-            auditLog.setTagDesc(apiDesc);
-            auditLog.setOperationSummary(operationSummary);
-            auditLog.setOperationDesc(operationDesc);
-            auditLog.setArgs(JsonUtils.writeAsString(joinPoint.getArgs()));
+            auditLogPO.setUri(uri);
+            auditLogPO.setTagName(apiName);
+            auditLogPO.setTagDesc(apiDesc);
+            auditLogPO.setOperationSummary(operationSummary);
+            auditLogPO.setOperationDesc(operationDesc);
+            auditLogPO.setArgs(JsonUtils.writeAsString(joinPoint.getArgs()));
 
-            log.debug("auditLog: {}", auditLog);
+            log.debug("auditLog: {}", auditLogPO);
             log.debug("request method：{}.{}", joinPoint.getSignature().getDeclaringTypeName(), methodName);
 
-            auditLogRepository.save(auditLog);
+            auditLogRepository.save(auditLogPO);
         }
     }
 }
