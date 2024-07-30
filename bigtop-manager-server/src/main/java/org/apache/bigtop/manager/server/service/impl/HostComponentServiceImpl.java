@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
-import org.apache.bigtop.manager.dao.po.HostComponent;
+import org.apache.bigtop.manager.dao.po.HostComponentPO;
 import org.apache.bigtop.manager.dao.repository.ComponentRepository;
 import org.apache.bigtop.manager.dao.repository.HostComponentRepository;
 import org.apache.bigtop.manager.dao.repository.HostRepository;
@@ -48,21 +48,21 @@ public class HostComponentServiceImpl implements HostComponentService {
 
     @Override
     public List<HostComponentVO> list(Long clusterId) {
-        List<HostComponent> hostComponentList = hostComponentRepository.findAllByComponentClusterId(clusterId);
-        return HostComponentConverter.INSTANCE.fromEntity2VO(hostComponentList);
+        List<HostComponentPO> hostComponentPOList = hostComponentRepository.findAllByComponentClusterId(clusterId);
+        return HostComponentConverter.INSTANCE.fromEntity2VO(hostComponentPOList);
     }
 
     @Override
     public List<HostComponentVO> listByHost(Long clusterId, Long hostId) {
-        List<HostComponent> hostComponentList =
+        List<HostComponentPO> hostComponentPOList =
                 hostComponentRepository.findAllByComponentClusterIdAndHostId(clusterId, clusterId);
-        return HostComponentConverter.INSTANCE.fromEntity2VO(hostComponentList);
+        return HostComponentConverter.INSTANCE.fromEntity2VO(hostComponentPOList);
     }
 
     @Override
     public List<HostComponentVO> listByService(Long clusterId, Long serviceId) {
-        List<HostComponent> hostComponentList =
+        List<HostComponentPO> hostComponentPOList =
                 hostComponentRepository.findAllByComponentClusterIdAndComponentServiceId(clusterId, serviceId);
-        return HostComponentConverter.INSTANCE.fromEntity2VO(hostComponentList);
+        return HostComponentConverter.INSTANCE.fromEntity2VO(hostComponentPOList);
     }
 }

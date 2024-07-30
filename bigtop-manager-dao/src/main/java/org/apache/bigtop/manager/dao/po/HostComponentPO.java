@@ -50,7 +50,7 @@ import jakarta.persistence.TableGenerator;
         table = "sequence",
         pkColumnName = "seq_name",
         valueColumnName = "seq_count")
-public class HostComponent extends BasePO {
+public class HostComponentPO extends BasePO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "host_component_generator")

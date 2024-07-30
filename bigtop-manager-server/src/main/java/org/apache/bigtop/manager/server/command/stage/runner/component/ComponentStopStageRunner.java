@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.server.command.stage.runner.component;
 
 import org.apache.bigtop.manager.common.enums.MaintainState;
-import org.apache.bigtop.manager.dao.po.HostComponent;
+import org.apache.bigtop.manager.dao.po.HostComponentPO;
 import org.apache.bigtop.manager.dao.po.Task;
 import org.apache.bigtop.manager.dao.repository.HostComponentRepository;
 import org.apache.bigtop.manager.server.command.stage.factory.StageType;
@@ -52,10 +52,10 @@ public class ComponentStopStageRunner extends AbstractStageRunner {
         Long clusterId = task.getClusterPO().getId();
         String componentName = task.getComponentName();
         String hostname = task.getHostname();
-        HostComponent hostComponent =
+        HostComponentPO hostComponentPO =
                 hostComponentRepository.findByComponentClusterIdAndComponentComponentNameAndHostHostname(
                         clusterId, componentName, hostname);
-        hostComponent.setState(MaintainState.STOPPED);
-        hostComponentRepository.save(hostComponent);
+        hostComponentPO.setState(MaintainState.STOPPED);
+        hostComponentRepository.save(hostComponentPO);
     }
 }

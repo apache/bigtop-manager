@@ -144,7 +144,7 @@ public class CacheDistributeStageRunner extends AbstractStageRunner {
 
         List<Service> services = serviceRepository.findAllByClusterId(clusterId);
         List<ServiceConfig> serviceConfigList = serviceConfigRepository.findAllByClusterAndSelectedIsTrue(clusterPO);
-        List<HostComponent> hostComponents = hostComponentRepository.findAllByComponentClusterId(clusterId);
+        List<HostComponentPO> hostComponentPOList = hostComponentRepository.findAllByComponentClusterId(clusterId);
         List<Repo> repos = repoRepository.findAllByCluster(clusterPO);
         Iterable<Setting> settings = settingRepository.findAll();
         List<HostPO> hostPOList = hostRepository.findAllByClusterId(clusterId);
@@ -178,7 +178,7 @@ public class CacheDistributeStageRunner extends AbstractStageRunner {
         }
 
         hostMap = new HashMap<>();
-        hostComponents.forEach(x -> {
+        hostComponentPOList.forEach(x -> {
             if (hostMap.containsKey(x.getComponentPO().getComponentName())) {
                 hostMap.get(x.getComponentPO().getComponentName()).add(x.getHostPO().getHostname());
             } else {

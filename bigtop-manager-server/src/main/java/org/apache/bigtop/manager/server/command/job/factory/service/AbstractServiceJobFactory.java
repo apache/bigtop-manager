@@ -23,7 +23,7 @@ import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.po.HostPO;
-import org.apache.bigtop.manager.dao.po.HostComponent;
+import org.apache.bigtop.manager.dao.po.HostComponentPO;
 import org.apache.bigtop.manager.dao.repository.ComponentRepository;
 import org.apache.bigtop.manager.dao.repository.HostComponentRepository;
 import org.apache.bigtop.manager.server.command.job.factory.AbstractJobFactory;
@@ -132,14 +132,14 @@ public abstract class AbstractServiceJobFactory extends AbstractJobFactory {
     }
 
     protected List<String> findHostnamesByComponentName(String componentName) {
-        List<HostComponent> hostComponents =
+        List<HostComponentPO> hostComponentPOList =
                 hostComponentRepository.findAllByComponentClusterIdAndComponentComponentName(
                         clusterPO.getId(), componentName);
-        if (hostComponents == null) {
+        if (hostComponentPOList == null) {
             return new ArrayList<>();
         } else {
-            return hostComponents.stream()
-                    .map(HostComponent::getHostPO)
+            return hostComponentPOList.stream()
+                    .map(HostComponentPO::getHostPO)
                     .map(HostPO::getHostname)
                     .toList();
         }

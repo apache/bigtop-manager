@@ -21,8 +21,13 @@ package org.apache.bigtop.manager.server.service.impl;
 import org.apache.bigtop.manager.common.constants.ComponentCategories;
 import org.apache.bigtop.manager.common.enums.MaintainState;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.po.*;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
+import org.apache.bigtop.manager.dao.po.ComponentPO;
+import org.apache.bigtop.manager.dao.po.HostComponentPO;
+import org.apache.bigtop.manager.dao.po.HostPO;
+import org.apache.bigtop.manager.dao.po.Service;
+import org.apache.bigtop.manager.dao.po.ServiceConfig;
+import org.apache.bigtop.manager.dao.po.TypeConfig;
 import org.apache.bigtop.manager.dao.repository.HostComponentRepository;
 import org.apache.bigtop.manager.dao.repository.ServiceConfigRepository;
 import org.apache.bigtop.manager.dao.repository.ServiceRepository;
@@ -61,25 +66,25 @@ public class ServiceServiceImpl implements ServiceService {
     @Override
     public List<ServiceVO> list(Long clusterId) {
         List<ServiceVO> res = new ArrayList<>();
-        List<HostComponent> hostComponentList = hostComponentRepository.findAllByComponentClusterId(clusterId);
-        Map<Long, List<HostComponent>> serviceIdToHostComponent = hostComponentList.stream()
-                .collect(Collectors.groupingBy(hostComponent ->
-                        hostComponent.getComponentPO().getService().getId()));
+        Map<Long, List<HostComponentPO>> serviceIdToHostComponent =
+                hostComponentRepository.findAllByComponentClusterId(clusterId).stream()
+                        .collect(Collectors.groupingBy(hostComponent ->
+                                hostComponent.getComponentPO().getService().getId()));
 
-        for (Map.Entry<Long, List<HostComponent>> entry : serviceIdToHostComponent.entrySet()) {
-            List<HostComponent> hostComponents = entry.getValue();
-            Service service = hostComponents.get(0).getComponentPO().getService();
+        for (Map.Entry<Long, List<HostComponentPO>> entry : serviceIdToHostComponent.entrySet()) {
+            List<HostComponentPO> hostComponentPOList = entry.getValue();
+            Service service = hostComponentPOList.get(0).getComponentPO().getService();
             ServiceVO serviceVO = ServiceConverter.INSTANCE.fromEntity2VO(service);
             serviceVO.setQuickLinks(new ArrayList<>());
 
             boolean isHealthy = true;
             boolean isClient = true;
-            for (HostComponent hostComponent : hostComponents) {
-                ComponentPO componentPO = hostComponent.getComponentPO();
+            for (HostComponentPO hostComponentPO : hostComponentPOList) {
+                ComponentPO componentPO = hostComponentPO.getComponentPO();
 
                 String quickLink = componentPO.getQuickLink();
                 if (StringUtils.isNotBlank(quickLink)) {
-                    QuickLinkVO quickLinkVO = resolveQuickLink(hostComponent, quickLink);
+                    QuickLinkVO quickLinkVO = resolveQuickLink(hostComponentPO, quickLink);
                     serviceVO.getQuickLinks().add(quickLinkVO);
                 }
 
@@ -91,7 +96,7 @@ public class ServiceServiceImpl implements ServiceService {
                 MaintainState expectedState = category.equalsIgnoreCase(ComponentCategories.CLIENT)
                         ? MaintainState.INSTALLED
                         : MaintainState.STARTED;
-                if (!hostComponent.getState().equals(expectedState)) {
+                if (!hostComponentPO.getState().equals(expectedState)) {
                     isHealthy = false;
                 }
             }
@@ -110,15 +115,15 @@ public class ServiceServiceImpl implements ServiceService {
         return ServiceConverter.INSTANCE.fromEntity2VO(service);
     }
 
-    private QuickLinkVO resolveQuickLink(HostComponent hostComponent, String quickLinkJson) {
+    private QuickLinkVO resolveQuickLink(HostComponentPO hostComponentPO, String quickLinkJson) {
         QuickLinkVO quickLinkVO = new QuickLinkVO();
 
         QuickLinkDTO quickLinkDTO = JsonUtils.readFromString(quickLinkJson, QuickLinkDTO.class);
         quickLinkVO.setDisplayName(quickLinkDTO.getDisplayName());
 
-        ComponentPO componentPO = hostComponent.getComponentPO();
+        ComponentPO componentPO = hostComponentPO.getComponentPO();
         ClusterPO clusterPO = componentPO.getClusterPO();
-        HostPO hostPO = hostComponent.getHostPO();
+        HostPO hostPO = hostComponentPO.getHostPO();
         Service service = componentPO.getService();
         ServiceConfig serviceConfig =
                 serviceConfigRepository.findByClusterAndServiceAndSelectedIsTrue(clusterPO, service);
