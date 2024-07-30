@@ -18,8 +18,8 @@
  */
 package org.apache.bigtop.manager.dao.repository;
 
-import org.apache.bigtop.manager.dao.entity.Job;
-import org.apache.bigtop.manager.dao.entity.Stage;
+import org.apache.bigtop.manager.dao.po.Job;
+import org.apache.bigtop.manager.dao.po.Stage;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

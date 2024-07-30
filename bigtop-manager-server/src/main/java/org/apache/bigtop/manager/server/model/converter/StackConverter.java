@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.server.model.converter;
 
-import org.apache.bigtop.manager.dao.entity.Stack;
+import org.apache.bigtop.manager.dao.po.Stack;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.dto.StackDTO;
 import org.apache.bigtop.manager.server.model.vo.StackVO;

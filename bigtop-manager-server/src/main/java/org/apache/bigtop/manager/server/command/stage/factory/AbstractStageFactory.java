@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.server.command.stage.factory;
 
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.entity.Stage;
+import org.apache.bigtop.manager.dao.po.Stage;
 
 public abstract class AbstractStageFactory implements StageFactory {
 

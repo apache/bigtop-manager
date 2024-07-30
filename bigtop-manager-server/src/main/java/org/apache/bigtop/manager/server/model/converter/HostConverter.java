@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.server.model.converter;
 
-import org.apache.bigtop.manager.dao.entity.Host;
+import org.apache.bigtop.manager.dao.po.Host;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.dto.HostDTO;
 import org.apache.bigtop.manager.server.model.req.HostReq;

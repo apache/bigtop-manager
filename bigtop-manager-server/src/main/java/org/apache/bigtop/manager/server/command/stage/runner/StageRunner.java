@@ -18,8 +18,8 @@
  */
 package org.apache.bigtop.manager.server.command.stage.runner;
 
-import org.apache.bigtop.manager.dao.entity.Stage;
-import org.apache.bigtop.manager.dao.entity.Task;
+import org.apache.bigtop.manager.dao.po.Stage;
+import org.apache.bigtop.manager.dao.po.Task;
 import org.apache.bigtop.manager.server.command.stage.factory.StageContext;
 import org.apache.bigtop.manager.server.command.stage.factory.StageType;
 

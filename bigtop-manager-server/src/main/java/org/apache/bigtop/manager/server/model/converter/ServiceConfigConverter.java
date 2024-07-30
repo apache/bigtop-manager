@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.server.model.converter;
 
-import org.apache.bigtop.manager.dao.entity.ServiceConfig;
+import org.apache.bigtop.manager.dao.po.ServiceConfig;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.vo.ServiceConfigVO;
 

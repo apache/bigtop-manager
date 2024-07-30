@@ -16,9 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.dao.entity;
-
-import org.apache.bigtop.manager.common.enums.MaintainState;
+package org.apache.bigtop.manager.dao.po;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -41,50 +39,37 @@ import jakarta.persistence.UniqueConstraint;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(
-        name = "\"cluster\"",
+        name = "repo",
         uniqueConstraints = {
             @UniqueConstraint(
-                    name = "uk_cluster_name",
-                    columnNames = {"cluster_name"})
+                    name = "uk_repo_id",
+                    columnNames = {"repo_id", "os", "arch", "cluster_id"})
         },
-        indexes = {@Index(name = "idx_cluster_stack_id", columnList = "stack_id")})
-@TableGenerator(
-        name = "cluster_generator",
-        table = "sequence",
-        pkColumnName = "seq_name",
-        valueColumnName = "seq_count")
-public class Cluster extends BaseEntity {
+        indexes = {@Index(name = "idx_repo_cluster_id", columnList = "cluster_id")})
+@TableGenerator(name = "repo_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
+public class Repo extends BasePO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "cluster_generator")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "repo_generator")
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "cluster_name")
-    private String clusterName;
+    @Column(name = "base_url")
+    private String baseUrl;
 
-    @Column(name = "cluster_type")
-    private Integer clusterType;
+    @Column(name = "os")
+    private String os;
 
-    @Column(name = "\"root\"")
-    private String root;
+    @Column(name = "arch")
+    private String arch;
 
-    @Column(name = "user_group")
-    private String userGroup;
+    @Column(name = "repo_id")
+    private String repoId;
 
-    @Column(name = "packages")
-    private String packages;
-
-    @Column(name = "repo_template")
-    private String repoTemplate;
-
-    @Column(name = "state")
-    private MaintainState state;
-
-    @Column(name = "selected")
-    private Boolean selected;
+    @Column(name = "repo_name")
+    private String repoName;
 
     @ManyToOne
-    @JoinColumn(name = "stack_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Stack stack;
+    @JoinColumn(name = "cluster_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private Cluster cluster;
 }

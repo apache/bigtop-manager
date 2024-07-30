@@ -16,7 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.dao.entity;
+package org.apache.bigtop.manager.dao.po;
+
+import org.apache.bigtop.manager.common.enums.MaintainState;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -39,48 +41,53 @@ import jakarta.persistence.UniqueConstraint;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(
-        name = "service",
+        name = "host",
         uniqueConstraints = {
             @UniqueConstraint(
-                    name = "uk_service_name",
-                    columnNames = {"service_name", "cluster_id"})
+                    name = "uk_hostname",
+                    columnNames = {"hostname", "cluster_id"})
         },
-        indexes = {@Index(name = "idx_service_cluster_id", columnList = "cluster_id")})
-@TableGenerator(
-        name = "service_generator",
-        table = "sequence",
-        pkColumnName = "seq_name",
-        valueColumnName = "seq_count")
-public class Service extends BaseEntity {
+        indexes = {@Index(name = "idx_host_cluster_id", columnList = "cluster_id")})
+@TableGenerator(name = "host_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
+public class Host extends BasePO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "service_generator")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "host_generator")
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "service_name")
-    private String serviceName;
+    @Column(name = "hostname")
+    private String hostname;
 
-    @Column(name = "display_name")
-    private String displayName;
+    @Column(name = "ipv4")
+    private String ipv4;
 
-    @Column(name = "service_desc")
-    private String serviceDesc;
+    @Column(name = "ipv6")
+    private String ipv6;
 
-    @Column(name = "service_version")
-    private String serviceVersion;
+    @Column(name = "arch")
+    private String arch;
 
-    @Column(name = "os_specifics")
-    private String osSpecifics;
+    @Column(name = "os")
+    private String os;
 
-    @Column(name = "service_user")
-    private String serviceUser;
+    @Column(name = "available_processors")
+    private Integer availableProcessors;
 
-    @Column(name = "service_group")
-    private String serviceGroup;
+    @Column(name = "free_memory_size")
+    private Long freeMemorySize;
 
-    @Column(name = "required_services")
-    private String requiredServices;
+    @Column(name = "total_memory_size")
+    private Long totalMemorySize;
+
+    @Column(name = "free_disk")
+    private Long freeDisk;
+
+    @Column(name = "total_disk")
+    private Long totalDisk;
+
+    @Column(name = "state")
+    private MaintainState state;
 
     @ManyToOne
     @JoinColumn(name = "cluster_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))

@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.dao.repository;
 
-import org.apache.bigtop.manager.dao.entity.Service;
+import org.apache.bigtop.manager.dao.po.Service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

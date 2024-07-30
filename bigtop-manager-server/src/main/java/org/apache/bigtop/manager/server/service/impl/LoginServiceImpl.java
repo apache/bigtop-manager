@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
-import org.apache.bigtop.manager.dao.entity.User;
+import org.apache.bigtop.manager.dao.po.User;
 import org.apache.bigtop.manager.dao.repository.UserRepository;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;

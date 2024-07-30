@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.server.stack;
 
-import org.apache.bigtop.manager.dao.entity.Stack;
+import org.apache.bigtop.manager.dao.po.Stack;
 import org.apache.bigtop.manager.dao.repository.StackRepository;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.model.dto.StackDTO;

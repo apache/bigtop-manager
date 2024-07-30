@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.dao.entity;
+package org.apache.bigtop.manager.dao.po;
 
 import org.apache.bigtop.manager.common.enums.JobState;
 
@@ -46,33 +46,21 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(
-        name = "stage",
-        indexes = {
-            @Index(name = "idx_stage_cluster_id", columnList = "cluster_id"),
-            @Index(name = "idx_stage_job_id", columnList = "job_id")
-        })
-@TableGenerator(name = "stage_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
-public class Stage extends BaseEntity {
+        name = "\"job\"",
+        indexes = {@Index(name = "idx_job_cluster_id", columnList = "cluster_id")})
+@TableGenerator(name = "job_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
+public class Job extends BasePO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "stage_generator")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "job_generator")
     @Column(name = "id")
     private Long id;
-
-    @Column(name = "name")
-    private String name;
 
     @Column(name = "state")
     private JobState state;
 
-    @Column(name = "\"order\"")
-    private Integer order;
-
-    @Column(name = "service_name")
-    private String serviceName;
-
-    @Column(name = "component_name")
-    private String componentName;
+    @Column(name = "name")
+    private String name;
 
     @Lob
     @Basic(fetch = FetchType.LAZY)
@@ -80,14 +68,10 @@ public class Stage extends BaseEntity {
     private String context;
 
     @ManyToOne
-    @JoinColumn(name = "job_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Job job;
-
-    @ManyToOne
     @JoinColumn(name = "cluster_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Cluster cluster;
 
     @ToString.Exclude
-    @OneToMany(mappedBy = "stage")
-    private List<Task> tasks;
+    @OneToMany(mappedBy = "job")
+    private List<Stage> stages;
 }

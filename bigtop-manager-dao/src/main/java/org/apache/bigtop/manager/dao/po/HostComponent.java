@@ -16,79 +16,55 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.dao.entity;
+package org.apache.bigtop.manager.dao.po;
+
+import org.apache.bigtop.manager.common.enums.MaintainState;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
-import jakarta.persistence.UniqueConstraint;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(
-        name = "component",
-        uniqueConstraints = {
-            @UniqueConstraint(
-                    name = "uk_component_name",
-                    columnNames = {"component_name", "cluster_id"})
-        },
+        name = "host_component",
         indexes = {
-            @Index(name = "idx_component_cluster_id", columnList = "cluster_id"),
-            @Index(name = "idx_component_service_id", columnList = "service_id")
+            @Index(name = "idx_hc_component_id", columnList = "component_id"),
+            @Index(name = "idx_hc_host_id", columnList = "host_id")
         })
 @TableGenerator(
-        name = "component_generator",
+        name = "host_component_generator",
         table = "sequence",
         pkColumnName = "seq_name",
         valueColumnName = "seq_count")
-public class Component extends BaseEntity {
+public class HostComponent extends BasePO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "component_generator")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "host_component_generator")
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "component_name")
-    private String componentName;
-
-    @Column(name = "display_name")
-    private String displayName;
-
-    @Column(name = "command_script")
-    private String commandScript;
-
-    @Lob
-    @Basic(fetch = FetchType.LAZY)
-    @Column(name = "custom_commands", length = 16777216)
-    private String customCommands;
-
-    @Column(name = "category")
-    private String category;
-
-    @Column(name = "quick_link")
-    private String quickLink;
+    @Column(name = "state")
+    private MaintainState state;
 
     @ManyToOne
-    @JoinColumn(name = "service_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Service service;
+    @JoinColumn(name = "host_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private Host host;
 
     @ManyToOne
-    @JoinColumn(name = "cluster_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Cluster cluster;
+    @JoinColumn(name = "component_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private Component component;
 }

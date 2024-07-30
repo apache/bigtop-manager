@@ -20,8 +20,8 @@ package org.apache.bigtop.manager.server.command.stage.runner;
 
 import org.apache.bigtop.manager.common.constants.MessageConstants;
 import org.apache.bigtop.manager.common.enums.JobState;
-import org.apache.bigtop.manager.dao.entity.Stage;
-import org.apache.bigtop.manager.dao.entity.Task;
+import org.apache.bigtop.manager.dao.po.Stage;
+import org.apache.bigtop.manager.dao.po.Task;
 import org.apache.bigtop.manager.dao.repository.StageRepository;
 import org.apache.bigtop.manager.dao.repository.TaskRepository;
 import org.apache.bigtop.manager.grpc.generated.CommandReply;

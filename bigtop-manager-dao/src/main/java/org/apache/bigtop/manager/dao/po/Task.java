@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.dao.entity;
+package org.apache.bigtop.manager.dao.po;
 
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.enums.JobState;
@@ -51,7 +51,7 @@ import jakarta.persistence.TableGenerator;
             @Index(name = "idx_task_stage_id", columnList = "stage_id")
         })
 @TableGenerator(name = "task_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
-public class Task extends BaseEntity {
+public class Task extends BasePO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "task_generator")

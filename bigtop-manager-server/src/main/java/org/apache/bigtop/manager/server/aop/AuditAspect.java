@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.server.aop;
 
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.entity.AuditLog;
+import org.apache.bigtop.manager.dao.po.AuditLog;
 import org.apache.bigtop.manager.dao.repository.AuditLogRepository;
 import org.apache.bigtop.manager.server.holder.SessionUserHolder;
 

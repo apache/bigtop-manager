@@ -19,10 +19,10 @@
 package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.entity.Cluster;
-import org.apache.bigtop.manager.dao.entity.Service;
-import org.apache.bigtop.manager.dao.entity.ServiceConfig;
-import org.apache.bigtop.manager.dao.entity.TypeConfig;
+import org.apache.bigtop.manager.dao.po.Cluster;
+import org.apache.bigtop.manager.dao.po.Service;
+import org.apache.bigtop.manager.dao.po.ServiceConfig;
+import org.apache.bigtop.manager.dao.po.TypeConfig;
 import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.dao.repository.ServiceConfigRepository;
 import org.apache.bigtop.manager.dao.repository.ServiceRepository;

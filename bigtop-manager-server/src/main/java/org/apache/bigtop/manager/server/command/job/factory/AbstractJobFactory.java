@@ -20,10 +20,10 @@ package org.apache.bigtop.manager.server.command.job.factory;
 
 import org.apache.bigtop.manager.common.enums.JobState;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.entity.Cluster;
-import org.apache.bigtop.manager.dao.entity.Job;
-import org.apache.bigtop.manager.dao.entity.Stage;
-import org.apache.bigtop.manager.dao.entity.Task;
+import org.apache.bigtop.manager.dao.po.Cluster;
+import org.apache.bigtop.manager.dao.po.Job;
+import org.apache.bigtop.manager.dao.po.Stage;
+import org.apache.bigtop.manager.dao.po.Task;
 import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.dao.repository.JobRepository;
 import org.apache.bigtop.manager.dao.repository.StageRepository;

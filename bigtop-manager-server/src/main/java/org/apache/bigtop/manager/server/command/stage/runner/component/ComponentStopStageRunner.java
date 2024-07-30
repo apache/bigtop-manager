@@ -19,8 +19,8 @@
 package org.apache.bigtop.manager.server.command.stage.runner.component;
 
 import org.apache.bigtop.manager.common.enums.MaintainState;
-import org.apache.bigtop.manager.dao.entity.HostComponent;
-import org.apache.bigtop.manager.dao.entity.Task;
+import org.apache.bigtop.manager.dao.po.HostComponent;
+import org.apache.bigtop.manager.dao.po.Task;
 import org.apache.bigtop.manager.dao.repository.HostComponentRepository;
 import org.apache.bigtop.manager.server.command.stage.factory.StageType;
 import org.apache.bigtop.manager.server.command.stage.runner.AbstractStageRunner;

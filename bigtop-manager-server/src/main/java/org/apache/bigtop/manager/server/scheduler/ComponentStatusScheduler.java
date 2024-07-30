@@ -19,12 +19,12 @@
 package org.apache.bigtop.manager.server.scheduler;
 
 import org.apache.bigtop.manager.common.enums.MaintainState;
-import org.apache.bigtop.manager.dao.entity.Cluster;
-import org.apache.bigtop.manager.dao.entity.Component;
-import org.apache.bigtop.manager.dao.entity.Host;
-import org.apache.bigtop.manager.dao.entity.HostComponent;
-import org.apache.bigtop.manager.dao.entity.Service;
-import org.apache.bigtop.manager.dao.entity.Stack;
+import org.apache.bigtop.manager.dao.po.Cluster;
+import org.apache.bigtop.manager.dao.po.Component;
+import org.apache.bigtop.manager.dao.po.Host;
+import org.apache.bigtop.manager.dao.po.HostComponent;
+import org.apache.bigtop.manager.dao.po.Service;
+import org.apache.bigtop.manager.dao.po.Stack;
 import org.apache.bigtop.manager.dao.repository.HostComponentRepository;
 import org.apache.bigtop.manager.grpc.generated.ComponentStatusReply;
 import org.apache.bigtop.manager.grpc.generated.ComponentStatusRequest;

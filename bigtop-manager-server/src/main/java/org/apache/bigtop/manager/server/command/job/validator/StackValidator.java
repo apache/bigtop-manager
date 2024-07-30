@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.server.command.job.validator;
 
 import org.apache.bigtop.manager.common.enums.Command;
-import org.apache.bigtop.manager.dao.entity.Stack;
+import org.apache.bigtop.manager.dao.po.Stack;
 import org.apache.bigtop.manager.dao.repository.StackRepository;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;

@@ -20,11 +20,11 @@ package org.apache.bigtop.manager.server.command.job.runner.service;
 
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.enums.MaintainState;
-import org.apache.bigtop.manager.dao.entity.Cluster;
-import org.apache.bigtop.manager.dao.entity.Component;
-import org.apache.bigtop.manager.dao.entity.Host;
-import org.apache.bigtop.manager.dao.entity.HostComponent;
-import org.apache.bigtop.manager.dao.entity.Service;
+import org.apache.bigtop.manager.dao.po.Cluster;
+import org.apache.bigtop.manager.dao.po.Component;
+import org.apache.bigtop.manager.dao.po.Host;
+import org.apache.bigtop.manager.dao.po.HostComponent;
+import org.apache.bigtop.manager.dao.po.Service;
 import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.dao.repository.ComponentRepository;
 import org.apache.bigtop.manager.dao.repository.HostComponentRepository;

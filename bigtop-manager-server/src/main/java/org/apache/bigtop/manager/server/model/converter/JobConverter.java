@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.server.model.converter;
 
-import org.apache.bigtop.manager.dao.entity.Job;
+import org.apache.bigtop.manager.dao.po.Job;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.vo.CommandVO;
 import org.apache.bigtop.manager.server.model.vo.JobVO;

@@ -19,8 +19,8 @@
 package org.apache.bigtop.manager.server.command.stage.factory.config;
 
 import org.apache.bigtop.manager.common.enums.Command;
-import org.apache.bigtop.manager.dao.entity.Host;
-import org.apache.bigtop.manager.dao.entity.Task;
+import org.apache.bigtop.manager.dao.po.Host;
+import org.apache.bigtop.manager.dao.po.Task;
 import org.apache.bigtop.manager.dao.repository.HostRepository;
 import org.apache.bigtop.manager.server.command.stage.factory.AbstractStageFactory;
 import org.apache.bigtop.manager.server.command.stage.factory.StageType;

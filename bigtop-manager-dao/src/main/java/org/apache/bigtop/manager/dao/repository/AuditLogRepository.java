@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.dao.repository;
 
-import org.apache.bigtop.manager.dao.entity.AuditLog;
+import org.apache.bigtop.manager.dao.po.AuditLog;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.dao.entity;
+package org.apache.bigtop.manager.dao.po;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -34,7 +34,7 @@ import jakarta.persistence.TableGenerator;
 @Entity
 @Table(name = "\"user\"")
 @TableGenerator(name = "user_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
-public class User extends BaseEntity {
+public class User extends BasePO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "user_generator")

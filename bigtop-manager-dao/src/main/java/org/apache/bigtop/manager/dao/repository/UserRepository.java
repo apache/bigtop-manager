@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.dao.repository;
 
-import org.apache.bigtop.manager.dao.entity.User;
+import org.apache.bigtop.manager.dao.po.User;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

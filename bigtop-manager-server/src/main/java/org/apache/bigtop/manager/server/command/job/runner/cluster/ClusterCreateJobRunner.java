@@ -20,9 +20,9 @@ package org.apache.bigtop.manager.server.command.job.runner.cluster;
 
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.enums.MaintainState;
-import org.apache.bigtop.manager.dao.entity.Cluster;
-import org.apache.bigtop.manager.dao.entity.Stage;
-import org.apache.bigtop.manager.dao.entity.Task;
+import org.apache.bigtop.manager.dao.po.Cluster;
+import org.apache.bigtop.manager.dao.po.Stage;
+import org.apache.bigtop.manager.dao.po.Task;
 import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.dao.repository.JobRepository;
 import org.apache.bigtop.manager.dao.repository.StageRepository;

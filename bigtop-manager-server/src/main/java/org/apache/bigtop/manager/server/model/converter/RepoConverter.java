@@ -19,8 +19,8 @@
 package org.apache.bigtop.manager.server.model.converter;
 
 import org.apache.bigtop.manager.common.message.entity.pojo.RepoInfo;
-import org.apache.bigtop.manager.dao.entity.Cluster;
-import org.apache.bigtop.manager.dao.entity.Repo;
+import org.apache.bigtop.manager.dao.po.Cluster;
+import org.apache.bigtop.manager.dao.po.Repo;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.dto.RepoDTO;
 

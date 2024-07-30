@@ -19,8 +19,8 @@
 package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.common.enums.MaintainState;
-import org.apache.bigtop.manager.dao.entity.Cluster;
-import org.apache.bigtop.manager.dao.entity.Host;
+import org.apache.bigtop.manager.dao.po.Cluster;
+import org.apache.bigtop.manager.dao.po.Host;
 import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.dao.repository.HostRepository;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;

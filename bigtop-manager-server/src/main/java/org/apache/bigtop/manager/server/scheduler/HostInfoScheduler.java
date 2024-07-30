@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.server.scheduler;
 
 import org.apache.bigtop.manager.common.enums.MaintainState;
-import org.apache.bigtop.manager.dao.entity.Host;
+import org.apache.bigtop.manager.dao.po.Host;
 import org.apache.bigtop.manager.dao.repository.HostRepository;
 import org.apache.bigtop.manager.grpc.generated.HostInfoReply;
 import org.apache.bigtop.manager.grpc.generated.HostInfoRequest;

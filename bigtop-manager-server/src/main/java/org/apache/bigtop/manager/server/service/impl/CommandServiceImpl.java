@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
-import org.apache.bigtop.manager.dao.entity.Job;
+import org.apache.bigtop.manager.dao.po.Job;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
 import org.apache.bigtop.manager.server.command.job.factory.JobContext;
 import org.apache.bigtop.manager.server.command.job.factory.JobFactories;

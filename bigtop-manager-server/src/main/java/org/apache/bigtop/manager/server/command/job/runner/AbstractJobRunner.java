@@ -19,9 +19,9 @@
 package org.apache.bigtop.manager.server.command.job.runner;
 
 import org.apache.bigtop.manager.common.enums.JobState;
-import org.apache.bigtop.manager.dao.entity.Job;
-import org.apache.bigtop.manager.dao.entity.Stage;
-import org.apache.bigtop.manager.dao.entity.Task;
+import org.apache.bigtop.manager.dao.po.Job;
+import org.apache.bigtop.manager.dao.po.Stage;
+import org.apache.bigtop.manager.dao.po.Task;
 import org.apache.bigtop.manager.dao.repository.JobRepository;
 import org.apache.bigtop.manager.dao.repository.StageRepository;
 import org.apache.bigtop.manager.dao.repository.TaskRepository;

@@ -19,9 +19,9 @@
 package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.common.enums.MaintainState;
-import org.apache.bigtop.manager.dao.entity.Cluster;
-import org.apache.bigtop.manager.dao.entity.Repo;
-import org.apache.bigtop.manager.dao.entity.Stack;
+import org.apache.bigtop.manager.dao.po.Cluster;
+import org.apache.bigtop.manager.dao.po.Repo;
+import org.apache.bigtop.manager.dao.po.Stack;
 import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.dao.repository.RepoRepository;
 import org.apache.bigtop.manager.dao.repository.StackRepository;

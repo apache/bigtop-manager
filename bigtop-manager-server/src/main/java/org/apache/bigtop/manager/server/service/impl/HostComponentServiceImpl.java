@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
-import org.apache.bigtop.manager.dao.entity.HostComponent;
+import org.apache.bigtop.manager.dao.po.HostComponent;
 import org.apache.bigtop.manager.dao.repository.ComponentRepository;
 import org.apache.bigtop.manager.dao.repository.HostComponentRepository;
 import org.apache.bigtop.manager.dao.repository.HostRepository;

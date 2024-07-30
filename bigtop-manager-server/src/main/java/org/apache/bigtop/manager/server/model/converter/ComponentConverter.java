@@ -18,9 +18,9 @@
  */
 package org.apache.bigtop.manager.server.model.converter;
 
-import org.apache.bigtop.manager.dao.entity.Cluster;
-import org.apache.bigtop.manager.dao.entity.Component;
-import org.apache.bigtop.manager.dao.entity.Service;
+import org.apache.bigtop.manager.dao.po.Cluster;
+import org.apache.bigtop.manager.dao.po.Component;
+import org.apache.bigtop.manager.dao.po.Service;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
 import org.apache.bigtop.manager.server.model.vo.ComponentVO;

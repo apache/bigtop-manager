@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.server.command.stage.runner;
 
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.entity.Stage;
+import org.apache.bigtop.manager.dao.po.Stage;
 import org.apache.bigtop.manager.server.command.stage.factory.StageContext;
 import org.apache.bigtop.manager.server.command.stage.factory.StageType;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;

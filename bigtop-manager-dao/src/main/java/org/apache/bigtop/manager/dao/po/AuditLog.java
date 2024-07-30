@@ -16,66 +16,58 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.dao.entity;
+package org.apache.bigtop.manager.dao.po;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
+import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
-import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
-import jakarta.persistence.ForeignKey;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
-import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(
-        name = "service_config",
-        indexes = {
-            @Index(name = "idx_sc_cluster_id", columnList = "cluster_id"),
-            @Index(name = "idx_sc_service_id", columnList = "service_id")
-        })
+@Table(name = "audit_log")
 @TableGenerator(
-        name = "service_config_generator",
+        name = "audit_log_generator",
         table = "sequence",
         pkColumnName = "seq_name",
         valueColumnName = "seq_count")
-public class ServiceConfig extends BaseEntity {
+public class AuditLog extends BasePO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "service_config_generator")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "audit_log_generator")
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "config_desc")
-    private String configDesc;
+    @Column(name = "uri")
+    private String uri;
 
-    @Column(name = "version")
-    private Integer version;
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "args", length = 16777216)
+    private String args;
 
-    @Column(name = "selected")
-    private Boolean selected;
+    @Column(name = "tag_name")
+    private String tagName;
 
-    @ToString.Exclude
-    @OneToMany(mappedBy = "serviceConfig")
-    private List<TypeConfig> configs;
+    @Column(name = "tag_desc")
+    private String tagDesc;
 
-    @ManyToOne
-    @JoinColumn(name = "service_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Service service;
+    @Column(name = "operation_summary")
+    private String operationSummary;
 
-    @ManyToOne
-    @JoinColumn(name = "cluster_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Cluster cluster;
+    @Column(name = "operation_desc")
+    private String operationDesc;
+
+    @Column(name = "user_id")
+    private Long userId;
 }

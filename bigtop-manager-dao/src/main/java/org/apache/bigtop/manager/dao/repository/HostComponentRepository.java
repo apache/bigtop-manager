@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.dao.repository;
 
-import org.apache.bigtop.manager.dao.entity.HostComponent;
+import org.apache.bigtop.manager.dao.po.HostComponent;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

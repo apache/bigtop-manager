@@ -19,8 +19,8 @@
 package org.apache.bigtop.manager.dao.repository;
 
 import org.apache.bigtop.manager.common.enums.JobState;
-import org.apache.bigtop.manager.dao.entity.Stage;
-import org.apache.bigtop.manager.dao.entity.Task;
+import org.apache.bigtop.manager.dao.po.Stage;
+import org.apache.bigtop.manager.dao.po.Task;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

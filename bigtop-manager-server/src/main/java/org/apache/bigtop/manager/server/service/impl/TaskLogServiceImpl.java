@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.common.enums.JobState;
-import org.apache.bigtop.manager.dao.entity.Task;
+import org.apache.bigtop.manager.dao.po.Task;
 import org.apache.bigtop.manager.dao.repository.TaskRepository;
 import org.apache.bigtop.manager.grpc.generated.TaskLogReply;
 import org.apache.bigtop.manager.grpc.generated.TaskLogRequest;

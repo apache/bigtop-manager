@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.server.command.stage.factory;
 
-import org.apache.bigtop.manager.dao.entity.Stage;
+import org.apache.bigtop.manager.dao.po.Stage;
 
 /**
  * Stage factory.

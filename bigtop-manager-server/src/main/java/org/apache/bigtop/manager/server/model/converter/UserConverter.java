@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.server.model.converter;
 
-import org.apache.bigtop.manager.dao.entity.User;
+import org.apache.bigtop.manager.dao.po.User;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.dto.UserDTO;
 import org.apache.bigtop.manager.server.model.req.UserReq;
