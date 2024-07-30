@@ -27,32 +27,35 @@
   import { ServiceConfigVO, TypeConfigVO } from '@/api/config/types.ts'
   import { useComponentStore } from '@/store/component'
   import { HostComponentVO } from '@/api/component/types.ts'
-  import DotState from '@/components/dot-state/index.vue'
   import { useServiceStore } from '@/store/service'
   import { type ServiceVO, StateColor } from '@/api/service/types.ts'
   import { Modal } from 'ant-design-vue'
   import { useI18n } from 'vue-i18n'
+  import DotState from '@/components/dot-state/index.vue'
+  import Job from '@/components/job-info/job.vue'
+  import { execCommand } from '@/api/command'
+  import { useClusterStore } from '@/store/cluster'
 
   interface Menu {
     key: string
-    iconName: string
+    action: string
     dicText: string
   }
 
   const menuOps: Menu[] = [
     {
       key: '1',
-      iconName: 'start',
+      action: 'start',
       dicText: 'service.start_service'
     },
     {
       key: '2',
-      iconName: 'stop',
+      action: 'stop',
       dicText: 'service.stop_service'
     },
     {
       key: '3',
-      iconName: 'restart',
+      action: 'restart',
       dicText: 'service.restart_service'
     }
   ]
@@ -65,36 +68,49 @@
   const { hostComponents } = storeToRefs(componentStore)
   const serviceStore = useServiceStore()
   const { installedServices } = storeToRefs(serviceStore)
+  const clusterStore = useClusterStore()
+  const { clusterId } = storeToRefs(clusterStore)
+  const serviceConfigDesc = ref<SelectProps['options']>([])
+  const activeSelect = ref()
+  const currentConfigs = ref<TypeConfigVO[]>([])
+  const currentHostComponent = ref<HostComponentVO[]>([])
+  const serviceName = ref<string>(route.params.serviceName as string)
+  const currentConfigVersion = ref<number>()
+  const initConfigVersion = ref<number>()
+  const showConfigTip = ref<boolean>(false)
+  const activeConfig = ref()
+  const menuClicked = ref<Menu>()
+  const jobWindowOpened = ref(false)
+
   const selectedService = computed(() => {
     return installedServices.value.filter(
       (service: ServiceVO) => service.serviceName === serviceName.value
     )[0]
   })
 
-  const serviceName = ref<string>(route.params.serviceName as string)
-
   // summary model start
-  const currentHostComponent = ref<HostComponentVO[]>([])
   watch(hostComponents, (newVal) => {
     currentHostComponent.value = newVal.filter(
       (hc: HostComponentVO) => hc.serviceName === serviceName.value
     )
   })
 
-  // summary model end
-
-  // config model start
-  const serviceConfigDesc = ref<SelectProps['options']>([])
-  const activeSelect = ref()
-  const currentConfigs = ref<TypeConfigVO[]>([])
-  const currentConfigVersion = ref<number>()
-  const initConfigVersion = ref<number>()
-  const showConfigTip = ref<boolean>(false)
+  watch(currentConfigs, (newVal) => {
+    activeConfig.value = newVal.length > 0 ? newVal[0].typeName : null
+  })
 
   watch(allConfigs, (newVal) => {
     allConfigs.value = newVal
     loadCurrentConfigs()
   })
+
+  watch(
+    () => route.params,
+    (params) => {
+      serviceName.value = params.serviceName as string
+      initServiceMeta()
+    }
+  )
 
   const loadCurrentConfigs = () => {
     serviceConfigDesc.value = allConfigs.value
@@ -105,9 +121,7 @@
         title: `${sc.configDesc}
           \n${sc.createTime}`
       }))
-
     currentConfigVersion.value = serviceConfigDesc.value?.[0].value as number
-
     currentConfigs.value = allConfigs.value
       .filter(
         (sc: ServiceConfigVO) =>
@@ -126,19 +140,13 @@
       currentConfigVersion.value = Number(value.key)
     }
     showConfigTip.value = currentConfigVersion.value !== initConfigVersion.value
-
     loadCurrentConfigs()
   }
-
-  const activeConfig = ref()
-
-  watch(currentConfigs, (newVal) => {
-    activeConfig.value = newVal.length > 0 ? newVal[0].typeName : null
-  })
 
   const handleMenuClick: MenuProps['onClick'] = (e) => {
     const menu = menuOps.find((menu) => menu.key == e.key)
     const text = `${menu?.dicText}_warn`
+    menuClicked.value = menu
     Modal.confirm({
       title: t('common.confirm'),
       icon: createVNode(QuestionCircleOutlined),
@@ -150,8 +158,25 @@
     })
   }
 
-  const onOk = () => {
-    // resolve api
+  const onOk = async () => {
+    try {
+      if (!menuClicked.value) {
+        return
+      }
+      await execCommand({
+        command: menuClicked.value.action,
+        clusterId: clusterId.value,
+        commandLevel: 'service',
+        serviceCommands: [
+          {
+            serviceName: serviceName.value
+          }
+        ]
+      })
+      jobWindowOpened.value = true
+    } catch (error) {
+      console.log('error :>> ', error)
+    }
   }
 
   const initServiceMeta = async () => {
@@ -167,130 +192,131 @@
     initServiceMeta()
     componentStore.resumeIntervalFn()
   })
-
-  watch(
-    () => route.params,
-    (params) => {
-      serviceName.value = params.serviceName as string
-      initServiceMeta()
-    }
-  )
 </script>
 
 <template>
-  <a-tabs>
-    <template #rightExtra>
-      <a-dropdown :trigger="['click']" placement="bottomRight">
-        <template #overlay>
-          <a-menu @click="handleMenuClick">
-            <a-menu-item v-for="item in menuOps" :key="item.key">
-              <svg-icon :name="item.iconName"></svg-icon>
-              <span>{{ $t(item.dicText) }}</span>
-            </a-menu-item>
-          </a-menu>
-        </template>
-        <a-button type="primary">
-          {{ $t('common.action') }}
-          <DownOutlined />
-        </a-button>
-      </a-dropdown>
-    </template>
-    <a-tab-pane key="summary">
-      <template #tab>{{ $t('service.summary') }}</template>
-      <a-layout-content class="summary-layout">
-        <div class="left-section">
-          <h2>{{ $t('service.components') }}</h2>
-          <div v-if="currentHostComponent.length > 0" class="summary-ctx">
-            <template v-for="item in currentHostComponent" :key="`${item.id}`">
-              <div class="card">
-                <div class="service-name">
-                  <router-link :to="'/services/' + serviceName">
-                    {{ item.displayName }}
-                  </router-link>
-                  <a-tag
-                    :bordered="false"
-                    style="color: rgb(145 134 134 / 90%)"
-                  >
-                    {{ item.category }}
-                  </a-tag>
-                </div>
-                <div class="comp-info">
-                  <div class="host-name">{{ item.hostname }}</div>
-                </div>
-                <footer>
-                  <div class="comp-state">
-                    <dot-state :color="StateColor[item.state]" class="dot-rest">
-                      <span class="comp-state-text">{{ item.state }}</span>
-                    </dot-state>
+  <div>
+    <a-tabs>
+      <template #rightExtra>
+        <a-dropdown :trigger="['click']" placement="bottomRight">
+          <template #overlay>
+            <a-menu @click="handleMenuClick">
+              <a-menu-item v-for="item in menuOps" :key="item.key">
+                <svg-icon :name="item.action"></svg-icon>
+                <span>{{ $t(item.dicText) }}</span>
+              </a-menu-item>
+            </a-menu>
+          </template>
+          <a-button type="primary">
+            {{ $t('common.action') }}
+            <DownOutlined />
+          </a-button>
+        </a-dropdown>
+      </template>
+      <a-tab-pane key="summary">
+        <template #tab>{{ $t('service.summary') }}</template>
+        <a-layout-content class="summary-layout">
+          <div class="left-section">
+            <h2>{{ $t('service.components') }}</h2>
+            <div v-if="currentHostComponent.length > 0" class="summary-ctx">
+              <template
+                v-for="item in currentHostComponent"
+                :key="`${item.id}`"
+              >
+                <div class="card">
+                  <div class="service-name">
+                    <router-link :to="'/services/' + serviceName">
+                      {{ item.displayName }}
+                    </router-link>
+                    <a-tag
+                      :bordered="false"
+                      style="color: rgb(145 134 134 / 90%)"
+                    >
+                      {{ item.category }}
+                    </a-tag>
                   </div>
-                </footer>
-              </div>
-            </template>
-          </div>
-        </div>
-        <div class="right-section">
-          <h2>{{ $t('service.quick_links') }}</h2>
-          <ul
-            v-if="
-              selectedService.quickLinks &&
-              selectedService.quickLinks.length > 0
-            "
-          >
-            <li v-for="link in selectedService.quickLinks" :key="link.url">
-              <a :href="link.url" target="_blank">{{ link.displayName }}</a>
-            </li>
-          </ul>
-          <div v-else class="no-link-text">{{ $t('service.no_link') }}</div>
-        </div>
-      </a-layout-content>
-    </a-tab-pane>
-
-    <a-tab-pane key="config" force-render>
-      <template #tab>{{ $t('service.config') }}</template>
-      <a-space>
-        <a-select
-          v-model:value="activeSelect"
-          label-in-value
-          :options="serviceConfigDesc"
-          @change="handleChange"
-        ></a-select>
-        <template v-if="showConfigTip">
-          <a-button type="primary">Not Current Config</a-button></template
-        >
-      </a-space>
-
-      <a-divider />
-      <a-collapse v-model:active-key="activeConfig" ghost accordion>
-        <a-collapse-panel
-          v-for="config in currentConfigs"
-          :key="config.typeName"
-          class="panel"
-          :header="config.typeName"
-        >
-          <div
-            v-for="property in config.properties"
-            :key="property.name"
-            class="config-item"
-          >
-            <div class="config-item-key">
-              {{ property.displayName ?? property.name }}
-            </div>
-            <a-tooltip class="config-item-value">
-              <template #title>
-                {{ property.desc }}
+                  <div class="comp-info">
+                    <div class="host-name">{{ item.hostname }}</div>
+                  </div>
+                  <footer>
+                    <div class="comp-state">
+                      <dot-state
+                        :color="StateColor[item.state]"
+                        class="dot-rest"
+                      >
+                        <span class="comp-state-text">{{ item.state }}</span>
+                      </dot-state>
+                    </div>
+                  </footer>
+                </div>
               </template>
-              <a-textarea
-                v-if="property.attrs && property.attrs.type === 'longtext'"
-                v-model:value="property.value"
-                :rows="10"
-              />
-              <a-input v-else v-model:value="property.value" />
-            </a-tooltip>
+            </div>
           </div>
-        </a-collapse-panel>
-      </a-collapse>
-    </a-tab-pane>
-  </a-tabs>
+          <div class="right-section">
+            <h2>{{ $t('service.quick_links') }}</h2>
+            <ul
+              v-if="
+                selectedService.quickLinks &&
+                selectedService.quickLinks.length > 0
+              "
+            >
+              <li v-for="link in selectedService.quickLinks" :key="link.url">
+                <a :href="link.url" target="_blank">{{ link.displayName }}</a>
+              </li>
+            </ul>
+            <div v-else class="no-link-text">{{ $t('service.no_link') }}</div>
+          </div>
+        </a-layout-content>
+      </a-tab-pane>
+
+      <a-tab-pane key="config" force-render>
+        <template #tab>{{ $t('service.config') }}</template>
+        <a-space>
+          <a-select
+            v-model:value="activeSelect"
+            label-in-value
+            :options="serviceConfigDesc"
+            @change="handleChange"
+          ></a-select>
+          <template v-if="showConfigTip">
+            <a-button type="primary">Not Current Config</a-button></template
+          >
+        </a-space>
+
+        <a-divider />
+        <a-collapse v-model:active-key="activeConfig" ghost accordion>
+          <a-collapse-panel
+            v-for="config in currentConfigs"
+            :key="config.typeName"
+            class="panel"
+            :header="config.typeName"
+          >
+            <div
+              v-for="property in config.properties"
+              :key="property.name"
+              class="config-item"
+            >
+              <div class="config-item-key">
+                {{ property.displayName ?? property.name }}
+              </div>
+              <a-tooltip class="config-item-value">
+                <template #title>
+                  {{ property.desc }}
+                </template>
+                <a-textarea
+                  v-if="property.attrs && property.attrs.type === 'longtext'"
+                  v-model:value="property.value"
+                  :rows="10"
+                />
+                <a-input v-else v-model:value="property.value" />
+              </a-tooltip>
+            </div>
+          </a-collapse-panel>
+        </a-collapse>
+      </a-tab-pane>
+    </a-tabs>
+    <job v-model:visible="jobWindowOpened" />
+  </div>
 </template>
 
 <style scoped lang="scss">
