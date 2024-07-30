@@ -86,5 +86,5 @@ public class ClusterPO extends BasePO {
 
     @ManyToOne
     @JoinColumn(name = "stack_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Stack stack;
+    private StackPO stackPO;
 }

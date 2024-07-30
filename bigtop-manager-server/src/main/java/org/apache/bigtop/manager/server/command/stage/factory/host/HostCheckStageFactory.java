@@ -56,8 +56,8 @@ public class HostCheckStageFactory extends AbstractStageFactory {
         if (context.getClusterId() != null) {
             ClusterPO clusterPO = clusterRepository.getReferenceById(context.getClusterId());
 
-            context.setStackName(clusterPO.getStack().getStackName());
-            context.setStackVersion(clusterPO.getStack().getStackVersion());
+            context.setStackName(clusterPO.getStackPO().getStackName());
+            context.setStackVersion(clusterPO.getStackPO().getStackVersion());
         }
 
         // Create stages

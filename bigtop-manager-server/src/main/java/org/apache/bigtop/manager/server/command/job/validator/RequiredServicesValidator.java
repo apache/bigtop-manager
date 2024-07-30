@@ -60,8 +60,8 @@ public class RequiredServicesValidator implements CommandValidator {
 
         Long clusterId = commandDTO.getClusterId();
         ClusterPO clusterPO = clusterRepository.getReferenceById(clusterId);
-        String stackName = clusterPO.getStack().getStackName();
-        String stackVersion = clusterPO.getStack().getStackVersion();
+        String stackName = clusterPO.getStackPO().getStackName();
+        String stackVersion = clusterPO.getStackPO().getStackVersion();
 
         List<String> serviceNames =
                 serviceCommands.stream().map(ServiceCommandDTO::getServiceName).toList();

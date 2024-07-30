@@ -139,8 +139,8 @@ public class CacheDistributeStageRunner extends AbstractStageRunner {
 
         Long clusterId = clusterPO.getId();
         String clusterName = clusterPO.getClusterName();
-        String stackName = clusterPO.getStack().getStackName();
-        String stackVersion = clusterPO.getStack().getStackVersion();
+        String stackName = clusterPO.getStackPO().getStackName();
+        String stackVersion = clusterPO.getStackPO().getStackVersion();
 
         List<Service> services = serviceRepository.findAllByClusterId(clusterId);
         List<ServiceConfigPO> serviceConfigPOList = serviceConfigRepository.findAllByClusterAndSelectedIsTrue(clusterPO);

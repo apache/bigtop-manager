@@ -101,8 +101,8 @@ public class ServiceInstallJobRunner extends AbstractJobRunner {
         String serviceName = serviceCommand.getServiceName();
         ClusterPO clusterPO = clusterRepository.getReferenceById(clusterId);
 
-        String stackName = clusterPO.getStack().getStackName();
-        String stackVersion = clusterPO.getStack().getStackVersion();
+        String stackName = clusterPO.getStackPO().getStackName();
+        String stackVersion = clusterPO.getStackPO().getStackVersion();
 
         // 1. Persist service
         if (service == null) {

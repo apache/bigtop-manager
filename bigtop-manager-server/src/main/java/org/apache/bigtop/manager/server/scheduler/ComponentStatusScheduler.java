@@ -19,12 +19,8 @@
 package org.apache.bigtop.manager.server.scheduler;
 
 import org.apache.bigtop.manager.common.enums.MaintainState;
-import org.apache.bigtop.manager.dao.po.ClusterPO;
-import org.apache.bigtop.manager.dao.po.ComponentPO;
-import org.apache.bigtop.manager.dao.po.HostPO;
-import org.apache.bigtop.manager.dao.po.HostComponentPO;
-import org.apache.bigtop.manager.dao.po.Service;
-import org.apache.bigtop.manager.dao.po.Stack;
+import org.apache.bigtop.manager.dao.po.*;
+import org.apache.bigtop.manager.dao.po.StackPO;
 import org.apache.bigtop.manager.dao.repository.HostComponentRepository;
 import org.apache.bigtop.manager.grpc.generated.ComponentStatusReply;
 import org.apache.bigtop.manager.grpc.generated.ComponentStatusRequest;
@@ -61,15 +57,15 @@ public class ComponentStatusScheduler {
             ComponentPO componentPO = hostComponentPO.getComponentPO();
             Service service = componentPO.getService();
             ClusterPO clusterPO = hostPO.getClusterPO();
-            Stack stack = clusterPO.getStack();
+            StackPO stackPO = clusterPO.getStackPO();
 
             ComponentStatusRequest request = ComponentStatusRequest.newBuilder()
                     .setServiceName(service.getServiceName())
                     .setComponentName(componentPO.getComponentName())
                     .setCommandScript(componentPO.getCommandScript())
                     .setRoot(clusterPO.getRoot())
-                    .setStackName(stack.getStackName())
-                    .setStackVersion(stack.getStackVersion())
+                    .setStackName(stackPO.getStackName())
+                    .setStackVersion(stackPO.getStackVersion())
                     .build();
             ComponentStatusServiceGrpc.ComponentStatusServiceBlockingStub blockingStub = GrpcClient.getBlockingStub(
                     hostPO.getHostname(), ComponentStatusServiceGrpc.ComponentStatusServiceBlockingStub.class);

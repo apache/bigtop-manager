@@ -21,7 +21,7 @@ package org.apache.bigtop.manager.server.service.impl;
 import org.apache.bigtop.manager.common.enums.MaintainState;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.RepoPO;
-import org.apache.bigtop.manager.dao.po.Stack;
+import org.apache.bigtop.manager.dao.po.StackPO;
 import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.dao.repository.RepoRepository;
 import org.apache.bigtop.manager.dao.repository.StackRepository;
@@ -72,12 +72,12 @@ public class ClusterServiceImpl implements ClusterService {
     @Override
     public ClusterVO save(ClusterDTO clusterDTO) {
         // Save cluster
-        Stack stack =
+        StackPO stackPO =
                 stackRepository.findByStackNameAndStackVersion(clusterDTO.getStackName(), clusterDTO.getStackVersion());
         StackDTO stackDTO = StackUtils.getStackKeyMap()
                 .get(StackUtils.fullStackName(clusterDTO.getStackName(), clusterDTO.getStackVersion()))
                 .getLeft();
-        ClusterPO clusterPO = ClusterConverter.INSTANCE.fromDTO2Entity(clusterDTO, stackDTO, stack);
+        ClusterPO clusterPO = ClusterConverter.INSTANCE.fromDTO2Entity(clusterDTO, stackDTO, stackPO);
         clusterPO.setSelected(clusterRepository.count() == 0);
         clusterPO.setState(MaintainState.UNINSTALLED);
 

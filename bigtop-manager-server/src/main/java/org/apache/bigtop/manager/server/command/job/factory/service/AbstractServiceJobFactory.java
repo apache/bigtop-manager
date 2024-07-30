@@ -64,8 +64,8 @@ public abstract class AbstractServiceJobFactory extends AbstractJobFactory {
     protected DAG<String, ComponentCommandWrapper, DagGraphEdge> dag;
 
     protected void initAttrs() {
-        stackName = clusterPO.getStack().getStackName();
-        stackVersion = clusterPO.getStack().getStackVersion();
+        stackName = clusterPO.getStackPO().getStackName();
+        stackVersion = clusterPO.getStackPO().getStackVersion();
         dag = StackUtils.getStackDagMap().get(StackUtils.fullStackName(stackName, stackVersion));
     }
 

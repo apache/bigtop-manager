@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.server.model.converter;
 
-import org.apache.bigtop.manager.dao.po.Stack;
+import org.apache.bigtop.manager.dao.po.StackPO;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.dto.StackDTO;
 import org.apache.bigtop.manager.server.model.vo.StackVO;
@@ -32,7 +32,7 @@ public interface StackConverter {
 
     StackConverter INSTANCE = Mappers.getMapper(StackConverter.class);
 
-    StackVO fromEntity2VO(Stack stack);
+    StackVO fromEntity2VO(StackPO stackPO);
 
     StackVO fromDTO2VO(StackDTO stackDTO);
 
