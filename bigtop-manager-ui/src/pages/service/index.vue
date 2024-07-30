@@ -18,10 +18,10 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onMounted, ref, watch } from 'vue'
+  import { computed, onMounted, ref, watch, createVNode } from 'vue'
   import { useRoute } from 'vue-router'
   import type { SelectProps, MenuProps } from 'ant-design-vue'
-  import { DownOutlined } from '@ant-design/icons-vue'
+  import { DownOutlined, QuestionCircleOutlined } from '@ant-design/icons-vue'
   import { useConfigStore } from '@/store/config'
   import { storeToRefs } from 'pinia'
   import { ServiceConfigVO, TypeConfigVO } from '@/api/config/types.ts'
@@ -29,38 +29,35 @@
   import { HostComponentVO } from '@/api/component/types.ts'
   import DotState from '@/components/dot-state/index.vue'
   import { useServiceStore } from '@/store/service'
-  import { ServiceVO } from '@/api/service/types.ts'
+  import { type ServiceVO, StateColor } from '@/api/service/types.ts'
+  import { Modal } from 'ant-design-vue'
+  import { useI18n } from 'vue-i18n'
 
-  const menuOps = [
+  interface Menu {
+    key: string
+    iconName: string
+    dicText: string
+  }
+
+  const menuOps: Menu[] = [
     {
       key: '1',
       iconName: 'start',
-      dicText: 'service.start_all'
+      dicText: 'service.start_service'
     },
     {
       key: '2',
       iconName: 'stop',
-      dicText: 'service.stop_all'
+      dicText: 'service.stop_service'
     },
     {
       key: '3',
       iconName: 'restart',
-      dicText: 'service.restart_all'
+      dicText: 'service.restart_service'
     }
   ]
 
-  // #52c41a   green
-  // #ff4d4f   red
-  // #d9d9d9   gray
-  // #f0f964   yellow
-  const stateColor = {
-    Installed: '#52c41a',
-    Started: '#52c41a',
-    Maintained: '#d9d9d9',
-    Uninstalled: '#f0f964',
-    Stopped: '#ff4d4f'
-  }
-
+  const { t } = useI18n()
   const route = useRoute()
   const configStore = useConfigStore()
   const { allConfigs } = storeToRefs(configStore)
@@ -106,7 +103,7 @@
         value: sc.version,
         label: `Version: ${sc.version}`,
         title: `${sc.configDesc}
-        \n${sc.createTime}`
+          \n${sc.createTime}`
       }))
 
     currentConfigVersion.value = serviceConfigDesc.value?.[0].value as number
@@ -138,9 +135,23 @@
   watch(currentConfigs, (newVal) => {
     activeConfig.value = newVal.length > 0 ? newVal[0].typeName : null
   })
-  // config model end
+
   const handleMenuClick: MenuProps['onClick'] = (e) => {
-    console.log('click', e)
+    const menu = menuOps.find((menu) => menu.key == e.key)
+    const text = `${menu?.dicText}_warn`
+    Modal.confirm({
+      title: t('common.confirm'),
+      icon: createVNode(QuestionCircleOutlined),
+      content: t(text, [selectedService.value.displayName]),
+      centered: true,
+      okText: t('common.confirm'),
+      cancelText: t('common.cancel'),
+      onOk: onOk
+    })
+  }
+
+  const onOk = () => {
+    // resolve api
   }
 
   const initServiceMeta = async () => {
@@ -208,7 +219,7 @@
                 </div>
                 <footer>
                   <div class="comp-state">
-                    <dot-state :color="stateColor[item.state]" class="dot-rest">
+                    <dot-state :color="StateColor[item.state]" class="dot-rest">
                       <span class="comp-state-text">{{ item.state }}</span>
                     </dot-state>
                   </div>

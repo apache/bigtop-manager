@@ -35,3 +35,11 @@ export interface QuickLinkVO {
   displayName: string
   url: string
 }
+
+export enum StateColor {
+  Installed = '#2196F3',
+  Started = '#52c41a',
+  Maintained = '#d9d9d9',
+  Uninstalled = '#f0f964',
+  Stopped = '#ff4d4f'
+}
