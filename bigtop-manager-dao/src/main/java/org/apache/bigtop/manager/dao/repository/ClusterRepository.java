@@ -18,13 +18,13 @@
  */
 package org.apache.bigtop.manager.dao.repository;
 
-import org.apache.bigtop.manager.dao.po.Cluster;
+import org.apache.bigtop.manager.dao.po.ClusterPO;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface ClusterRepository extends JpaRepository<Cluster, Long> {
+public interface ClusterRepository extends JpaRepository<ClusterPO, Long> {
 
-    Optional<Cluster> findByClusterName(String clusterName);
+    Optional<ClusterPO> findByClusterName(String clusterName);
 }

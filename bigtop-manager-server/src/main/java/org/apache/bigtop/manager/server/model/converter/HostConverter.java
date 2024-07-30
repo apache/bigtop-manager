@@ -39,7 +39,7 @@ public interface HostConverter {
 
     Host fromDTO2Entity(HostDTO hostDTO);
 
-    @Mapping(target = "clusterName", source = "cluster.clusterName")
+    @Mapping(target = "clusterName", source = "clusterPO.clusterName")
     HostVO fromEntity2VO(Host host);
 
     List<HostVO> fromEntity2VO(List<Host> hosts);

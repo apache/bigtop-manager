@@ -24,7 +24,7 @@ import org.apache.bigtop.manager.common.message.entity.pojo.ClusterInfo;
 import org.apache.bigtop.manager.common.message.entity.pojo.ComponentInfo;
 import org.apache.bigtop.manager.common.message.entity.pojo.RepoInfo;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.po.Cluster;
+import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.Component;
 import org.apache.bigtop.manager.dao.po.Host;
 import org.apache.bigtop.manager.dao.po.HostComponent;
@@ -143,17 +143,17 @@ public class CacheDistributeStageRunner extends AbstractStageRunner {
     }
 
     private void genCaches() {
-        Cluster cluster = clusterRepository.getReferenceById(stageContext.getClusterId());
+        ClusterPO clusterPO = clusterRepository.getReferenceById(stageContext.getClusterId());
 
-        Long clusterId = cluster.getId();
-        String clusterName = cluster.getClusterName();
-        String stackName = cluster.getStack().getStackName();
-        String stackVersion = cluster.getStack().getStackVersion();
+        Long clusterId = clusterPO.getId();
+        String clusterName = clusterPO.getClusterName();
+        String stackName = clusterPO.getStack().getStackName();
+        String stackVersion = clusterPO.getStack().getStackVersion();
 
         List<Service> services = serviceRepository.findAllByClusterId(clusterId);
-        List<ServiceConfig> serviceConfigList = serviceConfigRepository.findAllByClusterAndSelectedIsTrue(cluster);
+        List<ServiceConfig> serviceConfigList = serviceConfigRepository.findAllByClusterAndSelectedIsTrue(clusterPO);
         List<HostComponent> hostComponents = hostComponentRepository.findAllByComponentClusterId(clusterId);
-        List<Repo> repos = repoRepository.findAllByCluster(cluster);
+        List<Repo> repos = repoRepository.findAllByCluster(clusterPO);
         Iterable<Setting> settings = settingRepository.findAll();
         List<Host> hostList = hostRepository.findAllByClusterId(clusterId);
 
@@ -161,10 +161,10 @@ public class CacheDistributeStageRunner extends AbstractStageRunner {
         clusterInfo.setClusterName(clusterName);
         clusterInfo.setStackName(stackName);
         clusterInfo.setStackVersion(stackVersion);
-        clusterInfo.setUserGroup(cluster.getUserGroup());
-        clusterInfo.setRepoTemplate(cluster.getRepoTemplate());
-        clusterInfo.setRoot(cluster.getRoot());
-        clusterInfo.setPackages(List.of(cluster.getPackages().split(",")));
+        clusterInfo.setUserGroup(clusterPO.getUserGroup());
+        clusterInfo.setRepoTemplate(clusterPO.getRepoTemplate());
+        clusterInfo.setRoot(clusterPO.getRoot());
+        clusterInfo.setPackages(List.of(clusterPO.getPackages().split(",")));
 
         serviceConfigMap = new HashMap<>();
         for (ServiceConfig serviceConfig : serviceConfigList) {

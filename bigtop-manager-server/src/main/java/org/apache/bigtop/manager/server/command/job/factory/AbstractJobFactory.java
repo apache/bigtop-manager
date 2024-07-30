@@ -20,7 +20,7 @@ package org.apache.bigtop.manager.server.command.job.factory;
 
 import org.apache.bigtop.manager.common.enums.JobState;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.po.Cluster;
+import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.Job;
 import org.apache.bigtop.manager.dao.po.Stage;
 import org.apache.bigtop.manager.dao.po.Task;
@@ -49,7 +49,7 @@ public abstract class AbstractJobFactory implements JobFactory {
 
     protected JobContext jobContext;
 
-    protected Cluster cluster;
+    protected ClusterPO clusterPO;
 
     protected Job job;
 
@@ -75,12 +75,12 @@ public abstract class AbstractJobFactory implements JobFactory {
 
     private void initJob() {
         Long clusterId = jobContext.getCommandDTO().getClusterId();
-        this.cluster = clusterId == null ? new Cluster() : clusterRepository.getReferenceById(clusterId);
+        this.clusterPO = clusterId == null ? new ClusterPO() : clusterRepository.getReferenceById(clusterId);
 
         this.job = new Job();
         job.setName(jobContext.getCommandDTO().getContext());
         job.setState(JobState.PENDING);
-        job.setCluster(cluster.getId() == null ? null : cluster);
+        job.setClusterPO(clusterPO.getId() == null ? null : clusterPO);
         job.setContext(JsonUtils.writeAsString(jobContext));
         job.setStages(stages);
     }
@@ -90,14 +90,14 @@ public abstract class AbstractJobFactory implements JobFactory {
 
         for (int i = 0; i < job.getStages().size(); i++) {
             Stage stage = job.getStages().get(i);
-            stage.setCluster(cluster.getId() == null ? null : cluster);
+            stage.setClusterPO(clusterPO.getId() == null ? null : clusterPO);
             stage.setJob(job);
             stage.setOrder(i + 1);
             stage.setState(JobState.PENDING);
             stageRepository.save(stage);
 
             for (Task task : stage.getTasks()) {
-                task.setCluster(cluster.getId() == null ? null : cluster);
+                task.setClusterPO(clusterPO.getId() == null ? null : clusterPO);
                 task.setJob(job);
                 task.setStage(stage);
                 task.setState(JobState.PENDING);

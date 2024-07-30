@@ -49,7 +49,7 @@ public class ComponentStartStageRunner extends AbstractStageRunner {
     public void onTaskSuccess(Task task) {
         super.onTaskSuccess(task);
 
-        Long clusterId = task.getCluster().getId();
+        Long clusterId = task.getClusterPO().getId();
         String componentName = task.getComponentName();
         String hostname = task.getHostname();
         HostComponent hostComponent =

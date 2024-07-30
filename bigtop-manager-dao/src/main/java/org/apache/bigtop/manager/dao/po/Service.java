@@ -84,5 +84,5 @@ public class Service extends BasePO {
 
     @ManyToOne
     @JoinColumn(name = "cluster_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Cluster cluster;
+    private ClusterPO clusterPO;
 }

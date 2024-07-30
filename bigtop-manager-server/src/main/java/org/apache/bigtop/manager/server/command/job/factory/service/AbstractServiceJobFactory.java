@@ -64,8 +64,8 @@ public abstract class AbstractServiceJobFactory extends AbstractJobFactory {
     protected DAG<String, ComponentCommandWrapper, DagGraphEdge> dag;
 
     protected void initAttrs() {
-        stackName = cluster.getStack().getStackName();
-        stackVersion = cluster.getStack().getStackVersion();
+        stackName = clusterPO.getStack().getStackName();
+        stackVersion = clusterPO.getStack().getStackVersion();
         dag = StackUtils.getStackDagMap().get(StackUtils.fullStackName(stackName, stackVersion));
     }
 
@@ -104,7 +104,7 @@ public abstract class AbstractServiceJobFactory extends AbstractJobFactory {
     protected List<String> getComponentNames() {
         List<String> serviceNames = getServiceNames();
         List<Component> components =
-                componentRepository.findAllByClusterIdAndServiceServiceNameIn(cluster.getId(), serviceNames);
+                componentRepository.findAllByClusterIdAndServiceServiceNameIn(clusterPO.getId(), serviceNames);
 
         return components.stream().map(Component::getComponentName).toList();
     }
@@ -134,7 +134,7 @@ public abstract class AbstractServiceJobFactory extends AbstractJobFactory {
     protected List<String> findHostnamesByComponentName(String componentName) {
         List<HostComponent> hostComponents =
                 hostComponentRepository.findAllByComponentClusterIdAndComponentComponentName(
-                        cluster.getId(), componentName);
+                        clusterPO.getId(), componentName);
         if (hostComponents == null) {
             return new ArrayList<>();
         } else {

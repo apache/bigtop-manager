@@ -21,7 +21,7 @@ package org.apache.bigtop.manager.server.command.stage.factory.host;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.message.entity.payload.HostCheckPayload;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.po.Cluster;
+import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.Task;
 import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.grpc.generated.CommandRequest;
@@ -54,10 +54,10 @@ public class HostCheckStageFactory extends AbstractStageFactory {
     @Override
     public void doCreateStage() {
         if (context.getClusterId() != null) {
-            Cluster cluster = clusterRepository.getReferenceById(context.getClusterId());
+            ClusterPO clusterPO = clusterRepository.getReferenceById(context.getClusterId());
 
-            context.setStackName(cluster.getStack().getStackName());
-            context.setStackVersion(cluster.getStack().getStackVersion());
+            context.setStackName(clusterPO.getStack().getStackName());
+            context.setStackVersion(clusterPO.getStack().getStackVersion());
         }
 
         // Create stages

@@ -24,7 +24,7 @@ import org.apache.bigtop.manager.common.message.entity.pojo.CustomCommandInfo;
 import org.apache.bigtop.manager.common.message.entity.pojo.OSSpecificInfo;
 import org.apache.bigtop.manager.common.message.entity.pojo.ScriptInfo;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.po.Cluster;
+import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.Task;
 import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.grpc.generated.CommandRequest;
@@ -46,11 +46,11 @@ public abstract class AbstractComponentStageFactory extends AbstractStageFactory
     @Resource
     private ClusterRepository clusterRepository;
 
-    protected Cluster cluster;
+    protected ClusterPO clusterPO;
 
     @Override
     public void doCreateStage() {
-        cluster = clusterRepository.getReferenceById(context.getClusterId());
+        clusterPO = clusterRepository.getReferenceById(context.getClusterId());
 
         Command command = getCommand();
         ServiceDTO serviceDTO = context.getServiceDTO();
@@ -99,7 +99,7 @@ public abstract class AbstractComponentStageFactory extends AbstractStageFactory
         commandPayload.setStackName(context.getStackName());
         commandPayload.setStackVersion(context.getStackVersion());
         commandPayload.setComponentName(componentDTO.getComponentName());
-        commandPayload.setRoot(cluster.getRoot());
+        commandPayload.setRoot(clusterPO.getRoot());
         commandPayload.setHostname(hostname);
 
         commandPayload.setCustomCommands(convertCustomCommandInfo(componentDTO.getCustomCommands()));

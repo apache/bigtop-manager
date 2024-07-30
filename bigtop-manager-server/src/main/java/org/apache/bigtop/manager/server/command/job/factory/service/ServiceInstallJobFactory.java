@@ -85,7 +85,7 @@ public class ServiceInstallJobFactory extends AbstractServiceJobFactory {
                     List<String> hostnames = new ArrayList<>(componentHost.getHostnames());
                     List<String> existHostnames = hostComponentRepository
                             .findAllByComponentClusterIdAndComponentComponentNameAndHostHostnameIn(
-                                    cluster.getId(), componentName, hostnames)
+                                    clusterPO.getId(), componentName, hostnames)
                             .stream()
                             .map(hostComponent -> hostComponent.getHost().getHostname())
                             .toList();

@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.common.enums.MaintainState;
-import org.apache.bigtop.manager.dao.po.Cluster;
+import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.Host;
 import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.dao.repository.HostRepository;
@@ -65,7 +65,7 @@ public class HostServiceImpl implements HostService {
 
     @Override
     public List<HostVO> batchSave(Long clusterId, List<String> hostnames) {
-        Cluster cluster = clusterRepository.getReferenceById(clusterId);
+        ClusterPO clusterPO = clusterRepository.getReferenceById(clusterId);
 
         List<Host> hostnameIn = hostRepository.findAllByHostnameIn(hostnames);
         List<Host> hosts = new ArrayList<>();
@@ -75,7 +75,7 @@ public class HostServiceImpl implements HostService {
         for (String hostname : hostnames) {
             Host host = new Host();
             host.setHostname(hostname);
-            host.setCluster(cluster);
+            host.setClusterPO(clusterPO);
             host.setState(MaintainState.INSTALLED);
 
             if (hostInMap.containsKey(hostname)) {

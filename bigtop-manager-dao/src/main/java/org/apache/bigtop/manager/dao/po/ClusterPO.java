@@ -53,7 +53,7 @@ import jakarta.persistence.UniqueConstraint;
         table = "sequence",
         pkColumnName = "seq_name",
         valueColumnName = "seq_count")
-public class Cluster extends BasePO {
+public class ClusterPO extends BasePO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "cluster_generator")

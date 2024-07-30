@@ -21,13 +21,8 @@ package org.apache.bigtop.manager.server.service.impl;
 import org.apache.bigtop.manager.common.constants.ComponentCategories;
 import org.apache.bigtop.manager.common.enums.MaintainState;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.po.Cluster;
-import org.apache.bigtop.manager.dao.po.Component;
-import org.apache.bigtop.manager.dao.po.Host;
-import org.apache.bigtop.manager.dao.po.HostComponent;
-import org.apache.bigtop.manager.dao.po.Service;
-import org.apache.bigtop.manager.dao.po.ServiceConfig;
-import org.apache.bigtop.manager.dao.po.TypeConfig;
+import org.apache.bigtop.manager.dao.po.*;
+import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.repository.HostComponentRepository;
 import org.apache.bigtop.manager.dao.repository.ServiceConfigRepository;
 import org.apache.bigtop.manager.dao.repository.ServiceRepository;
@@ -122,11 +117,11 @@ public class ServiceServiceImpl implements ServiceService {
         quickLinkVO.setDisplayName(quickLinkDTO.getDisplayName());
 
         Component component = hostComponent.getComponent();
-        Cluster cluster = component.getCluster();
+        ClusterPO clusterPO = component.getClusterPO();
         Host host = hostComponent.getHost();
         Service service = component.getService();
         ServiceConfig serviceConfig =
-                serviceConfigRepository.findByClusterAndServiceAndSelectedIsTrue(cluster, service);
+                serviceConfigRepository.findByClusterAndServiceAndSelectedIsTrue(clusterPO, service);
         List<TypeConfig> typeConfigs = serviceConfig.getConfigs();
 
         // Use HTTP for now, need to handle https in the future

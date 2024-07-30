@@ -37,7 +37,7 @@ public interface HostComponentConverter {
     @Mapping(target = "displayName", source = "component.displayName")
     @Mapping(target = "category", source = "component.category")
     @Mapping(target = "serviceName", source = "component.service.serviceName")
-    @Mapping(target = "clusterName", source = "component.cluster.clusterName")
+    @Mapping(target = "clusterName", source = "component.clusterPO.clusterName")
     @Mapping(target = "hostname", source = "host.hostname")
     HostComponentVO fromEntity2VO(HostComponent hostComponent);
 

@@ -20,7 +20,7 @@ package org.apache.bigtop.manager.server.command.job.runner.cluster;
 
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.enums.MaintainState;
-import org.apache.bigtop.manager.dao.po.Cluster;
+import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.Stage;
 import org.apache.bigtop.manager.dao.po.Task;
 import org.apache.bigtop.manager.dao.repository.ClusterRepository;
@@ -82,24 +82,24 @@ public class ClusterCreateJobRunner extends AbstractJobRunner {
         super.onSuccess();
 
         CommandDTO commandDTO = getCommandDTO();
-        Cluster cluster = clusterRepository
+        ClusterPO clusterPO = clusterRepository
                 .findByClusterName(commandDTO.getClusterCommand().getClusterName())
-                .orElse(new Cluster());
+                .orElse(new ClusterPO());
 
         // Update cluster state to installed
-        cluster.setState(MaintainState.INSTALLED);
-        clusterRepository.save(cluster);
+        clusterPO.setState(MaintainState.INSTALLED);
+        clusterRepository.save(clusterPO);
 
         // Link job to cluster after cluster successfully added
-        job.setCluster(cluster);
+        job.setClusterPO(clusterPO);
         jobRepository.save(job);
 
         for (Stage stage : job.getStages()) {
-            stage.setCluster(cluster);
+            stage.setClusterPO(clusterPO);
             stageRepository.save(stage);
 
             for (Task task : stage.getTasks()) {
-                task.setCluster(cluster);
+                task.setClusterPO(clusterPO);
                 taskRepository.save(task);
             }
         }
