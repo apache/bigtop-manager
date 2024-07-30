@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.dao.repository;
 
-import org.apache.bigtop.manager.dao.po.Job;
+import org.apache.bigtop.manager.dao.po.JobPO;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,11 +26,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface JobRepository extends JpaRepository<Job, Long> {
+public interface JobRepository extends JpaRepository<JobPO, Long> {
 
-    Page<Job> findAllByClusterIsNull(Pageable pageable);
+    Page<JobPO> findAllByClusterIsNull(Pageable pageable);
 
-    Page<Job> findAllByClusterId(Long clusterId, Pageable pageable);
+    Page<JobPO> findAllByClusterId(Long clusterId, Pageable pageable);
 
-    List<Job> findAllByClusterId(Long clusterId);
+    List<JobPO> findAllByClusterId(Long clusterId);
 }

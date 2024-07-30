@@ -73,7 +73,7 @@ public abstract class AbstractStageRunner implements StageRunner {
             CommandRequest.Builder builder = CommandRequest.newBuilder(protoRequest);
             builder.setTaskId(taskPO.getId());
             builder.setStageId(stagePO.getId());
-            builder.setJobId(stagePO.getJob().getId());
+            builder.setJobId(stagePO.getJobPO().getId());
             CommandRequest request = builder.build();
 
             futures.add(CompletableFuture.supplyAsync(() -> {

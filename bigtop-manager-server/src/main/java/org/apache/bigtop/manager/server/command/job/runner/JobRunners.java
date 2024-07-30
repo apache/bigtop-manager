@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.server.command.job.runner;
 
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.po.Job;
+import org.apache.bigtop.manager.dao.po.JobPO;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
 import org.apache.bigtop.manager.server.command.job.factory.JobContext;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
@@ -40,12 +40,12 @@ public class JobRunners {
 
     private static final Map<CommandIdentifier, String> JOB_RUNNERS = new HashMap<>();
 
-    public static JobRunner getJobRunner(Job job) {
+    public static JobRunner getJobRunner(JobPO jobPO) {
         if (!LOADED.get()) {
             load();
         }
 
-        JobContext jobContext = JsonUtils.readFromString(job.getContext(), JobContext.class);
+        JobContext jobContext = JsonUtils.readFromString(jobPO.getContext(), JobContext.class);
         CommandDTO commandDTO = jobContext.getCommandDTO();
         CommandIdentifier identifier = new CommandIdentifier(commandDTO.getCommandLevel(), commandDTO.getCommand());
         if (!JOB_RUNNERS.containsKey(identifier)) {
@@ -57,7 +57,7 @@ public class JobRunners {
 
         String beanName = JOB_RUNNERS.get(identifier);
         JobRunner runner = SpringContextHolder.getApplicationContext().getBean(beanName, JobRunner.class);
-        runner.setJob(job);
+        runner.setJob(jobPO);
         runner.setJobContext(jobContext);
 
         return runner;

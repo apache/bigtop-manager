@@ -109,7 +109,7 @@ public class TaskPO extends BasePO {
 
     @ManyToOne
     @JoinColumn(name = "job_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Job job;
+    private JobPO jobPO;
 
     @ManyToOne
     @JoinColumn(name = "stage_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))

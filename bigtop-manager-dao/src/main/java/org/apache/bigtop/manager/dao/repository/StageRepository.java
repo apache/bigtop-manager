@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.dao.repository;
 
-import org.apache.bigtop.manager.dao.po.Job;
+import org.apache.bigtop.manager.dao.po.JobPO;
 import org.apache.bigtop.manager.dao.po.StagePO;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -27,5 +27,5 @@ import java.util.List;
 
 public interface StageRepository extends JpaRepository<StagePO, Long> {
 
-    List<StagePO> findByJob(Job job);
+    List<StagePO> findByJob(JobPO jobPO);
 }

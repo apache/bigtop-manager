@@ -91,10 +91,10 @@ public class ClusterCreateJobRunner extends AbstractJobRunner {
         clusterRepository.save(clusterPO);
 
         // Link job to cluster after cluster successfully added
-        job.setClusterPO(clusterPO);
-        jobRepository.save(job);
+        jobPO.setClusterPO(clusterPO);
+        jobRepository.save(jobPO);
 
-        for (StagePO stagePO : job.getStagePOList()) {
+        for (StagePO stagePO : jobPO.getStagePOList()) {
             stagePO.setClusterPO(clusterPO);
             stageRepository.save(stagePO);
 

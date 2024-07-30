@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.server.command.job.runner;
 
-import org.apache.bigtop.manager.dao.po.Job;
+import org.apache.bigtop.manager.dao.po.JobPO;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
 import org.apache.bigtop.manager.server.command.job.factory.JobContext;
 
@@ -38,9 +38,9 @@ public interface JobRunner {
     /**
      * Set the job that this runner will manage.
      *
-     * @param job The job to be managed by this runner.
+     * @param jobPO The job to be managed by this runner.
      */
-    void setJob(Job job);
+    void setJob(JobPO jobPO);
 
     /**
      * Set the context for the job. The context may contain additional information necessary for running the job.

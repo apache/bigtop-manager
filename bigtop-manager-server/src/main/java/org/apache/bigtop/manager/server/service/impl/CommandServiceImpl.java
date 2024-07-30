@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
-import org.apache.bigtop.manager.dao.po.Job;
+import org.apache.bigtop.manager.dao.po.JobPO;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
 import org.apache.bigtop.manager.server.command.job.factory.JobContext;
 import org.apache.bigtop.manager.server.command.job.factory.JobFactories;
@@ -56,11 +56,11 @@ public class CommandServiceImpl implements CommandService {
         JobContext jobContext = new JobContext();
         jobContext.setCommandDTO(commandDTO);
         JobFactory jobFactory = JobFactories.getJobFactory(commandIdentifier);
-        Job job = jobFactory.createJob(jobContext);
+        JobPO jobPO = jobFactory.createJob(jobContext);
 
         // Submit job
-        jobScheduler.submit(job);
+        jobScheduler.submit(jobPO);
 
-        return JobConverter.INSTANCE.fromEntity2CommandVO(job);
+        return JobConverter.INSTANCE.fromEntity2CommandVO(jobPO);
     }
 }

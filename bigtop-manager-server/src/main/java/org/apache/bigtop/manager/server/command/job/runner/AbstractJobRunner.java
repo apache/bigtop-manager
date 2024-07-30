@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.server.command.job.runner;
 
 import org.apache.bigtop.manager.common.enums.JobState;
-import org.apache.bigtop.manager.dao.po.Job;
+import org.apache.bigtop.manager.dao.po.JobPO;
 import org.apache.bigtop.manager.dao.po.StagePO;
 import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.dao.repository.JobRepository;
@@ -46,13 +46,13 @@ public abstract class AbstractJobRunner implements JobRunner {
     @Resource
     private TaskRepository taskRepository;
 
-    protected Job job;
+    protected JobPO jobPO;
 
     protected JobContext jobContext;
 
     @Override
-    public void setJob(Job job) {
-        this.job = job;
+    public void setJob(JobPO jobPO) {
+        this.jobPO = jobPO;
     }
 
     @Override
@@ -65,7 +65,7 @@ public abstract class AbstractJobRunner implements JobRunner {
         beforeRun();
 
         // Sort stage
-        List<StagePO> stagePOList = job.getStagePOList();
+        List<StagePO> stagePOList = jobPO.getStagePOList();
         stagePOList.sort(Comparator.comparingInt(StagePO::getOrder));
 
         boolean success = true;
@@ -90,22 +90,22 @@ public abstract class AbstractJobRunner implements JobRunner {
 
     @Override
     public void beforeRun() {
-        job.setState(JobState.PROCESSING);
-        jobRepository.save(job);
+        jobPO.setState(JobState.PROCESSING);
+        jobRepository.save(jobPO);
     }
 
     @Override
     public void onSuccess() {
-        job.setState(JobState.SUCCESSFUL);
-        jobRepository.save(job);
+        jobPO.setState(JobState.SUCCESSFUL);
+        jobRepository.save(jobPO);
     }
 
     @Override
     public void onFailure() {
-        job.setState(JobState.FAILED);
-        jobRepository.save(job);
+        jobPO.setState(JobState.FAILED);
+        jobRepository.save(jobPO);
 
-        for (StagePO stagePO : job.getStagePOList()) {
+        for (StagePO stagePO : jobPO.getStagePOList()) {
             if (stagePO.getState() == JobState.PENDING) {
                 stagePO.setState(JobState.CANCELED);
                 stageRepository.save(stagePO);

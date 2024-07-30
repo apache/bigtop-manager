@@ -49,7 +49,7 @@ import java.util.List;
         name = "\"job\"",
         indexes = {@Index(name = "idx_job_cluster_id", columnList = "cluster_id")})
 @TableGenerator(name = "job_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
-public class Job extends BasePO {
+public class JobPO extends BasePO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "job_generator")
