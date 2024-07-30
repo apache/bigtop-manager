@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.server.command.job.validator;
 
 import org.apache.bigtop.manager.common.enums.Command;
-import org.apache.bigtop.manager.dao.po.Host;
+import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.repository.HostRepository;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
@@ -56,7 +56,7 @@ public class ServiceHostValidator implements CommandValidator {
                 .flatMap(x -> x.getHostnames().stream())
                 .collect(Collectors.toSet());
 
-        List<Host> hostnames = hostRepository.findAllByHostnameIn(hostnameSet);
+        List<HostPO> hostnames = hostRepository.findAllByHostnameIn(hostnameSet);
 
         if (hostnames.size() != hostnameSet.size()) {
             throw new ApiException(ApiExceptionEnum.HOST_NOT_FOUND);

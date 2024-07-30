@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.dao.repository;
 
-import org.apache.bigtop.manager.dao.po.Host;
+import org.apache.bigtop.manager.dao.po.HostPO;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,17 +27,17 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Collection;
 import java.util.List;
 
-public interface HostRepository extends JpaRepository<Host, Long> {
+public interface HostRepository extends JpaRepository<HostPO, Long> {
 
-    Host findByHostname(String hostname);
+    HostPO findByHostname(String hostname);
 
-    List<Host> findAllByHostnameIn(Collection<String> hostnames);
+    List<HostPO> findAllByHostnameIn(Collection<String> hostnames);
 
-    List<Host> findAllByClusterIdAndHostnameIn(Long clusterId, Collection<String> hostnames);
+    List<HostPO> findAllByClusterIdAndHostnameIn(Long clusterId, Collection<String> hostnames);
 
-    List<Host> findAllByClusterId(Long clusterId);
+    List<HostPO> findAllByClusterId(Long clusterId);
 
-    Page<Host> findAllByClusterId(Long clusterId, Pageable pageable);
+    Page<HostPO> findAllByClusterId(Long clusterId, Pageable pageable);
 
-    List<Host> findAllByClusterClusterName(String clusterName);
+    List<HostPO> findAllByClusterClusterName(String clusterName);
 }

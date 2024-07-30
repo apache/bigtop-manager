@@ -22,7 +22,7 @@ import org.apache.bigtop.manager.common.constants.ComponentCategories;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
-import org.apache.bigtop.manager.dao.po.Host;
+import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.po.HostComponent;
 import org.apache.bigtop.manager.dao.repository.ComponentRepository;
 import org.apache.bigtop.manager.dao.repository.HostComponentRepository;
@@ -139,8 +139,8 @@ public abstract class AbstractServiceJobFactory extends AbstractJobFactory {
             return new ArrayList<>();
         } else {
             return hostComponents.stream()
-                    .map(HostComponent::getHost)
-                    .map(Host::getHostname)
+                    .map(HostComponent::getHostPO)
+                    .map(HostPO::getHostname)
                     .toList();
         }
     }

@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.server.command.stage.factory.config;
 
 import org.apache.bigtop.manager.common.enums.Command;
-import org.apache.bigtop.manager.dao.po.Host;
+import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.po.Task;
 import org.apache.bigtop.manager.dao.repository.HostRepository;
 import org.apache.bigtop.manager.server.command.stage.factory.AbstractStageFactory;
@@ -55,7 +55,7 @@ public class CacheDistributeStageFactory extends AbstractStageFactory {
         } else {
             hostnames.addAll(context.getHostnames() == null ? List.of() : context.getHostnames());
             hostnames.addAll(hostRepository.findAllByClusterId(context.getClusterId()).stream()
-                    .map(Host::getHostname)
+                    .map(HostPO::getHostname)
                     .toList());
         }
 

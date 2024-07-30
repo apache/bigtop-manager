@@ -118,7 +118,7 @@ public class ServiceServiceImpl implements ServiceService {
 
         ComponentPO componentPO = hostComponent.getComponentPO();
         ClusterPO clusterPO = componentPO.getClusterPO();
-        Host host = hostComponent.getHost();
+        HostPO hostPO = hostComponent.getHostPO();
         Service service = componentPO.getService();
         ServiceConfig serviceConfig =
                 serviceConfigRepository.findByClusterAndServiceAndSelectedIsTrue(clusterPO, service);
@@ -132,14 +132,14 @@ public class ServiceServiceImpl implements ServiceService {
                     String port = propertyDTO.getValue().contains(":")
                             ? propertyDTO.getValue().split(":")[1]
                             : propertyDTO.getValue();
-                    String url = "http://" + host.getHostname() + ":" + port;
+                    String url = "http://" + hostPO.getHostname() + ":" + port;
                     quickLinkVO.setUrl(url);
                     return quickLinkVO;
                 }
             }
         }
 
-        String url = "http://" + host.getHostname() + ":" + quickLinkDTO.getHttpPortDefault();
+        String url = "http://" + hostPO.getHostname() + ":" + quickLinkDTO.getHttpPortDefault();
         quickLinkVO.setUrl(url);
         return quickLinkVO;
     }

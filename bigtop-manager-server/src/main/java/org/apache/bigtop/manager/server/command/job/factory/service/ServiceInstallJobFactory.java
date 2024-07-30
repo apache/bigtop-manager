@@ -87,7 +87,7 @@ public class ServiceInstallJobFactory extends AbstractServiceJobFactory {
                             .findAllByComponentClusterIdAndComponentComponentNameAndHostHostnameIn(
                                     clusterPO.getId(), componentName, hostnames)
                             .stream()
-                            .map(hostComponent -> hostComponent.getHost().getHostname())
+                            .map(hostComponent -> hostComponent.getHostPO().getHostname())
                             .toList();
 
                     hostnames.removeAll(existHostnames);

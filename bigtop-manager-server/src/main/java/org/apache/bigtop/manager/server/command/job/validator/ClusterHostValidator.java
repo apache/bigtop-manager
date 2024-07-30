@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.server.command.job.validator;
 
 import org.apache.bigtop.manager.common.enums.Command;
-import org.apache.bigtop.manager.dao.po.Host;
+import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.repository.HostRepository;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
@@ -51,9 +51,9 @@ public class ClusterHostValidator implements CommandValidator {
         ClusterCommandDTO clusterCommand = context.getCommandDTO().getClusterCommand();
         List<String> hostnames = clusterCommand.getHostnames();
 
-        List<Host> hosts = hostRepository.findAllByHostnameIn(hostnames);
-        if (CollectionUtils.isNotEmpty(hosts)) {
-            List<String> existsHostnames = hosts.stream().map(Host::getHostname).toList();
+        List<HostPO> hostPOList = hostRepository.findAllByHostnameIn(hostnames);
+        if (CollectionUtils.isNotEmpty(hostPOList)) {
+            List<String> existsHostnames = hostPOList.stream().map(HostPO::getHostname).toList();
             throw new ApiException(ApiExceptionEnum.HOST_ASSIGNED, String.join(",", existsHostnames));
         }
 

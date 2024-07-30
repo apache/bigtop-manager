@@ -49,7 +49,7 @@ import jakarta.persistence.UniqueConstraint;
         },
         indexes = {@Index(name = "idx_host_cluster_id", columnList = "cluster_id")})
 @TableGenerator(name = "host_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
-public class Host extends BasePO {
+public class HostPO extends BasePO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "host_generator")

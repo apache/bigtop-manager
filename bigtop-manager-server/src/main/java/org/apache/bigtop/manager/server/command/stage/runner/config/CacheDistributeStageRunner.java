@@ -147,7 +147,7 @@ public class CacheDistributeStageRunner extends AbstractStageRunner {
         List<HostComponent> hostComponents = hostComponentRepository.findAllByComponentClusterId(clusterId);
         List<Repo> repos = repoRepository.findAllByCluster(clusterPO);
         Iterable<Setting> settings = settingRepository.findAll();
-        List<Host> hostList = hostRepository.findAllByClusterId(clusterId);
+        List<HostPO> hostPOList = hostRepository.findAllByClusterId(clusterId);
 
         clusterInfo = new ClusterInfo();
         clusterInfo.setClusterName(clusterName);
@@ -180,16 +180,16 @@ public class CacheDistributeStageRunner extends AbstractStageRunner {
         hostMap = new HashMap<>();
         hostComponents.forEach(x -> {
             if (hostMap.containsKey(x.getComponentPO().getComponentName())) {
-                hostMap.get(x.getComponentPO().getComponentName()).add(x.getHost().getHostname());
+                hostMap.get(x.getComponentPO().getComponentName()).add(x.getHostPO().getHostname());
             } else {
                 Set<String> set = new HashSet<>();
-                set.add(x.getHost().getHostname());
+                set.add(x.getHostPO().getHostname());
                 hostMap.put(x.getComponentPO().getComponentName(), set);
             }
-            hostMap.get(x.getComponentPO().getComponentName()).add(x.getHost().getHostname());
+            hostMap.get(x.getComponentPO().getComponentName()).add(x.getHostPO().getHostname());
         });
 
-        Set<String> hostNameSet = hostList.stream().map(Host::getHostname).collect(Collectors.toSet());
+        Set<String> hostNameSet = hostPOList.stream().map(HostPO::getHostname).collect(Collectors.toSet());
         hostMap.put(ALL_HOST_KEY, hostNameSet);
 
         repoList = new ArrayList<>();

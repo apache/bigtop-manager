@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.server.scheduler;
 
 import org.apache.bigtop.manager.common.enums.MaintainState;
-import org.apache.bigtop.manager.dao.po.Host;
+import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.repository.HostRepository;
 import org.apache.bigtop.manager.grpc.generated.HostInfoReply;
 import org.apache.bigtop.manager.grpc.generated.HostInfoRequest;
@@ -46,35 +46,35 @@ public class HostInfoScheduler {
     @Async
     @Scheduled(fixedDelay = 30, timeUnit = TimeUnit.SECONDS)
     public void execute() {
-        List<Host> hosts = hostRepository.findAll();
-        for (Host host : hosts) {
-            getHostInfo(host);
+        List<HostPO> hostPOList = hostRepository.findAll();
+        for (HostPO hostPO : hostPOList) {
+            getHostInfo(hostPO);
         }
     }
 
-    private void getHostInfo(Host host) {
-        String hostname = host.getHostname();
+    private void getHostInfo(HostPO hostPO) {
+        String hostname = hostPO.getHostname();
         try {
             HostInfoServiceGrpc.HostInfoServiceBlockingStub stub =
                     GrpcClient.getBlockingStub(hostname, HostInfoServiceGrpc.HostInfoServiceBlockingStub.class);
             HostInfoReply reply = stub.getHostInfo(HostInfoRequest.newBuilder().build());
 
-            host.setArch(reply.getArch());
-            host.setAvailableProcessors(reply.getAvailableProcessors());
-            host.setIpv4(reply.getIpv4());
-            host.setIpv6(reply.getIpv6());
-            host.setOs(reply.getOs());
-            host.setFreeMemorySize(reply.getFreeMemorySize());
-            host.setTotalMemorySize(reply.getTotalMemorySize());
-            host.setFreeDisk(reply.getFreeDisk());
-            host.setTotalDisk(reply.getTotalDisk());
+            hostPO.setArch(reply.getArch());
+            hostPO.setAvailableProcessors(reply.getAvailableProcessors());
+            hostPO.setIpv4(reply.getIpv4());
+            hostPO.setIpv6(reply.getIpv6());
+            hostPO.setOs(reply.getOs());
+            hostPO.setFreeMemorySize(reply.getFreeMemorySize());
+            hostPO.setTotalMemorySize(reply.getTotalMemorySize());
+            hostPO.setFreeDisk(reply.getFreeDisk());
+            hostPO.setTotalDisk(reply.getTotalDisk());
 
-            host.setState(MaintainState.STARTED);
+            hostPO.setState(MaintainState.STARTED);
         } catch (Exception e) {
             log.error("Error getting host info", e);
-            host.setState(MaintainState.STOPPED);
+            hostPO.setState(MaintainState.STOPPED);
         }
 
-        hostRepository.save(host);
+        hostRepository.save(hostPO);
     }
 }

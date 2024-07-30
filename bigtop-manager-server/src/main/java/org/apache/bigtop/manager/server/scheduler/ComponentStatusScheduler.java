@@ -21,7 +21,7 @@ package org.apache.bigtop.manager.server.scheduler;
 import org.apache.bigtop.manager.common.enums.MaintainState;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
-import org.apache.bigtop.manager.dao.po.Host;
+import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.po.HostComponent;
 import org.apache.bigtop.manager.dao.po.Service;
 import org.apache.bigtop.manager.dao.po.Stack;
@@ -57,10 +57,10 @@ public class ComponentStatusScheduler {
                 continue;
             }
 
-            Host host = hostComponent.getHost();
+            HostPO hostPO = hostComponent.getHostPO();
             ComponentPO componentPO = hostComponent.getComponentPO();
             Service service = componentPO.getService();
-            ClusterPO clusterPO = host.getClusterPO();
+            ClusterPO clusterPO = hostPO.getClusterPO();
             Stack stack = clusterPO.getStack();
 
             ComponentStatusRequest request = ComponentStatusRequest.newBuilder()
@@ -72,7 +72,7 @@ public class ComponentStatusScheduler {
                     .setStackVersion(stack.getStackVersion())
                     .build();
             ComponentStatusServiceGrpc.ComponentStatusServiceBlockingStub blockingStub = GrpcClient.getBlockingStub(
-                    host.getHostname(), ComponentStatusServiceGrpc.ComponentStatusServiceBlockingStub.class);
+                    hostPO.getHostname(), ComponentStatusServiceGrpc.ComponentStatusServiceBlockingStub.class);
             ComponentStatusReply reply = blockingStub.getComponentStatus(request);
 
             // Status 0 means the service is running
