@@ -30,16 +30,16 @@
       <a-menu>
         <a-menu-item key="start">
           <svg-icon name="start" />
-          {{ $t('service.start_all') }}
+          <span>{{ $t('service.start_all') }}</span>
         </a-menu-item>
         <a-menu-item key="stop">
           <svg-icon name="stop" />
-          {{ $t('service.stop_all') }}
+          <span>{{ $t('service.stop_all') }}</span>
         </a-menu-item>
         <a-menu-divider />
         <a-menu-item key="add" @click="() => (addWindowOpened = true)">
           <svg-icon name="plus" />
-          {{ $t('service.add') }}
+          <span> {{ $t('service.add') }}</span>
         </a-menu-item>
       </a-menu>
     </template>

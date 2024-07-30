@@ -169,7 +169,7 @@
 <template>
   <a-tabs>
     <template #rightExtra>
-      <a-dropdown placement="bottomRight">
+      <a-dropdown :trigger="['click']" placement="bottomRight">
         <template #overlay>
           <a-menu @click="handleMenuClick">
             <a-menu-item v-for="item in menuOps" :key="item.key">

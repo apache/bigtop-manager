@@ -32,7 +32,7 @@
       },
       color: {
         type: String,
-        default: '#333'
+        default: '#000'
       },
       className: {
         type: String,
@@ -43,7 +43,7 @@
       const symbolId = computed(() => `#${props.prefix}-${props.name}`)
       const svgClass = computed(() => {
         if (props.className) {
-          return `${props.className}`
+          return `svg-icon ${props.className}`
         }
         return 'svg-icon'
       })
@@ -60,9 +60,10 @@
 
 <style lang="scss" scoped>
   .svg-icon {
-    height: 20px;
-    width: 20px;
+    height: 1em;
+    width: 1em;
     margin-right: 6px;
-    vertical-align: text-top;
+    vertical-align: -0.15em;
+    overflow: hidden;
   }
 </style>
