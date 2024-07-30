@@ -23,6 +23,8 @@ import org.apache.bigtop.manager.server.enums.ResponseStatus;
 
 import lombok.Data;
 
+import java.util.Objects;
+
 @Data
 public class ResponseEntity<T> {
 
@@ -74,5 +76,13 @@ public class ResponseEntity<T> {
 
     public static <T> ResponseEntity<T> error(ApiExceptionEnum ex) {
         return new ResponseEntity<>(ex.getCode(), ex.getMessage());
+    }
+
+    public Boolean isSuccess() {
+        return Objects.equals(code, ResponseStatus.SUCCESS.getCode());
+    }
+
+    public Boolean isFailed() {
+        return !isSuccess();
     }
 }
