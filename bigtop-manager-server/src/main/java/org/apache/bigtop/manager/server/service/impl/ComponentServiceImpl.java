@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
-import org.apache.bigtop.manager.dao.po.Component;
+import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.repository.ComponentRepository;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
@@ -54,9 +54,9 @@ public class ComponentServiceImpl implements ComponentService {
 
     @Override
     public ComponentVO get(Long id) {
-        Component component = componentRepository
+        ComponentPO componentPO = componentRepository
                 .findById(id)
                 .orElseThrow(() -> new ApiException(ApiExceptionEnum.COMPONENT_NOT_FOUND));
-        return ComponentConverter.INSTANCE.fromEntity2VO(component);
+        return ComponentConverter.INSTANCE.fromEntity2VO(componentPO);
     }
 }

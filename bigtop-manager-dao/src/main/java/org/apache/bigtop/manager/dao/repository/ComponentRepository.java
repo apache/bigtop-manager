@@ -18,19 +18,19 @@
  */
 package org.apache.bigtop.manager.dao.repository;
 
-import org.apache.bigtop.manager.dao.po.Component;
+import org.apache.bigtop.manager.dao.po.ComponentPO;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface ComponentRepository extends JpaRepository<Component, Long> {
+public interface ComponentRepository extends JpaRepository<ComponentPO, Long> {
 
-    Component findByClusterIdAndComponentName(Long clusterId, String componentName);
+    ComponentPO findByClusterIdAndComponentName(Long clusterId, String componentName);
 
-    List<Component> findAllByClusterIdAndComponentNameIn(Long clusterId, List<String> componentNames);
+    List<ComponentPO> findAllByClusterIdAndComponentNameIn(Long clusterId, List<String> componentNames);
 
-    List<Component> findAllByClusterId(Long clusterId);
+    List<ComponentPO> findAllByClusterId(Long clusterId);
 
-    List<Component> findAllByClusterIdAndServiceServiceNameIn(Long clusterId, List<String> serviceNames);
+    List<ComponentPO> findAllByClusterIdAndServiceServiceNameIn(Long clusterId, List<String> serviceNames);
 }

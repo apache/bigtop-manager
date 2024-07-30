@@ -20,7 +20,7 @@ package org.apache.bigtop.manager.server.scheduler;
 
 import org.apache.bigtop.manager.common.enums.MaintainState;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
-import org.apache.bigtop.manager.dao.po.Component;
+import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.po.Host;
 import org.apache.bigtop.manager.dao.po.HostComponent;
 import org.apache.bigtop.manager.dao.po.Service;
@@ -58,15 +58,15 @@ public class ComponentStatusScheduler {
             }
 
             Host host = hostComponent.getHost();
-            Component component = hostComponent.getComponent();
-            Service service = component.getService();
+            ComponentPO componentPO = hostComponent.getComponentPO();
+            Service service = componentPO.getService();
             ClusterPO clusterPO = host.getClusterPO();
             Stack stack = clusterPO.getStack();
 
             ComponentStatusRequest request = ComponentStatusRequest.newBuilder()
                     .setServiceName(service.getServiceName())
-                    .setComponentName(component.getComponentName())
-                    .setCommandScript(component.getCommandScript())
+                    .setComponentName(componentPO.getComponentName())
+                    .setCommandScript(componentPO.getCommandScript())
                     .setRoot(clusterPO.getRoot())
                     .setStackName(stack.getStackName())
                     .setStackVersion(stack.getStackVersion())

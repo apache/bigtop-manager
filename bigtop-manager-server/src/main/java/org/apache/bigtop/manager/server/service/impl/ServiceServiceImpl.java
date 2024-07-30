@@ -64,26 +64,26 @@ public class ServiceServiceImpl implements ServiceService {
         List<HostComponent> hostComponentList = hostComponentRepository.findAllByComponentClusterId(clusterId);
         Map<Long, List<HostComponent>> serviceIdToHostComponent = hostComponentList.stream()
                 .collect(Collectors.groupingBy(hostComponent ->
-                        hostComponent.getComponent().getService().getId()));
+                        hostComponent.getComponentPO().getService().getId()));
 
         for (Map.Entry<Long, List<HostComponent>> entry : serviceIdToHostComponent.entrySet()) {
             List<HostComponent> hostComponents = entry.getValue();
-            Service service = hostComponents.get(0).getComponent().getService();
+            Service service = hostComponents.get(0).getComponentPO().getService();
             ServiceVO serviceVO = ServiceConverter.INSTANCE.fromEntity2VO(service);
             serviceVO.setQuickLinks(new ArrayList<>());
 
             boolean isHealthy = true;
             boolean isClient = true;
             for (HostComponent hostComponent : hostComponents) {
-                Component component = hostComponent.getComponent();
+                ComponentPO componentPO = hostComponent.getComponentPO();
 
-                String quickLink = component.getQuickLink();
+                String quickLink = componentPO.getQuickLink();
                 if (StringUtils.isNotBlank(quickLink)) {
                     QuickLinkVO quickLinkVO = resolveQuickLink(hostComponent, quickLink);
                     serviceVO.getQuickLinks().add(quickLinkVO);
                 }
 
-                String category = component.getCategory();
+                String category = componentPO.getCategory();
                 if (!category.equalsIgnoreCase(ComponentCategories.CLIENT)) {
                     isClient = false;
                 }
@@ -116,10 +116,10 @@ public class ServiceServiceImpl implements ServiceService {
         QuickLinkDTO quickLinkDTO = JsonUtils.readFromString(quickLinkJson, QuickLinkDTO.class);
         quickLinkVO.setDisplayName(quickLinkDTO.getDisplayName());
 
-        Component component = hostComponent.getComponent();
-        ClusterPO clusterPO = component.getClusterPO();
+        ComponentPO componentPO = hostComponent.getComponentPO();
+        ClusterPO clusterPO = componentPO.getClusterPO();
         Host host = hostComponent.getHost();
-        Service service = component.getService();
+        Service service = componentPO.getService();
         ServiceConfig serviceConfig =
                 serviceConfigRepository.findByClusterAndServiceAndSelectedIsTrue(clusterPO, service);
         List<TypeConfig> typeConfigs = serviceConfig.getConfigs();

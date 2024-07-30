@@ -66,5 +66,5 @@ public class HostComponent extends BasePO {
 
     @ManyToOne
     @JoinColumn(name = "component_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Component component;
+    private ComponentPO componentPO;
 }

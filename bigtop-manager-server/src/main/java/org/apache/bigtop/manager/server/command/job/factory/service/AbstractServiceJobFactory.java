@@ -21,7 +21,7 @@ package org.apache.bigtop.manager.server.command.job.factory.service;
 import org.apache.bigtop.manager.common.constants.ComponentCategories;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.po.Component;
+import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.po.Host;
 import org.apache.bigtop.manager.dao.po.HostComponent;
 import org.apache.bigtop.manager.dao.repository.ComponentRepository;
@@ -103,10 +103,10 @@ public abstract class AbstractServiceJobFactory extends AbstractJobFactory {
 
     protected List<String> getComponentNames() {
         List<String> serviceNames = getServiceNames();
-        List<Component> components =
+        List<ComponentPO> componentPOList =
                 componentRepository.findAllByClusterIdAndServiceServiceNameIn(clusterPO.getId(), serviceNames);
 
-        return components.stream().map(Component::getComponentName).toList();
+        return componentPOList.stream().map(ComponentPO::getComponentName).toList();
     }
 
     protected String findServiceNameByComponentName(String componentName) {

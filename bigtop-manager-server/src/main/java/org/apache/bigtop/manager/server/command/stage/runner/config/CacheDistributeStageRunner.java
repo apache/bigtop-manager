@@ -24,16 +24,8 @@ import org.apache.bigtop.manager.common.message.entity.pojo.ClusterInfo;
 import org.apache.bigtop.manager.common.message.entity.pojo.ComponentInfo;
 import org.apache.bigtop.manager.common.message.entity.pojo.RepoInfo;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.po.ClusterPO;
-import org.apache.bigtop.manager.dao.po.Component;
-import org.apache.bigtop.manager.dao.po.Host;
-import org.apache.bigtop.manager.dao.po.HostComponent;
-import org.apache.bigtop.manager.dao.po.Repo;
-import org.apache.bigtop.manager.dao.po.Service;
-import org.apache.bigtop.manager.dao.po.ServiceConfig;
-import org.apache.bigtop.manager.dao.po.Setting;
-import org.apache.bigtop.manager.dao.po.Task;
-import org.apache.bigtop.manager.dao.po.TypeConfig;
+import org.apache.bigtop.manager.dao.po.*;
+import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.dao.repository.ComponentRepository;
 import org.apache.bigtop.manager.dao.repository.HostComponentRepository;
@@ -187,14 +179,14 @@ public class CacheDistributeStageRunner extends AbstractStageRunner {
 
         hostMap = new HashMap<>();
         hostComponents.forEach(x -> {
-            if (hostMap.containsKey(x.getComponent().getComponentName())) {
-                hostMap.get(x.getComponent().getComponentName()).add(x.getHost().getHostname());
+            if (hostMap.containsKey(x.getComponentPO().getComponentName())) {
+                hostMap.get(x.getComponentPO().getComponentName()).add(x.getHost().getHostname());
             } else {
                 Set<String> set = new HashSet<>();
                 set.add(x.getHost().getHostname());
-                hostMap.put(x.getComponent().getComponentName(), set);
+                hostMap.put(x.getComponentPO().getComponentName(), set);
             }
-            hostMap.get(x.getComponent().getComponentName()).add(x.getHost().getHostname());
+            hostMap.get(x.getComponentPO().getComponentName()).add(x.getHost().getHostname());
         });
 
         Set<String> hostNameSet = hostList.stream().map(Host::getHostname).collect(Collectors.toSet());
@@ -213,8 +205,8 @@ public class CacheDistributeStageRunner extends AbstractStageRunner {
         settings.forEach(x -> settingsMap.put(x.getTypeName(), x.getConfigData()));
 
         componentInfoMap = new HashMap<>();
-        List<Component> componentList = componentRepository.findAll();
-        componentList.forEach(c -> {
+        List<ComponentPO> componentPOList = componentRepository.findAll();
+        componentPOList.forEach(c -> {
             ComponentInfo componentInfo = new ComponentInfo();
             componentInfo.setComponentName(c.getComponentName());
             componentInfo.setCommandScript(c.getCommandScript());

@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.server.model.converter;
 
 import org.apache.bigtop.manager.dao.po.ClusterPO;
-import org.apache.bigtop.manager.dao.po.Component;
+import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.po.Service;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
@@ -45,7 +45,7 @@ public interface ComponentConverter {
     @Mapping(target = "quickLink", source = "quickLink", qualifiedByName = "obj2Json")
     @Mapping(target = "service", expression = "java(service)")
     @Mapping(target = "cluster", expression = "java(cluster)")
-    Component fromDTO2Entity(ComponentDTO componentDTO, @Context Service service, @Context ClusterPO clusterPO);
+    ComponentPO fromDTO2Entity(ComponentDTO componentDTO, @Context Service service, @Context ClusterPO clusterPO);
 
     ComponentVO fromDTO2VO(ComponentDTO componentDTO);
 
@@ -56,7 +56,7 @@ public interface ComponentConverter {
 
     @Mapping(target = "serviceName", source = "service.serviceName")
     @Mapping(target = "clusterName", source = "clusterPO.clusterName")
-    ComponentVO fromEntity2VO(Component component);
+    ComponentVO fromEntity2VO(ComponentPO componentPO);
 
-    List<ComponentVO> fromEntity2VO(List<Component> components);
+    List<ComponentVO> fromEntity2VO(List<ComponentPO> componentPOList);
 }

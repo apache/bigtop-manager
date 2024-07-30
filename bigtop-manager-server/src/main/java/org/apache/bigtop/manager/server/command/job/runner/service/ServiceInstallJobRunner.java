@@ -21,7 +21,7 @@ package org.apache.bigtop.manager.server.command.job.runner.service;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.enums.MaintainState;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
-import org.apache.bigtop.manager.dao.po.Component;
+import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.po.Host;
 import org.apache.bigtop.manager.dao.po.HostComponent;
 import org.apache.bigtop.manager.dao.po.Service;
@@ -118,11 +118,11 @@ public class ServiceInstallJobRunner extends AbstractJobRunner {
             String componentName = componentHostDTO.getComponentName();
 
             // 3. Persist component
-            Component component = componentRepository.findByClusterIdAndComponentName(clusterId, componentName);
-            if (component == null) {
+            ComponentPO componentPO = componentRepository.findByClusterIdAndComponentName(clusterId, componentName);
+            if (componentPO == null) {
                 ComponentDTO componentDTO = StackUtils.getComponentDTO(stackName, stackVersion, componentName);
-                component = ComponentConverter.INSTANCE.fromDTO2Entity(componentDTO, service, clusterPO);
-                component = componentRepository.save(component);
+                componentPO = ComponentConverter.INSTANCE.fromDTO2Entity(componentDTO, service, clusterPO);
+                componentPO = componentRepository.save(componentPO);
             }
 
             // 4. Persist hostComponent
@@ -134,7 +134,7 @@ public class ServiceInstallJobRunner extends AbstractJobRunner {
 
                     hostComponent = new HostComponent();
                     hostComponent.setHost(host);
-                    hostComponent.setComponent(component);
+                    hostComponent.setComponentPO(componentPO);
                     hostComponent.setState(MaintainState.UNINSTALLED);
                     hostComponentRepository.save(hostComponent);
                 }
