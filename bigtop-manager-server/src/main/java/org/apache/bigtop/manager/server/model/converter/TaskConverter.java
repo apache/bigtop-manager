@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.server.model.converter;
 
-import org.apache.bigtop.manager.dao.po.Task;
+import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.vo.TaskVO;
 
@@ -33,5 +33,5 @@ public interface TaskConverter {
 
     @Mapping(target = "createTime", source = "createTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
     @Mapping(target = "updateTime", source = "updateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
-    TaskVO fromEntity2VO(Task task);
+    TaskVO fromEntity2VO(TaskPO taskPO);
 }

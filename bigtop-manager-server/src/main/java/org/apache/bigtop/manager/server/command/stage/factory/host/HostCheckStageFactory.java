@@ -22,7 +22,7 @@ import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.message.entity.payload.HostCheckPayload;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
-import org.apache.bigtop.manager.dao.po.Task;
+import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.grpc.generated.CommandRequest;
 import org.apache.bigtop.manager.grpc.generated.CommandType;
@@ -63,27 +63,27 @@ public class HostCheckStageFactory extends AbstractStageFactory {
         // Create stages
         stage.setName("Check Hosts");
 
-        List<Task> tasks = new ArrayList<>();
+        List<TaskPO> taskPOList = new ArrayList<>();
         for (String hostname : context.getHostnames()) {
-            Task task = new Task();
-            task.setName(stage.getName() + " on " + hostname);
-            task.setStackName(context.getStackName());
-            task.setStackVersion(context.getStackVersion());
-            task.setHostname(hostname);
-            task.setServiceName("cluster");
-            task.setServiceUser("root");
-            task.setServiceGroup("root");
-            task.setComponentName("bigtop-manager-agent");
-            task.setCommand(Command.CUSTOM);
-            task.setCustomCommand("check_host");
+            TaskPO taskPO = new TaskPO();
+            taskPO.setName(stage.getName() + " on " + hostname);
+            taskPO.setStackName(context.getStackName());
+            taskPO.setStackVersion(context.getStackVersion());
+            taskPO.setHostname(hostname);
+            taskPO.setServiceName("cluster");
+            taskPO.setServiceUser("root");
+            taskPO.setServiceGroup("root");
+            taskPO.setComponentName("bigtop-manager-agent");
+            taskPO.setCommand(Command.CUSTOM);
+            taskPO.setCustomCommand("check_host");
 
             CommandRequest request = createMessage(hostname);
-            task.setContent(ProtobufUtil.toJson(request));
+            taskPO.setContent(ProtobufUtil.toJson(request));
 
-            tasks.add(task);
+            taskPOList.add(taskPO);
         }
 
-        stage.setTasks(tasks);
+        stage.setTaskPOList(taskPOList);
     }
 
     private CommandRequest createMessage(String hostname) {

@@ -21,7 +21,7 @@ package org.apache.bigtop.manager.server.service.impl;
 import org.apache.bigtop.manager.common.enums.JobState;
 import org.apache.bigtop.manager.dao.po.Job;
 import org.apache.bigtop.manager.dao.po.Stage;
-import org.apache.bigtop.manager.dao.po.Task;
+import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.dao.repository.JobRepository;
 import org.apache.bigtop.manager.dao.repository.StageRepository;
 import org.apache.bigtop.manager.dao.repository.TaskRepository;
@@ -86,9 +86,9 @@ public class JobServiceImpl implements JobService {
         }
 
         for (Stage stage : job.getStages()) {
-            for (Task task : stage.getTasks()) {
-                task.setState(JobState.PENDING);
-                taskRepository.save(task);
+            for (TaskPO taskPO : stage.getTaskPOList()) {
+                taskPO.setState(JobState.PENDING);
+                taskRepository.save(taskPO);
             }
 
             stage.setState(JobState.PENDING);

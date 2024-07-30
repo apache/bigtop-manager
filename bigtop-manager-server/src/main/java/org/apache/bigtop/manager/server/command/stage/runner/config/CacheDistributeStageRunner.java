@@ -114,24 +114,24 @@ public class CacheDistributeStageRunner extends AbstractStageRunner {
     }
 
     @Override
-    public void beforeRunTask(Task task) {
-        super.beforeRunTask(task);
+    public void beforeRunTask(TaskPO taskPO) {
+        super.beforeRunTask(taskPO);
 
         // Generate task content before execute
-        updateTask(task);
+        updateTask(taskPO);
     }
 
-    private void updateTask(Task task) {
+    private void updateTask(TaskPO taskPO) {
         if (stageContext.getClusterId() == null) {
             genEmptyCaches();
         } else {
             genCaches();
         }
 
-        CommandRequest request = getMessage(task.getHostname());
-        task.setContent(ProtobufUtil.toJson(request));
+        CommandRequest request = getMessage(taskPO.getHostname());
+        taskPO.setContent(ProtobufUtil.toJson(request));
 
-        taskRepository.save(task);
+        taskRepository.save(taskPO);
     }
 
     private void genCaches() {

@@ -21,7 +21,7 @@ package org.apache.bigtop.manager.server.command.stage.runner;
 import org.apache.bigtop.manager.common.constants.MessageConstants;
 import org.apache.bigtop.manager.common.enums.JobState;
 import org.apache.bigtop.manager.dao.po.Stage;
-import org.apache.bigtop.manager.dao.po.Task;
+import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.dao.repository.StageRepository;
 import org.apache.bigtop.manager.dao.repository.TaskRepository;
 import org.apache.bigtop.manager.grpc.generated.CommandReply;
@@ -66,28 +66,28 @@ public abstract class AbstractStageRunner implements StageRunner {
         beforeRun();
 
         List<CompletableFuture<Boolean>> futures = new ArrayList<>();
-        for (Task task : stage.getTasks()) {
-            beforeRunTask(task);
+        for (TaskPO taskPO : stage.getTaskPOList()) {
+            beforeRunTask(taskPO);
 
-            CommandRequest protoRequest = ProtobufUtil.fromJson(task.getContent(), CommandRequest.class);
+            CommandRequest protoRequest = ProtobufUtil.fromJson(taskPO.getContent(), CommandRequest.class);
             CommandRequest.Builder builder = CommandRequest.newBuilder(protoRequest);
-            builder.setTaskId(task.getId());
+            builder.setTaskId(taskPO.getId());
             builder.setStageId(stage.getId());
             builder.setJobId(stage.getJob().getId());
             CommandRequest request = builder.build();
 
             futures.add(CompletableFuture.supplyAsync(() -> {
                 CommandServiceGrpc.CommandServiceBlockingStub stub = GrpcClient.getBlockingStub(
-                        task.getHostname(), CommandServiceGrpc.CommandServiceBlockingStub.class);
+                        taskPO.getHostname(), CommandServiceGrpc.CommandServiceBlockingStub.class);
                 CommandReply reply = stub.exec(request);
 
-                log.info("Execute task {} completed: {}", task.getId(), reply);
+                log.info("Execute task {} completed: {}", taskPO.getId(), reply);
                 boolean taskSuccess = reply != null && reply.getCode() == MessageConstants.SUCCESS_CODE;
 
                 if (taskSuccess) {
-                    onTaskSuccess(task);
+                    onTaskSuccess(taskPO);
                 } else {
-                    onTaskFailure(task);
+                    onTaskFailure(taskPO);
                 }
 
                 return taskSuccess;
@@ -132,20 +132,20 @@ public abstract class AbstractStageRunner implements StageRunner {
     }
 
     @Override
-    public void beforeRunTask(Task task) {
-        task.setState(JobState.PROCESSING);
-        taskRepository.save(task);
+    public void beforeRunTask(TaskPO taskPO) {
+        taskPO.setState(JobState.PROCESSING);
+        taskRepository.save(taskPO);
     }
 
     @Override
-    public void onTaskSuccess(Task task) {
-        task.setState(JobState.SUCCESSFUL);
-        taskRepository.save(task);
+    public void onTaskSuccess(TaskPO taskPO) {
+        taskPO.setState(JobState.SUCCESSFUL);
+        taskRepository.save(taskPO);
     }
 
     @Override
-    public void onTaskFailure(Task task) {
-        task.setState(JobState.FAILED);
-        taskRepository.save(task);
+    public void onTaskFailure(TaskPO taskPO) {
+        taskPO.setState(JobState.FAILED);
+        taskRepository.save(taskPO);
     }
 }

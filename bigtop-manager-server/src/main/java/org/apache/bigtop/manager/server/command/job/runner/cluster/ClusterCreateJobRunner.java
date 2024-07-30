@@ -22,7 +22,7 @@ import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.enums.MaintainState;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.Stage;
-import org.apache.bigtop.manager.dao.po.Task;
+import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.dao.repository.JobRepository;
 import org.apache.bigtop.manager.dao.repository.StageRepository;
@@ -98,9 +98,9 @@ public class ClusterCreateJobRunner extends AbstractJobRunner {
             stage.setClusterPO(clusterPO);
             stageRepository.save(stage);
 
-            for (Task task : stage.getTasks()) {
-                task.setClusterPO(clusterPO);
-                taskRepository.save(task);
+            for (TaskPO taskPO : stage.getTaskPOList()) {
+                taskPO.setClusterPO(clusterPO);
+                taskRepository.save(taskPO);
             }
         }
     }

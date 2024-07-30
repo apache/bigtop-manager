@@ -23,7 +23,7 @@ import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.Job;
 import org.apache.bigtop.manager.dao.po.Stage;
-import org.apache.bigtop.manager.dao.po.Task;
+import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.dao.repository.JobRepository;
 import org.apache.bigtop.manager.dao.repository.StageRepository;
@@ -96,12 +96,12 @@ public abstract class AbstractJobFactory implements JobFactory {
             stage.setState(JobState.PENDING);
             stageRepository.save(stage);
 
-            for (Task task : stage.getTasks()) {
-                task.setClusterPO(clusterPO.getId() == null ? null : clusterPO);
-                task.setJob(job);
-                task.setStage(stage);
-                task.setState(JobState.PENDING);
-                taskRepository.save(task);
+            for (TaskPO taskPO : stage.getTaskPOList()) {
+                taskPO.setClusterPO(clusterPO.getId() == null ? null : clusterPO);
+                taskPO.setJob(job);
+                taskPO.setStage(stage);
+                taskPO.setState(JobState.PENDING);
+                taskRepository.save(taskPO);
             }
         }
     }

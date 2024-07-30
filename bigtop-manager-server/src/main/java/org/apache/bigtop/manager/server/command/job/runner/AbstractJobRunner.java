@@ -21,7 +21,7 @@ package org.apache.bigtop.manager.server.command.job.runner;
 import org.apache.bigtop.manager.common.enums.JobState;
 import org.apache.bigtop.manager.dao.po.Job;
 import org.apache.bigtop.manager.dao.po.Stage;
-import org.apache.bigtop.manager.dao.po.Task;
+import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.dao.repository.JobRepository;
 import org.apache.bigtop.manager.dao.repository.StageRepository;
 import org.apache.bigtop.manager.dao.repository.TaskRepository;
@@ -110,9 +110,9 @@ public abstract class AbstractJobRunner implements JobRunner {
                 stage.setState(JobState.CANCELED);
                 stageRepository.save(stage);
 
-                for (Task task : stage.getTasks()) {
-                    task.setState(JobState.CANCELED);
-                    taskRepository.save(task);
+                for (TaskPO taskPO : stage.getTaskPOList()) {
+                    taskPO.setState(JobState.CANCELED);
+                    taskRepository.save(taskPO);
                 }
             }
         }

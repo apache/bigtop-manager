@@ -89,5 +89,5 @@ public class Stage extends BasePO {
 
     @ToString.Exclude
     @OneToMany(mappedBy = "stage")
-    private List<Task> tasks;
+    private List<TaskPO> taskPOList;
 }

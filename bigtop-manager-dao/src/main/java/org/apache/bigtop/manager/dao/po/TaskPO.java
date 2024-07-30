@@ -51,7 +51,7 @@ import jakarta.persistence.TableGenerator;
             @Index(name = "idx_task_stage_id", columnList = "stage_id")
         })
 @TableGenerator(name = "task_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
-public class Task extends BasePO {
+public class TaskPO extends BasePO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "task_generator")

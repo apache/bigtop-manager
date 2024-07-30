@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.server.command.stage.runner;
 
 import org.apache.bigtop.manager.dao.po.Stage;
-import org.apache.bigtop.manager.dao.po.Task;
+import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.server.command.stage.factory.StageContext;
 import org.apache.bigtop.manager.server.command.stage.factory.StageType;
 
@@ -73,21 +73,21 @@ public interface StageRunner {
     /**
      * Method to be called before running a task in the stage. Can be used for task-specific setup and preparation.
      *
-     * @param task The task that is about to be run.
+     * @param taskPO The task that is about to be run.
      */
-    void beforeRunTask(Task task);
+    void beforeRunTask(TaskPO taskPO);
 
     /**
      * Method to be called after a task in the stage has successfully run. Can be used for task-specific cleanup and finalization.
      *
-     * @param task The task that has been successfully run.
+     * @param taskPO The task that has been successfully run.
      */
-    void onTaskSuccess(Task task);
+    void onTaskSuccess(TaskPO taskPO);
 
     /**
      * Method to be called if a task in the stage fails to run. Can be used for task-specific error handling and recovery.
      *
-     * @param task The task that has failed to run.
+     * @param taskPO The task that has failed to run.
      */
-    void onTaskFailure(Task task);
+    void onTaskFailure(TaskPO taskPO);
 }

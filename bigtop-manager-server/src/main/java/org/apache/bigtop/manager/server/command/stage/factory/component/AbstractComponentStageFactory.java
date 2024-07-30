@@ -25,7 +25,7 @@ import org.apache.bigtop.manager.common.message.entity.pojo.OSSpecificInfo;
 import org.apache.bigtop.manager.common.message.entity.pojo.ScriptInfo;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
-import org.apache.bigtop.manager.dao.po.Task;
+import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.grpc.generated.CommandRequest;
 import org.apache.bigtop.manager.grpc.generated.CommandType;
@@ -60,31 +60,31 @@ public abstract class AbstractComponentStageFactory extends AbstractStageFactory
         stage.setServiceName(serviceDTO.getServiceName());
         stage.setComponentName(componentDTO.getComponentName());
 
-        List<Task> tasks = new ArrayList<>();
+        List<TaskPO> taskPOList = new ArrayList<>();
         for (String hostname : context.getHostnames()) {
-            Task task = new Task();
+            TaskPO taskPO = new TaskPO();
 
             // Required fields
-            task.setName(stage.getName() + " on " + hostname);
-            task.setHostname(hostname);
-            task.setCommand(command);
-            task.setServiceName(serviceDTO.getServiceName());
-            task.setStackName(context.getStackName());
-            task.setStackVersion(context.getStackVersion());
+            taskPO.setName(stage.getName() + " on " + hostname);
+            taskPO.setHostname(hostname);
+            taskPO.setCommand(command);
+            taskPO.setServiceName(serviceDTO.getServiceName());
+            taskPO.setStackName(context.getStackName());
+            taskPO.setStackVersion(context.getStackVersion());
 
             // Context fields
-            task.setComponentName(componentDTO.getComponentName());
-            task.setServiceUser(serviceDTO.getServiceUser());
-            task.setServiceGroup(serviceDTO.getServiceGroup());
-            task.setCustomCommands(JsonUtils.writeAsString(componentDTO.getCustomCommands()));
-            task.setCommandScript(JsonUtils.writeAsString(componentDTO.getCommandScript()));
+            taskPO.setComponentName(componentDTO.getComponentName());
+            taskPO.setServiceUser(serviceDTO.getServiceUser());
+            taskPO.setServiceGroup(serviceDTO.getServiceGroup());
+            taskPO.setCustomCommands(JsonUtils.writeAsString(componentDTO.getCustomCommands()));
+            taskPO.setCommandScript(JsonUtils.writeAsString(componentDTO.getCommandScript()));
 
             CommandRequest request = getMessage(serviceDTO, componentDTO, hostname, command);
-            task.setContent(ProtobufUtil.toJson(request));
-            tasks.add(task);
+            taskPO.setContent(ProtobufUtil.toJson(request));
+            taskPOList.add(taskPO);
         }
 
-        stage.setTasks(tasks);
+        stage.setTaskPOList(taskPOList);
     }
 
     protected abstract Command getCommand();

@@ -20,7 +20,7 @@ package org.apache.bigtop.manager.server.command.stage.factory.config;
 
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.dao.po.HostPO;
-import org.apache.bigtop.manager.dao.po.Task;
+import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.dao.repository.HostRepository;
 import org.apache.bigtop.manager.server.command.stage.factory.AbstractStageFactory;
 import org.apache.bigtop.manager.server.command.stage.factory.StageType;
@@ -61,23 +61,23 @@ public class CacheDistributeStageFactory extends AbstractStageFactory {
 
         stage.setName("Distribute Caches");
 
-        List<Task> tasks = new ArrayList<>();
+        List<TaskPO> taskPOList = new ArrayList<>();
         hostnames = hostnames.stream().distinct().toList();
         for (String hostname : hostnames) {
-            Task task = new Task();
-            task.setName(stage.getName() + " on " + hostname);
-            task.setStackName(context.getStackName());
-            task.setStackVersion(context.getStackVersion());
-            task.setHostname(hostname);
-            task.setServiceName("cluster");
-            task.setServiceUser("root");
-            task.setServiceGroup("root");
-            task.setComponentName("bigtop-manager-agent");
-            task.setCommand(Command.CUSTOM);
-            task.setCustomCommand("cache_host");
-            tasks.add(task);
+            TaskPO taskPO = new TaskPO();
+            taskPO.setName(stage.getName() + " on " + hostname);
+            taskPO.setStackName(context.getStackName());
+            taskPO.setStackVersion(context.getStackVersion());
+            taskPO.setHostname(hostname);
+            taskPO.setServiceName("cluster");
+            taskPO.setServiceUser("root");
+            taskPO.setServiceGroup("root");
+            taskPO.setComponentName("bigtop-manager-agent");
+            taskPO.setCommand(Command.CUSTOM);
+            taskPO.setCustomCommand("cache_host");
+            taskPOList.add(taskPO);
         }
 
-        stage.setTasks(tasks);
+        stage.setTaskPOList(taskPOList);
     }
 }
