@@ -142,7 +142,7 @@ public class CacheDistributeStageRunner extends AbstractStageRunner {
         String stackName = clusterPO.getStackPO().getStackName();
         String stackVersion = clusterPO.getStackPO().getStackVersion();
 
-        List<Service> services = serviceRepository.findAllByClusterId(clusterId);
+        List<ServicePO> servicePOList = serviceRepository.findAllByClusterId(clusterId);
         List<ServiceConfigPO> serviceConfigPOList = serviceConfigRepository.findAllByClusterAndSelectedIsTrue(clusterPO);
         List<HostComponentPO> hostComponentPOList = hostComponentRepository.findAllByComponentClusterId(clusterId);
         List<RepoPO> repoPOList = repoRepository.findAllByCluster(clusterPO);
@@ -165,14 +165,14 @@ public class CacheDistributeStageRunner extends AbstractStageRunner {
                         JsonUtils.readFromString(typeConfigPO.getPropertiesJson(), new TypeReference<>() {});
                 String configMapStr = JsonUtils.writeAsString(StackConfigUtils.extractConfigMap(properties));
 
-                if (serviceConfigMap.containsKey(serviceConfigPO.getService().getServiceName())) {
+                if (serviceConfigMap.containsKey(serviceConfigPO.getServicePO().getServiceName())) {
                     serviceConfigMap
-                            .get(serviceConfigPO.getService().getServiceName())
+                            .get(serviceConfigPO.getServicePO().getServiceName())
                             .put(typeConfigPO.getTypeName(), configMapStr);
                 } else {
                     Map<String, Object> hashMap = new HashMap<>();
                     hashMap.put(typeConfigPO.getTypeName(), configMapStr);
-                    serviceConfigMap.put(serviceConfigPO.getService().getServiceName(), hashMap);
+                    serviceConfigMap.put(serviceConfigPO.getServicePO().getServiceName(), hashMap);
                 }
             }
         }
@@ -199,7 +199,7 @@ public class CacheDistributeStageRunner extends AbstractStageRunner {
         });
 
         userMap = new HashMap<>();
-        services.forEach(x -> userMap.put(x.getServiceUser(), Set.of(x.getServiceGroup())));
+        servicePOList.forEach(x -> userMap.put(x.getServiceUser(), Set.of(x.getServiceGroup())));
 
         settingsMap = new HashMap<>();
         settings.forEach(x -> settingsMap.put(x.getTypeName(), x.getConfigData()));
@@ -213,7 +213,7 @@ public class CacheDistributeStageRunner extends AbstractStageRunner {
             componentInfo.setDisplayName(c.getDisplayName());
             componentInfo.setCategory(c.getCategory());
             componentInfo.setCustomCommands(c.getCustomCommands());
-            componentInfo.setServiceName(c.getService().getServiceName());
+            componentInfo.setServiceName(c.getServicePO().getServiceName());
             componentInfoMap.put(c.getComponentName(), componentInfo);
         });
     }

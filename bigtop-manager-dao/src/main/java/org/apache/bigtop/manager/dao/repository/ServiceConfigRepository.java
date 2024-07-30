@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.dao.repository;
 
 import org.apache.bigtop.manager.dao.po.ClusterPO;
-import org.apache.bigtop.manager.dao.po.Service;
+import org.apache.bigtop.manager.dao.po.ServicePO;
 import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
 
 import org.springframework.data.domain.Sort;
@@ -36,14 +36,14 @@ public interface ServiceConfigRepository extends JpaRepository<ServiceConfigPO, 
 
     List<ServiceConfigPO> findAllByCluster(ClusterPO clusterPO, Sort sort);
 
-    List<ServiceConfigPO> findAllByClusterAndService(ClusterPO clusterPO, Service service);
+    List<ServiceConfigPO> findAllByClusterAndService(ClusterPO clusterPO, ServicePO servicePO);
 
-    ServiceConfigPO findByClusterAndServiceAndSelectedIsTrue(ClusterPO clusterPO, Service service);
+    ServiceConfigPO findByClusterAndServiceAndSelectedIsTrue(ClusterPO clusterPO, ServicePO servicePO);
 
     List<ServiceConfigPO> findAllByClusterAndSelectedIsTrue(ClusterPO clusterPO);
 
     @Transactional
     @Modifying
     @Query("UPDATE ServiceConfigPO s SET s.selected = false WHERE s.clusterPO = :cluster AND s.service = :service")
-    void setAllSelectedToFalseByClusterAndService(ClusterPO clusterPO, Service service);
+    void setAllSelectedToFalseByClusterAndService(ClusterPO clusterPO, ServicePO servicePO);
 }

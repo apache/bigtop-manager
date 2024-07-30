@@ -51,7 +51,7 @@ import jakarta.persistence.UniqueConstraint;
         table = "sequence",
         pkColumnName = "seq_name",
         valueColumnName = "seq_count")
-public class Service extends BasePO {
+public class ServicePO extends BasePO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "service_generator")

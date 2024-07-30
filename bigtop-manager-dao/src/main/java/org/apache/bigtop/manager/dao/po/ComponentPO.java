@@ -86,7 +86,7 @@ public class ComponentPO extends BasePO {
 
     @ManyToOne
     @JoinColumn(name = "service_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Service service;
+    private ServicePO servicePO;
 
     @ManyToOne
     @JoinColumn(name = "cluster_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))

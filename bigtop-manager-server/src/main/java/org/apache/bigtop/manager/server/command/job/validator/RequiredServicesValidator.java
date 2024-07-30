@@ -20,7 +20,7 @@ package org.apache.bigtop.manager.server.command.job.validator;
 
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
-import org.apache.bigtop.manager.dao.po.Service;
+import org.apache.bigtop.manager.dao.po.ServicePO;
 import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.dao.repository.ServiceRepository;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
@@ -73,9 +73,9 @@ public class RequiredServicesValidator implements CommandValidator {
                 return;
             }
 
-            List<Service> serviceList = serviceRepository.findByClusterIdAndServiceNameIn(clusterId, requiredServices);
+            List<ServicePO> servicePOList = serviceRepository.findByClusterIdAndServiceNameIn(clusterId, requiredServices);
             List<String> list =
-                    serviceList.stream().map(Service::getServiceName).toList();
+                    servicePOList.stream().map(ServicePO::getServiceName).toList();
 
             requiredServices.removeAll(list);
 

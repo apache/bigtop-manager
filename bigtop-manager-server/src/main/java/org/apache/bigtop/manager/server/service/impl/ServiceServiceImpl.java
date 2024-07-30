@@ -21,13 +21,8 @@ package org.apache.bigtop.manager.server.service.impl;
 import org.apache.bigtop.manager.common.constants.ComponentCategories;
 import org.apache.bigtop.manager.common.enums.MaintainState;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.po.ClusterPO;
-import org.apache.bigtop.manager.dao.po.ComponentPO;
-import org.apache.bigtop.manager.dao.po.HostComponentPO;
-import org.apache.bigtop.manager.dao.po.HostPO;
-import org.apache.bigtop.manager.dao.po.Service;
-import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
-import org.apache.bigtop.manager.dao.po.TypeConfigPO;
+import org.apache.bigtop.manager.dao.po.*;
+import org.apache.bigtop.manager.dao.po.ServicePO;
 import org.apache.bigtop.manager.dao.repository.HostComponentRepository;
 import org.apache.bigtop.manager.dao.repository.ServiceConfigRepository;
 import org.apache.bigtop.manager.dao.repository.ServiceRepository;
@@ -69,12 +64,12 @@ public class ServiceServiceImpl implements ServiceService {
         Map<Long, List<HostComponentPO>> serviceIdToHostComponent =
                 hostComponentRepository.findAllByComponentClusterId(clusterId).stream()
                         .collect(Collectors.groupingBy(hostComponent ->
-                                hostComponent.getComponentPO().getService().getId()));
+                                hostComponent.getComponentPO().getServicePO().getId()));
 
         for (Map.Entry<Long, List<HostComponentPO>> entry : serviceIdToHostComponent.entrySet()) {
             List<HostComponentPO> hostComponentPOList = entry.getValue();
-            Service service = hostComponentPOList.get(0).getComponentPO().getService();
-            ServiceVO serviceVO = ServiceConverter.INSTANCE.fromEntity2VO(service);
+            ServicePO servicePO = hostComponentPOList.get(0).getComponentPO().getServicePO();
+            ServiceVO serviceVO = ServiceConverter.INSTANCE.fromEntity2VO(servicePO);
             serviceVO.setQuickLinks(new ArrayList<>());
 
             boolean isHealthy = true;
@@ -111,8 +106,8 @@ public class ServiceServiceImpl implements ServiceService {
 
     @Override
     public ServiceVO get(Long id) {
-        Service service = serviceRepository.findById(id).orElse(new Service());
-        return ServiceConverter.INSTANCE.fromEntity2VO(service);
+        ServicePO servicePO = serviceRepository.findById(id).orElse(new ServicePO());
+        return ServiceConverter.INSTANCE.fromEntity2VO(servicePO);
     }
 
     private QuickLinkVO resolveQuickLink(HostComponentPO hostComponentPO, String quickLinkJson) {
@@ -124,9 +119,9 @@ public class ServiceServiceImpl implements ServiceService {
         ComponentPO componentPO = hostComponentPO.getComponentPO();
         ClusterPO clusterPO = componentPO.getClusterPO();
         HostPO hostPO = hostComponentPO.getHostPO();
-        Service service = componentPO.getService();
+        ServicePO servicePO = componentPO.getServicePO();
         ServiceConfigPO serviceConfigPO =
-                serviceConfigRepository.findByClusterAndServiceAndSelectedIsTrue(clusterPO, service);
+                serviceConfigRepository.findByClusterAndServiceAndSelectedIsTrue(clusterPO, servicePO);
         List<TypeConfigPO> typeConfigPOList = serviceConfigPO.getConfigs();
 
         // Use HTTP for now, need to handle https in the future

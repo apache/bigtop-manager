@@ -55,12 +55,12 @@ public class ComponentStatusScheduler {
 
             HostPO hostPO = hostComponentPO.getHostPO();
             ComponentPO componentPO = hostComponentPO.getComponentPO();
-            Service service = componentPO.getService();
+            ServicePO servicePO = componentPO.getServicePO();
             ClusterPO clusterPO = hostPO.getClusterPO();
             StackPO stackPO = clusterPO.getStackPO();
 
             ComponentStatusRequest request = ComponentStatusRequest.newBuilder()
-                    .setServiceName(service.getServiceName())
+                    .setServiceName(servicePO.getServiceName())
                     .setComponentName(componentPO.getComponentName())
                     .setCommandScript(componentPO.getCommandScript())
                     .setRoot(clusterPO.getRoot())

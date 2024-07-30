@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.server.model.converter;
 
 import org.apache.bigtop.manager.dao.po.ClusterPO;
-import org.apache.bigtop.manager.dao.po.Service;
+import org.apache.bigtop.manager.dao.po.ServicePO;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.model.vo.ServiceVO;
@@ -42,7 +42,7 @@ public interface ServiceConverter {
     @Mapping(target = "osSpecifics", source = "osSpecifics", qualifiedByName = "obj2Json")
     @Mapping(target = "requiredServices", source = "requiredServices", qualifiedByName = "obj2Json")
     @Mapping(target = "cluster", expression = "java(cluster)")
-    Service fromDTO2Entity(ServiceDTO serviceDTO, @Context ClusterPO clusterPO);
+    ServicePO fromDTO2Entity(ServiceDTO serviceDTO, @Context ClusterPO clusterPO);
 
     ServiceVO fromDTO2VO(ServiceDTO serviceDTO);
 
@@ -57,7 +57,7 @@ public interface ServiceConverter {
 
     @Mapping(target = "requiredServices", source = "requiredServices", qualifiedByName = "json2List")
     @Mapping(target = "clusterName", source = "clusterPO.clusterName")
-    ServiceVO fromEntity2VO(Service service);
+    ServiceVO fromEntity2VO(ServicePO servicePO);
 
-    List<ServiceVO> fromEntity2VO(List<Service> services);
+    List<ServiceVO> fromEntity2VO(List<ServicePO> servicePOList);
 }
