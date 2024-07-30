@@ -20,7 +20,7 @@ package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.common.enums.MaintainState;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
-import org.apache.bigtop.manager.dao.po.Repo;
+import org.apache.bigtop.manager.dao.po.RepoPO;
 import org.apache.bigtop.manager.dao.po.Stack;
 import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.dao.repository.RepoRepository;
@@ -91,18 +91,18 @@ public class ClusterServiceImpl implements ClusterService {
         hostService.batchSave(clusterPO.getId(), clusterDTO.getHostnames());
 
         // Save repo
-        List<Repo> repos = RepoConverter.INSTANCE.fromDTO2Entity(clusterDTO.getRepoInfoList(), clusterPO);
-        List<Repo> oldRepos = repoRepository.findAllByCluster(clusterPO);
+        List<RepoPO> repoPOList = RepoConverter.INSTANCE.fromDTO2Entity(clusterDTO.getRepoInfoList(), clusterPO);
+        List<RepoPO> oldrepoPOList = repoRepository.findAllByCluster(clusterPO);
 
-        for (Repo repo : repos) {
-            for (Repo oldRepo : oldRepos) {
-                if (oldRepo.getArch().equals(repo.getArch()) && oldRepo.getOs().equals(repo.getOs())) {
-                    repo.setId(oldRepo.getId());
+        for (RepoPO repoPO : repoPOList) {
+            for (RepoPO oldRepoPO : oldrepoPOList) {
+                if (oldRepoPO.getArch().equals(repoPO.getArch()) && oldRepoPO.getOs().equals(repoPO.getOs())) {
+                    repoPO.setId(oldRepoPO.getId());
                 }
             }
         }
 
-        repoRepository.saveAll(repos);
+        repoRepository.saveAll(repoPOList);
         return ClusterConverter.INSTANCE.fromEntity2VO(clusterPO);
     }
 

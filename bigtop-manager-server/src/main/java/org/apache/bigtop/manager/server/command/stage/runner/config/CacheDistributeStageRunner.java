@@ -145,7 +145,7 @@ public class CacheDistributeStageRunner extends AbstractStageRunner {
         List<Service> services = serviceRepository.findAllByClusterId(clusterId);
         List<ServiceConfigPO> serviceConfigPOList = serviceConfigRepository.findAllByClusterAndSelectedIsTrue(clusterPO);
         List<HostComponentPO> hostComponentPOList = hostComponentRepository.findAllByComponentClusterId(clusterId);
-        List<Repo> repos = repoRepository.findAllByCluster(clusterPO);
+        List<RepoPO> repoPOList = repoRepository.findAllByCluster(clusterPO);
         Iterable<Setting> settings = settingRepository.findAll();
         List<HostPO> hostPOList = hostRepository.findAllByClusterId(clusterId);
 
@@ -193,8 +193,8 @@ public class CacheDistributeStageRunner extends AbstractStageRunner {
         hostMap.put(ALL_HOST_KEY, hostNameSet);
 
         repoList = new ArrayList<>();
-        repos.forEach(repo -> {
-            RepoInfo repoInfo = RepoConverter.INSTANCE.fromEntity2Message(repo);
+        repoPOList.forEach(repoPO -> {
+            RepoInfo repoInfo = RepoConverter.INSTANCE.fromEntity2Message(repoPO);
             repoList.add(repoInfo);
         });
 
