@@ -22,7 +22,7 @@ import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.Service;
 import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
-import org.apache.bigtop.manager.dao.po.TypeConfig;
+import org.apache.bigtop.manager.dao.po.TypeConfigPO;
 import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.dao.repository.ServiceConfigRepository;
 import org.apache.bigtop.manager.dao.repository.ServiceRepository;
@@ -143,11 +143,11 @@ public class ConfigServiceImpl implements ConfigService {
         for (TypeConfigDTO typeConfigDTO : configs) {
             String typeName = typeConfigDTO.getTypeName();
             List<PropertyDTO> properties = typeConfigDTO.getProperties();
-            TypeConfig typeConfig = new TypeConfig();
-            typeConfig.setTypeName(typeName);
-            typeConfig.setPropertiesJson(JsonUtils.writeAsString(properties));
-            typeConfig.setServiceConfigPO(serviceConfigPO);
-            typeConfigRepository.save(typeConfig);
+            TypeConfigPO typeConfigPO = new TypeConfigPO();
+            typeConfigPO.setTypeName(typeName);
+            typeConfigPO.setPropertiesJson(JsonUtils.writeAsString(properties));
+            typeConfigPO.setServiceConfigPO(serviceConfigPO);
+            typeConfigRepository.save(typeConfigPO);
         }
     }
 }

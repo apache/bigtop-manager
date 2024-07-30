@@ -160,18 +160,18 @@ public class CacheDistributeStageRunner extends AbstractStageRunner {
 
         serviceConfigMap = new HashMap<>();
         for (ServiceConfigPO serviceConfigPO : serviceConfigPOList) {
-            for (TypeConfig typeConfig : serviceConfigPO.getConfigs()) {
+            for (TypeConfigPO typeConfigPO : serviceConfigPO.getConfigs()) {
                 List<PropertyDTO> properties =
-                        JsonUtils.readFromString(typeConfig.getPropertiesJson(), new TypeReference<>() {});
+                        JsonUtils.readFromString(typeConfigPO.getPropertiesJson(), new TypeReference<>() {});
                 String configMapStr = JsonUtils.writeAsString(StackConfigUtils.extractConfigMap(properties));
 
                 if (serviceConfigMap.containsKey(serviceConfigPO.getService().getServiceName())) {
                     serviceConfigMap
                             .get(serviceConfigPO.getService().getServiceName())
-                            .put(typeConfig.getTypeName(), configMapStr);
+                            .put(typeConfigPO.getTypeName(), configMapStr);
                 } else {
                     Map<String, Object> hashMap = new HashMap<>();
-                    hashMap.put(typeConfig.getTypeName(), configMapStr);
+                    hashMap.put(typeConfigPO.getTypeName(), configMapStr);
                     serviceConfigMap.put(serviceConfigPO.getService().getServiceName(), hashMap);
                 }
             }

@@ -27,7 +27,7 @@ import org.apache.bigtop.manager.dao.po.HostComponentPO;
 import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.po.Service;
 import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
-import org.apache.bigtop.manager.dao.po.TypeConfig;
+import org.apache.bigtop.manager.dao.po.TypeConfigPO;
 import org.apache.bigtop.manager.dao.repository.HostComponentRepository;
 import org.apache.bigtop.manager.dao.repository.ServiceConfigRepository;
 import org.apache.bigtop.manager.dao.repository.ServiceRepository;
@@ -127,11 +127,11 @@ public class ServiceServiceImpl implements ServiceService {
         Service service = componentPO.getService();
         ServiceConfigPO serviceConfigPO =
                 serviceConfigRepository.findByClusterAndServiceAndSelectedIsTrue(clusterPO, service);
-        List<TypeConfig> typeConfigs = serviceConfigPO.getConfigs();
+        List<TypeConfigPO> typeConfigPOList = serviceConfigPO.getConfigs();
 
         // Use HTTP for now, need to handle https in the future
-        for (TypeConfig typeConfig : typeConfigs) {
-            TypeConfigDTO typeConfigDTO = TypeConfigConverter.INSTANCE.fromEntity2DTO(typeConfig);
+        for (TypeConfigPO typeConfigPO : typeConfigPOList) {
+            TypeConfigDTO typeConfigDTO = TypeConfigConverter.INSTANCE.fromEntity2DTO(typeConfigPO);
             for (PropertyDTO propertyDTO : typeConfigDTO.getProperties()) {
                 if (propertyDTO.getName().equals(quickLinkDTO.getHttpPortProperty())) {
                     String port = propertyDTO.getValue().contains(":")

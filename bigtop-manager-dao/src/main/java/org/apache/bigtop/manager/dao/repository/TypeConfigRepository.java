@@ -18,8 +18,8 @@
  */
 package org.apache.bigtop.manager.dao.repository;
 
-import org.apache.bigtop.manager.dao.po.TypeConfig;
+import org.apache.bigtop.manager.dao.po.TypeConfigPO;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface TypeConfigRepository extends JpaRepository<TypeConfig, Long> {}
+public interface TypeConfigRepository extends JpaRepository<TypeConfigPO, Long> {}

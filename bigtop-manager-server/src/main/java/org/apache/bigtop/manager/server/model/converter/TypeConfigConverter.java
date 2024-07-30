@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.server.model.converter;
 
-import org.apache.bigtop.manager.dao.po.TypeConfig;
+import org.apache.bigtop.manager.dao.po.TypeConfigPO;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.dto.TypeConfigDTO;
 import org.apache.bigtop.manager.server.model.vo.TypeConfigVO;
@@ -38,17 +38,17 @@ public interface TypeConfigConverter {
     TypeConfigConverter INSTANCE = Mappers.getMapper(TypeConfigConverter.class);
 
     @Mapping(target = "properties", source = "propertiesJson", qualifiedByName = "json2PropertyDTOList")
-    TypeConfigDTO fromEntity2DTO(TypeConfig typeConfig);
+    TypeConfigDTO fromEntity2DTO(TypeConfigPO typeConfigPO);
 
-    List<TypeConfigDTO> fromEntity2DTO(List<TypeConfig> typeConfigs);
+    List<TypeConfigDTO> fromEntity2DTO(List<TypeConfigPO> typeConfigPOS);
 
     TypeConfigVO fromDTO2VO(TypeConfigDTO typeConfigDTO);
 
     List<TypeConfigVO> fromDTO2VO(List<TypeConfigDTO> typeConfigDTOList);
 
     @Mapping(target = "properties", source = "propertiesJson", qualifiedByName = "json2PropertyVOList")
-    TypeConfigVO fromEntity2VO(TypeConfig typeConfig);
+    TypeConfigVO fromEntity2VO(TypeConfigPO typeConfigPO);
 
     @Named("fromEntity2VO")
-    List<TypeConfigVO> fromEntity2VO(List<TypeConfig> typeConfigs);
+    List<TypeConfigVO> fromEntity2VO(List<TypeConfigPO> typeConfigPOS);
 }

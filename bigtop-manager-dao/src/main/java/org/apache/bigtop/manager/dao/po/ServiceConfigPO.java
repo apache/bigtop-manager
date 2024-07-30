@@ -69,7 +69,7 @@ public class ServiceConfigPO extends BasePO {
 
     @ToString.Exclude
     @OneToMany(mappedBy = "serviceConfig")
-    private List<TypeConfig> configs;
+    private List<TypeConfigPO> configs;
 
     @ManyToOne
     @JoinColumn(name = "service_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
