@@ -34,7 +34,7 @@ import jakarta.persistence.TableGenerator;
 @Entity
 @Table(name = "\"user\"")
 @TableGenerator(name = "user_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
-public class User extends BasePO {
+public class UserPO extends BasePO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "user_generator")

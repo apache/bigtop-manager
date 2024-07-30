@@ -18,11 +18,11 @@
  */
 package org.apache.bigtop.manager.dao.repository;
 
-import org.apache.bigtop.manager.dao.po.User;
+import org.apache.bigtop.manager.dao.po.UserPO;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<UserPO, Long> {
 
-    User findByUsername(String username);
+    UserPO findByUsername(String username);
 }

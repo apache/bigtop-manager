@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
-import org.apache.bigtop.manager.dao.po.User;
+import org.apache.bigtop.manager.dao.po.UserPO;
 import org.apache.bigtop.manager.dao.repository.UserRepository;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
@@ -41,16 +41,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserVO current() {
         Long id = SessionUserHolder.getUserId();
-        User user = userRepository.findById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.NEED_LOGIN));
-        return UserConverter.INSTANCE.fromEntity2VO(user);
+        UserPO userPO = userRepository.findById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.NEED_LOGIN));
+        return UserConverter.INSTANCE.fromEntity2VO(userPO);
     }
 
     @Override
     public UserVO update(UserDTO userDTO) {
         Long id = SessionUserHolder.getUserId();
-        User user = userRepository.findById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.NEED_LOGIN));
-        user.setNickname(userDTO.getNickname());
-        userRepository.save(user);
-        return UserConverter.INSTANCE.fromEntity2VO(user);
+        UserPO userPO = userRepository.findById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.NEED_LOGIN));
+        userPO.setNickname(userDTO.getNickname());
+        userRepository.save(userPO);
+        return UserConverter.INSTANCE.fromEntity2VO(userPO);
     }
 }
