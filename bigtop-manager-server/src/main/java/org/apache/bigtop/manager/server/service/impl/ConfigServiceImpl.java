@@ -21,7 +21,7 @@ package org.apache.bigtop.manager.server.service.impl;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.Service;
-import org.apache.bigtop.manager.dao.po.ServiceConfig;
+import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
 import org.apache.bigtop.manager.dao.po.TypeConfig;
 import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.dao.repository.ServiceConfigRepository;
@@ -61,14 +61,14 @@ public class ConfigServiceImpl implements ConfigService {
     public List<ServiceConfigVO> list(Long clusterId) {
         ClusterPO clusterPO = clusterRepository.getReferenceById(clusterId);
         Sort sort = Sort.by(Sort.Direction.DESC, "version");
-        List<ServiceConfig> list = serviceConfigRepository.findAllByCluster(clusterPO, sort);
+        List<ServiceConfigPO> list = serviceConfigRepository.findAllByCluster(clusterPO, sort);
         return ServiceConfigConverter.INSTANCE.fromEntity2VO(list);
     }
 
     @Override
     public List<ServiceConfigVO> latest(Long clusterId) {
         ClusterPO clusterPO = clusterRepository.getReferenceById(clusterId);
-        List<ServiceConfig> list = serviceConfigRepository.findAllByClusterAndSelectedIsTrue(clusterPO);
+        List<ServiceConfigPO> list = serviceConfigRepository.findAllByClusterAndSelectedIsTrue(clusterPO);
         return ServiceConfigConverter.INSTANCE.fromEntity2VO(list);
     }
 
@@ -77,7 +77,7 @@ public class ConfigServiceImpl implements ConfigService {
         // Save configs
         ClusterPO clusterPO = clusterRepository.getReferenceById(clusterId);
         Service service = serviceRepository.getReferenceById(serviceId);
-        ServiceConfig serviceCurrentConfig = findServiceCurrentConfig(clusterPO, service);
+        ServiceConfigPO serviceCurrentConfig = findServiceCurrentConfig(clusterPO, service);
         if (serviceCurrentConfig == null) {
             // Add config for new service
             addServiceConfig(clusterPO, service, configs);
@@ -87,12 +87,12 @@ public class ConfigServiceImpl implements ConfigService {
         }
     }
 
-    private ServiceConfig findServiceCurrentConfig(ClusterPO clusterPO, Service service) {
+    private ServiceConfigPO findServiceCurrentConfig(ClusterPO clusterPO, Service service) {
         return serviceConfigRepository.findByClusterAndServiceAndSelectedIsTrue(clusterPO, service);
     }
 
     private void upsertServiceConfig(
-            ClusterPO clusterPO, Service service, ServiceConfig currentConfig, List<TypeConfigDTO> configs) {
+            ClusterPO clusterPO, Service service, ServiceConfigPO currentConfig, List<TypeConfigDTO> configs) {
         List<TypeConfigDTO> existConfigs = TypeConfigConverter.INSTANCE.fromEntity2DTO(currentConfig.getConfigs());
         if (shouldUpdateConfig(existConfigs, configs)) {
             // Unselect current config
@@ -132,13 +132,13 @@ public class ConfigServiceImpl implements ConfigService {
 
     private void addServiceConfig(
             ClusterPO clusterPO, Service service, List<TypeConfigDTO> configs, String configDesc, Integer version) {
-        ServiceConfig serviceConfig = new ServiceConfig();
-        serviceConfig.setClusterPO(clusterPO);
-        serviceConfig.setService(service);
-        serviceConfig.setConfigDesc(configDesc);
-        serviceConfig.setVersion(version);
-        serviceConfig.setSelected(true);
-        serviceConfigRepository.save(serviceConfig);
+        ServiceConfigPO serviceConfigPO = new ServiceConfigPO();
+        serviceConfigPO.setClusterPO(clusterPO);
+        serviceConfigPO.setService(service);
+        serviceConfigPO.setConfigDesc(configDesc);
+        serviceConfigPO.setVersion(version);
+        serviceConfigPO.setSelected(true);
+        serviceConfigRepository.save(serviceConfigPO);
 
         for (TypeConfigDTO typeConfigDTO : configs) {
             String typeName = typeConfigDTO.getTypeName();
@@ -146,7 +146,7 @@ public class ConfigServiceImpl implements ConfigService {
             TypeConfig typeConfig = new TypeConfig();
             typeConfig.setTypeName(typeName);
             typeConfig.setPropertiesJson(JsonUtils.writeAsString(properties));
-            typeConfig.setServiceConfig(serviceConfig);
+            typeConfig.setServiceConfigPO(serviceConfigPO);
             typeConfigRepository.save(typeConfig);
         }
     }

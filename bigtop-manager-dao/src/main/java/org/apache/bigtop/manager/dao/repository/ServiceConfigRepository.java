@@ -20,7 +20,7 @@ package org.apache.bigtop.manager.dao.repository;
 
 import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.Service;
-import org.apache.bigtop.manager.dao.po.ServiceConfig;
+import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -30,20 +30,20 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-public interface ServiceConfigRepository extends JpaRepository<ServiceConfig, Long> {
+public interface ServiceConfigRepository extends JpaRepository<ServiceConfigPO, Long> {
 
-    List<ServiceConfig> findAllByCluster(ClusterPO clusterPO);
+    List<ServiceConfigPO> findAllByCluster(ClusterPO clusterPO);
 
-    List<ServiceConfig> findAllByCluster(ClusterPO clusterPO, Sort sort);
+    List<ServiceConfigPO> findAllByCluster(ClusterPO clusterPO, Sort sort);
 
-    List<ServiceConfig> findAllByClusterAndService(ClusterPO clusterPO, Service service);
+    List<ServiceConfigPO> findAllByClusterAndService(ClusterPO clusterPO, Service service);
 
-    ServiceConfig findByClusterAndServiceAndSelectedIsTrue(ClusterPO clusterPO, Service service);
+    ServiceConfigPO findByClusterAndServiceAndSelectedIsTrue(ClusterPO clusterPO, Service service);
 
-    List<ServiceConfig> findAllByClusterAndSelectedIsTrue(ClusterPO clusterPO);
+    List<ServiceConfigPO> findAllByClusterAndSelectedIsTrue(ClusterPO clusterPO);
 
     @Transactional
     @Modifying
-    @Query("UPDATE ServiceConfig s SET s.selected = false WHERE s.clusterPO = :cluster AND s.service = :service")
+    @Query("UPDATE ServiceConfigPO s SET s.selected = false WHERE s.clusterPO = :cluster AND s.service = :service")
     void setAllSelectedToFalseByClusterAndService(ClusterPO clusterPO, Service service);
 }

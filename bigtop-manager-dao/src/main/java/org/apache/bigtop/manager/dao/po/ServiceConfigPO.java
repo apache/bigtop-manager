@@ -51,7 +51,7 @@ import java.util.List;
         table = "sequence",
         pkColumnName = "seq_name",
         valueColumnName = "seq_count")
-public class ServiceConfig extends BasePO {
+public class ServiceConfigPO extends BasePO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "service_config_generator")

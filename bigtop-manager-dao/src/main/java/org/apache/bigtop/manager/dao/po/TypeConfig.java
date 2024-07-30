@@ -62,5 +62,5 @@ public class TypeConfig extends BasePO {
 
     @ManyToOne
     @JoinColumn(name = "service_config_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private ServiceConfig serviceConfig;
+    private ServiceConfigPO serviceConfigPO;
 }

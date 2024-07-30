@@ -26,7 +26,7 @@ import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.po.HostComponentPO;
 import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.po.Service;
-import org.apache.bigtop.manager.dao.po.ServiceConfig;
+import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
 import org.apache.bigtop.manager.dao.po.TypeConfig;
 import org.apache.bigtop.manager.dao.repository.HostComponentRepository;
 import org.apache.bigtop.manager.dao.repository.ServiceConfigRepository;
@@ -125,9 +125,9 @@ public class ServiceServiceImpl implements ServiceService {
         ClusterPO clusterPO = componentPO.getClusterPO();
         HostPO hostPO = hostComponentPO.getHostPO();
         Service service = componentPO.getService();
-        ServiceConfig serviceConfig =
+        ServiceConfigPO serviceConfigPO =
                 serviceConfigRepository.findByClusterAndServiceAndSelectedIsTrue(clusterPO, service);
-        List<TypeConfig> typeConfigs = serviceConfig.getConfigs();
+        List<TypeConfig> typeConfigs = serviceConfigPO.getConfigs();
 
         // Use HTTP for now, need to handle https in the future
         for (TypeConfig typeConfig : typeConfigs) {

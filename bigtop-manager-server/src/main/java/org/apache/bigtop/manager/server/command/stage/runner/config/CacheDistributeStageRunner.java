@@ -143,7 +143,7 @@ public class CacheDistributeStageRunner extends AbstractStageRunner {
         String stackVersion = clusterPO.getStack().getStackVersion();
 
         List<Service> services = serviceRepository.findAllByClusterId(clusterId);
-        List<ServiceConfig> serviceConfigList = serviceConfigRepository.findAllByClusterAndSelectedIsTrue(clusterPO);
+        List<ServiceConfigPO> serviceConfigPOList = serviceConfigRepository.findAllByClusterAndSelectedIsTrue(clusterPO);
         List<HostComponentPO> hostComponentPOList = hostComponentRepository.findAllByComponentClusterId(clusterId);
         List<Repo> repos = repoRepository.findAllByCluster(clusterPO);
         Iterable<Setting> settings = settingRepository.findAll();
@@ -159,20 +159,20 @@ public class CacheDistributeStageRunner extends AbstractStageRunner {
         clusterInfo.setPackages(List.of(clusterPO.getPackages().split(",")));
 
         serviceConfigMap = new HashMap<>();
-        for (ServiceConfig serviceConfig : serviceConfigList) {
-            for (TypeConfig typeConfig : serviceConfig.getConfigs()) {
+        for (ServiceConfigPO serviceConfigPO : serviceConfigPOList) {
+            for (TypeConfig typeConfig : serviceConfigPO.getConfigs()) {
                 List<PropertyDTO> properties =
                         JsonUtils.readFromString(typeConfig.getPropertiesJson(), new TypeReference<>() {});
                 String configMapStr = JsonUtils.writeAsString(StackConfigUtils.extractConfigMap(properties));
 
-                if (serviceConfigMap.containsKey(serviceConfig.getService().getServiceName())) {
+                if (serviceConfigMap.containsKey(serviceConfigPO.getService().getServiceName())) {
                     serviceConfigMap
-                            .get(serviceConfig.getService().getServiceName())
+                            .get(serviceConfigPO.getService().getServiceName())
                             .put(typeConfig.getTypeName(), configMapStr);
                 } else {
                     Map<String, Object> hashMap = new HashMap<>();
                     hashMap.put(typeConfig.getTypeName(), configMapStr);
-                    serviceConfigMap.put(serviceConfig.getService().getServiceName(), hashMap);
+                    serviceConfigMap.put(serviceConfigPO.getService().getServiceName(), hashMap);
                 }
             }
         }

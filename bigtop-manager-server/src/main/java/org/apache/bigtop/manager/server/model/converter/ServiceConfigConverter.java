@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.server.model.converter;
 
-import org.apache.bigtop.manager.dao.po.ServiceConfig;
+import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.vo.ServiceConfigVO;
 
@@ -37,7 +37,7 @@ public interface ServiceConfigConverter {
 
     @Mapping(target = "serviceName", source = "service.serviceName")
     @Mapping(target = "configs", source = "configs", qualifiedByName = "fromEntity2VO")
-    ServiceConfigVO fromEntity2VO(ServiceConfig serviceConfig);
+    ServiceConfigVO fromEntity2VO(ServiceConfigPO serviceConfigPO);
 
-    List<ServiceConfigVO> fromEntity2VO(List<ServiceConfig> serviceConfigs);
+    List<ServiceConfigVO> fromEntity2VO(List<ServiceConfigPO> serviceConfigPOS);
 }
