@@ -52,7 +52,7 @@ import java.util.List;
             @Index(name = "idx_stage_job_id", columnList = "job_id")
         })
 @TableGenerator(name = "stage_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
-public class Stage extends BasePO {
+public class StagePO extends BasePO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "stage_generator")

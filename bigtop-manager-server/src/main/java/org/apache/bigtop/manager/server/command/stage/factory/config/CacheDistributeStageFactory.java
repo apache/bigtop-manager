@@ -59,13 +59,13 @@ public class CacheDistributeStageFactory extends AbstractStageFactory {
                     .toList());
         }
 
-        stage.setName("Distribute Caches");
+        stagePO.setName("Distribute Caches");
 
         List<TaskPO> taskPOList = new ArrayList<>();
         hostnames = hostnames.stream().distinct().toList();
         for (String hostname : hostnames) {
             TaskPO taskPO = new TaskPO();
-            taskPO.setName(stage.getName() + " on " + hostname);
+            taskPO.setName(stagePO.getName() + " on " + hostname);
             taskPO.setStackName(context.getStackName());
             taskPO.setStackVersion(context.getStackVersion());
             taskPO.setHostname(hostname);
@@ -78,6 +78,6 @@ public class CacheDistributeStageFactory extends AbstractStageFactory {
             taskPOList.add(taskPO);
         }
 
-        stage.setTaskPOList(taskPOList);
+        stagePO.setTaskPOList(taskPOList);
     }
 }

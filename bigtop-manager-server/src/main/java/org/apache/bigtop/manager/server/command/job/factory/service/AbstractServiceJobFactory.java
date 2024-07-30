@@ -149,7 +149,7 @@ public abstract class AbstractServiceJobFactory extends AbstractJobFactory {
         StageContext stageContext = StageContext.fromPayload(JsonUtils.writeAsString(jobContext.getCommandDTO()));
         stageContext.setStackName(stackName);
         stageContext.setStackVersion(stackVersion);
-        stages.add(StageFactories.getStageFactory(StageType.CACHE_DISTRIBUTE).createStage(stageContext));
+        stagePOList.add(StageFactories.getStageFactory(StageType.CACHE_DISTRIBUTE).createStage(stageContext));
     }
 
     protected void createInstallStages() {
@@ -165,7 +165,7 @@ public abstract class AbstractServiceJobFactory extends AbstractJobFactory {
             }
 
             StageContext stageContext = createStageContext(serviceName, componentName, hostnames);
-            stages.add(
+            stagePOList.add(
                     StageFactories.getStageFactory(StageType.COMPONENT_INSTALL).createStage(stageContext));
         }
     }
@@ -188,7 +188,7 @@ public abstract class AbstractServiceJobFactory extends AbstractJobFactory {
             }
 
             StageContext stageContext = createStageContext(serviceName, componentName, hostnames);
-            stages.add(StageFactories.getStageFactory(StageType.COMPONENT_START).createStage(stageContext));
+            stagePOList.add(StageFactories.getStageFactory(StageType.COMPONENT_START).createStage(stageContext));
         }
     }
 
@@ -210,7 +210,7 @@ public abstract class AbstractServiceJobFactory extends AbstractJobFactory {
             }
 
             StageContext stageContext = createStageContext(serviceName, componentName, hostnames);
-            stages.add(StageFactories.getStageFactory(StageType.COMPONENT_STOP).createStage(stageContext));
+            stagePOList.add(StageFactories.getStageFactory(StageType.COMPONENT_STOP).createStage(stageContext));
         }
     }
 
@@ -232,7 +232,7 @@ public abstract class AbstractServiceJobFactory extends AbstractJobFactory {
             }
 
             StageContext stageContext = createStageContext(serviceName, componentName, List.of(hostnames.get(0)));
-            stages.add(StageFactories.getStageFactory(StageType.COMPONENT_CHECK).createStage(stageContext));
+            stagePOList.add(StageFactories.getStageFactory(StageType.COMPONENT_CHECK).createStage(stageContext));
         }
     }
 

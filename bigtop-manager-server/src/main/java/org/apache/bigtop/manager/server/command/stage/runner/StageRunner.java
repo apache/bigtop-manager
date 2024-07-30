@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.server.command.stage.runner;
 
-import org.apache.bigtop.manager.dao.po.Stage;
+import org.apache.bigtop.manager.dao.po.StagePO;
 import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.server.command.stage.factory.StageContext;
 import org.apache.bigtop.manager.server.command.stage.factory.StageType;
@@ -39,9 +39,9 @@ public interface StageRunner {
     /**
      * Set the stage that this runner will manage.
      *
-     * @param stage The stage to be managed by this runner.
+     * @param stagePO The stage to be managed by this runner.
      */
-    void setStage(Stage stage);
+    void setStage(StagePO stagePO);
 
     /**
      * Set the context for the stage. The context may contain additional information necessary for running the stage.

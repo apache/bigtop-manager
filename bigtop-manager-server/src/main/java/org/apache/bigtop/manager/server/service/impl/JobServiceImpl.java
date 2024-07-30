@@ -20,7 +20,7 @@ package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.common.enums.JobState;
 import org.apache.bigtop.manager.dao.po.Job;
-import org.apache.bigtop.manager.dao.po.Stage;
+import org.apache.bigtop.manager.dao.po.StagePO;
 import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.dao.repository.JobRepository;
 import org.apache.bigtop.manager.dao.repository.StageRepository;
@@ -85,14 +85,14 @@ public class JobServiceImpl implements JobService {
             throw new ApiException(ApiExceptionEnum.JOB_NOT_RETRYABLE);
         }
 
-        for (Stage stage : job.getStages()) {
-            for (TaskPO taskPO : stage.getTaskPOList()) {
+        for (StagePO stagePO : job.getStagePOList()) {
+            for (TaskPO taskPO : stagePO.getTaskPOList()) {
                 taskPO.setState(JobState.PENDING);
                 taskRepository.save(taskPO);
             }
 
-            stage.setState(JobState.PENDING);
-            stageRepository.save(stage);
+            stagePO.setState(JobState.PENDING);
+            stageRepository.save(stagePO);
         }
 
         job.setState(JobState.PENDING);

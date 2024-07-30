@@ -20,7 +20,7 @@ package org.apache.bigtop.manager.server.command.stage.runner;
 
 import org.apache.bigtop.manager.common.constants.MessageConstants;
 import org.apache.bigtop.manager.common.enums.JobState;
-import org.apache.bigtop.manager.dao.po.Stage;
+import org.apache.bigtop.manager.dao.po.StagePO;
 import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.dao.repository.StageRepository;
 import org.apache.bigtop.manager.dao.repository.TaskRepository;
@@ -47,13 +47,13 @@ public abstract class AbstractStageRunner implements StageRunner {
     @Resource
     protected TaskRepository taskRepository;
 
-    protected Stage stage;
+    protected StagePO stagePO;
 
     protected StageContext stageContext;
 
     @Override
-    public void setStage(Stage stage) {
-        this.stage = stage;
+    public void setStage(StagePO stagePO) {
+        this.stagePO = stagePO;
     }
 
     @Override
@@ -66,14 +66,14 @@ public abstract class AbstractStageRunner implements StageRunner {
         beforeRun();
 
         List<CompletableFuture<Boolean>> futures = new ArrayList<>();
-        for (TaskPO taskPO : stage.getTaskPOList()) {
+        for (TaskPO taskPO : stagePO.getTaskPOList()) {
             beforeRunTask(taskPO);
 
             CommandRequest protoRequest = ProtobufUtil.fromJson(taskPO.getContent(), CommandRequest.class);
             CommandRequest.Builder builder = CommandRequest.newBuilder(protoRequest);
             builder.setTaskId(taskPO.getId());
-            builder.setStageId(stage.getId());
-            builder.setJobId(stage.getJob().getId());
+            builder.setStageId(stagePO.getId());
+            builder.setJobId(stagePO.getJob().getId());
             CommandRequest request = builder.build();
 
             futures.add(CompletableFuture.supplyAsync(() -> {
@@ -115,20 +115,20 @@ public abstract class AbstractStageRunner implements StageRunner {
 
     @Override
     public void beforeRun() {
-        stage.setState(JobState.PROCESSING);
-        stageRepository.save(stage);
+        stagePO.setState(JobState.PROCESSING);
+        stageRepository.save(stagePO);
     }
 
     @Override
     public void onSuccess() {
-        stage.setState(JobState.SUCCESSFUL);
-        stageRepository.save(stage);
+        stagePO.setState(JobState.SUCCESSFUL);
+        stageRepository.save(stagePO);
     }
 
     @Override
     public void onFailure() {
-        stage.setState(JobState.FAILED);
-        stageRepository.save(stage);
+        stagePO.setState(JobState.FAILED);
+        stageRepository.save(stagePO);
     }
 
     @Override

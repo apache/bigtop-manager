@@ -113,7 +113,7 @@ public class TaskPO extends BasePO {
 
     @ManyToOne
     @JoinColumn(name = "stage_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Stage stage;
+    private StagePO stagePO;
 
     @ManyToOne
     @JoinColumn(name = "cluster_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))

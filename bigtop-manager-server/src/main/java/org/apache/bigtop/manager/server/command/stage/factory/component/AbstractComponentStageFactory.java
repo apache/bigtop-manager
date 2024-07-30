@@ -56,16 +56,16 @@ public abstract class AbstractComponentStageFactory extends AbstractStageFactory
         ServiceDTO serviceDTO = context.getServiceDTO();
         ComponentDTO componentDTO = context.getComponentDTO();
 
-        stage.setName(command.toCamelCase() + " " + componentDTO.getDisplayName());
-        stage.setServiceName(serviceDTO.getServiceName());
-        stage.setComponentName(componentDTO.getComponentName());
+        stagePO.setName(command.toCamelCase() + " " + componentDTO.getDisplayName());
+        stagePO.setServiceName(serviceDTO.getServiceName());
+        stagePO.setComponentName(componentDTO.getComponentName());
 
         List<TaskPO> taskPOList = new ArrayList<>();
         for (String hostname : context.getHostnames()) {
             TaskPO taskPO = new TaskPO();
 
             // Required fields
-            taskPO.setName(stage.getName() + " on " + hostname);
+            taskPO.setName(stagePO.getName() + " on " + hostname);
             taskPO.setHostname(hostname);
             taskPO.setCommand(command);
             taskPO.setServiceName(serviceDTO.getServiceName());
@@ -84,7 +84,7 @@ public abstract class AbstractComponentStageFactory extends AbstractStageFactory
             taskPOList.add(taskPO);
         }
 
-        stage.setTaskPOList(taskPOList);
+        stagePO.setTaskPOList(taskPOList);
     }
 
     protected abstract Command getCommand();

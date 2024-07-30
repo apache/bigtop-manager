@@ -21,7 +21,7 @@ package org.apache.bigtop.manager.server.command.job.runner.cluster;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.enums.MaintainState;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
-import org.apache.bigtop.manager.dao.po.Stage;
+import org.apache.bigtop.manager.dao.po.StagePO;
 import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.dao.repository.JobRepository;
@@ -94,11 +94,11 @@ public class ClusterCreateJobRunner extends AbstractJobRunner {
         job.setClusterPO(clusterPO);
         jobRepository.save(job);
 
-        for (Stage stage : job.getStages()) {
-            stage.setClusterPO(clusterPO);
-            stageRepository.save(stage);
+        for (StagePO stagePO : job.getStagePOList()) {
+            stagePO.setClusterPO(clusterPO);
+            stageRepository.save(stagePO);
 
-            for (TaskPO taskPO : stage.getTaskPOList()) {
+            for (TaskPO taskPO : stagePO.getTaskPOList()) {
                 taskPO.setClusterPO(clusterPO);
                 taskRepository.save(taskPO);
             }

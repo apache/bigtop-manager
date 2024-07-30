@@ -61,12 +61,12 @@ public class HostCheckStageFactory extends AbstractStageFactory {
         }
 
         // Create stages
-        stage.setName("Check Hosts");
+        stagePO.setName("Check Hosts");
 
         List<TaskPO> taskPOList = new ArrayList<>();
         for (String hostname : context.getHostnames()) {
             TaskPO taskPO = new TaskPO();
-            taskPO.setName(stage.getName() + " on " + hostname);
+            taskPO.setName(stagePO.getName() + " on " + hostname);
             taskPO.setStackName(context.getStackName());
             taskPO.setStackVersion(context.getStackVersion());
             taskPO.setHostname(hostname);
@@ -83,7 +83,7 @@ public class HostCheckStageFactory extends AbstractStageFactory {
             taskPOList.add(taskPO);
         }
 
-        stage.setTaskPOList(taskPOList);
+        stagePO.setTaskPOList(taskPOList);
     }
 
     private CommandRequest createMessage(String hostname) {
