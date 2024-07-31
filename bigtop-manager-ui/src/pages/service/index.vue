@@ -217,14 +217,14 @@
           <template #overlay>
             <a-menu @click="handleMenuClick">
               <a-menu-item v-for="item in menuOps" :key="item.key">
-                <svg-icon :name="item.action"></svg-icon>
+                <svg-icon :name="item.action" />
                 <span>{{ $t(item.dicText) }}</span>
               </a-menu-item>
             </a-menu>
           </template>
           <a-button type="primary">
             {{ $t('common.action') }}
-            <DownOutlined />
+            <down-outlined />
           </a-button>
         </a-dropdown>
       </template>
