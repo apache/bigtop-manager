@@ -18,23 +18,26 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onMounted, ref, watch, createVNode } from 'vue'
-  import { useRoute } from 'vue-router'
-  import type { SelectProps, MenuProps } from 'ant-design-vue'
-  import { DownOutlined, QuestionCircleOutlined } from '@ant-design/icons-vue'
-  import { useConfigStore } from '@/store/config'
   import { storeToRefs } from 'pinia'
-  import { ServiceConfigVO, TypeConfigVO } from '@/api/config/types.ts'
-  import { useComponentStore } from '@/store/component'
-  import { HostComponentVO } from '@/api/component/types.ts'
-  import { useServiceStore } from '@/store/service'
-  import { type ServiceVO, StateColor } from '@/api/service/types.ts'
-  import { Modal } from 'ant-design-vue'
+  import { useRoute } from 'vue-router'
+  import { computed, onMounted, ref, watch, createVNode } from 'vue'
+
   import { useI18n } from 'vue-i18n'
+  import { type SelectProps, type MenuProps, Modal } from 'ant-design-vue'
+  import { DownOutlined, QuestionCircleOutlined } from '@ant-design/icons-vue'
+
+  import { useConfigStore } from '@/store/config'
+  import { useComponentStore } from '@/store/component'
+  import { useServiceStore } from '@/store/service'
+  import { useClusterStore } from '@/store/cluster'
+
+  import { type ServiceVO, StateColor } from '@/api/service/types.ts'
+  import { ServiceConfigVO, TypeConfigVO } from '@/api/config/types.ts'
+  import { HostComponentVO } from '@/api/component/types.ts'
+  import { execCommand } from '@/api/command'
+
   import DotState from '@/components/dot-state/index.vue'
   import Job from '@/components/job-info/job.vue'
-  import { execCommand } from '@/api/command'
-  import { useClusterStore } from '@/store/cluster'
 
   interface Menu {
     key: string
@@ -63,13 +66,15 @@
   const { t } = useI18n()
   const route = useRoute()
   const configStore = useConfigStore()
-  const { allConfigs } = storeToRefs(configStore)
   const componentStore = useComponentStore()
-  const { hostComponents } = storeToRefs(componentStore)
   const serviceStore = useServiceStore()
-  const { installedServices } = storeToRefs(serviceStore)
   const clusterStore = useClusterStore()
+
+  const { allConfigs } = storeToRefs(configStore)
+  const { hostComponents } = storeToRefs(componentStore)
+  const { installedServices } = storeToRefs(serviceStore)
   const { clusterId } = storeToRefs(clusterStore)
+
   const serviceConfigDesc = ref<SelectProps['options']>([])
   const activeSelect = ref()
   const currentConfigs = ref<TypeConfigVO[]>([])
@@ -88,7 +93,6 @@
     )[0]
   })
 
-  // summary model start
   watch(hostComponents, (newVal) => {
     currentHostComponent.value = newVal.filter(
       (hc: HostComponentVO) => hc.serviceName === serviceName.value
@@ -113,26 +117,37 @@
   )
 
   const loadCurrentConfigs = () => {
-    serviceConfigDesc.value = allConfigs.value
-      .filter((sc: ServiceConfigVO) => sc.serviceName === serviceName.value)
-      .map((sc: ServiceConfigVO) => ({
-        value: sc.version,
-        label: `Version: ${sc.version}`,
-        title: `${sc.configDesc}
-          \n${sc.createTime}`
-      }))
+    serviceConfigDesc.value = allConfigs.value.reduce(
+      (pre, sc: ServiceConfigVO) => {
+        if (sc.serviceName === serviceName.value) {
+          pre?.push({
+            value: sc.version,
+            label: `Version: ${sc.version}`,
+            title: `${sc.configDesc}
+                  \n${sc.createTime}`
+          })
+        }
+        return pre
+      },
+      [] as SelectProps['options']
+    )
     currentConfigVersion.value = serviceConfigDesc.value?.[0].value as number
-    currentConfigs.value = allConfigs.value
-      .filter(
-        (sc: ServiceConfigVO) =>
+    currentConfigs.value = allConfigs.value.reduce(
+      (pre, sc: ServiceConfigVO) => {
+        if (
           sc.serviceName === serviceName.value &&
           currentConfigVersion.value === sc.version
-      )
-      .flatMap((sc: ServiceConfigVO) => sc.configs)
-      .map((cd: TypeConfigVO) => ({
-        typeName: cd.typeName,
-        properties: cd.properties
-      }))
+        ) {
+          const typeConfigs = sc.configs.map(({ typeName, properties }) => ({
+            typeName,
+            properties
+          }))
+          pre.push(...typeConfigs)
+        }
+        return pre
+      },
+      [] as TypeConfigVO[]
+    )
   }
 
   const handleChange: SelectProps['onChange'] = (value) => {
@@ -323,14 +338,17 @@
   .dot-rest {
     @include flex(center, center);
   }
+
   .summary-layout {
     display: flex;
 
     .left-section {
       width: 82%;
+
       .a-card {
         background-color: rgb(128, 171, 209);
       }
+
       border-right: 2px solid #eee;
     }
 
@@ -351,6 +369,7 @@
         list-style: none;
         margin: 0;
         padding: 0;
+
         li {
           a {
             display: flex;
@@ -374,20 +393,24 @@
         min-width: calc((100% / 3) - 1.5rem);
         box-shadow: 0 0 2px rgba(0, 0, 0, 0.1);
         overflow: auto;
+
         &:hover {
           box-shadow: 0 0 6px rgba(0, 0, 0, 0.16);
           transform: scale(1.002);
           transition: all 0.3s;
         }
+
         .service-name {
           font-size: 1.06rem;
           font-weight: 600;
           margin-bottom: 0.375rem;
           @include flex(space-between, center);
         }
+
         .comp-info {
           @include flex(center);
           margin-bottom: 1.25rem;
+
           .host-name {
             width: 80%;
             font-size: 0.8rem;
@@ -396,11 +419,14 @@
             flex: 1;
           }
         }
+
         footer {
           @include flex(space-between, center);
+
           .comp-state {
             font-size: 1rem;
             align-items: flex-end;
+
             &-text {
               color: #888;
             }
