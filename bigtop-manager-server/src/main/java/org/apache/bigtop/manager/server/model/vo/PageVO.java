@@ -49,7 +49,7 @@ public class PageVO<T> {
         if (page.hasContent()) {
             try {
                 Class<S> clz = (Class<S>) page.getContent().get(0).getClass();
-                String className = "org.apache.bigtop.manager.server.model.mapper." + clz.getSimpleName() + "Mapper";
+                String className = "org.apache.bigtop.manager.server.model.converter." + clz.getSimpleName() + "Converter";
                 Class<?> mapper = Class.forName(className);
                 Object o = Mappers.getMapper(mapper);
                 Method method = o.getClass().getDeclaredMethod("fromEntity2VO", List.class);

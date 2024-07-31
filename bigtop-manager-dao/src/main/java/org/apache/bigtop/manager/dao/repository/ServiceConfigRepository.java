@@ -19,8 +19,8 @@
 package org.apache.bigtop.manager.dao.repository;
 
 import org.apache.bigtop.manager.dao.po.ClusterPO;
-import org.apache.bigtop.manager.dao.po.ServicePO;
 import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
+import org.apache.bigtop.manager.dao.po.ServicePO;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -44,6 +44,6 @@ public interface ServiceConfigRepository extends JpaRepository<ServiceConfigPO, 
 
     @Transactional
     @Modifying
-    @Query("UPDATE ServiceConfigPO s SET s.selected = false WHERE s.clusterPO = :cluster AND s.service = :service")
+    @Query("UPDATE ServiceConfigPO s SET s.selected = false WHERE s.clusterPO = :cluster AND s.servicePO = :service")
     void setAllSelectedToFalseByClusterAndService(ClusterPO clusterPO, ServicePO servicePO);
 }
