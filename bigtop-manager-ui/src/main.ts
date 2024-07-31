@@ -26,6 +26,8 @@ import i18n from '@/locales'
 
 import '@/assets/styles/default.scss'
 import 'ant-design-vue/dist/reset.css'
+import 'virtual:svg-icons-register'
+import SvgIcon from '@/components/svg-icon/svg-icon.vue'
 
 const app = createApp(App)
 
@@ -35,5 +37,5 @@ app.use(pinia)
 app.use(i18n)
 
 message.config({ maxCount: 1 })
-
+app.component('svg-icon', SvgIcon)
 app.mount('#app')

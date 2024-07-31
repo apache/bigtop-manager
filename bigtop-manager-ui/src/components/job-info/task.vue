@@ -65,19 +65,19 @@
           </a>
         </template>
         <template v-if="column.dataIndex === 'state'">
-          <CheckCircleTwoTone
+          <check-circle-two-tone
             v-if="text === 'Successful'"
             :two-tone-color="State[text as keyof typeof State]"
           />
-          <CloseCircleTwoTone
+          <close-circle-two-tone
             v-else-if="text === 'Failed'"
             :two-tone-color="State[text as keyof typeof State]"
           />
-          <MinusCircleTwoTone
+          <minus-circle-two-tone
             v-else-if="text === 'Canceled'"
             :two-tone-color="State[text as keyof typeof State]"
           />
-          <LoadingOutlined v-else />
+          <loading-outlined v-else />
         </template>
       </template>
     </a-table>

@@ -272,15 +272,15 @@
         </template>
         <template #bodyCell="{ column, text }">
           <template v-if="column.dataIndex === 'state'">
-            <CheckCircleTwoTone
+            <check-circle-two-tone
               v-if="text === 'INSTALLED'"
               two-tone-color="#52c41a"
             />
-            <MinusCircleTwoTone
+            <minus-circle-two-tone
               v-else-if="text === 'MAINTAINED'"
               two-tone-color="orange"
             />
-            <CloseCircleTwoTone v-else two-tone-color="red" />
+            <close-circle-two-tone v-else two-tone-color="red" />
           </template>
         </template>
       </a-table>

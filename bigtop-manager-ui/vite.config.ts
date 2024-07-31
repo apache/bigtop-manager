@@ -19,6 +19,7 @@
 
 import { loadEnv, defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
 import path from 'path'
 
 // https://vitejs.dev/config/
@@ -31,6 +32,11 @@ export default defineConfig(({ mode }) => {
         script: {
           defineModel: true
         }
+      }),
+      createSvgIconsPlugin({
+        iconDirs: [path.resolve(process.cwd(), 'src/assets/images/svg')],
+        symbolId: 'icon-[dir]-[name]',
+        customDomId: '__svg__icons__dom__'
       })
     ],
     resolve: {

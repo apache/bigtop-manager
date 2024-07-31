@@ -18,36 +18,117 @@
 -->
 
 <script setup lang="ts">
-  import { ref } from 'vue'
-  import { PlusOutlined, CaretRightOutlined } from '@ant-design/icons-vue'
-  import SquareFilled from '@/components/icons/square-filled.vue'
-  import ServiceAdd from '@/components/service-add/index.vue'
+  import { useI18n } from 'vue-i18n'
+  import { storeToRefs } from 'pinia'
+  import { ref, createVNode } from 'vue'
+  import { type MenuProps, Modal } from 'ant-design-vue'
+  import { QuestionCircleOutlined } from '@ant-design/icons-vue'
 
+  import { useClusterStore } from '@/store/cluster'
+  import { useServiceStore } from '@/store/service'
+
+  import { type ServiceVO } from '@/api/service/types.ts'
+  import { execCommand } from '@/api/command'
+
+  import ServiceAdd from '@/components/service-add/index.vue'
+  import Job from '@/components/job-info/job.vue'
+
+  interface Menu {
+    key: string
+    action: string
+    dicText: string
+  }
+
+  const menuOps: Menu[] = [
+    {
+      key: '1',
+      action: 'start',
+      dicText: 'service.start_all'
+    },
+    {
+      key: '2',
+      action: 'stop',
+      dicText: 'service.stop_all'
+    },
+    {
+      key: '3',
+      action: 'restart',
+      dicText: 'service.restart_all'
+    }
+  ]
+
+  const { t } = useI18n()
+  const clusterStore = useClusterStore()
+  const serviceStore = useServiceStore()
+  const { clusterId } = storeToRefs(clusterStore)
+  const { installedServices } = storeToRefs(serviceStore)
+  const menuClicked = ref<Menu>()
   const addWindowOpened = ref(false)
+  const jobWindowOpened = ref(false)
+
+  const handleMenuClick: MenuProps['onClick'] = (e) => {
+    if (e.key === '4') {
+      addWindowOpened.value = true
+      return
+    }
+    const menu = menuOps.find((menu) => menu.key == e.key)
+    const text = `${menu?.dicText}_services`
+    menuClicked.value = menu
+    Modal.confirm({
+      title: t('common.confirm'),
+      icon: createVNode(QuestionCircleOutlined),
+      content: t(text),
+      centered: true,
+      okText: t('common.confirm'),
+      cancelText: t('common.cancel'),
+      onOk: onOk
+    })
+  }
+
+  const onOk = async () => {
+    try {
+      if (!menuClicked.value) {
+        return
+      }
+      await execCommand({
+        command: menuClicked.value.action,
+        clusterId: clusterId.value,
+        commandLevel: 'service',
+        serviceCommands: getServiceCommands()
+      })
+      jobWindowOpened.value = true
+    } catch (error) {
+      console.log('error :>> ', error)
+    }
+  }
+
+  const getServiceCommands = () => {
+    return installedServices.value.map((service: ServiceVO) => {
+      return {
+        serviceName: service?.serviceName
+      }
+    })
+  }
 </script>
 
 <template>
   <a-dropdown trigger="click" @click.stop>
     <a class="dropdown-text">···</a>
     <template #overlay>
-      <a-menu>
-        <a-menu-item key="start">
-          <caret-right-outlined />
-          {{ $t('service.start_all') }}
-        </a-menu-item>
-        <a-menu-item key="stop">
-          <square-filled />
-          {{ $t('service.stop_all') }}
+      <a-menu @click="handleMenuClick">
+        <a-menu-item v-for="menu in menuOps" :key="menu.key">
+          <svg-icon :name="menu.action" />
+          <span>{{ $t(menu.dicText) }}</span>
         </a-menu-item>
         <a-menu-divider />
-        <a-menu-item key="add" @click="() => (addWindowOpened = true)">
-          <plus-outlined />
-          {{ $t('service.add') }}
+        <a-menu-item key="4">
+          <svg-icon name="plus" />
+          <span> {{ $t('service.add') }}</span>
         </a-menu-item>
       </a-menu>
     </template>
   </a-dropdown>
-
+  <job v-model:visible="jobWindowOpened" />
   <suspense>
     <service-add v-model:open="addWindowOpened" />
   </suspense>
