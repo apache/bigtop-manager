@@ -36,8 +36,7 @@ public interface ServiceConfigConverter {
     ServiceConfigConverter INSTANCE = Mappers.getMapper(ServiceConfigConverter.class);
 
     @Mapping(target = "serviceName", source = "servicePO.serviceName")
-    @Mapping(target = "configs", source = "configs", qualifiedByName = "fromPO2VO")
     ServiceConfigVO fromPO2VO(ServiceConfigPO serviceConfigPO);
 
-    List<ServiceConfigVO> fromPO2VO(List<ServiceConfigPO> serviceConfigPOS);
+    List<ServiceConfigVO> fromPO2VO(List<ServiceConfigPO> serviceConfigPOList);
 }

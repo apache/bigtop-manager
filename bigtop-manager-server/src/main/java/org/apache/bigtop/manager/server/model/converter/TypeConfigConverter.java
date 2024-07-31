@@ -25,7 +25,6 @@ import org.apache.bigtop.manager.server.model.vo.TypeConfigVO;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -40,7 +39,7 @@ public interface TypeConfigConverter {
     @Mapping(target = "properties", source = "propertiesJson", qualifiedByName = "json2PropertyDTOList")
     TypeConfigDTO fromPO2DTO(TypeConfigPO typeConfigPO);
 
-    List<TypeConfigDTO> fromPO2DTO(List<TypeConfigPO> typeConfigPOS);
+    List<TypeConfigDTO> fromPO2DTO(List<TypeConfigPO> typeConfigPOList);
 
     TypeConfigVO fromDTO2VO(TypeConfigDTO typeConfigDTO);
 
@@ -49,6 +48,5 @@ public interface TypeConfigConverter {
     @Mapping(target = "properties", source = "propertiesJson", qualifiedByName = "json2PropertyVOList")
     TypeConfigVO fromPO2VO(TypeConfigPO typeConfigPO);
 
-    @Named("fromEntity2VO")
-    List<TypeConfigVO> fromPO2VO(List<TypeConfigPO> typeConfigPOS);
+    List<TypeConfigVO> fromPO2VO(List<TypeConfigPO> typeConfigPOList);
 }
