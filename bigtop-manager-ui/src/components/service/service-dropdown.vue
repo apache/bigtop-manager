@@ -18,17 +18,20 @@
 -->
 
 <script setup lang="ts">
-  import { ref, createVNode } from 'vue'
-  import ServiceAdd from '@/components/service-add/index.vue'
-  import { QuestionCircleOutlined } from '@ant-design/icons-vue'
-  import Job from '@/components/job-info/job.vue'
-  import { execCommand } from '@/api/command'
-  import { type MenuProps, Modal } from 'ant-design-vue'
-  import { useClusterStore } from '@/store/cluster'
-  import { storeToRefs } from 'pinia'
   import { useI18n } from 'vue-i18n'
+  import { storeToRefs } from 'pinia'
+  import { ref, createVNode } from 'vue'
+  import { type MenuProps, Modal } from 'ant-design-vue'
+  import { QuestionCircleOutlined } from '@ant-design/icons-vue'
+
+  import { useClusterStore } from '@/store/cluster'
   import { useServiceStore } from '@/store/service'
+
   import { type ServiceVO } from '@/api/service/types.ts'
+  import { execCommand } from '@/api/command'
+
+  import ServiceAdd from '@/components/service-add/index.vue'
+  import Job from '@/components/job-info/job.vue'
 
   interface Menu {
     key: string
