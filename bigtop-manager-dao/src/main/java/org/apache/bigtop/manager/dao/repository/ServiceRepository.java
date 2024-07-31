@@ -28,11 +28,11 @@ import java.util.List;
 
 public interface ServiceRepository extends JpaRepository<ServicePO, Long> {
 
-    List<ServicePO> findAllByClusterId(Long clusterId);
+    List<ServicePO> findAllByClusterPOId(Long clusterId);
 
-    Page<ServicePO> findAllByClusterId(Long clusterId, Pageable pageable);
+    Page<ServicePO> findAllByClusterPOId(Long clusterId, Pageable pageable);
 
-    ServicePO findByClusterIdAndServiceName(Long clusterId, String serviceName);
+    ServicePO findByClusterPOIdAndServiceName(Long clusterId, String serviceName);
 
-    List<ServicePO> findByClusterIdAndServiceNameIn(Long clusterId, List<String> serviceNames);
+    List<ServicePO> findByClusterPOIdAndServiceNameIn(Long clusterId, List<String> serviceNames);
 }

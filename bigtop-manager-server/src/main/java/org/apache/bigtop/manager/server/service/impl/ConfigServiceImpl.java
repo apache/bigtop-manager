@@ -61,14 +61,14 @@ public class ConfigServiceImpl implements ConfigService {
     public List<ServiceConfigVO> list(Long clusterId) {
         ClusterPO clusterPO = clusterRepository.getReferenceById(clusterId);
         Sort sort = Sort.by(Sort.Direction.DESC, "version");
-        List<ServiceConfigPO> list = serviceConfigRepository.findAllByCluster(clusterPO, sort);
+        List<ServiceConfigPO> list = serviceConfigRepository.findAllByClusterPO(clusterPO, sort);
         return ServiceConfigConverter.INSTANCE.fromEntity2VO(list);
     }
 
     @Override
     public List<ServiceConfigVO> latest(Long clusterId) {
         ClusterPO clusterPO = clusterRepository.getReferenceById(clusterId);
-        List<ServiceConfigPO> list = serviceConfigRepository.findAllByClusterAndSelectedIsTrue(clusterPO);
+        List<ServiceConfigPO> list = serviceConfigRepository.findAllByClusterPOAndSelectedIsTrue(clusterPO);
         return ServiceConfigConverter.INSTANCE.fromEntity2VO(list);
     }
 
@@ -88,7 +88,7 @@ public class ConfigServiceImpl implements ConfigService {
     }
 
     private ServiceConfigPO findServiceCurrentConfig(ClusterPO clusterPO, ServicePO servicePO) {
-        return serviceConfigRepository.findByClusterAndServiceAndSelectedIsTrue(clusterPO, servicePO);
+        return serviceConfigRepository.findByClusterPOAndServicePOAndSelectedIsTrue(clusterPO, servicePO);
     }
 
     private void upsertServiceConfig(

@@ -32,15 +32,15 @@ import java.util.List;
 
 public interface ServiceConfigRepository extends JpaRepository<ServiceConfigPO, Long> {
 
-    List<ServiceConfigPO> findAllByCluster(ClusterPO clusterPO);
+    List<ServiceConfigPO> findAllByClusterPO(ClusterPO clusterPO);
 
-    List<ServiceConfigPO> findAllByCluster(ClusterPO clusterPO, Sort sort);
+    List<ServiceConfigPO> findAllByClusterPO(ClusterPO clusterPO, Sort sort);
 
-    List<ServiceConfigPO> findAllByClusterAndService(ClusterPO clusterPO, ServicePO servicePO);
+    List<ServiceConfigPO> findAllByClusterPOAndServicePO(ClusterPO clusterPO, ServicePO servicePO);
 
-    ServiceConfigPO findByClusterAndServiceAndSelectedIsTrue(ClusterPO clusterPO, ServicePO servicePO);
+    ServiceConfigPO findByClusterPOAndServicePOAndSelectedIsTrue(ClusterPO clusterPO, ServicePO servicePO);
 
-    List<ServiceConfigPO> findAllByClusterAndSelectedIsTrue(ClusterPO clusterPO);
+    List<ServiceConfigPO> findAllByClusterPOAndSelectedIsTrue(ClusterPO clusterPO);
 
     @Transactional
     @Modifying

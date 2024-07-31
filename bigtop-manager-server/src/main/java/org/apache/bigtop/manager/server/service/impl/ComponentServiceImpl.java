@@ -44,7 +44,7 @@ public class ComponentServiceImpl implements ComponentService {
     @Override
     public List<ComponentVO> list(Long clusterId) {
         List<ComponentVO> componentVOList = new ArrayList<>();
-        componentRepository.findAllByClusterId(clusterId).forEach(component -> {
+        componentRepository.findAllByClusterPOId(clusterId).forEach(component -> {
             ComponentVO componentVO = ComponentConverter.INSTANCE.fromEntity2VO(component);
             componentVOList.add(componentVO);
         });

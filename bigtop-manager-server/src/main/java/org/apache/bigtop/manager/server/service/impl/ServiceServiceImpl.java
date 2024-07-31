@@ -62,7 +62,7 @@ public class ServiceServiceImpl implements ServiceService {
     public List<ServiceVO> list(Long clusterId) {
         List<ServiceVO> res = new ArrayList<>();
         Map<Long, List<HostComponentPO>> serviceIdToHostComponent =
-                hostComponentRepository.findAllByComponentClusterId(clusterId).stream()
+                hostComponentRepository.findAllByComponentPOClusterId(clusterId).stream()
                         .collect(Collectors.groupingBy(hostComponent ->
                                 hostComponent.getComponentPO().getServicePO().getId()));
 
@@ -121,7 +121,7 @@ public class ServiceServiceImpl implements ServiceService {
         HostPO hostPO = hostComponentPO.getHostPO();
         ServicePO servicePO = componentPO.getServicePO();
         ServiceConfigPO serviceConfigPO =
-                serviceConfigRepository.findByClusterAndServiceAndSelectedIsTrue(clusterPO, servicePO);
+                serviceConfigRepository.findByClusterPOAndServicePOAndSelectedIsTrue(clusterPO, servicePO);
         List<TypeConfigPO> typeConfigPOList = serviceConfigPO.getConfigs();
 
         // Use HTTP for now, need to handle https in the future

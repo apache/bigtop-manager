@@ -54,7 +54,7 @@ public class CacheDistributeStageFactory extends AbstractStageFactory {
             hostnames.addAll(context.getHostnames());
         } else {
             hostnames.addAll(context.getHostnames() == null ? List.of() : context.getHostnames());
-            hostnames.addAll(hostRepository.findAllByClusterId(context.getClusterId()).stream()
+            hostnames.addAll(hostRepository.findAllByClusterPOId(context.getClusterId()).stream()
                     .map(HostPO::getHostname)
                     .toList());
         }

@@ -142,12 +142,12 @@ public class CacheDistributeStageRunner extends AbstractStageRunner {
         String stackName = clusterPO.getStackPO().getStackName();
         String stackVersion = clusterPO.getStackPO().getStackVersion();
 
-        List<ServicePO> servicePOList = serviceRepository.findAllByClusterId(clusterId);
-        List<ServiceConfigPO> serviceConfigPOList = serviceConfigRepository.findAllByClusterAndSelectedIsTrue(clusterPO);
-        List<HostComponentPO> hostComponentPOList = hostComponentRepository.findAllByComponentClusterId(clusterId);
-        List<RepoPO> repoPOList = repoRepository.findAllByCluster(clusterPO);
+        List<ServicePO> servicePOList = serviceRepository.findAllByClusterPOId(clusterId);
+        List<ServiceConfigPO> serviceConfigPOList = serviceConfigRepository.findAllByClusterPOAndSelectedIsTrue(clusterPO);
+        List<HostComponentPO> hostComponentPOList = hostComponentRepository.findAllByComponentPOClusterId(clusterId);
+        List<RepoPO> repoPOList = repoRepository.findAllByClusterPO(clusterPO);
         Iterable<SettingPO> settings = settingRepository.findAll();
-        List<HostPO> hostPOList = hostRepository.findAllByClusterId(clusterId);
+        List<HostPO> hostPOList = hostRepository.findAllByClusterPOId(clusterId);
 
         clusterInfo = new ClusterInfo();
         clusterInfo.setClusterName(clusterName);

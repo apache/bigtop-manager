@@ -27,5 +27,5 @@ import java.util.List;
 
 public interface RepoRepository extends JpaRepository<RepoPO, Long> {
 
-    List<RepoPO> findAllByCluster(ClusterPO clusterPO);
+    List<RepoPO> findAllByClusterPO(ClusterPO clusterPO);
 }

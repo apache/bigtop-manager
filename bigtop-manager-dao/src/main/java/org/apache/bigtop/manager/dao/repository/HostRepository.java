@@ -33,11 +33,11 @@ public interface HostRepository extends JpaRepository<HostPO, Long> {
 
     List<HostPO> findAllByHostnameIn(Collection<String> hostnames);
 
-    List<HostPO> findAllByClusterIdAndHostnameIn(Long clusterId, Collection<String> hostnames);
+    List<HostPO> findAllByClusterPOIdAndHostnameIn(Long clusterId, Collection<String> hostnames);
 
-    List<HostPO> findAllByClusterId(Long clusterId);
+    List<HostPO> findAllByClusterPOId(Long clusterId);
 
-    Page<HostPO> findAllByClusterId(Long clusterId, Pageable pageable);
+    Page<HostPO> findAllByClusterPOId(Long clusterId, Pageable pageable);
 
-    List<HostPO> findAllByClusterClusterName(String clusterName);
+    List<HostPO> findAllByClusterPOClusterName(String clusterName);
 }

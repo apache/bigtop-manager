@@ -27,5 +27,5 @@ import java.util.List;
 
 public interface StageRepository extends JpaRepository<StagePO, Long> {
 
-    List<StagePO> findByJob(JobPO jobPO);
+    List<StagePO> findByJobPO(JobPO jobPO);
 }

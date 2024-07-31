@@ -53,7 +53,7 @@ public class ComponentStopStageRunner extends AbstractStageRunner {
         String componentName = taskPO.getComponentName();
         String hostname = taskPO.getHostname();
         HostComponentPO hostComponentPO =
-                hostComponentRepository.findByComponentClusterIdAndComponentComponentNameAndHostHostname(
+                hostComponentRepository.findByComponentPOClusterIdAndComponentPOComponentNameAndHostPOHostname(
                         clusterId, componentName, hostname);
         hostComponentPO.setState(MaintainState.STOPPED);
         hostComponentRepository.save(hostComponentPO);

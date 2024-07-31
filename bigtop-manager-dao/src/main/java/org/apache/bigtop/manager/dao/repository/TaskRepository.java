@@ -28,11 +28,11 @@ import java.util.List;
 
 public interface TaskRepository extends JpaRepository<TaskPO, Long> {
 
-    List<TaskPO> findByStage(StagePO stagePO);
+    List<TaskPO> findByStagePO(StagePO stagePO);
 
-    List<TaskPO> findAllByJobId(Long jobId);
+    List<TaskPO> findAllByJobPOId(Long jobId);
 
-    List<TaskPO> findAllByJobIdAndState(Long jobId, JobState state);
+    List<TaskPO> findAllByJobPOIdAndState(Long jobId, JobState state);
 
-    List<TaskPO> findAllByJobIdAndHostnameAndState(Long jobId, String hostname, JobState state);
+    List<TaskPO> findAllByJobPOIdAndHostnameAndState(Long jobId, String hostname, JobState state);
 }

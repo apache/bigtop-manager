@@ -28,9 +28,9 @@ import java.util.List;
 
 public interface JobRepository extends JpaRepository<JobPO, Long> {
 
-    Page<JobPO> findAllByClusterIsNull(Pageable pageable);
+    Page<JobPO> findAllByClusterPOIsNull(Pageable pageable);
 
-    Page<JobPO> findAllByClusterId(Long clusterId, Pageable pageable);
+    Page<JobPO> findAllByClusterPOId(Long clusterId, Pageable pageable);
 
-    List<JobPO> findAllByClusterId(Long clusterId);
+    List<JobPO> findAllByClusterPOId(Long clusterId);
 }

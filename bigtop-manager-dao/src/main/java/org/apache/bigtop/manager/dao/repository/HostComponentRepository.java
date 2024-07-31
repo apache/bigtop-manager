@@ -26,21 +26,21 @@ import java.util.List;
 
 public interface HostComponentRepository extends JpaRepository<HostComponentPO, Long> {
 
-    List<HostComponentPO> findAllByComponentClusterIdAndComponentComponentName(Long clusterId, String componentName);
+    List<HostComponentPO> findAllByComponentPOClusterIdAndComponentPOComponentName(Long clusterId, String componentName);
 
-    HostComponentPO findByComponentClusterIdAndComponentComponentNameAndHostHostname(
+    HostComponentPO findByComponentPOClusterIdAndComponentPOComponentNameAndHostPOHostname(
             Long clusterId, String componentName, String hostnames);
 
-    List<HostComponentPO> findAllByComponentClusterIdAndComponentComponentNameAndHostHostnameIn(
+    List<HostComponentPO> findAllByComponentPOClusterIdAndComponentPOComponentNameAndHostPOHostnameIn(
             Long clusterId, String componentName, List<String> hostnames);
 
-    List<HostComponentPO> findAllByComponentClusterId(Long clusterId);
+    List<HostComponentPO> findAllByComponentPOClusterId(Long clusterId);
 
-    HostComponentPO findByComponentComponentNameAndHostHostname(String componentName, String hostName);
+    HostComponentPO findByComponentPOComponentNameAndHostPOHostname(String componentName, String hostName);
 
-    List<HostComponentPO> findAllByComponentClusterIdAndHostId(Long clusterId, Long componentId);
+    List<HostComponentPO> findAllByComponentPOClusterIdAndHostPOId(Long clusterId, Long componentId);
 
-    List<HostComponentPO> findAllByComponentClusterIdAndComponentServiceId(Long clusterId, Long serviceId);
+    List<HostComponentPO> findAllByComponentPOClusterIdAndComponentPOServiceId(Long clusterId, Long serviceId);
 
-    List<HostComponentPO> findAllByComponentServiceId(Long serviceId);
+    List<HostComponentPO> findAllByComponentPOServiceId(Long serviceId);
 }

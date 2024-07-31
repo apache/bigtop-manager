@@ -104,7 +104,7 @@ public abstract class AbstractServiceJobFactory extends AbstractJobFactory {
     protected List<String> getComponentNames() {
         List<String> serviceNames = getServiceNames();
         List<ComponentPO> componentPOList =
-                componentRepository.findAllByClusterIdAndServiceServiceNameIn(clusterPO.getId(), serviceNames);
+                componentRepository.findAllByClusterPOIdAndServicePOServiceNameIn(clusterPO.getId(), serviceNames);
 
         return componentPOList.stream().map(ComponentPO::getComponentName).toList();
     }
@@ -133,7 +133,7 @@ public abstract class AbstractServiceJobFactory extends AbstractJobFactory {
 
     protected List<String> findHostnamesByComponentName(String componentName) {
         List<HostComponentPO> hostComponentPOList =
-                hostComponentRepository.findAllByComponentClusterIdAndComponentComponentName(
+                hostComponentRepository.findAllByComponentPOClusterIdAndComponentPOComponentName(
                         clusterPO.getId(), componentName);
         if (hostComponentPOList == null) {
             return new ArrayList<>();

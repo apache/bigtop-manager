@@ -55,7 +55,7 @@ public class HostServiceImpl implements HostService {
 
     @Override
     public List<HostVO> list(Long clusterId) {
-        List<HostPO> hostPOList = hostRepository.findAllByClusterId(clusterId);
+        List<HostPO> hostPOList = hostRepository.findAllByClusterPOId(clusterId);
         if (CollectionUtils.isEmpty(hostPOList)) {
             throw new ApiException(ApiExceptionEnum.HOST_NOT_FOUND);
         }

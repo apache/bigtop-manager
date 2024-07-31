@@ -26,11 +26,11 @@ import java.util.List;
 
 public interface ComponentRepository extends JpaRepository<ComponentPO, Long> {
 
-    ComponentPO findByClusterIdAndComponentName(Long clusterId, String componentName);
+    ComponentPO findByClusterPOIdAndComponentName(Long clusterId, String componentName);
 
-    List<ComponentPO> findAllByClusterIdAndComponentNameIn(Long clusterId, List<String> componentNames);
+    List<ComponentPO> findAllByClusterPOIdAndComponentNameIn(Long clusterId, List<String> componentNames);
 
-    List<ComponentPO> findAllByClusterId(Long clusterId);
+    List<ComponentPO> findAllByClusterPOId(Long clusterId);
 
-    List<ComponentPO> findAllByClusterIdAndServiceServiceNameIn(Long clusterId, List<String> serviceNames);
+    List<ComponentPO> findAllByClusterPOIdAndServicePOServiceNameIn(Long clusterId, List<String> serviceNames);
 }

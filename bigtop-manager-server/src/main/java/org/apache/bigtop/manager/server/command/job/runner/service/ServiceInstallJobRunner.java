@@ -87,7 +87,7 @@ public class ServiceInstallJobRunner extends AbstractJobRunner {
         // Persist service, component and hostComponent metadata to database
         for (ServiceCommandDTO serviceCommand : serviceCommands) {
             String serviceName = serviceCommand.getServiceName();
-            ServicePO servicePO = serviceRepository.findByClusterIdAndServiceName(clusterId, serviceName);
+            ServicePO servicePO = serviceRepository.findByClusterPOIdAndServiceName(clusterId, serviceName);
             upsertService(servicePO, serviceCommand);
         }
     }
@@ -115,7 +115,7 @@ public class ServiceInstallJobRunner extends AbstractJobRunner {
             String componentName = componentHostDTO.getComponentName();
 
             // 3. Persist component
-            ComponentPO componentPO = componentRepository.findByClusterIdAndComponentName(clusterId, componentName);
+            ComponentPO componentPO = componentRepository.findByClusterPOIdAndComponentName(clusterId, componentName);
             if (componentPO == null) {
                 ComponentDTO componentDTO = StackUtils.getComponentDTO(stackName, stackVersion, componentName);
                 componentPO = ComponentConverter.INSTANCE.fromDTO2Entity(componentDTO, servicePO, clusterPO);
@@ -125,7 +125,7 @@ public class ServiceInstallJobRunner extends AbstractJobRunner {
             // 4. Persist hostComponent
             for (String hostname : componentHostDTO.getHostnames()) {
                 HostComponentPO hostComponentPO =
-                        hostComponentRepository.findByComponentComponentNameAndHostHostname(componentName, hostname);
+                        hostComponentRepository.findByComponentPOComponentNameAndHostPOHostname(componentName, hostname);
                 if (hostComponentPO == null) {
                     HostPO hostPO = hostRepository.findByHostname(hostname);
 

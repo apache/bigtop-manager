@@ -64,9 +64,9 @@ public class JobServiceImpl implements JobService {
         Pageable pageable = PageRequest.of(pageQuery.getPageNum(), pageQuery.getPageSize(), pageQuery.getSort());
         Page<JobPO> page;
         if (ClusterUtils.isNoneCluster(clusterId)) {
-            page = jobRepository.findAllByClusterIsNull(pageable);
+            page = jobRepository.findAllByClusterPOIsNull(pageable);
         } else {
-            page = jobRepository.findAllByClusterId(clusterId, pageable);
+            page = jobRepository.findAllByClusterPOId(clusterId, pageable);
         }
 
         return PageVO.of(page);

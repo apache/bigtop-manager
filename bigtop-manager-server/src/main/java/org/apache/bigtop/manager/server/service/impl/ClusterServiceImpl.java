@@ -92,7 +92,7 @@ public class ClusterServiceImpl implements ClusterService {
 
         // Save repo
         List<RepoPO> repoPOList = RepoConverter.INSTANCE.fromDTO2Entity(clusterDTO.getRepoInfoList(), clusterPO);
-        List<RepoPO> oldrepoPOList = repoRepository.findAllByCluster(clusterPO);
+        List<RepoPO> oldrepoPOList = repoRepository.findAllByClusterPO(clusterPO);
 
         for (RepoPO repoPO : repoPOList) {
             for (RepoPO oldRepoPO : oldrepoPOList) {
