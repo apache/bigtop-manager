@@ -30,9 +30,9 @@ import org.apache.bigtop.manager.dao.repository.TaskRepository;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
 import org.apache.bigtop.manager.server.command.job.runner.AbstractJobRunner;
 import org.apache.bigtop.manager.server.enums.CommandLevel;
+import org.apache.bigtop.manager.server.model.converter.ClusterConverter;
 import org.apache.bigtop.manager.server.model.dto.ClusterDTO;
 import org.apache.bigtop.manager.server.model.dto.CommandDTO;
-import org.apache.bigtop.manager.server.model.mapper.ClusterMapper;
 import org.apache.bigtop.manager.server.service.ClusterService;
 
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -73,7 +73,7 @@ public class ClusterCreateJobRunner extends AbstractJobRunner {
 
         // Save cluster
         CommandDTO commandDTO = getCommandDTO();
-        ClusterDTO clusterDTO = ClusterMapper.INSTANCE.fromCommand2DTO(commandDTO.getClusterCommand());
+        ClusterDTO clusterDTO = ClusterConverter.INSTANCE.fromCommand2DTO(commandDTO.getClusterCommand());
         clusterService.save(clusterDTO);
     }
 

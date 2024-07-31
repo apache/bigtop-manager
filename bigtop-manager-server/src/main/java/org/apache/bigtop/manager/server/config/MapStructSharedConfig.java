@@ -16,18 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.mapper;
+package org.apache.bigtop.manager.server.config;
 
-import org.apache.bigtop.manager.server.model.dto.LoginDTO;
-import org.apache.bigtop.manager.server.model.req.LoginReq;
+import org.mapstruct.MapperConfig;
+import org.mapstruct.ReportingPolicy;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
-
-@Mapper
-public interface LoginMapper {
-
-    LoginMapper INSTANCE = Mappers.getMapper(LoginMapper.class);
-
-    LoginDTO fromReq2DTO(LoginReq loginReq);
-}
+@MapperConfig(unmappedTargetPolicy = ReportingPolicy.IGNORE)
+public class MapStructSharedConfig {}

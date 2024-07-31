@@ -31,11 +31,11 @@ import org.apache.bigtop.manager.dao.entity.TypeConfig;
 import org.apache.bigtop.manager.dao.repository.HostComponentRepository;
 import org.apache.bigtop.manager.dao.repository.ServiceConfigRepository;
 import org.apache.bigtop.manager.dao.repository.ServiceRepository;
+import org.apache.bigtop.manager.server.model.converter.ServiceConverter;
+import org.apache.bigtop.manager.server.model.converter.TypeConfigConverter;
 import org.apache.bigtop.manager.server.model.dto.PropertyDTO;
 import org.apache.bigtop.manager.server.model.dto.QuickLinkDTO;
 import org.apache.bigtop.manager.server.model.dto.TypeConfigDTO;
-import org.apache.bigtop.manager.server.model.mapper.ServiceMapper;
-import org.apache.bigtop.manager.server.model.mapper.TypeConfigMapper;
 import org.apache.bigtop.manager.server.model.vo.QuickLinkVO;
 import org.apache.bigtop.manager.server.model.vo.ServiceVO;
 import org.apache.bigtop.manager.server.service.ServiceService;
@@ -74,7 +74,7 @@ public class ServiceServiceImpl implements ServiceService {
         for (Map.Entry<Long, List<HostComponent>> entry : serviceIdToHostComponent.entrySet()) {
             List<HostComponent> hostComponents = entry.getValue();
             Service service = hostComponents.get(0).getComponent().getService();
-            ServiceVO serviceVO = ServiceMapper.INSTANCE.fromEntity2VO(service);
+            ServiceVO serviceVO = ServiceConverter.INSTANCE.fromEntity2VO(service);
             serviceVO.setQuickLinks(new ArrayList<>());
 
             boolean isHealthy = true;
@@ -112,7 +112,7 @@ public class ServiceServiceImpl implements ServiceService {
     @Override
     public ServiceVO get(Long id) {
         Service service = serviceRepository.findById(id).orElse(new Service());
-        return ServiceMapper.INSTANCE.fromEntity2VO(service);
+        return ServiceConverter.INSTANCE.fromEntity2VO(service);
     }
 
     private QuickLinkVO resolveQuickLink(HostComponent hostComponent, String quickLinkJson) {
@@ -131,7 +131,7 @@ public class ServiceServiceImpl implements ServiceService {
 
         // Use HTTP for now, need to handle https in the future
         for (TypeConfig typeConfig : typeConfigs) {
-            TypeConfigDTO typeConfigDTO = TypeConfigMapper.INSTANCE.fromEntity2DTO(typeConfig);
+            TypeConfigDTO typeConfigDTO = TypeConfigConverter.INSTANCE.fromEntity2DTO(typeConfig);
             for (PropertyDTO propertyDTO : typeConfigDTO.getProperties()) {
                 if (propertyDTO.getName().equals(quickLinkDTO.getHttpPortProperty())) {
                     String port = propertyDTO.getValue().contains(":")

@@ -16,32 +16,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.mapper;
+package org.apache.bigtop.manager.server.model.converter;
 
-import org.apache.bigtop.manager.common.message.entity.pojo.RepoInfo;
-import org.apache.bigtop.manager.dao.entity.Cluster;
-import org.apache.bigtop.manager.dao.entity.Repo;
-import org.apache.bigtop.manager.server.model.dto.RepoDTO;
+import org.apache.bigtop.manager.dao.entity.Host;
+import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
+import org.apache.bigtop.manager.server.model.dto.HostDTO;
+import org.apache.bigtop.manager.server.model.req.HostReq;
+import org.apache.bigtop.manager.server.model.vo.HostVO;
 
-import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper
-public interface RepoMapper {
+@Mapper(config = MapStructSharedConfig.class)
+public interface HostConverter {
 
-    RepoMapper INSTANCE = Mappers.getMapper(RepoMapper.class);
+    HostConverter INSTANCE = Mappers.getMapper(HostConverter.class);
 
-    @Mapping(target = "cluster", expression = "java(cluster)")
-    Repo fromDTO2Entity(RepoDTO repoDTO, @Context Cluster cluster);
+    HostDTO fromReq2DTO(HostReq hostReq);
 
-    @Mapping(target = "cluster", expression = "java(cluster)")
-    List<Repo> fromDTO2Entity(List<RepoDTO> repoDTOList, @Context Cluster cluster);
+    Host fromDTO2Entity(HostDTO hostDTO);
 
-    RepoInfo fromEntity2Message(Repo repo);
+    @Mapping(target = "clusterName", source = "cluster.clusterName")
+    HostVO fromEntity2VO(Host host);
 
-    List<RepoInfo> fromDTO2Message(List<RepoDTO> repoDTOs);
+    List<HostVO> fromEntity2VO(List<Host> hosts);
 }

@@ -16,25 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.mapper;
+package org.apache.bigtop.manager.server.model.converter;
 
-import org.apache.bigtop.manager.dao.entity.User;
-import org.apache.bigtop.manager.server.model.dto.UserDTO;
-import org.apache.bigtop.manager.server.model.req.UserReq;
-import org.apache.bigtop.manager.server.model.vo.UserVO;
+import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
+import org.apache.bigtop.manager.server.model.dto.CommandDTO;
+import org.apache.bigtop.manager.server.model.dto.command.ServiceCommandDTO;
+import org.apache.bigtop.manager.server.model.req.CommandReq;
+import org.apache.bigtop.manager.server.model.req.command.ServiceCommandReq;
 
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-@Mapper
-public interface UserMapper {
+import java.util.List;
 
-    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
+@Mapper(config = MapStructSharedConfig.class)
+public interface CommandConverter {
 
-    @Mapping(target = "createTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
-    @Mapping(target = "updateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
-    UserVO fromEntity2VO(User user);
+    CommandConverter INSTANCE = Mappers.getMapper(CommandConverter.class);
 
-    UserDTO fromReq2DTO(UserReq userReq);
+    CommandDTO fromReq2DTO(CommandReq commandReq);
+
+    ServiceCommandDTO fromServiceReq2DTO(ServiceCommandReq req);
+
+    List<ServiceCommandDTO> fromServiceReq2DTO(List<ServiceCommandReq> reqs);
 }

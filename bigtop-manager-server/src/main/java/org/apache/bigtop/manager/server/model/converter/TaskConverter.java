@@ -16,26 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.mapper;
+package org.apache.bigtop.manager.server.model.converter;
 
-import org.apache.bigtop.manager.server.model.dto.CommandDTO;
-import org.apache.bigtop.manager.server.model.dto.command.ServiceCommandDTO;
-import org.apache.bigtop.manager.server.model.req.CommandReq;
-import org.apache.bigtop.manager.server.model.req.command.ServiceCommandReq;
+import org.apache.bigtop.manager.dao.entity.Task;
+import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
+import org.apache.bigtop.manager.server.model.vo.TaskVO;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-import java.util.List;
+@Mapper(config = MapStructSharedConfig.class)
+public interface TaskConverter {
 
-@Mapper
-public interface CommandMapper {
+    TaskConverter INSTANCE = Mappers.getMapper(TaskConverter.class);
 
-    CommandMapper INSTANCE = Mappers.getMapper(CommandMapper.class);
-
-    CommandDTO fromReq2DTO(CommandReq commandReq);
-
-    ServiceCommandDTO fromServiceReq2DTO(ServiceCommandReq req);
-
-    List<ServiceCommandDTO> fromServiceReq2DTO(List<ServiceCommandReq> reqs);
+    @Mapping(target = "createTime", source = "createTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
+    @Mapping(target = "updateTime", source = "updateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
+    TaskVO fromEntity2VO(Task task);
 }

@@ -27,10 +27,10 @@ import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.dao.repository.ServiceConfigRepository;
 import org.apache.bigtop.manager.dao.repository.ServiceRepository;
 import org.apache.bigtop.manager.dao.repository.TypeConfigRepository;
+import org.apache.bigtop.manager.server.model.converter.ServiceConfigConverter;
+import org.apache.bigtop.manager.server.model.converter.TypeConfigConverter;
 import org.apache.bigtop.manager.server.model.dto.PropertyDTO;
 import org.apache.bigtop.manager.server.model.dto.TypeConfigDTO;
-import org.apache.bigtop.manager.server.model.mapper.ServiceConfigMapper;
-import org.apache.bigtop.manager.server.model.mapper.TypeConfigMapper;
 import org.apache.bigtop.manager.server.model.vo.ServiceConfigVO;
 import org.apache.bigtop.manager.server.service.ConfigService;
 
@@ -62,14 +62,14 @@ public class ConfigServiceImpl implements ConfigService {
         Cluster cluster = clusterRepository.getReferenceById(clusterId);
         Sort sort = Sort.by(Sort.Direction.DESC, "version");
         List<ServiceConfig> list = serviceConfigRepository.findAllByCluster(cluster, sort);
-        return ServiceConfigMapper.INSTANCE.fromEntity2VO(list);
+        return ServiceConfigConverter.INSTANCE.fromEntity2VO(list);
     }
 
     @Override
     public List<ServiceConfigVO> latest(Long clusterId) {
         Cluster cluster = clusterRepository.getReferenceById(clusterId);
         List<ServiceConfig> list = serviceConfigRepository.findAllByClusterAndSelectedIsTrue(cluster);
-        return ServiceConfigMapper.INSTANCE.fromEntity2VO(list);
+        return ServiceConfigConverter.INSTANCE.fromEntity2VO(list);
     }
 
     @Override
@@ -93,7 +93,7 @@ public class ConfigServiceImpl implements ConfigService {
 
     private void upsertServiceConfig(
             Cluster cluster, Service service, ServiceConfig currentConfig, List<TypeConfigDTO> configs) {
-        List<TypeConfigDTO> existConfigs = TypeConfigMapper.INSTANCE.fromEntity2DTO(currentConfig.getConfigs());
+        List<TypeConfigDTO> existConfigs = TypeConfigConverter.INSTANCE.fromEntity2DTO(currentConfig.getConfigs());
         if (shouldUpdateConfig(existConfigs, configs)) {
             // Unselect current config
             currentConfig.setSelected(false);

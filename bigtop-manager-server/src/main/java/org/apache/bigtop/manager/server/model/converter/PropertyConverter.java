@@ -16,32 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.agent;
+package org.apache.bigtop.manager.server.model.converter;
 
-import org.apache.bigtop.manager.agent.monitoring.AgentHostMonitoring;
+import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
+import org.apache.bigtop.manager.server.model.dto.PropertyDTO;
+import org.apache.bigtop.manager.server.model.vo.PropertyVO;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import java.util.List;
 
-import java.net.UnknownHostException;
-import java.text.DecimalFormat;
+@Mapper(config = MapStructSharedConfig.class)
+public interface PropertyConverter {
 
-@SpringBootTest
-public class AgentApplicationTests {
+    PropertyConverter INSTANCE = Mappers.getMapper(PropertyConverter.class);
 
-    @Test
-    void contextLoads() {}
+    PropertyVO fromDTO2VO(PropertyDTO propertyDTO);
 
-    @Test
-    void getHostAgentInfo() throws UnknownHostException {
-        JsonNode hostInfo = AgentHostMonitoring.getHostInfo();
-        System.out.println(hostInfo.toPrettyString());
-    }
-
-    @Test
-    void testNum() {
-        System.out.println(new DecimalFormat("#.00").format(123.2344));
-    }
+    List<PropertyVO> fromDTO2VO(List<PropertyDTO> propertyDTOList);
 }

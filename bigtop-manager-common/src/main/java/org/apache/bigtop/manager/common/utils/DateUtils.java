@@ -31,12 +31,16 @@ import java.util.Objects;
 public final class DateUtils {
 
     /**
-     * date format of yyyy-MM-dd HH:mm:ss
+     * date format pattern of yyyy-MM-dd HH:mm:ss
      */
-    public static final String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
+    private static final String DEFAULT_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
     private DateUtils() {
         throw new UnsupportedOperationException("Construct DateUtils");
+    }
+
+    public static String format(Timestamp timestamp) {
+        return format(timestamp, DEFAULT_PATTERN);
     }
 
     public static String format(Timestamp timestamp, String pattern) {
@@ -45,6 +49,10 @@ public final class DateUtils {
         }
 
         return format(new Date(timestamp.getTime()), pattern);
+    }
+
+    public static String format(Date date) {
+        return format(date, DEFAULT_PATTERN);
     }
 
     public static String format(Date date, String pattern) {

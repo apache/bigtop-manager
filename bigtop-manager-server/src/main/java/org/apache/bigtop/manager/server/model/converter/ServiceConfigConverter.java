@@ -16,10 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.mapper;
+package org.apache.bigtop.manager.server.model.converter;
 
-import org.apache.bigtop.manager.dao.entity.HostComponent;
-import org.apache.bigtop.manager.server.model.vo.HostComponentVO;
+import org.apache.bigtop.manager.dao.entity.ServiceConfig;
+import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
+import org.apache.bigtop.manager.server.model.vo.ServiceConfigVO;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -27,18 +28,16 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper
-public interface HostComponentMapper {
+@Mapper(
+        uses = {TypeConfigConverter.class},
+        config = MapStructSharedConfig.class)
+public interface ServiceConfigConverter {
 
-    HostComponentMapper INSTANCE = Mappers.getMapper(HostComponentMapper.class);
+    ServiceConfigConverter INSTANCE = Mappers.getMapper(ServiceConfigConverter.class);
 
-    @Mapping(target = "componentName", source = "component.componentName")
-    @Mapping(target = "displayName", source = "component.displayName")
-    @Mapping(target = "category", source = "component.category")
-    @Mapping(target = "serviceName", source = "component.service.serviceName")
-    @Mapping(target = "clusterName", source = "component.cluster.clusterName")
-    @Mapping(target = "hostname", source = "host.hostname")
-    HostComponentVO fromEntity2VO(HostComponent hostComponent);
+    @Mapping(target = "serviceName", source = "service.serviceName")
+    @Mapping(target = "configs", source = "configs", qualifiedByName = "fromEntity2VO")
+    ServiceConfigVO fromEntity2VO(ServiceConfig serviceConfig);
 
-    List<HostComponentVO> fromEntity2VO(List<HostComponent> hostComponents);
+    List<ServiceConfigVO> fromEntity2VO(List<ServiceConfig> serviceConfigs);
 }

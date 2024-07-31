@@ -16,29 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server;
+package org.apache.bigtop.manager.server.model.converter;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
+import org.apache.bigtop.manager.server.model.dto.LoginDTO;
+import org.apache.bigtop.manager.server.model.req.LoginReq;
 
-import reactor.core.publisher.Mono;
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class ServerApplicationTests {
+@Mapper(config = MapStructSharedConfig.class)
+public interface LoginConverter {
 
-    @Test
-    void contextLoads() {}
+    LoginConverter INSTANCE = Mappers.getMapper(LoginConverter.class);
 
-    @Test
-    public void queryMonitoring() {
-        WebClient webClient =
-                WebClient.builder().baseUrl("http://localhost:9090").build();
-        Mono<String> body = webClient
-                .get()
-                .uri("/api/v1/query?query=absent(up{job=bm-agent-host}==1)", "")
-                .retrieve()
-                .bodyToMono(String.class);
-        System.out.println(body.block());
-    }
+    LoginDTO fromReq2DTO(LoginReq loginReq);
 }

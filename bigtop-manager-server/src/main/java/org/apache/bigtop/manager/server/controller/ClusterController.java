@@ -18,8 +18,8 @@
  */
 package org.apache.bigtop.manager.server.controller;
 
+import org.apache.bigtop.manager.server.model.converter.ClusterConverter;
 import org.apache.bigtop.manager.server.model.dto.ClusterDTO;
-import org.apache.bigtop.manager.server.model.mapper.ClusterMapper;
 import org.apache.bigtop.manager.server.model.req.ClusterReq;
 import org.apache.bigtop.manager.server.model.vo.ClusterVO;
 import org.apache.bigtop.manager.server.service.ClusterService;
@@ -62,7 +62,7 @@ public class ClusterController {
     @Operation(summary = "update", description = "Update a cluster")
     @PutMapping("/{id}")
     public ResponseEntity<ClusterVO> update(@PathVariable Long id, @RequestBody @Validated ClusterReq clusterReq) {
-        ClusterDTO clusterDTO = ClusterMapper.INSTANCE.fromReq2DTO(clusterReq);
+        ClusterDTO clusterDTO = ClusterConverter.INSTANCE.fromReq2DTO(clusterReq);
         return ResponseEntity.success(clusterService.update(id, clusterDTO));
     }
 }

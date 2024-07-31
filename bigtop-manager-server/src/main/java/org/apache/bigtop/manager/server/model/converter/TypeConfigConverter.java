@@ -16,9 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.mapper;
+package org.apache.bigtop.manager.server.model.converter;
 
 import org.apache.bigtop.manager.dao.entity.TypeConfig;
+import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.dto.TypeConfigDTO;
 import org.apache.bigtop.manager.server.model.vo.TypeConfigVO;
 
@@ -29,10 +30,12 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper(uses = {TypeConvert.class})
-public interface TypeConfigMapper {
+@Mapper(
+        uses = {ConverterTool.class},
+        config = MapStructSharedConfig.class)
+public interface TypeConfigConverter {
 
-    TypeConfigMapper INSTANCE = Mappers.getMapper(TypeConfigMapper.class);
+    TypeConfigConverter INSTANCE = Mappers.getMapper(TypeConfigConverter.class);
 
     @Mapping(target = "properties", source = "propertiesJson", qualifiedByName = "json2PropertyDTOList")
     TypeConfigDTO fromEntity2DTO(TypeConfig typeConfig);
