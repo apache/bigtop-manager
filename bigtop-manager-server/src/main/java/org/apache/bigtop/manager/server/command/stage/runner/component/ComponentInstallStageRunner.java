@@ -53,7 +53,7 @@ public class ComponentInstallStageRunner extends AbstractStageRunner {
         String componentName = taskPO.getComponentName();
         String hostname = taskPO.getHostname();
         HostComponentPO hostComponentPO =
-                hostComponentRepository.findByComponentPOClusterIdAndComponentPOComponentNameAndHostPOHostname(
+                hostComponentRepository.findByComponentPOClusterPOIdAndComponentPOComponentNameAndHostPOHostname(
                         clusterId, componentName, hostname);
         hostComponentPO.setState(MaintainState.INSTALLED);
         hostComponentRepository.save(hostComponentPO);

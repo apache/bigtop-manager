@@ -20,7 +20,10 @@ package org.apache.bigtop.manager.server.command.job.runner.service;
 
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.enums.MaintainState;
-import org.apache.bigtop.manager.dao.po.*;
+import org.apache.bigtop.manager.dao.po.ClusterPO;
+import org.apache.bigtop.manager.dao.po.ComponentPO;
+import org.apache.bigtop.manager.dao.po.HostComponentPO;
+import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.po.ServicePO;
 import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.dao.repository.ComponentRepository;
@@ -125,7 +128,8 @@ public class ServiceInstallJobRunner extends AbstractJobRunner {
             // 4. Persist hostComponent
             for (String hostname : componentHostDTO.getHostnames()) {
                 HostComponentPO hostComponentPO =
-                        hostComponentRepository.findByComponentPOComponentNameAndHostPOHostname(componentName, hostname);
+                        hostComponentRepository.findByComponentPOComponentNameAndHostPOHostname(
+                                componentName, hostname);
                 if (hostComponentPO == null) {
                     HostPO hostPO = hostRepository.findByHostname(hostname);
 

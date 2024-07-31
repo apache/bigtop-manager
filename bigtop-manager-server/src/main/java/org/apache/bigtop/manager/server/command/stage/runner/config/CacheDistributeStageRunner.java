@@ -18,14 +18,25 @@
  */
 package org.apache.bigtop.manager.server.command.stage.runner.config;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.common.constants.Constants;
 import org.apache.bigtop.manager.common.message.entity.payload.CacheMessagePayload;
 import org.apache.bigtop.manager.common.message.entity.pojo.ClusterInfo;
 import org.apache.bigtop.manager.common.message.entity.pojo.ComponentInfo;
 import org.apache.bigtop.manager.common.message.entity.pojo.RepoInfo;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.po.*;
+import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
+import org.apache.bigtop.manager.dao.po.HostComponentPO;
+import org.apache.bigtop.manager.dao.po.HostPO;
+import org.apache.bigtop.manager.dao.po.RepoPO;
+import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
+import org.apache.bigtop.manager.dao.po.ServicePO;
+import org.apache.bigtop.manager.dao.po.SettingPO;
+import org.apache.bigtop.manager.dao.po.TaskPO;
+import org.apache.bigtop.manager.dao.po.TypeConfigPO;
 import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.dao.repository.ComponentRepository;
 import org.apache.bigtop.manager.dao.repository.HostComponentRepository;
@@ -45,16 +56,10 @@ import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.model.dto.StackDTO;
 import org.apache.bigtop.manager.server.utils.StackConfigUtils;
 import org.apache.bigtop.manager.server.utils.StackUtils;
-
 import org.apache.commons.lang3.tuple.ImmutablePair;
-
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import lombok.extern.slf4j.Slf4j;
-
-import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -143,8 +148,9 @@ public class CacheDistributeStageRunner extends AbstractStageRunner {
         String stackVersion = clusterPO.getStackPO().getStackVersion();
 
         List<ServicePO> servicePOList = serviceRepository.findAllByClusterPOId(clusterId);
-        List<ServiceConfigPO> serviceConfigPOList = serviceConfigRepository.findAllByClusterPOAndSelectedIsTrue(clusterPO);
-        List<HostComponentPO> hostComponentPOList = hostComponentRepository.findAllByComponentPOClusterId(clusterId);
+        List<ServiceConfigPO> serviceConfigPOList =
+                serviceConfigRepository.findAllByClusterPOAndSelectedIsTrue(clusterPO);
+        List<HostComponentPO> hostComponentPOList = hostComponentRepository.findAllByComponentPOClusterPOId(clusterId);
         List<RepoPO> repoPOList = repoRepository.findAllByClusterPO(clusterPO);
         Iterable<SettingPO> settings = settingRepository.findAll();
         List<HostPO> hostPOList = hostRepository.findAllByClusterPOId(clusterId);
@@ -180,7 +186,8 @@ public class CacheDistributeStageRunner extends AbstractStageRunner {
         hostMap = new HashMap<>();
         hostComponentPOList.forEach(x -> {
             if (hostMap.containsKey(x.getComponentPO().getComponentName())) {
-                hostMap.get(x.getComponentPO().getComponentName()).add(x.getHostPO().getHostname());
+                hostMap.get(x.getComponentPO().getComponentName())
+                        .add(x.getHostPO().getHostname());
             } else {
                 Set<String> set = new HashSet<>();
                 set.add(x.getHostPO().getHostname());

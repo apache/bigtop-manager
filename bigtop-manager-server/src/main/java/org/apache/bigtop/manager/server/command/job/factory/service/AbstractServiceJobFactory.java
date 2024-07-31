@@ -22,8 +22,8 @@ import org.apache.bigtop.manager.common.constants.ComponentCategories;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
-import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.po.HostComponentPO;
+import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.repository.ComponentRepository;
 import org.apache.bigtop.manager.dao.repository.HostComponentRepository;
 import org.apache.bigtop.manager.server.command.job.factory.AbstractJobFactory;
@@ -133,7 +133,7 @@ public abstract class AbstractServiceJobFactory extends AbstractJobFactory {
 
     protected List<String> findHostnamesByComponentName(String componentName) {
         List<HostComponentPO> hostComponentPOList =
-                hostComponentRepository.findAllByComponentPOClusterIdAndComponentPOComponentName(
+                hostComponentRepository.findAllByComponentPOClusterPOIdAndComponentPOComponentName(
                         clusterPO.getId(), componentName);
         if (hostComponentPOList == null) {
             return new ArrayList<>();
@@ -149,7 +149,8 @@ public abstract class AbstractServiceJobFactory extends AbstractJobFactory {
         StageContext stageContext = StageContext.fromPayload(JsonUtils.writeAsString(jobContext.getCommandDTO()));
         stageContext.setStackName(stackName);
         stageContext.setStackVersion(stackVersion);
-        stagePOList.add(StageFactories.getStageFactory(StageType.CACHE_DISTRIBUTE).createStage(stageContext));
+        stagePOList.add(
+                StageFactories.getStageFactory(StageType.CACHE_DISTRIBUTE).createStage(stageContext));
     }
 
     protected void createInstallStages() {
@@ -188,7 +189,8 @@ public abstract class AbstractServiceJobFactory extends AbstractJobFactory {
             }
 
             StageContext stageContext = createStageContext(serviceName, componentName, hostnames);
-            stagePOList.add(StageFactories.getStageFactory(StageType.COMPONENT_START).createStage(stageContext));
+            stagePOList.add(
+                    StageFactories.getStageFactory(StageType.COMPONENT_START).createStage(stageContext));
         }
     }
 
@@ -210,7 +212,8 @@ public abstract class AbstractServiceJobFactory extends AbstractJobFactory {
             }
 
             StageContext stageContext = createStageContext(serviceName, componentName, hostnames);
-            stagePOList.add(StageFactories.getStageFactory(StageType.COMPONENT_STOP).createStage(stageContext));
+            stagePOList.add(
+                    StageFactories.getStageFactory(StageType.COMPONENT_STOP).createStage(stageContext));
         }
     }
 
@@ -232,7 +235,8 @@ public abstract class AbstractServiceJobFactory extends AbstractJobFactory {
             }
 
             StageContext stageContext = createStageContext(serviceName, componentName, List.of(hostnames.get(0)));
-            stagePOList.add(StageFactories.getStageFactory(StageType.COMPONENT_CHECK).createStage(stageContext));
+            stagePOList.add(
+                    StageFactories.getStageFactory(StageType.COMPONENT_CHECK).createStage(stageContext));
         }
     }
 

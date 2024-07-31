@@ -73,7 +73,8 @@ public class RequiredServicesValidator implements CommandValidator {
                 return;
             }
 
-            List<ServicePO> servicePOList = serviceRepository.findByClusterPOIdAndServiceNameIn(clusterId, requiredServices);
+            List<ServicePO> servicePOList =
+                    serviceRepository.findByClusterPOIdAndServiceNameIn(clusterId, requiredServices);
             List<String> list =
                     servicePOList.stream().map(ServicePO::getServiceName).toList();
 

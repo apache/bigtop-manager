@@ -48,21 +48,21 @@ public class HostComponentServiceImpl implements HostComponentService {
 
     @Override
     public List<HostComponentVO> list(Long clusterId) {
-        List<HostComponentPO> hostComponentPOList = hostComponentRepository.findAllByComponentPOClusterId(clusterId);
+        List<HostComponentPO> hostComponentPOList = hostComponentRepository.findAllByComponentPOClusterPOId(clusterId);
         return HostComponentConverter.INSTANCE.fromPO2VO(hostComponentPOList);
     }
 
     @Override
     public List<HostComponentVO> listByHost(Long clusterId, Long hostId) {
         List<HostComponentPO> hostComponentPOList =
-                hostComponentRepository.findAllByComponentPOClusterIdAndHostPOId(clusterId, clusterId);
+                hostComponentRepository.findAllByComponentPOClusterPOIdAndHostPOId(clusterId, clusterId);
         return HostComponentConverter.INSTANCE.fromPO2VO(hostComponentPOList);
     }
 
     @Override
     public List<HostComponentVO> listByService(Long clusterId, Long serviceId) {
         List<HostComponentPO> hostComponentPOList =
-                hostComponentRepository.findAllByComponentPOClusterIdAndComponentPOServiceId(clusterId, serviceId);
+                hostComponentRepository.findAllByComponentPOClusterPOIdAndComponentPOServicePOId(clusterId, serviceId);
         return HostComponentConverter.INSTANCE.fromPO2VO(hostComponentPOList);
     }
 }

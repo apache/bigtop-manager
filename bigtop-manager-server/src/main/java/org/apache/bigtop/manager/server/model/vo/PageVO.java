@@ -49,10 +49,11 @@ public class PageVO<T> {
         if (page.hasContent()) {
             try {
                 Class<S> clz = (Class<S>) page.getContent().get(0).getClass();
-                String className = "org.apache.bigtop.manager.server.model.converter." + clz.getSimpleName() + "Converter";
+                String className = "org.apache.bigtop.manager.server.model.converter."
+                        + clz.getSimpleName().replace("PO", "") + "Converter";
                 Class<?> mapper = Class.forName(className);
                 Object o = Mappers.getMapper(mapper);
-                Method method = o.getClass().getDeclaredMethod("fromEntity2VO", List.class);
+                Method method = o.getClass().getDeclaredMethod("fromPO2VO", List.class);
                 content = (List<T>) method.invoke(o, page.getContent());
             } catch (Exception e) {
                 throw new ServerException(e);

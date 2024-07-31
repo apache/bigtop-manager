@@ -21,8 +21,13 @@ package org.apache.bigtop.manager.server.service.impl;
 import org.apache.bigtop.manager.common.constants.ComponentCategories;
 import org.apache.bigtop.manager.common.enums.MaintainState;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.po.*;
+import org.apache.bigtop.manager.dao.po.ClusterPO;
+import org.apache.bigtop.manager.dao.po.ComponentPO;
+import org.apache.bigtop.manager.dao.po.HostComponentPO;
+import org.apache.bigtop.manager.dao.po.HostPO;
+import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
 import org.apache.bigtop.manager.dao.po.ServicePO;
+import org.apache.bigtop.manager.dao.po.TypeConfigPO;
 import org.apache.bigtop.manager.dao.repository.HostComponentRepository;
 import org.apache.bigtop.manager.dao.repository.ServiceConfigRepository;
 import org.apache.bigtop.manager.dao.repository.ServiceRepository;
@@ -62,7 +67,7 @@ public class ServiceServiceImpl implements ServiceService {
     public List<ServiceVO> list(Long clusterId) {
         List<ServiceVO> res = new ArrayList<>();
         Map<Long, List<HostComponentPO>> serviceIdToHostComponent =
-                hostComponentRepository.findAllByComponentPOClusterId(clusterId).stream()
+                hostComponentRepository.findAllByComponentPOClusterPOId(clusterId).stream()
                         .collect(Collectors.groupingBy(hostComponent ->
                                 hostComponent.getComponentPO().getServicePO().getId()));
 

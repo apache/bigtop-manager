@@ -88,6 +88,6 @@ public class StagePO extends BasePO {
     private ClusterPO clusterPO;
 
     @ToString.Exclude
-    @OneToMany(mappedBy = "stage")
+    @OneToMany(mappedBy = "stagePO")
     private List<TaskPO> taskPOList;
 }

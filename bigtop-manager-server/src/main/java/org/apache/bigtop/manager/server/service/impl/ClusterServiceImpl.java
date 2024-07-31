@@ -96,7 +96,8 @@ public class ClusterServiceImpl implements ClusterService {
 
         for (RepoPO repoPO : repoPOList) {
             for (RepoPO oldRepoPO : oldrepoPOList) {
-                if (oldRepoPO.getArch().equals(repoPO.getArch()) && oldRepoPO.getOs().equals(repoPO.getOs())) {
+                if (oldRepoPO.getArch().equals(repoPO.getArch())
+                        && oldRepoPO.getOs().equals(repoPO.getOs())) {
                     repoPO.setId(oldRepoPO.getId());
                 }
             }

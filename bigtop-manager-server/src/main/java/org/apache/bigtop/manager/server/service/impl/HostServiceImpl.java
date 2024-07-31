@@ -70,7 +70,8 @@ public class HostServiceImpl implements HostService {
         List<HostPO> hostnameIn = hostRepository.findAllByHostnameIn(hostnames);
         List<HostPO> hostPOList = new ArrayList<>();
 
-        Map<String, HostPO> hostInMap = hostnameIn.stream().collect(Collectors.toMap(HostPO::getHostname, host -> host));
+        Map<String, HostPO> hostInMap =
+                hostnameIn.stream().collect(Collectors.toMap(HostPO::getHostname, host -> host));
 
         for (String hostname : hostnames) {
             HostPO hostPO = new HostPO();
@@ -92,7 +93,8 @@ public class HostServiceImpl implements HostService {
 
     @Override
     public HostVO get(Long id) {
-        HostPO hostPO = hostRepository.findById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.HOST_NOT_FOUND));
+        HostPO hostPO =
+                hostRepository.findById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.HOST_NOT_FOUND));
 
         return HostConverter.INSTANCE.fromPO2VO(hostPO);
     }

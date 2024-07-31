@@ -68,7 +68,7 @@ public class ServiceConfigPO extends BasePO {
     private Boolean selected;
 
     @ToString.Exclude
-    @OneToMany(mappedBy = "serviceConfig")
+    @OneToMany(mappedBy = "serviceConfigPO")
     private List<TypeConfigPO> configs;
 
     @ManyToOne

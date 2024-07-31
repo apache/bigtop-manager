@@ -53,7 +53,8 @@ public class ClusterHostValidator implements CommandValidator {
 
         List<HostPO> hostPOList = hostRepository.findAllByHostnameIn(hostnames);
         if (CollectionUtils.isNotEmpty(hostPOList)) {
-            List<String> existsHostnames = hostPOList.stream().map(HostPO::getHostname).toList();
+            List<String> existsHostnames =
+                    hostPOList.stream().map(HostPO::getHostname).toList();
             throw new ApiException(ApiExceptionEnum.HOST_ASSIGNED, String.join(",", existsHostnames));
         }
 

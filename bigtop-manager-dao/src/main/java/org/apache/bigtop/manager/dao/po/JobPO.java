@@ -72,6 +72,6 @@ public class JobPO extends BasePO {
     private ClusterPO clusterPO;
 
     @ToString.Exclude
-    @OneToMany(mappedBy = "job")
+    @OneToMany(mappedBy = "jobPO")
     private List<StagePO> stagePOList;
 }
