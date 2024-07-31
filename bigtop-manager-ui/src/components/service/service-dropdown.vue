@@ -64,6 +64,10 @@
   const jobWindowOpened = ref(false)
 
   const handleMenuClick: MenuProps['onClick'] = (e) => {
+    if (e.key === '4') {
+      addWindowOpened.value = true
+      return
+    }
     const menu = menuOps.find((menu) => menu.key == e.key)
     const text = `${menu?.dicText}_services`
     menuClicked.value = menu
@@ -114,7 +118,7 @@
           <span>{{ $t(menu.dicText) }}</span>
         </a-menu-item>
         <a-menu-divider />
-        <a-menu-item key="add" @click="() => (addWindowOpened = true)">
+        <a-menu-item key="4">
           <svg-icon name="plus" />
           <span> {{ $t('service.add') }}</span>
         </a-menu-item>
