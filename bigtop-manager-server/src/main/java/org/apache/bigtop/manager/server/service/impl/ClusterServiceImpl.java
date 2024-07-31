@@ -77,7 +77,7 @@ public class ClusterServiceImpl implements ClusterService {
         StackDTO stackDTO = StackUtils.getStackKeyMap()
                 .get(StackUtils.fullStackName(clusterDTO.getStackName(), clusterDTO.getStackVersion()))
                 .getLeft();
-        ClusterPO clusterPO = ClusterConverter.INSTANCE.fromDTO2Entity(clusterDTO, stackDTO, stackPO);
+        ClusterPO clusterPO = ClusterConverter.INSTANCE.fromDTO2PO(clusterDTO, stackDTO, stackPO);
         clusterPO.setSelected(clusterRepository.count() == 0);
         clusterPO.setState(MaintainState.UNINSTALLED);
 
@@ -91,7 +91,7 @@ public class ClusterServiceImpl implements ClusterService {
         hostService.batchSave(clusterPO.getId(), clusterDTO.getHostnames());
 
         // Save repo
-        List<RepoPO> repoPOList = RepoConverter.INSTANCE.fromDTO2Entity(clusterDTO.getRepoInfoList(), clusterPO);
+        List<RepoPO> repoPOList = RepoConverter.INSTANCE.fromDTO2PO(clusterDTO.getRepoInfoList(), clusterPO);
         List<RepoPO> oldrepoPOList = repoRepository.findAllByClusterPO(clusterPO);
 
         for (RepoPO repoPO : repoPOList) {
@@ -116,7 +116,7 @@ public class ClusterServiceImpl implements ClusterService {
 
     @Override
     public ClusterVO update(Long id, ClusterDTO clusterDTO) {
-        ClusterPO clusterPO = ClusterConverter.INSTANCE.fromDTO2Entity(clusterDTO);
+        ClusterPO clusterPO = ClusterConverter.INSTANCE.fromDTO2PO(clusterDTO);
         clusterPO.setId(id);
         clusterRepository.save(clusterPO);
 

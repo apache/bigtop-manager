@@ -32,7 +32,7 @@ public interface StackConverter {
 
     StackConverter INSTANCE = Mappers.getMapper(StackConverter.class);
 
-    StackVO fromEntity2VO(StackPO stackPO);
+    StackVO fromPO2VO(StackPO stackPO);
 
     StackVO fromDTO2VO(StackDTO stackDTO);
 

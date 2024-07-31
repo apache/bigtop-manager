@@ -38,9 +38,9 @@ public interface JobConverter {
 
     @Mapping(target = "createTime", source = "createTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
     @Mapping(target = "updateTime", source = "updateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
-    JobVO fromEntity2VO(JobPO jobPO);
+    JobVO fromPO2VO(JobPO jobPO);
 
-    List<JobVO> fromEntity2VO(List<JobPO> jobPO);
+    List<JobVO> fromPO2VO(List<JobPO> jobPO);
 
-    CommandVO fromEntity2CommandVO(JobPO jobPO);
+    CommandVO fromPO2CommandVO(JobPO jobPO);
 }

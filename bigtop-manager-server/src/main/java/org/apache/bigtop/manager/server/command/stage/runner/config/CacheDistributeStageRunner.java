@@ -194,7 +194,7 @@ public class CacheDistributeStageRunner extends AbstractStageRunner {
 
         repoList = new ArrayList<>();
         repoPOList.forEach(repoPO -> {
-            RepoInfo repoInfo = RepoConverter.INSTANCE.fromEntity2Message(repoPO);
+            RepoInfo repoInfo = RepoConverter.INSTANCE.fromPO2Message(repoPO);
             repoList.add(repoInfo);
         });
 

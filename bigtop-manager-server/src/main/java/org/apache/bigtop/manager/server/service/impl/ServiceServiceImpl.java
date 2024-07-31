@@ -69,7 +69,7 @@ public class ServiceServiceImpl implements ServiceService {
         for (Map.Entry<Long, List<HostComponentPO>> entry : serviceIdToHostComponent.entrySet()) {
             List<HostComponentPO> hostComponentPOList = entry.getValue();
             ServicePO servicePO = hostComponentPOList.get(0).getComponentPO().getServicePO();
-            ServiceVO serviceVO = ServiceConverter.INSTANCE.fromEntity2VO(servicePO);
+            ServiceVO serviceVO = ServiceConverter.INSTANCE.fromPO2VO(servicePO);
             serviceVO.setQuickLinks(new ArrayList<>());
 
             boolean isHealthy = true;
@@ -107,7 +107,7 @@ public class ServiceServiceImpl implements ServiceService {
     @Override
     public ServiceVO get(Long id) {
         ServicePO servicePO = serviceRepository.findById(id).orElse(new ServicePO());
-        return ServiceConverter.INSTANCE.fromEntity2VO(servicePO);
+        return ServiceConverter.INSTANCE.fromPO2VO(servicePO);
     }
 
     private QuickLinkVO resolveQuickLink(HostComponentPO hostComponentPO, String quickLinkJson) {
@@ -126,7 +126,7 @@ public class ServiceServiceImpl implements ServiceService {
 
         // Use HTTP for now, need to handle https in the future
         for (TypeConfigPO typeConfigPO : typeConfigPOList) {
-            TypeConfigDTO typeConfigDTO = TypeConfigConverter.INSTANCE.fromEntity2DTO(typeConfigPO);
+            TypeConfigDTO typeConfigDTO = TypeConfigConverter.INSTANCE.fromPO2DTO(typeConfigPO);
             for (PropertyDTO propertyDTO : typeConfigDTO.getProperties()) {
                 if (propertyDTO.getName().equals(quickLinkDTO.getHttpPortProperty())) {
                     String port = propertyDTO.getValue().contains(":")

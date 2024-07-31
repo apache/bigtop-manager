@@ -36,13 +36,13 @@ public interface RepoConverter {
 
     RepoConverter INSTANCE = Mappers.getMapper(RepoConverter.class);
 
-    @Mapping(target = "cluster", expression = "java(cluster)")
-    RepoPO fromDTO2Entity(RepoDTO repoDTO, @Context ClusterPO clusterPO);
+    @Mapping(target = "clusterPO", expression = "java(clusterPO)")
+    RepoPO fromDTO2PO(RepoDTO repoDTO, @Context ClusterPO clusterPO);
 
-    @Mapping(target = "cluster", expression = "java(cluster)")
-    List<RepoPO> fromDTO2Entity(List<RepoDTO> repoDTOList, @Context ClusterPO clusterPO);
+    @Mapping(target = "clusterPO", expression = "java(clusterPO)")
+    List<RepoPO> fromDTO2PO(List<RepoDTO> repoDTOList, @Context ClusterPO clusterPO);
 
-    RepoInfo fromEntity2Message(RepoPO repoPO);
+    RepoInfo fromPO2Message(RepoPO repoPO);
 
     List<RepoInfo> fromDTO2Message(List<RepoDTO> repoDTOs);
 }

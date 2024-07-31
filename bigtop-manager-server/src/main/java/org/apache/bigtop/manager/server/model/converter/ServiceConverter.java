@@ -42,7 +42,7 @@ public interface ServiceConverter {
     @Mapping(target = "osSpecifics", source = "osSpecifics", qualifiedByName = "obj2Json")
     @Mapping(target = "requiredServices", source = "requiredServices", qualifiedByName = "obj2Json")
     @Mapping(target = "cluster", expression = "java(cluster)")
-    ServicePO fromDTO2Entity(ServiceDTO serviceDTO, @Context ClusterPO clusterPO);
+    ServicePO fromDTO2PO(ServiceDTO serviceDTO, @Context ClusterPO clusterPO);
 
     ServiceVO fromDTO2VO(ServiceDTO serviceDTO);
 
@@ -57,7 +57,7 @@ public interface ServiceConverter {
 
     @Mapping(target = "requiredServices", source = "requiredServices", qualifiedByName = "json2List")
     @Mapping(target = "clusterName", source = "clusterPO.clusterName")
-    ServiceVO fromEntity2VO(ServicePO servicePO);
+    ServiceVO fromPO2VO(ServicePO servicePO);
 
-    List<ServiceVO> fromEntity2VO(List<ServicePO> servicePOList);
+    List<ServiceVO> fromPO2VO(List<ServicePO> servicePOList);
 }

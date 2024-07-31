@@ -61,6 +61,6 @@ public class CommandServiceImpl implements CommandService {
         // Submit job
         jobScheduler.submit(jobPO);
 
-        return JobConverter.INSTANCE.fromEntity2CommandVO(jobPO);
+        return JobConverter.INSTANCE.fromPO2CommandVO(jobPO);
     }
 }

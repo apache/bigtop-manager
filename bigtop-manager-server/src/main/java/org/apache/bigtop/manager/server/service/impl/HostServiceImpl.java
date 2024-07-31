@@ -60,7 +60,7 @@ public class HostServiceImpl implements HostService {
             throw new ApiException(ApiExceptionEnum.HOST_NOT_FOUND);
         }
 
-        return HostConverter.INSTANCE.fromEntity2VO(hostPOList);
+        return HostConverter.INSTANCE.fromPO2VO(hostPOList);
     }
 
     @Override
@@ -87,23 +87,23 @@ public class HostServiceImpl implements HostService {
 
         hostRepository.saveAll(hostPOList);
 
-        return HostConverter.INSTANCE.fromEntity2VO(hostPOList);
+        return HostConverter.INSTANCE.fromPO2VO(hostPOList);
     }
 
     @Override
     public HostVO get(Long id) {
         HostPO hostPO = hostRepository.findById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.HOST_NOT_FOUND));
 
-        return HostConverter.INSTANCE.fromEntity2VO(hostPO);
+        return HostConverter.INSTANCE.fromPO2VO(hostPO);
     }
 
     @Override
     public HostVO update(Long id, HostDTO hostDTO) {
-        HostPO hostPO = HostConverter.INSTANCE.fromDTO2Entity(hostDTO);
+        HostPO hostPO = HostConverter.INSTANCE.fromDTO2PO(hostDTO);
         hostPO.setId(id);
         hostRepository.save(hostPO);
 
-        return HostConverter.INSTANCE.fromEntity2VO(hostPO);
+        return HostConverter.INSTANCE.fromPO2VO(hostPO);
     }
 
     @Override

@@ -104,7 +104,7 @@ public class ServiceInstallJobRunner extends AbstractJobRunner {
         // 1. Persist service
         if (servicePO == null) {
             ServiceDTO serviceDTO = StackUtils.getServiceDTO(stackName, stackVersion, serviceName);
-            servicePO = ServiceConverter.INSTANCE.fromDTO2Entity(serviceDTO, clusterPO);
+            servicePO = ServiceConverter.INSTANCE.fromDTO2PO(serviceDTO, clusterPO);
             servicePO = serviceRepository.save(servicePO);
         }
 
@@ -118,7 +118,7 @@ public class ServiceInstallJobRunner extends AbstractJobRunner {
             ComponentPO componentPO = componentRepository.findByClusterPOIdAndComponentName(clusterId, componentName);
             if (componentPO == null) {
                 ComponentDTO componentDTO = StackUtils.getComponentDTO(stackName, stackVersion, componentName);
-                componentPO = ComponentConverter.INSTANCE.fromDTO2Entity(componentDTO, servicePO, clusterPO);
+                componentPO = ComponentConverter.INSTANCE.fromDTO2PO(componentDTO, servicePO, clusterPO);
                 componentPO = componentRepository.save(componentPO);
             }
 

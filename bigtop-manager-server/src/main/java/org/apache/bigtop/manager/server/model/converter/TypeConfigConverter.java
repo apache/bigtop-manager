@@ -38,17 +38,17 @@ public interface TypeConfigConverter {
     TypeConfigConverter INSTANCE = Mappers.getMapper(TypeConfigConverter.class);
 
     @Mapping(target = "properties", source = "propertiesJson", qualifiedByName = "json2PropertyDTOList")
-    TypeConfigDTO fromEntity2DTO(TypeConfigPO typeConfigPO);
+    TypeConfigDTO fromPO2DTO(TypeConfigPO typeConfigPO);
 
-    List<TypeConfigDTO> fromEntity2DTO(List<TypeConfigPO> typeConfigPOS);
+    List<TypeConfigDTO> fromPO2DTO(List<TypeConfigPO> typeConfigPOS);
 
     TypeConfigVO fromDTO2VO(TypeConfigDTO typeConfigDTO);
 
     List<TypeConfigVO> fromDTO2VO(List<TypeConfigDTO> typeConfigDTOList);
 
     @Mapping(target = "properties", source = "propertiesJson", qualifiedByName = "json2PropertyVOList")
-    TypeConfigVO fromEntity2VO(TypeConfigPO typeConfigPO);
+    TypeConfigVO fromPO2VO(TypeConfigPO typeConfigPO);
 
     @Named("fromEntity2VO")
-    List<TypeConfigVO> fromEntity2VO(List<TypeConfigPO> typeConfigPOS);
+    List<TypeConfigVO> fromPO2VO(List<TypeConfigPO> typeConfigPOS);
 }

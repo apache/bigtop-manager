@@ -75,7 +75,7 @@ public class JobServiceImpl implements JobService {
     @Override
     public JobVO get(Long id) {
         JobPO jobPO = jobRepository.getReferenceById(id);
-        return JobConverter.INSTANCE.fromEntity2VO(jobPO);
+        return JobConverter.INSTANCE.fromPO2VO(jobPO);
     }
 
     @Override
@@ -99,6 +99,6 @@ public class JobServiceImpl implements JobService {
         jobRepository.save(jobPO);
         jobScheduler.submit(jobPO);
 
-        return JobConverter.INSTANCE.fromEntity2VO(jobPO);
+        return JobConverter.INSTANCE.fromPO2VO(jobPO);
     }
 }

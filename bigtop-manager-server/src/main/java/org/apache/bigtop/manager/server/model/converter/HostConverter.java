@@ -37,10 +37,10 @@ public interface HostConverter {
 
     HostDTO fromReq2DTO(HostReq hostReq);
 
-    HostPO fromDTO2Entity(HostDTO hostDTO);
+    HostPO fromDTO2PO(HostDTO hostDTO);
 
     @Mapping(target = "clusterName", source = "clusterPO.clusterName")
-    HostVO fromEntity2VO(HostPO hostPO);
+    HostVO fromPO2VO(HostPO hostPO);
 
-    List<HostVO> fromEntity2VO(List<HostPO> hostPOList);
+    List<HostVO> fromPO2VO(List<HostPO> hostPOList);
 }

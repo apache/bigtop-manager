@@ -33,5 +33,5 @@ public interface TaskConverter {
 
     @Mapping(target = "createTime", source = "createTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
     @Mapping(target = "updateTime", source = "updateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
-    TaskVO fromEntity2VO(TaskPO taskPO);
+    TaskVO fromPO2VO(TaskPO taskPO);
 }
