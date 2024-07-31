@@ -17,38 +17,27 @@
   ~ under the License.
 -->
 
-<script>
-  import { defineComponent, computed } from 'vue'
-  export default defineComponent({
-    name: 'SvgIcon',
-    props: {
-      prefix: {
-        type: String,
-        default: 'icon'
-      },
-      name: {
-        type: String,
-        required: true
-      },
-      color: {
-        type: String,
-        default: '#000'
-      },
-      className: {
-        type: String,
-        default: ''
-      }
-    },
-    setup(props) {
-      const symbolId = computed(() => `#${props.prefix}-${props.name}`)
-      const svgClass = computed(() => {
-        if (props.className) {
-          return `svg-icon ${props.className}`
-        }
-        return 'svg-icon'
-      })
-      return { symbolId, svgClass }
+<script setup lang="ts">
+  import { computed } from 'vue'
+
+  interface SvgIconProps {
+    prefix: string
+    name: string
+    color: string
+    className: string
+  }
+
+  const props = withDefaults(defineProps<SvgIconProps>(), {
+    prefix: 'icon',
+    color: '#000'
+  })
+
+  const symbolId = computed(() => `#${props.prefix}-${props.name}`)
+  const svgClass = computed(() => {
+    if (props.className) {
+      return `svg-icon ${props.className}`
     }
+    return 'svg-icon'
   })
 </script>
 
@@ -60,10 +49,10 @@
 
 <style lang="scss" scoped>
   .svg-icon {
-    height: 1em;
-    width: 1em;
+    height: 1.2em;
+    width: 1.2em;
     margin-right: 6px;
-    vertical-align: -0.15em;
+    vertical-align: -0.25em;
     overflow: hidden;
   }
 </style>
