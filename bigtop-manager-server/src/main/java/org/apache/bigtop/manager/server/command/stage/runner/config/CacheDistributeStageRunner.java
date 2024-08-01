@@ -24,16 +24,16 @@ import org.apache.bigtop.manager.common.message.entity.pojo.ClusterInfo;
 import org.apache.bigtop.manager.common.message.entity.pojo.ComponentInfo;
 import org.apache.bigtop.manager.common.message.entity.pojo.RepoInfo;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.entity.Cluster;
-import org.apache.bigtop.manager.dao.entity.Component;
-import org.apache.bigtop.manager.dao.entity.Host;
-import org.apache.bigtop.manager.dao.entity.HostComponent;
-import org.apache.bigtop.manager.dao.entity.Repo;
-import org.apache.bigtop.manager.dao.entity.Service;
-import org.apache.bigtop.manager.dao.entity.ServiceConfig;
-import org.apache.bigtop.manager.dao.entity.Setting;
-import org.apache.bigtop.manager.dao.entity.Task;
-import org.apache.bigtop.manager.dao.entity.TypeConfig;
+import org.apache.bigtop.manager.dao.po.ClusterPO;
+import org.apache.bigtop.manager.dao.po.ComponentPO;
+import org.apache.bigtop.manager.dao.po.HostComponentPO;
+import org.apache.bigtop.manager.dao.po.HostPO;
+import org.apache.bigtop.manager.dao.po.RepoPO;
+import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
+import org.apache.bigtop.manager.dao.po.ServicePO;
+import org.apache.bigtop.manager.dao.po.SettingPO;
+import org.apache.bigtop.manager.dao.po.TaskPO;
+import org.apache.bigtop.manager.dao.po.TypeConfigPO;
 import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.dao.repository.ComponentRepository;
 import org.apache.bigtop.manager.dao.repository.HostComponentRepository;
@@ -122,106 +122,108 @@ public class CacheDistributeStageRunner extends AbstractStageRunner {
     }
 
     @Override
-    public void beforeRunTask(Task task) {
-        super.beforeRunTask(task);
+    public void beforeRunTask(TaskPO taskPO) {
+        super.beforeRunTask(taskPO);
 
         // Generate task content before execute
-        updateTask(task);
+        updateTask(taskPO);
     }
 
-    private void updateTask(Task task) {
+    private void updateTask(TaskPO taskPO) {
         if (stageContext.getClusterId() == null) {
             genEmptyCaches();
         } else {
             genCaches();
         }
 
-        CommandRequest request = getMessage(task.getHostname());
-        task.setContent(ProtobufUtil.toJson(request));
+        CommandRequest request = getMessage(taskPO.getHostname());
+        taskPO.setContent(ProtobufUtil.toJson(request));
 
-        taskRepository.save(task);
+        taskRepository.save(taskPO);
     }
 
     private void genCaches() {
-        Cluster cluster = clusterRepository.getReferenceById(stageContext.getClusterId());
+        ClusterPO clusterPO = clusterRepository.getReferenceById(stageContext.getClusterId());
 
-        Long clusterId = cluster.getId();
-        String clusterName = cluster.getClusterName();
-        String stackName = cluster.getStack().getStackName();
-        String stackVersion = cluster.getStack().getStackVersion();
+        Long clusterId = clusterPO.getId();
+        String clusterName = clusterPO.getClusterName();
+        String stackName = clusterPO.getStackPO().getStackName();
+        String stackVersion = clusterPO.getStackPO().getStackVersion();
 
-        List<Service> services = serviceRepository.findAllByClusterId(clusterId);
-        List<ServiceConfig> serviceConfigList = serviceConfigRepository.findAllByClusterAndSelectedIsTrue(cluster);
-        List<HostComponent> hostComponents = hostComponentRepository.findAllByComponentClusterId(clusterId);
-        List<Repo> repos = repoRepository.findAllByCluster(cluster);
-        Iterable<Setting> settings = settingRepository.findAll();
-        List<Host> hostList = hostRepository.findAllByClusterId(clusterId);
+        List<ServicePO> servicePOList = serviceRepository.findAllByClusterPOId(clusterId);
+        List<ServiceConfigPO> serviceConfigPOList =
+                serviceConfigRepository.findAllByClusterPOAndSelectedIsTrue(clusterPO);
+        List<HostComponentPO> hostComponentPOList = hostComponentRepository.findAllByComponentPOClusterPOId(clusterId);
+        List<RepoPO> repoPOList = repoRepository.findAllByClusterPO(clusterPO);
+        Iterable<SettingPO> settings = settingRepository.findAll();
+        List<HostPO> hostPOList = hostRepository.findAllByClusterPOId(clusterId);
 
         clusterInfo = new ClusterInfo();
         clusterInfo.setClusterName(clusterName);
         clusterInfo.setStackName(stackName);
         clusterInfo.setStackVersion(stackVersion);
-        clusterInfo.setUserGroup(cluster.getUserGroup());
-        clusterInfo.setRepoTemplate(cluster.getRepoTemplate());
-        clusterInfo.setRoot(cluster.getRoot());
-        clusterInfo.setPackages(List.of(cluster.getPackages().split(",")));
+        clusterInfo.setUserGroup(clusterPO.getUserGroup());
+        clusterInfo.setRepoTemplate(clusterPO.getRepoTemplate());
+        clusterInfo.setRoot(clusterPO.getRoot());
+        clusterInfo.setPackages(List.of(clusterPO.getPackages().split(",")));
 
         serviceConfigMap = new HashMap<>();
-        for (ServiceConfig serviceConfig : serviceConfigList) {
-            for (TypeConfig typeConfig : serviceConfig.getConfigs()) {
+        for (ServiceConfigPO serviceConfigPO : serviceConfigPOList) {
+            for (TypeConfigPO typeConfigPO : serviceConfigPO.getConfigs()) {
                 List<PropertyDTO> properties =
-                        JsonUtils.readFromString(typeConfig.getPropertiesJson(), new TypeReference<>() {});
+                        JsonUtils.readFromString(typeConfigPO.getPropertiesJson(), new TypeReference<>() {});
                 String configMapStr = JsonUtils.writeAsString(StackConfigUtils.extractConfigMap(properties));
 
-                if (serviceConfigMap.containsKey(serviceConfig.getService().getServiceName())) {
+                if (serviceConfigMap.containsKey(serviceConfigPO.getServicePO().getServiceName())) {
                     serviceConfigMap
-                            .get(serviceConfig.getService().getServiceName())
-                            .put(typeConfig.getTypeName(), configMapStr);
+                            .get(serviceConfigPO.getServicePO().getServiceName())
+                            .put(typeConfigPO.getTypeName(), configMapStr);
                 } else {
                     Map<String, Object> hashMap = new HashMap<>();
-                    hashMap.put(typeConfig.getTypeName(), configMapStr);
-                    serviceConfigMap.put(serviceConfig.getService().getServiceName(), hashMap);
+                    hashMap.put(typeConfigPO.getTypeName(), configMapStr);
+                    serviceConfigMap.put(serviceConfigPO.getServicePO().getServiceName(), hashMap);
                 }
             }
         }
 
         hostMap = new HashMap<>();
-        hostComponents.forEach(x -> {
-            if (hostMap.containsKey(x.getComponent().getComponentName())) {
-                hostMap.get(x.getComponent().getComponentName()).add(x.getHost().getHostname());
+        hostComponentPOList.forEach(x -> {
+            if (hostMap.containsKey(x.getComponentPO().getComponentName())) {
+                hostMap.get(x.getComponentPO().getComponentName())
+                        .add(x.getHostPO().getHostname());
             } else {
                 Set<String> set = new HashSet<>();
-                set.add(x.getHost().getHostname());
-                hostMap.put(x.getComponent().getComponentName(), set);
+                set.add(x.getHostPO().getHostname());
+                hostMap.put(x.getComponentPO().getComponentName(), set);
             }
-            hostMap.get(x.getComponent().getComponentName()).add(x.getHost().getHostname());
+            hostMap.get(x.getComponentPO().getComponentName()).add(x.getHostPO().getHostname());
         });
 
-        Set<String> hostNameSet = hostList.stream().map(Host::getHostname).collect(Collectors.toSet());
+        Set<String> hostNameSet = hostPOList.stream().map(HostPO::getHostname).collect(Collectors.toSet());
         hostMap.put(ALL_HOST_KEY, hostNameSet);
 
         repoList = new ArrayList<>();
-        repos.forEach(repo -> {
-            RepoInfo repoInfo = RepoConverter.INSTANCE.fromEntity2Message(repo);
+        repoPOList.forEach(repoPO -> {
+            RepoInfo repoInfo = RepoConverter.INSTANCE.fromPO2Message(repoPO);
             repoList.add(repoInfo);
         });
 
         userMap = new HashMap<>();
-        services.forEach(x -> userMap.put(x.getServiceUser(), Set.of(x.getServiceGroup())));
+        servicePOList.forEach(x -> userMap.put(x.getServiceUser(), Set.of(x.getServiceGroup())));
 
         settingsMap = new HashMap<>();
         settings.forEach(x -> settingsMap.put(x.getTypeName(), x.getConfigData()));
 
         componentInfoMap = new HashMap<>();
-        List<Component> componentList = componentRepository.findAll();
-        componentList.forEach(c -> {
+        List<ComponentPO> componentPOList = componentRepository.findAll();
+        componentPOList.forEach(c -> {
             ComponentInfo componentInfo = new ComponentInfo();
             componentInfo.setComponentName(c.getComponentName());
             componentInfo.setCommandScript(c.getCommandScript());
             componentInfo.setDisplayName(c.getDisplayName());
             componentInfo.setCategory(c.getCategory());
             componentInfo.setCustomCommands(c.getCustomCommands());
-            componentInfo.setServiceName(c.getService().getServiceName());
+            componentInfo.setServiceName(c.getServicePO().getServiceName());
             componentInfoMap.put(c.getComponentName(), componentInfo);
         });
     }

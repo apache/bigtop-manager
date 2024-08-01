@@ -20,10 +20,10 @@ package org.apache.bigtop.manager.server.command.job.factory;
 
 import org.apache.bigtop.manager.common.enums.JobState;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.entity.Cluster;
-import org.apache.bigtop.manager.dao.entity.Job;
-import org.apache.bigtop.manager.dao.entity.Stage;
-import org.apache.bigtop.manager.dao.entity.Task;
+import org.apache.bigtop.manager.dao.po.ClusterPO;
+import org.apache.bigtop.manager.dao.po.JobPO;
+import org.apache.bigtop.manager.dao.po.StagePO;
+import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.dao.repository.JobRepository;
 import org.apache.bigtop.manager.dao.repository.StageRepository;
@@ -49,14 +49,14 @@ public abstract class AbstractJobFactory implements JobFactory {
 
     protected JobContext jobContext;
 
-    protected Cluster cluster;
+    protected ClusterPO clusterPO;
 
-    protected Job job;
+    protected JobPO jobPO;
 
-    protected List<Stage> stages = new ArrayList<>();
+    protected List<StagePO> stagePOList = new ArrayList<>();
 
     @Override
-    public Job createJob(JobContext jobContext) {
+    public JobPO createJob(JobContext jobContext) {
         this.jobContext = jobContext;
 
         // Create and init job
@@ -68,40 +68,40 @@ public abstract class AbstractJobFactory implements JobFactory {
         // Save job
         saveJob();
 
-        return this.job;
+        return this.jobPO;
     }
 
     protected abstract void createStagesAndTasks();
 
     private void initJob() {
         Long clusterId = jobContext.getCommandDTO().getClusterId();
-        this.cluster = clusterId == null ? new Cluster() : clusterRepository.getReferenceById(clusterId);
+        this.clusterPO = clusterId == null ? new ClusterPO() : clusterRepository.getReferenceById(clusterId);
 
-        this.job = new Job();
-        job.setName(jobContext.getCommandDTO().getContext());
-        job.setState(JobState.PENDING);
-        job.setCluster(cluster.getId() == null ? null : cluster);
-        job.setContext(JsonUtils.writeAsString(jobContext));
-        job.setStages(stages);
+        this.jobPO = new JobPO();
+        jobPO.setName(jobContext.getCommandDTO().getContext());
+        jobPO.setState(JobState.PENDING);
+        jobPO.setClusterPO(clusterPO.getId() == null ? null : clusterPO);
+        jobPO.setContext(JsonUtils.writeAsString(jobContext));
+        jobPO.setStagePOList(stagePOList);
     }
 
     protected void saveJob() {
-        jobRepository.save(job);
+        jobRepository.save(jobPO);
 
-        for (int i = 0; i < job.getStages().size(); i++) {
-            Stage stage = job.getStages().get(i);
-            stage.setCluster(cluster.getId() == null ? null : cluster);
-            stage.setJob(job);
-            stage.setOrder(i + 1);
-            stage.setState(JobState.PENDING);
-            stageRepository.save(stage);
+        for (int i = 0; i < jobPO.getStagePOList().size(); i++) {
+            StagePO stagePO = jobPO.getStagePOList().get(i);
+            stagePO.setClusterPO(clusterPO.getId() == null ? null : clusterPO);
+            stagePO.setJobPO(jobPO);
+            stagePO.setOrder(i + 1);
+            stagePO.setState(JobState.PENDING);
+            stageRepository.save(stagePO);
 
-            for (Task task : stage.getTasks()) {
-                task.setCluster(cluster.getId() == null ? null : cluster);
-                task.setJob(job);
-                task.setStage(stage);
-                task.setState(JobState.PENDING);
-                taskRepository.save(task);
+            for (TaskPO taskPO : stagePO.getTaskPOList()) {
+                taskPO.setClusterPO(clusterPO.getId() == null ? null : clusterPO);
+                taskPO.setJobPO(jobPO);
+                taskPO.setStagePO(stagePO);
+                taskPO.setState(JobState.PENDING);
+                taskRepository.save(taskPO);
             }
         }
     }

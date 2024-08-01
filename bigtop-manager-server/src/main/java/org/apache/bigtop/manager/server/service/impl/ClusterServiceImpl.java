@@ -19,9 +19,9 @@
 package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.common.enums.MaintainState;
-import org.apache.bigtop.manager.dao.entity.Cluster;
-import org.apache.bigtop.manager.dao.entity.Repo;
-import org.apache.bigtop.manager.dao.entity.Stack;
+import org.apache.bigtop.manager.dao.po.ClusterPO;
+import org.apache.bigtop.manager.dao.po.RepoPO;
+import org.apache.bigtop.manager.dao.po.StackPO;
 import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.dao.repository.RepoRepository;
 import org.apache.bigtop.manager.dao.repository.StackRepository;
@@ -72,54 +72,55 @@ public class ClusterServiceImpl implements ClusterService {
     @Override
     public ClusterVO save(ClusterDTO clusterDTO) {
         // Save cluster
-        Stack stack =
+        StackPO stackPO =
                 stackRepository.findByStackNameAndStackVersion(clusterDTO.getStackName(), clusterDTO.getStackVersion());
         StackDTO stackDTO = StackUtils.getStackKeyMap()
                 .get(StackUtils.fullStackName(clusterDTO.getStackName(), clusterDTO.getStackVersion()))
                 .getLeft();
-        Cluster cluster = ClusterConverter.INSTANCE.fromDTO2Entity(clusterDTO, stackDTO, stack);
-        cluster.setSelected(clusterRepository.count() == 0);
-        cluster.setState(MaintainState.UNINSTALLED);
+        ClusterPO clusterPO = ClusterConverter.INSTANCE.fromDTO2PO(clusterDTO, stackDTO, stackPO);
+        clusterPO.setSelected(clusterRepository.count() == 0);
+        clusterPO.setState(MaintainState.UNINSTALLED);
 
-        Cluster oldCluster =
-                clusterRepository.findByClusterName(clusterDTO.getClusterName()).orElse(new Cluster());
-        if (oldCluster.getId() != null) {
-            cluster.setId(oldCluster.getId());
+        ClusterPO oldClusterPO =
+                clusterRepository.findByClusterName(clusterDTO.getClusterName()).orElse(new ClusterPO());
+        if (oldClusterPO.getId() != null) {
+            clusterPO.setId(oldClusterPO.getId());
         }
-        clusterRepository.save(cluster);
+        clusterRepository.save(clusterPO);
 
-        hostService.batchSave(cluster.getId(), clusterDTO.getHostnames());
+        hostService.batchSave(clusterPO.getId(), clusterDTO.getHostnames());
 
         // Save repo
-        List<Repo> repos = RepoConverter.INSTANCE.fromDTO2Entity(clusterDTO.getRepoInfoList(), cluster);
-        List<Repo> oldRepos = repoRepository.findAllByCluster(cluster);
+        List<RepoPO> repoPOList = RepoConverter.INSTANCE.fromDTO2PO(clusterDTO.getRepoInfoList(), clusterPO);
+        List<RepoPO> oldrepoPOList = repoRepository.findAllByClusterPO(clusterPO);
 
-        for (Repo repo : repos) {
-            for (Repo oldRepo : oldRepos) {
-                if (oldRepo.getArch().equals(repo.getArch()) && oldRepo.getOs().equals(repo.getOs())) {
-                    repo.setId(oldRepo.getId());
+        for (RepoPO repoPO : repoPOList) {
+            for (RepoPO oldRepoPO : oldrepoPOList) {
+                if (oldRepoPO.getArch().equals(repoPO.getArch())
+                        && oldRepoPO.getOs().equals(repoPO.getOs())) {
+                    repoPO.setId(oldRepoPO.getId());
                 }
             }
         }
 
-        repoRepository.saveAll(repos);
-        return ClusterConverter.INSTANCE.fromEntity2VO(cluster);
+        repoRepository.saveAll(repoPOList);
+        return ClusterConverter.INSTANCE.fromEntity2VO(clusterPO);
     }
 
     @Override
     public ClusterVO get(Long id) {
-        Cluster cluster =
+        ClusterPO clusterPO =
                 clusterRepository.findById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.CLUSTER_NOT_FOUND));
 
-        return ClusterConverter.INSTANCE.fromEntity2VO(cluster);
+        return ClusterConverter.INSTANCE.fromEntity2VO(clusterPO);
     }
 
     @Override
     public ClusterVO update(Long id, ClusterDTO clusterDTO) {
-        Cluster cluster = ClusterConverter.INSTANCE.fromDTO2Entity(clusterDTO);
-        cluster.setId(id);
-        clusterRepository.save(cluster);
+        ClusterPO clusterPO = ClusterConverter.INSTANCE.fromDTO2PO(clusterDTO);
+        clusterPO.setId(id);
+        clusterRepository.save(clusterPO);
 
-        return ClusterConverter.INSTANCE.fromEntity2VO(cluster);
+        return ClusterConverter.INSTANCE.fromEntity2VO(clusterPO);
     }
 }

@@ -19,20 +19,20 @@
 package org.apache.bigtop.manager.dao.repository;
 
 import org.apache.bigtop.manager.common.enums.JobState;
-import org.apache.bigtop.manager.dao.entity.Stage;
-import org.apache.bigtop.manager.dao.entity.Task;
+import org.apache.bigtop.manager.dao.po.StagePO;
+import org.apache.bigtop.manager.dao.po.TaskPO;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface TaskRepository extends JpaRepository<Task, Long> {
+public interface TaskRepository extends JpaRepository<TaskPO, Long> {
 
-    List<Task> findByStage(Stage stage);
+    List<TaskPO> findByStagePO(StagePO stagePO);
 
-    List<Task> findAllByJobId(Long jobId);
+    List<TaskPO> findAllByJobPOId(Long jobId);
 
-    List<Task> findAllByJobIdAndState(Long jobId, JobState state);
+    List<TaskPO> findAllByJobPOIdAndState(Long jobId, JobState state);
 
-    List<Task> findAllByJobIdAndHostnameAndState(Long jobId, String hostname, JobState state);
+    List<TaskPO> findAllByJobPOIdAndHostnameAndState(Long jobId, String hostname, JobState state);
 }

@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.server.model.converter;
 
-import org.apache.bigtop.manager.dao.entity.Host;
+import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.dto.HostDTO;
 import org.apache.bigtop.manager.server.model.req.HostReq;
@@ -37,10 +37,10 @@ public interface HostConverter {
 
     HostDTO fromReq2DTO(HostReq hostReq);
 
-    Host fromDTO2Entity(HostDTO hostDTO);
+    HostPO fromDTO2PO(HostDTO hostDTO);
 
-    @Mapping(target = "clusterName", source = "cluster.clusterName")
-    HostVO fromEntity2VO(Host host);
+    @Mapping(target = "clusterName", source = "clusterPO.clusterName")
+    HostVO fromPO2VO(HostPO hostPO);
 
-    List<HostVO> fromEntity2VO(List<Host> hosts);
+    List<HostVO> fromPO2VO(List<HostPO> hostPOList);
 }

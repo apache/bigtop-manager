@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.dao.repository;
 
-import org.apache.bigtop.manager.dao.entity.Service;
+import org.apache.bigtop.manager.dao.po.ServicePO;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,13 +26,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface ServiceRepository extends JpaRepository<Service, Long> {
+public interface ServiceRepository extends JpaRepository<ServicePO, Long> {
 
-    List<Service> findAllByClusterId(Long clusterId);
+    List<ServicePO> findAllByClusterPOId(Long clusterId);
 
-    Page<Service> findAllByClusterId(Long clusterId, Pageable pageable);
+    Page<ServicePO> findAllByClusterPOId(Long clusterId, Pageable pageable);
 
-    Service findByClusterIdAndServiceName(Long clusterId, String serviceName);
+    ServicePO findByClusterPOIdAndServiceName(Long clusterId, String serviceName);
 
-    List<Service> findByClusterIdAndServiceNameIn(Long clusterId, List<String> serviceNames);
+    List<ServicePO> findByClusterPOIdAndServiceNameIn(Long clusterId, List<String> serviceNames);
 }

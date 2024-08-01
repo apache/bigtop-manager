@@ -19,8 +19,8 @@
 package org.apache.bigtop.manager.server.command.stage.runner.component;
 
 import org.apache.bigtop.manager.common.enums.MaintainState;
-import org.apache.bigtop.manager.dao.entity.HostComponent;
-import org.apache.bigtop.manager.dao.entity.Task;
+import org.apache.bigtop.manager.dao.po.HostComponentPO;
+import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.dao.repository.HostComponentRepository;
 import org.apache.bigtop.manager.server.command.stage.factory.StageType;
 import org.apache.bigtop.manager.server.command.stage.runner.AbstractStageRunner;
@@ -46,16 +46,16 @@ public class ComponentStopStageRunner extends AbstractStageRunner {
     }
 
     @Override
-    public void onTaskSuccess(Task task) {
-        super.onTaskSuccess(task);
+    public void onTaskSuccess(TaskPO taskPO) {
+        super.onTaskSuccess(taskPO);
 
-        Long clusterId = task.getCluster().getId();
-        String componentName = task.getComponentName();
-        String hostname = task.getHostname();
-        HostComponent hostComponent =
-                hostComponentRepository.findByComponentClusterIdAndComponentComponentNameAndHostHostname(
+        Long clusterId = taskPO.getClusterPO().getId();
+        String componentName = taskPO.getComponentName();
+        String hostname = taskPO.getHostname();
+        HostComponentPO hostComponentPO =
+                hostComponentRepository.findByComponentPOClusterPOIdAndComponentPOComponentNameAndHostPOHostname(
                         clusterId, componentName, hostname);
-        hostComponent.setState(MaintainState.STOPPED);
-        hostComponentRepository.save(hostComponent);
+        hostComponentPO.setState(MaintainState.STOPPED);
+        hostComponentRepository.save(hostComponentPO);
     }
 }

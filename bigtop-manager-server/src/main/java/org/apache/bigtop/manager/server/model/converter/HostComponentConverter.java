@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.server.model.converter;
 
-import org.apache.bigtop.manager.dao.entity.HostComponent;
+import org.apache.bigtop.manager.dao.po.HostComponentPO;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.vo.HostComponentVO;
 
@@ -33,13 +33,13 @@ public interface HostComponentConverter {
 
     HostComponentConverter INSTANCE = Mappers.getMapper(HostComponentConverter.class);
 
-    @Mapping(target = "componentName", source = "component.componentName")
-    @Mapping(target = "displayName", source = "component.displayName")
-    @Mapping(target = "category", source = "component.category")
-    @Mapping(target = "serviceName", source = "component.service.serviceName")
-    @Mapping(target = "clusterName", source = "component.cluster.clusterName")
-    @Mapping(target = "hostname", source = "host.hostname")
-    HostComponentVO fromEntity2VO(HostComponent hostComponent);
+    @Mapping(target = "componentName", source = "componentPO.componentName")
+    @Mapping(target = "displayName", source = "componentPO.displayName")
+    @Mapping(target = "category", source = "componentPO.category")
+    @Mapping(target = "serviceName", source = "componentPO.servicePO.serviceName")
+    @Mapping(target = "clusterName", source = "componentPO.clusterPO.clusterName")
+    @Mapping(target = "hostname", source = "hostPO.hostname")
+    HostComponentVO fromPO2VO(HostComponentPO hostComponentPO);
 
-    List<HostComponentVO> fromEntity2VO(List<HostComponent> hostComponents);
+    List<HostComponentVO> fromPO2VO(List<HostComponentPO> hostComponentPOList);
 }

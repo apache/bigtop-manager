@@ -16,22 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.dao.entity;
+package org.apache.bigtop.manager.dao.po;
+
+import org.apache.bigtop.manager.common.enums.MaintainState;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
@@ -39,28 +39,32 @@ import jakarta.persistence.TableGenerator;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "type_config")
+@Table(
+        name = "host_component",
+        indexes = {
+            @Index(name = "idx_hc_component_id", columnList = "component_id"),
+            @Index(name = "idx_hc_host_id", columnList = "host_id")
+        })
 @TableGenerator(
-        name = "type_config_generator",
+        name = "host_component_generator",
         table = "sequence",
         pkColumnName = "seq_name",
         valueColumnName = "seq_count")
-public class TypeConfig extends BaseEntity {
+public class HostComponentPO extends BasePO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "type_config_generator")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "host_component_generator")
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "type_name")
-    private String typeName;
-
-    @Lob
-    @Basic(fetch = FetchType.LAZY)
-    @Column(name = "properties_json", length = 16777216)
-    private String propertiesJson;
+    @Column(name = "state")
+    private MaintainState state;
 
     @ManyToOne
-    @JoinColumn(name = "service_config_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private ServiceConfig serviceConfig;
+    @JoinColumn(name = "host_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private HostPO hostPO;
+
+    @ManyToOne
+    @JoinColumn(name = "component_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private ComponentPO componentPO;
 }

@@ -16,10 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.dao.entity;
+package org.apache.bigtop.manager.dao.po;
+
+import org.apache.bigtop.manager.common.enums.JobState;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
@@ -34,61 +37,57 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
-import jakarta.persistence.UniqueConstraint;
+import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(
-        name = "component",
-        uniqueConstraints = {
-            @UniqueConstraint(
-                    name = "uk_component_name",
-                    columnNames = {"component_name", "cluster_id"})
-        },
+        name = "stage",
         indexes = {
-            @Index(name = "idx_component_cluster_id", columnList = "cluster_id"),
-            @Index(name = "idx_component_service_id", columnList = "service_id")
+            @Index(name = "idx_stage_cluster_id", columnList = "cluster_id"),
+            @Index(name = "idx_stage_job_id", columnList = "job_id")
         })
-@TableGenerator(
-        name = "component_generator",
-        table = "sequence",
-        pkColumnName = "seq_name",
-        valueColumnName = "seq_count")
-public class Component extends BaseEntity {
+@TableGenerator(name = "stage_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
+public class StagePO extends BasePO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "component_generator")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "stage_generator")
     @Column(name = "id")
     private Long id;
+
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "state")
+    private JobState state;
+
+    @Column(name = "\"order\"")
+    private Integer order;
+
+    @Column(name = "service_name")
+    private String serviceName;
 
     @Column(name = "component_name")
     private String componentName;
 
-    @Column(name = "display_name")
-    private String displayName;
-
-    @Column(name = "command_script")
-    private String commandScript;
-
     @Lob
     @Basic(fetch = FetchType.LAZY)
-    @Column(name = "custom_commands", length = 16777216)
-    private String customCommands;
-
-    @Column(name = "category")
-    private String category;
-
-    @Column(name = "quick_link")
-    private String quickLink;
+    @Column(name = "\"context\"", length = 16777216)
+    private String context;
 
     @ManyToOne
-    @JoinColumn(name = "service_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Service service;
+    @JoinColumn(name = "job_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private JobPO jobPO;
 
     @ManyToOne
     @JoinColumn(name = "cluster_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Cluster cluster;
+    private ClusterPO clusterPO;
+
+    @ToString.Exclude
+    @OneToMany(mappedBy = "stagePO")
+    private List<TaskPO> taskPOList;
 }

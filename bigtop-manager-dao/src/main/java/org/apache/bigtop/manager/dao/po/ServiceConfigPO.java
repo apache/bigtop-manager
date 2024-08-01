@@ -16,10 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.dao.entity;
+package org.apache.bigtop.manager.dao.po;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
@@ -31,58 +32,50 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
-import jakarta.persistence.UniqueConstraint;
+import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(
-        name = "service",
-        uniqueConstraints = {
-            @UniqueConstraint(
-                    name = "uk_service_name",
-                    columnNames = {"service_name", "cluster_id"})
-        },
-        indexes = {@Index(name = "idx_service_cluster_id", columnList = "cluster_id")})
+        name = "service_config",
+        indexes = {
+            @Index(name = "idx_sc_cluster_id", columnList = "cluster_id"),
+            @Index(name = "idx_sc_service_id", columnList = "service_id")
+        })
 @TableGenerator(
-        name = "service_generator",
+        name = "service_config_generator",
         table = "sequence",
         pkColumnName = "seq_name",
         valueColumnName = "seq_count")
-public class Service extends BaseEntity {
+public class ServiceConfigPO extends BasePO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "service_generator")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "service_config_generator")
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "service_name")
-    private String serviceName;
+    @Column(name = "config_desc")
+    private String configDesc;
 
-    @Column(name = "display_name")
-    private String displayName;
+    @Column(name = "version")
+    private Integer version;
 
-    @Column(name = "service_desc")
-    private String serviceDesc;
+    @Column(name = "selected")
+    private Boolean selected;
 
-    @Column(name = "service_version")
-    private String serviceVersion;
+    @ToString.Exclude
+    @OneToMany(mappedBy = "serviceConfigPO")
+    private List<TypeConfigPO> configs;
 
-    @Column(name = "os_specifics")
-    private String osSpecifics;
-
-    @Column(name = "service_user")
-    private String serviceUser;
-
-    @Column(name = "service_group")
-    private String serviceGroup;
-
-    @Column(name = "required_services")
-    private String requiredServices;
+    @ManyToOne
+    @JoinColumn(name = "service_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private ServicePO servicePO;
 
     @ManyToOne
     @JoinColumn(name = "cluster_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Cluster cluster;
+    private ClusterPO clusterPO;
 }

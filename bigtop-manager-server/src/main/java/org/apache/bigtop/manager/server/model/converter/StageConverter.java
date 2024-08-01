@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.server.model.converter;
 
-import org.apache.bigtop.manager.dao.entity.Stage;
+import org.apache.bigtop.manager.dao.po.StagePO;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.vo.StageVO;
 
@@ -35,5 +35,6 @@ public interface StageConverter {
 
     @Mapping(target = "createTime", source = "createTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
     @Mapping(target = "updateTime", source = "updateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
-    StageVO fromEntity2VO(Stage stage);
+    @Mapping(target = "tasks", source = "taskPOList")
+    StageVO fromPO2VO(StagePO stagePO);
 }

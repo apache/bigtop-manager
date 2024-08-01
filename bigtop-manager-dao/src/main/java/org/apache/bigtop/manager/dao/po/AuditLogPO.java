@@ -16,40 +16,58 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.dao.entity;
+package org.apache.bigtop.manager.dao.po;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "\"user\"")
-@TableGenerator(name = "user_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
-public class User extends BaseEntity {
+@Table(name = "audit_log")
+@TableGenerator(
+        name = "audit_log_generator",
+        table = "sequence",
+        pkColumnName = "seq_name",
+        valueColumnName = "seq_count")
+public class AuditLogPO extends BasePO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "user_generator")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "audit_log_generator")
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "username")
-    private String username;
+    @Column(name = "uri")
+    private String uri;
 
-    @Column(name = "\"password\"")
-    private String password;
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "args", length = 16777216)
+    private String args;
 
-    @Column(name = "nickname")
-    private String nickname;
+    @Column(name = "tag_name")
+    private String tagName;
 
-    @Column(name = "status")
-    private Boolean status;
+    @Column(name = "tag_desc")
+    private String tagDesc;
+
+    @Column(name = "operation_summary")
+    private String operationSummary;
+
+    @Column(name = "operation_desc")
+    private String operationDesc;
+
+    @Column(name = "user_id")
+    private Long userId;
 }

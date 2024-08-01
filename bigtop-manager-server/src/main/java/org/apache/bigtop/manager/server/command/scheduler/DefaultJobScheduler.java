@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.server.command.scheduler;
 
-import org.apache.bigtop.manager.dao.entity.Job;
+import org.apache.bigtop.manager.dao.po.JobPO;
 import org.apache.bigtop.manager.server.command.job.runner.JobRunner;
 import org.apache.bigtop.manager.server.command.job.runner.JobRunners;
 import org.apache.bigtop.manager.server.holder.SessionUserHolder;
@@ -43,12 +43,12 @@ public class DefaultJobScheduler implements JobScheduler {
     private volatile boolean running = true;
 
     @Override
-    public void submit(Job job) {
+    public void submit(JobPO jobPO) {
         Long userId = SessionUserHolder.getUserId();
         queue.offer(() -> {
             try {
                 SessionUserHolder.setUserId(userId);
-                JobRunner runner = JobRunners.getJobRunner(job);
+                JobRunner runner = JobRunners.getJobRunner(jobPO);
                 runner.run();
             } finally {
                 SessionUserHolder.clear();

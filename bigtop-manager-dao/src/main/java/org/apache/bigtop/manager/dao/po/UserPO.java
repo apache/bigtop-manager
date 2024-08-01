@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.dao.entity;
+package org.apache.bigtop.manager.dao.po;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -28,29 +28,28 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
-import jakarta.persistence.UniqueConstraint;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(
-        name = "stack",
-        uniqueConstraints = {
-            @UniqueConstraint(
-                    name = "uk_stack",
-                    columnNames = {"stack_name", "stack_version"})
-        })
-@TableGenerator(name = "stack_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
-public class Stack extends BaseEntity {
+@Table(name = "\"user\"")
+@TableGenerator(name = "user_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
+public class UserPO extends BasePO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "stack_generator")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "user_generator")
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "stack_name")
-    private String stackName;
+    @Column(name = "username")
+    private String username;
 
-    @Column(name = "stack_version")
-    private String stackVersion;
+    @Column(name = "\"password\"")
+    private String password;
+
+    @Column(name = "nickname")
+    private String nickname;
+
+    @Column(name = "status")
+    private Boolean status;
 }

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.dao.entity;
+package org.apache.bigtop.manager.dao.po;
 
 import org.apache.bigtop.manager.common.enums.MaintainState;
 
@@ -49,7 +49,7 @@ import jakarta.persistence.UniqueConstraint;
         },
         indexes = {@Index(name = "idx_host_cluster_id", columnList = "cluster_id")})
 @TableGenerator(name = "host_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
-public class Host extends BaseEntity {
+public class HostPO extends BasePO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "host_generator")
@@ -91,5 +91,5 @@ public class Host extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "cluster_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Cluster cluster;
+    private ClusterPO clusterPO;
 }

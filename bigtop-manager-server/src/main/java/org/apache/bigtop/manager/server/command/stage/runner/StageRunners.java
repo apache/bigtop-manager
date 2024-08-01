@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.server.command.stage.runner;
 
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.entity.Stage;
+import org.apache.bigtop.manager.dao.po.StagePO;
 import org.apache.bigtop.manager.server.command.stage.factory.StageContext;
 import org.apache.bigtop.manager.server.command.stage.factory.StageType;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
@@ -37,17 +37,17 @@ public class StageRunners {
 
     private static final Map<StageType, String> STAGE_RUNNERS = new HashMap<>();
 
-    public static StageRunner getStageRunner(Stage stage) {
+    public static StageRunner getStageRunner(StagePO stagePO) {
         if (!LOADED.get()) {
             load();
         }
 
-        StageContext stageContext = JsonUtils.readFromString(stage.getContext(), StageContext.class);
+        StageContext stageContext = JsonUtils.readFromString(stagePO.getContext(), StageContext.class);
         StageType stageType = stageContext.getStageType();
 
         String beanName = STAGE_RUNNERS.get(stageType);
         StageRunner runner = SpringContextHolder.getApplicationContext().getBean(beanName, StageRunner.class);
-        runner.setStage(stage);
+        runner.setStage(stagePO);
         runner.setStageContext(stageContext);
 
         return runner;

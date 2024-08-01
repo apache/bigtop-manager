@@ -16,13 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.dao.entity;
+package org.apache.bigtop.manager.dao.po;
 
+import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.enums.JobState;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
@@ -37,36 +37,35 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
-import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(
-        name = "stage",
+        name = "\"task\"",
         indexes = {
-            @Index(name = "idx_stage_cluster_id", columnList = "cluster_id"),
-            @Index(name = "idx_stage_job_id", columnList = "job_id")
+            @Index(name = "idx_task_cluster_id", columnList = "cluster_id"),
+            @Index(name = "idx_task_job_id", columnList = "job_id"),
+            @Index(name = "idx_task_stage_id", columnList = "stage_id")
         })
-@TableGenerator(name = "stage_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
-public class Stage extends BaseEntity {
+@TableGenerator(name = "task_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
+public class TaskPO extends BasePO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "stage_generator")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "task_generator")
     @Column(name = "id")
     private Long id;
 
     @Column(name = "name")
     private String name;
 
+    @Column(name = "message_id")
+    private String messageId;
+
     @Column(name = "state")
     private JobState state;
-
-    @Column(name = "\"order\"")
-    private Integer order;
 
     @Column(name = "service_name")
     private String serviceName;
@@ -74,20 +73,49 @@ public class Stage extends BaseEntity {
     @Column(name = "component_name")
     private String componentName;
 
+    @Column(name = "command")
+    private Command command;
+
+    @Column(name = "custom_command")
+    private String customCommand;
+
     @Lob
     @Basic(fetch = FetchType.LAZY)
-    @Column(name = "\"context\"", length = 16777216)
-    private String context;
+    @Column(name = "custom_commands", length = 16777216)
+    private String customCommands;
+
+    @Column(name = "command_script")
+    private String commandScript;
+
+    @Column(name = "hostname")
+    private String hostname;
+
+    @Column(name = "stack_name")
+    private String stackName;
+
+    @Column(name = "stack_version")
+    private String stackVersion;
+
+    @Column(name = "service_user")
+    private String serviceUser;
+
+    @Column(name = "service_group")
+    private String serviceGroup;
+
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "content", length = 16777216)
+    private String content;
 
     @ManyToOne
     @JoinColumn(name = "job_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Job job;
+    private JobPO jobPO;
+
+    @ManyToOne
+    @JoinColumn(name = "stage_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private StagePO stagePO;
 
     @ManyToOne
     @JoinColumn(name = "cluster_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Cluster cluster;
-
-    @ToString.Exclude
-    @OneToMany(mappedBy = "stage")
-    private List<Task> tasks;
+    private ClusterPO clusterPO;
 }

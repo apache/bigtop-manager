@@ -19,8 +19,8 @@
 package org.apache.bigtop.manager.server.command.stage.factory.config;
 
 import org.apache.bigtop.manager.common.enums.Command;
-import org.apache.bigtop.manager.dao.entity.Host;
-import org.apache.bigtop.manager.dao.entity.Task;
+import org.apache.bigtop.manager.dao.po.HostPO;
+import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.dao.repository.HostRepository;
 import org.apache.bigtop.manager.server.command.stage.factory.AbstractStageFactory;
 import org.apache.bigtop.manager.server.command.stage.factory.StageType;
@@ -54,30 +54,30 @@ public class CacheDistributeStageFactory extends AbstractStageFactory {
             hostnames.addAll(context.getHostnames());
         } else {
             hostnames.addAll(context.getHostnames() == null ? List.of() : context.getHostnames());
-            hostnames.addAll(hostRepository.findAllByClusterId(context.getClusterId()).stream()
-                    .map(Host::getHostname)
+            hostnames.addAll(hostRepository.findAllByClusterPOId(context.getClusterId()).stream()
+                    .map(HostPO::getHostname)
                     .toList());
         }
 
-        stage.setName("Distribute Caches");
+        stagePO.setName("Distribute Caches");
 
-        List<Task> tasks = new ArrayList<>();
+        List<TaskPO> taskPOList = new ArrayList<>();
         hostnames = hostnames.stream().distinct().toList();
         for (String hostname : hostnames) {
-            Task task = new Task();
-            task.setName(stage.getName() + " on " + hostname);
-            task.setStackName(context.getStackName());
-            task.setStackVersion(context.getStackVersion());
-            task.setHostname(hostname);
-            task.setServiceName("cluster");
-            task.setServiceUser("root");
-            task.setServiceGroup("root");
-            task.setComponentName("bigtop-manager-agent");
-            task.setCommand(Command.CUSTOM);
-            task.setCustomCommand("cache_host");
-            tasks.add(task);
+            TaskPO taskPO = new TaskPO();
+            taskPO.setName(stagePO.getName() + " on " + hostname);
+            taskPO.setStackName(context.getStackName());
+            taskPO.setStackVersion(context.getStackVersion());
+            taskPO.setHostname(hostname);
+            taskPO.setServiceName("cluster");
+            taskPO.setServiceUser("root");
+            taskPO.setServiceGroup("root");
+            taskPO.setComponentName("bigtop-manager-agent");
+            taskPO.setCommand(Command.CUSTOM);
+            taskPO.setCustomCommand("cache_host");
+            taskPOList.add(taskPO);
         }
 
-        stage.setTasks(tasks);
+        stagePO.setTaskPOList(taskPOList);
     }
 }

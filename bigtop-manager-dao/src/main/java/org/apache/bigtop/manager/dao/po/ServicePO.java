@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.dao.entity;
+package org.apache.bigtop.manager.dao.po;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -39,37 +39,50 @@ import jakarta.persistence.UniqueConstraint;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(
-        name = "repo",
+        name = "service",
         uniqueConstraints = {
             @UniqueConstraint(
-                    name = "uk_repo_id",
-                    columnNames = {"repo_id", "os", "arch", "cluster_id"})
+                    name = "uk_service_name",
+                    columnNames = {"service_name", "cluster_id"})
         },
-        indexes = {@Index(name = "idx_repo_cluster_id", columnList = "cluster_id")})
-@TableGenerator(name = "repo_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
-public class Repo extends BaseEntity {
+        indexes = {@Index(name = "idx_service_cluster_id", columnList = "cluster_id")})
+@TableGenerator(
+        name = "service_generator",
+        table = "sequence",
+        pkColumnName = "seq_name",
+        valueColumnName = "seq_count")
+public class ServicePO extends BasePO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "repo_generator")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "service_generator")
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "base_url")
-    private String baseUrl;
+    @Column(name = "service_name")
+    private String serviceName;
 
-    @Column(name = "os")
-    private String os;
+    @Column(name = "display_name")
+    private String displayName;
 
-    @Column(name = "arch")
-    private String arch;
+    @Column(name = "service_desc")
+    private String serviceDesc;
 
-    @Column(name = "repo_id")
-    private String repoId;
+    @Column(name = "service_version")
+    private String serviceVersion;
 
-    @Column(name = "repo_name")
-    private String repoName;
+    @Column(name = "os_specifics")
+    private String osSpecifics;
+
+    @Column(name = "service_user")
+    private String serviceUser;
+
+    @Column(name = "service_group")
+    private String serviceGroup;
+
+    @Column(name = "required_services")
+    private String requiredServices;
 
     @ManyToOne
     @JoinColumn(name = "cluster_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Cluster cluster;
+    private ClusterPO clusterPO;
 }

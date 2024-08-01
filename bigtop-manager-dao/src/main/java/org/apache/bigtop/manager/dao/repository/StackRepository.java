@@ -18,11 +18,11 @@
  */
 package org.apache.bigtop.manager.dao.repository;
 
-import org.apache.bigtop.manager.dao.entity.Stack;
+import org.apache.bigtop.manager.dao.po.StackPO;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface StackRepository extends JpaRepository<Stack, Long> {
+public interface StackRepository extends JpaRepository<StackPO, Long> {
 
-    Stack findByStackNameAndStackVersion(String stackName, String stackVersion);
+    StackPO findByStackNameAndStackVersion(String stackName, String stackVersion);
 }

@@ -20,9 +20,9 @@ package org.apache.bigtop.manager.server.command.job.runner.cluster;
 
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.enums.MaintainState;
-import org.apache.bigtop.manager.dao.entity.Cluster;
-import org.apache.bigtop.manager.dao.entity.Stage;
-import org.apache.bigtop.manager.dao.entity.Task;
+import org.apache.bigtop.manager.dao.po.ClusterPO;
+import org.apache.bigtop.manager.dao.po.StagePO;
+import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.dao.repository.JobRepository;
 import org.apache.bigtop.manager.dao.repository.StageRepository;
@@ -82,25 +82,25 @@ public class ClusterCreateJobRunner extends AbstractJobRunner {
         super.onSuccess();
 
         CommandDTO commandDTO = getCommandDTO();
-        Cluster cluster = clusterRepository
+        ClusterPO clusterPO = clusterRepository
                 .findByClusterName(commandDTO.getClusterCommand().getClusterName())
-                .orElse(new Cluster());
+                .orElse(new ClusterPO());
 
         // Update cluster state to installed
-        cluster.setState(MaintainState.INSTALLED);
-        clusterRepository.save(cluster);
+        clusterPO.setState(MaintainState.INSTALLED);
+        clusterRepository.save(clusterPO);
 
         // Link job to cluster after cluster successfully added
-        job.setCluster(cluster);
-        jobRepository.save(job);
+        jobPO.setClusterPO(clusterPO);
+        jobRepository.save(jobPO);
 
-        for (Stage stage : job.getStages()) {
-            stage.setCluster(cluster);
-            stageRepository.save(stage);
+        for (StagePO stagePO : jobPO.getStagePOList()) {
+            stagePO.setClusterPO(clusterPO);
+            stageRepository.save(stagePO);
 
-            for (Task task : stage.getTasks()) {
-                task.setCluster(cluster);
-                taskRepository.save(task);
+            for (TaskPO taskPO : stagePO.getTaskPOList()) {
+                taskPO.setClusterPO(clusterPO);
+                taskRepository.save(taskPO);
             }
         }
     }

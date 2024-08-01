@@ -19,8 +19,8 @@
 package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.common.enums.MaintainState;
-import org.apache.bigtop.manager.dao.entity.Cluster;
-import org.apache.bigtop.manager.dao.entity.Host;
+import org.apache.bigtop.manager.dao.po.ClusterPO;
+import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.dao.repository.HostRepository;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
@@ -55,55 +55,57 @@ public class HostServiceImpl implements HostService {
 
     @Override
     public List<HostVO> list(Long clusterId) {
-        List<Host> hosts = hostRepository.findAllByClusterId(clusterId);
-        if (CollectionUtils.isEmpty(hosts)) {
+        List<HostPO> hostPOList = hostRepository.findAllByClusterPOId(clusterId);
+        if (CollectionUtils.isEmpty(hostPOList)) {
             throw new ApiException(ApiExceptionEnum.HOST_NOT_FOUND);
         }
 
-        return HostConverter.INSTANCE.fromEntity2VO(hosts);
+        return HostConverter.INSTANCE.fromPO2VO(hostPOList);
     }
 
     @Override
     public List<HostVO> batchSave(Long clusterId, List<String> hostnames) {
-        Cluster cluster = clusterRepository.getReferenceById(clusterId);
+        ClusterPO clusterPO = clusterRepository.getReferenceById(clusterId);
 
-        List<Host> hostnameIn = hostRepository.findAllByHostnameIn(hostnames);
-        List<Host> hosts = new ArrayList<>();
+        List<HostPO> hostnameIn = hostRepository.findAllByHostnameIn(hostnames);
+        List<HostPO> hostPOList = new ArrayList<>();
 
-        Map<String, Host> hostInMap = hostnameIn.stream().collect(Collectors.toMap(Host::getHostname, host -> host));
+        Map<String, HostPO> hostInMap =
+                hostnameIn.stream().collect(Collectors.toMap(HostPO::getHostname, host -> host));
 
         for (String hostname : hostnames) {
-            Host host = new Host();
-            host.setHostname(hostname);
-            host.setCluster(cluster);
-            host.setState(MaintainState.INSTALLED);
+            HostPO hostPO = new HostPO();
+            hostPO.setHostname(hostname);
+            hostPO.setClusterPO(clusterPO);
+            hostPO.setState(MaintainState.INSTALLED);
 
             if (hostInMap.containsKey(hostname)) {
-                host.setId(hostInMap.get(hostname).getId());
+                hostPO.setId(hostInMap.get(hostname).getId());
             }
 
-            hosts.add(host);
+            hostPOList.add(hostPO);
         }
 
-        hostRepository.saveAll(hosts);
+        hostRepository.saveAll(hostPOList);
 
-        return HostConverter.INSTANCE.fromEntity2VO(hosts);
+        return HostConverter.INSTANCE.fromPO2VO(hostPOList);
     }
 
     @Override
     public HostVO get(Long id) {
-        Host host = hostRepository.findById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.HOST_NOT_FOUND));
+        HostPO hostPO =
+                hostRepository.findById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.HOST_NOT_FOUND));
 
-        return HostConverter.INSTANCE.fromEntity2VO(host);
+        return HostConverter.INSTANCE.fromPO2VO(hostPO);
     }
 
     @Override
     public HostVO update(Long id, HostDTO hostDTO) {
-        Host host = HostConverter.INSTANCE.fromDTO2Entity(hostDTO);
-        host.setId(id);
-        hostRepository.save(host);
+        HostPO hostPO = HostConverter.INSTANCE.fromDTO2PO(hostDTO);
+        hostPO.setId(id);
+        hostRepository.save(hostPO);
 
-        return HostConverter.INSTANCE.fromEntity2VO(host);
+        return HostConverter.INSTANCE.fromPO2VO(hostPO);
     }
 
     @Override

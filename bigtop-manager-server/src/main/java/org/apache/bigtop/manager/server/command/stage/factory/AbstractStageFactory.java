@@ -19,25 +19,25 @@
 package org.apache.bigtop.manager.server.command.stage.factory;
 
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.entity.Stage;
+import org.apache.bigtop.manager.dao.po.StagePO;
 
 public abstract class AbstractStageFactory implements StageFactory {
 
     protected StageContext context;
 
-    protected Stage stage;
+    protected StagePO stagePO;
 
     @Override
-    public Stage createStage(StageContext context) {
+    public StagePO createStage(StageContext context) {
         this.context = context;
         this.context.setStageType(getStageType());
 
-        this.stage = new Stage();
-        this.stage.setContext(JsonUtils.writeAsString(context));
+        this.stagePO = new StagePO();
+        this.stagePO.setContext(JsonUtils.writeAsString(context));
 
         doCreateStage();
 
-        return this.stage;
+        return this.stagePO;
     }
 
     protected abstract void doCreateStage();

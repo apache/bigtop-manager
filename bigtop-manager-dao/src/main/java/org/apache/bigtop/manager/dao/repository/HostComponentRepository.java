@@ -18,29 +18,30 @@
  */
 package org.apache.bigtop.manager.dao.repository;
 
-import org.apache.bigtop.manager.dao.entity.HostComponent;
+import org.apache.bigtop.manager.dao.po.HostComponentPO;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface HostComponentRepository extends JpaRepository<HostComponent, Long> {
+public interface HostComponentRepository extends JpaRepository<HostComponentPO, Long> {
 
-    List<HostComponent> findAllByComponentClusterIdAndComponentComponentName(Long clusterId, String componentName);
+    List<HostComponentPO> findAllByComponentPOClusterPOIdAndComponentPOComponentName(
+            Long clusterId, String componentName);
 
-    HostComponent findByComponentClusterIdAndComponentComponentNameAndHostHostname(
+    HostComponentPO findByComponentPOClusterPOIdAndComponentPOComponentNameAndHostPOHostname(
             Long clusterId, String componentName, String hostnames);
 
-    List<HostComponent> findAllByComponentClusterIdAndComponentComponentNameAndHostHostnameIn(
+    List<HostComponentPO> findAllByComponentPOClusterPOIdAndComponentPOComponentNameAndHostPOHostnameIn(
             Long clusterId, String componentName, List<String> hostnames);
 
-    List<HostComponent> findAllByComponentClusterId(Long clusterId);
+    List<HostComponentPO> findAllByComponentPOClusterPOId(Long clusterId);
 
-    HostComponent findByComponentComponentNameAndHostHostname(String componentName, String hostName);
+    HostComponentPO findByComponentPOComponentNameAndHostPOHostname(String componentName, String hostName);
 
-    List<HostComponent> findAllByComponentClusterIdAndHostId(Long clusterId, Long componentId);
+    List<HostComponentPO> findAllByComponentPOClusterPOIdAndHostPOId(Long clusterId, Long componentId);
 
-    List<HostComponent> findAllByComponentClusterIdAndComponentServiceId(Long clusterId, Long serviceId);
+    List<HostComponentPO> findAllByComponentPOClusterPOIdAndComponentPOServicePOId(Long clusterId, Long serviceId);
 
-    List<HostComponent> findAllByComponentServiceId(Long serviceId);
+    List<HostComponentPO> findAllByComponentPOServicePOId(Long serviceId);
 }

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.dao.entity;
+package org.apache.bigtop.manager.dao.po;
 
 import org.apache.bigtop.manager.common.enums.MaintainState;
 
@@ -35,36 +35,56 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
+import jakarta.persistence.UniqueConstraint;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(
-        name = "host_component",
-        indexes = {
-            @Index(name = "idx_hc_component_id", columnList = "component_id"),
-            @Index(name = "idx_hc_host_id", columnList = "host_id")
-        })
+        name = "\"cluster\"",
+        uniqueConstraints = {
+            @UniqueConstraint(
+                    name = "uk_cluster_name",
+                    columnNames = {"cluster_name"})
+        },
+        indexes = {@Index(name = "idx_cluster_stack_id", columnList = "stack_id")})
 @TableGenerator(
-        name = "host_component_generator",
+        name = "cluster_generator",
         table = "sequence",
         pkColumnName = "seq_name",
         valueColumnName = "seq_count")
-public class HostComponent extends BaseEntity {
+public class ClusterPO extends BasePO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "host_component_generator")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "cluster_generator")
     @Column(name = "id")
     private Long id;
+
+    @Column(name = "cluster_name")
+    private String clusterName;
+
+    @Column(name = "cluster_type")
+    private Integer clusterType;
+
+    @Column(name = "\"root\"")
+    private String root;
+
+    @Column(name = "user_group")
+    private String userGroup;
+
+    @Column(name = "packages")
+    private String packages;
+
+    @Column(name = "repo_template")
+    private String repoTemplate;
 
     @Column(name = "state")
     private MaintainState state;
 
-    @ManyToOne
-    @JoinColumn(name = "host_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Host host;
+    @Column(name = "selected")
+    private Boolean selected;
 
     @ManyToOne
-    @JoinColumn(name = "component_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Component component;
+    @JoinColumn(name = "stack_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private StackPO stackPO;
 }

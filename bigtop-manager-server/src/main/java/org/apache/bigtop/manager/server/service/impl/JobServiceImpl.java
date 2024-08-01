@@ -19,9 +19,9 @@
 package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.common.enums.JobState;
-import org.apache.bigtop.manager.dao.entity.Job;
-import org.apache.bigtop.manager.dao.entity.Stage;
-import org.apache.bigtop.manager.dao.entity.Task;
+import org.apache.bigtop.manager.dao.po.JobPO;
+import org.apache.bigtop.manager.dao.po.StagePO;
+import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.dao.repository.JobRepository;
 import org.apache.bigtop.manager.dao.repository.StageRepository;
 import org.apache.bigtop.manager.dao.repository.TaskRepository;
@@ -62,11 +62,11 @@ public class JobServiceImpl implements JobService {
     public PageVO<JobVO> list(Long clusterId) {
         PageQuery pageQuery = PageUtils.getPageQuery();
         Pageable pageable = PageRequest.of(pageQuery.getPageNum(), pageQuery.getPageSize(), pageQuery.getSort());
-        Page<Job> page;
+        Page<JobPO> page;
         if (ClusterUtils.isNoneCluster(clusterId)) {
-            page = jobRepository.findAllByClusterIsNull(pageable);
+            page = jobRepository.findAllByClusterPOIsNull(pageable);
         } else {
-            page = jobRepository.findAllByClusterId(clusterId, pageable);
+            page = jobRepository.findAllByClusterPOId(clusterId, pageable);
         }
 
         return PageVO.of(page);
@@ -74,31 +74,31 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public JobVO get(Long id) {
-        Job job = jobRepository.getReferenceById(id);
-        return JobConverter.INSTANCE.fromEntity2VO(job);
+        JobPO jobPO = jobRepository.getReferenceById(id);
+        return JobConverter.INSTANCE.fromPO2VO(jobPO);
     }
 
     @Override
     public JobVO retry(Long id) {
-        Job job = jobRepository.getReferenceById(id);
-        if (job.getState() != JobState.FAILED) {
+        JobPO jobPO = jobRepository.getReferenceById(id);
+        if (jobPO.getState() != JobState.FAILED) {
             throw new ApiException(ApiExceptionEnum.JOB_NOT_RETRYABLE);
         }
 
-        for (Stage stage : job.getStages()) {
-            for (Task task : stage.getTasks()) {
-                task.setState(JobState.PENDING);
-                taskRepository.save(task);
+        for (StagePO stagePO : jobPO.getStagePOList()) {
+            for (TaskPO taskPO : stagePO.getTaskPOList()) {
+                taskPO.setState(JobState.PENDING);
+                taskRepository.save(taskPO);
             }
 
-            stage.setState(JobState.PENDING);
-            stageRepository.save(stage);
+            stagePO.setState(JobState.PENDING);
+            stageRepository.save(stagePO);
         }
 
-        job.setState(JobState.PENDING);
-        jobRepository.save(job);
-        jobScheduler.submit(job);
+        jobPO.setState(JobState.PENDING);
+        jobRepository.save(jobPO);
+        jobScheduler.submit(jobPO);
 
-        return JobConverter.INSTANCE.fromEntity2VO(job);
+        return JobConverter.INSTANCE.fromPO2VO(jobPO);
     }
 }

@@ -19,9 +19,9 @@
 package org.apache.bigtop.manager.server.command.job.runner;
 
 import org.apache.bigtop.manager.common.enums.JobState;
-import org.apache.bigtop.manager.dao.entity.Job;
-import org.apache.bigtop.manager.dao.entity.Stage;
-import org.apache.bigtop.manager.dao.entity.Task;
+import org.apache.bigtop.manager.dao.po.JobPO;
+import org.apache.bigtop.manager.dao.po.StagePO;
+import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.dao.repository.JobRepository;
 import org.apache.bigtop.manager.dao.repository.StageRepository;
 import org.apache.bigtop.manager.dao.repository.TaskRepository;
@@ -46,13 +46,13 @@ public abstract class AbstractJobRunner implements JobRunner {
     @Resource
     private TaskRepository taskRepository;
 
-    protected Job job;
+    protected JobPO jobPO;
 
     protected JobContext jobContext;
 
     @Override
-    public void setJob(Job job) {
-        this.job = job;
+    public void setJob(JobPO jobPO) {
+        this.jobPO = jobPO;
     }
 
     @Override
@@ -65,17 +65,17 @@ public abstract class AbstractJobRunner implements JobRunner {
         beforeRun();
 
         // Sort stage
-        List<Stage> stages = job.getStages();
-        stages.sort(Comparator.comparingInt(Stage::getOrder));
+        List<StagePO> stagePOList = jobPO.getStagePOList();
+        stagePOList.sort(Comparator.comparingInt(StagePO::getOrder));
 
         boolean success = true;
-        LinkedBlockingQueue<Stage> queue = new LinkedBlockingQueue<>(stages);
+        LinkedBlockingQueue<StagePO> queue = new LinkedBlockingQueue<>(stagePOList);
         while (!queue.isEmpty()) {
-            Stage stage = queue.poll();
-            StageRunner runner = StageRunners.getStageRunner(stage);
+            StagePO stagePO = queue.poll();
+            StageRunner runner = StageRunners.getStageRunner(stagePO);
             runner.run();
 
-            if (stage.getState() == JobState.FAILED) {
+            if (stagePO.getState() == JobState.FAILED) {
                 success = false;
                 break;
             }
@@ -90,29 +90,29 @@ public abstract class AbstractJobRunner implements JobRunner {
 
     @Override
     public void beforeRun() {
-        job.setState(JobState.PROCESSING);
-        jobRepository.save(job);
+        jobPO.setState(JobState.PROCESSING);
+        jobRepository.save(jobPO);
     }
 
     @Override
     public void onSuccess() {
-        job.setState(JobState.SUCCESSFUL);
-        jobRepository.save(job);
+        jobPO.setState(JobState.SUCCESSFUL);
+        jobRepository.save(jobPO);
     }
 
     @Override
     public void onFailure() {
-        job.setState(JobState.FAILED);
-        jobRepository.save(job);
+        jobPO.setState(JobState.FAILED);
+        jobRepository.save(jobPO);
 
-        for (Stage stage : job.getStages()) {
-            if (stage.getState() == JobState.PENDING) {
-                stage.setState(JobState.CANCELED);
-                stageRepository.save(stage);
+        for (StagePO stagePO : jobPO.getStagePOList()) {
+            if (stagePO.getState() == JobState.PENDING) {
+                stagePO.setState(JobState.CANCELED);
+                stageRepository.save(stagePO);
 
-                for (Task task : stage.getTasks()) {
-                    task.setState(JobState.CANCELED);
-                    taskRepository.save(task);
+                for (TaskPO taskPO : stagePO.getTaskPOList()) {
+                    taskPO.setState(JobState.CANCELED);
+                    taskRepository.save(taskPO);
                 }
             }
         }

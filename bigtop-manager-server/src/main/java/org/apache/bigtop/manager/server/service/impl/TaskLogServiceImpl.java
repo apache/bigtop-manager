@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.common.enums.JobState;
-import org.apache.bigtop.manager.dao.entity.Task;
+import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.dao.repository.TaskRepository;
 import org.apache.bigtop.manager.grpc.generated.TaskLogReply;
 import org.apache.bigtop.manager.grpc.generated.TaskLogRequest;
@@ -41,13 +41,13 @@ public class TaskLogServiceImpl implements TaskLogService {
     private TaskRepository taskRepository;
 
     public void registerSink(Long taskId, FluxSink<String> sink) {
-        Task task = taskRepository.getReferenceById(taskId);
-        String hostname = task.getHostname();
+        TaskPO taskPO = taskRepository.getReferenceById(taskId);
+        String hostname = taskPO.getHostname();
 
-        if (task.getState() == JobState.PENDING || task.getState() == JobState.CANCELED) {
+        if (taskPO.getState() == JobState.PENDING || taskPO.getState() == JobState.CANCELED) {
             new Thread(() -> {
                         sink.next("There is no log when task is in status: "
-                                + task.getState().name().toLowerCase()
+                                + taskPO.getState().name().toLowerCase()
                                 + ", please reopen the window when status changed");
                         sink.complete();
                     })

@@ -18,12 +18,12 @@
  */
 package org.apache.bigtop.manager.server.command.job.factory;
 
-import org.apache.bigtop.manager.dao.entity.Job;
+import org.apache.bigtop.manager.dao.po.JobPO;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
 
 public interface JobFactory {
 
     CommandIdentifier getCommandIdentifier();
 
-    Job createJob(JobContext jobContext);
+    JobPO createJob(JobContext jobContext);
 }

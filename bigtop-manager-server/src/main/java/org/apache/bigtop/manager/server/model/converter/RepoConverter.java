@@ -19,8 +19,8 @@
 package org.apache.bigtop.manager.server.model.converter;
 
 import org.apache.bigtop.manager.common.message.entity.pojo.RepoInfo;
-import org.apache.bigtop.manager.dao.entity.Cluster;
-import org.apache.bigtop.manager.dao.entity.Repo;
+import org.apache.bigtop.manager.dao.po.ClusterPO;
+import org.apache.bigtop.manager.dao.po.RepoPO;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.dto.RepoDTO;
 
@@ -36,13 +36,13 @@ public interface RepoConverter {
 
     RepoConverter INSTANCE = Mappers.getMapper(RepoConverter.class);
 
-    @Mapping(target = "cluster", expression = "java(cluster)")
-    Repo fromDTO2Entity(RepoDTO repoDTO, @Context Cluster cluster);
+    @Mapping(target = "clusterPO", expression = "java(clusterPO)")
+    RepoPO fromDTO2PO(RepoDTO repoDTO, @Context ClusterPO clusterPO);
 
-    @Mapping(target = "cluster", expression = "java(cluster)")
-    List<Repo> fromDTO2Entity(List<RepoDTO> repoDTOList, @Context Cluster cluster);
+    @Mapping(target = "clusterPO", expression = "java(clusterPO)")
+    List<RepoPO> fromDTO2PO(List<RepoDTO> repoDTOList, @Context ClusterPO clusterPO);
 
-    RepoInfo fromEntity2Message(Repo repo);
+    RepoInfo fromPO2Message(RepoPO repoPO);
 
     List<RepoInfo> fromDTO2Message(List<RepoDTO> repoDTOs);
 }

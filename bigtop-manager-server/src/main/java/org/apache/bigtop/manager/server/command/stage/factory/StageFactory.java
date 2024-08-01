@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.server.command.stage.factory;
 
-import org.apache.bigtop.manager.dao.entity.Stage;
+import org.apache.bigtop.manager.dao.po.StagePO;
 
 /**
  * Stage factory.
@@ -38,5 +38,5 @@ public interface StageFactory {
      * @param context the stage context
      * @return the stage
      */
-    Stage createStage(StageContext context);
+    StagePO createStage(StageContext context);
 }

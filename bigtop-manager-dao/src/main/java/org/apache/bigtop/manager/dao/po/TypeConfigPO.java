@@ -16,58 +16,51 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.dao.entity;
+package org.apache.bigtop.manager.dao.po;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
+import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "audit_log")
+@Table(name = "type_config")
 @TableGenerator(
-        name = "audit_log_generator",
+        name = "type_config_generator",
         table = "sequence",
         pkColumnName = "seq_name",
         valueColumnName = "seq_count")
-public class AuditLog extends BaseEntity {
+public class TypeConfigPO extends BasePO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "audit_log_generator")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "type_config_generator")
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "uri")
-    private String uri;
+    @Column(name = "type_name")
+    private String typeName;
 
     @Lob
     @Basic(fetch = FetchType.LAZY)
-    @Column(name = "args", length = 16777216)
-    private String args;
+    @Column(name = "properties_json", length = 16777216)
+    private String propertiesJson;
 
-    @Column(name = "tag_name")
-    private String tagName;
-
-    @Column(name = "tag_desc")
-    private String tagDesc;
-
-    @Column(name = "operation_summary")
-    private String operationSummary;
-
-    @Column(name = "operation_desc")
-    private String operationDesc;
-
-    @Column(name = "user_id")
-    private Long userId;
+    @ManyToOne
+    @JoinColumn(name = "service_config_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private ServiceConfigPO serviceConfigPO;
 }

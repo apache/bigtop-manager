@@ -16,75 +16,62 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.dao.entity;
+package org.apache.bigtop.manager.dao.po;
 
-import org.apache.bigtop.manager.common.enums.MaintainState;
+import org.apache.bigtop.manager.common.enums.JobState;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
+import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
-import jakarta.persistence.UniqueConstraint;
+import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(
-        name = "\"cluster\"",
-        uniqueConstraints = {
-            @UniqueConstraint(
-                    name = "uk_cluster_name",
-                    columnNames = {"cluster_name"})
-        },
-        indexes = {@Index(name = "idx_cluster_stack_id", columnList = "stack_id")})
-@TableGenerator(
-        name = "cluster_generator",
-        table = "sequence",
-        pkColumnName = "seq_name",
-        valueColumnName = "seq_count")
-public class Cluster extends BaseEntity {
+        name = "\"job\"",
+        indexes = {@Index(name = "idx_job_cluster_id", columnList = "cluster_id")})
+@TableGenerator(name = "job_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
+public class JobPO extends BasePO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "cluster_generator")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "job_generator")
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "cluster_name")
-    private String clusterName;
-
-    @Column(name = "cluster_type")
-    private Integer clusterType;
-
-    @Column(name = "\"root\"")
-    private String root;
-
-    @Column(name = "user_group")
-    private String userGroup;
-
-    @Column(name = "packages")
-    private String packages;
-
-    @Column(name = "repo_template")
-    private String repoTemplate;
-
     @Column(name = "state")
-    private MaintainState state;
+    private JobState state;
 
-    @Column(name = "selected")
-    private Boolean selected;
+    @Column(name = "name")
+    private String name;
+
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "\"context\"", length = 16777216)
+    private String context;
 
     @ManyToOne
-    @JoinColumn(name = "stack_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Stack stack;
+    @JoinColumn(name = "cluster_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private ClusterPO clusterPO;
+
+    @ToString.Exclude
+    @OneToMany(mappedBy = "jobPO")
+    private List<StagePO> stagePOList;
 }

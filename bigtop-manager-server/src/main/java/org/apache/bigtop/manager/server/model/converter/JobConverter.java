@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.server.model.converter;
 
-import org.apache.bigtop.manager.dao.entity.Job;
+import org.apache.bigtop.manager.dao.po.JobPO;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.vo.CommandVO;
 import org.apache.bigtop.manager.server.model.vo.JobVO;
@@ -38,9 +38,10 @@ public interface JobConverter {
 
     @Mapping(target = "createTime", source = "createTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
     @Mapping(target = "updateTime", source = "updateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
-    JobVO fromEntity2VO(Job job);
+    @Mapping(target = "stages", source = "stagePOList")
+    JobVO fromPO2VO(JobPO jobPO);
 
-    List<JobVO> fromEntity2VO(List<Job> job);
+    List<JobVO> fromPO2VO(List<JobPO> jobPO);
 
-    CommandVO fromEntity2CommandVO(Job job);
+    CommandVO fromPO2CommandVO(JobPO jobPO);
 }

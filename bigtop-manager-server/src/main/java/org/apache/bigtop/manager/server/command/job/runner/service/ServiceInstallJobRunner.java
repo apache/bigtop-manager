@@ -20,11 +20,11 @@ package org.apache.bigtop.manager.server.command.job.runner.service;
 
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.enums.MaintainState;
-import org.apache.bigtop.manager.dao.entity.Cluster;
-import org.apache.bigtop.manager.dao.entity.Component;
-import org.apache.bigtop.manager.dao.entity.Host;
-import org.apache.bigtop.manager.dao.entity.HostComponent;
-import org.apache.bigtop.manager.dao.entity.Service;
+import org.apache.bigtop.manager.dao.po.ClusterPO;
+import org.apache.bigtop.manager.dao.po.ComponentPO;
+import org.apache.bigtop.manager.dao.po.HostComponentPO;
+import org.apache.bigtop.manager.dao.po.HostPO;
+import org.apache.bigtop.manager.dao.po.ServicePO;
 import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.dao.repository.ComponentRepository;
 import org.apache.bigtop.manager.dao.repository.HostComponentRepository;
@@ -90,53 +90,54 @@ public class ServiceInstallJobRunner extends AbstractJobRunner {
         // Persist service, component and hostComponent metadata to database
         for (ServiceCommandDTO serviceCommand : serviceCommands) {
             String serviceName = serviceCommand.getServiceName();
-            Service service = serviceRepository.findByClusterIdAndServiceName(clusterId, serviceName);
-            upsertService(service, serviceCommand);
+            ServicePO servicePO = serviceRepository.findByClusterPOIdAndServiceName(clusterId, serviceName);
+            upsertService(servicePO, serviceCommand);
         }
     }
 
-    private void upsertService(Service service, ServiceCommandDTO serviceCommand) {
+    private void upsertService(ServicePO servicePO, ServiceCommandDTO serviceCommand) {
         CommandDTO commandDTO = getCommandDTO();
         Long clusterId = commandDTO.getClusterId();
         String serviceName = serviceCommand.getServiceName();
-        Cluster cluster = clusterRepository.getReferenceById(clusterId);
+        ClusterPO clusterPO = clusterRepository.getReferenceById(clusterId);
 
-        String stackName = cluster.getStack().getStackName();
-        String stackVersion = cluster.getStack().getStackVersion();
+        String stackName = clusterPO.getStackPO().getStackName();
+        String stackVersion = clusterPO.getStackPO().getStackVersion();
 
         // 1. Persist service
-        if (service == null) {
+        if (servicePO == null) {
             ServiceDTO serviceDTO = StackUtils.getServiceDTO(stackName, stackVersion, serviceName);
-            service = ServiceConverter.INSTANCE.fromDTO2Entity(serviceDTO, cluster);
-            service = serviceRepository.save(service);
+            servicePO = ServiceConverter.INSTANCE.fromDTO2PO(serviceDTO, clusterPO);
+            servicePO = serviceRepository.save(servicePO);
         }
 
         // 2. Update configs
-        configService.upsert(clusterId, service.getId(), serviceCommand.getConfigs());
+        configService.upsert(clusterId, servicePO.getId(), serviceCommand.getConfigs());
 
         for (ComponentHostDTO componentHostDTO : serviceCommand.getComponentHosts()) {
             String componentName = componentHostDTO.getComponentName();
 
             // 3. Persist component
-            Component component = componentRepository.findByClusterIdAndComponentName(clusterId, componentName);
-            if (component == null) {
+            ComponentPO componentPO = componentRepository.findByClusterPOIdAndComponentName(clusterId, componentName);
+            if (componentPO == null) {
                 ComponentDTO componentDTO = StackUtils.getComponentDTO(stackName, stackVersion, componentName);
-                component = ComponentConverter.INSTANCE.fromDTO2Entity(componentDTO, service, cluster);
-                component = componentRepository.save(component);
+                componentPO = ComponentConverter.INSTANCE.fromDTO2PO(componentDTO, servicePO, clusterPO);
+                componentPO = componentRepository.save(componentPO);
             }
 
             // 4. Persist hostComponent
             for (String hostname : componentHostDTO.getHostnames()) {
-                HostComponent hostComponent =
-                        hostComponentRepository.findByComponentComponentNameAndHostHostname(componentName, hostname);
-                if (hostComponent == null) {
-                    Host host = hostRepository.findByHostname(hostname);
+                HostComponentPO hostComponentPO =
+                        hostComponentRepository.findByComponentPOComponentNameAndHostPOHostname(
+                                componentName, hostname);
+                if (hostComponentPO == null) {
+                    HostPO hostPO = hostRepository.findByHostname(hostname);
 
-                    hostComponent = new HostComponent();
-                    hostComponent.setHost(host);
-                    hostComponent.setComponent(component);
-                    hostComponent.setState(MaintainState.UNINSTALLED);
-                    hostComponentRepository.save(hostComponent);
+                    hostComponentPO = new HostComponentPO();
+                    hostComponentPO.setHostPO(hostPO);
+                    hostComponentPO.setComponentPO(componentPO);
+                    hostComponentPO.setState(MaintainState.UNINSTALLED);
+                    hostComponentRepository.save(hostComponentPO);
                 }
             }
         }

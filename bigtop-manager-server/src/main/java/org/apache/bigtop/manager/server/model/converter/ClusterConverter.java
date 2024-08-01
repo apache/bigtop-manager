@@ -18,8 +18,8 @@
  */
 package org.apache.bigtop.manager.server.model.converter;
 
-import org.apache.bigtop.manager.dao.entity.Cluster;
-import org.apache.bigtop.manager.dao.entity.Stack;
+import org.apache.bigtop.manager.dao.po.ClusterPO;
+import org.apache.bigtop.manager.dao.po.StackPO;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.dto.ClusterDTO;
 import org.apache.bigtop.manager.server.model.dto.StackDTO;
@@ -41,12 +41,12 @@ public interface ClusterConverter {
 
     ClusterDTO fromCommand2DTO(ClusterCommandDTO clusterCommandDTO);
 
-    Cluster fromDTO2Entity(ClusterDTO clusterDTO);
+    ClusterPO fromDTO2PO(ClusterDTO clusterDTO);
 
-    @Mapping(target = "stackName", source = "cluster.stack.stackName")
-    @Mapping(target = "stackVersion", source = "cluster.stack.stackVersion")
-    ClusterVO fromEntity2VO(Cluster cluster);
+    @Mapping(target = "stackName", source = "stackPO.stackName")
+    @Mapping(target = "stackVersion", source = "stackPO.stackVersion")
+    ClusterVO fromEntity2VO(ClusterPO clusterPO);
 
-    @Mapping(target = "stack", expression = "java(stack)")
-    Cluster fromDTO2Entity(ClusterDTO clusterDTO, StackDTO stackDTO, @Context Stack stack);
+    @Mapping(target = "stackPO", expression = "java(stackPO)")
+    ClusterPO fromDTO2PO(ClusterDTO clusterDTO, StackDTO stackDTO, @Context StackPO stackPO);
 }

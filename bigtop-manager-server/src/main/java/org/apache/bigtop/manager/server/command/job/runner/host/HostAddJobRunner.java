@@ -56,6 +56,6 @@ public class HostAddJobRunner extends AbstractJobRunner {
 
         List<String> hostnames =
                 hostCommands.stream().map(HostCommandDTO::getHostname).toList();
-        hostService.batchSave(job.getCluster().getId(), hostnames);
+        hostService.batchSave(jobPO.getClusterPO().getId(), hostnames);
     }
 }

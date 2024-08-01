@@ -18,9 +18,9 @@
  */
 package org.apache.bigtop.manager.server.model.converter;
 
-import org.apache.bigtop.manager.dao.entity.Cluster;
-import org.apache.bigtop.manager.dao.entity.Component;
-import org.apache.bigtop.manager.dao.entity.Service;
+import org.apache.bigtop.manager.dao.po.ClusterPO;
+import org.apache.bigtop.manager.dao.po.ComponentPO;
+import org.apache.bigtop.manager.dao.po.ServicePO;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
 import org.apache.bigtop.manager.server.model.vo.ComponentVO;
@@ -43,9 +43,9 @@ public interface ComponentConverter {
     @Mapping(target = "commandScript", source = "commandScript", qualifiedByName = "obj2Json")
     @Mapping(target = "customCommands", source = "customCommands", qualifiedByName = "obj2Json")
     @Mapping(target = "quickLink", source = "quickLink", qualifiedByName = "obj2Json")
-    @Mapping(target = "service", expression = "java(service)")
-    @Mapping(target = "cluster", expression = "java(cluster)")
-    Component fromDTO2Entity(ComponentDTO componentDTO, @Context Service service, @Context Cluster cluster);
+    @Mapping(target = "servicePO", expression = "java(servicePO)")
+    @Mapping(target = "clusterPO", expression = "java(clusterPO)")
+    ComponentPO fromDTO2PO(ComponentDTO componentDTO, @Context ServicePO servicePO, @Context ClusterPO clusterPO);
 
     ComponentVO fromDTO2VO(ComponentDTO componentDTO);
 
@@ -54,9 +54,9 @@ public interface ComponentConverter {
     @Mapping(target = "componentName", source = "name")
     ComponentDTO fromModel2DTO(ComponentModel componentModel);
 
-    @Mapping(target = "serviceName", source = "service.serviceName")
-    @Mapping(target = "clusterName", source = "cluster.clusterName")
-    ComponentVO fromEntity2VO(Component component);
+    @Mapping(target = "serviceName", source = "servicePO.serviceName")
+    @Mapping(target = "clusterName", source = "clusterPO.clusterName")
+    ComponentVO fromPO2VO(ComponentPO componentPO);
 
-    List<ComponentVO> fromEntity2VO(List<Component> components);
+    List<ComponentVO> fromPO2VO(List<ComponentPO> componentPOList);
 }

@@ -24,8 +24,8 @@ import org.apache.bigtop.manager.common.message.entity.pojo.CustomCommandInfo;
 import org.apache.bigtop.manager.common.message.entity.pojo.OSSpecificInfo;
 import org.apache.bigtop.manager.common.message.entity.pojo.ScriptInfo;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.entity.Cluster;
-import org.apache.bigtop.manager.dao.entity.Task;
+import org.apache.bigtop.manager.dao.po.ClusterPO;
+import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.grpc.generated.CommandRequest;
 import org.apache.bigtop.manager.grpc.generated.CommandType;
@@ -46,45 +46,45 @@ public abstract class AbstractComponentStageFactory extends AbstractStageFactory
     @Resource
     private ClusterRepository clusterRepository;
 
-    protected Cluster cluster;
+    protected ClusterPO clusterPO;
 
     @Override
     public void doCreateStage() {
-        cluster = clusterRepository.getReferenceById(context.getClusterId());
+        clusterPO = clusterRepository.getReferenceById(context.getClusterId());
 
         Command command = getCommand();
         ServiceDTO serviceDTO = context.getServiceDTO();
         ComponentDTO componentDTO = context.getComponentDTO();
 
-        stage.setName(command.toCamelCase() + " " + componentDTO.getDisplayName());
-        stage.setServiceName(serviceDTO.getServiceName());
-        stage.setComponentName(componentDTO.getComponentName());
+        stagePO.setName(command.toCamelCase() + " " + componentDTO.getDisplayName());
+        stagePO.setServiceName(serviceDTO.getServiceName());
+        stagePO.setComponentName(componentDTO.getComponentName());
 
-        List<Task> tasks = new ArrayList<>();
+        List<TaskPO> taskPOList = new ArrayList<>();
         for (String hostname : context.getHostnames()) {
-            Task task = new Task();
+            TaskPO taskPO = new TaskPO();
 
             // Required fields
-            task.setName(stage.getName() + " on " + hostname);
-            task.setHostname(hostname);
-            task.setCommand(command);
-            task.setServiceName(serviceDTO.getServiceName());
-            task.setStackName(context.getStackName());
-            task.setStackVersion(context.getStackVersion());
+            taskPO.setName(stagePO.getName() + " on " + hostname);
+            taskPO.setHostname(hostname);
+            taskPO.setCommand(command);
+            taskPO.setServiceName(serviceDTO.getServiceName());
+            taskPO.setStackName(context.getStackName());
+            taskPO.setStackVersion(context.getStackVersion());
 
             // Context fields
-            task.setComponentName(componentDTO.getComponentName());
-            task.setServiceUser(serviceDTO.getServiceUser());
-            task.setServiceGroup(serviceDTO.getServiceGroup());
-            task.setCustomCommands(JsonUtils.writeAsString(componentDTO.getCustomCommands()));
-            task.setCommandScript(JsonUtils.writeAsString(componentDTO.getCommandScript()));
+            taskPO.setComponentName(componentDTO.getComponentName());
+            taskPO.setServiceUser(serviceDTO.getServiceUser());
+            taskPO.setServiceGroup(serviceDTO.getServiceGroup());
+            taskPO.setCustomCommands(JsonUtils.writeAsString(componentDTO.getCustomCommands()));
+            taskPO.setCommandScript(JsonUtils.writeAsString(componentDTO.getCommandScript()));
 
             CommandRequest request = getMessage(serviceDTO, componentDTO, hostname, command);
-            task.setContent(ProtobufUtil.toJson(request));
-            tasks.add(task);
+            taskPO.setContent(ProtobufUtil.toJson(request));
+            taskPOList.add(taskPO);
         }
 
-        stage.setTasks(tasks);
+        stagePO.setTaskPOList(taskPOList);
     }
 
     protected abstract Command getCommand();
@@ -99,7 +99,7 @@ public abstract class AbstractComponentStageFactory extends AbstractStageFactory
         commandPayload.setStackName(context.getStackName());
         commandPayload.setStackVersion(context.getStackVersion());
         commandPayload.setComponentName(componentDTO.getComponentName());
-        commandPayload.setRoot(cluster.getRoot());
+        commandPayload.setRoot(clusterPO.getRoot());
         commandPayload.setHostname(hostname);
 
         commandPayload.setCustomCommands(convertCustomCommandInfo(componentDTO.getCustomCommands()));
