@@ -163,12 +163,13 @@
         pageSize: paginationProps.value.pageSize,
         sort: 'desc'
       } as Pagination
-      const { content } = await getJobs(clusterId.value, params)
+      const { content, total } = await getJobs(clusterId.value, params)
       jobs.value = content.map((v) => {
         return {
           ...v
         }
       })
+      paginationProps.value.total = total
       loading.value = false
     } catch (error) {
       console.log('error :>> ', error)
