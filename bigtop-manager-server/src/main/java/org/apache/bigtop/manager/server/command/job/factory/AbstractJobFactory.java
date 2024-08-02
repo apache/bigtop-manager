@@ -30,6 +30,8 @@ import org.apache.bigtop.manager.dao.repository.StageRepository;
 import org.apache.bigtop.manager.dao.repository.TaskRepository;
 
 import jakarta.annotation.Resource;
+import org.apache.bigtop.manager.server.command.job.Job;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,7 +58,7 @@ public abstract class AbstractJobFactory implements JobFactory {
     protected List<StagePO> stagePOList = new ArrayList<>();
 
     @Override
-    public JobPO createJob(JobContext jobContext) {
+    public JobPO createJobOld(JobContext jobContext) {
         this.jobContext = jobContext;
 
         // Create and init job
@@ -104,5 +106,10 @@ public abstract class AbstractJobFactory implements JobFactory {
                 taskRepository.save(taskPO);
             }
         }
+    }
+
+    @Override
+    public Job createJob(JobContext jobContext) {
+        return null;
     }
 }

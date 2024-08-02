@@ -61,6 +61,11 @@ public class TaskPO extends BasePO {
     @Column(name = "name")
     private String name;
 
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "context", length = 16777216)
+    private String context;
+
     @Column(name = "message_id")
     private String messageId;
 

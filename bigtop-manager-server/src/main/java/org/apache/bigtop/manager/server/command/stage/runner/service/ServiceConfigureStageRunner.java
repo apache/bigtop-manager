@@ -23,11 +23,13 @@ import org.apache.bigtop.manager.server.command.stage.runner.AbstractStageRunner
 
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
+import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@org.springframework.stereotype.Component
+@Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class ServiceConfigureStageRunner extends AbstractStageRunner {
 

@@ -52,9 +52,12 @@ public class StageContext {
     private List<RepoDTO> repoInfoList;
 
     public static StageContext fromPayload(String payload) {
-        StageContext context = new StageContext();
         CommandDTO commandDTO = JsonUtils.readFromString(payload, CommandDTO.class);
+        return fromCommandDTO(commandDTO);
+    }
 
+    public static StageContext fromCommandDTO(CommandDTO commandDTO) {
+        StageContext context = new StageContext();
         context.setClusterId(commandDTO.getClusterId());
 
         switch (commandDTO.getCommandLevel()) {

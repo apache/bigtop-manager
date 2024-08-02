@@ -20,12 +20,16 @@ package org.apache.bigtop.manager.server.command.job.factory.service;
 
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
+import org.apache.bigtop.manager.server.command.job.Job;
+import org.apache.bigtop.manager.server.command.job.ServiceInstallJob;
+import org.apache.bigtop.manager.server.command.job.factory.JobContext;
 import org.apache.bigtop.manager.server.enums.CommandLevel;
 import org.apache.bigtop.manager.server.model.dto.ComponentHostDTO;
 import org.apache.bigtop.manager.server.model.dto.command.ServiceCommandDTO;
 
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,13 +37,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-@org.springframework.stereotype.Component
+@Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class ServiceInstallJobFactory extends AbstractServiceJobFactory {
 
     @Override
     public CommandIdentifier getCommandIdentifier() {
         return new CommandIdentifier(CommandLevel.SERVICE, Command.INSTALL);
+    }
+
+    @Override
+    public Job createJob(JobContext jobContext) {
+        return new ServiceInstallJob(jobContext);
     }
 
     /**

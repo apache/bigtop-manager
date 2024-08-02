@@ -18,6 +18,8 @@
  */
 package org.apache.bigtop.manager.server.command.stage.runner;
 
+import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.common.constants.MessageConstants;
 import org.apache.bigtop.manager.common.enums.JobState;
 import org.apache.bigtop.manager.dao.po.StagePO;
@@ -31,9 +33,6 @@ import org.apache.bigtop.manager.grpc.utils.ProtobufUtil;
 import org.apache.bigtop.manager.server.command.stage.factory.StageContext;
 import org.apache.bigtop.manager.server.grpc.GrpcClient;
 
-import lombok.extern.slf4j.Slf4j;
-
-import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -41,15 +40,14 @@ import java.util.concurrent.CompletableFuture;
 @Slf4j
 public abstract class AbstractStageRunner implements StageRunner {
 
+    protected StagePO stagePO;
+    protected StageContext stageContext;
+
     @Resource
     protected StageRepository stageRepository;
 
     @Resource
     protected TaskRepository taskRepository;
-
-    protected StagePO stagePO;
-
-    protected StageContext stageContext;
 
     @Override
     public void setStage(StagePO stagePO) {
@@ -72,8 +70,6 @@ public abstract class AbstractStageRunner implements StageRunner {
             CommandRequest protoRequest = ProtobufUtil.fromJson(taskPO.getContent(), CommandRequest.class);
             CommandRequest.Builder builder = CommandRequest.newBuilder(protoRequest);
             builder.setTaskId(taskPO.getId());
-            builder.setStageId(stagePO.getId());
-            builder.setJobId(stagePO.getJobPO().getId());
             CommandRequest request = builder.build();
 
             futures.add(CompletableFuture.supplyAsync(() -> {

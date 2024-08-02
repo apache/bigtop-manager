@@ -18,29 +18,54 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
+import org.apache.bigtop.manager.common.enums.JobState;
+import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.JobPO;
+import org.apache.bigtop.manager.dao.po.StagePO;
+import org.apache.bigtop.manager.dao.po.TaskPO;
+import org.apache.bigtop.manager.dao.repository.ClusterRepository;
+import org.apache.bigtop.manager.dao.repository.JobRepository;
+import org.apache.bigtop.manager.dao.repository.StageRepository;
+import org.apache.bigtop.manager.dao.repository.TaskRepository;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
+import org.apache.bigtop.manager.server.command.job.Job;
 import org.apache.bigtop.manager.server.command.job.factory.JobContext;
 import org.apache.bigtop.manager.server.command.job.factory.JobFactories;
 import org.apache.bigtop.manager.server.command.job.factory.JobFactory;
 import org.apache.bigtop.manager.server.command.job.validator.ValidatorContext;
 import org.apache.bigtop.manager.server.command.job.validator.ValidatorExecutionChain;
 import org.apache.bigtop.manager.server.command.scheduler.JobScheduler;
+import org.apache.bigtop.manager.server.command.stage.Stage;
+import org.apache.bigtop.manager.server.command.task.Task;
 import org.apache.bigtop.manager.server.model.converter.JobConverter;
 import org.apache.bigtop.manager.server.model.dto.CommandDTO;
 import org.apache.bigtop.manager.server.model.vo.CommandVO;
 import org.apache.bigtop.manager.server.service.CommandService;
+
+import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
 
 import jakarta.annotation.Resource;
 
 @Slf4j
-@org.springframework.stereotype.Service
+@Service
 public class CommandServiceImpl implements CommandService {
 
     @Resource
     private JobScheduler jobScheduler;
+
+    @Resource
+    private ClusterRepository clusterRepository;
+
+    @Resource
+    private JobRepository jobRepository;
+
+    @Resource
+    private StageRepository stageRepository;
+
+    @Resource
+    private TaskRepository taskRepository;
 
     @Override
     public CommandVO command(CommandDTO commandDTO) {
@@ -56,11 +81,46 @@ public class CommandServiceImpl implements CommandService {
         JobContext jobContext = new JobContext();
         jobContext.setCommandDTO(commandDTO);
         JobFactory jobFactory = JobFactories.getJobFactory(commandIdentifier);
-        JobPO jobPO = jobFactory.createJob(jobContext);
+        Job job = jobFactory.createJob(jobContext);
+
+        // Save job
+        JobPO jobPO = saveJob(job);
 
         // Submit job
-        jobScheduler.submit(jobPO);
+        jobScheduler.submit(job);
 
         return JobConverter.INSTANCE.fromPO2CommandVO(jobPO);
+    }
+
+    protected JobPO saveJob(Job job) {
+        Long clusterId = job.getJobContext().getCommandDTO().getClusterId();
+        ClusterPO clusterPO = clusterId == null ? null : clusterRepository.getReferenceById(clusterId);
+
+        JobPO jobPO = job.toJobPO();
+        jobPO.setClusterPO(clusterPO);
+        jobPO.setState(JobState.PENDING);
+        jobRepository.save(jobPO);
+
+        for (int i = 0; i < job.getStages().size(); i++) {
+            Stage stage = job.getStages().get(i);
+            StagePO stagePO = stage.toStagePO();
+            stagePO.setClusterPO(clusterPO);
+            stagePO.setJobPO(jobPO);
+            stagePO.setOrder(i + 1);
+            stagePO.setState(JobState.PENDING);
+            stageRepository.save(stagePO);
+
+            for (int j = 0; j < stage.getTasks().size(); j++) {
+                Task task = stage.getTasks().get(j);
+                TaskPO taskPO = task.toTaskPO();
+                taskPO.setClusterPO(clusterPO);
+                taskPO.setJobPO(jobPO);
+                taskPO.setStagePO(stagePO);
+                taskPO.setState(JobState.PENDING);
+                taskRepository.save(taskPO);
+            }
+        }
+
+        return jobPO;
     }
 }

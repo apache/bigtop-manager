@@ -18,6 +18,8 @@
  */
 package org.apache.bigtop.manager.server.command.job.runner.service;
 
+import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.enums.MaintainState;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
@@ -42,17 +44,14 @@ import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.model.dto.command.ServiceCommandDTO;
 import org.apache.bigtop.manager.server.service.ConfigService;
 import org.apache.bigtop.manager.server.utils.StackUtils;
-
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
-import lombok.extern.slf4j.Slf4j;
-
-import jakarta.annotation.Resource;
 import java.util.List;
 
 @Slf4j
-@org.springframework.stereotype.Component
+@Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class ServiceInstallJobRunner extends AbstractJobRunner {
 

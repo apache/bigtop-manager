@@ -18,6 +18,8 @@
  */
 package org.apache.bigtop.manager.server.command.stage.factory.host;
 
+import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.message.entity.payload.HostCheckPayload;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
@@ -29,18 +31,15 @@ import org.apache.bigtop.manager.grpc.generated.CommandType;
 import org.apache.bigtop.manager.grpc.utils.ProtobufUtil;
 import org.apache.bigtop.manager.server.command.stage.factory.AbstractStageFactory;
 import org.apache.bigtop.manager.server.command.stage.factory.StageType;
-
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
-import lombok.extern.slf4j.Slf4j;
-
-import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-@org.springframework.stereotype.Component
+@Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class HostCheckStageFactory extends AbstractStageFactory {
 

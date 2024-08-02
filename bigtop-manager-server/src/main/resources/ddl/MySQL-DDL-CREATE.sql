@@ -201,6 +201,7 @@ CREATE TABLE `task`
     `command_script`  VARCHAR(255),
     `component_name`  VARCHAR(255),
     `content`         LONGTEXT,
+    `context`         LONGTEXT NOT NULL,
     `create_by`       BIGINT,
     `create_time`     DATETIME,
     `custom_command`  VARCHAR(255),

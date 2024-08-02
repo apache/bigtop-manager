@@ -27,6 +27,7 @@ import org.apache.bigtop.manager.stack.common.utils.linux.LinuxFileUtils;
 
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,13 +42,13 @@ import static org.apache.bigtop.manager.common.constants.CacheFiles.SETTINGS_INF
 import static org.apache.bigtop.manager.common.constants.CacheFiles.USERS_INFO;
 
 @Slf4j
-@org.springframework.stereotype.Component
+@Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class CacheDistributeCommandExecutor extends AbstractCommandExecutor {
+public class CacheFileUpdateCommandExecutor extends AbstractCommandExecutor {
 
     @Override
     public CommandType getCommandType() {
-        return CommandType.CACHE_DISTRIBUTE;
+        return CommandType.UPDATE_CACHE_FILES;
     }
 
     @Override

@@ -18,6 +18,9 @@
  */
 package org.apache.bigtop.manager.server.command.stage.runner.config;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.common.constants.Constants;
 import org.apache.bigtop.manager.common.message.entity.payload.CacheMessagePayload;
 import org.apache.bigtop.manager.common.message.entity.pojo.ClusterInfo;
@@ -53,16 +56,11 @@ import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.model.dto.StackDTO;
 import org.apache.bigtop.manager.server.utils.StackConfigUtils;
 import org.apache.bigtop.manager.server.utils.StackUtils;
-
 import org.apache.commons.lang3.tuple.ImmutablePair;
-
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import lombok.extern.slf4j.Slf4j;
-
-import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -74,9 +72,23 @@ import java.util.stream.Collectors;
 import static org.apache.bigtop.manager.common.constants.Constants.ALL_HOST_KEY;
 
 @Slf4j
-@org.springframework.stereotype.Component
+@Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class CacheDistributeStageRunner extends AbstractStageRunner {
+
+    private ClusterInfo clusterInfo;
+
+    private Map<String, ComponentInfo> componentInfoMap;
+
+    private Map<String, Map<String, Object>> serviceConfigMap;
+
+    private Map<String, Set<String>> hostMap;
+
+    private List<RepoInfo> repoList;
+
+    private Map<String, Set<String>> userMap;
+
+    private Map<String, Object> settingsMap;
 
     @Resource
     private ClusterRepository clusterRepository;
@@ -101,20 +113,6 @@ public class CacheDistributeStageRunner extends AbstractStageRunner {
 
     @Resource
     private ComponentRepository componentRepository;
-
-    private ClusterInfo clusterInfo;
-
-    private Map<String, ComponentInfo> componentInfoMap;
-
-    private Map<String, Map<String, Object>> serviceConfigMap;
-
-    private Map<String, Set<String>> hostMap;
-
-    private List<RepoInfo> repoList;
-
-    private Map<String, Set<String>> userMap;
-
-    private Map<String, Object> settingsMap;
 
     @Override
     public StageType getStageType() {
@@ -270,7 +268,7 @@ public class CacheDistributeStageRunner extends AbstractStageRunner {
         messagePayload.setComponentInfo(componentInfoMap);
 
         CommandRequest.Builder builder = CommandRequest.newBuilder();
-        builder.setType(CommandType.CACHE_DISTRIBUTE);
+        builder.setType(CommandType.UPDATE_CACHE_FILES);
         builder.setHostname(hostname);
         builder.setPayload(JsonUtils.writeAsString(messagePayload));
 

@@ -18,16 +18,12 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
-import org.apache.bigtop.manager.common.enums.JobState;
+import jakarta.annotation.Resource;
 import org.apache.bigtop.manager.dao.po.JobPO;
-import org.apache.bigtop.manager.dao.po.StagePO;
-import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.dao.repository.JobRepository;
 import org.apache.bigtop.manager.dao.repository.StageRepository;
 import org.apache.bigtop.manager.dao.repository.TaskRepository;
 import org.apache.bigtop.manager.server.command.scheduler.JobScheduler;
-import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
-import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.model.converter.JobConverter;
 import org.apache.bigtop.manager.server.model.query.PageQuery;
 import org.apache.bigtop.manager.server.model.vo.JobVO;
@@ -35,13 +31,10 @@ import org.apache.bigtop.manager.server.model.vo.PageVO;
 import org.apache.bigtop.manager.server.service.JobService;
 import org.apache.bigtop.manager.server.utils.ClusterUtils;
 import org.apache.bigtop.manager.server.utils.PageUtils;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import jakarta.annotation.Resource;
 
 @Service
 public class JobServiceImpl implements JobService {
@@ -80,25 +73,26 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public JobVO retry(Long id) {
-        JobPO jobPO = jobRepository.getReferenceById(id);
-        if (jobPO.getState() != JobState.FAILED) {
-            throw new ApiException(ApiExceptionEnum.JOB_NOT_RETRYABLE);
-        }
-
-        for (StagePO stagePO : jobPO.getStagePOList()) {
-            for (TaskPO taskPO : stagePO.getTaskPOList()) {
-                taskPO.setState(JobState.PENDING);
-                taskRepository.save(taskPO);
-            }
-
-            stagePO.setState(JobState.PENDING);
-            stageRepository.save(stagePO);
-        }
-
-        jobPO.setState(JobState.PENDING);
-        jobRepository.save(jobPO);
-        jobScheduler.submit(jobPO);
-
-        return JobConverter.INSTANCE.fromPO2VO(jobPO);
+        throw new RuntimeException("Api is in maintenance");
+//        JobPO jobPO = jobRepository.getReferenceById(id);
+//        if (jobPO.getState() != JobState.FAILED) {
+//            throw new ApiException(ApiExceptionEnum.JOB_NOT_RETRYABLE);
+//        }
+//
+//        for (StagePO stagePO : jobPO.getStagePOList()) {
+//            for (TaskPO taskPO : stagePO.getTaskPOList()) {
+//                taskPO.setState(JobState.PENDING);
+//                taskRepository.save(taskPO);
+//            }
+//
+//            stagePO.setState(JobState.PENDING);
+//            stageRepository.save(stagePO);
+//        }
+//
+//        jobPO.setState(JobState.PENDING);
+//        jobRepository.save(jobPO);
+//        jobScheduler.submit(jobPO);
+//
+//        return JobConverter.INSTANCE.fromPO2VO(jobPO);
     }
 }

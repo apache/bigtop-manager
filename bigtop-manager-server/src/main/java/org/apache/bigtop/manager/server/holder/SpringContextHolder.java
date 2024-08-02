@@ -44,6 +44,10 @@ public class SpringContextHolder implements ApplicationContextAware {
         SpringContextHolder.applicationContext = applicationContext;
     }
 
+    public static <T> T getBean(Class<T> clazz) {
+        return applicationContext.getBean(clazz);
+    }
+
     public static Map<String, CommandValidator> getCommandValidators() {
         return applicationContext.getBeansOfType(CommandValidator.class);
     }

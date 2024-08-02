@@ -18,17 +18,19 @@
  */
 package org.apache.bigtop.manager.server.command.job.factory.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
+import org.apache.bigtop.manager.server.command.job.Job;
+import org.apache.bigtop.manager.server.command.job.ServiceRestartJob;
+import org.apache.bigtop.manager.server.command.job.factory.JobContext;
 import org.apache.bigtop.manager.server.enums.CommandLevel;
-
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
-
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 @Slf4j
-@org.springframework.stereotype.Component
+@Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class ServiceRestartJobFactory extends AbstractServiceJobFactory {
 
@@ -44,5 +46,10 @@ public class ServiceRestartJobFactory extends AbstractServiceJobFactory {
         super.createStopStages();
 
         super.createStartStages();
+    }
+
+    @Override
+    public Job createJob(JobContext jobContext) {
+        return new ServiceRestartJob(jobContext);
     }
 }

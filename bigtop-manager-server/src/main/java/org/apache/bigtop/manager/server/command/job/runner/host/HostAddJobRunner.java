@@ -18,6 +18,8 @@
  */
 package org.apache.bigtop.manager.server.command.job.runner.host;
 
+import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
 import org.apache.bigtop.manager.server.command.job.runner.AbstractJobRunner;
@@ -25,17 +27,14 @@ import org.apache.bigtop.manager.server.enums.CommandLevel;
 import org.apache.bigtop.manager.server.model.dto.CommandDTO;
 import org.apache.bigtop.manager.server.model.dto.command.HostCommandDTO;
 import org.apache.bigtop.manager.server.service.HostService;
-
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
-import lombok.extern.slf4j.Slf4j;
-
-import jakarta.annotation.Resource;
 import java.util.List;
 
 @Slf4j
-@org.springframework.stereotype.Component
+@Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class HostAddJobRunner extends AbstractJobRunner {
 
