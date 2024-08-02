@@ -96,14 +96,14 @@ public class CommandServiceImpl implements CommandService {
         Long clusterId = job.getJobContext().getCommandDTO().getClusterId();
         ClusterPO clusterPO = clusterId == null ? null : clusterRepository.getReferenceById(clusterId);
 
-        JobPO jobPO = job.toJobPO();
+        JobPO jobPO = job.getJobPO();
         jobPO.setClusterPO(clusterPO);
         jobPO.setState(JobState.PENDING);
         jobRepository.save(jobPO);
 
         for (int i = 0; i < job.getStages().size(); i++) {
             Stage stage = job.getStages().get(i);
-            StagePO stagePO = stage.toStagePO();
+            StagePO stagePO = stage.getStagePO();
             stagePO.setClusterPO(clusterPO);
             stagePO.setJobPO(jobPO);
             stagePO.setOrder(i + 1);
@@ -112,7 +112,7 @@ public class CommandServiceImpl implements CommandService {
 
             for (int j = 0; j < stage.getTasks().size(); j++) {
                 Task task = stage.getTasks().get(j);
-                TaskPO taskPO = task.toTaskPO();
+                TaskPO taskPO = task.getTaskPO();
                 taskPO.setClusterPO(clusterPO);
                 taskPO.setJobPO(jobPO);
                 taskPO.setStagePO(stagePO);

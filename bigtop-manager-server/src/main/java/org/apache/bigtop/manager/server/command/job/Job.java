@@ -40,5 +40,5 @@ public interface Job {
 
     List<Stage> getStages();
 
-    JobPO toJobPO();
+    JobPO getJobPO();
 }

@@ -30,7 +30,11 @@ public abstract class AbstractJob implements Job {
     protected List<Stage> stages;
 
     protected ClusterPO clusterPO;
-    protected JobPO jobPO;
+
+    /**
+     * Do not use this directly, please use {@link #getJobPO()} to make sure it's initialized.
+     */
+    private JobPO jobPO;
 
     public AbstractJob(JobContext jobContext) {
         this.jobContext = jobContext;
@@ -59,6 +63,7 @@ public abstract class AbstractJob implements Job {
 
     @Override
     public void beforeRun() {
+        JobPO jobPO = getJobPO();
         jobPO.setState(JobState.PROCESSING);
         jobRepository.save(jobPO);
     }
@@ -88,25 +93,27 @@ public abstract class AbstractJob implements Job {
 
     @Override
     public void onSuccess() {
+        JobPO jobPO = getJobPO();
         jobPO.setState(JobState.SUCCESSFUL);
         jobRepository.save(jobPO);
     }
 
     @Override
     public void onFailure() {
+        JobPO jobPO = getJobPO();
         List<StagePO> stagePOList = new ArrayList<>();
         List<TaskPO> taskPOList = new ArrayList<>();
 
         jobPO.setState(JobState.FAILED);
 
         for (Stage stage : getStages()) {
-            StagePO stagePO = stage.toStagePO();
+            StagePO stagePO = stage.getStagePO();
             if (stagePO.getState() == JobState.PENDING) {
                 stagePO.setState(JobState.CANCELED);
                 stagePOList.add(stagePO);
 
                 for (Task task : stage.getTasks()) {
-                    TaskPO taskPO = task.toTaskPO();
+                    TaskPO taskPO = task.getTaskPO();
                     taskPO.setState(JobState.CANCELED);
                     taskPOList.add(taskPO);
                 }
@@ -129,7 +136,7 @@ public abstract class AbstractJob implements Job {
     }
 
     @Override
-    public JobPO toJobPO() {
+    public JobPO getJobPO() {
         if (jobPO == null) {
             jobPO = new JobPO();
             jobPO.setName(getName());

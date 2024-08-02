@@ -19,7 +19,10 @@ public abstract class AbstractStage implements Stage {
     protected StageContext stageContext;
     protected List<Task> tasks;
 
-    protected StagePO stagePO;
+    /**
+     * Do not use this directly, please use {@link #getStagePO()} to make sure it's initialized.
+     */
+    private StagePO stagePO;
 
     public AbstractStage(StageContext stageContext) {
         this.stageContext = stageContext;
@@ -52,6 +55,7 @@ public abstract class AbstractStage implements Stage {
 
     @Override
     public void beforeRun() {
+        StagePO stagePO = getStagePO();
         stagePO.setState(JobState.PROCESSING);
         stageRepository.save(stagePO);
     }
@@ -87,12 +91,14 @@ public abstract class AbstractStage implements Stage {
 
     @Override
     public void onSuccess() {
+        StagePO stagePO = getStagePO();
         stagePO.setState(JobState.SUCCESSFUL);
         stageRepository.save(stagePO);
     }
 
     @Override
     public void onFailure() {
+        StagePO stagePO = getStagePO();
         stagePO.setState(JobState.FAILED);
         stageRepository.save(stagePO);
     }
@@ -108,7 +114,7 @@ public abstract class AbstractStage implements Stage {
     }
 
     @Override
-    public StagePO toStagePO() {
+    public StagePO getStagePO() {
         if (stagePO == null) {
             stagePO = new StagePO();
             stagePO.setName(getName());

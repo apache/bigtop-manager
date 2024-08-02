@@ -20,7 +20,11 @@ public abstract class AbstractTask implements Task {
     protected TaskContext taskContext;
 
     protected CommandRequest commandRequest;
-    protected TaskPO taskPO;
+
+    /**
+     * Do not use this directly, please use {@link #getTaskPO()} to make sure it's initialized.
+     */
+    private TaskPO taskPO;
 
     public AbstractTask(TaskContext taskContext) {
         this.taskContext = taskContext;
@@ -42,6 +46,7 @@ public abstract class AbstractTask implements Task {
 
     @Override
     public void beforeRun() {
+        TaskPO taskPO = getTaskPO();
         taskPO.setState(JobState.PROCESSING);
         taskRepository.save(taskPO);
     }
@@ -51,7 +56,7 @@ public abstract class AbstractTask implements Task {
         beforeRun();
 
         CommandRequest.Builder builder = CommandRequest.newBuilder(getCommandRequest());
-        builder.setTaskId(taskPO.getId());
+        builder.setTaskId(getTaskPO().getId());
         commandRequest = builder.build();
 
         CommandServiceGrpc.CommandServiceBlockingStub stub = GrpcClient.getBlockingStub(
@@ -71,6 +76,7 @@ public abstract class AbstractTask implements Task {
 
     @Override
     public void onSuccess() {
+        TaskPO taskPO = getTaskPO();
         taskPO.setContent(ProtobufUtil.toJson(commandRequest));
         taskPO.setState(JobState.SUCCESSFUL);
         taskRepository.save(taskPO);
@@ -78,6 +84,7 @@ public abstract class AbstractTask implements Task {
 
     @Override
     public void onFailure() {
+        TaskPO taskPO = getTaskPO();
         taskPO.setContent(ProtobufUtil.toJson(commandRequest));
         taskPO.setState(JobState.FAILED);
         taskRepository.save(taskPO);
@@ -89,7 +96,7 @@ public abstract class AbstractTask implements Task {
     }
 
     @Override
-    public TaskPO toTaskPO() {
+    public TaskPO getTaskPO() {
         if (taskPO == null) {
             taskPO = new TaskPO();
             taskPO.setName(getName());

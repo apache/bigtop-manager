@@ -16,5 +16,5 @@ public interface Task {
 
     TaskContext getTaskContext();
 
-    TaskPO toTaskPO();
+    TaskPO getTaskPO();
 }

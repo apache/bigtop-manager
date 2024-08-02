@@ -22,5 +22,5 @@ public interface Stage {
 
     List<Task> getTasks();
 
-    StagePO toStagePO();
+    StagePO getStagePO();
 }

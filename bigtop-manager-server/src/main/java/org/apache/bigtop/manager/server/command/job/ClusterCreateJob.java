@@ -2,6 +2,7 @@ package org.apache.bigtop.manager.server.command.job;
 
 import org.apache.bigtop.manager.common.enums.MaintainState;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
+import org.apache.bigtop.manager.dao.po.JobPO;
 import org.apache.bigtop.manager.dao.po.StagePO;
 import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.server.command.job.factory.JobContext;
@@ -62,16 +63,17 @@ public class ClusterCreateJob extends AbstractJob {
         clusterRepository.save(clusterPO);
 
         // Link job to cluster after cluster successfully added
+        JobPO jobPO = getJobPO();
         jobPO.setClusterPO(clusterPO);
         jobRepository.save(jobPO);
 
         for (Stage stage : getStages()) {
-            StagePO stagePO = stage.toStagePO();
+            StagePO stagePO = stage.getStagePO();
             stagePO.setClusterPO(clusterPO);
             stageRepository.save(stagePO);
 
             for (Task task : stage.getTasks()) {
-                TaskPO taskPO = task.toTaskPO();
+                TaskPO taskPO = task.getTaskPO();
                 taskPO.setClusterPO(clusterPO);
                 taskRepository.save(taskPO);
             }

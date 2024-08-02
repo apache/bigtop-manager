@@ -1,6 +1,5 @@
 package org.apache.bigtop.manager.server.command.task;
 
-import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
 import org.apache.bigtop.manager.common.message.entity.pojo.CustomCommandInfo;
 import org.apache.bigtop.manager.common.message.entity.pojo.OSSpecificInfo;
@@ -38,7 +37,7 @@ public abstract class AbstractComponentTask extends AbstractTask {
     protected CommandRequest getCommandRequest() {
         CommandPayload commandPayload = new CommandPayload();
         commandPayload.setServiceName(taskContext.getServiceName());
-        commandPayload.setCommand(Command.CHECK);
+        commandPayload.setCommand(getCommand());
         commandPayload.setServiceUser(taskContext.getServiceUser());
         commandPayload.setServiceGroup(taskContext.getServiceGroup());
         commandPayload.setStackName(taskContext.getStackName());
