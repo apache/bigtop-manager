@@ -20,7 +20,6 @@
 <script setup lang="ts">
   import { BellOutlined } from '@ant-design/icons-vue'
   import { computed, ref } from 'vue'
-  import DotState from '@/components/dot-state/index.vue'
   import dayjs from 'dayjs'
   import customParseFormat from 'dayjs/plugin/customParseFormat'
   const visible = ref(false)

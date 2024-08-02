@@ -17,13 +17,7 @@
  * under the License.
  */
 
-export enum State {
-  Pending = '#1677ff',
-  Processing = '#1677fe',
-  Successful = '#52c41a',
-  Failed = '#ff4d4f',
-  Canceled = '#80868b'
-}
+import { State } from '@/utils/enums'
 
 export type StateType = keyof typeof State
 

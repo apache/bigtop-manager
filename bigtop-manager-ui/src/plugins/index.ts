@@ -17,25 +17,11 @@
  * under the License.
  */
 
-export type MaintainState =
-  | 'Uninstalled'
-  | 'Installed'
-  | 'Maintained'
-  | 'Started'
-  | 'Stopped'
+import type { App } from 'vue'
+import compPlugin from '@/components/common'
 
-export enum State {
-  Pending = '#1677ff',
-  Processing = '#1677fe',
-  Successful = '#52c41a',
-  Failed = '#ff4d4f',
-  Canceled = '#80868b'
-}
-
-export enum ServiceState {
-  Installed = '#2196F3',
-  Started = '#52c41a',
-  Maintained = '#d9d9d9',
-  Uninstalled = '#f0f964',
-  Stopped = '#ff4d4f'
+export default {
+  install(app: App) {
+    app.use(compPlugin)
+  }
 }

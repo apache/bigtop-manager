@@ -30,6 +30,7 @@
   } from 'vue'
 
   import { useI18n } from 'vue-i18n'
+  import { ServiceState } from '@/utils/enums'
   import { type SelectProps, type MenuProps, Modal } from 'ant-design-vue'
   import { DownOutlined, QuestionCircleOutlined } from '@ant-design/icons-vue'
 
@@ -38,12 +39,11 @@
   import { useServiceStore } from '@/store/service'
   import { useClusterStore } from '@/store/cluster'
 
-  import { type ServiceVO, StateColor } from '@/api/service/types.ts'
+  import type { ServiceVO } from '@/api/service/types.ts'
   import { ServiceConfigVO, TypeConfigVO } from '@/api/config/types.ts'
   import { HostComponentVO } from '@/api/component/types.ts'
   import { execCommand } from '@/api/command'
 
-  import DotState from '@/components/dot-state/index.vue'
   import Job from '@/components/job-info/job.vue'
 
   interface Menu {
@@ -266,7 +266,7 @@
                   <footer>
                     <div class="comp-state">
                       <dot-state
-                        :color="StateColor[item.state]"
+                        :color="ServiceState[item.state]"
                         class="dot-rest"
                       >
                         <span class="comp-state-text">{{ item.state }}</span>
