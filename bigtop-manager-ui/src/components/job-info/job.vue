@@ -256,7 +256,7 @@
     </div>
     <a-table
       v-show="getCurrPage == 'isJobTable'"
-      :scroll="{ y: 500 }"
+      :scroll="{ y: 400 }"
       :loading="loading"
       :data-source="jobs"
       :columns="columnsProp"
