@@ -66,7 +66,8 @@ public abstract class AbstractComponentTask extends AbstractTask {
 
         Map<String, Object> properties = taskContext.getProperties();
 
-        commandPayload.setCustomCommands(convertCustomCommandInfo((List<CustomCommandDTO>) properties.get("customCommands")));
+        commandPayload.setCustomCommands(
+                convertCustomCommandInfo((List<CustomCommandDTO>) properties.get("customCommands")));
         commandPayload.setOsSpecifics(convertOSSpecificInfo((List<OSSpecificDTO>) properties.get("osSpecifics")));
         commandPayload.setCommandScript(convertScriptInfo((ScriptDTO) properties.get("commandScript")));
 
@@ -77,7 +78,6 @@ public abstract class AbstractComponentTask extends AbstractTask {
 
         return builder.build();
     }
-
 
     private ScriptInfo convertScriptInfo(ScriptDTO scriptDTO) {
         if (scriptDTO == null) {

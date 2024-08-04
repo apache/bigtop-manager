@@ -18,6 +18,4 @@
  */
 package org.apache.bigtop.manager.server.command.factory;
 
-public abstract class AbstractJobFactory implements JobFactory {
-
-}
+public abstract class AbstractJobFactory implements JobFactory {}

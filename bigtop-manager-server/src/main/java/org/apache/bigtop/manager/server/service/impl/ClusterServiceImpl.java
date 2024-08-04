@@ -18,8 +18,6 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
-import jakarta.annotation.Resource;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.common.enums.MaintainState;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.RepoPO;
@@ -37,8 +35,12 @@ import org.apache.bigtop.manager.server.model.vo.ClusterVO;
 import org.apache.bigtop.manager.server.service.ClusterService;
 import org.apache.bigtop.manager.server.service.HostService;
 import org.apache.bigtop.manager.server.utils.StackUtils;
+
 import org.springframework.stereotype.Service;
 
+import lombok.extern.slf4j.Slf4j;
+
+import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -66,9 +66,6 @@ public class TaskPO extends BasePO {
     @Column(name = "context", length = 16777216)
     private String context;
 
-    @Column(name = "message_id")
-    private String messageId;
-
     @Column(name = "state")
     private JobState state;
 
@@ -83,14 +80,6 @@ public class TaskPO extends BasePO {
 
     @Column(name = "custom_command")
     private String customCommand;
-
-    @Lob
-    @Basic(fetch = FetchType.LAZY)
-    @Column(name = "custom_commands", length = 16777216)
-    private String customCommands;
-
-    @Column(name = "command_script")
-    private String commandScript;
 
     @Column(name = "hostname")
     private String hostname;

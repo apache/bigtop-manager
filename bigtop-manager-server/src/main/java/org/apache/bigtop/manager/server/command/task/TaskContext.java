@@ -18,8 +18,9 @@
  */
 package org.apache.bigtop.manager.server.command.task;
 
-import lombok.Data;
 import org.apache.bigtop.manager.common.enums.Command;
+
+import lombok.Data;
 
 import java.util.Map;
 

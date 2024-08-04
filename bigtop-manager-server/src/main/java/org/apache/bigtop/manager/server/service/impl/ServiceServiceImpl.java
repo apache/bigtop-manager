@@ -18,8 +18,6 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
-import jakarta.annotation.Resource;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.common.constants.ComponentCategories;
 import org.apache.bigtop.manager.common.enums.MaintainState;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
@@ -41,9 +39,14 @@ import org.apache.bigtop.manager.server.model.dto.TypeConfigDTO;
 import org.apache.bigtop.manager.server.model.vo.QuickLinkVO;
 import org.apache.bigtop.manager.server.model.vo.ServiceVO;
 import org.apache.bigtop.manager.server.service.ServiceService;
+
 import org.apache.commons.lang3.StringUtils;
+
 import org.springframework.stereotype.Service;
 
+import lombok.extern.slf4j.Slf4j;
+
+import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

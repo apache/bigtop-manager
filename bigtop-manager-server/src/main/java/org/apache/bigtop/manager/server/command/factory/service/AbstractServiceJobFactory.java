@@ -20,6 +20,4 @@ package org.apache.bigtop.manager.server.command.factory.service;
 
 import org.apache.bigtop.manager.server.command.factory.AbstractJobFactory;
 
-public abstract class AbstractServiceJobFactory extends AbstractJobFactory {
-
-}
+public abstract class AbstractServiceJobFactory extends AbstractJobFactory {}

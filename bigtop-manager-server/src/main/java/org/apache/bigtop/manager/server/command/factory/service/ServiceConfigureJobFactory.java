@@ -18,16 +18,18 @@
  */
 package org.apache.bigtop.manager.server.command.factory.service;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
 import org.apache.bigtop.manager.server.command.job.Job;
-import org.apache.bigtop.manager.server.command.job.ServiceConfigureJob;
 import org.apache.bigtop.manager.server.command.job.JobContext;
+import org.apache.bigtop.manager.server.command.job.ServiceConfigureJob;
 import org.apache.bigtop.manager.server.enums.CommandLevel;
+
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component

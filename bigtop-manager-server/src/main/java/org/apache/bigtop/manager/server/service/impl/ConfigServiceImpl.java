@@ -18,7 +18,6 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
-import jakarta.annotation.Resource;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
@@ -40,6 +39,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
 
+import jakarta.annotation.Resource;
 import java.util.List;
 
 @Slf4j
