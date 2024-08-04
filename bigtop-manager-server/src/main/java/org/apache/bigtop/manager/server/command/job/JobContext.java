@@ -18,28 +18,12 @@
  */
 package org.apache.bigtop.manager.server.command.job;
 
-import org.apache.bigtop.manager.dao.po.JobPO;
-import org.apache.bigtop.manager.server.command.stage.Stage;
+import org.apache.bigtop.manager.server.model.dto.CommandDTO;
 
-import java.util.List;
+import lombok.Data;
 
-public interface Job {
+@Data
+public class JobContext {
 
-    String getName();
-
-    void beforeRun();
-
-    void run();
-
-    void onSuccess();
-
-    void onFailure();
-
-    JobContext getJobContext();
-
-    List<Stage> getStages();
-
-    void loadJobPO(JobPO jobPO);
-
-    JobPO getJobPO();
+    private CommandDTO commandDTO;
 }

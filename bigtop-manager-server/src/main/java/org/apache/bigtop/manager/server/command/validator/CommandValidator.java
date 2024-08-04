@@ -16,30 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.command.job;
+package org.apache.bigtop.manager.server.command.validator;
 
-import org.apache.bigtop.manager.dao.po.JobPO;
-import org.apache.bigtop.manager.server.command.stage.Stage;
+import org.apache.bigtop.manager.server.command.CommandIdentifier;
 
 import java.util.List;
 
-public interface Job {
+public interface CommandValidator {
 
-    String getName();
+    List<CommandIdentifier> getCommandIdentifiers();
 
-    void beforeRun();
-
-    void run();
-
-    void onSuccess();
-
-    void onFailure();
-
-    JobContext getJobContext();
-
-    List<Stage> getStages();
-
-    void loadJobPO(JobPO jobPO);
-
-    JobPO getJobPO();
+    void validate(ValidatorContext context);
 }

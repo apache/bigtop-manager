@@ -1,6 +1,5 @@
 package org.apache.bigtop.manager.server.command.stage;
 
-import org.apache.bigtop.manager.server.command.stage.factory.StageContext;
 import org.apache.bigtop.manager.server.command.task.ComponentStartTask;
 import org.apache.bigtop.manager.server.command.task.Task;
 

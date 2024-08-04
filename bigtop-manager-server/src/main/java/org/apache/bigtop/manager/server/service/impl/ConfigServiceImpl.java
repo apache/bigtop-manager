@@ -18,6 +18,7 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
+import jakarta.annotation.Resource;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
@@ -37,21 +38,25 @@ import org.apache.bigtop.manager.server.service.ConfigService;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class ConfigServiceImpl implements ConfigService {
 
-    // Autowired Beans
-    private final ClusterRepository clusterRepository;
-    private final ServiceRepository serviceRepository;
-    private final ServiceConfigRepository serviceConfigRepository;
-    private final TypeConfigRepository typeConfigRepository;
+    @Resource
+    private ClusterRepository clusterRepository;
+
+    @Resource
+    private ServiceRepository serviceRepository;
+
+    @Resource
+    private ServiceConfigRepository serviceConfigRepository;
+
+    @Resource
+    private TypeConfigRepository typeConfigRepository;
 
     @Override
     public List<ServiceConfigVO> list(Long clusterId) {

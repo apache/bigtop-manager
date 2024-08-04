@@ -10,7 +10,6 @@ import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.dao.repository.JobRepository;
 import org.apache.bigtop.manager.dao.repository.StageRepository;
 import org.apache.bigtop.manager.dao.repository.TaskRepository;
-import org.apache.bigtop.manager.server.command.job.factory.JobContext;
 import org.apache.bigtop.manager.server.command.stage.Stage;
 import org.apache.bigtop.manager.server.command.task.Task;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
@@ -74,7 +73,7 @@ public abstract class AbstractJob implements Job {
 
         boolean success = true;
         LinkedBlockingQueue<Stage> queue = new LinkedBlockingQueue<>(stages);
-         while (!queue.isEmpty()) {
+        while (!queue.isEmpty()) {
             Stage stage = queue.poll();
             Boolean stageSuccess = stage.run();
 

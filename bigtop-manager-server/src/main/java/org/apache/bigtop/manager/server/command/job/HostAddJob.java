@@ -1,9 +1,8 @@
 package org.apache.bigtop.manager.server.command.job;
 
-import org.apache.bigtop.manager.server.command.job.factory.JobContext;
 import org.apache.bigtop.manager.server.command.stage.CacheFileUpdateStage;
 import org.apache.bigtop.manager.server.command.stage.HostCheckStage;
-import org.apache.bigtop.manager.server.command.stage.factory.StageContext;
+import org.apache.bigtop.manager.server.command.stage.StageContext;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 import org.apache.bigtop.manager.server.model.dto.CommandDTO;
 import org.apache.bigtop.manager.server.model.dto.command.HostCommandDTO;

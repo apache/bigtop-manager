@@ -16,30 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.command.job;
+package org.apache.bigtop.manager.server.command.factory.host;
 
-import org.apache.bigtop.manager.dao.po.JobPO;
-import org.apache.bigtop.manager.server.command.stage.Stage;
+import org.apache.bigtop.manager.server.command.factory.AbstractJobFactory;
 
-import java.util.List;
-
-public interface Job {
-
-    String getName();
-
-    void beforeRun();
-
-    void run();
-
-    void onSuccess();
-
-    void onFailure();
-
-    JobContext getJobContext();
-
-    List<Stage> getStages();
-
-    void loadJobPO(JobPO jobPO);
-
-    JobPO getJobPO();
-}
+public abstract class AbstractHostJobFactory extends AbstractJobFactory {}
