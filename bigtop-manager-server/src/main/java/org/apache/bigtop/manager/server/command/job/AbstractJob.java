@@ -136,6 +136,11 @@ public abstract class AbstractJob implements Job {
     }
 
     @Override
+    public void loadJobPO(JobPO jobPO) {
+        this.jobPO = jobPO;
+    }
+
+    @Override
     public JobPO getJobPO() {
         if (jobPO == null) {
             jobPO = new JobPO();

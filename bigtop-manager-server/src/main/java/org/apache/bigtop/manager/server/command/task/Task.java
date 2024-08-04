@@ -16,5 +16,7 @@ public interface Task {
 
     TaskContext getTaskContext();
 
+    void loadTaskPO(TaskPO taskPO);
+
     TaskPO getTaskPO();
 }

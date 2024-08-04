@@ -47,7 +47,7 @@ public class ServiceInstallJob extends AbstractServiceJob {
         // Install components
         super.createInstallStages();
 
-        // Distribute caches after installed
+        // Update cache files after installed
         super.createCacheStage();
 
         // Start all master components
@@ -78,14 +78,17 @@ public class ServiceInstallJob extends AbstractServiceJob {
             for (ComponentHostDTO componentHost : componentHosts) {
                 if (componentHost.getComponentName().equals(componentName)) {
                     List<String> hostnames = new ArrayList<>(componentHost.getHostnames());
-                    List<String> existHostnames = hostComponentRepository
-                            .findAllByComponentPOClusterPOIdAndComponentPOComponentNameAndHostPOHostnameIn(
-                                    clusterPO.getId(), componentName, hostnames)
-                            .stream()
-                            .map(hostComponent -> hostComponent.getHostPO().getHostname())
-                            .toList();
+                    if (serviceCommand.getInstalled()) {
+                        List<String> existHostnames = hostComponentRepository
+                                .findAllByComponentPOClusterPOIdAndComponentPOComponentNameAndHostPOHostnameIn(
+                                        clusterPO.getId(), componentName, hostnames)
+                                .stream()
+                                .map(hostComponent -> hostComponent.getHostPO().getHostname())
+                                .toList();
 
-                    hostnames.removeAll(existHostnames);
+                        hostnames.removeAll(existHostnames);
+                    }
+
                     return hostnames;
                 }
             }
@@ -119,7 +122,7 @@ public class ServiceInstallJob extends AbstractServiceJob {
         String stackName = clusterPO.getStackPO().getStackName();
         String stackVersion = clusterPO.getStackPO().getStackVersion();
 
-        // 1. Persist service
+        // 1. Persist service and components
         if (servicePO == null) {
             ServiceDTO serviceDTO = StackUtils.getServiceDTO(stackName, stackVersion, serviceName);
             servicePO = ServiceConverter.INSTANCE.fromDTO2PO(serviceDTO, clusterPO);

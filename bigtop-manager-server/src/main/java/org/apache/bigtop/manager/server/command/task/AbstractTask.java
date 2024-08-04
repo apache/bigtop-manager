@@ -96,6 +96,11 @@ public abstract class AbstractTask implements Task {
     }
 
     @Override
+    public void loadTaskPO(TaskPO taskPO) {
+        this.taskPO = taskPO;
+    }
+
+    @Override
     public TaskPO getTaskPO() {
         if (taskPO == null) {
             taskPO = new TaskPO();

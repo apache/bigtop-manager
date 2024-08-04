@@ -36,6 +36,9 @@ public class ServiceCommandReq {
     @NotNull @Schema(description = "Service name", example = "zookeeper")
     private String serviceName;
 
+    @Schema(description = "If service installed", example = "true")
+    private Boolean installed;
+
     @Schema(description = "Config Description", example = "Initial config for zookeeper")
     private String configDesc;
 

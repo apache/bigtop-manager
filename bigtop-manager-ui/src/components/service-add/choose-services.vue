@@ -18,18 +18,18 @@
 -->
 
 <script setup lang="ts">
-  import { storeToRefs } from 'pinia'
-  import { TableProps } from 'ant-design-vue'
-  import { useServiceStore } from '@/store/service'
-  import { MergedServiceVO } from '@/store/service/types.ts'
-  import { onMounted } from 'vue'
-  import { ServiceVO } from '@/api/service/types.ts'
-  import { useStackStore } from '@/store/stack'
-  import { ComponentVO, ServiceComponentVO } from '@/api/component/types.ts'
-  import { TypeConfigVO, ServiceConfigVO } from '@/api/config/types.ts'
-  import _ from 'lodash'
+import {storeToRefs} from 'pinia'
+import {TableProps} from 'ant-design-vue'
+import {useServiceStore} from '@/store/service'
+import {MergedServiceVO} from '@/store/service/types.ts'
+import {onMounted} from 'vue'
+import {ServiceVO} from '@/api/service/types.ts'
+import {useStackStore} from '@/store/stack'
+import {ComponentVO, ServiceComponentVO} from '@/api/component/types.ts'
+import {ServiceConfigVO, TypeConfigVO} from '@/api/config/types.ts'
+import _ from 'lodash'
 
-  const serviceInfo = defineModel<any>('serviceInfo')
+const serviceInfo = defineModel<any>('serviceInfo')
   const disableButton = defineModel<boolean>('disableButton')
 
   const stackStore = useStackStore()
@@ -84,6 +84,7 @@
 
     return {
       serviceName: serviceName,
+      installed: false,
       componentHosts: componentHosts,
       configs: configs
     }

@@ -114,6 +114,11 @@ public abstract class AbstractStage implements Stage {
     }
 
     @Override
+    public void loadStagePO(StagePO stagePO) {
+        this.stagePO = stagePO;
+    }
+
+    @Override
     public StagePO getStagePO() {
         if (stagePO == null) {
             stagePO = new StagePO();
