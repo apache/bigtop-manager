@@ -33,6 +33,6 @@ public class ComponentCheckTask extends AbstractComponentTask {
 
     @Override
     public String getName() {
-        return "Check component " + taskContext.getComponentName() + " on " + taskContext.getHostname();
+        return "Check " + taskContext.getComponentDisplayName() + " on " + taskContext.getHostname();
     }
 }

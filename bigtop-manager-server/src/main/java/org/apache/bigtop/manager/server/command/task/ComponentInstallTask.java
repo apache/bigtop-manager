@@ -49,6 +49,6 @@ public class ComponentInstallTask extends AbstractComponentTask {
 
     @Override
     public String getName() {
-        return "Install component " + taskContext.getComponentName() + " on " + taskContext.getHostname();
+        return "Install " + taskContext.getComponentDisplayName() + " on " + taskContext.getHostname();
     }
 }

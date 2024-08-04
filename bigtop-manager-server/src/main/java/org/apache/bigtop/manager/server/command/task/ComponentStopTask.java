@@ -49,6 +49,6 @@ public class ComponentStopTask extends AbstractComponentTask {
 
     @Override
     public String getName() {
-        return "Stop component " + taskContext.getComponentName() + " on " + taskContext.getHostname();
+        return "Stop " + taskContext.getComponentDisplayName() + " on " + taskContext.getHostname();
     }
 }

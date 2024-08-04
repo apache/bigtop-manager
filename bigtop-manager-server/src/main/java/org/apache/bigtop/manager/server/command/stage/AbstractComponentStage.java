@@ -72,6 +72,7 @@ public abstract class AbstractComponentStage extends AbstractStage {
         taskContext.setStackName(stageContext.getStackName());
         taskContext.setStackVersion(stageContext.getStackVersion());
         taskContext.setComponentName(componentDTO.getComponentName());
+        taskContext.setComponentDisplayName(componentDTO.getDisplayName());
         taskContext.setServiceUser(serviceDTO.getServiceUser());
         taskContext.setServiceGroup(serviceDTO.getServiceGroup());
         taskContext.setRoot(clusterPO.getRoot());

@@ -45,6 +45,8 @@ public class TaskContext {
 
     private String componentName;
 
+    private String componentDisplayName;
+
     private Command command;
 
     private String customCommand;

@@ -74,6 +74,7 @@ public class CacheFileUpdateStage extends AbstractStage {
         taskContext.setServiceUser("root");
         taskContext.setServiceGroup("root");
         taskContext.setComponentName("agent");
+        taskContext.setComponentDisplayName("Agent");
         taskContext.setCommand(Command.CUSTOM);
         taskContext.setCustomCommand("update_cache_files");
 

@@ -63,6 +63,7 @@ public class HostCheckStage extends AbstractStage {
         taskContext.setServiceUser("root");
         taskContext.setServiceGroup("root");
         taskContext.setComponentName("agent");
+        taskContext.setComponentDisplayName("Agent");
         taskContext.setCommand(Command.CUSTOM);
         taskContext.setCustomCommand("check_host");
 

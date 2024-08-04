@@ -49,6 +49,6 @@ public class ComponentStartTask extends AbstractComponentTask {
 
     @Override
     public String getName() {
-        return "Start component " + taskContext.getComponentName() + " on " + taskContext.getHostname();
+        return "Start " + taskContext.getComponentDisplayName() + " on " + taskContext.getHostname();
     }
 }
