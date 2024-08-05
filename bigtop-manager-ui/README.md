@@ -37,16 +37,20 @@ Editor: VsCode
 ——————————— API                     calls the backend interface
 ——————————— assets                  static assets
 ——————————— components              customize components
-——————————— layouts                 vue pages
+——————————— composables             composable
+——————————— directives              customize directive
+——————————— layouts                 overall page layout
 ——————————— locales                 internationalization
 ——————————— pages                   components
+——————————— plugins                 global registration configuration
 ——————————— router                  router
-———————————store                    global persistence
-———————————types                    data type
+——————————— store                   global persistence
+——————————— styles                  style and theme
+——————————— types                   data type
 ——————————— utils                   utility function
 ——————————— App.vue                 project root component
-———————————main.ts                  Project packaging portal
-——————————————————index.html        Project page
-——————————————————package.json      Package management profile for your project
-——————————————————vite.config.ts    Project configuration file
+——————————— main.ts                 Project packaging portal
+—————————————————— index.html       Project page
+—————————————————— package.json     Package management profile for your project
+—————————————————— vite.config.ts   Project configuration file
 ```
