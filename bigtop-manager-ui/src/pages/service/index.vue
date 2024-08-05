@@ -20,7 +20,14 @@
 <script setup lang="ts">
   import { storeToRefs } from 'pinia'
   import { useRoute } from 'vue-router'
-  import { computed, onMounted, ref, watch, createVNode } from 'vue'
+  import {
+    computed,
+    onMounted,
+    ref,
+    watch,
+    createVNode,
+    onUnmounted
+  } from 'vue'
 
   import { useI18n } from 'vue-i18n'
   import { type SelectProps, type MenuProps, Modal } from 'ant-design-vue'
@@ -200,12 +207,15 @@
     activeSelect.value = serviceConfigDesc.value?.[0]
     currentConfigVersion.value = serviceConfigDesc.value?.[0].value as number
     initConfigVersion.value = serviceConfigDesc.value?.[0].value as number
-    await componentStore.loadHostComponents()
   }
 
   onMounted(() => {
     initServiceMeta()
     componentStore.resumeIntervalFn()
+  })
+
+  onUnmounted(() => {
+    componentStore.pauseIntervalFn()
   })
 </script>
 

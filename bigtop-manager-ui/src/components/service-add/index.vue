@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { ref, h, watch, reactive } from 'vue'
+  import { ref, h, watch, reactive, onUnmounted, onMounted } from 'vue'
   import { Modal } from 'ant-design-vue'
   import { ExclamationCircleFilled } from '@ant-design/icons-vue'
   import { useI18n } from 'vue-i18n'
@@ -187,6 +187,14 @@
       }
     })
   }
+
+  onMounted(() => {
+    componentStore.resumeIntervalFn()
+  })
+
+  onUnmounted(() => {
+    componentStore.pauseIntervalFn()
+  })
 </script>
 
 <template>

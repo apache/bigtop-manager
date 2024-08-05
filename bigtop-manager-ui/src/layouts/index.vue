@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { onMounted } from 'vue'
+  import { onMounted, onUnmounted } from 'vue'
   import LayoutFooter from '@/layouts/footer.vue'
   import LayoutContent from '@/layouts/content.vue'
   import LayoutHeader from '@/layouts/header.vue'
@@ -37,13 +37,14 @@
 
   onMounted(() => {
     userStore.getUserInfo()
-
     clusterStore.loadClusters()
-
-    console.log('loading...')
     serviceStore.loadServices()
-    componentStore.loadHostComponents()
+    componentStore.resumeIntervalFn()
     configStore.loadLatestConfigs()
+  })
+
+  onUnmounted(() => {
+    componentStore.pauseIntervalFn()
   })
 </script>
 

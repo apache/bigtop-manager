@@ -138,7 +138,6 @@
       loading.value = false
       return
     }
-    getJobsList()
     initInterval()
   }
 
@@ -147,13 +146,10 @@
       intervalId.value?.resume()
       return
     }
-    intervalId.value = useIntervalFn(
-      async () => {
-        await getJobsList()
-      },
-      MONITOR_SCHEDULE_INTERVAL,
-      { immediate: false, immediateCallback: true }
-    )
+    intervalId.value = useIntervalFn(getJobsList, MONITOR_SCHEDULE_INTERVAL, {
+      immediate: true,
+      immediateCallback: true
+    })
   }
 
   const getJobsList = async () => {
@@ -163,12 +159,9 @@
         pageSize: paginationProps.value.pageSize,
         sort: 'desc'
       } as Pagination
-      const { content } = await getJobs(clusterId.value, params)
-      jobs.value = content.map((v) => {
-        return {
-          ...v
-        }
-      })
+      const { content, total } = await getJobs(clusterId.value, params)
+      jobs.value = content.map((v) => ({ ...v }))
+      paginationProps.value.total = total
       loading.value = false
     } catch (error) {
       console.log('error :>> ', error)
@@ -255,7 +248,7 @@
     </div>
     <a-table
       v-show="getCurrPage == 'isJobTable'"
-      :scroll="{ y: 500 }"
+      :scroll="{ y: 400 }"
       :loading="loading"
       :data-source="jobs"
       :columns="columnsProp"
