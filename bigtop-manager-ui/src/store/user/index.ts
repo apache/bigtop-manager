@@ -26,7 +26,7 @@ import { initialRoutes, layoutRoutes } from '@/router/routes.ts'
 import { useClusterStore } from '@/store/cluster'
 import { RouteRecordRaw } from 'vue-router'
 import { useServiceStore } from '@/store/service'
-import CircleFilled from '@/components/icons/circle-filled.vue'
+import SvgIcon from '@/components/common/svg-icon/svg-icon.vue'
 
 export const useUserStore = defineStore(
   'user',
@@ -56,8 +56,9 @@ export const useUserStore = defineStore(
               key: service.serviceName,
               to: '/services/' + service.serviceName,
               title: service.displayName,
-              icon: h(CircleFilled, {
-                style: `font-size: 8px; color: ${color}; margin-right: 0.5rem;`
+              icon: h(SvgIcon, {
+                name: 'circle-filled',
+                style: `font-size: 8px; color: ${color}; vertical-align:inherit`
               })
             })
           })

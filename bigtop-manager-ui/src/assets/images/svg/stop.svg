@@ -17,9 +17,9 @@
   ~ specific language governing permissions and limitations
   ~ under the License.
 -->
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1722394157011"
-  class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1130"
-  xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200">
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg t="1722394157011" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1130"
+  xmlns:xlink="http://www.w3.org/1999/xlink" width="1em" height="1em">
   <path
     d="M256 192h512c35.392 0 64 28.608 64 64v512c0 35.392-28.608 64-64 64H256c-35.392 0-64-28.608-64-64V256c0-35.392 28.608-64 64-64z"
     fill="#333333" p-id="1131"></path>

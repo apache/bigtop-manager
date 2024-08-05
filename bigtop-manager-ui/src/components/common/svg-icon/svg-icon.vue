@@ -52,7 +52,7 @@
   .svg-icon {
     height: 1.2em;
     width: 1.2em;
-    margin-right: 6px;
+    margin: 0 6px;
     vertical-align: -0.25em;
     overflow: hidden;
   }
