@@ -43,19 +43,15 @@ import jakarta.servlet.http.HttpServletRequest;
 @Configuration
 public class AuditAspect {
 
-    private static final String POINT_CUT = "@annotation(org.apache.bigtop.manager.server.annotations.Audit)";
-
     @Resource
     private AuditLogRepository auditLogRepository;
 
-    @Before(value = POINT_CUT)
+    @Before(value = "@annotation(org.apache.bigtop.manager.server.annotations.Audit)")
     public void before(JoinPoint joinPoint) {
         MethodSignature ms = (MethodSignature) joinPoint.getSignature();
-        AuditLogPO auditLogPO = new AuditLogPO();
-        auditLogPO.setUserId(SessionUserHolder.getUserId());
-
+        Long userId = SessionUserHolder.getUserId();
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        if (attributes != null) {
+        if (attributes != null && userId != null) {
             // obtain request uri
             HttpServletRequest request = attributes.getRequest();
             String uri = request.getRequestURI();
@@ -79,6 +75,8 @@ public class AuditAspect {
                 operationDesc = operation.description();
             }
 
+            AuditLogPO auditLogPO = new AuditLogPO();
+            auditLogPO.setUserId(userId);
             auditLogPO.setUri(uri);
             auditLogPO.setTagName(apiName);
             auditLogPO.setTagDesc(apiDesc);
