@@ -138,7 +138,6 @@
       loading.value = false
       return
     }
-    getJobsList()
     initInterval()
   }
 
