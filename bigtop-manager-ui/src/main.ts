@@ -25,7 +25,7 @@ import pinia from '@/store'
 import i18n from '@/locales'
 import plugins from '@/plugins'
 
-import '@/assets/styles/default.scss'
+import '@/styles/default.scss'
 import 'ant-design-vue/dist/reset.css'
 import 'virtual:svg-icons-register'
 
