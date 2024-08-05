@@ -21,15 +21,16 @@
   import { computed } from 'vue'
 
   interface SvgIconProps {
-    prefix: string
+    prefix?: string
     name: string
-    color: string
-    className: string
+    color?: string
+    className?: string
   }
 
   const props = withDefaults(defineProps<SvgIconProps>(), {
     prefix: 'icon',
-    color: '#000'
+    color: '#000',
+    className: ''
   })
 
   const symbolId = computed(() => `#${props.prefix}-${props.name}`)
