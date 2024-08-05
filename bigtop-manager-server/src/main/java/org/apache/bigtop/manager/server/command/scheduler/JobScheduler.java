@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.server.command.scheduler;
 
-import org.apache.bigtop.manager.dao.po.JobPO;
+import org.apache.bigtop.manager.server.command.job.Job;
 
 /**
  * JobScheduler interface for job management.
@@ -28,9 +28,9 @@ public interface JobScheduler {
 
     /**
      * Submits a job to the job scheduler.
-     * @param jobPO The job to be submitted.
+     * @param job The job to be submitted.
      */
-    void submit(JobPO jobPO);
+    void submit(Job job);
 
     /**
      * Starts the job scheduler.

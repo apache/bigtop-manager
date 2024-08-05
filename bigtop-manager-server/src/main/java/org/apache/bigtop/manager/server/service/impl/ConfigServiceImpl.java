@@ -35,6 +35,7 @@ import org.apache.bigtop.manager.server.model.vo.ServiceConfigVO;
 import org.apache.bigtop.manager.server.service.ConfigService;
 
 import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,7 +43,7 @@ import jakarta.annotation.Resource;
 import java.util.List;
 
 @Slf4j
-@org.springframework.stereotype.Service
+@Service
 public class ConfigServiceImpl implements ConfigService {
 
     @Resource

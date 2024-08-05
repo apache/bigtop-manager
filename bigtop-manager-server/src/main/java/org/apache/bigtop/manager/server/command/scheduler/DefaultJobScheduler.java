@@ -18,9 +18,7 @@
  */
 package org.apache.bigtop.manager.server.command.scheduler;
 
-import org.apache.bigtop.manager.dao.po.JobPO;
-import org.apache.bigtop.manager.server.command.job.runner.JobRunner;
-import org.apache.bigtop.manager.server.command.job.runner.JobRunners;
+import org.apache.bigtop.manager.server.command.job.Job;
 import org.apache.bigtop.manager.server.holder.SessionUserHolder;
 
 import org.springframework.stereotype.Component;
@@ -43,13 +41,12 @@ public class DefaultJobScheduler implements JobScheduler {
     private volatile boolean running = true;
 
     @Override
-    public void submit(JobPO jobPO) {
+    public void submit(Job job) {
         Long userId = SessionUserHolder.getUserId();
         queue.offer(() -> {
             try {
                 SessionUserHolder.setUserId(userId);
-                JobRunner runner = JobRunners.getJobRunner(jobPO);
-                runner.run();
+                job.run();
             } finally {
                 SessionUserHolder.clear();
             }

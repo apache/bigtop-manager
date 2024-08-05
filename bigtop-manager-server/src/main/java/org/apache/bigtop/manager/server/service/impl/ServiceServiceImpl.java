@@ -42,6 +42,8 @@ import org.apache.bigtop.manager.server.service.ServiceService;
 
 import org.apache.commons.lang3.StringUtils;
 
+import org.springframework.stereotype.Service;
+
 import lombok.extern.slf4j.Slf4j;
 
 import jakarta.annotation.Resource;
@@ -51,7 +53,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
-@org.springframework.stereotype.Service
+@Service
 public class ServiceServiceImpl implements ServiceService {
 
     @Resource

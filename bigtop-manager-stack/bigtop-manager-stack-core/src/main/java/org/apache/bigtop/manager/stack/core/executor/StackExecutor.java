@@ -110,7 +110,7 @@ public class StackExecutor {
 
             return result;
         } catch (Exception e) {
-            log.info("Error executing command, payload: {}", commandPayload, e);
+            log.error("Error executing command, payload: {}", commandPayload, e);
             return ShellResult.fail();
         }
     }

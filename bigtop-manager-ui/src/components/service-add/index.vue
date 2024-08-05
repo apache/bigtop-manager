@@ -117,6 +117,7 @@
 
       return {
         serviceName: serviceName,
+        installed: true,
         componentHosts: componentHosts,
         configs: configs
       }
