@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import { MaintainState } from '@/utils/enums.ts'
+import { MaintainState } from '@/enums/state'
 
 export interface ComponentVO {
   id: number

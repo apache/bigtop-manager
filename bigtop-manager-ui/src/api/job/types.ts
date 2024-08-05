@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import { State } from '@/utils/enums'
+import { State } from '@/enums/state'
 
 export type StateType = keyof typeof State
 

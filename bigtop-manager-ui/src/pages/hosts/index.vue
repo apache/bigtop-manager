@@ -30,7 +30,7 @@
   } from '@ant-design/icons-vue'
   import { useHostStore } from '@/store/host'
   import { DEFAULT_PAGE_SIZE } from '@/utils/constant.ts'
-  import { CommonState, CurrState } from '@/utils/enums'
+  import { CommonState, CurrState } from '@/enums/state'
 
   const hostStore = useHostStore()
   const { hosts, loading } = storeToRefs(hostStore)

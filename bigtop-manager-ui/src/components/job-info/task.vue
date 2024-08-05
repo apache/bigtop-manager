@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
   import { TaskVO } from '@/api/job/types.ts'
-  import { State } from '@/utils/enums'
+  import { State } from '@/enums/state'
   import useBaseTable from '@/composables/use-base-table'
   import type { TableColumnType } from 'ant-design-vue'
 

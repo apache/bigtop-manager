@@ -30,7 +30,7 @@
   } from 'vue'
 
   import { useI18n } from 'vue-i18n'
-  import { CommonState, CurrState } from '@/utils/enums'
+  import { CommonState, CurrState } from '@/enums/state'
   import { type SelectProps, type MenuProps, Modal } from 'ant-design-vue'
   import { DownOutlined, QuestionCircleOutlined } from '@ant-design/icons-vue'
 
