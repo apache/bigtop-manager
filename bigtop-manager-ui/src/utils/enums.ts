@@ -32,10 +32,16 @@ export enum State {
   Canceled = '#80868b'
 }
 
-export enum ServiceState {
-  Installed = '#2196F3',
-  Started = '#52c41a',
-  Maintained = '#d9d9d9',
-  Uninstalled = '#f0f964',
-  Stopped = '#ff4d4f'
+export enum CommonState {
+  normal = '#52c41a',
+  abnormal = '#ff4d4f',
+  maintained = '#d9d9d9'
+}
+
+export enum CurrState {
+  Installed,
+  Started,
+  Maintained,
+  Uninstalled,
+  Stopped
 }

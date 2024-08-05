@@ -30,7 +30,7 @@
   } from 'vue'
 
   import { useI18n } from 'vue-i18n'
-  import { ServiceState } from '@/utils/enums'
+  import { CommonState, CurrState } from '@/utils/enums'
   import { type SelectProps, type MenuProps, Modal } from 'ant-design-vue'
   import { DownOutlined, QuestionCircleOutlined } from '@ant-design/icons-vue'
 
@@ -209,6 +209,15 @@
     initConfigVersion.value = serviceConfigDesc.value?.[0].value as number
   }
 
+  const stateColor = (type: keyof typeof CurrState) => {
+    if ([0, 1].includes(CurrState[type])) {
+      return CommonState['normal']
+    } else if (CurrState[type] === 2) {
+      return CommonState['maintained']
+    }
+    return CommonState['abnormal']
+  }
+
   onMounted(() => {
     initServiceMeta()
     componentStore.resumeIntervalFn()
@@ -266,7 +275,7 @@
                   <footer>
                     <div class="comp-state">
                       <dot-state
-                        :color="ServiceState[item.state]"
+                        :color="stateColor(item.state)"
                         class="dot-rest"
                       >
                         <span class="comp-state-text">{{ item.state }}</span>
