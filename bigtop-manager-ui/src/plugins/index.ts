@@ -18,10 +18,23 @@
  */
 
 import type { App } from 'vue'
-import compPlugin from '@/components/common'
+import router from '@/router'
+import pinia from '@/store'
+import i18n from '@/locales'
+import Antd, { message } from 'ant-design-vue'
+import components from '@/components/common'
+
+interface PluginOptions {
+  antdMessageMaxCount: number
+}
 
 export default {
-  install(app: App) {
-    app.use(compPlugin)
+  install(app: App, options: PluginOptions) {
+    app.use(Antd)
+    app.use(router)
+    app.use(pinia)
+    app.use(i18n)
+    app.use(components)
+    message.config({ maxCount: options.antdMessageMaxCount })
   }
 }
