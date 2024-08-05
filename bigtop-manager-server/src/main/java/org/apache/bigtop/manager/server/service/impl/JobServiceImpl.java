@@ -19,13 +19,21 @@
 package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.common.enums.JobState;
+import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.JobPO;
 import org.apache.bigtop.manager.dao.po.StagePO;
 import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.dao.repository.JobRepository;
 import org.apache.bigtop.manager.dao.repository.StageRepository;
 import org.apache.bigtop.manager.dao.repository.TaskRepository;
+import org.apache.bigtop.manager.server.command.CommandIdentifier;
+import org.apache.bigtop.manager.server.command.factory.JobFactories;
+import org.apache.bigtop.manager.server.command.factory.JobFactory;
+import org.apache.bigtop.manager.server.command.job.Job;
+import org.apache.bigtop.manager.server.command.job.JobContext;
 import org.apache.bigtop.manager.server.command.scheduler.JobScheduler;
+import org.apache.bigtop.manager.server.command.stage.Stage;
+import org.apache.bigtop.manager.server.command.task.Task;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.model.converter.JobConverter;
@@ -42,6 +50,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.Resource;
+import java.util.List;
 
 @Service
 public class JobServiceImpl implements JobService {
@@ -85,6 +94,14 @@ public class JobServiceImpl implements JobService {
             throw new ApiException(ApiExceptionEnum.JOB_NOT_RETRYABLE);
         }
 
+        resetJobStatusInDB(jobPO);
+        Job job = recreateJob(jobPO);
+        jobScheduler.submit(job);
+
+        return JobConverter.INSTANCE.fromPO2VO(jobPO);
+    }
+
+    private void resetJobStatusInDB(JobPO jobPO) {
         for (StagePO stagePO : jobPO.getStagePOList()) {
             for (TaskPO taskPO : stagePO.getTaskPOList()) {
                 taskPO.setState(JobState.PENDING);
@@ -97,8 +114,58 @@ public class JobServiceImpl implements JobService {
 
         jobPO.setState(JobState.PENDING);
         jobRepository.save(jobPO);
-        jobScheduler.submit(jobPO);
+    }
 
-        return JobConverter.INSTANCE.fromPO2VO(jobPO);
+    private Job recreateJob(JobPO jobPO) {
+        JobContext jobContext = JsonUtils.readFromString(jobPO.getContext(), JobContext.class);
+        CommandIdentifier commandIdentifier = new CommandIdentifier(
+                jobContext.getCommandDTO().getCommandLevel(),
+                jobContext.getCommandDTO().getCommand());
+        JobFactory jobFactory = JobFactories.getJobFactory(commandIdentifier);
+        Job job = jobFactory.createJob(jobContext);
+
+        job.loadJobPO(jobPO);
+        for (int i = 0; i < job.getStages().size(); i++) {
+            Stage stage = job.getStages().get(i);
+            StagePO stagePO = findCorrectStagePO(jobPO.getStagePOList(), i + 1);
+            if (stagePO == null) {
+                throw new ApiException(ApiExceptionEnum.JOB_NOT_RETRYABLE);
+            }
+
+            stage.loadStagePO(stagePO);
+
+            for (int j = 0; j < stage.getTasks().size(); j++) {
+                Task task = stage.getTasks().get(j);
+                TaskPO taskPO = findCorrectTaskPO(
+                        stagePO.getTaskPOList(), task.getTaskContext().getHostname());
+                if (taskPO == null) {
+                    throw new ApiException(ApiExceptionEnum.JOB_NOT_RETRYABLE);
+                }
+
+                task.loadTaskPO(taskPO);
+            }
+        }
+
+        return job;
+    }
+
+    private StagePO findCorrectStagePO(List<StagePO> stagePOList, Integer order) {
+        for (StagePO stagePO : stagePOList) {
+            if (stagePO.getOrder().equals(order)) {
+                return stagePO;
+            }
+        }
+
+        return null;
+    }
+
+    private TaskPO findCorrectTaskPO(List<TaskPO> taskPOList, String hostname) {
+        for (TaskPO taskPO : taskPOList) {
+            if (taskPO.getHostname().equals(hostname)) {
+                return taskPO;
+            }
+        }
+
+        return null;
     }
 }

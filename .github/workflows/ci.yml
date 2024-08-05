@@ -33,7 +33,7 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
           cache: 'maven'
-      - run: ./mvnw clean test
+      - run: ./mvnw clean test -Dskip.pnpm -Dskip.installnodepnpm
 
   build:
     name: "Build project"

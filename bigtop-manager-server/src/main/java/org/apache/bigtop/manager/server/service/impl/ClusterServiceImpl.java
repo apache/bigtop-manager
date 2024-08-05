@@ -36,6 +36,8 @@ import org.apache.bigtop.manager.server.service.ClusterService;
 import org.apache.bigtop.manager.server.service.HostService;
 import org.apache.bigtop.manager.server.utils.StackUtils;
 
+import org.springframework.stereotype.Service;
+
 import lombok.extern.slf4j.Slf4j;
 
 import jakarta.annotation.Resource;
@@ -43,7 +45,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-@org.springframework.stereotype.Service
+@Service
 public class ClusterServiceImpl implements ClusterService {
 
     @Resource

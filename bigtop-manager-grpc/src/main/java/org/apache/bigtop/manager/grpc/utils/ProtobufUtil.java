@@ -38,7 +38,7 @@ public class ProtobufUtil {
 
     public static <T extends Message> String toJson(T message) {
         try {
-            return JsonFormat.printer().print(message);
+            return JsonFormat.printer().omittingInsignificantWhitespace().print(message);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
