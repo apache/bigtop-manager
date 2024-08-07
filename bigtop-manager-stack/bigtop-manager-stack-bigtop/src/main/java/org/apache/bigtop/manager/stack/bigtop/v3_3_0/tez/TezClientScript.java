@@ -16,22 +16,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.stack.xml;
+package org.apache.bigtop.manager.stack.bigtop.v3_3_0.tez;
 
-import org.apache.bigtop.manager.server.stack.model.StackModel;
+import org.apache.bigtop.manager.common.shell.ShellResult;
+import org.apache.bigtop.manager.spi.stack.ClientScript;
+import org.apache.bigtop.manager.spi.stack.Params;
+import org.apache.bigtop.manager.spi.stack.Script;
+import org.apache.bigtop.manager.stack.common.utils.PackageUtils;
 
-import lombok.Data;
+import com.google.auto.service.AutoService;
+import lombok.extern.slf4j.Slf4j;
 
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
+@Slf4j
+@AutoService(Script.class)
+public class TezClientScript implements ClientScript {
 
-@Data
-@XmlRootElement(name = "metainfo")
-@XmlAccessorType(XmlAccessType.FIELD)
-public class StackMetainfoXml {
+    @Override
+    public ShellResult install(Params params) {
+        return PackageUtils.install(params.getPackageList());
+    }
 
-    @XmlElement(name = "stack")
-    private StackModel stack;
+    @Override
+    public ShellResult configure(Params params) {
+        return TezSetup.config(params);
+    }
 }

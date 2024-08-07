@@ -103,7 +103,8 @@ public class YarnSetup {
                 yarnUser,
                 yarnGroup,
                 Constants.PERMISSION_644,
-                yarnParams.yarnSite());
+                yarnParams.yarnSite(),
+                yarnParams.getGlobalParamsMap());
 
         // log4j
         LinuxFileUtils.toFileByTemplate(

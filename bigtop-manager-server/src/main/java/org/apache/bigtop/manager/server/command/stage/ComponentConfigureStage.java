@@ -16,22 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.stack.xml;
+package org.apache.bigtop.manager.server.command.stage;
 
-import org.apache.bigtop.manager.server.stack.model.StackModel;
+import org.apache.bigtop.manager.server.command.task.ComponentConfigureTask;
+import org.apache.bigtop.manager.server.command.task.Task;
 
-import lombok.Data;
+public class ComponentConfigureStage extends AbstractComponentStage {
 
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
+    public ComponentConfigureStage(StageContext stageContext) {
+        super(stageContext);
+    }
 
-@Data
-@XmlRootElement(name = "metainfo")
-@XmlAccessorType(XmlAccessType.FIELD)
-public class StackMetainfoXml {
+    @Override
+    protected Task createTask(String hostname) {
+        return new ComponentConfigureTask(createTaskContext(hostname));
+    }
 
-    @XmlElement(name = "stack")
-    private StackModel stack;
+    @Override
+    public String getName() {
+        return "Configure " + stageContext.getComponentDTO().getDisplayName();
+    }
 }

@@ -19,7 +19,6 @@
 -->
 
 <metainfo>
-    <schema-version>2.0</schema-version>
     <service>
         <name>hdfs</name>
         <display-name>HDFS</display-name>
@@ -113,7 +112,7 @@
                     <package>hadoop_3_3_0</package>
                     <package>hadoop_3_3_0-client</package>
                     <package>hadoop_3_3_0-libhdfs</package>
-                </packages>
+                </packages>c
             </os-specific>
         </os-specifics>
 

@@ -67,6 +67,9 @@ public class ServiceInstallJob extends AbstractServiceJob {
         // Update cache files after installed
         super.createCacheStage();
 
+        // Configure services
+        super.createConfigureStages();
+
         // Start all master components
         super.createStartStages();
 
