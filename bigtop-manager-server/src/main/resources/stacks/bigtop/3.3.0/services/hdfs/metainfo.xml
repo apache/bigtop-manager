@@ -112,7 +112,7 @@
                     <package>hadoop_3_3_0</package>
                     <package>hadoop_3_3_0-client</package>
                     <package>hadoop_3_3_0-libhdfs</package>
-                </packages>c
+                </packages>
             </os-specific>
         </os-specifics>
 

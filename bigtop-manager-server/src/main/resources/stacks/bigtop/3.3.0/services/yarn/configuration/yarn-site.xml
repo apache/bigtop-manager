@@ -38,8 +38,7 @@
         <name>yarn.resourcemanager.address</name>
         <value>0.0.0.0:8032</value>
         <description>
-            The address of the applications manager interface in the
-            RM.
+            The address of the applications manager interface in the RM.
         </description>
     </property>
     <property>
@@ -96,8 +95,7 @@
     </property>
     <property>
         <name>yarn.application.classpath</name>
-        <value>
-            ${hadoop_conf_dir!},${hadoop_home!}/*,${hadoop_home!}/lib/*,${hadoop_hdfs_home!}/*,${hadoop_hdfs_home!}/lib/*,${hadoop_yarn_home!}/*,${hadoop_yarn_home!}/lib/*</value>
+        <value>${hadoop_conf_dir!},${hadoop_home!}/*,${hadoop_home!}/lib/*,${hadoop_hdfs_home!}/*,${hadoop_hdfs_home!}/lib/*,${hadoop_yarn_home!}/*,${hadoop_yarn_home!}/lib/*</value>
         <description>Classpath for typical applications.</description>
     </property>
     <property>
