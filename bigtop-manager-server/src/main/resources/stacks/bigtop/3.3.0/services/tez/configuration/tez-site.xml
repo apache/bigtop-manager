@@ -57,7 +57,7 @@
     <property>
         <name>tez.staging-dir</name>
         <display-name>TEZ Staging directory</display-name>
-        <value>/tmp/${tez_user!}/staging</value>
+        <value>/tmp/${user.name}/staging</value>
         <description>The staging dir used while submitting DAGs</description>
     </property>
     <property>

@@ -38,28 +38,38 @@ import java.util.List;
 @Data
 @Slf4j
 public class HdfsUtil {
+    public static void createDirectory(String user, String directory) {
+        UserGroupInformation ugi = UserGroupInformation.createRemoteUser(user);
+        try {
+            ugi.doAs((PrivilegedAction<Void>) () -> {
+                try (FileSystem fs = getFileSystem()) {
+                    // Create dest dir if not exist
+                    Path destDirPath = new Path(directory);
+                    if (!fs.exists(destDirPath)) {
+                        fs.mkdirs(destDirPath);
+                    }
+                } catch (Exception e) {
+                    log.error("Error while creating directory on hdfs", e);
+                    throw new StackException(e);
+                }
+
+                return null;
+            });
+        } catch (Exception e) {
+            log.error("Error while creating directory on hdfs", e);
+            throw new StackException(e);
+        }
+    }
 
     public static void uploadFile(String user, String localFilePath, String destDir) {
         uploadFile(user, localFilePath, destDir, null);
     }
 
     public static void uploadFile(String user, String localFilePath, String destDir, String destFilename) {
-        Configuration conf = new Configuration();
-        conf.addResource(new Path("/etc/hadoop/conf/core-site.xml"));
-        conf.addResource(new Path("/etc/hadoop/conf/hdfs-site.xml"));
-
-        List<String> namenodeList = LocalSettings.hosts("namenode");
-        if (CollectionUtils.isEmpty(namenodeList)) {
-            String msg = "No namenode found in the cluster";
-            log.error(msg);
-            throw new StackException(msg);
-        }
-
-        String hdfsUri = MessageFormat.format("hdfs://{0}:8020", namenodeList.get(0));
         UserGroupInformation ugi = UserGroupInformation.createRemoteUser(user);
         try {
             ugi.doAs((PrivilegedAction<Void>) () -> {
-                try (FileSystem fs = FileSystem.get(new URI(hdfsUri), conf)) {
+                try (FileSystem fs = getFileSystem()) {
                     // Create dest dir if not exist
                     Path destDirPath = new Path(destDir);
                     if (!fs.exists(destDirPath)) {
@@ -80,5 +90,21 @@ public class HdfsUtil {
             log.error("Error while uploading file to hdfs", e);
             throw new StackException(e);
         }
+    }
+
+    private static FileSystem getFileSystem() throws Exception {
+        Configuration conf = new Configuration();
+        conf.addResource(new Path("/etc/hadoop/conf/core-site.xml"));
+        conf.addResource(new Path("/etc/hadoop/conf/hdfs-site.xml"));
+
+        List<String> namenodeList = LocalSettings.hosts("namenode");
+        if (CollectionUtils.isEmpty(namenodeList)) {
+            String msg = "No namenode found in the cluster";
+            log.error(msg);
+            throw new StackException(msg);
+        }
+
+        String hdfsUri = MessageFormat.format("hdfs://{0}:8020", namenodeList.get(0));
+        return FileSystem.get(new URI(hdfsUri), conf);
     }
 }

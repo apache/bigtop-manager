@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.text.MessageFormat;
 
-import static org.apache.bigtop.manager.common.constants.Constants.PERMISSION_644;
+import static org.apache.bigtop.manager.common.constants.Constants.PERMISSION_755;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -61,7 +61,7 @@ public class TezSetup {
                 MessageFormat.format("{0}/tez-env.sh", confDir),
                 tezUser,
                 tezGroup,
-                PERMISSION_644,
+                PERMISSION_755,
                 tezParams.getGlobalParamsMap());
 
         // maybe we should upload tez.tar.gz to HDFS here?
