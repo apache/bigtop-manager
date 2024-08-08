@@ -19,7 +19,7 @@
 
 <script lang="ts" setup>
   import { StageVO } from '@/api/job/types.ts'
-  import { watch } from 'vue'
+  import { watchEffect } from 'vue'
   import CustomProgress from './custom-progress.vue'
   import useBaseTable from '@/composables/use-base-table'
   import type { TableColumnType } from 'ant-design-vue'
@@ -33,20 +33,12 @@
   const baseTable = useBaseTable<StageVO>(props.columns, props.stages)
   const { dataSource, columnsProp, loading, paginationProps, onChange } =
     baseTable
-  watch(
-    () => props.stages,
-    (val) => {
-      if (val.length == 0) {
-        loading.value = true
-      } else {
-        loading.value = false
-      }
-    },
-    {
-      immediate: true,
-      deep: true
-    }
-  )
+
+  watchEffect(() => {
+    dataSource.value = props.stages
+    loading.value = false
+  })
+
   const emits = defineEmits(['clickStage'])
   const clickStage = (record: StageVO) => {
     emits('clickStage', record)

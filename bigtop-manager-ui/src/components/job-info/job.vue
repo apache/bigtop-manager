@@ -18,16 +18,10 @@
 -->
 
 <script setup lang="ts">
-  import { ref, watch, computed, toRefs, nextTick } from 'vue'
+  import { ref, watch, computed, toRefs, nextTick, watchEffect } from 'vue'
   import { useClusterStore } from '@/store/cluster'
   import { storeToRefs } from 'pinia'
-  import {
-    JobVO,
-    StageVO,
-    TaskVO,
-    OuterData,
-    Pagination
-  } from '@/api/job/types.ts'
+  import { JobVO, StageVO, TaskVO, OuterData } from '@/api/job/types.ts'
   import { getJobs } from '@/api/job'
   import { Pausable, useIntervalFn } from '@vueuse/core'
   import { MONITOR_SCHEDULE_INTERVAL } from '@/utils/constant.ts'
@@ -107,26 +101,22 @@
   })
 
   watch(visible, (val) => {
-    if (val) {
-      resetState()
-      loading.value = true
-      checkDataOrigin(outerData.value ? true : false)
-    }
-  })
-
-  watch(outerData, (val) => {
     if (!val) return
-    jobs.value = val.meta as any
+    resetState()
+    loading.value = true
+    checkDataOrigin(outerData.value ? true : false)
   })
 
-  watch(jobs, (val) => {
-    if (val) {
-      const len = breadcrumbs.value.length
-      const idxId = breadcrumbs.value[len - 1]?.id
-      if (idxId) {
-        stages.value = val.find((v: JobVO) => v.id == idxId)?.stages || []
-      }
-    }
+  watchEffect(() => {
+    if (!outerData.value) return
+    jobs.value = outerData.value.meta as any
+  })
+
+  watchEffect(() => {
+    if (!jobs.value) return
+    const id = breadcrumbs.value[breadcrumbs.value.length - 1]?.id
+    id &&
+      (stages.value = jobs.value.find((v: JobVO) => v.id == id)?.stages || [])
   })
 
   const checkDataOrigin = (isOuter = false) => {
@@ -154,12 +144,12 @@
 
   const getJobsList = async () => {
     try {
-      const params = {
-        pageNum: paginationProps.value.current,
-        pageSize: paginationProps.value.pageSize,
+      const { current: pageNum, pageSize } = paginationProps.value
+      const { content, total } = await getJobs(clusterId.value, {
+        pageNum,
+        pageSize,
         sort: 'desc'
-      } as Pagination
-      const { content, total } = await getJobs(clusterId.value, params)
+      })
       jobs.value = content.map((v) => ({ ...v }))
       paginationProps.value.total = total
       loading.value = false
