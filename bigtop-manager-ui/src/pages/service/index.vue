@@ -120,6 +120,7 @@
     (params) => {
       serviceName.value = params.serviceName as string
       initServiceMeta()
+      componentStore.resumeIntervalFn()
     }
   )
 
@@ -220,7 +221,6 @@
 
   onMounted(() => {
     initServiceMeta()
-    componentStore.resumeIntervalFn()
   })
 
   onUnmounted(() => {
