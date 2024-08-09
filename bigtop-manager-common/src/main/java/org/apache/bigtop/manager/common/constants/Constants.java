@@ -43,13 +43,20 @@ public final class Constants {
     public static final String ALL_HOST_KEY = "all";
 
     /**
-     * permission 755
-     */
-    public static final String PERMISSION_755 = "rwxr-xr-x";
-    /**
      * permission 644
      */
     public static final String PERMISSION_644 = "rw-r--r--";
+
+    /**
+     * permission 755
+     */
+    public static final String PERMISSION_755 = "rwxr-xr-x";
+
+    /**
+     * permission 775
+     */
+    public static final String PERMISSION_775 = "rwxrwxr-x";
+
     /**
      * permission 777
      */

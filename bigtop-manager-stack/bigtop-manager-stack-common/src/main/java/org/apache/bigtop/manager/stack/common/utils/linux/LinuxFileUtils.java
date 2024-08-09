@@ -22,6 +22,7 @@ import org.apache.bigtop.manager.common.constants.Constants;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.common.utils.YamlUtils;
 import org.apache.bigtop.manager.stack.common.enums.ConfigType;
+import org.apache.bigtop.manager.stack.common.exception.StackException;
 import org.apache.bigtop.manager.stack.common.utils.template.TemplateUtils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -226,7 +227,7 @@ public class LinuxFileUtils {
         Path path = Paths.get(dirPath);
 
         if (Files.isSymbolicLink(path)) {
-            log.warn("unable to create symbolic link: [{}]", dirPath);
+            log.error("Directory is symbolic link: [{}]", dirPath);
             return;
         }
 
@@ -239,5 +240,41 @@ public class LinuxFileUtils {
 
         updateOwner(dirPath, owner, group, recursive);
         updatePermissions(dirPath, permissions, recursive);
+    }
+
+    /**
+     * create symbolic link
+     *
+     * @param target target file
+     * @param source source file
+     */
+    public static void createSymbolicLink(String target, String source) {
+        if (StringUtils.isBlank(target) || StringUtils.isBlank(source)) {
+            log.error("target, source must not be null");
+            return;
+        }
+
+        Path targetPath = Paths.get(target);
+        Path sourcePath = Paths.get(source);
+
+        try {
+            log.info("Creating symbolic link: [{}] -> [{}]", target, source);
+            if (Files.exists(targetPath)) {
+                if (Files.isSymbolicLink(targetPath)) {
+                    Path existingSourcePath = Files.readSymbolicLink(targetPath);
+                    if (!existingSourcePath.equals(sourcePath)) {
+                        throw new IOException(
+                                "Symbolic link already exists and points to a different source: " + existingSourcePath);
+                    }
+                } else {
+                    throw new IOException("Target path exists and is not a symbolic link: " + target);
+                }
+            }
+
+            Files.createSymbolicLink(targetPath, sourcePath);
+        } catch (IOException e) {
+            log.error("Error when create symbolic link", e);
+            throw new StackException(e);
+        }
     }
 }

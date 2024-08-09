@@ -58,7 +58,7 @@ public abstract class AbstractHook implements Hook {
             }
 
             log.info(
-                    "Adding user: {} to group: {} and groups: [{}]",
+                    "Adding user: {} to primary group: {} and supplementary groups: [{}]",
                     user.getKey(),
                     userGroup,
                     String.join(",", groups));

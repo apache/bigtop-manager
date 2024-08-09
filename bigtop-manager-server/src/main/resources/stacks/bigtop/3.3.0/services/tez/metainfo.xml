@@ -20,37 +20,23 @@
 
 <metainfo>
     <service>
-        <name>zookeeper</name>
-        <display-name>ZooKeeper</display-name>
-        <desc>
-            Apache ZooKeeper is an effort to develop and maintain an open-source server which enables highly
-            reliable distributed coordination.
-        </desc>
-        <version>3.7.2-1</version>
-        <user>zookeeper</user>
-        <group>zookeeper</group>
+        <name>tez</name>
+        <display-name>Tez</display-name>
+        <desc>Tez is the next generation Hadoop Query Processing framework written on top of YARN.</desc>
+        <version>0.10.2-1</version>
+        <user>tez</user>
+        <group>tez</group>
 
         <components>
             <component>
-                <name>zookeeper_server</name>
-                <display-name>ZooKeeper Server</display-name>
-                <category>master</category>
-                <cardinality>1+</cardinality>
-                <command-script>
-                    <script-id>org.apache.bigtop.manager.stack.bigtop.v3_3_0.zookeeper.ZookeeperServerScript</script-id>
-                    <script-type>java</script-type>
-                    <timeout>1200</timeout>
-                </command-script>
-            </component>
-
-            <component>
-                <name>zookeeper_client</name>
-                <display-name>ZooKeeper Client</display-name>
+                <name>tez_client</name>
+                <display-name>Tez Client</display-name>
                 <category>client</category>
                 <cardinality>1+</cardinality>
                 <command-script>
-                    <script-id>org.apache.bigtop.manager.stack.bigtop.v3_3_0.zookeeper.ZookeeperClientScript</script-id>
+                    <script-id>org.apache.bigtop.manager.stack.bigtop.v3_3_0.tez.TezClientScript</script-id>
                     <script-type>java</script-type>
+                    <timeout>1200</timeout>
                 </command-script>
             </component>
         </components>
@@ -65,9 +51,13 @@
                     <arch>x86_64</arch>
                 </architectures>
                 <packages>
-                    <package>zookeeper_3_3_0</package>
+                    <package>tez_3_3_0</package>
                 </packages>
             </os-specific>
         </os-specifics>
+
+        <required-services>
+            <service>hdfs</service>
+        </required-services>
     </service>
 </metainfo>

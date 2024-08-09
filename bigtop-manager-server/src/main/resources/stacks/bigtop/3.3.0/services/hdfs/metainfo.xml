@@ -19,7 +19,6 @@
 -->
 
 <metainfo>
-    <schema-version>2.0</schema-version>
     <service>
         <name>hdfs</name>
         <display-name>HDFS</display-name>

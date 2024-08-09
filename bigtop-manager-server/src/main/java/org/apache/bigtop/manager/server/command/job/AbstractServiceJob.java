@@ -28,6 +28,7 @@ import org.apache.bigtop.manager.dao.repository.ComponentRepository;
 import org.apache.bigtop.manager.dao.repository.HostComponentRepository;
 import org.apache.bigtop.manager.server.command.stage.CacheFileUpdateStage;
 import org.apache.bigtop.manager.server.command.stage.ComponentCheckStage;
+import org.apache.bigtop.manager.server.command.stage.ComponentConfigureStage;
 import org.apache.bigtop.manager.server.command.stage.ComponentInstallStage;
 import org.apache.bigtop.manager.server.command.stage.ComponentStartStage;
 import org.apache.bigtop.manager.server.command.stage.ComponentStopStage;
@@ -35,6 +36,7 @@ import org.apache.bigtop.manager.server.command.stage.StageContext;
 import org.apache.bigtop.manager.server.exception.ServerException;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
+import org.apache.bigtop.manager.server.model.dto.ComponentHostDTO;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.model.dto.command.ServiceCommandDTO;
 import org.apache.bigtop.manager.server.stack.dag.ComponentCommandWrapper;
@@ -175,6 +177,23 @@ public abstract class AbstractServiceJob extends AbstractJob {
 
             StageContext stageContext = createStageContext(serviceName, componentName, hostnames);
             stages.add(new ComponentInstallStage(stageContext));
+        }
+    }
+
+    protected void createConfigureStages() {
+        for (ServiceCommandDTO serviceCommand : jobContext.getCommandDTO().getServiceCommands()) {
+            if (serviceCommand.getInstalled()) {
+                continue;
+            }
+
+            for (ComponentHostDTO componentHost : serviceCommand.getComponentHosts()) {
+                String serviceName = serviceCommand.getServiceName();
+                String componentName = componentHost.getComponentName();
+                List<String> hostnames = componentHost.getHostnames();
+
+                StageContext stageContext = createStageContext(serviceName, componentName, hostnames);
+                stages.add(new ComponentConfigureStage(stageContext));
+            }
         }
     }
 

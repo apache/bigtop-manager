@@ -58,7 +58,6 @@ if [[ "$DEBUG" == "true" ]]; then
   JAVA_OPTS="${JAVA_OPTS} -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
 fi
 
-
 cd $BIGTOP_MANAGER_HOME
 
 $JAVA_HOME/bin/java $JAVA_OPTS \

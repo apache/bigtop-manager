@@ -83,7 +83,7 @@ public class HdfsSetup {
         LinuxFileUtils.createDirectories(
                 hdfsParams.getDfsDataDir(), hdfsUser, hdfsGroup, Constants.PERMISSION_755, true);
         LinuxFileUtils.createDirectories(
-                hdfsParams.getHadoopLogDir(), hdfsUser, hdfsGroup, Constants.PERMISSION_755, true);
+                hdfsParams.getHadoopLogDir(), hdfsUser, hdfsGroup, Constants.PERMISSION_775, true);
         LinuxFileUtils.createDirectories(
                 hdfsParams.getHadoopPidDir(), hdfsUser, hdfsGroup, Constants.PERMISSION_755, true);
 
@@ -150,6 +150,10 @@ public class HdfsSetup {
                 Constants.PERMISSION_644,
                 hdfsParams.getGlobalParamsMap());
 
+        // log.info("Creating /apps on hdfs");
+        // HdfsUtil.createDirectory(hdfsUser, "/apps");
+
+        log.info("Successfully configured HDFS");
         return ShellResult.success("HDFS Configure success!");
     }
 
