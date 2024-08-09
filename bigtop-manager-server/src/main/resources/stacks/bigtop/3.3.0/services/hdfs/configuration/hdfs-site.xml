@@ -102,8 +102,7 @@
         <name>dfs.replication</name>
         <value>3</value>
         <display-name>Block replication</display-name>
-        <description>Default block replication.
-        </description>
+        <description>Default block replication.</description>
     </property>
     <property>
         <name>dfs.heartbeat.interval</name>
