@@ -25,7 +25,6 @@ import org.apache.bigtop.manager.stack.common.utils.linux.LinuxAccountUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
-import java.util.Set;
 
 @Slf4j
 public abstract class AbstractHook implements Hook {
@@ -47,22 +46,16 @@ public abstract class AbstractHook implements Hook {
     protected abstract void doAfter();
 
     private void addUserAndGroup() {
-        Map<String, Set<String>> users = LocalSettings.users();
-        String userGroup = LocalSettings.cluster().getUserGroup();
+        Map<String, String> users = LocalSettings.users();
+        String group = LocalSettings.cluster().getUserGroup();
+        LinuxAccountUtils.groupAdd(group);
 
-        for (Map.Entry<String, Set<String>> user : users.entrySet()) {
-            Set<String> groups = user.getValue();
-            for (String group : groups) {
-                log.info("Adding group: {}", group);
-                LinuxAccountUtils.groupAdd(group);
-            }
+        for (Map.Entry<String, String> user : users.entrySet()) {
+            String service = user.getKey();
+            String username = user.getValue();
 
-            log.info(
-                    "Adding user: {} to primary group: {} and supplementary groups: [{}]",
-                    user.getKey(),
-                    userGroup,
-                    String.join(",", groups));
-            LinuxAccountUtils.userAdd(user.getKey(), userGroup, groups);
+            log.info("Adding user: {} to group: {}", username, group);
+            LinuxAccountUtils.userAdd(username, group, null);
         }
     }
 }

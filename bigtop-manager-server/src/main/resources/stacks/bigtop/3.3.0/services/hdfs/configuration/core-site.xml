@@ -53,9 +53,7 @@
         <name>fs.defaultFS</name>
         <!-- cluster variant -->
         <value>hdfs://localhost:8020</value>
-        <description>The name of the default file system. Either the
-            literal string "local" or a host:port for HDFS.
-        </description>
+        <description>The name of the default file system. Either the literal string "local" or a host:port for HDFS.</description>
         <final>true</final>
     </property>
     <property>
@@ -73,16 +71,14 @@
     <property>
         <name>ipc.client.idlethreshold</name>
         <value>8000</value>
-        <description>Defines the threshold number of connections after which
-            connections will be inspected for idleness.
+        <description>
+            Defines the threshold number of connections after which connections will be inspected for idleness.
         </description>
     </property>
     <property>
         <name>ipc.client.connection.maxidletime</name>
         <value>30000</value>
-        <description>The maximum time after which a client will bring down the
-            connection to the server.
-        </description>
+        <description>The maximum time after which a client will bring down the connection to the server.</description>
     </property>
     <property>
         <name>ipc.client.connect.max.retries</name>
@@ -93,18 +89,16 @@
         <name>ipc.server.tcpnodelay</name>
         <value>true</value>
         <description>Turn on/off Nagle's algorithm for the TCP socket
-            connection on
-            the server. Setting to true disables the algorithm and may
-            decrease latency
-            with a cost of more/smaller packets.
+            connection on the server. Setting to true disables the algorithm and may
+            decrease latency with a cost of more/smaller packets.
         </description>
     </property>
     <property>
         <name>hadoop.http.authentication.type</name>
         <value>simple</value>
         <description>
-            Defines authentication used for Oozie HTTP endpoint. Supported values are: simple | kerberos |
-            #AUTHENTICATION_HANDLER_CLASSNAME#
+            Defines authentication used for Oozie HTTP endpoint.
+            Supported values are: simple | kerberos | #AUTHENTICATION_HANDLER_CLASSNAME#
         </description>
     </property>
     <property>
@@ -118,9 +112,7 @@
     <property>
         <name>hadoop.security.authorization</name>
         <value>false</value>
-        <description>
-            Enable authorization for different protocols.
-        </description>
+        <description>Enable authorization for different protocols.</description>
     </property>
     <property>
         <name>hadoop.security.auth_to_local</name>

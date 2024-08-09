@@ -102,8 +102,7 @@
         <name>dfs.replication</name>
         <value>3</value>
         <display-name>Block replication</display-name>
-        <description>Default block replication.
-        </description>
+        <description>Default block replication.</description>
     </property>
     <property>
         <name>dfs.heartbeat.interval</name>
@@ -216,8 +215,7 @@
     </property>
     <property>
         <name>dfs.permissions.superusergroup</name>
-        <value>hdfs</value>
-        <property-type>GROUP</property-type>
+        <value>hadoop</value>
         <description>The name of the group of super-users.</description>
     </property>
     <property>

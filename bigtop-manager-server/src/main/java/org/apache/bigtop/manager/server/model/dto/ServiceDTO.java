@@ -35,8 +35,6 @@ public class ServiceDTO {
 
     private String serviceUser;
 
-    private String serviceGroup;
-
     private List<OSSpecificDTO> osSpecifics;
 
     private List<ComponentDTO> components;

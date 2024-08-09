@@ -28,7 +28,6 @@
         </desc>
         <version>3.6.4</version>
         <user>zookeeper</user>
-        <group>zookeeper</group>
 
         <components>
             <component>

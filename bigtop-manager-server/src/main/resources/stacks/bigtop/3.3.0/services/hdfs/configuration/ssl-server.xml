@@ -32,7 +32,6 @@
     <property>
         <name>ssl.server.truststore.password</name>
         <value>bigdata</value>
-        <property-type>PASSWORD</property-type>
         <description>Password to open the trust store file.</description>
     </property>
     <property>
@@ -53,7 +52,6 @@
     <property>
         <name>ssl.server.keystore.password</name>
         <value>bigdata</value>
-        <property-type>PASSWORD</property-type>
         <description>Password to open the keystore file.</description>
     </property>
     <property>

@@ -29,7 +29,6 @@
         </desc>
         <version>2.8.2</version>
         <user>kafka</user>
-        <group>kafka</group>
 
         <components>
             <component>

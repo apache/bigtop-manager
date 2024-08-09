@@ -41,7 +41,7 @@ public class CacheMessagePayload extends BasePayload {
 
     private ClusterInfo clusterInfo;
 
-    private Map<String, Set<String>> userInfo;
+    private Map<String, String> userInfo;
 
     private List<RepoInfo> repoInfo;
 

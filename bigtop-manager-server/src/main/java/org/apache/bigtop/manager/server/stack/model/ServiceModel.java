@@ -42,8 +42,6 @@ public class ServiceModel {
 
     private String user;
 
-    private String group;
-
     @XmlElementWrapper(name = "os-specifics")
     @XmlElements(@XmlElement(name = "os-specific"))
     private List<OSSpecificModel> osSpecifics;
