@@ -41,8 +41,6 @@ public class TaskContext {
 
     private String serviceUser;
 
-    private String serviceGroup;
-
     private String componentName;
 
     private String componentDisplayName;

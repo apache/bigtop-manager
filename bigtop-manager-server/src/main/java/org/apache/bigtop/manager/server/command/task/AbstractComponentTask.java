@@ -57,7 +57,6 @@ public abstract class AbstractComponentTask extends AbstractTask {
         commandPayload.setServiceName(taskContext.getServiceName());
         commandPayload.setCommand(getCommand());
         commandPayload.setServiceUser(taskContext.getServiceUser());
-        commandPayload.setServiceGroup(taskContext.getServiceGroup());
         commandPayload.setStackName(taskContext.getStackName());
         commandPayload.setStackVersion(taskContext.getStackVersion());
         commandPayload.setComponentName(taskContext.getComponentName());

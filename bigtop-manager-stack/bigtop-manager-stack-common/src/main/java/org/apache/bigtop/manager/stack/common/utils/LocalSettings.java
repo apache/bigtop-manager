@@ -33,7 +33,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 @Slf4j
 public class LocalSettings {
@@ -87,9 +86,9 @@ public class LocalSettings {
         return settings;
     }
 
-    public static Map<String, Set<String>> users() {
+    public static Map<String, String> users() {
 
-        Map<String, Set<String>> userMap = new HashMap<>();
+        Map<String, String> userMap = new HashMap<>();
         File file = new File(Constants.STACK_CACHE_DIR + CacheFiles.USERS_INFO);
         if (file.exists()) {
             userMap = JsonUtils.readFromFile(file, new TypeReference<>() {});

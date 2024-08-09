@@ -25,7 +25,6 @@
         <desc>Apache Hadoop NextGen MapReduce (YARN)</desc>
         <version>3.3.6-1</version>
         <user>yarn</user>
-        <group>yarn</group>
 
         <components>
             <component>

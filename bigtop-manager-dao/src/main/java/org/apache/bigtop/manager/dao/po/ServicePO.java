@@ -76,9 +76,6 @@ public class ServicePO extends BasePO {
     @Column(name = "service_user")
     private String serviceUser;
 
-    @Column(name = "service_group")
-    private String serviceGroup;
-
     @Column(name = "required_services")
     private String requiredServices;
 

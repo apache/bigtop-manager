@@ -32,7 +32,6 @@
     <property>
         <name>ssl.client.truststore.password</name>
         <value/>
-        <property-type>PASSWORD</property-type>
         <description>Password to open the trust store file.</description>
     </property>
     <property>

@@ -129,7 +129,6 @@ public abstract class AbstractTask implements Task {
             taskPO.setHostname(taskContext.getHostname());
             taskPO.setServiceName(taskContext.getServiceName());
             taskPO.setServiceUser(taskContext.getServiceUser());
-            taskPO.setServiceGroup(taskContext.getServiceGroup());
             taskPO.setComponentName(taskContext.getComponentName());
             taskPO.setCommand(getCommand());
             taskPO.setCustomCommand(getCustomCommand());
