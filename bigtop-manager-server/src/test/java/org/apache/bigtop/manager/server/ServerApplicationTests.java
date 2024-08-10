@@ -41,4 +41,9 @@ class ServerApplicationTests {
                 .bodyToMono(String.class);
         System.out.println(body.block());
     }
+
+    @Test
+    public void AiAssistant(){
+        new AIAssistantFactory();
+    }
 }

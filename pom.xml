@@ -34,15 +34,18 @@
     <description>Bigtop Manager Parent</description>
 
     <modules>
-        <module>bigtop-manager-agent</module>
         <module>bigtop-manager-bom</module>
+
+        <module>bigtop-manager-agent</module>
         <module>bigtop-manager-common</module>
         <module>bigtop-manager-server</module>
         <module>bigtop-manager-stack</module>
-        <module>bigtop-manager-ui</module>
         <module>bigtop-manager-dao</module>
         <module>bigtop-manager-spi</module>
         <module>bigtop-manager-grpc</module>
+        <module>bigtop-manager-ui</module>
+        <module>bigtop-manager-ai</module>
+
     </modules>
 
     <properties>
@@ -123,6 +126,27 @@
             <dependency>
                 <groupId>org.apache.bigtop</groupId>
                 <artifactId>bigtop-manager-ui</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.bigtop</groupId>
+                <artifactId>bigtop-manager-ai</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.bigtop</groupId>
+                <artifactId>bigtop-manager-ai-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.bigtop</groupId>
+                <artifactId>bigtop-manager-ai-openai</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apacje.bigtop</groupId>
+                <artifactId>bigtop-manager-ai-assistant</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>
@@ -206,6 +230,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+
             </plugin>
 
             <plugin>
@@ -243,6 +268,7 @@
                             <sortPlugins />
                         </sortPom>
                     </pom>
+
                 </configuration>
             </plugin>
         </plugins>

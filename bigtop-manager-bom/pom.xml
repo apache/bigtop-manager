@@ -49,6 +49,7 @@
         <oshi-core.version>6.4.11</oshi-core.version>
         <micrometer.version>1.12.4</micrometer.version>
         <jdbc.dm.version>8.1.2.192</jdbc.dm.version>
+        <langchain4j.version>0.33.0</langchain4j.version>
     </properties>
 
     <dependencyManagement>
@@ -241,6 +242,16 @@
                 <groupId>net.devh</groupId>
                 <artifactId>grpc-client-spring-boot-starter</artifactId>
                 <version>${grpc-spring-boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j</artifactId>
+                <version>${langchain4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j-open-ai</artifactId>
+                <version>${langchain4j.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
