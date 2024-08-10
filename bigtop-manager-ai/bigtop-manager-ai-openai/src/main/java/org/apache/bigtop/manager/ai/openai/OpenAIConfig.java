@@ -1,9 +1,8 @@
 package org.apache.bigtop.manager.ai.openai;
 
-import lombok.AllArgsConstructor;
+import dev.langchain4j.model.openai.OpenAiChatModelName;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
 
 /**
@@ -17,7 +16,7 @@ import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
 @Builder
 public class OpenAIConfig implements AIAssistantConfigProvider {
     private final static String BASE_URL = "https://api.openai.com";
-    private final static String MODEL = OpenAIModels.GPT_3_5_TURBO.getValue();
+    private final static String MODEL = OpenAiChatModelName.GPT_3_5_TURBO.toString();
     private int memoryLen;
     private String apiKey;
     private String baseUrl;
