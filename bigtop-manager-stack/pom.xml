@@ -65,10 +65,6 @@
             <groupId>org.apache.bigtop</groupId>
             <artifactId>bigtop-manager-common</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.apache.bigtop</groupId>
-            <artifactId>bigtop-manager-spi</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
