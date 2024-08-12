@@ -355,7 +355,7 @@
 
 <style scoped lang="scss">
   .dot-rest {
-    @include flex(center, center);
+    @include flexbox($justify: center, $align: center);
   }
 
   .summary-layout {
@@ -399,8 +399,7 @@
     }
 
     .summary-ctx {
-      display: flex;
-      flex-wrap: wrap;
+      @include flexbox($wrap: wrap);
       box-sizing: border-box;
 
       .card {
@@ -423,11 +422,11 @@
           font-size: 1.06rem;
           font-weight: 600;
           margin-bottom: 0.375rem;
-          @include flex(space-between, center);
+          @include flexbox($justify: space-between, $align: center);
         }
 
         .comp-info {
-          @include flex(center);
+          @include flexbox($justify: center);
           margin-bottom: 1.25rem;
 
           .host-name {
@@ -440,8 +439,7 @@
         }
 
         footer {
-          @include flex(space-between, center);
-
+          @include flexbox($justify: space-between, $align: center);
           .comp-state {
             font-size: 1rem;
             align-items: flex-end;
@@ -456,10 +454,11 @@
   }
 
   .container {
-    display: flex;
-    flex-direction: column;
-    justify-content: start;
-    align-items: center;
+    @include flexbox(
+      $direction: column,
+      $justify: space-between,
+      $align: center
+    );
     align-content: center;
     height: 100%;
 
@@ -479,9 +478,7 @@
         text-align: start;
 
         .config-item {
-          display: flex;
-          align-items: center;
-          justify-content: start;
+          @include flexbox($justify: start, $align: center);
           margin-bottom: 1rem;
 
           .config-item-key {

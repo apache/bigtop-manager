@@ -166,10 +166,7 @@
 
 <style scoped lang="scss">
   .container {
-    display: flex;
-    flex-direction: column;
-    justify-content: start;
-    align-items: center;
+    @include flexbox($direction: column, $justify: start, $align: center);
     align-content: center;
     height: 100%;
 
@@ -180,9 +177,8 @@
     }
 
     .retry {
-      display: flex;
-      flex-direction: row;
       justify-content: end;
+      @include flexbox($direction: row, $justify: end, $align: center);
       margin: 0 1rem 1rem 0;
       width: 100%;
 

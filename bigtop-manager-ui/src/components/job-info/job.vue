@@ -283,10 +283,7 @@
 
 <style lang="scss" scoped>
   .footer-btns {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
+    @include flexbox($justify: space-between, $wrap: wrap, $align: center);
   }
 
   .logs-wait-msg {

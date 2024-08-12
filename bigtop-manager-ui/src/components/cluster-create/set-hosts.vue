@@ -162,10 +162,7 @@
 </template>
 <style scoped lang="scss">
   .container {
-    display: flex;
-    flex-direction: column;
-    justify-content: start;
-    align-items: center;
+    @include flexbox($direction: column, $justify: start, $align: center);
     height: 100%;
 
     .title {

@@ -259,10 +259,7 @@
 
 <style scoped lang="scss">
   .container {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
+    @include flexbox($direction: row, $justify: center, $align: center);
 
     .step {
       width: 15%;

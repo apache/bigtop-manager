@@ -111,9 +111,7 @@
 <style scoped lang="scss">
   .sider {
     .header {
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      @include flexbox($justify: center, $align: center);
       height: 32px;
       margin: 1rem;
 
@@ -131,9 +129,7 @@
     }
 
     .menu-title-flex {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      @include flexbox($justify: space-between, $align: center);
     }
   }
 </style>

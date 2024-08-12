@@ -57,9 +57,7 @@
 
 <style scoped lang="scss">
   .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    @include flexbox($justify: space-between, $align: center);
     background: #fff;
     padding: 0 1rem;
     height: 48px;
@@ -71,9 +69,7 @@
     }
 
     .header-right {
-      display: flex;
-      justify-content: end;
-      align-items: center;
+      @include flexbox($justify: end, $align: center);
     }
   }
 </style>

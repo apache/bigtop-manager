@@ -293,9 +293,7 @@
     min-height: 540px;
 
     .statistics {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      @include flexbox($justify: space-between, $align: center);
 
       .card {
         width: 20%;
@@ -311,9 +309,7 @@
     }
 
     .charts {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      @include flexbox($justify: space-between, $align: center);
 
       .chart {
         width: 45%;
@@ -322,9 +318,7 @@
     }
 
     .host-link {
-      display: flex;
-      flex-direction: column;
-      align-items: end;
+      @include flexbox($direction: column, $align: end);
       margin-bottom: 1.5rem;
     }
   }

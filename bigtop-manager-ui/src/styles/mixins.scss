@@ -17,9 +17,10 @@
  * under the License.
  */
 
-
-@mixin flex($row: null, $col: null) {
+@mixin flexbox($direction: null, $wrap: null, $justify: null, $align: null) {
   display: flex;
-  justify-content: $row;
-  align-items: $col;
+  flex-direction: $direction;
+  flex-wrap: $wrap;
+  justify-content: $justify;
+  align-items: $align;
 }

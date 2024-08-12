@@ -56,9 +56,7 @@
 
 <style lang="scss" scoped>
   .icon {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    @include flexbox($justify: center, $align: center);
     font-size: 16px;
     cursor: pointer;
     border-radius: 50%;
