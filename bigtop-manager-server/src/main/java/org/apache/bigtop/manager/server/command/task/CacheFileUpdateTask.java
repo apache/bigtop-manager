@@ -228,6 +228,7 @@ public class CacheFileUpdateTask extends AbstractTask {
         clusterInfo.setUserGroup(stackDTO.getUserGroup());
         clusterInfo.setRepoTemplate(stackDTO.getRepoTemplate());
         clusterInfo.setRoot(stackDTO.getRoot());
+        clusterInfo.setPackages(List.of(stackDTO.getPackages().split(",")));
 
         List<String> hostnames = (List<String>) properties.get("hostnames");
         hostMap.put(Constants.ALL_HOST_KEY, new HashSet<>(hostnames));

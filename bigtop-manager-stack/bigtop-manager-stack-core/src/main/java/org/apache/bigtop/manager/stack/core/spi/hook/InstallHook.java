@@ -18,8 +18,6 @@
  */
 package org.apache.bigtop.manager.stack.core.spi.hook;
 
-import com.google.auto.service.AutoService;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.common.message.entity.pojo.RepoInfo;
 import org.apache.bigtop.manager.common.utils.os.OSDetection;
 import org.apache.bigtop.manager.stack.core.param.Params;
@@ -27,7 +25,11 @@ import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
 import org.apache.bigtop.manager.stack.core.utils.PackageUtils;
 import org.apache.bigtop.manager.stack.core.utils.linux.LinuxAccountUtils;
 import org.apache.bigtop.manager.stack.core.utils.template.BaseTemplate;
+
 import org.springframework.util.CollectionUtils;
+
+import com.google.auto.service.AutoService;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.util.List;
@@ -89,7 +91,7 @@ public class InstallHook extends AbstractHook {
 
     private void installPackages(Params params) {
         List<String> installedPackages = PackageUtils.listInstalledPackages();
-        List<String> needInstallPackages = params.getPackageList().stream()
+        List<String> needInstallPackages = LocalSettings.packages().stream()
                 .filter(pkg -> !installedPackages.contains(pkg))
                 .toList();
 
