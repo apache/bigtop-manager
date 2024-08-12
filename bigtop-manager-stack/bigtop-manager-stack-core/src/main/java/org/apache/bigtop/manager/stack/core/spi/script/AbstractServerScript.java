@@ -18,5 +18,4 @@
  */
 package org.apache.bigtop.manager.stack.core.spi.script;
 
-public abstract class AbstractServerScript extends AbstractScript {
-}
+public abstract class AbstractServerScript extends AbstractScript {}

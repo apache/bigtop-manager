@@ -21,10 +21,10 @@ package org.apache.bigtop.manager.stack.core.utils;
 import org.apache.bigtop.manager.common.enums.OSType;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.common.utils.os.OSDetection;
+import org.apache.bigtop.manager.stack.core.exception.StackException;
 import org.apache.bigtop.manager.stack.core.spi.PrioritySPIFactory;
 import org.apache.bigtop.manager.stack.core.spi.repo.PackageManager;
 import org.apache.bigtop.manager.stack.core.spi.repo.PackageManagerType;
-import org.apache.bigtop.manager.stack.core.exception.StackException;
 
 import org.apache.commons.lang3.EnumUtils;
 

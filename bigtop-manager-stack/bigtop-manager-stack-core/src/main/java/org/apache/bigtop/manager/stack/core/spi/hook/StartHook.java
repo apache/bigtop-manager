@@ -18,9 +18,10 @@
  */
 package org.apache.bigtop.manager.stack.core.spi.hook;
 
+import org.apache.bigtop.manager.stack.core.param.Params;
+
 import com.google.auto.service.AutoService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.bigtop.manager.stack.core.param.Params;
 
 /**
  * obtain agent execute command

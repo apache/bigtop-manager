@@ -18,8 +18,9 @@
  */
 package org.apache.bigtop.manager.stack.core.spi.hook;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.stack.core.param.Params;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public abstract class AbstractHook implements Hook {
