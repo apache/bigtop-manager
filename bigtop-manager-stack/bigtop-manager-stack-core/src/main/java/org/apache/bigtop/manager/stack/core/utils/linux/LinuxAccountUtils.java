@@ -18,13 +18,16 @@
  */
 package org.apache.bigtop.manager.stack.core.utils.linux;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.common.shell.ShellExecutor;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.common.utils.FileUtils;
 import org.apache.bigtop.manager.stack.core.exception.StackException;
+
 import org.apache.commons.lang3.StringUtils;
+
 import org.springframework.util.CollectionUtils;
+
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
