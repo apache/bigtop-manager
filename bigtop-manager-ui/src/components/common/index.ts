@@ -18,7 +18,7 @@
  */
 
 import type { App } from 'vue'
-import SvgIcon from './svg-icon/svg-icon.vue'
+import SvgIcon from './svg-icon/index.vue'
 import DotState from './dot-state/index.vue'
 
 const comments = {
