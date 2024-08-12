@@ -60,6 +60,12 @@
 </script>
 
 <style lang="scss" scoped>
+  @mixin dot($width, $height, $color) {
+    width: $width;
+    height: $height;
+    background: $color;
+    border-radius: 50%;
+  }
   .dot-state {
     &::before {
       content: '';

@@ -16,31 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
- 
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  display: none;
-  -webkit-box-shadow: inset 0 0 2px #b18933;
-}
-::scrollbar-track {
-  display: none;
-  -webkit-box-shadow: inset 0 0 2px #98f165;
-  border-radius: 1px;
-}
-::-webkit-scrollbar-thumb {
-  border-radius: 10px;
-  background: #c1c1c1;
-  -webkit-box-shadow: inset 0 0 1px rgba(0, 102, 102, 0.144);
-}
-::scrollbar-thumb {
-  border-radius: 10px;
-  background: #c1c1c1;
-  -webkit-box-shadow: inset 0 0 1px rgba(0, 102, 102, 0.144);
-}
+
+@import '@/styles/function.scss';
+@import '@/styles/variables.scss';
+@import '@/styles/mixins.scss'
