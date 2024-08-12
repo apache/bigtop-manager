@@ -18,24 +18,19 @@
  */
 package org.apache.bigtop.manager.stack.core.utils.linux;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.common.shell.ShellExecutor;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.common.utils.FileUtils;
 import org.apache.bigtop.manager.stack.core.exception.StackException;
-
 import org.apache.commons.lang3.StringUtils;
-
 import org.springframework.util.CollectionUtils;
-
-import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -287,7 +282,6 @@ public class LinuxAccountUtils {
      * @return primary group, if user not exists, return null
      */
     public static String getUserPrimaryGroup(String user) {
-        Map<String, String> res = new HashMap<>();
         if (!isUserExists(user)) {
             return null;
         }
