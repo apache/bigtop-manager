@@ -26,7 +26,15 @@ public class ServiceConfigureJob extends AbstractServiceJob {
 
     @Override
     protected void createStages() {
+        // Update cache files
         super.createCacheStage();
+
+        // Configure services
+        super.createConfigureStages();
+
+        // Restart services
+        super.createStopStages();
+        super.createStartStages();
     }
 
     @Override

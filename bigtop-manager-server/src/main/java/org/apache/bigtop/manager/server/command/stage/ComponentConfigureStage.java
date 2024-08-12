@@ -16,41 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.command.task;
+package org.apache.bigtop.manager.server.command.stage;
 
-import org.apache.bigtop.manager.common.enums.Command;
+import org.apache.bigtop.manager.server.command.task.ComponentConfigureTask;
+import org.apache.bigtop.manager.server.command.task.Task;
 
-import lombok.Data;
+public class ComponentConfigureStage extends AbstractComponentStage {
 
-import java.util.Map;
+    public ComponentConfigureStage(StageContext stageContext) {
+        super(stageContext);
+    }
 
-@Data
-public class TaskContext {
+    @Override
+    protected Task createTask(String hostname) {
+        return new ComponentConfigureTask(createTaskContext(hostname));
+    }
 
-    private Long clusterId;
-
-    private String clusterName;
-
-    private String hostname;
-
-    private String stackName;
-
-    private String stackVersion;
-
-    private String serviceName;
-
-    private String serviceUser;
-
-    private String componentName;
-
-    private String componentDisplayName;
-
-    private Command command;
-
-    private String customCommand;
-
-    private String root;
-
-    // Extra properties for specific tasks
-    protected Map<String, Object> properties;
+    @Override
+    public String getName() {
+        return "Configure " + stageContext.getComponentDTO().getDisplayName();
+    }
 }

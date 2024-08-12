@@ -20,37 +20,19 @@ package org.apache.bigtop.manager.server.command.task;
 
 import org.apache.bigtop.manager.common.enums.Command;
 
-import lombok.Data;
+public class ComponentConfigureTask extends AbstractComponentTask {
 
-import java.util.Map;
+    public ComponentConfigureTask(TaskContext taskContext) {
+        super(taskContext);
+    }
 
-@Data
-public class TaskContext {
+    @Override
+    protected Command getCommand() {
+        return Command.CONFIGURE;
+    }
 
-    private Long clusterId;
-
-    private String clusterName;
-
-    private String hostname;
-
-    private String stackName;
-
-    private String stackVersion;
-
-    private String serviceName;
-
-    private String serviceUser;
-
-    private String componentName;
-
-    private String componentDisplayName;
-
-    private Command command;
-
-    private String customCommand;
-
-    private String root;
-
-    // Extra properties for specific tasks
-    protected Map<String, Object> properties;
+    @Override
+    public String getName() {
+        return "Configure " + taskContext.getComponentDisplayName() + " on " + taskContext.getHostname();
+    }
 }

@@ -19,7 +19,6 @@
 -->
 
 <metainfo>
-    <schema-version>2.0</schema-version>
     <service>
         <name>kafka</name>
         <display-name>Kafka</display-name>
@@ -30,7 +29,6 @@
         </desc>
         <version>2.8.2</version>
         <user>kafka</user>
-        <group>kafka</group>
 
         <components>
             <component>

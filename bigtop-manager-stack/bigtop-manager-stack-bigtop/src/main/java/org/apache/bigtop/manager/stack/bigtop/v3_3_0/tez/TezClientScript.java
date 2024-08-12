@@ -16,41 +16,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.command.task;
+package org.apache.bigtop.manager.stack.bigtop.v3_3_0.tez;
 
-import org.apache.bigtop.manager.common.enums.Command;
+import org.apache.bigtop.manager.common.shell.ShellResult;
+import org.apache.bigtop.manager.spi.stack.ClientScript;
+import org.apache.bigtop.manager.spi.stack.Params;
+import org.apache.bigtop.manager.spi.stack.Script;
+import org.apache.bigtop.manager.stack.common.utils.PackageUtils;
 
-import lombok.Data;
+import com.google.auto.service.AutoService;
+import lombok.extern.slf4j.Slf4j;
 
-import java.util.Map;
+@Slf4j
+@AutoService(Script.class)
+public class TezClientScript implements ClientScript {
 
-@Data
-public class TaskContext {
+    @Override
+    public ShellResult install(Params params) {
+        return PackageUtils.install(params.getPackageList());
+    }
 
-    private Long clusterId;
-
-    private String clusterName;
-
-    private String hostname;
-
-    private String stackName;
-
-    private String stackVersion;
-
-    private String serviceName;
-
-    private String serviceUser;
-
-    private String componentName;
-
-    private String componentDisplayName;
-
-    private Command command;
-
-    private String customCommand;
-
-    private String root;
-
-    // Extra properties for specific tasks
-    protected Map<String, Object> properties;
+    @Override
+    public ShellResult configure(Params params) {
+        return TezSetup.config(params);
+    }
 }

@@ -86,20 +86,12 @@
 
 USER="$(whoami)"
 export JAVA_HOME=${java_home!}
-
 export HADOOP_HOME=${hadoop_home!}
-
 export HADOOP_COMMON_HOME=${hadoop_home!}
-
 export HADOOP_HDFS_HOME=${hadoop_hdfs_home!}
-
 export HADOOP_CONF_DIR=${hadoop_conf_dir!}
-
 export HADOOP_HEAPSIZE_MAX=${hadoop_heapsize_max}
-
 export HADOOP_HEAPSIZE_MIN=${hadoop_heapsize_min}
-
-export HADOOP_JAAS_DEBUG=true
 
 # export HADOOP_OPTS="-Djava.net.preferIPv4Stack=true -Dsun.security.krb5.debug=true -Dsun.security.spnego.debug"
 
@@ -108,11 +100,8 @@ export HADOOP_OS_TYPE=${HADOOP_OS_TYPE:-$(uname -s)}
 </#noparse>
 
 export HADOOP_LOG_DIR=${hadoop_log_dir_prefix}/$USER
-
 export HADOOP_PID_DIR=${hadoop_pid_dir_prefix}/$USER
-
 export HADOOP_ROOT_LOGGER=${hadoop_root_logger}
-
 export HADOOP_LIBEXEC_DIR=${hadoop_libexec_dir}
 
 ]]>

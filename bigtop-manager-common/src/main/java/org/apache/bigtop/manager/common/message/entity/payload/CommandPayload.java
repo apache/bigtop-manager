@@ -48,8 +48,6 @@ public class CommandPayload extends BasePayload {
 
     private String serviceUser;
 
-    private String serviceGroup;
-
     private String stackName;
 
     private String stackVersion;

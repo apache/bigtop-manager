@@ -72,7 +72,6 @@ public class CacheFileUpdateStage extends AbstractStage {
         taskContext.setStackVersion(stageContext.getStackVersion());
         taskContext.setServiceName("cluster");
         taskContext.setServiceUser("root");
-        taskContext.setServiceGroup("root");
         taskContext.setComponentName("agent");
         taskContext.setComponentDisplayName("Agent");
         taskContext.setCommand(Command.CUSTOM);

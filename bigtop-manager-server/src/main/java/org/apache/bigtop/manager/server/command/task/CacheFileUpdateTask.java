@@ -83,7 +83,7 @@ public class CacheFileUpdateTask extends AbstractTask {
     private Map<String, Map<String, Object>> serviceConfigMap;
     private Map<String, Set<String>> hostMap;
     private List<RepoInfo> repoList;
-    private Map<String, Set<String>> userMap;
+    private Map<String, String> userMap;
     private Map<String, Object> settingsMap;
 
     public CacheFileUpdateTask(TaskContext taskContext) {
@@ -186,7 +186,7 @@ public class CacheFileUpdateTask extends AbstractTask {
         });
 
         userMap = new HashMap<>();
-        servicePOList.forEach(x -> userMap.put(x.getServiceUser(), Set.of(x.getServiceGroup())));
+        servicePOList.forEach(x -> userMap.put(x.getServiceName(), x.getServiceUser()));
 
         settingsMap = new HashMap<>();
         settings.forEach(x -> settingsMap.put(x.getTypeName(), x.getConfigData()));
@@ -234,7 +234,7 @@ public class CacheFileUpdateTask extends AbstractTask {
         hostMap.put(Constants.ALL_HOST_KEY, new HashSet<>(hostnames));
 
         for (ServiceDTO serviceDTO : serviceDTOList) {
-            userMap.put(serviceDTO.getServiceUser(), Set.of(serviceDTO.getServiceGroup()));
+            userMap.put(serviceDTO.getServiceName(), serviceDTO.getServiceUser());
         }
     }
 

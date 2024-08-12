@@ -134,9 +134,7 @@ public abstract class BaseParams implements Params {
     }
 
     public String group() {
-        return StringUtils.isNotBlank(this.commandPayload.getServiceGroup())
-                ? this.commandPayload.getServiceGroup()
-                : ROOT_USER;
+        return LocalSettings.cluster().getUserGroup();
     }
 
     public String serviceName() {

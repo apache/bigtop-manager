@@ -19,7 +19,6 @@
 -->
 
 <metainfo>
-    <schema-version>2.0</schema-version>
     <stack>
         <stack-name>bigtop</stack-name>
         <stack-version>3.3.0</stack-version>

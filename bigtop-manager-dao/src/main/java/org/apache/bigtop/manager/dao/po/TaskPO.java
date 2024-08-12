@@ -93,9 +93,6 @@ public class TaskPO extends BasePO {
     @Column(name = "service_user")
     private String serviceUser;
 
-    @Column(name = "service_group")
-    private String serviceGroup;
-
     @Lob
     @Basic(fetch = FetchType.LAZY)
     @Column(name = "content", length = 16777216)
