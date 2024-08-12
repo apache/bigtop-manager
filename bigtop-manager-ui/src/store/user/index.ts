@@ -26,7 +26,7 @@ import { initialRoutes, layoutRoutes } from '@/router/routes.ts'
 import { useClusterStore } from '@/store/cluster'
 import { RouteRecordRaw } from 'vue-router'
 import { useServiceStore } from '@/store/service'
-import SvgIcon from '@/components/common/svg-icon/svg-icon.vue'
+import SvgIcon from '@/components/common/svg-icon/index.vue'
 
 export const useUserStore = defineStore(
   'user',
