@@ -16,21 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.stack.core.spi;
+package org.apache.bigtop.manager.stack.core.spi.hook;
 
-import java.util.List;
+import org.apache.bigtop.manager.stack.core.param.Params;
+import org.apache.bigtop.manager.stack.core.spi.PrioritySPI;
 
-public interface Params {
+public interface Hook extends PrioritySPI {
 
-    List<String> getPackageList();
+    void before(Params params);
 
-    String serviceHome();
-
-    String confDir();
-
-    String user();
-
-    String group();
-
-    String serviceName();
+    void after(Params params);
 }

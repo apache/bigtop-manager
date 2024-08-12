@@ -21,12 +21,13 @@ package org.apache.bigtop.manager.stack.nop.v1_0_0.kafka;
 import com.google.auto.service.AutoService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.common.shell.ShellResult;
-import org.apache.bigtop.manager.stack.core.spi.Params;
-import org.apache.bigtop.manager.stack.core.spi.Script;
+import org.apache.bigtop.manager.stack.core.param.Params;
+import org.apache.bigtop.manager.stack.core.spi.script.AbstractServerScript;
+import org.apache.bigtop.manager.stack.core.spi.script.Script;
 
 @Slf4j
 @AutoService(Script.class)
-public class KafkaBrokerScript implements Script {
+public class KafkaBrokerScript extends AbstractServerScript {
 
     @Override
     public ShellResult install(Params params) {

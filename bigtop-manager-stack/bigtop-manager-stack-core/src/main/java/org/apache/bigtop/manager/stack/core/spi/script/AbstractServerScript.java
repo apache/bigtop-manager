@@ -16,11 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.stack.core.spi;
+package org.apache.bigtop.manager.stack.core.spi.script;
 
-public interface Hook extends PrioritySPI {
-
-    void before();
-
-    void after();
+public abstract class AbstractServerScript extends AbstractScript {
 }

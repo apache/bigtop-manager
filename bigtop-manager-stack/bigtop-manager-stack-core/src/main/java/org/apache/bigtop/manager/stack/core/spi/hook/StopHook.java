@@ -16,11 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.stack.core.hook;
+package org.apache.bigtop.manager.stack.core.spi.hook;
 
 import com.google.auto.service.AutoService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.bigtop.manager.stack.core.spi.Hook;
+import org.apache.bigtop.manager.stack.core.param.Params;
 
 /**
  * obtain agent execute command
@@ -32,10 +32,10 @@ public class StopHook extends AbstractHook {
     public static final String NAME = "stop";
 
     @Override
-    public void doBefore() {}
+    public void doBefore(Params params) {}
 
     @Override
-    public void doAfter() {}
+    public void doAfter(Params params) {}
 
     @Override
     public String getName() {

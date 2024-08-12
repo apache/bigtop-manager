@@ -21,13 +21,13 @@ package org.apache.bigtop.manager.stack.nop.v1_0_0.zookeeper;
 import com.google.auto.service.AutoService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.common.shell.ShellResult;
-import org.apache.bigtop.manager.stack.core.spi.ClientScript;
-import org.apache.bigtop.manager.stack.core.spi.Params;
-import org.apache.bigtop.manager.stack.core.spi.Script;
+import org.apache.bigtop.manager.stack.core.param.Params;
+import org.apache.bigtop.manager.stack.core.spi.script.AbstractClientScript;
+import org.apache.bigtop.manager.stack.core.spi.script.Script;
 
 @Slf4j
 @AutoService(Script.class)
-public class ZookeeperClientScript implements ClientScript {
+public class ZookeeperClientScript extends AbstractClientScript {
 
     @Override
     public ShellResult install(Params params) {

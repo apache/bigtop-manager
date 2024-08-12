@@ -16,16 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.stack.core.utils;
+package org.apache.bigtop.manager.stack.core.param;
 
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
 import org.apache.bigtop.manager.common.message.entity.pojo.OSSpecificInfo;
 import org.apache.bigtop.manager.common.utils.NetUtils;
 import org.apache.bigtop.manager.common.utils.os.OSDetection;
-import org.apache.bigtop.manager.stack.core.spi.Params;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
 
+import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
 import org.apache.commons.lang3.StringUtils;
 
 import lombok.Getter;

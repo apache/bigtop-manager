@@ -16,15 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.stack.core.repo;
+package org.apache.bigtop.manager.stack.core.spi.repo;
 
 import com.google.auto.service.AutoService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.common.shell.ShellExecutor;
 import org.apache.bigtop.manager.common.shell.ShellResult;
-import org.apache.bigtop.manager.stack.core.enums.PackageManagerType;
 import org.apache.bigtop.manager.stack.core.exception.StackException;
-import org.apache.bigtop.manager.stack.core.spi.PackageManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,14 +31,15 @@ import java.util.List;
 
 @Slf4j
 @AutoService(PackageManager.class)
-public class YumPackageManager implements PackageManager {
+public class AptPackageManager implements PackageManager {
 
-    private static final String YUM = "/usr/bin/yum";
+    private static final String APT = "/usr/bin/apt";
+    private static final String APT_GET = "/usr/bin/apt-get";
 
     @Override
     public ShellResult installPackage(Collection<String> packages) {
         List<String> builderParameters = new ArrayList<>();
-        builderParameters.add(YUM);
+        builderParameters.add(APT_GET);
         builderParameters.add("install");
         builderParameters.add("-y");
         builderParameters.addAll(packages);
@@ -55,7 +54,7 @@ public class YumPackageManager implements PackageManager {
     @Override
     public ShellResult uninstallPackage(Collection<String> packages) {
         List<String> builderParameters = new ArrayList<>();
-        builderParameters.add(YUM);
+        builderParameters.add(APT_GET);
         builderParameters.add("remove");
         builderParameters.add("-y");
         builderParameters.addAll(packages);
@@ -68,14 +67,15 @@ public class YumPackageManager implements PackageManager {
     }
 
     @Override
-    public String listPackages() {
+    public List<String> listPackages() {
         List<String> builderParameters = new ArrayList<>();
-        builderParameters.add(YUM);
+        builderParameters.add(APT);
         builderParameters.add("list");
+        builderParameters.add("--installed");
 
         try {
             ShellResult output = ShellExecutor.execCommand(builderParameters);
-            return output.getOutput();
+            return output.getOutput().strip().lines().map(line -> line.split("/")[0]).toList();
         } catch (IOException e) {
             throw new StackException(e);
         }
@@ -83,6 +83,6 @@ public class YumPackageManager implements PackageManager {
 
     @Override
     public String getName() {
-        return PackageManagerType.YUM.name();
+        return PackageManagerType.APT.name();
     }
 }

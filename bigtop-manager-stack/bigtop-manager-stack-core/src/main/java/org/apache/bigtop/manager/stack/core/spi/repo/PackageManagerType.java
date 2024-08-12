@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.stack.core.enums;
+package org.apache.bigtop.manager.stack.core.spi.repo;
 
 import org.apache.bigtop.manager.common.enums.OSType;
 

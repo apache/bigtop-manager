@@ -16,22 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.stack.core.spi;
+package org.apache.bigtop.manager.stack.core.spi.hook;
 
-import org.apache.bigtop.manager.common.shell.ShellResult;
+import com.google.auto.service.AutoService;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.bigtop.manager.stack.core.param.Params;
 
-public interface ClientScript extends Script {
+/**
+ * obtain agent execute command
+ */
+@Slf4j
+@AutoService(Hook.class)
+public class StartHook extends AbstractHook {
 
-    default ShellResult start(Params params) {
-        configure(params);
-        return ShellResult.success();
-    }
+    public static final String NAME = "start";
 
-    default ShellResult stop(Params params) {
-        return ShellResult.success();
-    }
+    @Override
+    public void doBefore(Params params) {}
 
-    default ShellResult status(Params params) {
-        return ShellResult.success();
+    @Override
+    public void doAfter(Params params) {}
+
+    @Override
+    public String getName() {
+        return NAME;
     }
 }

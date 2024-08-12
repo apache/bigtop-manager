@@ -16,17 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.stack.core.spi;
+package org.apache.bigtop.manager.stack.core.spi.script;
 
 import org.apache.bigtop.manager.common.shell.ShellResult;
+import org.apache.bigtop.manager.stack.core.param.Params;
 
-import java.util.Collection;
+public abstract class AbstractClientScript extends AbstractScript {
 
-public interface PackageManager extends PrioritySPI {
+    public ShellResult start(Params params) {
+        return ShellResult.success();
+    }
 
-    ShellResult installPackage(Collection<String> packages);
+    public ShellResult stop(Params params) {
+        return ShellResult.success();
+    }
 
-    ShellResult uninstallPackage(Collection<String> packages);
-
-    String listPackages();
+    public ShellResult status(Params params) {
+        return ShellResult.success();
+    }
 }

@@ -22,8 +22,8 @@ import org.apache.bigtop.manager.common.enums.OSType;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.common.utils.os.OSDetection;
 import org.apache.bigtop.manager.stack.core.spi.PrioritySPIFactory;
-import org.apache.bigtop.manager.stack.core.spi.PackageManager;
-import org.apache.bigtop.manager.stack.core.enums.PackageManagerType;
+import org.apache.bigtop.manager.stack.core.spi.repo.PackageManager;
+import org.apache.bigtop.manager.stack.core.spi.repo.PackageManagerType;
 import org.apache.bigtop.manager.stack.core.exception.StackException;
 
 import org.apache.commons.lang3.EnumUtils;
@@ -80,5 +80,14 @@ public class PackageUtils {
         }
 
         return getPackageManager().installPackage(packageList);
+    }
+
+    /**
+     * List installed packages
+     *
+     * @return list of installed packages
+     */
+    public static List<String> listInstalledPackages() {
+        return getPackageManager().listPackages();
     }
 }

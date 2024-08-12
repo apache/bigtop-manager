@@ -16,29 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.stack.core.hook;
+package org.apache.bigtop.manager.stack.core.param;
 
-import com.google.auto.service.AutoService;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.bigtop.manager.stack.core.spi.Hook;
+import java.util.List;
 
-/**
- * obtain agent execute command
- */
-@Slf4j
-@AutoService(Hook.class)
-public class RestartHook extends AbstractHook {
+public interface Params {
 
-    public static final String NAME = "restart";
+    List<String> getPackageList();
 
-    @Override
-    public void doBefore() {}
+    String serviceHome();
 
-    @Override
-    public void doAfter() {}
+    String confDir();
 
-    @Override
-    public String getName() {
-        return NAME;
-    }
+    String user();
+
+    String group();
+
+    String serviceName();
 }

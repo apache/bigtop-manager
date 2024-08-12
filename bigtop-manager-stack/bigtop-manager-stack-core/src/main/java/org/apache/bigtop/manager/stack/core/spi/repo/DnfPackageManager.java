@@ -16,15 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.stack.core.repo;
+package org.apache.bigtop.manager.stack.core.spi.repo;
 
 import com.google.auto.service.AutoService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.common.shell.ShellExecutor;
 import org.apache.bigtop.manager.common.shell.ShellResult;
-import org.apache.bigtop.manager.stack.core.enums.PackageManagerType;
 import org.apache.bigtop.manager.stack.core.exception.StackException;
-import org.apache.bigtop.manager.stack.core.spi.PackageManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -68,14 +66,15 @@ public class DnfPackageManager implements PackageManager {
     }
 
     @Override
-    public String listPackages() {
+    public List<String> listPackages() {
         List<String> builderParameters = new ArrayList<>();
         builderParameters.add(DNF);
         builderParameters.add("list");
+        builderParameters.add("installed");
 
         try {
             ShellResult output = ShellExecutor.execCommand(builderParameters);
-            return output.getOutput();
+            return output.getOutput().strip().lines().map(line -> line.split("\\s+")[0]).toList();
         } catch (IOException e) {
             throw new StackException(e);
         }

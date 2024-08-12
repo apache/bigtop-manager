@@ -16,23 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.stack.core.spi;
+package org.apache.bigtop.manager.stack.core.spi.script;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.common.shell.ShellResult;
-
+import org.apache.bigtop.manager.stack.core.param.Params;
 import org.apache.commons.lang3.StringUtils;
 
-public interface Script extends PrioritySPI {
+@Slf4j
+public abstract class AbstractScript implements Script {
 
-    ShellResult install(Params params);
-
-    ShellResult configure(Params params);
-
-    ShellResult start(Params params);
-
-    ShellResult stop(Params params);
-
-    default ShellResult restart(Params params) {
+    public ShellResult restart(Params params) {
         ShellResult shellResult = stop(params);
         if (shellResult.getExitCode() != 0) {
             return shellResult;
@@ -48,9 +42,8 @@ public interface Script extends PrioritySPI {
                 StringUtils.join(shellResult.getErrMsg(), shellResult1.getErrMsg()));
     }
 
-    ShellResult status(Params params);
-
-    default ShellResult check(Params params) {
+    @Override
+    public ShellResult check(Params params) {
         return ShellResult.success();
     }
 }

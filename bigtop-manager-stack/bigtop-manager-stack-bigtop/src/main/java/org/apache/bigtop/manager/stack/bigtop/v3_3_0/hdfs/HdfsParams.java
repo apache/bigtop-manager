@@ -20,7 +20,7 @@ package org.apache.bigtop.manager.stack.bigtop.v3_3_0.hdfs;
 
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
-import org.apache.bigtop.manager.stack.core.utils.BaseParams;
+import org.apache.bigtop.manager.stack.core.param.BaseParams;
 import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
 
 import org.apache.commons.lang3.StringUtils;

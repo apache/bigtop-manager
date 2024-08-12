@@ -20,6 +20,7 @@ package org.apache.bigtop.manager.stack.core.utils.linux;
 
 import org.apache.bigtop.manager.common.shell.ShellExecutor;
 import org.apache.bigtop.manager.common.shell.ShellResult;
+import org.apache.bigtop.manager.common.utils.FileUtils;
 import org.apache.bigtop.manager.stack.core.exception.StackException;
 
 import org.apache.commons.lang3.StringUtils;
@@ -28,11 +29,15 @@ import org.springframework.util.CollectionUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 @Slf4j
 public class LinuxAccountUtils {
@@ -74,8 +79,8 @@ public class LinuxAccountUtils {
      * Add user
      * useradd [options] LOGIN
      */
-    public static void userAdd(String user, String group, Collection<String> groups) {
-        userAdd(user, group, null, groups, null, null, null, false);
+    public static void userAdd(String user, String group) {
+        userAdd(user, group, null, null, null, null, null, false);
     }
 
     /**
@@ -273,5 +278,43 @@ public class LinuxAccountUtils {
         } catch (IOException e) {
             throw new StackException(e);
         }
+    }
+
+    /**
+     * Get user and it's primary group
+     *
+     * @param user username
+     * @return primary group, if user not exists, return null
+     */
+    public static String getUserPrimaryGroup(String user) {
+        Map<String, String> res = new HashMap<>();
+        if (!isUserExists(user)) {
+            return null;
+        }
+
+        // Search for user's primary group id
+        int groupId = 0;
+        Stream<String> lines = FileUtils.readFile2Str(new File("/etc/passwd")).lines();
+        for (String line : lines.toList()) {
+            String[] split = line.split(":");
+            if (split[0].equals(user)) {
+                groupId = Integer.parseInt(split[3]);
+            }
+        }
+
+        if (groupId == 0) {
+            return null;
+        }
+
+        // Search for group name
+        lines = FileUtils.readFile2Str(new File("/etc/group")).lines();
+        for (String line : lines.toList()) {
+            String[] split = line.split(":");
+            if (Integer.parseInt(split[2]) == groupId) {
+                return split[0];
+            }
+        }
+
+        return null;
     }
 }
