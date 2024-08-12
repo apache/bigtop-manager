@@ -19,10 +19,10 @@
 
 <script setup lang="ts">
   import { ref, watch, computed, toRefs, nextTick, watchEffect } from 'vue'
-  import { useClusterStore } from '@/store/cluster'
+  import { useClusterStore } from '@/store/cluster/index.ts'
   import { storeToRefs } from 'pinia'
   import { JobVO, StageVO, TaskVO, OuterData } from '@/api/job/types.ts'
-  import { getJobs } from '@/api/job'
+  import { getJobs } from '@/api/job/index.ts'
   import { Pausable, useIntervalFn } from '@vueuse/core'
   import { MONITOR_SCHEDULE_INTERVAL } from '@/utils/constant.ts'
   import CustomProgress from './custom-progress.vue'
@@ -144,10 +144,10 @@
 
   const getJobsList = async () => {
     try {
-      const { current: pageNum, pageSize } = paginationProps.value
+      const { current, pageSize } = paginationProps.value
       const { content, total } = await getJobs(clusterId.value, {
-        pageNum,
-        pageSize,
+        pageNum: current as number,
+        pageSize: pageSize as number,
         sort: 'desc'
       })
       jobs.value = content.map((v) => ({ ...v }))

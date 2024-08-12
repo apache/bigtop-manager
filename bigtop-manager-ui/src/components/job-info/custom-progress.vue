@@ -19,7 +19,7 @@
 
 <script lang="ts" setup>
   import { computed } from 'vue'
-  import { State } from '@/enums/state'
+  import { State } from '@/enums/state.ts'
   import {
     MinusCircleFilled as Canceled,
     CheckCircleFilled as Successful,
