@@ -18,15 +18,14 @@
  */
 package org.apache.bigtop.manager.stack.core.hook;
 
-import org.apache.bigtop.manager.common.message.entity.pojo.RepoInfo;
-import org.apache.bigtop.manager.common.utils.os.OSDetection;
-import org.apache.bigtop.manager.spi.stack.Hook;
-import org.apache.bigtop.manager.stack.common.utils.LocalSettings;
-import org.apache.bigtop.manager.stack.common.utils.PackageUtils;
-import org.apache.bigtop.manager.stack.common.utils.template.BaseTemplate;
-
 import com.google.auto.service.AutoService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.bigtop.manager.common.message.entity.pojo.RepoInfo;
+import org.apache.bigtop.manager.common.utils.os.OSDetection;
+import org.apache.bigtop.manager.stack.core.spi.Hook;
+import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
+import org.apache.bigtop.manager.stack.core.utils.PackageUtils;
+import org.apache.bigtop.manager.stack.core.utils.template.BaseTemplate;
 
 import java.util.List;
 

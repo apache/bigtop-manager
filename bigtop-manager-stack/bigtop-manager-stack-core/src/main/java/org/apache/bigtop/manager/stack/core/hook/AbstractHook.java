@@ -18,9 +18,9 @@
  */
 package org.apache.bigtop.manager.stack.core.hook;
 
-import org.apache.bigtop.manager.spi.stack.Hook;
-import org.apache.bigtop.manager.stack.common.utils.LocalSettings;
-import org.apache.bigtop.manager.stack.common.utils.linux.LinuxAccountUtils;
+import org.apache.bigtop.manager.stack.core.spi.Hook;
+import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
+import org.apache.bigtop.manager.stack.core.utils.linux.LinuxAccountUtils;
 
 import lombok.extern.slf4j.Slf4j;
 

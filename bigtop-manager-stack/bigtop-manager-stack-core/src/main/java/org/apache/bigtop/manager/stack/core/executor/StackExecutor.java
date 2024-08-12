@@ -23,11 +23,11 @@ import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
 import org.apache.bigtop.manager.common.message.entity.pojo.CustomCommandInfo;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.common.utils.CaseUtils;
-import org.apache.bigtop.manager.spi.plugin.PrioritySPIFactory;
-import org.apache.bigtop.manager.spi.stack.Hook;
-import org.apache.bigtop.manager.spi.stack.Params;
-import org.apache.bigtop.manager.spi.stack.Script;
-import org.apache.bigtop.manager.stack.common.exception.StackException;
+import org.apache.bigtop.manager.stack.core.spi.PrioritySPIFactory;
+import org.apache.bigtop.manager.stack.core.spi.Hook;
+import org.apache.bigtop.manager.stack.core.spi.Params;
+import org.apache.bigtop.manager.stack.core.spi.Script;
+import org.apache.bigtop.manager.stack.core.exception.StackException;
 
 import lombok.extern.slf4j.Slf4j;
 

@@ -18,13 +18,12 @@
  */
 package org.apache.bigtop.manager.stack.nop.v1_0_0.zookeeper;
 
-import org.apache.bigtop.manager.common.shell.ShellResult;
-import org.apache.bigtop.manager.spi.stack.ClientScript;
-import org.apache.bigtop.manager.spi.stack.Params;
-import org.apache.bigtop.manager.spi.stack.Script;
-
 import com.google.auto.service.AutoService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.bigtop.manager.common.shell.ShellResult;
+import org.apache.bigtop.manager.stack.core.spi.ClientScript;
+import org.apache.bigtop.manager.stack.core.spi.Params;
+import org.apache.bigtop.manager.stack.core.spi.Script;
 
 @Slf4j
 @AutoService(Script.class)

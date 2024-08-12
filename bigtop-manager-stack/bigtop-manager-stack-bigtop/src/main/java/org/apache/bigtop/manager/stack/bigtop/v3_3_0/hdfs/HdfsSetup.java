@@ -20,12 +20,12 @@ package org.apache.bigtop.manager.stack.bigtop.v3_3_0.hdfs;
 
 import org.apache.bigtop.manager.common.constants.Constants;
 import org.apache.bigtop.manager.common.shell.ShellResult;
-import org.apache.bigtop.manager.spi.stack.Params;
+import org.apache.bigtop.manager.stack.core.spi.Params;
 import org.apache.bigtop.manager.stack.bigtop.v3_3_0.kafka.KafkaParams;
-import org.apache.bigtop.manager.stack.common.enums.ConfigType;
-import org.apache.bigtop.manager.stack.common.exception.StackException;
-import org.apache.bigtop.manager.stack.common.utils.linux.LinuxFileUtils;
-import org.apache.bigtop.manager.stack.common.utils.linux.LinuxOSUtils;
+import org.apache.bigtop.manager.stack.core.enums.ConfigType;
+import org.apache.bigtop.manager.stack.core.exception.StackException;
+import org.apache.bigtop.manager.stack.core.utils.linux.LinuxFileUtils;
+import org.apache.bigtop.manager.stack.core.utils.linux.LinuxOSUtils;
 
 import org.apache.commons.lang3.StringUtils;
 

@@ -20,9 +20,9 @@ package org.apache.bigtop.manager.stack.bigtop.v3_3_0.tez;
 
 import org.apache.bigtop.manager.common.constants.Constants;
 import org.apache.bigtop.manager.common.shell.ShellResult;
-import org.apache.bigtop.manager.spi.stack.Params;
-import org.apache.bigtop.manager.stack.common.enums.ConfigType;
-import org.apache.bigtop.manager.stack.common.utils.linux.LinuxFileUtils;
+import org.apache.bigtop.manager.stack.core.spi.Params;
+import org.apache.bigtop.manager.stack.core.enums.ConfigType;
+import org.apache.bigtop.manager.stack.core.utils.linux.LinuxFileUtils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
