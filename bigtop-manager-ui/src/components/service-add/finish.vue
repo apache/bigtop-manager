@@ -48,10 +48,7 @@
 
 <style scoped lang="scss">
   .container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    @include flexbox($direction: column, $justify: center, $align: center);
     align-content: center;
     height: 100%;
   }

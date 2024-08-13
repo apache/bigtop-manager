@@ -30,6 +30,7 @@
   } from '@ant-design/icons-vue'
   import { useHostStore } from '@/store/host'
   import { DEFAULT_PAGE_SIZE } from '@/utils/constant.ts'
+  import { CommonState, CurrState } from '@/enums/state'
 
   const hostStore = useHostStore()
   const { hosts, loading } = storeToRefs(hostStore)
@@ -90,6 +91,15 @@
     }
   ]
 
+  const stateColor = (type: keyof typeof CurrState) => {
+    if ([0, 1].includes(CurrState[type])) {
+      return CommonState['normal']
+    } else if (CurrState[type] === 2) {
+      return CommonState['maintained']
+    }
+    return CommonState['abnormal']
+  }
+
   const displayKeys = (selectedRowKeys: string[]) => {
     message.info('This is a normal message' + selectedRowKeys)
   }
@@ -121,11 +131,11 @@
           <template #overlay>
             <a-menu>
               <a-menu-item @click="displayKeys(selectedRowKeys)">
-                <CaretRightFilled />
+                <caret-right-filled />
                 {{ $t('hosts.host_restart') }}
               </a-menu-item>
               <a-menu-item @click="displayKeys(selectedRowKeys)">
-                <StopFilled />
+                <stop-filled />
                 {{ $t('hosts.host_stop') }}
               </a-menu-item>
             </a-menu>
@@ -155,15 +165,15 @@
       </template>
       <template #bodyCell="{ column, text }">
         <template v-if="column.dataIndex === 'state'">
-          <CheckCircleTwoTone
-            v-if="text === 'INSTALLED'"
-            two-tone-color="#52c41a"
+          <check-circle-two-tone
+            v-if="text === 'Started'"
+            :two-tone-color="stateColor(text)"
           />
-          <MinusCircleTwoTone
-            v-else-if="text === 'MAINTAINED'"
-            two-tone-color="orange"
+          <minus-circle-two-tone
+            v-else-if="text === 'Maintained'"
+            :two-tone-color="stateColor(text)"
           />
-          <CloseCircleTwoTone v-else two-tone-color="red" />
+          <close-circle-two-tone v-else :two-tone-color="stateColor(text)" />
         </template>
         <template v-if="column.dataIndex === 'hostname'">
           <router-link to="/dashboard"> {{ text }} </router-link>

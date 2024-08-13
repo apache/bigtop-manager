@@ -30,6 +30,7 @@
   } from 'vue'
 
   import { useI18n } from 'vue-i18n'
+  import { CommonState, CurrState } from '@/enums/state'
   import { type SelectProps, type MenuProps, Modal } from 'ant-design-vue'
   import { DownOutlined, QuestionCircleOutlined } from '@ant-design/icons-vue'
 
@@ -38,12 +39,11 @@
   import { useServiceStore } from '@/store/service'
   import { useClusterStore } from '@/store/cluster'
 
-  import { type ServiceVO, StateColor } from '@/api/service/types.ts'
+  import type { ServiceVO } from '@/api/service/types.ts'
   import { ServiceConfigVO, TypeConfigVO } from '@/api/config/types.ts'
   import { HostComponentVO } from '@/api/component/types.ts'
   import { execCommand } from '@/api/command'
 
-  import DotState from '@/components/dot-state/index.vue'
   import Job from '@/components/job-info/job.vue'
 
   interface Menu {
@@ -120,6 +120,7 @@
     (params) => {
       serviceName.value = params.serviceName as string
       initServiceMeta()
+      componentStore.resumeIntervalFn()
     }
   )
 
@@ -209,6 +210,15 @@
     initConfigVersion.value = serviceConfigDesc.value?.[0].value as number
   }
 
+  const stateColor = (type: keyof typeof CurrState) => {
+    if ([0, 1].includes(CurrState[type])) {
+      return CommonState['normal']
+    } else if (CurrState[type] === 2) {
+      return CommonState['maintained']
+    }
+    return CommonState['abnormal']
+  }
+
   onMounted(() => {
     initServiceMeta()
     componentStore.resumeIntervalFn()
@@ -266,7 +276,7 @@
                   <footer>
                     <div class="comp-state">
                       <dot-state
-                        :color="StateColor[item.state]"
+                        :color="stateColor(item.state)"
                         class="dot-rest"
                       >
                         <span class="comp-state-text">{{ item.state }}</span>
@@ -346,7 +356,7 @@
 
 <style scoped lang="scss">
   .dot-rest {
-    @include flex(center, center);
+    @include flexbox($justify: center, $align: center);
   }
 
   .summary-layout {
@@ -390,8 +400,7 @@
     }
 
     .summary-ctx {
-      display: flex;
-      flex-wrap: wrap;
+      @include flexbox($wrap: wrap);
       box-sizing: border-box;
 
       .card {
@@ -414,11 +423,11 @@
           font-size: 1.06rem;
           font-weight: 600;
           margin-bottom: 0.375rem;
-          @include flex(space-between, center);
+          @include flexbox($justify: space-between, $align: center);
         }
 
         .comp-info {
-          @include flex(center);
+          @include flexbox($justify: center);
           margin-bottom: 1.25rem;
 
           .host-name {
@@ -431,8 +440,7 @@
         }
 
         footer {
-          @include flex(space-between, center);
-
+          @include flexbox($justify: space-between, $align: center);
           .comp-state {
             font-size: 1rem;
             align-items: flex-end;
@@ -447,10 +455,11 @@
   }
 
   .container {
-    display: flex;
-    flex-direction: column;
-    justify-content: start;
-    align-items: center;
+    @include flexbox(
+      $direction: column,
+      $justify: space-between,
+      $align: center
+    );
     align-content: center;
     height: 100%;
 
@@ -470,9 +479,7 @@
         text-align: start;
 
         .config-item {
-          display: flex;
-          align-items: center;
-          justify-content: start;
+          @include flexbox($justify: start, $align: center);
           margin-bottom: 1rem;
 
           .config-item-key {

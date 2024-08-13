@@ -31,10 +31,13 @@
     "@typescript-eslint/eslint-plugin": "^6.4.1",
     "@typescript-eslint/parser": "^6.4.1",
     "@vitejs/plugin-vue": "^4.2.3",
+    "autoprefixer": "^10.4.20",
+    "cssnano": "^7.0.5",
     "eslint": "^8.47.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
     "eslint-plugin-vue": "^9.17.0",
+    "postcss": "^8.4.41",
     "prettier": "^3.0.2",
     "sass": "^1.66.1",
     "sass-loader": "^13.3.2",
@@ -42,5 +45,13 @@
     "vite": "^4.4.5",
     "vite-plugin-svg-icons": "^2.0.1",
     "vue-tsc": "^1.8.5"
-  }
+  },
+  "browserslist": [
+    "defaults",
+    "not ie < 11",
+    "last 2 versions",
+    "> 1%",
+    "iOS 7",
+    "last 3 iOS versions"
+  ]
 }

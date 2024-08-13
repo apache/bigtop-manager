@@ -1,3 +1,4 @@
+<?xml version="1.0" ?>
 <!--
   ~ Licensed to the Apache Software Foundation (ASF) under one
   ~ or more contributor license agreements.  See the NOTICE file
@@ -16,17 +17,6 @@
   ~ specific language governing permissions and limitations
   ~ under the License.
 -->
-
-<template>
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="1em"
-    height="1em"
-    viewBox="0 0 1024 1024"
-  >
-    <path
-      fill="currentColor"
-      d="M252.068571 906.496h520.283429c89.581714 0 134.144-44.562286 134.144-132.845714V250.331429c0-88.283429-44.562286-132.845714-134.144-132.845715H252.068571c-89.142857 0-134.582857 44.141714-134.582857 132.845715V773.668571c0 88.704 45.44 132.845714 134.582857 132.845715z"
-    />
-  </svg>
-</template>
+<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 1024 1024">
+  <path fill="currentColor" d="M512 16C238 16 16 238 16 512s222 496 496 496 496-222 496-496S786 16 512 16z" />
+</svg>

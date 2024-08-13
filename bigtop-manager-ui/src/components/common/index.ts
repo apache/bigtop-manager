@@ -17,40 +17,21 @@
  * under the License.
  */
 
-import { State } from '@/enums/state'
+import type { App } from 'vue'
+import SvgIcon from './svg-icon/index.vue'
+import DotState from './dot-state/index.vue'
 
-export type StateType = keyof typeof State
-
-interface BaseVO {
-  id: number
-  name: string
-  state: StateType
-  createTime?: string
-  updateTime?: string
-  progress?: number
+const comments = {
+  SvgIcon,
+  DotState
 }
 
-export interface JobVO extends BaseVO {
-  stages: StageVO[]
+const install = (app: App) => {
+  for (const [key, comp] of Object.entries(comments)) {
+    app.component(key, comp)
+  }
 }
 
-export interface StageVO extends BaseVO {
-  order: number
-  tasks: TaskVO[]
-}
-
-export interface TaskVO extends BaseVO {
-  hostname: string
-}
-
-export interface Pagination {
-  pageNum: number
-  pageSize: number
-  sort?: 'asc' | 'desc'
-  orderBy?: string
-}
-
-export interface OuterData {
-  meta: JobVO[]
-  currItem: StageVO | TaskVO | undefined
+export default {
+  install
 }

@@ -17,40 +17,24 @@
  * under the License.
  */
 
-import { State } from '@/enums/state'
+import type { App } from 'vue'
+import router from '@/router'
+import pinia from '@/store'
+import i18n from '@/locales'
+import Antd, { message } from 'ant-design-vue'
+import components from '@/components/common'
 
-export type StateType = keyof typeof State
-
-interface BaseVO {
-  id: number
-  name: string
-  state: StateType
-  createTime?: string
-  updateTime?: string
-  progress?: number
+interface PluginOptions {
+  antdMessageMaxCount: number
 }
 
-export interface JobVO extends BaseVO {
-  stages: StageVO[]
-}
-
-export interface StageVO extends BaseVO {
-  order: number
-  tasks: TaskVO[]
-}
-
-export interface TaskVO extends BaseVO {
-  hostname: string
-}
-
-export interface Pagination {
-  pageNum: number
-  pageSize: number
-  sort?: 'asc' | 'desc'
-  orderBy?: string
-}
-
-export interface OuterData {
-  meta: JobVO[]
-  currItem: StageVO | TaskVO | undefined
+export default {
+  install(app: App, options: PluginOptions) {
+    app.use(Antd)
+    app.use(router)
+    app.use(pinia)
+    app.use(i18n)
+    app.use(components)
+    message.config({ maxCount: options.antdMessageMaxCount })
+  }
 }

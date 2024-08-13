@@ -17,40 +17,10 @@
  * under the License.
  */
 
-import { State } from '@/enums/state'
-
-export type StateType = keyof typeof State
-
-interface BaseVO {
-  id: number
-  name: string
-  state: StateType
-  createTime?: string
-  updateTime?: string
-  progress?: number
-}
-
-export interface JobVO extends BaseVO {
-  stages: StageVO[]
-}
-
-export interface StageVO extends BaseVO {
-  order: number
-  tasks: TaskVO[]
-}
-
-export interface TaskVO extends BaseVO {
-  hostname: string
-}
-
-export interface Pagination {
-  pageNum: number
-  pageSize: number
-  sort?: 'asc' | 'desc'
-  orderBy?: string
-}
-
-export interface OuterData {
-  meta: JobVO[]
-  currItem: StageVO | TaskVO | undefined
+@mixin flexbox($direction: null, $wrap: null, $justify: null, $align: null) {
+  display: flex;
+  flex-direction: $direction;
+  flex-wrap: $wrap;
+  justify-content: $justify;
+  align-items: $align;
 }

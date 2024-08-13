@@ -17,40 +17,14 @@
  * under the License.
  */
 
-import { State } from '@/enums/state'
+const autoprefixer = require('autoprefixer')
+const cssnano = require('cssnano')
 
-export type StateType = keyof typeof State
-
-interface BaseVO {
-  id: number
-  name: string
-  state: StateType
-  createTime?: string
-  updateTime?: string
-  progress?: number
-}
-
-export interface JobVO extends BaseVO {
-  stages: StageVO[]
-}
-
-export interface StageVO extends BaseVO {
-  order: number
-  tasks: TaskVO[]
-}
-
-export interface TaskVO extends BaseVO {
-  hostname: string
-}
-
-export interface Pagination {
-  pageNum: number
-  pageSize: number
-  sort?: 'asc' | 'desc'
-  orderBy?: string
-}
-
-export interface OuterData {
-  meta: JobVO[]
-  currItem: StageVO | TaskVO | undefined
+module.exports = {
+  plugins: [
+    autoprefixer(),
+    cssnano({
+      preset: 'default'
+    })
+  ]
 }
