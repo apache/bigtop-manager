@@ -15,33 +15,58 @@ import reactor.core.publisher.Flux;
  */
 public interface AIAssistant {
 
+    /**
+     * This ID is the unique identifier for the {@link AIAssistant}.
+     * Its memory storage is independent of AIAssistant instances in other threads.
+     * @return
+     */
+    Object getId();
+
+
+    /**
+     * This is a conversation based on streaming output.
+     * @param userMessage
+     * @return
+     */
     Flux<String> streamAsk(ChatMessage userMessage);
 
+    /**
+     * This is a conversation based on blocking output.
+     * @param userMessage
+     * @return
+     */
     String ask(ChatMessage userMessage);
 
+    /**
+     * This is primarily used to retrieve the AI assistant's history of chat conversations.
+     * @return
+     */
     ChatMemory getMemory();
 
+    /**
+     * This is used to get the AIAssistant's Platform
+     * @return
+     */
     String getPlatform();
+
 
     void setSystemPrompt(SystemMessage systemPrompt);
 
 
     void resetMemory();
 
-    /**
-     * This ID is the unique identifier for the {@link AIAssistant}. Its memory storage is independent of AIAssistant instances in other threads....
-     * @return
-     */
-    Object getId();
+
 
     default Flux<String> streamAsk(String message){
         return streamAsk(UserMessage.from(message));
     }
+
     default String ask(String message){
         return ask(UserMessage.from(message));
     }
+
     default void setSystemPrompt(String systemPrompt){
-        setSystemPrompt(systemPrompt);
+        setSystemPrompt(SystemMessage.systemMessage(systemPrompt));
     }
 
 

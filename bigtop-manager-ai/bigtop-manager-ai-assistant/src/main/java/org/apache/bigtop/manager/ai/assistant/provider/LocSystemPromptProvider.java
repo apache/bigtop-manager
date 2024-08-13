@@ -15,14 +15,14 @@ import java.util.Objects;
  * @Author: pgthinker
  * @GitHub: https://github.com/ningning0111
  * @Date: 2024/8/13 22:15
- * @Description:
+ * @Description: This is a simple system prompt word provider interface implemented based on local files.
  */
 public class LocSystemPromptProvider implements SystemPromptProvider {
 
     public final static String DEFAULT = "default";
     @Override
     public SystemMessage getSystemPrompt(Object id) {
-        if(Objects.equals(id.toString(), "default")){
+        if(Objects.equals(id.toString(), DEFAULT)){
             return getSystemPrompt();
         }
         return null;

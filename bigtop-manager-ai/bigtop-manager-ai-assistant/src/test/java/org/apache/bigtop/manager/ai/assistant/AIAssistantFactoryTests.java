@@ -25,6 +25,7 @@ public class AIAssistantFactoryTests {
     private AIAssistant aiAssistant = null;
     private AIAssistantFactory aiAssistantFactory = new AIAssistantFactory();
 
+    // The Key and url share from : https://pgthinker.me/2023/10/03/196/
     private AIAssistantConfigProvider configProvider = AIAssistantConfig.builder()
             .set("apiKey", "sk-KgvugzpKzki15GFxB72e7782De844b23B3E4Fc6dDf40B29a")
             .set("baseUrl", "https://api.mnzdna.xyz/v1")
