@@ -9,7 +9,7 @@ package org.apache.bigtop.manager.ai.core.exception;
  */
 public class PlatformNotFoundException extends RuntimeException{
     public PlatformNotFoundException(String platform){
-        super(platform + " not found. Please choose a type in PlatformType.");
+        super(platform + " platform not found. Please select one from PlatformType.");
     }
 
 
