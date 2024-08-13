@@ -197,7 +197,6 @@
       $align: center
     );
     align-content: center;
-    height: 100%;
 
     .title {
       font-size: 1.5rem;

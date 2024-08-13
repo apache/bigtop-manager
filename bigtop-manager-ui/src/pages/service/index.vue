@@ -221,6 +221,7 @@
 
   onMounted(() => {
     initServiceMeta()
+    componentStore.resumeIntervalFn()
   })
 
   onUnmounted(() => {
