@@ -19,17 +19,17 @@
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.tez;
 
 import org.apache.bigtop.manager.common.shell.ShellResult;
-import org.apache.bigtop.manager.spi.stack.ClientScript;
-import org.apache.bigtop.manager.spi.stack.Params;
-import org.apache.bigtop.manager.spi.stack.Script;
-import org.apache.bigtop.manager.stack.common.utils.PackageUtils;
+import org.apache.bigtop.manager.stack.core.param.Params;
+import org.apache.bigtop.manager.stack.core.spi.script.AbstractClientScript;
+import org.apache.bigtop.manager.stack.core.spi.script.Script;
+import org.apache.bigtop.manager.stack.core.utils.PackageUtils;
 
 import com.google.auto.service.AutoService;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @AutoService(Script.class)
-public class TezClientScript implements ClientScript {
+public class TezClientScript extends AbstractClientScript {
 
     @Override
     public ShellResult install(Params params) {

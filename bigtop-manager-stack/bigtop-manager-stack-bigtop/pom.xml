@@ -37,12 +37,7 @@
     <dependencies>
         <dependency>
             <groupId>org.apache.bigtop</groupId>
-            <artifactId>bigtop-manager-stack-common</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.auto.service</groupId>
-            <artifactId>auto-service</artifactId>
+            <artifactId>bigtop-manager-stack-core</artifactId>
         </dependency>
 
         <dependency>
@@ -65,6 +60,14 @@
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-reload4j</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.zookeeper</groupId>
+                    <artifactId>zookeeper</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.zookeeper</groupId>
+                    <artifactId>zookeeper-jute</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -90,6 +93,14 @@
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-reload4j</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.apache.zookeeper</groupId>
+                    <artifactId>zookeeper</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.zookeeper</groupId>
+                    <artifactId>zookeeper-jute</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -113,6 +124,14 @@
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-reload4j</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.zookeeper</groupId>
+                    <artifactId>zookeeper</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.zookeeper</groupId>
+                    <artifactId>zookeeper-jute</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

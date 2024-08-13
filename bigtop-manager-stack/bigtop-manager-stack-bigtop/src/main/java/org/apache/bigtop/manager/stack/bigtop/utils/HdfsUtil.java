@@ -18,8 +18,8 @@
  */
 package org.apache.bigtop.manager.stack.bigtop.utils;
 
-import org.apache.bigtop.manager.stack.common.exception.StackException;
-import org.apache.bigtop.manager.stack.common.utils.LocalSettings;
+import org.apache.bigtop.manager.stack.core.exception.StackException;
+import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.hadoop.conf.Configuration;
