@@ -47,13 +47,25 @@
             <groupId>org.apache.bigtop</groupId>
             <artifactId>bigtop-manager-common</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.apache.bigtop</groupId>
             <artifactId>bigtop-manager-grpc</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.apache.bigtop</groupId>
             <artifactId>bigtop-manager-stack-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.bigtop</groupId>
+            <artifactId>bigtop-manager-stack-bigtop</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.bigtop</groupId>
+            <artifactId>bigtop-manager-stack-nop</artifactId>
         </dependency>
 
         <dependency>

@@ -217,7 +217,6 @@ public class CacheFileUpdateTask extends AbstractTask {
         ImmutablePair<StackDTO, List<ServiceDTO>> immutablePair =
                 StackUtils.getStackKeyMap().get(fullStackName);
         StackDTO stackDTO = immutablePair.getLeft();
-        List<ServiceDTO> serviceDTOList = immutablePair.getRight();
 
         Map<String, Object> properties = taskContext.getProperties();
 
@@ -229,13 +228,10 @@ public class CacheFileUpdateTask extends AbstractTask {
         clusterInfo.setUserGroup(stackDTO.getUserGroup());
         clusterInfo.setRepoTemplate(stackDTO.getRepoTemplate());
         clusterInfo.setRoot(stackDTO.getRoot());
+        clusterInfo.setPackages(List.of(stackDTO.getPackages().split(",")));
 
         List<String> hostnames = (List<String>) properties.get("hostnames");
         hostMap.put(Constants.ALL_HOST_KEY, new HashSet<>(hostnames));
-
-        for (ServiceDTO serviceDTO : serviceDTOList) {
-            userMap.put(serviceDTO.getServiceName(), serviceDTO.getServiceUser());
-        }
     }
 
     @Override

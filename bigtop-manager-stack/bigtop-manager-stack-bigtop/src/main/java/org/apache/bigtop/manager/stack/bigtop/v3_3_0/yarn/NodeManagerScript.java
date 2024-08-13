@@ -19,11 +19,12 @@
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.yarn;
 
 import org.apache.bigtop.manager.common.shell.ShellResult;
-import org.apache.bigtop.manager.spi.stack.Params;
-import org.apache.bigtop.manager.spi.stack.Script;
-import org.apache.bigtop.manager.stack.common.exception.StackException;
-import org.apache.bigtop.manager.stack.common.utils.PackageUtils;
-import org.apache.bigtop.manager.stack.common.utils.linux.LinuxOSUtils;
+import org.apache.bigtop.manager.stack.core.exception.StackException;
+import org.apache.bigtop.manager.stack.core.param.Params;
+import org.apache.bigtop.manager.stack.core.spi.script.AbstractServerScript;
+import org.apache.bigtop.manager.stack.core.spi.script.Script;
+import org.apache.bigtop.manager.stack.core.utils.PackageUtils;
+import org.apache.bigtop.manager.stack.core.utils.linux.LinuxOSUtils;
 
 import com.google.auto.service.AutoService;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +33,7 @@ import java.text.MessageFormat;
 
 @Slf4j
 @AutoService(Script.class)
-public class NodeManagerScript implements Script {
+public class NodeManagerScript extends AbstractServerScript {
 
     @Override
     public ShellResult install(Params params) {

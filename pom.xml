@@ -41,7 +41,6 @@
         <module>bigtop-manager-stack</module>
         <module>bigtop-manager-ui</module>
         <module>bigtop-manager-dao</module>
-        <module>bigtop-manager-spi</module>
         <module>bigtop-manager-grpc</module>
     </modules>
 
@@ -91,18 +90,6 @@
             <dependency>
                 <groupId>org.apache.bigtop</groupId>
                 <artifactId>bigtop-manager-grpc</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.bigtop</groupId>
-                <artifactId>bigtop-manager-spi</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.bigtop</groupId>
-                <artifactId>bigtop-manager-stack-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

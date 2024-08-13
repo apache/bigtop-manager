@@ -34,7 +34,6 @@
 
     <modules>
         <module>bigtop-manager-stack-core</module>
-        <module>bigtop-manager-stack-common</module>
         <module>bigtop-manager-stack-bigtop</module>
         <module>bigtop-manager-stack-nop</module>
     </modules>
@@ -65,10 +64,6 @@
         <dependency>
             <groupId>org.apache.bigtop</groupId>
             <artifactId>bigtop-manager-common</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.bigtop</groupId>
-            <artifactId>bigtop-manager-spi</artifactId>
         </dependency>
 
         <dependency>

@@ -23,7 +23,7 @@ import org.apache.bigtop.manager.common.constants.MessageConstants;
 import org.apache.bigtop.manager.common.message.entity.payload.CacheMessagePayload;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.grpc.generated.CommandType;
-import org.apache.bigtop.manager.stack.common.utils.linux.LinuxFileUtils;
+import org.apache.bigtop.manager.stack.core.utils.linux.LinuxFileUtils;
 
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
