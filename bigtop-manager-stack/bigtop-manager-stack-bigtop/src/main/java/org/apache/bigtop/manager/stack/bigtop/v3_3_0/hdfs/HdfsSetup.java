@@ -150,9 +150,6 @@ public class HdfsSetup {
                 Constants.PERMISSION_644,
                 hdfsParams.getGlobalParamsMap());
 
-        // log.info("Creating /apps on hdfs");
-        // HdfsUtil.createDirectory(hdfsUser, "/apps");
-
         log.info("Successfully configured HDFS");
         return ShellResult.success("HDFS Configure success!");
     }
