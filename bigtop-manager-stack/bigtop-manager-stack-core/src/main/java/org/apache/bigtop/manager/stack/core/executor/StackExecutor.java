@@ -23,6 +23,7 @@ import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
 import org.apache.bigtop.manager.common.message.entity.pojo.CustomCommandInfo;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.common.utils.CaseUtils;
+import org.apache.bigtop.manager.common.utils.Environments;
 import org.apache.bigtop.manager.stack.core.exception.StackException;
 import org.apache.bigtop.manager.stack.core.param.Params;
 import org.apache.bigtop.manager.stack.core.spi.PrioritySPIFactory;
@@ -67,6 +68,10 @@ public class StackExecutor {
     }
 
     private static void runBeforeHook(String command, Params params) {
+        if (Environments.isDevMode()) {
+            return;
+        }
+
         Hook hook = HOOK_MAP.get(command.toLowerCase());
         if (hook != null) {
             hook.before(params);
@@ -74,6 +79,10 @@ public class StackExecutor {
     }
 
     private static void runAfterHook(String command, Params params) {
+        if (Environments.isDevMode()) {
+            return;
+        }
+
         Hook hook = HOOK_MAP.get(command.toLowerCase());
         if (hook != null) {
             hook.after(params);

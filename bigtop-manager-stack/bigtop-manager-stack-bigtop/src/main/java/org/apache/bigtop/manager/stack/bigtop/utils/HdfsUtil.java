@@ -30,6 +30,7 @@ import org.apache.hadoop.security.UserGroupInformation;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.File;
 import java.net.URI;
 import java.security.PrivilegedAction;
 import java.text.MessageFormat;
@@ -38,6 +39,13 @@ import java.util.List;
 @Data
 @Slf4j
 public class HdfsUtil {
+
+    /**
+     * Create directory on hdfs if not exist
+     *
+     * @param user      the system user to create the directory, which will infect the directory permission
+     * @param directory the directory path on hdfs
+     */
     public static void createDirectory(String user, String directory) {
         UserGroupInformation ugi = UserGroupInformation.createRemoteUser(user);
         try {
@@ -46,6 +54,7 @@ public class HdfsUtil {
                     // Create dest dir if not exist
                     Path destDirPath = new Path(directory);
                     if (!fs.exists(destDirPath)) {
+                        log.info("Creating directory [{}] on hdfs", destDirPath);
                         fs.mkdirs(destDirPath);
                     }
                 } catch (Exception e) {
@@ -61,10 +70,25 @@ public class HdfsUtil {
         }
     }
 
+    /**
+     * Upload file to hdfs, this will keep original filename on hdfs
+     *
+     * @param user          the system user to upload the file, which will infect the file permission
+     * @param localFilePath the local file path
+     * @param destDir       the destination directory on hdfs
+     */
     public static void uploadFile(String user, String localFilePath, String destDir) {
         uploadFile(user, localFilePath, destDir, null);
     }
 
+    /**
+     * Upload file to hdfs
+     *
+     * @param user          the system user to upload the file, which will infect the file permission
+     * @param localFilePath the local file path
+     * @param destDir       the destination directory on hdfs
+     * @param destFilename  the destination filename on hdfs, if null, use the original filename
+     */
     public static void uploadFile(String user, String localFilePath, String destDir, String destFilename) {
         UserGroupInformation ugi = UserGroupInformation.createRemoteUser(user);
         try {
@@ -73,12 +97,19 @@ public class HdfsUtil {
                     // Create dest dir if not exist
                     Path destDirPath = new Path(destDir);
                     if (!fs.exists(destDirPath)) {
+                        log.info("Creating directory [{}] on hdfs", destDirPath);
                         fs.mkdirs(destDirPath);
                     }
 
                     // upload file
-                    Path destFilePath = destFilename == null ? new Path(destDir) : new Path(destDir, destFilename);
-                    fs.copyFromLocalFile(new Path(localFilePath), destFilePath);
+                    String filename = destFilename == null
+                            ? localFilePath.substring(localFilePath.lastIndexOf(File.separator) + 1)
+                            : destFilename;
+                    Path destFilePath = new Path(destDir, filename);
+                    if (!fs.exists(destFilePath)) {
+                        log.info("Uploading [{}] to hdfs [{}]", localFilePath, destFilePath);
+                        fs.copyFromLocalFile(new Path(localFilePath), destFilePath);
+                    }
                 } catch (Exception e) {
                     log.error("Error while uploading file to hdfs", e);
                     throw new StackException(e);
@@ -92,6 +123,12 @@ public class HdfsUtil {
         }
     }
 
+    /**
+     * Get the hdfs FileSystem instance
+     *
+     * @return the hdfs FileSystem instance
+     * @throws Exception if any error occurs
+     */
     private static FileSystem getFileSystem() throws Exception {
         Configuration conf = new Configuration();
         conf.addResource(new Path("/etc/hadoop/conf/core-site.xml"));
