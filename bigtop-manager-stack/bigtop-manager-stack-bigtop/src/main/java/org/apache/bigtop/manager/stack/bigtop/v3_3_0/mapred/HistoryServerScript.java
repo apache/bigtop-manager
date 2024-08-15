@@ -58,7 +58,7 @@ public class HistoryServerScript extends AbstractServerScript {
     @Override
     public ShellResult stop(Params params) {
         Mapreduce2Params mapreduce2Params = (Mapreduce2Params) params;
-        String cmd = MessageFormat.format("{0} --daemon start historyserver", mapreduce2Params.mapredExec());
+        String cmd = MessageFormat.format("{0} --daemon stop historyserver", mapreduce2Params.mapredExec());
         try {
             return LinuxOSUtils.sudoExecCmd(cmd, mapreduce2Params.user());
         } catch (Exception e) {
