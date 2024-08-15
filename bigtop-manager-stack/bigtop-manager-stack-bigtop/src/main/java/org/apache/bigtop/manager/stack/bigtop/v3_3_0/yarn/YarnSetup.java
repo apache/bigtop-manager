@@ -78,7 +78,7 @@ public class YarnSetup {
                 yarnParams.getYarnPidDir(), yarnUser, yarnGroup, Constants.PERMISSION_755, true);
         LinuxFileUtils.createDirectories(yarnParams.getTmpDir(), yarnUser, yarnGroup, Constants.PERMISSION_755, true);
 
-        // hdfs.limits
+        // yarn.conf
         LinuxFileUtils.toFileByTemplate(
                 yarnParams.yarnLimits(),
                 MessageFormat.format("{0}/yarn.conf", BaseParams.LIMITS_CONF_DIR),
@@ -87,7 +87,7 @@ public class YarnSetup {
                 Constants.PERMISSION_644,
                 yarnParams.getGlobalParamsMap());
 
-        // hadoop-env.sh
+        // yarn-env.sh
         LinuxFileUtils.toFileByTemplate(
                 yarnEnv.get("content").toString(),
                 MessageFormat.format("{0}/yarn-env.sh", confDir),
@@ -96,7 +96,7 @@ public class YarnSetup {
                 Constants.PERMISSION_644,
                 yarnParams.getGlobalParamsMap());
 
-        // hdfs-site.xml
+        // yarn-site.xml
         LinuxFileUtils.toFile(
                 ConfigType.XML,
                 MessageFormat.format("{0}/yarn-site.xml", confDir),

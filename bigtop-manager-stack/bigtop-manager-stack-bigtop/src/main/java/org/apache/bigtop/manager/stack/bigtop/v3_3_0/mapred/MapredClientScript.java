@@ -16,27 +16,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-syntax = "proto3";
+package org.apache.bigtop.manager.stack.bigtop.v3_3_0.mapred;
 
-option java_multiple_files = true;
-option java_package = "org.apache.bigtop.manager.grpc.generated";
-option java_outer_classname = "ComponentStatusProto";
+import org.apache.bigtop.manager.common.shell.ShellResult;
+import org.apache.bigtop.manager.stack.core.param.Params;
+import org.apache.bigtop.manager.stack.core.spi.script.AbstractClientScript;
+import org.apache.bigtop.manager.stack.core.spi.script.Script;
+import org.apache.bigtop.manager.stack.core.utils.PackageUtils;
 
-service ComponentStatusService {
-  rpc GetComponentStatus (ComponentStatusRequest) returns (ComponentStatusReply) {}
-}
+import com.google.auto.service.AutoService;
+import lombok.extern.slf4j.Slf4j;
 
-message ComponentStatusRequest {
-  string service_name = 1;
-  string service_user = 2;
-  string component_name = 3;
-  string command_script = 4;
-  // TODO Unnecessary, should be removed in the future
-  string root = 5;
-  string stack_name = 6;
-  string stack_version = 7;
-}
+@Slf4j
+@AutoService(Script.class)
+public class MapredClientScript extends AbstractClientScript {
 
-message ComponentStatusReply {
-  int32 status = 1;
+    @Override
+    public ShellResult install(Params params) {
+        return PackageUtils.install(params.getPackageList());
+    }
+
+    @Override
+    public ShellResult configure(Params params) {
+        return MapredSetup.config(params);
+    }
 }

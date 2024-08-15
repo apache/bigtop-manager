@@ -21,8 +21,8 @@
 <configuration>
     <property>
         <name>content</name>
-        <display-name>yarn.conf template</display-name>
-        <description>This is the freemarker template for yarn file</description>
+        <display-name>mapreduce.conf template</display-name>
+        <description>This is the freemarker template for mapreduce file</description>
         <value><![CDATA[
 #
 # Licensed to the Apache Software Foundation (ASF) under one
@@ -42,8 +42,8 @@
 # limitations under the License.
 #
 
-${yarn_user}   - nofile   ${yarn_user_nofile_limit}
-${yarn_user}   - nproc    ${yarn_user_nproc_limit}
+${mapred_user}   - nofile ${mapred_user_nofile_limit}
+${mapred_user}   - nproc  ${mapred_user_nproc_limit}
 
 ]]>
         </value>

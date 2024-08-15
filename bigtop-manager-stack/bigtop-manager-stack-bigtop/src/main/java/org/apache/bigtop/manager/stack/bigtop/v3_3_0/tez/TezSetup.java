@@ -47,7 +47,7 @@ public class TezSetup {
         String tezGroup = tezParams.group();
 
         // tez-site
-        log.info("Generating {}/tez-site.xml file", confDir);
+        log.info("Generating [{}/tez-site.xml] file", confDir);
         LinuxFileUtils.toFile(
                 ConfigType.XML,
                 MessageFormat.format("{0}/tez-site.xml", confDir),
@@ -58,7 +58,7 @@ public class TezSetup {
                 tezParams.getGlobalParamsMap());
 
         // tez-env
-        log.info("Generating {}/tez-env.sh file", confDir);
+        log.info("Generating [{}/tez-env.sh] file", confDir);
         LinuxFileUtils.toFileByTemplate(
                 tezParams.getTezEnvContent(),
                 MessageFormat.format("{0}/tez-env.sh", confDir),

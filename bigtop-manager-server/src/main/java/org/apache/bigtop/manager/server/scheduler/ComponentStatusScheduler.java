@@ -66,6 +66,7 @@ public class ComponentStatusScheduler {
 
             ComponentStatusRequest request = ComponentStatusRequest.newBuilder()
                     .setServiceName(servicePO.getServiceName())
+                    .setServiceUser(servicePO.getServiceUser())
                     .setComponentName(componentPO.getComponentName())
                     .setCommandScript(componentPO.getCommandScript())
                     .setRoot(clusterPO.getRoot())

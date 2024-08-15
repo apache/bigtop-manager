@@ -142,6 +142,11 @@ public abstract class AbstractServiceJob extends AbstractJob {
         return componentDTO.getCategory().equalsIgnoreCase(ComponentCategories.SLAVE);
     }
 
+    protected Boolean isClientComponent(String componentName) {
+        ComponentDTO componentDTO = StackUtils.getComponentDTO(stackName, stackVersion, componentName);
+        return componentDTO.getCategory().equalsIgnoreCase(ComponentCategories.CLIENT);
+    }
+
     protected List<String> findHostnamesByComponentName(String componentName) {
         List<HostComponentPO> hostComponentPOList =
                 hostComponentRepository.findAllByComponentPOClusterPOIdAndComponentPOComponentName(
@@ -205,7 +210,7 @@ public abstract class AbstractServiceJob extends AbstractJob {
             String componentName = split[0];
             String serviceName = findServiceNameByComponentName(componentName);
 
-            if (!(isMasterComponent(componentName) || isSlaveComponent(componentName))) {
+            if (isClientComponent(componentName)) {
                 continue;
             }
 
@@ -227,7 +232,7 @@ public abstract class AbstractServiceJob extends AbstractJob {
             String componentName = split[0];
             String serviceName = findServiceNameByComponentName(componentName);
 
-            if (!(isMasterComponent(componentName) || isSlaveComponent(componentName))) {
+            if (isClientComponent(componentName)) {
                 continue;
             }
 
@@ -249,7 +254,7 @@ public abstract class AbstractServiceJob extends AbstractJob {
             String componentName = split[0];
             String serviceName = findServiceNameByComponentName(componentName);
 
-            if (!isMasterComponent(componentName)) {
+            if (isClientComponent(componentName)) {
                 continue;
             }
 

@@ -22,7 +22,7 @@
     <service>
         <name>yarn</name>
         <display-name>YARN</display-name>
-        <desc>Apache Hadoop NextGen MapReduce (YARN)</desc>
+        <desc>Apache Hadoop NextGen YARN.</desc>
         <version>3.3.6-1</version>
         <user>yarn</user>
 
