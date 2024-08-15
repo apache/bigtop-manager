@@ -50,7 +50,7 @@
     <property>
         <name>content</name>
         <display-name>mapred-env template</display-name>
-        <description>This is the jinja template for mapred-env.sh file</description>
+        <description>This is the freemarker template for mapred-env.sh file</description>
         <value><![CDATA[
 export HADOOP_JOB_HISTORYSERVER_HEAPSIZE=${jobhistory_heapsize!}
 
