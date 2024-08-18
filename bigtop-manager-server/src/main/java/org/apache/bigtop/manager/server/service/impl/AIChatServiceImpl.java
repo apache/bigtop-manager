@@ -1,20 +1,39 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *    https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.apache.bigtop.manager.server.service.impl;
 
-import lombok.extern.slf4j.Slf4j;
+import org.apache.bigtop.manager.common.utils.DateUtils;
 import org.apache.bigtop.manager.server.model.dto.PlatformDTO;
 import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
 import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
 import org.apache.bigtop.manager.server.model.vo.PlatformAuthorizedVO;
 import org.apache.bigtop.manager.server.model.vo.PlatformVO;
 import org.apache.bigtop.manager.server.service.AIChatService;
-import org.apache.bigtop.manager.server.utils.DateTimeUtils;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -24,31 +43,23 @@ public class AIChatServiceImpl implements AIChatService {
     @Override
     public List<PlatformVO> platforms() {
         List<PlatformVO> platforms = new ArrayList<>();
-        platforms.add(
-                new PlatformVO(1L,"OpenAI","GPT-3.5,GPT-4o")
-        );
-        platforms.add(
-                new PlatformVO(2L,"ChatGLM","GPT-3.5,GPT-4o")
-        );
+        platforms.add(new PlatformVO(1L, "OpenAI", "GPT-3.5,GPT-4o"));
+        platforms.add(new PlatformVO(2L, "ChatGLM", "GPT-3.5,GPT-4o"));
         return platforms;
     }
 
     @Override
     public List<PlatformAuthorizedVO> authorizedPlatforms() {
         List<PlatformAuthorizedVO> authorizedPlatforms = new ArrayList<>();
-        authorizedPlatforms.add(
-                new PlatformAuthorizedVO(1L,"OpenAI","sk-xxxxxxxxxxxxx","GPT-3.5,GPT-4o")
-        );
-        authorizedPlatforms.add(
-                new PlatformAuthorizedVO(2L,"ChatGLM","sk-yyyyyyyyyyyy","GPT-4o")
-        );
+        authorizedPlatforms.add(new PlatformAuthorizedVO(1L, "OpenAI", "sk-xxxxxxxxxxxxx", "GPT-3.5,GPT-4o"));
+        authorizedPlatforms.add(new PlatformAuthorizedVO(2L, "ChatGLM", "sk-yyyyyyyyyyyy", "GPT-4o"));
         return authorizedPlatforms;
     }
 
     @Override
     public PlatformVO addAuthorizedPlatform(PlatformDTO platformDTO) {
         log.info("Adding authorized platform: {}", platformDTO);
-        return new PlatformVO(1L,"OpenAI","GPT-3.5,GPT-4o");
+        return new PlatformVO(1L, "OpenAI", "GPT-3.5,GPT-4o");
     }
 
     @Override
@@ -61,7 +72,7 @@ public class AIChatServiceImpl implements AIChatService {
     @Override
     public ChatThreadVO createChatThreads(Long platformId, String model) {
 
-        return new ChatThreadVO(1L, platformId, model, DateTimeUtils.now());
+        return new ChatThreadVO(1L, platformId, model, DateUtils.format(new Date()));
     }
 
     @Override
@@ -75,11 +86,11 @@ public class AIChatServiceImpl implements AIChatService {
     public List<ChatThreadVO> getAllChatThreads(Long platformId, String model) {
         List<ChatThreadVO> chatThreads = new ArrayList<>();
         if (model == null || model.equals("GPT-3.5")) {
-            ChatThreadVO chatThreadVO = new ChatThreadVO(1L,platformId, "GPT-3.5", DateTimeUtils.now());
+            ChatThreadVO chatThreadVO = new ChatThreadVO(1L, platformId, "GPT-3.5", DateUtils.format(new Date()));
             chatThreads.add(chatThreadVO);
         }
         if (model == null || model.equals("GPT-4o")) {
-            ChatThreadVO chatThreadVO = new ChatThreadVO(2L, platformId, "GPT-4o", DateTimeUtils.now());
+            ChatThreadVO chatThreadVO = new ChatThreadVO(2L, platformId, "GPT-4o", DateUtils.format(new Date()));
             chatThreads.add(chatThreadVO);
         }
         return chatThreads;
@@ -89,11 +100,10 @@ public class AIChatServiceImpl implements AIChatService {
     public SseEmitter talk(Long platformId, Long threadId, String message) {
         String fullMessage = "您的问题是：" + message;
         fullMessage += "\n回答：";
-        fullMessage += "Bigtop Manager provides a modern, low-threshold web application to simplify " +
-                "the deployment and management of components for Bigtop, similar to Apache Ambari and Cloudera " +
-                "Manager.\n";
-        fullMessage += "Bigtop Manager提供了一个现代、低门槛的web应用程序，简化了Bigtop组件的部署和管理，类似于Apache " +
-                "Ambari和Cloudera Manager。\n";
+        fullMessage += "Bigtop Manager provides a modern, low-threshold web application to simplify "
+                + "the deployment and management of components for Bigtop, similar to Apache Ambari and Cloudera "
+                + "Manager.\n";
+        fullMessage += "Bigtop Manager提供了一个现代、低门槛的web应用程序，简化了Bigtop组件的部署和管理，类似于Apache " + "Ambari和Cloudera Manager。\n";
 
         SseEmitter emitter = new SseEmitter();
         Random random = new Random();
@@ -144,7 +154,7 @@ public class AIChatServiceImpl implements AIChatService {
             String messageText = isUser ? "hello" : "hello, I'm GPT";
             messageText += i;
 
-            ChatMessageVO message = new ChatMessageVO(sender, messageText, DateTimeUtils.now());
+            ChatMessageVO message = new ChatMessageVO(sender, messageText, DateUtils.format(new Date()));
             chatMessages.add(message);
 
             isUser = !isUser;
