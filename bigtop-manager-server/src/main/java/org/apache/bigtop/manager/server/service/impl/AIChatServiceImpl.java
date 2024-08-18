@@ -43,8 +43,8 @@ public class AIChatServiceImpl implements AIChatService {
     @Override
     public List<PlatformVO> platforms() {
         List<PlatformVO> platforms = new ArrayList<>();
-        platforms.add(new PlatformVO(1L, "OpenAI", "GPT-3.5,GPT-4o"));
-        platforms.add(new PlatformVO(2L, "ChatGLM", "GPT-3.5,GPT-4o"));
+        platforms.add(new PlatformVO(1L, "OpenAI", "GPT-3.5,GPT-4o", "API Key"));
+        platforms.add(new PlatformVO(2L, "ChatGLM", "GPT-3.5,GPT-4o", "AppKey"));
         return platforms;
     }
 
@@ -59,7 +59,7 @@ public class AIChatServiceImpl implements AIChatService {
     @Override
     public PlatformVO addAuthorizedPlatform(PlatformDTO platformDTO) {
         log.info("Adding authorized platform: {}", platformDTO);
-        return new PlatformVO(1L, "OpenAI", "GPT-3.5,GPT-4o");
+        return new PlatformVO(1L, "OpenAI", "GPT-3.5,GPT-4o", "API Key");
     }
 
     @Override

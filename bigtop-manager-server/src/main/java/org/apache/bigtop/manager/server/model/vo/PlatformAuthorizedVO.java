@@ -30,8 +30,8 @@ public class PlatformAuthorizedVO {
 
     private String supportModels;
 
-    public PlatformAuthorizedVO(long l, String name, String key, String models) {
-        this.platformId = l;
+    public PlatformAuthorizedVO(long platformId, String name, String key, String models) {
+        this.platformId = platformId;
         this.platformName = name;
         this.supportModels = models;
         this.apiKey = key;

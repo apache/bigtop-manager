@@ -75,12 +75,12 @@ public class AIChatController {
 
     @Operation(summary = "platforms", description = "Delete authorized platforms")
     @DeleteMapping("/platforms/{platformId}")
-    public ResponseEntity<Integer> deleteAuthorizedPlatform(@PathVariable Long platformId) {
+    public ResponseEntity<Boolean> deleteAuthorizedPlatform(@PathVariable Long platformId) {
         int code = chatService.deleteAuthorizedPlatform(platformId);
         if (code != 0) {
             return ResponseEntity.error(ResponseStatus.PARAMETER_ERROR, "Permission denied");
         }
-        return ResponseEntity.success(0);
+        return ResponseEntity.success(true);
     }
 
     @Operation(summary = "new threads", description = "Create a chat threads")
@@ -91,12 +91,12 @@ public class AIChatController {
 
     @Operation(summary = "delete threads", description = "Delete a chat threads")
     @DeleteMapping("platforms/{platformId}/threads/{threadId}")
-    public ResponseEntity<Integer> deleteChatThreads(@PathVariable Long platformId, @PathVariable Long threadId) {
+    public ResponseEntity<Boolean> deleteChatThreads(@PathVariable Long platformId, @PathVariable Long threadId) {
         int code = chatService.deleteChatThreads(platformId, threadId);
         if (code != 0) {
             return ResponseEntity.error(ResponseStatus.PARAMETER_ERROR, "No Content");
         }
-        return ResponseEntity.success(0);
+        return ResponseEntity.success(true);
     }
 
     @Operation(summary = "get", description = "Get all threads of a platform")

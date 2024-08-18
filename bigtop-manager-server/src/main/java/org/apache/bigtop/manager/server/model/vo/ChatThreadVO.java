@@ -32,9 +32,9 @@ public class ChatThreadVO {
 
     private String updateTime;
 
-    public ChatThreadVO(Long tid, Long pid, String model, String createTime) {
-        this.threadId = tid;
-        this.platformId = pid;
+    public ChatThreadVO(Long threadId, Long platformId, String model, String createTime) {
+        this.threadId = threadId;
+        this.platformId = platformId;
         this.model = model;
         this.createTime = createTime;
         this.updateTime = createTime;

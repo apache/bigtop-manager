@@ -28,9 +28,12 @@ public class PlatformVO {
 
     private String supportModels;
 
-    public PlatformVO(Long i, String name, String models) {
-        this.id = i;
+    private String authCredential;
+
+    public PlatformVO(Long id, String name, String models, String authCredential) {
+        this.id = id;
         this.name = name;
         this.supportModels = models;
+        this.authCredential = authCredential;
     }
 }
