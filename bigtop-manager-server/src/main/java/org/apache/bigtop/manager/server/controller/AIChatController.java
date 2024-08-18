@@ -78,7 +78,7 @@ public class AIChatController {
     public ResponseEntity<Integer> deleteAuthorizedPlatform(@PathVariable Long platformId) {
         int code = chatService.deleteAuthorizedPlatform(platformId);
         if (code != 0) {
-            return ResponseEntity.error(ResponseStatus.PARAMETER_ERROR, "权限不足");
+            return ResponseEntity.error(ResponseStatus.PARAMETER_ERROR, "Permission denied");
         }
         return ResponseEntity.success(0);
     }
@@ -94,7 +94,7 @@ public class AIChatController {
     public ResponseEntity<Integer> deleteChatThreads(@PathVariable Long platformId, @PathVariable Long threadId) {
         int code = chatService.deleteChatThreads(platformId, threadId);
         if (code != 0) {
-            return ResponseEntity.error(ResponseStatus.PARAMETER_ERROR, "无内容");
+            return ResponseEntity.error(ResponseStatus.PARAMETER_ERROR, "No Content");
         }
         return ResponseEntity.success(0);
     }
