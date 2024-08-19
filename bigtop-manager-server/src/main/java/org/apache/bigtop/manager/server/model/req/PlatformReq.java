@@ -21,6 +21,7 @@ package org.apache.bigtop.manager.server.model.req;
 import lombok.Data;
 
 import jakarta.validation.constraints.NotEmpty;
+import java.util.List;
 
 @Data
 public class PlatformReq {
@@ -28,5 +29,5 @@ public class PlatformReq {
     private Long platformId;
 
     @NotEmpty
-    private String apiKey;
+    private List<AuthCredentialReq> authCredentials;
 }

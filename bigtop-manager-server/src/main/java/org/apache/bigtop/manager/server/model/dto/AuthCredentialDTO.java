@@ -16,21 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.vo;
+package org.apache.bigtop.manager.server.model.dto;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class PlatformVO {
-    private Long id;
+public class AuthCredentialDTO implements Serializable {
 
-    private String name;
+    private String key;
 
-    private String supportModels;
-
-    public PlatformVO(Long id, String name, String models) {
-        this.id = id;
-        this.name = name;
-        this.supportModels = models;
-    }
+    private String value;
 }

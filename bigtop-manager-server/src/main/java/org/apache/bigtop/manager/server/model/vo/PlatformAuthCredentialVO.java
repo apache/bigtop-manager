@@ -21,16 +21,13 @@ package org.apache.bigtop.manager.server.model.vo;
 import lombok.Data;
 
 @Data
-public class PlatformVO {
-    private Long id;
-
+public class PlatformAuthCredentialVO {
     private String name;
 
-    private String supportModels;
+    private String displayName;
 
-    public PlatformVO(Long id, String name, String models) {
-        this.id = id;
+    public PlatformAuthCredentialVO(String name, String displayName) {
         this.name = name;
-        this.supportModels = models;
+        this.displayName = name;
     }
 }

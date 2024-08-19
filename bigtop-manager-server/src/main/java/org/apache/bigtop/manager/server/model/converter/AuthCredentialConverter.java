@@ -16,21 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.vo;
+package org.apache.bigtop.manager.server.model.converter;
 
-import lombok.Data;
+import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
+import org.apache.bigtop.manager.server.model.dto.PropertyDTO;
+import org.apache.bigtop.manager.server.model.vo.PropertyVO;
 
-@Data
-public class PlatformVO {
-    private Long id;
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 
-    private String name;
+import java.util.List;
 
-    private String supportModels;
+@Mapper(config = MapStructSharedConfig.class)
+public interface AuthCredentialConverter {
 
-    public PlatformVO(Long id, String name, String models) {
-        this.id = id;
-        this.name = name;
-        this.supportModels = models;
-    }
+    AuthCredentialConverter INSTANCE = Mappers.getMapper(AuthCredentialConverter.class);
+
+    PropertyVO fromDTO2VO(PropertyDTO propertyDTO);
+
+    List<PropertyVO> fromDTO2VO(List<PropertyDTO> propertyDTOList);
 }

@@ -22,10 +22,7 @@ import org.apache.bigtop.manager.server.enums.ResponseStatus;
 import org.apache.bigtop.manager.server.model.converter.PlatformConverter;
 import org.apache.bigtop.manager.server.model.dto.PlatformDTO;
 import org.apache.bigtop.manager.server.model.req.PlatformReq;
-import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
-import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
-import org.apache.bigtop.manager.server.model.vo.PlatformAuthorizedVO;
-import org.apache.bigtop.manager.server.model.vo.PlatformVO;
+import org.apache.bigtop.manager.server.model.vo.*;
 import org.apache.bigtop.manager.server.service.AIChatService;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
 
@@ -66,6 +63,12 @@ public class AIChatController {
         return ResponseEntity.success(chatService.authorizedPlatforms());
     }
 
+    @Operation(summary = "platforms", description = "Get authorized platforms")
+    @GetMapping("/platforms/{platformId}/auth/credential")
+    public ResponseEntity<List<PlatformAuthCredentialVO>> platformsAuthCredential(@PathVariable Long platformId) {
+        return ResponseEntity.success(chatService.platformsAuthCredential(platformId));
+    }
+
     @Operation(summary = "platforms", description = "Add authorized platforms")
     @PutMapping("/platforms")
     public ResponseEntity<PlatformVO> addAuthorizedPlatform(@RequestBody PlatformReq platformReq) {
@@ -102,7 +105,7 @@ public class AIChatController {
     @Operation(summary = "get", description = "Get all threads of a platform")
     @GetMapping("platforms/{platformId}/threads")
     public ResponseEntity<List<ChatThreadVO>> getAllChatThreads(
-            @PathVariable Long platformId, @RequestParam(value = "model", required = false) String model) {
+            @PathVariable Long platformId, @RequestParam String model) {
         return ResponseEntity.success(chatService.getAllChatThreads(platformId, model));
     }
 

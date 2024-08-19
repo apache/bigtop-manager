@@ -26,14 +26,11 @@ public class PlatformAuthorizedVO {
 
     private String platformName;
 
-    private String apiKey;
-
     private String supportModels;
 
-    public PlatformAuthorizedVO(long platformId, String name, String key, String models) {
+    public PlatformAuthorizedVO(long platformId, String name, String models) {
         this.platformId = platformId;
         this.platformName = name;
         this.supportModels = models;
-        this.apiKey = key;
     }
 }

@@ -20,13 +20,11 @@ package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.common.utils.DateUtils;
 import org.apache.bigtop.manager.server.model.dto.PlatformDTO;
-import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
-import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
-import org.apache.bigtop.manager.server.model.vo.PlatformAuthorizedVO;
-import org.apache.bigtop.manager.server.model.vo.PlatformVO;
+import org.apache.bigtop.manager.server.model.vo.*;
 import org.apache.bigtop.manager.server.service.AIChatService;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import lombok.extern.slf4j.Slf4j;
@@ -43,24 +41,38 @@ public class AIChatServiceImpl implements AIChatService {
     @Override
     public List<PlatformVO> platforms() {
         List<PlatformVO> platforms = new ArrayList<>();
-        platforms.add(new PlatformVO(1L, "OpenAI", "GPT-3.5,GPT-4o", "API Key"));
-        platforms.add(new PlatformVO(2L, "ChatGLM", "GPT-3.5,GPT-4o", "AppKey"));
+        platforms.add(new PlatformVO(1L, "OpenAI", "GPT-3.5,GPT-4o"));
+        platforms.add(new PlatformVO(2L, "ChatGLM", "GPT-3.5,GPT-4o"));
         return platforms;
     }
 
     @Override
     public List<PlatformAuthorizedVO> authorizedPlatforms() {
         List<PlatformAuthorizedVO> authorizedPlatforms = new ArrayList<>();
-        authorizedPlatforms.add(new PlatformAuthorizedVO(1L, "OpenAI", "sk-xxxxxxxxxxxxx", "GPT-3.5,GPT-4o"));
-        authorizedPlatforms.add(new PlatformAuthorizedVO(2L, "ChatGLM", "sk-yyyyyyyyyyyy", "GPT-4o"));
+        authorizedPlatforms.add(new PlatformAuthorizedVO(1L, "OpenAI",  "GPT-3.5,GPT-4o"));
+        authorizedPlatforms.add(new PlatformAuthorizedVO(2L, "ChatGLM",  "GPT-4o"));
         return authorizedPlatforms;
     }
 
     @Override
     public PlatformVO addAuthorizedPlatform(PlatformDTO platformDTO) {
         log.info("Adding authorized platform: {}", platformDTO);
-        return new PlatformVO(1L, "OpenAI", "GPT-3.5,GPT-4o", "API Key");
+        log.info(platformDTO.getAuthCredentials().toString());
+        return new PlatformVO(1L, "OpenAI", "GPT-3.5,GPT-4o");
     }
+
+    @Override
+    public List<PlatformAuthCredentialVO> platformsAuthCredential(Long platformId) {
+        List<PlatformAuthCredentialVO> platformAuthCredentials = new ArrayList<>();
+        platformAuthCredentials.add(
+                new PlatformAuthCredentialVO("api-key", "API Key")
+        );
+        platformAuthCredentials.add(
+                new PlatformAuthCredentialVO("api-secret", "API Secret")
+        );
+        return platformAuthCredentials;
+    }
+
 
     @Override
     public int deleteAuthorizedPlatform(Long platformId) {
@@ -85,11 +97,13 @@ public class AIChatServiceImpl implements AIChatService {
     @Override
     public List<ChatThreadVO> getAllChatThreads(Long platformId, String model) {
         List<ChatThreadVO> chatThreads = new ArrayList<>();
-        if (model == null || model.equals("GPT-3.5")) {
+        if (model.equals("GPT-3.5")) {
             ChatThreadVO chatThreadVO = new ChatThreadVO(1L, platformId, "GPT-3.5", DateUtils.format(new Date()));
             chatThreads.add(chatThreadVO);
+            ChatThreadVO chatThreadVO2 = new ChatThreadVO(3L, platformId, "GPT-3.5", DateUtils.format(new Date()));
+            chatThreads.add(chatThreadVO2);
         }
-        if (model == null || model.equals("GPT-4o")) {
+        if (model.equals("GPT-4o")) {
             ChatThreadVO chatThreadVO = new ChatThreadVO(2L, platformId, "GPT-4o", DateUtils.format(new Date()));
             chatThreads.add(chatThreadVO);
         }
@@ -98,12 +112,15 @@ public class AIChatServiceImpl implements AIChatService {
 
     @Override
     public SseEmitter talk(Long platformId, Long threadId, String message) {
-        String fullMessage = "您的问题是：" + message;
-        fullMessage += "\n回答：";
-        fullMessage += "Bigtop Manager provides a modern, low-threshold web application to simplify "
-                + "the deployment and management of components for Bigtop, similar to Apache Ambari and Cloudera "
-                + "Manager.\n";
-        fullMessage += "Bigtop Manager提供了一个现代、低门槛的web应用程序，简化了Bigtop组件的部署和管理，类似于Apache " + "Ambari和Cloudera Manager。\n";
+        String fullMessage = "Don't ask me" + message;
+        fullMessage += """
+                I won't tell you Bigtop Manager provides a modern, low-threshold web application to simplify \
+                the deployment and management of components for Bigtop, similar to Apache Ambari and Cloudera \
+                Manager.
+                And Bigtop Manager provides a modern, low-threshold web application to simplify \
+                the deployment and management of components for Bigtop, similar to Apache Ambari and Cloudera \
+                Manager.
+                """;
 
         SseEmitter emitter = new SseEmitter();
         Random random = new Random();
