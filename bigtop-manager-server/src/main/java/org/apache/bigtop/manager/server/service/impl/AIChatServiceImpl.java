@@ -20,11 +20,14 @@ package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.common.utils.DateUtils;
 import org.apache.bigtop.manager.server.model.dto.PlatformDTO;
-import org.apache.bigtop.manager.server.model.vo.*;
+import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
+import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
+import org.apache.bigtop.manager.server.model.vo.PlatformAuthCredentialVO;
+import org.apache.bigtop.manager.server.model.vo.PlatformAuthorizedVO;
+import org.apache.bigtop.manager.server.model.vo.PlatformVO;
 import org.apache.bigtop.manager.server.service.AIChatService;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import lombok.extern.slf4j.Slf4j;
@@ -49,8 +52,8 @@ public class AIChatServiceImpl implements AIChatService {
     @Override
     public List<PlatformAuthorizedVO> authorizedPlatforms() {
         List<PlatformAuthorizedVO> authorizedPlatforms = new ArrayList<>();
-        authorizedPlatforms.add(new PlatformAuthorizedVO(1L, "OpenAI",  "GPT-3.5,GPT-4o"));
-        authorizedPlatforms.add(new PlatformAuthorizedVO(2L, "ChatGLM",  "GPT-4o"));
+        authorizedPlatforms.add(new PlatformAuthorizedVO(1L, "OpenAI", "GPT-3.5,GPT-4o"));
+        authorizedPlatforms.add(new PlatformAuthorizedVO(2L, "ChatGLM", "GPT-4o"));
         return authorizedPlatforms;
     }
 
@@ -64,15 +67,10 @@ public class AIChatServiceImpl implements AIChatService {
     @Override
     public List<PlatformAuthCredentialVO> platformsAuthCredential(Long platformId) {
         List<PlatformAuthCredentialVO> platformAuthCredentials = new ArrayList<>();
-        platformAuthCredentials.add(
-                new PlatformAuthCredentialVO("api-key", "API Key")
-        );
-        platformAuthCredentials.add(
-                new PlatformAuthCredentialVO("api-secret", "API Secret")
-        );
+        platformAuthCredentials.add(new PlatformAuthCredentialVO("api-key", "API Key"));
+        platformAuthCredentials.add(new PlatformAuthCredentialVO("api-secret", "API Secret"));
         return platformAuthCredentials;
     }
-
 
     @Override
     public int deleteAuthorizedPlatform(Long platformId) {
@@ -113,7 +111,8 @@ public class AIChatServiceImpl implements AIChatService {
     @Override
     public SseEmitter talk(Long platformId, Long threadId, String message) {
         String fullMessage = "Don't ask me" + message;
-        fullMessage += """
+        fullMessage +=
+                """
                 I won't tell you Bigtop Manager provides a modern, low-threshold web application to simplify \
                 the deployment and management of components for Bigtop, similar to Apache Ambari and Cloudera \
                 Manager.

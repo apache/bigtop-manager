@@ -19,7 +19,11 @@
 package org.apache.bigtop.manager.server.service;
 
 import org.apache.bigtop.manager.server.model.dto.PlatformDTO;
-import org.apache.bigtop.manager.server.model.vo.*;
+import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
+import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
+import org.apache.bigtop.manager.server.model.vo.PlatformAuthCredentialVO;
+import org.apache.bigtop.manager.server.model.vo.PlatformAuthorizedVO;
+import org.apache.bigtop.manager.server.model.vo.PlatformVO;
 
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 

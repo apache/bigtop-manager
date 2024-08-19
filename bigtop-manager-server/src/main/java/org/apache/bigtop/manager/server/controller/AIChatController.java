@@ -22,7 +22,11 @@ import org.apache.bigtop.manager.server.enums.ResponseStatus;
 import org.apache.bigtop.manager.server.model.converter.PlatformConverter;
 import org.apache.bigtop.manager.server.model.dto.PlatformDTO;
 import org.apache.bigtop.manager.server.model.req.PlatformReq;
-import org.apache.bigtop.manager.server.model.vo.*;
+import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
+import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
+import org.apache.bigtop.manager.server.model.vo.PlatformAuthCredentialVO;
+import org.apache.bigtop.manager.server.model.vo.PlatformAuthorizedVO;
+import org.apache.bigtop.manager.server.model.vo.PlatformVO;
 import org.apache.bigtop.manager.server.service.AIChatService;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
 
