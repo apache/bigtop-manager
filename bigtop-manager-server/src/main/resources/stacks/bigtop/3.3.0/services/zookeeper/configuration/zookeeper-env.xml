@@ -35,7 +35,7 @@
     <property>
         <name>content</name>
         <display-name>zookeeper-env template</display-name>
-        <description>This is the jinja template for zookeeper-env.sh file</description>
+        <description>This is the freemarker template for zookeeper-env.sh file</description>
         <value><![CDATA[
 export JAVA_HOME=${java_home!}
 export ZOOKEEPER_HOME=${zookeeper_home!}

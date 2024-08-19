@@ -52,7 +52,7 @@ public class KafkaBrokerScript extends AbstractServerScript {
         KafkaParams kafkaParams = (KafkaParams) params;
 
         String cmd = MessageFormat.format(
-                "sh {0}/bin/kafka-server-start.sh {0}/config/server.properties > /dev/null 2>&1 & echo -n $!>{1}",
+                "{0}/bin/kafka-server-start.sh {0}/config/server.properties > /dev/null 2>&1 & echo -n $!>{1}",
                 kafkaParams.serviceHome(), kafkaParams.getKafkaPidFile());
         try {
             return LinuxOSUtils.sudoExecCmd(cmd, kafkaParams.user());
@@ -64,7 +64,7 @@ public class KafkaBrokerScript extends AbstractServerScript {
     @Override
     public ShellResult stop(Params params) {
         KafkaParams kafkaParams = (KafkaParams) params;
-        String cmd = MessageFormat.format("sh {0}/bin/kafka-server-stop.sh", kafkaParams.serviceHome());
+        String cmd = MessageFormat.format("{0}/bin/kafka-server-stop.sh", kafkaParams.serviceHome());
         try {
             return LinuxOSUtils.sudoExecCmd(cmd, kafkaParams.user());
         } catch (IOException e) {
