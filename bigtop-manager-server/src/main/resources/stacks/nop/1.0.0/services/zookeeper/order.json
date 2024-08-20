@@ -1,5 +1,0 @@
-{
-  "KAFKA_BROKER-INSTALL": [
-    "ZOOKEEPER_SERVER-INSTALL"
-  ]
-}

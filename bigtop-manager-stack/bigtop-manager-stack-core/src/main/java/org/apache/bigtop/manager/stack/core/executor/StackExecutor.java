@@ -69,10 +69,6 @@ public class StackExecutor {
     }
 
     private static void runBeforeHook(String command, Params params) {
-        if (Environments.isDevMode()) {
-            return;
-        }
-
         Hook hook = HOOK_MAP.get(command.toLowerCase());
         if (hook != null) {
             hook.before(params);
@@ -80,10 +76,6 @@ public class StackExecutor {
     }
 
     private static void runAfterHook(String command, Params params) {
-        if (Environments.isDevMode()) {
-            return;
-        }
-
         Hook hook = HOOK_MAP.get(command.toLowerCase());
         if (hook != null) {
             hook.after(params);
@@ -111,17 +103,22 @@ public class StackExecutor {
             Params params = (Params)
                     paramsClass.getDeclaredConstructor(CommandPayload.class).newInstance(commandPayload);
 
-            runBeforeHook(command, params);
+            if (Environments.isDevMode()) {
+                log.info("Executing {}::{} on dev mode", script.getName(), method.getName());
+                return ShellResult.success();
+            } else {
+                runBeforeHook(command, params);
 
-            log.info("Executing {}::{}", script.getName(), method.getName());
-            ShellResult result = (ShellResult) method.invoke(script, params);
-            if (result.getExitCode() != MessageConstants.SUCCESS_CODE) {
-                log.error("Error executing script: {}", result.getErrMsg());
+                log.info("Executing {}::{}", script.getName(), method.getName());
+                ShellResult result = (ShellResult) method.invoke(script, params);
+                if (result.getExitCode() != MessageConstants.SUCCESS_CODE) {
+                    log.error("Error executing script: {}", result.getErrMsg());
+                }
+
+                runAfterHook(command, params);
+
+                return result;
             }
-
-            runAfterHook(command, params);
-
-            return result;
         } catch (Exception e) {
             log.error("Error executing command, payload: {}", commandPayload, e);
             return ShellResult.fail();
