@@ -77,8 +77,6 @@ public class StackUtils {
 
     private static final String DEPENDENCY_FILE_NAME = "order.json";
 
-    private static final String NOP_STACK = "nop";
-
     private static final Map<String, Map<String, List<String>>> STACK_DEPENDENCY_MAP = new HashMap<>();
 
     private static final Map<String, Map<String, List<TypeConfigDTO>>> STACK_CONFIG_MAP = new HashMap<>();
@@ -202,13 +200,6 @@ public class StackUtils {
 
         for (File stackFolder : stackFolders) {
             String stackName = stackFolder.getName();
-
-            // If in dev mode, only parse nop stack
-            // If not in dev mode, skip nop stack
-            if (Environments.isDevMode() != stackName.equals(NOP_STACK)) {
-                continue;
-            }
-
             File[] versionFolders = Optional.ofNullable(stackFolder.listFiles()).orElse(new File[0]);
 
             for (File versionFolder : versionFolders) {

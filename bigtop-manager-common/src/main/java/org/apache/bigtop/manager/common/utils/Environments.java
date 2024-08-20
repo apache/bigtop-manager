@@ -23,8 +23,9 @@ import org.apache.commons.lang3.StringUtils;
 public class Environments {
 
     /**
-     * Indicates whether the application is running in development mode, which is disabled by default.
-     * In development mode, only NOP stacks are available and no real shell commands will be executed on the agent side.
+     * Indicates whether the application is running in development mode.
+     * In development mode, most tasks run on agent side will be proxied and return success by default.
+     * This should help developers test framework functions without depending on the existence of big data components.
      */
     public static Boolean isDevMode() {
         String devMode = System.getenv("DEV_MODE");
