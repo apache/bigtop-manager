@@ -19,7 +19,6 @@
 package org.apache.bigtop.manager.server.utils;
 
 import org.apache.bigtop.manager.common.enums.Command;
-import org.apache.bigtop.manager.common.utils.Environments;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.exception.ServerException;
