@@ -21,26 +21,28 @@ package org.apache.bigtop.manager.server.service.impl;
 import org.apache.bigtop.manager.common.constants.ComponentCategories;
 import org.apache.bigtop.manager.common.enums.MaintainState;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.entity.Cluster;
-import org.apache.bigtop.manager.dao.entity.Component;
-import org.apache.bigtop.manager.dao.entity.Host;
-import org.apache.bigtop.manager.dao.entity.HostComponent;
-import org.apache.bigtop.manager.dao.entity.Service;
-import org.apache.bigtop.manager.dao.entity.ServiceConfig;
-import org.apache.bigtop.manager.dao.entity.TypeConfig;
+import org.apache.bigtop.manager.dao.po.ClusterPO;
+import org.apache.bigtop.manager.dao.po.ComponentPO;
+import org.apache.bigtop.manager.dao.po.HostComponentPO;
+import org.apache.bigtop.manager.dao.po.HostPO;
+import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
+import org.apache.bigtop.manager.dao.po.ServicePO;
+import org.apache.bigtop.manager.dao.po.TypeConfigPO;
 import org.apache.bigtop.manager.dao.repository.HostComponentRepository;
 import org.apache.bigtop.manager.dao.repository.ServiceConfigRepository;
 import org.apache.bigtop.manager.dao.repository.ServiceRepository;
+import org.apache.bigtop.manager.server.model.converter.ServiceConverter;
+import org.apache.bigtop.manager.server.model.converter.TypeConfigConverter;
 import org.apache.bigtop.manager.server.model.dto.PropertyDTO;
 import org.apache.bigtop.manager.server.model.dto.QuickLinkDTO;
 import org.apache.bigtop.manager.server.model.dto.TypeConfigDTO;
-import org.apache.bigtop.manager.server.model.mapper.ServiceMapper;
-import org.apache.bigtop.manager.server.model.mapper.TypeConfigMapper;
 import org.apache.bigtop.manager.server.model.vo.QuickLinkVO;
 import org.apache.bigtop.manager.server.model.vo.ServiceVO;
 import org.apache.bigtop.manager.server.service.ServiceService;
 
 import org.apache.commons.lang3.StringUtils;
+
+import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -51,7 +53,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
-@org.springframework.stereotype.Service
+@Service
 public class ServiceServiceImpl implements ServiceService {
 
     @Resource
@@ -66,29 +68,29 @@ public class ServiceServiceImpl implements ServiceService {
     @Override
     public List<ServiceVO> list(Long clusterId) {
         List<ServiceVO> res = new ArrayList<>();
-        List<HostComponent> hostComponentList = hostComponentRepository.findAllByComponentClusterId(clusterId);
-        Map<Long, List<HostComponent>> serviceIdToHostComponent = hostComponentList.stream()
-                .collect(Collectors.groupingBy(hostComponent ->
-                        hostComponent.getComponent().getService().getId()));
+        Map<Long, List<HostComponentPO>> serviceIdToHostComponent =
+                hostComponentRepository.findAllByComponentPOClusterPOId(clusterId).stream()
+                        .collect(Collectors.groupingBy(hostComponent ->
+                                hostComponent.getComponentPO().getServicePO().getId()));
 
-        for (Map.Entry<Long, List<HostComponent>> entry : serviceIdToHostComponent.entrySet()) {
-            List<HostComponent> hostComponents = entry.getValue();
-            Service service = hostComponents.get(0).getComponent().getService();
-            ServiceVO serviceVO = ServiceMapper.INSTANCE.fromEntity2VO(service);
+        for (Map.Entry<Long, List<HostComponentPO>> entry : serviceIdToHostComponent.entrySet()) {
+            List<HostComponentPO> hostComponentPOList = entry.getValue();
+            ServicePO servicePO = hostComponentPOList.get(0).getComponentPO().getServicePO();
+            ServiceVO serviceVO = ServiceConverter.INSTANCE.fromPO2VO(servicePO);
             serviceVO.setQuickLinks(new ArrayList<>());
 
             boolean isHealthy = true;
             boolean isClient = true;
-            for (HostComponent hostComponent : hostComponents) {
-                Component component = hostComponent.getComponent();
+            for (HostComponentPO hostComponentPO : hostComponentPOList) {
+                ComponentPO componentPO = hostComponentPO.getComponentPO();
 
-                String quickLink = component.getQuickLink();
+                String quickLink = componentPO.getQuickLink();
                 if (StringUtils.isNotBlank(quickLink)) {
-                    QuickLinkVO quickLinkVO = resolveQuickLink(hostComponent, quickLink);
+                    QuickLinkVO quickLinkVO = resolveQuickLink(hostComponentPO, quickLink);
                     serviceVO.getQuickLinks().add(quickLinkVO);
                 }
 
-                String category = component.getCategory();
+                String category = componentPO.getCategory();
                 if (!category.equalsIgnoreCase(ComponentCategories.CLIENT)) {
                     isClient = false;
                 }
@@ -96,7 +98,7 @@ public class ServiceServiceImpl implements ServiceService {
                 MaintainState expectedState = category.equalsIgnoreCase(ComponentCategories.CLIENT)
                         ? MaintainState.INSTALLED
                         : MaintainState.STARTED;
-                if (!hostComponent.getState().equals(expectedState)) {
+                if (!hostComponentPO.getState().equals(expectedState)) {
                     isHealthy = false;
                 }
             }
@@ -111,40 +113,40 @@ public class ServiceServiceImpl implements ServiceService {
 
     @Override
     public ServiceVO get(Long id) {
-        Service service = serviceRepository.findById(id).orElse(new Service());
-        return ServiceMapper.INSTANCE.fromEntity2VO(service);
+        ServicePO servicePO = serviceRepository.findById(id).orElse(new ServicePO());
+        return ServiceConverter.INSTANCE.fromPO2VO(servicePO);
     }
 
-    private QuickLinkVO resolveQuickLink(HostComponent hostComponent, String quickLinkJson) {
+    private QuickLinkVO resolveQuickLink(HostComponentPO hostComponentPO, String quickLinkJson) {
         QuickLinkVO quickLinkVO = new QuickLinkVO();
 
         QuickLinkDTO quickLinkDTO = JsonUtils.readFromString(quickLinkJson, QuickLinkDTO.class);
         quickLinkVO.setDisplayName(quickLinkDTO.getDisplayName());
 
-        Component component = hostComponent.getComponent();
-        Cluster cluster = component.getCluster();
-        Host host = hostComponent.getHost();
-        Service service = component.getService();
-        ServiceConfig serviceConfig =
-                serviceConfigRepository.findByClusterAndServiceAndSelectedIsTrue(cluster, service);
-        List<TypeConfig> typeConfigs = serviceConfig.getConfigs();
+        ComponentPO componentPO = hostComponentPO.getComponentPO();
+        ClusterPO clusterPO = componentPO.getClusterPO();
+        HostPO hostPO = hostComponentPO.getHostPO();
+        ServicePO servicePO = componentPO.getServicePO();
+        ServiceConfigPO serviceConfigPO =
+                serviceConfigRepository.findByClusterPOAndServicePOAndSelectedIsTrue(clusterPO, servicePO);
+        List<TypeConfigPO> typeConfigPOList = serviceConfigPO.getConfigs();
 
         // Use HTTP for now, need to handle https in the future
-        for (TypeConfig typeConfig : typeConfigs) {
-            TypeConfigDTO typeConfigDTO = TypeConfigMapper.INSTANCE.fromEntity2DTO(typeConfig);
+        for (TypeConfigPO typeConfigPO : typeConfigPOList) {
+            TypeConfigDTO typeConfigDTO = TypeConfigConverter.INSTANCE.fromPO2DTO(typeConfigPO);
             for (PropertyDTO propertyDTO : typeConfigDTO.getProperties()) {
                 if (propertyDTO.getName().equals(quickLinkDTO.getHttpPortProperty())) {
                     String port = propertyDTO.getValue().contains(":")
                             ? propertyDTO.getValue().split(":")[1]
                             : propertyDTO.getValue();
-                    String url = "http://" + host.getHostname() + ":" + port;
+                    String url = "http://" + hostPO.getHostname() + ":" + port;
                     quickLinkVO.setUrl(url);
                     return quickLinkVO;
                 }
             }
         }
 
-        String url = "http://" + host.getHostname() + ":" + quickLinkDTO.getHttpPortDefault();
+        String url = "http://" + hostPO.getHostname() + ":" + quickLinkDTO.getHttpPortDefault();
         quickLinkVO.setUrl(url);
         return quickLinkVO;
     }

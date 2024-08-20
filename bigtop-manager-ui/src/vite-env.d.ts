@@ -17,10 +17,9 @@
  * under the License.
  */
 
-import { DefineComponent } from 'vue'
-
 declare module '*.vue' {
-  const component: DefineComponent<{}, {}, any>
+  import { defineComponent } from 'vue'
+  const component: ReturnType<typeof defineComponent>
   export default component
 }
 

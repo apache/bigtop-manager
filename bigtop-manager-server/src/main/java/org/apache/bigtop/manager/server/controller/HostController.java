@@ -18,8 +18,8 @@
  */
 package org.apache.bigtop.manager.server.controller;
 
+import org.apache.bigtop.manager.server.model.converter.HostConverter;
 import org.apache.bigtop.manager.server.model.dto.HostDTO;
-import org.apache.bigtop.manager.server.model.mapper.HostMapper;
 import org.apache.bigtop.manager.server.model.req.HostReq;
 import org.apache.bigtop.manager.server.model.req.HostnamesReq;
 import org.apache.bigtop.manager.server.model.vo.HostVO;
@@ -27,9 +27,11 @@ import org.apache.bigtop.manager.server.service.HostService;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
 
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,21 +57,22 @@ public class HostController {
     }
 
     @Operation(summary = "get", description = "Get a host")
-    // @GetMapping("/{id}")
-    public ResponseEntity<HostVO> get(@PathVariable Long id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<HostVO> get(@PathVariable Long id, @PathVariable Long clusterId) {
         return ResponseEntity.success(hostService.get(id));
     }
 
     @Operation(summary = "update", description = "Update a host")
-    // @PutMapping("/{id}")
-    public ResponseEntity<HostVO> update(@PathVariable Long id, @RequestBody @Validated HostReq hostReq) {
-        HostDTO hostDTO = HostMapper.INSTANCE.fromReq2DTO(hostReq);
+    @PutMapping("/{id}")
+    public ResponseEntity<HostVO> update(
+            @PathVariable Long clusterId, @PathVariable Long id, @RequestBody @Validated HostReq hostReq) {
+        HostDTO hostDTO = HostConverter.INSTANCE.fromReq2DTO(hostReq);
         return ResponseEntity.success(hostService.update(id, hostDTO));
     }
 
     @Operation(summary = "delete", description = "Delete a host")
-    // @DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> delete(@PathVariable Long id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Boolean> delete(@PathVariable Long clusterId, @PathVariable Long id) {
         return ResponseEntity.success(hostService.delete(id));
     }
 

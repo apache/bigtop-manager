@@ -21,16 +21,14 @@ package org.apache.bigtop.manager.server.controller;
 import org.apache.bigtop.manager.server.annotations.Audit;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
-import org.apache.bigtop.manager.server.holder.SessionUserHolder;
+import org.apache.bigtop.manager.server.model.converter.LoginConverter;
 import org.apache.bigtop.manager.server.model.dto.LoginDTO;
-import org.apache.bigtop.manager.server.model.mapper.LoginMapper;
 import org.apache.bigtop.manager.server.model.req.LoginReq;
 import org.apache.bigtop.manager.server.model.vo.LoginVO;
 import org.apache.bigtop.manager.server.service.LoginService;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
 
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,15 +53,7 @@ public class LoginController {
             throw new ApiException(ApiExceptionEnum.USERNAME_OR_PASSWORD_REQUIRED);
         }
 
-        LoginDTO loginDTO = LoginMapper.INSTANCE.fromReq2DTO(loginReq);
+        LoginDTO loginDTO = LoginConverter.INSTANCE.fromReq2DTO(loginReq);
         return ResponseEntity.success(loginService.login(loginDTO));
-    }
-
-    @Operation(summary = "test", description = "test")
-    @GetMapping(value = "/test")
-    public ResponseEntity<String> test() {
-        Long userId = SessionUserHolder.getUserId();
-        // throw new ServerException(ServerExceptionStatus.USERNAME_OR_PASSWORD_REQUIRED);
-        return ResponseEntity.success("111");
     }
 }

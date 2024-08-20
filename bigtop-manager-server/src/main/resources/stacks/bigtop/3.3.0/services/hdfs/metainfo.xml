@@ -19,14 +19,12 @@
 -->
 
 <metainfo>
-    <schema-version>2.0</schema-version>
     <service>
         <name>hdfs</name>
         <display-name>HDFS</display-name>
         <desc>Apache Hadoop Distributed File System.</desc>
         <version>3.3.6-1</version>
         <user>hdfs</user>
-        <group>hdfs</group>
 
         <components>
             <component>

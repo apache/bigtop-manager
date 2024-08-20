@@ -18,9 +18,9 @@
  */
 package org.apache.bigtop.manager.dao.repository;
 
-import org.apache.bigtop.manager.dao.entity.Cluster;
-import org.apache.bigtop.manager.dao.entity.Service;
-import org.apache.bigtop.manager.dao.entity.ServiceConfig;
+import org.apache.bigtop.manager.dao.po.ClusterPO;
+import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
+import org.apache.bigtop.manager.dao.po.ServicePO;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -30,20 +30,20 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-public interface ServiceConfigRepository extends JpaRepository<ServiceConfig, Long> {
+public interface ServiceConfigRepository extends JpaRepository<ServiceConfigPO, Long> {
 
-    List<ServiceConfig> findAllByCluster(Cluster cluster);
+    List<ServiceConfigPO> findAllByClusterPO(ClusterPO clusterPO);
 
-    List<ServiceConfig> findAllByCluster(Cluster cluster, Sort sort);
+    List<ServiceConfigPO> findAllByClusterPO(ClusterPO clusterPO, Sort sort);
 
-    List<ServiceConfig> findAllByClusterAndService(Cluster cluster, Service service);
+    List<ServiceConfigPO> findAllByClusterPOAndServicePO(ClusterPO clusterPO, ServicePO servicePO);
 
-    ServiceConfig findByClusterAndServiceAndSelectedIsTrue(Cluster cluster, Service service);
+    ServiceConfigPO findByClusterPOAndServicePOAndSelectedIsTrue(ClusterPO clusterPO, ServicePO servicePO);
 
-    List<ServiceConfig> findAllByClusterAndSelectedIsTrue(Cluster cluster);
+    List<ServiceConfigPO> findAllByClusterPOAndSelectedIsTrue(ClusterPO clusterPO);
 
     @Transactional
     @Modifying
-    @Query("UPDATE ServiceConfig s SET s.selected = false WHERE s.cluster = :cluster AND s.service = :service")
-    void setAllSelectedToFalseByClusterAndService(Cluster cluster, Service service);
+    @Query("UPDATE ServiceConfigPO s SET s.selected = false WHERE s.clusterPO = :cluster AND s.servicePO = :service")
+    void setAllSelectedToFalseByClusterAndService(ClusterPO clusterPO, ServicePO servicePO);
 }

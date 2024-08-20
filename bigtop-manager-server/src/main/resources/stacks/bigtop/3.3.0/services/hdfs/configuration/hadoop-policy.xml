@@ -35,7 +35,8 @@
             for block recovery.
             The ACL is a comma-separated list of user and group names. The user and
             group list is separated by a blank. For e.g. "alice,bob users,wheel".
-            A special value of "*" means all users are allowed.</description>
+            A special value of "*" means all users are allowed.
+        </description>
     </property>
     <property>
         <name>security.datanode.protocol.acl</name>
@@ -44,7 +45,8 @@
             communicate with the namenode.
             The ACL is a comma-separated list of user and group names. The user and
             group list is separated by a blank. For e.g. "alice,bob users,wheel".
-            A special value of "*" means all users are allowed.</description>
+            A special value of "*" means all users are allowed.
+        </description>
     </property>
     <property>
         <name>security.inter.datanode.protocol.acl</name>
@@ -53,7 +55,8 @@
             for updating generation timestamp.
             The ACL is a comma-separated list of user and group names. The user and
             group list is separated by a blank. For e.g. "alice,bob users,wheel".
-            A special value of "*" means all users are allowed.</description>
+            A special value of "*" means all users are allowed.
+        </description>
     </property>
     <property>
         <name>security.namenode.protocol.acl</name>
@@ -62,7 +65,8 @@
             namenode to communicate with the namenode.
             The ACL is a comma-separated list of user and group names. The user and
             group list is separated by a blank. For e.g. "alice,bob users,wheel".
-            A special value of "*" means all users are allowed.</description>
+            A special value of "*" means all users are allowed.
+        </description>
     </property>
     <property>
         <name>security.admin.operations.protocol.acl</name>
@@ -70,7 +74,8 @@
         <description>ACL for AdminOperationsProtocol. Used for admin commands.
             The ACL is a comma-separated list of user and group names. The user and
             group list is separated by a blank. For e.g. "alice,bob users,wheel".
-            A special value of "*" means all users are allowed.</description>
+            A special value of "*" means all users are allowed.
+        </description>
     </property>
     <property>
         <name>security.refresh.user.mappings.protocol.acl</name>
@@ -79,7 +84,8 @@
             users mappings. The ACL is a comma-separated list of user and
             group names. The user and group list is separated by a blank. For
             e.g. "alice,bob users,wheel".  A special value of "*" means all
-            users are allowed.</description>
+            users are allowed.
+        </description>
     </property>
     <property>
         <name>security.refresh.policy.protocol.acl</name>
@@ -88,13 +94,15 @@
             dfsadmin and mradmin commands to refresh the security policy in-effect.
             The ACL is a comma-separated list of user and group names. The user and
             group list is separated by a blank. For e.g. "alice,bob users,wheel".
-            A special value of "*" means all users are allowed.</description>
+            A special value of "*" means all users are allowed.
+        </description>
     </property>
     <property>
         <name>security.ha.service.protocol.acl</name>
         <value>*</value>
         <description>ACL for HAService protocol used by HAAdmin to manage the
-            active and stand-by states of namenode.</description>
+            active and stand-by states of namenode.
+        </description>
     </property>
     <property>
         <name>security.router.admin.protocol.acl</name>
@@ -108,8 +116,7 @@
     <property>
         <name>security.zkfc.protocol.acl</name>
         <value>*</value>
-        <description>ACL for access to the ZK Failover Controller
-        </description>
+        <description>ACL for access to the ZK Failover Controller</description>
     </property>
     <property>
         <name>security.qjournal.service.protocol.acl</name>
@@ -120,9 +127,7 @@
     <property>
         <name>security.interqjournal.service.protocol.acl</name>
         <value>*</value>
-        <description>ACL for InterQJournalProtocol, used by the JN to
-            communicate with other JN
-        </description>
+        <description>ACL for InterQJournalProtocol, used by the JN to communicate with other JN</description>
     </property>
     <property>
         <name>security.mrhs.client.protocol.acl</name>
@@ -131,7 +136,8 @@
             communciate with the MR History Server job status etc.
             The ACL is a comma-separated list of user and group names. The user and
             group list is separated by a blank. For e.g. "alice,bob users,wheel".
-            A special value of "*" means all users are allowed.</description>
+            A special value of "*" means all users are allowed.
+        </description>
     </property>
     <!-- YARN Protocols -->
     <property>
@@ -141,7 +147,8 @@
             ResourceManager and NodeManager to communicate with each other.
             The ACL is a comma-separated list of user and group names. The user and
             group list is separated by a blank. For e.g. "alice,bob users,wheel".
-            A special value of "*" means all users are allowed.</description>
+            A special value of "*" means all users are allowed.
+        </description>
     </property>
     <property>
         <name>security.resourcemanager-administration.protocol.acl</name>
@@ -149,7 +156,8 @@
         <description>ACL for ResourceManagerAdministrationProtocol, for admin commands.
             The ACL is a comma-separated list of user and group names. The user and
             group list is separated by a blank. For e.g. "alice,bob users,wheel".
-            A special value of "*" means all users are allowed.</description>
+            A special value of "*" means all users are allowed.
+        </description>
     </property>
     <property>
         <name>security.applicationclient.protocol.acl</name>
@@ -158,7 +166,8 @@
             and applications submission clients to communicate with each other.
             The ACL is a comma-separated list of user and group names. The user and
             group list is separated by a blank. For e.g. "alice,bob users,wheel".
-            A special value of "*" means all users are allowed.</description>
+            A special value of "*" means all users are allowed.
+        </description>
     </property>
     <property>
         <name>security.applicationmaster.protocol.acl</name>
@@ -167,7 +176,8 @@
             and ApplicationMasters to communicate with each other.
             The ACL is a comma-separated list of user and group names. The user and
             group list is separated by a blank. For e.g. "alice,bob users,wheel".
-            A special value of "*" means all users are allowed.</description>
+            A special value of "*" means all users are allowed.
+        </description>
     </property>
     <property>
         <name>security.containermanagement.protocol.acl</name>
@@ -176,7 +186,8 @@
             and ApplicationMasters to communicate with each other.
             The ACL is a comma-separated list of user and group names. The user and
             group list is separated by a blank. For e.g. "alice,bob users,wheel".
-            A special value of "*" means all users are allowed.</description>
+            A special value of "*" means all users are allowed.
+        </description>
     </property>
     <property>
         <name>security.resourcelocalizer.protocol.acl</name>
@@ -185,7 +196,8 @@
             and ResourceLocalizer to communicate with each other.
             The ACL is a comma-separated list of user and group names. The user and
             group list is separated by a blank. For e.g. "alice,bob users,wheel".
-            A special value of "*" means all users are allowed.</description>
+            A special value of "*" means all users are allowed.
+        </description>
     </property>
     <property>
         <name>security.job.task.protocol.acl</name>
@@ -194,7 +206,8 @@
             tasks to communicate with the parent tasktracker.
             The ACL is a comma-separated list of user and group names. The user and
             group list is separated by a blank. For e.g. "alice,bob users,wheel".
-            A special value of "*" means all users are allowed.</description>
+            A special value of "*" means all users are allowed.
+        </description>
     </property>
     <property>
         <name>security.job.client.protocol.acl</name>
@@ -203,7 +216,8 @@
             communciate with the MR ApplicationMaster to query job status etc.
             The ACL is a comma-separated list of user and group names. The user and
             group list is separated by a blank. For e.g. "alice,bob users,wheel".
-            A special value of "*" means all users are allowed.</description>
+            A special value of "*" means all users are allowed.
+        </description>
     </property>
     <property>
         <name>security.applicationhistory.protocol.acl</name>
@@ -212,7 +226,8 @@
             server and the generic history service client to communicate with each other.
             The ACL is a comma-separated list of user and group names. The user and
             group list is separated by a blank. For e.g. "alice,bob users,wheel".
-            A special value of "*" means all users are allowed.</description>
+            A special value of "*" means all users are allowed.
+        </description>
     </property>
     <property>
         <name>security.collector-nodemanager.protocol.acl</name>
@@ -222,7 +237,8 @@
             to communicate with each other.
             The ACL is a comma-separated list of user and group names. The user and
             group list is separated by a blank. For e.g. "alice,bob users,wheel".
-            A special value of "*" means all users are allowed.</description>
+            A special value of "*" means all users are allowed.
+        </description>
     </property>
     <property>
         <name>security.applicationmaster-nodemanager.applicationmaster.protocol.acl</name>
@@ -231,7 +247,8 @@
             and ApplicationMasters to communicate.
             The ACL is a comma-separated list of user and group names. The user and
             group list is separated by a blank. For e.g. "alice,bob users,wheel".
-            A special value of "*" means all users are allowed.</description>
+            A special value of "*" means all users are allowed.
+        </description>
     </property>
     <property>
         <name>security.distributedscheduling.protocol.acl</name>
@@ -240,6 +257,7 @@
             and Resourcemanager to communicate.
             The ACL is a comma-separated list of user and group names. The user and
             group list is separated by a blank. For e.g. "alice,bob users,wheel".
-            A special value of "*" means all users are allowed.</description>
+            A special value of "*" means all users are allowed.
+        </description>
     </property>
 </configuration>

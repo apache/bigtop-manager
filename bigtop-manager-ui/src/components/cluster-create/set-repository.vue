@@ -115,10 +115,7 @@
 
 <style scoped lang="scss">
   .container {
-    display: flex;
-    flex-direction: column;
-    justify-content: start;
-    align-items: center;
+    @include flexbox($direction: column, $justify: start, $align: center);
     align-content: center;
     height: 100%;
 
@@ -132,10 +129,8 @@
       position: relative;
 
       .editable-cell-input-wrapper {
+        @include flexbox($justify: center, $align: center);
         padding-right: 24px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
 
         .editable-cell-icon-check {
           position: absolute;
@@ -151,9 +146,7 @@
       }
 
       .editable-cell-text-wrapper {
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        @include flexbox($justify: center, $align: center);
         padding: 5px 24px 5px 5px;
 
         .editable-cell-icon {

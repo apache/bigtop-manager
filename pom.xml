@@ -41,7 +41,6 @@
         <module>bigtop-manager-server</module>
         <module>bigtop-manager-stack</module>
         <module>bigtop-manager-dao</module>
-        <module>bigtop-manager-spi</module>
         <module>bigtop-manager-grpc</module>
         <module>bigtop-manager-ui</module>
         <module>bigtop-manager-ai</module>
@@ -54,8 +53,8 @@
         <java.version>17</java.version>
         <flatten-maven-plugin.version>1.4.0</flatten-maven-plugin.version>
         <maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
-        <maven-assembly-plugin.version>3.6.0</maven-assembly-plugin.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+        <build-helper-maven-plugin.version>3.6.0</build-helper-maven-plugin.version>
         <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
         <spring-boot-maven-plugin.version>3.1.1</spring-boot-maven-plugin.version>
         <spotless-maven-plugin.version>2.43.0</spotless-maven-plugin.version>
@@ -67,6 +66,10 @@
         <grpc.version>1.63.0</grpc.version>
         <protobuf-java-util.version>3.25.3</protobuf-java-util.version>
         <grpc-spring-boot.version>3.1.0.RELEASE</grpc-spring-boot.version>
+
+        <!-- JUnit/Mockito -->
+        <junit.version>5.10.3</junit.version>
+        <mockito.version>5.12.0</mockito.version>
 
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <lombok.version>1.18.30</lombok.version>
@@ -90,18 +93,6 @@
             <dependency>
                 <groupId>org.apache.bigtop</groupId>
                 <artifactId>bigtop-manager-grpc</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.bigtop</groupId>
-                <artifactId>bigtop-manager-spi</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.bigtop</groupId>
-                <artifactId>bigtop-manager-stack-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -152,6 +143,27 @@
         </dependencies>
     </dependencyManagement>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
     <build>
         <pluginManagement>
             <plugins>
@@ -189,7 +201,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>${maven-assembly-plugin.version}</version>
+                    <version>${build-helper-maven-plugin.version}</version>
                 </plugin>
 
                 <plugin>

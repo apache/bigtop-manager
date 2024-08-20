@@ -28,12 +28,13 @@ service ComponentStatusService {
 
 message ComponentStatusRequest {
   string service_name = 1;
-  string component_name = 2;
-  string command_script = 3;
+  string service_user = 2;
+  string component_name = 3;
+  string command_script = 4;
   // TODO Unnecessary, should be removed in the future
-  string root = 4;
-  string stack_name = 5;
-  string stack_version = 6;
+  string root = 5;
+  string stack_name = 6;
+  string stack_version = 7;
 }
 
 message ComponentStatusReply {

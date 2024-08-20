@@ -120,14 +120,12 @@
 <style scoped lang="scss">
   .logs {
     height: 50vh;
-    display: flex;
-    flex-direction: column;
+    @include flexbox($direction: column);
     &_header {
       font-size: 16px;
       font-weight: 600;
       margin: 0 0 10px 0;
-      display: flex;
-      justify-content: space-between;
+      @include flexbox($justify: space-between);
 
       .copy-button {
         margin-left: 3px;

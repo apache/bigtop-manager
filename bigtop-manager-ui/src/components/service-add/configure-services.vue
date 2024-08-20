@@ -119,10 +119,7 @@
 
 <style scoped lang="scss">
   .container {
-    display: flex;
-    flex-direction: column;
-    justify-content: start;
-    align-items: center;
+    @include flexbox($direction: column, $justify: start, $align: center);
     align-content: center;
     height: 100%;
 
@@ -135,16 +132,13 @@
     .content {
       width: 100%;
       height: 100%;
-      margin-top: 1rem;
       overflow-y: auto;
 
       .panel {
         text-align: start;
 
         .config-item {
-          display: flex;
-          align-items: center;
-          justify-content: start;
+          @include flexbox($justify: start, $align: center);
           margin-bottom: 1rem;
 
           .config-item-key {

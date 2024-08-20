@@ -20,13 +20,13 @@ package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
+import org.apache.bigtop.manager.server.model.converter.ComponentConverter;
+import org.apache.bigtop.manager.server.model.converter.ServiceConverter;
+import org.apache.bigtop.manager.server.model.converter.StackConverter;
+import org.apache.bigtop.manager.server.model.converter.TypeConfigConverter;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.model.dto.StackDTO;
 import org.apache.bigtop.manager.server.model.dto.TypeConfigDTO;
-import org.apache.bigtop.manager.server.model.mapper.ComponentMapper;
-import org.apache.bigtop.manager.server.model.mapper.ServiceMapper;
-import org.apache.bigtop.manager.server.model.mapper.StackMapper;
-import org.apache.bigtop.manager.server.model.mapper.TypeConfigMapper;
 import org.apache.bigtop.manager.server.model.vo.ServiceComponentVO;
 import org.apache.bigtop.manager.server.model.vo.ServiceConfigVO;
 import org.apache.bigtop.manager.server.model.vo.StackVO;
@@ -56,8 +56,8 @@ public class StackServiceImpl implements StackService {
             StackDTO stackDTO = pair.left;
             List<ServiceDTO> serviceDTOList = pair.right;
 
-            StackVO stackVO = StackMapper.INSTANCE.fromDTO2VO(stackDTO);
-            stackVO.setServices(ServiceMapper.INSTANCE.fromDTO2VO(serviceDTOList));
+            StackVO stackVO = StackConverter.INSTANCE.fromDTO2VO(stackDTO);
+            stackVO.setServices(ServiceConverter.INSTANCE.fromDTO2VO(serviceDTOList));
             stackVOList.add(stackVO);
         }
 
@@ -78,7 +78,7 @@ public class StackServiceImpl implements StackService {
         for (ServiceDTO serviceDTO : serviceDTOList) {
             ServiceComponentVO element = new ServiceComponentVO();
             element.setServiceName(serviceDTO.getServiceName());
-            element.setComponents(ComponentMapper.INSTANCE.fromDTO2VO(serviceDTO.getComponents()));
+            element.setComponents(ComponentConverter.INSTANCE.fromDTO2VO(serviceDTO.getComponents()));
             list.add(element);
         }
 
@@ -95,7 +95,7 @@ public class StackServiceImpl implements StackService {
         for (Map.Entry<String, List<TypeConfigDTO>> entry : serviceConfigMap.entrySet()) {
             ServiceConfigVO element = new ServiceConfigVO();
             element.setServiceName(entry.getKey());
-            element.setConfigs(TypeConfigMapper.INSTANCE.fromDTO2VO(entry.getValue()));
+            element.setConfigs(TypeConfigConverter.INSTANCE.fromDTO2VO(entry.getValue()));
             list.add(element);
         }
 

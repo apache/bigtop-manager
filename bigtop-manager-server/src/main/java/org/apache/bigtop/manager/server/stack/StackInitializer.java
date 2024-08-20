@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.server.stack;
 
-import org.apache.bigtop.manager.dao.entity.Stack;
+import org.apache.bigtop.manager.dao.po.StackPO;
 import org.apache.bigtop.manager.dao.repository.StackRepository;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.model.dto.StackDTO;
@@ -58,13 +58,13 @@ public class StackInitializer implements ApplicationListener<ApplicationStartedE
             String stackName = stackDTO.getStackName();
             String stackVersion = stackDTO.getStackVersion();
 
-            Stack stack = stackRepository.findByStackNameAndStackVersion(stackName, stackVersion);
-            if (stack == null) {
-                stack = new Stack();
-                stack.setStackName(stackName);
-                stack.setStackVersion(stackVersion);
+            StackPO stackPO = stackRepository.findByStackNameAndStackVersion(stackName, stackVersion);
+            if (stackPO == null) {
+                stackPO = new StackPO();
+                stackPO.setStackName(stackName);
+                stackPO.setStackVersion(stackVersion);
 
-                stackRepository.save(stack);
+                stackRepository.save(stackPO);
             }
         }
 

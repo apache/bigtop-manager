@@ -26,11 +26,12 @@ import org.apache.bigtop.manager.stack.core.executor.StackExecutor;
 
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@org.springframework.stereotype.Component
+@Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class ComponentCommandExecutor extends AbstractCommandExecutor {
 

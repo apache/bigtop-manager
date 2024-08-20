@@ -23,10 +23,39 @@ BIGTOP_MANAGER_HOME=${BIGTOP_MANAGER_HOME:-$(cd $BIN_DIR/..; pwd)}
 
 source "${BIGTOP_MANAGER_HOME}/bin/env.sh"
 
+usage() {
+    echo "usage: $PROG [--debug]"
+    echo "       --debug        - enable debug mode"
+    echo "       -h, --help"
+    exit 1
+}
+
+DEBUG="false"
+DOCKER="false"
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+    --debug)
+        echo "enable debug mode."
+        DEBUG="true"
+        shift;;
+    -h|--help)
+        usage
+        shift;;
+    *)
+        echo "Unknown argument: '$1'" 1>&2
+        usage;;
+    esac
+done
+
 JAVA_OPTS=${JAVA_OPTS:-"-server -Duser.timezone=${SPRING_JACKSON_TIME_ZONE} -Xms4g -Xmx4g -Xmn2g -XX:+IgnoreUnrecognizedVMOptions -XX:+PrintGCDateStamps -XX:+PrintGCDetails -Xloggc:gc.log -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=dump.hprof"}
 
 if [[ "$DOCKER" == "true" ]]; then
   JAVA_OPTS="${JAVA_OPTS} -XX:-UseContainerSupport"
+fi
+
+if [[ "$DEBUG" == "true" ]]; then
+  JAVA_OPTS="${JAVA_OPTS} -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5006"
 fi
 
 cd $BIGTOP_MANAGER_HOME

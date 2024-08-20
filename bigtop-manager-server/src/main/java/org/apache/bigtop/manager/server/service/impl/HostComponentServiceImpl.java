@@ -18,11 +18,11 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
-import org.apache.bigtop.manager.dao.entity.HostComponent;
+import org.apache.bigtop.manager.dao.po.HostComponentPO;
 import org.apache.bigtop.manager.dao.repository.ComponentRepository;
 import org.apache.bigtop.manager.dao.repository.HostComponentRepository;
 import org.apache.bigtop.manager.dao.repository.HostRepository;
-import org.apache.bigtop.manager.server.model.mapper.HostComponentMapper;
+import org.apache.bigtop.manager.server.model.converter.HostComponentConverter;
 import org.apache.bigtop.manager.server.model.vo.HostComponentVO;
 import org.apache.bigtop.manager.server.service.HostComponentService;
 
@@ -48,21 +48,21 @@ public class HostComponentServiceImpl implements HostComponentService {
 
     @Override
     public List<HostComponentVO> list(Long clusterId) {
-        List<HostComponent> hostComponentList = hostComponentRepository.findAllByComponentClusterId(clusterId);
-        return HostComponentMapper.INSTANCE.fromEntity2VO(hostComponentList);
+        List<HostComponentPO> hostComponentPOList = hostComponentRepository.findAllByComponentPOClusterPOId(clusterId);
+        return HostComponentConverter.INSTANCE.fromPO2VO(hostComponentPOList);
     }
 
     @Override
     public List<HostComponentVO> listByHost(Long clusterId, Long hostId) {
-        List<HostComponent> hostComponentList =
-                hostComponentRepository.findAllByComponentClusterIdAndHostId(clusterId, clusterId);
-        return HostComponentMapper.INSTANCE.fromEntity2VO(hostComponentList);
+        List<HostComponentPO> hostComponentPOList =
+                hostComponentRepository.findAllByComponentPOClusterPOIdAndHostPOId(clusterId, clusterId);
+        return HostComponentConverter.INSTANCE.fromPO2VO(hostComponentPOList);
     }
 
     @Override
     public List<HostComponentVO> listByService(Long clusterId, Long serviceId) {
-        List<HostComponent> hostComponentList =
-                hostComponentRepository.findAllByComponentClusterIdAndComponentServiceId(clusterId, serviceId);
-        return HostComponentMapper.INSTANCE.fromEntity2VO(hostComponentList);
+        List<HostComponentPO> hostComponentPOList =
+                hostComponentRepository.findAllByComponentPOClusterPOIdAndComponentPOServicePOId(clusterId, serviceId);
+        return HostComponentConverter.INSTANCE.fromPO2VO(hostComponentPOList);
     }
 }

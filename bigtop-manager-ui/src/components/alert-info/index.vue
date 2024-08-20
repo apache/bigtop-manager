@@ -20,7 +20,6 @@
 <script setup lang="ts">
   import { BellOutlined } from '@ant-design/icons-vue'
   import { computed, ref } from 'vue'
-  import DotState from '@/components/dot-state/index.vue'
   import dayjs from 'dayjs'
   import customParseFormat from 'dayjs/plugin/customParseFormat'
   const visible = ref(false)
@@ -88,7 +87,7 @@
     font-size: 16px;
     cursor: pointer;
     border-radius: 50%;
-    @include flex(center, center);
+    @include flexbox($justify: center, $align: center);
 
     &:hover {
       background-color: var(--hover-color);
@@ -110,7 +109,7 @@
     li {
       padding: 10px;
       cursor: pointer;
-      @include flex(center, null);
+      @include flexbox($justify: center);
       &:hover {
         background-color: var(--hover-color);
       }

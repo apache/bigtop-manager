@@ -18,11 +18,8 @@
  */
 package org.apache.bigtop.manager.server.holder;
 
-import org.apache.bigtop.manager.server.command.job.factory.JobFactory;
-import org.apache.bigtop.manager.server.command.job.runner.JobRunner;
-import org.apache.bigtop.manager.server.command.job.validator.CommandValidator;
-import org.apache.bigtop.manager.server.command.stage.factory.StageFactory;
-import org.apache.bigtop.manager.server.command.stage.runner.StageRunner;
+import org.apache.bigtop.manager.server.command.factory.JobFactory;
+import org.apache.bigtop.manager.server.command.validator.CommandValidator;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -44,23 +41,15 @@ public class SpringContextHolder implements ApplicationContextAware {
         SpringContextHolder.applicationContext = applicationContext;
     }
 
+    public static <T> T getBean(Class<T> clazz) {
+        return applicationContext.getBean(clazz);
+    }
+
     public static Map<String, CommandValidator> getCommandValidators() {
         return applicationContext.getBeansOfType(CommandValidator.class);
     }
 
     public static Map<String, JobFactory> getJobFactories() {
         return applicationContext.getBeansOfType(JobFactory.class);
-    }
-
-    public static Map<String, JobRunner> getJobRunners() {
-        return applicationContext.getBeansOfType(JobRunner.class);
-    }
-
-    public static Map<String, StageFactory> getStageFactories() {
-        return applicationContext.getBeansOfType(StageFactory.class);
-    }
-
-    public static Map<String, StageRunner> getStageRunners() {
-        return applicationContext.getBeansOfType(StageRunner.class);
     }
 }

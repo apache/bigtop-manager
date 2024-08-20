@@ -50,7 +50,7 @@ echo -e "\033[32mCreating network bigtop-manager\033[0m"
 docker network create --driver bridge bigtop-manager
 
 echo -e "\033[32mCreating container bigtop-manager-server\033[0m"
-docker run -it -d -p 13306:3306 -p 15005:5005 -p 18080:8080 --name bigtop-manager-server --hostname bigtop-manager-server --network bigtop-manager --cap-add=SYS_TIME bigtop-manager/develop:trunk-rocky-8
+docker run -it -d -p 13306:3306 -p 15005:5005 -p 15006:5006 -p 18080:8080 --name bigtop-manager-server --hostname bigtop-manager-server --network bigtop-manager --cap-add=SYS_TIME bigtop-manager/develop:trunk-rocky-8
 docker cp ../../../bigtop-manager-server/target/bigtop-manager-server bigtop-manager-server:/opt/
 docker cp ../../../bigtop-manager-agent/target/bigtop-manager-agent bigtop-manager-server:/opt/
 SERVER_PUB_KEY=`docker exec bigtop-manager-server /bin/cat /root/.ssh/id_rsa.pub`
@@ -116,7 +116,7 @@ docker exec bigtop-manager-agent-01 bash -c "sed -i 's/host: localhost/host: $BI
 docker exec bigtop-manager-agent-02 bash -c "sed -i 's/host: localhost/host: $BIGTOP_MANAGER_SERVER_IP/' /opt/bigtop-manager-agent/conf/application.yml"
 
 docker exec bigtop-manager-server bash -c "nohup /bin/bash /opt/bigtop-manager-server/bin/start.sh --debug > /dev/null 2>&1 &"
-docker exec bigtop-manager-server bash -c "nohup /bin/bash /opt/bigtop-manager-agent/bin/start.sh > /dev/null 2>&1 &"
+docker exec bigtop-manager-server bash -c "nohup /bin/bash /opt/bigtop-manager-agent/bin/start.sh --debug > /dev/null 2>&1 &"
 docker exec bigtop-manager-agent-01 bash -c "nohup /bin/bash /opt/bigtop-manager-agent/bin/start.sh > /dev/null 2>&1 &"
 docker exec bigtop-manager-agent-02 bash -c "nohup /bin/bash /opt/bigtop-manager-agent/bin/start.sh > /dev/null 2>&1 &"
 

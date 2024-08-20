@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { ref, h, watch, reactive } from 'vue'
+  import { ref, h, watch, reactive, onUnmounted, onMounted } from 'vue'
   import { Modal } from 'ant-design-vue'
   import { ExclamationCircleFilled } from '@ant-design/icons-vue'
   import { useI18n } from 'vue-i18n'
@@ -117,6 +117,7 @@
 
       return {
         serviceName: serviceName,
+        installed: true,
         componentHosts: componentHosts,
         configs: configs
       }
@@ -187,6 +188,14 @@
       }
     })
   }
+
+  onMounted(() => {
+    componentStore.resumeIntervalFn()
+  })
+
+  onUnmounted(() => {
+    componentStore.pauseIntervalFn()
+  })
 </script>
 
 <template>
@@ -250,10 +259,7 @@
 
 <style scoped lang="scss">
   .container {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
+    @include flexbox($direction: row, $justify: center, $align: center);
 
     .step {
       width: 15%;

@@ -19,7 +19,6 @@
 -->
 
 <metainfo>
-    <schema-version>2.0</schema-version>
     <service>
         <name>zookeeper</name>
         <display-name>ZooKeeper</display-name>
@@ -29,7 +28,6 @@
         </desc>
         <version>3.6.4</version>
         <user>zookeeper</user>
-        <group>zookeeper</group>
 
         <components>
             <component>

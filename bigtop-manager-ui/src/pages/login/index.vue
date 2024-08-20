@@ -173,8 +173,7 @@
 
 <style scoped lang="scss">
   .login-container {
-    display: flex;
-    flex-direction: column;
+    @include flexbox($direction: column);
     height: 100vh;
     overflow: auto;
     background-color: var(--bg-color-container);
@@ -185,9 +184,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      @include flexbox($justify: center, $align: center);
 
       .login-main {
         border-radius: 0.25rem;
@@ -202,15 +199,11 @@
         }
 
         .login-header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
+          @include flexbox($justify: space-between, $align: center);
           padding: 0.5rem 1rem;
 
           .login-header-left {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            @include flexbox($justify: space-between, $align: center);
 
             .login-title {
               font-weight: 600;
@@ -251,11 +244,9 @@
           }
 
           .login-body-left {
-            display: flex;
+            @include flexbox($justify: center, $align: center);
             min-height: 520px;
             width: 700px;
-            justify-content: center;
-            align-items: center;
             background-color: var(--bg-color-container);
 
             @media (max-width: 991px) {
@@ -277,10 +268,11 @@
           }
 
           .login-body-right {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
+            @include flexbox(
+              $direction: column,
+              $justify: center,
+              $align: center
+            );
             width: 335px;
             padding: 0 1.25rem;
 
@@ -298,9 +290,7 @@
             .login-body-right-form {
               .login-body-right-form-bottom {
                 margin-bottom: 24px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
+                @include flexbox($justify: space-between, $align: center);
               }
             }
           }

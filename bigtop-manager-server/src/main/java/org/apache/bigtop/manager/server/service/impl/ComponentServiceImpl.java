@@ -18,11 +18,11 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
-import org.apache.bigtop.manager.dao.entity.Component;
+import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.repository.ComponentRepository;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
-import org.apache.bigtop.manager.server.model.mapper.ComponentMapper;
+import org.apache.bigtop.manager.server.model.converter.ComponentConverter;
 import org.apache.bigtop.manager.server.model.vo.ComponentVO;
 import org.apache.bigtop.manager.server.service.ComponentService;
 
@@ -44,8 +44,8 @@ public class ComponentServiceImpl implements ComponentService {
     @Override
     public List<ComponentVO> list(Long clusterId) {
         List<ComponentVO> componentVOList = new ArrayList<>();
-        componentRepository.findAllByClusterId(clusterId).forEach(component -> {
-            ComponentVO componentVO = ComponentMapper.INSTANCE.fromEntity2VO(component);
+        componentRepository.findAllByClusterPOId(clusterId).forEach(component -> {
+            ComponentVO componentVO = ComponentConverter.INSTANCE.fromPO2VO(component);
             componentVOList.add(componentVO);
         });
 
@@ -54,9 +54,9 @@ public class ComponentServiceImpl implements ComponentService {
 
     @Override
     public ComponentVO get(Long id) {
-        Component component = componentRepository
+        ComponentPO componentPO = componentRepository
                 .findById(id)
                 .orElseThrow(() -> new ApiException(ApiExceptionEnum.COMPONENT_NOT_FOUND));
-        return ComponentMapper.INSTANCE.fromEntity2VO(component);
+        return ComponentConverter.INSTANCE.fromPO2VO(componentPO);
     }
 }

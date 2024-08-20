@@ -23,11 +23,12 @@ import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
 import org.apache.bigtop.manager.common.message.entity.pojo.CustomCommandInfo;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.common.utils.CaseUtils;
-import org.apache.bigtop.manager.spi.plugin.PrioritySPIFactory;
-import org.apache.bigtop.manager.spi.stack.Hook;
-import org.apache.bigtop.manager.spi.stack.Params;
-import org.apache.bigtop.manager.spi.stack.Script;
-import org.apache.bigtop.manager.stack.common.exception.StackException;
+import org.apache.bigtop.manager.common.utils.Environments;
+import org.apache.bigtop.manager.stack.core.exception.StackException;
+import org.apache.bigtop.manager.stack.core.param.Params;
+import org.apache.bigtop.manager.stack.core.spi.PrioritySPIFactory;
+import org.apache.bigtop.manager.stack.core.spi.hook.Hook;
+import org.apache.bigtop.manager.stack.core.spi.script.Script;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -66,17 +67,25 @@ public class StackExecutor {
         return script;
     }
 
-    private static void runBeforeHook(String command) {
+    private static void runBeforeHook(String command, Params params) {
+        if (Environments.isDevMode()) {
+            return;
+        }
+
         Hook hook = HOOK_MAP.get(command.toLowerCase());
         if (hook != null) {
-            hook.before();
+            hook.before(params);
         }
     }
 
-    private static void runAfterHook(String command) {
+    private static void runAfterHook(String command, Params params) {
+        if (Environments.isDevMode()) {
+            return;
+        }
+
         Hook hook = HOOK_MAP.get(command.toLowerCase());
         if (hook != null) {
-            hook.after();
+            hook.after(params);
         }
     }
 
@@ -101,16 +110,16 @@ public class StackExecutor {
             Params params = (Params)
                     paramsClass.getDeclaredConstructor(CommandPayload.class).newInstance(commandPayload);
 
-            runBeforeHook(command);
+            runBeforeHook(command, params);
 
             log.info("Executing {}::{}", script.getName(), method.getName());
             ShellResult result = (ShellResult) method.invoke(script, params);
 
-            runAfterHook(command);
+            runAfterHook(command, params);
 
             return result;
         } catch (Exception e) {
-            log.info("Error executing command, payload: {}", commandPayload, e);
+            log.error("Error executing command, payload: {}", commandPayload, e);
             return ShellResult.fail();
         }
     }

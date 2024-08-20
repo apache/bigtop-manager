@@ -42,10 +42,7 @@
 
 <style scoped lang="scss">
   .tour {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    @include flexbox($direction: column, $justify: center, $align: center);
     align-content: center;
     min-height: 540px;
   }

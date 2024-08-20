@@ -26,7 +26,7 @@
   import { ServiceVO } from '@/api/service/types.ts'
   import { useStackStore } from '@/store/stack'
   import { ComponentVO, ServiceComponentVO } from '@/api/component/types.ts'
-  import { TypeConfigVO, ServiceConfigVO } from '@/api/config/types.ts'
+  import { ServiceConfigVO, TypeConfigVO } from '@/api/config/types.ts'
   import _ from 'lodash'
 
   const serviceInfo = defineModel<any>('serviceInfo')
@@ -84,6 +84,7 @@
 
     return {
       serviceName: serviceName,
+      installed: false,
       componentHosts: componentHosts,
       configs: configs
     }
@@ -153,10 +154,7 @@
 
 <style scoped lang="scss">
   .container {
-    display: flex;
-    flex-direction: column;
-    justify-content: start;
-    align-items: center;
+    @include flexbox($direction: column, $justify: start, $align: center);
     align-content: center;
     height: 100%;
 

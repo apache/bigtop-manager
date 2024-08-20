@@ -33,9 +33,6 @@ import java.util.List;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ConfigurationXml {
 
-    @XmlElement(name = "schema-version")
-    private String schemaVersion;
-
     @XmlElement(name = "property")
     private List<PropertyModel> propertyModels;
 }

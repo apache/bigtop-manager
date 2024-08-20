@@ -37,7 +37,7 @@ import jakarta.annotation.Resource;
 public class MonitoringController {
 
     @Resource
-    MonitoringService monitoringService;
+    private MonitoringService monitoringService;
 
     @Operation(summary = "agent healthy", description = "agent healthy check")
     @GetMapping("agenthealthy")

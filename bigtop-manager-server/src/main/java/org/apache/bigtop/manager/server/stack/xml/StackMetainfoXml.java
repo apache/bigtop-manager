@@ -32,9 +32,6 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class StackMetainfoXml {
 
-    @XmlElement(name = "schema-version")
-    private String schemaVersion;
-
     @XmlElement(name = "stack")
     private StackModel stack;
 }
