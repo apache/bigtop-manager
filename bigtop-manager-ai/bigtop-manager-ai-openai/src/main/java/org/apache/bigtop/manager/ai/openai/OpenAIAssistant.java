@@ -1,3 +1,21 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *    https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.apache.bigtop.manager.ai.openai;
 
 import dev.langchain4j.internal.ValidationUtils;
@@ -7,6 +25,7 @@ import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.chat.StreamingChatLanguageModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
+import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 import org.apache.bigtop.manager.ai.core.AbstractAIAssistant;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
@@ -15,13 +34,6 @@ import org.springframework.util.NumberUtils;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @Project: org.apache.bigtop.manager.ai.openapi
- * @Author: pgthinker
- * @GitHub: https://github.com/ningning0111
- * @Date: 2024/8/10 16:26
- * @Description:
- */
 public class OpenAIAssistant extends AbstractAIAssistant {
 
     private final static String PLATFORM_NAME = "openai";
@@ -46,10 +58,12 @@ public class OpenAIAssistant extends AbstractAIAssistant {
         private Object id;
 
         private Map<String,String> configs = new HashMap<>();
+        private ChatMemoryStore chatMemoryStore;
 
         public Builder(){
             configs.put("baseUrl",BASE_URL);
             configs.put("modelName", MODEL_NAME);
+
         }
 
         public Builder withConfigProvider(AIAssistantConfigProvider configProvider){
@@ -62,6 +76,11 @@ public class OpenAIAssistant extends AbstractAIAssistant {
             return this;
         }
 
+        public Builder memoryStore(ChatMemoryStore chatMemoryStore){
+            this.chatMemoryStore = chatMemoryStore;
+            return this;
+        }
+
         public AIAssistant build(){
             ValidationUtils.ensureNotNull(id, "id");
             String baseUrl = configs.get("baseUrl");
@@ -70,7 +89,7 @@ public class OpenAIAssistant extends AbstractAIAssistant {
             Integer memoryLen = ValidationUtils.ensureNotNull(NumberUtils.parseNumber(configs.get("memoryLen"), Integer.class), "memoryLen not a number.");
             ChatLanguageModel openAiChatModel = OpenAiChatModel.builder().apiKey(apiKey).baseUrl(baseUrl).modelName(modelName).build();
             StreamingChatLanguageModel openaiStreamChatModel = OpenAiStreamingChatModel.builder().apiKey(apiKey).baseUrl(baseUrl).modelName(modelName).build();
-            MessageWindowChatMemory chatMemory = MessageWindowChatMemory.builder().id(id).maxMessages(memoryLen).build();
+            MessageWindowChatMemory chatMemory = MessageWindowChatMemory.builder().id(id).chatMemoryStore(chatMemoryStore).maxMessages(memoryLen).build();
             return new OpenAIAssistant(openAiChatModel,openaiStreamChatModel,chatMemory);
         }
 
