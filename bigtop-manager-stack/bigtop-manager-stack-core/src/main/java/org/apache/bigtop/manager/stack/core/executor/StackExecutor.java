@@ -18,6 +18,7 @@
  */
 package org.apache.bigtop.manager.stack.core.executor;
 
+import org.apache.bigtop.manager.common.constants.MessageConstants;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
 import org.apache.bigtop.manager.common.message.entity.pojo.CustomCommandInfo;
@@ -114,6 +115,9 @@ public class StackExecutor {
 
             log.info("Executing {}::{}", script.getName(), method.getName());
             ShellResult result = (ShellResult) method.invoke(script, params);
+            if (result.getExitCode() != MessageConstants.SUCCESS_CODE) {
+                log.error("Error executing script: {}", result.getErrMsg());
+            }
 
             runAfterHook(command, params);
 

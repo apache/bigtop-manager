@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.stack.bigtop.v3_3_0.zookeeper;
+package org.apache.bigtop.manager.stack.bigtop.v3_3_0.flink;
 
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.stack.core.exception.StackException;
@@ -27,14 +27,9 @@ import org.apache.bigtop.manager.stack.core.utils.PackageUtils;
 import org.apache.bigtop.manager.stack.core.utils.linux.LinuxOSUtils;
 
 import com.google.auto.service.AutoService;
-import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
-import java.text.MessageFormat;
-
-@Slf4j
 @AutoService(Script.class)
-public class ZookeeperServerScript extends AbstractServerScript {
+public class FlinkHistoryServerScript extends AbstractServerScript {
 
     @Override
     public ShellResult install(Params params) {
@@ -43,36 +38,37 @@ public class ZookeeperServerScript extends AbstractServerScript {
 
     @Override
     public ShellResult configure(Params params) {
-        return ZookeeperSetup.config(params);
+        return FlinkSetup.config(params);
     }
 
     @Override
     public ShellResult start(Params params) {
         configure(params);
-        ZookeeperParams zookeeperParams = (ZookeeperParams) params;
-
-        String cmd = MessageFormat.format("{0}/bin/zkServer.sh start", zookeeperParams.serviceHome());
+        FlinkParams flinkParams = (FlinkParams) params;
+        String hadoopClasspath = flinkParams.stackBinDir() + "/hadoop classpath";
+        String cmd = "export HADOOP_CLASSPATH=`" + hadoopClasspath + "`;" + flinkParams.stackLibDir()
+                + "/flink/bin/historyserver.sh start";
         try {
-            return LinuxOSUtils.sudoExecCmd(cmd, zookeeperParams.user());
-        } catch (IOException e) {
+            return LinuxOSUtils.sudoExecCmd(cmd, flinkParams.user());
+        } catch (Exception e) {
             throw new StackException(e);
         }
     }
 
     @Override
     public ShellResult stop(Params params) {
-        ZookeeperParams zookeeperParams = (ZookeeperParams) params;
-        String cmd = MessageFormat.format("{0}/bin/zkServer.sh stop", zookeeperParams.serviceHome());
+        FlinkParams flinkParams = (FlinkParams) params;
+        String cmd = flinkParams.stackLibDir() + "/flink/bin/historyserver.sh stop";
         try {
-            return LinuxOSUtils.sudoExecCmd(cmd, zookeeperParams.user());
-        } catch (IOException e) {
+            return LinuxOSUtils.sudoExecCmd(cmd, flinkParams.user());
+        } catch (Exception e) {
             throw new StackException(e);
         }
     }
 
     @Override
     public ShellResult status(Params params) {
-        ZookeeperParams zookeeperParams = (ZookeeperParams) params;
-        return LinuxOSUtils.checkProcess(zookeeperParams.getZookeeperPidFile());
+        FlinkParams flinkParams = (FlinkParams) params;
+        return LinuxOSUtils.checkProcess(flinkParams.getHistoryServerPidFile());
     }
 }
