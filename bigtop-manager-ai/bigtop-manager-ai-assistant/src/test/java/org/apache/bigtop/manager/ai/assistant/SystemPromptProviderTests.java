@@ -20,14 +20,33 @@ package org.apache.bigtop.manager.ai.assistant;
 
 import org.apache.bigtop.manager.ai.assistant.provider.LocSystemPromptProvider;
 import org.apache.bigtop.manager.ai.core.provider.SystemPromptProvider;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
+
+import dev.langchain4j.data.message.SystemMessage;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class SystemPromptProviderTests {
 
     private SystemPromptProvider systemPromptProvider = new LocSystemPromptProvider();
 
     @Test
-    public void loadSystemPromptTest(){
+    public void loadSystemPromptTest() {
         System.out.println(systemPromptProvider.getSystemPrompt());
+    }
+
+    @Test
+    public void loadSystemPromptByIdTest() {
+        SystemMessage systemPrompt1 = systemPromptProvider.getSystemPrompt("big-data-professor.st");
+        assertFalse(systemPrompt1.text().isEmpty());
+        System.out.println(systemPrompt1.text());
+
+        SystemMessage systemPrompt2 = systemPromptProvider.getSystemPrompt(LocSystemPromptProvider.DEFAULT);
+        assertFalse(systemPrompt2.text().isEmpty());
+        System.out.println(systemPrompt2.text());
+
+        assertEquals(systemPrompt1.text(), systemPrompt2.text());
     }
 }

@@ -40,9 +40,4 @@ public class TezClientScript extends AbstractClientScript {
     public ShellResult configure(Params params) {
         return TezSetup.config(params);
     }
-
-    @Test
-    public void AiAssistant(){
-        new AIAssistantFactory();
-    }
 }

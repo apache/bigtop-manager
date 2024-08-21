@@ -21,7 +21,10 @@ package org.apache.bigtop.manager.ai.core.provider;
 import dev.langchain4j.data.message.SystemMessage;
 
 public interface SystemPromptProvider {
+
+    // Return the SystemPrompt for the specified ID.
     SystemMessage getSystemPrompt(Object id);
 
+    // return default system prompt
     SystemMessage getSystemPrompt();
 }

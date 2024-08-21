@@ -18,6 +18,8 @@
  */
 package org.apache.bigtop.manager.ai.core;
 
+import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
+
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
@@ -26,7 +28,6 @@ import dev.langchain4j.model.StreamingResponseHandler;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.chat.StreamingChatLanguageModel;
 import dev.langchain4j.model.output.Response;
-import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 
@@ -36,36 +37,40 @@ public abstract class AbstractAIAssistant implements AIAssistant {
     private final Object assistantId;
     private final ChatMemory chatMemory;
 
-    public AbstractAIAssistant(ChatLanguageModel chatLanguageModel, StreamingChatLanguageModel streamingChatLanguageModel, ChatMemory chatMemory) {
+    public AbstractAIAssistant(
+            ChatLanguageModel chatLanguageModel,
+            StreamingChatLanguageModel streamingChatLanguageModel,
+            ChatMemory chatMemory) {
         this.chatLanguageModel = chatLanguageModel;
         this.streamingChatLanguageModel = streamingChatLanguageModel;
         this.chatMemory = chatMemory;
         this.assistantId = this.chatMemory.id();
     }
 
-
     @Override
     public Flux<String> streamAsk(ChatMessage chatMessage) {
         chatMemory.add(chatMessage);
-        Flux<String> streamAiMessage = Flux.create(emitter -> {
-            streamingChatLanguageModel.generate(chatMemory.messages(), new StreamingResponseHandler<>() {
-                @Override
-                public void onNext(String token) {
-                    emitter.next(token);
-                }
+        Flux<String> streamAiMessage = Flux.create(
+                emitter -> {
+                    streamingChatLanguageModel.generate(chatMemory.messages(), new StreamingResponseHandler<>() {
+                        @Override
+                        public void onNext(String token) {
+                            emitter.next(token);
+                        }
 
-                @Override
-                public void onError(Throwable error) {
-                    emitter.error(error);
-                }
+                        @Override
+                        public void onError(Throwable error) {
+                            emitter.error(error);
+                        }
 
-                @Override
-                public void onComplete(Response<AiMessage> response) {
-                    StreamingResponseHandler.super.onComplete(response);
-                    chatMemory.add(response.content());
-                }
-            });
-        }, FluxSink.OverflowStrategy.BUFFER);
+                        @Override
+                        public void onComplete(Response<AiMessage> response) {
+                            StreamingResponseHandler.super.onComplete(response);
+                            chatMemory.add(response.content());
+                        }
+                    });
+                },
+                FluxSink.OverflowStrategy.BUFFER);
 
         return streamAiMessage;
     }

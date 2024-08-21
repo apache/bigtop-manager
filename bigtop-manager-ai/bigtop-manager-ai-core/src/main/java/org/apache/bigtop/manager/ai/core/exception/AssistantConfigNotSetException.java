@@ -18,10 +18,10 @@
  */
 package org.apache.bigtop.manager.ai.core.exception;
 
-public class AssistantConfigNotSetException extends RuntimeException{
+public class AssistantConfigNotSetException extends RuntimeException {
     private String paramName;
 
-    public AssistantConfigNotSetException(String paramName){
+    public AssistantConfigNotSetException(String paramName) {
         super(paramName + " is a required parameter. You need to set.");
     }
 }

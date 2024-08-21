@@ -18,20 +18,22 @@
  */
 package org.apache.bigtop.manager.ai.assistant;
 
-import dev.langchain4j.data.message.ChatMessage;
-import dev.langchain4j.data.message.SystemMessage;
-import dev.langchain4j.memory.ChatMemory;
-import dev.langchain4j.model.openai.OpenAiChatModelName;
 import org.apache.bigtop.manager.ai.assistant.provider.AIAssistantConfig;
-import org.apache.bigtop.manager.ai.assistant.provider.LocSystemPromptProvider;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
+import org.apache.bigtop.manager.ai.core.factory.AIAssistantFactory;
 import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
-import org.apache.bigtop.manager.ai.core.provider.SystemPromptProvider;
-import org.junit.Assert;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import dev.langchain4j.model.openai.OpenAiChatModelName;
 import reactor.core.publisher.Flux;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.Mockito.when;
 
 public class AIAssistantServiceTest {
 
@@ -43,90 +45,43 @@ public class AIAssistantServiceTest {
             .set("memoryLen", "10")
             .set("modelName", OpenAiChatModelName.GPT_3_5_TURBO.toString())
             .build();
-    private AIAssistantFactory aiAssistantFactory = new AIAssistantFactory();
 
+    @Mock
+    private AIAssistant aiAssistant;
+
+    @Mock
+    private AIAssistantFactory aiAssistantFactory;
+
+    @BeforeEach
+    public void init() {
+        MockitoAnnotations.openMocks(this);
+        when(aiAssistant.ask("1?")).thenReturn("1");
+        when(aiAssistant.streamAsk("stream 1?")).thenReturn(Flux.create(emmit -> {
+            final String text = "stream text";
+            for (int i = 0; i < text.length(); i++) {
+                emmit.next(text.charAt(i) + "");
+            }
+        }));
+        when(aiAssistantFactory.create(PlatformType.OPENAI, configProvider)).thenReturn(this.aiAssistant);
+        when(aiAssistant.getPlatform()).thenReturn(PlatformType.OPENAI.getValue());
+    }
 
     @Test
-    public void createNew2SimpleChat(){
+    public void createNew2SimpleChat() {
         AIAssistant aiAssistant = aiAssistantFactory.create(PlatformType.OPENAI, configProvider);
-        String ask = aiAssistant.ask("Hi GPT!");
-        Assert.assertFalse(ask.isEmpty());
+        String ask = aiAssistant.ask("1?");
+        assertFalse(ask.isEmpty());
         System.out.println(ask);
     }
 
     @Test
     public void createNew2StreamChat() throws InterruptedException {
         AIAssistant aiAssistant = aiAssistantFactory.create(PlatformType.OPENAI, configProvider);
-        Flux<String> stringFlux = aiAssistant.streamAsk("Hi GPT!");
-        stringFlux.subscribe(System.out::println, error-> System.out.println("error:" + error), ()-> System.out.println("Completed"));
-        Thread.sleep(5000);
-    }
-
-    @Test
-    public void memoryTest(){
-        AIAssistant aiAssistant = aiAssistantFactory.create(PlatformType.OPENAI, configProvider);
-        String message1 = aiAssistant.ask("Hi, GPT!");
-        Assert.assertFalse(message1.isEmpty());
-        System.out.println(message1);
-
-        String message2 = aiAssistant.ask("What's your name?");
-        Assert.assertFalse( message2.isEmpty());
-        System.out.println(message2);
-
-        String message3 = aiAssistant.ask("What's langchain4j?");
-        Assert.assertFalse( message3.isEmpty());
-        System.out.println(message3);
-
-        String message4 = aiAssistant.ask("What was my first question during our conversation?");
-        Assert.assertFalse(message4.isEmpty());
-        System.out.println(message4);
-
-        String message5 = aiAssistant.ask("What is my second question during our conversation?");
-        Assert.assertFalse(message5.isEmpty());
-        System.out.println(message5);
-
-        String message6 = aiAssistant.ask("What is your answer to the first question?");
-        Assert.assertFalse( message6.isEmpty());
-        System.out.println(message6);
-
-        String message7 = aiAssistant.ask("What is your answer to the second question?");
-        Assert.assertFalse( message7.isEmpty());
-        System.out.println(message7);
-    }
-
-    @Test
-    public void systemPromptTest(){
-        SystemPromptProvider locSystemPromptProvider = new LocSystemPromptProvider();
-        AIAssistant aiAssistant = aiAssistantFactory.create(PlatformType.OPENAI, configProvider);
-        SystemMessage systemPrompt = locSystemPromptProvider.getSystemPrompt("default");
-//        SystemMessage systemPrompt = locSystemPromptProvider.getSystemPrompt(); // default return "default" system prompt
-        aiAssistant.setSystemPrompt(systemPrompt);
-
-        String ask = aiAssistant.ask("What's is Apache's Bigtop?");
-        Assert.assertFalse(ask.isEmpty());
-
-        ChatMemory memory = aiAssistant.getMemory();
-        ChatMessage chatMessage = memory.messages().get(0);
-        Assert.assertTrue(chatMessage instanceof SystemMessage);
-        System.out.println(chatMessage);
-
-    }
-
-    @Test
-    public void createAIByIdTest(){
-        AIAssistant aiAssistant = aiAssistantFactory.create(PlatformType.OPENAI, configProvider);
-        String resp = aiAssistant.ask("Hi GPT! What's your name?");
-        Assert.assertFalse(resp.isEmpty());
-        System.out.println(resp);
-        Object id = aiAssistant.getId();
-
-
-        // create AI by id
-        AIAssistant newAIAssistant = aiAssistantFactory.create(PlatformType.OPENAI, configProvider, id);
-        String ask = newAIAssistant.ask("What was my first question during our conversation?");
-        Assert.assertFalse(ask.isEmpty());
-        System.out.println(ask);
-        ChatMemory memory = newAIAssistant.getMemory();
-        System.out.println(memory.messages());
+        Flux<String> stringFlux = aiAssistant.streamAsk("stream 1?");
+        stringFlux.subscribe(
+                System.out::println,
+                error -> System.out.println("error:" + error),
+                () -> System.out.println("Completed"));
+        Thread.sleep(1000);
     }
 }

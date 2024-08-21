@@ -24,7 +24,6 @@ import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.memory.ChatMemory;
 import reactor.core.publisher.Flux;
 
-
 public interface AIAssistant {
 
     /**
@@ -33,7 +32,6 @@ public interface AIAssistant {
      * @return
      */
     Object getId();
-
 
     /**
      * This is a conversation based on streaming output.
@@ -61,27 +59,19 @@ public interface AIAssistant {
      */
     String getPlatform();
 
-
     void setSystemPrompt(SystemMessage systemPrompt);
-
 
     void resetMemory();
 
-
-
-    default Flux<String> streamAsk(String message){
+    default Flux<String> streamAsk(String message) {
         return streamAsk(UserMessage.from(message));
     }
 
-    default String ask(String message){
+    default String ask(String message) {
         return ask(UserMessage.from(message));
     }
 
-    default void setSystemPrompt(String systemPrompt){
+    default void setSystemPrompt(String systemPrompt) {
         setSystemPrompt(SystemMessage.systemMessage(systemPrompt));
     }
-
-
-
-
 }

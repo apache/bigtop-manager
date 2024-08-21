@@ -18,9 +18,12 @@
  */
 package org.apache.bigtop.manager.ai.assistant.provider;
 
-import dev.langchain4j.data.message.SystemMessage;
 import org.apache.bigtop.manager.ai.core.provider.SystemPromptProvider;
+
 import org.springframework.util.ResourceUtils;
+
+import dev.langchain4j.data.message.SystemMessage;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,25 +31,39 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Objects;
 
+@Slf4j
 public class LocSystemPromptProvider implements SystemPromptProvider {
 
-    public final static String DEFAULT = "default";
+    public static final String DEFAULT = "default";
+    private static final String SYSTEM_PROMPT_PATH = "src/main/resources/";
+    private static final String DEFAULT_NAME = "big-data-professor.st";
+
     @Override
     public SystemMessage getSystemPrompt(Object id) {
-        if(Objects.equals(id.toString(), DEFAULT)){
+        if (Objects.equals(id.toString(), DEFAULT)) {
             return getSystemPrompt();
+        } else {
+            return loadPromptFromFile(id.toString());
         }
-        return null;
     }
 
     @Override
     public SystemMessage getSystemPrompt() {
+        return loadPromptFromFile(DEFAULT_NAME);
+    }
+
+    private SystemMessage loadPromptFromFile(String fileName) {
+        final String filePath = SYSTEM_PROMPT_PATH + fileName;
         try {
-            File file = ResourceUtils.getFile("src/main/resources/big-data-professor.st");
-            String systemStr = Files.readString(file.toPath(), StandardCharsets.UTF_8);
-            return SystemMessage.from(systemStr);
+            File file = ResourceUtils.getFile(filePath);
+            String text = Files.readString(file.toPath(), StandardCharsets.UTF_8);
+            return SystemMessage.from(text);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            //
+            log.error(
+                    "Exception occurred while loading SystemPrompt from local. Here is some information:{}",
+                    e.getMessage());
+            return SystemMessage.from("");
         }
     }
 }

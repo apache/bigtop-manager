@@ -16,27 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.ai.openai;
+package org.apache.bigtop.manager.ai.core;
 
-import org.apache.bigtop.manager.ai.core.factory.ToolBox;
+import org.apache.bigtop.manager.ai.core.factory.AIAssistantFactory;
 
-import reactor.core.publisher.Flux;
-
-import java.util.List;
-
-public class OpenAIToolBox implements ToolBox {
-    @Override
-    public List<String> getTools() {
-        return null;
-    }
-
-    @Override
-    public String invoke(String toolName) {
-        return null;
-    }
-
-    @Override
-    public Flux<String> streamInvoke(String toolName) {
-        return null;
-    }
-}
+public abstract class AIAssistantAbstractFactory implements AIAssistantFactory {}

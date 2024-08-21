@@ -21,5 +21,5 @@ package org.apache.bigtop.manager.ai.core.provider;
 import java.util.Map;
 
 public interface AIAssistantConfigProvider {
-    Map<String,String> configs();
+    Map<String, String> configs();
 }

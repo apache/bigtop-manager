@@ -24,33 +24,31 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public enum PlatformType {
-
-
     OPENAI("openai");
 
     private final String value;
-    PlatformType(String value){
+
+    PlatformType(String value) {
         this.value = value;
     }
 
-    public static List<String> getPlatforms(){
-        return Arrays.stream(values()).map(item->item.value).collect(Collectors.toList());
+    public static List<String> getPlatforms() {
+        return Arrays.stream(values()).map(item -> item.value).collect(Collectors.toList());
     }
 
-    public static PlatformType getPlatformType(String value){
-        if(Objects.isNull(value) || value.isEmpty()){
+    public static PlatformType getPlatformType(String value) {
+        if (Objects.isNull(value) || value.isEmpty()) {
             return null;
         }
-        for(PlatformType platformType: PlatformType.values()){
-            if(platformType.value.equals(value)){
+        for (PlatformType platformType : PlatformType.values()) {
+            if (platformType.value.equals(value)) {
                 return platformType;
             }
         }
         return null;
     }
 
-    public String getValue(){
+    public String getValue() {
         return this.value;
     }
-
 }
