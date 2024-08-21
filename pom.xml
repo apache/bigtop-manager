@@ -34,14 +34,14 @@
     <description>Bigtop Manager Parent</description>
 
     <modules>
-        <module>bigtop-manager-bom</module>
         <module>bigtop-manager-agent</module>
+        <module>bigtop-manager-bom</module>
         <module>bigtop-manager-common</module>
         <module>bigtop-manager-server</module>
         <module>bigtop-manager-stack</module>
+        <module>bigtop-manager-ui</module>
         <module>bigtop-manager-dao</module>
         <module>bigtop-manager-grpc</module>
-        <module>bigtop-manager-ui</module>
         <module>bigtop-manager-ai</module>
     </modules>
 
