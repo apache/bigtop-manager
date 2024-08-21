@@ -26,8 +26,9 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <groupId>org.apache.bigtop</groupId>
     <artifactId>bigtop-manager-ai-assistant</artifactId>
+    <name>${project.artifactId}</name>
+    <description>Bigtop Manager AI Assistant</description>
 
     <dependencies>
         <dependency>

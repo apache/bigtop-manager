@@ -20,4 +20,4 @@ package org.apache.bigtop.manager.ai.core;
 
 import org.apache.bigtop.manager.ai.core.factory.AIAssistantFactory;
 
-public abstract class AIAssistantAbstractFactory implements AIAssistantFactory {}
+public abstract class AbstractAIAssistantFactory implements AIAssistantFactory {}

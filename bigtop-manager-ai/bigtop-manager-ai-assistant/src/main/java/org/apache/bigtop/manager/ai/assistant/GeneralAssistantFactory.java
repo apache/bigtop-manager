@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.ai.assistant;
 
 import org.apache.bigtop.manager.ai.assistant.provider.LocSystemPromptProvider;
-import org.apache.bigtop.manager.ai.core.AIAssistantAbstractFactory;
+import org.apache.bigtop.manager.ai.core.AbstractAIAssistantFactory;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 import org.apache.bigtop.manager.ai.core.factory.ToolBox;
@@ -33,7 +33,7 @@ import dev.langchain4j.store.memory.chat.InMemoryChatMemoryStore;
 
 import java.util.Objects;
 
-public class GeneralAssistantFactory extends AIAssistantAbstractFactory {
+public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
 
     private SystemPromptProvider systemPromptProvider = new LocSystemPromptProvider();
     private ChatMemoryStore chatMemoryStore = new InMemoryChatMemoryStore();
