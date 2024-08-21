@@ -19,6 +19,7 @@
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.solr;
 
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
+import org.apache.bigtop.manager.common.utils.Environments;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
 import org.apache.bigtop.manager.stack.core.param.BaseParams;
 import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
@@ -43,12 +44,12 @@ public class SolrParams extends BaseParams {
 
     public SolrParams(CommandPayload commandPayload) {
         super(commandPayload);
-        globalParamsMap.put("java_home", "/usr/local/java");
+        globalParamsMap.put("java_home", Environments.getJavaHome());
         globalParamsMap.put("solr_home", solrHomeDir);
         globalParamsMap.put("security_enabled", false);
         globalParamsMap.put("solr_pid_file", solrPidFile);
-        globalParamsMap.put("solr_user", "solr");
-        globalParamsMap.put("solr_group", "hadoop");
+        globalParamsMap.put("solr_user", user());
+        globalParamsMap.put("solr_group", group());
     }
 
     @GlobalParams
@@ -63,23 +64,20 @@ public class SolrParams extends BaseParams {
 
     public String getZnode() {
         Map<String, Object> solrEnv = LocalSettings.configurations(serviceName(), "solr-env");
-        String znode = (String) solrEnv.get("solr_znode");
-        return znode;
+        return (String) solrEnv.get("solr_znode");
     }
 
     public String getzkString() {
         List<String> ZookeeperServerHosts = LocalSettings.hosts("zookeeper_server");
         Map<String, Object> Zkport = LocalSettings.configurations("zookeeper", "zoo.cfg");
         String clientPort = (String) Zkport.get("clientPort");
-        String solrzkString = MessageFormat.format("{0}:{1}", ZookeeperServerHosts.get(0), clientPort);
-        return solrzkString;
+        return MessageFormat.format("{0}:{1}", ZookeeperServerHosts.get(0), clientPort);
     }
 
     public String zkHost() {
         String Znode = getZnode();
         String SolrZkstring = getzkString();
-        String Zkconnect = MessageFormat.format("{0}{1}", SolrZkstring, Znode);
-        return Zkconnect;
+        return MessageFormat.format("{0}{1}", SolrZkstring, Znode);
     }
 
     @GlobalParams
