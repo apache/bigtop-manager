@@ -47,8 +47,8 @@ public class SolrParams extends BaseParams {
         globalParamsMap.put("solr_home", solrHomeDir);
         globalParamsMap.put("security_enabled", false);
         globalParamsMap.put("solr_pid_file", solrPidFile);
-        globalParamsMap.put("yarn_user", user());
-        globalParamsMap.put("yarn_group", group());
+        globalParamsMap.put("solr_user", "solr");
+        globalParamsMap.put("solr_group", "hadoop");
     }
 
     @GlobalParams
