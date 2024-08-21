@@ -19,6 +19,7 @@
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.flink;
 
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
+import org.apache.bigtop.manager.common.utils.Environments;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
 import org.apache.bigtop.manager.stack.core.param.BaseParams;
 import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
@@ -51,7 +52,7 @@ public class FlinkParams extends BaseParams {
         super(commandPayload);
         globalParamsMap.put("flink_user", user());
         globalParamsMap.put("flink_group", group());
-        globalParamsMap.put("java_home", "/usr/local/java");
+        globalParamsMap.put("java_home", Environments.getJavaHome());
         globalParamsMap.put("hadoop_home", hadoopHome());
         globalParamsMap.put("hadoop_conf_dir", hadoopConfDir());
 
