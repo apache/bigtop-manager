@@ -123,16 +123,19 @@
                 <artifactId>bigtop-manager-ai</artifactId>
                 <version>${project.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.apache.bigtop</groupId>
                 <artifactId>bigtop-manager-ai-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.apache.bigtop</groupId>
                 <artifactId>bigtop-manager-ai-openai</artifactId>
                 <version>${project.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.apache.bigtop</groupId>
                 <artifactId>bigtop-manager-ai-assistant</artifactId>
@@ -277,7 +280,6 @@
                             <sortPlugins />
                         </sortPom>
                     </pom>
-
                 </configuration>
             </plugin>
         </plugins>
