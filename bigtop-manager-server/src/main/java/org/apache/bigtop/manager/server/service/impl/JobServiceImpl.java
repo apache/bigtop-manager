@@ -18,14 +18,16 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.apache.bigtop.manager.common.enums.JobState;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
+import org.apache.bigtop.manager.dao.mapper.JobMapper;
+import org.apache.bigtop.manager.dao.mapper.StageMapper;
+import org.apache.bigtop.manager.dao.mapper.TaskMapper;
 import org.apache.bigtop.manager.dao.po.JobPO;
 import org.apache.bigtop.manager.dao.po.StagePO;
 import org.apache.bigtop.manager.dao.po.TaskPO;
-import org.apache.bigtop.manager.dao.repository.JobRepository;
-import org.apache.bigtop.manager.dao.repository.StageRepository;
-import org.apache.bigtop.manager.dao.repository.TaskRepository;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
 import org.apache.bigtop.manager.server.command.factory.JobFactories;
 import org.apache.bigtop.manager.server.command.factory.JobFactory;
@@ -44,25 +46,23 @@ import org.apache.bigtop.manager.server.service.JobService;
 import org.apache.bigtop.manager.server.utils.ClusterUtils;
 import org.apache.bigtop.manager.server.utils.PageUtils;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.Resource;
+
 import java.util.List;
 
 @Service
 public class JobServiceImpl implements JobService {
 
     @Resource
-    private JobRepository jobRepository;
+    private JobMapper jobMapper;
 
     @Resource
-    private StageRepository stageRepository;
+    private StageMapper stageMapper;
 
     @Resource
-    private TaskRepository taskRepository;
+    private TaskMapper taskMapper;
 
     @Resource
     private JobScheduler jobScheduler;
@@ -70,26 +70,28 @@ public class JobServiceImpl implements JobService {
     @Override
     public PageVO<JobVO> list(Long clusterId) {
         PageQuery pageQuery = PageUtils.getPageQuery();
-        Pageable pageable = PageRequest.of(pageQuery.getPageNum(), pageQuery.getPageSize(), pageQuery.getSort());
-        Page<JobPO> page;
-        if (ClusterUtils.isNoneCluster(clusterId)) {
-            page = jobRepository.findAllByClusterPOIsNull(pageable);
-        } else {
-            page = jobRepository.findAllByClusterPOId(clusterId, pageable);
-        }
 
-        return PageVO.of(page);
+        PageHelper.startPage(pageQuery.getPageNum(), pageQuery.getPageSize(), pageQuery.getOrderBy());
+        List<JobPO> jobPOList;
+        if (ClusterUtils.isNoneCluster(clusterId)) {
+            jobPOList = jobMapper.findAllByClusterIsNull();
+        } else {
+            jobPOList = jobMapper.findAllByClusterId(clusterId);
+        }
+        PageInfo<JobPO> pageInfo = new PageInfo<>(jobPOList);
+
+        return PageVO.of(pageInfo);
     }
 
     @Override
     public JobVO get(Long id) {
-        JobPO jobPO = jobRepository.getReferenceById(id);
+        JobPO jobPO = jobMapper.findById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.JOB_NOT_FOUND));
         return JobConverter.INSTANCE.fromPO2VO(jobPO);
     }
 
     @Override
     public JobVO retry(Long id) {
-        JobPO jobPO = jobRepository.getReferenceById(id);
+        JobPO jobPO = jobMapper.findById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.JOB_NOT_FOUND));
         if (jobPO.getState() != JobState.FAILED) {
             throw new ApiException(ApiExceptionEnum.JOB_NOT_RETRYABLE);
         }
@@ -105,15 +107,15 @@ public class JobServiceImpl implements JobService {
         for (StagePO stagePO : jobPO.getStagePOList()) {
             for (TaskPO taskPO : stagePO.getTaskPOList()) {
                 taskPO.setState(JobState.PENDING);
-                taskRepository.save(taskPO);
+                taskMapper.updateById(taskPO);
             }
 
             stagePO.setState(JobState.PENDING);
-            stageRepository.save(stagePO);
+            stageMapper.updateById(stagePO);
         }
 
         jobPO.setState(JobState.PENDING);
-        jobRepository.save(jobPO);
+        jobMapper.updateById(jobPO);
     }
 
     private Job recreateJob(JobPO jobPO) {

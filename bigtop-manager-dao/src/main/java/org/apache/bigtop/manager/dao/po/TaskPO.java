@@ -46,9 +46,9 @@ import jakarta.persistence.TableGenerator;
 @Table(
         name = "\"task\"",
         indexes = {
-            @Index(name = "idx_task_cluster_id", columnList = "cluster_id"),
-            @Index(name = "idx_task_job_id", columnList = "job_id"),
-            @Index(name = "idx_task_stage_id", columnList = "stage_id")
+                @Index(name = "idx_task_cluster_id", columnList = "cluster_id"),
+                @Index(name = "idx_task_job_id", columnList = "job_id"),
+                @Index(name = "idx_task_stage_id", columnList = "stage_id")
         })
 @TableGenerator(name = "task_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
 public class TaskPO extends BasePO {
@@ -97,6 +97,15 @@ public class TaskPO extends BasePO {
     @Basic(fetch = FetchType.LAZY)
     @Column(name = "content", length = 16777216)
     private String content;
+
+    @Column(name = "stage_id")
+    private Long stageId;
+
+    @Column(name = "job_id")
+    private Long jobId;
+
+    @Column(name = "cluster_id")
+    private Long clusterId;
 
     @ManyToOne
     @JoinColumn(name = "job_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))

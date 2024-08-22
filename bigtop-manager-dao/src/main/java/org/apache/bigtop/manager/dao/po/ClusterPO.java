@@ -84,6 +84,9 @@ public class ClusterPO extends BasePO {
     @Column(name = "selected")
     private Boolean selected;
 
+    @Column(name = "stack_id")
+    private Long stackId;
+
     @ManyToOne
     @JoinColumn(name = "stack_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private StackPO stackPO;

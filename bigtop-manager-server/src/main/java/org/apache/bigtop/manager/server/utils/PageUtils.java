@@ -23,8 +23,6 @@ import org.apache.bigtop.manager.server.model.query.PageQuery;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
-import org.springframework.data.domain.Sort;
-
 public class PageUtils {
 
     private static final String PAGE_NUM = "pageNum";
@@ -53,9 +51,9 @@ public class PageUtils {
         String orderBy = StringUtils.defaultIfBlank(ServletUtils.getParameter(ORDER_BY), DEFAULT_ORDER_BY);
         String sort = StringUtils.defaultIfBlank(ServletUtils.getParameter(SORT), SORT_ASC);
         if (SORT_DESC.equals(sort)) {
-            query.setSort(Sort.by(orderBy).descending());
+            query.setOrderBy("ORDER BY " + orderBy + " DESC ");
         } else {
-            query.setSort(Sort.by(orderBy).ascending());
+            query.setOrderBy("ORDER BY " + orderBy + " ASC ");
         }
 
         return query;

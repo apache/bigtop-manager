@@ -40,6 +40,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
+
 import java.util.List;
 
 @Data
@@ -66,6 +67,9 @@ public class JobPO extends BasePO {
     @Basic(fetch = FetchType.LAZY)
     @Column(name = "\"context\"", length = 16777216)
     private String context;
+
+    @Column(name = "cluster_id")
+    private Long clusterId;
 
     @ManyToOne
     @JoinColumn(name = "cluster_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
