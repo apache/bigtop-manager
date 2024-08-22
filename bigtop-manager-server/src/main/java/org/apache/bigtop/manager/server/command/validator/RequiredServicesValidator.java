@@ -19,9 +19,9 @@
 package org.apache.bigtop.manager.server.command.validator;
 
 import org.apache.bigtop.manager.common.enums.Command;
+import org.apache.bigtop.manager.dao.mapper.ClusterMapper;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.ServicePO;
-import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.dao.repository.ServiceRepository;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
@@ -43,7 +43,7 @@ import java.util.List;
 public class RequiredServicesValidator implements CommandValidator {
 
     @Resource
-    private ClusterRepository clusterRepository;
+    private ClusterMapper clusterMapper;
 
     @Resource
     private ServiceRepository serviceRepository;
@@ -59,7 +59,7 @@ public class RequiredServicesValidator implements CommandValidator {
         List<ServiceCommandDTO> serviceCommands = commandDTO.getServiceCommands();
 
         Long clusterId = commandDTO.getClusterId();
-        ClusterPO clusterPO = clusterRepository.getReferenceById(clusterId);
+        ClusterPO clusterPO = clusterMapper.findById(clusterId);
         String stackName = clusterPO.getStackPO().getStackName();
         String stackVersion = clusterPO.getStackPO().getStackVersion();
 

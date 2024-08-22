@@ -18,8 +18,8 @@
  */
 package org.apache.bigtop.manager.server.command.stage;
 
+import org.apache.bigtop.manager.dao.mapper.ClusterMapper;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
-import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.server.command.task.TaskContext;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
@@ -30,7 +30,7 @@ import java.util.Map;
 
 public abstract class AbstractComponentStage extends AbstractStage {
 
-    private ClusterRepository clusterRepository;
+    private ClusterMapper clusterMapper;
 
     private ClusterPO clusterPO;
 
@@ -42,12 +42,12 @@ public abstract class AbstractComponentStage extends AbstractStage {
     protected void injectBeans() {
         super.injectBeans();
 
-        this.clusterRepository = SpringContextHolder.getBean(ClusterRepository.class);
+        this.clusterMapper = SpringContextHolder.getBean(ClusterMapper.class);
     }
 
     @Override
     protected void beforeCreateTasks() {
-        this.clusterPO = clusterRepository.getReferenceById(stageContext.getClusterId());
+        this.clusterPO = clusterMapper.findById(stageContext.getClusterId());
     }
 
     @Override

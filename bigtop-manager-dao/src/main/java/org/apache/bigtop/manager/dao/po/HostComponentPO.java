@@ -24,15 +24,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
-import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
 
@@ -60,11 +56,10 @@ public class HostComponentPO extends BasePO {
     @Column(name = "state")
     private MaintainState state;
 
-    @ManyToOne
-    @JoinColumn(name = "host_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private HostPO hostPO;
+    @Column(name = "host_id")
+    private Long hostId;
 
-    @ManyToOne
-    @JoinColumn(name = "component_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private ComponentPO componentPO;
+    @Column(name = "component_id")
+    private Long componentId;
+
 }

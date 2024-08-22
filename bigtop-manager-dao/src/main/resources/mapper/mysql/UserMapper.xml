@@ -21,23 +21,20 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="org.apache.bigtop.manager.dao.mapper.StackMapper">
+<mapper namespace="org.apache.bigtop.manager.dao.mapper.UserMapper">
 
     <sql id="baseColumns">
-        id, stack_name, stack_version
+        id, username, password, nickname, status
     </sql>
 
-    <select id="findByStackNameAndStackVersion" resultType="org.apache.bigtop.manager.dao.po.StackPO">
+    <select id="findByUsername" resultType="org.apache.bigtop.manager.dao.po.UserPO">
         select
         <include refid="baseColumns"/>
         from
-        stack
+        user
         <where>
-            <if test="stackName!=null">
-                cluster_name=#{clusterName}
-            </if>
-            <if test="stackVersion!=null">
-                and stack_version=#{stackVersion}
+            <if test="username!=null">
+                username=#{username}
             </if>
         </where>
         limit 1

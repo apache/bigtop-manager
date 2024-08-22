@@ -26,23 +26,18 @@
     <sql id="baseColumns">
         id, state, name, context, cluster_id
     </sql>
-    <sql id="baseColumnsV2">
-        ${alias}.id, ${alias}.state, ${alias}.name, ${alias}.context, ${alias}.cluster_id
-    </sql>
 
     <select id="findAllByClusterId" parameterType="java.lang.Long"
             resultType="org.apache.bigtop.manager.dao.po.JobPO">
         select
-        <include refid="baseColumnsV2">
-            <property name="alias" value="r"/>
-        </include>
+        <include refid="baseColumns"/>
         from
-        job r
-        left join (select * from cluster
-        <if test="clusterId != 0">
-            and id = #{clusterId}
-        </if>
-        ) c on r.cluster_id = c.id
+        job
+        <where>
+            <if test="clusterId != 0">
+                cluster_id = #{clusterId}
+            </if>
+        </where>
     </select>
 
     <select id="findAllByClusterIsNull"

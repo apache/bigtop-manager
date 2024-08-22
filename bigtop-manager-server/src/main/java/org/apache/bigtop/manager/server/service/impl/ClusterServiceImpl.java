@@ -113,7 +113,7 @@ public class ClusterServiceImpl implements ClusterService {
     @Override
     public ClusterVO get(Long id) {
         ClusterPO clusterPO =
-                clusterMapper.findById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.CLUSTER_NOT_FOUND));
+                clusterMapper.findOptionalById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.CLUSTER_NOT_FOUND));
 
         return ClusterConverter.INSTANCE.fromEntity2VO(clusterPO);
     }

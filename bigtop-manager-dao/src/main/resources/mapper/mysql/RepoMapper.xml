@@ -26,9 +26,6 @@
     <sql id="baseColumns">
         id, base_url, os, arch, repo_id, repo_name, cluster_id
     </sql>
-    <sql id="baseColumnsV2">
-        ${alias}.id, ${alias}.base_url, ${alias}.os, ${alias}.arch, ${alias}.repo_id, ${alias}.repo_name, ${alias}.cluster_id
-    </sql>
 
     <select id="findByRepoName" resultType="org.apache.bigtop.manager.dao.po.RepoPO">
         select
@@ -54,16 +51,14 @@
     <select id="findAllByClusterId" parameterType="java.lang.Long"
             resultType="org.apache.bigtop.manager.dao.po.RepoPO">
         select
-        <include refid="baseColumnsV2">
-            <property name="alias" value="r"/>
-        </include>
+        <include refid="baseColumns"/>
         from
-        repo r
-        left join (select * from cluster
-        <if test="clusterId != 0">
-            and id = #{clusterId}
-        </if>
-        ) c on r.cluster_id = c.id
+        repo
+        <where>
+            <if test="clusterId != 0">
+                cluster_id = #{clusterId}
+            </if>
+        </where>
     </select>
 
 </mapper>

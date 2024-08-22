@@ -23,18 +23,15 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
-import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
+
 import java.util.List;
 
 @Data
@@ -43,8 +40,8 @@ import java.util.List;
 @Table(
         name = "service_config",
         indexes = {
-            @Index(name = "idx_sc_cluster_id", columnList = "cluster_id"),
-            @Index(name = "idx_sc_service_id", columnList = "service_id")
+                @Index(name = "idx_sc_cluster_id", columnList = "cluster_id"),
+                @Index(name = "idx_sc_service_id", columnList = "service_id")
         })
 @TableGenerator(
         name = "service_config_generator",
@@ -71,11 +68,10 @@ public class ServiceConfigPO extends BasePO {
     @OneToMany(mappedBy = "serviceConfigPO")
     private List<TypeConfigPO> configs;
 
-    @ManyToOne
-    @JoinColumn(name = "service_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private ServicePO servicePO;
+    @Column(name = "service_id")
+    private Long serviceId;
 
-    @ManyToOne
-    @JoinColumn(name = "cluster_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private ClusterPO clusterPO;
+    @Column(name = "cluster_id")
+    private Long clusterId;
+
 }

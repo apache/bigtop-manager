@@ -19,9 +19,9 @@
 package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.common.enums.MaintainState;
+import org.apache.bigtop.manager.dao.mapper.ClusterMapper;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.HostPO;
-import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.dao.repository.HostRepository;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
@@ -48,7 +48,7 @@ import java.util.stream.Collectors;
 public class HostServiceImpl implements HostService {
 
     @Resource
-    private ClusterRepository clusterRepository;
+    private ClusterMapper clusterMapper;
 
     @Resource
     private HostRepository hostRepository;
@@ -65,7 +65,7 @@ public class HostServiceImpl implements HostService {
 
     @Override
     public List<HostVO> batchSave(Long clusterId, List<String> hostnames) {
-        ClusterPO clusterPO = clusterRepository.getReferenceById(clusterId);
+        ClusterPO clusterPO = clusterMapper.findById(clusterId);
 
         List<HostPO> hostnameIn = hostRepository.findAllByHostnameIn(hostnames);
         List<HostPO> hostPOList = new ArrayList<>();

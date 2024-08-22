@@ -19,11 +19,11 @@
 package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.common.enums.JobState;
+import org.apache.bigtop.manager.dao.mapper.ClusterMapper;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.JobPO;
 import org.apache.bigtop.manager.dao.po.StagePO;
 import org.apache.bigtop.manager.dao.po.TaskPO;
-import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.dao.repository.JobRepository;
 import org.apache.bigtop.manager.dao.repository.StageRepository;
 import org.apache.bigtop.manager.dao.repository.TaskRepository;
@@ -56,7 +56,7 @@ public class CommandServiceImpl implements CommandService {
     private JobScheduler jobScheduler;
 
     @Resource
-    private ClusterRepository clusterRepository;
+    private ClusterMapper clusterMapper;
 
     @Resource
     private JobRepository jobRepository;
@@ -94,7 +94,7 @@ public class CommandServiceImpl implements CommandService {
 
     protected JobPO saveJob(Job job) {
         Long clusterId = job.getJobContext().getCommandDTO().getClusterId();
-        ClusterPO clusterPO = clusterId == null ? null : clusterRepository.getReferenceById(clusterId);
+        ClusterPO clusterPO = clusterId == null ? null : clusterMapper.findById(clusterId);
 
         JobPO jobPO = job.getJobPO();
         jobPO.setClusterPO(clusterPO);

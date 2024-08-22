@@ -19,11 +19,11 @@
 package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.common.utils.JsonUtils;
+import org.apache.bigtop.manager.dao.mapper.ClusterMapper;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
 import org.apache.bigtop.manager.dao.po.ServicePO;
 import org.apache.bigtop.manager.dao.po.TypeConfigPO;
-import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.dao.repository.ServiceConfigRepository;
 import org.apache.bigtop.manager.dao.repository.ServiceRepository;
 import org.apache.bigtop.manager.dao.repository.TypeConfigRepository;
@@ -47,7 +47,7 @@ import java.util.List;
 public class ConfigServiceImpl implements ConfigService {
 
     @Resource
-    private ClusterRepository clusterRepository;
+    private ClusterMapper clusterMapper;
 
     @Resource
     private ServiceRepository serviceRepository;
@@ -60,7 +60,7 @@ public class ConfigServiceImpl implements ConfigService {
 
     @Override
     public List<ServiceConfigVO> list(Long clusterId) {
-        ClusterPO clusterPO = clusterRepository.getReferenceById(clusterId);
+        ClusterPO clusterPO = clusterMapper.findById(clusterId);
         Sort sort = Sort.by(Sort.Direction.DESC, "version");
         List<ServiceConfigPO> list = serviceConfigRepository.findAllByClusterPO(clusterPO, sort);
         return ServiceConfigConverter.INSTANCE.fromPO2VO(list);
@@ -68,7 +68,7 @@ public class ConfigServiceImpl implements ConfigService {
 
     @Override
     public List<ServiceConfigVO> latest(Long clusterId) {
-        ClusterPO clusterPO = clusterRepository.getReferenceById(clusterId);
+        ClusterPO clusterPO = clusterMapper.findById(clusterId);
         List<ServiceConfigPO> list = serviceConfigRepository.findAllByClusterPOAndSelectedIsTrue(clusterPO);
         return ServiceConfigConverter.INSTANCE.fromPO2VO(list);
     }
@@ -76,7 +76,7 @@ public class ConfigServiceImpl implements ConfigService {
     @Override
     public void upsert(Long clusterId, Long serviceId, List<TypeConfigDTO> configs) {
         // Save configs
-        ClusterPO clusterPO = clusterRepository.getReferenceById(clusterId);
+        ClusterPO clusterPO = clusterMapper.findById(clusterId);
         ServicePO servicePO = serviceRepository.getReferenceById(serviceId);
         ServiceConfigPO serviceCurrentConfig = findServiceCurrentConfig(clusterPO, servicePO);
         if (serviceCurrentConfig == null) {

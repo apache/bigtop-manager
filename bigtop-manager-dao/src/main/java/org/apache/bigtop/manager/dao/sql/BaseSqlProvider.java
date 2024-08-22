@@ -7,11 +7,12 @@ import org.springframework.core.ResolvableType;
 import org.springframework.util.Assert;
 
 import java.lang.reflect.Type;
+import java.util.Collection;
 
 @Slf4j
 public class BaseSqlProvider {
 
-    public <Entity> String save(Entity entity, ProviderContext context) {
+    public <Entity> String insert(Entity entity, ProviderContext context) {
         Assert.notNull(entity, "entity must not null");
 
         String databaseId = context.getDatabaseId();
@@ -33,16 +34,25 @@ public class BaseSqlProvider {
         return SQLBuilder.update(mataData, entity, databaseId);
     }
 
-    public String findById(ProviderContext context) {
+    public String selectById(Long id, ProviderContext context) {
         String databaseId = context.getDatabaseId();
 
         Class<?> entityClass = getEntityClass(context);
         TableMataData mataData = TableMataData.forClass(entityClass);
 
-        return SQLBuilder.selectById(mataData, databaseId);
+        return SQLBuilder.selectById(mataData, databaseId, id);
     }
 
-    public String findAll(ProviderContext context) {
+    public String selectByIds(Collection<Long> ids, ProviderContext context) {
+        String databaseId = context.getDatabaseId();
+
+        Class<?> entityClass = getEntityClass(context);
+        TableMataData mataData = TableMataData.forClass(entityClass);
+
+        return SQLBuilder.selectByIds(mataData, databaseId, ids);
+    }
+
+    public String selectAll(ProviderContext context) {
         String databaseId = context.getDatabaseId();
 
         Class<?> entityClass = getEntityClass(context);

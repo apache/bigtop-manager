@@ -19,9 +19,7 @@
 package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.dao.po.HostComponentPO;
-import org.apache.bigtop.manager.dao.repository.ComponentRepository;
 import org.apache.bigtop.manager.dao.repository.HostComponentRepository;
-import org.apache.bigtop.manager.dao.repository.HostRepository;
 import org.apache.bigtop.manager.server.model.converter.HostComponentConverter;
 import org.apache.bigtop.manager.server.model.vo.HostComponentVO;
 import org.apache.bigtop.manager.server.service.HostComponentService;
@@ -39,12 +37,6 @@ public class HostComponentServiceImpl implements HostComponentService {
 
     @Resource
     private HostComponentRepository hostComponentRepository;
-
-    @Resource
-    private ComponentRepository componentRepository;
-
-    @Resource
-    private HostRepository hostRepository;
 
     @Override
     public List<HostComponentVO> list(Long clusterId) {

@@ -20,11 +20,12 @@ package org.apache.bigtop.manager.server.command.job;
 
 import org.apache.bigtop.manager.common.enums.JobState;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
+import org.apache.bigtop.manager.dao.mapper.ClusterMapper;
+import org.apache.bigtop.manager.dao.mapper.StackMapper;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.JobPO;
 import org.apache.bigtop.manager.dao.po.StagePO;
 import org.apache.bigtop.manager.dao.po.TaskPO;
-import org.apache.bigtop.manager.dao.repository.ClusterRepository;
 import org.apache.bigtop.manager.dao.repository.JobRepository;
 import org.apache.bigtop.manager.dao.repository.StageRepository;
 import org.apache.bigtop.manager.dao.repository.TaskRepository;
@@ -38,7 +39,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public abstract class AbstractJob implements Job {
 
-    protected ClusterRepository clusterRepository;
+    protected StackMapper stackMapper;
+    protected ClusterMapper clusterMapper;
     protected JobRepository jobRepository;
     protected StageRepository stageRepository;
     protected TaskRepository taskRepository;
@@ -65,7 +67,9 @@ public abstract class AbstractJob implements Job {
     }
 
     protected void injectBeans() {
-        this.clusterRepository = SpringContextHolder.getBean(ClusterRepository.class);
+        this.stackMapper = SpringContextHolder.getBean(StackMapper.class);
+        this.clusterMapper = SpringContextHolder.getBean(ClusterMapper.class);
+
         this.jobRepository = SpringContextHolder.getBean(JobRepository.class);
         this.stageRepository = SpringContextHolder.getBean(StageRepository.class);
         this.taskRepository = SpringContextHolder.getBean(TaskRepository.class);
@@ -73,7 +77,7 @@ public abstract class AbstractJob implements Job {
 
     protected void beforeCreateStages() {
         Long clusterId = jobContext.getCommandDTO().getClusterId();
-        this.clusterPO = clusterId == null ? new ClusterPO() : clusterRepository.getReferenceById(clusterId);
+        this.clusterPO = clusterId == null ? new ClusterPO() : clusterMapper.findById(clusterId);
     }
 
     protected abstract void createStages();

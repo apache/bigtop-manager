@@ -25,6 +25,8 @@ import org.apache.bigtop.manager.common.message.entity.pojo.ClusterInfo;
 import org.apache.bigtop.manager.common.message.entity.pojo.ComponentInfo;
 import org.apache.bigtop.manager.common.message.entity.pojo.RepoInfo;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
+import org.apache.bigtop.manager.dao.mapper.ClusterMapper;
+import org.apache.bigtop.manager.dao.mapper.ComponentMapper;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.po.HostComponentPO;
@@ -34,8 +36,6 @@ import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
 import org.apache.bigtop.manager.dao.po.ServicePO;
 import org.apache.bigtop.manager.dao.po.SettingPO;
 import org.apache.bigtop.manager.dao.po.TypeConfigPO;
-import org.apache.bigtop.manager.dao.repository.ClusterRepository;
-import org.apache.bigtop.manager.dao.repository.ComponentRepository;
 import org.apache.bigtop.manager.dao.repository.HostComponentRepository;
 import org.apache.bigtop.manager.dao.repository.HostRepository;
 import org.apache.bigtop.manager.dao.repository.RepoRepository;
@@ -69,14 +69,14 @@ import static org.apache.bigtop.manager.common.constants.Constants.ALL_HOST_KEY;
 
 public class CacheFileUpdateTask extends AbstractTask {
 
-    private ClusterRepository clusterRepository;
+    private ClusterMapper clusterMapper;
     private HostComponentRepository hostComponentRepository;
     private ServiceRepository serviceRepository;
     private ServiceConfigRepository serviceConfigRepository;
     private RepoRepository repoRepository;
     private SettingRepository settingRepository;
     private HostRepository hostRepository;
-    private ComponentRepository componentRepository;
+    private ComponentMapper componentMapper;
 
     private ClusterInfo clusterInfo;
     private Map<String, ComponentInfo> componentInfoMap;
@@ -94,14 +94,14 @@ public class CacheFileUpdateTask extends AbstractTask {
     protected void injectBeans() {
         super.injectBeans();
 
-        this.clusterRepository = SpringContextHolder.getBean(ClusterRepository.class);
+        this.clusterMapper = SpringContextHolder.getBean(ClusterMapper.class);
         this.hostComponentRepository = SpringContextHolder.getBean(HostComponentRepository.class);
         this.serviceRepository = SpringContextHolder.getBean(ServiceRepository.class);
         this.serviceConfigRepository = SpringContextHolder.getBean(ServiceConfigRepository.class);
         this.repoRepository = SpringContextHolder.getBean(RepoRepository.class);
         this.settingRepository = SpringContextHolder.getBean(SettingRepository.class);
         this.hostRepository = SpringContextHolder.getBean(HostRepository.class);
-        this.componentRepository = SpringContextHolder.getBean(ComponentRepository.class);
+        this.componentMapper = SpringContextHolder.getBean(ComponentMapper.class);
     }
 
     @Override
@@ -120,7 +120,7 @@ public class CacheFileUpdateTask extends AbstractTask {
     }
 
     private void genFullCaches() {
-        ClusterPO clusterPO = clusterRepository.getReferenceById(taskContext.getClusterId());
+        ClusterPO clusterPO = clusterMapper.findById(taskContext.getClusterId());
 
         Long clusterId = clusterPO.getId();
         String clusterName = clusterPO.getClusterName();
@@ -192,7 +192,7 @@ public class CacheFileUpdateTask extends AbstractTask {
         settings.forEach(x -> settingsMap.put(x.getTypeName(), x.getConfigData()));
 
         componentInfoMap = new HashMap<>();
-        List<ComponentPO> componentPOList = componentRepository.findAll();
+        List<ComponentPO> componentPOList = componentMapper.findAll();
         componentPOList.forEach(c -> {
             ComponentInfo componentInfo = new ComponentInfo();
             componentInfo.setComponentName(c.getComponentName());
