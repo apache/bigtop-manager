@@ -20,15 +20,39 @@ package org.apache.bigtop.manager.common.utils;
 
 import org.apache.commons.lang3.StringUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class Environments {
 
     /**
-     * Indicates whether the application is running in development mode.
-     * In development mode, most tasks run on agent side will be proxied and return success by default.
+     * Indicates whether the application is running in dev mode.
+     * In dev mode, most tasks run on agent side will be proxied and return success by default.
      * This should help developers test framework functions without depending on the existence of big data components.
+     *
+     * @return true if the application is running in dev mode, false otherwise
      */
     public static Boolean isDevMode() {
         String devMode = System.getenv("DEV_MODE");
         return StringUtils.isNotBlank(devMode) && devMode.equals("true");
+    }
+
+    /**
+     * Get java home from system environments or properties.
+     *
+     * @return java home string
+     */
+    public static String getJavaHome() {
+        // Retrieve the JAVA_HOME environment variable
+        String javaHome = System.getenv("JAVA_HOME");
+
+        // Check if JAVA_HOME is set
+        if (javaHome != null) {
+            return javaHome;
+        } else {
+            // If JAVA_HOME is not set, use the java.home system property
+            log.info("JAVA_HOME is not set, using java.home system property instead.");
+            return System.getProperty("java.home");
+        }
     }
 }
