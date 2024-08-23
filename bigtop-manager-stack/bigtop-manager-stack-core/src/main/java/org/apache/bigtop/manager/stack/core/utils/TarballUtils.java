@@ -18,13 +18,12 @@
  */
 package org.apache.bigtop.manager.stack.core.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.common.message.entity.pojo.PackageInfo;
 import org.apache.bigtop.manager.stack.core.exception.StackException;
 import org.apache.bigtop.manager.stack.core.tarball.ChecksumValidator;
 import org.apache.bigtop.manager.stack.core.tarball.TarballDownloader;
 import org.apache.bigtop.manager.stack.core.tarball.TarballExtractor;
-
-import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 
@@ -72,7 +71,7 @@ public class TarballUtils {
             if (downloaded) {
                 break;
             } else {
-                if (i == 2) {
+                if (i == 3) {
                     log.error("Failed to download [{}], exiting...", remoteUrl);
                     throw new StackException("Failed to download " + remoteUrl);
                 } else {
