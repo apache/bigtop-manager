@@ -64,14 +64,14 @@ public class ServicePO extends BasePO {
     @Column(name = "display_name")
     private String displayName;
 
-    @Column(name = "service_desc")
+    @Column(name = "service_desc", length = 1024)
     private String serviceDesc;
 
     @Column(name = "service_version")
     private String serviceVersion;
 
-    @Column(name = "os_specifics")
-    private String osSpecifics;
+    @Column(name = "package_specifics", length = 1024)
+    private String packageSpecifics;
 
     @Column(name = "service_user")
     private String serviceUser;

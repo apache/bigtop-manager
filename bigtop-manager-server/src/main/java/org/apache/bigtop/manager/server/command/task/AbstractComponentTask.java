@@ -20,7 +20,8 @@ package org.apache.bigtop.manager.server.command.task;
 
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
 import org.apache.bigtop.manager.common.message.entity.pojo.CustomCommandInfo;
-import org.apache.bigtop.manager.common.message.entity.pojo.OSSpecificInfo;
+import org.apache.bigtop.manager.common.message.entity.pojo.PackageInfo;
+import org.apache.bigtop.manager.common.message.entity.pojo.PackageSpecificInfo;
 import org.apache.bigtop.manager.common.message.entity.pojo.ScriptInfo;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.repository.HostComponentRepository;
@@ -28,7 +29,8 @@ import org.apache.bigtop.manager.grpc.generated.CommandRequest;
 import org.apache.bigtop.manager.grpc.generated.CommandType;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 import org.apache.bigtop.manager.server.model.dto.CustomCommandDTO;
-import org.apache.bigtop.manager.server.model.dto.OSSpecificDTO;
+import org.apache.bigtop.manager.server.model.dto.PackageDTO;
+import org.apache.bigtop.manager.server.model.dto.PackageSpecificDTO;
 import org.apache.bigtop.manager.server.model.dto.ScriptDTO;
 
 import java.util.ArrayList;
@@ -67,7 +69,8 @@ public abstract class AbstractComponentTask extends AbstractTask {
 
         commandPayload.setCustomCommands(
                 convertCustomCommandInfo((List<CustomCommandDTO>) properties.get("customCommands")));
-        commandPayload.setOsSpecifics(convertOSSpecificInfo((List<OSSpecificDTO>) properties.get("osSpecifics")));
+        commandPayload.setPackageSpecifics(
+                convertPackageSpecificInfo((List<PackageSpecificDTO>) properties.get("packageSpecifics")));
         commandPayload.setCommandScript(convertScriptInfo((ScriptDTO) properties.get("commandScript")));
 
         CommandRequest.Builder builder = CommandRequest.newBuilder();
@@ -90,21 +93,28 @@ public abstract class AbstractComponentTask extends AbstractTask {
         return scriptInfo;
     }
 
-    private List<OSSpecificInfo> convertOSSpecificInfo(List<OSSpecificDTO> osSpecificDTOs) {
-        if (osSpecificDTOs == null) {
+    private List<PackageSpecificInfo> convertPackageSpecificInfo(List<PackageSpecificDTO> packageSpecificDTOList) {
+        if (packageSpecificDTOList == null) {
             return new ArrayList<>();
         }
 
-        List<OSSpecificInfo> osSpecificInfos = new ArrayList<>();
-        for (OSSpecificDTO osSpecificDTO : osSpecificDTOs) {
-            OSSpecificInfo osSpecificInfo = new OSSpecificInfo();
-            osSpecificInfo.setOs(osSpecificDTO.getOs());
-            osSpecificInfo.setArch(osSpecificDTO.getArch());
-            osSpecificInfo.setPackages(osSpecificDTO.getPackages());
-            osSpecificInfos.add(osSpecificInfo);
+        List<PackageSpecificInfo> packageSpecificInfos = new ArrayList<>();
+        for (PackageSpecificDTO packageSpecificDTO : packageSpecificDTOList) {
+            PackageSpecificInfo packageSpecificInfo = new PackageSpecificInfo();
+            packageSpecificInfo.setOs(packageSpecificDTO.getOs());
+            packageSpecificInfo.setArch(packageSpecificDTO.getArch());
+            List<PackageInfo> packageInfoList = new ArrayList<>();
+            for (PackageDTO packageDTO : packageSpecificDTO.getPackages()) {
+                PackageInfo packageInfo = new PackageInfo();
+                packageInfo.setName(packageDTO.getName());
+                packageInfo.setChecksum(packageDTO.getChecksum());
+                packageInfoList.add(packageInfo);
+            }
+            packageSpecificInfo.setPackages(packageInfoList);
+            packageSpecificInfos.add(packageSpecificInfo);
         }
 
-        return osSpecificInfos;
+        return packageSpecificInfos;
     }
 
     private List<CustomCommandInfo> convertCustomCommandInfo(List<CustomCommandDTO> customCommandDTOs) {

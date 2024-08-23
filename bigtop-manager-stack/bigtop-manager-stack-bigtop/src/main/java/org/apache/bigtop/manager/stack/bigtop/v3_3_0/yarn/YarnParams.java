@@ -19,8 +19,8 @@
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.yarn;
 
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
+import org.apache.bigtop.manager.stack.bigtop.param.BigtopParams;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
-import org.apache.bigtop.manager.stack.core.param.BaseParams;
 import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
 
 import lombok.Getter;
@@ -32,7 +32,7 @@ import java.util.Map;
 
 @Getter
 @Slf4j
-public class YarnParams extends BaseParams {
+public class YarnParams extends BigtopParams {
 
     private String yarnLogDir = "/var/log/hadoop-yarn";
     private String yarnPidDir = "/var/run/hadoop-yarn";

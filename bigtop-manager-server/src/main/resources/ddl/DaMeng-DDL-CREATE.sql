@@ -188,7 +188,7 @@ CREATE TABLE "bigtop_manager"."service" (
 	"update_by" BIGINT NULL,
 	"update_time" DATETIME NULL,
 	"display_name" VARCHAR(255) NULL,
-	"os_specifics" VARCHAR(255) NULL,
+	"package_specifics" VARCHAR(255) NULL,
 	"required_service" VARCHAR(255) NULL,
 	"service_desc" VARCHAR(255) NULL,
 	"service_group" VARCHAR(255) NULL,

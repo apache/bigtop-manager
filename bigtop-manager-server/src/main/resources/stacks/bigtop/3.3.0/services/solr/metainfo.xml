@@ -48,8 +48,8 @@
             </component>
         </components>
 
-        <os-specifics>
-            <os-specific>
+        <package-specifics>
+            <package-specific>
                 <operating-systems>
                     <os>centos7</os>
                     <os>rocky8</os>
@@ -58,10 +58,13 @@
                     <arch>x86_64</arch>
                 </architectures>
                 <packages>
-                    <package>solr_3_3_0</package>
+                    <package>
+                        <name>solr_3_3_0</name>
+                    </package>
                 </packages>
-            </os-specific>
-        </os-specifics>
+            </package-specific>
+        </package-specifics>
+
         <required-services>
             <service>zookeeper</service>
         </required-services>

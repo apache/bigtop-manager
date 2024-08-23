@@ -37,10 +37,15 @@ public class StackModel {
     @XmlElement(name = "stack-version")
     private String stackVersion;
 
-    private String root;
-
     @XmlElement(name = "user-group")
     private String userGroup;
+
+    /**
+     * The scope of the stack, should be one of 'global' or 'cluster'.
+     */
+    private String scope;
+
+    private String root;
 
     private String packages;
 
