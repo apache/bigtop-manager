@@ -75,7 +75,8 @@ public class InstallHook extends AbstractHook {
     private void writeRepo(Params params) {
         RepoInfo repo = LocalSettings.repos().stream()
                 .filter(r -> OSDetection.getOS().equals(r.getOs())
-                        && OSDetection.getArch().equals(r.getArch()))
+                        && OSDetection.getArch().equals(r.getArch())
+                        && !r.getRepoType().equals("tarball"))
                 .findFirst()
                 .orElse(null);
 

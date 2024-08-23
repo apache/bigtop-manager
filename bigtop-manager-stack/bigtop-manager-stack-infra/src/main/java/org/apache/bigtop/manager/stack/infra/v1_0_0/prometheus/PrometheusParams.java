@@ -16,30 +16,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.stack.model;
+package org.apache.bigtop.manager.stack.infra.v1_0_0.prometheus;
 
-import lombok.Data;
+import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
+import org.apache.bigtop.manager.stack.infra.param.InfraParams;
 
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlElementWrapper;
-import jakarta.xml.bind.annotation.XmlElements;
-import java.util.List;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
-@Data
-@XmlAccessorType(XmlAccessType.FIELD)
-public class OSSpecificModel {
+import java.text.MessageFormat;
 
-    @XmlElementWrapper(name = "operating-systems")
-    @XmlElements(@XmlElement(name = "os"))
-    private List<String> os;
+@Getter
+@Slf4j
+public class PrometheusParams extends InfraParams {
 
-    @XmlElementWrapper(name = "architectures")
-    @XmlElements(@XmlElement(name = "arch"))
-    private List<String> arch;
+    public PrometheusParams(CommandPayload commandPayload) {
+        super(commandPayload);
+    }
 
-    @XmlElementWrapper(name = "packages")
-    @XmlElements(@XmlElement(name = "package"))
-    private List<String> packages;
+    public String dataDir() {
+        return MessageFormat.format("{0}/data", serviceHome());
+    }
 }

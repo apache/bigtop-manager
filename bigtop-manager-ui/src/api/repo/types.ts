@@ -20,6 +20,7 @@
 export interface RepoVO {
   repoId: string
   repoName: string
+  repoType: string
   baseUrl: string
   os: string
   arch: string

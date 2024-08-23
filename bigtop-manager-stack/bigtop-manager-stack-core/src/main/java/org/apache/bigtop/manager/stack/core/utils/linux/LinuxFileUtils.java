@@ -224,8 +224,8 @@ public class LinuxFileUtils {
             log.error("dirPath must not be null");
             return;
         }
-        Path path = Paths.get(dirPath);
 
+        Path path = Paths.get(dirPath);
         if (Files.isSymbolicLink(path)) {
             log.error("Directory is symbolic link: [{}]", dirPath);
             return;
@@ -233,7 +233,15 @@ public class LinuxFileUtils {
 
         try {
             log.info("Creating directory: [{}]", path);
-            Files.createDirectories(path);
+            if (Files.exists(path)) {
+                if (Files.isDirectory(path)) {
+                    log.info("Directory already exists: [{}], skip creating", path);
+                } else {
+                    throw new IOException("Path exists and is not a directory: " + path);
+                }
+            } else {
+                Files.createDirectories(path);
+            }
         } catch (IOException e) {
             log.error("Error when create directory", e);
         }

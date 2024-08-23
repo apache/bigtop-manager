@@ -20,8 +20,8 @@ package org.apache.bigtop.manager.stack.bigtop.v3_3_0.kafka;
 
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
 import org.apache.bigtop.manager.common.utils.Environments;
+import org.apache.bigtop.manager.stack.bigtop.param.BigtopParams;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
-import org.apache.bigtop.manager.stack.core.param.BaseParams;
 import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
 
 import lombok.Getter;
@@ -29,7 +29,7 @@ import lombok.Getter;
 import java.util.Map;
 
 @Getter
-public class KafkaParams extends BaseParams {
+public class KafkaParams extends BigtopParams {
 
     private String kafkaLogDir = "/var/log/kafka";
     private String kafkaPidDir = "/var/run/kafka";

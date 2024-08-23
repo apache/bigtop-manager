@@ -20,8 +20,8 @@ package org.apache.bigtop.manager.stack.bigtop.v3_3_0.tez;
 
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
 import org.apache.bigtop.manager.common.utils.Environments;
+import org.apache.bigtop.manager.stack.bigtop.param.BigtopParams;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
-import org.apache.bigtop.manager.stack.core.param.BaseParams;
 import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
 
 import org.apache.commons.lang3.StringUtils;
@@ -34,7 +34,7 @@ import java.util.Map;
 
 @Getter
 @Slf4j
-public class TezParams extends BaseParams {
+public class TezParams extends BigtopParams {
 
     private String headDumpOpts;
     private String tezEnvContent;

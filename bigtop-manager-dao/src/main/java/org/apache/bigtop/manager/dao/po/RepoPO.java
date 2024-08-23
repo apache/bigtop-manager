@@ -69,6 +69,9 @@ public class RepoPO extends BasePO {
     @Column(name = "repo_name")
     private String repoName;
 
+    @Column(name = "repo_type")
+    private String repoType;
+
     @ManyToOne
     @JoinColumn(name = "cluster_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private ClusterPO clusterPO;

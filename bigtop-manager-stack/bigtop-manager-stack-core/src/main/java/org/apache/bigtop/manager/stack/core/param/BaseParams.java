@@ -20,10 +20,13 @@ package org.apache.bigtop.manager.stack.core.param;
 
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
-import org.apache.bigtop.manager.common.message.entity.pojo.OSSpecificInfo;
+import org.apache.bigtop.manager.common.message.entity.pojo.PackageInfo;
+import org.apache.bigtop.manager.common.message.entity.pojo.PackageSpecificInfo;
+import org.apache.bigtop.manager.common.message.entity.pojo.RepoInfo;
 import org.apache.bigtop.manager.common.utils.NetUtils;
 import org.apache.bigtop.manager.common.utils.os.OSDetection;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
+import org.apache.bigtop.manager.stack.core.exception.StackException;
 import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
 
 import org.apache.commons.lang3.StringUtils;
@@ -33,6 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,72 +76,66 @@ public abstract class BaseParams implements Params {
         globalParamsMap.remove("content");
     }
 
-    /**
-     * get the package list according to the os and arch
-     */
-    public List<String> getPackageList() {
-        List<OSSpecificInfo> osSpecifics = this.commandPayload.getOsSpecifics();
-        if (osSpecifics == null) {
-            return List.of();
-        }
-
-        String os = OSDetection.getOS();
-        String arch = OSDetection.getArch();
-        for (OSSpecificInfo osSpecific : osSpecifics) {
-            List<String> pkgOS = osSpecific.getOs();
-            List<String> pkgArch = osSpecific.getArch();
-            if (pkgOS.contains(os) && pkgArch.contains(arch)) {
-                return osSpecific.getPackages();
-            }
-        }
-
-        return List.of();
-    }
-
     public String hostname() {
         return NetUtils.getHostname();
-    }
-
-    public String stackBinDir() {
-        String stackName = this.commandPayload.getStackName();
-        String stackVersion = this.commandPayload.getStackVersion();
-        String root = this.commandPayload.getRoot();
-        return MessageFormat.format("{0}/{1}/{2}/usr/bin", root, stackName.toLowerCase(), stackVersion);
-    }
-
-    public String stackLibDir() {
-        String stackName = this.commandPayload.getStackName();
-        String stackVersion = this.commandPayload.getStackVersion();
-        String root = this.commandPayload.getRoot();
-        return MessageFormat.format("{0}/{1}/{2}/usr/lib", root, stackName.toLowerCase(), stackVersion);
-    }
-
-    /**
-     * service home dir
-     */
-    public String serviceHome() {
-        String service = this.commandPayload.getServiceName();
-        return stackLibDir() + "/" + service.toLowerCase();
     }
 
     /**
      * service conf dir
      */
+    @Override
     public String confDir() {
         return "/etc/" + this.commandPayload.getServiceName().toLowerCase() + "/conf";
     }
 
+    @Override
     public String user() {
         return StringUtils.isNotBlank(this.commandPayload.getServiceUser())
                 ? this.commandPayload.getServiceUser()
                 : ROOT_USER;
     }
 
+    @Override
     public String group() {
         return LocalSettings.cluster().getUserGroup();
     }
 
+    @Override
+    public RepoInfo repo() {
+        return LocalSettings.repos().stream()
+                .filter(r -> OSDetection.getOS().equals(r.getOs())
+                        && OSDetection.getArch().equals(r.getArch()))
+                .findFirst()
+                .orElseThrow(() -> new StackException(
+                        "Cannot find repo for os: [{}] and arch: [{}]", OSDetection.getOS(), OSDetection.getArch()));
+    }
+
+    @Override
+    public List<PackageInfo> packages() {
+        RepoInfo repo = this.repo();
+        List<PackageInfo> packageInfoList = new ArrayList<>();
+        for (PackageSpecificInfo packageSpecificInfo : this.commandPayload.getPackageSpecifics()) {
+            if (!packageSpecificInfo.getOs().contains(repo.getOs())
+                    || !packageSpecificInfo.getArch().contains(repo.getArch())) {
+                continue;
+            }
+
+            packageInfoList.addAll(packageSpecificInfo.getPackages());
+        }
+
+        return packageInfoList;
+    }
+
+    @Override
     public String serviceName() {
         return this.commandPayload.getServiceName();
+    }
+
+    @Override
+    public String stackHome() {
+        String stackName = this.commandPayload.getStackName();
+        String stackVersion = this.commandPayload.getStackVersion();
+        String root = this.commandPayload.getRoot();
+        return MessageFormat.format("{0}/{1}/{2}", root, stackName.toLowerCase(), stackVersion);
     }
 }

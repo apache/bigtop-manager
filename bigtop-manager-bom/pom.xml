@@ -36,9 +36,10 @@
         <freemarker.version>2.3.32</freemarker.version>
         <common-lang3.version>3.12.0</common-lang3.version>
         <snakeyaml.version>2.0</snakeyaml.version>
-        <commons-io.version>2.13.0</commons-io.version>
+        <commons-io.version>2.16.1</commons-io.version>
         <guava.version>32.1.1-jre</guava.version>
         <commons-collections4.version>4.4</commons-collections4.version>
+        <commons-compress.version>1.26.2</commons-compress.version>
         <jwt.version>4.4.0</jwt.version>
         <janino.version>3.0.16</janino.version>
         <eclipse-link.version>4.0.2</eclipse-link.version>
@@ -126,6 +127,12 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-collections4</artifactId>
                 <version>${commons-collections4.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>${commons-compress.version}</version>
             </dependency>
 
             <dependency>
