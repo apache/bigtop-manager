@@ -18,12 +18,13 @@
  */
 package org.apache.bigtop.manager.stack.core.utils;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.common.message.entity.pojo.PackageInfo;
 import org.apache.bigtop.manager.stack.core.exception.StackException;
 import org.apache.bigtop.manager.stack.core.tarball.ChecksumValidator;
 import org.apache.bigtop.manager.stack.core.tarball.TarballDownloader;
 import org.apache.bigtop.manager.stack.core.tarball.TarballExtractor;
+
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 
