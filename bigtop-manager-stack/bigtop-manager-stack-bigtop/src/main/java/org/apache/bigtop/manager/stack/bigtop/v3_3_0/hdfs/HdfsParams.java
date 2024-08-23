@@ -19,8 +19,8 @@
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.hdfs;
 
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
+import org.apache.bigtop.manager.stack.bigtop.param.BigtopParams;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
-import org.apache.bigtop.manager.stack.core.param.BaseParams;
 import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
 
 import org.apache.commons.lang3.StringUtils;
@@ -35,7 +35,7 @@ import java.util.Map;
 
 @Getter
 @Slf4j
-public class HdfsParams extends BaseParams {
+public class HdfsParams extends BigtopParams {
 
     private String hadoopLogDir = "/var/log/hadoop";
     private String hadoopPidDir = "/var/run/hadoop";

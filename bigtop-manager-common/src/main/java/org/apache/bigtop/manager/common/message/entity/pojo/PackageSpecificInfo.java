@@ -16,18 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.dto;
+package org.apache.bigtop.manager.common.message.entity.pojo;
 
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class OSSpecificDTO {
+public class PackageSpecificInfo {
 
     private List<String> os;
 
     private List<String> arch;
 
-    private List<String> packages;
+    private List<PackageInfo> packages;
 }

@@ -18,13 +18,12 @@
  */
 package org.apache.bigtop.manager.stack.core.param;
 
+import org.apache.bigtop.manager.common.message.entity.pojo.PackageInfo;
+import org.apache.bigtop.manager.common.message.entity.pojo.RepoInfo;
+
 import java.util.List;
 
 public interface Params {
-
-    List<String> getPackageList();
-
-    String serviceHome();
 
     String confDir();
 
@@ -32,5 +31,13 @@ public interface Params {
 
     String group();
 
+    RepoInfo repo();
+
+    List<PackageInfo> packages();
+
     String serviceName();
+
+    String serviceHome();
+
+    String stackHome();
 }

@@ -29,6 +29,8 @@ public class StackDTO {
 
     private String stackVersion;
 
+    private String scope;
+
     private String root;
 
     private String userGroup;

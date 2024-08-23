@@ -54,8 +54,8 @@
             </component>
         </components>
 
-        <os-specifics>
-            <os-specific>
+        <package-specifics>
+            <package-specific>
                 <operating-systems>
                     <os>centos7</os>
                     <os>rocky8</os>
@@ -64,9 +64,11 @@
                     <arch>x86_64</arch>
                 </architectures>
                 <packages>
-                    <package>zookeeper_3_3_0</package>
+                    <package>
+                        <name>zookeeper_3_3_0</name>
+                    </package>
                 </packages>
-            </os-specific>
-        </os-specifics>
+            </package-specific>
+        </package-specifics>
     </service>
 </metainfo>

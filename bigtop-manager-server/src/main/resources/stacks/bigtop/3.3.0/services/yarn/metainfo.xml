@@ -87,8 +87,8 @@
             </component>
         </components>
 
-        <os-specifics>
-            <os-specific>
+        <package-specifics>
+            <package-specific>
                 <operating-systems>
                     <os>centos7</os>
                     <os>rocky8</os>
@@ -97,12 +97,18 @@
                     <arch>x86_64</arch>
                 </architectures>
                 <packages>
-                    <package>hadoop_3_3_0-yarn</package>
-                    <package>hadoop_3_3_0-hdfs</package>
-                    <package>hadoop_3_3_0-mapreduce</package>
+                    <package>
+                        <name>hadoop_3_3_0-yarn</name>
+                    </package>
+                    <package>
+                        <name>hadoop_3_3_0-hdfs</name>
+                    </package>
+                    <package>
+                        <name>hadoop_3_3_0-mapreduce</name>
+                    </package>
                 </packages>
-            </os-specific>
-        </os-specifics>
+            </package-specific>
+        </package-specifics>
 
         <required-services>
             <service>zookeeper</service>

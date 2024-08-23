@@ -71,17 +71,23 @@ public abstract class AbstractTask implements Task {
 
     @Override
     public Boolean run() {
-        beforeRun();
+        boolean taskSuccess;
 
-        CommandRequest.Builder builder = CommandRequest.newBuilder(getCommandRequest());
-        builder.setTaskId(getTaskPO().getId());
-        commandRequest = builder.build();
+        try {
+            beforeRun();
 
-        CommandServiceGrpc.CommandServiceBlockingStub stub = GrpcClient.getBlockingStub(
-                taskContext.getHostname(), CommandServiceGrpc.CommandServiceBlockingStub.class);
-        CommandReply reply = stub.exec(commandRequest);
+            CommandRequest.Builder builder = CommandRequest.newBuilder(getCommandRequest());
+            builder.setTaskId(getTaskPO().getId());
+            commandRequest = builder.build();
 
-        boolean taskSuccess = reply != null && reply.getCode() == MessageConstants.SUCCESS_CODE;
+            CommandServiceGrpc.CommandServiceBlockingStub stub = GrpcClient.getBlockingStub(
+                    taskContext.getHostname(), CommandServiceGrpc.CommandServiceBlockingStub.class);
+            CommandReply reply = stub.exec(commandRequest);
+
+            taskSuccess = reply != null && reply.getCode() == MessageConstants.SUCCESS_CODE;
+        } catch (Exception e) {
+            taskSuccess = false;
+        }
 
         if (taskSuccess) {
             onSuccess();

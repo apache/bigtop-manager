@@ -22,7 +22,6 @@ import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.stack.core.param.Params;
 import org.apache.bigtop.manager.stack.core.spi.script.AbstractClientScript;
 import org.apache.bigtop.manager.stack.core.spi.script.Script;
-import org.apache.bigtop.manager.stack.core.utils.PackageUtils;
 
 import com.google.auto.service.AutoService;
 import lombok.extern.slf4j.Slf4j;
@@ -30,11 +29,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @AutoService(Script.class)
 public class YarnClientScript extends AbstractClientScript {
-
-    @Override
-    public ShellResult install(Params params) {
-        return PackageUtils.install(params.getPackageList());
-    }
 
     @Override
     public ShellResult configure(Params params) {

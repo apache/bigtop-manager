@@ -31,6 +31,8 @@ public class RepoInfo {
 
     private String repoName;
 
+    private String repoType;
+
     private String baseUrl;
 
     private String os;

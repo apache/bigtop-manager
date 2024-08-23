@@ -20,7 +20,7 @@ package org.apache.bigtop.manager.common.message.entity.payload;
 
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.message.entity.pojo.CustomCommandInfo;
-import org.apache.bigtop.manager.common.message.entity.pojo.OSSpecificInfo;
+import org.apache.bigtop.manager.common.message.entity.pojo.PackageSpecificInfo;
 import org.apache.bigtop.manager.common.message.entity.pojo.ScriptInfo;
 
 import lombok.Data;
@@ -56,5 +56,5 @@ public class CommandPayload extends BasePayload {
 
     private String componentName;
 
-    private List<OSSpecificInfo> osSpecifics;
+    private List<PackageSpecificInfo> packageSpecifics;
 }
