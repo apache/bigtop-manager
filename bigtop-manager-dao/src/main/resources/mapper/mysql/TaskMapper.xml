@@ -21,26 +21,18 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="org.apache.bigtop.manager.dao.mapper.StackMapper">
+<mapper namespace="org.apache.bigtop.manager.dao.mapper.TaskMapper">
 
-    <sql id="baseColumns">
-        id, stack_name, stack_version
-    </sql>
-
-    <select id="findByStackNameAndStackVersion" resultType="org.apache.bigtop.manager.dao.po.StackPO">
-        select
-        <include refid="baseColumns"/>
-        from
-        stack
-        <where>
-            <if test="stackName!=null">
-                stack_name=#{stackName}
-            </if>
-            <if test="stackVersion!=null">
-                and stack_version=#{stackVersion}
-            </if>
-        </where>
-        limit 1
-    </select>
+    <update id="updateStateByIds">
+        <foreach collection='tasks' item='task' separator=';'>
+            update task
+            <set>
+                <if test="task.state != null and task.state != ''">
+                    `state` = #{task.state},
+                </if>
+            </set>
+            where id = #{task.id}
+        </foreach>
+    </update>
 
 </mapper>

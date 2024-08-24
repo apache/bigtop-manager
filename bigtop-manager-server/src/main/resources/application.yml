@@ -19,9 +19,6 @@
 
 bigtop:
   manager:
-    orm:
-      # hibernate/eclipselink(default=eclipselink)
-      type: eclipselink
     grpc:
       port: 8835
 
@@ -74,6 +71,7 @@ mybatis:
   configuration:
     map-underscore-to-camel-case: true
     database-id: mysql
+    use-generated-keys: true
 
 pagehelper:
   reasonable: false

@@ -20,13 +20,13 @@ package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.common.enums.JobState;
 import org.apache.bigtop.manager.dao.mapper.ClusterMapper;
+import org.apache.bigtop.manager.dao.mapper.JobMapper;
+import org.apache.bigtop.manager.dao.mapper.StageMapper;
+import org.apache.bigtop.manager.dao.mapper.TaskMapper;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.JobPO;
 import org.apache.bigtop.manager.dao.po.StagePO;
 import org.apache.bigtop.manager.dao.po.TaskPO;
-import org.apache.bigtop.manager.dao.repository.JobRepository;
-import org.apache.bigtop.manager.dao.repository.StageRepository;
-import org.apache.bigtop.manager.dao.repository.TaskRepository;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
 import org.apache.bigtop.manager.server.command.factory.JobFactories;
 import org.apache.bigtop.manager.server.command.factory.JobFactory;
@@ -59,13 +59,13 @@ public class CommandServiceImpl implements CommandService {
     private ClusterMapper clusterMapper;
 
     @Resource
-    private JobRepository jobRepository;
+    private JobMapper jobMapper;
 
     @Resource
-    private StageRepository stageRepository;
+    private StageMapper stageMapper;
 
     @Resource
-    private TaskRepository taskRepository;
+    private TaskMapper taskMapper;
 
     @Override
     public CommandVO command(CommandDTO commandDTO) {
@@ -97,27 +97,27 @@ public class CommandServiceImpl implements CommandService {
         ClusterPO clusterPO = clusterId == null ? null : clusterMapper.findById(clusterId);
 
         JobPO jobPO = job.getJobPO();
-        jobPO.setClusterPO(clusterPO);
+        jobPO.setClusterId(clusterPO.getId());
         jobPO.setState(JobState.PENDING);
-        jobRepository.save(jobPO);
+        jobMapper.save(jobPO);
 
         for (int i = 0; i < job.getStages().size(); i++) {
             Stage stage = job.getStages().get(i);
             StagePO stagePO = stage.getStagePO();
-            stagePO.setClusterPO(clusterPO);
-            stagePO.setJobPO(jobPO);
+            stagePO.setClusterId(clusterPO.getId());
+            stagePO.setJobId(jobPO.getId());
             stagePO.setOrder(i + 1);
             stagePO.setState(JobState.PENDING);
-            stageRepository.save(stagePO);
+            stageMapper.save(stagePO);
 
             for (int j = 0; j < stage.getTasks().size(); j++) {
                 Task task = stage.getTasks().get(j);
                 TaskPO taskPO = task.getTaskPO();
-                taskPO.setClusterPO(clusterPO);
-                taskPO.setJobPO(jobPO);
-                taskPO.setStagePO(stagePO);
+                taskPO.setClusterId(clusterPO.getId());
+                taskPO.setJobId(jobPO.getId());
+                taskPO.setStageId(stagePO.getId());
                 taskPO.setState(JobState.PENDING);
-                taskRepository.save(taskPO);
+                taskMapper.save(taskPO);
             }
         }
 

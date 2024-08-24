@@ -22,8 +22,8 @@ import org.apache.bigtop.manager.common.constants.MessageConstants;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.enums.JobState;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
+import org.apache.bigtop.manager.dao.mapper.TaskMapper;
 import org.apache.bigtop.manager.dao.po.TaskPO;
-import org.apache.bigtop.manager.dao.repository.TaskRepository;
 import org.apache.bigtop.manager.grpc.generated.CommandReply;
 import org.apache.bigtop.manager.grpc.generated.CommandRequest;
 import org.apache.bigtop.manager.grpc.generated.CommandServiceGrpc;
@@ -33,7 +33,7 @@ import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 
 public abstract class AbstractTask implements Task {
 
-    protected TaskRepository taskRepository;
+    protected TaskMapper taskMapper;
 
     protected TaskContext taskContext;
 
@@ -51,7 +51,7 @@ public abstract class AbstractTask implements Task {
     }
 
     protected void injectBeans() {
-        this.taskRepository = SpringContextHolder.getBean(TaskRepository.class);
+        this.taskMapper = SpringContextHolder.getBean(TaskMapper.class);
     }
 
     protected abstract Command getCommand();
@@ -66,7 +66,7 @@ public abstract class AbstractTask implements Task {
     public void beforeRun() {
         TaskPO taskPO = getTaskPO();
         taskPO.setState(JobState.PROCESSING);
-        taskRepository.save(taskPO);
+        taskMapper.save(taskPO);
     }
 
     @Override
@@ -103,7 +103,7 @@ public abstract class AbstractTask implements Task {
         TaskPO taskPO = getTaskPO();
         taskPO.setContent(ProtobufUtil.toJson(commandRequest));
         taskPO.setState(JobState.SUCCESSFUL);
-        taskRepository.save(taskPO);
+        taskMapper.updateById(taskPO);
     }
 
     @Override
@@ -111,7 +111,7 @@ public abstract class AbstractTask implements Task {
         TaskPO taskPO = getTaskPO();
         taskPO.setContent(ProtobufUtil.toJson(commandRequest));
         taskPO.setState(JobState.FAILED);
-        taskRepository.save(taskPO);
+        taskMapper.updateById(taskPO);
     }
 
     @Override

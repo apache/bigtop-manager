@@ -18,8 +18,8 @@
  */
 package org.apache.bigtop.manager.server.stack;
 
+import org.apache.bigtop.manager.dao.mapper.StackMapper;
 import org.apache.bigtop.manager.dao.po.StackPO;
-import org.apache.bigtop.manager.dao.repository.StackRepository;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.model.dto.StackDTO;
 import org.apache.bigtop.manager.server.utils.StackUtils;
@@ -46,7 +46,7 @@ import java.util.Map;
 public class StackInitializer implements ApplicationListener<ApplicationStartedEvent> {
 
     @Resource
-    private StackRepository stackRepository;
+    private StackMapper stackMapper;
 
     @Override
     public void onApplicationEvent(@Nonnull ApplicationStartedEvent event) {
@@ -58,13 +58,13 @@ public class StackInitializer implements ApplicationListener<ApplicationStartedE
             String stackName = stackDTO.getStackName();
             String stackVersion = stackDTO.getStackVersion();
 
-            StackPO stackPO = stackRepository.findByStackNameAndStackVersion(stackName, stackVersion);
+            StackPO stackPO = stackMapper.findByStackNameAndStackVersion(stackName, stackVersion);
             if (stackPO == null) {
                 stackPO = new StackPO();
                 stackPO.setStackName(stackName);
                 stackPO.setStackVersion(stackVersion);
 
-                stackRepository.save(stackPO);
+                stackMapper.save(stackPO);
             }
         }
 

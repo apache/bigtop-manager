@@ -18,8 +18,6 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import org.apache.bigtop.manager.common.enums.JobState;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.mapper.JobMapper;
@@ -48,8 +46,10 @@ import org.apache.bigtop.manager.server.utils.PageUtils;
 
 import org.springframework.stereotype.Service;
 
-import jakarta.annotation.Resource;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 
+import jakarta.annotation.Resource;
 import java.util.List;
 
 @Service
@@ -85,13 +85,15 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public JobVO get(Long id) {
-        JobPO jobPO = jobMapper.findOptionalById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.JOB_NOT_FOUND));
+        JobPO jobPO =
+                jobMapper.findOptionalById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.JOB_NOT_FOUND));
         return JobConverter.INSTANCE.fromPO2VO(jobPO);
     }
 
     @Override
     public JobVO retry(Long id) {
-        JobPO jobPO = jobMapper.findOptionalById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.JOB_NOT_FOUND));
+        JobPO jobPO =
+                jobMapper.findOptionalById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.JOB_NOT_FOUND));
         if (jobPO.getState() != JobState.FAILED) {
             throw new ApiException(ApiExceptionEnum.JOB_NOT_RETRYABLE);
         }

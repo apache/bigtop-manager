@@ -19,8 +19,8 @@
 package org.apache.bigtop.manager.server.scheduler;
 
 import org.apache.bigtop.manager.common.enums.MaintainState;
+import org.apache.bigtop.manager.dao.mapper.HostMapper;
 import org.apache.bigtop.manager.dao.po.HostPO;
-import org.apache.bigtop.manager.dao.repository.HostRepository;
 import org.apache.bigtop.manager.grpc.generated.HostInfoReply;
 import org.apache.bigtop.manager.grpc.generated.HostInfoRequest;
 import org.apache.bigtop.manager.grpc.generated.HostInfoServiceGrpc;
@@ -41,12 +41,12 @@ import java.util.concurrent.TimeUnit;
 public class HostInfoScheduler {
 
     @Resource
-    private HostRepository hostRepository;
+    private HostMapper hostMapper;
 
     @Async
     @Scheduled(fixedDelay = 30, timeUnit = TimeUnit.SECONDS)
     public void execute() {
-        List<HostPO> hostPOList = hostRepository.findAll();
+        List<HostPO> hostPOList = hostMapper.findAll();
         for (HostPO hostPO : hostPOList) {
             getHostInfo(hostPO);
         }
@@ -69,12 +69,12 @@ public class HostInfoScheduler {
             hostPO.setFreeDisk(reply.getFreeDisk());
             hostPO.setTotalDisk(reply.getTotalDisk());
 
-            hostPO.setState(MaintainState.STARTED);
+            hostPO.setState(MaintainState.STARTED.getName());
         } catch (Exception e) {
             log.error("Error getting host info", e);
-            hostPO.setState(MaintainState.STOPPED);
+            hostPO.setState(MaintainState.STOPPED.getName());
         }
 
-        hostRepository.save(hostPO);
+        hostMapper.updateById(hostPO);
     }
 }

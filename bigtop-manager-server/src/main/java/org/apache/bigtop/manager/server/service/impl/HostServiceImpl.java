@@ -20,9 +20,9 @@ package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.common.enums.MaintainState;
 import org.apache.bigtop.manager.dao.mapper.ClusterMapper;
+import org.apache.bigtop.manager.dao.mapper.HostMapper;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.HostPO;
-import org.apache.bigtop.manager.dao.repository.HostRepository;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.grpc.GrpcClient;
@@ -51,11 +51,11 @@ public class HostServiceImpl implements HostService {
     private ClusterMapper clusterMapper;
 
     @Resource
-    private HostRepository hostRepository;
+    private HostMapper hostMapper;
 
     @Override
     public List<HostVO> list(Long clusterId) {
-        List<HostPO> hostPOList = hostRepository.findAllByClusterPOId(clusterId);
+        List<HostPO> hostPOList = hostMapper.findAllByClusterId(clusterId);
         if (CollectionUtils.isEmpty(hostPOList)) {
             throw new ApiException(ApiExceptionEnum.HOST_NOT_FOUND);
         }
@@ -67,7 +67,7 @@ public class HostServiceImpl implements HostService {
     public List<HostVO> batchSave(Long clusterId, List<String> hostnames) {
         ClusterPO clusterPO = clusterMapper.findById(clusterId);
 
-        List<HostPO> hostnameIn = hostRepository.findAllByHostnameIn(hostnames);
+        List<HostPO> hostnameIn = hostMapper.findAllByHostnameIn(hostnames);
         List<HostPO> hostPOList = new ArrayList<>();
 
         Map<String, HostPO> hostInMap =
@@ -76,8 +76,8 @@ public class HostServiceImpl implements HostService {
         for (String hostname : hostnames) {
             HostPO hostPO = new HostPO();
             hostPO.setHostname(hostname);
-            hostPO.setClusterPO(clusterPO);
-            hostPO.setState(MaintainState.INSTALLED);
+            hostPO.setClusterId(clusterPO.getId());
+            hostPO.setState(MaintainState.INSTALLED.getName());
 
             if (hostInMap.containsKey(hostname)) {
                 hostPO.setId(hostInMap.get(hostname).getId());
@@ -86,7 +86,7 @@ public class HostServiceImpl implements HostService {
             hostPOList.add(hostPO);
         }
 
-        hostRepository.saveAll(hostPOList);
+        hostMapper.saveAll(hostPOList);
 
         return HostConverter.INSTANCE.fromPO2VO(hostPOList);
     }
@@ -94,7 +94,7 @@ public class HostServiceImpl implements HostService {
     @Override
     public HostVO get(Long id) {
         HostPO hostPO =
-                hostRepository.findById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.HOST_NOT_FOUND));
+                hostMapper.findOptionalById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.HOST_NOT_FOUND));
 
         return HostConverter.INSTANCE.fromPO2VO(hostPO);
     }
@@ -103,14 +103,14 @@ public class HostServiceImpl implements HostService {
     public HostVO update(Long id, HostDTO hostDTO) {
         HostPO hostPO = HostConverter.INSTANCE.fromDTO2PO(hostDTO);
         hostPO.setId(id);
-        hostRepository.save(hostPO);
+        hostMapper.updateById(hostPO);
 
         return HostConverter.INSTANCE.fromPO2VO(hostPO);
     }
 
     @Override
     public Boolean delete(Long id) {
-        hostRepository.deleteById(id);
+        hostMapper.deleteById(id);
         return true;
     }
 

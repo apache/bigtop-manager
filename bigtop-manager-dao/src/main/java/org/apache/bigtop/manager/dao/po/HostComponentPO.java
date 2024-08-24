@@ -18,19 +18,23 @@
  */
 package org.apache.bigtop.manager.dao.po;
 
-import org.apache.bigtop.manager.common.enums.MaintainState;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
+import jakarta.persistence.Transient;
+import java.io.Serializable;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -46,7 +50,7 @@ import jakarta.persistence.TableGenerator;
         table = "sequence",
         pkColumnName = "seq_name",
         valueColumnName = "seq_count")
-public class HostComponentPO extends BasePO {
+public class HostComponentPO extends BasePO implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "host_component_generator")
@@ -54,7 +58,7 @@ public class HostComponentPO extends BasePO {
     private Long id;
 
     @Column(name = "state")
-    private MaintainState state;
+    private String state;
 
     @Column(name = "host_id")
     private Long hostId;
@@ -62,4 +66,47 @@ public class HostComponentPO extends BasePO {
     @Column(name = "component_id")
     private Long componentId;
 
+    @Transient
+    @Column(name = "stack_name")
+    private String stackName;
+
+    @Transient
+    @Column(name = "stack_version")
+    private String stackVersion;
+
+    @Transient
+    @Column(name = "service_id")
+    private Long serviceId;
+
+    @Transient
+    @Column(name = "service_name")
+    private String serviceName;
+
+    @Transient
+    @Column(name = "service_user")
+    private String serviceUser;
+
+    @Transient
+    @Column(name = "\"root\"")
+    private String root;
+
+    @Transient
+    @Column(name = "component_name")
+    private String componentName;
+
+    @Transient
+    @Column(name = "command_script")
+    private String commandScript;
+
+    @Transient
+    @Column(name = "hostname")
+    private String hostname;
+
+    @ManyToOne
+    @JoinColumn(name = "host_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private HostPO hostPO;
+
+    @ManyToOne
+    @JoinColumn(name = "component_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private ComponentPO componentPO;
 }

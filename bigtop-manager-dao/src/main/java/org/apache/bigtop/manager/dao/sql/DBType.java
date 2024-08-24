@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *    https://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -16,23 +16,35 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.dao.repository;
 
-import org.apache.bigtop.manager.common.enums.JobState;
-import org.apache.bigtop.manager.dao.po.StagePO;
-import org.apache.bigtop.manager.dao.po.TaskPO;
+package org.apache.bigtop.manager.dao.sql;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.stream.Stream;
 
-import java.util.List;
+public enum DBType {
+    MYSQL("mysql", "MYSQL"),
+    DM("dm", "DaMeng");
 
-public interface TaskRepository extends JpaRepository<TaskPO, Long> {
+    DBType(String code, String desc) {
+        this.code = code;
+        this.desc = desc;
+    }
 
-    List<TaskPO> findByStagePO(StagePO stagePO);
+    private final String code;
+    private final String desc;
 
-    List<TaskPO> findAllByJobPOId(Long jobId);
+    public String getCode() {
+        return this.code;
+    }
 
-    List<TaskPO> findAllByJobPOIdAndState(Long jobId, JobState state);
+    public String getDesc() {
+        return this.desc;
+    }
 
-    List<TaskPO> findAllByJobPOIdAndHostnameAndState(Long jobId, String hostname, JobState state);
+    public static DBType toType(String databaseId) {
+        return Stream.of(DBType.values())
+                .filter(p -> p.getCode().equals(databaseId))
+                .findFirst()
+                .orElse(null);
+    }
 }

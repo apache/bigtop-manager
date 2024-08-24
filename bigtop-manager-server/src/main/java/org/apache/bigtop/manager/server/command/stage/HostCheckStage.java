@@ -44,10 +44,10 @@ public class HostCheckStage extends AbstractStage {
     @Override
     protected void beforeCreateTasks() {
         if (stageContext.getClusterId() != null) {
-            ClusterPO clusterPO = clusterMapper.findById(stageContext.getClusterId());
+            ClusterPO clusterPO = clusterMapper.findByIdJoin(stageContext.getClusterId());
 
-            stageContext.setStackName(clusterPO.getStackPO().getStackName());
-            stageContext.setStackVersion(clusterPO.getStackPO().getStackVersion());
+            stageContext.setStackName(clusterPO.getStackName());
+            stageContext.setStackVersion(clusterPO.getStackVersion());
         }
     }
 

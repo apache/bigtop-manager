@@ -154,18 +154,15 @@ public abstract class AbstractServiceJob extends AbstractJob {
 
     protected List<String> findHostnamesByComponentName(String componentName) {
         List<HostComponentPO> hostComponentPOList =
-                hostComponentMapper.findAllByClusterIdAndComponentName(
-                        clusterPO.getId(), componentName);
+                hostComponentMapper.findAllByClusterIdAndComponentName(clusterPO.getId(), componentName);
         if (hostComponentPOList == null) {
             return new ArrayList<>();
         } else {
 
-            List<HostPO> hostPOList = hostMapper.findByIds(hostComponentPOList.stream()
-                    .map(HostComponentPO::getHostId).toList());
+            List<HostPO> hostPOList = hostMapper.findByIds(
+                    hostComponentPOList.stream().map(HostComponentPO::getHostId).toList());
 
-            return hostPOList.stream()
-                    .map(HostPO::getHostname)
-                    .toList();
+            return hostPOList.stream().map(HostPO::getHostname).toList();
         }
     }
 

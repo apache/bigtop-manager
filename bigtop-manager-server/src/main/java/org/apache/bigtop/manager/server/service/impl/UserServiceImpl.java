@@ -41,14 +41,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserVO current() {
         Long id = SessionUserHolder.getUserId();
-        UserPO userPO = userMapper.findOptionalById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.NEED_LOGIN));
+        UserPO userPO =
+                userMapper.findOptionalById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.NEED_LOGIN));
         return UserConverter.INSTANCE.fromPO2VO(userPO);
     }
 
     @Override
     public UserVO update(UserDTO userDTO) {
         Long id = SessionUserHolder.getUserId();
-        UserPO userPO = userMapper.findOptionalById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.NEED_LOGIN));
+        UserPO userPO =
+                userMapper.findOptionalById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.NEED_LOGIN));
         userPO.setNickname(userDTO.getNickname());
         userMapper.updateById(userPO);
         return UserConverter.INSTANCE.fromPO2VO(userPO);

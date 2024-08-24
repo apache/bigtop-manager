@@ -21,14 +21,14 @@ package org.apache.bigtop.manager.server.command.job;
 import org.apache.bigtop.manager.common.enums.JobState;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.mapper.ClusterMapper;
+import org.apache.bigtop.manager.dao.mapper.JobMapper;
 import org.apache.bigtop.manager.dao.mapper.StackMapper;
+import org.apache.bigtop.manager.dao.mapper.StageMapper;
+import org.apache.bigtop.manager.dao.mapper.TaskMapper;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.JobPO;
 import org.apache.bigtop.manager.dao.po.StagePO;
 import org.apache.bigtop.manager.dao.po.TaskPO;
-import org.apache.bigtop.manager.dao.repository.JobRepository;
-import org.apache.bigtop.manager.dao.repository.StageRepository;
-import org.apache.bigtop.manager.dao.repository.TaskRepository;
 import org.apache.bigtop.manager.server.command.stage.Stage;
 import org.apache.bigtop.manager.server.command.task.Task;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
@@ -41,9 +41,9 @@ public abstract class AbstractJob implements Job {
 
     protected StackMapper stackMapper;
     protected ClusterMapper clusterMapper;
-    protected JobRepository jobRepository;
-    protected StageRepository stageRepository;
-    protected TaskRepository taskRepository;
+    protected JobMapper jobMapper;
+    protected StageMapper stageMapper;
+    protected TaskMapper taskMapper;
 
     protected JobContext jobContext;
     protected List<Stage> stages;
@@ -70,9 +70,9 @@ public abstract class AbstractJob implements Job {
         this.stackMapper = SpringContextHolder.getBean(StackMapper.class);
         this.clusterMapper = SpringContextHolder.getBean(ClusterMapper.class);
 
-        this.jobRepository = SpringContextHolder.getBean(JobRepository.class);
-        this.stageRepository = SpringContextHolder.getBean(StageRepository.class);
-        this.taskRepository = SpringContextHolder.getBean(TaskRepository.class);
+        this.jobMapper = SpringContextHolder.getBean(JobMapper.class);
+        this.stageMapper = SpringContextHolder.getBean(StageMapper.class);
+        this.taskMapper = SpringContextHolder.getBean(TaskMapper.class);
     }
 
     protected void beforeCreateStages() {
@@ -86,7 +86,7 @@ public abstract class AbstractJob implements Job {
     public void beforeRun() {
         JobPO jobPO = getJobPO();
         jobPO.setState(JobState.PROCESSING);
-        jobRepository.save(jobPO);
+        jobMapper.save(jobPO);
     }
 
     @Override
@@ -121,7 +121,7 @@ public abstract class AbstractJob implements Job {
     public void onSuccess() {
         JobPO jobPO = getJobPO();
         jobPO.setState(JobState.SUCCESSFUL);
-        jobRepository.save(jobPO);
+        jobMapper.updateById(jobPO);
     }
 
     @Override
@@ -146,9 +146,9 @@ public abstract class AbstractJob implements Job {
             }
         }
 
-        taskRepository.saveAll(taskPOList);
-        stageRepository.saveAll(stagePOList);
-        jobRepository.save(jobPO);
+        taskMapper.updateStateByIds(taskPOList);
+        stageMapper.updateStateByIds(stagePOList);
+        jobMapper.updateById(jobPO);
     }
 
     @Override

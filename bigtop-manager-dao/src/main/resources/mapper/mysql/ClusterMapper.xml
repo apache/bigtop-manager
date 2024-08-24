@@ -26,6 +26,9 @@
     <sql id="baseColumns">
         id, cluster_name, cluster_type, root, user_group, packages, repo_template, state, selected, stack_id
     </sql>
+    <sql id="baseColumnsV2">
+        ${alias}.id, ${alias}.cluster_name, ${alias}.cluster_type, ${alias}.root, ${alias}.user_group, ${alias}.packages, ${alias}.repo_template, ${alias}.state, ${alias}.selected, ${alias}.stack_id
+    </sql>
 
     <select id="findByClusterName" resultType="org.apache.bigtop.manager.dao.po.ClusterPO">
         select
@@ -42,6 +45,37 @@
 
     <select id="count" resultType="java.lang.Integer">
         select count(*) from cluster
+    </select>
+
+    <select id="findByIdJoin"
+            resultType="org.apache.bigtop.manager.dao.po.ClusterPO">
+        select
+        <include refid="baseColumnsV2">
+            <property name="alias" value="r"/>
+        </include>
+        , s.stack_name, s.stack_version
+        from
+        cluster r
+        left join stack s
+        on r.stack_id = s.id
+        <where>
+            <if test="clusterId!=0">
+                r.id=#{clusterId}
+            </if>
+        </where>
+    </select>
+
+    <select id="findAllByJoin"
+            resultType="org.apache.bigtop.manager.dao.po.ClusterPO">
+        select
+        <include refid="baseColumnsV2">
+            <property name="alias" value="r"/>
+        </include>
+        , s.stack_name, s.stack_version
+        from
+        cluster r
+        left join stack s
+        on r.stack_id = s.id
     </select>
 
 </mapper>

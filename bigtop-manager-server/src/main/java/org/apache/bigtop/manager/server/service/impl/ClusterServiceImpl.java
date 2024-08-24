@@ -41,7 +41,6 @@ import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 
 import jakarta.annotation.Resource;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,7 +63,7 @@ public class ClusterServiceImpl implements ClusterService {
     @Override
     public List<ClusterVO> list() {
         List<ClusterVO> clusterVOList = new ArrayList<>();
-        clusterMapper.findAll().forEach(cluster -> {
+        clusterMapper.findAllByJoin().forEach(cluster -> {
             ClusterVO clusterVO = ClusterConverter.INSTANCE.fromEntity2VO(cluster);
             clusterVOList.add(clusterVO);
         });
@@ -82,7 +81,7 @@ public class ClusterServiceImpl implements ClusterService {
                 .getLeft();
         ClusterPO clusterPO = ClusterConverter.INSTANCE.fromDTO2PO(clusterDTO, stackDTO, stackPO);
         clusterPO.setSelected(clusterMapper.count() == 0);
-        clusterPO.setState(MaintainState.UNINSTALLED);
+        clusterPO.setState(MaintainState.UNINSTALLED.getName());
 
         ClusterPO oldClusterPO =
                 clusterMapper.findByClusterName(clusterDTO.getClusterName()).orElse(new ClusterPO());
@@ -112,8 +111,11 @@ public class ClusterServiceImpl implements ClusterService {
 
     @Override
     public ClusterVO get(Long id) {
-        ClusterPO clusterPO =
-                clusterMapper.findOptionalById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.CLUSTER_NOT_FOUND));
+        ClusterPO clusterPO = clusterMapper.findByIdJoin(id);
+
+        if (clusterPO == null) {
+            throw new ApiException(ApiExceptionEnum.CLUSTER_NOT_FOUND);
+        }
 
         return ClusterConverter.INSTANCE.fromEntity2VO(clusterPO);
     }

@@ -31,6 +31,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
+import java.io.Serializable;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -41,7 +42,7 @@ import jakarta.persistence.TableGenerator;
         table = "sequence",
         pkColumnName = "seq_name",
         valueColumnName = "seq_count")
-public class AuditLogPO extends BasePO {
+public class AuditLogPO extends BasePO implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "audit_log_generator")

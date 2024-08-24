@@ -18,8 +18,6 @@
  */
 package org.apache.bigtop.manager.dao.po;
 
-import org.apache.bigtop.manager.common.enums.MaintainState;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -31,13 +29,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
+import jakarta.persistence.Transient;
 import jakarta.persistence.UniqueConstraint;
+import java.io.Serializable;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(
-        name = "\"cluster\"",
+        name = "cluster",
         uniqueConstraints = {
             @UniqueConstraint(
                     name = "uk_cluster_name",
@@ -49,7 +49,7 @@ import jakarta.persistence.UniqueConstraint;
         table = "sequence",
         pkColumnName = "seq_name",
         valueColumnName = "seq_count")
-public class ClusterPO extends BasePO {
+public class ClusterPO extends BasePO implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "cluster_generator")
@@ -62,7 +62,7 @@ public class ClusterPO extends BasePO {
     @Column(name = "cluster_type")
     private Integer clusterType;
 
-    @Column(name = "\"root\"")
+    @Column(name = "root")
     private String root;
 
     @Column(name = "user_group")
@@ -75,7 +75,7 @@ public class ClusterPO extends BasePO {
     private String repoTemplate;
 
     @Column(name = "state")
-    private MaintainState state;
+    private String state;
 
     @Column(name = "selected")
     private Boolean selected;
@@ -83,4 +83,11 @@ public class ClusterPO extends BasePO {
     @Column(name = "stack_id")
     private Long stackId;
 
+    @Transient
+    @Column(name = "stack_name")
+    private String stackName;
+
+    @Transient
+    @Column(name = "stack_version")
+    private String stackVersion;
 }

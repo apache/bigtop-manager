@@ -19,8 +19,8 @@
 package org.apache.bigtop.manager.server.command.validator;
 
 import org.apache.bigtop.manager.common.enums.Command;
+import org.apache.bigtop.manager.dao.mapper.HostMapper;
 import org.apache.bigtop.manager.dao.po.HostPO;
-import org.apache.bigtop.manager.dao.repository.HostRepository;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.enums.CommandLevel;
@@ -38,7 +38,7 @@ import java.util.List;
 public class HostAddValidator implements CommandValidator {
 
     @Resource
-    private HostRepository hostRepository;
+    private HostMapper hostMapper;
 
     @Override
     public List<CommandIdentifier> getCommandIdentifiers() {
@@ -51,7 +51,7 @@ public class HostAddValidator implements CommandValidator {
                 .map(HostCommandDTO::getHostname)
                 .toList();
 
-        List<HostPO> hostPOList = hostRepository.findAllByHostnameIn(hostnames);
+        List<HostPO> hostPOList = hostMapper.findAllByHostnameIn(hostnames);
         if (CollectionUtils.isNotEmpty(hostPOList)) {
             List<String> existsHostnames =
                     hostPOList.stream().map(HostPO::getHostname).toList();

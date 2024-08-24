@@ -19,8 +19,8 @@
 package org.apache.bigtop.manager.server.command.stage;
 
 import org.apache.bigtop.manager.common.enums.Command;
+import org.apache.bigtop.manager.dao.mapper.HostMapper;
 import org.apache.bigtop.manager.dao.po.HostPO;
-import org.apache.bigtop.manager.dao.repository.HostRepository;
 import org.apache.bigtop.manager.server.command.task.CacheFileUpdateTask;
 import org.apache.bigtop.manager.server.command.task.Task;
 import org.apache.bigtop.manager.server.command.task.TaskContext;
@@ -33,7 +33,7 @@ import java.util.Map;
 
 public class CacheFileUpdateStage extends AbstractStage {
 
-    private HostRepository hostRepository;
+    private HostMapper hostMapper;
 
     public CacheFileUpdateStage(StageContext stageContext) {
         super(stageContext);
@@ -43,7 +43,7 @@ public class CacheFileUpdateStage extends AbstractStage {
     protected void injectBeans() {
         super.injectBeans();
 
-        this.hostRepository = SpringContextHolder.getBean(HostRepository.class);
+        this.hostMapper = SpringContextHolder.getBean(HostMapper.class);
     }
 
     @Override
@@ -54,7 +54,7 @@ public class CacheFileUpdateStage extends AbstractStage {
             hostnames.addAll(stageContext.getHostnames());
         } else {
             hostnames.addAll(stageContext.getHostnames() == null ? List.of() : stageContext.getHostnames());
-            hostnames.addAll(hostRepository.findAllByClusterPOId(stageContext.getClusterId()).stream()
+            hostnames.addAll(hostMapper.findAllByClusterId(stageContext.getClusterId()).stream()
                     .map(HostPO::getHostname)
                     .toList());
         }

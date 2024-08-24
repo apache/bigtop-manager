@@ -26,15 +26,20 @@ import lombok.EqualsAndHashCode;
 
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
+import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
+import java.io.Serializable;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -42,12 +47,12 @@ import jakarta.persistence.TableGenerator;
 @Table(
         name = "\"task\"",
         indexes = {
-                @Index(name = "idx_task_cluster_id", columnList = "cluster_id"),
-                @Index(name = "idx_task_job_id", columnList = "job_id"),
-                @Index(name = "idx_task_stage_id", columnList = "stage_id")
+            @Index(name = "idx_task_cluster_id", columnList = "cluster_id"),
+            @Index(name = "idx_task_job_id", columnList = "job_id"),
+            @Index(name = "idx_task_stage_id", columnList = "stage_id")
         })
 @TableGenerator(name = "task_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
-public class TaskPO extends BasePO {
+public class TaskPO extends BasePO implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "task_generator")
@@ -103,4 +108,15 @@ public class TaskPO extends BasePO {
     @Column(name = "cluster_id")
     private Long clusterId;
 
+    @ManyToOne
+    @JoinColumn(name = "job_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private JobPO jobPO;
+
+    @ManyToOne
+    @JoinColumn(name = "stage_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private StagePO stagePO;
+
+    @ManyToOne
+    @JoinColumn(name = "cluster_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private ClusterPO clusterPO;
 }

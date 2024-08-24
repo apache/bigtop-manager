@@ -20,8 +20,8 @@ package org.apache.bigtop.manager.server.command.stage;
 
 import org.apache.bigtop.manager.common.enums.JobState;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
+import org.apache.bigtop.manager.dao.mapper.StageMapper;
 import org.apache.bigtop.manager.dao.po.StagePO;
-import org.apache.bigtop.manager.dao.repository.StageRepository;
 import org.apache.bigtop.manager.server.command.task.Task;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 
@@ -31,7 +31,7 @@ import java.util.concurrent.CompletableFuture;
 
 public abstract class AbstractStage implements Stage {
 
-    protected StageRepository stageRepository;
+    protected StageMapper stageMapper;
 
     protected StageContext stageContext;
     protected List<Task> tasks;
@@ -55,7 +55,7 @@ public abstract class AbstractStage implements Stage {
     }
 
     protected void injectBeans() {
-        this.stageRepository = SpringContextHolder.getBean(StageRepository.class);
+        this.stageMapper = SpringContextHolder.getBean(StageMapper.class);
     }
 
     protected abstract void beforeCreateTasks();
@@ -74,7 +74,7 @@ public abstract class AbstractStage implements Stage {
     public void beforeRun() {
         StagePO stagePO = getStagePO();
         stagePO.setState(JobState.PROCESSING);
-        stageRepository.save(stagePO);
+        stageMapper.save(stagePO);
     }
 
     @Override
@@ -117,14 +117,14 @@ public abstract class AbstractStage implements Stage {
     public void onSuccess() {
         StagePO stagePO = getStagePO();
         stagePO.setState(JobState.SUCCESSFUL);
-        stageRepository.save(stagePO);
+        stageMapper.updateById(stagePO);
     }
 
     @Override
     public void onFailure() {
         StagePO stagePO = getStagePO();
         stagePO.setState(JobState.FAILED);
-        stageRepository.save(stagePO);
+        stageMapper.updateById(stagePO);
     }
 
     @Override

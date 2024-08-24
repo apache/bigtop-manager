@@ -21,6 +21,9 @@ package org.apache.bigtop.manager.server.service.impl;
 import org.apache.bigtop.manager.common.constants.ComponentCategories;
 import org.apache.bigtop.manager.common.enums.MaintainState;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
+import org.apache.bigtop.manager.dao.mapper.HostComponentMapper;
+import org.apache.bigtop.manager.dao.mapper.ServiceConfigMapper;
+import org.apache.bigtop.manager.dao.mapper.ServiceMapper;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.po.HostComponentPO;
@@ -28,9 +31,6 @@ import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
 import org.apache.bigtop.manager.dao.po.ServicePO;
 import org.apache.bigtop.manager.dao.po.TypeConfigPO;
-import org.apache.bigtop.manager.dao.repository.HostComponentRepository;
-import org.apache.bigtop.manager.dao.repository.ServiceConfigRepository;
-import org.apache.bigtop.manager.dao.repository.ServiceRepository;
 import org.apache.bigtop.manager.server.model.converter.ServiceConverter;
 import org.apache.bigtop.manager.server.model.converter.TypeConfigConverter;
 import org.apache.bigtop.manager.server.model.dto.PropertyDTO;
@@ -57,24 +57,24 @@ import java.util.stream.Collectors;
 public class ServiceServiceImpl implements ServiceService {
 
     @Resource
-    private ServiceRepository serviceRepository;
+    private ServiceMapper serviceMapper;
 
     @Resource
-    private HostComponentRepository hostComponentRepository;
+    private HostComponentMapper hostComponentMapper;
 
     @Resource
-    private ServiceConfigRepository serviceConfigRepository;
+    private ServiceConfigMapper serviceConfigMapper;
 
     @Override
     public List<ServiceVO> list(Long clusterId) {
         List<ServiceVO> res = new ArrayList<>();
         Map<Long, List<HostComponentPO>> serviceIdToHostComponent =
-                hostComponentRepository.findAllByComponentPOClusterPOId(clusterId).stream()
-                        .collect(Collectors.groupingBy(hostComponent ->
-                                hostComponent.getComponentPO().getServicePO().getId()));
+                hostComponentMapper.findAllByClusterId(clusterId).stream()
+                        .collect(Collectors.groupingBy(HostComponentPO::getServiceId));
 
         for (Map.Entry<Long, List<HostComponentPO>> entry : serviceIdToHostComponent.entrySet()) {
             List<HostComponentPO> hostComponentPOList = entry.getValue();
+            HostComponentPO hostComponentPO1 = hostComponentPOList.get(0);
             ServicePO servicePO = hostComponentPOList.get(0).getComponentPO().getServicePO();
             ServiceVO serviceVO = ServiceConverter.INSTANCE.fromPO2VO(servicePO);
             serviceVO.setQuickLinks(new ArrayList<>());
@@ -98,7 +98,7 @@ public class ServiceServiceImpl implements ServiceService {
                 MaintainState expectedState = category.equalsIgnoreCase(ComponentCategories.CLIENT)
                         ? MaintainState.INSTALLED
                         : MaintainState.STARTED;
-                if (!hostComponentPO.getState().equals(expectedState)) {
+                if (!MaintainState.fromString(hostComponentPO.getState()).equals(expectedState)) {
                     isHealthy = false;
                 }
             }
@@ -113,7 +113,7 @@ public class ServiceServiceImpl implements ServiceService {
 
     @Override
     public ServiceVO get(Long id) {
-        ServicePO servicePO = serviceRepository.findById(id).orElse(new ServicePO());
+        ServicePO servicePO = serviceMapper.findOptionalById(id).orElse(new ServicePO());
         return ServiceConverter.INSTANCE.fromPO2VO(servicePO);
     }
 
@@ -128,7 +128,7 @@ public class ServiceServiceImpl implements ServiceService {
         HostPO hostPO = hostComponentPO.getHostPO();
         ServicePO servicePO = componentPO.getServicePO();
         ServiceConfigPO serviceConfigPO =
-                serviceConfigRepository.findByClusterPOAndServicePOAndSelectedIsTrue(clusterPO, servicePO);
+                serviceConfigMapper.findByClusterIdAndServiceIdAndSelectedIsTrue(clusterPO.getId(), servicePO.getId());
         List<TypeConfigPO> typeConfigPOList = serviceConfigPO.getConfigs();
 
         // Use HTTP for now, need to handle https in the future

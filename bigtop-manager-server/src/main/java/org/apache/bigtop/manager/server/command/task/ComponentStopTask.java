@@ -41,10 +41,9 @@ public class ComponentStopTask extends AbstractComponentTask {
         String componentName = taskContext.getComponentName();
         String hostname = taskContext.getHostname();
         HostComponentPO hostComponentPO =
-                hostComponentRepository.findByComponentPOClusterPOIdAndComponentPOComponentNameAndHostPOHostname(
-                        clusterId, componentName, hostname);
-        hostComponentPO.setState(MaintainState.STOPPED);
-        hostComponentRepository.save(hostComponentPO);
+                hostComponentMapper.findByClusterIdAndComponentNameAndHostname(clusterId, componentName, hostname);
+        hostComponentPO.setState(MaintainState.STOPPED.getName());
+        hostComponentMapper.updateById(hostComponentPO);
     }
 
     @Override

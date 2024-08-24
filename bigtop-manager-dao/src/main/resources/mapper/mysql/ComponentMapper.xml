@@ -86,4 +86,17 @@
         on r.service_id = s.id and r.cluster_id = s.cluster_id
     </select>
 
+    <select id="findAllJoinService"
+            resultType="org.apache.bigtop.manager.dao.po.ComponentPO">
+        select
+        <include refid="baseColumnsV2">
+            <property name="alias" value="r"/>
+        </include>
+            , s.service_name
+        from
+        component r
+        left join service s
+        on r.service_id = s.id and r.cluster_id = s.cluster_id
+    </select>
+
 </mapper>
