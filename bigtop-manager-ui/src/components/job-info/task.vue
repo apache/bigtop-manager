@@ -36,7 +36,10 @@
   }
 
   const props = defineProps<TaskProps>()
-  const baseTable = useBaseTable<TaskVO>(props.columns, props.tasks)
+  const baseTable = useBaseTable<TaskVO>({
+    columns: props.columns,
+    rows: props.tasks
+  })
   const { dataSource, columnsProp, loading, paginationProps, onChange } =
     baseTable
 
