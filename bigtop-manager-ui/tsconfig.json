@@ -16,6 +16,8 @@
     },
     "skipLibCheck": true,
     "types": [
+      "vitest",
+      "vitest/globals",
       "vite/client",
       "vite-plugin-svg-icons/client"
     ],
