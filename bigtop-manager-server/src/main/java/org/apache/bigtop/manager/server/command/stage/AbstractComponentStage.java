@@ -78,7 +78,7 @@ public abstract class AbstractComponentStage extends AbstractStage {
 
         Map<String, Object> properties = new HashMap<>();
         properties.put("customCommands", componentDTO.getCustomCommands());
-        properties.put("osSpecifics", serviceDTO.getOsSpecifics());
+        properties.put("packageSpecifics", serviceDTO.getPackageSpecifics());
         properties.put("commandScript", componentDTO.getCommandScript());
         taskContext.setProperties(properties);
         return taskContext;

@@ -96,7 +96,7 @@ public abstract class AbstractServiceJob extends AbstractJob {
 
     protected List<String> getTodoListForCommand(Command command) {
         try {
-            List<String> orderedList = dag.topologicalSort();
+            List<String> orderedList = dag.getAllNodesList().isEmpty() ? new ArrayList<>() : dag.topologicalSort();
             List<String> componentNames = getComponentNames();
             List<String> componentCommandNames = new ArrayList<>(componentNames.stream()
                     .map(x -> x + "-" + command.name().toUpperCase())

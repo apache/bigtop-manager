@@ -42,6 +42,7 @@
         <module>bigtop-manager-ui</module>
         <module>bigtop-manager-dao</module>
         <module>bigtop-manager-grpc</module>
+        <module>bigtop-manager-ai</module>
     </modules>
 
     <properties>
@@ -107,13 +108,37 @@
 
             <dependency>
                 <groupId>org.apache.bigtop</groupId>
-                <artifactId>bigtop-manager-stack-nop</artifactId>
+                <artifactId>bigtop-manager-stack-infra</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.apache.bigtop</groupId>
                 <artifactId>bigtop-manager-ui</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.bigtop</groupId>
+                <artifactId>bigtop-manager-ai</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.bigtop</groupId>
+                <artifactId>bigtop-manager-ai-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.bigtop</groupId>
+                <artifactId>bigtop-manager-ai-openai</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.bigtop</groupId>
+                <artifactId>bigtop-manager-ai-assistant</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

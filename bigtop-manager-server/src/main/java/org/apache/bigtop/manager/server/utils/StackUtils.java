@@ -19,7 +19,6 @@
 package org.apache.bigtop.manager.server.utils;
 
 import org.apache.bigtop.manager.common.enums.Command;
-import org.apache.bigtop.manager.common.utils.Environments;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.exception.ServerException;
@@ -76,8 +75,6 @@ public class StackUtils {
     private static final String CONFIGURATION_FILE_EXTENSION = "xml";
 
     private static final String DEPENDENCY_FILE_NAME = "order.json";
-
-    private static final String NOP_STACK = "nop";
 
     private static final Map<String, Map<String, List<String>>> STACK_DEPENDENCY_MAP = new HashMap<>();
 
@@ -202,13 +199,6 @@ public class StackUtils {
 
         for (File stackFolder : stackFolders) {
             String stackName = stackFolder.getName();
-
-            // If in dev mode, only parse nop stack
-            // If not in dev mode, skip nop stack
-            if (Environments.isDevMode() != stackName.equals(NOP_STACK)) {
-                continue;
-            }
-
             File[] versionFolders = Optional.ofNullable(stackFolder.listFiles()).orElse(new File[0]);
 
             for (File versionFolder : versionFolders) {

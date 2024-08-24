@@ -38,6 +38,12 @@ public class RepoModel {
     @XmlElement(name = "repo-name")
     private String repoName;
 
+    /**
+     * Type of repositories, values can be 'binary', 'tarball'.
+     */
+    @XmlElement(name = "repo-type")
+    private String repoType;
+
     @XmlElement(name = "base-url")
     private String baseUrl;
 

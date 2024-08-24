@@ -26,6 +26,7 @@ header:
     - '**/target/**'
     - '**/*.ftl'
     - '**/*.log'
+    - '**/*.st'
     - '.git/'
     - '.github/**'
     - '**/.gitignore'

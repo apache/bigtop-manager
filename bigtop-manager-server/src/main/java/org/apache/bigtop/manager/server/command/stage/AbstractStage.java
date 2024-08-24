@@ -79,24 +79,31 @@ public abstract class AbstractStage implements Stage {
 
     @Override
     public Boolean run() {
-        beforeRun();
+        boolean allTaskSuccess;
 
-        List<CompletableFuture<Boolean>> futures = new ArrayList<>();
-        for (Task task : tasks) {
-            futures.add(CompletableFuture.supplyAsync(task::run));
+        try {
+            beforeRun();
+
+            List<CompletableFuture<Boolean>> futures = new ArrayList<>();
+            for (Task task : tasks) {
+                futures.add(CompletableFuture.supplyAsync(task::run));
+            }
+
+            List<Boolean> taskResults = futures.stream()
+                    .map((future) -> {
+                        try {
+                            return future.get();
+                        } catch (Exception e) {
+                            return false;
+                        }
+                    })
+                    .toList();
+
+            allTaskSuccess = taskResults.stream().allMatch(Boolean::booleanValue);
+        } catch (Exception e) {
+            allTaskSuccess = false;
         }
 
-        List<Boolean> taskResults = futures.stream()
-                .map((future) -> {
-                    try {
-                        return future.get();
-                    } catch (Exception e) {
-                        return false;
-                    }
-                })
-                .toList();
-
-        boolean allTaskSuccess = taskResults.stream().allMatch(Boolean::booleanValue);
         if (allTaskSuccess) {
             onSuccess();
         } else {

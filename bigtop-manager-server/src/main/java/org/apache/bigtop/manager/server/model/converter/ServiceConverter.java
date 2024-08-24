@@ -41,7 +41,7 @@ public interface ServiceConverter {
 
     ServiceConverter INSTANCE = Mappers.getMapper(ServiceConverter.class);
 
-    @Mapping(target = "osSpecifics", source = "osSpecifics", qualifiedByName = "obj2Json")
+    @Mapping(target = "packageSpecifics", source = "packageSpecifics", qualifiedByName = "obj2Json")
     @Mapping(target = "requiredServices", source = "requiredServices", qualifiedByName = "obj2Json")
     @Mapping(target = "clusterPO", expression = "java(clusterPO)")
     ServicePO fromDTO2PO(ServiceDTO serviceDTO, @Context ClusterPO clusterPO);

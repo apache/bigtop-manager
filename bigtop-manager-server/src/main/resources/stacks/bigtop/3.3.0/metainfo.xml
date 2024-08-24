@@ -23,6 +23,7 @@
         <stack-name>bigtop</stack-name>
         <stack-version>3.3.0</stack-version>
         <user-group>hadoop</user-group>
+        <scope>cluster</scope>
         <root>/opt</root>
         <packages>curl,wget</packages>
         <repo-template><![CDATA[
@@ -41,21 +42,8 @@ gpgcheck=0
         <repos>
             <repo>
                 <repo-id>Bigtop-3.3.0</repo-id>
-                <repo-name>Bigtop-3.3.0 for CentOS-7 x86_64</repo-name>
-                <os>centos7</os>
-                <arch>x86_64</arch>
-                <base-url>http://123.56.2.244/bigtop/3.3.0/centos7/x86_64/</base-url>
-            </repo>
-            <repo>
-                <repo-id>Bigtop-3.3.0</repo-id>
-                <repo-name>Bigtop-3.3.0 for CentOS-7 aarch64</repo-name>
-                <os>centos7</os>
-                <arch>aarch64</arch>
-                <base-url>https://bigtop-snapshot.s3.amazonaws.com/centos-7/$basearch</base-url>
-            </repo>
-            <repo>
-                <repo-id>Bigtop-3.3.0</repo-id>
                 <repo-name>Bigtop-3.3.0 for RockyLinux-8 x86_64</repo-name>
+                <repo-type>binary</repo-type>
                 <os>rocky8</os>
                 <arch>x86_64</arch>
                 <base-url>http://123.56.2.244/bigtop/3.3.0/rocky8/x86_64/</base-url>

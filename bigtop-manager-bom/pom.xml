@@ -36,9 +36,10 @@
         <freemarker.version>2.3.32</freemarker.version>
         <common-lang3.version>3.12.0</common-lang3.version>
         <snakeyaml.version>2.0</snakeyaml.version>
-        <commons-io.version>2.13.0</commons-io.version>
+        <commons-io.version>2.16.1</commons-io.version>
         <guava.version>32.1.1-jre</guava.version>
         <commons-collections4.version>4.4</commons-collections4.version>
+        <commons-compress.version>1.26.2</commons-compress.version>
         <jwt.version>4.4.0</jwt.version>
         <janino.version>3.0.16</janino.version>
         <eclipse-link.version>4.0.2</eclipse-link.version>
@@ -49,6 +50,7 @@
         <oshi-core.version>6.4.11</oshi-core.version>
         <micrometer.version>1.12.4</micrometer.version>
         <jdbc.dm.version>8.1.2.192</jdbc.dm.version>
+        <langchain4j.version>0.33.0</langchain4j.version>
     </properties>
 
     <dependencyManagement>
@@ -125,6 +127,12 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-collections4</artifactId>
                 <version>${commons-collections4.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>${commons-compress.version}</version>
             </dependency>
 
             <dependency>
@@ -235,6 +243,16 @@
                 <groupId>net.devh</groupId>
                 <artifactId>grpc-client-spring-boot-starter</artifactId>
                 <version>${grpc-spring-boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j</artifactId>
+                <version>${langchain4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j-open-ai</artifactId>
+                <version>${langchain4j.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

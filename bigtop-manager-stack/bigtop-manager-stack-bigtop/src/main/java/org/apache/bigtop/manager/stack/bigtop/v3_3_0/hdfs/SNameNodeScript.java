@@ -23,7 +23,6 @@ import org.apache.bigtop.manager.stack.core.exception.StackException;
 import org.apache.bigtop.manager.stack.core.param.Params;
 import org.apache.bigtop.manager.stack.core.spi.script.AbstractServerScript;
 import org.apache.bigtop.manager.stack.core.spi.script.Script;
-import org.apache.bigtop.manager.stack.core.utils.PackageUtils;
 import org.apache.bigtop.manager.stack.core.utils.linux.LinuxOSUtils;
 
 import com.google.auto.service.AutoService;
@@ -34,11 +33,6 @@ import java.text.MessageFormat;
 @Slf4j
 @AutoService(Script.class)
 public class SNameNodeScript extends AbstractServerScript {
-
-    @Override
-    public ShellResult install(Params params) {
-        return PackageUtils.install(params.getPackageList());
-    }
 
     @Override
     public ShellResult configure(Params params) {

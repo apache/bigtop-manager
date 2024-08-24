@@ -35,7 +35,7 @@
     <modules>
         <module>bigtop-manager-stack-core</module>
         <module>bigtop-manager-stack-bigtop</module>
-        <module>bigtop-manager-stack-nop</module>
+        <module>bigtop-manager-stack-infra</module>
     </modules>
 
     <properties>

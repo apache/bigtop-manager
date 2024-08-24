@@ -23,7 +23,6 @@ import org.apache.bigtop.manager.stack.core.exception.StackException;
 import org.apache.bigtop.manager.stack.core.param.Params;
 import org.apache.bigtop.manager.stack.core.spi.script.AbstractServerScript;
 import org.apache.bigtop.manager.stack.core.spi.script.Script;
-import org.apache.bigtop.manager.stack.core.utils.PackageUtils;
 import org.apache.bigtop.manager.stack.core.utils.linux.LinuxOSUtils;
 
 import com.google.auto.service.AutoService;
@@ -37,11 +36,6 @@ import java.text.MessageFormat;
 public class ZookeeperServerScript extends AbstractServerScript {
 
     @Override
-    public ShellResult install(Params params) {
-        return PackageUtils.install(params.getPackageList());
-    }
-
-    @Override
     public ShellResult configure(Params params) {
         return ZookeeperSetup.config(params);
     }
@@ -51,7 +45,7 @@ public class ZookeeperServerScript extends AbstractServerScript {
         configure(params);
         ZookeeperParams zookeeperParams = (ZookeeperParams) params;
 
-        String cmd = MessageFormat.format("sh {0}/bin/zkServer.sh start", zookeeperParams.serviceHome());
+        String cmd = MessageFormat.format("{0}/bin/zkServer.sh start", zookeeperParams.serviceHome());
         try {
             return LinuxOSUtils.sudoExecCmd(cmd, zookeeperParams.user());
         } catch (IOException e) {
@@ -62,7 +56,7 @@ public class ZookeeperServerScript extends AbstractServerScript {
     @Override
     public ShellResult stop(Params params) {
         ZookeeperParams zookeeperParams = (ZookeeperParams) params;
-        String cmd = MessageFormat.format("sh {0}/bin/zkServer.sh stop", zookeeperParams.serviceHome());
+        String cmd = MessageFormat.format("{0}/bin/zkServer.sh stop", zookeeperParams.serviceHome());
         try {
             return LinuxOSUtils.sudoExecCmd(cmd, zookeeperParams.user());
         } catch (IOException e) {

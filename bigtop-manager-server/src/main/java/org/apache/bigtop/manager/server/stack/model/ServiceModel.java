@@ -42,9 +42,9 @@ public class ServiceModel {
 
     private String user;
 
-    @XmlElementWrapper(name = "os-specifics")
-    @XmlElements(@XmlElement(name = "os-specific"))
-    private List<OSSpecificModel> osSpecifics;
+    @XmlElementWrapper(name = "package-specifics")
+    @XmlElements(@XmlElement(name = "package-specific"))
+    private List<PackageSpecificModel> packageSpecifics;
 
     @XmlElementWrapper(name = "components")
     @XmlElements(@XmlElement(name = "component"))

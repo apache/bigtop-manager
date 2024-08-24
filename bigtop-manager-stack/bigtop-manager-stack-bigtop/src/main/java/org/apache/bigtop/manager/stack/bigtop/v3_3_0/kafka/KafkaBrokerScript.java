@@ -23,7 +23,6 @@ import org.apache.bigtop.manager.stack.core.exception.StackException;
 import org.apache.bigtop.manager.stack.core.param.Params;
 import org.apache.bigtop.manager.stack.core.spi.script.AbstractServerScript;
 import org.apache.bigtop.manager.stack.core.spi.script.Script;
-import org.apache.bigtop.manager.stack.core.utils.PackageUtils;
 import org.apache.bigtop.manager.stack.core.utils.linux.LinuxOSUtils;
 
 import com.google.auto.service.AutoService;
@@ -37,11 +36,6 @@ import java.text.MessageFormat;
 public class KafkaBrokerScript extends AbstractServerScript {
 
     @Override
-    public ShellResult install(Params params) {
-        return PackageUtils.install(params.getPackageList());
-    }
-
-    @Override
     public ShellResult configure(Params params) {
         return KafkaSetup.config(params);
     }
@@ -52,7 +46,7 @@ public class KafkaBrokerScript extends AbstractServerScript {
         KafkaParams kafkaParams = (KafkaParams) params;
 
         String cmd = MessageFormat.format(
-                "sh {0}/bin/kafka-server-start.sh {0}/config/server.properties > /dev/null 2>&1 & echo -n $!>{1}",
+                "{0}/bin/kafka-server-start.sh {0}/config/server.properties > /dev/null 2>&1 & echo -n $!>{1}",
                 kafkaParams.serviceHome(), kafkaParams.getKafkaPidFile());
         try {
             return LinuxOSUtils.sudoExecCmd(cmd, kafkaParams.user());
@@ -64,7 +58,7 @@ public class KafkaBrokerScript extends AbstractServerScript {
     @Override
     public ShellResult stop(Params params) {
         KafkaParams kafkaParams = (KafkaParams) params;
-        String cmd = MessageFormat.format("sh {0}/bin/kafka-server-stop.sh", kafkaParams.serviceHome());
+        String cmd = MessageFormat.format("{0}/bin/kafka-server-stop.sh", kafkaParams.serviceHome());
         try {
             return LinuxOSUtils.sudoExecCmd(cmd, kafkaParams.user());
         } catch (IOException e) {

@@ -87,18 +87,23 @@ public abstract class AbstractJob implements Job {
 
     @Override
     public void run() {
-        beforeRun();
-
         boolean success = true;
-        LinkedBlockingQueue<Stage> queue = new LinkedBlockingQueue<>(stages);
-        while (!queue.isEmpty()) {
-            Stage stage = queue.poll();
-            Boolean stageSuccess = stage.run();
 
-            if (!stageSuccess) {
-                success = false;
-                break;
+        try {
+            beforeRun();
+
+            LinkedBlockingQueue<Stage> queue = new LinkedBlockingQueue<>(stages);
+            while (!queue.isEmpty()) {
+                Stage stage = queue.poll();
+                Boolean stageSuccess = stage.run();
+
+                if (!stageSuccess) {
+                    success = false;
+                    break;
+                }
             }
+        } catch (Exception e) {
+            success = false;
         }
 
         if (success) {
