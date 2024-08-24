@@ -24,28 +24,72 @@
 <mapper namespace="org.apache.bigtop.manager.dao.mapper.JobMapper">
 
     <sql id="baseColumns">
-        id, state, name, context, cluster_id
+        id, state, name, context, cluster_id, create_time, update_time
     </sql>
+
+    <sql id="baseColumnsV2">
+        ${alias}.id, ${alias}.state, ${alias}.name, ${alias}.context, ${alias}.cluster_id, ${alias}.create_time, ${alias}.update_time
+    </sql>
+
+    <resultMap id="jobMap" type="org.apache.bigtop.manager.dao.po.JobPO">
+        <id column="id" property="id"></id>
+        <result column="state" property="state"></result>
+        <result column="name" property="name"></result>
+        <result column="context" property="context"></result>
+        <result column="cluster_id" property="clusterId"></result>
+        <result column="create_time" property="createTime"></result>
+        <result column="update_time" property="updateTime"></result>
+        <collection property="stagePOList" ofType="org.apache.bigtop.manager.dao.po.StagePO">
+            <id column="id" property="id"></id>
+            <result column="state" property="state"></result>
+            <result column="name" property="name"></result>
+            <result column="context" property="context"></result>
+            <result column="order" property="order"></result>
+            <result column="service_name" property="serviceName"></result>
+            <result column="component_name" property="componentName"></result>
+            <result column="cluster_id" property="clusterId"></result>
+            <result column="job_id" property="jobId"></result>
+            <collection property="taskPOList" ofType="org.apache.bigtop.manager.dao.po.TaskPO">
+                <id column="id" property="id"></id>
+                <result column="state" property="state"></result>
+                <result column="name" property="name"></result>
+                <result column="context" property="context"></result>
+
+
+                <result column="cluster_id" property="clusterId"></result>
+                <result column="job_id" property="jobId"></result>
+            </collection>
+        </collection>
+    </resultMap>
 
     <select id="findAllByClusterId" parameterType="java.lang.Long"
             resultType="org.apache.bigtop.manager.dao.po.JobPO">
         select
-        <include refid="baseColumns"/>
+        <include refid="baseColumnsV2">
+            <property name="alias" value="h"/>
+        </include>
         from
-        job
+        (select * from job
         <where>
             <if test="clusterId != 0">
                 cluster_id = #{clusterId}
             </if>
         </where>
+        ) h
+        left join stage st
+        on h.id = st.job_id
     </select>
 
     <select id="findAllByClusterIsNull"
             resultType="org.apache.bigtop.manager.dao.po.JobPO">
         select
-        <include refid="baseColumns"/>
+        <include refid="baseColumnsV2">
+            <property name="alias" value="h"/>
+        </include>
         from
-        job where cluster_id is null
+        (select * from job where cluster_id is null) h
+        left join stage st
+        on h.id = st.job_id
     </select>
 
 </mapper>

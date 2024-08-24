@@ -27,6 +27,10 @@
         id, hostname, ipv4, ipv6, os, arch, available_processors, free_memory_size, total_memory_size, free_disk, total_disk, state, cluster_id
     </sql>
 
+    <sql id="baseColumnsV2">
+        ${alias}.id,  ${alias}.hostname,  ${alias}.ipv4,  ${alias}.ipv6,  ${alias}.os,  ${alias}.arch,  ${alias}.available_processors,  ${alias}.free_memory_size,  ${alias}.total_memory_size,  ${alias}.free_disk,  ${alias}.total_disk,  ${alias}.state,  ${alias}.cluster_id
+    </sql>
+
     <select id="findByHostName" resultType="org.apache.bigtop.manager.dao.po.HostPO">
         select
         <include refid="baseColumns"/>
@@ -40,17 +44,44 @@
         limit 1
     </select>
 
+    <select id="findByIdJoin" resultType="org.apache.bigtop.manager.dao.po.HostPO">
+        select
+        <include refid="baseColumnsV2">
+            <property name="alias" value="h"/>
+        </include>
+        ,clus.cluster_name
+        from
+        (select * from host
+        <where>
+            <if test="id != 0">
+                id = #{id}
+            </if>
+        </where>
+        ) h
+        left join
+        cluster clus
+        on h.cluster_id = clus.id
+        limit 1
+    </select>
+
     <select id="findAllByClusterId" parameterType="java.lang.Long"
             resultType="org.apache.bigtop.manager.dao.po.HostPO">
         select
-        <include refid="baseColumns"/>
+        <include refid="baseColumnsV2">
+            <property name="alias" value="h"/>
+        </include>
+        ,clus.cluster_name
         from
-        host
+        host h
+        left join
+        (select * from cluster
         <where>
             <if test="clusterId != 0">
-                cluster_id = #{clusterId}
+                id = #{clusterId}
             </if>
         </where>
+        ) clus
+        on h.cluster_id = clus.id
     </select>
 
     <select id="findAllByHostnameIn"

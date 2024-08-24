@@ -86,6 +86,9 @@ public class ComponentPO extends BasePO implements Serializable {
     @Column(name = "quick_link")
     private String quickLink;
 
+    @Column(name = "cardinality")
+    private String cardinality;
+
     @Column(name = "service_id")
     private Long serviceId;
 
@@ -95,6 +98,10 @@ public class ComponentPO extends BasePO implements Serializable {
     @Transient
     @Column(name = "service_name")
     private String serviceName;
+
+    @Transient
+    @Column(name = "cluster_name")
+    private String clusterName;
 
     @ManyToOne
     @JoinColumn(name = "service_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))

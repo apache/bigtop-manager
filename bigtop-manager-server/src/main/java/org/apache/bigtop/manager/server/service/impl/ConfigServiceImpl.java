@@ -59,15 +59,13 @@ public class ConfigServiceImpl implements ConfigService {
 
     @Override
     public List<ServiceConfigVO> list(Long clusterId) {
-        ClusterPO clusterPO = clusterMapper.findById(clusterId);
-        List<ServiceConfigPO> list = serviceConfigMapper.findAllByClusterId(clusterPO.getId());
+        List<ServiceConfigPO> list = serviceConfigMapper.findAllByClusterId(clusterId);
         return ServiceConfigConverter.INSTANCE.fromPO2VO(list);
     }
 
     @Override
     public List<ServiceConfigVO> latest(Long clusterId) {
-        ClusterPO clusterPO = clusterMapper.findById(clusterId);
-        List<ServiceConfigPO> list = serviceConfigMapper.findAllByClusterIdAndSelectedIsTrue(clusterPO.getId());
+        List<ServiceConfigPO> list = serviceConfigMapper.findAllByClusterIdAndSelectedIsTrue(clusterId);
         return ServiceConfigConverter.INSTANCE.fromPO2VO(list);
     }
 

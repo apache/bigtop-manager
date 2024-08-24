@@ -45,15 +45,15 @@ public class PageUtils {
 
     public static PageQuery getPageQuery() {
         PageQuery query = new PageQuery();
-        query.setPageNum(NumberUtils.toInt(ServletUtils.getParameter(PAGE_NUM), DEFAULT_PAGE_NUM) - 1);
+        query.setPageNum(NumberUtils.toInt(ServletUtils.getParameter(PAGE_NUM), DEFAULT_PAGE_NUM));
         query.setPageSize(NumberUtils.toInt(ServletUtils.getParameter(PAGE_SIZE), DEFAULT_PAGE_SIZE));
 
         String orderBy = StringUtils.defaultIfBlank(ServletUtils.getParameter(ORDER_BY), DEFAULT_ORDER_BY);
         String sort = StringUtils.defaultIfBlank(ServletUtils.getParameter(SORT), SORT_ASC);
         if (SORT_DESC.equals(sort)) {
-            query.setOrderBy("ORDER BY " + orderBy + " DESC ");
+            query.setOrderBy(orderBy + " DESC ");
         } else {
-            query.setOrderBy("ORDER BY " + orderBy + " ASC ");
+            query.setOrderBy(orderBy + " ASC ");
         }
 
         return query;

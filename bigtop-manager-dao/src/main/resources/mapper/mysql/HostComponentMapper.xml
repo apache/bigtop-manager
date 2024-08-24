@@ -57,19 +57,26 @@
         <include refid="baseColumnsV2">
             <property name="alias" value="hc"/>
         </include>
+        , c.service_id, c.component_name, c.display_name, c.category, s.service_name, clus.cluster_name, ht.hostname
         from
         host_component hc
         left join (select * from component
         <where>
-            <if test="serviceId != null">
-                service_id = #{serviceId}
-            </if>
             <if test="clusterId != 0">
-                and cluster_id = #{clusterId}
+                cluster_id = #{clusterId}
+            </if>
+            <if test="serviceId != 0">
+                and service_id = #{serviceId}
             </if>
         </where>
         ) c
         on hc.component_id = c.id
+        left join service s
+        on c.service_id = s.id
+        left join cluster clus
+        on c.cluster_id = clus.id
+        left join host ht
+        on hc.host_id = ht.id
     </select>
 
     <select id="findByClusterIdAndComponentNameAndHostname"
@@ -110,19 +117,26 @@
         <include refid="baseColumnsV2">
             <property name="alias" value="hc"/>
         </include>
+        , c.service_id, c.component_name, c.display_name, c.category, s.service_name, clus.cluster_name, ht.hostname
         from
         host_component hc
+        left join component c
+        on hc.component_id = c.id
+        left join service s
+        on c.service_id = s.id
+        left join cluster clus
+        on c.cluster_id = clus.id
         left join (select * from host
         <where>
-            <if test="hostId != 0">
-                id = #{hostId}
-            </if>
             <if test="clusterId != 0">
-                and cluster_id = #{clusterId}
+                cluster_id = #{clusterId}
+            </if>
+            <if test="hostId != 0">
+                and id = #{hostId}
             </if>
         </where>
-        ) h
-        on hc.host_id = h.id
+            ) ht
+        on hc.host_id = ht.id
     </select>
 
     <select id="findAllByClusterId"
@@ -131,7 +145,7 @@
         <include refid="baseColumnsV2">
             <property name="alias" value="hc"/>
         </include>
-            , c.service_id
+            , c.service_id, c.component_name, c.display_name, c.category, s.service_name, clus.cluster_name, ht.hostname
         from
         host_component hc
         left join (select * from component
@@ -142,6 +156,12 @@
         </where>
         ) c
         on hc.component_id = c.id
+        left join service s
+        on c.service_id = s.id
+        left join cluster clus
+        on c.cluster_id = clus.id
+        left join host ht
+        on hc.host_id = ht.id
     </select>
 
     <select id="findAllJoin"

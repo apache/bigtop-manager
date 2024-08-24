@@ -30,6 +30,8 @@ public interface ComponentMapper extends BaseMapper<ComponentPO> {
     ComponentPO findByClusterIdAndComponentName(
             @Param("clusterId") Long clusterId, @Param("componentName") String componentName);
 
+    ComponentPO findByIdJoin(@Param("id") Long id);
+
     List<ComponentPO> findAllByClusterId(@Param("clusterId") Long clusterId);
 
     List<ComponentPO> findAllJoinService();

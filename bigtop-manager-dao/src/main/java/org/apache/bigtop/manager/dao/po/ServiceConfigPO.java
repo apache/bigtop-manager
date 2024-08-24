@@ -18,6 +18,7 @@
  */
 package org.apache.bigtop.manager.dao.po;
 
+import jakarta.persistence.Transient;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -77,6 +78,10 @@ public class ServiceConfigPO extends BasePO implements Serializable {
 
     @Column(name = "cluster_id")
     private Long clusterId;
+
+    @Transient
+    @Column(name = "service_name")
+    private String serviceName;
 
     @ManyToOne
     @JoinColumn(name = "service_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))

@@ -94,7 +94,7 @@ public class JobServiceImpl implements JobService {
     public JobVO retry(Long id) {
         JobPO jobPO =
                 jobMapper.findOptionalById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.JOB_NOT_FOUND));
-        if (jobPO.getState() != JobState.FAILED) {
+        if (JobState.fromString(jobPO.getState()) != JobState.FAILED) {
             throw new ApiException(ApiExceptionEnum.JOB_NOT_RETRYABLE);
         }
 
@@ -116,7 +116,7 @@ public class JobServiceImpl implements JobService {
             stageMapper.updateById(stagePO);
         }
 
-        jobPO.setState(JobState.PENDING);
+        jobPO.setState(JobState.PENDING.getName());
         jobMapper.updateById(jobPO);
     }
 

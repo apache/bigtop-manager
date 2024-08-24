@@ -85,7 +85,7 @@ public abstract class AbstractJob implements Job {
     @Override
     public void beforeRun() {
         JobPO jobPO = getJobPO();
-        jobPO.setState(JobState.PROCESSING);
+        jobPO.setState(JobState.PROCESSING.getName());
         jobMapper.save(jobPO);
     }
 
@@ -120,7 +120,7 @@ public abstract class AbstractJob implements Job {
     @Override
     public void onSuccess() {
         JobPO jobPO = getJobPO();
-        jobPO.setState(JobState.SUCCESSFUL);
+        jobPO.setState(JobState.SUCCESSFUL.getName());
         jobMapper.updateById(jobPO);
     }
 
@@ -130,7 +130,7 @@ public abstract class AbstractJob implements Job {
         List<StagePO> stagePOList = new ArrayList<>();
         List<TaskPO> taskPOList = new ArrayList<>();
 
-        jobPO.setState(JobState.FAILED);
+        jobPO.setState(JobState.FAILED.getName());
 
         for (Stage stage : getStages()) {
             StagePO stagePO = stage.getStagePO();

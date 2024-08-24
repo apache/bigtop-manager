@@ -23,7 +23,6 @@ import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.vo.ServiceConfigVO;
 
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -35,7 +34,6 @@ public interface ServiceConfigConverter {
 
     ServiceConfigConverter INSTANCE = Mappers.getMapper(ServiceConfigConverter.class);
 
-    @Mapping(target = "serviceName", source = "servicePO.serviceName")
     ServiceConfigVO fromPO2VO(ServiceConfigPO serviceConfigPO);
 
     List<ServiceConfigVO> fromPO2VO(List<ServiceConfigPO> serviceConfigPOList);

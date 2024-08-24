@@ -38,6 +38,7 @@ import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 
 import jakarta.annotation.Resource;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -93,8 +94,10 @@ public class HostServiceImpl implements HostService {
 
     @Override
     public HostVO get(Long id) {
-        HostPO hostPO =
-                hostMapper.findOptionalById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.HOST_NOT_FOUND));
+        HostPO hostPO = hostMapper.findByIdJoin(id);
+        if (hostPO == null) {
+            throw new ApiException(ApiExceptionEnum.HOST_NOT_FOUND);
+        }
 
         return HostConverter.INSTANCE.fromPO2VO(hostPO);
     }

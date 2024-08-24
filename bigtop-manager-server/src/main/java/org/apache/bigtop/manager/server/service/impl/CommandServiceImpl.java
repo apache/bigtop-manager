@@ -98,7 +98,7 @@ public class CommandServiceImpl implements CommandService {
 
         JobPO jobPO = job.getJobPO();
         jobPO.setClusterId(clusterPO.getId());
-        jobPO.setState(JobState.PENDING);
+        jobPO.setState(JobState.PENDING.getName());
         jobMapper.save(jobPO);
 
         for (int i = 0; i < job.getStages().size(); i++) {

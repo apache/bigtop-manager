@@ -79,6 +79,14 @@ public class HostComponentPO extends BasePO implements Serializable {
     private Long serviceId;
 
     @Transient
+    @Column(name = "cluster_name")
+    private String clusterName;
+
+    @Transient
+    @Column(name = "root")
+    private String root;
+
+    @Transient
     @Column(name = "service_name")
     private String serviceName;
 
@@ -87,12 +95,16 @@ public class HostComponentPO extends BasePO implements Serializable {
     private String serviceUser;
 
     @Transient
-    @Column(name = "\"root\"")
-    private String root;
-
-    @Transient
     @Column(name = "component_name")
     private String componentName;
+
+    @Transient
+    @Column(name = "display_name")
+    private String displayName;
+
+    @Transient
+    @Column(name = "category")
+    private String category;
 
     @Transient
     @Column(name = "command_script")

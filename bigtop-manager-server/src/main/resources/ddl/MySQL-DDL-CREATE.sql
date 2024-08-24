@@ -109,6 +109,7 @@ CREATE TABLE `component`
     `custom_commands` LONGTEXT,
     `display_name`    VARCHAR(255),
     `quick_link`      VARCHAR(255),
+    `cardinality`     VARCHAR(255),
     `update_by`       BIGINT,
     `update_time`     DATETIME,
     `cluster_id`      BIGINT,

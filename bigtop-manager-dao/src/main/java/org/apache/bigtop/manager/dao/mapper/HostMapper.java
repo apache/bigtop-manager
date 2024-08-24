@@ -35,4 +35,6 @@ public interface HostMapper extends BaseMapper<HostPO> {
     List<HostPO> findAllByHostnameIn(@Param("hostnames") Collection<String> hostnames);
 
     List<HostPO> findAllByClusterId(@Param("clusterId") Long clusterId);
+
+    HostPO findByIdJoin(@Param("id") Long id);
 }

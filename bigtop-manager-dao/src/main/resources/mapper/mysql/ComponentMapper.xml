@@ -24,10 +24,10 @@
 <mapper namespace="org.apache.bigtop.manager.dao.mapper.ComponentMapper">
 
     <sql id="baseColumns">
-        id, component_name, display_name, command_script, custom_commands, category, quick_link, service_id, cluster_id
+        id, component_name, display_name, command_script, custom_commands, category, quick_link, cardinality, service_id, cluster_id
     </sql>
     <sql id="baseColumnsV2">
-        ${alias}.id, ${alias}.component_name, ${alias}.command_script, ${alias}.custom_commands, ${alias}.category, ${alias}.quick_link, ${alias}.service_id, ${alias}.cluster_id
+        ${alias}.id, ${alias}.component_name, ${alias}.display_name, ${alias}.command_script, ${alias}.custom_commands, ${alias}.category, ${alias}.quick_link, ${alias}.cardinality, ${alias}.service_id, ${alias}.cluster_id
     </sql>
 
     <select id="findByClusterIdAndComponentName"
@@ -49,12 +49,19 @@
     <select id="findAllByClusterId"
             resultType="org.apache.bigtop.manager.dao.po.ComponentPO">
         select
-        <include refid="baseColumns"/>
+        <include refid="baseColumnsV2">
+            <property name="alias" value="r"/>
+        </include>
+            ,c.cluster_name, s.service_name
         from
-        component
+        component r
+        left join cluster c
+        on r.cluster_id = c.id
+            left join service s
+            on r.service_id = s.id
         <where>
             <if test="clusterId != 0">
-                cluster_id = #{clusterId}
+                r.cluster_id = #{clusterId}
             </if>
         </where>
     </select>

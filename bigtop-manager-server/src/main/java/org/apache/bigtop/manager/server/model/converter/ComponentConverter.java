@@ -54,8 +54,6 @@ public interface ComponentConverter {
     @Mapping(target = "componentName", source = "name")
     ComponentDTO fromModel2DTO(ComponentModel componentModel);
 
-    @Mapping(target = "serviceName", source = "servicePO.serviceName")
-    @Mapping(target = "clusterName", source = "clusterPO.clusterName")
     ComponentVO fromPO2VO(ComponentPO componentPO);
 
     List<ComponentVO> fromPO2VO(List<ComponentPO> componentPOList);

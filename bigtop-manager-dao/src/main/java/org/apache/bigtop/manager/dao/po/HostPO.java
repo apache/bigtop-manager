@@ -18,6 +18,7 @@
  */
 package org.apache.bigtop.manager.dao.po;
 
+import jakarta.persistence.Transient;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -90,6 +91,10 @@ public class HostPO extends BasePO implements Serializable {
 
     @Column(name = "cluster_id")
     private Long clusterId;
+
+    @Transient
+    @Column(name = "cluster_name")
+    private String clusterName;
 
     @ManyToOne
     @JoinColumn(name = "cluster_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))

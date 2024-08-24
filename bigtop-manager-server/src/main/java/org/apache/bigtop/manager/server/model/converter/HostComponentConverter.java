@@ -23,7 +23,6 @@ import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.vo.HostComponentVO;
 
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -33,12 +32,6 @@ public interface HostComponentConverter {
 
     HostComponentConverter INSTANCE = Mappers.getMapper(HostComponentConverter.class);
 
-    @Mapping(target = "componentName", source = "componentPO.componentName")
-    @Mapping(target = "displayName", source = "componentPO.displayName")
-    @Mapping(target = "category", source = "componentPO.category")
-    @Mapping(target = "serviceName", source = "componentPO.servicePO.serviceName")
-    @Mapping(target = "clusterName", source = "componentPO.clusterPO.clusterName")
-    @Mapping(target = "hostname", source = "hostPO.hostname")
     HostComponentVO fromPO2VO(HostComponentPO hostComponentPO);
 
     List<HostComponentVO> fromPO2VO(List<HostComponentPO> hostComponentPOList);

@@ -58,7 +58,7 @@ public class JobPO extends BasePO implements Serializable {
     private Long id;
 
     @Column(name = "state")
-    private JobState state;
+    private String state;
 
     @Column(name = "name")
     private String name;
