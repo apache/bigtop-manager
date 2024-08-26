@@ -166,7 +166,7 @@ public class AIChatServiceImpl implements AIChatService {
         }
         Long userId = SessionUserHolder.getUserId();
         UserPO userPO = userRepository.findById(userId).orElse(null);
-        if (userPO != null && !Objects.equals(userId, userPO.getId())) {
+        if (userPO != null && !Objects.equals(userId, platformAuthorizedPO.getId())) {
             return null;
         }
         PlatformPO platformPO = platformRepository.findById(platformAuthorizedPO.getPlatformId()).orElse(null);
@@ -181,30 +181,39 @@ public class AIChatServiceImpl implements AIChatService {
         ChatThreadPO chatThreadPO = new ChatThreadPO();
         chatThreadPO.setUserPO(userPO);
         chatThreadPO.setModel(model);
-        chatThreadPO.setPlatformPO(platformAuthorizedPO);
+        chatThreadPO.setPlatformAuthorizedPO(platformAuthorizedPO);
         chatThreadRepository.save(chatThreadPO);
         return ChatThreadConverter.INSTANCE.fromPO2VO(chatThreadPO);
     }
 
     @Override
     public int deleteChatThreads(Long platformId, Long threadId) {
-        Random random = new Random();
-        int randomInt = random.nextInt();
-        return randomInt % 2;
+        Long userId = SessionUserHolder.getUserId();
+        UserPO userPO = userRepository.findById(userId).orElseThrow(() -> new ApiException(ApiExceptionEnum.NEED_LOGIN));
+        List<ChatThreadPO> chatThreadPOS = chatThreadRepository.findAllByUserPO(userPO);
+        for (ChatThreadPO chatThreadPO : chatThreadPOS) {
+            if (chatThreadPO.getId().equals(threadId) && chatThreadPO.getPlatformAuthorizedPO().getId().equals(platformId)) {
+                chatThreadRepository.deleteById(threadId);
+                return 0;
+            }
+        }
+        return -1;
     }
 
     @Override
     public List<ChatThreadVO> getAllChatThreads(Long platformId, String model) {
-        List<ChatThreadVO> chatThreads = new ArrayList<>();
-        if (model.equals("GPT-3.5")) {
-            ChatThreadVO chatThreadVO = new ChatThreadVO(1L, platformId, "GPT-3.5", DateUtils.format(new Date()));
-            chatThreads.add(chatThreadVO);
-            ChatThreadVO chatThreadVO2 = new ChatThreadVO(3L, platformId, "GPT-3.5", DateUtils.format(new Date()));
-            chatThreads.add(chatThreadVO2);
+        PlatformAuthorizedPO platformAuthorizedPO = platformAuthorizedRepository.findById(platformId).orElse(null);
+        if (platformAuthorizedPO == null) {
+            log.info("No platform auth {}", platformId);
+            return null;
         }
-        if (model.equals("GPT-4o")) {
-            ChatThreadVO chatThreadVO = new ChatThreadVO(2L, platformId, "GPT-4o", DateUtils.format(new Date()));
-            chatThreads.add(chatThreadVO);
+        List<ChatThreadPO> chatThreadPOS = chatThreadRepository.findAllByPlatformAuthorizedPO(platformAuthorizedPO);
+        List<ChatThreadVO> chatThreads = new ArrayList<>();
+        for (ChatThreadPO chatThreadPO : chatThreadPOS) {
+            ChatThreadVO chatThreadVO = ChatThreadConverter.INSTANCE.fromPO2VO(chatThreadPO);
+            if (chatThreadVO.getModel().equals(model)) {
+                chatThreads.add(chatThreadVO);
+            }
         }
         return chatThreads;
     }

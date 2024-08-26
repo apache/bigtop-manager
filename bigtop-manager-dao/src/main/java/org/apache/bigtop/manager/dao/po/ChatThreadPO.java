@@ -43,5 +43,5 @@ public class ChatThreadPO extends BasePO {
 
     @ManyToOne
     @JoinColumn(name = "platform_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private PlatformAuthorizedPO platformPO;
+    private PlatformAuthorizedPO platformAuthorizedPO;
 }
