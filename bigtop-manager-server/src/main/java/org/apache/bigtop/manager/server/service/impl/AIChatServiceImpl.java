@@ -20,6 +20,7 @@ package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.ai.assistant.GeneralAssistantFactory;
 import org.apache.bigtop.manager.ai.assistant.provider.AIAssistantConfig;
+import org.apache.bigtop.manager.ai.assistant.store.PersistentChatMemoryStore;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistantFactory;
@@ -29,24 +30,24 @@ import org.apache.bigtop.manager.dao.po.ChatThreadPO;
 import org.apache.bigtop.manager.dao.po.PlatformAuthorizedPO;
 import org.apache.bigtop.manager.dao.po.PlatformPO;
 import org.apache.bigtop.manager.dao.po.UserPO;
-import org.apache.bigtop.manager.dao.repository.ChatThreadRepository;
-import org.apache.bigtop.manager.dao.repository.PlatformAuthorizedRepository;
-import org.apache.bigtop.manager.dao.repository.PlatformRepository;
-import org.apache.bigtop.manager.dao.repository.UserRepository;
+import org.apache.bigtop.manager.dao.repository.*;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.holder.SessionUserHolder;
+import org.apache.bigtop.manager.server.model.converter.ChatMessageConverter;
 import org.apache.bigtop.manager.server.model.converter.ChatThreadConverter;
 import org.apache.bigtop.manager.server.model.converter.PlatformAuthorizedConverter;
 import org.apache.bigtop.manager.server.model.converter.PlatformConverter;
 import org.apache.bigtop.manager.server.model.dto.PlatformDTO;
 import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
+import org.apache.bigtop.manager.dao.po.ChatMessagePO;
 import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
 import org.apache.bigtop.manager.server.model.vo.PlatformAuthCredentialVO;
 import org.apache.bigtop.manager.server.model.vo.PlatformAuthorizedVO;
 import org.apache.bigtop.manager.server.model.vo.PlatformVO;
 import org.apache.bigtop.manager.server.service.AIChatService;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -79,7 +80,17 @@ public class AIChatServiceImpl implements AIChatService {
     @Resource
     private ChatThreadRepository chatThreadRepository;
 
-    private final AIAssistantFactory aiAssistantFactory = new GeneralAssistantFactory();
+    @Resource
+    private ChatMessageRepository chatMessageRepository;
+
+    private AIAssistantFactory aiAssistantFactory;
+
+    public AIAssistantFactory getAiAssistantFactory() {
+        if (aiAssistantFactory == null) {
+            aiAssistantFactory = new GeneralAssistantFactory(new PersistentChatMemoryStore(chatThreadRepository, chatMessageRepository));
+        }
+        return aiAssistantFactory;
+    }
 
     @Override
     public List<PlatformVO> platforms() {
@@ -271,8 +282,8 @@ public class AIChatServiceImpl implements AIChatService {
                 .set("modelName", OpenAiChatModelName.GPT_3_5_TURBO.toString())
                 .build();
 
-        AIAssistant aiAssistant = aiAssistantFactory.create(PlatformType.OPENAI, configProvider);
-        Flux<String> stringFlux = aiAssistant.streamAsk("hello, write a 100 words story");
+        AIAssistant aiAssistant = getAiAssistantFactory().create(PlatformType.OPENAI, configProvider, threadId);
+        Flux<String> stringFlux = aiAssistant.streamAsk(message);
 
         SseEmitter emitter = new SseEmitter();
         stringFlux.subscribe(
@@ -291,19 +302,16 @@ public class AIChatServiceImpl implements AIChatService {
     @Override
     public List<ChatMessageVO> history(Long platformId, Long threadId) {
         List<ChatMessageVO> chatMessages = new ArrayList<>();
-        Random random = new Random();
-        int numberOfMessages = random.nextInt(11);
-        boolean isUser = true;
-
-        for (int i = 0; i < numberOfMessages; i++) {
-            String sender = isUser ? "user" : "AI";
-            String messageText = isUser ? "hello" : "hello, I'm GPT";
-            messageText += i;
-
-            ChatMessageVO message = new ChatMessageVO(sender, messageText, DateUtils.format(new Date()));
-            chatMessages.add(message);
-
-            isUser = !isUser;
+        ChatThreadPO chatThreadPO = chatThreadRepository.findById(threadId).orElse(null);
+        if (chatThreadPO == null) {
+            return null;
+        }
+        List<ChatMessagePO> chatMessagePOs = chatMessageRepository.findAllByChatThreadPO(chatThreadPO);
+        for (ChatMessagePO chatMessagePO : chatMessagePOs) {
+            ChatMessageVO chatMessageVO = ChatMessageConverter.INSTANCE.fromPO2VO(chatMessagePO);
+            if (chatMessageVO.getSender().equals("User") || chatMessageVO.getSender().equals("AI")) {
+                chatMessages.add(chatMessageVO);
+            }
         }
         return chatMessages;
     }

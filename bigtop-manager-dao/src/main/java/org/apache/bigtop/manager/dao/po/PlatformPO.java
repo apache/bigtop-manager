@@ -37,7 +37,7 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "\"platform\"")
-@TableGenerator(name = "user_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
+@TableGenerator(name = "platform_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
 public class PlatformPO extends BasePO {
 
     @Id

@@ -44,6 +44,10 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
         this.systemPromptProvider = systemPromptProvider;
     }
 
+    public GeneralAssistantFactory(ChatMemoryStore chatMemoryStore) {
+        this.chatMemoryStore = chatMemoryStore;
+    }
+
     public GeneralAssistantFactory(SystemPromptProvider systemPromptProvider, ChatMemoryStore chatMemoryStore) {
         this.systemPromptProvider = systemPromptProvider;
         this.chatMemoryStore = chatMemoryStore;

@@ -18,19 +18,18 @@
  */
 package org.apache.bigtop.manager.dao.repository;
 
+import org.apache.bigtop.manager.dao.po.ChatMessagePO;
 import org.apache.bigtop.manager.dao.po.ChatThreadPO;
 import org.apache.bigtop.manager.dao.po.PlatformAuthorizedPO;
 import org.apache.bigtop.manager.dao.po.UserPO;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-public interface ChatThreadRepository extends JpaRepository<ChatThreadPO, Long> {
-    List<ChatThreadPO> findAllByUserPO(UserPO userPO);
+public interface ChatMessageRepository extends JpaRepository<ChatMessagePO, Long> {
+    List<ChatMessagePO> findAllByChatThreadPO(ChatThreadPO chatThread);
 
-    List<ChatThreadPO> findAllByPlatformAuthorizedPO(PlatformAuthorizedPO platformAuthorizedPO);
-
+    void deleteByChatThreadPO(ChatThreadPO chatThreadPO);
     //    PlatformPO findById(Long id);
 }

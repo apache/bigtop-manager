@@ -16,21 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.dao.repository;
+package org.apache.bigtop.manager.server.model.converter;
 
+import org.apache.bigtop.manager.dao.po.ChatMessagePO;
 import org.apache.bigtop.manager.dao.po.ChatThreadPO;
-import org.apache.bigtop.manager.dao.po.PlatformAuthorizedPO;
-import org.apache.bigtop.manager.dao.po.UserPO;
+import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
+import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
+import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.factory.Mappers;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+@Mapper(config = MapStructSharedConfig.class)
+public interface ChatMessageConverter {
+    ChatMessageConverter INSTANCE = Mappers.getMapper(ChatMessageConverter.class);
 
-import java.util.List;
-
-public interface ChatThreadRepository extends JpaRepository<ChatThreadPO, Long> {
-    List<ChatThreadPO> findAllByUserPO(UserPO userPO);
-
-    List<ChatThreadPO> findAllByPlatformAuthorizedPO(PlatformAuthorizedPO platformAuthorizedPO);
-
-    //    PlatformPO findById(Long id);
+    ChatMessageVO fromPO2VO(ChatMessagePO chatMessagePO);
 }
