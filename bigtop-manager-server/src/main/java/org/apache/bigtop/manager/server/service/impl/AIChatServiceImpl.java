@@ -50,8 +50,8 @@ import org.apache.bigtop.manager.server.model.vo.PlatformAuthCredentialVO;
 import org.apache.bigtop.manager.server.model.vo.PlatformAuthorizedVO;
 import org.apache.bigtop.manager.server.model.vo.PlatformVO;
 import org.apache.bigtop.manager.server.service.AIChatService;
-
 import org.apache.bigtop.manager.server.utils.MessageSourceUtils;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -143,7 +143,8 @@ public class AIChatServiceImpl implements AIChatService {
         }
         aiAssistantConfigBuilder = aiAssistantConfigBuilder.set("baseUrl", platformPO.getApiUrl());
         aiAssistantConfigBuilder = aiAssistantConfigBuilder.set("memoryLen", "10");
-        aiAssistantConfigBuilder = aiAssistantConfigBuilder.set("modelName", platformPO.getSupportModels().split(",")[0]);
+        aiAssistantConfigBuilder = aiAssistantConfigBuilder.set(
+                "modelName", platformPO.getSupportModels().split(",")[0]);
         AIAssistantConfigProvider configProvider = aiAssistantConfigBuilder.build();
         if (!Objects.equals(platformPO.getName(), "OpenAI")) {
             throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
