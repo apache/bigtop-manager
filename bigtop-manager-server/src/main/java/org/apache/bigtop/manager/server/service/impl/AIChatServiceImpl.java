@@ -18,17 +18,24 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
+import dev.langchain4j.model.openai.OpenAiChatModelName;
 import jakarta.annotation.Resource;
+import org.apache.bigtop.manager.ai.assistant.GeneralAssistantFactory;
+import org.apache.bigtop.manager.ai.assistant.provider.AIAssistantConfig;
+import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.common.utils.DateUtils;
+import org.apache.bigtop.manager.dao.po.ChatThreadPO;
 import org.apache.bigtop.manager.dao.po.PlatformAuthorizedPO;
 import org.apache.bigtop.manager.dao.po.PlatformPO;
 import org.apache.bigtop.manager.dao.po.UserPO;
+import org.apache.bigtop.manager.dao.repository.ChatThreadRepository;
 import org.apache.bigtop.manager.dao.repository.PlatformAuthorizedRepository;
 import org.apache.bigtop.manager.dao.repository.PlatformRepository;
 import org.apache.bigtop.manager.dao.repository.UserRepository;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.holder.SessionUserHolder;
+import org.apache.bigtop.manager.server.model.converter.ChatThreadConverter;
 import org.apache.bigtop.manager.server.model.converter.PlatformAuthorizedConverter;
 import org.apache.bigtop.manager.server.model.converter.PlatformConverter;
 import org.apache.bigtop.manager.server.model.dto.PlatformDTO;
@@ -38,12 +45,15 @@ import org.apache.bigtop.manager.server.model.vo.PlatformAuthCredentialVO;
 import org.apache.bigtop.manager.server.model.vo.PlatformAuthorizedVO;
 import org.apache.bigtop.manager.server.model.vo.PlatformVO;
 import org.apache.bigtop.manager.server.service.AIChatService;
-
+import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
+import org.apache.bigtop.manager.ai.core.factory.AIAssistantFactory;
+import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Flux;
 
 import java.io.IOException;
 import java.util.*;
@@ -57,6 +67,10 @@ public class AIChatServiceImpl implements AIChatService {
     private PlatformAuthorizedRepository platformAuthorizedRepository;
     @Resource
     private UserRepository userRepository;
+    @Resource
+    private ChatThreadRepository chatThreadRepository;
+
+    private final AIAssistantFactory aiAssistantFactory = new GeneralAssistantFactory();
 
     @Override
     public List<PlatformVO> platforms() {
@@ -145,8 +159,31 @@ public class AIChatServiceImpl implements AIChatService {
 
     @Override
     public ChatThreadVO createChatThreads(Long platformId, String model) {
-
-        return new ChatThreadVO(1L, platformId, model, DateUtils.format(new Date()));
+        PlatformAuthorizedPO platformAuthorizedPO = platformAuthorizedRepository.findById(platformId).orElse(null);
+        if (platformAuthorizedPO == null) {
+            log.info("No platform auth {}", platformId);
+            return null;
+        }
+        Long userId = SessionUserHolder.getUserId();
+        UserPO userPO = userRepository.findById(userId).orElse(null);
+        if (userPO != null && !Objects.equals(userId, userPO.getId())) {
+            return null;
+        }
+        PlatformPO platformPO = platformRepository.findById(platformAuthorizedPO.getPlatformId()).orElse(null);
+        if (platformPO == null) {
+            log.info("No platform {}", platformAuthorizedPO.getPlatformId());
+            return null;
+        }
+        List<String> support_models = List.of(platformPO.getSupportModels().split(","));
+        if (!support_models.contains(model)) {
+            return null;
+        }
+        ChatThreadPO chatThreadPO = new ChatThreadPO();
+        chatThreadPO.setUserPO(userPO);
+        chatThreadPO.setModel(model);
+        chatThreadPO.setPlatformPO(platformAuthorizedPO);
+        chatThreadRepository.save(chatThreadPO);
+        return ChatThreadConverter.INSTANCE.fromPO2VO(chatThreadPO);
     }
 
     @Override
@@ -174,51 +211,49 @@ public class AIChatServiceImpl implements AIChatService {
 
     @Override
     public SseEmitter talk(Long platformId, Long threadId, String message) {
-        String fullMessage = "Don't ask me" + message;
-        fullMessage +=
-                """
-                I won't tell you Bigtop Manager provides a modern, low-threshold web application to simplify \
-                the deployment and management of components for Bigtop, similar to Apache Ambari and Cloudera \
-                Manager.
-                And Bigtop Manager provides a modern, low-threshold web application to simplify \
-                the deployment and management of components for Bigtop, similar to Apache Ambari and Cloudera \
-                Manager.
-                """;
+        ChatThreadPO chatThreadPO = chatThreadRepository.findById(threadId).orElse(null);
+        if (chatThreadPO == null) {
+            return null;
+        }
+        Long userId = SessionUserHolder.getUserId();
+        UserPO userPO = userRepository.findById(userId).orElse(null);
+        if (userPO == null) {
+            return null;
+        }
+        if (!chatThreadPO.getUserPO().getId().equals(userPO.getId())) {
+            return null;
+        }
+        PlatformAuthorizedPO platformAuthorizedPO = platformAuthorizedRepository.findById(platformId).orElse(null);
+        if (platformAuthorizedPO == null) {
+            return null;
+        }
+        if (!platformAuthorizedPO.getId().equals(platformId)) {
+            return null;
+        }
+        AIAssistantConfigProvider configProvider;
+        configProvider = AIAssistantConfig.builder().set("apiKey", "sk-YxmC0296FXAw7XaILnbsspfl8hO534G6KOUsajwdQCIspMVz")
+                // The `baseUrl` has a default value that is automatically generated based on the `PlatformType`.
+                .set("baseUrl", "https://api.chatanywhere.tech/v1")
+                // default 30
+                .set("memoryLen", "10")
+                .set("modelName", OpenAiChatModelName.GPT_3_5_TURBO.toString())
+                .build();
+
+        AIAssistant aiAssistant = aiAssistantFactory.create(PlatformType.OPENAI, configProvider);
+        Flux<String> stringFlux = aiAssistant.streamAsk("hello, write a 100 words story");
 
         SseEmitter emitter = new SseEmitter();
-        Random random = new Random();
-
-        try {
-            StringBuilder remainingMessage = new StringBuilder(fullMessage);
-
-            while (!remainingMessage.isEmpty()) {
-                int charsToSend = random.nextInt(21);
-                // 2% probability of simulated transmission failure
-                if (random.nextInt(50) == 2) {
+        stringFlux.subscribe(
+                data -> {
                     try {
-                        emitter.send(SseEmitter.event().name("error").data("broken pipe"));
-                    } catch (IOException e) {
+                        emitter.send(SseEmitter.event().name("message").data(data));
+                    } catch (Exception e) {
                         emitter.completeWithError(e);
                     }
-                    emitter.complete();
-                    return emitter;
-                }
-                charsToSend = Math.min(charsToSend, remainingMessage.length());
-
-                String part = remainingMessage.substring(0, charsToSend);
-                remainingMessage.delete(0, charsToSend);
-
-                emitter.send(SseEmitter.event().name("message").data(part));
-
-                int delay = random.nextInt(101);
-                Thread.sleep(delay);
-            }
-        } catch (IOException | InterruptedException e) {
-            emitter.completeWithError(e);
-            throw new RuntimeException(e);
-        }
-
-        emitter.complete();
+                },
+                emitter::completeWithError,
+                emitter::complete
+        );
         return emitter;
     }
 
