@@ -119,16 +119,13 @@ public class AIChatServiceImpl implements AIChatService {
     @Override
     public PlatformVO addAuthorizedPlatform(PlatformDTO platformDTO) {
         Optional<PlatformPO> optionalPlatform = platformRepository.findById(platformDTO.getPlatformId());
-        PlatformPO platformPO = optionalPlatform.orElse(null);
-        if (platformPO == null) {
-            return null;
-        }
+        PlatformPO platformPO = optionalPlatform.orElseThrow(()->new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND));
         Map<String, String> credentialNeed = platformPO.getCredential();
         Map<String, String> credentialGet = platformDTO.getAuthCredentials();
         Map<String, String> credentialSet = new HashMap<>();
         for (String key : credentialNeed.keySet()) {
             if (!credentialGet.containsKey(key)) {
-                return null;
+                throw new ApiException(ApiExceptionEnum.CREDIT_INCORRECT);
             }
             credentialSet.put(key, credentialGet.get(key));
         }
@@ -155,10 +152,7 @@ public class AIChatServiceImpl implements AIChatService {
 
     @Override
     public List<PlatformAuthCredentialVO> platformsAuthCredential(Long platformId) {
-        PlatformPO platformPO = platformRepository.findById(platformId).orElse(null);
-        if (platformPO == null) {
-            return null;
-        }
+        PlatformPO platformPO = platformRepository.findById(platformId).orElseThrow(()->new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND));
         List<PlatformAuthCredentialVO> platformAuthCredentialVOs = new ArrayList<>();
         for (String key : platformPO.getCredential().keySet()) {
             PlatformAuthCredentialVO platformAuthCredentialVO =
@@ -169,7 +163,7 @@ public class AIChatServiceImpl implements AIChatService {
     }
 
     @Override
-    public int deleteAuthorizedPlatform(Long platformId) {
+    public boolean deleteAuthorizedPlatform(Long platformId) {
         Long userId = SessionUserHolder.getUserId();
         UserPO userPO =
                 userRepository.findById(userId).orElseThrow(() -> new ApiException(ApiExceptionEnum.NEED_LOGIN));
@@ -177,20 +171,16 @@ public class AIChatServiceImpl implements AIChatService {
         for (PlatformAuthorizedPO authorizedPlatformPO : authorizedPlatformPOs) {
             if (authorizedPlatformPO.getId().equals(platformId)) {
                 platformAuthorizedRepository.deleteById(authorizedPlatformPO.getId());
-                return 0;
+                return true;
             }
         }
-        return 1;
+        throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
     }
 
     @Override
     public ChatThreadVO createChatThreads(Long platformId, String model) {
         PlatformAuthorizedPO platformAuthorizedPO =
-                platformAuthorizedRepository.findById(platformId).orElse(null);
-        if (platformAuthorizedPO == null) {
-            log.info("No platform auth {}", platformId);
-            return null;
-        }
+                platformAuthorizedRepository.findById(platformId).orElseThrow(()->new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED));
         Long userId = SessionUserHolder.getUserId();
         UserPO userPO = userRepository.findById(userId).orElse(null);
         if (userPO != null && !Objects.equals(userId, platformAuthorizedPO.getId())) {
@@ -198,14 +188,10 @@ public class AIChatServiceImpl implements AIChatService {
         }
         PlatformPO platformPO = platformRepository
                 .findById(platformAuthorizedPO.getPlatformId())
-                .orElse(null);
-        if (platformPO == null) {
-            log.info("No platform {}", platformAuthorizedPO.getPlatformId());
-            return null;
-        }
+                .orElseThrow(()->new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND));
         List<String> support_models = List.of(platformPO.getSupportModels().split(","));
         if (!support_models.contains(model)) {
-            return null;
+            throw new ApiException(ApiExceptionEnum.MODEL_NOT_SUPPORTED);
         }
         ChatThreadPO chatThreadPO = new ChatThreadPO();
         chatThreadPO.setUserPO(userPO);
@@ -216,7 +202,7 @@ public class AIChatServiceImpl implements AIChatService {
     }
 
     @Override
-    public int deleteChatThreads(Long platformId, Long threadId) {
+    public boolean deleteChatThreads(Long platformId, Long threadId) {
         Long userId = SessionUserHolder.getUserId();
         UserPO userPO =
                 userRepository.findById(userId).orElseThrow(() -> new ApiException(ApiExceptionEnum.NEED_LOGIN));
@@ -225,20 +211,16 @@ public class AIChatServiceImpl implements AIChatService {
             if (chatThreadPO.getId().equals(threadId)
                     && chatThreadPO.getPlatformAuthorizedPO().getId().equals(platformId)) {
                 chatThreadRepository.deleteById(threadId);
-                return 0;
+                return true;
             }
         }
-        return -1;
+        throw new ApiException(ApiExceptionEnum.CHAT_THREAD_NOT_FOUND);
     }
 
     @Override
     public List<ChatThreadVO> getAllChatThreads(Long platformId, String model) {
         PlatformAuthorizedPO platformAuthorizedPO =
-                platformAuthorizedRepository.findById(platformId).orElse(null);
-        if (platformAuthorizedPO == null) {
-            log.info("No platform auth {}", platformId);
-            return null;
-        }
+                platformAuthorizedRepository.findById(platformId).orElseThrow(() -> new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED));
         List<ChatThreadPO> chatThreadPOS = chatThreadRepository.findAllByPlatformAuthorizedPO(platformAuthorizedPO);
         List<ChatThreadVO> chatThreads = new ArrayList<>();
         for (ChatThreadPO chatThreadPO : chatThreadPOS) {
@@ -254,34 +236,32 @@ public class AIChatServiceImpl implements AIChatService {
     public SseEmitter talk(Long platformId, Long threadId, String message) {
         ChatThreadPO chatThreadPO = chatThreadRepository.findById(threadId).orElse(null);
         if (chatThreadPO == null) {
-            return null;
+            throw new ApiException(ApiExceptionEnum.CHAT_THREAD_NOT_FOUND);
         }
         Long userId = SessionUserHolder.getUserId();
         UserPO userPO = userRepository.findById(userId).orElse(null);
-        if (userPO == null) {
-            return null;
-        }
-        if (!chatThreadPO.getUserPO().getId().equals(userPO.getId())) {
-            return null;
+        if (userPO == null || !Objects.equals(userId, chatThreadPO.getUserPO().getId())) {
+            throw new ApiException(ApiExceptionEnum.CHAT_THREAD_NOT_FOUND);
         }
         PlatformAuthorizedPO platformAuthorizedPO =
                 platformAuthorizedRepository.findById(platformId).orElse(null);
-        if (platformAuthorizedPO == null) {
-            return null;
+        if (platformAuthorizedPO == null || !Objects.equals(platformAuthorizedPO.getId(), platformId)) {
+            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED);
         }
-        if (!platformAuthorizedPO.getId().equals(platformId)) {
-            return null;
+        PlatformPO platformPO = platformRepository.findById(platformAuthorizedPO.getPlatformId()).orElseThrow(() -> new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND));
+        AIAssistantConfig.Builder aiAssistantConfigBuilder =  AIAssistantConfig.builder();
+        log.info(platformAuthorizedPO.getCredentials().toString());
+        for (String key: platformAuthorizedPO.getCredentials().keySet()) {
+            log.info(key, platformAuthorizedPO.getCredentials().get(key));
+            aiAssistantConfigBuilder = aiAssistantConfigBuilder.set(key, platformAuthorizedPO.getCredentials().get(key));
         }
-        AIAssistantConfigProvider configProvider;
-        configProvider = AIAssistantConfig.builder()
-                .set("apiKey", "sk-YxmC0296FXAw7XaILnbsspfl8hO534G6KOUsajwdQCIspMVz")
-                // The `baseUrl` has a default value that is automatically generated based on the `PlatformType`.
-                .set("baseUrl", "https://api.chatanywhere.tech/v1")
-                // default 30
-                .set("memoryLen", "10")
-                .set("modelName", OpenAiChatModelName.GPT_3_5_TURBO.toString())
-                .build();
-
+        aiAssistantConfigBuilder = aiAssistantConfigBuilder.set("baseUrl", platformPO.getApiUrl());
+        aiAssistantConfigBuilder = aiAssistantConfigBuilder.set("memoryLen", "10");
+        aiAssistantConfigBuilder = aiAssistantConfigBuilder.set("modelName", chatThreadPO.getModel());
+        AIAssistantConfigProvider configProvider = aiAssistantConfigBuilder.build();
+        if (!Objects.equals(platformPO.getName(), "OpenAI")) {
+            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
+        }
         AIAssistant aiAssistant = getAiAssistantFactory().create(PlatformType.OPENAI, configProvider, threadId);
         Flux<String> stringFlux = aiAssistant.streamAsk(message);
 
@@ -302,10 +282,7 @@ public class AIChatServiceImpl implements AIChatService {
     @Override
     public List<ChatMessageVO> history(Long platformId, Long threadId) {
         List<ChatMessageVO> chatMessages = new ArrayList<>();
-        ChatThreadPO chatThreadPO = chatThreadRepository.findById(threadId).orElse(null);
-        if (chatThreadPO == null) {
-            return null;
-        }
+        ChatThreadPO chatThreadPO = chatThreadRepository.findById(threadId).orElseThrow(() -> new ApiException(ApiExceptionEnum.CHAT_THREAD_NOT_FOUND));
         List<ChatMessagePO> chatMessagePOs = chatMessageRepository.findAllByChatThreadPO(chatThreadPO);
         for (ChatMessagePO chatMessagePO : chatMessagePOs) {
             ChatMessageVO chatMessageVO = ChatMessageConverter.INSTANCE.fromPO2VO(chatMessagePO);

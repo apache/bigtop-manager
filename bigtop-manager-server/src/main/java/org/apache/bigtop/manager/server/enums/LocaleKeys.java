@@ -56,6 +56,13 @@ public enum LocaleKeys {
 
     COMMAND_NOT_FOUND("command.not.found"),
     COMMAND_NOT_SUPPORTED("command.not.supported"),
+
+    PLATFORM_NOT_FOUND("platform.not.found"),
+    PLATFORM_NOT_AUTHORIZED("platform.not.authorized"),
+    PERMISSION_DENIED("permission.denied"),
+    CREDIT_INCORRECT("credit.incorrect"),
+    MODEL_NOT_SUPPORTED("model.not.supported"),
+    CHAT_THREAD_NOT_FOUND("chat.thread.not.found"),
     ;
 
     private final String key;
