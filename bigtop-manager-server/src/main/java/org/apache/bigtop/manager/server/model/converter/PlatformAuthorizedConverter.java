@@ -16,14 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.dto;
+package org.apache.bigtop.manager.server.model.converter;
 
-import lombok.Data;
+import org.apache.bigtop.manager.dao.po.PlatformAuthorizedPO;
+import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
+import org.apache.bigtop.manager.server.model.vo.PlatformAuthorizedVO;
 
-import java.util.Map;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.factory.Mappers;
 
-@Data
-public class PlatformDTO {
-    private Long platformId;
-    private Map<String, String> authCredentials;
+@Mapper(config = MapStructSharedConfig.class)
+public interface PlatformAuthorizedConverter {
+    PlatformAuthorizedConverter INSTANCE = Mappers.getMapper(PlatformAuthorizedConverter.class);
+
+    @Mapping(source = "id", target = "platformId")
+    PlatformAuthorizedVO fromPO2VO(PlatformAuthorizedPO platformAuthorizedPO);
 }

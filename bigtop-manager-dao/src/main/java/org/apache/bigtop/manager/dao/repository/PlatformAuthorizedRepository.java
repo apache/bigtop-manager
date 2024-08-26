@@ -16,14 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.dto;
+package org.apache.bigtop.manager.dao.repository;
 
-import lombok.Data;
+import org.apache.bigtop.manager.dao.po.PlatformAuthorizedPO;
+import org.apache.bigtop.manager.dao.po.UserPO;
 
-import java.util.Map;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-@Data
-public class PlatformDTO {
-    private Long platformId;
-    private Map<String, String> authCredentials;
+import java.util.List;
+
+public interface PlatformAuthorizedRepository extends JpaRepository<PlatformAuthorizedPO, Long> {
+    List<PlatformAuthorizedPO> findAllByUserPO(UserPO userPO);
+
+    //    List<PlatformAuthorizedPO> findByUserId(UserPO userPO);
+
+    //    PlatformPO findById(Long id);
 }

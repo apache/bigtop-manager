@@ -63,7 +63,7 @@ public class LocSystemPromptProvider implements SystemPromptProvider {
             log.error(
                     "Exception occurred while loading SystemPrompt from local. Here is some information:{}",
                     e.getMessage());
-            return SystemMessage.from("");
+            return SystemMessage.from("You are a helpful assistant.");
         }
     }
 }

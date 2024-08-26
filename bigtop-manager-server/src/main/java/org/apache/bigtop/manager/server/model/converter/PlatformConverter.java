@@ -18,16 +18,40 @@
  */
 package org.apache.bigtop.manager.server.model.converter;
 
+import org.apache.bigtop.manager.dao.po.PlatformPO;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.dto.PlatformDTO;
+import org.apache.bigtop.manager.server.model.req.AuthCredentialReq;
 import org.apache.bigtop.manager.server.model.req.PlatformReq;
+import org.apache.bigtop.manager.server.model.vo.PlatformVO;
 
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Mapper(config = MapStructSharedConfig.class)
 public interface PlatformConverter {
     PlatformConverter INSTANCE = Mappers.getMapper(PlatformConverter.class);
 
     PlatformDTO fromReq2DTO(PlatformReq platformReq);
+
+    PlatformVO fromPO2VO(PlatformPO platformPO);
+
+    default Map<String, String> mapAuthCredentials(List<AuthCredentialReq> authCredentials) {
+        if (authCredentials == null) {
+            return null;
+        }
+        return authCredentials.stream()
+                .collect(Collectors.toMap(AuthCredentialReq::getKey, AuthCredentialReq::getValue));
+    }
+
+    @AfterMapping
+    default void afterMapping(@MappingTarget PlatformDTO platformDTO, PlatformReq platformReq) {
+        platformDTO.setAuthCredentials(mapAuthCredentials(platformReq.getAuthCredentials()));
+    }
 }
