@@ -36,6 +36,7 @@ import org.apache.bigtop.manager.dao.repository.PlatformAuthorizedRepository;
 import org.apache.bigtop.manager.dao.repository.PlatformRepository;
 import org.apache.bigtop.manager.dao.repository.UserRepository;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
+import org.apache.bigtop.manager.server.enums.LocaleKeys;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.holder.SessionUserHolder;
 import org.apache.bigtop.manager.server.model.converter.ChatMessageConverter;
@@ -50,6 +51,7 @@ import org.apache.bigtop.manager.server.model.vo.PlatformAuthorizedVO;
 import org.apache.bigtop.manager.server.model.vo.PlatformVO;
 import org.apache.bigtop.manager.server.service.AIChatService;
 
+import org.apache.bigtop.manager.server.utils.MessageSourceUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -83,6 +85,8 @@ public class AIChatServiceImpl implements AIChatService {
     private ChatMessageRepository chatMessageRepository;
 
     private AIAssistantFactory aiAssistantFactory;
+
+    private final AIAssistantFactory aiTestFactory = new GeneralAssistantFactory();
 
     public AIAssistantFactory getAiAssistantFactory() {
         if (aiAssistantFactory == null) {
@@ -131,7 +135,25 @@ public class AIChatServiceImpl implements AIChatService {
             credentialSet.put(key, credentialGet.get(key));
         }
 
-        // TODO: test connect
+        AIAssistantConfig.Builder aiAssistantConfigBuilder = AIAssistantConfig.builder();
+        for (String key : platformDTO.getAuthCredentials().keySet()) {
+            log.info(key, platformDTO.getAuthCredentials().get(key));
+            aiAssistantConfigBuilder = aiAssistantConfigBuilder.set(
+                    key, platformDTO.getAuthCredentials().get(key));
+        }
+        aiAssistantConfigBuilder = aiAssistantConfigBuilder.set("baseUrl", platformPO.getApiUrl());
+        aiAssistantConfigBuilder = aiAssistantConfigBuilder.set("memoryLen", "10");
+        aiAssistantConfigBuilder = aiAssistantConfigBuilder.set("modelName", platformPO.getSupportModels().split(",")[0]);
+        AIAssistantConfigProvider configProvider = aiAssistantConfigBuilder.build();
+        if (!Objects.equals(platformPO.getName(), "OpenAI")) {
+            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
+        }
+        AIAssistant aiAssistant = aiTestFactory.create(PlatformType.OPENAI, configProvider);
+        try {
+            aiAssistant.ask("Answer one word.");
+        } catch (Exception e) {
+            throw new ApiException(ApiExceptionEnum.CREDIT_INCORRECT, e.getMessage());
+        }
 
         Long userId = SessionUserHolder.getUserId();
         UserPO userPO =
@@ -140,6 +162,7 @@ public class AIChatServiceImpl implements AIChatService {
         platformAuthorizedPO.setCredentials(credentialSet);
         platformAuthorizedPO.setPlatformId(platformPO.getId());
         platformAuthorizedPO.setUserPO(userPO);
+
         platformAuthorizedRepository.save(platformAuthorizedPO);
         PlatformVO platformVO = PlatformConverter.INSTANCE.fromPO2VO(platformPO);
         log.info(
@@ -271,6 +294,7 @@ public class AIChatServiceImpl implements AIChatService {
             throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
         }
         AIAssistant aiAssistant = getAiAssistantFactory().create(PlatformType.OPENAI, configProvider, threadId);
+        aiAssistant.setSystemPrompt(MessageSourceUtils.getMessage(LocaleKeys.CHAT_LANGUAGE_PROMPT));
         Flux<String> stringFlux = aiAssistant.streamAsk(message);
 
         SseEmitter emitter = new SseEmitter();

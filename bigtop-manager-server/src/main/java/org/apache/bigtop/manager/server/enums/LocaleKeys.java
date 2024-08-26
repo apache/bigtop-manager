@@ -63,6 +63,8 @@ public enum LocaleKeys {
     CREDIT_INCORRECT("credit.incorrect"),
     MODEL_NOT_SUPPORTED("model.not.supported"),
     CHAT_THREAD_NOT_FOUND("chat.thread.not.found"),
+
+    CHAT_LANGUAGE_PROMPT("chat.language.prompt"),
     ;
 
     private final String key;
