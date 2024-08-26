@@ -19,7 +19,11 @@ import jakarta.persistence.TableGenerator;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "\"chat_message\"")
-@TableGenerator(name = "chat_message_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
+@TableGenerator(
+        name = "chat_message_generator",
+        table = "sequence",
+        pkColumnName = "seq_name",
+        valueColumnName = "seq_count")
 public class ChatMessagePO extends BasePO {
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "chat_threads_generator")

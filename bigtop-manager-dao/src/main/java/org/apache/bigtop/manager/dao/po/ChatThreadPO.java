@@ -37,7 +37,11 @@ import jakarta.persistence.TableGenerator;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "\"chat_thread\"")
-@TableGenerator(name = "chat_thread_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
+@TableGenerator(
+        name = "chat_thread_generator",
+        table = "sequence",
+        pkColumnName = "seq_name",
+        valueColumnName = "seq_count")
 public class ChatThreadPO extends BasePO {
 
     @Id

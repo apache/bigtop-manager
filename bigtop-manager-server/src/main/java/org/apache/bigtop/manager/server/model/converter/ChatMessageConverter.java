@@ -19,12 +19,10 @@
 package org.apache.bigtop.manager.server.model.converter;
 
 import org.apache.bigtop.manager.dao.po.ChatMessagePO;
-import org.apache.bigtop.manager.dao.po.ChatThreadPO;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
-import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
+
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(config = MapStructSharedConfig.class)

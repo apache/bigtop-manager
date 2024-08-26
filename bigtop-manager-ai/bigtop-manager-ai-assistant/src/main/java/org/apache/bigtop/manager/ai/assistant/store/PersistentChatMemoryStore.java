@@ -1,22 +1,23 @@
 package org.apache.bigtop.manager.ai.assistant.store;
 
-import dev.langchain4j.data.message.*;
-import dev.langchain4j.store.memory.chat.ChatMemoryStore;
-import jakarta.annotation.Resource;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.dao.po.ChatMessagePO;
 import org.apache.bigtop.manager.dao.po.ChatThreadPO;
 import org.apache.bigtop.manager.dao.repository.ChatMessageRepository;
 import org.apache.bigtop.manager.dao.repository.ChatThreadRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
+
+import dev.langchain4j.data.message.AiMessage;
+import dev.langchain4j.data.message.ChatMessage;
+import dev.langchain4j.data.message.ChatMessageType;
+import dev.langchain4j.data.message.SystemMessage;
+import dev.langchain4j.data.message.UserMessage;
+import dev.langchain4j.store.memory.chat.ChatMemoryStore;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
-
 
 @Component
 @Slf4j
@@ -25,10 +26,12 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
     private final ChatThreadRepository chatThreadRepository;
     private final ChatMessageRepository chatMessageRepository;
 
-    public PersistentChatMemoryStore(ChatThreadRepository chatThreadRepository, ChatMessageRepository chatMessageRepository) {
+    public PersistentChatMemoryStore(
+            ChatThreadRepository chatThreadRepository, ChatMessageRepository chatMessageRepository) {
         this.chatThreadRepository = chatThreadRepository;
         this.chatMessageRepository = chatMessageRepository;
     }
+
     private ChatMessage convertToChatMessage(ChatMessagePO chatMessagePO) {
         if (chatMessagePO.getSender().equals("AI")) {
             return new AiMessage(chatMessagePO.getMessage());
@@ -43,11 +46,11 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
 
     private ChatMessagePO convertToChatMessagePO(ChatMessage chatMessage, Long chatThreadId) {
         ChatMessagePO chatMessagePO = new ChatMessagePO();
-        if (chatMessage.type().equals(ChatMessageType.AI) ){
+        if (chatMessage.type().equals(ChatMessageType.AI)) {
             chatMessagePO.setSender("AI");
             AiMessage aiMessage = (AiMessage) chatMessage;
             chatMessagePO.setMessage(aiMessage.text());
-        } else if (chatMessage.type().equals(ChatMessageType.USER) ){
+        } else if (chatMessage.type().equals(ChatMessageType.USER)) {
             chatMessagePO.setSender("User");
             UserMessage userMessage = (UserMessage) chatMessage;
             chatMessagePO.setMessage(userMessage.singleText());
@@ -64,7 +67,8 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
         } else {
             chatMessagePO.setUserPO(null);
         }
-        chatMessagePO.setChatThreadPO(chatThreadRepository.findById(chatThreadId).orElse(null));
+        chatMessagePO.setChatThreadPO(
+                chatThreadRepository.findById(chatThreadId).orElse(null));
         return chatMessagePO;
     }
 
@@ -80,26 +84,25 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
             return new ArrayList<>();
         }
         List<ChatMessagePO> chatMessages = chatMessageRepository.findAllByChatThreadPO(chatThreadPO);
-        if(chatMessages.isEmpty()){
+        if (chatMessages.isEmpty()) {
             return new ArrayList<>();
         } else {
-            return chatMessages.stream()
-                    .map(this::convertToChatMessage)
-                    .collect(Collectors.toList());
+            return chatMessages.stream().map(this::convertToChatMessage).collect(Collectors.toList());
         }
     }
 
     @Override
     public void updateMessages(Object threadId, List<ChatMessage> messages) {
         log.info("updateMessages called");
-            ChatMessagePO chatMessagePO = convertToChatMessagePO(messages.get(messages.size()-1),(Long) threadId);
-            chatMessageRepository.save(chatMessagePO);
+        ChatMessagePO chatMessagePO = convertToChatMessagePO(messages.get(messages.size() - 1), (Long) threadId);
+        chatMessageRepository.save(chatMessagePO);
     }
 
     @Override
     public void deleteMessages(Object threadId) {
         log.info("deleteMessages called");
-        ChatThreadPO  chatThreadPO = chatThreadRepository.findById((Long) threadId).orElse(null);
+        ChatThreadPO chatThreadPO =
+                chatThreadRepository.findById((Long) threadId).orElse(null);
         chatMessageRepository.deleteByChatThreadPO(chatThreadPO);
     }
 }

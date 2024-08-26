@@ -25,12 +25,16 @@ import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistantFactory;
 import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
-import org.apache.bigtop.manager.common.utils.DateUtils;
+import org.apache.bigtop.manager.dao.po.ChatMessagePO;
 import org.apache.bigtop.manager.dao.po.ChatThreadPO;
 import org.apache.bigtop.manager.dao.po.PlatformAuthorizedPO;
 import org.apache.bigtop.manager.dao.po.PlatformPO;
 import org.apache.bigtop.manager.dao.po.UserPO;
-import org.apache.bigtop.manager.dao.repository.*;
+import org.apache.bigtop.manager.dao.repository.ChatMessageRepository;
+import org.apache.bigtop.manager.dao.repository.ChatThreadRepository;
+import org.apache.bigtop.manager.dao.repository.PlatformAuthorizedRepository;
+import org.apache.bigtop.manager.dao.repository.PlatformRepository;
+import org.apache.bigtop.manager.dao.repository.UserRepository;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.holder.SessionUserHolder;
@@ -40,30 +44,25 @@ import org.apache.bigtop.manager.server.model.converter.PlatformAuthorizedConver
 import org.apache.bigtop.manager.server.model.converter.PlatformConverter;
 import org.apache.bigtop.manager.server.model.dto.PlatformDTO;
 import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
-import org.apache.bigtop.manager.dao.po.ChatMessagePO;
 import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
 import org.apache.bigtop.manager.server.model.vo.PlatformAuthCredentialVO;
 import org.apache.bigtop.manager.server.model.vo.PlatformAuthorizedVO;
 import org.apache.bigtop.manager.server.model.vo.PlatformVO;
 import org.apache.bigtop.manager.server.service.AIChatService;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import dev.langchain4j.model.openai.OpenAiChatModelName;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Random;
 
 @Slf4j
 @Service
@@ -87,7 +86,8 @@ public class AIChatServiceImpl implements AIChatService {
 
     public AIAssistantFactory getAiAssistantFactory() {
         if (aiAssistantFactory == null) {
-            aiAssistantFactory = new GeneralAssistantFactory(new PersistentChatMemoryStore(chatThreadRepository, chatMessageRepository));
+            aiAssistantFactory = new GeneralAssistantFactory(
+                    new PersistentChatMemoryStore(chatThreadRepository, chatMessageRepository));
         }
         return aiAssistantFactory;
     }
@@ -119,7 +119,8 @@ public class AIChatServiceImpl implements AIChatService {
     @Override
     public PlatformVO addAuthorizedPlatform(PlatformDTO platformDTO) {
         Optional<PlatformPO> optionalPlatform = platformRepository.findById(platformDTO.getPlatformId());
-        PlatformPO platformPO = optionalPlatform.orElseThrow(()->new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND));
+        PlatformPO platformPO =
+                optionalPlatform.orElseThrow(() -> new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND));
         Map<String, String> credentialNeed = platformPO.getCredential();
         Map<String, String> credentialGet = platformDTO.getAuthCredentials();
         Map<String, String> credentialSet = new HashMap<>();
@@ -152,7 +153,9 @@ public class AIChatServiceImpl implements AIChatService {
 
     @Override
     public List<PlatformAuthCredentialVO> platformsAuthCredential(Long platformId) {
-        PlatformPO platformPO = platformRepository.findById(platformId).orElseThrow(()->new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND));
+        PlatformPO platformPO = platformRepository
+                .findById(platformId)
+                .orElseThrow(() -> new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND));
         List<PlatformAuthCredentialVO> platformAuthCredentialVOs = new ArrayList<>();
         for (String key : platformPO.getCredential().keySet()) {
             PlatformAuthCredentialVO platformAuthCredentialVO =
@@ -179,8 +182,9 @@ public class AIChatServiceImpl implements AIChatService {
 
     @Override
     public ChatThreadVO createChatThreads(Long platformId, String model) {
-        PlatformAuthorizedPO platformAuthorizedPO =
-                platformAuthorizedRepository.findById(platformId).orElseThrow(()->new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED));
+        PlatformAuthorizedPO platformAuthorizedPO = platformAuthorizedRepository
+                .findById(platformId)
+                .orElseThrow(() -> new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED));
         Long userId = SessionUserHolder.getUserId();
         UserPO userPO = userRepository.findById(userId).orElse(null);
         if (userPO != null && !Objects.equals(userId, platformAuthorizedPO.getId())) {
@@ -188,7 +192,7 @@ public class AIChatServiceImpl implements AIChatService {
         }
         PlatformPO platformPO = platformRepository
                 .findById(platformAuthorizedPO.getPlatformId())
-                .orElseThrow(()->new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND));
+                .orElseThrow(() -> new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND));
         List<String> support_models = List.of(platformPO.getSupportModels().split(","));
         if (!support_models.contains(model)) {
             throw new ApiException(ApiExceptionEnum.MODEL_NOT_SUPPORTED);
@@ -219,8 +223,9 @@ public class AIChatServiceImpl implements AIChatService {
 
     @Override
     public List<ChatThreadVO> getAllChatThreads(Long platformId, String model) {
-        PlatformAuthorizedPO platformAuthorizedPO =
-                platformAuthorizedRepository.findById(platformId).orElseThrow(() -> new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED));
+        PlatformAuthorizedPO platformAuthorizedPO = platformAuthorizedRepository
+                .findById(platformId)
+                .orElseThrow(() -> new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED));
         List<ChatThreadPO> chatThreadPOS = chatThreadRepository.findAllByPlatformAuthorizedPO(platformAuthorizedPO);
         List<ChatThreadVO> chatThreads = new ArrayList<>();
         for (ChatThreadPO chatThreadPO : chatThreadPOS) {
@@ -248,12 +253,15 @@ public class AIChatServiceImpl implements AIChatService {
         if (platformAuthorizedPO == null || !Objects.equals(platformAuthorizedPO.getId(), platformId)) {
             throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED);
         }
-        PlatformPO platformPO = platformRepository.findById(platformAuthorizedPO.getPlatformId()).orElseThrow(() -> new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND));
-        AIAssistantConfig.Builder aiAssistantConfigBuilder =  AIAssistantConfig.builder();
+        PlatformPO platformPO = platformRepository
+                .findById(platformAuthorizedPO.getPlatformId())
+                .orElseThrow(() -> new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND));
+        AIAssistantConfig.Builder aiAssistantConfigBuilder = AIAssistantConfig.builder();
         log.info(platformAuthorizedPO.getCredentials().toString());
-        for (String key: platformAuthorizedPO.getCredentials().keySet()) {
+        for (String key : platformAuthorizedPO.getCredentials().keySet()) {
             log.info(key, platformAuthorizedPO.getCredentials().get(key));
-            aiAssistantConfigBuilder = aiAssistantConfigBuilder.set(key, platformAuthorizedPO.getCredentials().get(key));
+            aiAssistantConfigBuilder = aiAssistantConfigBuilder.set(
+                    key, platformAuthorizedPO.getCredentials().get(key));
         }
         aiAssistantConfigBuilder = aiAssistantConfigBuilder.set("baseUrl", platformPO.getApiUrl());
         aiAssistantConfigBuilder = aiAssistantConfigBuilder.set("memoryLen", "10");
@@ -282,11 +290,14 @@ public class AIChatServiceImpl implements AIChatService {
     @Override
     public List<ChatMessageVO> history(Long platformId, Long threadId) {
         List<ChatMessageVO> chatMessages = new ArrayList<>();
-        ChatThreadPO chatThreadPO = chatThreadRepository.findById(threadId).orElseThrow(() -> new ApiException(ApiExceptionEnum.CHAT_THREAD_NOT_FOUND));
+        ChatThreadPO chatThreadPO = chatThreadRepository
+                .findById(threadId)
+                .orElseThrow(() -> new ApiException(ApiExceptionEnum.CHAT_THREAD_NOT_FOUND));
         List<ChatMessagePO> chatMessagePOs = chatMessageRepository.findAllByChatThreadPO(chatThreadPO);
         for (ChatMessagePO chatMessagePO : chatMessagePOs) {
             ChatMessageVO chatMessageVO = ChatMessageConverter.INSTANCE.fromPO2VO(chatMessagePO);
-            if (chatMessageVO.getSender().equals("User") || chatMessageVO.getSender().equals("AI")) {
+            if (chatMessageVO.getSender().equals("User")
+                    || chatMessageVO.getSender().equals("AI")) {
                 chatMessages.add(chatMessageVO);
             }
         }

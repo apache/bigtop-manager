@@ -18,7 +18,6 @@
  */
 package org.apache.bigtop.manager.server.controller;
 
-import org.apache.bigtop.manager.server.enums.ResponseStatus;
 import org.apache.bigtop.manager.server.model.converter.PlatformConverter;
 import org.apache.bigtop.manager.server.model.dto.PlatformDTO;
 import org.apache.bigtop.manager.server.model.req.PlatformReq;

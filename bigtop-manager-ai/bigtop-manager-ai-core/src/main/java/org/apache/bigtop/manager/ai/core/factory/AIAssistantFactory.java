@@ -18,7 +18,6 @@
  */
 package org.apache.bigtop.manager.ai.core.factory;
 
-import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.exception.PlatformNotFoundException;
 import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
