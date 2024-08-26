@@ -20,17 +20,15 @@ package org.apache.bigtop.manager.server.model.converter;
 
 import org.apache.bigtop.manager.dao.po.PlatformPO;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
-import org.apache.bigtop.manager.server.model.dto.AuthCredentialDTO;
 import org.apache.bigtop.manager.server.model.dto.PlatformDTO;
 import org.apache.bigtop.manager.server.model.req.AuthCredentialReq;
 import org.apache.bigtop.manager.server.model.req.PlatformReq;
-
 import org.apache.bigtop.manager.server.model.vo.PlatformVO;
+
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
-import org.springframework.web.bind.annotation.Mapping;
 
 import java.util.List;
 import java.util.Map;

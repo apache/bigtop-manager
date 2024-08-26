@@ -21,6 +21,7 @@ package org.apache.bigtop.manager.dao.repository;
 import org.apache.bigtop.manager.dao.po.ChatThreadPO;
 import org.apache.bigtop.manager.dao.po.PlatformAuthorizedPO;
 import org.apache.bigtop.manager.dao.po.UserPO;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -30,5 +31,5 @@ public interface ChatThreadRepository extends JpaRepository<ChatThreadPO, Long> 
 
     List<ChatThreadPO> findAllByPlatformAuthorizedPO(PlatformAuthorizedPO platformAuthorizedPO);
 
-//    PlatformPO findById(Long id);
+    //    PlatformPO findById(Long id);
 }

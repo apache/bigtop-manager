@@ -19,12 +19,9 @@
 package org.apache.bigtop.manager.server.model.converter;
 
 import org.apache.bigtop.manager.dao.po.PlatformAuthorizedPO;
-import org.apache.bigtop.manager.dao.po.PlatformPO;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
-import org.apache.bigtop.manager.server.model.dto.PlatformDTO;
-import org.apache.bigtop.manager.server.model.req.PlatformReq;
 import org.apache.bigtop.manager.server.model.vo.PlatformAuthorizedVO;
-import org.apache.bigtop.manager.server.model.vo.PlatformVO;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;

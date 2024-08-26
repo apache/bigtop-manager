@@ -1,10 +1,10 @@
 package org.apache.bigtop.manager.dao.converter;
 
+import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
-import com.google.gson.Gson;
 import java.util.Map;
 
 @Converter

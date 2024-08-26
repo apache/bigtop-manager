@@ -19,9 +19,10 @@
 package org.apache.bigtop.manager.dao.repository;
 
 import org.apache.bigtop.manager.dao.po.PlatformPO;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PlatformRepository extends JpaRepository<PlatformPO, Long> {
 
-//    PlatformPO findById(Long id);
+    //    PlatformPO findById(Long id);
 }
