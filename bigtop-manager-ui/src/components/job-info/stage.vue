@@ -30,7 +30,10 @@
   }
 
   const props = defineProps<StageProps>()
-  const baseTable = useBaseTable<StageVO>(props.columns, props.stages)
+  const baseTable = useBaseTable<StageVO>({
+    columns: props.columns,
+    rows: props.stages
+  })
   const { dataSource, columnsProp, loading, paginationProps, onChange } =
     baseTable
 

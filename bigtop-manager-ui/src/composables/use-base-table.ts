@@ -19,12 +19,13 @@
 
 import { ref, onUnmounted } from 'vue'
 import type { TablePaginationConfig, TableColumnType } from 'ant-design-vue'
-
-const useBaseTable = <T>(
-  columns: TableColumnType[],
-  rows?: T[],
+export interface UseBaseTableProps<T> {
+  columns: TableColumnType[]
+  rows?: T[]
   pagination?: TablePaginationConfig | false | undefined
-) => {
+}
+const useBaseTable = <T>(props: UseBaseTableProps<T>) => {
+  const { columns, rows, pagination } = props
   const loading = ref(false)
   const dataSource = ref<T[]>(rows || [])
   const columnsProp = ref<TableColumnType[]>(columns)

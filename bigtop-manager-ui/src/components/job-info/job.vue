@@ -94,7 +94,7 @@
     paginationProps,
     onChange,
     resetState
-  } = useBaseTable<JobVO>(columns, [])
+  } = useBaseTable<JobVO>({ columns })
 
   const getCurrPage = computed(() => {
     return currPage.value[breadcrumbs.value.length - 1]
