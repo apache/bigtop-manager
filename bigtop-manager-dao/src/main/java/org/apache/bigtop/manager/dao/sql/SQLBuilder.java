@@ -59,7 +59,7 @@ public class SQLBuilder {
                     }
                     Object value = ReflectionUtils.invokeMethod(ps.getReadMethod(), entity);
                     if (!ObjectUtils.isEmpty(value)) {
-                        sql.VALUES(entry.getValue(), getTokenParam(entry.getKey()));
+                        sql.VALUES("`" + entry.getValue() + "`", getTokenParam(entry.getKey()));
                     }
                 }
                 break;
@@ -91,7 +91,7 @@ public class SQLBuilder {
                     }
                     Object value = ReflectionUtils.invokeMethod(ps.getReadMethod(), entity);
                     if (!ObjectUtils.isEmpty(value)) {
-                        sql.SET(getEquals(entry.getValue(), entry.getKey()));
+                        sql.SET("`" + getEquals(entry.getValue() + "`", entry.getKey()));
                     }
                 }
 

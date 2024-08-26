@@ -38,7 +38,7 @@ DEALLOCATE PREPARE statement;
 
 CREATE TABLE `audit_log`
 (
-    `id`                BIGINT NOT NULL,
+    `id`                BIGINT NOT NULL AUTO_INCREMENT,
     `args`              LONGTEXT,
     `create_by`         BIGINT,
     `create_time`       DATETIME,
@@ -51,15 +51,6 @@ CREATE TABLE `audit_log`
     `uri`               VARCHAR(255),
     `user_id`           BIGINT,
     PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE `sequence`
-(
-    `id`        BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `seq_name`  VARCHAR(100) NOT NULL,
-    `seq_count` BIGINT(20) DEFAULT NULL,
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_seq_name` (`seq_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `user`
@@ -100,7 +91,7 @@ CREATE TABLE `cluster`
 
 CREATE TABLE `component`
 (
-    `id`              BIGINT NOT NULL,
+    `id`              BIGINT NOT NULL AUTO_INCREMENT,
     `category`        VARCHAR(255),
     `command_script`  VARCHAR(255),
     `component_name`  VARCHAR(255),
@@ -122,7 +113,7 @@ CREATE TABLE `component`
 
 CREATE TABLE `host_component`
 (
-    `id`           BIGINT NOT NULL,
+    `id`           BIGINT NOT NULL AUTO_INCREMENT,
     `create_by`    BIGINT,
     `create_time`  DATETIME,
     `state`        VARCHAR(255),
@@ -198,7 +189,7 @@ CREATE TABLE `stack`
 
 CREATE TABLE `task`
 (
-    `id`              BIGINT NOT NULL,
+    `id`              BIGINT NOT NULL AUTO_INCREMENT,
     `command`         VARCHAR(255),
     `component_name`  VARCHAR(255),
     `content`         LONGTEXT,
@@ -241,7 +232,7 @@ CREATE TABLE `job`
 
 CREATE TABLE `type_config`
 (
-    `id`                BIGINT NOT NULL,
+    `id`                BIGINT NOT NULL AUTO_INCREMENT,
     `create_by`         BIGINT,
     `create_time`       DATETIME,
     `properties_json`   LONGTEXT,
@@ -254,7 +245,7 @@ CREATE TABLE `type_config`
 
 CREATE TABLE `service`
 (
-    `id`                BIGINT NOT NULL,
+    `id`                BIGINT NOT NULL AUTO_INCREMENT,
     `create_by`         BIGINT,
     `create_time`       DATETIME,
     `display_name`      VARCHAR(255),
@@ -274,7 +265,7 @@ CREATE TABLE `service`
 
 CREATE TABLE `service_config`
 (
-    `id`          BIGINT NOT NULL,
+    `id`          BIGINT NOT NULL AUTO_INCREMENT,
     `config_desc` VARCHAR(255),
     `create_by`   BIGINT,
     `create_time` DATETIME,
@@ -291,7 +282,7 @@ CREATE TABLE `service_config`
 
 CREATE TABLE `setting`
 (
-    `id`          BIGINT NOT NULL,
+    `id`          BIGINT NOT NULL AUTO_INCREMENT,
     `config_data` LONGTEXT,
     `create_by`   BIGINT,
     `create_time` DATETIME,
@@ -321,24 +312,6 @@ CREATE TABLE `stage`
     KEY              `idx_cluster_id` (`cluster_id`),
     KEY              `idx_job_id` (`job_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- Initialize sequence table.
-INSERT INTO sequence(seq_name, seq_count)
-VALUES ('audit_log_generator', 0),
-       ('cluster_generator', 0),
-       ('stack_generator', 0),
-       ('service_generator', 0),
-       ('task_generator', 0),
-       ('host_generator', 0),
-       ('user_generator', 0),
-       ('repo_generator', 0),
-       ('host_component_generator', 0),
-       ('service_config_generator', 0),
-       ('job_generator', 0),
-       ('type_config_generator', 0),
-       ('component_generator', 0),
-       ('stage_generator', 0),
-       ('settings_generator', 0);
 
 -- Adding default admin user
 INSERT INTO bigtop_manager.user (id, create_time, update_time, nickname, password, status, username)

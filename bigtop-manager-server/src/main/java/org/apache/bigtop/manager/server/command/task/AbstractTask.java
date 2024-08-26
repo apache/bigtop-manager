@@ -65,7 +65,7 @@ public abstract class AbstractTask implements Task {
     @Override
     public void beforeRun() {
         TaskPO taskPO = getTaskPO();
-        taskPO.setState(JobState.PROCESSING);
+        taskPO.setState(JobState.PROCESSING.getName());
         taskMapper.save(taskPO);
     }
 
@@ -102,7 +102,7 @@ public abstract class AbstractTask implements Task {
     public void onSuccess() {
         TaskPO taskPO = getTaskPO();
         taskPO.setContent(ProtobufUtil.toJson(commandRequest));
-        taskPO.setState(JobState.SUCCESSFUL);
+        taskPO.setState(JobState.SUCCESSFUL.getName());
         taskMapper.updateById(taskPO);
     }
 
@@ -110,7 +110,7 @@ public abstract class AbstractTask implements Task {
     public void onFailure() {
         TaskPO taskPO = getTaskPO();
         taskPO.setContent(ProtobufUtil.toJson(commandRequest));
-        taskPO.setState(JobState.FAILED);
+        taskPO.setState(JobState.FAILED.getName());
         taskMapper.updateById(taskPO);
     }
 
@@ -136,7 +136,7 @@ public abstract class AbstractTask implements Task {
             taskPO.setServiceName(taskContext.getServiceName());
             taskPO.setServiceUser(taskContext.getServiceUser());
             taskPO.setComponentName(taskContext.getComponentName());
-            taskPO.setCommand(getCommand());
+            taskPO.setCommand(getCommand().getName());
             taskPO.setCustomCommand(getCustomCommand());
         }
 

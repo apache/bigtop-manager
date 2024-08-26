@@ -24,10 +24,13 @@ import org.apache.bigtop.manager.dao.po.ServicePO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ServiceMapper extends BaseMapper<ServicePO> {
 
     List<ServicePO> findAllByClusterId(@Param("clusterId") Long clusterId);
+
+    Optional<ServicePO> findByIdJoin(@Param("id") Long id);
 
     ServicePO findByClusterIdAndServiceName(
             @Param("clusterId") Long clusterId, @Param("serviceName") String serviceName);

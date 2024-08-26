@@ -35,6 +35,5 @@ public interface StageConverter {
 
     @Mapping(target = "createTime", source = "createTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
     @Mapping(target = "updateTime", source = "updateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
-    @Mapping(target = "tasks", source = "taskPOList")
     StageVO fromPO2VO(StagePO stagePO);
 }

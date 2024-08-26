@@ -22,28 +22,36 @@ import org.apache.bigtop.manager.common.utils.CaseUtils;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
+@AllArgsConstructor
+@Getter
 public enum Command {
-    CREATE,
+    CREATE("create", "Create"),
 
-    INSTALL,
+    INSTALL("install", "Install"),
 
-    UNINSTALL,
+    UNINSTALL("uninstall", "Uninstall"),
 
-    START,
+    START("start", "Start"),
 
-    STOP,
+    STOP("stop", "Stop"),
 
-    STATUS,
+    STATUS("status", "Status"),
 
-    RESTART,
+    RESTART("restart", "Restart"),
 
-    CONFIGURE,
+    CONFIGURE("configure", "Configure"),
 
-    CHECK,
+    CHECK("check", "Check"),
 
-    CUSTOM,
+    CUSTOM("custom", "Custom"),
     ;
+
+    private final String code;
+
+    private final String name;
 
     @JsonCreator
     public static Command fromString(String value) {

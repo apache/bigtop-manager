@@ -24,13 +24,13 @@ import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.mapper.HostComponentMapper;
 import org.apache.bigtop.manager.dao.mapper.ServiceConfigMapper;
 import org.apache.bigtop.manager.dao.mapper.ServiceMapper;
-import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.po.HostComponentPO;
-import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
 import org.apache.bigtop.manager.dao.po.ServicePO;
 import org.apache.bigtop.manager.dao.po.TypeConfigPO;
+import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
+import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.model.converter.ServiceConverter;
 import org.apache.bigtop.manager.server.model.converter.TypeConfigConverter;
 import org.apache.bigtop.manager.server.model.dto.PropertyDTO;
@@ -68,40 +68,39 @@ public class ServiceServiceImpl implements ServiceService {
     @Override
     public List<ServiceVO> list(Long clusterId) {
         List<ServiceVO> res = new ArrayList<>();
-        Map<Long, List<HostComponentPO>> serviceIdToHostComponent =
-                hostComponentMapper.findAllByClusterId(clusterId).stream()
-                        .collect(Collectors.groupingBy(HostComponentPO::getServiceId));
 
-        for (Map.Entry<Long, List<HostComponentPO>> entry : serviceIdToHostComponent.entrySet()) {
-            List<HostComponentPO> hostComponentPOList = entry.getValue();
-            HostComponentPO hostComponentPO1 = hostComponentPOList.get(0);
-            ServicePO servicePO = hostComponentPOList.get(0).getComponentPO().getServicePO();
+        List<ServicePO> servicePOList = serviceMapper.findAllByClusterId(clusterId);
+        List<HostComponentPO> allByClusterId = hostComponentMapper.findAllByClusterId(clusterId);
+        Map<Long, List<HostComponentPO>> serviceIdToHostComponent =
+                allByClusterId.stream().collect(Collectors.groupingBy(HostComponentPO::getServiceId));
+        Map<Long, List<HostComponentPO>> componentIdToHostComponent =
+                allByClusterId.stream().collect(Collectors.groupingBy(HostComponentPO::getComponentId));
+
+        for (ServicePO servicePO : servicePOList) {
+            Long serviceId = servicePO.getId();
             ServiceVO serviceVO = ServiceConverter.INSTANCE.fromPO2VO(servicePO);
+            List<ComponentPO> components = servicePO.getComponents();
             serviceVO.setQuickLinks(new ArrayList<>());
 
-            boolean isHealthy = true;
-            boolean isClient = true;
-            for (HostComponentPO hostComponentPO : hostComponentPOList) {
-                ComponentPO componentPO = hostComponentPO.getComponentPO();
+            for (ComponentPO componentPO : components) {
+                Long componentId = componentPO.getId();
+                List<HostComponentPO> hostComponentPOList = componentIdToHostComponent.get(componentId);
 
                 String quickLink = componentPO.getQuickLink();
                 if (StringUtils.isNotBlank(quickLink)) {
-                    QuickLinkVO quickLinkVO = resolveQuickLink(hostComponentPO, quickLink);
-                    serviceVO.getQuickLinks().add(quickLinkVO);
-                }
-
-                String category = componentPO.getCategory();
-                if (!category.equalsIgnoreCase(ComponentCategories.CLIENT)) {
-                    isClient = false;
-                }
-
-                MaintainState expectedState = category.equalsIgnoreCase(ComponentCategories.CLIENT)
-                        ? MaintainState.INSTALLED
-                        : MaintainState.STARTED;
-                if (!MaintainState.fromString(hostComponentPO.getState()).equals(expectedState)) {
-                    isHealthy = false;
+                    List<QuickLinkVO> quickLinkVOList =
+                            resolveQuickLink(hostComponentPOList, quickLink, clusterId, serviceId);
+                    serviceVO.getQuickLinks().addAll(quickLinkVOList);
                 }
             }
+            boolean isClient = components.stream()
+                    .allMatch(componentPO -> componentPO.getCategory().equalsIgnoreCase(ComponentCategories.CLIENT));
+            boolean isHealthy = serviceIdToHostComponent.get(serviceId).stream().allMatch(hostComponentPO -> {
+                MaintainState expectedState = hostComponentPO.getCategory().equalsIgnoreCase(ComponentCategories.CLIENT)
+                        ? MaintainState.INSTALLED
+                        : MaintainState.STARTED;
+                return hostComponentPO.getState().equals(expectedState.getName());
+            });
 
             serviceVO.setIsClient(isClient);
             serviceVO.setIsHealthy(isHealthy);
@@ -113,41 +112,43 @@ public class ServiceServiceImpl implements ServiceService {
 
     @Override
     public ServiceVO get(Long id) {
-        ServicePO servicePO = serviceMapper.findOptionalById(id).orElse(new ServicePO());
+        ServicePO servicePO =
+                serviceMapper.findByIdJoin(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.SERVICE_NOT_FOUND));
         return ServiceConverter.INSTANCE.fromPO2VO(servicePO);
     }
 
-    private QuickLinkVO resolveQuickLink(HostComponentPO hostComponentPO, String quickLinkJson) {
-        QuickLinkVO quickLinkVO = new QuickLinkVO();
+    private List<QuickLinkVO> resolveQuickLink(
+            List<HostComponentPO> hostComponentPOList, String quickLinkJson, Long clusterId, Long serviceId) {
+        List<QuickLinkVO> quickLinkVOList = new ArrayList<>();
 
         QuickLinkDTO quickLinkDTO = JsonUtils.readFromString(quickLinkJson, QuickLinkDTO.class);
-        quickLinkVO.setDisplayName(quickLinkDTO.getDisplayName());
 
-        ComponentPO componentPO = hostComponentPO.getComponentPO();
-        ClusterPO clusterPO = componentPO.getClusterPO();
-        HostPO hostPO = hostComponentPO.getHostPO();
-        ServicePO servicePO = componentPO.getServicePO();
         ServiceConfigPO serviceConfigPO =
-                serviceConfigMapper.findByClusterIdAndServiceIdAndSelectedIsTrue(clusterPO.getId(), servicePO.getId());
+                serviceConfigMapper.findByClusterIdAndServiceIdAndSelectedIsTrue(clusterId, serviceId);
         List<TypeConfigPO> typeConfigPOList = serviceConfigPO.getConfigs();
 
+        String httpPort = quickLinkDTO.getHttpPortDefault();
         // Use HTTP for now, need to handle https in the future
         for (TypeConfigPO typeConfigPO : typeConfigPOList) {
             TypeConfigDTO typeConfigDTO = TypeConfigConverter.INSTANCE.fromPO2DTO(typeConfigPO);
             for (PropertyDTO propertyDTO : typeConfigDTO.getProperties()) {
                 if (propertyDTO.getName().equals(quickLinkDTO.getHttpPortProperty())) {
-                    String port = propertyDTO.getValue().contains(":")
+
+                    httpPort = propertyDTO.getValue().contains(":")
                             ? propertyDTO.getValue().split(":")[1]
                             : propertyDTO.getValue();
-                    String url = "http://" + hostPO.getHostname() + ":" + port;
-                    quickLinkVO.setUrl(url);
-                    return quickLinkVO;
                 }
             }
         }
 
-        String url = "http://" + hostPO.getHostname() + ":" + quickLinkDTO.getHttpPortDefault();
-        quickLinkVO.setUrl(url);
-        return quickLinkVO;
+        for (HostComponentPO hostComponentPO : hostComponentPOList) {
+            QuickLinkVO quickLinkVO = new QuickLinkVO();
+            quickLinkVO.setDisplayName(quickLinkDTO.getDisplayName());
+            String url = "http://" + hostComponentPO.getHostname() + ":" + httpPort;
+            quickLinkVO.setUrl(url);
+            quickLinkVOList.add(quickLinkVO);
+        }
+
+        return quickLinkVOList;
     }
 }

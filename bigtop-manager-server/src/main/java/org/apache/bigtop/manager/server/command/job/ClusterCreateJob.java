@@ -81,17 +81,17 @@ public class ClusterCreateJob extends AbstractJob {
 
         // Link job to cluster after cluster successfully added
         JobPO jobPO = getJobPO();
-        jobPO.setClusterPO(clusterPO);
+        jobPO.setClusterId(clusterPO.getId());
         jobMapper.updateById(jobPO);
 
         for (Stage stage : getStages()) {
             StagePO stagePO = stage.getStagePO();
-            stagePO.setClusterPO(clusterPO);
+            stagePO.setClusterId(clusterPO.getId());
             stageMapper.updateById(stagePO);
 
             for (Task task : stage.getTasks()) {
                 TaskPO taskPO = task.getTaskPO();
-                taskPO.setClusterPO(clusterPO);
+                taskPO.setClusterId(clusterPO.getId());
                 taskMapper.updateById(taskPO);
             }
         }

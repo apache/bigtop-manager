@@ -85,15 +85,13 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public JobVO get(Long id) {
-        JobPO jobPO =
-                jobMapper.findOptionalById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.JOB_NOT_FOUND));
+        JobPO jobPO = jobMapper.findByIdJoin(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.JOB_NOT_FOUND));
         return JobConverter.INSTANCE.fromPO2VO(jobPO);
     }
 
     @Override
     public JobVO retry(Long id) {
-        JobPO jobPO =
-                jobMapper.findOptionalById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.JOB_NOT_FOUND));
+        JobPO jobPO = jobMapper.findByIdJoin(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.JOB_NOT_FOUND));
         if (JobState.fromString(jobPO.getState()) != JobState.FAILED) {
             throw new ApiException(ApiExceptionEnum.JOB_NOT_RETRYABLE);
         }
@@ -106,13 +104,13 @@ public class JobServiceImpl implements JobService {
     }
 
     private void resetJobStatusInDB(JobPO jobPO) {
-        for (StagePO stagePO : jobPO.getStagePOList()) {
-            for (TaskPO taskPO : stagePO.getTaskPOList()) {
-                taskPO.setState(JobState.PENDING);
+        for (StagePO stagePO : jobPO.getStages()) {
+            for (TaskPO taskPO : stagePO.getTasks()) {
+                taskPO.setState(JobState.PENDING.getName());
                 taskMapper.updateById(taskPO);
             }
 
-            stagePO.setState(JobState.PENDING);
+            stagePO.setState(JobState.PENDING.getName());
             stageMapper.updateById(stagePO);
         }
 
@@ -131,7 +129,7 @@ public class JobServiceImpl implements JobService {
         job.loadJobPO(jobPO);
         for (int i = 0; i < job.getStages().size(); i++) {
             Stage stage = job.getStages().get(i);
-            StagePO stagePO = findCorrectStagePO(jobPO.getStagePOList(), i + 1);
+            StagePO stagePO = findCorrectStagePO(jobPO.getStages(), i + 1);
             if (stagePO == null) {
                 throw new ApiException(ApiExceptionEnum.JOB_NOT_RETRYABLE);
             }
@@ -141,7 +139,7 @@ public class JobServiceImpl implements JobService {
             for (int j = 0; j < stage.getTasks().size(); j++) {
                 Task task = stage.getTasks().get(j);
                 TaskPO taskPO = findCorrectTaskPO(
-                        stagePO.getTaskPOList(), task.getTaskContext().getHostname());
+                        stagePO.getTasks(), task.getTaskContext().getHostname());
                 if (taskPO == null) {
                     throw new ApiException(ApiExceptionEnum.JOB_NOT_RETRYABLE);
                 }

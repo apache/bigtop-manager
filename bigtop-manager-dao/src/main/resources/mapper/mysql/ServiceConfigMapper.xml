@@ -32,19 +32,19 @@
     </sql>
 
     <resultMap id="serviceConfigMap" type="org.apache.bigtop.manager.dao.po.ServiceConfigPO">
-        <id column="id" property="id"></id>
-        <result column="config_desc" property="configDesc"></result>
-        <result column="version" property="version"></result>
-        <result column="selected" property="selected"></result>
-        <result column="service_id" property="serviceId"></result>
-        <result column="cluster_id" property="clusterId"></result>
-        <result column="create_time" property="createTime"></result>
-        <result column="update_time" property="updateTime"></result>
-        <result column="service_name" property="serviceName"></result>
+        <id column="id" property="id"/>
+        <result column="config_desc" property="configDesc"/>
+        <result column="version" property="version"/>
+        <result column="selected" property="selected"/>
+        <result column="service_id" property="serviceId"/>
+        <result column="cluster_id" property="clusterId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="service_name" property="serviceName"/>
         <collection property="configs" ofType="org.apache.bigtop.manager.dao.po.TypeConfigPO">
-            <id column="id" property="id"></id>
-            <result column="type_name" property="typeName"></result>
-            <result column="properties_json" property="propertiesJson"></result>
+            <id column="tc_id" property="id"/>
+            <result column="type_name" property="typeName"/>
+            <result column="properties_json" property="propertiesJson"/>
         </collection>
     </resultMap>
 
@@ -53,7 +53,7 @@
         <include refid="baseColumnsV2">
             <property name="alias" value="r"/>
         </include>
-        , s.service_name, tc.*
+        , s.service_name, tc.type_name, tc.properties_json, tc.id as tc_id
         from
         (select * from service_config
         <where>
@@ -74,7 +74,7 @@
         <include refid="baseColumnsV2">
             <property name="alias" value="r"/>
         </include>
-        , s.service_name, tc.*
+        , s.service_name, tc.type_name, tc.properties_json
         from
         (select * from service_config
         <where>
@@ -82,8 +82,8 @@
             <if test="clusterId != 0">
                 and cluster_id = #{clusterId}
             </if>
-            <if test="serviceName != null">
-                and service_name = #{serviceName}
+            <if test="serviceId != 0">
+                and service_id = #{serviceId}
             </if>
         </where>
         ) r
@@ -99,7 +99,7 @@
         <include refid="baseColumnsV2">
             <property name="alias" value="r"/>
         </include>
-        , s.service_name, tc.*
+        , s.service_name, tc.type_name, tc.properties_json
         from
         (select * from service_config
         <where>

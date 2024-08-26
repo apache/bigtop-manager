@@ -19,11 +19,9 @@
 package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.common.enums.JobState;
-import org.apache.bigtop.manager.dao.mapper.ClusterMapper;
 import org.apache.bigtop.manager.dao.mapper.JobMapper;
 import org.apache.bigtop.manager.dao.mapper.StageMapper;
 import org.apache.bigtop.manager.dao.mapper.TaskMapper;
-import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.JobPO;
 import org.apache.bigtop.manager.dao.po.StagePO;
 import org.apache.bigtop.manager.dao.po.TaskPO;
@@ -54,9 +52,6 @@ public class CommandServiceImpl implements CommandService {
 
     @Resource
     private JobScheduler jobScheduler;
-
-    @Resource
-    private ClusterMapper clusterMapper;
 
     @Resource
     private JobMapper jobMapper;
@@ -94,29 +89,34 @@ public class CommandServiceImpl implements CommandService {
 
     protected JobPO saveJob(Job job) {
         Long clusterId = job.getJobContext().getCommandDTO().getClusterId();
-        ClusterPO clusterPO = clusterId == null ? null : clusterMapper.findById(clusterId);
 
         JobPO jobPO = job.getJobPO();
-        jobPO.setClusterId(clusterPO.getId());
+        if (clusterId != null) {
+            jobPO.setClusterId(clusterId);
+        }
         jobPO.setState(JobState.PENDING.getName());
         jobMapper.save(jobPO);
 
         for (int i = 0; i < job.getStages().size(); i++) {
             Stage stage = job.getStages().get(i);
             StagePO stagePO = stage.getStagePO();
-            stagePO.setClusterId(clusterPO.getId());
+            if (clusterId != null) {
+                stagePO.setClusterId(clusterId);
+            }
             stagePO.setJobId(jobPO.getId());
             stagePO.setOrder(i + 1);
-            stagePO.setState(JobState.PENDING);
+            stagePO.setState(JobState.PENDING.getName());
             stageMapper.save(stagePO);
 
             for (int j = 0; j < stage.getTasks().size(); j++) {
                 Task task = stage.getTasks().get(j);
                 TaskPO taskPO = task.getTaskPO();
-                taskPO.setClusterId(clusterPO.getId());
+                if (clusterId != null) {
+                    taskPO.setClusterId(clusterId);
+                }
                 taskPO.setJobId(jobPO.getId());
                 taskPO.setStageId(stagePO.getId());
-                taskPO.setState(JobState.PENDING);
+                taskPO.setState(JobState.PENDING.getName());
                 taskMapper.save(taskPO);
             }
         }

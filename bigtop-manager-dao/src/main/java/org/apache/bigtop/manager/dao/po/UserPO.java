@@ -33,7 +33,7 @@ import java.io.Serializable;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "\"user\"")
+@Table(name = "user")
 @TableGenerator(name = "user_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
 public class UserPO extends BasePO implements Serializable {
 
@@ -45,7 +45,7 @@ public class UserPO extends BasePO implements Serializable {
     @Column(name = "username")
     private String username;
 
-    @Column(name = "\"password\"")
+    @Column(name = "password")
     private String password;
 
     @Column(name = "nickname")

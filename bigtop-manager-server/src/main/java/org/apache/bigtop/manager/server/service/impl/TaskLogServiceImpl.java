@@ -44,10 +44,11 @@ public class TaskLogServiceImpl implements TaskLogService {
         TaskPO taskPO = taskMapper.findById(taskId);
         String hostname = taskPO.getHostname();
 
-        if (taskPO.getState() == JobState.PENDING || taskPO.getState() == JobState.CANCELED) {
+        if (JobState.fromString(taskPO.getState()) == JobState.PENDING
+                || JobState.fromString(taskPO.getState()) == JobState.CANCELED) {
             new Thread(() -> {
                         sink.next("There is no log when task is in status: "
-                                + taskPO.getState().name().toLowerCase()
+                                + taskPO.getState().toLowerCase()
                                 + ", please reopen the window when status changed");
                         sink.complete();
                     })

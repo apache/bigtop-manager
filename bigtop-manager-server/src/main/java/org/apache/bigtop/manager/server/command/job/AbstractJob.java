@@ -134,13 +134,13 @@ public abstract class AbstractJob implements Job {
 
         for (Stage stage : getStages()) {
             StagePO stagePO = stage.getStagePO();
-            if (stagePO.getState() == JobState.PENDING) {
-                stagePO.setState(JobState.CANCELED);
+            if (JobState.fromString(stagePO.getState()) == JobState.PENDING) {
+                stagePO.setState(JobState.CANCELED.getName());
                 stagePOList.add(stagePO);
 
                 for (Task task : stage.getTasks()) {
                     TaskPO taskPO = task.getTaskPO();
-                    taskPO.setState(JobState.CANCELED);
+                    taskPO.setState(JobState.CANCELED.getName());
                     taskPOList.add(taskPO);
                 }
             }

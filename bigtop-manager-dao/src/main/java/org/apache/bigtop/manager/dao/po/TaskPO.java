@@ -18,25 +18,18 @@
  */
 package org.apache.bigtop.manager.dao.po;
 
-import org.apache.bigtop.manager.common.enums.Command;
-import org.apache.bigtop.manager.common.enums.JobState;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
-import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
 import java.io.Serializable;
@@ -45,7 +38,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(
-        name = "\"task\"",
+        name = "task",
         indexes = {
             @Index(name = "idx_task_cluster_id", columnList = "cluster_id"),
             @Index(name = "idx_task_job_id", columnList = "job_id"),
@@ -68,7 +61,7 @@ public class TaskPO extends BasePO implements Serializable {
     private String context;
 
     @Column(name = "state")
-    private JobState state;
+    private String state;
 
     @Column(name = "service_name")
     private String serviceName;
@@ -77,7 +70,7 @@ public class TaskPO extends BasePO implements Serializable {
     private String componentName;
 
     @Column(name = "command")
-    private Command command;
+    private String command;
 
     @Column(name = "custom_command")
     private String customCommand;
@@ -107,16 +100,4 @@ public class TaskPO extends BasePO implements Serializable {
 
     @Column(name = "cluster_id")
     private Long clusterId;
-
-    @ManyToOne
-    @JoinColumn(name = "job_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private JobPO jobPO;
-
-    @ManyToOne
-    @JoinColumn(name = "stage_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private StagePO stagePO;
-
-    @ManyToOne
-    @JoinColumn(name = "cluster_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private ClusterPO clusterPO;
 }

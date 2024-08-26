@@ -18,25 +18,19 @@
  */
 package org.apache.bigtop.manager.dao.po;
 
-import org.apache.bigtop.manager.common.enums.JobState;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
-import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
@@ -64,9 +58,9 @@ public class StagePO extends BasePO implements Serializable {
     private String name;
 
     @Column(name = "state")
-    private JobState state;
+    private String state;
 
-    @Column(name = "\"order\"")
+    @Column(name = "order")
     private Integer order;
 
     @Column(name = "service_name")
@@ -77,7 +71,7 @@ public class StagePO extends BasePO implements Serializable {
 
     @Lob
     @Basic(fetch = FetchType.LAZY)
-    @Column(name = "\"context\"", length = 16777216)
+    @Column(name = "context", length = 16777216)
     private String context;
 
     @Column(name = "job_id")
@@ -88,13 +82,5 @@ public class StagePO extends BasePO implements Serializable {
 
     @ToString.Exclude
     @OneToMany(mappedBy = "stagePO")
-    private List<TaskPO> taskPOList;
-
-    @ManyToOne
-    @JoinColumn(name = "job_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private JobPO jobPO;
-
-    @ManyToOne
-    @JoinColumn(name = "cluster_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private ClusterPO clusterPO;
+    private List<TaskPO> tasks;
 }

@@ -152,14 +152,14 @@ public class CacheFileUpdateTask extends AbstractTask {
                         JsonUtils.readFromString(typeConfigPO.getPropertiesJson(), new TypeReference<>() {});
                 String configMapStr = JsonUtils.writeAsString(StackConfigUtils.extractConfigMap(properties));
 
-                if (serviceConfigMap.containsKey(serviceConfigPO.getServicePO().getServiceName())) {
+                if (serviceConfigMap.containsKey(serviceConfigPO.getServiceName())) {
                     serviceConfigMap
-                            .get(serviceConfigPO.getServicePO().getServiceName())
+                            .get(serviceConfigPO.getServiceName())
                             .put(typeConfigPO.getTypeName(), configMapStr);
                 } else {
                     Map<String, Object> hashMap = new HashMap<>();
                     hashMap.put(typeConfigPO.getTypeName(), configMapStr);
-                    serviceConfigMap.put(serviceConfigPO.getServicePO().getServiceName(), hashMap);
+                    serviceConfigMap.put(serviceConfigPO.getServiceName(), hashMap);
                 }
             }
         }

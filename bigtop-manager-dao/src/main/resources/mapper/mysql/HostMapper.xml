@@ -92,7 +92,7 @@
         host
         <where>
             <if test="hostnames != null and hostnames.size() > 0">
-                cluster_id = in
+                cluster_id in
                 <foreach collection="hostnames" item="hostname" index="index" open="(" close=")" separator=", ">
                     #{hostname}
                 </foreach>

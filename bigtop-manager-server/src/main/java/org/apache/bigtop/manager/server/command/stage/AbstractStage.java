@@ -73,7 +73,7 @@ public abstract class AbstractStage implements Stage {
     @Override
     public void beforeRun() {
         StagePO stagePO = getStagePO();
-        stagePO.setState(JobState.PROCESSING);
+        stagePO.setState(JobState.PROCESSING.getName());
         stageMapper.save(stagePO);
     }
 
@@ -116,14 +116,14 @@ public abstract class AbstractStage implements Stage {
     @Override
     public void onSuccess() {
         StagePO stagePO = getStagePO();
-        stagePO.setState(JobState.SUCCESSFUL);
+        stagePO.setState(JobState.SUCCESSFUL.getName());
         stageMapper.updateById(stagePO);
     }
 
     @Override
     public void onFailure() {
         StagePO stagePO = getStagePO();
-        stagePO.setState(JobState.FAILED);
+        stagePO.setState(JobState.FAILED.getName());
         stageMapper.updateById(stagePO);
     }
 
