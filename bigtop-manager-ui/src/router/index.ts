@@ -19,36 +19,13 @@
 
 import routes from './routes'
 import { createRouter, createWebHistory } from 'vue-router'
-import { useServiceStore } from '@/store/service'
-import { storeToRefs } from 'pinia'
-import { ServiceVO } from '@/api/service/types.ts'
-import { useClusterStore } from '@/store/cluster'
+import { createRouterGuard } from './guard'
 
 const router = createRouter({
   routes,
   history: createWebHistory(import.meta.env.VITE_APP_BASE)
 })
 
-router.beforeEach(async (to) => {
-  if (to.name === 'services') {
-    const clusterStore = useClusterStore()
-    const serviceStore = useServiceStore()
-    const { clusterId } = storeToRefs(clusterStore)
-    const { installedServices } = storeToRefs(serviceStore)
-
-    if (clusterId.value === 0) {
-      await clusterStore.loadClusters()
-      await serviceStore.loadServices()
-    }
-
-    const installedServiceNames = installedServices.value.map(
-      (service: ServiceVO) => service.serviceName
-    )
-
-    if (!installedServiceNames.includes(to.params.serviceName as string)) {
-      return '/404'
-    }
-  }
-})
+createRouterGuard(router)
 
 export default router

@@ -16,16 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+import type { RouteRecordRaw } from 'vue-router'
 
-import { VNode } from 'vue'
-
-type MenuItem = {
-  key?: string
-  to: string
-  title?: string
-  icon?: VNode
-  children?: MenuItem[]
-  hidden?: boolean
+interface RouteModuleType {
+  routes: RouteRecordRaw[]
 }
+export function mergeRouteModules(
+  routeModules: Record<string, unknown>
+): RouteRecordRaw[] {
+  const mergedRoutes: RouteRecordRaw[] = []
 
-export type { MenuItem }
+  for (const routeModule of Object.values(routeModules)) {
+    const moduleRoutes = (routeModule as RouteModuleType)?.routes ?? []
+    mergedRoutes.push(...moduleRoutes)
+  }
+
+  return mergedRoutes
+}

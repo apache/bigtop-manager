@@ -17,15 +17,19 @@
  * under the License.
  */
 
-import { VNode } from 'vue'
+import { RouteRecordRaw } from 'vue-router'
+import { DesktopOutlined } from '@ant-design/icons-vue'
+import { h } from 'vue'
 
-type MenuItem = {
-  key?: string
-  to: string
-  title?: string
-  icon?: VNode
-  children?: MenuItem[]
-  hidden?: boolean
-}
+const routes: RouteRecordRaw[] = [
+  {
+    path: '/hosts',
+    component: () => import('@/pages/hosts/index.vue'),
+    meta: {
+      title: 'Hosts',
+      icon: h(DesktopOutlined)
+    }
+  }
+]
 
-export type { MenuItem }
+export { routes }

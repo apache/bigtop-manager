@@ -17,15 +17,40 @@
  * under the License.
  */
 
-import { VNode } from 'vue'
+import { RouteRecordRaw } from 'vue-router'
+import {
+  SettingOutlined,
+  BarsOutlined,
+  UserOutlined
+} from '@ant-design/icons-vue'
+import { h } from 'vue'
 
-type MenuItem = {
-  key?: string
-  to: string
-  title?: string
-  icon?: VNode
-  children?: MenuItem[]
-  hidden?: boolean
-}
+const routes: RouteRecordRaw[] = [
+  {
+    path: '/cluster/',
+    meta: {
+      title: 'Cluster',
+      icon: h(SettingOutlined)
+    },
+    children: [
+      {
+        path: 'stack',
+        component: () => import('@/pages/cluster/stack/index.vue'),
+        meta: {
+          title: 'Stack',
+          icon: h(BarsOutlined)
+        }
+      },
+      {
+        path: 'account',
+        component: () => import('@/pages/cluster/account/index.vue'),
+        meta: {
+          title: 'Account',
+          icon: h(UserOutlined)
+        }
+      }
+    ]
+  }
+]
 
-export type { MenuItem }
+export { routes }

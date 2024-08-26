@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { onMounted, ref, watch } from 'vue'
+  import { computed, onMounted, ref, watch } from 'vue'
   import { useUIStore } from '@/store/ui'
   import { useUserStore } from '@/store/user'
   import { storeToRefs } from 'pinia'
@@ -34,6 +34,10 @@
 
   const selectedKeys = ref<string[]>([])
   const openKeys = ref<string[]>([])
+
+  const siderMenu = computed(() =>
+    menuItems.value.filter((menuItem) => !menuItem.hidden)
+  )
 
   const updateSideBar = () => {
     const splitPath = router.currentRoute.value.path.split('/')
@@ -67,7 +71,7 @@
       theme="dark"
       mode="inline"
     >
-      <template v-for="item in menuItems">
+      <template v-for="item in siderMenu">
         <template v-if="item.children">
           <a-sub-menu :key="item.key">
             <template #title>

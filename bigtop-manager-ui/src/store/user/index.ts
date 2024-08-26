@@ -22,7 +22,8 @@ import { getCurrentUser, updateUser } from '@/api/user'
 import { computed, h, shallowRef } from 'vue'
 import { UserReq, UserVO } from '@/api/user/types.ts'
 import { MenuItem } from '@/store/user/types.ts'
-import { initialRoutes, layoutRoutes } from '@/router/routes.ts'
+import { routes as initialRoutes } from '@/router/routes/modules/dashboard.ts'
+import { dynamicRoutes as layoutRoutes } from '@/router/routes/index'
 import { useClusterStore } from '@/store/cluster'
 import { RouteRecordRaw } from 'vue-router'
 import { useServiceStore } from '@/store/service'
@@ -45,7 +46,8 @@ export const useUserStore = defineStore(
           key: route.meta?.title?.toLowerCase(),
           to: route.path,
           title: route.meta?.title,
-          icon: route.meta?.icon
+          icon: route.meta?.icon,
+          hidden: Boolean(route.meta?.hidden)
         }
 
         if (route.meta?.title === 'Services') {

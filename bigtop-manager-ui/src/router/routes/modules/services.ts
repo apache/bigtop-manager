@@ -17,15 +17,20 @@
  * under the License.
  */
 
-import { VNode } from 'vue'
+import { RouteRecordRaw } from 'vue-router'
+import { AppstoreOutlined } from '@ant-design/icons-vue'
+import { h } from 'vue'
 
-type MenuItem = {
-  key?: string
-  to: string
-  title?: string
-  icon?: VNode
-  children?: MenuItem[]
-  hidden?: boolean
-}
+const routes: RouteRecordRaw[] = [
+  {
+    name: 'services',
+    path: '/services/:serviceName',
+    component: () => import('@/pages/service/index.vue'),
+    meta: {
+      title: 'Services',
+      icon: h(AppstoreOutlined)
+    }
+  }
+]
 
-export type { MenuItem }
+export { routes }
