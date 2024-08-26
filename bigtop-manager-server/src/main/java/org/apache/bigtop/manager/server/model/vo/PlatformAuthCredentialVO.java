@@ -28,6 +28,6 @@ public class PlatformAuthCredentialVO {
 
     public PlatformAuthCredentialVO(String name, String displayName) {
         this.name = name;
-        this.displayName = name;
+        this.displayName = displayName;
     }
 }

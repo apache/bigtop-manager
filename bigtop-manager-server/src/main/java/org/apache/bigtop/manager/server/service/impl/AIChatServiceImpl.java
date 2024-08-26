@@ -18,7 +18,19 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
+import jakarta.annotation.Resource;
 import org.apache.bigtop.manager.common.utils.DateUtils;
+import org.apache.bigtop.manager.dao.po.PlatformAuthorizedPO;
+import org.apache.bigtop.manager.dao.po.PlatformPO;
+import org.apache.bigtop.manager.dao.po.UserPO;
+import org.apache.bigtop.manager.dao.repository.PlatformAuthorizedRepository;
+import org.apache.bigtop.manager.dao.repository.PlatformRepository;
+import org.apache.bigtop.manager.dao.repository.UserRepository;
+import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
+import org.apache.bigtop.manager.server.exception.ApiException;
+import org.apache.bigtop.manager.server.holder.SessionUserHolder;
+import org.apache.bigtop.manager.server.model.converter.PlatformAuthorizedConverter;
+import org.apache.bigtop.manager.server.model.converter.PlatformConverter;
 import org.apache.bigtop.manager.server.model.dto.PlatformDTO;
 import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
 import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
@@ -27,56 +39,108 @@ import org.apache.bigtop.manager.server.model.vo.PlatformAuthorizedVO;
 import org.apache.bigtop.manager.server.model.vo.PlatformVO;
 import org.apache.bigtop.manager.server.service.AIChatService;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @Slf4j
 @Service
 public class AIChatServiceImpl implements AIChatService {
+    @Resource
+    private PlatformRepository platformRepository;
+    @Resource
+    private PlatformAuthorizedRepository platformAuthorizedRepository;
+    @Resource
+    private UserRepository userRepository;
+
     @Override
     public List<PlatformVO> platforms() {
+        List<PlatformPO> platformPOs = platformRepository.findAll();
         List<PlatformVO> platforms = new ArrayList<>();
-        platforms.add(new PlatformVO(1L, "OpenAI", "GPT-3.5,GPT-4o"));
-        platforms.add(new PlatformVO(2L, "ChatGLM", "GPT-3.5,GPT-4o"));
+        for (PlatformPO platformPO : platformPOs) {
+            platforms.add(PlatformConverter.INSTANCE.fromPO2VO(platformPO));
+        }
         return platforms;
     }
 
     @Override
     public List<PlatformAuthorizedVO> authorizedPlatforms() {
         List<PlatformAuthorizedVO> authorizedPlatforms = new ArrayList<>();
-        authorizedPlatforms.add(new PlatformAuthorizedVO(1L, "OpenAI", "GPT-3.5,GPT-4o"));
-        authorizedPlatforms.add(new PlatformAuthorizedVO(2L, "ChatGLM", "GPT-4o"));
+        Long userId = SessionUserHolder.getUserId();
+        UserPO userPO = userRepository.findById(userId).orElseThrow(() -> new ApiException(ApiExceptionEnum.NEED_LOGIN));
+
+        List<PlatformAuthorizedPO> authorizedPlatformPOs = platformAuthorizedRepository.findAllByUserPO(userPO);
+        for (PlatformAuthorizedPO authorizedPlatformPO : authorizedPlatformPOs) {
+            authorizedPlatforms.add(PlatformAuthorizedConverter.INSTANCE.fromPO2VO(authorizedPlatformPO));
+        }
         return authorizedPlatforms;
     }
 
     @Override
     public PlatformVO addAuthorizedPlatform(PlatformDTO platformDTO) {
+        Optional<PlatformPO> optionalPlatform =  platformRepository.findById(platformDTO.getPlatformId());
+        PlatformPO platformPO = optionalPlatform.orElse(null);
+        if (platformPO == null) {
+            return null;
+        }
+        Map<String,String> credentialNeed = platformPO.getCredential();
+        Map<String,String> credentialGet =platformDTO.getAuthCredentials();
+        Map<String,String> credentialSet = new HashMap<>();
+        for (String key : credentialNeed.keySet()) {
+            if (!credentialGet.containsKey(key)) {
+                return null;
+            }
+            credentialSet.put(key, credentialGet.get(key));
+        }
+
+        // TODO: test connect
+
+        Long userId = SessionUserHolder.getUserId();
+        UserPO userPO = userRepository.findById(userId).orElseThrow(() -> new ApiException(ApiExceptionEnum.NEED_LOGIN));
+        PlatformAuthorizedPO platformAuthorizedPO = new PlatformAuthorizedPO();
+        platformAuthorizedPO.setCredentials(credentialSet);
+        platformAuthorizedPO.setPlatformId(platformPO.getId());
+        platformAuthorizedPO.setUserPO(userPO);
+        platformAuthorizedRepository.save(platformAuthorizedPO);
+        PlatformVO platformVO = PlatformConverter.INSTANCE.fromPO2VO(platformPO);
+        log.info("Adding authorized platform {}", platformDTO.getAuthCredentials().toString());
+        log.info(platformPO.getCredential().toString());
         log.info("Adding authorized platform: {}", platformDTO);
         log.info(platformDTO.getAuthCredentials().toString());
-        return new PlatformVO(1L, "OpenAI", "GPT-3.5,GPT-4o");
+        return platformVO;
     }
 
     @Override
     public List<PlatformAuthCredentialVO> platformsAuthCredential(Long platformId) {
-        List<PlatformAuthCredentialVO> platformAuthCredentials = new ArrayList<>();
-        platformAuthCredentials.add(new PlatformAuthCredentialVO("api-key", "API Key"));
-        platformAuthCredentials.add(new PlatformAuthCredentialVO("api-secret", "API Secret"));
-        return platformAuthCredentials;
+        PlatformPO platformPO = platformRepository.findById(platformId).orElse(null);
+        if (platformPO == null) {
+            return null;
+        }
+        List<PlatformAuthCredentialVO> platformAuthCredentialVOs = new ArrayList<>();
+        for (String key : platformPO.getCredential().keySet()) {
+            PlatformAuthCredentialVO platformAuthCredentialVO = new PlatformAuthCredentialVO(key, platformPO.getCredential().get(key));
+            platformAuthCredentialVOs.add(platformAuthCredentialVO);
+        }
+        return platformAuthCredentialVOs;
     }
 
     @Override
     public int deleteAuthorizedPlatform(Long platformId) {
-        Random random = new Random();
-        int randomInt = random.nextInt();
-        return randomInt % 2;
+        Long userId = SessionUserHolder.getUserId();
+        UserPO userPO = userRepository.findById(userId).orElseThrow(() -> new ApiException(ApiExceptionEnum.NEED_LOGIN));
+        List<PlatformAuthorizedPO> authorizedPlatformPOs = platformAuthorizedRepository.findAllByUserPO(userPO);
+        for (PlatformAuthorizedPO authorizedPlatformPO : authorizedPlatformPOs) {
+            if (authorizedPlatformPO.getId().equals(platformId)) {
+                platformAuthorizedRepository.deleteById(authorizedPlatformPO.getId());
+                return 0;
+            }
+        }
+        return 1;
     }
 
     @Override
