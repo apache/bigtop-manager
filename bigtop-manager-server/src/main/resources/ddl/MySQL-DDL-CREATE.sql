@@ -410,5 +410,5 @@ VALUES (1, now(), now(), 'Administrator', '21232f297a57a5a743894a0e4a801fc3', tr
 -- Adding default ai chat platform
 INSERT INTO bigtop_manager.llm_platform (id,api_url,credential,NAME,support_models)
 VALUES
-(1,'https://api.chatanywhere.tech/v1','{"apiKey": "API Key"}','OpenAI','gpt-3.5-turbo,gpt-4,gpt-4o,gpt-3.5-turbo-16k,gpt-4-turbo-preview,gpt-4-32k,gpt-4o-mini'),
+(1,'https://api.openai.com/v1','{"apiKey": "API Key"}','OpenAI','gpt-3.5-turbo,gpt-4,gpt-4o,gpt-3.5-turbo-16k,gpt-4-turbo-preview,gpt-4-32k,gpt-4o-mini'),
 (2,'https://open.bigmodel.cn/api/paas/v4/','{"apiKey": "API Key"}','BigModel','glm-4-0520,glm-4,glm-4-air,glm-4-airx,glm-4-long Beta,glm-4-flash');
