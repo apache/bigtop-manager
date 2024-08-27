@@ -55,7 +55,6 @@ import org.apache.bigtop.manager.server.utils.MessageSourceUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 
 import jakarta.annotation.Resource;
@@ -66,7 +65,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-@Slf4j
+
 @Service
 public class AIChatServiceImpl implements AIChatService {
     @Resource
@@ -121,7 +120,7 @@ public class AIChatServiceImpl implements AIChatService {
     }
 
     @Override
-    public PlatformVO addAuthorizedPlatform(PlatformDTO platformDTO) {
+    public PlatformAuthorizedVO addAuthorizedPlatform(PlatformDTO platformDTO) {
         Optional<PlatformPO> optionalPlatform = platformRepository.findById(platformDTO.getPlatformId());
         PlatformPO platformPO =
                 optionalPlatform.orElseThrow(() -> new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND));
@@ -137,7 +136,6 @@ public class AIChatServiceImpl implements AIChatService {
 
         AIAssistantConfig.Builder aiAssistantConfigBuilder = AIAssistantConfig.builder();
         for (String key : platformDTO.getAuthCredentials().keySet()) {
-            log.info(key, platformDTO.getAuthCredentials().get(key));
             aiAssistantConfigBuilder = aiAssistantConfigBuilder.set(
                     key, platformDTO.getAuthCredentials().get(key));
         }
@@ -146,9 +144,7 @@ public class AIChatServiceImpl implements AIChatService {
         aiAssistantConfigBuilder = aiAssistantConfigBuilder.set(
                 "modelName", platformPO.getSupportModels().split(",")[0]);
         AIAssistantConfigProvider configProvider = aiAssistantConfigBuilder.build();
-        if (!Objects.equals(platformPO.getName(), "OpenAI")) {
-            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
-        }
+
         AIAssistant aiAssistant = aiTestFactory.create(PlatformType.OPENAI, configProvider);
         try {
             aiAssistant.ask("Answer one word.");
@@ -161,18 +157,14 @@ public class AIChatServiceImpl implements AIChatService {
                 userRepository.findById(userId).orElseThrow(() -> new ApiException(ApiExceptionEnum.NEED_LOGIN));
         PlatformAuthorizedPO platformAuthorizedPO = new PlatformAuthorizedPO();
         platformAuthorizedPO.setCredentials(credentialSet);
-        platformAuthorizedPO.setPlatformId(platformPO.getId());
+        platformAuthorizedPO.setPlatformPO(platformPO);
         platformAuthorizedPO.setUserPO(userPO);
 
         platformAuthorizedRepository.save(platformAuthorizedPO);
-        PlatformVO platformVO = PlatformConverter.INSTANCE.fromPO2VO(platformPO);
-        log.info(
-                "Adding authorized platform {}",
-                platformDTO.getAuthCredentials().toString());
-        log.info(platformPO.getCredential().toString());
-        log.info("Adding authorized platform: {}", platformDTO);
-        log.info(platformDTO.getAuthCredentials().toString());
-        return platformVO;
+        PlatformAuthorizedVO platformAuthorizedVO = PlatformAuthorizedConverter.INSTANCE.fromPO2VO(platformAuthorizedPO);
+        platformAuthorizedVO.setSupportModels(platformPO.getSupportModels());
+        platformAuthorizedVO.setPlatformName(platformPO.getName());
+        return platformAuthorizedVO;
     }
 
     @Override
@@ -211,11 +203,11 @@ public class AIChatServiceImpl implements AIChatService {
                 .orElseThrow(() -> new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED));
         Long userId = SessionUserHolder.getUserId();
         UserPO userPO = userRepository.findById(userId).orElse(null);
-        if (userPO != null && !Objects.equals(userId, platformAuthorizedPO.getId())) {
-            return null;
+        if (userPO == null || !Objects.equals(userId, platformAuthorizedPO.getUserPO().getId())) {
+            throw new ApiException(ApiExceptionEnum.PERMISSION_DENIED);
         }
         PlatformPO platformPO = platformRepository
-                .findById(platformAuthorizedPO.getPlatformId())
+                .findById(platformAuthorizedPO.getPlatformPO().getId())
                 .orElseThrow(() -> new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND));
         List<String> support_models = List.of(platformPO.getSupportModels().split(","));
         if (!support_models.contains(model)) {
@@ -278,12 +270,10 @@ public class AIChatServiceImpl implements AIChatService {
             throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED);
         }
         PlatformPO platformPO = platformRepository
-                .findById(platformAuthorizedPO.getPlatformId())
+                .findById(platformAuthorizedPO.getPlatformPO().getId())
                 .orElseThrow(() -> new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND));
         AIAssistantConfig.Builder aiAssistantConfigBuilder = AIAssistantConfig.builder();
-        log.info(platformAuthorizedPO.getCredentials().toString());
         for (String key : platformAuthorizedPO.getCredentials().keySet()) {
-            log.info(key, platformAuthorizedPO.getCredentials().get(key));
             aiAssistantConfigBuilder = aiAssistantConfigBuilder.set(
                     key, platformAuthorizedPO.getCredentials().get(key));
         }
@@ -291,9 +281,6 @@ public class AIChatServiceImpl implements AIChatService {
         aiAssistantConfigBuilder = aiAssistantConfigBuilder.set("memoryLen", "10");
         aiAssistantConfigBuilder = aiAssistantConfigBuilder.set("modelName", chatThreadPO.getModel());
         AIAssistantConfigProvider configProvider = aiAssistantConfigBuilder.build();
-        if (!Objects.equals(platformPO.getName(), "OpenAI")) {
-            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
-        }
         AIAssistant aiAssistant = getAiAssistantFactory().create(PlatformType.OPENAI, configProvider, threadId);
         aiAssistant.setSystemPrompt(MessageSourceUtils.getMessage(LocaleKeys.CHAT_LANGUAGE_PROMPT));
         Flux<String> stringFlux = aiAssistant.streamAsk(message);

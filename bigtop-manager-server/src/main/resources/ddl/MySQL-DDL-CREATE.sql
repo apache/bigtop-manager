@@ -321,6 +321,66 @@ CREATE TABLE `stage`
     KEY              `idx_job_id` (`job_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE `platform`
+(
+    `id`             BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `name`           VARCHAR(255)        NOT NULL,
+    `api_url`        VARCHAR(255)        NOT NULL,
+    `credential`     JSON                DEFAULT NULL,
+    `support_models` VARCHAR(255)        DEFAULT NULL,
+    `create_time`    DATETIME            DEFAULT CURRENT_TIMESTAMP,
+    `update_time`    DATETIME            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `create_by`      BIGINT              DEFAULT NULL,
+    `update_by`      BIGINT              DEFAULT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `platform_authorized`
+(
+    `id`          BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `user_id`     BIGINT(20) UNSIGNED NOT NULL,
+    `platform_id` BIGINT(20) UNSIGNED NOT NULL,
+    `credentials` JSON                NOT NULL,
+    `create_time` DATETIME            DEFAULT CURRENT_TIMESTAMP,
+    `update_time` DATETIME            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `create_by`   BIGINT              DEFAULT NULL,
+    `update_by`   BIGINT              DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    KEY `idx_platform_id` (`platform_id`),
+    KEY `idx_user_id` (`user_id`),
+    CONSTRAINT `platform_authorized_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `platform_authorized_ibfk_2` FOREIGN KEY (`platform_id`) REFERENCES `platform` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `chat_thread`
+(
+    `id`          BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `platform_id` BIGINT(20) UNSIGNED NOT NULL,
+    `user_id`     BIGINT(20) UNSIGNED NOT NULL,
+    `model`       VARCHAR(255)        NOT NULL,
+    `create_time` DATETIME            DEFAULT CURRENT_TIMESTAMP,
+    `update_time` DATETIME            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `create_by`   BIGINT              DEFAULT NULL,
+    `update_by`   BIGINT              DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    CONSTRAINT `fk_platform_authorized` FOREIGN KEY (`platform_id`) REFERENCES `platform_authorized` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `chat_message`
+(
+    `id`          BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `thread_id`   BIGINT(20) UNSIGNED NOT NULL,
+    `user_id`     BIGINT(20) UNSIGNED NOT NULL,
+    `message`     TEXT                NOT NULL,
+    `sender`      VARCHAR(50)         NOT NULL,
+    `create_time` DATETIME            DEFAULT CURRENT_TIMESTAMP,
+    `update_time` DATETIME            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    CONSTRAINT `fk_chat_message_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_chat_thread` FOREIGN KEY (`thread_id`) REFERENCES `chat_thread` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- Initialize sequence table.
 INSERT INTO sequence(seq_name, seq_count)
 VALUES ('audit_log_generator', 0),
@@ -337,7 +397,11 @@ VALUES ('audit_log_generator', 0),
        ('type_config_generator', 0),
        ('component_generator', 0),
        ('stage_generator', 0),
-       ('settings_generator', 0);
+       ('settings_generator', 0),
+       ('platform_generator', 0),
+       ('platform_authorized_generator', 0),
+       ('chat_thread_generator', 0),
+       ('chat_message_generator', 0);
 
 -- Adding default admin user
 INSERT INTO bigtop_manager.user (id, create_time, update_time, nickname, password, status, username)

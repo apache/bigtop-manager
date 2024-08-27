@@ -18,6 +18,7 @@
  */
 package org.apache.bigtop.manager.server.service;
 
+import org.apache.bigtop.manager.dao.po.PlatformAuthorizedPO;
 import org.apache.bigtop.manager.server.model.dto.PlatformDTO;
 import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
 import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
@@ -34,7 +35,7 @@ public interface AIChatService {
 
     List<PlatformAuthorizedVO> authorizedPlatforms();
 
-    PlatformVO addAuthorizedPlatform(PlatformDTO platformDTO);
+    PlatformAuthorizedVO addAuthorizedPlatform(PlatformDTO platformDTO);
 
     List<PlatformAuthCredentialVO> platformsAuthCredential(Long platformId);
 

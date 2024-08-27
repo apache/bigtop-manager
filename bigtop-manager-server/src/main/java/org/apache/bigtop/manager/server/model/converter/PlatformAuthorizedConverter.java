@@ -31,5 +31,7 @@ public interface PlatformAuthorizedConverter {
     PlatformAuthorizedConverter INSTANCE = Mappers.getMapper(PlatformAuthorizedConverter.class);
 
     @Mapping(source = "id", target = "platformId")
+    @Mapping(source = "platformPO.supportModels", target = "supportModels")
+    @Mapping(source = "platformPO.name", target = "platformName")
     PlatformAuthorizedVO fromPO2VO(PlatformAuthorizedPO platformAuthorizedPO);
 }

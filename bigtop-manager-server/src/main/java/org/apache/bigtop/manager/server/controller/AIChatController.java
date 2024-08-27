@@ -74,7 +74,7 @@ public class AIChatController {
 
     @Operation(summary = "platforms", description = "Add authorized platforms")
     @PutMapping("/platforms")
-    public ResponseEntity<PlatformVO> addAuthorizedPlatform(@RequestBody PlatformReq platformReq) {
+    public ResponseEntity<PlatformAuthorizedVO> addAuthorizedPlatform(@RequestBody PlatformReq platformReq) {
         PlatformDTO platformDTO = PlatformConverter.INSTANCE.fromReq2DTO(platformReq);
         return ResponseEntity.success(chatService.addAuthorizedPlatform(platformDTO));
     }

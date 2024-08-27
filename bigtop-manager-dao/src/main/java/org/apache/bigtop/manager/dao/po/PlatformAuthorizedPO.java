@@ -53,9 +53,6 @@ public class PlatformAuthorizedPO extends BasePO {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "platform_id", nullable = false)
-    private Long platformId;
-
     @Column(name = "credentials", columnDefinition = "json", nullable = false)
     @Convert(converter = JsonToMapConverter.class)
     private Map<String, String> credentials;
@@ -63,4 +60,8 @@ public class PlatformAuthorizedPO extends BasePO {
     @ManyToOne
     @JoinColumn(name = "user_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private UserPO userPO;
+
+    @ManyToOne
+    @JoinColumn(name = "platform_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private PlatformPO platformPO;
 }
