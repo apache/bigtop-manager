@@ -33,13 +33,10 @@ import org.apache.bigtop.manager.server.command.stage.Stage;
 import org.apache.bigtop.manager.server.command.task.Task;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
-@Slf4j
 public abstract class AbstractJob implements Job {
 
     protected StackMapper stackMapper;
