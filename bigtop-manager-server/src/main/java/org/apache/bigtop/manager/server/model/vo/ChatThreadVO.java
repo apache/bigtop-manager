@@ -40,7 +40,5 @@ public class ChatThreadVO {
         this.updateTime = createTime;
     }
 
-    public ChatThreadVO() {
-
-    }
+    public ChatThreadVO() {}
 }

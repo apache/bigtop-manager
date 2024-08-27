@@ -65,7 +65,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-
 @Service
 public class AIChatServiceImpl implements AIChatService {
     @Resource
@@ -161,7 +160,8 @@ public class AIChatServiceImpl implements AIChatService {
         platformAuthorizedPO.setUserPO(userPO);
 
         platformAuthorizedRepository.save(platformAuthorizedPO);
-        PlatformAuthorizedVO platformAuthorizedVO = PlatformAuthorizedConverter.INSTANCE.fromPO2VO(platformAuthorizedPO);
+        PlatformAuthorizedVO platformAuthorizedVO =
+                PlatformAuthorizedConverter.INSTANCE.fromPO2VO(platformAuthorizedPO);
         platformAuthorizedVO.setSupportModels(platformPO.getSupportModels());
         platformAuthorizedVO.setPlatformName(platformPO.getName());
         return platformAuthorizedVO;
@@ -203,7 +203,8 @@ public class AIChatServiceImpl implements AIChatService {
                 .orElseThrow(() -> new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED));
         Long userId = SessionUserHolder.getUserId();
         UserPO userPO = userRepository.findById(userId).orElse(null);
-        if (userPO == null || !Objects.equals(userId, platformAuthorizedPO.getUserPO().getId())) {
+        if (userPO == null
+                || !Objects.equals(userId, platformAuthorizedPO.getUserPO().getId())) {
             throw new ApiException(ApiExceptionEnum.PERMISSION_DENIED);
         }
         PlatformPO platformPO = platformRepository

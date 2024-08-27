@@ -34,7 +34,5 @@ public class PlatformAuthorizedVO {
         this.supportModels = models;
     }
 
-    public PlatformAuthorizedVO() {
-
-    }
+    public PlatformAuthorizedVO() {}
 }
