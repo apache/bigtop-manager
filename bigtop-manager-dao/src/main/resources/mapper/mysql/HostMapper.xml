@@ -31,14 +31,14 @@
         ${alias}.id,  ${alias}.hostname,  ${alias}.ipv4,  ${alias}.ipv6,  ${alias}.os,  ${alias}.arch,  ${alias}.available_processors,  ${alias}.free_memory_size,  ${alias}.total_memory_size,  ${alias}.free_disk,  ${alias}.total_disk,  ${alias}.state,  ${alias}.cluster_id
     </sql>
 
-    <select id="findByHostName" resultType="org.apache.bigtop.manager.dao.po.HostPO">
+    <select id="findByHostname" resultType="org.apache.bigtop.manager.dao.po.HostPO">
         select
         <include refid="baseColumns"/>
         from
         host
         <where>
-            <if test="hostname!=null">
-                hostname=#{hostname}
+            <if test="hostname != null">
+                hostname = #{hostname}
             </if>
         </where>
         limit 1
@@ -58,7 +58,7 @@
             </if>
         </where>
         ) h
-        left join
+        inner join
         cluster clus
         on h.cluster_id = clus.id
         limit 1
@@ -73,7 +73,7 @@
         ,clus.cluster_name
         from
         host h
-        left join
+        inner join
         (select * from cluster
         <where>
             <if test="clusterId != 0">
@@ -92,7 +92,7 @@
         host
         <where>
             <if test="hostnames != null and hostnames.size() > 0">
-                cluster_id in
+                hostname in
                 <foreach collection="hostnames" item="hostname" index="index" open="(" close=")" separator=", ">
                     #{hostname}
                 </foreach>
@@ -104,7 +104,7 @@
         insert into host (hostname, ipv4, ipv6, os, arch, available_processors, free_memory_size, total_memory_size, free_disk, total_disk, state, cluster_id)
         values
         <foreach collection='hosts' item='host' separator=','>
-            (#{host.hostname}, #{host.ipv4}, #{host.ipv6}, #{host.os}, #{host.arch}, #{host.available_processors}, #{host.free_memory_size}, #{host.total_memory_size}, #{host.free_disk}, #{host.total_disk}, #{host.state}, #{host.cluster_id})
+            (#{host.hostname}, #{host.ipv4}, #{host.ipv6}, #{host.os}, #{host.arch}, #{host.availableProcessors}, #{host.freeMemorySize}, #{host.totalMemorySize}, #{host.freeDisk}, #{host.totalDisk}, #{host.state}, #{host.clusterId})
         </foreach>
     </insert>
 

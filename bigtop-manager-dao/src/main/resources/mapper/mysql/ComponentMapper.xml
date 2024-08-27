@@ -52,13 +52,13 @@
         <include refid="baseColumnsV2">
             <property name="alias" value="r"/>
         </include>
-            ,c.cluster_name, s.service_name
+        ,c.cluster_name, s.service_name
         from
         component r
-        left join cluster c
+        inner join cluster c
         on r.cluster_id = c.id
-            left join service s
-            on r.service_id = s.id
+        inner join service s
+        on r.service_id = s.id
         <where>
             <if test="clusterId != 0">
                 r.cluster_id = #{clusterId}
@@ -80,7 +80,7 @@
             </if>
         </where>
         ) r
-        left join (select * from service
+        inner join (select * from service
         <where>
             <if test="serviceNames != null">
                 service_name in
@@ -102,7 +102,7 @@
             , s.service_name
         from
         component r
-        left join service s
+        inner join service s
         on r.service_id = s.id and r.cluster_id = s.cluster_id
     </select>
 

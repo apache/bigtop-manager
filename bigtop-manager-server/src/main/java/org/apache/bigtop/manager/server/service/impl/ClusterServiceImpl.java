@@ -87,8 +87,10 @@ public class ClusterServiceImpl implements ClusterService {
                 clusterMapper.findByClusterName(clusterDTO.getClusterName()).orElse(new ClusterPO());
         if (oldClusterPO.getId() != null) {
             clusterPO.setId(oldClusterPO.getId());
+            clusterMapper.updateById(clusterPO);
+        } else {
+            clusterMapper.save(clusterPO);
         }
-        clusterMapper.save(clusterPO);
 
         hostService.batchSave(clusterPO.getId(), clusterDTO.getHostnames());
 

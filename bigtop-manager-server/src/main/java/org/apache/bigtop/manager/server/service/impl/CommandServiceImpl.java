@@ -96,6 +96,7 @@ public class CommandServiceImpl implements CommandService {
         }
         jobPO.setState(JobState.PENDING.getName());
         jobMapper.save(jobPO);
+        job.loadJobPO(jobPO);
 
         for (int i = 0; i < job.getStages().size(); i++) {
             Stage stage = job.getStages().get(i);
@@ -107,6 +108,7 @@ public class CommandServiceImpl implements CommandService {
             stagePO.setOrder(i + 1);
             stagePO.setState(JobState.PENDING.getName());
             stageMapper.save(stagePO);
+            stage.loadStagePO(stagePO);
 
             for (int j = 0; j < stage.getTasks().size(); j++) {
                 Task task = stage.getTasks().get(j);
@@ -118,6 +120,7 @@ public class CommandServiceImpl implements CommandService {
                 taskPO.setStageId(stagePO.getId());
                 taskPO.setState(JobState.PENDING.getName());
                 taskMapper.save(taskPO);
+                task.loadTaskPO(taskPO);
             }
         }
 

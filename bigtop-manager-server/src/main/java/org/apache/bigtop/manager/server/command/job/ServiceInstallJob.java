@@ -103,7 +103,7 @@ public class ServiceInstallJob extends AbstractServiceJob {
                                 .findAllByClusterIdAndComponentNameAndHostnameIn(
                                         clusterPO.getId(), componentName, hostnames)
                                 .stream()
-                                .map(hostComponent -> hostComponent.getHostPO().getHostname())
+                                .map(HostComponentPO::getHostname)
                                 .toList();
 
                         hostnames.removeAll(existHostnames);
@@ -165,13 +165,13 @@ public class ServiceInstallJob extends AbstractServiceJob {
 
             // 4. Persist hostComponent
             for (String hostname : componentHostDTO.getHostnames()) {
-                HostComponentPO hostComponentPO =
-                        hostComponentMapper.findByComponentPOComponentNameAndHostPOHostname(componentName, hostname);
+                HostComponentPO hostComponentPO = hostComponentMapper.findByClusterIdAndComponentNameAndHostname(
+                        clusterId, componentName, hostname);
                 if (hostComponentPO == null) {
                     HostPO hostPO = hostMapper.findByHostname(hostname);
 
                     hostComponentPO = new HostComponentPO();
-                    hostComponentPO.setHostPO(hostPO);
+                    hostComponentPO.setHostId(hostPO.getId());
                     hostComponentPO.setComponentId(componentPO.getId());
                     hostComponentPO.setState(MaintainState.UNINSTALLED.getName());
                     hostComponentMapper.save(hostComponentPO);

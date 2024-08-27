@@ -67,10 +67,10 @@
             </if>
         </where>
         ) s
-        left join
+        inner join
         cluster clus
         on s.cluster_id = clus.id
-        left join
+        inner join
         component c
         on c.service_id = s.id
     </select>
@@ -90,7 +90,7 @@
             </if>
         </where>
         ) s
-        left join
+        inner join
         cluster clus
         on s.cluster_id = clus.id
     </select>
@@ -106,7 +106,7 @@
                 cluster_id = #{clusterId}
             </if>
             <if test="serviceName != null">
-                service_name = #{serviceName}
+                and service_name = #{serviceName}
             </if>
         </where>
     </select>

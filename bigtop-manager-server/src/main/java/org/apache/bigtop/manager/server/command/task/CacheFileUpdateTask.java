@@ -166,15 +166,14 @@ public class CacheFileUpdateTask extends AbstractTask {
 
         hostMap = new HashMap<>();
         hostComponentPOList.forEach(x -> {
-            if (hostMap.containsKey(x.getComponentPO().getComponentName())) {
-                hostMap.get(x.getComponentPO().getComponentName())
-                        .add(x.getHostPO().getHostname());
+            if (hostMap.containsKey(x.getComponentName())) {
+                hostMap.get(x.getComponentName()).add(x.getHostname());
             } else {
                 Set<String> set = new HashSet<>();
-                set.add(x.getHostPO().getHostname());
-                hostMap.put(x.getComponentPO().getComponentName(), set);
+                set.add(x.getHostname());
+                hostMap.put(x.getComponentName(), set);
             }
-            hostMap.get(x.getComponentPO().getComponentName()).add(x.getHostPO().getHostname());
+            hostMap.get(x.getComponentName()).add(x.getHostname());
         });
 
         Set<String> hostNameSet = hostPOList.stream().map(HostPO::getHostname).collect(Collectors.toSet());

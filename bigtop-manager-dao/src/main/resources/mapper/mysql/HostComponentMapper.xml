@@ -38,7 +38,7 @@
         </include>
         from
         host_component hc
-        left join (select * from component
+        inner join (select * from component
         <where>
             <if test="componentName != null">
                 component_name = #{componentName}
@@ -60,7 +60,7 @@
         , c.service_id, c.component_name, c.display_name, c.category, s.service_name, clus.cluster_name, ht.hostname
         from
         host_component hc
-        left join (select * from component
+        inner join (select * from component
         <where>
             <if test="clusterId != 0">
                 cluster_id = #{clusterId}
@@ -71,11 +71,11 @@
         </where>
         ) c
         on hc.component_id = c.id
-        left join service s
+        inner join service s
         on c.service_id = s.id
-        left join cluster clus
+        inner join cluster clus
         on c.cluster_id = clus.id
-        left join host ht
+        inner join host ht
         on hc.host_id = ht.id
     </select>
 
@@ -87,9 +87,9 @@
         </include>
         from
         host_component hc
-        left join (select * from host
+        inner join (select * from host
         <where>
-            <if test="hostname != 0">
+            <if test="hostname != null">
                 hostname = #{hostname}
             </if>
             <if test="clusterId != 0">
@@ -98,17 +98,48 @@
         </where>
         ) h
         on hc.host_id = h.id
-        left join (select * from component
+        inner join (select * from component
         <where>
-            <if test="componentName != 0">
+            <if test="componentName != null">
                 component_name = #{componentName}
+            </if>
+        </where>
+        ) c
+        on hc.component_id = c.id and h.cluster_id = c.cluster_id
+        limit 1
+    </select>
+
+    <select id="findAllByClusterIdAndComponentNameAndHostnameIn"
+            resultType="org.apache.bigtop.manager.dao.po.HostComponentPO">
+        select
+        <include refid="baseColumnsV2">
+            <property name="alias" value="hc"/>
+        </include>
+            , c.component_name
+        from
+        host_component hc
+        inner join (select * from host
+        <where>
+            <if test="hostnames != null">
+                hostname in
+                <foreach collection="hostnames" item="hostname" index="index" open="(" close=")" separator=",">
+                    #{hostname}
+                </foreach>
             </if>
             <if test="clusterId != 0">
                 and cluster_id = #{clusterId}
             </if>
         </where>
+        ) h
+        on hc.host_id = h.id
+        inner join (select * from component
+        <where>
+            <if test="componentName != 0">
+                component_name = #{componentName}
+            </if>
+        </where>
         ) c
-        on hc.component_id = c.id
+        on hc.component_id = c.id and h.cluster_id = c.cluster_id
     </select>
 
     <select id="findAllByClusterIdAndHostId"
@@ -120,13 +151,13 @@
         , c.service_id, c.component_name, c.display_name, c.category, s.service_name, clus.cluster_name, ht.hostname
         from
         host_component hc
-        left join component c
+        inner join component c
         on hc.component_id = c.id
-        left join service s
+        inner join service s
         on c.service_id = s.id
-        left join cluster clus
+        inner join cluster clus
         on c.cluster_id = clus.id
-        left join (select * from host
+        inner join (select * from host
         <where>
             <if test="clusterId != 0">
                 cluster_id = #{clusterId}
@@ -148,7 +179,7 @@
             , c.service_id, c.component_name, c.display_name, c.category, s.service_name, clus.cluster_name, ht.hostname
         from
         host_component hc
-        left join (select * from component
+        inner join (select * from component
         <where>
             <if test="clusterId != 0">
                 cluster_id = #{clusterId}
@@ -156,11 +187,11 @@
         </where>
         ) c
         on hc.component_id = c.id
-        left join service s
+        inner join service s
         on c.service_id = s.id
-        left join cluster clus
+        inner join cluster clus
         on c.cluster_id = clus.id
-        left join host ht
+        inner join host ht
         on hc.host_id = ht.id
     </select>
 
@@ -173,18 +204,18 @@
         ,st.stack_name,st.stack_version,ser.service_name,ser.service_user,clu.root,c.component_name,c.command_script,hst.hostname
         from
         host_component hc
-        left join host hst
+        inner join host hst
         on hc.host_id = hst.id
-        left join
+        inner join
         component c
         on hc.component_id = c.id
-        left join
+        inner join
         cluster clu
         on c.cluster_id = clu.id
-        left join
+        inner join
         service ser
         on c.service_id=ser.id and c.cluster_id = ser.cluster_id
-        left join stack st
+        inner join stack st
         on clu.stack_id = st.id
     </select>
 

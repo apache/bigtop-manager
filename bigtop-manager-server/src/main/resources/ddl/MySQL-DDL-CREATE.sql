@@ -179,10 +179,6 @@ CREATE TABLE `stack`
     `update_time`    DATETIME DEFAULT NULL,
     `create_by`      BIGINT,
     `update_by`      BIGINT,
-    `component_name` VARCHAR(255),
-    `context`        LONGTEXT,
-    `order`          INTEGER,
-    `service_name`   VARCHAR(255),
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_stack` (`stack_name`, `stack_version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
@@ -299,7 +295,6 @@ CREATE TABLE `stage`
     `cluster_id`     BIGINT(20) UNSIGNED DEFAULT NULL,
     `job_id`         BIGINT(20) UNSIGNED NOT NULL,
     `state`          VARCHAR(32) NOT NULL,
-    `stage_order`    INT UNSIGNED DEFAULT NULL,
     `create_time`    DATETIME DEFAULT NULL,
     `update_time`    DATETIME DEFAULT NULL,
     `component_name` VARCHAR(255),

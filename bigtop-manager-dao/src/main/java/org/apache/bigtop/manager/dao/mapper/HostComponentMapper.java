@@ -44,8 +44,6 @@ public interface HostComponentMapper extends BaseMapper<HostComponentPO> {
 
     List<HostComponentPO> findAllByClusterId(@Param("clusterId") Long clusterId);
 
-    HostComponentPO findByComponentPOComponentNameAndHostPOHostname(String componentName, String hostName);
-
     List<HostComponentPO> findAllByClusterIdAndHostId(@Param("clusterId") Long clusterId, @Param("hostId") Long hostId);
 
     List<HostComponentPO> findAllByClusterIdAndServiceId(

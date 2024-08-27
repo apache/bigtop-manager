@@ -72,9 +72,8 @@ public abstract class AbstractStage implements Stage {
 
     @Override
     public void beforeRun() {
-        StagePO stagePO = getStagePO();
         stagePO.setState(JobState.PROCESSING.getName());
-        stageMapper.save(stagePO);
+        stageMapper.updateById(stagePO);
     }
 
     @Override

@@ -41,10 +41,10 @@
     </select>
 
     <insert id="saveAll">
-        insert into repo (cluster_name, cluster_type, root, user_group, packages, repo_template, state, selected)
+        insert into repo (base_url, os, arch, repo_id, repo_name, cluster_id)
         values
         <foreach collection='clusters' item='cluster' separator=','>
-            (#{cluster.clusterName},#{cluster.clusterType},#{cluster.root},#{cluster.userGroup},#{cluster.packages},#{cluster.repoTemplate},#{cluster.state},#{cluster.selected})
+            (#{cluster.baseUrl},#{cluster.os},#{cluster.arch},#{cluster.repoId},#{cluster.repoName},#{cluster.clusterId})
         </foreach>
     </insert>
 

@@ -64,9 +64,8 @@ public abstract class AbstractTask implements Task {
 
     @Override
     public void beforeRun() {
-        TaskPO taskPO = getTaskPO();
         taskPO.setState(JobState.PROCESSING.getName());
-        taskMapper.save(taskPO);
+        taskMapper.updateById(taskPO);
     }
 
     @Override

@@ -89,9 +89,9 @@
             </if>
         </where>
         ) h
-        left join stage st
+        inner join stage st
         on h.id = st.job_id
-        left join task tk
+        inner join task tk
         on tk.job_id = h.id and st.id = tk.stage_id
     </select>
 
@@ -109,9 +109,9 @@
             </if>
         </where>
         ) h
-        left join stage st
+        inner join stage st
         on h.id = st.job_id
-        left join task tk
+        inner join task tk
         on tk.job_id = h.id and st.id = tk.stage_id
     </select>
 
@@ -123,7 +123,7 @@
         </include>
         from
         (select * from job where cluster_id is null) h
-        left join stage st
+        inner join stage st
         on h.id = st.job_id
     </select>
 

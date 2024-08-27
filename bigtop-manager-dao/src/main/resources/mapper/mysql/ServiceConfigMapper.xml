@@ -62,9 +62,9 @@
             </if>
         </where>
         ) r
-        left join service s
+        inner join service s
         on r.service_id = s.id
-        left join type_config tc
+        inner join type_config tc
         on r.id = tc.service_config_id
         order by version desc
     </select>
@@ -87,9 +87,9 @@
             </if>
         </where>
         ) r
-        left join service s
+        inner join service s
         on r.service_id = s.id
-        left join type_config tc
+        inner join type_config tc
         on r.id = tc.service_config_id
         limit 1
     </select>
@@ -109,9 +109,9 @@
             </if>
         </where>
         ) r
-        left join service s
+        inner join service s
         on r.service_id = s.id
-        left join type_config tc
+        inner join type_config tc
         on r.id = tc.service_config_id
     </select>
 

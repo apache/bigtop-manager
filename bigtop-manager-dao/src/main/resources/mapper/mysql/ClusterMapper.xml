@@ -56,7 +56,7 @@
         , s.stack_name, s.stack_version
         from
         cluster r
-        left join stack s
+        inner join stack s
         on r.stack_id = s.id
         <where>
             <if test="clusterId!=0">
@@ -74,7 +74,7 @@
         , s.stack_name, s.stack_version
         from
         cluster r
-        left join stack s
+        inner join stack s
         on r.stack_id = s.id
     </select>
 
