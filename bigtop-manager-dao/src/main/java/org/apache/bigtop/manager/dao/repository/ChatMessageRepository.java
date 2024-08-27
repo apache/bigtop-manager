@@ -29,5 +29,4 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessagePO, Long
     List<ChatMessagePO> findAllByChatThreadPO(ChatThreadPO chatThread);
 
     void deleteByChatThreadPO(ChatThreadPO chatThreadPO);
-    //    PlatformPO findById(Long id);
 }

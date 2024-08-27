@@ -31,14 +31,12 @@ import dev.langchain4j.data.message.ChatMessageType;
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-@Slf4j
 public class PersistentChatMemoryStore implements ChatMemoryStore {
 
     private final ChatThreadRepository chatThreadRepository;
@@ -92,8 +90,6 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
 
     @Override
     public List<ChatMessage> getMessages(Object threadId) {
-        log.info("getMessages called");
-        log.info("threadId: {}", threadId.toString());
         ChatThreadPO chatThreadPO = null;
         if (chatThreadRepository != null) {
             chatThreadPO = chatThreadRepository.findById((Long) threadId).orElse(null);
@@ -111,14 +107,12 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
 
     @Override
     public void updateMessages(Object threadId, List<ChatMessage> messages) {
-        log.info("updateMessages called");
         ChatMessagePO chatMessagePO = convertToChatMessagePO(messages.get(messages.size() - 1), (Long) threadId);
         chatMessageRepository.save(chatMessagePO);
     }
 
     @Override
     public void deleteMessages(Object threadId) {
-        log.info("deleteMessages called");
         ChatThreadPO chatThreadPO =
                 chatThreadRepository.findById((Long) threadId).orElse(null);
         chatMessageRepository.deleteByChatThreadPO(chatThreadPO);
