@@ -28,6 +28,7 @@ import { useClusterStore } from '@/store/cluster'
 import { RouteRecordRaw } from 'vue-router'
 import { useServiceStore } from '@/store/service'
 import SvgIcon from '@/components/common/svg-icon/index.vue'
+import { routePriorityMap } from '@/utils/router-util'
 
 export const useUserStore = defineStore(
   'user',
@@ -47,7 +48,8 @@ export const useUserStore = defineStore(
           to: route.path,
           title: route.meta?.title,
           icon: route.meta?.icon,
-          hidden: Boolean(route.meta?.hidden)
+          hidden: Boolean(route.meta?.hidden),
+          priority: routePriorityMap[`${route.meta?.title}`] || 0
         }
 
         if (route.meta?.title === 'Services') {

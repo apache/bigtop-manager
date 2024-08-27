@@ -21,11 +21,20 @@ import type { RouteRecordRaw } from 'vue-router'
 interface RouteModuleType {
   routes: RouteRecordRaw[]
 }
+
+type RoutePriorityMap = { [key: string]: number }
+
+export const routePriorityMap: RoutePriorityMap = {
+  Dashboard: 1,
+  Hosts: 2,
+  Services: 3,
+  Cluster: 4
+}
+
 export function mergeRouteModules(
   routeModules: Record<string, unknown>
 ): RouteRecordRaw[] {
   const mergedRoutes: RouteRecordRaw[] = []
-
   for (const routeModule of Object.values(routeModules)) {
     const moduleRoutes = (routeModule as RouteModuleType)?.routes ?? []
     mergedRoutes.push(...moduleRoutes)
