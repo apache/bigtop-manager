@@ -30,6 +30,4 @@ public interface ChatThreadRepository extends JpaRepository<ChatThreadPO, Long> 
     List<ChatThreadPO> findAllByUserPO(UserPO userPO);
 
     List<ChatThreadPO> findAllByPlatformAuthorizedPO(PlatformAuthorizedPO platformAuthorizedPO);
-
-    //    PlatformPO findById(Long id);
 }

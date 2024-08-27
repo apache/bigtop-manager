@@ -27,8 +27,4 @@ import java.util.List;
 
 public interface PlatformAuthorizedRepository extends JpaRepository<PlatformAuthorizedPO, Long> {
     List<PlatformAuthorizedPO> findAllByUserPO(UserPO userPO);
-
-    //    List<PlatformAuthorizedPO> findByUserId(UserPO userPO);
-
-    //    PlatformPO findById(Long id);
 }

@@ -36,16 +36,16 @@ import jakarta.persistence.TableGenerator;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "\"chat_thread\"")
+@Table(name = "\"llm_chat_thread\"")
 @TableGenerator(
-        name = "chat_thread_generator",
+        name = "llm_chat_thread_generator",
         table = "sequence",
         pkColumnName = "seq_name",
         valueColumnName = "seq_count")
 public class ChatThreadPO extends BasePO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "chat_threads_generator")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "llm_chat_threads_generator")
     @Column(name = "id")
     private Long id;
 

@@ -36,16 +36,16 @@ import java.util.Map;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "\"platform\"")
+@Table(name = "\"llm_platform\"")
 @TableGenerator(
-        name = "platform_generator",
+        name = "llm_platform_generator",
         table = "sequence",
         pkColumnName = "seq_name",
         valueColumnName = "seq_count")
 public class PlatformPO extends BasePO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "platform_generator")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "llm_platform_generator")
     @Column(name = "id")
     private Long id;
 
