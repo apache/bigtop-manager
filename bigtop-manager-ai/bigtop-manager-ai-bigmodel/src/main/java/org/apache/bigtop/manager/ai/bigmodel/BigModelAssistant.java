@@ -91,12 +91,12 @@ public class BigModelAssistant extends AbstractAIAssistant {
             String apiKey = ValidationUtils.ensureNotNull(configs.get("apiKey"), "apiKey");
             Integer memoryLen = ValidationUtils.ensureNotNull(
                     NumberUtils.parseNumber(configs.get("memoryLen"), Integer.class), "memoryLen not a number.");
-            ChatLanguageModel openAiChatModel = OpenAiChatModel.builder()
+            ChatLanguageModel bigModelChatModel = OpenAiChatModel.builder()
                     .apiKey(apiKey)
                     .baseUrl(baseUrl)
                     .modelName(modelName)
                     .build();
-            StreamingChatLanguageModel openaiStreamChatModel = OpenAiStreamingChatModel.builder()
+            StreamingChatLanguageModel bigModelStreamChatModel = OpenAiStreamingChatModel.builder()
                     .apiKey(apiKey)
                     .baseUrl(baseUrl)
                     .modelName(modelName)
@@ -106,7 +106,7 @@ public class BigModelAssistant extends AbstractAIAssistant {
                     .chatMemoryStore(chatMemoryStore)
                     .maxMessages(memoryLen)
                     .build();
-            return new BigModelAssistant(openAiChatModel, openaiStreamChatModel, chatMemory);
+            return new BigModelAssistant(bigModelChatModel, bigModelStreamChatModel, chatMemory);
         }
     }
 }
