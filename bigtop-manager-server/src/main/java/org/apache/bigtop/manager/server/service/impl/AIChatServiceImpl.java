@@ -18,6 +18,7 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
+import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 import org.apache.bigtop.manager.ai.assistant.GeneralAssistantFactory;
 import org.apache.bigtop.manager.ai.assistant.provider.AIAssistantConfig;
 import org.apache.bigtop.manager.ai.assistant.store.PersistentChatMemoryStore;
@@ -43,6 +44,7 @@ import org.apache.bigtop.manager.server.model.converter.ChatMessageConverter;
 import org.apache.bigtop.manager.server.model.converter.ChatThreadConverter;
 import org.apache.bigtop.manager.server.model.converter.PlatformAuthorizedConverter;
 import org.apache.bigtop.manager.server.model.converter.PlatformConverter;
+import org.apache.bigtop.manager.server.model.dto.PlatformAuthorizedDTO;
 import org.apache.bigtop.manager.server.model.dto.PlatformDTO;
 import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
 import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
@@ -51,7 +53,9 @@ import org.apache.bigtop.manager.server.model.vo.PlatformAuthorizedVO;
 import org.apache.bigtop.manager.server.model.vo.PlatformVO;
 import org.apache.bigtop.manager.server.service.AIChatService;
 import org.apache.bigtop.manager.server.utils.MessageSourceUtils;
-
+import org.apache.bigtop.manager.ai.core.AbstractAIAssistant;
+import org.apache.bigtop.manager.ai.openai.OpenAIAssistant;
+//import org.apache.bigtop.manager.ai.bigmodel;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -84,6 +88,7 @@ public class AIChatServiceImpl implements AIChatService {
 
     private AIAssistantFactory aiAssistantFactory;
 
+    private PersistentChatMemoryStore persistentChatMemoryStore;
     private final AIAssistantFactory aiTestFactory = new GeneralAssistantFactory();
 
     public AIAssistantFactory getAiAssistantFactory() {
@@ -92,6 +97,63 @@ public class AIChatServiceImpl implements AIChatService {
                     new PersistentChatMemoryStore(chatThreadRepository, chatMessageRepository));
         }
         return aiAssistantFactory;
+    }
+    public ChatMemoryStore getChatMemoryStore() {
+        if (persistentChatMemoryStore == null) {
+            persistentChatMemoryStore = new PersistentChatMemoryStore(chatThreadRepository, chatMessageRepository);
+        }
+        return persistentChatMemoryStore;
+    }
+
+    private AIAssistantConfig.Builder getAIAssistantConfigBuilder(PlatformAuthorizedDTO platformAuthorizedDTO) {
+        AIAssistantConfig.Builder aiAssistantConfigBuilder = AIAssistantConfig.builder();
+        for (String key : platformAuthorizedDTO.getCredentials().keySet()) {
+            aiAssistantConfigBuilder = aiAssistantConfigBuilder.set(
+                    key, platformAuthorizedDTO.getCredentials().get(key));
+        }
+        aiAssistantConfigBuilder = aiAssistantConfigBuilder.set("baseUrl", platformAuthorizedDTO.getBaseUrl());
+        aiAssistantConfigBuilder = aiAssistantConfigBuilder.set("memoryLen", "10");
+        aiAssistantConfigBuilder = aiAssistantConfigBuilder.set("modelName", platformAuthorizedDTO.getModel());
+        return aiAssistantConfigBuilder;
+    }
+
+    private AIAssistant buildAIAssistant(PlatformAuthorizedDTO platformAuthorizedDTO, Long threadId) {
+        AIAssistant aiAssistant = null;
+        AIAssistantConfig.Builder aiAssistantConfigBuilder = getAIAssistantConfigBuilder(platformAuthorizedDTO);
+        if (platformAuthorizedDTO.getPlatformName().equalsIgnoreCase("openai")) {
+            aiAssistant = (OpenAIAssistant) OpenAIAssistant.builder()
+                    .id(threadId)
+                    .memoryStore(getChatMemoryStore())
+                    .withConfigProvider(aiAssistantConfigBuilder.build())
+                    .build();
+        }
+//         else if (platformAuthorizedDTO.getPlatformName().equalsIgnoreCase("bigmodel")) {
+//            aiAssistant = (OpenAIAssistant) BigModelAssistant.builder()
+//                    .id(threadId)
+//                    .memoryStore(getChatMemoryStore())
+//                    .withConfigProvider(aiAssistantConfigBuilder.build())
+//                    .build();
+//        }
+        return aiAssistant;
+    }
+
+    private Boolean testAuthorization(PlatformAuthorizedDTO platformAuthorizedDTO) {
+        AIAssistant aiAssistant = null;
+        AIAssistantConfig.Builder aiAssistantConfigBuilder = getAIAssistantConfigBuilder(platformAuthorizedDTO);
+        if (platformAuthorizedDTO.getPlatformName().equalsIgnoreCase("openai")) {
+            aiAssistant = OpenAIAssistant.builder()
+                    .withConfigProvider(aiAssistantConfigBuilder.build())
+                    .build();
+        }
+        if (aiAssistant == null) {
+            return false;
+        }
+        try {
+            aiAssistant.ask("Answer one word.");
+        } catch (Exception e) {
+            throw new ApiException(ApiExceptionEnum.CREDIT_INCORRECT, e.getMessage());
+        }
+        return true;
     }
 
     @Override
@@ -133,22 +195,14 @@ public class AIChatServiceImpl implements AIChatService {
             credentialSet.put(key, credentialGet.get(key));
         }
 
-        AIAssistantConfig.Builder aiAssistantConfigBuilder = AIAssistantConfig.builder();
-        for (String key : platformDTO.getAuthCredentials().keySet()) {
-            aiAssistantConfigBuilder = aiAssistantConfigBuilder.set(
-                    key, platformDTO.getAuthCredentials().get(key));
-        }
-        aiAssistantConfigBuilder = aiAssistantConfigBuilder.set("baseUrl", platformPO.getApiUrl());
-        aiAssistantConfigBuilder = aiAssistantConfigBuilder.set("memoryLen", "10");
-        aiAssistantConfigBuilder = aiAssistantConfigBuilder.set(
-                "modelName", platformPO.getSupportModels().split(",")[0]);
-        AIAssistantConfigProvider configProvider = aiAssistantConfigBuilder.build();
+        PlatformAuthorizedDTO platformAuthorizedDTO = new PlatformAuthorizedDTO();
+        platformAuthorizedDTO.setPlatformName(platformPO.getName());
+        platformAuthorizedDTO.setCredentials(credentialSet);
+        platformAuthorizedDTO.setBaseUrl(platformPO.getApiUrl());
+        platformAuthorizedDTO.setModel(platformPO.getSupportModels().split(",")[0]);
 
-        AIAssistant aiAssistant = aiTestFactory.create(PlatformType.OPENAI, configProvider);
-        try {
-            aiAssistant.ask("Answer one word.");
-        } catch (Exception e) {
-            throw new ApiException(ApiExceptionEnum.CREDIT_INCORRECT, e.getMessage());
+        if (!testAuthorization(platformAuthorizedDTO)) {
+            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
         }
 
         Long userId = SessionUserHolder.getUserId();
@@ -273,17 +327,16 @@ public class AIChatServiceImpl implements AIChatService {
         PlatformPO platformPO = platformRepository
                 .findById(platformAuthorizedPO.getPlatformPO().getId())
                 .orElseThrow(() -> new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND));
-        AIAssistantConfig.Builder aiAssistantConfigBuilder = AIAssistantConfig.builder();
-        for (String key : platformAuthorizedPO.getCredentials().keySet()) {
-            aiAssistantConfigBuilder = aiAssistantConfigBuilder.set(
-                    key, platformAuthorizedPO.getCredentials().get(key));
+
+        PlatformAuthorizedDTO platformAuthorizedDTO = new PlatformAuthorizedDTO();
+        platformAuthorizedDTO.setPlatformName(platformPO.getName());
+        platformAuthorizedDTO.setCredentials(platformAuthorizedPO.getCredentials());
+        platformAuthorizedDTO.setBaseUrl(platformPO.getApiUrl());
+        platformAuthorizedDTO.setModel(chatThreadPO.getModel());
+        AIAssistant aiAssistant = buildAIAssistant(platformAuthorizedDTO, chatThreadPO.getId());
+        if (aiAssistant == null) {
+            throw new ApiException(ApiExceptionEnum.CREDIT_INCORRECT);
         }
-        aiAssistantConfigBuilder = aiAssistantConfigBuilder.set("baseUrl", platformPO.getApiUrl());
-        aiAssistantConfigBuilder = aiAssistantConfigBuilder.set("memoryLen", "10");
-        aiAssistantConfigBuilder = aiAssistantConfigBuilder.set("modelName", chatThreadPO.getModel());
-        AIAssistantConfigProvider configProvider = aiAssistantConfigBuilder.build();
-        AIAssistant aiAssistant = getAiAssistantFactory().create(PlatformType.OPENAI, configProvider, threadId);
-        aiAssistant.setSystemPrompt(MessageSourceUtils.getMessage(LocaleKeys.CHAT_LANGUAGE_PROMPT));
         Flux<String> stringFlux = aiAssistant.streamAsk(message);
 
         SseEmitter emitter = new SseEmitter();
