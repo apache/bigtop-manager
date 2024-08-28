@@ -28,4 +28,11 @@ public class PlatformAuthorizedDTO {
     private String baseUrl;
     private String model;
     private Map<String, String> credentials;
+
+    public PlatformAuthorizedDTO(String name, Map<String, String> credentialSet, String apiUrl, String model) {
+        this.platformName = name;
+        this.credentials = credentialSet;
+        this.baseUrl = apiUrl;
+        this.model = model;
+    }
 }

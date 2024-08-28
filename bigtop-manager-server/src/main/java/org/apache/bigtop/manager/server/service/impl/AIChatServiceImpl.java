@@ -122,7 +122,7 @@ public class AIChatServiceImpl implements AIChatService {
             return false;
         }
         try {
-            aiAssistant.ask("Answer one word.");
+            aiAssistant.ask("1+1=");
         } catch (Exception e) {
             throw new ApiException(ApiExceptionEnum.CREDIT_INCORRECT, e.getMessage());
         }
@@ -167,12 +167,12 @@ public class AIChatServiceImpl implements AIChatService {
             }
             credentialSet.put(key, credentialGet.get(key));
         }
-
-        PlatformAuthorizedDTO platformAuthorizedDTO = new PlatformAuthorizedDTO();
-        platformAuthorizedDTO.setPlatformName(platformPO.getName());
-        platformAuthorizedDTO.setCredentials(credentialSet);
-        platformAuthorizedDTO.setBaseUrl(platformPO.getApiUrl());
-        platformAuthorizedDTO.setModel(platformPO.getSupportModels().split(",")[0]);
+        List<String> models = List.of(platformPO.getSupportModels().split(","));
+        if (models.isEmpty()) {
+            throw new ApiException(ApiExceptionEnum.MODEL_NOT_SUPPORTED);
+        }
+        PlatformAuthorizedDTO platformAuthorizedDTO =
+                new PlatformAuthorizedDTO(platformPO.getName(), credentialSet, platformPO.getApiUrl(), models.get(0));
 
         if (!testAuthorization(platformAuthorizedDTO)) {
             throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
@@ -301,11 +301,11 @@ public class AIChatServiceImpl implements AIChatService {
                 .findById(platformAuthorizedPO.getPlatformPO().getId())
                 .orElseThrow(() -> new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND));
 
-        PlatformAuthorizedDTO platformAuthorizedDTO = new PlatformAuthorizedDTO();
-        platformAuthorizedDTO.setPlatformName(platformPO.getName());
-        platformAuthorizedDTO.setCredentials(platformAuthorizedPO.getCredentials());
-        platformAuthorizedDTO.setBaseUrl(platformPO.getApiUrl());
-        platformAuthorizedDTO.setModel(chatThreadPO.getModel());
+        PlatformAuthorizedDTO platformAuthorizedDTO = new PlatformAuthorizedDTO(
+                platformPO.getName(),
+                platformAuthorizedPO.getCredentials(),
+                platformPO.getApiUrl(),
+                chatThreadPO.getModel());
         AIAssistant aiAssistant = buildAIAssistant(platformAuthorizedDTO, chatThreadPO.getId());
         if (aiAssistant == null) {
             throw new ApiException(ApiExceptionEnum.CREDIT_INCORRECT);
