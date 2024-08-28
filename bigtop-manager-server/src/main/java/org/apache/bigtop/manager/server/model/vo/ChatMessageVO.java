@@ -18,17 +18,19 @@
  */
 package org.apache.bigtop.manager.server.model.vo;
 
+import org.apache.bigtop.manager.ai.core.enums.MessageSender;
+
 import lombok.Data;
 
 @Data
 public class ChatMessageVO {
-    private String sender;
+    private MessageSender sender;
 
     private String message;
 
     private String createTime;
 
-    public ChatMessageVO(String sender, String messageText, String createTime) {
+    public ChatMessageVO(MessageSender sender, String messageText, String createTime) {
         this.sender = sender;
         this.message = messageText;
         this.createTime = createTime;

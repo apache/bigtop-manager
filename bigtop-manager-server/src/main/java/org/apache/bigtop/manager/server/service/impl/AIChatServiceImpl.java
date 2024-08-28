@@ -21,6 +21,7 @@ package org.apache.bigtop.manager.server.service.impl;
 import org.apache.bigtop.manager.ai.assistant.GeneralAssistantFactory;
 import org.apache.bigtop.manager.ai.assistant.provider.AIAssistantConfig;
 import org.apache.bigtop.manager.ai.assistant.store.PersistentChatMemoryStore;
+import org.apache.bigtop.manager.ai.core.enums.MessageSender;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistantFactory;
 import org.apache.bigtop.manager.dao.po.ChatMessagePO;
@@ -335,8 +336,11 @@ public class AIChatServiceImpl implements AIChatService {
         List<ChatMessagePO> chatMessagePOs = chatMessageRepository.findAllByChatThreadPO(chatThreadPO);
         for (ChatMessagePO chatMessagePO : chatMessagePOs) {
             ChatMessageVO chatMessageVO = ChatMessageConverter.INSTANCE.fromPO2VO(chatMessagePO);
-            if (chatMessageVO.getSender().equals("User")
-                    || chatMessageVO.getSender().equals("AI")) {
+            MessageSender sender = chatMessageVO.getSender();
+            if (sender == null) {
+                continue;
+            }
+            if (sender.equals(MessageSender.USER) || sender.equals(MessageSender.AI)) {
                 chatMessages.add(chatMessageVO);
             }
         }

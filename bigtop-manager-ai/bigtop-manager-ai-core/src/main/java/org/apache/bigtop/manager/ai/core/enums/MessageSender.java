@@ -16,30 +16,41 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.converter;
+package org.apache.bigtop.manager.ai.core.enums;
 
-import org.apache.bigtop.manager.ai.core.enums.MessageSender;
-import org.apache.bigtop.manager.dao.po.ChatMessagePO;
-import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
-import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
+public enum MessageSender {
+    USER("USER"),
+    AI("AI"),
+    SYSTEM("SYSTEM");
 
-@Mapper(config = MapStructSharedConfig.class)
-public interface ChatMessageConverter {
-    ChatMessageConverter INSTANCE = Mappers.getMapper(ChatMessageConverter.class);
+    private final String value;
 
-    ChatMessageVO fromPO2VO(ChatMessagePO chatMessagePO);
+    MessageSender(String value) {
+        this.value = value;
+    }
 
-    default MessageSender mapStringToMessageSender(String sender) {
-        if (sender == null) {
+    public static List<String> getSenders() {
+        return Arrays.stream(values()).map(item -> item.value).collect(Collectors.toList());
+    }
+
+    public static MessageSender getMessageSender(String value) {
+        if (Objects.isNull(value) || value.isEmpty()) {
             return null;
         }
-        try {
-            return MessageSender.valueOf(sender.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            return null;
+        for (MessageSender messageSender : MessageSender.values()) {
+            if (messageSender.value.equals(value)) {
+                return messageSender;
+            }
         }
+        return null;
+    }
+
+    public String getValue() {
+        return this.value;
     }
 }

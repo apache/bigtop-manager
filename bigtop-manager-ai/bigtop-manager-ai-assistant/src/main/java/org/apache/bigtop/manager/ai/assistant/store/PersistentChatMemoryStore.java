@@ -18,6 +18,7 @@
  */
 package org.apache.bigtop.manager.ai.assistant.store;
 
+import org.apache.bigtop.manager.ai.core.enums.MessageSender;
 import org.apache.bigtop.manager.dao.po.ChatMessagePO;
 import org.apache.bigtop.manager.dao.po.ChatThreadPO;
 import org.apache.bigtop.manager.dao.repository.ChatMessageRepository;
@@ -49,11 +50,12 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
     }
 
     private ChatMessage convertToChatMessage(ChatMessagePO chatMessagePO) {
-        if (chatMessagePO.getSender().equals("AI")) {
+        String sender = chatMessagePO.getSender().toUpperCase();
+        if (sender.equals(MessageSender.AI.getValue())) {
             return new AiMessage(chatMessagePO.getMessage());
-        } else if (chatMessagePO.getSender().equals("User")) {
+        } else if (sender.equals(MessageSender.USER.getValue())) {
             return new UserMessage(chatMessagePO.getMessage());
-        } else if (chatMessagePO.getSender().equals("System")) {
+        } else if (sender.equals(MessageSender.SYSTEM.getValue())) {
             return new SystemMessage(chatMessagePO.getMessage());
         } else {
             return null;
@@ -63,15 +65,15 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
     private ChatMessagePO convertToChatMessagePO(ChatMessage chatMessage, Long chatThreadId) {
         ChatMessagePO chatMessagePO = new ChatMessagePO();
         if (chatMessage.type().equals(ChatMessageType.AI)) {
-            chatMessagePO.setSender("AI");
+            chatMessagePO.setSender(MessageSender.AI.getValue());
             AiMessage aiMessage = (AiMessage) chatMessage;
             chatMessagePO.setMessage(aiMessage.text());
         } else if (chatMessage.type().equals(ChatMessageType.USER)) {
-            chatMessagePO.setSender("User");
+            chatMessagePO.setSender(MessageSender.USER.getValue());
             UserMessage userMessage = (UserMessage) chatMessage;
             chatMessagePO.setMessage(userMessage.singleText());
         } else if (chatMessage.type().equals(ChatMessageType.SYSTEM)) {
-            chatMessagePO.setSender("System");
+            chatMessagePO.setSender(MessageSender.SYSTEM.getValue());
             SystemMessage systemMessage = (SystemMessage) chatMessage;
             chatMessagePO.setMessage(systemMessage.text());
         } else {
