@@ -24,11 +24,11 @@
 <mapper namespace="org.apache.bigtop.manager.dao.mapper.ServiceMapper">
 
     <sql id="baseColumns">
-        id, service_name, display_name, service_desc, service_version, os_specifics, service_user, required_services, cluster_id
+        id, service_name, display_name, service_desc, service_version, package_specifics, service_user, required_services, cluster_id
     </sql>
 
     <sql id="baseColumnsV2">
-        ${alias}.id, ${alias}.service_name, ${alias}.display_name, ${alias}.service_desc, ${alias}.service_version, ${alias}.os_specifics, ${alias}.service_user, ${alias}.required_services, ${alias}.cluster_id
+        ${alias}.id, ${alias}.service_name, ${alias}.display_name, ${alias}.service_desc, ${alias}.service_version, ${alias}.package_specifics, ${alias}.service_user, ${alias}.required_services, ${alias}.cluster_id
     </sql>
 
     <resultMap id="serviceMap" type="org.apache.bigtop.manager.dao.po.ServicePO">
@@ -37,7 +37,7 @@
         <result column="display_name" property="displayName"/>
         <result column="service_desc" property="serviceDesc"/>
         <result column="service_version" property="serviceVersion"/>
-        <result column="os_specifics" property="osSpecifics"/>
+        <result column="package_specifics" property="packageSpecifics"/>
         <result column="service_user" property="serviceUser"/>
         <result column="required_services" property="requiredServices"/>
         <result column="cluster_id" property="clusterId"/>
