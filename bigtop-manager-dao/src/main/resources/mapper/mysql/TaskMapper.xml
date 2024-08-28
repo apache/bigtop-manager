@@ -23,15 +23,16 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.apache.bigtop.manager.dao.mapper.TaskMapper">
 
-    <update id="updateStateByIds">
-        <foreach collection='tasks' item='task' separator=';'>
-            update task
-            <set>
-                <if test="task.state != null and task.state != ''">
-                    `state` = #{task.state},
-                </if>
-            </set>
-            where id = #{task.id}
+    <update id="updateStateByIds" parameterType="java.util.List">
+        UPDATE task
+        SET `state` = CASE
+        <foreach collection="tasks" item="item" index="index">
+            WHEN id = #{item.id} THEN #{item.state}
+        </foreach>
+        END
+        WHERE id IN
+        <foreach collection="tasks" index="index" item="item" open="(" separator="," close=")">
+            #{item.id}
         </foreach>
     </update>
 

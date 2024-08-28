@@ -46,7 +46,7 @@
 
     <logger name="eclipselink.logging" level="DEBUG" additivity="true" />
 
-    <root level="INFO">
+    <root level="DEBUG">
         <appender-ref ref="STDOUT" />
         <appender-ref ref="SERVER_LOG_FILE" />
     </root>
