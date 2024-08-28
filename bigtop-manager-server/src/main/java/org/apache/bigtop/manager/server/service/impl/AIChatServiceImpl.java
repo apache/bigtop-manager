@@ -18,14 +18,11 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
-import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 import org.apache.bigtop.manager.ai.assistant.GeneralAssistantFactory;
 import org.apache.bigtop.manager.ai.assistant.provider.AIAssistantConfig;
 import org.apache.bigtop.manager.ai.assistant.store.PersistentChatMemoryStore;
-import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistantFactory;
-import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
 import org.apache.bigtop.manager.dao.po.ChatMessagePO;
 import org.apache.bigtop.manager.dao.po.ChatThreadPO;
 import org.apache.bigtop.manager.dao.po.PlatformAuthorizedPO;
@@ -37,7 +34,6 @@ import org.apache.bigtop.manager.dao.repository.PlatformAuthorizedRepository;
 import org.apache.bigtop.manager.dao.repository.PlatformRepository;
 import org.apache.bigtop.manager.dao.repository.UserRepository;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
-import org.apache.bigtop.manager.server.enums.LocaleKeys;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.holder.SessionUserHolder;
 import org.apache.bigtop.manager.server.model.converter.ChatMessageConverter;
@@ -52,8 +48,7 @@ import org.apache.bigtop.manager.server.model.vo.PlatformAuthCredentialVO;
 import org.apache.bigtop.manager.server.model.vo.PlatformAuthorizedVO;
 import org.apache.bigtop.manager.server.model.vo.PlatformVO;
 import org.apache.bigtop.manager.server.service.AIChatService;
-import org.apache.bigtop.manager.server.utils.MessageSourceUtils;
-import org.apache.bigtop.manager.ai.core.AbstractAIAssistant;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -112,13 +107,18 @@ public class AIChatServiceImpl implements AIChatService {
     private AIAssistant buildAIAssistant(PlatformAuthorizedDTO platformAuthorizedDTO, Long threadId) {
         AIAssistant aiAssistant = null;
         AIAssistantConfig.Builder aiAssistantConfigBuilder = getAIAssistantConfigBuilder(platformAuthorizedDTO);
-        aiAssistant = getAiAssistantFactory().create(platformAuthorizedDTO.getPlatformName().toLowerCase(),aiAssistantConfigBuilder.build(),threadId);
+        aiAssistant = getAiAssistantFactory()
+                .create(
+                        platformAuthorizedDTO.getPlatformName().toLowerCase(),
+                        aiAssistantConfigBuilder.build(),
+                        threadId);
         return aiAssistant;
     }
 
     private Boolean testAuthorization(PlatformAuthorizedDTO platformAuthorizedDTO) {
         AIAssistantConfig.Builder aiAssistantConfigBuilder = getAIAssistantConfigBuilder(platformAuthorizedDTO);
-        AIAssistant aiAssistant = aiTestFactory.create(platformAuthorizedDTO.getPlatformName().toLowerCase(),aiAssistantConfigBuilder.build());
+        AIAssistant aiAssistant = aiTestFactory.create(
+                platformAuthorizedDTO.getPlatformName().toLowerCase(), aiAssistantConfigBuilder.build());
         if (aiAssistant == null) {
             return false;
         }

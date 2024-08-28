@@ -18,6 +18,12 @@
  */
 package org.apache.bigtop.manager.ai.bigmodel;
 
+import org.apache.bigtop.manager.ai.core.AbstractAIAssistant;
+import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
+import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
+
+import org.springframework.util.NumberUtils;
+
 import dev.langchain4j.internal.ValidationUtils;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
@@ -26,10 +32,6 @@ import dev.langchain4j.model.chat.StreamingChatLanguageModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
-import org.apache.bigtop.manager.ai.core.AbstractAIAssistant;
-import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
-import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
-import org.springframework.util.NumberUtils;
 
 import java.util.HashMap;
 import java.util.Map;
