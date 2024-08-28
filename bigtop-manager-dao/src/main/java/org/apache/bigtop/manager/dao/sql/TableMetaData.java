@@ -42,9 +42,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
-public class TableMataData {
+public class TableMetaData {
 
-    private static final Map<Class<?>, TableMataData> TABLE_CACHE = new ConcurrentHashMap<>(64);
+    private static final Map<Class<?>, TableMetaData> TABLE_CACHE = new ConcurrentHashMap<>(64);
 
     /**
      * tableName
@@ -71,14 +71,14 @@ public class TableMataData {
      */
     private final Map<String, Class<?>> fieldTypeMap = new HashMap<>();
 
-    private TableMataData(Class<?> clazz) {
+    private TableMetaData(Class<?> clazz) {
         initTableInfo(clazz);
     }
 
-    public static TableMataData forClass(Class<?> entityClass) {
-        TableMataData tableMataDate = TABLE_CACHE.get(entityClass);
+    public static TableMetaData forClass(Class<?> entityClass) {
+        TableMetaData tableMataDate = TABLE_CACHE.get(entityClass);
         if (tableMataDate == null) {
-            tableMataDate = new TableMataData(entityClass);
+            tableMataDate = new TableMetaData(entityClass);
             TABLE_CACHE.put(entityClass, tableMataDate);
         }
 

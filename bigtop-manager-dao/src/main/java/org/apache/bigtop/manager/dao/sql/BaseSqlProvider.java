@@ -41,7 +41,7 @@ public class BaseSqlProvider {
         String databaseId = context.getDatabaseId();
 
         Class<?> entityClass = entity.getClass();
-        TableMataData mataData = TableMataData.forClass(entityClass);
+        TableMetaData mataData = TableMetaData.forClass(entityClass);
 
         return SQLBuilder.insert(mataData, entity, databaseId);
     }
@@ -52,7 +52,7 @@ public class BaseSqlProvider {
         String databaseId = context.getDatabaseId();
 
         Class<?> entityClass = entity.getClass();
-        TableMataData mataData = TableMataData.forClass(entityClass);
+        TableMetaData mataData = TableMetaData.forClass(entityClass);
 
         return SQLBuilder.update(mataData, entity, databaseId);
     }
@@ -61,7 +61,7 @@ public class BaseSqlProvider {
         String databaseId = context.getDatabaseId();
 
         Class<?> entityClass = getEntityClass(context);
-        TableMataData mataData = TableMataData.forClass(entityClass);
+        TableMetaData mataData = TableMetaData.forClass(entityClass);
 
         return SQLBuilder.selectById(mataData, databaseId, id);
     }
@@ -70,7 +70,7 @@ public class BaseSqlProvider {
         String databaseId = context.getDatabaseId();
 
         Class<?> entityClass = getEntityClass(context);
-        TableMataData mataData = TableMataData.forClass(entityClass);
+        TableMetaData mataData = TableMetaData.forClass(entityClass);
 
         return SQLBuilder.selectByIds(mataData, databaseId, ids);
     }
@@ -79,7 +79,7 @@ public class BaseSqlProvider {
         String databaseId = context.getDatabaseId();
 
         Class<?> entityClass = getEntityClass(context);
-        TableMataData mataData = TableMataData.forClass(entityClass);
+        TableMetaData mataData = TableMetaData.forClass(entityClass);
 
         return SQLBuilder.selectAll(mataData, databaseId);
     }
@@ -88,7 +88,7 @@ public class BaseSqlProvider {
         String databaseId = context.getDatabaseId();
 
         Class<?> entityClass = getEntityClass(context);
-        TableMataData mataData = TableMataData.forClass(entityClass);
+        TableMetaData mataData = TableMetaData.forClass(entityClass);
 
         return SQLBuilder.deleteById(mataData, databaseId, id);
     }
@@ -97,7 +97,7 @@ public class BaseSqlProvider {
         String databaseId = context.getDatabaseId();
 
         Class<?> entityClass = getEntityClass(context);
-        TableMataData mataData = TableMataData.forClass(entityClass);
+        TableMetaData mataData = TableMetaData.forClass(entityClass);
 
         return SQLBuilder.deleteByIds(mataData, databaseId, ids);
     }

@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SQLBuilder {
 
-    public static <Entity> String insert(TableMataData mataData, Entity entity, String databaseId) {
+    public static <Entity> String insert(TableMetaData mataData, Entity entity, String databaseId) {
         Class<?> entityClass = entity.getClass();
         Map<String, String> fieldColumnMap = mataData.getFieldColumnMap();
 
@@ -72,7 +72,7 @@ public class SQLBuilder {
         return sql.toString();
     }
 
-    public static <Entity> String update(TableMataData mataData, Entity entity, String databaseId) {
+    public static <Entity> String update(TableMetaData mataData, Entity entity, String databaseId) {
         Class<?> entityClass = entity.getClass();
         Map<String, String> fieldColumnMap = mataData.getFieldColumnMap();
 
@@ -106,7 +106,7 @@ public class SQLBuilder {
         return sql.toString();
     }
 
-    public static String selectById(TableMataData mataData, String databaseId, Serializable id) {
+    public static String selectById(TableMetaData mataData, String databaseId, Serializable id) {
 
         SQL sql = new SQL();
         switch (DBType.toType(databaseId)) {
@@ -125,7 +125,7 @@ public class SQLBuilder {
     }
 
     public static String selectByIds(
-            TableMataData mataData, String databaseId, Collection<? extends Serializable> ids) {
+            TableMetaData mataData, String databaseId, Collection<? extends Serializable> ids) {
 
         SQL sql = new SQL();
         switch (DBType.toType(databaseId)) {
@@ -144,7 +144,7 @@ public class SQLBuilder {
         return sql.toString();
     }
 
-    public static String selectAll(TableMataData mataData, String databaseId) {
+    public static String selectAll(TableMetaData mataData, String databaseId) {
 
         SQL sql = new SQL();
         switch (DBType.toType(databaseId)) {
@@ -161,7 +161,7 @@ public class SQLBuilder {
         return sql.toString();
     }
 
-    public static String deleteById(TableMataData mataData, String databaseId, Serializable id) {
+    public static String deleteById(TableMetaData mataData, String databaseId, Serializable id) {
         SQL sql = new SQL();
         switch (DBType.toType(databaseId)) {
             case MYSQL: {
@@ -178,7 +178,7 @@ public class SQLBuilder {
     }
 
     public static String deleteByIds(
-            TableMataData mataData, String databaseId, Collection<? extends Serializable> ids) {
+            TableMetaData mataData, String databaseId, Collection<? extends Serializable> ids) {
         SQL sql = new SQL();
         switch (DBType.toType(databaseId)) {
             case MYSQL: {
