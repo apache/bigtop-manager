@@ -76,13 +76,13 @@ public class TableMetaData {
     }
 
     public static TableMetaData forClass(Class<?> entityClass) {
-        TableMetaData tableMataDate = TABLE_CACHE.get(entityClass);
-        if (tableMataDate == null) {
-            tableMataDate = new TableMetaData(entityClass);
-            TABLE_CACHE.put(entityClass, tableMataDate);
+        TableMetaData tableMetaData = TABLE_CACHE.get(entityClass);
+        if (tableMetaData == null) {
+            tableMetaData = new TableMetaData(entityClass);
+            TABLE_CACHE.put(entityClass, tableMetaData);
         }
 
-        return tableMataDate;
+        return tableMetaData;
     }
 
     public String getBaseColumns() {

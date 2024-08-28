@@ -40,17 +40,17 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SQLBuilder {
 
-    public static <Entity> String insert(TableMetaData mataData, Entity entity, String databaseId) {
+    public static <Entity> String insert(TableMetaData tableMetaData, Entity entity, String databaseId) {
         Class<?> entityClass = entity.getClass();
-        Map<String, String> fieldColumnMap = mataData.getFieldColumnMap();
+        Map<String, String> fieldColumnMap = tableMetaData.getFieldColumnMap();
 
         SQL sql = new SQL();
         switch (DBType.toType(databaseId)) {
             case MYSQL: {
-                sql.INSERT_INTO(mataData.getTableName());
+                sql.INSERT_INTO(tableMetaData.getTableName());
                 for (Map.Entry<String, String> entry : fieldColumnMap.entrySet()) {
                     // 忽略主键
-                    if (Objects.equals(entry.getKey(), mataData.getPkProperty())) {
+                    if (Objects.equals(entry.getKey(), tableMetaData.getPkProperty())) {
                         continue;
                     }
                     PropertyDescriptor ps = BeanUtils.getPropertyDescriptor(entityClass, entry.getKey());
@@ -72,17 +72,17 @@ public class SQLBuilder {
         return sql.toString();
     }
 
-    public static <Entity> String update(TableMetaData mataData, Entity entity, String databaseId) {
+    public static <Entity> String update(TableMetaData tableMetaData, Entity entity, String databaseId) {
         Class<?> entityClass = entity.getClass();
-        Map<String, String> fieldColumnMap = mataData.getFieldColumnMap();
+        Map<String, String> fieldColumnMap = tableMetaData.getFieldColumnMap();
 
         SQL sql = new SQL();
         switch (DBType.toType(databaseId)) {
             case MYSQL: {
-                sql.UPDATE(mataData.getTableName());
+                sql.UPDATE(tableMetaData.getTableName());
                 for (Map.Entry<String, String> entry : fieldColumnMap.entrySet()) {
                     // 忽略主键
-                    if (Objects.equals(entry.getKey(), mataData.getPkProperty())) {
+                    if (Objects.equals(entry.getKey(), tableMetaData.getPkProperty())) {
                         continue;
                     }
                     PropertyDescriptor ps = BeanUtils.getPropertyDescriptor(entityClass, entry.getKey());
@@ -95,7 +95,7 @@ public class SQLBuilder {
                     }
                 }
 
-                sql.WHERE(getEquals(mataData.getPkColumn(), mataData.getPkProperty()));
+                sql.WHERE(getEquals(tableMetaData.getPkColumn(), tableMetaData.getPkProperty()));
                 break;
             }
             default: {
@@ -106,14 +106,14 @@ public class SQLBuilder {
         return sql.toString();
     }
 
-    public static String selectById(TableMetaData mataData, String databaseId, Serializable id) {
+    public static String selectById(TableMetaData tableMetaData, String databaseId, Serializable id) {
 
         SQL sql = new SQL();
         switch (DBType.toType(databaseId)) {
             case MYSQL: {
-                sql.SELECT(mataData.getBaseColumns());
-                sql.FROM(mataData.getTableName());
-                sql.WHERE(mataData.getPkColumn() + " = '" + id + "'");
+                sql.SELECT(tableMetaData.getBaseColumns());
+                sql.FROM(tableMetaData.getTableName());
+                sql.WHERE(tableMetaData.getPkColumn() + " = '" + id + "'");
                 break;
             }
             default: {
@@ -125,15 +125,15 @@ public class SQLBuilder {
     }
 
     public static String selectByIds(
-            TableMetaData mataData, String databaseId, Collection<? extends Serializable> ids) {
+            TableMetaData tableMetaData, String databaseId, Collection<? extends Serializable> ids) {
 
         SQL sql = new SQL();
         switch (DBType.toType(databaseId)) {
             case MYSQL: {
                 String idsStr = ids.stream().map(String::valueOf).collect(Collectors.joining("', '"));
-                sql.SELECT(mataData.getBaseColumns());
-                sql.FROM(mataData.getTableName());
-                sql.WHERE(mataData.getPkColumn() + " in ('" + idsStr + "')");
+                sql.SELECT(tableMetaData.getBaseColumns());
+                sql.FROM(tableMetaData.getTableName());
+                sql.WHERE(tableMetaData.getPkColumn() + " in ('" + idsStr + "')");
                 break;
             }
             default: {
@@ -144,13 +144,13 @@ public class SQLBuilder {
         return sql.toString();
     }
 
-    public static String selectAll(TableMetaData mataData, String databaseId) {
+    public static String selectAll(TableMetaData tableMetaData, String databaseId) {
 
         SQL sql = new SQL();
         switch (DBType.toType(databaseId)) {
             case MYSQL: {
-                sql.SELECT(mataData.getBaseColumns());
-                sql.FROM(mataData.getTableName());
+                sql.SELECT(tableMetaData.getBaseColumns());
+                sql.FROM(tableMetaData.getTableName());
                 break;
             }
             default: {
@@ -161,12 +161,12 @@ public class SQLBuilder {
         return sql.toString();
     }
 
-    public static String deleteById(TableMetaData mataData, String databaseId, Serializable id) {
+    public static String deleteById(TableMetaData tableMetaData, String databaseId, Serializable id) {
         SQL sql = new SQL();
         switch (DBType.toType(databaseId)) {
             case MYSQL: {
-                sql.DELETE_FROM(mataData.getTableName());
-                sql.WHERE(mataData.getPkColumn() + " = '" + id + "'");
+                sql.DELETE_FROM(tableMetaData.getTableName());
+                sql.WHERE(tableMetaData.getPkColumn() + " = '" + id + "'");
                 break;
             }
             default: {
@@ -178,13 +178,13 @@ public class SQLBuilder {
     }
 
     public static String deleteByIds(
-            TableMetaData mataData, String databaseId, Collection<? extends Serializable> ids) {
+            TableMetaData tableMetaData, String databaseId, Collection<? extends Serializable> ids) {
         SQL sql = new SQL();
         switch (DBType.toType(databaseId)) {
             case MYSQL: {
                 String idsStr = ids.stream().map(String::valueOf).collect(Collectors.joining("', '"));
-                sql.DELETE_FROM(mataData.getTableName());
-                sql.WHERE(mataData.getPkColumn() + " in ('" + idsStr + "')");
+                sql.DELETE_FROM(tableMetaData.getTableName());
+                sql.WHERE(tableMetaData.getPkColumn() + " in ('" + idsStr + "')");
                 break;
             }
             default: {

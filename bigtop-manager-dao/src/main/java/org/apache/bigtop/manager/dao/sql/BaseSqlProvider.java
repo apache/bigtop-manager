@@ -41,9 +41,9 @@ public class BaseSqlProvider {
         String databaseId = context.getDatabaseId();
 
         Class<?> entityClass = entity.getClass();
-        TableMetaData mataData = TableMetaData.forClass(entityClass);
+        TableMetaData tableMetaData = TableMetaData.forClass(entityClass);
 
-        return SQLBuilder.insert(mataData, entity, databaseId);
+        return SQLBuilder.insert(tableMetaData, entity, databaseId);
     }
 
     public <Entity> String updateById(Entity entity, ProviderContext context) {
@@ -52,54 +52,54 @@ public class BaseSqlProvider {
         String databaseId = context.getDatabaseId();
 
         Class<?> entityClass = entity.getClass();
-        TableMetaData mataData = TableMetaData.forClass(entityClass);
+        TableMetaData tableMetaData = TableMetaData.forClass(entityClass);
 
-        return SQLBuilder.update(mataData, entity, databaseId);
+        return SQLBuilder.update(tableMetaData, entity, databaseId);
     }
 
     public String selectById(Serializable id, ProviderContext context) {
         String databaseId = context.getDatabaseId();
 
         Class<?> entityClass = getEntityClass(context);
-        TableMetaData mataData = TableMetaData.forClass(entityClass);
+        TableMetaData tableMetaData = TableMetaData.forClass(entityClass);
 
-        return SQLBuilder.selectById(mataData, databaseId, id);
+        return SQLBuilder.selectById(tableMetaData, databaseId, id);
     }
 
     public String selectByIds(Collection<? extends Serializable> ids, ProviderContext context) {
         String databaseId = context.getDatabaseId();
 
         Class<?> entityClass = getEntityClass(context);
-        TableMetaData mataData = TableMetaData.forClass(entityClass);
+        TableMetaData tableMetaData = TableMetaData.forClass(entityClass);
 
-        return SQLBuilder.selectByIds(mataData, databaseId, ids);
+        return SQLBuilder.selectByIds(tableMetaData, databaseId, ids);
     }
 
     public String selectAll(ProviderContext context) {
         String databaseId = context.getDatabaseId();
 
         Class<?> entityClass = getEntityClass(context);
-        TableMetaData mataData = TableMetaData.forClass(entityClass);
+        TableMetaData tableMetaData = TableMetaData.forClass(entityClass);
 
-        return SQLBuilder.selectAll(mataData, databaseId);
+        return SQLBuilder.selectAll(tableMetaData, databaseId);
     }
 
     public String deleteById(Serializable id, ProviderContext context) {
         String databaseId = context.getDatabaseId();
 
         Class<?> entityClass = getEntityClass(context);
-        TableMetaData mataData = TableMetaData.forClass(entityClass);
+        TableMetaData tableMetaData = TableMetaData.forClass(entityClass);
 
-        return SQLBuilder.deleteById(mataData, databaseId, id);
+        return SQLBuilder.deleteById(tableMetaData, databaseId, id);
     }
 
     public String deleteByIds(Collection<? extends Serializable> ids, ProviderContext context) {
         String databaseId = context.getDatabaseId();
 
         Class<?> entityClass = getEntityClass(context);
-        TableMetaData mataData = TableMetaData.forClass(entityClass);
+        TableMetaData tableMetaData = TableMetaData.forClass(entityClass);
 
-        return SQLBuilder.deleteByIds(mataData, databaseId, ids);
+        return SQLBuilder.deleteByIds(tableMetaData, databaseId, ids);
     }
 
     private Class<?> getEntityClass(ProviderContext context) {
