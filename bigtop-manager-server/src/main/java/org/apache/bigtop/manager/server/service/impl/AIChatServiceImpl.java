@@ -81,7 +81,6 @@ public class AIChatServiceImpl implements AIChatService {
 
     private AIAssistantFactory aiAssistantFactory;
 
-    private PersistentChatMemoryStore persistentChatMemoryStore;
     private final AIAssistantFactory aiTestFactory = new GeneralAssistantFactory();
 
     public AIAssistantFactory getAiAssistantFactory() {
