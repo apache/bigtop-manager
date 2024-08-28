@@ -25,6 +25,8 @@ type MenuItem = {
   title?: string
   icon?: VNode
   children?: MenuItem[]
+  hidden?: boolean
+  priority?: number
 }
 
 export type { MenuItem }

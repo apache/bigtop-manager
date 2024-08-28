@@ -17,14 +17,19 @@
  * under the License.
  */
 
-import 'vue-router'
-import { VNode } from 'vue'
+import { RouteRecordRaw } from 'vue-router'
+import { DesktopOutlined } from '@ant-design/icons-vue'
+import { h } from 'vue'
 
-declare module 'vue-router' {
-  interface RouteMeta {
-    title?: string
-    icon?: VNode
-    hidden?: boolean
-    priority?: number
+const routes: RouteRecordRaw[] = [
+  {
+    path: '/hosts',
+    component: () => import('@/pages/hosts/index.vue'),
+    meta: {
+      title: 'Hosts',
+      icon: h(DesktopOutlined)
+    }
   }
-}
+]
+
+export { routes }

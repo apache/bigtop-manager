@@ -17,14 +17,40 @@
  * under the License.
  */
 
-import 'vue-router'
-import { VNode } from 'vue'
+import { RouteRecordRaw } from 'vue-router'
+import {
+  SettingOutlined,
+  BarsOutlined,
+  UserOutlined
+} from '@ant-design/icons-vue'
+import { h } from 'vue'
 
-declare module 'vue-router' {
-  interface RouteMeta {
-    title?: string
-    icon?: VNode
-    hidden?: boolean
-    priority?: number
+const routes: RouteRecordRaw[] = [
+  {
+    path: '/cluster/',
+    meta: {
+      title: 'Cluster',
+      icon: h(SettingOutlined)
+    },
+    children: [
+      {
+        path: 'stack',
+        component: () => import('@/pages/cluster/stack/index.vue'),
+        meta: {
+          title: 'Stack',
+          icon: h(BarsOutlined)
+        }
+      },
+      {
+        path: 'account',
+        component: () => import('@/pages/cluster/account/index.vue'),
+        meta: {
+          title: 'Account',
+          icon: h(UserOutlined)
+        }
+      }
+    ]
   }
-}
+]
+
+export { routes }

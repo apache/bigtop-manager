@@ -16,15 +16,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+import type { RouteRecordRaw } from 'vue-router'
 
-import 'vue-router'
-import { VNode } from 'vue'
+interface RouteModuleType {
+  routes: RouteRecordRaw[]
+}
 
-declare module 'vue-router' {
-  interface RouteMeta {
-    title?: string
-    icon?: VNode
-    hidden?: boolean
-    priority?: number
+type RoutePriorityMap = { [key: string]: number }
+export const routePriorityMap: RoutePriorityMap = {
+  Dashboard: 1,
+  Hosts: 2,
+  Services: 3,
+  Cluster: 4
+}
+
+export function mergeRouteModules(
+  routeModules: Record<string, unknown>
+): RouteRecordRaw[] {
+  const mergedRoutes: RouteRecordRaw[] = []
+  for (const routeModule of Object.values(routeModules)) {
+    const moduleRoutes = (routeModule as RouteModuleType)?.routes ?? []
+    mergedRoutes.push(...moduleRoutes)
   }
+
+  return mergedRoutes
 }

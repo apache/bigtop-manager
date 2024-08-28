@@ -17,14 +17,19 @@
  * under the License.
  */
 
-import 'vue-router'
-import { VNode } from 'vue'
+import { RouteRecordRaw } from 'vue-router'
+import { PieChartOutlined } from '@ant-design/icons-vue'
+import { h } from 'vue'
 
-declare module 'vue-router' {
-  interface RouteMeta {
-    title?: string
-    icon?: VNode
-    hidden?: boolean
-    priority?: number
+const routes: RouteRecordRaw[] = [
+  {
+    path: '/dashboard',
+    component: () => import('@/pages/dashboard/index.vue'),
+    meta: {
+      title: 'Dashboard',
+      icon: h(PieChartOutlined)
+    }
   }
-}
+]
+
+export { routes }

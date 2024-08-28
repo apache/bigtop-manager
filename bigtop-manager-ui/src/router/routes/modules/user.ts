@@ -17,14 +17,41 @@
  * under the License.
  */
 
-import 'vue-router'
-import { VNode } from 'vue'
+import { RouteRecordRaw } from 'vue-router'
+import {
+  SettingOutlined,
+  UserOutlined,
+  ProfileOutlined
+} from '@ant-design/icons-vue'
+import { h } from 'vue'
 
-declare module 'vue-router' {
-  interface RouteMeta {
-    title?: string
-    icon?: VNode
-    hidden?: boolean
-    priority?: number
+const routes: RouteRecordRaw[] = [
+  {
+    path: '/user/',
+    meta: {
+      title: 'user',
+      icon: h(UserOutlined),
+      hidden: true
+    },
+    children: [
+      {
+        path: 'profile',
+        component: () => import('@/pages/user/profile/index.vue'),
+        meta: {
+          title: 'Profile',
+          icon: h(ProfileOutlined)
+        }
+      },
+      {
+        path: 'settings',
+        component: () => import('@/pages/user/settings/index.vue'),
+        meta: {
+          title: 'Settings',
+          icon: h(SettingOutlined)
+        }
+      }
+    ]
   }
-}
+]
+
+export { routes }

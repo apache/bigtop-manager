@@ -17,14 +17,28 @@
  * under the License.
  */
 
-import 'vue-router'
-import { VNode } from 'vue'
+import { RouteRecordRaw } from 'vue-router'
+import { mergeRouteModules } from '@/utils/router-util'
 
-declare module 'vue-router' {
-  interface RouteMeta {
-    title?: string
-    icon?: VNode
-    hidden?: boolean
-    priority?: number
+const dynamicRoutesFiles = import.meta.glob('./modules/**/*.ts', {
+  eager: true
+})
+
+export const dynamicRoutes: RouteRecordRaw[] =
+  mergeRouteModules(dynamicRoutesFiles)
+
+const routes: RouteRecordRaw[] = [
+  { path: '/login', component: () => import('@/pages/login/index.vue') },
+  {
+    path: '/',
+    redirect: '/dashboard',
+    component: () => import('@/layouts/index.vue'),
+    children: [...dynamicRoutes]
+  },
+  {
+    path: '/:pathMatch(.*)',
+    component: () => import('@/pages/error/404.vue')
   }
-}
+]
+
+export default routes
