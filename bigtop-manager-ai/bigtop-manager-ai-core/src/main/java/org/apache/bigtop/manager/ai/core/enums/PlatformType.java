@@ -24,7 +24,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public enum PlatformType {
-    OPENAI("openai");
+    OPENAI("openai"),
+    BIGMODEL("bigmodel");
 
     private final String value;
 

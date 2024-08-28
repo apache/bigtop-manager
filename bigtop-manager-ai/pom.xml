@@ -34,6 +34,7 @@
         <module>bigtop-manager-ai-openai</module>
         <module>bigtop-manager-ai-core</module>
         <module>bigtop-manager-ai-assistant</module>
+        <module>bigtop-manager-ai-bigmodel</module>
     </modules>
 
     <dependencyManagement>

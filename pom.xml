@@ -135,7 +135,11 @@
                 <artifactId>bigtop-manager-ai-openai</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>org.apache.bigtop</groupId>
+                <artifactId>bigtop-manager-ai-bigmodel</artifactId>
+                <version>${project.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.apache.bigtop</groupId>
                 <artifactId>bigtop-manager-ai-assistant</artifactId>

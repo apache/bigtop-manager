@@ -23,30 +23,22 @@
         <groupId>org.apache.bigtop</groupId>
         <artifactId>bigtop-manager-ai</artifactId>
         <version>${revision}</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>bigtop-manager-ai-assistant</artifactId>
+    <artifactId>bigtop-manager-ai-bigmodel</artifactId>
     <name>${project.artifactId}</name>
-    <description>Bigtop Manager AI Assistant</description>
+    <description>Bigtop Manager AI OpenAI</description>
 
     <dependencies>
         <dependency>
             <groupId>org.apache.bigtop</groupId>
-            <artifactId>bigtop-manager-ai-openai</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.bigtop</groupId>
-            <artifactId>bigtop-manager-ai-bigmodel</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.bigtop</groupId>
             <artifactId>bigtop-manager-ai-core</artifactId>
+            <version>${revision}</version>
         </dependency>
+
         <dependency>
-            <groupId>org.apache.bigtop</groupId>
-            <artifactId>bigtop-manager-dao</artifactId>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-open-ai</artifactId>
         </dependency>
     </dependencies>
-
 </project>

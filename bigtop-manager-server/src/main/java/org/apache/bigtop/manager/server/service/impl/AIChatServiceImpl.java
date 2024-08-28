@@ -54,8 +54,6 @@ import org.apache.bigtop.manager.server.model.vo.PlatformVO;
 import org.apache.bigtop.manager.server.service.AIChatService;
 import org.apache.bigtop.manager.server.utils.MessageSourceUtils;
 import org.apache.bigtop.manager.ai.core.AbstractAIAssistant;
-import org.apache.bigtop.manager.ai.openai.OpenAIAssistant;
-//import org.apache.bigtop.manager.ai.bigmodel;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -98,12 +96,6 @@ public class AIChatServiceImpl implements AIChatService {
         }
         return aiAssistantFactory;
     }
-    public ChatMemoryStore getChatMemoryStore() {
-        if (persistentChatMemoryStore == null) {
-            persistentChatMemoryStore = new PersistentChatMemoryStore(chatThreadRepository, chatMessageRepository);
-        }
-        return persistentChatMemoryStore;
-    }
 
     private AIAssistantConfig.Builder getAIAssistantConfigBuilder(PlatformAuthorizedDTO platformAuthorizedDTO) {
         AIAssistantConfig.Builder aiAssistantConfigBuilder = AIAssistantConfig.builder();
@@ -120,31 +112,13 @@ public class AIChatServiceImpl implements AIChatService {
     private AIAssistant buildAIAssistant(PlatformAuthorizedDTO platformAuthorizedDTO, Long threadId) {
         AIAssistant aiAssistant = null;
         AIAssistantConfig.Builder aiAssistantConfigBuilder = getAIAssistantConfigBuilder(platformAuthorizedDTO);
-        if (platformAuthorizedDTO.getPlatformName().equalsIgnoreCase("openai")) {
-            aiAssistant = (OpenAIAssistant) OpenAIAssistant.builder()
-                    .id(threadId)
-                    .memoryStore(getChatMemoryStore())
-                    .withConfigProvider(aiAssistantConfigBuilder.build())
-                    .build();
-        }
-//         else if (platformAuthorizedDTO.getPlatformName().equalsIgnoreCase("bigmodel")) {
-//            aiAssistant = (OpenAIAssistant) BigModelAssistant.builder()
-//                    .id(threadId)
-//                    .memoryStore(getChatMemoryStore())
-//                    .withConfigProvider(aiAssistantConfigBuilder.build())
-//                    .build();
-//        }
+        aiAssistant = getAiAssistantFactory().create(platformAuthorizedDTO.getPlatformName().toLowerCase(),aiAssistantConfigBuilder.build(),threadId);
         return aiAssistant;
     }
 
     private Boolean testAuthorization(PlatformAuthorizedDTO platformAuthorizedDTO) {
-        AIAssistant aiAssistant = null;
         AIAssistantConfig.Builder aiAssistantConfigBuilder = getAIAssistantConfigBuilder(platformAuthorizedDTO);
-        if (platformAuthorizedDTO.getPlatformName().equalsIgnoreCase("openai")) {
-            aiAssistant = OpenAIAssistant.builder()
-                    .withConfigProvider(aiAssistantConfigBuilder.build())
-                    .build();
-        }
+        AIAssistant aiAssistant = aiTestFactory.create(platformAuthorizedDTO.getPlatformName().toLowerCase(),aiAssistantConfigBuilder.build());
         if (aiAssistant == null) {
             return false;
         }
