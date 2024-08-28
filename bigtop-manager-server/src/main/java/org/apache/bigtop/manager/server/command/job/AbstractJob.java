@@ -144,9 +144,12 @@ public abstract class AbstractJob implements Job {
                 }
             }
         }
-
-        taskMapper.updateStateByIds(taskPOList);
-        stageMapper.updateStateByIds(stagePOList);
+        if (!taskPOList.isEmpty()) {
+            taskMapper.updateStateByIds(taskPOList);
+        }
+        if (!stagePOList.isEmpty()) {
+            stageMapper.updateStateByIds(stagePOList);
+        }
         jobMapper.updateById(jobPO);
     }
 
