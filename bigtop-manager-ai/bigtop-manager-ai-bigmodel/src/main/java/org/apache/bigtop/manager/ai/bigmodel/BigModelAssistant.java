@@ -38,9 +38,9 @@ import java.util.Map;
 
 public class BigModelAssistant extends AbstractAIAssistant {
 
-    private static final String PLATFORM_NAME = "openai";
-    private static final String BASE_URL = "https://api.openai.com/v1";
-    private static final String MODEL_NAME = "gpt-3.5-turbo";
+    private static final String PLATFORM_NAME = "bigmodel";
+    private static final String BASE_URL = "https://open.bigmodel.cn/api/paas/v4/";
+    private static final String MODEL_NAME = "glm-4-0520";
 
     private BigModelAssistant(
             ChatLanguageModel chatLanguageModel,

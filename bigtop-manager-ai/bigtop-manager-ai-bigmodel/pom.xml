@@ -27,7 +27,7 @@
 
     <artifactId>bigtop-manager-ai-bigmodel</artifactId>
     <name>${project.artifactId}</name>
-    <description>Bigtop Manager AI OpenAI</description>
+    <description>Bigtop Manager AI BigModel</description>
 
     <dependencies>
         <dependency>
