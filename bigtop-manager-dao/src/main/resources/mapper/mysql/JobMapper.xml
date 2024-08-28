@@ -41,9 +41,8 @@
         <result column="update_time" property="updateTime"/>
         <collection property="stages" ofType="org.apache.bigtop.manager.dao.po.StagePO">
             <id column="s_id" property="id"/>
-            <result column="state" property="state"/>
-            <result column="name" property="name"/>
-            <result column="context" property="context"/>
+            <result column="s_state" property="state"/>
+            <result column="s_name" property="name"/>
             <result column="order" property="order"/>
             <result column="service_name" property="serviceName"/>
             <result column="component_name" property="componentName"/>
@@ -54,9 +53,8 @@
             <collection property="tasks" ofType="org.apache.bigtop.manager.dao.po.TaskPO">
                 <id column="t_id" property="id"/>
                 <result column="state" property="state"/>
-                <result column="name" property="name"/>
-                <result column="context" property="context"/>
-                <result column="state" property="state"/>
+                <result column="t_name" property="name"/>
+                <result column="t_state" property="state"/>
                 <result column="service_name" property="serviceName"/>
                 <result column="component_name" property="componentName"/>
                 <result column="command" property="command"/>
@@ -80,7 +78,8 @@
         <include refid="baseColumnsV2">
             <property name="alias" value="h"/>
         </include>
-            , st.order, tk.hostname, st.id as s_id, tk.id as t_id
+        , st.id as s_id, st.name as s_name, st.state as s_state, st.order
+        , tk.id as t_id, tk.name as t_name, tk.state as t_state, tk.hostname
         from
         (select * from job
         <where>
@@ -100,7 +99,8 @@
         <include refid="baseColumnsV2">
             <property name="alias" value="h"/>
         </include>
-            , st.order, tk.hostname
+        , st.id as s_id, st.name as s_name, st.state as s_state, st.order
+        , tk.id as t_id, tk.name as t_name, tk.state as t_state, tk.hostname
         from
         (select * from job
         <where>
