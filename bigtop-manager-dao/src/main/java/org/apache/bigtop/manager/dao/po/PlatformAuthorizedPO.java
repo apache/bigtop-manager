@@ -58,10 +58,6 @@ public class PlatformAuthorizedPO extends BasePO {
     private Map<String, String> credentials;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private UserPO userPO;
-
-    @ManyToOne
     @JoinColumn(name = "platform_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private PlatformPO platformPO;
 }

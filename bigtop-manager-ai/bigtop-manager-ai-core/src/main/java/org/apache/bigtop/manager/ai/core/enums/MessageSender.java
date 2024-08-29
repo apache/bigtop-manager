@@ -18,11 +18,14 @@
  */
 package org.apache.bigtop.manager.ai.core.enums;
 
+import lombok.Getter;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+@Getter
 public enum MessageSender {
     USER("USER"),
     AI("AI"),
@@ -47,10 +50,7 @@ public enum MessageSender {
                 return messageSender;
             }
         }
-        return null;
-    }
 
-    public String getValue() {
-        return this.value;
+        return null;
     }
 }

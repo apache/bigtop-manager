@@ -22,6 +22,7 @@ import org.apache.bigtop.manager.ai.assistant.GeneralAssistantFactory;
 import org.apache.bigtop.manager.ai.assistant.provider.AIAssistantConfig;
 import org.apache.bigtop.manager.ai.assistant.store.PersistentChatMemoryStore;
 import org.apache.bigtop.manager.ai.core.enums.MessageSender;
+import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistantFactory;
 import org.apache.bigtop.manager.dao.po.ChatMessagePO;
@@ -92,40 +93,34 @@ public class AIChatServiceImpl implements AIChatService {
         return aiAssistantFactory;
     }
 
-    private AIAssistantConfig.Builder getAIAssistantConfigBuilder(PlatformAuthorizedDTO platformAuthorizedDTO) {
-        AIAssistantConfig.Builder aiAssistantConfigBuilder = AIAssistantConfig.builder();
-        for (String key : platformAuthorizedDTO.getCredentials().keySet()) {
-            aiAssistantConfigBuilder = aiAssistantConfigBuilder.set(
-                    key, platformAuthorizedDTO.getCredentials().get(key));
-        }
-        aiAssistantConfigBuilder = aiAssistantConfigBuilder.set("memoryLen", "10");
-        aiAssistantConfigBuilder = aiAssistantConfigBuilder.set("modelName", platformAuthorizedDTO.getModel());
-        return aiAssistantConfigBuilder;
+    private AIAssistantConfig getAIAssistantConfig(PlatformAuthorizedDTO platformAuthorizedDTO) {
+        return AIAssistantConfig.builder()
+                .setModel(platformAuthorizedDTO.getModel())
+                .addCredentials(platformAuthorizedDTO.getCredentials())
+                .build();
+    }
+
+    private PlatformType getPlatformType(String platformName) {
+        return PlatformType.valueOf(platformName.toLowerCase());
     }
 
     private AIAssistant buildAIAssistant(PlatformAuthorizedDTO platformAuthorizedDTO, Long threadId) {
-        AIAssistant aiAssistant = null;
-        AIAssistantConfig.Builder aiAssistantConfigBuilder = getAIAssistantConfigBuilder(platformAuthorizedDTO);
-        aiAssistant = getAiAssistantFactory()
+        return getAiAssistantFactory()
                 .create(
-                        platformAuthorizedDTO.getPlatformName().toLowerCase(),
-                        aiAssistantConfigBuilder.build(),
+                        getPlatformType(platformAuthorizedDTO.getPlatformName()),
+                        getAIAssistantConfig(platformAuthorizedDTO),
                         threadId);
-        return aiAssistant;
     }
 
     private Boolean testAuthorization(PlatformAuthorizedDTO platformAuthorizedDTO) {
-        AIAssistantConfig.Builder aiAssistantConfigBuilder = getAIAssistantConfigBuilder(platformAuthorizedDTO);
         AIAssistant aiAssistant = aiTestFactory.create(
-                platformAuthorizedDTO.getPlatformName().toLowerCase(), aiAssistantConfigBuilder.build());
-        if (aiAssistant == null) {
-            return false;
-        }
+                getPlatformType(platformAuthorizedDTO.getPlatformName()), getAIAssistantConfig(platformAuthorizedDTO));
         try {
             aiAssistant.ask("1+1=");
         } catch (Exception e) {
             throw new ApiException(ApiExceptionEnum.CREDIT_INCORRECT, e.getMessage());
         }
+
         return true;
     }
 
@@ -142,14 +137,12 @@ public class AIChatServiceImpl implements AIChatService {
     @Override
     public List<PlatformAuthorizedVO> authorizedPlatforms() {
         List<PlatformAuthorizedVO> authorizedPlatforms = new ArrayList<>();
-        Long userId = SessionUserHolder.getUserId();
-        UserPO userPO =
-                userRepository.findById(userId).orElseThrow(() -> new ApiException(ApiExceptionEnum.NEED_LOGIN));
 
-        List<PlatformAuthorizedPO> authorizedPlatformPOs = platformAuthorizedRepository.findAllByUserPO(userPO);
+        List<PlatformAuthorizedPO> authorizedPlatformPOs = platformAuthorizedRepository.findAll();
         for (PlatformAuthorizedPO authorizedPlatformPO : authorizedPlatformPOs) {
             authorizedPlatforms.add(PlatformAuthorizedConverter.INSTANCE.fromPO2VO(authorizedPlatformPO));
         }
+
         return authorizedPlatforms;
     }
 
@@ -178,13 +171,9 @@ public class AIChatServiceImpl implements AIChatService {
             throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
         }
 
-        Long userId = SessionUserHolder.getUserId();
-        UserPO userPO =
-                userRepository.findById(userId).orElseThrow(() -> new ApiException(ApiExceptionEnum.NEED_LOGIN));
         PlatformAuthorizedPO platformAuthorizedPO = new PlatformAuthorizedPO();
         platformAuthorizedPO.setCredentials(credentialSet);
         platformAuthorizedPO.setPlatformPO(platformPO);
-        platformAuthorizedPO.setUserPO(userPO);
 
         platformAuthorizedRepository.save(platformAuthorizedPO);
         PlatformAuthorizedVO platformAuthorizedVO =
@@ -210,16 +199,14 @@ public class AIChatServiceImpl implements AIChatService {
 
     @Override
     public boolean deleteAuthorizedPlatform(Long platformId) {
-        Long userId = SessionUserHolder.getUserId();
-        UserPO userPO =
-                userRepository.findById(userId).orElseThrow(() -> new ApiException(ApiExceptionEnum.NEED_LOGIN));
-        List<PlatformAuthorizedPO> authorizedPlatformPOs = platformAuthorizedRepository.findAllByUserPO(userPO);
+        List<PlatformAuthorizedPO> authorizedPlatformPOs = platformAuthorizedRepository.findAll();
         for (PlatformAuthorizedPO authorizedPlatformPO : authorizedPlatformPOs) {
             if (authorizedPlatformPO.getId().equals(platformId)) {
                 platformAuthorizedRepository.deleteById(authorizedPlatformPO.getId());
                 return true;
             }
         }
+
         throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
     }
 
@@ -230,15 +217,11 @@ public class AIChatServiceImpl implements AIChatService {
                 .orElseThrow(() -> new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED));
         Long userId = SessionUserHolder.getUserId();
         UserPO userPO = userRepository.findById(userId).orElse(null);
-        if (userPO == null
-                || !Objects.equals(userId, platformAuthorizedPO.getUserPO().getId())) {
-            throw new ApiException(ApiExceptionEnum.PERMISSION_DENIED);
-        }
         PlatformPO platformPO = platformRepository
                 .findById(platformAuthorizedPO.getPlatformPO().getId())
                 .orElseThrow(() -> new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND));
-        List<String> support_models = List.of(platformPO.getSupportModels().split(","));
-        if (!support_models.contains(model)) {
+        List<String> supportModels = List.of(platformPO.getSupportModels().split(","));
+        if (!supportModels.contains(model)) {
             throw new ApiException(ApiExceptionEnum.MODEL_NOT_SUPPORTED);
         }
         ChatThreadPO chatThreadPO = new ChatThreadPO();
@@ -284,42 +267,36 @@ public class AIChatServiceImpl implements AIChatService {
     @Override
     public SseEmitter talk(Long platformId, Long threadId, String message) {
         ChatThreadPO chatThreadPO = chatThreadRepository.findById(threadId).orElse(null);
-        if (chatThreadPO == null) {
-            throw new ApiException(ApiExceptionEnum.CHAT_THREAD_NOT_FOUND);
-        }
         Long userId = SessionUserHolder.getUserId();
-        UserPO userPO = userRepository.findById(userId).orElse(null);
-        if (userPO == null || !Objects.equals(userId, chatThreadPO.getUserPO().getId())) {
+        if (chatThreadPO == null
+                || !Objects.equals(userId, chatThreadPO.getUserPO().getId())) {
             throw new ApiException(ApiExceptionEnum.CHAT_THREAD_NOT_FOUND);
         }
-        PlatformAuthorizedPO platformAuthorizedPO =
-                platformAuthorizedRepository.findById(platformId).orElse(null);
-        if (platformAuthorizedPO == null || !Objects.equals(platformAuthorizedPO.getId(), platformId)) {
+        PlatformAuthorizedPO platformAuthorizedPO = platformAuthorizedRepository.findByPlatformPOId(platformId);
+        if (platformAuthorizedPO == null) {
             throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED);
         }
-        PlatformPO platformPO = platformRepository
-                .findById(platformAuthorizedPO.getPlatformPO().getId())
-                .orElseThrow(() -> new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND));
 
         PlatformAuthorizedDTO platformAuthorizedDTO = new PlatformAuthorizedDTO(
-                platformPO.getName(), platformAuthorizedPO.getCredentials(), chatThreadPO.getModel());
+                platformAuthorizedPO.getPlatformPO().getName(),
+                platformAuthorizedPO.getCredentials(),
+                chatThreadPO.getModel());
         AIAssistant aiAssistant = buildAIAssistant(platformAuthorizedDTO, chatThreadPO.getId());
-        if (aiAssistant == null) {
-            throw new ApiException(ApiExceptionEnum.CREDIT_INCORRECT);
-        }
         Flux<String> stringFlux = aiAssistant.streamAsk(message);
 
         SseEmitter emitter = new SseEmitter();
         stringFlux.subscribe(
-                data -> {
+                s -> {
                     try {
-                        emitter.send(SseEmitter.event().name("message").data(data));
+                        emitter.send(s);
                     } catch (Exception e) {
                         emitter.completeWithError(e);
                     }
                 },
-                emitter::completeWithError,
+                Throwable::printStackTrace,
                 emitter::complete);
+
+        emitter.onTimeout(emitter::complete);
         return emitter;
     }
 

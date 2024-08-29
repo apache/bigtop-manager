@@ -37,6 +37,8 @@ public abstract class AbstractAIAssistant implements AIAssistant {
     private final Object assistantId;
     private final ChatMemory chatMemory;
 
+    protected static final Integer MEMORY_LEN = 10;
+
     public AbstractAIAssistant(
             ChatLanguageModel chatLanguageModel,
             StreamingChatLanguageModel streamingChatLanguageModel,
@@ -50,29 +52,25 @@ public abstract class AbstractAIAssistant implements AIAssistant {
     @Override
     public Flux<String> streamAsk(ChatMessage chatMessage) {
         chatMemory.add(chatMessage);
-        Flux<String> streamAiMessage = Flux.create(
-                emitter -> {
-                    streamingChatLanguageModel.generate(chatMemory.messages(), new StreamingResponseHandler<>() {
-                        @Override
-                        public void onNext(String token) {
-                            emitter.next(token);
-                        }
+        return Flux.create(
+                emitter -> streamingChatLanguageModel.generate(chatMemory.messages(), new StreamingResponseHandler<>() {
+                    @Override
+                    public void onNext(String token) {
+                        emitter.next(token);
+                    }
 
-                        @Override
-                        public void onError(Throwable error) {
-                            emitter.error(error);
-                        }
+                    @Override
+                    public void onError(Throwable error) {
+                        emitter.error(error);
+                    }
 
-                        @Override
-                        public void onComplete(Response<AiMessage> response) {
-                            StreamingResponseHandler.super.onComplete(response);
-                            chatMemory.add(response.content());
-                        }
-                    });
-                },
+                    @Override
+                    public void onComplete(Response<AiMessage> response) {
+                        StreamingResponseHandler.super.onComplete(response);
+                        chatMemory.add(response.content());
+                    }
+                }),
                 FluxSink.OverflowStrategy.BUFFER);
-
-        return streamAiMessage;
     }
 
     @Override

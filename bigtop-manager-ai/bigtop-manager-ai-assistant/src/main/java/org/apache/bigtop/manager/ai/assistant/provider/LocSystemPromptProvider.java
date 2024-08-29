@@ -18,6 +18,7 @@
  */
 package org.apache.bigtop.manager.ai.assistant.provider;
 
+import org.apache.bigtop.manager.ai.core.enums.SystemPrompt;
 import org.apache.bigtop.manager.ai.core.provider.SystemPromptProvider;
 
 import org.springframework.util.ResourceUtils;
@@ -29,37 +30,33 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.Objects;
 
 @Slf4j
 public class LocSystemPromptProvider implements SystemPromptProvider {
 
-    public static final String DEFAULT = "default";
     private static final String SYSTEM_PROMPT_PATH = "src/main/resources/";
-    private static final String DEFAULT_NAME = "big-data-professor.st";
 
     @Override
-    public SystemMessage getSystemPrompt(Object id) {
-        if (Objects.equals(id.toString(), DEFAULT)) {
-            return getSystemPrompt();
-        } else {
-            return loadPromptFromFile(id.toString());
+    public SystemMessage getSystemPrompt(SystemPrompt systemPrompt) {
+        if (systemPrompt == SystemPrompt.DEFAULT_PROMPT) {
+            systemPrompt = SystemPrompt.BIGDATA_PROFESSOR;
         }
+
+        return loadPromptFromFile(systemPrompt.getValue());
     }
 
     @Override
     public SystemMessage getSystemPrompt() {
-        return loadPromptFromFile(DEFAULT_NAME);
+        return getSystemPrompt(SystemPrompt.DEFAULT_PROMPT);
     }
 
     private SystemMessage loadPromptFromFile(String fileName) {
-        final String filePath = SYSTEM_PROMPT_PATH + fileName;
+        final String filePath = SYSTEM_PROMPT_PATH + fileName + ".st";
         try {
             File file = ResourceUtils.getFile(filePath);
             String text = Files.readString(file.toPath(), StandardCharsets.UTF_8);
             return SystemMessage.from(text);
         } catch (IOException e) {
-            //
             log.error(
                     "Exception occurred while loading SystemPrompt from local. Here is some information:{}",
                     e.getMessage());

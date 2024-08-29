@@ -32,18 +32,18 @@ import org.mockito.MockitoAnnotations;
 import dev.langchain4j.model.openai.OpenAiChatModelName;
 import reactor.core.publisher.Flux;
 
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.when;
 
 public class AIAssistantServiceTest {
 
     private AIAssistantConfigProvider configProvider = AIAssistantConfig.builder()
-            .set("apiKey", "sk-")
+            .addConfig("apiKey", "sk-")
             // The `baseUrl` has a default value that is automatically generated based on the `PlatformType`.
-            .set("baseUrl", "https://api.openai.com/v1")
-            // default 30
-            .set("memoryLen", "10")
-            .set("modelName", OpenAiChatModelName.GPT_3_5_TURBO.toString())
+            .addConfig("baseUrl", "https://api.openai.com/v1")
+            .addConfig("modelName", OpenAiChatModelName.GPT_3_5_TURBO.toString())
             .build();
 
     @Mock
@@ -51,6 +51,8 @@ public class AIAssistantServiceTest {
 
     @Mock
     private AIAssistantFactory aiAssistantFactory;
+
+    private final String threadId = UUID.randomUUID().toString();
 
     @BeforeEach
     public void init() {
@@ -62,13 +64,14 @@ public class AIAssistantServiceTest {
                 emmit.next(text.charAt(i) + "");
             }
         }));
-        when(aiAssistantFactory.create(PlatformType.OPENAI, configProvider)).thenReturn(this.aiAssistant);
-        when(aiAssistant.getPlatform()).thenReturn(PlatformType.OPENAI.getValue());
+        when(aiAssistantFactory.create(PlatformType.OPENAI, configProvider, threadId))
+                .thenReturn(this.aiAssistant);
+        when(aiAssistant.getPlatform()).thenReturn(PlatformType.OPENAI);
     }
 
     @Test
     public void createNew2SimpleChat() {
-        AIAssistant aiAssistant = aiAssistantFactory.create(PlatformType.OPENAI, configProvider);
+        AIAssistant aiAssistant = aiAssistantFactory.create(PlatformType.OPENAI, configProvider, threadId);
         String ask = aiAssistant.ask("1?");
         assertFalse(ask.isEmpty());
         System.out.println(ask);
@@ -76,7 +79,7 @@ public class AIAssistantServiceTest {
 
     @Test
     public void createNew2StreamChat() throws InterruptedException {
-        AIAssistant aiAssistant = aiAssistantFactory.create(PlatformType.OPENAI, configProvider);
+        AIAssistant aiAssistant = aiAssistantFactory.create(PlatformType.OPENAI, configProvider, threadId);
         Flux<String> stringFlux = aiAssistant.streamAsk("stream 1?");
         stringFlux.subscribe(
                 System.out::println,

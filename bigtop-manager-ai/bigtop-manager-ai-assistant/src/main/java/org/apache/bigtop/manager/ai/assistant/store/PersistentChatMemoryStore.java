@@ -24,8 +24,6 @@ import org.apache.bigtop.manager.dao.po.ChatThreadPO;
 import org.apache.bigtop.manager.dao.repository.ChatMessageRepository;
 import org.apache.bigtop.manager.dao.repository.ChatThreadRepository;
 
-import org.springframework.stereotype.Component;
-
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.ChatMessageType;
@@ -37,7 +35,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component
 public class PersistentChatMemoryStore implements ChatMemoryStore {
 
     private final ChatThreadRepository chatThreadRepository;
@@ -50,7 +47,7 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
     }
 
     private ChatMessage convertToChatMessage(ChatMessagePO chatMessagePO) {
-        String sender = chatMessagePO.getSender().toUpperCase();
+        String sender = chatMessagePO.getSender().toLowerCase();
         if (sender.equals(MessageSender.AI.getValue())) {
             return new AiMessage(chatMessagePO.getMessage());
         } else if (sender.equals(MessageSender.USER.getValue())) {

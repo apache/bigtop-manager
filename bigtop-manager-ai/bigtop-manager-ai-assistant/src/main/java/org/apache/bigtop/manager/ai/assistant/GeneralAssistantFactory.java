@@ -21,11 +21,15 @@ package org.apache.bigtop.manager.ai.assistant;
 import org.apache.bigtop.manager.ai.assistant.provider.LocSystemPromptProvider;
 import org.apache.bigtop.manager.ai.core.AbstractAIAssistantFactory;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
+import org.apache.bigtop.manager.ai.core.enums.SystemPrompt;
+import org.apache.bigtop.manager.ai.core.exception.PlatformNotFoundException;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 import org.apache.bigtop.manager.ai.core.factory.ToolBox;
 import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
 import org.apache.bigtop.manager.ai.core.provider.SystemPromptProvider;
 import org.apache.bigtop.manager.ai.openai.OpenAIAssistant;
+
+import org.apache.commons.lang3.NotImplementedException;
 
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
@@ -35,17 +39,19 @@ import java.util.Objects;
 
 public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
 
-    private SystemPromptProvider systemPromptProvider = new LocSystemPromptProvider();
-    private ChatMemoryStore chatMemoryStore = new InMemoryChatMemoryStore();
+    private final SystemPromptProvider systemPromptProvider;
+    private final ChatMemoryStore chatMemoryStore;
 
-    public GeneralAssistantFactory() {}
+    public GeneralAssistantFactory() {
+        this(new LocSystemPromptProvider(), new InMemoryChatMemoryStore());
+    }
 
     public GeneralAssistantFactory(SystemPromptProvider systemPromptProvider) {
-        this.systemPromptProvider = systemPromptProvider;
+        this(systemPromptProvider, new InMemoryChatMemoryStore());
     }
 
     public GeneralAssistantFactory(ChatMemoryStore chatMemoryStore) {
-        this.chatMemoryStore = chatMemoryStore;
+        this(new LocSystemPromptProvider(), chatMemoryStore);
     }
 
     public GeneralAssistantFactory(SystemPromptProvider systemPromptProvider, ChatMemoryStore chatMemoryStore) {
@@ -55,29 +61,33 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
 
     @Override
     public AIAssistant createWithPrompt(
-            PlatformType platformType, AIAssistantConfigProvider assistantConfig, Object id, Object promptId) {
-        AIAssistant aiAssistant = create(platformType, assistantConfig, id);
-        SystemMessage systemPrompt = systemPromptProvider.getSystemPrompt(promptId);
+            PlatformType platformType,
+            AIAssistantConfigProvider assistantConfig,
+            Object id,
+            SystemPrompt systemPrompts) {
+        AIAssistant aiAssistant;
+        if (Objects.requireNonNull(platformType) == PlatformType.OPENAI) {
+            aiAssistant = OpenAIAssistant.builder()
+                    .id(id)
+                    .memoryStore(chatMemoryStore)
+                    .withConfigProvider(assistantConfig)
+                    .build();
+        } else {
+            throw new PlatformNotFoundException(platformType.getValue());
+        }
+
+        SystemMessage systemPrompt = systemPromptProvider.getSystemPrompt(systemPrompts);
         aiAssistant.setSystemPrompt(systemPrompt);
         return aiAssistant;
     }
 
     @Override
     public AIAssistant create(PlatformType platformType, AIAssistantConfigProvider assistantConfig, Object id) {
-        if (Objects.requireNonNull(platformType) == PlatformType.OPENAI) {
-            AIAssistant aiAssistant = OpenAIAssistant.builder()
-                    .id(id)
-                    .memoryStore(chatMemoryStore)
-                    .withConfigProvider(assistantConfig)
-                    .build();
-            aiAssistant.setSystemPrompt(systemPromptProvider.getSystemPrompt());
-            return aiAssistant;
-        }
-        return null;
+        return createWithPrompt(platformType, assistantConfig, id, SystemPrompt.DEFAULT_PROMPT);
     }
 
     @Override
     public ToolBox createToolBox(PlatformType platformType) {
-        return null;
+        throw new NotImplementedException("ToolBox is not implemented for GeneralAssistantFactory");
     }
 }

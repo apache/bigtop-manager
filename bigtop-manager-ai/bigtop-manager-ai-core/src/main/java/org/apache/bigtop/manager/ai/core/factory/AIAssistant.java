@@ -18,6 +18,8 @@
  */
 package org.apache.bigtop.manager.ai.core.factory;
 
+import org.apache.bigtop.manager.ai.core.enums.PlatformType;
+
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
@@ -57,7 +59,7 @@ public interface AIAssistant {
      * This is used to get the AIAssistant's Platform
      * @return
      */
-    String getPlatform();
+    PlatformType getPlatform();
 
     void setSystemPrompt(SystemMessage systemPrompt);
 

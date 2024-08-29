@@ -19,12 +19,9 @@
 package org.apache.bigtop.manager.dao.repository;
 
 import org.apache.bigtop.manager.dao.po.PlatformAuthorizedPO;
-import org.apache.bigtop.manager.dao.po.UserPO;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
-
 public interface PlatformAuthorizedRepository extends JpaRepository<PlatformAuthorizedPO, Long> {
-    List<PlatformAuthorizedPO> findAllByUserPO(UserPO userPO);
+    PlatformAuthorizedPO findByPlatformPOId(Long platformId);
 }
