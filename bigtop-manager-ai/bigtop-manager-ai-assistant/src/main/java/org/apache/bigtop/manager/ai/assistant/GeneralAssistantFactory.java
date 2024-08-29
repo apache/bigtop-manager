@@ -19,7 +19,6 @@
 package org.apache.bigtop.manager.ai.assistant;
 
 import org.apache.bigtop.manager.ai.assistant.provider.LocSystemPromptProvider;
-import org.apache.bigtop.manager.ai.bigmodel.BigModelAssistant;
 import org.apache.bigtop.manager.ai.core.AbstractAIAssistantFactory;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
@@ -27,7 +26,6 @@ import org.apache.bigtop.manager.ai.core.factory.ToolBox;
 import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
 import org.apache.bigtop.manager.ai.core.provider.SystemPromptProvider;
 import org.apache.bigtop.manager.ai.openai.OpenAIAssistant;
-import org.apache.bigtop.manager.ai.qianfan.QianFanAssistant;
 
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
@@ -68,22 +66,6 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
     public AIAssistant create(PlatformType platformType, AIAssistantConfigProvider assistantConfig, Object id) {
         if (Objects.requireNonNull(platformType) == PlatformType.OPENAI) {
             AIAssistant aiAssistant = OpenAIAssistant.builder()
-                    .id(id)
-                    .memoryStore(chatMemoryStore)
-                    .withConfigProvider(assistantConfig)
-                    .build();
-            aiAssistant.setSystemPrompt(systemPromptProvider.getSystemPrompt());
-            return aiAssistant;
-        } else if (Objects.requireNonNull(platformType) == PlatformType.BIGMODEL) {
-            AIAssistant aiAssistant = BigModelAssistant.builder()
-                    .id(id)
-                    .memoryStore(chatMemoryStore)
-                    .withConfigProvider(assistantConfig)
-                    .build();
-            aiAssistant.setSystemPrompt(systemPromptProvider.getSystemPrompt());
-            return aiAssistant;
-        } else if (Objects.requireNonNull(platformType) == PlatformType.QIANFAN) {
-            AIAssistant aiAssistant = QianFanAssistant.builder()
                     .id(id)
                     .memoryStore(chatMemoryStore)
                     .withConfigProvider(assistantConfig)

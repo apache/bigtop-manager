@@ -37,14 +37,6 @@
         </dependency>
         <dependency>
             <groupId>org.apache.bigtop</groupId>
-            <artifactId>bigtop-manager-ai-bigmodel</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.bigtop</groupId>
-            <artifactId>bigtop-manager-ai-qianfan</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.bigtop</groupId>
             <artifactId>bigtop-manager-ai-core</artifactId>
         </dependency>
         <dependency>
