@@ -302,9 +302,7 @@ public class AIChatServiceImpl implements AIChatService {
                 .orElseThrow(() -> new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND));
 
         PlatformAuthorizedDTO platformAuthorizedDTO = new PlatformAuthorizedDTO(
-                platformPO.getName(),
-                platformAuthorizedPO.getCredentials(),
-                chatThreadPO.getModel());
+                platformPO.getName(), platformAuthorizedPO.getCredentials(), chatThreadPO.getModel());
         AIAssistant aiAssistant = buildAIAssistant(platformAuthorizedDTO, chatThreadPO.getId());
         if (aiAssistant == null) {
             throw new ApiException(ApiExceptionEnum.CREDIT_INCORRECT);
