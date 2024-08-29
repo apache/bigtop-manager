@@ -325,7 +325,6 @@ CREATE TABLE `llm_platform`
 (
     `id`             BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
     `name`           VARCHAR(255)        NOT NULL,
-    `api_url`        VARCHAR(255)        NOT NULL,
     `credential`     JSON                DEFAULT NULL,
     `support_models` VARCHAR(255)        DEFAULT NULL,
     `create_time`    DATETIME            DEFAULT CURRENT_TIMESTAMP,
@@ -347,9 +346,7 @@ CREATE TABLE `llm_platform_authorized`
     `update_by`   BIGINT              DEFAULT NULL,
     PRIMARY KEY (`id`),
     KEY `idx_platform_id` (`platform_id`),
-    KEY `idx_user_id` (`user_id`),
-    CONSTRAINT `llm_platform_authorized_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE,
-    CONSTRAINT `llm_platform_authorized_ibfk_2` FOREIGN KEY (`platform_id`) REFERENCES `llm_platform` (`id`) ON DELETE CASCADE
+    KEY `idx_user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `llm_chat_thread`
@@ -362,9 +359,7 @@ CREATE TABLE `llm_chat_thread`
     `update_time` DATETIME            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `create_by`   BIGINT              DEFAULT NULL,
     `update_by`   BIGINT              DEFAULT NULL,
-    PRIMARY KEY (`id`),
-    CONSTRAINT `fk_llm_platform_authorized` FOREIGN KEY (`platform_id`) REFERENCES `llm_platform_authorized` (`id`) ON DELETE CASCADE,
-    CONSTRAINT `fk_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
+    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `llm_chat_message`
@@ -376,9 +371,7 @@ CREATE TABLE `llm_chat_message`
     `sender`      VARCHAR(50)         NOT NULL,
     `create_time` DATETIME            DEFAULT CURRENT_TIMESTAMP,
     `update_time` DATETIME            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`),
-    CONSTRAINT `fk_llm_chat_message_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE,
-    CONSTRAINT `fk_llm_chat_thread` FOREIGN KEY (`thread_id`) REFERENCES `llm_chat_thread` (`id`) ON DELETE CASCADE
+    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Initialize sequence table.
@@ -408,7 +401,8 @@ INSERT INTO bigtop_manager.user (id, create_time, update_time, nickname, passwor
 VALUES (1, now(), now(), 'Administrator', '21232f297a57a5a743894a0e4a801fc3', true, 'admin');
 
 -- Adding default ai chat platform
-INSERT INTO bigtop_manager.llm_platform (id,api_url,credential,NAME,support_models)
+INSERT INTO bigtop_manager.llm_platform (id,credential,NAME,support_models)
 VALUES
-(1,'https://api.openai.com/v1','{"apiKey": "API Key"}','OpenAI','gpt-3.5-turbo,gpt-4,gpt-4o,gpt-3.5-turbo-16k,gpt-4-turbo-preview,gpt-4-32k,gpt-4o-mini'),
-(2,'https://open.bigmodel.cn/api/paas/v4/','{"apiKey": "API Key"}','BigModel','glm-4-0520,glm-4,glm-4-air,glm-4-airx,glm-4-long Beta,glm-4-flash');
+(1,'{"apiKey": "API Key"}','OpenAI','gpt-3.5-turbo,gpt-4,gpt-4o,gpt-3.5-turbo-16k,gpt-4-turbo-preview,gpt-4-32k,gpt-4o-mini'),
+(2,'{"apiKey": "API Key"}','BigModel','glm-4-0520,glm-4,glm-4-air,glm-4-airx,glm-4-long Beta,glm-4-flash'),
+(3,'{"apiKey": "API Key", "secretKey": "Secret Key"}','QianFan','Yi-34B-Chat');

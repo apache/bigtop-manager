@@ -98,7 +98,6 @@ public class AIChatServiceImpl implements AIChatService {
             aiAssistantConfigBuilder = aiAssistantConfigBuilder.set(
                     key, platformAuthorizedDTO.getCredentials().get(key));
         }
-        aiAssistantConfigBuilder = aiAssistantConfigBuilder.set("baseUrl", platformAuthorizedDTO.getBaseUrl());
         aiAssistantConfigBuilder = aiAssistantConfigBuilder.set("memoryLen", "10");
         aiAssistantConfigBuilder = aiAssistantConfigBuilder.set("modelName", platformAuthorizedDTO.getModel());
         return aiAssistantConfigBuilder;
@@ -173,7 +172,7 @@ public class AIChatServiceImpl implements AIChatService {
             throw new ApiException(ApiExceptionEnum.MODEL_NOT_SUPPORTED);
         }
         PlatformAuthorizedDTO platformAuthorizedDTO =
-                new PlatformAuthorizedDTO(platformPO.getName(), credentialSet, platformPO.getApiUrl(), models.get(0));
+                new PlatformAuthorizedDTO(platformPO.getName(), credentialSet, models.get(0));
 
         if (!testAuthorization(platformAuthorizedDTO)) {
             throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
@@ -305,7 +304,6 @@ public class AIChatServiceImpl implements AIChatService {
         PlatformAuthorizedDTO platformAuthorizedDTO = new PlatformAuthorizedDTO(
                 platformPO.getName(),
                 platformAuthorizedPO.getCredentials(),
-                platformPO.getApiUrl(),
                 chatThreadPO.getModel());
         AIAssistant aiAssistant = buildAIAssistant(platformAuthorizedDTO, chatThreadPO.getId());
         if (aiAssistant == null) {

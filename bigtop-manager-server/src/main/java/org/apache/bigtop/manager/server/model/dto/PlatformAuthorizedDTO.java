@@ -25,14 +25,12 @@ import java.util.Map;
 @Data
 public class PlatformAuthorizedDTO {
     private String platformName;
-    private String baseUrl;
     private String model;
     private Map<String, String> credentials;
 
-    public PlatformAuthorizedDTO(String name, Map<String, String> credentialSet, String apiUrl, String model) {
+    public PlatformAuthorizedDTO(String name, Map<String, String> credentialSet, String model) {
         this.platformName = name;
         this.credentials = credentialSet;
-        this.baseUrl = apiUrl;
         this.model = model;
     }
 }

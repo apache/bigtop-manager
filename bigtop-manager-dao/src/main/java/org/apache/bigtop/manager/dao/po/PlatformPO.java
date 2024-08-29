@@ -52,9 +52,6 @@ public class PlatformPO extends BasePO {
     @Column(nullable = false, length = 255)
     private String name;
 
-    @Column(name = "api_url", nullable = false, length = 255)
-    private String apiUrl;
-
     @Column(name = "credential", columnDefinition = "json", nullable = false)
     @Convert(converter = JsonToMapConverter.class)
     private Map<String, String> credential;
