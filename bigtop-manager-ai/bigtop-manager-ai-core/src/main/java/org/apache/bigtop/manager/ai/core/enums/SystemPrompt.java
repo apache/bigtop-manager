@@ -23,7 +23,8 @@ import lombok.Getter;
 @Getter
 public enum SystemPrompt {
     DEFAULT_PROMPT("default"),
-    BIGDATA_PROFESSOR("big-data-professor");
+    BIGDATA_PROFESSOR("big-data-professor"),
+    LANGUAGE_PROMPT("language-prompt");
     ;
 
     private final String value;

@@ -27,9 +27,9 @@ import java.util.stream.Collectors;
 
 @Getter
 public enum MessageSender {
-    USER("USER"),
-    AI("AI"),
-    SYSTEM("SYSTEM");
+    USER("user"),
+    AI("ai"),
+    SYSTEM("system");
 
     private final String value;
 

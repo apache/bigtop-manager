@@ -337,7 +337,6 @@ CREATE TABLE `llm_platform`
 CREATE TABLE `llm_platform_authorized`
 (
     `id`          BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `user_id`     BIGINT(20) UNSIGNED NOT NULL,
     `platform_id` BIGINT(20) UNSIGNED NOT NULL,
     `credentials` JSON                NOT NULL,
     `create_time` DATETIME            DEFAULT CURRENT_TIMESTAMP,
@@ -346,7 +345,6 @@ CREATE TABLE `llm_platform_authorized`
     `update_by`   BIGINT              DEFAULT NULL,
     PRIMARY KEY (`id`),
     KEY `idx_platform_id` (`platform_id`),
-    KEY `idx_user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `llm_chat_thread`

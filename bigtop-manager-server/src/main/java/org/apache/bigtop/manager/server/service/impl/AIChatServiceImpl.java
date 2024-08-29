@@ -54,6 +54,7 @@ import org.apache.bigtop.manager.server.service.AIChatService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 
 import jakarta.annotation.Resource;
@@ -64,6 +65,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class AIChatServiceImpl implements AIChatService {
     @Resource
@@ -101,7 +103,7 @@ public class AIChatServiceImpl implements AIChatService {
     }
 
     private PlatformType getPlatformType(String platformName) {
-        return PlatformType.valueOf(platformName.toLowerCase());
+        return PlatformType.getPlatformType(platformName.toLowerCase());
     }
 
     private AIAssistant buildAIAssistant(PlatformAuthorizedDTO platformAuthorizedDTO, Long threadId) {
@@ -235,8 +237,7 @@ public class AIChatServiceImpl implements AIChatService {
     @Override
     public boolean deleteChatThreads(Long platformId, Long threadId) {
         Long userId = SessionUserHolder.getUserId();
-        UserPO userPO =
-                userRepository.findById(userId).orElseThrow(() -> new ApiException(ApiExceptionEnum.NEED_LOGIN));
+        UserPO userPO = userRepository.getReferenceById(userId);
         List<ChatThreadPO> chatThreadPOS = chatThreadRepository.findAllByUserPO(userPO);
         for (ChatThreadPO chatThreadPO : chatThreadPOS) {
             if (chatThreadPO.getId().equals(threadId)
@@ -282,6 +283,7 @@ public class AIChatServiceImpl implements AIChatService {
                 platformAuthorizedPO.getCredentials(),
                 chatThreadPO.getModel());
         AIAssistant aiAssistant = buildAIAssistant(platformAuthorizedDTO, chatThreadPO.getId());
+        log.info(message);
         Flux<String> stringFlux = aiAssistant.streamAsk(message);
 
         SseEmitter emitter = new SseEmitter();
@@ -306,6 +308,11 @@ public class AIChatServiceImpl implements AIChatService {
         ChatThreadPO chatThreadPO = chatThreadRepository
                 .findById(threadId)
                 .orElseThrow(() -> new ApiException(ApiExceptionEnum.CHAT_THREAD_NOT_FOUND));
+        Long userId = SessionUserHolder.getUserId();
+        UserPO userPO = userRepository.getReferenceById(userId);
+        if (!chatThreadPO.getUserPO().equals(userPO)) {
+            throw new ApiException(ApiExceptionEnum.PERMISSION_DENIED);
+        }
         List<ChatMessagePO> chatMessagePOs = chatMessageRepository.findAllByChatThreadPO(chatThreadPO);
         for (ChatMessagePO chatMessagePO : chatMessagePOs) {
             ChatMessageVO chatMessageVO = ChatMessageConverter.INSTANCE.fromPO2VO(chatMessagePO);
