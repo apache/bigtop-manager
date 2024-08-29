@@ -39,13 +39,7 @@ import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Entity
-@Table(name = "\"llm_platform_authorized\"")
-@TableGenerator(
-        name = "llm_platform_authorized_generator",
-        table = "sequence",
-        pkColumnName = "seq_name",
-        valueColumnName = "seq_count")
+@Table(name = "llm_platform_authorized")
 public class PlatformAuthorizedPO extends BasePO {
 
     @Id
@@ -57,7 +51,6 @@ public class PlatformAuthorizedPO extends BasePO {
     @Convert(converter = JsonToMapConverter.class)
     private Map<String, String> credentials;
 
-    @ManyToOne
-    @JoinColumn(name = "platform_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private PlatformPO platformPO;
+    @Column(name = "platform_id")
+    private Long platformId;
 }

@@ -115,6 +115,7 @@ docker exec bigtop-manager-server bash -c "sed -i 's/host: localhost/host: $BIGT
 docker exec bigtop-manager-agent-01 bash -c "sed -i 's/host: localhost/host: $BIGTOP_MANAGER_SERVER_IP/' /opt/bigtop-manager-agent/conf/application.yml"
 docker exec bigtop-manager-agent-02 bash -c "sed -i 's/host: localhost/host: $BIGTOP_MANAGER_SERVER_IP/' /opt/bigtop-manager-agent/conf/application.yml"
 
+docker exec bigtop-manager-server bash -c "mysql -uroot -proot -Dbigtop_manager < /opt/bigtop-manager-server/ddl/MySQL-DDL-CREATE.sql"
 docker exec bigtop-manager-server bash -c "nohup /bin/bash /opt/bigtop-manager-server/bin/start.sh --debug > /dev/null 2>&1 &"
 docker exec bigtop-manager-server bash -c "nohup /bin/bash /opt/bigtop-manager-agent/bin/start.sh --debug > /dev/null 2>&1 &"
 docker exec bigtop-manager-agent-01 bash -c "nohup /bin/bash /opt/bigtop-manager-agent/bin/start.sh > /dev/null 2>&1 &"

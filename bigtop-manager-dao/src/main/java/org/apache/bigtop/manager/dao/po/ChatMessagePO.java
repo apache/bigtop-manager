@@ -35,16 +35,9 @@ import jakarta.persistence.TableGenerator;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Entity
 @Table(name = "\"llm_chat_message\"")
-@TableGenerator(
-        name = "llm_chat_message_generator",
-        table = "sequence",
-        pkColumnName = "seq_name",
-        valueColumnName = "seq_count")
 public class ChatMessagePO extends BasePO {
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "llm_chat_threads_generator")
     @Column(name = "id")
     private Long id;
 
@@ -54,11 +47,9 @@ public class ChatMessagePO extends BasePO {
     @Column(name = "sender")
     private String sender;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private UserPO userPO;
+    @Column(name = "user_id")
+    private Long userId;
 
-    @ManyToOne
-    @JoinColumn(name = "thread_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private ChatThreadPO chatThreadPO;
+    @Column(name = "thread_id")
+    private Long chatThreadId;
 }

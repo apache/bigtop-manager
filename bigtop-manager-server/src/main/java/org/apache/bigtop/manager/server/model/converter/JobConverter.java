@@ -38,7 +38,6 @@ public interface JobConverter {
 
     @Mapping(target = "createTime", source = "createTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
     @Mapping(target = "updateTime", source = "updateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
-    @Mapping(target = "stages", source = "stagePOList")
     JobVO fromPO2VO(JobPO jobPO);
 
     List<JobVO> fromPO2VO(List<JobPO> jobPO);

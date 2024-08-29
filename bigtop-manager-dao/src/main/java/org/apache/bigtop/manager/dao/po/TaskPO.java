@@ -18,56 +18,31 @@
  */
 package org.apache.bigtop.manager.dao.po;
 
-import org.apache.bigtop.manager.common.enums.Command;
-import org.apache.bigtop.manager.common.enums.JobState;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
-import jakarta.persistence.ConstraintMode;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ForeignKey;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.TableGenerator;
+import java.io.Serializable;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Entity
-@Table(
-        name = "\"task\"",
-        indexes = {
-            @Index(name = "idx_task_cluster_id", columnList = "cluster_id"),
-            @Index(name = "idx_task_job_id", columnList = "job_id"),
-            @Index(name = "idx_task_stage_id", columnList = "stage_id")
-        })
-@TableGenerator(name = "task_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
-public class TaskPO extends BasePO {
+@Table(name = "task")
+public class TaskPO extends BasePO implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "task_generator")
     @Column(name = "id")
     private Long id;
 
     @Column(name = "name")
     private String name;
 
-    @Lob
-    @Basic(fetch = FetchType.LAZY)
-    @Column(name = "context", length = 16777216)
+    @Column(name = "context")
     private String context;
 
     @Column(name = "state")
-    private JobState state;
+    private String state;
 
     @Column(name = "service_name")
     private String serviceName;
@@ -76,7 +51,7 @@ public class TaskPO extends BasePO {
     private String componentName;
 
     @Column(name = "command")
-    private Command command;
+    private String command;
 
     @Column(name = "custom_command")
     private String customCommand;
@@ -93,20 +68,15 @@ public class TaskPO extends BasePO {
     @Column(name = "service_user")
     private String serviceUser;
 
-    @Lob
-    @Basic(fetch = FetchType.LAZY)
-    @Column(name = "content", length = 16777216)
+    @Column(name = "content")
     private String content;
 
-    @ManyToOne
-    @JoinColumn(name = "job_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private JobPO jobPO;
+    @Column(name = "stage_id")
+    private Long stageId;
 
-    @ManyToOne
-    @JoinColumn(name = "stage_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private StagePO stagePO;
+    @Column(name = "job_id")
+    private Long jobId;
 
-    @ManyToOne
-    @JoinColumn(name = "cluster_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private ClusterPO clusterPO;
+    @Column(name = "cluster_id")
+    private Long clusterId;
 }

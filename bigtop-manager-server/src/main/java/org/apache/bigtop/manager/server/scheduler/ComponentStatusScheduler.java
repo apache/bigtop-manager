@@ -19,13 +19,8 @@
 package org.apache.bigtop.manager.server.scheduler;
 
 import org.apache.bigtop.manager.common.enums.MaintainState;
-import org.apache.bigtop.manager.dao.po.ClusterPO;
-import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.po.HostComponentPO;
-import org.apache.bigtop.manager.dao.po.HostPO;
-import org.apache.bigtop.manager.dao.po.ServicePO;
-import org.apache.bigtop.manager.dao.po.StackPO;
-import org.apache.bigtop.manager.dao.repository.HostComponentRepository;
+import org.apache.bigtop.manager.dao.repository.HostComponentDao;
 import org.apache.bigtop.manager.grpc.generated.ComponentStatusReply;
 import org.apache.bigtop.manager.grpc.generated.ComponentStatusRequest;
 import org.apache.bigtop.manager.grpc.generated.ComponentStatusServiceGrpc;
@@ -46,46 +41,43 @@ import java.util.concurrent.TimeUnit;
 public class ComponentStatusScheduler {
 
     @Resource
-    private HostComponentRepository hostComponentRepository;
+    private HostComponentDao hostComponentDao;
 
     @Async
     @Scheduled(fixedDelay = 30, timeUnit = TimeUnit.SECONDS)
     public void execute() {
-        List<HostComponentPO> hostComponentPOList = hostComponentRepository.findAll();
+        List<HostComponentPO> hostComponentPOList = hostComponentDao.findAllJoin();
         for (HostComponentPO hostComponentPO : hostComponentPOList) {
             // Only check services which should be in running
-            if (!List.of(MaintainState.STARTED, MaintainState.STOPPED).contains(hostComponentPO.getState())) {
+            if (!List.of(MaintainState.STARTED, MaintainState.STOPPED)
+                    .contains(MaintainState.fromString(hostComponentPO.getState()))) {
                 continue;
             }
 
-            HostPO hostPO = hostComponentPO.getHostPO();
-            ComponentPO componentPO = hostComponentPO.getComponentPO();
-            ServicePO servicePO = componentPO.getServicePO();
-            ClusterPO clusterPO = hostPO.getClusterPO();
-            StackPO stackPO = clusterPO.getStackPO();
-
             ComponentStatusRequest request = ComponentStatusRequest.newBuilder()
-                    .setServiceName(servicePO.getServiceName())
-                    .setServiceUser(servicePO.getServiceUser())
-                    .setComponentName(componentPO.getComponentName())
-                    .setCommandScript(componentPO.getCommandScript())
-                    .setRoot(clusterPO.getRoot())
-                    .setStackName(stackPO.getStackName())
-                    .setStackVersion(stackPO.getStackVersion())
+                    .setServiceName(hostComponentPO.getServiceName())
+                    .setServiceUser(hostComponentPO.getServiceUser())
+                    .setComponentName(hostComponentPO.getComponentName())
+                    .setCommandScript(hostComponentPO.getCommandScript())
+                    .setRoot(hostComponentPO.getRoot())
+                    .setStackName(hostComponentPO.getStackName())
+                    .setStackVersion(hostComponentPO.getStackVersion())
                     .build();
             ComponentStatusServiceGrpc.ComponentStatusServiceBlockingStub blockingStub = GrpcClient.getBlockingStub(
-                    hostPO.getHostname(), ComponentStatusServiceGrpc.ComponentStatusServiceBlockingStub.class);
+                    hostComponentPO.getHostname(), ComponentStatusServiceGrpc.ComponentStatusServiceBlockingStub.class);
             ComponentStatusReply reply = blockingStub.getComponentStatus(request);
 
             // Status 0 means the service is running
-            if (reply.getStatus() == 0 && hostComponentPO.getState() == MaintainState.STOPPED) {
-                hostComponentPO.setState(MaintainState.STARTED);
-                hostComponentRepository.save(hostComponentPO);
+            if (reply.getStatus() == 0
+                    && MaintainState.fromString(hostComponentPO.getState()) == MaintainState.STOPPED) {
+                hostComponentPO.setState(MaintainState.STARTED.getName());
+                hostComponentDao.updateById(hostComponentPO);
             }
 
-            if (reply.getStatus() != 0 && hostComponentPO.getState() == MaintainState.STARTED) {
-                hostComponentPO.setState(MaintainState.STOPPED);
-                hostComponentRepository.save(hostComponentPO);
+            if (reply.getStatus() != 0
+                    && MaintainState.fromString(hostComponentPO.getState()) == MaintainState.STARTED) {
+                hostComponentPO.setState(MaintainState.STOPPED.getName());
+                hostComponentDao.updateById(hostComponentPO);
             }
         }
     }

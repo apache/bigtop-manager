@@ -22,29 +22,16 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.persistence.TableGenerator;
-import jakarta.persistence.UniqueConstraint;
+import java.io.Serializable;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Entity
-@Table(
-        name = "stack",
-        uniqueConstraints = {
-            @UniqueConstraint(
-                    name = "uk_stack",
-                    columnNames = {"stack_name", "stack_version"})
-        })
-@TableGenerator(name = "stack_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
-public class StackPO extends BasePO {
+@Table(name = "stack")
+public class StackPO extends BasePO implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "stack_generator")
     @Column(name = "id")
     private Long id;
 

@@ -21,8 +21,8 @@ package org.apache.bigtop.manager.ai.assistant.store;
 import org.apache.bigtop.manager.ai.core.enums.MessageSender;
 import org.apache.bigtop.manager.dao.po.ChatMessagePO;
 import org.apache.bigtop.manager.dao.po.ChatThreadPO;
-import org.apache.bigtop.manager.dao.repository.ChatMessageRepository;
-import org.apache.bigtop.manager.dao.repository.ChatThreadRepository;
+import org.apache.bigtop.manager.dao.repository.ChatMessageDao;
+import org.apache.bigtop.manager.dao.repository.ChatThreadDao;
 
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
@@ -37,13 +37,13 @@ import java.util.stream.Collectors;
 
 public class PersistentChatMemoryStore implements ChatMemoryStore {
 
-    private final ChatThreadRepository chatThreadRepository;
-    private final ChatMessageRepository chatMessageRepository;
+    private final ChatThreadDao chatThreadDao;
+    private final ChatMessageDao chatMessageDao;
 
     public PersistentChatMemoryStore(
-            ChatThreadRepository chatThreadRepository, ChatMessageRepository chatMessageRepository) {
-        this.chatThreadRepository = chatThreadRepository;
-        this.chatMessageRepository = chatMessageRepository;
+            ChatThreadDao chatThreadDao, ChatMessageDao chatMessageDao) {
+        this.chatThreadDao = chatThreadDao;
+        this.chatMessageDao = chatMessageDao;
     }
 
     private ChatMessage convertToChatMessage(ChatMessagePO chatMessagePO) {
@@ -76,27 +76,27 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
         } else {
             chatMessagePO.setSender(chatMessage.type().toString());
         }
-        ChatThreadPO chatThreadPO = chatThreadRepository.findById(chatThreadId).orElse(null);
+        ChatThreadPO chatThreadPO = chatThreadDao.findById(chatThreadId).orElse(null);
         if (chatThreadPO != null) {
             chatMessagePO.setUserPO(chatThreadPO.getUserPO());
         } else {
             chatMessagePO.setUserPO(null);
         }
         chatMessagePO.setChatThreadPO(
-                chatThreadRepository.findById(chatThreadId).orElse(null));
+                chatThreadDao.findById(chatThreadId).orElse(null));
         return chatMessagePO;
     }
 
     @Override
     public List<ChatMessage> getMessages(Object threadId) {
         ChatThreadPO chatThreadPO = null;
-        if (chatThreadRepository != null) {
-            chatThreadPO = chatThreadRepository.findById((Long) threadId).orElse(null);
+        if (chatThreadDao != null) {
+            chatThreadPO = chatThreadDao.findById((Long) threadId).orElse(null);
         }
         if (chatThreadPO == null) {
             return new ArrayList<>();
         }
-        List<ChatMessagePO> chatMessages = chatMessageRepository.findAllByChatThreadPO(chatThreadPO);
+        List<ChatMessagePO> chatMessages = chatMessageDao.findAllByChatThreadPO(chatThreadPO);
         if (chatMessages.isEmpty()) {
             return new ArrayList<>();
         } else {
@@ -107,13 +107,13 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
     @Override
     public void updateMessages(Object threadId, List<ChatMessage> messages) {
         ChatMessagePO chatMessagePO = convertToChatMessagePO(messages.get(messages.size() - 1), (Long) threadId);
-        chatMessageRepository.save(chatMessagePO);
+        chatMessageDao.save(chatMessagePO);
     }
 
     @Override
     public void deleteMessages(Object threadId) {
         ChatThreadPO chatThreadPO =
-                chatThreadRepository.findById((Long) threadId).orElse(null);
-        chatMessageRepository.deleteByChatThreadPO(chatThreadPO);
+                chatThreadDao.findById((Long) threadId).orElse(null);
+        chatMessageDao.deleteByChatThreadPO(chatThreadPO);
     }
 }

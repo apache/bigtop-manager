@@ -48,6 +48,10 @@
             <directoryMode>0755</directoryMode>
         </fileSet>
         <fileSet>
+            <directory>${basedir}/src/main/resources/ddl</directory>
+            <outputDirectory>ddl</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>${basedir}/../bigtop-manager-ui/dist</directory>
             <outputDirectory>./ui</outputDirectory>
         </fileSet>

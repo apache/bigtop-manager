@@ -38,7 +38,7 @@ DEALLOCATE PREPARE statement;
 
 CREATE TABLE `audit_log`
 (
-    `id`                BIGINT NOT NULL,
+    `id`                BIGINT NOT NULL AUTO_INCREMENT,
     `args`              LONGTEXT,
     `create_by`         BIGINT,
     `create_time`       DATETIME,
@@ -51,15 +51,6 @@ CREATE TABLE `audit_log`
     `uri`               VARCHAR(255),
     `user_id`           BIGINT,
     PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE `sequence`
-(
-    `id`        BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `seq_name`  VARCHAR(100) NOT NULL,
-    `seq_count` BIGINT(20) DEFAULT NULL,
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_seq_name` (`seq_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `user`
@@ -95,12 +86,13 @@ CREATE TABLE `cluster`
     `user_group`    VARCHAR(255),
     `stack_id`      BIGINT,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_cluster_name` (`cluster_name`)
+    UNIQUE KEY `uk_cluster_name` (`cluster_name`),
+    KEY `idx_cluster_stack_id` (`stack_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `component`
 (
-    `id`              BIGINT NOT NULL,
+    `id`              BIGINT NOT NULL AUTO_INCREMENT,
     `category`        VARCHAR(255),
     `command_script`  VARCHAR(255),
     `component_name`  VARCHAR(255),
@@ -109,6 +101,7 @@ CREATE TABLE `component`
     `custom_commands` LONGTEXT,
     `display_name`    VARCHAR(255),
     `quick_link`      VARCHAR(255),
+    `cardinality`     VARCHAR(255),
     `update_by`       BIGINT,
     `update_time`     DATETIME,
     `cluster_id`      BIGINT,
@@ -121,7 +114,7 @@ CREATE TABLE `component`
 
 CREATE TABLE `host_component`
 (
-    `id`           BIGINT NOT NULL,
+    `id`           BIGINT NOT NULL AUTO_INCREMENT,
     `create_by`    BIGINT,
     `create_time`  DATETIME,
     `state`        VARCHAR(255),
@@ -156,7 +149,8 @@ CREATE TABLE `host`
     `total_memory_size`    BIGINT,
     `update_by`            BIGINT,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_hostname` (`hostname`)
+    UNIQUE KEY `uk_hostname` (`hostname`, `cluster_id`),
+    KEY            `idx_host_cluster_id` (cluster_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `repo`
@@ -187,17 +181,13 @@ CREATE TABLE `stack`
     `update_time`    DATETIME DEFAULT NULL,
     `create_by`      BIGINT,
     `update_by`      BIGINT,
-    `component_name` VARCHAR(255),
-    `context`        LONGTEXT,
-    `order`          INTEGER,
-    `service_name`   VARCHAR(255),
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_stack` (`stack_name`, `stack_version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 CREATE TABLE `task`
 (
-    `id`              BIGINT NOT NULL,
+    `id`              BIGINT NOT NULL AUTO_INCREMENT,
     `command`         VARCHAR(255),
     `component_name`  VARCHAR(255),
     `content`         LONGTEXT,
@@ -240,7 +230,7 @@ CREATE TABLE `job`
 
 CREATE TABLE `type_config`
 (
-    `id`                BIGINT NOT NULL,
+    `id`                BIGINT NOT NULL AUTO_INCREMENT,
     `create_by`         BIGINT,
     `create_time`       DATETIME,
     `properties_json`   LONGTEXT,
@@ -253,7 +243,7 @@ CREATE TABLE `type_config`
 
 CREATE TABLE `service`
 (
-    `id`                BIGINT NOT NULL,
+    `id`                BIGINT NOT NULL AUTO_INCREMENT,
     `create_by`         BIGINT,
     `create_time`       DATETIME,
     `display_name`      VARCHAR(255),
@@ -273,7 +263,7 @@ CREATE TABLE `service`
 
 CREATE TABLE `service_config`
 (
-    `id`          BIGINT NOT NULL,
+    `id`          BIGINT NOT NULL AUTO_INCREMENT,
     `config_desc` VARCHAR(255),
     `create_by`   BIGINT,
     `create_time` DATETIME,
@@ -290,7 +280,7 @@ CREATE TABLE `service_config`
 
 CREATE TABLE `setting`
 (
-    `id`          BIGINT NOT NULL,
+    `id`          BIGINT NOT NULL AUTO_INCREMENT,
     `config_data` LONGTEXT,
     `create_by`   BIGINT,
     `create_time` DATETIME,
@@ -307,7 +297,6 @@ CREATE TABLE `stage`
     `cluster_id`     BIGINT(20) UNSIGNED DEFAULT NULL,
     `job_id`         BIGINT(20) UNSIGNED NOT NULL,
     `state`          VARCHAR(32) NOT NULL,
-    `stage_order`    INT UNSIGNED DEFAULT NULL,
     `create_time`    DATETIME DEFAULT NULL,
     `update_time`    DATETIME DEFAULT NULL,
     `component_name` VARCHAR(255),

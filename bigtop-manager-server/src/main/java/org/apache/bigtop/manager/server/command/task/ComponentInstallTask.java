@@ -41,10 +41,9 @@ public class ComponentInstallTask extends AbstractComponentTask {
         String componentName = taskContext.getComponentName();
         String hostname = taskContext.getHostname();
         HostComponentPO hostComponentPO =
-                hostComponentRepository.findByComponentPOClusterPOIdAndComponentPOComponentNameAndHostPOHostname(
-                        clusterId, componentName, hostname);
-        hostComponentPO.setState(MaintainState.INSTALLED);
-        hostComponentRepository.save(hostComponentPO);
+                hostComponentDao.findByClusterIdAndComponentNameAndHostname(clusterId, componentName, hostname);
+        hostComponentPO.setState(MaintainState.INSTALLED.getName());
+        hostComponentDao.updateById(hostComponentPO);
     }
 
     @Override

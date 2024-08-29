@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.dao.po.UserPO;
-import org.apache.bigtop.manager.dao.repository.UserRepository;
+import org.apache.bigtop.manager.dao.repository.UserDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.model.dto.LoginDTO;
@@ -35,11 +35,11 @@ import jakarta.annotation.Resource;
 public class LoginServiceImpl implements LoginService {
 
     @Resource
-    private UserRepository userRepository;
+    private UserDao userDao;
 
     @Override
     public LoginVO login(LoginDTO loginDTO) {
-        UserPO userPO = userRepository.findByUsername(loginDTO.getUsername());
+        UserPO userPO = userDao.findByUsername(loginDTO.getUsername());
         if (userPO == null || !loginDTO.getPassword().equalsIgnoreCase(userPO.getPassword())) {
             throw new ApiException(ApiExceptionEnum.INCORRECT_USERNAME_OR_PASSWORD);
         }

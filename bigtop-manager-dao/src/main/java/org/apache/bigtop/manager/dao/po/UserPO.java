@@ -22,29 +22,23 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.persistence.TableGenerator;
+import java.io.Serializable;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Entity
-@Table(name = "\"user\"")
-@TableGenerator(name = "user_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
-public class UserPO extends BasePO {
+@Table(name = "user")
+public class UserPO extends BasePO implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "user_generator")
     @Column(name = "id")
     private Long id;
 
     @Column(name = "username")
     private String username;
 
-    @Column(name = "\"password\"")
+    @Column(name = "password")
     private String password;
 
     @Column(name = "nickname")

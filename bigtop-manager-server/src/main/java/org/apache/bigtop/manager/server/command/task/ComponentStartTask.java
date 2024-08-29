@@ -41,10 +41,9 @@ public class ComponentStartTask extends AbstractComponentTask {
         String componentName = taskContext.getComponentName();
         String hostname = taskContext.getHostname();
         HostComponentPO hostComponentPO =
-                hostComponentRepository.findByComponentPOClusterPOIdAndComponentPOComponentNameAndHostPOHostname(
-                        clusterId, componentName, hostname);
-        hostComponentPO.setState(MaintainState.STARTED);
-        hostComponentRepository.save(hostComponentPO);
+                hostComponentDao.findByClusterIdAndComponentNameAndHostname(clusterId, componentName, hostname);
+        hostComponentPO.setState(MaintainState.STARTED.getName());
+        hostComponentDao.updateById(hostComponentPO);
     }
 
     @Override

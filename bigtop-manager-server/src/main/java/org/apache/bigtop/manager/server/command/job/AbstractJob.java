@@ -24,10 +24,11 @@ import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.JobPO;
 import org.apache.bigtop.manager.dao.po.StagePO;
 import org.apache.bigtop.manager.dao.po.TaskPO;
-import org.apache.bigtop.manager.dao.repository.ClusterRepository;
-import org.apache.bigtop.manager.dao.repository.JobRepository;
-import org.apache.bigtop.manager.dao.repository.StageRepository;
-import org.apache.bigtop.manager.dao.repository.TaskRepository;
+import org.apache.bigtop.manager.dao.repository.ClusterDao;
+import org.apache.bigtop.manager.dao.repository.JobDao;
+import org.apache.bigtop.manager.dao.repository.StackDao;
+import org.apache.bigtop.manager.dao.repository.StageDao;
+import org.apache.bigtop.manager.dao.repository.TaskDao;
 import org.apache.bigtop.manager.server.command.stage.Stage;
 import org.apache.bigtop.manager.server.command.task.Task;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
@@ -38,10 +39,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public abstract class AbstractJob implements Job {
 
-    protected ClusterRepository clusterRepository;
-    protected JobRepository jobRepository;
-    protected StageRepository stageRepository;
-    protected TaskRepository taskRepository;
+    protected StackDao stackDao;
+    protected ClusterDao clusterDao;
+    protected JobDao jobDao;
+    protected StageDao stageDao;
+    protected TaskDao taskDao;
 
     protected JobContext jobContext;
     protected List<Stage> stages;
@@ -65,24 +67,25 @@ public abstract class AbstractJob implements Job {
     }
 
     protected void injectBeans() {
-        this.clusterRepository = SpringContextHolder.getBean(ClusterRepository.class);
-        this.jobRepository = SpringContextHolder.getBean(JobRepository.class);
-        this.stageRepository = SpringContextHolder.getBean(StageRepository.class);
-        this.taskRepository = SpringContextHolder.getBean(TaskRepository.class);
+        this.stackDao = SpringContextHolder.getBean(StackDao.class);
+        this.clusterDao = SpringContextHolder.getBean(ClusterDao.class);
+
+        this.jobDao = SpringContextHolder.getBean(JobDao.class);
+        this.stageDao = SpringContextHolder.getBean(StageDao.class);
+        this.taskDao = SpringContextHolder.getBean(TaskDao.class);
     }
 
     protected void beforeCreateStages() {
         Long clusterId = jobContext.getCommandDTO().getClusterId();
-        this.clusterPO = clusterId == null ? new ClusterPO() : clusterRepository.getReferenceById(clusterId);
+        this.clusterPO = clusterId == null ? new ClusterPO() : clusterDao.findById(clusterId);
     }
 
     protected abstract void createStages();
 
     @Override
     public void beforeRun() {
-        JobPO jobPO = getJobPO();
-        jobPO.setState(JobState.PROCESSING);
-        jobRepository.save(jobPO);
+        jobPO.setState(JobState.PROCESSING.getName());
+        jobDao.updateById(jobPO);
     }
 
     @Override
@@ -116,8 +119,8 @@ public abstract class AbstractJob implements Job {
     @Override
     public void onSuccess() {
         JobPO jobPO = getJobPO();
-        jobPO.setState(JobState.SUCCESSFUL);
-        jobRepository.save(jobPO);
+        jobPO.setState(JobState.SUCCESSFUL.getName());
+        jobDao.updateById(jobPO);
     }
 
     @Override
@@ -126,25 +129,28 @@ public abstract class AbstractJob implements Job {
         List<StagePO> stagePOList = new ArrayList<>();
         List<TaskPO> taskPOList = new ArrayList<>();
 
-        jobPO.setState(JobState.FAILED);
+        jobPO.setState(JobState.FAILED.getName());
 
         for (Stage stage : getStages()) {
             StagePO stagePO = stage.getStagePO();
-            if (stagePO.getState() == JobState.PENDING) {
-                stagePO.setState(JobState.CANCELED);
+            if (JobState.fromString(stagePO.getState()) == JobState.PENDING) {
+                stagePO.setState(JobState.CANCELED.getName());
                 stagePOList.add(stagePO);
 
                 for (Task task : stage.getTasks()) {
                     TaskPO taskPO = task.getTaskPO();
-                    taskPO.setState(JobState.CANCELED);
+                    taskPO.setState(JobState.CANCELED.getName());
                     taskPOList.add(taskPO);
                 }
             }
         }
-
-        taskRepository.saveAll(taskPOList);
-        stageRepository.saveAll(stagePOList);
-        jobRepository.save(jobPO);
+        if (!taskPOList.isEmpty()) {
+            taskDao.updateStateByIds(taskPOList);
+        }
+        if (!stagePOList.isEmpty()) {
+            stageDao.updateStateByIds(stagePOList);
+        }
+        jobDao.updateById(jobPO);
     }
 
     @Override

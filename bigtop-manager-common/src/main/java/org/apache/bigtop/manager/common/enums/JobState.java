@@ -22,18 +22,26 @@ import org.apache.bigtop.manager.common.utils.CaseUtils;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
+@AllArgsConstructor
+@Getter
 public enum JobState {
-    PENDING,
+    PENDING("pending", "Pending"),
 
-    PROCESSING,
+    PROCESSING("processing", "Processing"),
 
-    SUCCESSFUL,
+    SUCCESSFUL("successful", "Successful"),
 
-    FAILED,
+    FAILED("failed", "Failed"),
 
-    CANCELED,
+    CANCELED("canceled", "Canceled"),
     ;
+
+    private final String code;
+
+    private final String name;
 
     @JsonCreator
     public static JobState fromString(String value) {

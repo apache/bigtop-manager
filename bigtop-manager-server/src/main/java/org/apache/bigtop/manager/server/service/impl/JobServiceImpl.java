@@ -23,9 +23,9 @@ import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.JobPO;
 import org.apache.bigtop.manager.dao.po.StagePO;
 import org.apache.bigtop.manager.dao.po.TaskPO;
-import org.apache.bigtop.manager.dao.repository.JobRepository;
-import org.apache.bigtop.manager.dao.repository.StageRepository;
-import org.apache.bigtop.manager.dao.repository.TaskRepository;
+import org.apache.bigtop.manager.dao.repository.JobDao;
+import org.apache.bigtop.manager.dao.repository.StageDao;
+import org.apache.bigtop.manager.dao.repository.TaskDao;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
 import org.apache.bigtop.manager.server.command.factory.JobFactories;
 import org.apache.bigtop.manager.server.command.factory.JobFactory;
@@ -44,10 +44,10 @@ import org.apache.bigtop.manager.server.service.JobService;
 import org.apache.bigtop.manager.server.utils.ClusterUtils;
 import org.apache.bigtop.manager.server.utils.PageUtils;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 
 import jakarta.annotation.Resource;
 import java.util.List;
@@ -56,13 +56,13 @@ import java.util.List;
 public class JobServiceImpl implements JobService {
 
     @Resource
-    private JobRepository jobRepository;
+    private JobDao jobDao;
 
     @Resource
-    private StageRepository stageRepository;
+    private StageDao stageDao;
 
     @Resource
-    private TaskRepository taskRepository;
+    private TaskDao taskDao;
 
     @Resource
     private JobScheduler jobScheduler;
@@ -70,27 +70,29 @@ public class JobServiceImpl implements JobService {
     @Override
     public PageVO<JobVO> list(Long clusterId) {
         PageQuery pageQuery = PageUtils.getPageQuery();
-        Pageable pageable = PageRequest.of(pageQuery.getPageNum(), pageQuery.getPageSize(), pageQuery.getSort());
-        Page<JobPO> page;
-        if (ClusterUtils.isNoneCluster(clusterId)) {
-            page = jobRepository.findAllByClusterPOIsNull(pageable);
-        } else {
-            page = jobRepository.findAllByClusterPOId(clusterId, pageable);
-        }
 
-        return PageVO.of(page);
+        PageHelper.startPage(pageQuery.getPageNum(), pageQuery.getPageSize(), pageQuery.getOrderBy());
+        List<JobPO> jobPOList;
+        if (ClusterUtils.isNoneCluster(clusterId)) {
+            jobPOList = jobDao.findAllByClusterIsNull();
+        } else {
+            jobPOList = jobDao.findAllByClusterId(clusterId);
+        }
+        PageInfo<JobPO> pageInfo = new PageInfo<>(jobPOList);
+
+        return PageVO.of(pageInfo);
     }
 
     @Override
     public JobVO get(Long id) {
-        JobPO jobPO = jobRepository.getReferenceById(id);
+        JobPO jobPO = jobDao.findByIdJoin(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.JOB_NOT_FOUND));
         return JobConverter.INSTANCE.fromPO2VO(jobPO);
     }
 
     @Override
     public JobVO retry(Long id) {
-        JobPO jobPO = jobRepository.getReferenceById(id);
-        if (jobPO.getState() != JobState.FAILED) {
+        JobPO jobPO = jobDao.findByIdJoin(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.JOB_NOT_FOUND));
+        if (JobState.fromString(jobPO.getState()) != JobState.FAILED) {
             throw new ApiException(ApiExceptionEnum.JOB_NOT_RETRYABLE);
         }
 
@@ -102,18 +104,18 @@ public class JobServiceImpl implements JobService {
     }
 
     private void resetJobStatusInDB(JobPO jobPO) {
-        for (StagePO stagePO : jobPO.getStagePOList()) {
-            for (TaskPO taskPO : stagePO.getTaskPOList()) {
-                taskPO.setState(JobState.PENDING);
-                taskRepository.save(taskPO);
+        for (StagePO stagePO : jobPO.getStages()) {
+            for (TaskPO taskPO : stagePO.getTasks()) {
+                taskPO.setState(JobState.PENDING.getName());
+                taskDao.updateById(taskPO);
             }
 
-            stagePO.setState(JobState.PENDING);
-            stageRepository.save(stagePO);
+            stagePO.setState(JobState.PENDING.getName());
+            stageDao.updateById(stagePO);
         }
 
-        jobPO.setState(JobState.PENDING);
-        jobRepository.save(jobPO);
+        jobPO.setState(JobState.PENDING.getName());
+        jobDao.updateById(jobPO);
     }
 
     private Job recreateJob(JobPO jobPO) {
@@ -127,7 +129,7 @@ public class JobServiceImpl implements JobService {
         job.loadJobPO(jobPO);
         for (int i = 0; i < job.getStages().size(); i++) {
             Stage stage = job.getStages().get(i);
-            StagePO stagePO = findCorrectStagePO(jobPO.getStagePOList(), i + 1);
+            StagePO stagePO = findCorrectStagePO(jobPO.getStages(), i + 1);
             if (stagePO == null) {
                 throw new ApiException(ApiExceptionEnum.JOB_NOT_RETRYABLE);
             }
@@ -137,7 +139,7 @@ public class JobServiceImpl implements JobService {
             for (int j = 0; j < stage.getTasks().size(); j++) {
                 Task task = stage.getTasks().get(j);
                 TaskPO taskPO = findCorrectTaskPO(
-                        stagePO.getTaskPOList(), task.getTaskContext().getHostname());
+                        stagePO.getTasks(), task.getTaskContext().getHostname());
                 if (taskPO == null) {
                     throw new ApiException(ApiExceptionEnum.JOB_NOT_RETRYABLE);
                 }

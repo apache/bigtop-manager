@@ -35,28 +35,19 @@ import jakarta.persistence.TableGenerator;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Entity
-@Table(name = "\"llm_chat_thread\"")
-@TableGenerator(
-        name = "llm_chat_thread_generator",
-        table = "sequence",
-        pkColumnName = "seq_name",
-        valueColumnName = "seq_count")
-public class ChatThreadPO extends BasePO {
 
+@Table(name = "llm_chat_thread")
+public class ChatThreadPO extends BasePO {
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "llm_chat_threads_generator")
     @Column(name = "id")
     private Long id;
 
     @Column(name = "model", nullable = false, length = 255)
     private String model;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private UserPO userPO;
+    @Column(name = "user_id")
+    private Long userPO;
 
-    @ManyToOne
-    @JoinColumn(name = "platform_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private PlatformAuthorizedPO platformAuthorizedPO;
+    @Column(name = "platform_id")
+    private Long platformAuthorizedId;
 }

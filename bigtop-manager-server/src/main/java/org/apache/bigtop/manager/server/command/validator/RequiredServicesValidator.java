@@ -21,8 +21,8 @@ package org.apache.bigtop.manager.server.command.validator;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.ServicePO;
-import org.apache.bigtop.manager.dao.repository.ClusterRepository;
-import org.apache.bigtop.manager.dao.repository.ServiceRepository;
+import org.apache.bigtop.manager.dao.repository.ClusterDao;
+import org.apache.bigtop.manager.dao.repository.ServiceDao;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.enums.CommandLevel;
@@ -43,10 +43,10 @@ import java.util.List;
 public class RequiredServicesValidator implements CommandValidator {
 
     @Resource
-    private ClusterRepository clusterRepository;
+    private ClusterDao clusterDao;
 
     @Resource
-    private ServiceRepository serviceRepository;
+    private ServiceDao serviceDao;
 
     @Override
     public List<CommandIdentifier> getCommandIdentifiers() {
@@ -59,9 +59,9 @@ public class RequiredServicesValidator implements CommandValidator {
         List<ServiceCommandDTO> serviceCommands = commandDTO.getServiceCommands();
 
         Long clusterId = commandDTO.getClusterId();
-        ClusterPO clusterPO = clusterRepository.getReferenceById(clusterId);
-        String stackName = clusterPO.getStackPO().getStackName();
-        String stackVersion = clusterPO.getStackPO().getStackVersion();
+        ClusterPO clusterPO = clusterDao.findByIdJoin(clusterId);
+        String stackName = clusterPO.getStackName();
+        String stackVersion = clusterPO.getStackVersion();
 
         List<String> serviceNames =
                 serviceCommands.stream().map(ServiceCommandDTO::getServiceName).toList();
@@ -73,8 +73,7 @@ public class RequiredServicesValidator implements CommandValidator {
                 return;
             }
 
-            List<ServicePO> servicePOList =
-                    serviceRepository.findByClusterPOIdAndServiceNameIn(clusterId, requiredServices);
+            List<ServicePO> servicePOList = serviceDao.findByClusterIdAndServiceNameIn(clusterId, requiredServices);
             List<String> list =
                     servicePOList.stream().map(ServicePO::getServiceName).toList();
 

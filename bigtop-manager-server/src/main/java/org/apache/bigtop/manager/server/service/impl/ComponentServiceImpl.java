@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.dao.po.ComponentPO;
-import org.apache.bigtop.manager.dao.repository.ComponentRepository;
+import org.apache.bigtop.manager.dao.repository.ComponentDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.model.converter.ComponentConverter;
@@ -39,12 +39,12 @@ import java.util.List;
 public class ComponentServiceImpl implements ComponentService {
 
     @Resource
-    private ComponentRepository componentRepository;
+    private ComponentDao componentDao;
 
     @Override
     public List<ComponentVO> list(Long clusterId) {
         List<ComponentVO> componentVOList = new ArrayList<>();
-        componentRepository.findAllByClusterPOId(clusterId).forEach(component -> {
+        componentDao.findAllByClusterId(clusterId).forEach(component -> {
             ComponentVO componentVO = ComponentConverter.INSTANCE.fromPO2VO(component);
             componentVOList.add(componentVO);
         });
@@ -54,8 +54,8 @@ public class ComponentServiceImpl implements ComponentService {
 
     @Override
     public ComponentVO get(Long id) {
-        ComponentPO componentPO = componentRepository
-                .findById(id)
+        ComponentPO componentPO = componentDao
+                .findOptionalById(id)
                 .orElseThrow(() -> new ApiException(ApiExceptionEnum.COMPONENT_NOT_FOUND));
         return ComponentConverter.INSTANCE.fromPO2VO(componentPO);
     }

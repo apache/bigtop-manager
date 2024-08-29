@@ -25,7 +25,6 @@ import org.apache.bigtop.manager.server.model.req.HostReq;
 import org.apache.bigtop.manager.server.model.vo.HostVO;
 
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -39,7 +38,6 @@ public interface HostConverter {
 
     HostPO fromDTO2PO(HostDTO hostDTO);
 
-    @Mapping(target = "clusterName", source = "clusterPO.clusterName")
     HostVO fromPO2VO(HostPO hostPO);
 
     List<HostVO> fromPO2VO(List<HostPO> hostPOList);

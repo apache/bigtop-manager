@@ -18,8 +18,6 @@
  */
 package org.apache.bigtop.manager.server.model.query;
 
-import org.springframework.data.domain.Sort;
-
 import lombok.Data;
 
 @Data
@@ -29,5 +27,5 @@ public class PageQuery {
 
     private Integer pageSize;
 
-    private Sort sort;
+    private String orderBy;
 }

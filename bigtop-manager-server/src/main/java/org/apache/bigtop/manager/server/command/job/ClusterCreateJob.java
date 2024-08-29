@@ -71,28 +71,28 @@ public class ClusterCreateJob extends AbstractJob {
         super.onSuccess();
 
         CommandDTO commandDTO = jobContext.getCommandDTO();
-        ClusterPO clusterPO = clusterRepository
+        ClusterPO clusterPO = clusterDao
                 .findByClusterName(commandDTO.getClusterCommand().getClusterName())
                 .orElse(new ClusterPO());
 
         // Update cluster state to installed
-        clusterPO.setState(MaintainState.INSTALLED);
-        clusterRepository.save(clusterPO);
+        clusterPO.setState(MaintainState.INSTALLED.getName());
+        clusterDao.updateById(clusterPO);
 
         // Link job to cluster after cluster successfully added
         JobPO jobPO = getJobPO();
-        jobPO.setClusterPO(clusterPO);
-        jobRepository.save(jobPO);
+        jobPO.setClusterId(clusterPO.getId());
+        jobDao.updateById(jobPO);
 
         for (Stage stage : getStages()) {
             StagePO stagePO = stage.getStagePO();
-            stagePO.setClusterPO(clusterPO);
-            stageRepository.save(stagePO);
+            stagePO.setClusterId(clusterPO.getId());
+            stageDao.updateById(stagePO);
 
             for (Task task : stage.getTasks()) {
                 TaskPO taskPO = task.getTaskPO();
-                taskPO.setClusterPO(clusterPO);
-                taskRepository.save(taskPO);
+                taskPO.setClusterId(clusterPO.getId());
+                taskDao.updateById(taskPO);
             }
         }
     }

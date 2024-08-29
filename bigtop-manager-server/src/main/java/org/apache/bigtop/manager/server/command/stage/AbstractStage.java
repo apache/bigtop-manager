@@ -21,7 +21,7 @@ package org.apache.bigtop.manager.server.command.stage;
 import org.apache.bigtop.manager.common.enums.JobState;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.StagePO;
-import org.apache.bigtop.manager.dao.repository.StageRepository;
+import org.apache.bigtop.manager.dao.repository.StageDao;
 import org.apache.bigtop.manager.server.command.task.Task;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 
@@ -31,7 +31,7 @@ import java.util.concurrent.CompletableFuture;
 
 public abstract class AbstractStage implements Stage {
 
-    protected StageRepository stageRepository;
+    protected StageDao stageDao;
 
     protected StageContext stageContext;
     protected List<Task> tasks;
@@ -55,7 +55,7 @@ public abstract class AbstractStage implements Stage {
     }
 
     protected void injectBeans() {
-        this.stageRepository = SpringContextHolder.getBean(StageRepository.class);
+        this.stageDao = SpringContextHolder.getBean(StageDao.class);
     }
 
     protected abstract void beforeCreateTasks();
@@ -72,9 +72,8 @@ public abstract class AbstractStage implements Stage {
 
     @Override
     public void beforeRun() {
-        StagePO stagePO = getStagePO();
-        stagePO.setState(JobState.PROCESSING);
-        stageRepository.save(stagePO);
+        stagePO.setState(JobState.PROCESSING.getName());
+        stageDao.updateById(stagePO);
     }
 
     @Override
@@ -116,15 +115,15 @@ public abstract class AbstractStage implements Stage {
     @Override
     public void onSuccess() {
         StagePO stagePO = getStagePO();
-        stagePO.setState(JobState.SUCCESSFUL);
-        stageRepository.save(stagePO);
+        stagePO.setState(JobState.SUCCESSFUL.getName());
+        stageDao.updateById(stagePO);
     }
 
     @Override
     public void onFailure() {
         StagePO stagePO = getStagePO();
-        stagePO.setState(JobState.FAILED);
-        stageRepository.save(stagePO);
+        stagePO.setState(JobState.FAILED.getName());
+        stageDao.updateById(stagePO);
     }
 
     @Override

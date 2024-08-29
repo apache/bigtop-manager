@@ -23,7 +23,7 @@ import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.enums.JobState;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.TaskPO;
-import org.apache.bigtop.manager.dao.repository.TaskRepository;
+import org.apache.bigtop.manager.dao.repository.TaskDao;
 import org.apache.bigtop.manager.grpc.generated.CommandReply;
 import org.apache.bigtop.manager.grpc.generated.CommandRequest;
 import org.apache.bigtop.manager.grpc.generated.CommandServiceGrpc;
@@ -33,7 +33,7 @@ import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 
 public abstract class AbstractTask implements Task {
 
-    protected TaskRepository taskRepository;
+    protected TaskDao taskDao;
 
     protected TaskContext taskContext;
 
@@ -51,7 +51,7 @@ public abstract class AbstractTask implements Task {
     }
 
     protected void injectBeans() {
-        this.taskRepository = SpringContextHolder.getBean(TaskRepository.class);
+        this.taskDao = SpringContextHolder.getBean(TaskDao.class);
     }
 
     protected abstract Command getCommand();
@@ -64,9 +64,8 @@ public abstract class AbstractTask implements Task {
 
     @Override
     public void beforeRun() {
-        TaskPO taskPO = getTaskPO();
-        taskPO.setState(JobState.PROCESSING);
-        taskRepository.save(taskPO);
+        taskPO.setState(JobState.PROCESSING.getName());
+        taskDao.updateById(taskPO);
     }
 
     @Override
@@ -102,16 +101,16 @@ public abstract class AbstractTask implements Task {
     public void onSuccess() {
         TaskPO taskPO = getTaskPO();
         taskPO.setContent(ProtobufUtil.toJson(commandRequest));
-        taskPO.setState(JobState.SUCCESSFUL);
-        taskRepository.save(taskPO);
+        taskPO.setState(JobState.SUCCESSFUL.getName());
+        taskDao.updateById(taskPO);
     }
 
     @Override
     public void onFailure() {
         TaskPO taskPO = getTaskPO();
         taskPO.setContent(ProtobufUtil.toJson(commandRequest));
-        taskPO.setState(JobState.FAILED);
-        taskRepository.save(taskPO);
+        taskPO.setState(JobState.FAILED.getName());
+        taskDao.updateById(taskPO);
     }
 
     @Override
@@ -136,7 +135,7 @@ public abstract class AbstractTask implements Task {
             taskPO.setServiceName(taskContext.getServiceName());
             taskPO.setServiceUser(taskContext.getServiceUser());
             taskPO.setComponentName(taskContext.getComponentName());
-            taskPO.setCommand(getCommand());
+            taskPO.setCommand(getCommand().getName());
             taskPO.setCustomCommand(getCustomCommand());
         }
 

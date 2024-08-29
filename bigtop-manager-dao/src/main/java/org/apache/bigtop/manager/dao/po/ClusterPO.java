@@ -18,45 +18,21 @@
  */
 package org.apache.bigtop.manager.dao.po;
 
-import org.apache.bigtop.manager.common.enums.MaintainState;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.ConstraintMode;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ForeignKey;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.TableGenerator;
-import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.Transient;
+import java.io.Serializable;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Entity
-@Table(
-        name = "\"cluster\"",
-        uniqueConstraints = {
-            @UniqueConstraint(
-                    name = "uk_cluster_name",
-                    columnNames = {"cluster_name"})
-        },
-        indexes = {@Index(name = "idx_cluster_stack_id", columnList = "stack_id")})
-@TableGenerator(
-        name = "cluster_generator",
-        table = "sequence",
-        pkColumnName = "seq_name",
-        valueColumnName = "seq_count")
-public class ClusterPO extends BasePO {
+@Table(name = "cluster")
+public class ClusterPO extends BasePO implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "cluster_generator")
     @Column(name = "id")
     private Long id;
 
@@ -66,7 +42,7 @@ public class ClusterPO extends BasePO {
     @Column(name = "cluster_type")
     private Integer clusterType;
 
-    @Column(name = "\"root\"")
+    @Column(name = "root")
     private String root;
 
     @Column(name = "user_group")
@@ -79,12 +55,19 @@ public class ClusterPO extends BasePO {
     private String repoTemplate;
 
     @Column(name = "state")
-    private MaintainState state;
+    private String state;
 
     @Column(name = "selected")
     private Boolean selected;
 
-    @ManyToOne
-    @JoinColumn(name = "stack_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private StackPO stackPO;
+    @Column(name = "stack_id")
+    private Long stackId;
+
+    @Transient
+    @Column(name = "stack_name")
+    private String stackName;
+
+    @Transient
+    @Column(name = "stack_version")
+    private String stackVersion;
 }

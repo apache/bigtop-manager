@@ -19,14 +19,12 @@
 package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.common.enums.JobState;
-import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.JobPO;
 import org.apache.bigtop.manager.dao.po.StagePO;
 import org.apache.bigtop.manager.dao.po.TaskPO;
-import org.apache.bigtop.manager.dao.repository.ClusterRepository;
-import org.apache.bigtop.manager.dao.repository.JobRepository;
-import org.apache.bigtop.manager.dao.repository.StageRepository;
-import org.apache.bigtop.manager.dao.repository.TaskRepository;
+import org.apache.bigtop.manager.dao.repository.JobDao;
+import org.apache.bigtop.manager.dao.repository.StageDao;
+import org.apache.bigtop.manager.dao.repository.TaskDao;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
 import org.apache.bigtop.manager.server.command.factory.JobFactories;
 import org.apache.bigtop.manager.server.command.factory.JobFactory;
@@ -56,16 +54,13 @@ public class CommandServiceImpl implements CommandService {
     private JobScheduler jobScheduler;
 
     @Resource
-    private ClusterRepository clusterRepository;
+    private JobDao jobDao;
 
     @Resource
-    private JobRepository jobRepository;
+    private StageDao stageDao;
 
     @Resource
-    private StageRepository stageRepository;
-
-    @Resource
-    private TaskRepository taskRepository;
+    private TaskDao taskDao;
 
     @Override
     public CommandVO command(CommandDTO commandDTO) {
@@ -94,30 +89,38 @@ public class CommandServiceImpl implements CommandService {
 
     protected JobPO saveJob(Job job) {
         Long clusterId = job.getJobContext().getCommandDTO().getClusterId();
-        ClusterPO clusterPO = clusterId == null ? null : clusterRepository.getReferenceById(clusterId);
 
         JobPO jobPO = job.getJobPO();
-        jobPO.setClusterPO(clusterPO);
-        jobPO.setState(JobState.PENDING);
-        jobRepository.save(jobPO);
+        if (clusterId != null) {
+            jobPO.setClusterId(clusterId);
+        }
+        jobPO.setState(JobState.PENDING.getName());
+        jobDao.save(jobPO);
+        job.loadJobPO(jobPO);
 
         for (int i = 0; i < job.getStages().size(); i++) {
             Stage stage = job.getStages().get(i);
             StagePO stagePO = stage.getStagePO();
-            stagePO.setClusterPO(clusterPO);
-            stagePO.setJobPO(jobPO);
+            if (clusterId != null) {
+                stagePO.setClusterId(clusterId);
+            }
+            stagePO.setJobId(jobPO.getId());
             stagePO.setOrder(i + 1);
-            stagePO.setState(JobState.PENDING);
-            stageRepository.save(stagePO);
+            stagePO.setState(JobState.PENDING.getName());
+            stageDao.save(stagePO);
+            stage.loadStagePO(stagePO);
 
             for (int j = 0; j < stage.getTasks().size(); j++) {
                 Task task = stage.getTasks().get(j);
                 TaskPO taskPO = task.getTaskPO();
-                taskPO.setClusterPO(clusterPO);
-                taskPO.setJobPO(jobPO);
-                taskPO.setStagePO(stagePO);
-                taskPO.setState(JobState.PENDING);
-                taskRepository.save(taskPO);
+                if (clusterId != null) {
+                    taskPO.setClusterId(clusterId);
+                }
+                taskPO.setJobId(jobPO.getId());
+                taskPO.setStageId(stagePO.getId());
+                taskPO.setState(JobState.PENDING.getName());
+                taskDao.save(taskPO);
+                task.loadTaskPO(taskPO);
             }
         }
 
