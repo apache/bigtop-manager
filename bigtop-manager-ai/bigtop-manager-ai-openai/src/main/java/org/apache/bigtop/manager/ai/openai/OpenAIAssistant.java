@@ -87,6 +87,9 @@ public class OpenAIAssistant extends AbstractAIAssistant {
         public AIAssistant build() {
             ValidationUtils.ensureNotNull(id, "id");
             String baseUrl = configs.get("baseUrl");
+            if (baseUrl == null) {
+                baseUrl = BASE_URL;
+            }
             String modelName = configs.get("modelName");
             String apiKey = ValidationUtils.ensureNotNull(configs.get("apiKey"), "apiKey");
             Integer memoryLen = ValidationUtils.ensureNotNull(

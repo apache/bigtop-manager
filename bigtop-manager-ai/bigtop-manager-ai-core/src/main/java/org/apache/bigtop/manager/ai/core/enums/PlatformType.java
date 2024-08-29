@@ -25,7 +25,8 @@ import java.util.stream.Collectors;
 
 public enum PlatformType {
     OPENAI("openai"),
-    BIGMODEL("bigmodel");
+    BIGMODEL("bigmodel"),
+    QIANFAN("qianfan");
 
     private final String value;
 

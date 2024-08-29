@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.ai.bigmodel;
+package org.apache.bigtop.manager.ai.qianfan;
 
 import org.apache.bigtop.manager.ai.core.AbstractAIAssistant;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
@@ -29,20 +29,19 @@ import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.chat.StreamingChatLanguageModel;
-import dev.langchain4j.model.openai.OpenAiChatModel;
-import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
+import dev.langchain4j.model.qianfan.QianfanChatModel;
+import dev.langchain4j.model.qianfan.QianfanStreamingChatModel;
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class BigModelAssistant extends AbstractAIAssistant {
+public class QianFanAssistant extends AbstractAIAssistant {
 
-    private static final String PLATFORM_NAME = "bigmodel";
-    private static final String BASE_URL = "https://open.bigmodel.cn/api/paas/v4/";
+    private static final String PLATFORM_NAME = "qianfan";
     private static final String MODEL_NAME = "glm-4-0520";
 
-    private BigModelAssistant(
+    private QianFanAssistant(
             ChatLanguageModel chatLanguageModel,
             StreamingChatLanguageModel streamingChatLanguageModel,
             ChatMemory chatMemory) {
@@ -65,7 +64,6 @@ public class BigModelAssistant extends AbstractAIAssistant {
         private ChatMemoryStore chatMemoryStore;
 
         public Builder() {
-            configs.put("baseUrl", BASE_URL);
             configs.put("modelName", MODEL_NAME);
         }
 
@@ -86,22 +84,19 @@ public class BigModelAssistant extends AbstractAIAssistant {
 
         public AIAssistant build() {
             ValidationUtils.ensureNotNull(id, "id");
-            String baseUrl = configs.get("baseUrl");
-            if (baseUrl == null) {
-                baseUrl = BASE_URL;
-            }
             String modelName = configs.get("modelName");
             String apiKey = ValidationUtils.ensureNotNull(configs.get("apiKey"), "apiKey");
+            String secretKey = ValidationUtils.ensureNotNull(configs.get("secretKey"), "secretKey");
             Integer memoryLen = ValidationUtils.ensureNotNull(
                     NumberUtils.parseNumber(configs.get("memoryLen"), Integer.class), "memoryLen not a number.");
-            ChatLanguageModel bigModelChatModel = OpenAiChatModel.builder()
+            ChatLanguageModel qianFanChatModel = QianfanChatModel.builder()
                     .apiKey(apiKey)
-                    .baseUrl(baseUrl)
+                    .secretKey(secretKey)
                     .modelName(modelName)
                     .build();
-            StreamingChatLanguageModel bigModelStreamChatModel = OpenAiStreamingChatModel.builder()
+            StreamingChatLanguageModel qianFanStreamChatModel = QianfanStreamingChatModel.builder()
                     .apiKey(apiKey)
-                    .baseUrl(baseUrl)
+                    .secretKey(secretKey)
                     .modelName(modelName)
                     .build();
             MessageWindowChatMemory chatMemory = MessageWindowChatMemory.builder()
@@ -109,7 +104,7 @@ public class BigModelAssistant extends AbstractAIAssistant {
                     .chatMemoryStore(chatMemoryStore)
                     .maxMessages(memoryLen)
                     .build();
-            return new BigModelAssistant(bigModelChatModel, bigModelStreamChatModel, chatMemory);
+            return new QianFanAssistant(qianFanChatModel, qianFanStreamChatModel, chatMemory);
         }
     }
 }
