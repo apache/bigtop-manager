@@ -32,7 +32,7 @@ import org.mapstruct.factory.Mappers;
 public interface PlatformAuthorizedConverter {
     PlatformAuthorizedConverter INSTANCE = Mappers.getMapper(PlatformAuthorizedConverter.class);
 
-    @Mapping(target = "platformId", expression = "java(platformPO.getId())")
+    @Mapping(target = "platformId", source = "id")
     @Mapping(target = "supportModels", expression = "java(platformPO.getSupportModels())")
     @Mapping(target = "platformName", expression = "java(platformPO.getName())")
     PlatformAuthorizedVO fromPO2VO(PlatformAuthorizedPO platformAuthorizedPO, @Context PlatformPO platformPO);

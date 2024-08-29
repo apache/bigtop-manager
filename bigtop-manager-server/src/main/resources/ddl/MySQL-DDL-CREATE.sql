@@ -333,7 +333,7 @@ CREATE TABLE `llm_platform_authorized`
     `create_by`   BIGINT              DEFAULT NULL,
     `update_by`   BIGINT              DEFAULT NULL,
     PRIMARY KEY (`id`),
-    KEY `idx_platform_id` (`platform_id`),
+    KEY `idx_platform_id` (`platform_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `llm_chat_thread`
@@ -346,7 +346,9 @@ CREATE TABLE `llm_chat_thread`
     `update_time` DATETIME            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `create_by`   BIGINT              DEFAULT NULL,
     `update_by`   BIGINT              DEFAULT NULL,
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    KEY             `idx_platform_id` (`platform_id`),
+    KEY             `idx_user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `llm_chat_message`
@@ -358,30 +360,10 @@ CREATE TABLE `llm_chat_message`
     `sender`      VARCHAR(50)         NOT NULL,
     `create_time` DATETIME            DEFAULT CURRENT_TIMESTAMP,
     `update_time` DATETIME            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    KEY              `idx_thread_id` (`thread_id`),
+    KEY              `idx_user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- Initialize sequence table.
-INSERT INTO sequence(seq_name, seq_count)
-VALUES ('audit_log_generator', 0),
-       ('cluster_generator', 0),
-       ('stack_generator', 0),
-       ('service_generator', 0),
-       ('task_generator', 0),
-       ('host_generator', 0),
-       ('user_generator', 0),
-       ('repo_generator', 0),
-       ('host_component_generator', 0),
-       ('service_config_generator', 0),
-       ('job_generator', 0),
-       ('type_config_generator', 0),
-       ('component_generator', 0),
-       ('stage_generator', 0),
-       ('settings_generator', 0),
-       ('llm_platform_generator', 0),
-       ('llm_platform_authorized_generator', 0),
-       ('llm_chat_thread_generator', 0),
-       ('llm_chat_message_generator', 0);
 
 -- Adding default admin user
 INSERT INTO bigtop_manager.user (id, create_time, update_time, nickname, password, status, username)

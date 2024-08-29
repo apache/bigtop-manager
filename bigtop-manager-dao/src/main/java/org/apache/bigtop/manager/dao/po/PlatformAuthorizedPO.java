@@ -18,23 +18,21 @@
  */
 package org.apache.bigtop.manager.dao.po;
 
-import org.apache.bigtop.manager.dao.converter.JsonToMapConverter;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.io.Serializable;
 import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "llm_platform_authorized")
-public class PlatformAuthorizedPO extends BasePO {
+public class PlatformAuthorizedPO extends BasePO implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "llm_platform_authorized_generator")
@@ -42,12 +40,8 @@ public class PlatformAuthorizedPO extends BasePO {
     private Long id;
 
     @Column(name = "credentials", columnDefinition = "json", nullable = false)
-    @Convert(converter = JsonToMapConverter.class)
     private Map<String, String> credentials;
 
     @Column(name = "platform_id")
     private Long platformId;
-
-    @Column(name = "support_models")
-    private String supportModels;
 }

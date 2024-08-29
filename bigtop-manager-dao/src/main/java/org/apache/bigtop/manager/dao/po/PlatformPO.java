@@ -18,31 +18,28 @@
  */
 package org.apache.bigtop.manager.dao.po;
 
-import org.apache.bigtop.manager.dao.converter.JsonToMapConverter;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.io.Serializable;
 import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "llm_platform")
-public class PlatformPO extends BasePO {
+public class PlatformPO extends BasePO implements Serializable {
 
     @Id
     @Column(name = "id")
     private Long id;
 
-    @Column(nullable = false, length = 255)
+    @Column(name = "name", nullable = false, length = 255)
     private String name;
 
     @Column(name = "credential", columnDefinition = "json", nullable = false)
-    @Convert(converter = JsonToMapConverter.class)
     private Map<String, String> credential;
 
     @Column(name = "support_models", length = 255)

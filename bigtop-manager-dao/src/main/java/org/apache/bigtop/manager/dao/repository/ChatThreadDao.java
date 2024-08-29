@@ -27,6 +27,8 @@ import java.util.List;
 public interface ChatThreadDao extends BaseDao<ChatThreadPO> {
     List<ChatThreadPO> findAllByUserId(@Param("user_id") Long userId);
 
+    ChatThreadPO findById(Long id);
+
     List<ChatThreadPO> findAllByPlatformAuthorizedIdAndUserId(
             @Param("platform_id") Long platformAuthorizedId, @Param("user_id") Long userId);
 }

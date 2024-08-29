@@ -24,11 +24,12 @@ import lombok.EqualsAndHashCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.io.Serializable;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "llm_chat_message")
-public class ChatMessagePO extends BasePO {
+public class ChatMessagePO extends BasePO implements Serializable {
     @Id
     @Column(name = "id")
     private Long id;
