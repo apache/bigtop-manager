@@ -19,8 +19,8 @@
 package org.apache.bigtop.manager.server.aop;
 
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.mapper.AuditLogMapper;
 import org.apache.bigtop.manager.dao.po.AuditLogPO;
+import org.apache.bigtop.manager.dao.repository.AuditLogDao;
 import org.apache.bigtop.manager.server.holder.SessionUserHolder;
 
 import org.aspectj.lang.JoinPoint;
@@ -44,7 +44,7 @@ import jakarta.servlet.http.HttpServletRequest;
 public class AuditAspect {
 
     @Resource
-    private AuditLogMapper auditLogMapper;
+    private AuditLogDao auditLogDao;
 
     @Before(value = "@annotation(org.apache.bigtop.manager.server.annotations.Audit)")
     public void before(JoinPoint joinPoint) {
@@ -87,7 +87,7 @@ public class AuditAspect {
             log.debug("auditLog: {}", auditLogPO);
             log.debug("request method：{}.{}", joinPoint.getSignature().getDeclaringTypeName(), methodName);
 
-            auditLogMapper.save(auditLogPO);
+            auditLogDao.save(auditLogPO);
         }
     }
 }

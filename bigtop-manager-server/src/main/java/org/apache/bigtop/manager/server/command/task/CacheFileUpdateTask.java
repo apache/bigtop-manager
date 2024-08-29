@@ -25,14 +25,6 @@ import org.apache.bigtop.manager.common.message.entity.pojo.ClusterInfo;
 import org.apache.bigtop.manager.common.message.entity.pojo.ComponentInfo;
 import org.apache.bigtop.manager.common.message.entity.pojo.RepoInfo;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.mapper.ClusterMapper;
-import org.apache.bigtop.manager.dao.mapper.ComponentMapper;
-import org.apache.bigtop.manager.dao.mapper.HostComponentMapper;
-import org.apache.bigtop.manager.dao.mapper.HostMapper;
-import org.apache.bigtop.manager.dao.mapper.RepoMapper;
-import org.apache.bigtop.manager.dao.mapper.ServiceConfigMapper;
-import org.apache.bigtop.manager.dao.mapper.ServiceMapper;
-import org.apache.bigtop.manager.dao.mapper.SettingMapper;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.po.HostComponentPO;
@@ -42,6 +34,14 @@ import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
 import org.apache.bigtop.manager.dao.po.ServicePO;
 import org.apache.bigtop.manager.dao.po.SettingPO;
 import org.apache.bigtop.manager.dao.po.TypeConfigPO;
+import org.apache.bigtop.manager.dao.repository.ClusterDao;
+import org.apache.bigtop.manager.dao.repository.ComponentDao;
+import org.apache.bigtop.manager.dao.repository.HostComponentDao;
+import org.apache.bigtop.manager.dao.repository.HostDao;
+import org.apache.bigtop.manager.dao.repository.RepoDao;
+import org.apache.bigtop.manager.dao.repository.ServiceConfigDao;
+import org.apache.bigtop.manager.dao.repository.ServiceDao;
+import org.apache.bigtop.manager.dao.repository.SettingDao;
 import org.apache.bigtop.manager.grpc.generated.CommandRequest;
 import org.apache.bigtop.manager.grpc.generated.CommandType;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
@@ -69,14 +69,14 @@ import static org.apache.bigtop.manager.common.constants.Constants.ALL_HOST_KEY;
 
 public class CacheFileUpdateTask extends AbstractTask {
 
-    private ClusterMapper clusterMapper;
-    private HostComponentMapper hostComponentMapper;
-    private ServiceMapper serviceMapper;
-    private ServiceConfigMapper serviceConfigMapper;
-    private RepoMapper repoMapper;
-    private SettingMapper settingMapper;
-    private HostMapper hostMapper;
-    private ComponentMapper componentMapper;
+    private ClusterDao clusterDao;
+    private HostComponentDao hostComponentDao;
+    private ServiceDao serviceDao;
+    private ServiceConfigDao serviceConfigDao;
+    private RepoDao repoDao;
+    private SettingDao settingDao;
+    private HostDao hostDao;
+    private ComponentDao componentDao;
 
     private ClusterInfo clusterInfo;
     private Map<String, ComponentInfo> componentInfoMap;
@@ -94,14 +94,14 @@ public class CacheFileUpdateTask extends AbstractTask {
     protected void injectBeans() {
         super.injectBeans();
 
-        this.clusterMapper = SpringContextHolder.getBean(ClusterMapper.class);
-        this.hostComponentMapper = SpringContextHolder.getBean(HostComponentMapper.class);
-        this.serviceMapper = SpringContextHolder.getBean(ServiceMapper.class);
-        this.serviceConfigMapper = SpringContextHolder.getBean(ServiceConfigMapper.class);
-        this.repoMapper = SpringContextHolder.getBean(RepoMapper.class);
-        this.settingMapper = SpringContextHolder.getBean(SettingMapper.class);
-        this.hostMapper = SpringContextHolder.getBean(HostMapper.class);
-        this.componentMapper = SpringContextHolder.getBean(ComponentMapper.class);
+        this.clusterDao = SpringContextHolder.getBean(ClusterDao.class);
+        this.hostComponentDao = SpringContextHolder.getBean(HostComponentDao.class);
+        this.serviceDao = SpringContextHolder.getBean(ServiceDao.class);
+        this.serviceConfigDao = SpringContextHolder.getBean(ServiceConfigDao.class);
+        this.repoDao = SpringContextHolder.getBean(RepoDao.class);
+        this.settingDao = SpringContextHolder.getBean(SettingDao.class);
+        this.hostDao = SpringContextHolder.getBean(HostDao.class);
+        this.componentDao = SpringContextHolder.getBean(ComponentDao.class);
     }
 
     @Override
@@ -120,7 +120,7 @@ public class CacheFileUpdateTask extends AbstractTask {
     }
 
     private void genFullCaches() {
-        ClusterPO clusterPO = clusterMapper.findByIdJoin(taskContext.getClusterId());
+        ClusterPO clusterPO = clusterDao.findByIdJoin(taskContext.getClusterId());
 
         Long clusterId = clusterPO.getId();
         String clusterName = clusterPO.getClusterName();
@@ -128,13 +128,13 @@ public class CacheFileUpdateTask extends AbstractTask {
         String stackName = clusterPO.getStackName();
         String stackVersion = clusterPO.getStackVersion();
 
-        List<ServicePO> servicePOList = serviceMapper.findAllByClusterId(clusterId);
+        List<ServicePO> servicePOList = serviceDao.findAllByClusterId(clusterId);
         List<ServiceConfigPO> serviceConfigPOList =
-                serviceConfigMapper.findAllByClusterIdAndSelectedIsTrue(clusterPO.getId());
-        List<HostComponentPO> hostComponentPOList = hostComponentMapper.findAllByClusterId(clusterId);
-        List<RepoPO> repoPOList = repoMapper.findAllByClusterId(clusterPO.getId());
-        Iterable<SettingPO> settings = settingMapper.findAll();
-        List<HostPO> hostPOList = hostMapper.findAllByClusterId(clusterId);
+                serviceConfigDao.findAllByClusterIdAndSelectedIsTrue(clusterPO.getId());
+        List<HostComponentPO> hostComponentPOList = hostComponentDao.findAllByClusterId(clusterId);
+        List<RepoPO> repoPOList = repoDao.findAllByClusterId(clusterPO.getId());
+        Iterable<SettingPO> settings = settingDao.findAll();
+        List<HostPO> hostPOList = hostDao.findAllByClusterId(clusterId);
 
         clusterInfo = new ClusterInfo();
         clusterInfo.setClusterName(clusterName);
@@ -192,7 +192,7 @@ public class CacheFileUpdateTask extends AbstractTask {
         settings.forEach(x -> settingsMap.put(x.getTypeName(), x.getConfigData()));
 
         componentInfoMap = new HashMap<>();
-        List<ComponentPO> componentPOList = componentMapper.findAllJoinService();
+        List<ComponentPO> componentPOList = componentDao.findAllJoinService();
         componentPOList.forEach(c -> {
             ComponentInfo componentInfo = new ComponentInfo();
             componentInfo.setComponentName(c.getComponentName());

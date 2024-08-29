@@ -17,25 +17,24 @@
  * under the License.
  */
 
-package org.apache.bigtop.manager.dao.mapper;
+package org.apache.bigtop.manager.dao.repository;
 
-import org.apache.bigtop.manager.dao.po.ComponentPO;
+import org.apache.bigtop.manager.dao.po.HostPO;
 
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Collection;
 import java.util.List;
 
-public interface ComponentMapper extends BaseMapper<ComponentPO> {
+public interface HostDao extends BaseDao<HostPO> {
 
-    ComponentPO findByClusterIdAndComponentName(
-            @Param("clusterId") Long clusterId, @Param("componentName") String componentName);
+    int saveAll(@Param("hosts") List<HostPO> hosts);
 
-    ComponentPO findByIdJoin(@Param("id") Long id);
+    HostPO findByHostname(@Param("hostname") String hostname);
 
-    List<ComponentPO> findAllByClusterId(@Param("clusterId") Long clusterId);
+    List<HostPO> findAllByHostnameIn(@Param("hostnames") Collection<String> hostnames);
 
-    List<ComponentPO> findAllJoinService();
+    List<HostPO> findAllByClusterId(@Param("clusterId") Long clusterId);
 
-    List<ComponentPO> findAllByClusterIdAndServiceServiceNameIn(
-            @Param("clusterId") Long clusterId, @Param("serviceNames") List<String> serviceNames);
+    HostPO findByIdJoin(@Param("id") Long id);
 }

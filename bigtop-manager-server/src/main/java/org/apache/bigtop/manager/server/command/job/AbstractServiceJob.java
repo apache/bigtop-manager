@@ -21,13 +21,13 @@ package org.apache.bigtop.manager.server.command.job;
 import org.apache.bigtop.manager.common.constants.ComponentCategories;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.mapper.ComponentMapper;
-import org.apache.bigtop.manager.dao.mapper.HostComponentMapper;
-import org.apache.bigtop.manager.dao.mapper.HostMapper;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.po.HostComponentPO;
 import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.po.StackPO;
+import org.apache.bigtop.manager.dao.repository.ComponentDao;
+import org.apache.bigtop.manager.dao.repository.HostComponentDao;
+import org.apache.bigtop.manager.dao.repository.HostDao;
 import org.apache.bigtop.manager.server.command.stage.CacheFileUpdateStage;
 import org.apache.bigtop.manager.server.command.stage.ComponentCheckStage;
 import org.apache.bigtop.manager.server.command.stage.ComponentConfigureStage;
@@ -53,9 +53,9 @@ import java.util.List;
 
 public abstract class AbstractServiceJob extends AbstractJob {
 
-    protected ComponentMapper componentMapper;
-    protected HostComponentMapper hostComponentMapper;
-    protected HostMapper hostMapper;
+    protected ComponentDao componentDao;
+    protected HostComponentDao hostComponentDao;
+    protected HostDao hostDao;
 
     protected String stackName;
     protected String stackVersion;
@@ -69,15 +69,15 @@ public abstract class AbstractServiceJob extends AbstractJob {
     protected void injectBeans() {
         super.injectBeans();
 
-        this.componentMapper = SpringContextHolder.getBean(ComponentMapper.class);
-        this.hostComponentMapper = SpringContextHolder.getBean(HostComponentMapper.class);
-        this.hostMapper = SpringContextHolder.getBean(HostMapper.class);
+        this.componentDao = SpringContextHolder.getBean(ComponentDao.class);
+        this.hostComponentDao = SpringContextHolder.getBean(HostComponentDao.class);
+        this.hostDao = SpringContextHolder.getBean(HostDao.class);
     }
 
     @Override
     protected void beforeCreateStages() {
         super.beforeCreateStages();
-        StackPO stackPO = stackMapper.findById(clusterPO.getStackId());
+        StackPO stackPO = stackDao.findById(clusterPO.getStackId());
 
         stackName = stackPO.getStackName();
         stackVersion = stackPO.getStackVersion();
@@ -120,7 +120,7 @@ public abstract class AbstractServiceJob extends AbstractJob {
     protected List<String> getComponentNames() {
         List<String> serviceNames = getServiceNames();
         List<ComponentPO> componentPOList =
-                componentMapper.findAllByClusterIdAndServiceServiceNameIn(clusterPO.getId(), serviceNames);
+                componentDao.findAllByClusterIdAndServiceServiceNameIn(clusterPO.getId(), serviceNames);
 
         return componentPOList.stream().map(ComponentPO::getComponentName).toList();
     }
@@ -154,12 +154,12 @@ public abstract class AbstractServiceJob extends AbstractJob {
 
     protected List<String> findHostnamesByComponentName(String componentName) {
         List<HostComponentPO> hostComponentPOList =
-                hostComponentMapper.findAllByClusterIdAndComponentName(clusterPO.getId(), componentName);
+                hostComponentDao.findAllByClusterIdAndComponentName(clusterPO.getId(), componentName);
         if (hostComponentPOList == null) {
             return new ArrayList<>();
         } else {
 
-            List<HostPO> hostPOList = hostMapper.findByIds(
+            List<HostPO> hostPOList = hostDao.findByIds(
                     hostComponentPOList.stream().map(HostComponentPO::getHostId).toList());
 
             return hostPOList.stream().map(HostPO::getHostname).toList();

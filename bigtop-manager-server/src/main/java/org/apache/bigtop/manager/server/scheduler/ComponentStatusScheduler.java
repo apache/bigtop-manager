@@ -19,8 +19,8 @@
 package org.apache.bigtop.manager.server.scheduler;
 
 import org.apache.bigtop.manager.common.enums.MaintainState;
-import org.apache.bigtop.manager.dao.mapper.HostComponentMapper;
 import org.apache.bigtop.manager.dao.po.HostComponentPO;
+import org.apache.bigtop.manager.dao.repository.HostComponentDao;
 import org.apache.bigtop.manager.grpc.generated.ComponentStatusReply;
 import org.apache.bigtop.manager.grpc.generated.ComponentStatusRequest;
 import org.apache.bigtop.manager.grpc.generated.ComponentStatusServiceGrpc;
@@ -41,12 +41,12 @@ import java.util.concurrent.TimeUnit;
 public class ComponentStatusScheduler {
 
     @Resource
-    private HostComponentMapper hostComponentMapper;
+    private HostComponentDao hostComponentDao;
 
     @Async
     @Scheduled(fixedDelay = 30, timeUnit = TimeUnit.SECONDS)
     public void execute() {
-        List<HostComponentPO> hostComponentPOList = hostComponentMapper.findAllJoin();
+        List<HostComponentPO> hostComponentPOList = hostComponentDao.findAllJoin();
         for (HostComponentPO hostComponentPO : hostComponentPOList) {
             // Only check services which should be in running
             if (!List.of(MaintainState.STARTED, MaintainState.STOPPED)
@@ -71,13 +71,13 @@ public class ComponentStatusScheduler {
             if (reply.getStatus() == 0
                     && MaintainState.fromString(hostComponentPO.getState()) == MaintainState.STOPPED) {
                 hostComponentPO.setState(MaintainState.STARTED.getName());
-                hostComponentMapper.updateById(hostComponentPO);
+                hostComponentDao.updateById(hostComponentPO);
             }
 
             if (reply.getStatus() != 0
                     && MaintainState.fromString(hostComponentPO.getState()) == MaintainState.STARTED) {
                 hostComponentPO.setState(MaintainState.STOPPED.getName());
-                hostComponentMapper.updateById(hostComponentPO);
+                hostComponentDao.updateById(hostComponentPO);
             }
         }
     }

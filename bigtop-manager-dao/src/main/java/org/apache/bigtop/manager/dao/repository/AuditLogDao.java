@@ -17,17 +17,8 @@
  * under the License.
  */
 
-package org.apache.bigtop.manager.dao.mapper;
+package org.apache.bigtop.manager.dao.repository;
 
-import org.apache.bigtop.manager.dao.po.StagePO;
+import org.apache.bigtop.manager.dao.po.AuditLogPO;
 
-import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
-
-public interface StageMapper extends BaseMapper<StagePO> {
-
-    List<StagePO> findByJobId(@Param("jobId") Long jobId);
-
-    void updateStateByIds(@Param("stages") List<StagePO> stages);
-}
+public interface AuditLogDao extends BaseDao<AuditLogPO> {}

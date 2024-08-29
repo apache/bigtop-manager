@@ -17,8 +17,20 @@
  * under the License.
  */
 
-package org.apache.bigtop.manager.dao.mapper;
+package org.apache.bigtop.manager.dao.repository;
 
-import org.apache.bigtop.manager.dao.po.TypeConfigPO;
+import org.apache.bigtop.manager.dao.po.RepoPO;
 
-public interface TypeConfigMapper extends BaseMapper<TypeConfigPO> {}
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface RepoDao extends BaseDao<RepoPO> {
+
+    Optional<RepoPO> findByRepoName(@Param("repoName") String clusterName);
+
+    int saveAll(@Param("clusters") List<RepoPO> repos);
+
+    List<RepoPO> findAllByClusterId(@Param("clusterId") Long clusterId);
+}

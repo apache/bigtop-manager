@@ -19,8 +19,8 @@
 package org.apache.bigtop.manager.server.scheduler;
 
 import org.apache.bigtop.manager.common.enums.MaintainState;
-import org.apache.bigtop.manager.dao.mapper.HostMapper;
 import org.apache.bigtop.manager.dao.po.HostPO;
+import org.apache.bigtop.manager.dao.repository.HostDao;
 import org.apache.bigtop.manager.grpc.generated.HostInfoReply;
 import org.apache.bigtop.manager.grpc.generated.HostInfoRequest;
 import org.apache.bigtop.manager.grpc.generated.HostInfoServiceGrpc;
@@ -41,12 +41,12 @@ import java.util.concurrent.TimeUnit;
 public class HostInfoScheduler {
 
     @Resource
-    private HostMapper hostMapper;
+    private HostDao hostDao;
 
     @Async
     @Scheduled(fixedDelay = 30, timeUnit = TimeUnit.SECONDS)
     public void execute() {
-        List<HostPO> hostPOList = hostMapper.findAll();
+        List<HostPO> hostPOList = hostDao.findAll();
         for (HostPO hostPO : hostPOList) {
             getHostInfo(hostPO);
         }
@@ -75,6 +75,6 @@ public class HostInfoScheduler {
             hostPO.setState(MaintainState.STOPPED.getName());
         }
 
-        hostMapper.updateById(hostPO);
+        hostDao.updateById(hostPO);
     }
 }

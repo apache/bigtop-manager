@@ -17,13 +17,15 @@
  * under the License.
  */
 
-package org.apache.bigtop.manager.dao.mapper;
+package org.apache.bigtop.manager.dao.repository;
 
-import org.apache.bigtop.manager.dao.po.UserPO;
+import org.apache.bigtop.manager.dao.po.TaskPO;
 
 import org.apache.ibatis.annotations.Param;
 
-public interface UserMapper extends BaseMapper<UserPO> {
+import java.util.List;
 
-    UserPO findByUsername(@Param("username") String username);
+public interface TaskDao extends BaseDao<TaskPO> {
+
+    void updateStateByIds(@Param("tasks") List<TaskPO> tasks);
 }

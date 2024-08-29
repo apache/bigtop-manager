@@ -19,8 +19,8 @@
 package org.apache.bigtop.manager.server.command.validator;
 
 import org.apache.bigtop.manager.common.enums.Command;
-import org.apache.bigtop.manager.dao.mapper.StackMapper;
 import org.apache.bigtop.manager.dao.po.StackPO;
+import org.apache.bigtop.manager.dao.repository.StackDao;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.enums.CommandLevel;
@@ -36,7 +36,7 @@ import java.util.List;
 public class StackValidator implements CommandValidator {
 
     @Resource
-    private StackMapper stackMapper;
+    private StackDao stackDao;
 
     @Override
     public List<CommandIdentifier> getCommandIdentifiers() {
@@ -49,7 +49,7 @@ public class StackValidator implements CommandValidator {
         String stackName = clusterCommand.getStackName();
         String stackVersion = clusterCommand.getStackVersion();
 
-        StackPO stackPO = stackMapper.findByStackNameAndStackVersion(stackName, stackVersion);
+        StackPO stackPO = stackDao.findByStackNameAndStackVersion(stackName, stackVersion);
         if (stackPO == null) {
             throw new ApiException(ApiExceptionEnum.STACK_NOT_FOUND);
         }

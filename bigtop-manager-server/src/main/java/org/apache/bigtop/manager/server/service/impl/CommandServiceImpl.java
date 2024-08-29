@@ -19,12 +19,12 @@
 package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.common.enums.JobState;
-import org.apache.bigtop.manager.dao.mapper.JobMapper;
-import org.apache.bigtop.manager.dao.mapper.StageMapper;
-import org.apache.bigtop.manager.dao.mapper.TaskMapper;
 import org.apache.bigtop.manager.dao.po.JobPO;
 import org.apache.bigtop.manager.dao.po.StagePO;
 import org.apache.bigtop.manager.dao.po.TaskPO;
+import org.apache.bigtop.manager.dao.repository.JobDao;
+import org.apache.bigtop.manager.dao.repository.StageDao;
+import org.apache.bigtop.manager.dao.repository.TaskDao;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
 import org.apache.bigtop.manager.server.command.factory.JobFactories;
 import org.apache.bigtop.manager.server.command.factory.JobFactory;
@@ -54,13 +54,13 @@ public class CommandServiceImpl implements CommandService {
     private JobScheduler jobScheduler;
 
     @Resource
-    private JobMapper jobMapper;
+    private JobDao jobDao;
 
     @Resource
-    private StageMapper stageMapper;
+    private StageDao stageDao;
 
     @Resource
-    private TaskMapper taskMapper;
+    private TaskDao taskDao;
 
     @Override
     public CommandVO command(CommandDTO commandDTO) {
@@ -95,7 +95,7 @@ public class CommandServiceImpl implements CommandService {
             jobPO.setClusterId(clusterId);
         }
         jobPO.setState(JobState.PENDING.getName());
-        jobMapper.save(jobPO);
+        jobDao.save(jobPO);
         job.loadJobPO(jobPO);
 
         for (int i = 0; i < job.getStages().size(); i++) {
@@ -107,7 +107,7 @@ public class CommandServiceImpl implements CommandService {
             stagePO.setJobId(jobPO.getId());
             stagePO.setOrder(i + 1);
             stagePO.setState(JobState.PENDING.getName());
-            stageMapper.save(stagePO);
+            stageDao.save(stagePO);
             stage.loadStagePO(stagePO);
 
             for (int j = 0; j < stage.getTasks().size(); j++) {
@@ -119,7 +119,7 @@ public class CommandServiceImpl implements CommandService {
                 taskPO.setJobId(jobPO.getId());
                 taskPO.setStageId(stagePO.getId());
                 taskPO.setState(JobState.PENDING.getName());
-                taskMapper.save(taskPO);
+                taskDao.save(taskPO);
                 task.loadTaskPO(taskPO);
             }
         }

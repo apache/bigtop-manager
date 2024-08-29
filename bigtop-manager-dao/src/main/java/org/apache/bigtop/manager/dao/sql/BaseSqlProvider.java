@@ -19,7 +19,7 @@
 
 package org.apache.bigtop.manager.dao.sql;
 
-import org.apache.bigtop.manager.dao.mapper.BaseMapper;
+import org.apache.bigtop.manager.dao.repository.BaseDao;
 
 import org.apache.ibatis.builder.annotation.ProviderContext;
 
@@ -106,7 +106,7 @@ public class BaseSqlProvider {
         Class<?> mapperType = context.getMapperType();
         for (Type parent : mapperType.getGenericInterfaces()) {
             ResolvableType parentType = ResolvableType.forType(parent);
-            if (parentType.getRawClass() == BaseMapper.class) {
+            if (parentType.getRawClass() == BaseDao.class) {
                 return parentType.getGeneric(0).getRawClass();
             }
         }

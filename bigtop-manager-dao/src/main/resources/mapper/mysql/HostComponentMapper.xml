@@ -21,7 +21,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="org.apache.bigtop.manager.dao.mapper.HostComponentMapper">
+<mapper namespace="org.apache.bigtop.manager.dao.repository.HostComponentDao">
 
     <sql id="baseColumns">
         id, state, host_id, component_id

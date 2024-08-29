@@ -17,14 +17,13 @@
  * under the License.
  */
 
-package org.apache.bigtop.manager.dao.mapper;
+package org.apache.bigtop.manager.dao.repository;
 
-import org.apache.bigtop.manager.dao.po.StackPO;
+import org.apache.bigtop.manager.dao.po.UserPO;
 
 import org.apache.ibatis.annotations.Param;
 
-public interface StackMapper extends BaseMapper<StackPO> {
+public interface UserDao extends BaseDao<UserPO> {
 
-    StackPO findByStackNameAndStackVersion(
-            @Param("stackName") String stackName, @Param("stackVersion") String stackVersion);
+    UserPO findByUsername(@Param("username") String username);
 }

@@ -21,7 +21,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="org.apache.bigtop.manager.dao.mapper.ServiceConfigMapper">
+<mapper namespace="org.apache.bigtop.manager.dao.repository.ServiceConfigDao">
 
     <sql id="baseColumns">
         id, config_desc, version, selected, service_id, cluster_id, create_time, update_time

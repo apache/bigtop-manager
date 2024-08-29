@@ -21,7 +21,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="org.apache.bigtop.manager.dao.mapper.ClusterMapper">
+<mapper namespace="org.apache.bigtop.manager.dao.repository.ClusterDao">
 
     <sql id="baseColumns">
         id, cluster_name, cluster_type, root, user_group, packages, repo_template, state, selected, stack_id

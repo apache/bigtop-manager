@@ -19,8 +19,8 @@
 package org.apache.bigtop.manager.server.command.validator;
 
 import org.apache.bigtop.manager.common.enums.Command;
-import org.apache.bigtop.manager.dao.mapper.ClusterMapper;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
+import org.apache.bigtop.manager.dao.repository.ClusterDao;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.enums.CommandLevel;
@@ -37,7 +37,7 @@ import java.util.Optional;
 public class ClusterCreateValidator implements CommandValidator {
 
     @Resource
-    private ClusterMapper clusterMapper;
+    private ClusterDao clusterDao;
 
     @Override
     public List<CommandIdentifier> getCommandIdentifiers() {
@@ -49,7 +49,7 @@ public class ClusterCreateValidator implements CommandValidator {
         ClusterCommandDTO clusterCommand = context.getCommandDTO().getClusterCommand();
         String clusterName = clusterCommand.getClusterName();
 
-        Optional<ClusterPO> clusterOptional = clusterMapper.findByClusterName(clusterName);
+        Optional<ClusterPO> clusterOptional = clusterDao.findByClusterName(clusterName);
 
         if (clusterOptional.isPresent()) {
             throw new ApiException(ApiExceptionEnum.CLUSTER_IS_INSTALLED, clusterName);

@@ -21,7 +21,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="org.apache.bigtop.manager.dao.mapper.JobMapper">
+<mapper namespace="org.apache.bigtop.manager.dao.repository.JobDao">
 
     <sql id="baseColumns">
         id, state, name, context, cluster_id, create_time, update_time

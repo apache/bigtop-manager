@@ -19,8 +19,8 @@
 package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.common.enums.MaintainState;
-import org.apache.bigtop.manager.dao.mapper.HostMapper;
 import org.apache.bigtop.manager.dao.po.HostPO;
+import org.apache.bigtop.manager.dao.repository.HostDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.grpc.GrpcClient;
@@ -46,11 +46,11 @@ import java.util.stream.Collectors;
 public class HostServiceImpl implements HostService {
 
     @Resource
-    private HostMapper hostMapper;
+    private HostDao hostDao;
 
     @Override
     public List<HostVO> list(Long clusterId) {
-        List<HostPO> hostPOList = hostMapper.findAllByClusterId(clusterId);
+        List<HostPO> hostPOList = hostDao.findAllByClusterId(clusterId);
         if (CollectionUtils.isEmpty(hostPOList)) {
             throw new ApiException(ApiExceptionEnum.HOST_NOT_FOUND);
         }
@@ -61,7 +61,7 @@ public class HostServiceImpl implements HostService {
     @Override
     public List<HostVO> batchSave(Long clusterId, List<String> hostnames) {
 
-        List<HostPO> hostnameIn = hostMapper.findAllByHostnameIn(hostnames);
+        List<HostPO> hostnameIn = hostDao.findAllByHostnameIn(hostnames);
         List<HostPO> hostPOList = new ArrayList<>();
 
         Map<String, HostPO> hostInMap =
@@ -80,14 +80,14 @@ public class HostServiceImpl implements HostService {
             hostPOList.add(hostPO);
         }
 
-        hostMapper.saveAll(hostPOList);
+        hostDao.saveAll(hostPOList);
 
         return HostConverter.INSTANCE.fromPO2VO(hostPOList);
     }
 
     @Override
     public HostVO get(Long id) {
-        HostPO hostPO = hostMapper.findByIdJoin(id);
+        HostPO hostPO = hostDao.findByIdJoin(id);
         if (hostPO == null) {
             throw new ApiException(ApiExceptionEnum.HOST_NOT_FOUND);
         }
@@ -99,14 +99,14 @@ public class HostServiceImpl implements HostService {
     public HostVO update(Long id, HostDTO hostDTO) {
         HostPO hostPO = HostConverter.INSTANCE.fromDTO2PO(hostDTO);
         hostPO.setId(id);
-        hostMapper.updateById(hostPO);
+        hostDao.updateById(hostPO);
 
         return HostConverter.INSTANCE.fromPO2VO(hostPO);
     }
 
     @Override
     public Boolean delete(Long id) {
-        hostMapper.deleteById(id);
+        hostDao.deleteById(id);
         return true;
     }
 

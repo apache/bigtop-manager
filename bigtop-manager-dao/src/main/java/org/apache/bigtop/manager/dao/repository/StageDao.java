@@ -17,22 +17,17 @@
  * under the License.
  */
 
-package org.apache.bigtop.manager.dao.mapper;
+package org.apache.bigtop.manager.dao.repository;
 
-import org.apache.bigtop.manager.dao.po.ClusterPO;
+import org.apache.bigtop.manager.dao.po.StagePO;
 
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
-import java.util.Optional;
 
-public interface ClusterMapper extends BaseMapper<ClusterPO> {
+public interface StageDao extends BaseDao<StagePO> {
 
-    Optional<ClusterPO> findByClusterName(@Param("clusterName") String clusterName);
+    List<StagePO> findByJobId(@Param("jobId") Long jobId);
 
-    Integer count();
-
-    ClusterPO findByIdJoin(@Param("clusterId") Long clusterId);
-
-    List<ClusterPO> findAllByJoin();
+    void updateStateByIds(@Param("stages") List<StagePO> stages);
 }

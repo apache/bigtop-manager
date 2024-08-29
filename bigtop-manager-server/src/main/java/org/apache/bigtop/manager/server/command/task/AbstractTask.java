@@ -22,8 +22,8 @@ import org.apache.bigtop.manager.common.constants.MessageConstants;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.enums.JobState;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.mapper.TaskMapper;
 import org.apache.bigtop.manager.dao.po.TaskPO;
+import org.apache.bigtop.manager.dao.repository.TaskDao;
 import org.apache.bigtop.manager.grpc.generated.CommandReply;
 import org.apache.bigtop.manager.grpc.generated.CommandRequest;
 import org.apache.bigtop.manager.grpc.generated.CommandServiceGrpc;
@@ -33,7 +33,7 @@ import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 
 public abstract class AbstractTask implements Task {
 
-    protected TaskMapper taskMapper;
+    protected TaskDao taskDao;
 
     protected TaskContext taskContext;
 
@@ -51,7 +51,7 @@ public abstract class AbstractTask implements Task {
     }
 
     protected void injectBeans() {
-        this.taskMapper = SpringContextHolder.getBean(TaskMapper.class);
+        this.taskDao = SpringContextHolder.getBean(TaskDao.class);
     }
 
     protected abstract Command getCommand();
@@ -65,7 +65,7 @@ public abstract class AbstractTask implements Task {
     @Override
     public void beforeRun() {
         taskPO.setState(JobState.PROCESSING.getName());
-        taskMapper.updateById(taskPO);
+        taskDao.updateById(taskPO);
     }
 
     @Override
@@ -102,7 +102,7 @@ public abstract class AbstractTask implements Task {
         TaskPO taskPO = getTaskPO();
         taskPO.setContent(ProtobufUtil.toJson(commandRequest));
         taskPO.setState(JobState.SUCCESSFUL.getName());
-        taskMapper.updateById(taskPO);
+        taskDao.updateById(taskPO);
     }
 
     @Override
@@ -110,7 +110,7 @@ public abstract class AbstractTask implements Task {
         TaskPO taskPO = getTaskPO();
         taskPO.setContent(ProtobufUtil.toJson(commandRequest));
         taskPO.setState(JobState.FAILED.getName());
-        taskMapper.updateById(taskPO);
+        taskDao.updateById(taskPO);
     }
 
     @Override

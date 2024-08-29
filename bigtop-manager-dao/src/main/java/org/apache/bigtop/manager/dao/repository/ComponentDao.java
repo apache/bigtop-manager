@@ -17,15 +17,25 @@
  * under the License.
  */
 
-package org.apache.bigtop.manager.dao.mapper;
+package org.apache.bigtop.manager.dao.repository;
 
-import org.apache.bigtop.manager.dao.po.TaskPO;
+import org.apache.bigtop.manager.dao.po.ComponentPO;
 
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-public interface TaskMapper extends BaseMapper<TaskPO> {
+public interface ComponentDao extends BaseDao<ComponentPO> {
 
-    void updateStateByIds(@Param("tasks") List<TaskPO> tasks);
+    ComponentPO findByClusterIdAndComponentName(
+            @Param("clusterId") Long clusterId, @Param("componentName") String componentName);
+
+    ComponentPO findByIdJoin(@Param("id") Long id);
+
+    List<ComponentPO> findAllByClusterId(@Param("clusterId") Long clusterId);
+
+    List<ComponentPO> findAllJoinService();
+
+    List<ComponentPO> findAllByClusterIdAndServiceServiceNameIn(
+            @Param("clusterId") Long clusterId, @Param("serviceNames") List<String> serviceNames);
 }

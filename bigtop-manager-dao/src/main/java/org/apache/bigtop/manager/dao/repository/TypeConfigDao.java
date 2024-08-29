@@ -17,20 +17,8 @@
  * under the License.
  */
 
-package org.apache.bigtop.manager.dao.mapper;
+package org.apache.bigtop.manager.dao.repository;
 
-import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
+import org.apache.bigtop.manager.dao.po.TypeConfigPO;
 
-import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
-
-public interface ServiceConfigMapper extends BaseMapper<ServiceConfigPO> {
-
-    List<ServiceConfigPO> findAllByClusterId(@Param("clusterId") Long clusterId);
-
-    ServiceConfigPO findByClusterIdAndServiceIdAndSelectedIsTrue(
-            @Param("clusterId") Long clusterId, @Param("serviceId") Long serviceId);
-
-    List<ServiceConfigPO> findAllByClusterIdAndSelectedIsTrue(@Param("clusterId") Long clusterId);
-}
+public interface TypeConfigDao extends BaseDao<TypeConfigPO> {}

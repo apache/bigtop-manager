@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.bigtop.manager.dao.mapper;
+package org.apache.bigtop.manager.dao.repository;
 
 import org.apache.bigtop.manager.dao.sql.BaseSqlProvider;
 
@@ -32,7 +32,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-public interface BaseMapper<Entity> {
+public interface BaseDao<Entity> {
 
     /**
      * Insert the entity.

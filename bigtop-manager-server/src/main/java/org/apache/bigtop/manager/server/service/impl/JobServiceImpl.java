@@ -20,12 +20,12 @@ package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.common.enums.JobState;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.mapper.JobMapper;
-import org.apache.bigtop.manager.dao.mapper.StageMapper;
-import org.apache.bigtop.manager.dao.mapper.TaskMapper;
 import org.apache.bigtop.manager.dao.po.JobPO;
 import org.apache.bigtop.manager.dao.po.StagePO;
 import org.apache.bigtop.manager.dao.po.TaskPO;
+import org.apache.bigtop.manager.dao.repository.JobDao;
+import org.apache.bigtop.manager.dao.repository.StageDao;
+import org.apache.bigtop.manager.dao.repository.TaskDao;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
 import org.apache.bigtop.manager.server.command.factory.JobFactories;
 import org.apache.bigtop.manager.server.command.factory.JobFactory;
@@ -56,13 +56,13 @@ import java.util.List;
 public class JobServiceImpl implements JobService {
 
     @Resource
-    private JobMapper jobMapper;
+    private JobDao jobDao;
 
     @Resource
-    private StageMapper stageMapper;
+    private StageDao stageDao;
 
     @Resource
-    private TaskMapper taskMapper;
+    private TaskDao taskDao;
 
     @Resource
     private JobScheduler jobScheduler;
@@ -74,9 +74,9 @@ public class JobServiceImpl implements JobService {
         PageHelper.startPage(pageQuery.getPageNum(), pageQuery.getPageSize(), pageQuery.getOrderBy());
         List<JobPO> jobPOList;
         if (ClusterUtils.isNoneCluster(clusterId)) {
-            jobPOList = jobMapper.findAllByClusterIsNull();
+            jobPOList = jobDao.findAllByClusterIsNull();
         } else {
-            jobPOList = jobMapper.findAllByClusterId(clusterId);
+            jobPOList = jobDao.findAllByClusterId(clusterId);
         }
         PageInfo<JobPO> pageInfo = new PageInfo<>(jobPOList);
 
@@ -85,13 +85,13 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public JobVO get(Long id) {
-        JobPO jobPO = jobMapper.findByIdJoin(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.JOB_NOT_FOUND));
+        JobPO jobPO = jobDao.findByIdJoin(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.JOB_NOT_FOUND));
         return JobConverter.INSTANCE.fromPO2VO(jobPO);
     }
 
     @Override
     public JobVO retry(Long id) {
-        JobPO jobPO = jobMapper.findByIdJoin(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.JOB_NOT_FOUND));
+        JobPO jobPO = jobDao.findByIdJoin(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.JOB_NOT_FOUND));
         if (JobState.fromString(jobPO.getState()) != JobState.FAILED) {
             throw new ApiException(ApiExceptionEnum.JOB_NOT_RETRYABLE);
         }
@@ -107,15 +107,15 @@ public class JobServiceImpl implements JobService {
         for (StagePO stagePO : jobPO.getStages()) {
             for (TaskPO taskPO : stagePO.getTasks()) {
                 taskPO.setState(JobState.PENDING.getName());
-                taskMapper.updateById(taskPO);
+                taskDao.updateById(taskPO);
             }
 
             stagePO.setState(JobState.PENDING.getName());
-            stageMapper.updateById(stagePO);
+            stageDao.updateById(stagePO);
         }
 
         jobPO.setState(JobState.PENDING.getName());
-        jobMapper.updateById(jobPO);
+        jobDao.updateById(jobPO);
     }
 
     private Job recreateJob(JobPO jobPO) {

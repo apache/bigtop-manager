@@ -17,20 +17,20 @@
  * under the License.
  */
 
-package org.apache.bigtop.manager.dao.mapper;
+package org.apache.bigtop.manager.dao.repository;
 
-import org.apache.bigtop.manager.dao.po.JobPO;
+import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
 
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
-import java.util.Optional;
 
-public interface JobMapper extends BaseMapper<JobPO> {
+public interface ServiceConfigDao extends BaseDao<ServiceConfigPO> {
 
-    List<JobPO> findAllByClusterId(@Param("clusterId") Long clusterId);
+    List<ServiceConfigPO> findAllByClusterId(@Param("clusterId") Long clusterId);
 
-    Optional<JobPO> findByIdJoin(@Param("id") Long id);
+    ServiceConfigPO findByClusterIdAndServiceIdAndSelectedIsTrue(
+            @Param("clusterId") Long clusterId, @Param("serviceId") Long serviceId);
 
-    List<JobPO> findAllByClusterIsNull();
+    List<ServiceConfigPO> findAllByClusterIdAndSelectedIsTrue(@Param("clusterId") Long clusterId);
 }

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.bigtop.manager.dao.mapper;
+package org.apache.bigtop.manager.dao.repository;
 
 import org.apache.bigtop.manager.dao.po.HostComponentPO;
 
@@ -25,7 +25,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-public interface HostComponentMapper extends BaseMapper<HostComponentPO> {
+public interface HostComponentDao extends BaseDao<HostComponentPO> {
 
     List<HostComponentPO> findAllJoin();
 

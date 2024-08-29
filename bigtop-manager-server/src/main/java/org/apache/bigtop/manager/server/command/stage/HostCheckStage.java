@@ -19,8 +19,8 @@
 package org.apache.bigtop.manager.server.command.stage;
 
 import org.apache.bigtop.manager.common.enums.Command;
-import org.apache.bigtop.manager.dao.mapper.ClusterMapper;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
+import org.apache.bigtop.manager.dao.repository.ClusterDao;
 import org.apache.bigtop.manager.server.command.task.HostCheckTask;
 import org.apache.bigtop.manager.server.command.task.Task;
 import org.apache.bigtop.manager.server.command.task.TaskContext;
@@ -28,7 +28,7 @@ import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 
 public class HostCheckStage extends AbstractStage {
 
-    private ClusterMapper clusterMapper;
+    private ClusterDao clusterDao;
 
     public HostCheckStage(StageContext stageContext) {
         super(stageContext);
@@ -38,13 +38,13 @@ public class HostCheckStage extends AbstractStage {
     protected void injectBeans() {
         super.injectBeans();
 
-        this.clusterMapper = SpringContextHolder.getBean(ClusterMapper.class);
+        this.clusterDao = SpringContextHolder.getBean(ClusterDao.class);
     }
 
     @Override
     protected void beforeCreateTasks() {
         if (stageContext.getClusterId() != null) {
-            ClusterPO clusterPO = clusterMapper.findByIdJoin(stageContext.getClusterId());
+            ClusterPO clusterPO = clusterDao.findByIdJoin(stageContext.getClusterId());
 
             stageContext.setStackName(clusterPO.getStackName());
             stageContext.setStackVersion(clusterPO.getStackVersion());

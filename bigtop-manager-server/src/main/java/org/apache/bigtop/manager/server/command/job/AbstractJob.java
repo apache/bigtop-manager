@@ -20,15 +20,15 @@ package org.apache.bigtop.manager.server.command.job;
 
 import org.apache.bigtop.manager.common.enums.JobState;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.mapper.ClusterMapper;
-import org.apache.bigtop.manager.dao.mapper.JobMapper;
-import org.apache.bigtop.manager.dao.mapper.StackMapper;
-import org.apache.bigtop.manager.dao.mapper.StageMapper;
-import org.apache.bigtop.manager.dao.mapper.TaskMapper;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.JobPO;
 import org.apache.bigtop.manager.dao.po.StagePO;
 import org.apache.bigtop.manager.dao.po.TaskPO;
+import org.apache.bigtop.manager.dao.repository.ClusterDao;
+import org.apache.bigtop.manager.dao.repository.JobDao;
+import org.apache.bigtop.manager.dao.repository.StackDao;
+import org.apache.bigtop.manager.dao.repository.StageDao;
+import org.apache.bigtop.manager.dao.repository.TaskDao;
 import org.apache.bigtop.manager.server.command.stage.Stage;
 import org.apache.bigtop.manager.server.command.task.Task;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
@@ -39,11 +39,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public abstract class AbstractJob implements Job {
 
-    protected StackMapper stackMapper;
-    protected ClusterMapper clusterMapper;
-    protected JobMapper jobMapper;
-    protected StageMapper stageMapper;
-    protected TaskMapper taskMapper;
+    protected StackDao stackDao;
+    protected ClusterDao clusterDao;
+    protected JobDao jobDao;
+    protected StageDao stageDao;
+    protected TaskDao taskDao;
 
     protected JobContext jobContext;
     protected List<Stage> stages;
@@ -67,17 +67,17 @@ public abstract class AbstractJob implements Job {
     }
 
     protected void injectBeans() {
-        this.stackMapper = SpringContextHolder.getBean(StackMapper.class);
-        this.clusterMapper = SpringContextHolder.getBean(ClusterMapper.class);
+        this.stackDao = SpringContextHolder.getBean(StackDao.class);
+        this.clusterDao = SpringContextHolder.getBean(ClusterDao.class);
 
-        this.jobMapper = SpringContextHolder.getBean(JobMapper.class);
-        this.stageMapper = SpringContextHolder.getBean(StageMapper.class);
-        this.taskMapper = SpringContextHolder.getBean(TaskMapper.class);
+        this.jobDao = SpringContextHolder.getBean(JobDao.class);
+        this.stageDao = SpringContextHolder.getBean(StageDao.class);
+        this.taskDao = SpringContextHolder.getBean(TaskDao.class);
     }
 
     protected void beforeCreateStages() {
         Long clusterId = jobContext.getCommandDTO().getClusterId();
-        this.clusterPO = clusterId == null ? new ClusterPO() : clusterMapper.findById(clusterId);
+        this.clusterPO = clusterId == null ? new ClusterPO() : clusterDao.findById(clusterId);
     }
 
     protected abstract void createStages();
@@ -85,7 +85,7 @@ public abstract class AbstractJob implements Job {
     @Override
     public void beforeRun() {
         jobPO.setState(JobState.PROCESSING.getName());
-        jobMapper.updateById(jobPO);
+        jobDao.updateById(jobPO);
     }
 
     @Override
@@ -120,7 +120,7 @@ public abstract class AbstractJob implements Job {
     public void onSuccess() {
         JobPO jobPO = getJobPO();
         jobPO.setState(JobState.SUCCESSFUL.getName());
-        jobMapper.updateById(jobPO);
+        jobDao.updateById(jobPO);
     }
 
     @Override
@@ -145,12 +145,12 @@ public abstract class AbstractJob implements Job {
             }
         }
         if (!taskPOList.isEmpty()) {
-            taskMapper.updateStateByIds(taskPOList);
+            taskDao.updateStateByIds(taskPOList);
         }
         if (!stagePOList.isEmpty()) {
-            stageMapper.updateStateByIds(stagePOList);
+            stageDao.updateStateByIds(stagePOList);
         }
-        jobMapper.updateById(jobPO);
+        jobDao.updateById(jobPO);
     }
 
     @Override

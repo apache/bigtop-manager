@@ -19,8 +19,8 @@
 package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.common.enums.JobState;
-import org.apache.bigtop.manager.dao.mapper.TaskMapper;
 import org.apache.bigtop.manager.dao.po.TaskPO;
+import org.apache.bigtop.manager.dao.repository.TaskDao;
 import org.apache.bigtop.manager.grpc.generated.TaskLogReply;
 import org.apache.bigtop.manager.grpc.generated.TaskLogRequest;
 import org.apache.bigtop.manager.grpc.generated.TaskLogServiceGrpc;
@@ -38,10 +38,10 @@ import jakarta.annotation.Resource;
 public class TaskLogServiceImpl implements TaskLogService {
 
     @Resource
-    private TaskMapper taskMapper;
+    private TaskDao taskDao;
 
     public void registerSink(Long taskId, FluxSink<String> sink) {
-        TaskPO taskPO = taskMapper.findById(taskId);
+        TaskPO taskPO = taskDao.findById(taskId);
         String hostname = taskPO.getHostname();
 
         if (JobState.fromString(taskPO.getState()) == JobState.PENDING

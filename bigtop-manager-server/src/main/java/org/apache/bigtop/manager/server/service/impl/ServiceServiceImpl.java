@@ -21,14 +21,14 @@ package org.apache.bigtop.manager.server.service.impl;
 import org.apache.bigtop.manager.common.constants.ComponentCategories;
 import org.apache.bigtop.manager.common.enums.MaintainState;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.mapper.HostComponentMapper;
-import org.apache.bigtop.manager.dao.mapper.ServiceConfigMapper;
-import org.apache.bigtop.manager.dao.mapper.ServiceMapper;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.po.HostComponentPO;
 import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
 import org.apache.bigtop.manager.dao.po.ServicePO;
 import org.apache.bigtop.manager.dao.po.TypeConfigPO;
+import org.apache.bigtop.manager.dao.repository.HostComponentDao;
+import org.apache.bigtop.manager.dao.repository.ServiceConfigDao;
+import org.apache.bigtop.manager.dao.repository.ServiceDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.model.converter.ServiceConverter;
@@ -57,20 +57,20 @@ import java.util.stream.Collectors;
 public class ServiceServiceImpl implements ServiceService {
 
     @Resource
-    private ServiceMapper serviceMapper;
+    private ServiceDao serviceDao;
 
     @Resource
-    private HostComponentMapper hostComponentMapper;
+    private HostComponentDao hostComponentDao;
 
     @Resource
-    private ServiceConfigMapper serviceConfigMapper;
+    private ServiceConfigDao serviceConfigDao;
 
     @Override
     public List<ServiceVO> list(Long clusterId) {
         List<ServiceVO> res = new ArrayList<>();
 
-        List<ServicePO> servicePOList = serviceMapper.findAllByClusterId(clusterId);
-        List<HostComponentPO> allByClusterId = hostComponentMapper.findAllByClusterId(clusterId);
+        List<ServicePO> servicePOList = serviceDao.findAllByClusterId(clusterId);
+        List<HostComponentPO> allByClusterId = hostComponentDao.findAllByClusterId(clusterId);
         Map<Long, List<HostComponentPO>> serviceIdToHostComponent =
                 allByClusterId.stream().collect(Collectors.groupingBy(HostComponentPO::getServiceId));
         Map<Long, List<HostComponentPO>> componentIdToHostComponent =
@@ -113,7 +113,7 @@ public class ServiceServiceImpl implements ServiceService {
     @Override
     public ServiceVO get(Long id) {
         ServicePO servicePO =
-                serviceMapper.findByIdJoin(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.SERVICE_NOT_FOUND));
+                serviceDao.findByIdJoin(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.SERVICE_NOT_FOUND));
         return ServiceConverter.INSTANCE.fromPO2VO(servicePO);
     }
 
@@ -124,7 +124,7 @@ public class ServiceServiceImpl implements ServiceService {
         QuickLinkDTO quickLinkDTO = JsonUtils.readFromString(quickLinkJson, QuickLinkDTO.class);
 
         ServiceConfigPO serviceConfigPO =
-                serviceConfigMapper.findByClusterIdAndServiceIdAndSelectedIsTrue(clusterId, serviceId);
+                serviceConfigDao.findByClusterIdAndServiceIdAndSelectedIsTrue(clusterId, serviceId);
         List<TypeConfigPO> typeConfigPOList = serviceConfigPO.getConfigs();
 
         String httpPort = quickLinkDTO.getHttpPortDefault();

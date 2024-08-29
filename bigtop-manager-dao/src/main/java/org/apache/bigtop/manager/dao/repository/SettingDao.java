@@ -17,8 +17,8 @@
  * under the License.
  */
 
-package org.apache.bigtop.manager.dao.mapper;
+package org.apache.bigtop.manager.dao.repository;
 
-import org.apache.bigtop.manager.dao.po.AuditLogPO;
+import org.apache.bigtop.manager.dao.po.SettingPO;
 
-public interface AuditLogMapper extends BaseMapper<AuditLogPO> {}
+public interface SettingDao extends BaseDao<SettingPO> {}
