@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *    https://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -16,10 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.apache.bigtop.manager.dao.repository;
 
-import org.apache.bigtop.manager.dao.po.AuditLogPO;
+import org.apache.bigtop.manager.dao.po.StackPO;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.apache.ibatis.annotations.Param;
 
-public interface AuditLogRepository extends JpaRepository<AuditLogPO, Long> {}
+public interface StackDao extends BaseDao<StackPO> {
+
+    StackPO findByStackNameAndStackVersion(
+            @Param("stackName") String stackName, @Param("stackVersion") String stackVersion);
+}

@@ -18,8 +18,6 @@
  */
 package org.apache.bigtop.manager.server.model.vo;
 
-import org.apache.bigtop.manager.common.enums.MaintainState;
-
 import lombok.Data;
 
 @Data
@@ -37,5 +35,5 @@ public class ClusterVO {
 
     private Boolean selected;
 
-    private MaintainState state;
+    private String state;
 }

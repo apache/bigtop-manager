@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *    https://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -16,16 +16,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.apache.bigtop.manager.dao.repository;
 
-import org.apache.bigtop.manager.dao.po.ClusterPO;
-import org.apache.bigtop.manager.dao.po.RepoPO;
+import org.apache.bigtop.manager.dao.po.ServicePO;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Optional;
 
-public interface RepoRepository extends JpaRepository<RepoPO, Long> {
+public interface ServiceDao extends BaseDao<ServicePO> {
 
-    List<RepoPO> findAllByClusterPO(ClusterPO clusterPO);
+    List<ServicePO> findAllByClusterId(@Param("clusterId") Long clusterId);
+
+    Optional<ServicePO> findByIdJoin(@Param("id") Long id);
+
+    ServicePO findByClusterIdAndServiceName(
+            @Param("clusterId") Long clusterId, @Param("serviceName") String serviceName);
+
+    List<ServicePO> findByClusterIdAndServiceNameIn(
+            @Param("clusterId") Long clusterId, @Param("serviceNames") List<String> serviceNames);
 }

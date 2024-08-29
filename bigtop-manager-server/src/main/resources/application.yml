@@ -19,9 +19,6 @@
 
 bigtop:
   manager:
-    orm:
-      # hibernate/eclipselink(default=eclipselink)
-      type: eclipselink
     grpc:
       port: 8835
 
@@ -54,29 +51,6 @@ spring:
   jackson:
     default-property-inclusion: non-null
 
-  jpa:
-    show-sql: true
-    properties:
-      eclipselink:
-        ddl-generation: create-or-extend-tables
-        weaving: false
-        persistence-context:
-          persist-on-commit: false
-        cache:
-          shared:
-            default: false
-        logging:
-          connection: false
-          logger: org.eclipse.persistence.logging.slf4j.SLF4JLogger
-          parameters: true
-          session: false
-          thread: false
-          timestamp: false
-          level:
-            connection: FINE
-            sql: FINEST
-            jpa: FINER
-
   messages:
     basename: i18n/messages
 
@@ -91,3 +65,15 @@ springdoc:
 monitoring:
   prometheus-host: "http://localhost:9090"
   agent-host-job-name: "bm-agent-host"
+
+mybatis:
+  mapper-locations: classpath*:mapper/**/*Mapper.xml
+  configuration:
+    map-underscore-to-camel-case: true
+    database-id: mysql
+    use-generated-keys: true
+
+pagehelper:
+  reasonable: false
+  supportMethodsArguments: true
+  params: count=countSql

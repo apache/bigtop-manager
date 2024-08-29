@@ -36,10 +36,10 @@ public interface RepoConverter {
 
     RepoConverter INSTANCE = Mappers.getMapper(RepoConverter.class);
 
-    @Mapping(target = "clusterPO", expression = "java(clusterPO)")
+    @Mapping(target = "clusterId", expression = "java(clusterPO.getId())")
     RepoPO fromDTO2PO(RepoDTO repoDTO, @Context ClusterPO clusterPO);
 
-    @Mapping(target = "clusterPO", expression = "java(clusterPO)")
+    @Mapping(target = "clusterId", expression = "java(clusterPO.getId())")
     List<RepoPO> fromDTO2PO(List<RepoDTO> repoDTOList, @Context ClusterPO clusterPO);
 
     RepoInfo fromPO2Message(RepoPO repoPO);

@@ -21,39 +21,24 @@ package org.apache.bigtop.manager.dao.po;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
-import jakarta.persistence.TableGenerator;
+import java.io.Serializable;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Entity
 @Table(name = "audit_log")
-@TableGenerator(
-        name = "audit_log_generator",
-        table = "sequence",
-        pkColumnName = "seq_name",
-        valueColumnName = "seq_count")
-public class AuditLogPO extends BasePO {
+public class AuditLogPO extends BasePO implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "audit_log_generator")
     @Column(name = "id")
     private Long id;
 
     @Column(name = "uri")
     private String uri;
 
-    @Lob
-    @Basic(fetch = FetchType.LAZY)
-    @Column(name = "args", length = 16777216)
+    @Column(name = "args")
     private String args;
 
     @Column(name = "tag_name")

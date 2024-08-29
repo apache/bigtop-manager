@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *    https://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -16,28 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.apache.bigtop.manager.dao.repository;
 
-import org.apache.bigtop.manager.dao.po.HostPO;
+import org.apache.bigtop.manager.dao.po.ComponentPO;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.apache.ibatis.annotations.Param;
 
-import java.util.Collection;
 import java.util.List;
 
-public interface HostRepository extends JpaRepository<HostPO, Long> {
+public interface ComponentDao extends BaseDao<ComponentPO> {
 
-    HostPO findByHostname(String hostname);
+    ComponentPO findByClusterIdAndComponentName(
+            @Param("clusterId") Long clusterId, @Param("componentName") String componentName);
 
-    List<HostPO> findAllByHostnameIn(Collection<String> hostnames);
+    ComponentPO findByIdJoin(@Param("id") Long id);
 
-    List<HostPO> findAllByClusterPOIdAndHostnameIn(Long clusterId, Collection<String> hostnames);
+    List<ComponentPO> findAllByClusterId(@Param("clusterId") Long clusterId);
 
-    List<HostPO> findAllByClusterPOId(Long clusterId);
+    List<ComponentPO> findAllJoinService();
 
-    Page<HostPO> findAllByClusterPOId(Long clusterId, Pageable pageable);
-
-    List<HostPO> findAllByClusterPOClusterName(String clusterName);
+    List<ComponentPO> findAllByClusterIdAndServiceServiceNameIn(
+            @Param("clusterId") Long clusterId, @Param("serviceNames") List<String> serviceNames);
 }

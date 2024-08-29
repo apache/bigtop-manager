@@ -45,10 +45,10 @@ public interface ClusterConverter {
 
     ClusterDTO fromPO2DTO(ClusterPO clusterPO);
 
-    @Mapping(target = "stackName", source = "stackPO.stackName")
-    @Mapping(target = "stackVersion", source = "stackPO.stackVersion")
     ClusterVO fromEntity2VO(ClusterPO clusterPO);
 
-    @Mapping(target = "stackPO", expression = "java(stackPO)")
+    @Mapping(target = "stackName", expression = "java(stackPO.getStackName())")
+    @Mapping(target = "stackVersion", expression = "java(stackPO.getStackVersion())")
+    @Mapping(target = "stackId", expression = "java(stackPO.getId())")
     ClusterPO fromDTO2PO(ClusterDTO clusterDTO, StackDTO stackDTO, @Context StackPO stackPO);
 }

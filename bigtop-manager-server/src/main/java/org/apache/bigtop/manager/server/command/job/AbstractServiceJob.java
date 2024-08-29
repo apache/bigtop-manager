@@ -24,8 +24,10 @@ import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.po.HostComponentPO;
 import org.apache.bigtop.manager.dao.po.HostPO;
-import org.apache.bigtop.manager.dao.repository.ComponentRepository;
-import org.apache.bigtop.manager.dao.repository.HostComponentRepository;
+import org.apache.bigtop.manager.dao.po.StackPO;
+import org.apache.bigtop.manager.dao.repository.ComponentDao;
+import org.apache.bigtop.manager.dao.repository.HostComponentDao;
+import org.apache.bigtop.manager.dao.repository.HostDao;
 import org.apache.bigtop.manager.server.command.stage.CacheFileUpdateStage;
 import org.apache.bigtop.manager.server.command.stage.ComponentCheckStage;
 import org.apache.bigtop.manager.server.command.stage.ComponentConfigureStage;
@@ -51,8 +53,9 @@ import java.util.List;
 
 public abstract class AbstractServiceJob extends AbstractJob {
 
-    protected ComponentRepository componentRepository;
-    protected HostComponentRepository hostComponentRepository;
+    protected ComponentDao componentDao;
+    protected HostComponentDao hostComponentDao;
+    protected HostDao hostDao;
 
     protected String stackName;
     protected String stackVersion;
@@ -66,16 +69,18 @@ public abstract class AbstractServiceJob extends AbstractJob {
     protected void injectBeans() {
         super.injectBeans();
 
-        this.componentRepository = SpringContextHolder.getBean(ComponentRepository.class);
-        this.hostComponentRepository = SpringContextHolder.getBean(HostComponentRepository.class);
+        this.componentDao = SpringContextHolder.getBean(ComponentDao.class);
+        this.hostComponentDao = SpringContextHolder.getBean(HostComponentDao.class);
+        this.hostDao = SpringContextHolder.getBean(HostDao.class);
     }
 
     @Override
     protected void beforeCreateStages() {
         super.beforeCreateStages();
+        StackPO stackPO = stackDao.findById(clusterPO.getStackId());
 
-        stackName = clusterPO.getStackPO().getStackName();
-        stackVersion = clusterPO.getStackPO().getStackVersion();
+        stackName = stackPO.getStackName();
+        stackVersion = stackPO.getStackVersion();
         dag = StackUtils.getStackDagMap().get(StackUtils.fullStackName(stackName, stackVersion));
     }
 
@@ -115,7 +120,7 @@ public abstract class AbstractServiceJob extends AbstractJob {
     protected List<String> getComponentNames() {
         List<String> serviceNames = getServiceNames();
         List<ComponentPO> componentPOList =
-                componentRepository.findAllByClusterPOIdAndServicePOServiceNameIn(clusterPO.getId(), serviceNames);
+                componentDao.findAllByClusterIdAndServiceServiceNameIn(clusterPO.getId(), serviceNames);
 
         return componentPOList.stream().map(ComponentPO::getComponentName).toList();
     }
@@ -149,15 +154,15 @@ public abstract class AbstractServiceJob extends AbstractJob {
 
     protected List<String> findHostnamesByComponentName(String componentName) {
         List<HostComponentPO> hostComponentPOList =
-                hostComponentRepository.findAllByComponentPOClusterPOIdAndComponentPOComponentName(
-                        clusterPO.getId(), componentName);
+                hostComponentDao.findAllByClusterIdAndComponentName(clusterPO.getId(), componentName);
         if (hostComponentPOList == null) {
             return new ArrayList<>();
         } else {
-            return hostComponentPOList.stream()
-                    .map(HostComponentPO::getHostPO)
-                    .map(HostPO::getHostname)
-                    .toList();
+
+            List<HostPO> hostPOList = hostDao.findByIds(
+                    hostComponentPOList.stream().map(HostComponentPO::getHostId).toList());
+
+            return hostPOList.stream().map(HostPO::getHostname).toList();
         }
     }
 

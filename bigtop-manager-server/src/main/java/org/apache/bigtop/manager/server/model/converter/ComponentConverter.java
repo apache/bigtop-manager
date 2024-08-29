@@ -43,8 +43,8 @@ public interface ComponentConverter {
     @Mapping(target = "commandScript", source = "commandScript", qualifiedByName = "obj2Json")
     @Mapping(target = "customCommands", source = "customCommands", qualifiedByName = "obj2Json")
     @Mapping(target = "quickLink", source = "quickLink", qualifiedByName = "obj2Json")
-    @Mapping(target = "servicePO", expression = "java(servicePO)")
-    @Mapping(target = "clusterPO", expression = "java(clusterPO)")
+    @Mapping(target = "serviceId", expression = "java(servicePO.getId())")
+    @Mapping(target = "clusterId", expression = "java(clusterPO.getId())")
     ComponentPO fromDTO2PO(ComponentDTO componentDTO, @Context ServicePO servicePO, @Context ClusterPO clusterPO);
 
     ComponentVO fromDTO2VO(ComponentDTO componentDTO);
@@ -54,8 +54,6 @@ public interface ComponentConverter {
     @Mapping(target = "componentName", source = "name")
     ComponentDTO fromModel2DTO(ComponentModel componentModel);
 
-    @Mapping(target = "serviceName", source = "servicePO.serviceName")
-    @Mapping(target = "clusterName", source = "clusterPO.clusterName")
     ComponentVO fromPO2VO(ComponentPO componentPO);
 
     List<ComponentVO> fromPO2VO(List<ComponentPO> componentPOList);

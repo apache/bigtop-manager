@@ -18,41 +18,21 @@
  */
 package org.apache.bigtop.manager.dao.po;
 
-import org.apache.bigtop.manager.common.enums.MaintainState;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.ConstraintMode;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ForeignKey;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.TableGenerator;
-import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.Transient;
+import java.io.Serializable;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Entity
-@Table(
-        name = "host",
-        uniqueConstraints = {
-            @UniqueConstraint(
-                    name = "uk_hostname",
-                    columnNames = {"hostname", "cluster_id"})
-        },
-        indexes = {@Index(name = "idx_host_cluster_id", columnList = "cluster_id")})
-@TableGenerator(name = "host_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
-public class HostPO extends BasePO {
+@Table(name = "host")
+public class HostPO extends BasePO implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "host_generator")
     @Column(name = "id")
     private Long id;
 
@@ -87,9 +67,12 @@ public class HostPO extends BasePO {
     private Long totalDisk;
 
     @Column(name = "state")
-    private MaintainState state;
+    private String state;
 
-    @ManyToOne
-    @JoinColumn(name = "cluster_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private ClusterPO clusterPO;
+    @Column(name = "cluster_id")
+    private Long clusterId;
+
+    @Transient
+    @Column(name = "cluster_name")
+    private String clusterName;
 }

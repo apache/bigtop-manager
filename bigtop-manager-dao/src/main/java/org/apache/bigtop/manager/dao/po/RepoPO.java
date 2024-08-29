@@ -22,35 +22,16 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.ConstraintMode;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ForeignKey;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.TableGenerator;
-import jakarta.persistence.UniqueConstraint;
+import java.io.Serializable;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Entity
-@Table(
-        name = "repo",
-        uniqueConstraints = {
-            @UniqueConstraint(
-                    name = "uk_repo_id",
-                    columnNames = {"repo_id", "os", "arch", "cluster_id"})
-        },
-        indexes = {@Index(name = "idx_repo_cluster_id", columnList = "cluster_id")})
-@TableGenerator(name = "repo_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
-public class RepoPO extends BasePO {
+@Table(name = "repo")
+public class RepoPO extends BasePO implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "repo_generator")
     @Column(name = "id")
     private Long id;
 
@@ -72,7 +53,6 @@ public class RepoPO extends BasePO {
     @Column(name = "repo_type")
     private String repoType;
 
-    @ManyToOne
-    @JoinColumn(name = "cluster_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private ClusterPO clusterPO;
+    @Column(name = "cluster_id")
+    private Long clusterId;
 }

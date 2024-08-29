@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.dao.po.UserPO;
-import org.apache.bigtop.manager.dao.repository.UserRepository;
+import org.apache.bigtop.manager.dao.repository.UserDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.holder.SessionUserHolder;
@@ -36,21 +36,21 @@ import jakarta.annotation.Resource;
 public class UserServiceImpl implements UserService {
 
     @Resource
-    private UserRepository userRepository;
+    private UserDao userDao;
 
     @Override
     public UserVO current() {
         Long id = SessionUserHolder.getUserId();
-        UserPO userPO = userRepository.findById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.NEED_LOGIN));
+        UserPO userPO = userDao.findOptionalById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.NEED_LOGIN));
         return UserConverter.INSTANCE.fromPO2VO(userPO);
     }
 
     @Override
     public UserVO update(UserDTO userDTO) {
         Long id = SessionUserHolder.getUserId();
-        UserPO userPO = userRepository.findById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.NEED_LOGIN));
+        UserPO userPO = userDao.findOptionalById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.NEED_LOGIN));
         userPO.setNickname(userDTO.getNickname());
-        userRepository.save(userPO);
+        userDao.updateById(userPO);
         return UserConverter.INSTANCE.fromPO2VO(userPO);
     }
 }

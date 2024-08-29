@@ -24,8 +24,8 @@ import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.po.HostComponentPO;
 import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.po.ServicePO;
-import org.apache.bigtop.manager.dao.repository.HostRepository;
-import org.apache.bigtop.manager.dao.repository.ServiceRepository;
+import org.apache.bigtop.manager.dao.repository.HostDao;
+import org.apache.bigtop.manager.dao.repository.ServiceDao;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 import org.apache.bigtop.manager.server.model.converter.ComponentConverter;
 import org.apache.bigtop.manager.server.model.converter.ServiceConverter;
@@ -43,8 +43,8 @@ import java.util.List;
 public class ServiceInstallJob extends AbstractServiceJob {
 
     private ConfigService configService;
-    private ServiceRepository serviceRepository;
-    private HostRepository hostRepository;
+    private ServiceDao serviceDao;
+    private HostDao hostDao;
 
     public ServiceInstallJob(JobContext jobContext) {
         super(jobContext);
@@ -55,8 +55,8 @@ public class ServiceInstallJob extends AbstractServiceJob {
         super.injectBeans();
 
         this.configService = SpringContextHolder.getBean(ConfigService.class);
-        this.serviceRepository = SpringContextHolder.getBean(ServiceRepository.class);
-        this.hostRepository = SpringContextHolder.getBean(HostRepository.class);
+        this.serviceDao = SpringContextHolder.getBean(ServiceDao.class);
+        this.hostDao = SpringContextHolder.getBean(HostDao.class);
     }
 
     @Override
@@ -99,11 +99,11 @@ public class ServiceInstallJob extends AbstractServiceJob {
                 if (componentHost.getComponentName().equals(componentName)) {
                     List<String> hostnames = new ArrayList<>(componentHost.getHostnames());
                     if (serviceCommand.getInstalled()) {
-                        List<String> existHostnames = hostComponentRepository
-                                .findAllByComponentPOClusterPOIdAndComponentPOComponentNameAndHostPOHostnameIn(
+                        List<String> existHostnames = hostComponentDao
+                                .findAllByClusterIdAndComponentNameAndHostnameIn(
                                         clusterPO.getId(), componentName, hostnames)
                                 .stream()
-                                .map(hostComponent -> hostComponent.getHostPO().getHostname())
+                                .map(HostComponentPO::getHostname)
                                 .toList();
 
                         hostnames.removeAll(existHostnames);
@@ -128,7 +128,7 @@ public class ServiceInstallJob extends AbstractServiceJob {
         // Persist service, component and hostComponent metadata to database
         for (ServiceCommandDTO serviceCommand : serviceCommands) {
             String serviceName = serviceCommand.getServiceName();
-            ServicePO servicePO = serviceRepository.findByClusterPOIdAndServiceName(clusterId, serviceName);
+            ServicePO servicePO = serviceDao.findByClusterIdAndServiceName(clusterId, serviceName);
             upsertService(servicePO, serviceCommand);
         }
     }
@@ -137,16 +137,16 @@ public class ServiceInstallJob extends AbstractServiceJob {
         CommandDTO commandDTO = jobContext.getCommandDTO();
         Long clusterId = commandDTO.getClusterId();
         String serviceName = serviceCommand.getServiceName();
-        ClusterPO clusterPO = clusterRepository.getReferenceById(clusterId);
+        ClusterPO clusterPO = clusterDao.findByIdJoin(clusterId);
 
-        String stackName = clusterPO.getStackPO().getStackName();
-        String stackVersion = clusterPO.getStackPO().getStackVersion();
+        String stackName = clusterPO.getStackName();
+        String stackVersion = clusterPO.getStackVersion();
 
         // 1. Persist service and components
         if (servicePO == null) {
             ServiceDTO serviceDTO = StackUtils.getServiceDTO(stackName, stackVersion, serviceName);
             servicePO = ServiceConverter.INSTANCE.fromDTO2PO(serviceDTO, clusterPO);
-            servicePO = serviceRepository.save(servicePO);
+            serviceDao.save(servicePO);
         }
 
         // 2. Update configs
@@ -156,26 +156,25 @@ public class ServiceInstallJob extends AbstractServiceJob {
             String componentName = componentHostDTO.getComponentName();
 
             // 3. Persist component
-            ComponentPO componentPO = componentRepository.findByClusterPOIdAndComponentName(clusterId, componentName);
+            ComponentPO componentPO = componentDao.findByClusterIdAndComponentName(clusterId, componentName);
             if (componentPO == null) {
                 ComponentDTO componentDTO = StackUtils.getComponentDTO(stackName, stackVersion, componentName);
                 componentPO = ComponentConverter.INSTANCE.fromDTO2PO(componentDTO, servicePO, clusterPO);
-                componentPO = componentRepository.save(componentPO);
+                componentDao.save(componentPO);
             }
 
             // 4. Persist hostComponent
             for (String hostname : componentHostDTO.getHostnames()) {
                 HostComponentPO hostComponentPO =
-                        hostComponentRepository.findByComponentPOComponentNameAndHostPOHostname(
-                                componentName, hostname);
+                        hostComponentDao.findByClusterIdAndComponentNameAndHostname(clusterId, componentName, hostname);
                 if (hostComponentPO == null) {
-                    HostPO hostPO = hostRepository.findByHostname(hostname);
+                    HostPO hostPO = hostDao.findByHostname(hostname);
 
                     hostComponentPO = new HostComponentPO();
-                    hostComponentPO.setHostPO(hostPO);
-                    hostComponentPO.setComponentPO(componentPO);
-                    hostComponentPO.setState(MaintainState.UNINSTALLED);
-                    hostComponentRepository.save(hostComponentPO);
+                    hostComponentPO.setHostId(hostPO.getId());
+                    hostComponentPO.setComponentId(componentPO.getId());
+                    hostComponentPO.setState(MaintainState.UNINSTALLED.getName());
+                    hostComponentDao.save(hostComponentPO);
                 }
             }
         }

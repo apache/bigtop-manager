@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.server.aop;
 
 import org.apache.bigtop.manager.dao.po.AuditLogPO;
-import org.apache.bigtop.manager.dao.repository.AuditLogRepository;
+import org.apache.bigtop.manager.dao.repository.AuditLogDao;
 import org.apache.bigtop.manager.server.holder.SessionUserHolder;
 
 import org.aspectj.lang.JoinPoint;
@@ -46,7 +46,7 @@ import static org.mockito.Mockito.when;
 class AuditAspectTest {
 
     @Mock
-    private AuditLogRepository auditLogRepository;
+    private AuditLogDao auditLogDao;
 
     @Mock
     private JoinPoint joinPoint;
@@ -86,7 +86,7 @@ class AuditAspectTest {
 
         auditAspect.before(joinPoint);
 
-        verify(auditLogRepository, times(1)).save(any(AuditLogPO.class));
+        verify(auditLogDao, times(1)).save(any(AuditLogPO.class));
     }
 
     @Test
@@ -95,7 +95,7 @@ class AuditAspectTest {
 
         auditAspect.before(joinPoint);
 
-        verify(auditLogRepository, never()).save(any(AuditLogPO.class));
+        verify(auditLogDao, never()).save(any(AuditLogPO.class));
     }
 
     @Test
@@ -104,6 +104,6 @@ class AuditAspectTest {
 
         auditAspect.before(joinPoint);
 
-        verify(auditLogRepository, never()).save(any(AuditLogPO.class));
+        verify(auditLogDao, never()).save(any(AuditLogPO.class));
     }
 }

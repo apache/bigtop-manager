@@ -42,15 +42,15 @@
         <commons-compress.version>1.26.2</commons-compress.version>
         <jwt.version>4.4.0</jwt.version>
         <janino.version>3.0.16</janino.version>
-        <eclipse-link.version>4.0.2</eclipse-link.version>
         <jaxb-runtime.version>4.0.4</jaxb-runtime.version>
-        <hibernate-core.version>6.2.5.Final</hibernate-core.version>
         <commons-text.version>1.11.0</commons-text.version>
         <prometheus-java-client.version>1.0.0</prometheus-java-client.version>
         <oshi-core.version>6.4.11</oshi-core.version>
         <micrometer.version>1.12.4</micrometer.version>
         <jdbc.dm.version>8.1.2.192</jdbc.dm.version>
         <langchain4j.version>0.33.0</langchain4j.version>
+        <mybatis-spring-boot-starter.version>3.0.3</mybatis-spring-boot-starter.version>
+        <pagehelper-spring-boot-starter.version>2.1.0</pagehelper-spring-boot-starter.version>
     </properties>
 
     <dependencyManagement>
@@ -67,18 +67,6 @@
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
                 <version>${springdoc.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.eclipse.persistence</groupId>
-                <artifactId>org.eclipse.persistence.jpa</artifactId>
-                <version>${eclipse-link.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.eclipse.persistence</groupId>
-                <artifactId>org.eclipse.persistence.extension</artifactId>
-                <version>${eclipse-link.version}</version>
             </dependency>
 
             <dependency>
@@ -160,13 +148,6 @@
             </dependency>
 
             <dependency>
-                <groupId>org.hibernate.orm</groupId>
-                <artifactId>hibernate-core</artifactId>
-                <version>${hibernate-core.version}</version>
-                <scope>provided</scope>
-            </dependency>
-
-            <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-text</artifactId>
                 <version>${commons-text.version}</version>
@@ -201,6 +182,19 @@
                 <groupId>com.github.oshi</groupId>
                 <artifactId>oshi-core</artifactId>
                 <version>${oshi-core.version}</version>
+            </dependency>
+
+            <!-- mybatis -->
+            <dependency>
+                <groupId>org.mybatis.spring.boot</groupId>
+                <artifactId>mybatis-spring-boot-starter</artifactId>
+                <version>${mybatis-spring-boot-starter.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.pagehelper</groupId>
+                <artifactId>pagehelper-spring-boot-starter</artifactId>
+                <version>${pagehelper-spring-boot-starter.version}</version>
             </dependency>
 
             <!-- dameng -->

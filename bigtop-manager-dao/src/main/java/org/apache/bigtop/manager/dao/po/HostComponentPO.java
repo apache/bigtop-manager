@@ -18,53 +18,78 @@
  */
 package org.apache.bigtop.manager.dao.po;
 
-import org.apache.bigtop.manager.common.enums.MaintainState;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.ConstraintMode;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ForeignKey;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.TableGenerator;
+import jakarta.persistence.Transient;
+import java.io.Serializable;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Entity
-@Table(
-        name = "host_component",
-        indexes = {
-            @Index(name = "idx_hc_component_id", columnList = "component_id"),
-            @Index(name = "idx_hc_host_id", columnList = "host_id")
-        })
-@TableGenerator(
-        name = "host_component_generator",
-        table = "sequence",
-        pkColumnName = "seq_name",
-        valueColumnName = "seq_count")
-public class HostComponentPO extends BasePO {
+@Table(name = "host_component")
+public class HostComponentPO extends BasePO implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "host_component_generator")
     @Column(name = "id")
     private Long id;
 
     @Column(name = "state")
-    private MaintainState state;
+    private String state;
 
-    @ManyToOne
-    @JoinColumn(name = "host_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private HostPO hostPO;
+    @Column(name = "host_id")
+    private Long hostId;
 
-    @ManyToOne
-    @JoinColumn(name = "component_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private ComponentPO componentPO;
+    @Column(name = "component_id")
+    private Long componentId;
+
+    @Transient
+    @Column(name = "stack_name")
+    private String stackName;
+
+    @Transient
+    @Column(name = "stack_version")
+    private String stackVersion;
+
+    @Transient
+    @Column(name = "service_id")
+    private Long serviceId;
+
+    @Transient
+    @Column(name = "cluster_name")
+    private String clusterName;
+
+    @Transient
+    @Column(name = "root")
+    private String root;
+
+    @Transient
+    @Column(name = "service_name")
+    private String serviceName;
+
+    @Transient
+    @Column(name = "service_user")
+    private String serviceUser;
+
+    @Transient
+    @Column(name = "component_name")
+    private String componentName;
+
+    @Transient
+    @Column(name = "display_name")
+    private String displayName;
+
+    @Transient
+    @Column(name = "category")
+    private String category;
+
+    @Transient
+    @Column(name = "command_script")
+    private String commandScript;
+
+    @Transient
+    @Column(name = "hostname")
+    private String hostname;
 }

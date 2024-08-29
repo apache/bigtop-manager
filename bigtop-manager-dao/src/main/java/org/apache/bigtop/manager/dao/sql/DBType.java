@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *    https://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -16,10 +16,35 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.dao.repository;
 
-import org.apache.bigtop.manager.dao.po.TypeConfigPO;
+package org.apache.bigtop.manager.dao.sql;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.stream.Stream;
 
-public interface TypeConfigRepository extends JpaRepository<TypeConfigPO, Long> {}
+public enum DBType {
+    MYSQL("mysql", "MYSQL"),
+    DM("dm", "DaMeng");
+
+    DBType(String code, String desc) {
+        this.code = code;
+        this.desc = desc;
+    }
+
+    private final String code;
+    private final String desc;
+
+    public String getCode() {
+        return this.code;
+    }
+
+    public String getDesc() {
+        return this.desc;
+    }
+
+    public static DBType toType(String databaseId) {
+        return Stream.of(DBType.values())
+                .filter(p -> p.getCode().equals(databaseId))
+                .findFirst()
+                .orElse(null);
+    }
+}
