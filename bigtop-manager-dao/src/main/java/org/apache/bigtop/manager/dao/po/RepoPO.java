@@ -22,32 +22,16 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
 import jakarta.persistence.Table;
-import jakarta.persistence.TableGenerator;
-import jakarta.persistence.UniqueConstraint;
 import java.io.Serializable;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Entity
-@Table(
-        name = "repo",
-        uniqueConstraints = {
-            @UniqueConstraint(
-                    name = "uk_repo_id",
-                    columnNames = {"repo_id", "os", "arch", "cluster_id"})
-        },
-        indexes = {@Index(name = "idx_repo_cluster_id", columnList = "cluster_id")})
-@TableGenerator(name = "repo_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
+@Table(name = "repo")
 public class RepoPO extends BasePO implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "repo_generator")
     @Column(name = "id")
     private Long id;
 

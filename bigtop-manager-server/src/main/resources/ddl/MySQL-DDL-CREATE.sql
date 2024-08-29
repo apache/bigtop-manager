@@ -86,7 +86,8 @@ CREATE TABLE `cluster`
     `user_group`    VARCHAR(255),
     `stack_id`      BIGINT,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_cluster_name` (`cluster_name`)
+    UNIQUE KEY `uk_cluster_name` (`cluster_name`),
+    KEY `idx_cluster_stack_id` (`stack_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `component`
@@ -148,7 +149,8 @@ CREATE TABLE `host`
     `total_memory_size`    BIGINT,
     `update_by`            BIGINT,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_hostname` (`hostname`)
+    UNIQUE KEY `uk_hostname` (`hostname`, `cluster_id`),
+    KEY            `idx_host_cluster_id` (cluster_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `repo`

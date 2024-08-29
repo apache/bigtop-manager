@@ -22,33 +22,17 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
 import jakarta.persistence.Table;
-import jakarta.persistence.TableGenerator;
 import jakarta.persistence.Transient;
-import jakarta.persistence.UniqueConstraint;
 import java.io.Serializable;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Entity
-@Table(
-        name = "host",
-        uniqueConstraints = {
-            @UniqueConstraint(
-                    name = "uk_hostname",
-                    columnNames = {"hostname", "cluster_id"})
-        },
-        indexes = {@Index(name = "idx_host_cluster_id", columnList = "cluster_id")})
-@TableGenerator(name = "host_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
+@Table(name = "host")
 public class HostPO extends BasePO implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "host_generator")
     @Column(name = "id")
     private Long id;
 

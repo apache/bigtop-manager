@@ -26,13 +26,13 @@ import java.sql.Timestamp;
 @Data
 public abstract class BasePO {
 
-    @Column(name = "create_time", updatable = false)
+    @Column(name = "create_time")
     private Timestamp createTime;
 
     @Column(name = "update_time")
     private Timestamp updateTime;
 
-    @Column(name = "create_by", updatable = false)
+    @Column(name = "create_by")
     private Long createBy;
 
     @Column(name = "update_by")

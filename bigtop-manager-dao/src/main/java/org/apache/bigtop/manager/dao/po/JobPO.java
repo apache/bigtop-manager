@@ -22,32 +22,20 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
 import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.TableGenerator;
 import java.io.Serializable;
 import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Entity
-@Table(
-        name = "job",
-        indexes = {@Index(name = "idx_job_cluster_id", columnList = "cluster_id")})
-@TableGenerator(name = "job_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
+@Table(name = "job")
 public class JobPO extends BasePO implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "job_generator")
     @Column(name = "id")
     private Long id;
 
@@ -58,8 +46,7 @@ public class JobPO extends BasePO implements Serializable {
     private String name;
 
     @Lob
-    @Basic(fetch = FetchType.LAZY)
-    @Column(name = "context", length = 16777216)
+    @Column(name = "context")
     private String context;
 
     @Column(name = "cluster_id")

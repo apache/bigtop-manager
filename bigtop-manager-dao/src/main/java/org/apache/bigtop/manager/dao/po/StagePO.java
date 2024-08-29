@@ -22,35 +22,18 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
-import jakarta.persistence.Lob;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.TableGenerator;
 import java.io.Serializable;
 import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Entity
-@Table(
-        name = "stage",
-        indexes = {
-            @Index(name = "idx_stage_cluster_id", columnList = "cluster_id"),
-            @Index(name = "idx_stage_job_id", columnList = "job_id")
-        })
-@TableGenerator(name = "stage_generator", table = "sequence", pkColumnName = "seq_name", valueColumnName = "seq_count")
+@Table(name = "stage")
 public class StagePO extends BasePO implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "stage_generator")
     @Column(name = "id")
     private Long id;
 
@@ -69,9 +52,7 @@ public class StagePO extends BasePO implements Serializable {
     @Column(name = "component_name")
     private String componentName;
 
-    @Lob
-    @Basic(fetch = FetchType.LAZY)
-    @Column(name = "context", length = 16777216)
+    @Column(name = "context")
     private String context;
 
     @Column(name = "job_id")
@@ -81,6 +62,5 @@ public class StagePO extends BasePO implements Serializable {
     private Long clusterId;
 
     @ToString.Exclude
-    @OneToMany(mappedBy = "stagePO")
     private List<TaskPO> tasks;
 }

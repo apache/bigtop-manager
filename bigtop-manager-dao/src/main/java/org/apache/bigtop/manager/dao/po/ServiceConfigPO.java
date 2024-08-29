@@ -23,36 +23,18 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.TableGenerator;
 import jakarta.persistence.Transient;
 import java.io.Serializable;
 import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Entity
-@Table(
-        name = "service_config",
-        indexes = {
-            @Index(name = "idx_sc_cluster_id", columnList = "cluster_id"),
-            @Index(name = "idx_sc_service_id", columnList = "service_id")
-        })
-@TableGenerator(
-        name = "service_config_generator",
-        table = "sequence",
-        pkColumnName = "seq_name",
-        valueColumnName = "seq_count")
+@Table(name = "service_config")
 public class ServiceConfigPO extends BasePO implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "service_config_generator")
     @Column(name = "id")
     private Long id;
 
@@ -66,7 +48,6 @@ public class ServiceConfigPO extends BasePO implements Serializable {
     private Boolean selected;
 
     @ToString.Exclude
-    @OneToMany(mappedBy = "serviceConfigPO")
     private List<TypeConfigPO> configs;
 
     @Column(name = "service_id")

@@ -21,39 +21,23 @@ package org.apache.bigtop.manager.dao.po;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
-import jakarta.persistence.TableGenerator;
 import java.io.Serializable;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Entity
 @Table(name = "setting")
-@TableGenerator(
-        name = "settings_generator",
-        table = "sequence",
-        pkColumnName = "seq_name",
-        valueColumnName = "seq_count")
 public class SettingPO extends BasePO implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "settings_generator")
     @Column(name = "id")
     private Long id;
 
     @Column(name = "type_name")
     private String typeName;
 
-    @Lob
-    @Basic(fetch = FetchType.LAZY)
-    @Column(name = "config_data", length = 16777216)
+    @Column(name = "config_data")
     private String configData;
 }

@@ -49,7 +49,7 @@ public class SQLBuilder {
             case MYSQL: {
                 sql.INSERT_INTO(tableMetaData.getTableName());
                 for (Map.Entry<String, String> entry : fieldColumnMap.entrySet()) {
-                    // 忽略主键
+                    // Ignore primary key
                     if (Objects.equals(entry.getKey(), tableMetaData.getPkProperty())) {
                         continue;
                     }
@@ -81,7 +81,7 @@ public class SQLBuilder {
             case MYSQL: {
                 sql.UPDATE(tableMetaData.getTableName());
                 for (Map.Entry<String, String> entry : fieldColumnMap.entrySet()) {
-                    // 忽略主键
+                    // Ignore primary key
                     if (Objects.equals(entry.getKey(), tableMetaData.getPkProperty())) {
                         continue;
                     }
