@@ -20,10 +20,13 @@ package org.apache.bigtop.manager.dao.repository;
 
 import org.apache.bigtop.manager.dao.po.ChatThreadPO;
 
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 public interface ChatThreadDao extends BaseDao<ChatThreadPO> {
-    List<ChatThreadPO> findAllByUserId(Long userId);
+    List<ChatThreadPO> findAllByUserId(@Param("user_id") Long userId);
 
-    List<ChatThreadPO> findAllByPlatformAuthorizedId(Long platformAuthorizedId);
+    List<ChatThreadPO> findAllByPlatformAuthorizedIdAndUserId(
+            @Param("platform_id") Long platformAuthorizedId, @Param("user_id") Long userId);
 }

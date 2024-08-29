@@ -19,6 +19,7 @@
 package org.apache.bigtop.manager.dao.repository;
 
 import org.apache.bigtop.manager.dao.po.PlatformAuthorizedPO;
+
 import org.apache.ibatis.annotations.Param;
 
 public interface PlatformAuthorizedDao extends BaseDao<PlatformAuthorizedPO> {

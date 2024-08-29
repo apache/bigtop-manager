@@ -20,10 +20,12 @@ package org.apache.bigtop.manager.dao.repository;
 
 import org.apache.bigtop.manager.dao.po.ChatMessagePO;
 
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 public interface ChatMessageDao extends BaseDao<ChatMessagePO> {
-    List<ChatMessagePO> findAllByChatThreadId(Long chatThreadId);
+    List<ChatMessagePO> findAllByChatThreadId(@Param("thread_id") Long chatThreadId);
 
-    void deleteByChatThreadId(Long chatThreadId);
+    void deleteByChatThreadId(@Param("thread_id") Long chatThreadId);
 }

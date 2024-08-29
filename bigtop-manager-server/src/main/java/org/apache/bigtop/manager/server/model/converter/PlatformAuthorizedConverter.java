@@ -19,9 +19,11 @@
 package org.apache.bigtop.manager.server.model.converter;
 
 import org.apache.bigtop.manager.dao.po.PlatformAuthorizedPO;
+import org.apache.bigtop.manager.dao.po.PlatformPO;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.vo.PlatformAuthorizedVO;
 
+import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -30,8 +32,8 @@ import org.mapstruct.factory.Mappers;
 public interface PlatformAuthorizedConverter {
     PlatformAuthorizedConverter INSTANCE = Mappers.getMapper(PlatformAuthorizedConverter.class);
 
-    @Mapping(source = "id", target = "platformId")
-    @Mapping(source = "platformPO.supportModels", target = "supportModels")
-    @Mapping(source = "platformPO.name", target = "platformName")
-    PlatformAuthorizedVO fromPO2VO(PlatformAuthorizedPO platformAuthorizedPO);
+    @Mapping(target = "platformId", expression = "java(platformPO.getId())")
+    @Mapping(target = "supportModels", expression = "java(platformPO.getSupportModels())")
+    @Mapping(target = "platformName", expression = "java(platformPO.getName())")
+    PlatformAuthorizedVO fromPO2VO(PlatformAuthorizedPO platformAuthorizedPO, @Context PlatformPO platformPO);
 }

@@ -25,17 +25,13 @@ import lombok.EqualsAndHashCode;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.persistence.TableGenerator;
 import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Table(name = "\"llm_platform\"")
+@Table(name = "llm_platform")
 public class PlatformPO extends BasePO {
 
     @Id

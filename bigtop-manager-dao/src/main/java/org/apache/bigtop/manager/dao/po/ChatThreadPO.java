@@ -22,20 +22,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.ConstraintMode;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ForeignKey;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.TableGenerator;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-
 @Table(name = "llm_chat_thread")
 public class ChatThreadPO extends BasePO {
     @Id
@@ -46,7 +37,7 @@ public class ChatThreadPO extends BasePO {
     private String model;
 
     @Column(name = "user_id")
-    private Long userPO;
+    private Long userId;
 
     @Column(name = "platform_id")
     private Long platformAuthorizedId;

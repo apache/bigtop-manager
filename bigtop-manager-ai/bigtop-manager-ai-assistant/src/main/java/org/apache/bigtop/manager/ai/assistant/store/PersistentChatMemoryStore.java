@@ -40,8 +40,7 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
     private final ChatThreadDao chatThreadDao;
     private final ChatMessageDao chatMessageDao;
 
-    public PersistentChatMemoryStore(
-            ChatThreadDao chatThreadDao, ChatMessageDao chatMessageDao) {
+    public PersistentChatMemoryStore(ChatThreadDao chatThreadDao, ChatMessageDao chatMessageDao) {
         this.chatThreadDao = chatThreadDao;
         this.chatMessageDao = chatMessageDao;
     }
@@ -76,27 +75,15 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
         } else {
             chatMessagePO.setSender(chatMessage.type().toString());
         }
-        ChatThreadPO chatThreadPO = chatThreadDao.findById(chatThreadId).orElse(null);
-        if (chatThreadPO != null) {
-            chatMessagePO.setUserPO(chatThreadPO.getUserPO());
-        } else {
-            chatMessagePO.setUserPO(null);
-        }
-        chatMessagePO.setChatThreadPO(
-                chatThreadDao.findById(chatThreadId).orElse(null));
+        ChatThreadPO chatThreadPO = chatThreadDao.findById(chatThreadId);
+        chatMessagePO.setUserId(chatThreadPO.getUserId());
+        chatMessagePO.setChatThreadId(chatThreadId);
         return chatMessagePO;
     }
 
     @Override
     public List<ChatMessage> getMessages(Object threadId) {
-        ChatThreadPO chatThreadPO = null;
-        if (chatThreadDao != null) {
-            chatThreadPO = chatThreadDao.findById((Long) threadId).orElse(null);
-        }
-        if (chatThreadPO == null) {
-            return new ArrayList<>();
-        }
-        List<ChatMessagePO> chatMessages = chatMessageDao.findAllByChatThreadPO(chatThreadPO);
+        List<ChatMessagePO> chatMessages = chatMessageDao.findAllByChatThreadId((Long) threadId);
         if (chatMessages.isEmpty()) {
             return new ArrayList<>();
         } else {
@@ -112,8 +99,7 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
 
     @Override
     public void deleteMessages(Object threadId) {
-        ChatThreadPO chatThreadPO =
-                chatThreadDao.findById((Long) threadId).orElse(null);
-        chatMessageDao.deleteByChatThreadPO(chatThreadPO);
+        ChatThreadPO chatThreadPO = chatThreadDao.findById((Long) threadId);
+        chatMessageDao.deleteByChatThreadId((Long) threadId);
     }
 }

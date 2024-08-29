@@ -24,17 +24,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Convert;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.TableGenerator;
 import java.util.Map;
 
 @Data
@@ -53,4 +47,7 @@ public class PlatformAuthorizedPO extends BasePO {
 
     @Column(name = "platform_id")
     private Long platformId;
+
+    @Column(name = "support_models")
+    private String supportModels;
 }
