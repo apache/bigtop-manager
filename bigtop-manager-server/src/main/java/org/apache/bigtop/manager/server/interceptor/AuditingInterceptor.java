@@ -20,6 +20,10 @@
 package org.apache.bigtop.manager.server.interceptor;
 
 import org.apache.bigtop.manager.common.utils.ClassUtils;
+import org.apache.bigtop.manager.dao.annotations.CreateBy;
+import org.apache.bigtop.manager.dao.annotations.CreateTime;
+import org.apache.bigtop.manager.dao.annotations.UpdateBy;
+import org.apache.bigtop.manager.dao.annotations.UpdateTime;
 import org.apache.bigtop.manager.dao.po.BasePO;
 import org.apache.bigtop.manager.server.holder.SessionUserHolder;
 
@@ -31,10 +35,6 @@ import org.apache.ibatis.plugin.Intercepts;
 import org.apache.ibatis.plugin.Invocation;
 import org.apache.ibatis.plugin.Signature;
 
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
@@ -77,18 +77,18 @@ public class AuditingInterceptor implements Interceptor {
             for (Field field : fields) {
                 boolean accessible = field.canAccess(parameter);
                 field.setAccessible(true);
-                if (field.isAnnotationPresent(CreatedBy.class)
+                if (field.isAnnotationPresent(CreateBy.class)
                         && SqlCommandType.INSERT == sqlCommandType
                         && currentUser != null) {
                     field.set(parameter, currentUser);
                 }
-                if (field.isAnnotationPresent(CreatedDate.class) && SqlCommandType.INSERT == sqlCommandType) {
+                if (field.isAnnotationPresent(CreateTime.class) && SqlCommandType.INSERT == sqlCommandType) {
                     field.set(parameter, timestamp);
                 }
-                if (field.isAnnotationPresent(LastModifiedBy.class) && currentUser != null) {
+                if (field.isAnnotationPresent(UpdateBy.class) && currentUser != null) {
                     field.set(parameter, currentUser);
                 }
-                if (field.isAnnotationPresent(LastModifiedDate.class)) {
+                if (field.isAnnotationPresent(UpdateTime.class)) {
                     field.set(parameter, timestamp);
                 }
                 field.setAccessible(accessible);
