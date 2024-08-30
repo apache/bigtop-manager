@@ -18,7 +18,29 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
-import org.apache.bigtop.manager.common.utils.DateUtils;
+import org.apache.bigtop.manager.ai.assistant.GeneralAssistantFactory;
+import org.apache.bigtop.manager.ai.assistant.provider.AIAssistantConfig;
+import org.apache.bigtop.manager.ai.assistant.store.PersistentChatMemoryStore;
+import org.apache.bigtop.manager.ai.core.enums.MessageSender;
+import org.apache.bigtop.manager.ai.core.enums.PlatformType;
+import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
+import org.apache.bigtop.manager.ai.core.factory.AIAssistantFactory;
+import org.apache.bigtop.manager.dao.po.ChatMessagePO;
+import org.apache.bigtop.manager.dao.po.ChatThreadPO;
+import org.apache.bigtop.manager.dao.po.PlatformAuthorizedPO;
+import org.apache.bigtop.manager.dao.po.PlatformPO;
+import org.apache.bigtop.manager.dao.repository.ChatMessageDao;
+import org.apache.bigtop.manager.dao.repository.ChatThreadDao;
+import org.apache.bigtop.manager.dao.repository.PlatformAuthorizedDao;
+import org.apache.bigtop.manager.dao.repository.PlatformDao;
+import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
+import org.apache.bigtop.manager.server.exception.ApiException;
+import org.apache.bigtop.manager.server.holder.SessionUserHolder;
+import org.apache.bigtop.manager.server.model.converter.ChatMessageConverter;
+import org.apache.bigtop.manager.server.model.converter.ChatThreadConverter;
+import org.apache.bigtop.manager.server.model.converter.PlatformAuthorizedConverter;
+import org.apache.bigtop.manager.server.model.converter.PlatformConverter;
+import org.apache.bigtop.manager.server.model.dto.PlatformAuthorizedDTO;
 import org.apache.bigtop.manager.server.model.dto.PlatformDTO;
 import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
 import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
@@ -27,153 +49,275 @@ import org.apache.bigtop.manager.server.model.vo.PlatformAuthorizedVO;
 import org.apache.bigtop.manager.server.model.vo.PlatformVO;
 import org.apache.bigtop.manager.server.service.AIChatService;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Flux;
 
-import java.io.IOException;
+import jakarta.annotation.Resource;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
+import java.util.Map;
+import java.util.Objects;
 
-@Slf4j
 @Service
 public class AIChatServiceImpl implements AIChatService {
+    @Resource
+    private PlatformDao platformDao;
+
+    @Resource
+    private PlatformAuthorizedDao platformAuthorizedDao;
+
+    @Resource
+    private ChatThreadDao chatThreadDao;
+
+    @Resource
+    private ChatMessageDao chatMessageDao;
+
+    private AIAssistantFactory aiAssistantFactory;
+
+    private final AIAssistantFactory aiTestFactory = new GeneralAssistantFactory();
+
+    public AIAssistantFactory getAiAssistantFactory() {
+        if (aiAssistantFactory == null) {
+            aiAssistantFactory =
+                    new GeneralAssistantFactory(new PersistentChatMemoryStore(chatThreadDao, chatMessageDao));
+        }
+        return aiAssistantFactory;
+    }
+
+    private AIAssistantConfig getAIAssistantConfig(PlatformAuthorizedDTO platformAuthorizedDTO) {
+        return AIAssistantConfig.builder()
+                .setModel(platformAuthorizedDTO.getModel())
+                .addCredentials(platformAuthorizedDTO.getCredentials())
+                .build();
+    }
+
+    private PlatformType getPlatformType(String platformName) {
+        return PlatformType.getPlatformType(platformName.toLowerCase());
+    }
+
+    private AIAssistant buildAIAssistant(PlatformAuthorizedDTO platformAuthorizedDTO, Long threadId) {
+        return getAiAssistantFactory()
+                .create(
+                        getPlatformType(platformAuthorizedDTO.getPlatformName()),
+                        getAIAssistantConfig(platformAuthorizedDTO),
+                        threadId);
+    }
+
+    private Boolean testAuthorization(PlatformAuthorizedDTO platformAuthorizedDTO) {
+        AIAssistant aiAssistant = aiTestFactory.create(
+                getPlatformType(platformAuthorizedDTO.getPlatformName()), getAIAssistantConfig(platformAuthorizedDTO));
+        try {
+            aiAssistant.ask("1+1=");
+        } catch (Exception e) {
+            throw new ApiException(ApiExceptionEnum.CREDIT_INCORRECT, e.getMessage());
+        }
+
+        return true;
+    }
+
     @Override
     public List<PlatformVO> platforms() {
+        List<PlatformPO> platformPOs = platformDao.findAll();
         List<PlatformVO> platforms = new ArrayList<>();
-        platforms.add(new PlatformVO(1L, "OpenAI", "GPT-3.5,GPT-4o"));
-        platforms.add(new PlatformVO(2L, "ChatGLM", "GPT-3.5,GPT-4o"));
+        for (PlatformPO platformPO : platformPOs) {
+            platforms.add(PlatformConverter.INSTANCE.fromPO2VO(platformPO));
+        }
         return platforms;
     }
 
     @Override
     public List<PlatformAuthorizedVO> authorizedPlatforms() {
         List<PlatformAuthorizedVO> authorizedPlatforms = new ArrayList<>();
-        authorizedPlatforms.add(new PlatformAuthorizedVO(1L, "OpenAI", "GPT-3.5,GPT-4o"));
-        authorizedPlatforms.add(new PlatformAuthorizedVO(2L, "ChatGLM", "GPT-4o"));
+        List<PlatformAuthorizedPO> authorizedPlatformPOs = platformAuthorizedDao.findAll();
+        for (PlatformAuthorizedPO authorizedPlatformPO : authorizedPlatformPOs) {
+            PlatformPO platformPO = platformDao.findById(authorizedPlatformPO.getPlatformId());
+            authorizedPlatforms.add(PlatformAuthorizedConverter.INSTANCE.fromPO2VO(authorizedPlatformPO, platformPO));
+        }
+
         return authorizedPlatforms;
     }
 
     @Override
-    public PlatformVO addAuthorizedPlatform(PlatformDTO platformDTO) {
-        log.info("Adding authorized platform: {}", platformDTO);
-        log.info(platformDTO.getAuthCredentials().toString());
-        return new PlatformVO(1L, "OpenAI", "GPT-3.5,GPT-4o");
+    public PlatformAuthorizedVO addAuthorizedPlatform(PlatformDTO platformDTO) {
+        PlatformPO platformPO = platformDao.findByPlatformId(platformDTO.getPlatformId());
+        if (platformPO == null) {
+            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
+        }
+        Map<String, String> credentialSet = getStringMap(platformDTO, platformPO);
+        List<String> models = List.of(platformPO.getSupportModels().split(","));
+        if (models.isEmpty()) {
+            throw new ApiException(ApiExceptionEnum.MODEL_NOT_SUPPORTED);
+        }
+        PlatformAuthorizedDTO platformAuthorizedDTO =
+                new PlatformAuthorizedDTO(platformPO.getName(), credentialSet, models.get(0));
+
+        if (!testAuthorization(platformAuthorizedDTO)) {
+            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
+        }
+
+        PlatformAuthorizedPO platformAuthorizedPO = new PlatformAuthorizedPO();
+        platformAuthorizedPO.setCredentials(credentialSet);
+        platformAuthorizedPO.setPlatformId(platformPO.getId());
+
+        platformAuthorizedDao.saveWithCredentials(platformAuthorizedPO);
+        PlatformAuthorizedVO platformAuthorizedVO =
+                PlatformAuthorizedConverter.INSTANCE.fromPO2VO(platformAuthorizedPO, platformPO);
+        platformAuthorizedVO.setSupportModels(platformPO.getSupportModels());
+        platformAuthorizedVO.setPlatformName(platformPO.getName());
+        return platformAuthorizedVO;
+    }
+
+    private static @NotNull Map<String, String> getStringMap(PlatformDTO platformDTO, PlatformPO platformPO) {
+        if (platformPO == null) {
+            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
+        }
+        Map<String, String> credentialNeed = platformPO.getCredential();
+        Map<String, String> credentialGet = platformDTO.getAuthCredentials();
+        Map<String, String> credentialSet = new HashMap<>();
+        for (String key : credentialNeed.keySet()) {
+            if (!credentialGet.containsKey(key)) {
+                throw new ApiException(ApiExceptionEnum.CREDIT_INCORRECT);
+            }
+            credentialSet.put(key, credentialGet.get(key));
+        }
+        return credentialSet;
     }
 
     @Override
     public List<PlatformAuthCredentialVO> platformsAuthCredential(Long platformId) {
-        List<PlatformAuthCredentialVO> platformAuthCredentials = new ArrayList<>();
-        platformAuthCredentials.add(new PlatformAuthCredentialVO("api-key", "API Key"));
-        platformAuthCredentials.add(new PlatformAuthCredentialVO("api-secret", "API Secret"));
-        return platformAuthCredentials;
+        PlatformPO platformPO = platformDao.findByPlatformId(platformId);
+        if (platformPO == null) {
+            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
+        }
+        List<PlatformAuthCredentialVO> platformAuthCredentialVOs = new ArrayList<>();
+        for (String key : platformPO.getCredential().keySet()) {
+            PlatformAuthCredentialVO platformAuthCredentialVO =
+                    new PlatformAuthCredentialVO(key, platformPO.getCredential().get(key));
+            platformAuthCredentialVOs.add(platformAuthCredentialVO);
+        }
+        return platformAuthCredentialVOs;
     }
 
     @Override
-    public int deleteAuthorizedPlatform(Long platformId) {
-        Random random = new Random();
-        int randomInt = random.nextInt();
-        return randomInt % 2;
+    public boolean deleteAuthorizedPlatform(Long platformId) {
+        List<PlatformAuthorizedPO> authorizedPlatformPOs = platformAuthorizedDao.findAll();
+        for (PlatformAuthorizedPO authorizedPlatformPO : authorizedPlatformPOs) {
+            if (authorizedPlatformPO.getId().equals(platformId)) {
+                platformAuthorizedDao.deleteById(authorizedPlatformPO.getId());
+                return true;
+            }
+        }
+
+        throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
     }
 
     @Override
     public ChatThreadVO createChatThreads(Long platformId, String model) {
-
-        return new ChatThreadVO(1L, platformId, model, DateUtils.format(new Date()));
+        PlatformAuthorizedPO platformAuthorizedPO = platformAuthorizedDao.findByPlatformId(platformId);
+        if (platformAuthorizedPO == null) {
+            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
+        }
+        Long userId = SessionUserHolder.getUserId();
+        PlatformPO platformPO = platformDao.findByPlatformId(platformAuthorizedPO.getPlatformId());
+        List<String> supportModels = List.of(platformPO.getSupportModels().split(","));
+        if (!supportModels.contains(model)) {
+            throw new ApiException(ApiExceptionEnum.MODEL_NOT_SUPPORTED);
+        }
+        ChatThreadPO chatThreadPO = new ChatThreadPO();
+        chatThreadPO.setUserId(userId);
+        chatThreadPO.setModel(model);
+        chatThreadPO.setPlatformId(platformAuthorizedPO.getId());
+        chatThreadDao.save(chatThreadPO);
+        return ChatThreadConverter.INSTANCE.fromPO2VO(chatThreadPO);
     }
 
     @Override
-    public int deleteChatThreads(Long platformId, Long threadId) {
-        Random random = new Random();
-        int randomInt = random.nextInt();
-        return randomInt % 2;
+    public boolean deleteChatThreads(Long platformId, Long threadId) {
+        Long userId = SessionUserHolder.getUserId();
+        List<ChatThreadPO> chatThreadPOS = chatThreadDao.findAllByUserId(userId);
+        for (ChatThreadPO chatThreadPO : chatThreadPOS) {
+            if (chatThreadPO.getId().equals(threadId)
+                    && chatThreadPO.getPlatformId().equals(platformId)) {
+                chatThreadDao.deleteById(threadId);
+                return true;
+            }
+        }
+        throw new ApiException(ApiExceptionEnum.CHAT_THREAD_NOT_FOUND);
     }
 
     @Override
     public List<ChatThreadVO> getAllChatThreads(Long platformId, String model) {
+        Long userId = SessionUserHolder.getUserId();
+        List<ChatThreadPO> chatThreadPOS = chatThreadDao.findAllByPlatformAuthorizedIdAndUserId(platformId, userId);
         List<ChatThreadVO> chatThreads = new ArrayList<>();
-        if (model.equals("GPT-3.5")) {
-            ChatThreadVO chatThreadVO = new ChatThreadVO(1L, platformId, "GPT-3.5", DateUtils.format(new Date()));
-            chatThreads.add(chatThreadVO);
-            ChatThreadVO chatThreadVO2 = new ChatThreadVO(3L, platformId, "GPT-3.5", DateUtils.format(new Date()));
-            chatThreads.add(chatThreadVO2);
-        }
-        if (model.equals("GPT-4o")) {
-            ChatThreadVO chatThreadVO = new ChatThreadVO(2L, platformId, "GPT-4o", DateUtils.format(new Date()));
-            chatThreads.add(chatThreadVO);
+        for (ChatThreadPO chatThreadPO : chatThreadPOS) {
+            ChatThreadVO chatThreadVO = ChatThreadConverter.INSTANCE.fromPO2VO(chatThreadPO);
+            if (chatThreadVO.getModel().equals(model)) {
+                chatThreads.add(chatThreadVO);
+            }
         }
         return chatThreads;
     }
 
     @Override
     public SseEmitter talk(Long platformId, Long threadId, String message) {
-        String fullMessage = "Don't ask me" + message;
-        fullMessage +=
-                """
-                I won't tell you Bigtop Manager provides a modern, low-threshold web application to simplify \
-                the deployment and management of components for Bigtop, similar to Apache Ambari and Cloudera \
-                Manager.
-                And Bigtop Manager provides a modern, low-threshold web application to simplify \
-                the deployment and management of components for Bigtop, similar to Apache Ambari and Cloudera \
-                Manager.
-                """;
-
-        SseEmitter emitter = new SseEmitter();
-        Random random = new Random();
-
-        try {
-            StringBuilder remainingMessage = new StringBuilder(fullMessage);
-
-            while (!remainingMessage.isEmpty()) {
-                int charsToSend = random.nextInt(21);
-                // 2% probability of simulated transmission failure
-                if (random.nextInt(50) == 2) {
-                    try {
-                        emitter.send(SseEmitter.event().name("error").data("broken pipe"));
-                    } catch (IOException e) {
-                        emitter.completeWithError(e);
-                    }
-                    emitter.complete();
-                    return emitter;
-                }
-                charsToSend = Math.min(charsToSend, remainingMessage.length());
-
-                String part = remainingMessage.substring(0, charsToSend);
-                remainingMessage.delete(0, charsToSend);
-
-                emitter.send(SseEmitter.event().name("message").data(part));
-
-                int delay = random.nextInt(101);
-                Thread.sleep(delay);
-            }
-        } catch (IOException | InterruptedException e) {
-            emitter.completeWithError(e);
-            throw new RuntimeException(e);
+        ChatThreadPO chatThreadPO = chatThreadDao.findById(threadId);
+        Long userId = SessionUserHolder.getUserId();
+        if (chatThreadPO == null || !Objects.equals(userId, chatThreadPO.getUserId())) {
+            throw new ApiException(ApiExceptionEnum.CHAT_THREAD_NOT_FOUND);
+        }
+        PlatformAuthorizedPO platformAuthorizedPO = platformAuthorizedDao.findByPlatformId(platformId);
+        if (platformAuthorizedPO == null) {
+            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED);
         }
 
-        emitter.complete();
+        PlatformPO platformPO = platformDao.findById(platformAuthorizedPO.getPlatformId());
+        PlatformAuthorizedDTO platformAuthorizedDTO = new PlatformAuthorizedDTO(
+                platformPO.getName(), platformAuthorizedPO.getCredentials(), chatThreadPO.getModel());
+        AIAssistant aiAssistant = buildAIAssistant(platformAuthorizedDTO, chatThreadPO.getId());
+        Flux<String> stringFlux = aiAssistant.streamAsk(message);
+
+        SseEmitter emitter = new SseEmitter();
+        stringFlux.subscribe(
+                s -> {
+                    try {
+                        emitter.send(s);
+                    } catch (Exception e) {
+                        emitter.completeWithError(e);
+                    }
+                },
+                Throwable::printStackTrace,
+                emitter::complete);
+
+        emitter.onTimeout(emitter::complete);
         return emitter;
     }
 
     @Override
     public List<ChatMessageVO> history(Long platformId, Long threadId) {
         List<ChatMessageVO> chatMessages = new ArrayList<>();
-        Random random = new Random();
-        int numberOfMessages = random.nextInt(11);
-        boolean isUser = true;
-
-        for (int i = 0; i < numberOfMessages; i++) {
-            String sender = isUser ? "user" : "AI";
-            String messageText = isUser ? "hello" : "hello, I'm GPT";
-            messageText += i;
-
-            ChatMessageVO message = new ChatMessageVO(sender, messageText, DateUtils.format(new Date()));
-            chatMessages.add(message);
-
-            isUser = !isUser;
+        ChatThreadPO chatThreadPO = chatThreadDao.findById(threadId);
+        if (chatThreadPO == null) {
+            throw new ApiException(ApiExceptionEnum.CHAT_THREAD_NOT_FOUND);
+        }
+        Long userId = SessionUserHolder.getUserId();
+        if (!chatThreadPO.getUserId().equals(userId)) {
+            throw new ApiException(ApiExceptionEnum.PERMISSION_DENIED);
+        }
+        List<ChatMessagePO> chatMessagePOs = chatMessageDao.findAllByThreadId(threadId);
+        for (ChatMessagePO chatMessagePO : chatMessagePOs) {
+            ChatMessageVO chatMessageVO = ChatMessageConverter.INSTANCE.fromPO2VO(chatMessagePO);
+            MessageSender sender = chatMessageVO.getSender();
+            if (sender == null) {
+                continue;
+            }
+            if (sender.equals(MessageSender.USER) || sender.equals(MessageSender.AI)) {
+                chatMessages.add(chatMessageVO);
+            }
         }
         return chatMessages;
     }

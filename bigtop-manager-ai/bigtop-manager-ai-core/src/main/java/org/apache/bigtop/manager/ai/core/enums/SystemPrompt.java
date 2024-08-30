@@ -16,14 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.ai.core.provider;
+package org.apache.bigtop.manager.ai.core.enums;
 
-import java.util.Map;
+import lombok.Getter;
 
-public interface AIAssistantConfigProvider {
-    String getModel();
+@Getter
+public enum SystemPrompt {
+    DEFAULT_PROMPT("default"),
+    BIGDATA_PROFESSOR("big-data-professor"),
+    LANGUAGE_PROMPT("language-prompt");
+    ;
 
-    Map<String, String> getCredentials();
+    private final String value;
 
-    Map<String, String> getConfigs();
+    SystemPrompt(String value) {
+        this.value = value;
+    }
 }

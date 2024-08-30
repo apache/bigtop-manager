@@ -16,14 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.ai.core.provider;
+package org.apache.bigtop.manager.dao.repository;
 
-import java.util.Map;
+import org.apache.bigtop.manager.dao.po.ChatThreadPO;
 
-public interface AIAssistantConfigProvider {
-    String getModel();
+import org.apache.ibatis.annotations.Param;
 
-    Map<String, String> getCredentials();
+import java.util.List;
 
-    Map<String, String> getConfigs();
+public interface ChatThreadDao extends BaseDao<ChatThreadPO> {
+    List<ChatThreadPO> findAllByUserId(@Param("userId") Long userId);
+
+    ChatThreadPO findById(Long id);
+
+    List<ChatThreadPO> findAllByPlatformAuthorizedIdAndUserId(
+            @Param("platformId") Long platformAuthorizedId, @Param("userId") Long userId);
 }

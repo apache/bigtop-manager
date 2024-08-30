@@ -310,6 +310,66 @@ CREATE TABLE `stage`
     KEY              `idx_job_id` (`job_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE `llm_platform`
+(
+    `id`             BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `name`           VARCHAR(255)        NOT NULL,
+    `credential`     JSON                DEFAULT NULL,
+    `support_models` VARCHAR(255)        DEFAULT NULL,
+    `create_time`    DATETIME            DEFAULT CURRENT_TIMESTAMP,
+    `update_time`    DATETIME            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `create_by`      BIGINT              DEFAULT NULL,
+    `update_by`      BIGINT              DEFAULT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `llm_platform_authorized`
+(
+    `id`          BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `platform_id` BIGINT(20) UNSIGNED NOT NULL,
+    `credentials` JSON                NOT NULL,
+    `create_time` DATETIME            DEFAULT CURRENT_TIMESTAMP,
+    `update_time` DATETIME            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `create_by`   BIGINT              DEFAULT NULL,
+    `update_by`   BIGINT              DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    KEY `idx_platform_id` (`platform_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `llm_chat_thread`
+(
+    `id`          BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `platform_id` BIGINT(20) UNSIGNED NOT NULL,
+    `user_id`     BIGINT(20) UNSIGNED NOT NULL,
+    `model`       VARCHAR(255)        NOT NULL,
+    `create_time` DATETIME            DEFAULT CURRENT_TIMESTAMP,
+    `update_time` DATETIME            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `create_by`   BIGINT              DEFAULT NULL,
+    `update_by`   BIGINT              DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    KEY             `idx_platform_id` (`platform_id`),
+    KEY             `idx_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `llm_chat_message`
+(
+    `id`          BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `thread_id`   BIGINT(20) UNSIGNED NOT NULL,
+    `user_id`     BIGINT(20) UNSIGNED NOT NULL,
+    `message`     TEXT                NOT NULL,
+    `sender`      VARCHAR(50)         NOT NULL,
+    `create_time` DATETIME            DEFAULT CURRENT_TIMESTAMP,
+    `update_time` DATETIME            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY              `idx_thread_id` (`thread_id`),
+    KEY              `idx_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- Adding default admin user
 INSERT INTO bigtop_manager.user (id, create_time, update_time, nickname, password, status, username)
 VALUES (1, now(), now(), 'Administrator', '21232f297a57a5a743894a0e4a801fc3', true, 'admin');
+
+-- Adding default ai chat platform
+INSERT INTO bigtop_manager.llm_platform (id,credential,NAME,support_models)
+VALUES
+(1,'{"apiKey": "API Key"}','OpenAI','gpt-3.5-turbo,gpt-4,gpt-4o,gpt-3.5-turbo-16k,gpt-4-turbo-preview,gpt-4-32k,gpt-4o-mini');

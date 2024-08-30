@@ -16,14 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.ai.core.provider;
+package org.apache.bigtop.manager.server.model.converter;
 
-import java.util.Map;
+import org.apache.bigtop.manager.dao.po.ChatThreadPO;
+import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
+import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
 
-public interface AIAssistantConfigProvider {
-    String getModel();
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.factory.Mappers;
 
-    Map<String, String> getCredentials();
+@Mapper(config = MapStructSharedConfig.class)
+public interface ChatThreadConverter {
+    ChatThreadConverter INSTANCE = Mappers.getMapper(ChatThreadConverter.class);
 
-    Map<String, String> getConfigs();
+    @Mapping(source = "id", target = "threadId")
+    ChatThreadVO fromPO2VO(ChatThreadPO platformAuthorizedPO);
 }

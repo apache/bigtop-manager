@@ -16,14 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.ai.core.provider;
+package org.apache.bigtop.manager.dao.repository;
 
-import java.util.Map;
+import org.apache.bigtop.manager.dao.po.PlatformAuthorizedPO;
 
-public interface AIAssistantConfigProvider {
-    String getModel();
+import org.apache.ibatis.annotations.Param;
 
-    Map<String, String> getCredentials();
+public interface PlatformAuthorizedDao extends BaseDao<PlatformAuthorizedPO> {
+    PlatformAuthorizedPO findByPlatformId(@Param("id") Long platformId);
 
-    Map<String, String> getConfigs();
+    void saveWithCredentials(PlatformAuthorizedPO platformAuthorizedPO);
 }

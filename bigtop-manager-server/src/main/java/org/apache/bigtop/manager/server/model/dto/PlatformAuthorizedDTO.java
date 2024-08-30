@@ -16,14 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.ai.core.provider;
+package org.apache.bigtop.manager.server.model.dto;
+
+import lombok.Data;
 
 import java.util.Map;
 
-public interface AIAssistantConfigProvider {
-    String getModel();
+@Data
+public class PlatformAuthorizedDTO {
+    private String platformName;
+    private String model;
+    private Map<String, String> credentials;
 
-    Map<String, String> getCredentials();
-
-    Map<String, String> getConfigs();
+    public PlatformAuthorizedDTO(String name, Map<String, String> credentialSet, String model) {
+        this.platformName = name;
+        this.credentials = credentialSet;
+        this.model = model;
+    }
 }

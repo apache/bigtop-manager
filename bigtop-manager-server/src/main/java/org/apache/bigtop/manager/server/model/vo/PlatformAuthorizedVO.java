@@ -33,4 +33,6 @@ public class PlatformAuthorizedVO {
         this.platformName = name;
         this.supportModels = models;
     }
+
+    public PlatformAuthorizedVO() {}
 }

@@ -26,28 +26,31 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Getter
-public enum PlatformType {
-    OPENAI("openai");
+public enum MessageSender {
+    USER("user"),
+    AI("ai"),
+    SYSTEM("system");
 
     private final String value;
 
-    PlatformType(String value) {
+    MessageSender(String value) {
         this.value = value;
     }
 
-    public static List<String> getPlatforms() {
+    public static List<String> getSenders() {
         return Arrays.stream(values()).map(item -> item.value).collect(Collectors.toList());
     }
 
-    public static PlatformType getPlatformType(String value) {
+    public static MessageSender getMessageSender(String value) {
         if (Objects.isNull(value) || value.isEmpty()) {
             return null;
         }
-        for (PlatformType platformType : PlatformType.values()) {
-            if (platformType.value.equals(value)) {
-                return platformType;
+        for (MessageSender messageSender : MessageSender.values()) {
+            if (messageSender.value.equals(value)) {
+                return messageSender;
             }
         }
+
         return null;
     }
 }

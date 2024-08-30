@@ -20,10 +20,10 @@ package org.apache.bigtop.manager.server.model.dto;
 
 import lombok.Data;
 
-import java.util.List;
+import java.util.Map;
 
 @Data
 public class PlatformDTO {
     private Long platformId;
-    private List<AuthCredentialDTO> authCredentials;
+    private Map<String, String> authCredentials;
 }

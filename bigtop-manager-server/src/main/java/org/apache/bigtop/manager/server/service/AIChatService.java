@@ -34,15 +34,15 @@ public interface AIChatService {
 
     List<PlatformAuthorizedVO> authorizedPlatforms();
 
-    PlatformVO addAuthorizedPlatform(PlatformDTO platformDTO);
+    PlatformAuthorizedVO addAuthorizedPlatform(PlatformDTO platformDTO);
 
     List<PlatformAuthCredentialVO> platformsAuthCredential(Long platformId);
 
-    int deleteAuthorizedPlatform(Long platformId);
+    boolean deleteAuthorizedPlatform(Long platformId);
 
     ChatThreadVO createChatThreads(Long platformId, String model);
 
-    int deleteChatThreads(Long platformId, Long threadId);
+    boolean deleteChatThreads(Long platformId, Long threadId);
 
     List<ChatThreadVO> getAllChatThreads(Long platformId, String model);
 

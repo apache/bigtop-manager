@@ -16,14 +16,32 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.ai.core.provider;
+package org.apache.bigtop.manager.dao.po;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import java.io.Serializable;
 import java.util.Map;
 
-public interface AIAssistantConfigProvider {
-    String getModel();
+@Data
+@EqualsAndHashCode(callSuper = true)
+@Table(name = "llm_platform")
+public class PlatformPO extends BasePO implements Serializable {
 
-    Map<String, String> getCredentials();
+    @Id
+    @Column(name = "id")
+    private Long id;
 
-    Map<String, String> getConfigs();
+    @Column(name = "name", nullable = false, length = 255)
+    private String name;
+
+    @Column(name = "credential", columnDefinition = "json", nullable = false)
+    private Map<String, String> credential;
+
+    @Column(name = "support_models", length = 255)
+    private String supportModels;
 }

@@ -19,10 +19,9 @@
 package org.apache.bigtop.manager.ai.openai;
 
 import org.apache.bigtop.manager.ai.core.AbstractAIAssistant;
+import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
-
-import org.springframework.util.NumberUtils;
 
 import dev.langchain4j.internal.ValidationUtils;
 import dev.langchain4j.memory.ChatMemory;
@@ -33,14 +32,9 @@ import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class OpenAIAssistant extends AbstractAIAssistant {
 
-    private static final String PLATFORM_NAME = "openai";
     private static final String BASE_URL = "https://api.openai.com/v1";
-    private static final String MODEL_NAME = "gpt-3.5-turbo";
 
     private OpenAIAssistant(
             ChatLanguageModel chatLanguageModel,
@@ -50,8 +44,8 @@ public class OpenAIAssistant extends AbstractAIAssistant {
     }
 
     @Override
-    public String getPlatform() {
-        return PLATFORM_NAME;
+    public PlatformType getPlatform() {
+        return PlatformType.OPENAI;
     }
 
     public static Builder builder() {
@@ -61,16 +55,13 @@ public class OpenAIAssistant extends AbstractAIAssistant {
     public static class Builder {
         private Object id;
 
-        private Map<String, String> configs = new HashMap<>();
         private ChatMemoryStore chatMemoryStore;
+        private AIAssistantConfigProvider configProvider;
 
-        public Builder() {
-            configs.put("baseUrl", BASE_URL);
-            configs.put("modelName", MODEL_NAME);
-        }
+        public Builder() {}
 
         public Builder withConfigProvider(AIAssistantConfigProvider configProvider) {
-            this.configs = configProvider.configs();
+            this.configProvider = configProvider;
             return this;
         }
 
@@ -86,25 +77,23 @@ public class OpenAIAssistant extends AbstractAIAssistant {
 
         public AIAssistant build() {
             ValidationUtils.ensureNotNull(id, "id");
-            String baseUrl = configs.get("baseUrl");
-            String modelName = configs.get("modelName");
-            String apiKey = ValidationUtils.ensureNotNull(configs.get("apiKey"), "apiKey");
-            Integer memoryLen = ValidationUtils.ensureNotNull(
-                    NumberUtils.parseNumber(configs.get("memoryLen"), Integer.class), "memoryLen not a number.");
+            String model = ValidationUtils.ensureNotNull(configProvider.getModel(), "model");
+            String apiKey = ValidationUtils.ensureNotNull(
+                    configProvider.getCredentials().get("apiKey"), "apiKey");
             ChatLanguageModel openAiChatModel = OpenAiChatModel.builder()
                     .apiKey(apiKey)
-                    .baseUrl(baseUrl)
-                    .modelName(modelName)
+                    .baseUrl(BASE_URL)
+                    .modelName(model)
                     .build();
             StreamingChatLanguageModel openaiStreamChatModel = OpenAiStreamingChatModel.builder()
                     .apiKey(apiKey)
-                    .baseUrl(baseUrl)
-                    .modelName(modelName)
+                    .baseUrl(BASE_URL)
+                    .modelName(model)
                     .build();
             MessageWindowChatMemory chatMemory = MessageWindowChatMemory.builder()
                     .id(id)
                     .chatMemoryStore(chatMemoryStore)
-                    .maxMessages(memoryLen)
+                    .maxMessages(MEMORY_LEN)
                     .build();
             return new OpenAIAssistant(openAiChatModel, openaiStreamChatModel, chatMemory);
         }

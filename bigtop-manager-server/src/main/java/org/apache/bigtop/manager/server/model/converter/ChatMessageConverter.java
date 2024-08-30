@@ -16,38 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.ai.core.enums;
+package org.apache.bigtop.manager.server.model.converter;
 
-import lombok.Getter;
+import org.apache.bigtop.manager.ai.core.enums.MessageSender;
+import org.apache.bigtop.manager.dao.po.ChatMessagePO;
+import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
+import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 
-@Getter
-public enum PlatformType {
-    OPENAI("openai");
+@Mapper(config = MapStructSharedConfig.class)
+public interface ChatMessageConverter {
+    ChatMessageConverter INSTANCE = Mappers.getMapper(ChatMessageConverter.class);
 
-    private final String value;
+    ChatMessageVO fromPO2VO(ChatMessagePO chatMessagePO);
 
-    PlatformType(String value) {
-        this.value = value;
-    }
-
-    public static List<String> getPlatforms() {
-        return Arrays.stream(values()).map(item -> item.value).collect(Collectors.toList());
-    }
-
-    public static PlatformType getPlatformType(String value) {
-        if (Objects.isNull(value) || value.isEmpty()) {
+    default MessageSender mapStringToMessageSender(String sender) {
+        if (sender == null) {
             return null;
         }
-        for (PlatformType platformType : PlatformType.values()) {
-            if (platformType.value.equals(value)) {
-                return platformType;
-            }
+        try {
+            return MessageSender.valueOf(sender.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return null;
         }
-        return null;
     }
 }

@@ -24,42 +24,83 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AIAssistantConfig implements AIAssistantConfigProvider {
-    private final Map<String, String> configMap;
 
-    private AIAssistantConfig(Map<String, String> configMap) {
-        this.configMap = configMap;
+    /**
+     * Model name for platform that we want to use
+     */
+    private final String model;
+
+    /**
+     * Credentials for different platforms
+     */
+    private final Map<String, String> credentials;
+
+    /**
+     * Platform extra configs are put here
+     */
+    private final Map<String, String> configs;
+
+    private AIAssistantConfig(String model, Map<String, String> credentials, Map<String, String> configMap) {
+        this.model = model;
+        this.credentials = credentials;
+        this.configs = configMap;
     }
 
     public static Builder builder() {
         return new Builder();
     }
 
-    public static Builder withDefault(String baseUrl, String apiKey) {
-        Builder builder = new Builder();
-        return builder.set("baseUrl", baseUrl).set("apiKey", apiKey);
+    @Override
+    public String getModel() {
+        return model;
     }
 
     @Override
-    public Map<String, String> configs() {
+    public Map<String, String> getCredentials() {
+        return credentials;
+    }
 
-        return configMap;
+    @Override
+    public Map<String, String> getConfigs() {
+        return configs;
     }
 
     public static class Builder {
-        private final Map<String, String> configs;
+        private String model;
 
-        public Builder() {
-            configs = new HashMap<>();
-            configs.put("memoryLen", "30");
+        private final Map<String, String> credentials = new HashMap<>();
+
+        private final Map<String, String> configs = new HashMap<>();
+
+        public Builder() {}
+
+        public Builder setModel(String model) {
+            this.model = model;
+            return this;
         }
 
-        public Builder set(String key, String value) {
+        public Builder addCredential(String key, String value) {
+            credentials.put(key, value);
+            return this;
+        }
+
+        public Builder addCredentials(Map<String, String> credentialMap) {
+            credentials.putAll(credentialMap);
+            return this;
+        }
+
+        public Builder addConfig(String key, String value) {
             configs.put(key, value);
             return this;
         }
 
+        public Builder addConfigs(Map<String, String> configMap) {
+            configs.putAll(configMap);
+            return this;
+        }
+
         public AIAssistantConfig build() {
-            return new AIAssistantConfig(configs);
+            return new AIAssistantConfig(model, credentials, configs);
         }
     }
 }

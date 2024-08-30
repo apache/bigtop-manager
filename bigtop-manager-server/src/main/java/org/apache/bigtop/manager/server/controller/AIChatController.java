@@ -18,7 +18,6 @@
  */
 package org.apache.bigtop.manager.server.controller;
 
-import org.apache.bigtop.manager.server.enums.ResponseStatus;
 import org.apache.bigtop.manager.server.model.converter.PlatformConverter;
 import org.apache.bigtop.manager.server.model.dto.PlatformDTO;
 import org.apache.bigtop.manager.server.model.req.PlatformReq;
@@ -75,7 +74,7 @@ public class AIChatController {
 
     @Operation(summary = "platforms", description = "Add authorized platforms")
     @PutMapping("/platforms")
-    public ResponseEntity<PlatformVO> addAuthorizedPlatform(@RequestBody PlatformReq platformReq) {
+    public ResponseEntity<PlatformAuthorizedVO> addAuthorizedPlatform(@RequestBody PlatformReq platformReq) {
         PlatformDTO platformDTO = PlatformConverter.INSTANCE.fromReq2DTO(platformReq);
         return ResponseEntity.success(chatService.addAuthorizedPlatform(platformDTO));
     }
@@ -83,11 +82,7 @@ public class AIChatController {
     @Operation(summary = "platforms", description = "Delete authorized platforms")
     @DeleteMapping("/platforms/{platformId}")
     public ResponseEntity<Boolean> deleteAuthorizedPlatform(@PathVariable Long platformId) {
-        int code = chatService.deleteAuthorizedPlatform(platformId);
-        if (code != 0) {
-            return ResponseEntity.error(ResponseStatus.PARAMETER_ERROR, "Permission denied");
-        }
-        return ResponseEntity.success(true);
+        return ResponseEntity.success(chatService.deleteAuthorizedPlatform(platformId));
     }
 
     @Operation(summary = "new threads", description = "Create a chat threads")
@@ -99,11 +94,7 @@ public class AIChatController {
     @Operation(summary = "delete threads", description = "Delete a chat threads")
     @DeleteMapping("platforms/{platformId}/threads/{threadId}")
     public ResponseEntity<Boolean> deleteChatThreads(@PathVariable Long platformId, @PathVariable Long threadId) {
-        int code = chatService.deleteChatThreads(platformId, threadId);
-        if (code != 0) {
-            return ResponseEntity.error(ResponseStatus.PARAMETER_ERROR, "No Content");
-        }
-        return ResponseEntity.success(true);
+        return ResponseEntity.success(chatService.deleteChatThreads(platformId, threadId));
     }
 
     @Operation(summary = "get", description = "Get all threads of a platform")

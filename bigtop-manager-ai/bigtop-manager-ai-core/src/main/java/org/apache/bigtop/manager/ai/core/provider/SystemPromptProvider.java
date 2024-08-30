@@ -18,12 +18,13 @@
  */
 package org.apache.bigtop.manager.ai.core.provider;
 
+import org.apache.bigtop.manager.ai.core.enums.SystemPrompt;
+
 import dev.langchain4j.data.message.SystemMessage;
 
 public interface SystemPromptProvider {
 
-    // Return the SystemPrompt for the specified ID.
-    SystemMessage getSystemPrompt(Object id);
+    SystemMessage getSystemPrompt(SystemPrompt systemPrompt);
 
     // return default system prompt
     SystemMessage getSystemPrompt();
