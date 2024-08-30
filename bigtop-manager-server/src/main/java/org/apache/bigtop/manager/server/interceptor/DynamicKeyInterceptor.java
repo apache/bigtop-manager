@@ -65,10 +65,12 @@ public class DynamicKeyInterceptor implements Interceptor {
             log.debug("parameter: {}", parameter);
 
             Object object = parameter;
-            if (parameter instanceof MapperMethod.ParamMap<?> first) {
-                if (first.get("param1") instanceof Collection) {
-                    object = ((Collection<?>) first.get("param1"))
+            if (parameter instanceof MapperMethod.ParamMap<?> paramMap) {
+                if (paramMap.get("param1") instanceof Collection) {
+                    object = ((Collection<?>) paramMap.get("param1"))
                             .stream().findFirst().get();
+                } else {
+                    object = paramMap.get("param1");
                 }
             }
             TableMetaData metaData = TableMetaData.forClass(object.getClass());
