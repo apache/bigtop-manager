@@ -22,15 +22,15 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.apache.bigtop.manager.dao.repository.ChatMessageDao">
 
-    <select id="findAllByChatThreadId" resultType="org.apache.bigtop.manager.dao.po.ChatMessagePO">
+    <select id="findAllByThreadId" resultType="org.apache.bigtop.manager.dao.po.ChatMessagePO">
         SELECT *
         FROM llm_chat_message
-        WHERE thread_id = #{thread_id}
+        WHERE thread_id = #{threadId}
     </select>
 
-    <delete id="deleteByChatThreadId">
+    <delete id="deleteByThreadId">
         DELETE FROM llm_chat_message
-        WHERE thread_id = #{thread_id}
+        WHERE thread_id = #{threadId}
     </delete>
 
 </mapper>

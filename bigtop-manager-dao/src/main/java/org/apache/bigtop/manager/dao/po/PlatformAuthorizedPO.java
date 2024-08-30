@@ -22,8 +22,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.io.Serializable;
@@ -35,7 +33,6 @@ import java.util.Map;
 public class PlatformAuthorizedPO extends BasePO implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "llm_platform_authorized_generator")
     @Column(name = "id")
     private Long id;
 

@@ -31,7 +31,6 @@
         <result property="credential" column="credential" typeHandler="org.apache.bigtop.manager.dao.handler.JsonTypeHandler"/>
     </resultMap>
 
-    <!-- Sample select statement using the resultMap -->
     <select id="findByPlatformId" resultMap="PlatformResultMap">
         SELECT * FROM llm_platform WHERE id = #{id}
     </select>

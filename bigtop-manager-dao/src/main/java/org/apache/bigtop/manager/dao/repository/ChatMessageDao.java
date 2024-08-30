@@ -25,7 +25,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 public interface ChatMessageDao extends BaseDao<ChatMessagePO> {
-    List<ChatMessagePO> findAllByChatThreadId(@Param("thread_id") Long chatThreadId);
+    List<ChatMessagePO> findAllByThreadId(@Param("threadId") Long threadId);
 
-    void deleteByChatThreadId(@Param("thread_id") Long chatThreadId);
+    void deleteByThreadId(@Param("threadId") Long threadId);
 }

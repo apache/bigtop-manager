@@ -25,10 +25,10 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 public interface ChatThreadDao extends BaseDao<ChatThreadPO> {
-    List<ChatThreadPO> findAllByUserId(@Param("user_id") Long userId);
+    List<ChatThreadPO> findAllByUserId(@Param("userId") Long userId);
 
     ChatThreadPO findById(Long id);
 
     List<ChatThreadPO> findAllByPlatformAuthorizedIdAndUserId(
-            @Param("platform_id") Long platformAuthorizedId, @Param("user_id") Long userId);
+            @Param("platformId") Long platformAuthorizedId, @Param("userId") Long userId);
 }

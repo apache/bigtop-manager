@@ -44,5 +44,5 @@ public class ChatMessagePO extends BasePO implements Serializable {
     private Long userId;
 
     @Column(name = "thread_id")
-    private Long chatThreadId;
+    private Long threadId;
 }

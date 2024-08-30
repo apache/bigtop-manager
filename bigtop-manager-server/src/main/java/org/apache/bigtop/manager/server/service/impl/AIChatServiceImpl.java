@@ -53,7 +53,6 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 
 import jakarta.annotation.Resource;
@@ -63,7 +62,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-@Slf4j
 @Service
 public class AIChatServiceImpl implements AIChatService {
     @Resource
@@ -224,7 +222,6 @@ public class AIChatServiceImpl implements AIChatService {
             throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
         }
         Long userId = SessionUserHolder.getUserId();
-        log.info(String.valueOf(platformAuthorizedPO.getPlatformId()));
         PlatformPO platformPO = platformDao.findByPlatformId(platformAuthorizedPO.getPlatformId());
         List<String> supportModels = List.of(platformPO.getSupportModels().split(","));
         if (!supportModels.contains(model)) {
@@ -282,7 +279,6 @@ public class AIChatServiceImpl implements AIChatService {
         PlatformAuthorizedDTO platformAuthorizedDTO = new PlatformAuthorizedDTO(
                 platformPO.getName(), platformAuthorizedPO.getCredentials(), chatThreadPO.getModel());
         AIAssistant aiAssistant = buildAIAssistant(platformAuthorizedDTO, chatThreadPO.getId());
-        log.info(message);
         Flux<String> stringFlux = aiAssistant.streamAsk(message);
 
         SseEmitter emitter = new SseEmitter();
@@ -312,7 +308,7 @@ public class AIChatServiceImpl implements AIChatService {
         if (!chatThreadPO.getUserId().equals(userId)) {
             throw new ApiException(ApiExceptionEnum.PERMISSION_DENIED);
         }
-        List<ChatMessagePO> chatMessagePOs = chatMessageDao.findAllByChatThreadId(threadId);
+        List<ChatMessagePO> chatMessagePOs = chatMessageDao.findAllByThreadId(threadId);
         for (ChatMessagePO chatMessagePO : chatMessagePOs) {
             ChatMessageVO chatMessageVO = ChatMessageConverter.INSTANCE.fromPO2VO(chatMessagePO);
             MessageSender sender = chatMessageVO.getSender();

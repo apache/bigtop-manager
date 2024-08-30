@@ -77,13 +77,13 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
         }
         ChatThreadPO chatThreadPO = chatThreadDao.findById(chatThreadId);
         chatMessagePO.setUserId(chatThreadPO.getUserId());
-        chatMessagePO.setChatThreadId(chatThreadId);
+        chatMessagePO.setThreadId(chatThreadId);
         return chatMessagePO;
     }
 
     @Override
     public List<ChatMessage> getMessages(Object threadId) {
-        List<ChatMessagePO> chatMessages = chatMessageDao.findAllByChatThreadId((Long) threadId);
+        List<ChatMessagePO> chatMessages = chatMessageDao.findAllByThreadId((Long) threadId);
         if (chatMessages.isEmpty()) {
             return new ArrayList<>();
         } else {
@@ -99,7 +99,6 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
 
     @Override
     public void deleteMessages(Object threadId) {
-        ChatThreadPO chatThreadPO = chatThreadDao.findById((Long) threadId);
-        chatMessageDao.deleteByChatThreadId((Long) threadId);
+        chatMessageDao.deleteByThreadId((Long) threadId);
     }
 }

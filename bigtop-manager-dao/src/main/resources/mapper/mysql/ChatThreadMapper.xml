@@ -27,13 +27,13 @@
     <select id="findAllByUserId" resultType="org.apache.bigtop.manager.dao.po.ChatThreadPO">
         SELECT *
         FROM llm_chat_thread
-        WHERE user_id = #{user_id}
+        WHERE user_id = #{userId}
     </select>
 
     <select id="findAllByPlatformAuthorizedIdAndUserId" resultType="org.apache.bigtop.manager.dao.po.ChatThreadPO">
         SELECT *
         FROM llm_chat_thread
-        WHERE platform_id = #{platform_id} AND user_id = #{user_id}
+        WHERE platform_id = #{platformId} AND user_id = #{userId}
     </select>
 
 </mapper>
