@@ -16,34 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.dao.po;
+package org.apache.bigtop.manager.dao.annotations;
 
-import org.apache.bigtop.manager.dao.annotations.CreateBy;
-import org.apache.bigtop.manager.dao.annotations.CreateTime;
-import org.apache.bigtop.manager.dao.annotations.UpdateBy;
-import org.apache.bigtop.manager.dao.annotations.UpdateTime;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import lombok.Data;
-
-import jakarta.persistence.Column;
-import java.sql.Timestamp;
-
-@Data
-public abstract class BasePO {
-
-    @CreateTime
-    @Column(name = "create_time")
-    private Timestamp createTime;
-
-    @UpdateTime
-    @Column(name = "update_time")
-    private Timestamp updateTime;
-
-    @CreateBy
-    @Column(name = "create_by")
-    private Long createBy;
-
-    @UpdateBy
-    @Column(name = "update_by")
-    private Long updateBy;
-}
+@Retention(RetentionPolicy.RUNTIME)
+@Target(value = {ElementType.FIELD})
+public @interface UpdateTime {}
