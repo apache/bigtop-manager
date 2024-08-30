@@ -100,7 +100,7 @@
         </where>
     </select>
 
-    <insert id="saveAll">
+    <insert id="saveAll" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         insert into host (hostname, ipv4, ipv6, os, arch, available_processors, free_memory_size, total_memory_size, free_disk, total_disk, state, cluster_id)
         values
         <foreach collection='hosts' item='host' separator=','>
