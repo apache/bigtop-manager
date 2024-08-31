@@ -24,9 +24,10 @@ import org.apache.bigtop.manager.dao.annotations.CreateBy;
 import org.apache.bigtop.manager.dao.annotations.CreateTime;
 import org.apache.bigtop.manager.dao.annotations.UpdateBy;
 import org.apache.bigtop.manager.dao.annotations.UpdateTime;
-import org.apache.bigtop.manager.dao.po.BasePO;
 import org.apache.bigtop.manager.server.holder.SessionUserHolder;
 
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.ibatis.binding.MapperMethod;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlCommandType;
@@ -41,6 +42,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
 import java.sql.Timestamp;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -53,6 +56,7 @@ import java.util.List;
 })
 public class AuditingInterceptor implements Interceptor {
 
+    @SuppressWarnings("unchecked")
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         MappedStatement mappedStatement = (MappedStatement) invocation.getArgs()[0];
@@ -62,39 +66,60 @@ public class AuditingInterceptor implements Interceptor {
         Object parameter = invocation.getArgs()[1];
         log.debug("sqlCommandType {}", sqlCommandType);
 
-        if (!(parameter instanceof BasePO)) {
-            return invocation.proceed();
+        Collection<Object> objects;
+        if (parameter instanceof MapperMethod.ParamMap) {
+            MapperMethod.ParamMap<Object> paramMap = ((MapperMethod.ParamMap<Object>) parameter);
+            if (paramMap.get("param1") instanceof Collection) {
+                objects = ((Collection<Object>) paramMap.get("param1"));
+            } else {
+                objects = Collections.singletonList(paramMap.get("param1"));
+            }
+        } else {
+            objects = Collections.singletonList(parameter);
         }
 
+        for (Object o : objects) {
+            setAuditFields(o, sqlCommandType);
+        }
+
+        return invocation.proceed();
+    }
+
+    private Pair<Long, Timestamp> getAuditInfo() {
         // Get the current time and operator
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         Long currentUser = SessionUserHolder.getUserId();
         log.debug("timestamp: {} currentUser: {}", timestamp, currentUser);
+        return Pair.of(currentUser, timestamp);
+    }
 
-        // Modify audit fields
-        List<Field> fields = ClassUtils.getFields(parameter.getClass());
+    private void setAuditFields(Object object, SqlCommandType sqlCommandType) throws IllegalAccessException {
+
+        Pair<Long, Timestamp> auditInfo = getAuditInfo();
+        Long currentUser = auditInfo.getLeft();
+        Timestamp timestamp = auditInfo.getRight();
+
+        List<Field> fields = ClassUtils.getFields(object.getClass());
         if (SqlCommandType.INSERT == sqlCommandType || SqlCommandType.UPDATE == sqlCommandType) {
             for (Field field : fields) {
-                boolean accessible = field.canAccess(parameter);
+                boolean accessible = field.canAccess(object);
                 field.setAccessible(true);
                 if (field.isAnnotationPresent(CreateBy.class)
                         && SqlCommandType.INSERT == sqlCommandType
                         && currentUser != null) {
-                    field.set(parameter, currentUser);
+                    field.set(object, currentUser);
                 }
                 if (field.isAnnotationPresent(CreateTime.class) && SqlCommandType.INSERT == sqlCommandType) {
-                    field.set(parameter, timestamp);
+                    field.set(object, timestamp);
                 }
                 if (field.isAnnotationPresent(UpdateBy.class) && currentUser != null) {
-                    field.set(parameter, currentUser);
+                    field.set(object, currentUser);
                 }
                 if (field.isAnnotationPresent(UpdateTime.class)) {
-                    field.set(parameter, timestamp);
+                    field.set(object, timestamp);
                 }
                 field.setAccessible(accessible);
             }
         }
-
-        return invocation.proceed();
     }
 }
