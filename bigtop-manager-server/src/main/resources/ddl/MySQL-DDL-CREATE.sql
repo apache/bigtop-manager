@@ -360,6 +360,8 @@ CREATE TABLE `llm_chat_message`
     `sender`      VARCHAR(50)         NOT NULL,
     `create_time` DATETIME            DEFAULT CURRENT_TIMESTAMP,
     `update_time` DATETIME            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `create_by`   BIGINT              DEFAULT NULL,
+    `update_by`   BIGINT              DEFAULT NULL,
     PRIMARY KEY (`id`),
     KEY              `idx_thread_id` (`thread_id`),
     KEY              `idx_user_id` (`user_id`)

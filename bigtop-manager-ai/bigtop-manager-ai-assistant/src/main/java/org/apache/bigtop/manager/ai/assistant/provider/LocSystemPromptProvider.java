@@ -30,11 +30,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Objects;
 
 @Slf4j
 public class LocSystemPromptProvider implements SystemPromptProvider {
-
-    private static final String SYSTEM_PROMPT_PATH = "src/main/resources/";
 
     @Override
     public SystemMessage getSystemPrompt(SystemPrompt systemPrompt) {
@@ -50,17 +49,38 @@ public class LocSystemPromptProvider implements SystemPromptProvider {
         return getSystemPrompt(SystemPrompt.DEFAULT_PROMPT);
     }
 
-    private SystemMessage loadPromptFromFile(String fileName) {
-        final String filePath = SYSTEM_PROMPT_PATH + fileName + ".st";
+    private String loadTextFromFile(String fileName) {
         try {
-            File file = ResourceUtils.getFile(filePath);
-            String text = Files.readString(file.toPath(), StandardCharsets.UTF_8);
-            return SystemMessage.from(text);
-        } catch (IOException e) {
+            String fullPath = Objects.requireNonNull(
+                            this.getClass().getClassLoader().getResource(fileName))
+                    .toString();
+            File file = ResourceUtils.getFile(fullPath);
+            return Files.readString(file.toPath(), StandardCharsets.UTF_8);
+        } catch (IOException | NullPointerException e) {
             log.error(
                     "Exception occurred while loading SystemPrompt from local. Here is some information:{}",
                     e.getMessage());
+            return null;
+        }
+    }
+
+    private SystemMessage loadPromptFromFile(String fileName) {
+        final String filePath = fileName + ".st";
+        String text = loadTextFromFile(filePath);
+        if (text == null) {
             return SystemMessage.from("You are a helpful assistant.");
+        } else {
+            return SystemMessage.from(text);
+        }
+    }
+
+    public SystemMessage getLanguagePrompt(String locale) {
+        final String filePath = SystemPrompt.LANGUAGE_PROMPT.getValue() + '-' + locale + ".st";
+        String text = loadTextFromFile(filePath);
+        if (text == null) {
+            return SystemMessage.from("Answer in " + locale);
+        } else {
+            return SystemMessage.from(text);
         }
     }
 }

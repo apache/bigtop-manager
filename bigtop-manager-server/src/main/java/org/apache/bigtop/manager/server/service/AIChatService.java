@@ -30,6 +30,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.util.List;
 
 public interface AIChatService {
+
     List<PlatformVO> platforms();
 
     List<PlatformAuthorizedVO> authorizedPlatforms();

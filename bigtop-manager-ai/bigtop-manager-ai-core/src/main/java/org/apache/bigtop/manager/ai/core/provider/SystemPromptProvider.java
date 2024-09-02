@@ -28,4 +28,6 @@ public interface SystemPromptProvider {
 
     // return default system prompt
     SystemMessage getSystemPrompt();
+
+    SystemMessage getLanguagePrompt(String locale);
 }
