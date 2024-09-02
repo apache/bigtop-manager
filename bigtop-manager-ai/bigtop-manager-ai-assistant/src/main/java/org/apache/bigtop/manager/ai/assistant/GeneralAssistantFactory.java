@@ -78,6 +78,10 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
 
         SystemMessage systemPrompt = systemPromptProvider.getSystemPrompt(systemPrompts);
         aiAssistant.setSystemPrompt(systemPrompt);
+        String locale = assistantConfig.getLanguage();
+        if (locale != null) {
+            aiAssistant.setSystemPrompt(systemPromptProvider.getLanguagePrompt(locale));
+        }
         return aiAssistant;
     }
 

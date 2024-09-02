@@ -26,4 +26,6 @@ public interface AIAssistantConfigProvider {
     Map<String, String> getCredentials();
 
     Map<String, String> getConfigs();
+
+    String getLanguage();
 }

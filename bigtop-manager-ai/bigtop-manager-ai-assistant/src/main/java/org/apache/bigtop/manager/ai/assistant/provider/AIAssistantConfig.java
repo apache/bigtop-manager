@@ -35,14 +35,17 @@ public class AIAssistantConfig implements AIAssistantConfigProvider {
      */
     private final Map<String, String> credentials;
 
+    private final String language;
     /**
      * Platform extra configs are put here
      */
     private final Map<String, String> configs;
 
-    private AIAssistantConfig(String model, Map<String, String> credentials, Map<String, String> configMap) {
+    private AIAssistantConfig(
+            String model, Map<String, String> credentials, String language, Map<String, String> configMap) {
         this.model = model;
         this.credentials = credentials;
+        this.language = language;
         this.configs = configMap;
     }
 
@@ -65,8 +68,14 @@ public class AIAssistantConfig implements AIAssistantConfigProvider {
         return configs;
     }
 
+    @Override
+    public String getLanguage() {
+        return language;
+    }
+
     public static class Builder {
         private String model;
+        private String language;
 
         private final Map<String, String> credentials = new HashMap<>();
 
@@ -89,6 +98,11 @@ public class AIAssistantConfig implements AIAssistantConfigProvider {
             return this;
         }
 
+        public Builder setLanguage(String language) {
+            this.language = language;
+            return this;
+        }
+
         public Builder addConfig(String key, String value) {
             configs.put(key, value);
             return this;
@@ -100,7 +114,7 @@ public class AIAssistantConfig implements AIAssistantConfigProvider {
         }
 
         public AIAssistantConfig build() {
-            return new AIAssistantConfig(model, credentials, configs);
+            return new AIAssistantConfig(model, credentials, language, configs);
         }
     }
 }

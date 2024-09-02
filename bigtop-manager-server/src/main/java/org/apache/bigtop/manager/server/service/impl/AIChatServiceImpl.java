@@ -50,6 +50,7 @@ import org.apache.bigtop.manager.server.model.vo.PlatformVO;
 import org.apache.bigtop.manager.server.service.AIChatService;
 
 import org.jetbrains.annotations.NotNull;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -91,6 +92,7 @@ public class AIChatServiceImpl implements AIChatService {
     private AIAssistantConfig getAIAssistantConfig(PlatformAuthorizedDTO platformAuthorizedDTO) {
         return AIAssistantConfig.builder()
                 .setModel(platformAuthorizedDTO.getModel())
+                .setLanguage(LocaleContextHolder.getLocale().toString())
                 .addCredentials(platformAuthorizedDTO.getCredentials())
                 .build();
     }
