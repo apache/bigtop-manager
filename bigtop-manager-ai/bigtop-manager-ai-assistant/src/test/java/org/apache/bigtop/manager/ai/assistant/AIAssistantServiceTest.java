@@ -64,14 +64,14 @@ public class AIAssistantServiceTest {
                 emmit.next(text.charAt(i) + "");
             }
         }));
-        when(aiAssistantFactory.create(PlatformType.OPENAI, configProvider, threadId))
+        when(aiAssistantFactory.create(PlatformType.OPENAI, configProvider, threadId, false))
                 .thenReturn(this.aiAssistant);
         when(aiAssistant.getPlatform()).thenReturn(PlatformType.OPENAI);
     }
 
     @Test
     public void createNew2SimpleChat() {
-        AIAssistant aiAssistant = aiAssistantFactory.create(PlatformType.OPENAI, configProvider, threadId);
+        AIAssistant aiAssistant = aiAssistantFactory.create(PlatformType.OPENAI, configProvider, threadId, false);
         String ask = aiAssistant.ask("1?");
         assertFalse(ask.isEmpty());
         System.out.println(ask);
@@ -79,7 +79,7 @@ public class AIAssistantServiceTest {
 
     @Test
     public void createNew2StreamChat() throws InterruptedException {
-        AIAssistant aiAssistant = aiAssistantFactory.create(PlatformType.OPENAI, configProvider, threadId);
+        AIAssistant aiAssistant = aiAssistantFactory.create(PlatformType.OPENAI, configProvider, threadId, false);
         Flux<String> stringFlux = aiAssistant.streamAsk("stream 1?");
         stringFlux.subscribe(
                 System.out::println,

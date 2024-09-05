@@ -22,24 +22,21 @@ import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.enums.SystemPrompt;
 import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
 
-import java.util.UUID;
-
 public interface AIAssistantFactory {
 
     AIAssistant createWithPrompt(
-            PlatformType platformType, AIAssistantConfigProvider assistantConfig, Object id, SystemPrompt systemPrompt);
+            PlatformType platformType,
+            AIAssistantConfigProvider assistantConfig,
+            Object id,
+            SystemPrompt systemPrompt,
+            boolean isPersistent);
 
-    AIAssistant create(PlatformType platformType, AIAssistantConfigProvider assistantConfig, Object id);
+    AIAssistant create(
+            PlatformType platformType, AIAssistantConfigProvider assistantConfig, Object id, boolean isPersistent);
 
-    /**
-     * TODO Create AIAssistant without memory, should delete UUID
-     *
-     * @param platformType platform type
-     * @param assistantConfig assistant config
-     * @return AIAssistant
-     */
-    default AIAssistant create(PlatformType platformType, AIAssistantConfigProvider assistantConfig) {
-        return create(platformType, assistantConfig, UUID.randomUUID().toString());
+    default AIAssistant create(
+            PlatformType platformType, AIAssistantConfigProvider assistantConfig, boolean isPersistent) {
+        return create(platformType, assistantConfig, null, isPersistent);
     }
 
     ToolBox createToolBox(PlatformType platformType);

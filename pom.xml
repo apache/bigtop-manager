@@ -138,6 +138,12 @@
 
             <dependency>
                 <groupId>org.apache.bigtop</groupId>
+                <artifactId>bigtop-manager-ai-dashscope</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.bigtop</groupId>
                 <artifactId>bigtop-manager-ai-assistant</artifactId>
                 <version>${project.version}</version>
             </dependency>

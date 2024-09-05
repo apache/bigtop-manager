@@ -35,10 +35,10 @@ public class SystemPromptProviderTests {
 
     @Test
     public void loadSystemPromptByIdTest() {
-        SystemMessage systemPrompt1 = systemPromptProvider.getSystemPrompt(SystemPrompt.BIGDATA_PROFESSOR);
+        SystemMessage systemPrompt1 = systemPromptProvider.getSystemMessage(SystemPrompt.BIGDATA_PROFESSOR);
         assertFalse(systemPrompt1.text().isEmpty());
 
-        SystemMessage systemPrompt2 = systemPromptProvider.getSystemPrompt();
+        SystemMessage systemPrompt2 = systemPromptProvider.getSystemMessage();
         assertFalse(systemPrompt2.text().isEmpty());
 
         assertEquals(systemPrompt1.text(), systemPrompt2.text());

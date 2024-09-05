@@ -16,39 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.ai.core.enums;
+package org.apache.bigtop.manager.ai.dashscope;
 
 import lombok.Getter;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import lombok.Setter;
 
 @Getter
-public enum PlatformType {
-    OPENAI("openai"),
-    DASH_SCOPE("dashscope");
+@Setter
+public class DashScopeThreadParam {
+    private Object threadId;
 
-    private final String value;
+    private String assistantId;
 
-    PlatformType(String value) {
-        this.value = value;
-    }
+    private String assistantThreadId;
 
-    public static List<String> getPlatforms() {
-        return Arrays.stream(values()).map(item -> item.value).collect(Collectors.toList());
-    }
+    private String model;
 
-    public static PlatformType getPlatformType(String value) {
-        if (Objects.isNull(value) || value.isEmpty()) {
-            return null;
-        }
-        for (PlatformType platformType : PlatformType.values()) {
-            if (platformType.value.equals(value)) {
-                return platformType;
-            }
-        }
-        return null;
-    }
+    private String apiKey;
 }

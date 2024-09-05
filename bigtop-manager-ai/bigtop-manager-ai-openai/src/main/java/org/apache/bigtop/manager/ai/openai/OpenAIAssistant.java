@@ -20,27 +20,104 @@ package org.apache.bigtop.manager.ai.openai;
 
 import org.apache.bigtop.manager.ai.core.AbstractAIAssistant;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
+import org.apache.bigtop.manager.ai.core.exception.AssistantConfigNotSetException;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
 
+import dev.langchain4j.data.message.AiMessage;
+import dev.langchain4j.data.message.SystemMessage;
+import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.internal.ValidationUtils;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
+import dev.langchain4j.model.StreamingResponseHandler;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.chat.StreamingChatLanguageModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
+import dev.langchain4j.model.output.Response;
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.FluxSink;
 
 public class OpenAIAssistant extends AbstractAIAssistant {
 
+    private final ChatLanguageModel chatLanguageModel;
+    private final StreamingChatLanguageModel streamingChatLanguageModel;
+    private final ChatMemory chatMemory;
+
     private static final String BASE_URL = "https://api.openai.com/v1";
 
-    private OpenAIAssistant(
+    public OpenAIAssistant(
             ChatLanguageModel chatLanguageModel,
             StreamingChatLanguageModel streamingChatLanguageModel,
             ChatMemory chatMemory) {
-        super(chatLanguageModel, streamingChatLanguageModel, chatMemory);
+        this.chatLanguageModel = chatLanguageModel;
+        this.streamingChatLanguageModel = streamingChatLanguageModel;
+        this.chatMemory = chatMemory;
+    }
+
+    @Override
+    public Flux<String> streamAsk(String chatMessage) {
+        if (chatMemory == null || streamingChatLanguageModel == null) {
+            throw new AssistantConfigNotSetException("threadId");
+        }
+        chatMemory.add(UserMessage.from(chatMessage));
+        return Flux.create(
+                emitter -> streamingChatLanguageModel.generate(chatMemory.messages(), new StreamingResponseHandler<>() {
+                    @Override
+                    public void onNext(String token) {
+                        emitter.next(token);
+                    }
+
+                    @Override
+                    public void onError(Throwable error) {
+                        emitter.error(error);
+                    }
+
+                    @Override
+                    public void onComplete(Response<AiMessage> response) {
+                        StreamingResponseHandler.super.onComplete(response);
+                        chatMemory.add(response.content());
+                    }
+                }),
+                FluxSink.OverflowStrategy.BUFFER);
+    }
+
+    @Override
+    public String ask(String chatMessage) {
+        if (chatMemory == null || chatLanguageModel == null) {
+            throw new AssistantConfigNotSetException("threadId");
+        }
+        chatMemory.add(UserMessage.from(chatMessage));
+        Response<AiMessage> generate = chatLanguageModel.generate(chatMemory.messages());
+        String aiMessage = generate.content().text();
+        chatMemory.add(AiMessage.from(aiMessage));
+        return aiMessage;
+    }
+
+    @Override
+    public void setSystemPrompt(String systemPrompt) {
+        if (chatMemory == null) {
+            throw new AssistantConfigNotSetException("threadId");
+        }
+        chatMemory.add(SystemMessage.systemMessage(systemPrompt));
+    }
+
+    public void setSystemPrompt(SystemMessage systemPrompt) {
+        if (chatMemory == null) {
+            throw new AssistantConfigNotSetException("threadId");
+        }
+        chatMemory.add(systemPrompt);
+    }
+
+    @Override
+    public Object getId() {
+        return chatMemory.id();
+    }
+
+    public void resetMemory() {
+        chatMemory.clear();
     }
 
     @Override
@@ -76,7 +153,6 @@ public class OpenAIAssistant extends AbstractAIAssistant {
         }
 
         public AIAssistant build() {
-            ValidationUtils.ensureNotNull(id, "id");
             String model = ValidationUtils.ensureNotNull(configProvider.getModel(), "model");
             String apiKey = ValidationUtils.ensureNotNull(
                     configProvider.getCredentials().get("apiKey"), "apiKey");
@@ -90,11 +166,13 @@ public class OpenAIAssistant extends AbstractAIAssistant {
                     .baseUrl(BASE_URL)
                     .modelName(model)
                     .build();
-            MessageWindowChatMemory chatMemory = MessageWindowChatMemory.builder()
-                    .id(id)
+            MessageWindowChatMemory.Builder builder = MessageWindowChatMemory.builder()
                     .chatMemoryStore(chatMemoryStore)
-                    .maxMessages(MEMORY_LEN)
-                    .build();
+                    .maxMessages(MEMORY_LEN);
+            if (id != null) {
+                builder.id(id);
+            }
+            MessageWindowChatMemory chatMemory = builder.build();
             return new OpenAIAssistant(openAiChatModel, openaiStreamChatModel, chatMemory);
         }
     }

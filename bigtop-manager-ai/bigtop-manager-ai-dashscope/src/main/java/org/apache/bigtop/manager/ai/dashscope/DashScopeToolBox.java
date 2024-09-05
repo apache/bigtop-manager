@@ -16,39 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.ai.core.enums;
+package org.apache.bigtop.manager.ai.dashscope;
 
-import lombok.Getter;
+import org.apache.bigtop.manager.ai.core.factory.ToolBox;
 
-import java.util.Arrays;
+import reactor.core.publisher.Flux;
+
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
-@Getter
-public enum PlatformType {
-    OPENAI("openai"),
-    DASH_SCOPE("dashscope");
-
-    private final String value;
-
-    PlatformType(String value) {
-        this.value = value;
+public class DashScopeToolBox implements ToolBox {
+    @Override
+    public List<String> getTools() {
+        return null;
     }
 
-    public static List<String> getPlatforms() {
-        return Arrays.stream(values()).map(item -> item.value).collect(Collectors.toList());
+    @Override
+    public String invoke(String toolName) {
+        return null;
     }
 
-    public static PlatformType getPlatformType(String value) {
-        if (Objects.isNull(value) || value.isEmpty()) {
-            return null;
-        }
-        for (PlatformType platformType : PlatformType.values()) {
-            if (platformType.value.equals(value)) {
-                return platformType;
-            }
-        }
+    @Override
+    public Flux<String> streamInvoke(String toolName) {
         return null;
     }
 }

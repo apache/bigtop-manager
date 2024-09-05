@@ -16,16 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.ai.core.provider;
+package org.apache.bigtop.manager.ai.dashscope.repository;
 
-import org.apache.bigtop.manager.ai.core.enums.SystemPrompt;
+public interface DashScopeMessageRepository {
+    default void saveUserMessage(String message, Long threadId) {}
 
-public interface SystemPromptProvider {
+    default void saveAiMessage(String message, Long threadId) {}
 
-    String getSystemMessage(SystemPrompt systemPrompt);
-
-    // return default system prompt
-    String getSystemMessage();
-
-    String getLanguagePrompt(String locale);
+    default void saveSystemMessage(String message, Long threadId) {}
 }
