@@ -187,7 +187,6 @@ public class DashScopeAssistant extends AbstractAIAssistant {
                 })
                 .doOnComplete(() -> {
                     messageRepository.saveAiMessage(finalMessage.toString(), (Long) dashScopeThreadParam.getThreadId());
-                    System.out.println("Stream processing completed.");
                 });
     }
 
