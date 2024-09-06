@@ -54,11 +54,23 @@ public interface AIAssistant {
      */
     PlatformType getPlatform();
 
+    /**
+     * This is used to create a thread
+     * @return
+     */
     default Map<String, String> creatThread() {
         return new HashMap<>();
     }
 
+    /**
+     * This is used to set system prompt
+     * @return
+     */
     void setSystemPrompt(String systemPrompt);
 
+    /**
+     * This is used to test whether the configuration is correct
+     * @return
+     */
     boolean test();
 }

@@ -100,6 +100,18 @@ public class DashScopeAssistant extends AbstractAIAssistant {
         return runs;
     }
 
+    private String getValueFromAssistantStreamMessage(AssistantStreamMessage assistantStreamMessage) {
+        ThreadMessageDelta threadMessageDelta = (ThreadMessageDelta) assistantStreamMessage.getData();
+        StringBuilder streamMessage = new StringBuilder();
+
+        List<ContentBase> contents = threadMessageDelta.getDelta().getContent();
+        for (ContentBase content : contents) {
+            ContentText contentText = (ContentText) content;
+            streamMessage.append(contentText.getText().getValue());
+        }
+        return streamMessage.toString();
+    }
+
     @Override
     public PlatformType getPlatform() {
         return PlatformType.DASH_SCOPE;
@@ -138,18 +150,6 @@ public class DashScopeAssistant extends AbstractAIAssistant {
         return dashScopeThreadParam.getThreadId();
     }
 
-    private String getValueFromAssistantStreamMessage(AssistantStreamMessage assistantStreamMessage) {
-        ThreadMessageDelta threadMessageDelta = (ThreadMessageDelta) assistantStreamMessage.getData();
-        StringBuilder streamMessage = new StringBuilder();
-
-        List<ContentBase> contents = threadMessageDelta.getDelta().getContent();
-        for (ContentBase content : contents) {
-            ContentText contentText = (ContentText) content;
-            streamMessage.append(contentText.getText().getValue());
-        }
-        return streamMessage.toString();
-    }
-
     @Override
     public Flux<String> streamAsk(String userMessage) {
         messageRepository.saveUserMessage(userMessage, (Long) dashScopeThreadParam.getThreadId());
@@ -182,7 +182,7 @@ public class DashScopeAssistant extends AbstractAIAssistant {
                             assistantStreamMessage.getEvent().equals(AssistantStreamEvents.THREAD_MESSAGE_DELTA)
                                     ? getValueFromAssistantStreamMessage(assistantStreamMessage)
                                     : "";
-                    finalMessage.append(message); // 在这里拼接消息
+                    finalMessage.append(message);
                     return message;
                 })
                 .doOnComplete(() -> {
