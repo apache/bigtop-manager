@@ -72,6 +72,7 @@
                         <goals>
                             <goal>pnpm</goal>
                         </goals>
+                        <phase>generate-resources</phase>
                         <configuration>
                             <arguments>build</arguments>
                         </configuration>

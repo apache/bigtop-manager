@@ -24,7 +24,7 @@ jobs:
       - run: ./mvnw clean spotless:check
 
   unit-tests-java:
-    name: "Run unit test(java)"
+    name: "Run unit test(Java)"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
