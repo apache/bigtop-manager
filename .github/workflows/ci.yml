@@ -34,6 +34,18 @@ jobs:
           java-version: '17'
           cache: 'maven'
       - run: ./mvnw clean test -Dskip.pnpm -Dskip.installnodepnpm
+      
+  unit-tests-ts:
+    name: "Run unit tests(Vue/Typescript)"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'maven'
+      - run: ./mvnw -pl bigtop-manager-ui test
 
   build:
     name: "Build project"

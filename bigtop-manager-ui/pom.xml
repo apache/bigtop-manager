@@ -34,6 +34,7 @@
         <node.version>v18.17.0</node.version>
         <pnpm.version>v8.6.9</pnpm.version>
         <frontend-maven-plugin.version>1.13.4</frontend-maven-plugin.version>
+        <skip.pnpm.test>false</skip.pnpm.test>
     </properties>
 
     <build>
@@ -71,9 +72,18 @@
                         <goals>
                             <goal>pnpm</goal>
                         </goals>
-                        <phase>generate-resources</phase>
                         <configuration>
                             <arguments>build</arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>pnpm test</id>
+                        <goals>
+                            <goal>pnpm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>test:run</arguments>
+                            <skip>${skip.pnpm.test}</skip>
                         </configuration>
                     </execution>
                 </executions>
