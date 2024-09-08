@@ -64,7 +64,7 @@
                         </goals>
                         <phase>generate-resources</phase>
                         <configuration>
-                            <arguments>install --force</arguments>
+                            <arguments>install</arguments>
                         </configuration>
                     </execution>
                     <execution>
@@ -81,6 +81,7 @@
                         <goals>
                             <goal>pnpm</goal>
                         </goals>
+                        <phase>test</phase>
                         <configuration>
                             <arguments>test:run</arguments>
                             <skip>${skip.pnpm.test}</skip>

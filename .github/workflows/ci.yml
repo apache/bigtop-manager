@@ -23,8 +23,8 @@ jobs:
           cache: 'maven'
       - run: ./mvnw clean spotless:check
 
-  unit-tests:
-    name: "Run unit tests"
+  unit-tests-java:
+    name: "Run unit test(java)"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -33,7 +33,7 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
           cache: 'maven'
-      - run: ./mvnw clean test -Dskip.pnpm -Dskip.installnodepnpm
+      - run: ./mvnw clean test -Dskip.pnpm -Dskip.installnodepnpm -Dskip.pnpm.test
       
   unit-tests-ts:
     name: "Run unit tests(Vue/Typescript)"
