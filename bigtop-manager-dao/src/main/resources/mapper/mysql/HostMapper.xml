@@ -100,11 +100,11 @@
         </where>
     </select>
 
-    <insert id="saveAll">
-        insert into host (hostname, ipv4, ipv6, os, arch, available_processors, free_memory_size, total_memory_size, free_disk, total_disk, state, cluster_id)
+    <insert id="saveAll" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into host (hostname, ipv4, ipv6, os, arch, available_processors, free_memory_size, total_memory_size, free_disk, total_disk, state, cluster_id, create_by, update_by, create_time, update_time)
         values
         <foreach collection='hosts' item='host' separator=','>
-            (#{host.hostname}, #{host.ipv4}, #{host.ipv6}, #{host.os}, #{host.arch}, #{host.availableProcessors}, #{host.freeMemorySize}, #{host.totalMemorySize}, #{host.freeDisk}, #{host.totalDisk}, #{host.state}, #{host.clusterId})
+            (#{host.hostname}, #{host.ipv4}, #{host.ipv6}, #{host.os}, #{host.arch}, #{host.availableProcessors}, #{host.freeMemorySize}, #{host.totalMemorySize}, #{host.freeDisk}, #{host.totalDisk}, #{host.state}, #{host.clusterId} ,#{host.createBy},#{host.updateBy},#{host.createTime},#{host.updateTime})
         </foreach>
     </insert>
 

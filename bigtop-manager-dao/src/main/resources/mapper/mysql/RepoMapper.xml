@@ -40,11 +40,11 @@
         limit 1
     </select>
 
-    <insert id="saveAll">
-        insert into repo (base_url, os, arch, repo_id, repo_name, cluster_id)
+    <insert id="saveAll" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into repo (base_url, os, arch, repo_id, repo_name, cluster_id, create_by, update_by, create_time, update_time)
         values
         <foreach collection='clusters' item='cluster' separator=','>
-            (#{cluster.baseUrl},#{cluster.os},#{cluster.arch},#{cluster.repoId},#{cluster.repoName},#{cluster.clusterId})
+            (#{cluster.baseUrl},#{cluster.os},#{cluster.arch},#{cluster.repoId},#{cluster.repoName},#{cluster.clusterId},#{cluster.createBy},#{cluster.updateBy},#{cluster.createTime},#{cluster.updateTime})
         </foreach>
     </insert>
 
