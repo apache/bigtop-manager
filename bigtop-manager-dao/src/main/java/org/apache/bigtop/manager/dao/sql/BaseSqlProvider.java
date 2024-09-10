@@ -84,7 +84,8 @@ public class BaseSqlProvider {
         return SQLBuilder.selectAll(tableMetaData, databaseId);
     }
 
-    public <Condition> String findByCondition(Condition condition, ProviderContext context) throws IllegalAccessException {
+    public <Condition> String findByCondition(Condition condition, ProviderContext context)
+            throws IllegalAccessException {
         String databaseId = context.getDatabaseId();
 
         Class<?> entityClass = getEntityClass(context);

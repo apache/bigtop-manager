@@ -202,8 +202,8 @@ public class SQLBuilder {
         return sql.toString();
     }
 
-    public static <Condition> String findByCondition(TableMetaData tableMetaData, String databaseId, Condition condition)
-            throws IllegalAccessException {
+    public static <Condition> String findByCondition(
+            TableMetaData tableMetaData, String databaseId, Condition condition) throws IllegalAccessException {
         String tableName = tableMetaData.getTableName();
         log.info("databaseId: {}", databaseId);
         SQL sql = new SQL();
