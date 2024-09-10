@@ -17,14 +17,13 @@
  * under the License.
  */
 
-package org.apache.bigtop.manager.server.interceptor;
+package org.apache.bigtop.manager.dao.interceptor;
 
 import org.apache.bigtop.manager.common.utils.ClassUtils;
 import org.apache.bigtop.manager.dao.annotations.CreateBy;
 import org.apache.bigtop.manager.dao.annotations.CreateTime;
 import org.apache.bigtop.manager.dao.annotations.UpdateBy;
 import org.apache.bigtop.manager.dao.annotations.UpdateTime;
-import org.apache.bigtop.manager.server.holder.SessionUserHolder;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.ibatis.binding.MapperMethod;
@@ -43,6 +42,7 @@ import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 
 @Slf4j
 @Intercepts({
@@ -52,6 +52,12 @@ import java.util.List;
             args = {MappedStatement.class, Object.class})
 })
 public class AuditingInterceptor implements Interceptor {
+
+    private final Supplier<Long> supplier;
+
+    public AuditingInterceptor(Supplier<Long> supplier) {
+        this.supplier = supplier;
+    }
 
     @SuppressWarnings("unchecked")
     @Override
@@ -85,7 +91,7 @@ public class AuditingInterceptor implements Interceptor {
     private Pair<Long, Timestamp> getAuditInfo() {
         // Get the current time and operator
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        Long currentUser = SessionUserHolder.getUserId();
+        Long currentUser = supplier.get();
         log.debug("timestamp: {} currentUser: {}", timestamp, currentUser);
         return Pair.of(currentUser, timestamp);
     }

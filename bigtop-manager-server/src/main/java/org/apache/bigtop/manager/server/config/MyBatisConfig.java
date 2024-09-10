@@ -18,7 +18,8 @@
  */
 package org.apache.bigtop.manager.server.config;
 
-import org.apache.bigtop.manager.server.interceptor.AuditingInterceptor;
+import org.apache.bigtop.manager.dao.interceptor.AuditingInterceptor;
+import org.apache.bigtop.manager.server.holder.SessionUserHolder;
 
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -48,7 +49,7 @@ public class MyBatisConfig {
         org.apache.ibatis.session.Configuration configuration = new org.apache.ibatis.session.Configuration();
         configuration.setMapUnderscoreToCamelCase(true);
         configuration.setUseGeneratedKeys(true);
-        configuration.addInterceptor(new AuditingInterceptor());
+        configuration.addInterceptor(new AuditingInterceptor(SessionUserHolder::getUserId));
 
         sessionFactory.setDatabaseIdProvider(new ProductNameDatabaseIdProvider());
         sessionFactory.setConfiguration(configuration);
