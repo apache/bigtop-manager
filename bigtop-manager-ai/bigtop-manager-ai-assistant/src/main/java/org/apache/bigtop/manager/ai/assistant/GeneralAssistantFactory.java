@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.ai.assistant;
 
 import org.apache.bigtop.manager.ai.assistant.provider.LocSystemPromptProvider;
-import org.apache.bigtop.manager.ai.assistant.provider.PersistentProvider;
+import org.apache.bigtop.manager.ai.assistant.provider.PersistentStoreProvider;
 import org.apache.bigtop.manager.ai.core.AbstractAIAssistantFactory;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.enums.SystemPrompt;
@@ -40,23 +40,24 @@ import java.util.Objects;
 public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
 
     private final SystemPromptProvider systemPromptProvider;
-    private final PersistentProvider persistentProvider;
+    private final PersistentStoreProvider persistentStoreProvider;
 
     public GeneralAssistantFactory() {
-        this(new LocSystemPromptProvider(), new PersistentProvider());
+        this(new LocSystemPromptProvider(), new PersistentStoreProvider());
     }
 
     public GeneralAssistantFactory(SystemPromptProvider systemPromptProvider) {
-        this(systemPromptProvider, new PersistentProvider());
+        this(systemPromptProvider, new PersistentStoreProvider());
     }
 
-    public GeneralAssistantFactory(PersistentProvider persistentProvider) {
-        this(new LocSystemPromptProvider(), persistentProvider);
+    public GeneralAssistantFactory(PersistentStoreProvider persistentStoreProvider) {
+        this(new LocSystemPromptProvider(), persistentStoreProvider);
     }
 
-    public GeneralAssistantFactory(SystemPromptProvider systemPromptProvider, PersistentProvider persistentProvider) {
+    public GeneralAssistantFactory(
+            SystemPromptProvider systemPromptProvider, PersistentStoreProvider persistentStoreProvider) {
         this.systemPromptProvider = systemPromptProvider;
-        this.persistentProvider = persistentProvider;
+        this.persistentStoreProvider = persistentStoreProvider;
     }
 
     @Override
@@ -70,14 +71,15 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
         if (Objects.requireNonNull(platformType) == PlatformType.OPENAI) {
             aiAssistant = OpenAIAssistant.builder()
                     .id(id)
-                    .memoryStore(isPersistent ? persistentProvider.getChatMemoryStore() : new InMemoryChatMemoryStore())
+                    .memoryStore(
+                            isPersistent ? persistentStoreProvider.getChatMemoryStore() : new InMemoryChatMemoryStore())
                     .withConfigProvider(assistantConfig)
                     .build();
         } else if (Objects.requireNonNull(platformType) == PlatformType.DASH_SCOPE) {
             aiAssistant = DashScopeAssistant.builder()
                     .id(id)
                     .withConfigProvider(assistantConfig)
-                    .messageRepository(persistentProvider.getPersistentRepository())
+                    .messageRepository(persistentStoreProvider.getPersistentRepository())
                     .build();
         } else {
             throw new PlatformNotFoundException(platformType.getValue());

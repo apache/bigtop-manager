@@ -22,7 +22,7 @@ import org.apache.bigtop.manager.ai.core.AbstractAIAssistant;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
-import org.apache.bigtop.manager.ai.dashscope.repository.DashScopeMessageRepository;
+import org.apache.bigtop.manager.ai.core.repository.MessageRepository;
 
 import com.alibaba.dashscope.aigc.generation.Generation;
 import com.alibaba.dashscope.aigc.generation.GenerationParam;
@@ -64,10 +64,10 @@ public class DashScopeAssistant extends AbstractAIAssistant {
     private Messages messages = null;
     private Threads threads = null;
     private Runs runs = null;
-    private final DashScopeMessageRepository messageRepository;
+    private final MessageRepository messageRepository;
     private final DashScopeThreadParam dashScopeThreadParam;
 
-    public DashScopeAssistant(DashScopeMessageRepository messageRepository, DashScopeThreadParam dashScopeThreadParam) {
+    public DashScopeAssistant(MessageRepository messageRepository, DashScopeThreadParam dashScopeThreadParam) {
         this.messageRepository = messageRepository;
         this.dashScopeThreadParam = dashScopeThreadParam;
     }
@@ -307,7 +307,7 @@ public class DashScopeAssistant extends AbstractAIAssistant {
     public static class Builder {
         private Object id;
         private AIAssistantConfigProvider configProvider;
-        private DashScopeMessageRepository messageRepository;
+        private MessageRepository messageRepository;
 
         public Builder() {}
 
@@ -321,7 +321,7 @@ public class DashScopeAssistant extends AbstractAIAssistant {
             return this;
         }
 
-        public Builder messageRepository(DashScopeMessageRepository messageRepository) {
+        public Builder messageRepository(MessageRepository messageRepository) {
             this.messageRepository = messageRepository;
             return this;
         }

@@ -69,11 +69,6 @@ public class AIAssistantConfig implements AIAssistantConfigProvider {
     }
 
     @Override
-    public void addConfigs(Map<String, String> configMap) {
-        configs.putAll(configMap);
-    }
-
-    @Override
     public String getLanguage() {
         return language;
     }

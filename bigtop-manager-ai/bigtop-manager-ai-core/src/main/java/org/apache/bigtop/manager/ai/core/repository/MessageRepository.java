@@ -16,9 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.ai.dashscope.repository;
+package org.apache.bigtop.manager.ai.core.repository;
 
-public interface DashScopeMessageRepository {
+public interface MessageRepository {
     default void saveUserMessage(String message, Long threadId) {}
 
     default void saveAiMessage(String message, Long threadId) {}

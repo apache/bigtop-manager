@@ -19,13 +19,13 @@
 package org.apache.bigtop.manager.ai.assistant.store;
 
 import org.apache.bigtop.manager.ai.core.enums.MessageSender;
-import org.apache.bigtop.manager.ai.dashscope.repository.DashScopeMessageRepository;
+import org.apache.bigtop.manager.ai.core.repository.MessageRepository;
 import org.apache.bigtop.manager.dao.po.ChatMessagePO;
 import org.apache.bigtop.manager.dao.po.ChatThreadPO;
 import org.apache.bigtop.manager.dao.repository.ChatMessageDao;
 import org.apache.bigtop.manager.dao.repository.ChatThreadDao;
 
-public class PersistentRepository implements DashScopeMessageRepository {
+public class PersistentMessageRepository implements MessageRepository {
     private final ChatThreadDao chatThreadDao;
     private final ChatMessageDao chatMessageDao;
 
@@ -33,14 +33,9 @@ public class PersistentRepository implements DashScopeMessageRepository {
         return chatThreadDao == null || chatMessageDao == null;
     }
 
-    public PersistentRepository(ChatThreadDao chatThreadDao, ChatMessageDao chatMessageDao) {
+    public PersistentMessageRepository(ChatThreadDao chatThreadDao, ChatMessageDao chatMessageDao) {
         this.chatThreadDao = chatThreadDao;
         this.chatMessageDao = chatMessageDao;
-    }
-
-    public PersistentRepository() {
-        this.chatThreadDao = null;
-        this.chatMessageDao = null;
     }
 
     private ChatMessagePO getChatMessagePO(String message, Long threadId, MessageSender sender) {

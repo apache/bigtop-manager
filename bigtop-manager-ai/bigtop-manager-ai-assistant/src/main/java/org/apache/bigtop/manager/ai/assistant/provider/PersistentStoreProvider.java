@@ -19,38 +19,40 @@
 package org.apache.bigtop.manager.ai.assistant.provider;
 
 import org.apache.bigtop.manager.ai.assistant.store.PersistentChatMemoryStore;
-import org.apache.bigtop.manager.ai.assistant.store.PersistentRepository;
+import org.apache.bigtop.manager.ai.assistant.store.PersistentMessageRepository;
+import org.apache.bigtop.manager.ai.core.repository.MessageRepository;
 import org.apache.bigtop.manager.dao.repository.ChatMessageDao;
 import org.apache.bigtop.manager.dao.repository.ChatThreadDao;
 
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
+import dev.langchain4j.store.memory.chat.InMemoryChatMemoryStore;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class PersistentProvider {
+public class PersistentStoreProvider {
     private final ChatThreadDao chatThreadDao;
     private final ChatMessageDao chatMessageDao;
 
-    public PersistentProvider(ChatThreadDao chatThreadDao, ChatMessageDao chatMessageDao) {
+    public PersistentStoreProvider(ChatThreadDao chatThreadDao, ChatMessageDao chatMessageDao) {
         this.chatThreadDao = chatThreadDao;
         this.chatMessageDao = chatMessageDao;
     }
 
-    public PersistentProvider() {
+    public PersistentStoreProvider() {
         chatMessageDao = null;
         chatThreadDao = null;
     }
 
-    public PersistentRepository getPersistentRepository() {
-        if (chatThreadDao == null) {
-            return new PersistentRepository();
-        }
-        return new PersistentRepository(chatThreadDao, chatMessageDao);
+    public MessageRepository getPersistentRepository() {
+        return new PersistentMessageRepository(chatThreadDao, chatMessageDao);
     }
 
     public ChatMemoryStore getChatMemoryStore() {
+        if (chatThreadDao == null) {
+            return new InMemoryChatMemoryStore();
+        }
         return new PersistentChatMemoryStore(chatThreadDao, chatMessageDao);
     }
 }
