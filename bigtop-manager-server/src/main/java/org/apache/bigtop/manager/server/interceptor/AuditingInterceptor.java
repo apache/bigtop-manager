@@ -36,8 +36,6 @@ import org.apache.ibatis.plugin.Intercepts;
 import org.apache.ibatis.plugin.Invocation;
 import org.apache.ibatis.plugin.Signature;
 
-import org.springframework.stereotype.Component;
-
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
@@ -47,7 +45,6 @@ import java.util.Collections;
 import java.util.List;
 
 @Slf4j
-@Component
 @Intercepts({
     @Signature(
             type = Executor.class,
@@ -94,7 +91,6 @@ public class AuditingInterceptor implements Interceptor {
     }
 
     private void setAuditFields(Object object, SqlCommandType sqlCommandType) throws IllegalAccessException {
-
         Pair<Long, Timestamp> auditInfo = getAuditInfo();
         Long currentUser = auditInfo.getLeft();
         Timestamp timestamp = auditInfo.getRight();
