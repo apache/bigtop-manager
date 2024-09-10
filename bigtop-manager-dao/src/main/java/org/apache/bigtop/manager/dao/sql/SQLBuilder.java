@@ -202,7 +202,7 @@ public class SQLBuilder {
         return sql.toString();
     }
 
-    public static <C> String findByCondition(TableMetaData tableMetaData, String databaseId, C condition)
+    public static <Condition> String findByCondition(TableMetaData tableMetaData, String databaseId, Condition condition)
             throws IllegalAccessException {
         String tableName = tableMetaData.getTableName();
         log.info("databaseId: {}", databaseId);
@@ -228,7 +228,7 @@ public class SQLBuilder {
         return "#{" + property + "}";
     }
 
-    private static <R> SQL mysqlCondition(R condition, String tableName) throws IllegalAccessException {
+    private static <Condition> SQL mysqlCondition(Condition condition, String tableName) throws IllegalAccessException {
 
         Class<?> loadClass;
         try {
