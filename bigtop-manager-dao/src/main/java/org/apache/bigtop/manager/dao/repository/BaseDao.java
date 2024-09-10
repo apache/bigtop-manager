@@ -76,7 +76,7 @@ public interface BaseDao<Entity> {
      * Query all entities.
      */
     @SelectProvider(type = BaseSqlProvider.class, method = "findByCondition")
-    <C> List<Entity> findByCondition(C condition);
+    <Condition> List<Entity> findByCondition(Condition condition);
 
     /**
      * Delete the entity by primary key.
