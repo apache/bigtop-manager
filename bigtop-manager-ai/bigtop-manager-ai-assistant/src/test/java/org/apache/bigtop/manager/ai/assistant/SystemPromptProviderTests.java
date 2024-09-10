@@ -24,8 +24,6 @@ import org.apache.bigtop.manager.ai.core.provider.SystemPromptProvider;
 
 import org.junit.jupiter.api.Test;
 
-import dev.langchain4j.data.message.SystemMessage;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
@@ -35,12 +33,12 @@ public class SystemPromptProviderTests {
 
     @Test
     public void loadSystemPromptByIdTest() {
-        SystemMessage systemPrompt1 = systemPromptProvider.getSystemPrompt(SystemPrompt.BIGDATA_PROFESSOR);
-        assertFalse(systemPrompt1.text().isEmpty());
+        String systemPrompt1 = systemPromptProvider.getSystemMessage(SystemPrompt.BIGDATA_PROFESSOR);
+        assertFalse(systemPrompt1.isEmpty());
 
-        SystemMessage systemPrompt2 = systemPromptProvider.getSystemPrompt();
-        assertFalse(systemPrompt2.text().isEmpty());
+        String systemPrompt2 = systemPromptProvider.getSystemMessage();
+        assertFalse(systemPrompt2.isEmpty());
 
-        assertEquals(systemPrompt1.text(), systemPrompt2.text());
+        assertEquals(systemPrompt1, systemPrompt2);
     }
 }

@@ -342,6 +342,7 @@ CREATE TABLE `llm_chat_thread`
     `platform_id` BIGINT(20) UNSIGNED NOT NULL,
     `user_id`     BIGINT(20) UNSIGNED NOT NULL,
     `model`       VARCHAR(255)        NOT NULL,
+    `thread_info` JSON                DEFAULT NULL,
     `create_time` DATETIME            DEFAULT CURRENT_TIMESTAMP,
     `update_time` DATETIME            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `create_by`   BIGINT              DEFAULT NULL,
@@ -374,4 +375,5 @@ VALUES (1, now(), now(), 'Administrator', '21232f297a57a5a743894a0e4a801fc3', tr
 -- Adding default ai chat platform
 INSERT INTO bigtop_manager.llm_platform (id,credential,NAME,support_models)
 VALUES
-(1,'{"apiKey": "API Key"}','OpenAI','gpt-3.5-turbo,gpt-4,gpt-4o,gpt-3.5-turbo-16k,gpt-4-turbo-preview,gpt-4-32k,gpt-4o-mini');
+(1,'{"apiKey": "API Key"}','OpenAI','gpt-3.5-turbo,gpt-4,gpt-4o,gpt-3.5-turbo-16k,gpt-4-turbo-preview,gpt-4-32k,gpt-4o-mini'),
+(2,'{"apiKey": "API Key"}','DashScope','qwen-max,qwen-plus,qwen-turbo');

@@ -20,11 +20,10 @@ package org.apache.bigtop.manager.ai.core.factory;
 
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 
-import dev.langchain4j.data.message.ChatMessage;
-import dev.langchain4j.data.message.SystemMessage;
-import dev.langchain4j.data.message.UserMessage;
-import dev.langchain4j.memory.ChatMemory;
 import reactor.core.publisher.Flux;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public interface AIAssistant {
 
@@ -40,20 +39,14 @@ public interface AIAssistant {
      * @param userMessage
      * @return
      */
-    Flux<String> streamAsk(ChatMessage userMessage);
+    Flux<String> streamAsk(String userMessage);
 
     /**
      * This is a conversation based on blocking output.
      * @param userMessage
      * @return
      */
-    String ask(ChatMessage userMessage);
-
-    /**
-     * This is primarily used to retrieve the AI assistant's history of chat conversations.
-     * @return
-     */
-    ChatMemory getMemory();
+    String ask(String userMessage);
 
     /**
      * This is used to get the AIAssistant's Platform
@@ -61,19 +54,23 @@ public interface AIAssistant {
      */
     PlatformType getPlatform();
 
-    void setSystemPrompt(SystemMessage systemPrompt);
-
-    void resetMemory();
-
-    default Flux<String> streamAsk(String message) {
-        return streamAsk(UserMessage.from(message));
+    /**
+     * This is used to create a thread
+     * @return
+     */
+    default Map<String, String> createThread() {
+        return new HashMap<>();
     }
 
-    default String ask(String message) {
-        return ask(UserMessage.from(message));
-    }
+    /**
+     * This is used to set system prompt
+     * @return
+     */
+    void setSystemPrompt(String systemPrompt);
 
-    default void setSystemPrompt(String systemPrompt) {
-        setSystemPrompt(SystemMessage.systemMessage(systemPrompt));
-    }
+    /**
+     * This is used to test whether the configuration is correct
+     * @return
+     */
+    boolean test();
 }

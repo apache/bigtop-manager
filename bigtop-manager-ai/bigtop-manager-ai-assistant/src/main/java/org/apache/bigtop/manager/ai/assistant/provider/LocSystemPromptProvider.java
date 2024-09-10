@@ -23,7 +23,6 @@ import org.apache.bigtop.manager.ai.core.provider.SystemPromptProvider;
 
 import org.springframework.util.ResourceUtils;
 
-import dev.langchain4j.data.message.SystemMessage;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -36,7 +35,7 @@ import java.util.Objects;
 public class LocSystemPromptProvider implements SystemPromptProvider {
 
     @Override
-    public SystemMessage getSystemPrompt(SystemPrompt systemPrompt) {
+    public String getSystemMessage(SystemPrompt systemPrompt) {
         if (systemPrompt == SystemPrompt.DEFAULT_PROMPT) {
             systemPrompt = SystemPrompt.BIGDATA_PROFESSOR;
         }
@@ -45,8 +44,8 @@ public class LocSystemPromptProvider implements SystemPromptProvider {
     }
 
     @Override
-    public SystemMessage getSystemPrompt() {
-        return getSystemPrompt(SystemPrompt.DEFAULT_PROMPT);
+    public String getSystemMessage() {
+        return getSystemMessage(SystemPrompt.DEFAULT_PROMPT);
     }
 
     private String loadTextFromFile(String fileName) {
@@ -64,23 +63,23 @@ public class LocSystemPromptProvider implements SystemPromptProvider {
         }
     }
 
-    private SystemMessage loadPromptFromFile(String fileName) {
+    private String loadPromptFromFile(String fileName) {
         final String filePath = fileName + ".st";
         String text = loadTextFromFile(filePath);
         if (text == null) {
-            return SystemMessage.from("You are a helpful assistant.");
+            return "You are a helpful assistant.";
         } else {
-            return SystemMessage.from(text);
+            return text;
         }
     }
 
-    public SystemMessage getLanguagePrompt(String locale) {
+    public String getLanguagePrompt(String locale) {
         final String filePath = SystemPrompt.LANGUAGE_PROMPT.getValue() + '-' + locale + ".st";
         String text = loadTextFromFile(filePath);
         if (text == null) {
-            return SystemMessage.from("Answer in " + locale);
+            return "Answer in " + locale;
         } else {
-            return SystemMessage.from(text);
+            return text;
         }
     }
 }

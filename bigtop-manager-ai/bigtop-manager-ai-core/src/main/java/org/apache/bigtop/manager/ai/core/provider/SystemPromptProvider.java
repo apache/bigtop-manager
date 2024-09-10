@@ -20,14 +20,12 @@ package org.apache.bigtop.manager.ai.core.provider;
 
 import org.apache.bigtop.manager.ai.core.enums.SystemPrompt;
 
-import dev.langchain4j.data.message.SystemMessage;
-
 public interface SystemPromptProvider {
 
-    SystemMessage getSystemPrompt(SystemPrompt systemPrompt);
+    String getSystemMessage(SystemPrompt systemPrompt);
 
     // return default system prompt
-    SystemMessage getSystemPrompt();
+    String getSystemMessage();
 
-    SystemMessage getLanguagePrompt(String locale);
+    String getLanguagePrompt(String locale);
 }

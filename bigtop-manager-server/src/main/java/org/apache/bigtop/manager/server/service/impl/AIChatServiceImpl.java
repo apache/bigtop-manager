@@ -20,7 +20,7 @@ package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.ai.assistant.GeneralAssistantFactory;
 import org.apache.bigtop.manager.ai.assistant.provider.AIAssistantConfig;
-import org.apache.bigtop.manager.ai.assistant.store.PersistentChatMemoryStore;
+import org.apache.bigtop.manager.ai.assistant.provider.PersistentStoreProvider;
 import org.apache.bigtop.manager.ai.core.enums.MessageSender;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
@@ -54,6 +54,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 
 import jakarta.annotation.Resource;
@@ -64,6 +65,7 @@ import java.util.Map;
 import java.util.Objects;
 
 @Service
+@Slf4j
 public class AIChatServiceImpl implements AIChatService {
     @Resource
     private PlatformDao platformDao;
@@ -79,21 +81,21 @@ public class AIChatServiceImpl implements AIChatService {
 
     private AIAssistantFactory aiAssistantFactory;
 
-    private final AIAssistantFactory aiTestFactory = new GeneralAssistantFactory();
-
     public AIAssistantFactory getAiAssistantFactory() {
         if (aiAssistantFactory == null) {
             aiAssistantFactory =
-                    new GeneralAssistantFactory(new PersistentChatMemoryStore(chatThreadDao, chatMessageDao));
+                    new GeneralAssistantFactory(new PersistentStoreProvider(chatThreadDao, chatMessageDao));
         }
         return aiAssistantFactory;
     }
 
-    private AIAssistantConfig getAIAssistantConfig(PlatformAuthorizedDTO platformAuthorizedDTO) {
+    private AIAssistantConfig getAIAssistantConfig(
+            PlatformAuthorizedDTO platformAuthorizedDTO, Map<String, String> configs) {
         return AIAssistantConfig.builder()
                 .setModel(platformAuthorizedDTO.getModel())
                 .setLanguage(LocaleContextHolder.getLocale().toString())
                 .addCredentials(platformAuthorizedDTO.getCredentials())
+                .addConfigs(configs)
                 .build();
     }
 
@@ -101,24 +103,26 @@ public class AIChatServiceImpl implements AIChatService {
         return PlatformType.getPlatformType(platformName.toLowerCase());
     }
 
-    private AIAssistant buildAIAssistant(PlatformAuthorizedDTO platformAuthorizedDTO, Long threadId) {
+    private AIAssistant buildAIAssistant(
+            PlatformAuthorizedDTO platformAuthorizedDTO, Long threadId, Map<String, String> configs) {
         return getAiAssistantFactory()
                 .create(
                         getPlatformType(platformAuthorizedDTO.getPlatformName()),
-                        getAIAssistantConfig(platformAuthorizedDTO),
+                        getAIAssistantConfig(platformAuthorizedDTO, configs),
                         threadId);
     }
 
     private Boolean testAuthorization(PlatformAuthorizedDTO platformAuthorizedDTO) {
-        AIAssistant aiAssistant = aiTestFactory.create(
-                getPlatformType(platformAuthorizedDTO.getPlatformName()), getAIAssistantConfig(platformAuthorizedDTO));
+        AIAssistant aiAssistant = getAiAssistantFactory()
+                .create(
+                        getPlatformType(platformAuthorizedDTO.getPlatformName()),
+                        getAIAssistantConfig(platformAuthorizedDTO, null),
+                        false);
         try {
-            aiAssistant.ask("1+1=");
+            return aiAssistant.test();
         } catch (Exception e) {
             throw new ApiException(ApiExceptionEnum.CREDIT_INCORRECT, e.getMessage());
         }
-
-        return true;
     }
 
     @Override
@@ -233,7 +237,13 @@ public class AIChatServiceImpl implements AIChatService {
         chatThreadPO.setUserId(userId);
         chatThreadPO.setModel(model);
         chatThreadPO.setPlatformId(platformAuthorizedPO.getId());
-        chatThreadDao.save(chatThreadPO);
+
+        PlatformAuthorizedDTO platformAuthorizedDTO = new PlatformAuthorizedDTO(
+                platformPO.getName(), platformAuthorizedPO.getCredentials(), chatThreadPO.getModel());
+        AIAssistant aiAssistant = buildAIAssistant(platformAuthorizedDTO, null, null);
+        Map<String, String> threadInfo = aiAssistant.createThread();
+        chatThreadPO.setThreadInfo(threadInfo);
+        chatThreadDao.saveWithThreadInfo(chatThreadPO);
         return ChatThreadConverter.INSTANCE.fromPO2VO(chatThreadPO);
     }
 
@@ -267,9 +277,9 @@ public class AIChatServiceImpl implements AIChatService {
 
     @Override
     public SseEmitter talk(Long platformId, Long threadId, String message) {
-        ChatThreadPO chatThreadPO = chatThreadDao.findById(threadId);
+        ChatThreadPO chatThreadPO = chatThreadDao.findByThreadId(threadId);
         Long userId = SessionUserHolder.getUserId();
-        if (chatThreadPO == null || !Objects.equals(userId, chatThreadPO.getUserId())) {
+        if (!Objects.equals(userId, chatThreadPO.getUserId())) {
             throw new ApiException(ApiExceptionEnum.CHAT_THREAD_NOT_FOUND);
         }
         PlatformAuthorizedPO platformAuthorizedPO = platformAuthorizedDao.findByPlatformId(platformId);
@@ -280,7 +290,8 @@ public class AIChatServiceImpl implements AIChatService {
         PlatformPO platformPO = platformDao.findById(platformAuthorizedPO.getPlatformId());
         PlatformAuthorizedDTO platformAuthorizedDTO = new PlatformAuthorizedDTO(
                 platformPO.getName(), platformAuthorizedPO.getCredentials(), chatThreadPO.getModel());
-        AIAssistant aiAssistant = buildAIAssistant(platformAuthorizedDTO, chatThreadPO.getId());
+        AIAssistant aiAssistant =
+                buildAIAssistant(platformAuthorizedDTO, chatThreadPO.getId(), chatThreadPO.getThreadInfo());
         Flux<String> stringFlux = aiAssistant.streamAsk(message);
 
         SseEmitter emitter = new SseEmitter();

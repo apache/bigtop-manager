@@ -16,22 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.ai.core.factory;
+package org.apache.bigtop.manager.ai.dashscope;
 
-import org.apache.bigtop.manager.ai.core.enums.PlatformType;
-import org.apache.bigtop.manager.ai.core.enums.SystemPrompt;
-import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
+import lombok.Getter;
+import lombok.Setter;
 
-public interface AIAssistantFactory {
+@Getter
+@Setter
+public class DashScopeThreadParam {
+    private Object threadId;
 
-    AIAssistant createWithPrompt(
-            PlatformType platformType, AIAssistantConfigProvider assistantConfig, Object id, SystemPrompt systemPrompt);
+    private String assistantId;
 
-    AIAssistant create(PlatformType platformType, AIAssistantConfigProvider assistantConfig, Object id);
+    private String assistantThreadId;
 
-    default AIAssistant create(PlatformType platformType, AIAssistantConfigProvider assistantConfig) {
-        return create(platformType, assistantConfig, null);
-    }
+    private String model;
 
-    ToolBox createToolBox(PlatformType platformType);
+    private String apiKey;
 }

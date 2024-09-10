@@ -16,22 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.ai.core.factory;
+package org.apache.bigtop.manager.ai.core.repository;
 
-import org.apache.bigtop.manager.ai.core.enums.PlatformType;
-import org.apache.bigtop.manager.ai.core.enums.SystemPrompt;
-import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
+public interface MessageRepository {
+    default void saveUserMessage(String message, Long threadId) {}
 
-public interface AIAssistantFactory {
+    default void saveAiMessage(String message, Long threadId) {}
 
-    AIAssistant createWithPrompt(
-            PlatformType platformType, AIAssistantConfigProvider assistantConfig, Object id, SystemPrompt systemPrompt);
-
-    AIAssistant create(PlatformType platformType, AIAssistantConfigProvider assistantConfig, Object id);
-
-    default AIAssistant create(PlatformType platformType, AIAssistantConfigProvider assistantConfig) {
-        return create(platformType, assistantConfig, null);
-    }
-
-    ToolBox createToolBox(PlatformType platformType);
+    default void saveSystemMessage(String message, Long threadId) {}
 }

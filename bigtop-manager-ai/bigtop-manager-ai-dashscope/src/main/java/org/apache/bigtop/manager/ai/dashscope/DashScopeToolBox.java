@@ -16,22 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.ai.core.factory;
+package org.apache.bigtop.manager.ai.dashscope;
 
-import org.apache.bigtop.manager.ai.core.enums.PlatformType;
-import org.apache.bigtop.manager.ai.core.enums.SystemPrompt;
-import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
+import org.apache.bigtop.manager.ai.core.factory.ToolBox;
 
-public interface AIAssistantFactory {
+import reactor.core.publisher.Flux;
 
-    AIAssistant createWithPrompt(
-            PlatformType platformType, AIAssistantConfigProvider assistantConfig, Object id, SystemPrompt systemPrompt);
+import java.util.List;
 
-    AIAssistant create(PlatformType platformType, AIAssistantConfigProvider assistantConfig, Object id);
-
-    default AIAssistant create(PlatformType platformType, AIAssistantConfigProvider assistantConfig) {
-        return create(platformType, assistantConfig, null);
+public class DashScopeToolBox implements ToolBox {
+    @Override
+    public List<String> getTools() {
+        return null;
     }
 
-    ToolBox createToolBox(PlatformType platformType);
+    @Override
+    public String invoke(String toolName) {
+        return null;
+    }
+
+    @Override
+    public Flux<String> streamInvoke(String toolName) {
+        return null;
+    }
 }
