@@ -60,44 +60,16 @@ import java.util.List;
 import java.util.Map;
 
 public class DashScopeAssistant extends AbstractAIAssistant {
-    private Assistants assistants = null;
-    private Messages messages = null;
-    private Threads threads = null;
-    private Runs runs = null;
+    private final Assistants assistants = new Assistants();
+    private final Messages messages = new Messages();
+    private final Threads threads = new Threads();
+    private final Runs runs = new Runs();
     private final MessageRepository messageRepository;
     private final DashScopeThreadParam dashScopeThreadParam;
 
     public DashScopeAssistant(MessageRepository messageRepository, DashScopeThreadParam dashScopeThreadParam) {
         this.messageRepository = messageRepository;
         this.dashScopeThreadParam = dashScopeThreadParam;
-    }
-
-    private Assistants getAssistants() {
-        if (assistants == null) {
-            assistants = new Assistants();
-        }
-        return assistants;
-    }
-
-    private Threads getThreads() {
-        if (threads == null) {
-            threads = new Threads();
-        }
-        return threads;
-    }
-
-    private Messages getMessages() {
-        if (messages == null) {
-            messages = new Messages();
-        }
-        return messages;
-    }
-
-    private Runs getRuns() {
-        if (runs == null) {
-            runs = new Runs();
-        }
-        return runs;
     }
 
     private String getValueFromAssistantStreamMessage(AssistantStreamMessage assistantStreamMessage) {
@@ -128,7 +100,7 @@ public class DashScopeAssistant extends AbstractAIAssistant {
                 .content(systemPrompt)
                 .build();
         try {
-            getMessages().create(dashScopeThreadParam.getAssistantThreadId(), textMessageParam);
+            messages.create(dashScopeThreadParam.getAssistantThreadId(), textMessageParam);
         } catch (NoApiKeyException | InputRequiredException e) {
             throw new RuntimeException(e);
         }
@@ -137,7 +109,7 @@ public class DashScopeAssistant extends AbstractAIAssistant {
                 .assistantId(dashScopeThreadParam.getAssistantId())
                 .build();
         try {
-            getRuns().create(dashScopeThreadParam.getAssistantThreadId(), runParam);
+            runs.create(dashScopeThreadParam.getAssistantThreadId(), runParam);
         } catch (NoApiKeyException | InputRequiredException | InvalidateParameter e) {
             throw new RuntimeException(e);
         }
@@ -162,7 +134,7 @@ public class DashScopeAssistant extends AbstractAIAssistant {
                 .content(userMessage)
                 .build();
         try {
-            ThreadMessage message = getMessages().create(dashScopeThreadParam.getAssistantThreadId(), textMessageParam);
+            ThreadMessage message = messages.create(dashScopeThreadParam.getAssistantThreadId(), textMessageParam);
         } catch (NoApiKeyException | InputRequiredException e) {
             throw new RuntimeException(e);
         }
@@ -174,7 +146,7 @@ public class DashScopeAssistant extends AbstractAIAssistant {
                 .build();
         Flowable<AssistantStreamMessage> runFlowable = null;
         try {
-            runFlowable = getRuns().createStream(dashScopeThreadParam.getAssistantThreadId(), runParam);
+            runFlowable = runs.createStream(dashScopeThreadParam.getAssistantThreadId(), runParam);
         } catch (NoApiKeyException | InputRequiredException | InvalidateParameter e) {
             throw new RuntimeException(e);
         }
@@ -202,7 +174,7 @@ public class DashScopeAssistant extends AbstractAIAssistant {
                 .content(userMessage)
                 .build();
         try {
-            ThreadMessage message = getMessages().create(dashScopeThreadParam.getAssistantThreadId(), textMessageParam);
+            ThreadMessage message = messages.create(dashScopeThreadParam.getAssistantThreadId(), textMessageParam);
         } catch (NoApiKeyException | InputRequiredException e) {
             throw new RuntimeException(e);
         }
@@ -213,7 +185,7 @@ public class DashScopeAssistant extends AbstractAIAssistant {
                 .build();
         Run run;
         try {
-            run = getRuns().create(dashScopeThreadParam.getAssistantThreadId(), runParam);
+            run = runs.create(dashScopeThreadParam.getAssistantThreadId(), runParam);
         } catch (NoApiKeyException | InputRequiredException | InvalidateParameter e) {
             throw new RuntimeException(e);
         }
@@ -283,7 +255,7 @@ public class DashScopeAssistant extends AbstractAIAssistant {
     }
 
     @Override
-    public Map<String, String> creatThread() {
+    public Map<String, String> createThread() {
         AssistantParam param = AssistantParam.builder()
                 .model(dashScopeThreadParam.getModel())
                 .apiKey(dashScopeThreadParam.getApiKey())
@@ -291,7 +263,7 @@ public class DashScopeAssistant extends AbstractAIAssistant {
                 .build();
         Map<String, String> threadInfo = new HashMap<>();
         try {
-            Assistant assistant = getAssistants().create(param);
+            Assistant assistant = assistants.create(param);
             threadInfo.put("assistantId", assistant.getId());
         } catch (NoApiKeyException e) {
             throw new RuntimeException(e);
@@ -299,7 +271,7 @@ public class DashScopeAssistant extends AbstractAIAssistant {
         ThreadParam threadParam =
                 ThreadParam.builder().apiKey(dashScopeThreadParam.getApiKey()).build();
         try {
-            AssistantThread assistantThread = getThreads().create(threadParam);
+            AssistantThread assistantThread = threads.create(threadParam);
             threadInfo.put("assistantThreadId", assistantThread.getId());
         } catch (NoApiKeyException e) {
             throw new RuntimeException(e);

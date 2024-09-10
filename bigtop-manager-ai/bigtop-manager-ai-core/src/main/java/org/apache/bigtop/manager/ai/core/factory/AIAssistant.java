@@ -58,7 +58,7 @@ public interface AIAssistant {
      * This is used to create a thread
      * @return
      */
-    default Map<String, String> creatThread() {
+    default Map<String, String> createThread() {
         return new HashMap<>();
     }
 

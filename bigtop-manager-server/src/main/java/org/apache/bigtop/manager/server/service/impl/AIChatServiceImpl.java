@@ -241,7 +241,7 @@ public class AIChatServiceImpl implements AIChatService {
         PlatformAuthorizedDTO platformAuthorizedDTO = new PlatformAuthorizedDTO(
                 platformPO.getName(), platformAuthorizedPO.getCredentials(), chatThreadPO.getModel());
         AIAssistant aiAssistant = buildAIAssistant(platformAuthorizedDTO, null, null);
-        Map<String, String> threadInfo = aiAssistant.creatThread();
+        Map<String, String> threadInfo = aiAssistant.createThread();
         chatThreadPO.setThreadInfo(threadInfo);
         chatThreadDao.saveWithThreadInfo(chatThreadPO);
         return ChatThreadConverter.INSTANCE.fromPO2VO(chatThreadPO);
