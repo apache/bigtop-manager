@@ -72,9 +72,21 @@ public interface BaseDao<Entity> {
     @SelectProvider(type = BaseSqlProvider.class, method = "selectAll")
     List<Entity> findAll();
 
+    /**
+     * Query all entities.
+     */
+    @SelectProvider(type = BaseSqlProvider.class, method = "findByCondition")
+    <C> List<Entity> findByCondition(C condition);
+
+    /**
+     * Delete the entity by primary key.
+     */
     @DeleteProvider(type = BaseSqlProvider.class, method = "deleteById")
     boolean deleteById(Serializable id);
 
+    /**
+     * Delete the entity by primary key.
+     */
     @DeleteProvider(type = BaseSqlProvider.class, method = "deleteByIds")
     boolean deleteByIds(Collection<? extends Serializable> ids);
 }

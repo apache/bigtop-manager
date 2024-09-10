@@ -16,35 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.bigtop.manager.dao.enums;
 
-package org.apache.bigtop.manager.dao.sql;
-
-import java.util.stream.Stream;
-
-public enum DBType {
-    MYSQL("mysql", "MYSQL"),
-    DM("dm", "DaMeng");
-
-    DBType(String code, String desc) {
-        this.code = code;
-        this.desc = desc;
-    }
-
-    private final String code;
-    private final String desc;
-
-    public String getCode() {
-        return this.code;
-    }
-
-    public String getDesc() {
-        return this.desc;
-    }
-
-    public static DBType toType(String databaseId) {
-        return Stream.of(DBType.values())
-                .filter(p -> p.getCode().equals(databaseId))
-                .findFirst()
-                .orElse(null);
-    }
+public enum QueryType {
+    EQ,
+    NOT_EQ,
+    IN,
+    NOT_IN,
+    GT,
+    GTE,
+    LT,
+    LTE,
+    BETWEEN,
+    PREFIX_LIKE,
+    SUFFIX_LIKE,
+    LIKE,
+    NOT_LIKE,
+    NULL,
+    NOT_NULL,
 }
