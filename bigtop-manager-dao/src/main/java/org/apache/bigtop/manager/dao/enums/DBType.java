@@ -40,6 +40,6 @@ public enum DBType {
         return Stream.of(DBType.values())
                 .filter(p -> p.getCode().equals(databaseId))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Unsupported database : " + databaseId));
+                .orElseThrow(() -> new IllegalArgumentException("Unsupported database: " + databaseId));
     }
 }
