@@ -16,22 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.ai.core.factory;
+package org.apache.bigtop.manager.ai.core.provider;
 
-import org.apache.bigtop.manager.ai.core.enums.PlatformType;
-import org.apache.bigtop.manager.ai.core.enums.SystemPrompt;
-import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
+import org.apache.bigtop.manager.ai.core.repository.MessageRepository;
 
-public interface AIAssistantFactory {
+import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 
-    AIAssistant createWithPrompt(
-            PlatformType platformType, AIAssistantConfigProvider assistantConfig, Object id, SystemPrompt systemPrompt);
+public interface MessageStoreProvider {
+    MessageRepository getMessageRepository();
 
-    AIAssistant create(PlatformType platformType, AIAssistantConfigProvider assistantConfig, Object id);
-
-    default AIAssistant create(PlatformType platformType, AIAssistantConfigProvider assistantConfig) {
-        return create(platformType, assistantConfig, null);
-    }
-
-    ToolBox createToolBox(PlatformType platformType);
+    ChatMemoryStore getChatMemoryStore();
 }

@@ -119,6 +119,9 @@ public class DashScopeAssistant extends AbstractAIAssistant {
 
     @Override
     public void setSystemPrompt(String systemPrompt) {
+        if (dashScopeThreadParam.getAssistantId() == null) {
+            return;
+        }
         TextMessageParam textMessageParam = TextMessageParam.builder()
                 .apiKey(dashScopeThreadParam.getApiKey())
                 .role(Role.ASSISTANT.getValue())

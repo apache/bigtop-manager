@@ -109,8 +109,7 @@ public class AIChatServiceImpl implements AIChatService {
                 .create(
                         getPlatformType(platformAuthorizedDTO.getPlatformName()),
                         getAIAssistantConfig(platformAuthorizedDTO, configs),
-                        threadId,
-                        threadId != null);
+                        threadId);
     }
 
     private Boolean testAuthorization(PlatformAuthorizedDTO platformAuthorizedDTO) {

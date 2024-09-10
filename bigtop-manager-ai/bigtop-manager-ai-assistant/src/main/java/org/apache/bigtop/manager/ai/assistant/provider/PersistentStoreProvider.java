@@ -20,6 +20,7 @@ package org.apache.bigtop.manager.ai.assistant.provider;
 
 import org.apache.bigtop.manager.ai.assistant.store.PersistentChatMemoryStore;
 import org.apache.bigtop.manager.ai.assistant.store.PersistentMessageRepository;
+import org.apache.bigtop.manager.ai.core.provider.MessageStoreProvider;
 import org.apache.bigtop.manager.ai.core.repository.MessageRepository;
 import org.apache.bigtop.manager.dao.repository.ChatMessageDao;
 import org.apache.bigtop.manager.dao.repository.ChatThreadDao;
@@ -31,7 +32,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class PersistentStoreProvider {
+public class PersistentStoreProvider implements MessageStoreProvider {
     private final ChatThreadDao chatThreadDao;
     private final ChatMessageDao chatMessageDao;
 
@@ -45,10 +46,12 @@ public class PersistentStoreProvider {
         chatThreadDao = null;
     }
 
-    public MessageRepository getPersistentRepository() {
+    @Override
+    public MessageRepository getMessageRepository() {
         return new PersistentMessageRepository(chatThreadDao, chatMessageDao);
     }
 
+    @Override
     public ChatMemoryStore getChatMemoryStore() {
         if (chatThreadDao == null) {
             return new InMemoryChatMemoryStore();
