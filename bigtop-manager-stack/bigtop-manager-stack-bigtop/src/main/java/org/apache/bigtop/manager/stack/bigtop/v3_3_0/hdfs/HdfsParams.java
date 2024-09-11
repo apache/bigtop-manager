@@ -85,7 +85,7 @@ public class HdfsParams extends BigtopParams {
         Map<String, Object> coreSite = LocalSettings.configurations(serviceName(), "core-site");
         List<String> namenodeList = LocalSettings.hosts("namenode");
         if (!namenodeList.isEmpty()) {
-            coreSite.put("fs.defaultFS", MessageFormat.format("hdfs://{0}:8020", namenodeList.get(0)));
+            coreSite.put("fs.defaultFS", ((String) coreSite.get("fs.defaultFS")).replace("localhost", namenodeList.get(0)));
         }
         return coreSite;
     }
@@ -98,6 +98,12 @@ public class HdfsParams extends BigtopParams {
     @GlobalParams
     public Map<String, Object> hdfsSite() {
         Map<String, Object> hdfsSite = LocalSettings.configurations(serviceName(), "hdfs-site");
+        List<String> namenodeList = LocalSettings.hosts("namenode");
+        if (!namenodeList.isEmpty()) {
+            hdfsSite.put("dfs.namenode.rpc-address", ((String) hdfsSite.get("dfs.namenode.rpc-address")).replace("0.0.0.0", namenodeList.get(0)));
+            hdfsSite.put("dfs.datanode.https.address", ((String) hdfsSite.get("dfs.datanode.https.address")).replace("0.0.0.0", namenodeList.get(0)));
+            hdfsSite.put("dfs.namenode.https-address", ((String) hdfsSite.get("dfs.namenode.https-address")).replace("0.0.0.0", namenodeList.get(0)));
+        }
 
         dfsDataDir = (String) hdfsSite.get("dfs.datanode.data.dir");
         dfsNameNodeDir = (String) hdfsSite.get("dfs.namenode.name.dir");
