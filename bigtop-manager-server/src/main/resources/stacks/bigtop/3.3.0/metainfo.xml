@@ -48,6 +48,14 @@ gpgcheck=0
                 <arch>x86_64</arch>
                 <base-url>http://123.56.2.244/bigtop/3.3.0/rocky8/x86_64/</base-url>
             </repo>
+            <repo>
+                <repo-id>Bigtop-3.3.0</repo-id>
+                <repo-name>Bigtop-3.3.0 for openEuler-22.03 x86_64</repo-name>
+                <repo-type>binary</repo-type>
+                <os>openeuler22</os>
+                <arch>x86_64</arch>
+                <base-url>http://123.56.2.244/bigtop/3.3.0/openeuler22/x86_64/</base-url>
+            </repo>
         </repos>
     </stack>
 </metainfo>

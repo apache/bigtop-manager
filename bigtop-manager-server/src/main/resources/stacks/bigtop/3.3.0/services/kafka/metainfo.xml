@@ -59,6 +59,7 @@
                 <operating-systems>
                     <os>centos7</os>
                     <os>rocky8</os>
+                    <os>openeuler22</os>
                 </operating-systems>
                 <architectures>
                     <arch>x86_64</arch>

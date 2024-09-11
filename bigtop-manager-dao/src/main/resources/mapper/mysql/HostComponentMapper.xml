@@ -115,7 +115,7 @@
         <include refid="baseColumnsV2">
             <property name="alias" value="hc"/>
         </include>
-            , c.component_name
+            , c.component_name, h.hostname
         from
         host_component hc
         inner join (select * from host
@@ -134,7 +134,7 @@
         on hc.host_id = h.id
         inner join (select * from component
         <where>
-            <if test="componentName != 0">
+            <if test="componentName != null">
                 component_name = #{componentName}
             </if>
         </where>

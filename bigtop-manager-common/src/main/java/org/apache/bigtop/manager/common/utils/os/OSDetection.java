@@ -55,7 +55,7 @@ public class OSDetection {
 
     public static String getOS() {
         if (SystemUtils.IS_OS_LINUX) {
-            String os = getOSType().toLowerCase() + getOSVersion().toLowerCase();
+            String os = getOSType() + getOSVersion().toLowerCase();
             ifSupportedOS(os);
             return os;
         } else {
@@ -102,7 +102,7 @@ public class OSDetection {
     private static String getOSType() {
         String output = getOSRelease();
 
-        String osType = regexOS(ID_PATTERN, output);
+        String osType = regexOS(ID_PATTERN, output).toLowerCase();
 
         log.debug("osType: {}", osType);
         return osType;
