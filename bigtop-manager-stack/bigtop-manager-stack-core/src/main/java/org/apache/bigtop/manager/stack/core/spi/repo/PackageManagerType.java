@@ -28,6 +28,7 @@ import static org.apache.bigtop.manager.common.enums.OSType.CENTOS7;
 import static org.apache.bigtop.manager.common.enums.OSType.DEBIAN10;
 import static org.apache.bigtop.manager.common.enums.OSType.DEBIAN11;
 import static org.apache.bigtop.manager.common.enums.OSType.FEDORA36;
+import static org.apache.bigtop.manager.common.enums.OSType.OPENEULER22;
 import static org.apache.bigtop.manager.common.enums.OSType.ROCKY8;
 import static org.apache.bigtop.manager.common.enums.OSType.UBUNTU20;
 import static org.apache.bigtop.manager.common.enums.OSType.UBUNTU22;
@@ -36,7 +37,7 @@ import static org.apache.bigtop.manager.common.enums.OSType.UBUNTU22;
 public enum PackageManagerType {
     YUM(List.of(CENTOS7)),
 
-    DNF(List.of(ROCKY8, FEDORA36)),
+    DNF(List.of(ROCKY8, FEDORA36, OPENEULER22)),
 
     APT(List.of(UBUNTU20, UBUNTU22, DEBIAN10, DEBIAN11)),
     ;

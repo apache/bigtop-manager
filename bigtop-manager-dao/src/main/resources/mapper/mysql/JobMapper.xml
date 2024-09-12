@@ -73,7 +73,7 @@
         </collection>
     </resultMap>
 
-    <select id="findAllByClusterId" parameterType="java.lang.Long" resultMap="jobMap">
+    <select id="findAllByIdsJoin" parameterType="java.lang.Long" resultMap="jobMap">
         select
         <include refid="baseColumnsV2">
             <property name="alias" value="h"/>
@@ -83,8 +83,11 @@
         from
         (select * from job
         <where>
-            <if test="clusterId != 0">
-                cluster_id = #{clusterId}
+            <if test="ids != null">
+                id in
+                <foreach collection="ids" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
             </if>
         </where>
         ) h
@@ -92,6 +95,7 @@
         on h.id = st.job_id
         inner join task tk
         on tk.job_id = h.id and st.id = tk.stage_id
+        order by h.id desc
     </select>
 
     <select id="findByIdJoin" parameterType="java.lang.Long" resultMap="jobMap">
@@ -115,16 +119,24 @@
         on tk.job_id = h.id and st.id = tk.stage_id
     </select>
 
+    <select id="findAllByClusterId" parameterType="java.lang.Long" resultType="org.apache.bigtop.manager.dao.po.JobPO">
+        select
+        <include refid="baseColumns"/>
+        from
+        job
+        <where>
+            <if test="clusterId != 0">
+                cluster_id = #{clusterId}
+            </if>
+        </where>
+    </select>
+
     <select id="findAllByClusterIsNull"
             resultType="org.apache.bigtop.manager.dao.po.JobPO">
         select
-        <include refid="baseColumnsV2">
-            <property name="alias" value="h"/>
-        </include>
+        <include refid="baseColumns"/>
         from
-        (select * from job where cluster_id is null) h
-        inner join stage st
-        on h.id = st.job_id
+        job where cluster_id is null
     </select>
 
 </mapper>

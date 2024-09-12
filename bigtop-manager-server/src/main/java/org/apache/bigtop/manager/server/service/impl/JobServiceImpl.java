@@ -79,6 +79,9 @@ public class JobServiceImpl implements JobService {
             jobPOList = jobDao.findAllByClusterId(clusterId);
         }
         PageInfo<JobPO> pageInfo = new PageInfo<>(jobPOList);
+        List<JobPO> allByIdsJoin =
+                jobDao.findAllByIdsJoin(jobPOList.stream().map(JobPO::getId).toList());
+        pageInfo.setList(allByIdsJoin);
 
         return PageVO.of(pageInfo);
     }
