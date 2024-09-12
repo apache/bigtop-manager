@@ -22,7 +22,6 @@ import org.apache.bigtop.manager.ai.core.AbstractAIAssistant;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.exception.AssistantConfigNotSetException;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
-import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
 
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.SystemMessage;
@@ -36,7 +35,6 @@ import dev.langchain4j.model.chat.StreamingChatLanguageModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
 import dev.langchain4j.model.output.Response;
-import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 
@@ -44,7 +42,6 @@ public class OpenAIAssistant extends AbstractAIAssistant {
 
     private final ChatLanguageModel chatLanguageModel;
     private final StreamingChatLanguageModel streamingChatLanguageModel;
-    private final ChatMemory chatMemory;
 
     private static final String BASE_URL = "https://api.openai.com/v1";
 
@@ -52,9 +49,9 @@ public class OpenAIAssistant extends AbstractAIAssistant {
             ChatLanguageModel chatLanguageModel,
             StreamingChatLanguageModel streamingChatLanguageModel,
             ChatMemory chatMemory) {
+        super(chatMemory);
         this.chatLanguageModel = chatLanguageModel;
         this.streamingChatLanguageModel = streamingChatLanguageModel;
-        this.chatMemory = chatMemory;
     }
 
     @Override
@@ -129,28 +126,7 @@ public class OpenAIAssistant extends AbstractAIAssistant {
         return new Builder();
     }
 
-    public static class Builder {
-        private Object id;
-
-        private ChatMemoryStore chatMemoryStore;
-        private AIAssistantConfigProvider configProvider;
-
-        public Builder() {}
-
-        public Builder withConfigProvider(AIAssistantConfigProvider configProvider) {
-            this.configProvider = configProvider;
-            return this;
-        }
-
-        public Builder id(Object id) {
-            this.id = id;
-            return this;
-        }
-
-        public Builder memoryStore(ChatMemoryStore chatMemoryStore) {
-            this.chatMemoryStore = chatMemoryStore;
-            return this;
-        }
+    public static class Builder extends AbstractAIAssistant.Builder {
 
         public AIAssistant build() {
             String model = ValidationUtils.ensureNotNull(configProvider.getModel(), "model");

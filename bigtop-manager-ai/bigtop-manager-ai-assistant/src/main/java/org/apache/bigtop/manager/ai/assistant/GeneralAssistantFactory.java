@@ -19,44 +19,41 @@
 package org.apache.bigtop.manager.ai.assistant;
 
 import org.apache.bigtop.manager.ai.assistant.provider.LocSystemPromptProvider;
-import org.apache.bigtop.manager.ai.assistant.provider.PersistentStoreProvider;
 import org.apache.bigtop.manager.ai.core.AbstractAIAssistantFactory;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.enums.SystemPrompt;
-import org.apache.bigtop.manager.ai.core.exception.PlatformNotFoundException;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 import org.apache.bigtop.manager.ai.core.factory.ToolBox;
 import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
-import org.apache.bigtop.manager.ai.core.provider.MessageStoreProvider;
 import org.apache.bigtop.manager.ai.core.provider.SystemPromptProvider;
 import org.apache.bigtop.manager.ai.dashscope.DashScopeAssistant;
 import org.apache.bigtop.manager.ai.openai.OpenAIAssistant;
 
 import org.apache.commons.lang3.NotImplementedException;
 
-import java.util.Objects;
+import dev.langchain4j.store.memory.chat.ChatMemoryStore;
+import dev.langchain4j.store.memory.chat.InMemoryChatMemoryStore;
 
 public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
 
     private final SystemPromptProvider systemPromptProvider;
-    private final MessageStoreProvider messageStoreProvider;
+    private final ChatMemoryStore chatMemoryStore;
 
     public GeneralAssistantFactory() {
-        this(new LocSystemPromptProvider(), new PersistentStoreProvider());
+        this(new LocSystemPromptProvider(), new InMemoryChatMemoryStore());
     }
 
     public GeneralAssistantFactory(SystemPromptProvider systemPromptProvider) {
-        this(systemPromptProvider, new PersistentStoreProvider());
+        this(systemPromptProvider, new InMemoryChatMemoryStore());
     }
 
-    public GeneralAssistantFactory(MessageStoreProvider messageStoreProvider) {
-        this(new LocSystemPromptProvider(), messageStoreProvider);
+    public GeneralAssistantFactory(ChatMemoryStore chatMemoryStore) {
+        this(new LocSystemPromptProvider(), chatMemoryStore);
     }
 
-    public GeneralAssistantFactory(
-            SystemPromptProvider systemPromptProvider, MessageStoreProvider messageStoreProvider) {
+    public GeneralAssistantFactory(SystemPromptProvider systemPromptProvider, ChatMemoryStore chatMemoryStore) {
         this.systemPromptProvider = systemPromptProvider;
-        this.messageStoreProvider = messageStoreProvider;
+        this.chatMemoryStore = chatMemoryStore;
     }
 
     @Override
@@ -65,22 +62,17 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
             AIAssistantConfigProvider assistantConfig,
             Object id,
             SystemPrompt systemPrompts) {
-        AIAssistant aiAssistant;
-        if (Objects.requireNonNull(platformType) == PlatformType.OPENAI) {
-            aiAssistant = OpenAIAssistant.builder()
-                    .id(id)
-                    .memoryStore(messageStoreProvider.getChatMemoryStore())
-                    .withConfigProvider(assistantConfig)
-                    .build();
-        } else if (Objects.requireNonNull(platformType) == PlatformType.DASH_SCOPE) {
-            aiAssistant = DashScopeAssistant.builder()
-                    .id(id)
-                    .withConfigProvider(assistantConfig)
-                    .messageRepository(messageStoreProvider.getMessageRepository())
-                    .build();
-        } else {
-            throw new PlatformNotFoundException(platformType.getValue());
-        }
+        AIAssistant.Builder builder =
+                switch (platformType) {
+                    case OPENAI -> OpenAIAssistant.builder();
+                    case DASH_SCOPE -> DashScopeAssistant.builder();
+                };
+
+        AIAssistant aiAssistant = builder.id(id)
+                .memoryStore((id == null) ? new InMemoryChatMemoryStore() : chatMemoryStore)
+                .withConfigProvider(assistantConfig)
+                .build();
+
         String systemPrompt = systemPromptProvider.getSystemMessage(systemPrompts);
         aiAssistant.setSystemPrompt(systemPrompt);
         String locale = assistantConfig.getLanguage();

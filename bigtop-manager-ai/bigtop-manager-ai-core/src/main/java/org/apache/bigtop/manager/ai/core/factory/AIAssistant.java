@@ -19,7 +19,9 @@
 package org.apache.bigtop.manager.ai.core.factory;
 
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
+import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
 
+import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 import reactor.core.publisher.Flux;
 
 import java.util.HashMap;
@@ -73,4 +75,14 @@ public interface AIAssistant {
      * @return
      */
     boolean test();
+
+    interface Builder {
+        Builder id(Object id);
+
+        Builder memoryStore(ChatMemoryStore memoryStore);
+
+        Builder withConfigProvider(AIAssistantConfigProvider configProvider);
+
+        AIAssistant build();
+    }
 }

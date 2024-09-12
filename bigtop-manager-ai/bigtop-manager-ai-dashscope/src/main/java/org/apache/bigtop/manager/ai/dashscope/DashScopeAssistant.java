@@ -19,10 +19,9 @@
 package org.apache.bigtop.manager.ai.dashscope;
 
 import org.apache.bigtop.manager.ai.core.AbstractAIAssistant;
+import org.apache.bigtop.manager.ai.core.enums.MessageSender;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
-import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
-import org.apache.bigtop.manager.ai.core.repository.MessageRepository;
 
 import com.alibaba.dashscope.aigc.generation.Generation;
 import com.alibaba.dashscope.aigc.generation.GenerationParam;
@@ -50,7 +49,13 @@ import com.alibaba.dashscope.threads.runs.AssistantStreamMessage;
 import com.alibaba.dashscope.threads.runs.Run;
 import com.alibaba.dashscope.threads.runs.RunParam;
 import com.alibaba.dashscope.threads.runs.Runs;
+import dev.langchain4j.data.message.AiMessage;
+import dev.langchain4j.data.message.ChatMessage;
+import dev.langchain4j.data.message.SystemMessage;
+import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.internal.ValidationUtils;
+import dev.langchain4j.memory.ChatMemory;
+import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import io.reactivex.Flowable;
 import reactor.core.publisher.Flux;
 
@@ -64,11 +69,10 @@ public class DashScopeAssistant extends AbstractAIAssistant {
     private final Messages messages = new Messages();
     private final Threads threads = new Threads();
     private final Runs runs = new Runs();
-    private final MessageRepository messageRepository;
     private final DashScopeThreadParam dashScopeThreadParam;
 
-    public DashScopeAssistant(MessageRepository messageRepository, DashScopeThreadParam dashScopeThreadParam) {
-        this.messageRepository = messageRepository;
+    public DashScopeAssistant(ChatMemory chatMemory, DashScopeThreadParam dashScopeThreadParam) {
+        super(chatMemory);
         this.dashScopeThreadParam = dashScopeThreadParam;
     }
 
@@ -82,6 +86,20 @@ public class DashScopeAssistant extends AbstractAIAssistant {
             streamMessage.append(contentText.getText().getValue());
         }
         return streamMessage.toString();
+    }
+
+    private void saveMessage(String message, MessageSender sender) {
+        ChatMessage chatMessage;
+        if (sender.equals(MessageSender.AI)) {
+            chatMessage = new AiMessage(message);
+        } else if (sender.equals(MessageSender.USER)) {
+            chatMessage = new UserMessage(message);
+        } else if (sender.equals(MessageSender.SYSTEM)) {
+            chatMessage = new SystemMessage(message);
+        } else {
+            return;
+        }
+        chatMemory.add(chatMessage);
     }
 
     @Override
@@ -113,7 +131,7 @@ public class DashScopeAssistant extends AbstractAIAssistant {
         } catch (NoApiKeyException | InputRequiredException | InvalidateParameter e) {
             throw new RuntimeException(e);
         }
-        messageRepository.saveSystemMessage(systemPrompt, (Long) dashScopeThreadParam.getThreadId());
+        saveMessage(systemPrompt, MessageSender.SYSTEM);
     }
 
     public static Builder builder() {
@@ -127,7 +145,7 @@ public class DashScopeAssistant extends AbstractAIAssistant {
 
     @Override
     public Flux<String> streamAsk(String userMessage) {
-        messageRepository.saveUserMessage(userMessage, (Long) dashScopeThreadParam.getThreadId());
+        saveMessage(userMessage, MessageSender.USER);
         TextMessageParam textMessageParam = TextMessageParam.builder()
                 .apiKey(dashScopeThreadParam.getApiKey())
                 .role(Role.USER.getValue())
@@ -161,13 +179,13 @@ public class DashScopeAssistant extends AbstractAIAssistant {
                     return message;
                 })
                 .doOnComplete(() -> {
-                    messageRepository.saveAiMessage(finalMessage.toString(), (Long) dashScopeThreadParam.getThreadId());
+                    saveMessage(finalMessage.toString(), MessageSender.AI);
                 });
     }
 
     @Override
     public String ask(String userMessage) {
-        messageRepository.saveUserMessage(userMessage, (Long) dashScopeThreadParam.getThreadId());
+        saveMessage(userMessage, MessageSender.USER);
         TextMessageParam textMessageParam = TextMessageParam.builder()
                 .apiKey(dashScopeThreadParam.getApiKey())
                 .role(Role.USER.getValue())
@@ -231,7 +249,7 @@ public class DashScopeAssistant extends AbstractAIAssistant {
             ContentText contentText = (ContentText) content;
             finalMessage.append(contentText.getText().getValue());
         }
-        messageRepository.saveAiMessage(finalMessage.toString(), (Long) dashScopeThreadParam.getThreadId());
+        saveMessage(finalMessage.toString(), MessageSender.AI);
         return finalMessage.toString();
     }
 
@@ -279,27 +297,7 @@ public class DashScopeAssistant extends AbstractAIAssistant {
         return threadInfo;
     }
 
-    public static class Builder {
-        private Object id;
-        private AIAssistantConfigProvider configProvider;
-        private MessageRepository messageRepository;
-
-        public Builder() {}
-
-        public Builder withConfigProvider(AIAssistantConfigProvider configProvider) {
-            this.configProvider = configProvider;
-            return this;
-        }
-
-        public Builder id(Object id) {
-            this.id = id;
-            return this;
-        }
-
-        public Builder messageRepository(MessageRepository messageRepository) {
-            this.messageRepository = messageRepository;
-            return this;
-        }
+    public static class Builder extends AbstractAIAssistant.Builder {
 
         public AIAssistant build() {
             String model = ValidationUtils.ensureNotNull(configProvider.getModel(), "model");
@@ -316,10 +314,15 @@ public class DashScopeAssistant extends AbstractAIAssistant {
             if (assistantId != null) {
                 param.setAssistantId(assistantId);
             }
+            MessageWindowChatMemory.Builder builder = MessageWindowChatMemory.builder()
+                    .chatMemoryStore(chatMemoryStore)
+                    .maxMessages(MEMORY_LEN);
             if (id != null) {
+                builder.id(id);
                 param.setThreadId(id);
             }
-            return new DashScopeAssistant(messageRepository, param);
+            MessageWindowChatMemory chatMemory = builder.build();
+            return new DashScopeAssistant(chatMemory, param);
         }
     }
 }

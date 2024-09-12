@@ -19,13 +19,46 @@
 package org.apache.bigtop.manager.ai.core;
 
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
+import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
+
+import dev.langchain4j.memory.ChatMemory;
+import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 
 public abstract class AbstractAIAssistant implements AIAssistant {
 
     protected static final Integer MEMORY_LEN = 10;
+    protected final ChatMemory chatMemory;
+
+    protected AbstractAIAssistant(ChatMemory chatMemory) {
+        this.chatMemory = chatMemory;
+    }
 
     @Override
     public boolean test() {
         return ask("1+1=") != null;
+    }
+
+    public abstract static class Builder implements AIAssistant.Builder {
+        protected Object id;
+
+        protected ChatMemoryStore chatMemoryStore;
+        protected AIAssistantConfigProvider configProvider;
+
+        public Builder() {}
+
+        public Builder withConfigProvider(AIAssistantConfigProvider configProvider) {
+            this.configProvider = configProvider;
+            return this;
+        }
+
+        public Builder id(Object id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder memoryStore(ChatMemoryStore chatMemoryStore) {
+            this.chatMemoryStore = chatMemoryStore;
+            return this;
+        }
     }
 }
