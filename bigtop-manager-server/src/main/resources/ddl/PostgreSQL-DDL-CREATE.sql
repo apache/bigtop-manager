@@ -377,9 +377,5 @@ VALUES (now(), now(), 'Administrator', '21232f297a57a5a743894a0e4a801fc3', 1, 'a
 
 -- SQLINES DEMO ***  chat platform
 INSERT INTO llm_platform (credential, NAME, support_models)
-VALUES ('{
-  "apiKey": "API Key"
-}', 'OpenAI', 'gpt-3.5-turbo,gpt-4,gpt-4o,gpt-3.5-turbo-16k,gpt-4-turbo-preview,gpt-4-32k,gpt-4o-mini'),
-       ('{
-         "apiKey": "API Key"
-       }', 'DashScope', 'qwen-max,qwen-plus,qwen-turbo');
+VALUES ('{"apiKey": "API Key"}', 'OpenAI', 'gpt-3.5-turbo,gpt-4,gpt-4o,gpt-3.5-turbo-16k,gpt-4-turbo-preview,gpt-4-32k,gpt-4o-mini'),
+       ('{"apiKey": "API Key"}', 'DashScope', 'qwen-max,qwen-plus,qwen-turbo');
