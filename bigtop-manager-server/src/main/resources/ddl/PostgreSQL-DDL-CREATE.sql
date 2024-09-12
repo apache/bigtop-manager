@@ -17,7 +17,6 @@
  * under the License.
  */
 
--- SQLINES FOR EVALUATION USE ONLY (14 DAYS)
 CREATE TABLE audit_log
 (
     id                BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY,
