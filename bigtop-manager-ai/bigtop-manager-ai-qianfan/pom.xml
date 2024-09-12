@@ -23,34 +23,23 @@
         <groupId>org.apache.bigtop</groupId>
         <artifactId>bigtop-manager-ai</artifactId>
         <version>${revision}</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>bigtop-manager-ai-assistant</artifactId>
+    <artifactId>bigtop-manager-ai-qianfan</artifactId>
     <name>${project.artifactId}</name>
-    <description>Bigtop Manager AI Assistant</description>
+    <description>Bigtop Manager AI QianFan</description>
 
     <dependencies>
         <dependency>
             <groupId>org.apache.bigtop</groupId>
-            <artifactId>bigtop-manager-ai-openai</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.bigtop</groupId>
             <artifactId>bigtop-manager-ai-core</artifactId>
+            <version>${revision}</version>
         </dependency>
+
         <dependency>
-            <groupId>org.apache.bigtop</groupId>
-            <artifactId>bigtop-manager-ai-dashscope</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.bigtop</groupId>
-            <artifactId>bigtop-manager-ai-qianfan</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.bigtop</groupId>
-            <artifactId>bigtop-manager-dao</artifactId>
+            <groupId>com.baidubce</groupId>
+            <artifactId>qianfan</artifactId>
+            <version>0.1.1</version>
         </dependency>
     </dependencies>
-
 </project>
