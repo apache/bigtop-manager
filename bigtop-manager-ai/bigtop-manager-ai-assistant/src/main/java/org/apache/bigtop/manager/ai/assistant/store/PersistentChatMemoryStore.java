@@ -93,9 +93,6 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
 
     @Override
     public void updateMessages(Object threadId, List<ChatMessage> messages) {
-        if (threadId == null) {
-            return;
-        }
         ChatMessagePO chatMessagePO = convertToChatMessagePO(messages.get(messages.size() - 1), (Long) threadId);
         chatMessageDao.save(chatMessagePO);
     }
