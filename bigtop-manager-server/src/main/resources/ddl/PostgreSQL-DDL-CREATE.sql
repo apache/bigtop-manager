@@ -375,5 +375,7 @@ INSERT INTO "user" (create_time, update_time, nickname, password, status, userna
 VALUES (now(), now(), 'Administrator', '21232f297a57a5a743894a0e4a801fc3', 1, 'admin');
 
 INSERT INTO llm_platform (credential, NAME, support_models)
-VALUES ('{"apiKey": "API Key"}', 'OpenAI', 'gpt-3.5-turbo,gpt-4,gpt-4o,gpt-3.5-turbo-16k,gpt-4-turbo-preview,gpt-4-32k,gpt-4o-mini'),
-       ('{"apiKey": "API Key"}', 'DashScope', 'qwen-max,qwen-plus,qwen-turbo');
+VALUES
+('{"apiKey": "API Key"}','OpenAI','gpt-3.5-turbo,gpt-4,gpt-4o,gpt-3.5-turbo-16k,gpt-4-turbo-preview,gpt-4-32k,gpt-4o-mini'),
+('{"apiKey": "API Key"}','DashScope','qwen-max,qwen-plus,qwen-turbo'),
+('{"apiKey": "API Key", "secretKey": "Secret Key"}','QianFan','Yi-34B-Chat,ERNIE-4.0-8K,ERNIE-3.5-128K,ERNIE-Speed-8K,Llama-2-7B-Chat,Fuyu-8B');
