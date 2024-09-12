@@ -371,11 +371,9 @@ CREATE TABLE llm_chat_message
 CREATE INDEX idx_thread_id ON llm_chat_message (thread_id);
 CREATE INDEX idx_user_id ON llm_chat_message (user_id);
 
--- SQLINES DEMO *** min user
 INSERT INTO "user" (create_time, update_time, nickname, password, status, username)
 VALUES (now(), now(), 'Administrator', '21232f297a57a5a743894a0e4a801fc3', 1, 'admin');
 
--- SQLINES DEMO ***  chat platform
 INSERT INTO llm_platform (credential, NAME, support_models)
 VALUES ('{"apiKey": "API Key"}', 'OpenAI', 'gpt-3.5-turbo,gpt-4,gpt-4o,gpt-3.5-turbo-16k,gpt-4-turbo-preview,gpt-4-32k,gpt-4o-mini'),
        ('{"apiKey": "API Key"}', 'DashScope', 'qwen-max,qwen-plus,qwen-turbo');
