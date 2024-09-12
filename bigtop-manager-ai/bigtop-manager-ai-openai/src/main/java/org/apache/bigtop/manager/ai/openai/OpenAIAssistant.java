@@ -44,7 +44,6 @@ public class OpenAIAssistant extends AbstractAIAssistant {
 
     private final ChatLanguageModel chatLanguageModel;
     private final StreamingChatLanguageModel streamingChatLanguageModel;
-    private final ChatMemory chatMemory;
 
     private static final String BASE_URL = "https://api.openai.com/v1";
 
@@ -52,9 +51,9 @@ public class OpenAIAssistant extends AbstractAIAssistant {
             ChatLanguageModel chatLanguageModel,
             StreamingChatLanguageModel streamingChatLanguageModel,
             ChatMemory chatMemory) {
+        super(chatMemory);
         this.chatLanguageModel = chatLanguageModel;
         this.streamingChatLanguageModel = streamingChatLanguageModel;
-        this.chatMemory = chatMemory;
     }
 
     @Override

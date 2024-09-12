@@ -20,9 +20,16 @@ package org.apache.bigtop.manager.ai.core;
 
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 
+import dev.langchain4j.memory.ChatMemory;
+
 public abstract class AbstractAIAssistant implements AIAssistant {
 
     protected static final Integer MEMORY_LEN = 10;
+    protected final ChatMemory chatMemory;
+
+    protected AbstractAIAssistant(ChatMemory chatMemory) {
+        this.chatMemory = chatMemory;
+    }
 
     @Override
     public boolean test() {
