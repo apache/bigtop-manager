@@ -16,13 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.ai.openai;
+package org.apache.bigtop.manager.ai.qianfan;
 
 import org.apache.bigtop.manager.ai.core.AbstractAIAssistant;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 
 import dev.langchain4j.data.message.AiMessage;
+import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.internal.ValidationUtils;
@@ -31,26 +32,30 @@ import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.StreamingResponseHandler;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.chat.StreamingChatLanguageModel;
-import dev.langchain4j.model.openai.OpenAiChatModel;
-import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
 import dev.langchain4j.model.output.Response;
+import dev.langchain4j.model.qianfan.QianfanChatModel;
+import dev.langchain4j.model.qianfan.QianfanStreamingChatModel;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 
-public class OpenAIAssistant extends AbstractAIAssistant {
+public class QianFanAssistant extends AbstractAIAssistant {
 
     private final ChatLanguageModel chatLanguageModel;
     private final StreamingChatLanguageModel streamingChatLanguageModel;
+    private SystemMessage systemMessage;
 
-    private static final String BASE_URL = "https://api.openai.com/v1";
-
-    public OpenAIAssistant(
+    public QianFanAssistant(
             ChatLanguageModel chatLanguageModel,
             StreamingChatLanguageModel streamingChatLanguageModel,
             ChatMemory chatMemory) {
         super(chatMemory);
         this.chatLanguageModel = chatLanguageModel;
         this.streamingChatLanguageModel = streamingChatLanguageModel;
+        for (ChatMessage chatMessage : chatMemory.messages()) {
+            if (chatMessage instanceof SystemMessage) {
+                this.systemMessage = (SystemMessage) chatMessage;
+            }
+        }
     }
 
     @Override
@@ -88,12 +93,16 @@ public class OpenAIAssistant extends AbstractAIAssistant {
 
     @Override
     public void setSystemPrompt(String systemPrompt) {
-        chatMemory.add(SystemMessage.systemMessage(systemPrompt));
+        // Multiple system messages are not supported
+        if (this.systemMessage == null) {
+            this.systemMessage = SystemMessage.systemMessage(systemPrompt);
+            chatMemory.add(this.systemMessage);
+        }
     }
 
     @Override
     public PlatformType getPlatform() {
-        return PlatformType.OPENAI;
+        return PlatformType.QIANFAN;
     }
 
     public static Builder builder() {
@@ -106,14 +115,16 @@ public class OpenAIAssistant extends AbstractAIAssistant {
             String model = ValidationUtils.ensureNotNull(configProvider.getModel(), "model");
             String apiKey = ValidationUtils.ensureNotNull(
                     configProvider.getCredentials().get("apiKey"), "apiKey");
-            ChatLanguageModel openAiChatModel = OpenAiChatModel.builder()
+            String secretKey = ValidationUtils.ensureNotNull(
+                    configProvider.getCredentials().get("secretKey"), "secretKey");
+            ChatLanguageModel qianfanChatModel = QianfanChatModel.builder()
                     .apiKey(apiKey)
-                    .baseUrl(BASE_URL)
+                    .secretKey(secretKey)
                     .modelName(model)
                     .build();
-            StreamingChatLanguageModel openaiStreamChatModel = OpenAiStreamingChatModel.builder()
+            StreamingChatLanguageModel qianfanStreamChatModel = QianfanStreamingChatModel.builder()
                     .apiKey(apiKey)
-                    .baseUrl(BASE_URL)
+                    .secretKey(secretKey)
                     .modelName(model)
                     .build();
             MessageWindowChatMemory.Builder builder = MessageWindowChatMemory.builder()
@@ -123,7 +134,7 @@ public class OpenAIAssistant extends AbstractAIAssistant {
                 builder.id(id);
             }
             MessageWindowChatMemory chatMemory = builder.build();
-            return new OpenAIAssistant(openAiChatModel, openaiStreamChatModel, chatMemory);
+            return new QianFanAssistant(qianfanChatModel, qianfanStreamChatModel, chatMemory);
         }
     }
 }

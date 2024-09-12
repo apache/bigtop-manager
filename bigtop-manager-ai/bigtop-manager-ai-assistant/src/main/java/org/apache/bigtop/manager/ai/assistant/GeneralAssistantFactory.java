@@ -28,6 +28,7 @@ import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
 import org.apache.bigtop.manager.ai.core.provider.SystemPromptProvider;
 import org.apache.bigtop.manager.ai.dashscope.DashScopeAssistant;
 import org.apache.bigtop.manager.ai.openai.OpenAIAssistant;
+import org.apache.bigtop.manager.ai.qianfan.QianFanAssistant;
 
 import org.apache.commons.lang3.NotImplementedException;
 
@@ -66,8 +67,8 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
                 switch (platformType) {
                     case OPENAI -> OpenAIAssistant.builder();
                     case DASH_SCOPE -> DashScopeAssistant.builder();
+                    case QIANFAN -> QianFanAssistant.builder();
                 };
-
         AIAssistant aiAssistant = builder.id(id)
                 .memoryStore((id == null) ? new InMemoryChatMemoryStore() : chatMemoryStore)
                 .withConfigProvider(assistantConfig)

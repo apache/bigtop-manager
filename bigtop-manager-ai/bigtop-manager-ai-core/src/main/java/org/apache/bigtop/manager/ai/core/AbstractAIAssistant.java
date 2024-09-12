@@ -38,6 +38,11 @@ public abstract class AbstractAIAssistant implements AIAssistant {
         return ask("1+1=") != null;
     }
 
+    @Override
+    public Object getId() {
+        return chatMemory.id();
+    }
+
     public abstract static class Builder implements AIAssistant.Builder {
         protected Object id;
 

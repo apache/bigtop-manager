@@ -33,6 +33,7 @@
     <modules>
         <module>bigtop-manager-ai-openai</module>
         <module>bigtop-manager-ai-dashscope</module>
+        <module>bigtop-manager-ai-qianfan</module>
         <module>bigtop-manager-ai-core</module>
         <module>bigtop-manager-ai-assistant</module>
     </modules>
