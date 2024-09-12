@@ -17,24 +17,6 @@
  * under the License.
  */
 
-
--- delimiter ;
-
--- CREATE DATABASE `bigtop_manager` /*!40100 DEFAULT CHARACTER SET utf8 */;
---
--- CREATE USER 'bigtop_manager' IDENTIFIED BY 'bigdata';
-
--- USE @schema;
-
--- SQLINES DEMO *** ge_engine to InnoDB
--- SQLINES DEMO *** riable should be used for versions prior to MySQL 5.6
--- @version_short := substring_index(@@version, '.', 2);
--- @major := cast(substring_index(@version_short, '.', 1) as SIGNED);
--- @minor := cast(substring_index(@version_short, '.', -1) as SIGNED);
--- @engine_stmt := CASE WHEN (@major >= 5 AND @minor>=6) or @major >= 8 THEN  'SET default_storage_engine=INNODB' ELSE  'SET storage_engine=INNODB' END;
--- execute statement;
--- DEALLOCATE PREPARE statement;
-
 -- SQLINES FOR EVALUATION USE ONLY (14 DAYS)
 CREATE TABLE audit_log
 (
