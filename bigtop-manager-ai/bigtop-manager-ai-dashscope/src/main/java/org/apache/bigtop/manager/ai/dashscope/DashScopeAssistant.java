@@ -139,11 +139,6 @@ public class DashScopeAssistant extends AbstractAIAssistant {
     }
 
     @Override
-    public Object getId() {
-        return dashScopeThreadParam.getThreadId();
-    }
-
-    @Override
     public Flux<String> streamAsk(String userMessage) {
         saveMessage(userMessage, MessageSender.USER);
         TextMessageParam textMessageParam = TextMessageParam.builder()

@@ -28,7 +28,8 @@ import java.util.stream.Collectors;
 @Getter
 public enum PlatformType {
     OPENAI("openai"),
-    DASH_SCOPE("dashscope");
+    DASH_SCOPE("dashscope"),
+    QIANFAN("qianfan");
 
     private final String value;
 

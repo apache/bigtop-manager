@@ -56,9 +56,6 @@ public class OpenAIAssistant extends AbstractAIAssistant {
 
     @Override
     public Flux<String> streamAsk(String chatMessage) {
-        if (chatMemory == null || streamingChatLanguageModel == null) {
-            throw new AssistantConfigNotSetException("threadId");
-        }
         chatMemory.add(UserMessage.from(chatMessage));
         return Flux.create(
                 emitter -> streamingChatLanguageModel.generate(chatMemory.messages(), new StreamingResponseHandler<>() {
@@ -83,9 +80,6 @@ public class OpenAIAssistant extends AbstractAIAssistant {
 
     @Override
     public String ask(String chatMessage) {
-        if (chatMemory == null || chatLanguageModel == null) {
-            throw new AssistantConfigNotSetException("threadId");
-        }
         chatMemory.add(UserMessage.from(chatMessage));
         Response<AiMessage> generate = chatLanguageModel.generate(chatMemory.messages());
         String aiMessage = generate.content().text();
@@ -95,26 +89,7 @@ public class OpenAIAssistant extends AbstractAIAssistant {
 
     @Override
     public void setSystemPrompt(String systemPrompt) {
-        if (chatMemory == null) {
-            throw new AssistantConfigNotSetException("threadId");
-        }
         chatMemory.add(SystemMessage.systemMessage(systemPrompt));
-    }
-
-    public void setSystemPrompt(SystemMessage systemPrompt) {
-        if (chatMemory == null) {
-            throw new AssistantConfigNotSetException("threadId");
-        }
-        chatMemory.add(systemPrompt);
-    }
-
-    @Override
-    public Object getId() {
-        return chatMemory.id();
-    }
-
-    public void resetMemory() {
-        chatMemory.clear();
     }
 
     @Override
