@@ -17,16 +17,14 @@
  * under the License.
  */
 
-package org.apache.bigtop.manager.server.interceptor;
+package org.apache.bigtop.manager.dao.interceptor;
 
 import org.apache.bigtop.manager.common.utils.ClassUtils;
 import org.apache.bigtop.manager.dao.annotations.CreateBy;
 import org.apache.bigtop.manager.dao.annotations.CreateTime;
 import org.apache.bigtop.manager.dao.annotations.UpdateBy;
 import org.apache.bigtop.manager.dao.annotations.UpdateTime;
-import org.apache.bigtop.manager.server.holder.SessionUserHolder;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.ibatis.binding.MapperMethod;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -36,8 +34,6 @@ import org.apache.ibatis.plugin.Intercepts;
 import org.apache.ibatis.plugin.Invocation;
 import org.apache.ibatis.plugin.Signature;
 
-import org.springframework.stereotype.Component;
-
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
@@ -45,9 +41,9 @@ import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 
 @Slf4j
-@Component
 @Intercepts({
     @Signature(
             type = Executor.class,
@@ -55,6 +51,12 @@ import java.util.List;
             args = {MappedStatement.class, Object.class})
 })
 public class AuditingInterceptor implements Interceptor {
+
+    private final Supplier<Long> currentUser;
+
+    public AuditingInterceptor(Supplier<Long> currentUser) {
+        this.currentUser = currentUser;
+    }
 
     @SuppressWarnings("unchecked")
     @Override
@@ -85,19 +87,9 @@ public class AuditingInterceptor implements Interceptor {
         return invocation.proceed();
     }
 
-    private Pair<Long, Timestamp> getAuditInfo() {
-        // Get the current time and operator
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        Long currentUser = SessionUserHolder.getUserId();
-        log.debug("timestamp: {} currentUser: {}", timestamp, currentUser);
-        return Pair.of(currentUser, timestamp);
-    }
-
     private void setAuditFields(Object object, SqlCommandType sqlCommandType) throws IllegalAccessException {
-
-        Pair<Long, Timestamp> auditInfo = getAuditInfo();
-        Long currentUser = auditInfo.getLeft();
-        Timestamp timestamp = auditInfo.getRight();
+        Long userId = currentUser.get();
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
         List<Field> fields = ClassUtils.getFields(object.getClass());
         if (SqlCommandType.INSERT == sqlCommandType || SqlCommandType.UPDATE == sqlCommandType) {
@@ -106,14 +98,14 @@ public class AuditingInterceptor implements Interceptor {
                 field.setAccessible(true);
                 if (field.isAnnotationPresent(CreateBy.class)
                         && SqlCommandType.INSERT == sqlCommandType
-                        && currentUser != null) {
-                    field.set(object, currentUser);
+                        && userId != null) {
+                    field.set(object, userId);
                 }
                 if (field.isAnnotationPresent(CreateTime.class) && SqlCommandType.INSERT == sqlCommandType) {
                     field.set(object, timestamp);
                 }
-                if (field.isAnnotationPresent(UpdateBy.class) && currentUser != null) {
-                    field.set(object, currentUser);
+                if (field.isAnnotationPresent(UpdateBy.class) && userId != null) {
+                    field.set(object, userId);
                 }
                 if (field.isAnnotationPresent(UpdateTime.class)) {
                     field.set(object, timestamp);

@@ -18,7 +18,6 @@
  */
 package org.apache.bigtop.manager.server;
 
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -26,7 +25,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableAsync
 @EnableScheduling
-@MapperScan("org.apache.bigtop.manager.dao")
 @SpringBootApplication(scanBasePackages = {"org.apache.bigtop.manager.server", "org.apache.bigtop.manager.common"})
 public class ServerApplication {
 

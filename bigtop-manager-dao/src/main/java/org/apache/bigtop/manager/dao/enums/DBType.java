@@ -19,8 +19,11 @@
 
 package org.apache.bigtop.manager.dao.enums;
 
+import lombok.Getter;
+
 import java.util.stream.Stream;
 
+@Getter
 public enum DBType {
     MYSQL("mysql", "MYSQL"),
     DM("dm", "DaMeng");
@@ -33,18 +36,10 @@ public enum DBType {
     private final String code;
     private final String desc;
 
-    public String getCode() {
-        return this.code;
-    }
-
-    public String getDesc() {
-        return this.desc;
-    }
-
     public static DBType toType(String databaseId) {
         return Stream.of(DBType.values())
                 .filter(p -> p.getCode().equals(databaseId))
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(() -> new IllegalArgumentException("Unsupported database: " + databaseId));
     }
 }
