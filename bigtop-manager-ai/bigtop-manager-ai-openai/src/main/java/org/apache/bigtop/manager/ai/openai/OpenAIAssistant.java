@@ -128,7 +128,7 @@ public class OpenAIAssistant extends AbstractAIAssistant {
         return new Builder();
     }
 
-    public static class Builder {
+    public static class Builder implements AIAssistant.Builder {
         private Object id;
 
         private ChatMemoryStore chatMemoryStore;

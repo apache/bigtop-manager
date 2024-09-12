@@ -299,7 +299,7 @@ public class DashScopeAssistant extends AbstractAIAssistant {
         return threadInfo;
     }
 
-    public static class Builder {
+    public static class Builder implements AIAssistant.Builder {
         private Object id;
         private AIAssistantConfigProvider configProvider;
         private ChatMemoryStore chatMemoryStore;
@@ -316,7 +316,7 @@ public class DashScopeAssistant extends AbstractAIAssistant {
             return this;
         }
 
-        public Builder messageRepository(ChatMemoryStore chatMemoryStore) {
+        public Builder memoryStore(ChatMemoryStore chatMemoryStore) {
             this.chatMemoryStore = chatMemoryStore;
             return this;
         }
