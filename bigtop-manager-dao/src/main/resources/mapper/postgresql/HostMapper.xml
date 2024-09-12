@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one
+  ~ or more contributor license agreements.  See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership.  The ASF licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+-->
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.apache.bigtop.manager.dao.repository.HostDao">
+
+    <sql id="baseColumns">
+        id, hostname, ipv4, ipv6, os, arch, available_processors, free_memory_size, total_memory_size, free_disk, total_disk, state, cluster_id
+    </sql>
+
+    <sql id="baseColumnsV2">
+        ${alias}.id,  ${alias}.hostname,  ${alias}.ipv4,  ${alias}.ipv6,  ${alias}.os,  ${alias}.arch,  ${alias}.available_processors,  ${alias}.free_memory_size,  ${alias}.total_memory_size,  ${alias}.free_disk,  ${alias}.total_disk,  ${alias}.state,  ${alias}.cluster_id
+    </sql>
+
+    <select id="findByHostname" resultType="org.apache.bigtop.manager.dao.po.HostPO">
+        select
+        <include refid="baseColumns"/>
+        from
+        host
+        <where>
+            <if test="hostname != null">
+                hostname = #{hostname}
+            </if>
+        </where>
+        limit 1
+    </select>
+
+    <select id="findByIdJoin" resultType="org.apache.bigtop.manager.dao.po.HostPO">
+        select
+        <include refid="baseColumnsV2">
+            <property name="alias" value="h"/>
+        </include>
+        ,clus.cluster_name
+        from
+        (select * from host
+        <where>
+            <if test="id != 0">
+                id = #{id}
+            </if>
+        </where>
+        ) h
+        inner join
+        cluster clus
+        on h.cluster_id = clus.id
+        limit 1
+    </select>
+
+    <select id="findAllByClusterId" parameterType="java.lang.Long"
+            resultType="org.apache.bigtop.manager.dao.po.HostPO">
+        select
+        <include refid="baseColumnsV2">
+            <property name="alias" value="h"/>
+        </include>
+        ,clus.cluster_name
+        from
+        host h
+        inner join
+        (select * from cluster
+        <where>
+            <if test="clusterId != 0">
+                id = #{clusterId}
+            </if>
+        </where>
+        ) clus
+        on h.cluster_id = clus.id
+    </select>
+
+    <select id="findAllByHostnameIn"
+            resultType="org.apache.bigtop.manager.dao.po.HostPO">
+        select
+        <include refid="baseColumns"/>
+        from
+        host
+        <where>
+            <if test="hostnames != null and hostnames.size() > 0">
+                hostname in
+                <foreach collection="hostnames" item="hostname" index="index" open="(" close=")" separator=", ">
+                    #{hostname}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <insert id="saveAll" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into host (hostname, ipv4, ipv6, os, arch, available_processors, free_memory_size, total_memory_size, free_disk, total_disk, state, cluster_id, create_by, update_by, create_time, update_time)
+        values
+        <foreach collection='hosts' item='host' separator=','>
+            (#{host.hostname}, #{host.ipv4}, #{host.ipv6}, #{host.os}, #{host.arch}, #{host.availableProcessors}, #{host.freeMemorySize}, #{host.totalMemorySize}, #{host.freeDisk}, #{host.totalDisk}, #{host.state}, #{host.clusterId} ,#{host.createBy},#{host.updateBy},#{host.createTime},#{host.updateTime})
+        </foreach>
+    </insert>
+
+</mapper>

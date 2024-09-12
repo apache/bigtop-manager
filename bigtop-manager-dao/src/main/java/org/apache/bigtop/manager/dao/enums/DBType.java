@@ -26,6 +26,7 @@ import java.util.stream.Stream;
 @Getter
 public enum DBType {
     MYSQL("mysql", "MYSQL"),
+    POSTGRESQL("postgresql", "PostgreSQL"),
     DM("dm", "DaMeng");
 
     DBType(String code, String desc) {
