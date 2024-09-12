@@ -116,8 +116,7 @@ public class AIChatServiceImpl implements AIChatService {
         AIAssistant aiAssistant = getAiAssistantFactory()
                 .create(
                         getPlatformType(platformAuthorizedDTO.getPlatformName()),
-                        getAIAssistantConfig(platformAuthorizedDTO, null),
-                        null);
+                        getAIAssistantConfig(platformAuthorizedDTO, null));
         try {
             return aiAssistant.test();
         } catch (Exception e) {
