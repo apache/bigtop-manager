@@ -22,7 +22,6 @@ import org.apache.bigtop.manager.ai.core.AbstractAIAssistant;
 import org.apache.bigtop.manager.ai.core.enums.MessageSender;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
-import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
 
 import com.alibaba.dashscope.aigc.generation.Generation;
 import com.alibaba.dashscope.aigc.generation.GenerationParam;
@@ -57,7 +56,6 @@ import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.internal.ValidationUtils;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
-import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 import io.reactivex.Flowable;
 import reactor.core.publisher.Flux;
 
@@ -299,27 +297,7 @@ public class DashScopeAssistant extends AbstractAIAssistant {
         return threadInfo;
     }
 
-    public static class Builder implements AIAssistant.Builder {
-        private Object id;
-        private AIAssistantConfigProvider configProvider;
-        private ChatMemoryStore chatMemoryStore;
-
-        public Builder() {}
-
-        public Builder withConfigProvider(AIAssistantConfigProvider configProvider) {
-            this.configProvider = configProvider;
-            return this;
-        }
-
-        public Builder id(Object id) {
-            this.id = id;
-            return this;
-        }
-
-        public Builder memoryStore(ChatMemoryStore chatMemoryStore) {
-            this.chatMemoryStore = chatMemoryStore;
-            return this;
-        }
+    public static class Builder extends AbstractAIAssistant.Builder {
 
         public AIAssistant build() {
             String model = ValidationUtils.ensureNotNull(configProvider.getModel(), "model");
