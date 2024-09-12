@@ -93,14 +93,10 @@ public class QianFanAssistant extends AbstractAIAssistant {
 
     @Override
     public void setSystemPrompt(String systemPrompt) {
-        setSystemPrompt(SystemMessage.systemMessage(systemPrompt));
-    }
-
-    public void setSystemPrompt(SystemMessage systemPrompt) {
         // Multiple system messages are not supported
         if (this.systemMessage == null) {
-            this.systemMessage = systemPrompt;
-            chatMemory.add(systemPrompt);
+            this.systemMessage = SystemMessage.systemMessage(systemPrompt);
+            chatMemory.add(this.systemMessage);
         }
     }
 
