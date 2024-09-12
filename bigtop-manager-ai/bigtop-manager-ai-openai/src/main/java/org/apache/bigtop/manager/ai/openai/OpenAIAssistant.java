@@ -20,7 +20,6 @@ package org.apache.bigtop.manager.ai.openai;
 
 import org.apache.bigtop.manager.ai.core.AbstractAIAssistant;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
-import org.apache.bigtop.manager.ai.core.exception.AssistantConfigNotSetException;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 
 import dev.langchain4j.data.message.AiMessage;
