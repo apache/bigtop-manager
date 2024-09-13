@@ -1,7 +1,7 @@
 name: "Pull Request"
 on:
   pull_request:
-    types: [edited]
+    types: [opened, edited, reopened, synchronize]
 
 jobs:
   check-pr-title:
