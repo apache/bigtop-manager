@@ -15,5 +15,5 @@ jobs:
             const prTitle = context.payload.pull_request.title;
             const regex = /^BIGTOP-\d{1,9}:.*$/;
             if (!regex.test(prTitle)) {
-              core.setFailed(`PR title does not match the required pattern "BIGTOP-<digits>": ${prTitle}`);
+              core.setFailed(`PR title does not match the required pattern "BIGTOP-<digits>:": ${prTitle}`);
             }
