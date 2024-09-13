@@ -21,6 +21,8 @@ header:
     copyright-owner: Apache Software Foundation
 
   paths-ignore:
+    - '.gitmodules'
+    - '.github/actions'
     - '**/.idea/'
     - '**/*.iml'
     - '**/target/**'
