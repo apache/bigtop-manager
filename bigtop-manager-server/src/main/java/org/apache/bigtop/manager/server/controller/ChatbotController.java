@@ -26,7 +26,7 @@ import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
 import org.apache.bigtop.manager.server.model.vo.PlatformAuthCredentialVO;
 import org.apache.bigtop.manager.server.model.vo.PlatformAuthorizedVO;
 import org.apache.bigtop.manager.server.model.vo.PlatformVO;
-import org.apache.bigtop.manager.server.service.AIChatService;
+import org.apache.bigtop.manager.server.service.ChatbotService;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -48,71 +48,71 @@ import java.util.List;
 
 @Tag(name = "AI Chat Controller")
 @RestController
-@RequestMapping("/ai/chat/")
-public class AIChatController {
+@RequestMapping("/chatbot/")
+public class ChatbotController {
 
     @Resource
-    private AIChatService chatService;
+    private ChatbotService chatbotService;
 
     @Operation(summary = "platforms", description = "Get all platforms")
     @GetMapping("/platforms")
     public ResponseEntity<List<PlatformVO>> platforms() {
-        return ResponseEntity.success(chatService.platforms());
+        return ResponseEntity.success(chatbotService.platforms());
     }
 
     @Operation(summary = "platforms", description = "Get authorized platforms")
     @GetMapping("/platforms/authorized")
     public ResponseEntity<List<PlatformAuthorizedVO>> authorizedPlatforms() {
-        return ResponseEntity.success(chatService.authorizedPlatforms());
+        return ResponseEntity.success(chatbotService.authorizedPlatforms());
     }
 
     @Operation(summary = "platforms", description = "Get authorized platforms")
     @GetMapping("/platforms/{platformId}/auth/credential")
     public ResponseEntity<List<PlatformAuthCredentialVO>> platformsAuthCredential(@PathVariable Long platformId) {
-        return ResponseEntity.success(chatService.platformsAuthCredential(platformId));
+        return ResponseEntity.success(chatbotService.platformsAuthCredential(platformId));
     }
 
     @Operation(summary = "platforms", description = "Add authorized platforms")
     @PutMapping("/platforms")
     public ResponseEntity<PlatformAuthorizedVO> addAuthorizedPlatform(@RequestBody PlatformReq platformReq) {
         PlatformDTO platformDTO = PlatformConverter.INSTANCE.fromReq2DTO(platformReq);
-        return ResponseEntity.success(chatService.addAuthorizedPlatform(platformDTO));
+        return ResponseEntity.success(chatbotService.addAuthorizedPlatform(platformDTO));
     }
 
     @Operation(summary = "platforms", description = "Delete authorized platforms")
     @DeleteMapping("/platforms/{platformId}")
     public ResponseEntity<Boolean> deleteAuthorizedPlatform(@PathVariable Long platformId) {
-        return ResponseEntity.success(chatService.deleteAuthorizedPlatform(platformId));
+        return ResponseEntity.success(chatbotService.deleteAuthorizedPlatform(platformId));
     }
 
     @Operation(summary = "new threads", description = "Create a chat threads")
     @PutMapping("/platforms/{platformId}/threads")
     public ResponseEntity<ChatThreadVO> createChatThreads(@PathVariable Long platformId, @RequestParam String model) {
-        return ResponseEntity.success(chatService.createChatThreads(platformId, model));
+        return ResponseEntity.success(chatbotService.createChatThreads(platformId, model));
     }
 
     @Operation(summary = "delete threads", description = "Delete a chat threads")
     @DeleteMapping("platforms/{platformId}/threads/{threadId}")
     public ResponseEntity<Boolean> deleteChatThreads(@PathVariable Long platformId, @PathVariable Long threadId) {
-        return ResponseEntity.success(chatService.deleteChatThreads(platformId, threadId));
+        return ResponseEntity.success(chatbotService.deleteChatThreads(platformId, threadId));
     }
 
     @Operation(summary = "get", description = "Get all threads of a platform")
     @GetMapping("platforms/{platformId}/threads")
     public ResponseEntity<List<ChatThreadVO>> getAllChatThreads(
             @PathVariable Long platformId, @RequestParam String model) {
-        return ResponseEntity.success(chatService.getAllChatThreads(platformId, model));
+        return ResponseEntity.success(chatbotService.getAllChatThreads(platformId, model));
     }
 
-    @Operation(summary = "talk", description = "Talk with AI")
+    @Operation(summary = "talk", description = "Talk with Chatbot")
     @PostMapping("platforms/{platformId}/threads/{threadId}/talk")
     public SseEmitter talk(@PathVariable Long platformId, @PathVariable Long threadId, @RequestParam String message) {
-        return chatService.talk(platformId, threadId, message);
+        return chatbotService.talk(platformId, threadId, message);
     }
 
     @Operation(summary = "history", description = "Get chat records")
     @GetMapping("platforms/{platformId}/threads/{threadId}/history")
     public ResponseEntity<List<ChatMessageVO>> history(@PathVariable Long platformId, @PathVariable Long threadId) {
-        return ResponseEntity.success(chatService.history(platformId, threadId));
+        return ResponseEntity.success(chatbotService.history(platformId, threadId));
     }
 }

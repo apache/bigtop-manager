@@ -25,7 +25,7 @@ import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
 import org.apache.bigtop.manager.server.model.vo.PlatformAuthCredentialVO;
 import org.apache.bigtop.manager.server.model.vo.PlatformAuthorizedVO;
 import org.apache.bigtop.manager.server.model.vo.PlatformVO;
-import org.apache.bigtop.manager.server.service.AIChatService;
+import org.apache.bigtop.manager.server.service.ChatbotService;
 import org.apache.bigtop.manager.server.utils.MessageSourceUtils;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
 
@@ -50,13 +50,13 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class AIChatControllerTest {
+class ChatbotControllerTest {
 
     @Mock
-    private AIChatService chatService;
+    private ChatbotService chatbotService;
 
     @InjectMocks
-    private AIChatController chatController;
+    private ChatbotController chatbotController;
 
     private MockedStatic<MessageSourceUtils> mockedMessageSourceUtils;
 
@@ -74,9 +74,9 @@ class AIChatControllerTest {
     @Test
     void getAllPlatforms() {
         List<PlatformVO> platforms = new ArrayList<>();
-        when(chatService.platforms()).thenReturn(platforms);
+        when(chatbotService.platforms()).thenReturn(platforms);
 
-        ResponseEntity<List<PlatformVO>> response = chatController.platforms();
+        ResponseEntity<List<PlatformVO>> response = chatbotController.platforms();
 
         assertTrue(response.isSuccess());
         assertEquals(platforms, response.getData());
@@ -85,9 +85,9 @@ class AIChatControllerTest {
     @Test
     void getAuthorizedPlatforms() {
         List<PlatformAuthorizedVO> authorizedPlatforms = new ArrayList<>();
-        when(chatService.authorizedPlatforms()).thenReturn(authorizedPlatforms);
+        when(chatbotService.authorizedPlatforms()).thenReturn(authorizedPlatforms);
 
-        ResponseEntity<List<PlatformAuthorizedVO>> response = chatController.authorizedPlatforms();
+        ResponseEntity<List<PlatformAuthorizedVO>> response = chatbotController.authorizedPlatforms();
 
         assertTrue(response.isSuccess());
         assertEquals(authorizedPlatforms, response.getData());
@@ -97,9 +97,9 @@ class AIChatControllerTest {
     void platformsAuthCredential() {
         Long platformId = 1L;
         List<PlatformAuthCredentialVO> credentials = new ArrayList<>();
-        when(chatService.platformsAuthCredential(platformId)).thenReturn(credentials);
+        when(chatbotService.platformsAuthCredential(platformId)).thenReturn(credentials);
 
-        ResponseEntity<List<PlatformAuthCredentialVO>> response = chatController.platformsAuthCredential(platformId);
+        ResponseEntity<List<PlatformAuthCredentialVO>> response = chatbotController.platformsAuthCredential(platformId);
 
         assertTrue(response.isSuccess());
         assertEquals(credentials, response.getData());
@@ -110,9 +110,9 @@ class AIChatControllerTest {
         PlatformReq platformReq = new PlatformReq();
         PlatformAuthorizedVO authorizedVO = new PlatformAuthorizedVO();
 
-        when(chatService.addAuthorizedPlatform(any(PlatformDTO.class))).thenReturn(authorizedVO);
+        when(chatbotService.addAuthorizedPlatform(any(PlatformDTO.class))).thenReturn(authorizedVO);
 
-        ResponseEntity<PlatformAuthorizedVO> response = chatController.addAuthorizedPlatform(platformReq);
+        ResponseEntity<PlatformAuthorizedVO> response = chatbotController.addAuthorizedPlatform(platformReq);
 
         assertTrue(response.isSuccess());
         assertEquals(authorizedVO, response.getData());
@@ -121,9 +121,9 @@ class AIChatControllerTest {
     @Test
     void deleteAuthorizedPlatform() {
         Long platformId = 1L;
-        when(chatService.deleteAuthorizedPlatform(platformId)).thenReturn(true);
+        when(chatbotService.deleteAuthorizedPlatform(platformId)).thenReturn(true);
 
-        ResponseEntity<Boolean> response = chatController.deleteAuthorizedPlatform(platformId);
+        ResponseEntity<Boolean> response = chatbotController.deleteAuthorizedPlatform(platformId);
 
         assertTrue(response.isSuccess());
         assertEquals(true, response.getData());
@@ -135,9 +135,9 @@ class AIChatControllerTest {
         String model = "model1";
         ChatThreadVO chatThread = new ChatThreadVO();
 
-        when(chatService.createChatThreads(eq(platformId), eq(model))).thenReturn(chatThread);
+        when(chatbotService.createChatThreads(eq(platformId), eq(model))).thenReturn(chatThread);
 
-        ResponseEntity<ChatThreadVO> response = chatController.createChatThreads(platformId, model);
+        ResponseEntity<ChatThreadVO> response = chatbotController.createChatThreads(platformId, model);
 
         assertTrue(response.isSuccess());
         assertEquals(chatThread, response.getData());
@@ -148,9 +148,9 @@ class AIChatControllerTest {
         Long platformId = 1L;
         Long threadId = 1L;
 
-        when(chatService.deleteChatThreads(platformId, threadId)).thenReturn(true);
+        when(chatbotService.deleteChatThreads(platformId, threadId)).thenReturn(true);
 
-        ResponseEntity<Boolean> response = chatController.deleteChatThreads(platformId, threadId);
+        ResponseEntity<Boolean> response = chatbotController.deleteChatThreads(platformId, threadId);
 
         assertTrue(response.isSuccess());
         assertEquals(true, response.getData());
@@ -162,9 +162,9 @@ class AIChatControllerTest {
         String model = "model1";
         List<ChatThreadVO> chatThreads = new ArrayList<>();
 
-        when(chatService.getAllChatThreads(eq(platformId), eq(model))).thenReturn(chatThreads);
+        when(chatbotService.getAllChatThreads(eq(platformId), eq(model))).thenReturn(chatThreads);
 
-        ResponseEntity<List<ChatThreadVO>> response = chatController.getAllChatThreads(platformId, model);
+        ResponseEntity<List<ChatThreadVO>> response = chatbotController.getAllChatThreads(platformId, model);
 
         assertTrue(response.isSuccess());
         assertEquals(chatThreads, response.getData());
@@ -177,9 +177,9 @@ class AIChatControllerTest {
         String message = "Hello";
 
         SseEmitter emitter = new SseEmitter();
-        when(chatService.talk(eq(platformId), eq(threadId), eq(message))).thenReturn(emitter);
+        when(chatbotService.talk(eq(platformId), eq(threadId), eq(message))).thenReturn(emitter);
 
-        SseEmitter result = chatController.talk(platformId, threadId, message);
+        SseEmitter result = chatbotController.talk(platformId, threadId, message);
 
         assertEquals(emitter, result);
     }
@@ -190,9 +190,9 @@ class AIChatControllerTest {
         Long threadId = 1L;
         List<ChatMessageVO> history = new ArrayList<>();
 
-        when(chatService.history(platformId, threadId)).thenReturn(history);
+        when(chatbotService.history(platformId, threadId)).thenReturn(history);
 
-        ResponseEntity<List<ChatMessageVO>> response = chatController.history(platformId, threadId);
+        ResponseEntity<List<ChatMessageVO>> response = chatbotController.history(platformId, threadId);
 
         assertTrue(response.isSuccess());
         assertEquals(history, response.getData());
