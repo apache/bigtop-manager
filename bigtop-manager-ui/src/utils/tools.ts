@@ -56,3 +56,10 @@ export const scrollToBottom = (container: HTMLElement | null) => {
     container.scrollTop = container.scrollHeight
   })
 }
+
+export function getSvgUrl(name: string, fileName?: string) {
+  const path = fileName
+    ? `../assets/images/svg/${fileName}/${name}.svg`
+    : `../assets/images/svg/${name}.svg`
+  return new URL(path, import.meta.url).href
+}
