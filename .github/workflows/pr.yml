@@ -1,0 +1,16 @@
+name: "Pull Request"
+on: [push, pull_request]
+
+jobs:
+  check-pr-title:
+    name: "Check PR Title"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check PR title starts with "BIGTOP-"
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const prTitle = github.context.payload.pull_request.title;
+            if (!prTitle.startsWith("BIGTOP-")) {
+              core.setFailed(`PR title does not start with "BIGTOP-": ${prTitle}`);
+            }
