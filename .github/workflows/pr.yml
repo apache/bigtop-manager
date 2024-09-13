@@ -8,12 +8,9 @@ jobs:
     name: "Check PR Title"
     runs-on: ubuntu-latest
     steps:
-      - name: Check PR title regex
-        uses: actions/github-script@v7
+      - name: Check PR title
+        uses: thehanimo/pr-title-checker@v1.4.1
         with:
-          script: |
-            const prTitle = context.payload.pull_request.title;
-            const regex = /^BIGTOP-\d{1,9}:.*$/;
-            if (!regex.test(prTitle)) {
-              core.setFailed(`PR title does not match the required pattern "BIGTOP-<digits>:": ${prTitle}`);
-            }
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          pass_on_octokit_error: false
+          configuration_path: .github/pr-title-checker-config.json
