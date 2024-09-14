@@ -68,22 +68,23 @@ public class AuditingInterceptor implements Interceptor {
         Object parameter = invocation.getArgs()[1];
         log.debug("sqlCommandType {}", sqlCommandType);
 
-        Collection<Object> objects;
-        if (parameter instanceof MapperMethod.ParamMap) {
-            MapperMethod.ParamMap<Object> paramMap = ((MapperMethod.ParamMap<Object>) parameter);
-            if (paramMap.get("param1") instanceof Collection) {
-                objects = ((Collection<Object>) paramMap.get("param1"));
+        if (SqlCommandType.INSERT == sqlCommandType || SqlCommandType.UPDATE == sqlCommandType) {
+            Collection<Object> objects;
+            if (parameter instanceof MapperMethod.ParamMap) {
+                MapperMethod.ParamMap<Object> paramMap = ((MapperMethod.ParamMap<Object>) parameter);
+                if (paramMap.get("param1") instanceof Collection) {
+                    objects = ((Collection<Object>) paramMap.get("param1"));
+                } else {
+                    objects = Collections.singletonList(paramMap.get("param1"));
+                }
             } else {
-                objects = Collections.singletonList(paramMap.get("param1"));
+                objects = Collections.singletonList(parameter);
             }
-        } else {
-            objects = Collections.singletonList(parameter);
-        }
 
-        for (Object o : objects) {
-            setAuditFields(o, sqlCommandType);
+            for (Object o : objects) {
+                setAuditFields(o, sqlCommandType);
+            }
         }
-
         return invocation.proceed();
     }
 
@@ -92,26 +93,25 @@ public class AuditingInterceptor implements Interceptor {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
         List<Field> fields = ClassUtils.getFields(object.getClass());
-        if (SqlCommandType.INSERT == sqlCommandType || SqlCommandType.UPDATE == sqlCommandType) {
-            for (Field field : fields) {
-                boolean accessible = field.canAccess(object);
-                field.setAccessible(true);
-                if (field.isAnnotationPresent(CreateBy.class)
-                        && SqlCommandType.INSERT == sqlCommandType
-                        && userId != null) {
-                    field.set(object, userId);
-                }
-                if (field.isAnnotationPresent(CreateTime.class) && SqlCommandType.INSERT == sqlCommandType) {
-                    field.set(object, timestamp);
-                }
-                if (field.isAnnotationPresent(UpdateBy.class) && userId != null) {
-                    field.set(object, userId);
-                }
-                if (field.isAnnotationPresent(UpdateTime.class)) {
-                    field.set(object, timestamp);
-                }
-                field.setAccessible(accessible);
+
+        for (Field field : fields) {
+            boolean accessible = field.canAccess(object);
+            field.setAccessible(true);
+            if (field.isAnnotationPresent(CreateBy.class)
+                    && SqlCommandType.INSERT == sqlCommandType
+                    && userId != null) {
+                field.set(object, userId);
             }
+            if (field.isAnnotationPresent(CreateTime.class) && SqlCommandType.INSERT == sqlCommandType) {
+                field.set(object, timestamp);
+            }
+            if (field.isAnnotationPresent(UpdateBy.class) && userId != null) {
+                field.set(object, userId);
+            }
+            if (field.isAnnotationPresent(UpdateTime.class)) {
+                field.set(object, timestamp);
+            }
+            field.setAccessible(accessible);
         }
     }
 }
