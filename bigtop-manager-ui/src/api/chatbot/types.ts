@@ -65,8 +65,8 @@ export interface AuthTestResult {
 export type Sender = 'USER' | 'SYSTEM' | 'AI'
 export interface ChatThreadHistoryItem {
   sender: Sender
-  message: 'string'
-  createTime: 'string'
+  message: string
+  createTime: string
 }
 
 export interface ChatThreadHistoryCondition {

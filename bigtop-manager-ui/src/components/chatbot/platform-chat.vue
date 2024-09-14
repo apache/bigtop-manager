@@ -1,17 +1,11 @@
 <template>
   <div class="platfrom-chat">
     <section>
-      <article v-for="(chatItem, index) of chatThreadHistory" :key="index">
-        <div>{{ chatItem }}</div>
-        <!-- <div class="user"></div>
-        <div
-          v-for="(choice, idx) of record.choices"
-          :key="idx"
-          class="assitant"
-        >
-          <pre>{{ choice.message.content }}</pre>
-        </div> -->
-      </article>
+      <chat-msg-item
+        v-for="(chatItem, index) of chatThreadHistory"
+        :key="index"
+        :chat-item="chatItem"
+      />
     </section>
     <footer>
       <div class="msg-wrp">
@@ -49,6 +43,7 @@
   import type { Option } from './select-menu.vue'
   import { message } from 'ant-design-vue/es/components'
   import { ref, computed, watchEffect } from 'vue'
+  import ChatMsgItem from './chat-msg-item.vue'
 
   interface PlatfromChatPorps {
     currPage?: Option
@@ -74,6 +69,7 @@
       message.warning('请输入内容')
       return
     }
+    chatbot.updateThreadChatHistory('USER', inputText.value as string)
     chatbot.fetchSendChatMessage(inputText.value)
   }
 </script>

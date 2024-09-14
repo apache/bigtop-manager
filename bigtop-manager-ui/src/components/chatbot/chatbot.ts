@@ -8,7 +8,6 @@ import {
   getCredentialFormModelofPlatform,
   getSupportedPlatforms,
   getThreadChatHistory,
-  sendChatMessage,
   validateAuthCredentials
 } from '@/api/chatbot/index'
 import type {
@@ -19,8 +18,11 @@ import type {
   ChatThreadCondition,
   Platform,
   ChatThreadHistoryItem,
-  AuthCredential
+  AuthCredential,
+  Sender
 } from '@/api/chatbot/types'
+import { sendChatMessage } from '@/api/sse'
+import { AxiosProgressEvent, Canceler } from 'axios'
 
 export default defineStore(
   'chatbot',
@@ -35,6 +37,8 @@ export default defineStore(
     const currThread = ref<ChatThread>()
     const loading = ref(false)
     const isExpand = ref(false)
+    const canceler = ref<Canceler>()
+    const messageReciver = ref('')
 
     function setWindowExpandStatus(status: boolean) {
       isExpand.value = status
@@ -63,6 +67,13 @@ export default defineStore(
       if (!threadIds.includes(thread.threadId)) {
         chatThreads.value.push(thread)
       }
+    }
+    function updateThreadChatHistory(sender: Sender, message: string) {
+      chatThreadHistory.value.push({
+        sender,
+        message,
+        createTime: new Date().toISOString()
+      })
     }
 
     async function fetchAuthorizedPlatforms() {
@@ -149,7 +160,7 @@ export default defineStore(
           platformId: currPlatform.value?.platformId as string | number,
           threadId: currThread.value?.threadId as string | number
         })
-        console.log('data :>> ', data)
+        chatThreadHistory.value = data
       } catch (error) {
         console.log('error :>> ', error)
       }
@@ -157,18 +168,39 @@ export default defineStore(
 
     async function fetchSendChatMessage(message: string) {
       try {
-        const data = await sendChatMessage({
+        const reqparams = {
           platformId: currPlatform.value?.platformId as string | number,
           threadId: currThread.value?.threadId as string | number,
           message
-        })
-        console.log('data :>> ', data)
+        }
+        const { cancel, promise } = sendChatMessage(reqparams, onMessageReceive)
+        canceler.value = cancel
+        promise.then(onMessageComplete)
       } catch (error) {
         console.log('error :>> ', error)
       }
     }
 
+    const onMessageReceive = ({ event }: AxiosProgressEvent) => {
+      const str = event.target.responseText.replace(/data:\s*/g, '').trim()
+      messageReciver.value = str
+    }
+
+    const onMessageComplete = (res: string | undefined) => {
+      messageReciver.value = ''
+      cancelSseConnect()
+      updateThreadChatHistory('AI', (res || '').replace(/data:\s*/g, '').trim())
+    }
+
+    const cancelSseConnect = () => {
+      if (!canceler.value) {
+        return
+      }
+      canceler.value()
+    }
+
     return {
+      messageReciver,
       loading,
       isExpand,
       currPlatform,
@@ -180,6 +212,7 @@ export default defineStore(
       credentialFormModel,
       updateCurrPlatform,
       updateCurrThread,
+      updateThreadChatHistory,
       fetchSupportedPlatforms,
       fetchCredentialFormModelofPlatform,
       testAuthofPlatform,
