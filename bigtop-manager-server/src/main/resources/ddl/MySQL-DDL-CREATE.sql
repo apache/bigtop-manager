@@ -373,8 +373,8 @@ INSERT INTO bigtop_manager.user (id, create_time, update_time, nickname, passwor
 VALUES (1, now(), now(), 'Administrator', '21232f297a57a5a743894a0e4a801fc3', true, 'admin');
 
 -- Adding default llm platform
-INSERT INTO bigtop_manager.llm_platform (id,credential,NAME,support_models)
+INSERT INTO bigtop_manager.llm_platform (id, credential, name, support_models)
 VALUES
-(1,'{"apiKey": "API Key"}','OpenAI','gpt-3.5-turbo,gpt-4,gpt-4o,gpt-3.5-turbo-16k,gpt-4-turbo-preview,gpt-4-32k,gpt-4o-mini'),
-(2,'{"apiKey": "API Key"}','DashScope','qwen-max,qwen-plus,qwen-turbo'),
-(3,'{"apiKey": "API Key", "secretKey": "Secret Key"}','QianFan','Yi-34B-Chat,ERNIE-4.0-8K,ERNIE-3.5-128K,ERNIE-Speed-8K,Llama-2-7B-Chat,Fuyu-8B');
+(1, '{"apiKey": "API Key"}', 'OpenAI', 'gpt-3.5-turbo,gpt-4,gpt-4o,gpt-3.5-turbo-16k,gpt-4-turbo-preview,gpt-4-32k,gpt-4o-mini'),
+(2, '{"apiKey": "API Key"}', 'DashScope', 'qwen-max,qwen-plus,qwen-turbo'),
+(3, '{"apiKey": "API Key", "secretKey": "Secret Key"}', 'QianFan','Yi-34B-Chat,ERNIE-4.0-8K,ERNIE-3.5-128K,ERNIE-Speed-8K,Llama-2-7B-Chat,Fuyu-8B');
