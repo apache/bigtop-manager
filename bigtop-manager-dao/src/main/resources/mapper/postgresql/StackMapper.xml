@@ -24,7 +24,7 @@
 <mapper namespace="org.apache.bigtop.manager.dao.repository.StackDao">
 
     <sql id="baseColumns">
-        id, stack_name, stack_version
+        "id", "stack_name", "stack_version"
     </sql>
 
     <select id="findByStackNameAndStackVersion" resultType="org.apache.bigtop.manager.dao.po.StackPO">

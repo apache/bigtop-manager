@@ -40,7 +40,7 @@ CREATE TABLE "user"
     username    VARCHAR(32)  DEFAULT NULL,
     password    VARCHAR(32)  DEFAULT NULL,
     nickname    VARCHAR(32)  DEFAULT NULL,
-    status      int          DEFAULT 1,
+    status      BOOLEAN          DEFAULT TRUE,
     create_time TIMESTAMP(0) DEFAULT NULL,
     update_time TIMESTAMP(0) DEFAULT NULL,
     create_by   BIGINT,
@@ -57,7 +57,7 @@ CREATE TABLE cluster
     cluster_name  VARCHAR(255)                      DEFAULT NULL,
     cluster_desc  VARCHAR(255)                      DEFAULT NULL,
     cluster_type  SMALLINT CHECK (cluster_type > 0) DEFAULT 1,
-    selected      int                               DEFAULT 1,
+    selected      BOOLEAN                               DEFAULT TRUE,
     create_time   TIMESTAMP(0)                      DEFAULT NULL,
     update_time   TIMESTAMP(0)                      DEFAULT NULL,
     create_by     BIGINT,
@@ -265,7 +265,7 @@ CREATE TABLE service_config
     config_desc VARCHAR(255),
     create_by   BIGINT,
     create_time TIMESTAMP(0),
-    selected    SMALLINT default 0,
+    selected    BOOLEAN default FALSE,
     update_by   BIGINT,
     update_time TIMESTAMP(0),
     version     INTEGER,
@@ -372,7 +372,7 @@ CREATE INDEX idx_thread_id ON llm_chat_message (thread_id);
 CREATE INDEX idx_user_id ON llm_chat_message (user_id);
 
 INSERT INTO "user" (create_time, update_time, nickname, password, status, username)
-VALUES (now(), now(), 'Administrator', '21232f297a57a5a743894a0e4a801fc3', 1, 'admin');
+VALUES (now(), now(), 'Administrator', '21232f297a57a5a743894a0e4a801fc3', true, 'admin');
 
 INSERT INTO llm_platform (credential, NAME, support_models)
 VALUES

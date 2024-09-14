@@ -78,7 +78,7 @@
         from
         (select * from service_config
         <where>
-            selected = 1
+            selected is true
             <if test="clusterId != 0">
                 and cluster_id = #{clusterId}
             </if>
@@ -103,7 +103,7 @@
         from
         (select * from service_config
         <where>
-        selected = 1
+        selected is true
             <if test="clusterId != 0">
                 and cluster_id = #{clusterId}
             </if>

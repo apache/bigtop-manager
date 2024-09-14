@@ -24,13 +24,13 @@
 <mapper namespace="org.apache.bigtop.manager.dao.repository.StageDao">
 
     <update id="updateStateByIds" parameterType="java.util.List">
-        UPDATE stage
-        SET `state` = CASE
+        UPDATE "stage"
+        SET "state" = CASE
         <foreach collection="stages" item="item" index="index">
             WHEN id = #{item.id} THEN #{item.state}
         </foreach>
         END
-        WHERE id IN
+        WHERE "id" IN
         <foreach collection="stages" index="index" item="item" open="(" separator="," close=")">
             #{item.id}
         </foreach>
