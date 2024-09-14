@@ -34,6 +34,7 @@
     border-radius: 50%;
     border: 1px solid rgb(207, 207, 207);
     overflow: hidden;
+    padding: 4px;
   }
 
   .chat-item {
