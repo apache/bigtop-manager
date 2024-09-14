@@ -47,7 +47,7 @@ import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
 import org.apache.bigtop.manager.server.model.vo.PlatformAuthCredentialVO;
 import org.apache.bigtop.manager.server.model.vo.PlatformAuthorizedVO;
 import org.apache.bigtop.manager.server.model.vo.PlatformVO;
-import org.apache.bigtop.manager.server.service.AIChatService;
+import org.apache.bigtop.manager.server.service.ChatbotService;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -66,7 +66,7 @@ import java.util.Objects;
 
 @Service
 @Slf4j
-public class AIChatServiceImpl implements AIChatService {
+public class ChatbotServiceImpl implements ChatbotService {
     @Resource
     private PlatformDao platformDao;
 
