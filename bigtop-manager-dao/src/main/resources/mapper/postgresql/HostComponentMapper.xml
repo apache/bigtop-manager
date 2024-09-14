@@ -115,7 +115,7 @@
         <include refid="baseColumnsV2">
             <property name="alias" value="hc"/>
         </include>
-            , c.component_name
+        , c.component_name, h.hostname
         from
         host_component hc
         inner join (select * from host
@@ -134,7 +134,7 @@
         on hc.host_id = h.id
         inner join (select * from component
         <where>
-            <if test="componentName != 0">
+            <if test="componentName != null">
                 component_name = #{componentName}
             </if>
         </where>
@@ -166,7 +166,7 @@
                 and id = #{hostId}
             </if>
         </where>
-            ) ht
+        ) ht
         on hc.host_id = ht.id
     </select>
 
@@ -176,7 +176,7 @@
         <include refid="baseColumnsV2">
             <property name="alias" value="hc"/>
         </include>
-            , c.service_id, c.component_name, c.display_name, c.category, s.service_name, clus.cluster_name, ht.hostname
+        , c.service_id, c.component_name, c.display_name, c.category, s.service_name, clus.cluster_name, ht.hostname
         from
         host_component hc
         inner join (select * from component

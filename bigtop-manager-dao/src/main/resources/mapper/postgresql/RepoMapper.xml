@@ -24,7 +24,7 @@
 <mapper namespace="org.apache.bigtop.manager.dao.repository.RepoDao">
 
     <sql id="baseColumns">
-        id, base_url, os, arch, repo_id, repo_name, cluster_id
+        id, base_url, os, arch, repo_id, repo_name, repo_type, cluster_id
     </sql>
 
     <select id="findByRepoName" resultType="org.apache.bigtop.manager.dao.po.RepoPO">
@@ -41,10 +41,10 @@
     </select>
 
     <insert id="saveAll" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        insert into repo (base_url, os, arch, repo_id, repo_name, cluster_id, create_by, update_by, create_time, update_time)
+        insert into repo (base_url, os, arch, repo_id, repo_name, repo_type, cluster_id, create_by, update_by, create_time, update_time)
         values
         <foreach collection='clusters' item='cluster' separator=','>
-            (#{cluster.baseUrl},#{cluster.os},#{cluster.arch},#{cluster.repoId},#{cluster.repoName},#{cluster.clusterId},#{cluster.createBy},#{cluster.updateBy},#{cluster.createTime},#{cluster.updateTime})
+            (#{cluster.baseUrl},#{cluster.os},#{cluster.arch},#{cluster.repoId},#{cluster.repoName},#{cluster.repoType},#{cluster.clusterId},#{cluster.createBy},#{cluster.updateBy},#{cluster.createTime},#{cluster.updateTime})
         </foreach>
     </insert>
 
