@@ -77,6 +77,7 @@ COMMENT ON COLUMN cluster.cluster_desc IS 'Cluster Description';
 COMMENT ON COLUMN cluster.cluster_type IS '1-Physical Machine, 2-Kubernetes';
 COMMENT ON COLUMN cluster.selected IS '0-Disable, 1-Enable';
 
+DROP INDEX IF EXISTS idx_cluster_stack_id;
 CREATE INDEX idx_cluster_stack_id ON cluster (stack_id);
 
 CREATE TABLE component
@@ -99,6 +100,8 @@ CREATE TABLE component
     CONSTRAINT uk_component_name UNIQUE (component_name, cluster_id)
 );
 
+DROP INDEX IF EXISTS idx_component_cluster_id;
+DROP INDEX IF EXISTS idx_component_service_id;
 CREATE INDEX idx_component_cluster_id ON component (cluster_id);
 CREATE INDEX idx_component_service_id ON component (service_id);
 
@@ -115,6 +118,8 @@ CREATE TABLE host_component
     PRIMARY KEY (id)
 );
 
+DROP INDEX IF EXISTS idx_hc_component_id;
+DROP INDEX IF EXISTS idx_hc_host_id;
 CREATE INDEX idx_hc_component_id ON host_component (component_id);
 CREATE INDEX idx_hc_host_id ON host_component (host_id);
 
@@ -145,6 +150,7 @@ CREATE TABLE host
 
 COMMENT ON COLUMN host.physical_memory IS 'Total Physical Memory(Bytes)';
 
+DROP INDEX IF EXISTS idx_host_cluster_id;
 CREATE INDEX idx_host_cluster_id ON host (cluster_id);
 
 CREATE TABLE repo
@@ -165,6 +171,7 @@ CREATE TABLE repo
     CONSTRAINT uk_repo_id UNIQUE (repo_id, os, arch, cluster_id)
 );
 
+DROP INDEX IF EXISTS idx_cluster_id;
 CREATE INDEX idx_cluster_id ON repo (cluster_id);
 
 CREATE TABLE stack
@@ -205,6 +212,9 @@ CREATE TABLE task
     PRIMARY KEY (id)
 );
 
+DROP INDEX IF EXISTS idx_task_cluster_id;
+DROP INDEX IF EXISTS idx_task_job_id;
+DROP INDEX IF EXISTS idx_task_stage_id;
 CREATE INDEX idx_task_cluster_id ON task (cluster_id);
 CREATE INDEX idx_task_job_id ON task (job_id);
 CREATE INDEX idx_task_stage_id ON task (stage_id);
@@ -223,7 +233,7 @@ CREATE TABLE job
     PRIMARY KEY (id)
 );
 
-CREATE INDEX idx_cluster_id ON job (cluster_id);
+CREATE INDEX idx_job_cluster_id ON job (cluster_id);
 
 CREATE TABLE type_config
 (
@@ -307,7 +317,7 @@ CREATE TABLE stage
     PRIMARY KEY (id)
 );
 
-CREATE INDEX idx_cluster_id ON stage (cluster_id);
+CREATE INDEX idx_stage_cluster_id ON stage (cluster_id);
 CREATE INDEX idx_job_id ON stage (job_id);
 
 CREATE TABLE llm_platform
@@ -335,7 +345,7 @@ CREATE TABLE llm_platform_authorized
     PRIMARY KEY (id)
 );
 
-CREATE INDEX idx_platform_id ON llm_platform_authorized (platform_id);
+CREATE INDEX idx_authorized_platform_id ON llm_platform_authorized (platform_id);
 
 CREATE TABLE llm_chat_thread
 (
@@ -351,8 +361,8 @@ CREATE TABLE llm_chat_thread
     PRIMARY KEY (id)
 );
 
-CREATE INDEX idx_platform_id ON llm_chat_thread (platform_id);
-CREATE INDEX idx_user_id ON llm_chat_thread (user_id);
+CREATE INDEX idx_chatthread_platform_id ON llm_chat_thread (platform_id);
+CREATE INDEX idx_chatthread_user_id ON llm_chat_thread (user_id);
 
 CREATE TABLE llm_chat_message
 (
@@ -369,7 +379,7 @@ CREATE TABLE llm_chat_message
 );
 
 CREATE INDEX idx_thread_id ON llm_chat_message (thread_id);
-CREATE INDEX idx_user_id ON llm_chat_message (user_id);
+CREATE INDEX idx_message_user_id ON llm_chat_message (user_id);
 
 INSERT INTO "user" (create_time, update_time, nickname, password, status, username)
 VALUES (now(), now(), 'Administrator', '21232f297a57a5a743894a0e4a801fc3', true, 'admin');
