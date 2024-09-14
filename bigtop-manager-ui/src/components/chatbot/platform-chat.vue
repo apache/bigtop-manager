@@ -61,7 +61,7 @@
 
   watchEffect(() => {
     if (props.currPage?.action == 'PLATFORM_CHAT') {
-      chatbot.startConnectAssistant()
+      // chatbot.startConnectAssistant()
     }
   })
 
