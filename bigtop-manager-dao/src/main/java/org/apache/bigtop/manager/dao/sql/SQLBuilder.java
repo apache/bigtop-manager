@@ -38,6 +38,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Multiple data source support
@@ -299,6 +300,7 @@ public class SQLBuilder {
 
     public static <Condition> String findByCondition(
             TableMetaData tableMetaData, String databaseId, Condition condition) throws IllegalAccessException {
+        String tableName = tableMetaData.getTableName();
         log.info("databaseId: {}", databaseId);
         SQL sql = new SQL();
         switch (DBType.toType(databaseId)) {
