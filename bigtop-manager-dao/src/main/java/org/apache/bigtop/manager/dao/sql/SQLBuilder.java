@@ -255,7 +255,7 @@ public class SQLBuilder {
         }
 
         List<Field> fieldList = ClassUtils.getFields(loadClass);
-        /* 加入查询条件 */
+        /* Prepare SQL */
         SQL sql = new SQL();
         sql.SELECT("*");
         sql.FROM(tableMetaData.getTableName());
