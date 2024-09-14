@@ -60,20 +60,13 @@ spring:
 springdoc:
   packages-to-scan: org.apache.bigtop.manager.server
   swagger-ui:
-    defaultModelsExpandDepth: -1
+    default-models-expand-depth: -1
 
 monitoring:
   prometheus-host: "http://localhost:9090"
   agent-host-job-name: "bm-agent-host"
 
-mybatis:
-  mapper-locations: classpath*:mapper/**/*Mapper.xml
-  configuration:
-    map-underscore-to-camel-case: true
-    database-id: mysql
-    use-generated-keys: true
-
 pagehelper:
   reasonable: false
-  supportMethodsArguments: true
   params: count=countSql
+  support-methods-arguments: true
