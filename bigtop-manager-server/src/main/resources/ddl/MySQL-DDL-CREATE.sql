@@ -372,7 +372,7 @@ CREATE TABLE `llm_chat_message`
 INSERT INTO bigtop_manager.user (id, create_time, update_time, nickname, password, status, username)
 VALUES (1, now(), now(), 'Administrator', '21232f297a57a5a743894a0e4a801fc3', true, 'admin');
 
--- Adding default ai chat platform
+-- Adding default llm platform
 INSERT INTO bigtop_manager.llm_platform (id,credential,NAME,support_models)
 VALUES
 (1,'{"apiKey": "API Key"}','OpenAI','gpt-3.5-turbo,gpt-4,gpt-4o,gpt-3.5-turbo-16k,gpt-4-turbo-preview,gpt-4-32k,gpt-4o-mini'),

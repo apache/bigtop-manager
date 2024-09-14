@@ -46,7 +46,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import java.util.List;
 
-@Tag(name = "AI Chat Controller")
+@Tag(name = "Chatbot Controller")
 @RestController
 @RequestMapping("/chatbot/")
 public class ChatbotController {
