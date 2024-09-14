@@ -19,9 +19,13 @@
   import SelectMenu from './select-menu.vue'
   import useChatbot from './chatbot'
   import { storeToRefs } from 'pinia'
-  import { Platform, ThreadCondition } from './request.ts'
   import { toRefs, computed } from 'vue'
   import type { SelectData, Option } from './select-menu.vue'
+  import type {
+    Platform,
+    ChatThreadCondition,
+    ChatThread
+  } from '@/api/chatbot/types'
 
   interface PreChatPorps {
     currPage?: Option
@@ -31,7 +35,7 @@
   const props = defineProps<PreChatPorps>()
   const emits = defineEmits(['update:currPage'])
   const { currPage } = toRefs(props)
-  const { currPlatform } = storeToRefs(chatbot)
+  const { currPlatform, chatThreads } = storeToRefs(chatbot)
 
   const PLATFORM_MODEL = computed<SelectData[]>(() => [
     {
@@ -42,18 +46,27 @@
     }
   ])
 
+  const formattedOptions = computed<Option[]>(() => {
+    return chatThreads.value.map((v, idx) => ({
+      ...v,
+      id: v.threadId,
+      name: `线程${idx}`,
+      action: 'SELSECT_THREAD_TO_CHAT'
+    }))
+  })
+
   const ChAT_THREAD_MANAGEMENT = computed<SelectData[]>(() => [
     {
       subTitle: '请选择下面的线程进入聊天',
       hasDel: true,
-      options: []
+      options: formattedOptions.value
     },
     {
       subTitle: '或者你可以',
       hasDel: false,
       options: [
         {
-          action: 'PLATFORM_CHAT',
+          action: 'CREATE_THREAD_TO_CHAT',
           name: '创建新线程'
         }
       ]
@@ -70,11 +83,22 @@
     }
 
     if (type == 'PLATFORM_CHAT') {
-      const platformInfo = {
-        platformId: currPlatform.value?.id,
-        model: option.name
-      } as ThreadCondition
-      chatbot.createThreadofChat(platformInfo)
+      if (option.action === 'SELSECT_THREAD_TO_CHAT') {
+        const { id: threadId, createTime, updateTime } = option
+        chatbot.updateCurrThread({
+          threadName: option.name,
+          threadId,
+          createTime,
+          updateTime
+        } as ChatThread)
+      }
+      if (option.action === 'CREATE_THREAD_TO_CHAT') {
+        const platformInfo = {
+          platformId: currPlatform.value?.platformId,
+          model: currPlatform.value?.currModel
+        } as ChatThreadCondition
+        chatbot.fetchCreateChatThread(platformInfo)
+      }
     }
 
     emits('update:currPage', { ...currPage.value, action: type })

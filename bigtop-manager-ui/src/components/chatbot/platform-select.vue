@@ -21,14 +21,14 @@
 
   defineProps<PlatformSelectProps>()
   const chatbot = useChatbot()
-  const { authorizedPlatformList } = storeToRefs(chatbot)
+  const { authorizedPlatforms } = storeToRefs(chatbot)
   const emits = defineEmits(['update:currPage'])
 
   const formattedOptions = computed(() => {
-    return authorizedPlatformList.value.map((platform: AuthorizedPlatform) => {
+    return authorizedPlatforms.value.map((platform: AuthorizedPlatform) => {
       return {
-        id: platform.id,
-        name: platform.name,
+        id: platform.platformId,
+        name: platform.platformName,
         action: 'PLATFORM_MODEL'
       }
     })

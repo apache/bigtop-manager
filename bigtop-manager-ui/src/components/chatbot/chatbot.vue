@@ -34,7 +34,7 @@
                 />
               </div>
               <div v-if="showChatPageOption" class="header-middle">
-                {{ `线程${currThread?.platformId}` }}
+                {{ currThread?.threadName }}
               </div>
               <div class="header-right">
                 <template v-if="showChatPageOption">
@@ -103,18 +103,19 @@
       }
       if (currPage.value?.action === 'PLATFORM_MANAGEMENT') {
         // todo 获取可支持的平台列表
-        await chatbot.getSupportedPlatforms()
+        await chatbot.fetchSupportedPlatforms()
       }
       if (currPage.value?.action === 'PLATFORM_AUTH') {
         // todo 获取可支持的平台授权表单
-        await chatbot.getCredentialFormModelofPlatform()
+        await chatbot.fetchCredentialFormModelofPlatform()
       }
       if (currPage.value?.action === 'SUPPORTED_PLATFORM_SELECT') {
         //todo 获取已授权的平台列表
-        await chatbot.getAuthorizedPlatforms()
+        await chatbot.fetchAuthorizedPlatforms()
       }
       if (currPage.value?.action === 'ChAT_THREAD_MANAGEMENT') {
         //todo 获取已创建的聊天线程
+        await chatbot.fetchChatThreads()
       }
     }
   })
@@ -156,7 +157,10 @@
   }
 
   const onHome = () => {
-    currPage.value = { action: 'SUPPORTED_PLATFORM_SELECT', name: '' }
+    currPage.value = {
+      action: 'SUPPORTED_PLATFORM_SELECT',
+      name: ''
+    }
     afterPages.value = [currPage.value]
   }
 

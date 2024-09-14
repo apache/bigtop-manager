@@ -21,26 +21,59 @@ import request from '@/api/request.ts'
 import {
   AuthorizedPlatform,
   SupportedPlatForm,
-  CredentialFormItem
+  CredentialFormItem,
+  AuthCredentialTestParams,
+  AuthTestResult,
+  ChatThread,
+  ChatThreadCondition
 } from '@/api/chatbot/types.ts'
 
-export const authorizedPlatforms = (): Promise<AuthorizedPlatform[]> => {
+export const getAuthorizedPlatforms = (): Promise<AuthorizedPlatform[]> => {
   return request({
     method: 'get',
     url: '/chatbot/platforms/authorized'
   })
 }
-export const supportedPlatforms = (): Promise<SupportedPlatForm[]> => {
+export const getSupportedPlatforms = (): Promise<SupportedPlatForm[]> => {
   return request({
     method: 'get',
     url: '/chatbot/platforms'
   })
 }
-export const credentialFormModelofPlatform = (
+export const getCredentialFormModelofPlatform = (
   platformId: string | number
 ): Promise<CredentialFormItem[]> => {
   return request({
     method: 'get',
     url: `/chatbot/platforms/${platformId}/auth/credential`
+  })
+}
+
+export const validateAuthCredentials = (
+  data: AuthCredentialTestParams
+): Promise<AuthTestResult> => {
+  return request({
+    method: 'put',
+    url: '/chatbot/platforms',
+    data
+  })
+}
+export const getChatThreads = (
+  params: ChatThreadCondition
+): Promise<ChatThread[]> => {
+  return request({
+    method: 'get',
+    url: `/chatbot/platforms/${params.platformId}/threads`,
+    params
+  })
+}
+
+export const createChatThread = (
+  params: ChatThreadCondition
+): Promise<ChatThread> => {
+  return request({
+    method: 'put',
+    url: `/chatbot/platforms/${params.platformId}/threads`,
+    params
   })
 }

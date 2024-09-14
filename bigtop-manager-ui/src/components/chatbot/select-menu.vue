@@ -38,7 +38,12 @@
   import { CloseOutlined } from '@ant-design/icons-vue'
   import { defineProps, toRefs } from 'vue'
 
-  export type Option = { action: string; name: string } & { [key: string]: any }
+  export type Option = {
+    action: string
+    name: string
+  } & {
+    [key: string]: any
+  }
 
   export interface SelectData {
     subTitle?: string

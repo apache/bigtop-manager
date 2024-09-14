@@ -44,7 +44,7 @@
   import SelectMenu from './select-menu.vue'
   import useChatbot from './chatbot'
   import { storeToRefs } from 'pinia'
-  import { computed, ref, toRefs, watchEffect } from 'vue'
+  import { computed, ref, toRefs, watchEffect, toRaw } from 'vue'
   import type { SelectData, Option } from './select-menu.vue'
   import type { FormInstance } from 'ant-design-vue'
 
@@ -59,12 +59,13 @@
   const props = defineProps<PlatformAuthorizeProps>()
   const emits = defineEmits(['update:currPage'])
   const { currPage } = toRefs(props)
-  const { loading, supportedPlatFormsList, credentialFormModel } =
+  const { loading, supportedPlatForms, credentialFormModel } =
     storeToRefs(chatbot)
 
   const formattedOptions = computed<Option[]>(() => {
-    return supportedPlatFormsList.value.map((v) => ({
-      ...v,
+    return supportedPlatForms.value.map((v) => ({
+      id: v.platformId,
+      name: v.platformName,
       action: 'PLATFORM_AUTH'
     }))
   })
@@ -94,19 +95,33 @@
 
   const onSelect = (type: string, option: Option) => {
     const { id, name, supportModels } = option
-    chatbot.updateCurrPlatform({ id, name, supportModels })
-    chatbot.getCredentialFormModelofPlatform()
+    chatbot.updateCurrPlatform({
+      platformId: id,
+      platformName: name,
+      supportModels
+    })
     emits('update:currPage', { ...option, action: type })
   }
 
   const onCheck = async () => {
-    try {
-      const values = await formRef.value?.validateFields()
-      chatbot.testAuthofPlatform(values)
-      emits('update:currPage', { ...currPage.value, action: 'PLATFORM_MODEL' })
-    } catch (errorInfo) {
-      console.log('Failed:', errorInfo)
+    if (!formRef.value) {
+      return
     }
+    formRef.value
+      .validate()
+      .then(async () => {
+        const isPass = await chatbot.testAuthofPlatform(toRaw(formState.value))
+        loading.value = false
+        if (isPass) {
+          emits('update:currPage', {
+            ...currPage.value,
+            action: 'PLATFORM_MODEL'
+          })
+        }
+      })
+      .catch((error) => {
+        console.log('error', error)
+      })
   }
 </script>
 
