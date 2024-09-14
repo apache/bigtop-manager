@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one
+  ~ or more contributor license agreements.  See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership.  The ASF licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+-->
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.apache.bigtop.manager.dao.repository.ServiceDao">
+
+    <sql id="baseColumns">
+        id, service_name, display_name, service_desc, service_version, package_specifics, service_user, required_services, cluster_id
+    </sql>
+
+    <sql id="baseColumnsV2">
+        ${alias}.id, ${alias}.service_name, ${alias}.display_name, ${alias}.service_desc, ${alias}.service_version, ${alias}.package_specifics, ${alias}.service_user, ${alias}.required_services, ${alias}.cluster_id
+    </sql>
+
+    <resultMap id="serviceMap" type="org.apache.bigtop.manager.dao.po.ServicePO">
+        <id column="id" property="id"/>
+        <result column="service_name" property="serviceName"/>
+        <result column="display_name" property="displayName"/>
+        <result column="service_desc" property="serviceDesc"/>
+        <result column="service_version" property="serviceVersion"/>
+        <result column="package_specifics" property="packageSpecifics"/>
+        <result column="service_user" property="serviceUser"/>
+        <result column="required_services" property="requiredServices"/>
+        <result column="cluster_id" property="clusterId"/>
+        <result column="cluster_name" property="clusterName"/>
+        <result column="user_group" property="userGroup"/>
+        <collection property="components" ofType="org.apache.bigtop.manager.dao.po.ComponentPO">
+            <id column="cid" property="id"/>
+            <result column="component_name" property="componentName"/>
+            <result column="category" property="category"/>
+            <result column="quick_link" property="quickLink"/>
+            <result column="service_id" property="serviceId"/>
+            <result column="cluster_id" property="clusterId"/>
+        </collection>
+    </resultMap>
+
+    <select id="findAllByClusterId" parameterType="java.lang.Long" resultMap="serviceMap">
+        select
+        <include refid="baseColumnsV2">
+            <property name="alias" value="s"/>
+        </include>
+        , clus.cluster_name, clus.user_group, c.component_name, c.category, c.quick_link, c.id as cid
+        from
+        (select * from service
+        <where>
+            <if test="clusterId != 0">
+                cluster_id = #{clusterId}
+            </if>
+        </where>
+        ) s
+        inner join
+        cluster clus
+        on s.cluster_id = clus.id
+        inner join
+        component c
+        on c.service_id = s.id
+    </select>
+
+    <select id="findByIdJoin" parameterType="java.lang.Long"
+            resultType="org.apache.bigtop.manager.dao.po.ServicePO">
+        select
+        <include refid="baseColumnsV2">
+            <property name="alias" value="s"/>
+        </include>
+        , clus.cluster_name, clus.user_group
+        from
+        (select * from service
+        <where>
+            <if test="id != 0">
+                id = #{id}
+            </if>
+        </where>
+        ) s
+        inner join
+        cluster clus
+        on s.cluster_id = clus.id
+    </select>
+
+    <select id="findByClusterIdAndServiceName"
+            resultType="org.apache.bigtop.manager.dao.po.ServicePO">
+        select
+        <include refid="baseColumns"/>
+        from
+        service
+        <where>
+            <if test="clusterId != 0">
+                cluster_id = #{clusterId}
+            </if>
+            <if test="serviceName != null">
+                and service_name = #{serviceName}
+            </if>
+        </where>
+    </select>
+
+    <select id="findByClusterIdAndServiceNameIn"
+            resultType="org.apache.bigtop.manager.dao.po.ServicePO">
+        select
+        <include refid="baseColumns"/>
+        from
+        service
+        <where>
+            <if test="clusterId != 0">
+                cluster_id = #{clusterId}
+            </if>
+            <if test="serviceNames != null and serviceNames.size() > 0">
+                and service_name = in
+                <foreach collection="serviceNames" item="serviceName" index="index" open="(" close=")" separator=", ">
+                    #{serviceName}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+</mapper>

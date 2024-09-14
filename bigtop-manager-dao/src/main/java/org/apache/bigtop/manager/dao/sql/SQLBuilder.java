@@ -71,6 +71,25 @@ public class SQLBuilder {
                 }
                 break;
             }
+            case POSTGRESQL: {
+                sql.INSERT_INTO("\"" + tableMetaData.getTableName() + "\"");
+                for (Map.Entry<String, String> entry : fieldColumnMap.entrySet()) {
+                    // Ignore primary key
+                    if (Objects.equals(entry.getKey(), tableMetaData.getPkProperty())) {
+                        continue;
+                    }
+                    PropertyDescriptor ps = BeanUtils.getPropertyDescriptor(entityClass, entry.getKey());
+                    if (ps == null || ps.getReadMethod() == null) {
+                        continue;
+                    }
+                    Object value = ReflectionUtils.invokeMethod(ps.getReadMethod(), entity);
+                    if (!ObjectUtils.isEmpty(value)) {
+                        sql.VALUES("\"" + entry.getValue() + "\"", getTokenParam(entry.getKey()));
+                    }
+                }
+                break;
+            }
+
             default: {
                 log.error("Unsupported data source");
             }
@@ -105,6 +124,25 @@ public class SQLBuilder {
                 sql.WHERE(getEquals(tableMetaData.getPkColumn(), tableMetaData.getPkProperty()));
                 break;
             }
+            case POSTGRESQL: {
+                sql.UPDATE("\"" + tableMetaData.getTableName() + "\"");
+                for (Map.Entry<String, String> entry : fieldColumnMap.entrySet()) {
+                    // Ignore primary key
+                    if (Objects.equals(entry.getKey(), tableMetaData.getPkProperty())) {
+                        continue;
+                    }
+                    PropertyDescriptor ps = BeanUtils.getPropertyDescriptor(entityClass, entry.getKey());
+                    if (ps == null || ps.getReadMethod() == null) {
+                        continue;
+                    }
+                    Object value = ReflectionUtils.invokeMethod(ps.getReadMethod(), entity);
+                    if (!ObjectUtils.isEmpty(value)) {
+                        sql.SET("\"" + getEquals(entry.getValue() + "\"", entry.getKey()));
+                    }
+                }
+                sql.WHERE(getEquals(tableMetaData.getPkColumn(), tableMetaData.getPkProperty()));
+                break;
+            }
             default: {
                 log.error("Unsupported data source");
             }
@@ -121,6 +159,16 @@ public class SQLBuilder {
                 sql.SELECT(tableMetaData.getBaseColumns());
                 sql.FROM(tableMetaData.getTableName());
                 sql.WHERE(tableMetaData.getPkColumn() + " = '" + id + "'");
+                break;
+            }
+            case POSTGRESQL: {
+                String baseColumns = tableMetaData.getBaseColumns();
+                if (baseColumns.toLowerCase().contains("user.")) {
+                    baseColumns = baseColumns.replace("user.", "\"user\".");
+                }
+                sql.SELECT(baseColumns);
+                sql.FROM("\"" + tableMetaData.getTableName() + "\"");
+                sql.WHERE(tableMetaData.getPkColumn() + " = " + id);
                 break;
             }
             default: {
@@ -143,6 +191,17 @@ public class SQLBuilder {
                 sql.WHERE(tableMetaData.getPkColumn() + " in ('" + idsStr + "')");
                 break;
             }
+            case POSTGRESQL: {
+                String idsStr = ids.stream().map(String::valueOf).collect(Collectors.joining(","));
+                String baseColumns = tableMetaData.getBaseColumns();
+                if (baseColumns.toLowerCase().contains("user.")) {
+                    baseColumns = baseColumns.replace("user.", "\"user\".");
+                }
+                sql.SELECT(baseColumns);
+                sql.FROM("\"" + tableMetaData.getTableName() + "\"");
+                sql.WHERE(tableMetaData.getPkColumn() + " in (" + idsStr + ")");
+                break;
+            }
             default: {
                 log.error("Unsupported data source");
             }
@@ -155,6 +214,14 @@ public class SQLBuilder {
 
         SQL sql = new SQL();
         switch (DBType.toType(databaseId)) {
+            case POSTGRESQL:
+                String baseColumns = tableMetaData.getBaseColumns();
+                if (baseColumns.toLowerCase().contains("user.")) {
+                    baseColumns = baseColumns.replace("user.", "\"user\".");
+                }
+                sql.SELECT(baseColumns);
+                sql.FROM("\"" + tableMetaData.getTableName() + "\"");
+                break;
             case MYSQL: {
                 sql.SELECT(tableMetaData.getBaseColumns());
                 sql.FROM(tableMetaData.getTableName());
@@ -176,6 +243,11 @@ public class SQLBuilder {
                 sql.WHERE(tableMetaData.getPkColumn() + " = '" + id + "'");
                 break;
             }
+            case POSTGRESQL: {
+                sql.FROM("\"" + tableMetaData.getTableName() + "\"");
+                sql.WHERE(tableMetaData.getPkColumn() + " = " + id);
+                break;
+            }
             default: {
                 log.error("Unsupported data source");
             }
@@ -194,6 +266,12 @@ public class SQLBuilder {
                 sql.WHERE(tableMetaData.getPkColumn() + " in ('" + idsStr + "')");
                 break;
             }
+            case POSTGRESQL: {
+                String idsStr = ids.stream().map(String::valueOf).collect(Collectors.joining(", "));
+                sql.DELETE_FROM("\"" + tableMetaData.getTableName() + "\"");
+                sql.WHERE(tableMetaData.getPkColumn() + " in (" + idsStr + ")");
+                break;
+            }
             default: {
                 log.error("Unsupported data source");
             }
@@ -208,6 +286,8 @@ public class SQLBuilder {
         log.info("databaseId: {}", databaseId);
         SQL sql = new SQL();
         switch (DBType.toType(databaseId)) {
+            case POSTGRESQL:
+                tableName = "\"" + tableName + "\"";
             case MYSQL: {
                 sql = mysqlCondition(condition, tableName);
                 break;
