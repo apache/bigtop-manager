@@ -7,6 +7,8 @@ import {
   getChatThreads,
   getCredentialFormModelofPlatform,
   getSupportedPlatforms,
+  getThreadChatHistory,
+  sendChatMessage,
   validateAuthCredentials
 } from '@/api/chatbot/index'
 import type {
@@ -16,21 +18,21 @@ import type {
   ChatThread,
   ChatThreadCondition,
   Platform,
-  ChatHistoryItem,
+  ChatThreadHistoryItem,
   AuthCredential
 } from '@/api/chatbot/types'
 
 export default defineStore(
   'chatbot',
   () => {
+    const chatThreads = ref<ChatThread[]>([])
     const authorizedPlatforms = ref<AuthorizedPlatform[]>([])
     const supportedPlatForms = ref<SupportedPlatForm[]>([])
     const credentialFormModel = ref<CredentialFormItem[]>([])
+    const chatThreadHistory = ref<ChatThreadHistoryItem[]>([])
 
-    const chatThreads = ref<ChatThread[]>([])
     const currPlatform = ref<AuthorizedPlatform>()
     const currThread = ref<ChatThread>()
-    const chatRecords = ref<ChatHistoryItem[]>([])
     const loading = ref(false)
     const isExpand = ref(false)
 
@@ -141,13 +143,38 @@ export default defineStore(
       }
     }
 
+    async function fetchThreadChatHistory() {
+      try {
+        const data = await getThreadChatHistory({
+          platformId: currPlatform.value?.platformId as string | number,
+          threadId: currThread.value?.threadId as string | number
+        })
+        console.log('data :>> ', data)
+      } catch (error) {
+        console.log('error :>> ', error)
+      }
+    }
+
+    async function fetchSendChatMessage(message: string) {
+      try {
+        const data = await sendChatMessage({
+          platformId: currPlatform.value?.platformId as string | number,
+          threadId: currThread.value?.threadId as string | number,
+          message
+        })
+        console.log('data :>> ', data)
+      } catch (error) {
+        console.log('error :>> ', error)
+      }
+    }
+
     return {
       loading,
       isExpand,
       currPlatform,
       currThread,
       chatThreads,
-      chatRecords,
+      chatThreadHistory,
       authorizedPlatforms,
       supportedPlatForms,
       credentialFormModel,
@@ -159,7 +186,9 @@ export default defineStore(
       fetchCreateChatThread,
       fetchChatThreads,
       setWindowExpandStatus,
-      fetchAuthorizedPlatforms
+      fetchAuthorizedPlatforms,
+      fetchThreadChatHistory,
+      fetchSendChatMessage
     }
   },
   {

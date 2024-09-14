@@ -1,15 +1,16 @@
 <template>
   <div class="platfrom-chat">
     <section>
-      <article v-for="(record, index) of chatRecords" :key="index">
-        <div class="user"></div>
+      <article v-for="(chatItem, index) of chatThreadHistory" :key="index">
+        <div>{{ chatItem }}</div>
+        <!-- <div class="user"></div>
         <div
           v-for="(choice, idx) of record.choices"
           :key="idx"
           class="assitant"
         >
           <pre>{{ choice.message.content }}</pre>
-        </div>
+        </div> -->
       </article>
     </section>
     <footer>
@@ -35,7 +36,7 @@
         </div>
       </div>
       <section>
-        {{ `${currPlatform?.name} ${currPlatform?.currModel}` }}
+        {{ `${currPlatform?.platformName} ${currPlatform?.currModel}` }}
       </section>
     </footer>
   </div>
@@ -56,12 +57,12 @@
   const chatbot = useChatbot()
   const inputText = ref('')
   const props = defineProps<PlatfromChatPorps>()
-  const { currPlatform, chatRecords } = storeToRefs(chatbot)
+  const { currPlatform, chatThreadHistory } = storeToRefs(chatbot)
   const sendable = computed(() => inputText.value != '')
 
   watchEffect(() => {
     if (props.currPage?.action == 'PLATFORM_CHAT') {
-      // chatbot.startConnectAssistant()
+      chatbot.fetchThreadChatHistory()
     }
   })
 
@@ -71,7 +72,9 @@
   const sendMessage = () => {
     if (inputText.value === '') {
       message.warning('请输入内容')
+      return
     }
+    chatbot.fetchSendChatMessage(inputText.value)
   }
 </script>
 

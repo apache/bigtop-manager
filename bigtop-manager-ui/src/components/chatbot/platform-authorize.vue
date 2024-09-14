@@ -64,8 +64,8 @@
 
   const formattedOptions = computed<Option[]>(() => {
     return supportedPlatForms.value.map((v) => ({
-      id: v.platformId,
-      name: v.platformName,
+      id: v.id,
+      name: v.name,
       action: 'PLATFORM_AUTH'
     }))
   })

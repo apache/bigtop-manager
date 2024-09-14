@@ -25,7 +25,10 @@ import {
   AuthCredentialTestParams,
   AuthTestResult,
   ChatThread,
-  ChatThreadCondition
+  ChatThreadCondition,
+  ChatThreadHistoryCondition,
+  ChatThreadHistoryItem,
+  sendChatMessageCondition
 } from '@/api/chatbot/types.ts'
 
 export const getAuthorizedPlatforms = (): Promise<AuthorizedPlatform[]> => {
@@ -58,6 +61,7 @@ export const validateAuthCredentials = (
     data
   })
 }
+
 export const getChatThreads = (
   params: ChatThreadCondition
 ): Promise<ChatThread[]> => {
@@ -67,7 +71,6 @@ export const getChatThreads = (
     params
   })
 }
-
 export const createChatThread = (
   params: ChatThreadCondition
 ): Promise<ChatThread> => {
@@ -75,5 +78,25 @@ export const createChatThread = (
     method: 'put',
     url: `/chatbot/platforms/${params.platformId}/threads`,
     params
+  })
+}
+export const getThreadChatHistory = (
+  params: ChatThreadHistoryCondition
+): Promise<ChatThreadHistoryItem[]> => {
+  return request({
+    method: 'get',
+    url: `/chatbot/platforms/${params.platformId}/threads/${params.threadId}/history`,
+    params
+  })
+}
+export const sendChatMessage = (
+  data: sendChatMessageCondition
+): Promise<any> => {
+  return request({
+    method: 'post',
+    url: `/chatbot/platforms/${data.platformId}/threads/${data.threadId}/talk`,
+    data: {
+      message: data.message
+    }
   })
 }

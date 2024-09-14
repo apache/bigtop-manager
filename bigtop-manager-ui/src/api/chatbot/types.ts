@@ -26,7 +26,9 @@ export interface Platform {
 export type AuthorizedPlatform = Platform
 
 export interface SupportedPlatForm extends Platform {
-  authCredential: string
+  id: string | number
+  name: string
+  supportModels: string
 }
 export interface CredentialFormItem {
   name: string
@@ -60,4 +62,18 @@ export interface AuthTestResult {
   supportModels: string
 }
 
-export interface ChatHistoryItem {}
+export type Sender = 'USER' | 'SYSTEM' | 'AI'
+export interface ChatThreadHistoryItem {
+  sender: Sender
+  message: 'string'
+  createTime: 'string'
+}
+
+export interface ChatThreadHistoryCondition {
+  platformId: string | number
+  threadId: string | number
+}
+
+export interface sendChatMessageCondition extends ChatThreadHistoryCondition {
+  message: string
+}

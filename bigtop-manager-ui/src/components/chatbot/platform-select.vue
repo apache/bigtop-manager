@@ -29,6 +29,7 @@
       return {
         id: platform.platformId,
         name: platform.platformName,
+        supportModels: platform.supportModels,
         action: 'PLATFORM_MODEL'
       }
     })
@@ -54,6 +55,10 @@
   ])
 
   const onSelect = (option: Option) => {
+    if (option.action === 'PLATFORM_MODEL') {
+      const { id: platformId, name: platformName, supportModels } = option
+      chatbot.updateCurrPlatform({ platformId, platformName, supportModels })
+    }
     emits('update:currPage', option)
   }
 </script>
