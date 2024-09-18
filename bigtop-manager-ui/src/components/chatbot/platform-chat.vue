@@ -1,6 +1,6 @@
 <template>
   <div class="platfrom-chat">
-    <section>
+    <section class="chat-container">
       <chat-msg-item
         v-for="(chatItem, index) of chatThreadHistory"
         :key="index"
@@ -10,6 +10,7 @@
     <footer>
       <div class="msg-wrp">
         <div
+          ref="msgInputRef"
           class="msg-input"
           data-placeholder="message chat"
           :contenteditable="true"
@@ -39,38 +40,73 @@
 <script setup lang="ts">
   import useChatbot from './chatbot'
   import { storeToRefs } from 'pinia'
-  import { getSvgUrl } from '@/utils/tools'
+  import { getSvgUrl, scrollToBottom } from '@/utils/tools'
   import type { Option } from './select-menu.vue'
   import { message } from 'ant-design-vue/es/components'
-  import { ref, computed, watchEffect } from 'vue'
+  import { ref, watch, computed, watchEffect, toRefs, nextTick } from 'vue'
   import ChatMsgItem from './chat-msg-item.vue'
 
   interface PlatfromChatPorps {
     currPage?: Option
+    visible: boolean
+    isExpand: boolean
   }
 
   const chatbot = useChatbot()
   const inputText = ref('')
+  const isMessageFullyReceived = ref(true)
+  const msgInputRef = ref<HTMLInputElement | null>(null)
   const props = defineProps<PlatfromChatPorps>()
+  const { visible, isExpand } = toRefs(props)
   const { currPlatform, chatThreadHistory } = storeToRefs(chatbot)
-  const sendable = computed(() => inputText.value != '')
+  const sendable = computed(
+    () => inputText.value != '' && isMessageFullyReceived.value
+  )
 
-  watchEffect(() => {
-    if (props.currPage?.action == 'PLATFORM_CHAT') {
+  watchEffect(async () => {
+    if (props.currPage?.action == 'PLATFORM_CHAT' && visible.value) {
       chatbot.fetchThreadChatHistory()
+      await nextTick()
+      scrollToBottom(document.querySelector('.chat-container') as HTMLElement)
     }
+  })
+
+  watch(isExpand, () => {
+    scrollToBottom(document.querySelector('.chat-container') as HTMLElement)
   })
 
   const onInput = (e: Event) => {
     inputText.value = (e.target as Element)?.textContent || ''
   }
+
+  const reciveMessage = async () => {
+    try {
+      const res = await chatbot.fetchSendChatMessage(inputText.value)
+      isMessageFullyReceived.value = res as boolean
+      inputText.value = ''
+      scrollToBottom(document.querySelector('.chat-container') as HTMLElement)
+    } catch (error) {
+      console.log('recived message:>> ', error)
+    } finally {
+      isMessageFullyReceived.value = true
+      scrollToBottom(document.querySelector('.chat-container') as HTMLElement)
+    }
+  }
+
+  const clearUpInputContent = () => {
+    msgInputRef.value!.innerHTML = ''
+  }
+
   const sendMessage = () => {
+    isMessageFullyReceived.value = false
     if (inputText.value === '') {
       message.warning('请输入内容')
       return
     }
     chatbot.updateThreadChatHistory('USER', inputText.value as string)
-    chatbot.fetchSendChatMessage(inputText.value)
+    scrollToBottom(document.querySelector('.chat-container') as HTMLElement)
+    clearUpInputContent()
+    reciveMessage()
   }
 </script>
 

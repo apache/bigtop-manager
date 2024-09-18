@@ -62,6 +62,8 @@
               :is="getCompName"
               v-bind="{ style }"
               v-model:currPage="currPage"
+              :is-expand="isExpand"
+              :visible="visible"
             ></component>
           </keep-alive>
         </a-card>

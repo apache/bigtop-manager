@@ -177,7 +177,7 @@ export default defineStore(
         }
         const { cancel, promise } = sendChatMessage(reqparams, onMessageReceive)
         canceler.value = cancel
-        promise.then(onMessageComplete)
+        return promise.then(onMessageComplete)
       } catch (error) {
         console.log('error :>> ', error)
       }
@@ -221,6 +221,7 @@ export default defineStore(
       messageReciver.value = ''
       cancelSseConnect()
       updateThreadChatHistory('AI', (res || '').replace(/data:\s*/g, '').trim())
+      return Promise.resolve(true)
     }
 
     const cancelSseConnect = () => {
