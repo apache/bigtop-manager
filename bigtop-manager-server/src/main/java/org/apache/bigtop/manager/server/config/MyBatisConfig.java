@@ -43,8 +43,10 @@ public class MyBatisConfig {
     public SqlSessionFactory sqlSessionFactory(DataSource dataSource) throws Exception {
         SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
         sessionFactory.setDataSource(dataSource);
-        sessionFactory.setMapperLocations(
-                new PathMatchingResourcePatternResolver().getResources("classpath*:mapper/**/*Mapper.xml"));
+        sessionFactory.setMapperLocations(new PathMatchingResourcePatternResolver()
+                .getResources(String.format(
+                        "classpath*:mapper/%s/**/*Mapper.xml",
+                        new ProductNameDatabaseIdProvider().getDatabaseId(dataSource))));
 
         org.apache.ibatis.session.Configuration configuration = new org.apache.ibatis.session.Configuration();
         configuration.setMapUnderscoreToCamelCase(true);

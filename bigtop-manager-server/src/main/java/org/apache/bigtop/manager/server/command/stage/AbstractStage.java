@@ -25,10 +25,13 @@ import org.apache.bigtop.manager.dao.repository.StageDao;
 import org.apache.bigtop.manager.server.command.task.Task;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+@Slf4j
 public abstract class AbstractStage implements Stage {
 
     protected StageDao stageDao;
@@ -93,6 +96,7 @@ public abstract class AbstractStage implements Stage {
                         try {
                             return future.get();
                         } catch (Exception e) {
+                            log.error("stage failed,", e);
                             return false;
                         }
                     })
@@ -100,6 +104,7 @@ public abstract class AbstractStage implements Stage {
 
             allTaskSuccess = taskResults.stream().allMatch(Boolean::booleanValue);
         } catch (Exception e) {
+            log.error("stage failed", e);
             allTaskSuccess = false;
         }
 

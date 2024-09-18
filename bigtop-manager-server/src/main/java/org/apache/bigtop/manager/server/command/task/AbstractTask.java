@@ -31,6 +31,9 @@ import org.apache.bigtop.manager.grpc.utils.ProtobufUtil;
 import org.apache.bigtop.manager.server.grpc.GrpcClient;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public abstract class AbstractTask implements Task {
 
     protected TaskDao taskDao;
@@ -85,6 +88,7 @@ public abstract class AbstractTask implements Task {
 
             taskSuccess = reply != null && reply.getCode() == MessageConstants.SUCCESS_CODE;
         } catch (Exception e) {
+            log.error("task failed", e);
             taskSuccess = false;
         }
 
