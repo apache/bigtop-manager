@@ -38,12 +38,12 @@ public class ChatThreadPO extends BasePO implements Serializable {
     @Column(name = "model", nullable = false, length = 255)
     private String model;
 
-    @Column(name = "thread_info", columnDefinition = "json", nullable = false)
+    @Column(name = "thread_info", columnDefinition = "json")
     private Map<String, String> threadInfo;
 
-    @Column(name = "user_id")
+    @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @Column(name = "platform_id")
+    @Column(name = "platform_id", nullable = false)
     private Long platformId;
 }

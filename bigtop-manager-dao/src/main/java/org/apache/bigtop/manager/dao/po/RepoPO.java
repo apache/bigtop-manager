@@ -53,6 +53,6 @@ public class RepoPO extends BasePO implements Serializable {
     @Column(name = "repo_type")
     private String repoType;
 
-    @Column(name = "cluster_id")
+    @Column(name = "cluster_id", nullable = false)
     private Long clusterId;
 }

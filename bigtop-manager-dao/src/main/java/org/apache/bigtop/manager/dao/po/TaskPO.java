@@ -38,7 +38,7 @@ public class TaskPO extends BasePO implements Serializable {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "context")
+    @Column(name = "context", nullable = false)
     private String context;
 
     @Column(name = "state")

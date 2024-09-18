@@ -39,14 +39,14 @@ public class JobPO extends BasePO implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "state")
+    @Column(name = "state", nullable = false)
     private String state;
 
     @Column(name = "name")
     private String name;
 
     @Lob
-    @Column(name = "context")
+    @Column(name = "context", nullable = false)
     private String context;
 
     @Column(name = "cluster_id")
