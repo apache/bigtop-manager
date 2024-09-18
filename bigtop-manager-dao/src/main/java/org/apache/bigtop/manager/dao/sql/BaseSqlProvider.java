@@ -46,7 +46,7 @@ public class BaseSqlProvider {
         return SQLBuilder.insert(tableMetaData, entity, databaseId);
     }
 
-    public <Entity> String updateById(Entity entity, ProviderContext context) {
+    public <Entity> String partialUpdateById(Entity entity, ProviderContext context) {
         Assert.notNull(entity, "entity must not null");
 
         String databaseId = context.getDatabaseId();
@@ -54,7 +54,7 @@ public class BaseSqlProvider {
         Class<?> entityClass = entity.getClass();
         TableMetaData tableMetaData = TableMetaData.forClass(entityClass);
 
-        return SQLBuilder.update(tableMetaData, entity, databaseId);
+        return SQLBuilder.partialUpdate(tableMetaData, entity, databaseId);
     }
 
     public String selectById(Serializable id, ProviderContext context) {

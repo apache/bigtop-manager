@@ -97,7 +97,7 @@ public class SQLBuilder {
         return sql.toString();
     }
 
-    public static <Entity> String update(TableMetaData tableMetaData, Entity entity, String databaseId) {
+    public static <Entity> String partialUpdate(TableMetaData tableMetaData, Entity entity, String databaseId) {
         Class<?> entityClass = entity.getClass();
         Map<String, String> fieldColumnMap = tableMetaData.getFieldColumnMap();
 

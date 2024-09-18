@@ -88,7 +88,7 @@ public abstract class AbstractJob implements Job {
     @Override
     public void beforeRun() {
         jobPO.setState(JobState.PROCESSING.getName());
-        jobDao.updateById(jobPO);
+        jobDao.partialUpdateById(jobPO);
     }
 
     @Override
@@ -124,7 +124,7 @@ public abstract class AbstractJob implements Job {
     public void onSuccess() {
         JobPO jobPO = getJobPO();
         jobPO.setState(JobState.SUCCESSFUL.getName());
-        jobDao.updateById(jobPO);
+        jobDao.partialUpdateById(jobPO);
     }
 
     @Override
@@ -154,7 +154,7 @@ public abstract class AbstractJob implements Job {
         if (!stagePOList.isEmpty()) {
             stageDao.updateStateByIds(stagePOList);
         }
-        jobDao.updateById(jobPO);
+        jobDao.partialUpdateById(jobPO);
     }
 
     @Override

@@ -71,13 +71,13 @@ public class ComponentStatusScheduler {
             if (reply.getStatus() == 0
                     && MaintainState.fromString(hostComponentPO.getState()) == MaintainState.STOPPED) {
                 hostComponentPO.setState(MaintainState.STARTED.getName());
-                hostComponentDao.updateById(hostComponentPO);
+                hostComponentDao.partialUpdateById(hostComponentPO);
             }
 
             if (reply.getStatus() != 0
                     && MaintainState.fromString(hostComponentPO.getState()) == MaintainState.STARTED) {
                 hostComponentPO.setState(MaintainState.STOPPED.getName());
-                hostComponentDao.updateById(hostComponentPO);
+                hostComponentDao.partialUpdateById(hostComponentPO);
             }
         }
     }

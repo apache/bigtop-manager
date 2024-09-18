@@ -87,7 +87,7 @@ public class ClusterServiceImpl implements ClusterService {
                 clusterDao.findByClusterName(clusterDTO.getClusterName()).orElse(new ClusterPO());
         if (oldClusterPO.getId() != null) {
             clusterPO.setId(oldClusterPO.getId());
-            clusterDao.updateById(clusterPO);
+            clusterDao.partialUpdateById(clusterPO);
         } else {
             clusterDao.save(clusterPO);
         }
@@ -126,7 +126,7 @@ public class ClusterServiceImpl implements ClusterService {
     public ClusterVO update(Long id, ClusterDTO clusterDTO) {
         ClusterPO clusterPO = ClusterConverter.INSTANCE.fromDTO2PO(clusterDTO);
         clusterPO.setId(id);
-        clusterDao.updateById(clusterPO);
+        clusterDao.partialUpdateById(clusterPO);
 
         return ClusterConverter.INSTANCE.fromEntity2VO(clusterPO);
     }
