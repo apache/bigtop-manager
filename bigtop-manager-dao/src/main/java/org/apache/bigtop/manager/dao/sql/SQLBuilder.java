@@ -31,6 +31,7 @@ import org.springframework.util.ReflectionUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
+import jakarta.persistence.Column;
 import java.beans.PropertyDescriptor;
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -118,6 +119,61 @@ public class SQLBuilder {
                     if (!ObjectUtils.isEmpty(value)) {
                         sql.SET(getEquals(entry.getValue(), entry.getKey()));
                     }
+                }
+
+                sql.WHERE(getEquals(tableMetaData.getPkColumn(), tableMetaData.getPkProperty()));
+                break;
+            }
+            case POSTGRESQL: {
+                sql.UPDATE("\"" + tableMetaData.getTableName() + "\"");
+                for (Map.Entry<String, String> entry : fieldColumnMap.entrySet()) {
+                    // Ignore primary key
+                    if (Objects.equals(entry.getKey(), tableMetaData.getPkProperty())) {
+                        continue;
+                    }
+                    PropertyDescriptor ps = BeanUtils.getPropertyDescriptor(entityClass, entry.getKey());
+                    if (ps == null || ps.getReadMethod() == null) {
+                        continue;
+                    }
+                    Object value = ReflectionUtils.invokeMethod(ps.getReadMethod(), entity);
+                    if (!ObjectUtils.isEmpty(value)) {
+                        sql.SET("\"" + getEquals(entry.getValue() + "\"", entry.getKey()));
+                    }
+                }
+                sql.WHERE(getEquals(tableMetaData.getPkColumn(), tableMetaData.getPkProperty()));
+                break;
+            }
+            default: {
+                log.error("Unsupported data source");
+            }
+        }
+
+        return sql.toString();
+    }
+
+    public static <Entity> String update(TableMetaData tableMetaData, Entity entity, String databaseId) {
+        Class<?> entityClass = entity.getClass();
+        Map<String, String> fieldColumnMap = tableMetaData.getFieldColumnMap();
+
+        SQL sql = new SQL();
+        switch (DBType.toType(databaseId)) {
+            case MYSQL: {
+                sql.UPDATE(tableMetaData.getTableName());
+                for (Map.Entry<String, String> entry : fieldColumnMap.entrySet()) {
+                    // Ignore primary key
+                    if (Objects.equals(entry.getKey(), tableMetaData.getPkProperty())) {
+                        continue;
+                    }
+                    PropertyDescriptor ps = BeanUtils.getPropertyDescriptor(entityClass, entry.getKey());
+                    Object value = ReflectionUtils.invokeMethod(ps.getReadMethod(), entity);
+                    Field field = ReflectionUtils.findField(entityClass, entry.getKey());
+                    if (field != null) {
+                        Column column = field.getAnnotation(Column.class);
+                        if (column != null && !column.nullable() && value == null) {
+                            continue;
+                        }
+                    }
+                    sql.SET(getEquals(entry.getValue(), entry.getKey()));
                 }
 
                 sql.WHERE(getEquals(tableMetaData.getPkColumn(), tableMetaData.getPkProperty()));
