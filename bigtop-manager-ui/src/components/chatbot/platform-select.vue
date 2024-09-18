@@ -3,6 +3,7 @@
     <select-menu
       :select-data="platformSelects"
       @select="onSelect"
+      @remove="onRemove"
     ></select-menu>
   </div>
 </template>
@@ -10,10 +11,10 @@
 <script setup lang="ts">
   import { storeToRefs } from 'pinia'
   import SelectMenu from './select-menu.vue'
-  import type { SelectData, Option } from './select-menu.vue'
   import { computed } from 'vue'
-  import type { AuthorizedPlatform } from '@/api/chatbot/types'
   import useChatbot from './chatbot'
+  import type { AuthorizedPlatform } from '@/api/chatbot/types'
+  import type { SelectData, Option } from './select-menu.vue'
 
   interface PlatformSelectProps {
     currPage?: Option
@@ -60,6 +61,11 @@
       chatbot.updateCurrPlatform({ platformId, platformName, supportModels })
     }
     emits('update:currPage', option)
+  }
+
+  const onRemove = (option: Option) => {
+    const { id: platformId } = option
+    chatbot.fetchDelAuthorizedPlatform(platformId)
   }
 </script>
 

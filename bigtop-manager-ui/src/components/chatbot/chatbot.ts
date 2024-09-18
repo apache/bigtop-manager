@@ -3,6 +3,8 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import {
   createChatThread,
+  delAuthorizedPlatform,
+  delChatThread,
   getAuthorizedPlatforms,
   getChatThreads,
   getCredentialFormModelofPlatform,
@@ -181,6 +183,35 @@ export default defineStore(
       }
     }
 
+    async function fetchDelAuthorizedPlatform() {
+      try {
+        const platformId = currPlatform.value?.platformId as string | number
+        const data = await delAuthorizedPlatform(platformId as string)
+        if (data) {
+          console.log('删除成功 :>> ')
+        } else {
+          console.log('删除失败 :>> ')
+        }
+      } catch (error) {
+        console.log('error :>> ', error)
+      }
+    }
+    async function fetchDelChatThread() {
+      try {
+        const data = await delChatThread({
+          platformId: currPlatform.value?.platformId as string | number,
+          threadId: currThread.value?.threadId as string | number
+        })
+        if (data) {
+          console.log('删除成功 :>> ')
+        } else {
+          console.log('删除失败 :>> ')
+        }
+      } catch (error) {
+        console.log('error :>> ', error)
+      }
+    }
+
     const onMessageReceive = ({ event }: AxiosProgressEvent) => {
       const str = event.target.responseText.replace(/data:\s*/g, '').trim()
       messageReciver.value = str
@@ -221,10 +252,14 @@ export default defineStore(
       setWindowExpandStatus,
       fetchAuthorizedPlatforms,
       fetchThreadChatHistory,
-      fetchSendChatMessage
+      fetchSendChatMessage,
+      fetchDelAuthorizedPlatform,
+      fetchDelChatThread
     }
   },
   {
-    persist: true // 启用持久化
+    persist: {
+      storage: sessionStorage
+    }
   }
 )

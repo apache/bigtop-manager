@@ -9,6 +9,7 @@
     <template v-if="currPage?.action === 'ChAT_THREAD_MANAGEMENT'">
       <select-menu
         :select-data="ChAT_THREAD_MANAGEMENT"
+        @remove="onRemove"
         @select="onSelect('PLATFORM_CHAT', $event)"
       />
     </template>
@@ -102,6 +103,11 @@
     }
 
     emits('update:currPage', { ...currPage.value, action: type })
+  }
+
+  const onRemove = (option: Option) => {
+    const { threadId, platformId } = option
+    chatbot.fetchDelChatThread({ threadId, platformId })
   }
 </script>
 

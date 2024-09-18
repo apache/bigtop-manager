@@ -77,3 +77,5 @@ export interface ChatThreadHistoryCondition {
 export interface sendChatMessageCondition extends ChatThreadHistoryCondition {
   message: string
 }
+
+export type ChatThreadDelCondition = ChatThreadHistoryCondition

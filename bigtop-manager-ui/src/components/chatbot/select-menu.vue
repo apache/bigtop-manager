@@ -25,6 +25,7 @@
                 v-show="item.hasDel"
                 :key="option"
                 class="select-item-del"
+                @click.stop="onRemove(option)"
               />
             </li>
           </template>
@@ -58,12 +59,16 @@
 
   interface SelectBoxEmits {
     (event: 'select', option: Option): void
+    (event: 'remove', option: Option): void
   }
 
   const props = defineProps<SelectBoxProps>()
   const emits = defineEmits<SelectBoxEmits>()
   const { selectData } = toRefs(props)
 
+  const onRemove = (option: Option) => {
+    emits('remove', option)
+  }
   const onSelect = (option: Option) => {
     emits('select', option)
   }

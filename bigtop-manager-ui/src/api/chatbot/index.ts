@@ -27,7 +27,8 @@ import {
   ChatThread,
   ChatThreadCondition,
   ChatThreadHistoryCondition,
-  ChatThreadHistoryItem
+  ChatThreadHistoryItem,
+  ChatThreadDelCondition
 } from '@/api/chatbot/types.ts'
 
 export const getAuthorizedPlatforms = (): Promise<AuthorizedPlatform[]> => {
@@ -88,14 +89,18 @@ export const getThreadChatHistory = (
     params
   })
 }
-// export const sendChatMessage = (
-//   data: sendChatMessageCondition
-// ): Promise<any> => {
-//   return request({
-//     method: 'post',
-//     url: `/chatbot/platforms/${data.platformId}/threads/${data.threadId}/talk`,
-//     data: {
-//       message: data.message
-//     }
-//   })
-// }
+
+export const delAuthorizedPlatform = (platformId: string): Promise<boolean> => {
+  return request({
+    method: 'delete',
+    url: `/chatbot/platforms/${platformId}`
+  })
+}
+export const delChatThread = (
+  params: ChatThreadDelCondition
+): Promise<boolean> => {
+  return request({
+    method: 'delete',
+    url: `/chatbot/platforms/${params.platformId}/threads/${params.threadId}`
+  })
+}
