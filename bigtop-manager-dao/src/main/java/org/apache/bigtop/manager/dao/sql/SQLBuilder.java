@@ -187,13 +187,15 @@ public class SQLBuilder {
                         continue;
                     }
                     PropertyDescriptor ps = BeanUtils.getPropertyDescriptor(entityClass, entry.getKey());
-                    if (ps == null || ps.getReadMethod() == null) {
-                        continue;
-                    }
                     Object value = ReflectionUtils.invokeMethod(ps.getReadMethod(), entity);
-                    if (!ObjectUtils.isEmpty(value)) {
-                        sql.SET("\"" + getEquals(entry.getValue() + "\"", entry.getKey()));
+                    Field field = ReflectionUtils.findField(entityClass, entry.getKey());
+                    if (field != null) {
+                        Column column = field.getAnnotation(Column.class);
+                        if (column != null && !column.nullable() && value == null) {
+                            continue;
+                        }
                     }
+                    sql.SET("\"" + getEquals(entry.getValue() + "\"", entry.getKey()));
                 }
                 sql.WHERE(getEquals(tableMetaData.getPkColumn(), tableMetaData.getPkProperty()));
                 break;
