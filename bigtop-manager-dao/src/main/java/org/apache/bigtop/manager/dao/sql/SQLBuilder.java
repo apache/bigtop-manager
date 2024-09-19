@@ -53,7 +53,7 @@ public class SQLBuilder {
         SQL sql = new SQL();
         switch (DBType.toType(databaseId)) {
             case MYSQL: {
-                sql.INSERT_INTO(tableMetaData.getTableName());
+                sql.INSERT_INTO(keywordsFormat(tableMetaData.getTableName(), DBType.MYSQL));
                 for (Map.Entry<String, String> entry : fieldColumnMap.entrySet()) {
                     // Ignore primary key
                     if (Objects.equals(entry.getKey(), tableMetaData.getPkProperty())) {
@@ -65,13 +65,13 @@ public class SQLBuilder {
                     }
                     Object value = ReflectionUtils.invokeMethod(ps.getReadMethod(), entity);
                     if (!ObjectUtils.isEmpty(value)) {
-                        sql.VALUES("`" + entry.getValue() + "`", getTokenParam(entry.getKey()));
+                        sql.VALUES(keywordsFormat(entry.getValue(), DBType.MYSQL), getTokenParam(entry.getKey()));
                     }
                 }
                 break;
             }
             case POSTGRESQL: {
-                sql.INSERT_INTO("\"" + tableMetaData.getTableName() + "\"");
+                sql.INSERT_INTO(keywordsFormat(tableMetaData.getTableName(), DBType.POSTGRESQL));
                 for (Map.Entry<String, String> entry : fieldColumnMap.entrySet()) {
                     // Ignore primary key
                     if (Objects.equals(entry.getKey(), tableMetaData.getPkProperty())) {
@@ -83,7 +83,7 @@ public class SQLBuilder {
                     }
                     Object value = ReflectionUtils.invokeMethod(ps.getReadMethod(), entity);
                     if (!ObjectUtils.isEmpty(value)) {
-                        sql.VALUES("\"" + entry.getValue() + "\"", getTokenParam(entry.getKey()));
+                        sql.VALUES(keywordsFormat(entry.getValue(), DBType.POSTGRESQL), getTokenParam(entry.getKey()));
                     }
                 }
                 break;
@@ -104,7 +104,7 @@ public class SQLBuilder {
         SQL sql = new SQL();
         switch (DBType.toType(databaseId)) {
             case MYSQL: {
-                sql.UPDATE(tableMetaData.getTableName());
+                sql.UPDATE(keywordsFormat(tableMetaData.getTableName(), DBType.MYSQL));
                 for (Map.Entry<String, String> entry : fieldColumnMap.entrySet()) {
                     // Ignore primary key
                     if (Objects.equals(entry.getKey(), tableMetaData.getPkProperty())) {
@@ -116,15 +116,16 @@ public class SQLBuilder {
                     }
                     Object value = ReflectionUtils.invokeMethod(ps.getReadMethod(), entity);
                     if (!ObjectUtils.isEmpty(value)) {
-                        sql.SET(getEquals(entry.getValue(), entry.getKey()));
+                        sql.SET(getEquals(keywordsFormat(entry.getValue(), DBType.MYSQL), entry.getKey()));
                     }
                 }
 
-                sql.WHERE(getEquals(tableMetaData.getPkColumn(), tableMetaData.getPkProperty()));
+                sql.WHERE(getEquals(
+                        keywordsFormat(tableMetaData.getPkColumn(), DBType.MYSQL), tableMetaData.getPkProperty()));
                 break;
             }
             case POSTGRESQL: {
-                sql.UPDATE("\"" + tableMetaData.getTableName() + "\"");
+                sql.UPDATE(keywordsFormat(tableMetaData.getTableName(), DBType.POSTGRESQL));
                 for (Map.Entry<String, String> entry : fieldColumnMap.entrySet()) {
                     // Ignore primary key
                     if (Objects.equals(entry.getKey(), tableMetaData.getPkProperty())) {
@@ -136,10 +137,11 @@ public class SQLBuilder {
                     }
                     Object value = ReflectionUtils.invokeMethod(ps.getReadMethod(), entity);
                     if (!ObjectUtils.isEmpty(value)) {
-                        sql.SET("\"" + getEquals(entry.getValue() + "\"", entry.getKey()));
+                        sql.SET(getEquals(keywordsFormat(entry.getValue(), DBType.POSTGRESQL), entry.getKey()));
                     }
                 }
-                sql.WHERE(getEquals(tableMetaData.getPkColumn(), tableMetaData.getPkProperty()));
+                sql.WHERE(getEquals(
+                        keywordsFormat(tableMetaData.getPkColumn(), DBType.POSTGRESQL), tableMetaData.getPkProperty()));
                 break;
             }
             default: {
@@ -166,7 +168,7 @@ public class SQLBuilder {
                     baseColumns = baseColumns.replace("user.", "\"user\".");
                 }
                 sql.SELECT(baseColumns);
-                sql.FROM("\"" + tableMetaData.getTableName() + "\"");
+                sql.FROM(keywordsFormat(tableMetaData.getTableName(), DBType.POSTGRESQL));
                 sql.WHERE(tableMetaData.getPkColumn() + " = " + id);
                 break;
             }
@@ -207,7 +209,7 @@ public class SQLBuilder {
                     baseColumns = baseColumns.replace("user.", "\"user\".");
                 }
                 sql.SELECT(baseColumns);
-                sql.FROM("\"" + tableMetaData.getTableName() + "\"");
+                sql.FROM(keywordsFormat(tableMetaData.getTableName(), DBType.POSTGRESQL));
                 sql.WHERE(tableMetaData.getPkColumn() + " in (" + idsStr + ")");
                 break;
             }
@@ -229,7 +231,7 @@ public class SQLBuilder {
                     baseColumns = baseColumns.replace("user.", "\"user\".");
                 }
                 sql.SELECT(baseColumns);
-                sql.FROM("\"" + tableMetaData.getTableName() + "\"");
+                sql.FROM(keywordsFormat(tableMetaData.getTableName(), DBType.POSTGRESQL));
                 break;
             case MYSQL: {
                 sql.SELECT(tableMetaData.getBaseColumns());
@@ -253,7 +255,7 @@ public class SQLBuilder {
                 break;
             }
             case POSTGRESQL: {
-                sql.FROM("\"" + tableMetaData.getTableName() + "\"");
+                sql.FROM(keywordsFormat(tableMetaData.getTableName(), DBType.POSTGRESQL));
                 sql.WHERE(tableMetaData.getPkColumn() + " = " + id);
                 break;
             }
@@ -286,7 +288,7 @@ public class SQLBuilder {
             }
             case POSTGRESQL: {
                 String idsStr = ids.stream().map(String::valueOf).collect(Collectors.joining(", "));
-                sql.DELETE_FROM("\"" + tableMetaData.getTableName() + "\"");
+                sql.DELETE_FROM(keywordsFormat(tableMetaData.getTableName(), DBType.POSTGRESQL));
                 sql.WHERE(tableMetaData.getPkColumn() + " in (" + idsStr + ")");
                 break;
             }
@@ -318,8 +320,16 @@ public class SQLBuilder {
         return sql.toString();
     }
 
+    private static String keywordsFormat(String keyword, DBType dbType) {
+        return switch (dbType) {
+            case MYSQL -> "`" + keyword + "`";
+            case POSTGRESQL -> "\"" + keyword + "\"";
+            default -> keyword;
+        };
+    }
+
     private static String getEquals(String column, String property) {
-        return "`" + column + "` = " + getTokenParam(property);
+        return column + " = " + getTokenParam(property);
     }
 
     private static String getTokenParam(String property) {

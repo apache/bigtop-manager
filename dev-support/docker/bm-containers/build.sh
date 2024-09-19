@@ -19,8 +19,10 @@ usage() {
     echo "usage: $PROG args"
     echo "  commands:"
     echo "       -c NUM_INSTANCES, --create NUM_INSTANCES  - Create Docker containers based bigtop-manager cluster, defaults to 3"
-    echo "       -d, --database                            - The specified database, defaults to postgres"
+    echo "       -e, --database                            - The specified database, defaults to postgres"
     echo "       -o, --os                                  - Specify the operating system, default is trunk-rocky-8"
+    echo "       --skip-build                              - Skip Compile"
+    echo "       -d, --destroy                             - Destroy all containers"
     echo "       -h, --help"
     exit 1
 }
@@ -97,7 +99,6 @@ create_container() {
       if [ $DATABASE == "mysql" ]; then
         log "docker exec ${container} bash -c \"mysql -h bm-mysql -P 3306 -uroot -proot -e 'create database bigtop_manager'\""
         docker exec ${container} bash -c "mysql -h bm-mysql -P 3306 -uroot -proot -e 'create database bigtop_manager'"
-        docker exec ${container} bash -c "mysql -h bm-mysql -P 3306 -uroot -proot -e 'show databases'"
         docker exec ${container} bash -c "mysql -h bm-mysql -P 3306 -uroot -proot -Dbigtop_manager < /opt/bigtop-manager-server/ddl/MySQL-DDL-CREATE.sql"
 
         docker exec ${container} bash -c "wget https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/8.0.33/mysql-connector-j-8.0.33.jar -O /opt/bigtop-manager-server/libs/mysql-connector-java-8.0.33.jar"
@@ -105,10 +106,16 @@ create_container() {
         docker exec ${container} bash -c "sed -i 's/postgresql/mysql/' /opt/bigtop-manager-server/conf/application.yml"
         docker exec ${container} bash -c "sed -i 's/localhost:5432/bm-mysql:3306/' /opt/bigtop-manager-server/conf/application.yml"
         docker exec ${container} bash -c "sed -i 's/postgres/root/' /opt/bigtop-manager-server/conf/application.yml"
+      elif [ $DATABASE == "postgres" ]; then
+        docker exec ${container} bash -c "yum install postgresql -y"
+        docker exec ${container} bash -c "PGPASSWORD=postgres psql -h bm-postgres -p5432 -U postgres -c 'create database bigtop_manager'"
+        docker exec ${container} bash -c "PGPASSWORD=postgres psql -h bm-postgres -p5432 -U postgres -d bigtop_manager -f /opt/bigtop-manager-server/ddl/PostgreSQL-DDL-CREATE.sql"
+        docker exec ${container} bash -c "sed -i 's/localhost:5432/bm-postgres:5432/' /opt/bigtop-manager-server/conf/application.yml"
       fi
-        docker exec ${container} bash -c "nohup /bin/bash /opt/bigtop-manager-server/bin/start.sh --debug > /dev/null 2>&1 &"
+      docker exec ${container} bash -c "nohup /bin/bash /opt/bigtop-manager-server/bin/start.sh --debug > /dev/null 2>&1 &"
     fi
     docker exec ${container} bash -c "nohup /bin/bash /opt/bigtop-manager-agent/bin/start.sh --debug > /dev/null 2>&1 &"
+    log "All Service Started!!!"
   done
 
 }
@@ -139,6 +146,14 @@ create_db() {
             sleep 5
         fi
     done
+  elif [ $DATABASE == "postgres" ]; then
+    docker run --restart=always -d \
+      -p 5432:5432 \
+      --network bigtop-manager \
+      --name bm-postgres \
+      --hostname bm-postgres \
+    	-e POSTGRES_PASSWORD=postgres \
+    	postgres:16
   fi
 }
 
