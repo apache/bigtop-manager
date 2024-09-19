@@ -175,9 +175,8 @@
         overflow: auto;
         font-weight: 500;
         &::before {
-          content: attr(data-placeholder); /* 模拟原生 input 的 placeholder */
+          content: attr(data-placeholder);
           color: #a9a9a9;
-          /* 字体溢出变为省略号 */
           display: block;
           overflow: hidden;
           white-space: nowrap;
