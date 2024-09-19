@@ -193,7 +193,8 @@ public class SQLBuilder {
         return sql.toString();
     }
 
-    public static <Entity> String partialUpdate(TableMetaData tableMetaData, Entity entity, String databaseId) {
+    public static <Entity> String update(
+            TableMetaData tableMetaData, Entity entity, String databaseId, boolean partial) {
         Class<?> entityClass = entity.getClass();
         Map<String, String> fieldColumnMap = tableMetaData.getFieldColumnMap();
 
@@ -211,59 +212,9 @@ public class SQLBuilder {
                         continue;
                     }
                     Object value = ReflectionUtils.invokeMethod(ps.getReadMethod(), entity);
-                    if (!ObjectUtils.isEmpty(value)) {
-                        sql.SET(getEquals(entry.getValue(), entry.getKey()));
-                    }
-                }
-
-                sql.WHERE(getEquals(tableMetaData.getPkColumn(), tableMetaData.getPkProperty()));
-                break;
-            }
-            case POSTGRESQL: {
-                sql.UPDATE("\"" + tableMetaData.getTableName() + "\"");
-                for (Map.Entry<String, String> entry : fieldColumnMap.entrySet()) {
-                    // Ignore primary key
-                    if (Objects.equals(entry.getKey(), tableMetaData.getPkProperty())) {
+                    if (ObjectUtils.isEmpty(value) && partial) {
                         continue;
                     }
-                    PropertyDescriptor ps = BeanUtils.getPropertyDescriptor(entityClass, entry.getKey());
-                    if (ps == null || ps.getReadMethod() == null) {
-                        continue;
-                    }
-                    Object value = ReflectionUtils.invokeMethod(ps.getReadMethod(), entity);
-                    if (!ObjectUtils.isEmpty(value)) {
-                        sql.SET("\"" + getEquals(entry.getValue() + "\"", entry.getKey()));
-                    }
-                }
-                sql.WHERE(getEquals(tableMetaData.getPkColumn(), tableMetaData.getPkProperty()));
-                break;
-            }
-            default: {
-                log.error("Unsupported data source");
-            }
-        }
-
-        return sql.toString();
-    }
-
-    public static <Entity> String update(TableMetaData tableMetaData, Entity entity, String databaseId) {
-        Class<?> entityClass = entity.getClass();
-        Map<String, String> fieldColumnMap = tableMetaData.getFieldColumnMap();
-
-        SQL sql = new SQL();
-        switch (DBType.toType(databaseId)) {
-            case MYSQL: {
-                sql.UPDATE(tableMetaData.getTableName());
-                for (Map.Entry<String, String> entry : fieldColumnMap.entrySet()) {
-                    // Ignore primary key
-                    if (Objects.equals(entry.getKey(), tableMetaData.getPkProperty())) {
-                        continue;
-                    }
-                    PropertyDescriptor ps = BeanUtils.getPropertyDescriptor(entityClass, entry.getKey());
-                    if (ps == null || ps.getReadMethod() == null) {
-                        continue;
-                    }
-                    Object value = ReflectionUtils.invokeMethod(ps.getReadMethod(), entity);
                     Field field = ReflectionUtils.findField(entityClass, entry.getKey());
                     if (field != null) {
                         Column column = field.getAnnotation(Column.class);
@@ -289,6 +240,9 @@ public class SQLBuilder {
                         continue;
                     }
                     Object value = ReflectionUtils.invokeMethod(ps.getReadMethod(), entity);
+                    if (ObjectUtils.isEmpty(value) && partial) {
+                        continue;
+                    }
                     Field field = ReflectionUtils.findField(entityClass, entry.getKey());
                     if (field != null) {
                         Column column = field.getAnnotation(Column.class);
@@ -309,15 +263,8 @@ public class SQLBuilder {
         return sql.toString();
     }
 
-    public static String escapeSingleQuote(String input) {
-        if (input != null) {
-            return input.replace("'", "''");
-        }
-        return null;
-    }
-
-    public static <Entity> String partialUpdateList(
-            TableMetaData tableMetaData, List<Entity> entities, String databaseId) {
+    public static <Entity> String updateList(
+            TableMetaData tableMetaData, List<Entity> entities, String databaseId, boolean partial) {
         if (entities == null || entities.isEmpty()) {
             throw new IllegalArgumentException("Entities list must not be null or empty");
         }
@@ -325,10 +272,9 @@ public class SQLBuilder {
         Class<?> entityClass = entities.get(0).getClass();
         Map<String, String> fieldColumnMap = tableMetaData.getFieldColumnMap();
 
-        SQL sql = new SQL();
+        StringBuilder sqlBuilder = new StringBuilder();
         switch (DBType.toType(databaseId)) {
             case MYSQL: {
-                StringBuilder sqlBuilder = new StringBuilder();
                 sqlBuilder
                         .append("UPDATE ")
                         .append(tableMetaData.getTableName())
@@ -336,8 +282,6 @@ public class SQLBuilder {
                 Map<String, StringBuilder> setClauses = new LinkedHashMap<>();
                 String primaryKey = "id";
                 for (Map.Entry<String, String> entry : fieldColumnMap.entrySet()) {
-                    log.info("entry: {}", entry);
-                    log.info("primaryKey: {}", tableMetaData.getPkProperty());
                     // Ignore primary key
                     if (Objects.equals(entry.getKey(), tableMetaData.getPkProperty())) {
                         primaryKey = entry.getValue();
@@ -346,7 +290,6 @@ public class SQLBuilder {
 
                     StringBuilder caseClause = new StringBuilder();
                     caseClause.append(entry.getValue()).append(" = CASE ");
-                    log.info(caseClause.toString());
                     for (Entity entity : entities) {
                         PropertyDescriptor ps = BeanUtils.getPropertyDescriptor(entityClass, entry.getKey());
                         if (ps == null || ps.getReadMethod() == null) {
@@ -354,22 +297,39 @@ public class SQLBuilder {
                         }
 
                         Object value = ReflectionUtils.invokeMethod(ps.getReadMethod(), entity);
-                        if (!ObjectUtils.isEmpty(value)) {
-                            PropertyDescriptor pkPs =
-                                    BeanUtils.getPropertyDescriptor(entityClass, tableMetaData.getPkProperty());
-                            Object pkValue = ReflectionUtils.invokeMethod(pkPs.getReadMethod(), entity);
+                        PropertyDescriptor pkPs =
+                                BeanUtils.getPropertyDescriptor(entityClass, tableMetaData.getPkProperty());
+                        if (pkPs == null || pkPs.getReadMethod() == null) {
+                            continue;
+                        }
+                        Object pkValue = ReflectionUtils.invokeMethod(pkPs.getReadMethod(), entity);
 
+                        if (!ObjectUtils.isEmpty(value)) {
                             caseClause
                                     .append("WHEN ")
                                     .append(primaryKey)
                                     .append(" = '")
-                                    .append(pkValue.toString())
+                                    .append(pkValue)
                                     .append("' THEN '")
                                     .append(escapeSingleQuote(value.toString()))
                                     .append("' ");
+                        } else if (!partial) {
+                            Field field = ReflectionUtils.findField(entityClass, entry.getKey());
+                            if (field != null) {
+                                Column column = field.getAnnotation(Column.class);
+                                if (column != null && !column.nullable() && value == null) {
+                                    continue;
+                                }
+                            }
+                            caseClause
+                                    .append("WHEN ")
+                                    .append(primaryKey)
+                                    .append(" = '")
+                                    .append(pkValue)
+                                    .append("' THEN NULL ");
                         }
                     }
-
+                    caseClause.append("ELSE ").append(entry.getValue()).append(" ");
                     caseClause.append("END");
                     setClauses.put(entry.getValue(), caseClause);
                 }
@@ -386,9 +346,82 @@ public class SQLBuilder {
                         .collect(Collectors.joining(", "));
 
                 sqlBuilder.append(pkValues).append(")");
-                return sqlBuilder.toString();
+                break;
             }
             case POSTGRESQL: {
+                sqlBuilder
+                        .append("UPDATE ")
+                        .append("\"")
+                        .append(tableMetaData.getTableName())
+                        .append("\"")
+                        .append(" SET ");
+                Map<String, StringBuilder> setClauses = new LinkedHashMap<>();
+                String primaryKey = "\"id\"";
+                for (Map.Entry<String, String> entry : fieldColumnMap.entrySet()) {
+                    // Ignore primary key
+                    if (Objects.equals(entry.getKey(), tableMetaData.getPkProperty())) {
+                        primaryKey = "\"" + entry.getValue() + "\"";
+                        continue;
+                    }
+
+                    StringBuilder caseClause = new StringBuilder();
+                    caseClause.append(entry.getValue()).append(" = CASE ");
+
+                    for (Entity entity : entities) {
+                        PropertyDescriptor ps = BeanUtils.getPropertyDescriptor(entityClass, entry.getKey());
+                        if (ps == null || ps.getReadMethod() == null) {
+                            continue;
+                        }
+                        Object value = ReflectionUtils.invokeMethod(ps.getReadMethod(), entity);
+                        PropertyDescriptor pkPs =
+                                BeanUtils.getPropertyDescriptor(entityClass, tableMetaData.getPkProperty());
+                        if (pkPs == null || pkPs.getReadMethod() == null) {
+                            continue;
+                        }
+                        Object pkValue = ReflectionUtils.invokeMethod(pkPs.getReadMethod(), entity);
+
+                        if (!ObjectUtils.isEmpty(value)) {
+                            caseClause
+                                    .append("WHEN ")
+                                    .append(primaryKey)
+                                    .append(" = '")
+                                    .append(pkValue)
+                                    .append("' THEN '")
+                                    .append(escapeSingleQuote(value.toString()))
+                                    .append("' ");
+                        } else if (!partial) {
+                            Field field = ReflectionUtils.findField(entityClass, entry.getKey());
+                            if (field != null) {
+                                Column column = field.getAnnotation(Column.class);
+                                if (column != null && !column.nullable() && value == null) {
+                                    continue;
+                                }
+                            }
+                            caseClause
+                                    .append("WHEN ")
+                                    .append(primaryKey)
+                                    .append(" = '")
+                                    .append(pkValue)
+                                    .append("' THEN NULL ");
+                        }
+                    }
+                    caseClause.append("ELSE \"").append(entry.getValue()).append("\" ");
+                    caseClause.append("END");
+                    setClauses.put(entry.getValue(), caseClause);
+                }
+                sqlBuilder.append(String.join(", ", setClauses.values()));
+
+                sqlBuilder.append(" WHERE ").append(primaryKey).append(" IN (");
+                String pkValues = entities.stream()
+                        .map(entity -> {
+                            PropertyDescriptor pkPs =
+                                    BeanUtils.getPropertyDescriptor(entityClass, tableMetaData.getPkProperty());
+                            Object pkValue = ReflectionUtils.invokeMethod(pkPs.getReadMethod(), entity);
+                            return "'" + pkValue.toString() + "'";
+                        })
+                        .collect(Collectors.joining(", "));
+
+                sqlBuilder.append(pkValues).append(")");
                 break;
             }
             default: {
@@ -396,7 +429,7 @@ public class SQLBuilder {
             }
         }
 
-        return sql.toString();
+        return sqlBuilder.toString();
     }
 
     public static String selectById(TableMetaData tableMetaData, String databaseId, Serializable id) {
@@ -573,6 +606,13 @@ public class SQLBuilder {
 
     private static String getTokenParam(String property) {
         return "#{" + property + "}";
+    }
+
+    private static String escapeSingleQuote(String input) {
+        if (input != null) {
+            return input.replace("'", "''");
+        }
+        return null;
     }
 
     private static <Condition> SQL mysqlCondition(Condition condition, TableMetaData tableMetaData)

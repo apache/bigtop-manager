@@ -65,12 +65,12 @@ public interface BaseDao<Entity> {
      */
     @UpdateProvider(type = BaseSqlProvider.class, method = "partialUpdateByIds")
     int partialUpdateByIds(List<Entity> entities);
-    //
-    //    /**
-    //     * Fully update the entity by primary key.
-    //     */
-    //    @UpdateProvider(type = BaseSqlProvider.class, method = "updateByIds")
-    //    int updateByIds(List<Entity> entities);
+
+    /**
+     * Fully update the entity by primary key.
+     */
+    @UpdateProvider(type = BaseSqlProvider.class, method = "updateByIds")
+    int updateByIds(List<Entity> entities);
 
     /**
      * Query the entity by primary key.
