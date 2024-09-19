@@ -109,13 +109,11 @@ public class SQLBuilder {
         Map<String, String> fieldColumnMap = tableMetaData.getFieldColumnMap();
 
         SQL sql = new SQL();
-
         switch (DBType.toType(databaseId)) {
             case MYSQL: {
                 sql.INSERT_INTO(tableMetaData.getTableName());
 
                 boolean firstRow = true;
-                List<String> columns = new ArrayList<>();
                 int idx = 0;
                 for (Entity entity : entities) {
                     List<String> values = new ArrayList<>();
