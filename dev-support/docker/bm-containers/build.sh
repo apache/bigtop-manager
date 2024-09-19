@@ -176,6 +176,10 @@ while [ $# -gt 0 ]; do
           echo "Requires a db" 1>&2
           usage
         fi
+        if [ $2 != "postgres" ] && [ $2 != "mysql" ]; then
+          echo "The Database should be [postgres], or [mysql]" 1>&2
+          usage
+        fi
         DATABASE=$2
         shift 2;;
     -o|--os)
@@ -183,11 +187,19 @@ while [ $# -gt 0 ]; do
           echo "Requires a os" 1>&2
           usage
         fi
+        if [ $2 != "trunk-rocky-8" ] && [ $2 != "trunk-centos-7" ] && [ $2 != "trunk-openeuler-22" ]; then
+          echo "The OS should be [trunk-rocky-8], [trunk-centos-7], or [trunk-openeuler-22]" 1>&2
+          usage
+        fi
         OS=$2
         shift 2;;
     -c|--create)
         if [ $# -lt 2 ]; then
           echo "Requires a container number" 1>&2
+          usage
+        fi
+        if [ $2 -gt 10 ] || [ $2 -lt 3 ]; then
+          echo "NUM-INSTANCES should be between [3-10]" 1>&2
           usage
         fi
         NUM_INSTANCES=$2
