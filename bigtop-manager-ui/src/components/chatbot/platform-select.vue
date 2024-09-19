@@ -20,12 +20,12 @@
   import { storeToRefs } from 'pinia'
   import SelectMenu from './select-menu.vue'
   import { computed, h } from 'vue'
-  import useChatbot from './chatbot'
-  import type { AuthorizedPlatform } from '@/api/chatbot/types'
-  import type { SelectData, Option } from './select-menu.vue'
+  import useChatbotStore from '@/store/chatbot/index'
   import { useI18n } from 'vue-i18n'
   import { Modal } from 'ant-design-vue/es/components'
   import { ExclamationCircleFilled } from '@ant-design/icons-vue/lib/icons'
+  import type { AuthorizedPlatform } from '@/api/chatbot/types'
+  import type { SelectData, Option } from './select-menu.vue'
 
   interface PlatformSelectProps {
     currPage?: Option
@@ -33,7 +33,7 @@
 
   defineProps<PlatformSelectProps>()
   const { t } = useI18n()
-  const chatbot = useChatbot()
+  const chatbot = useChatbotStore()
   const { authorizedPlatforms } = storeToRefs(chatbot)
   const emits = defineEmits(['update:currPage'])
 

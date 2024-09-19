@@ -18,12 +18,12 @@
 -->
 <script setup lang="ts">
   import SelectMenu from './select-menu.vue'
-  import useChatbot from './chatbot'
+  import useChatbotStore from '@/store/chatbot/index'
   import { storeToRefs } from 'pinia'
   import { computed, ref, toRefs, watchEffect, toRaw } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import type { SelectData, Option } from './select-menu.vue'
   import type { FormInstance } from 'ant-design-vue'
-  import { useI18n } from 'vue-i18n'
 
   interface PlatformAuthorizeProps {
     currPage?: Option
@@ -31,7 +31,7 @@
   type FormState = { [key: string]: string }
 
   const { t } = useI18n()
-  const chatbot = useChatbot()
+  const chatbot = useChatbotStore()
   const formRef = ref<FormInstance>()
   const formState = ref<FormState>({})
   const props = defineProps<PlatformAuthorizeProps>()

@@ -17,14 +17,14 @@
   ~ under the License.
 -->
 <script setup lang="ts">
-  import useChatbot from './chatbot'
+  import useChatbotStore from '@/store/chatbot/index'
   import { storeToRefs } from 'pinia'
   import { getSvgUrl, scrollToBottom } from '@/utils/tools'
-  import type { Option } from './select-menu.vue'
   import { message } from 'ant-design-vue/es/components'
   import { ref, watch, nextTick, computed, toRefs } from 'vue'
   import ChatMsgItem from './chat-msg-item.vue'
   import { useI18n } from 'vue-i18n'
+  import type { Option } from './select-menu.vue'
 
   interface PlatfromChatPorps {
     currPage?: Option
@@ -32,7 +32,7 @@
   }
 
   const { t } = useI18n()
-  const chatbot = useChatbot()
+  const chatbot = useChatbotStore()
   const inputText = ref('')
   const isMessageFullyReceived = ref(true)
   const msgInputRef = ref<HTMLInputElement | null>(null)

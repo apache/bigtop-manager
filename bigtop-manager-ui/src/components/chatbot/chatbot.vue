@@ -21,13 +21,13 @@
   import PlatformAuthorize from './platform-authorize.vue'
   import PlatformChat from './platform-chat.vue'
   import PlatformChatThread from './platform-chatthread.vue'
-  import useChatbot from './chatbot'
+  import useChatbotStore from '@/store/chatbot/index'
   import { getSvgUrl } from '@/utils/tools'
   import { storeToRefs } from 'pinia'
-  import type { Option } from './select-menu.vue'
   import { ref, watch, computed, unref } from 'vue'
+  import type { Option } from './select-menu.vue'
 
-  const chatbot = useChatbot()
+  const chatbot = useChatbotStore()
   const visible = ref(false)
   const currPage = ref<Option>({
     action: 'SUPPORTED_PLATFORM_SELECT',

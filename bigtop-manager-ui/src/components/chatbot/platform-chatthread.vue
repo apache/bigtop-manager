@@ -18,7 +18,7 @@
 -->
 <script setup lang="ts">
   import SelectMenu from './select-menu.vue'
-  import useChatbot from './chatbot'
+  import useChatbotStore from '@/store/chatbot/index'
   import { storeToRefs } from 'pinia'
   import { toRefs, computed } from 'vue'
   import type { SelectData, Option } from './select-menu.vue'
@@ -34,7 +34,7 @@
   }
 
   const { t } = useI18n()
-  const chatbot = useChatbot()
+  const chatbot = useChatbotStore()
   const props = defineProps<PreChatPorps>()
   const emits = defineEmits(['update:currPage'])
   const { currPage } = toRefs(props)
