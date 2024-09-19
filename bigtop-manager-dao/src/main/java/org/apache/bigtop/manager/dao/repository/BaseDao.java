@@ -42,6 +42,13 @@ public interface BaseDao<Entity> {
     int save(Entity entity);
 
     /**
+     * Insert all of the entity.
+     */
+    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
+    @InsertProvider(type = BaseSqlProvider.class, method = "insertList")
+    int saveAll(List<Entity> entities);
+
+    /**
      * Partially update the entity by primary key.
      */
     @UpdateProvider(type = BaseSqlProvider.class, method = "partialUpdateById")

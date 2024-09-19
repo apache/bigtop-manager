@@ -31,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.Collection;
+import java.util.List;
 
 @Slf4j
 public class BaseSqlProvider {
@@ -44,6 +45,19 @@ public class BaseSqlProvider {
         TableMetaData tableMetaData = TableMetaData.forClass(entityClass);
 
         return SQLBuilder.insert(tableMetaData, entity, databaseId);
+    }
+
+    public <Entity> String insertList(List<Entity> entities, ProviderContext context) {
+        Assert.notNull(entities, "entities must not be null");
+        Assert.notEmpty(entities, "entities list must not be empty");
+
+        String databaseId = context.getDatabaseId();
+
+        Class<?> entityClass = entities.get(0).getClass();
+
+        TableMetaData tableMetaData = TableMetaData.forClass(entityClass);
+
+        return SQLBuilder.insertList(tableMetaData, entities, databaseId);
     }
 
     public <Entity> String partialUpdateById(Entity entity, ProviderContext context) {

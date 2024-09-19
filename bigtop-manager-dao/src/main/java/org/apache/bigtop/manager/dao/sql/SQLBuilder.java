@@ -35,6 +35,7 @@ import jakarta.persistence.Column;
 import java.beans.PropertyDescriptor;
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -88,6 +89,99 @@ public class SQLBuilder {
                     }
                 }
                 break;
+            }
+
+            default: {
+                log.error("Unsupported data source");
+            }
+        }
+
+        return sql.toString();
+    }
+
+    public static <Entity> String insertList(TableMetaData tableMetaData, List<Entity> entities, String databaseId) {
+        if (entities == null || entities.isEmpty()) {
+            throw new IllegalArgumentException("Entities list must not be null or empty");
+        }
+
+        Class<?> entityClass = entities.get(0).getClass();
+        Map<String, String> fieldColumnMap = tableMetaData.getFieldColumnMap();
+
+        SQL sql = new SQL();
+
+        switch (DBType.toType(databaseId)) {
+            case MYSQL: {
+                sql.INSERT_INTO(tableMetaData.getTableName());
+
+                boolean firstRow = true;
+                List<String> columns = new ArrayList<>();
+                int idx = 0;
+                for (Entity entity : entities) {
+                    List<String> values = new ArrayList<>();
+                    for (Map.Entry<String, String> entry : fieldColumnMap.entrySet()) {
+                        // Ignore primary key
+                        if (Objects.equals(entry.getKey(), tableMetaData.getPkProperty())) {
+                            continue;
+                        }
+                        PropertyDescriptor ps = BeanUtils.getPropertyDescriptor(entityClass, entry.getKey());
+                        if (ps == null || ps.getReadMethod() == null) {
+                            continue;
+                        }
+                        Object value = ReflectionUtils.invokeMethod(ps.getReadMethod(), entity);
+                        if (!ObjectUtils.isEmpty(value)) {
+                            if (firstRow) {
+                                sql.VALUES(
+                                        "`" + entry.getValue() + "`",
+                                        getTokenParam("arg0[" + idx + "]." + entry.getKey()));
+                            }
+                            values.add(getTokenParam("arg0[" + idx + "]." + entry.getKey()));
+                        }
+                    }
+                    if (firstRow) {
+                        firstRow = false;
+                    } else {
+                        sql.ADD_ROW();
+                        sql.INTO_VALUES(values.toArray(new String[0]));
+                    }
+                    idx++;
+                }
+                break;
+            }
+            case POSTGRESQL: {
+                sql.INSERT_INTO("\"" + tableMetaData.getTableName() + "\"");
+
+                boolean firstRow = true;
+                List<String> columns = new ArrayList<>();
+                int idx = 0;
+                for (Entity entity : entities) {
+                    List<String> values = new ArrayList<>();
+                    for (Map.Entry<String, String> entry : fieldColumnMap.entrySet()) {
+                        // Ignore primary key
+                        if (Objects.equals(entry.getKey(), tableMetaData.getPkProperty())) {
+                            continue;
+                        }
+                        PropertyDescriptor ps = BeanUtils.getPropertyDescriptor(entityClass, entry.getKey());
+                        if (ps == null || ps.getReadMethod() == null) {
+                            continue;
+                        }
+                        Object value = ReflectionUtils.invokeMethod(ps.getReadMethod(), entity);
+                        if (!ObjectUtils.isEmpty(value)) {
+                            if (firstRow) {
+                                sql.VALUES(
+                                        "\"" + entry.getValue() + "\"",
+                                        getTokenParam("arg0[" + idx + "]." + entry.getKey()));
+                            }
+                            values.add(getTokenParam("arg0[" + idx + "]." + entry.getKey()));
+                        }
+                    }
+                    if (firstRow) {
+                        firstRow = false;
+                    } else {
+                        sql.ADD_ROW();
+                        sql.INTO_VALUES(values.toArray(new String[0]));
+                    }
+                    idx++;
+                }
             }
 
             default: {
@@ -165,6 +259,9 @@ public class SQLBuilder {
                         continue;
                     }
                     PropertyDescriptor ps = BeanUtils.getPropertyDescriptor(entityClass, entry.getKey());
+                    if (ps == null || ps.getReadMethod() == null) {
+                        continue;
+                    }
                     Object value = ReflectionUtils.invokeMethod(ps.getReadMethod(), entity);
                     Field field = ReflectionUtils.findField(entityClass, entry.getKey());
                     if (field != null) {
@@ -187,6 +284,9 @@ public class SQLBuilder {
                         continue;
                     }
                     PropertyDescriptor ps = BeanUtils.getPropertyDescriptor(entityClass, entry.getKey());
+                    if (ps == null || ps.getReadMethod() == null) {
+                        continue;
+                    }
                     Object value = ReflectionUtils.invokeMethod(ps.getReadMethod(), entity);
                     Field field = ReflectionUtils.findField(entityClass, entry.getKey());
                     if (field != null) {
