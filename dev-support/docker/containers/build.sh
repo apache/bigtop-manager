@@ -21,7 +21,7 @@ usage() {
     echo "       -c NUM_INSTANCES, --create NUM_INSTANCES  - Create Docker containers based bigtop-manager cluster, defaults to 3"
     echo "       -e, --database                            - The specified database, defaults to postgres"
     echo "       -o, --os                                  - Specify the operating system, default is trunk-rocky-8"
-    echo "       --skip-build                              - Skip Compile"
+    echo "       --skip-compile                              - Skip Compile"
     echo "       -d, --destroy                             - Destroy all containers"
     echo "       -h, --help"
     exit 1
@@ -204,7 +204,7 @@ while [ $# -gt 0 ]; do
         fi
         NUM_INSTANCES=$2
         shift 2;;
-    --skip-build)
+    --skip-compile)
         SKIP_BUILD=true
         shift;;
     -d|--destroy)

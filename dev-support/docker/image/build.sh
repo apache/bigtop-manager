@@ -35,8 +35,8 @@ if [ $# != 1 ]; then
   echo
   echo "Usage: build.sh <PREFIX-OS-VERSION>"
   echo
-  echo "Example: build.sh trunk-rockylinux-8"
-  echo "       : build.sh 1.0.0-rockylinux-8"
+  echo "Example: build.sh trunk-rocky-8"
+  echo "       : build.sh 1.0.0-rocky-8"
   exit 1
 fi
 
@@ -58,7 +58,7 @@ case ${OS}-${VERSION_INT} in
       CUSTOM_REPO="RUN mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.back \
       && curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo"
         ;;
-    rocky-8|rocky-9)
+    rocky-8)
       DOCKER_OS=rockylinux
         ;;
     openeuler-22)

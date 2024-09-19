@@ -47,7 +47,7 @@ Run the setup command, you will get `bigtop-manager/develop:trunk-rocky-8` image
 
 **RHEL (Rocky 8) :**
 ```shell
-/bin/bash dev-support/docker/containers/build-containers.sh -e postgres -c 3 -o trunk-rocky-8 [--skip-build]
+/bin/bash dev-support/docker/containers/build.sh -e postgres -c 3 -o trunk-rocky-8 [--skip-compile]
 ```
 ### **Step 5**: Access Web UI
 Now you can access Web UI which exposes on `http://localhost:8080`. Log in with username `admin` and password `admin`.
@@ -56,5 +56,5 @@ Clean up the containers when you are done developing or testing.
 
 **RHEL (Rocky 8) :**
 ```shell
-/bin/bash dev-support/docker/containers/build-containers.sh -d
+/bin/bash dev-support/docker/containers/build.sh -d
 ```
