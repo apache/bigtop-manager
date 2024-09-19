@@ -126,9 +126,7 @@
       }
 
       &-option {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
+        @include flexbox($justify: space-between, $align: center);
         border: 1px solid #c9c9c9;
         cursor: pointer;
 

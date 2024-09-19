@@ -147,16 +147,12 @@
 <style lang="scss" scoped>
   .platform-authorize {
     height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    @include flexbox($direction: column, $justify: space-between);
   }
 
   footer {
     width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
+    @include flexbox($justify: flex-end, $align: center);
     padding-bottom: 20px;
   }
 </style>

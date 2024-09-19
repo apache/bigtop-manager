@@ -227,8 +227,7 @@
 
   .base-model {
     border-radius: 14px;
-    display: flex;
-    flex-direction: column;
+    @include flexbox($direction: column);
     box-shadow: rgba(0, 0, 0, 0.2) 0px 20px 30px;
 
     :deep(.ant-card-head) {
@@ -239,8 +238,7 @@
     :deep(.ant-card-body) {
       height: 100%;
       padding: 0;
-      display: flex;
-      flex-direction: column;
+      @include flexbox($direction: column);
       overflow: auto;
     }
 
@@ -255,21 +253,15 @@
 
     .header {
       &-left {
-        display: flex;
-        align-items: center;
+        @include flexbox($align: center);
       }
 
       &-middle {
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        @include flexbox($justify: center, $align: center);
       }
 
       &-right {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-
+        @include flexbox($justify: flex-end, $align: center);
         img {
           margin-left: 10px;
         }

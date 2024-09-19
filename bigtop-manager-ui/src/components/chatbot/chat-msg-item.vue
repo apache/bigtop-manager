@@ -61,7 +61,7 @@
     margin-top: 44px;
     margin-bottom: 44px;
     &-msg {
-      @include flexbox(null, null, center, center);
+      @include flexbox($justify: center, $align: center);
       background-color: #e9e9e9;
       border-radius: 8px;
       padding: 8px;

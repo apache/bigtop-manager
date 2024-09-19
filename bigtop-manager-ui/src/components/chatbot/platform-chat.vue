@@ -137,9 +137,7 @@
 
 <style lang="scss" scoped>
   .platfrom-chat {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    @include flexbox($direction: column, $justify: space-between);
     position: relative;
     height: 100%;
     padding: 4px !important;
@@ -151,8 +149,7 @@
     }
 
     .msg-wrp {
-      display: flex;
-      align-items: center;
+      @include flexbox($align: center);
       border: 1px solid #e5e7eb;
       border-radius: 16px;
       padding: 6px;
@@ -199,9 +196,7 @@
         &-send {
           width: 50px;
           height: 34px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
+          @include flexbox($justify: flex-end, $align: center);
           border-radius: 12px;
         }
       }
