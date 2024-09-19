@@ -25,6 +25,7 @@
   import ChatMsgItem from './chat-msg-item.vue'
   import { useI18n } from 'vue-i18n'
   import type { Option } from './select-menu.vue'
+  import { ChatThreadHistoryItem } from '@/api/chatbot/types'
 
   interface PlatfromChatPorps {
     currPage?: Option
@@ -38,11 +39,17 @@
   const msgInputRef = ref<HTMLInputElement | null>(null)
   const props = defineProps<PlatfromChatPorps>()
   const { visible, currPage } = toRefs(props)
-  const { currPlatform, chatThreadHistory, isExpand } = storeToRefs(chatbot)
+  const { currPlatform, chatThreadHistory, isExpand, messageReciver, loading } =
+    storeToRefs(chatbot)
 
   const sendable = computed(
     () => inputText.value != '' && isMessageFullyReceived.value
   )
+
+  const tempMsg = computed<ChatThreadHistoryItem>(() => ({
+    sender: 'AI',
+    message: messageReciver.value
+  }))
 
   watch(
     [visible, isExpand, currPage],
@@ -53,7 +60,7 @@
       if (currPage.value?.action == 'PLATFORM_CHAT') {
         await chatbot.fetchThreadChatHistory()
         await nextTick()
-        scrollToBottom(document.querySelector('.chat-container') as HTMLElement)
+        handleScrollToBottom()
       }
     },
     {
@@ -71,12 +78,11 @@
       const res = await chatbot.fetchSendChatMessage(inputText.value)
       isMessageFullyReceived.value = res as boolean
       inputText.value = ''
-      scrollToBottom(document.querySelector('.chat-container') as HTMLElement)
     } catch (error) {
       console.log('recived message:>> ', error)
     } finally {
       isMessageFullyReceived.value = true
-      scrollToBottom(document.querySelector('.chat-container') as HTMLElement)
+      handleScrollToBottom()
     }
   }
 
@@ -91,9 +97,13 @@
       return
     }
     chatbot.updateThreadChatHistory('USER', inputText.value as string)
-    scrollToBottom(document.querySelector('.chat-container') as HTMLElement)
+    handleScrollToBottom()
     clearUpInputContent()
     reciveMessage()
+  }
+
+  const handleScrollToBottom = () => {
+    scrollToBottom(document.querySelector('.chat-container') as HTMLElement)
   }
 </script>
 
@@ -104,6 +114,11 @@
         v-for="(chatItem, index) of chatThreadHistory"
         :key="index"
         :chat-item="chatItem"
+      />
+      <chat-msg-item
+        v-if="loading"
+        :chat-item="tempMsg"
+        @updated-msg="handleScrollToBottom"
       />
     </section>
     <footer>

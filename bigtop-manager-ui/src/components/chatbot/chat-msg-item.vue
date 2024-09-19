@@ -17,7 +17,7 @@
   ~ under the License.
 -->
 <script setup lang="ts">
-  import { computed, ref } from 'vue'
+  import { computed, ref, watchEffect } from 'vue'
   import { getSvgUrl } from '@/utils/tools'
   import { ChatThreadHistoryItem } from '@/api/chatbot/types'
 
@@ -25,8 +25,14 @@
     chatItem: ChatThreadHistoryItem
   }
   const props = defineProps<Props>()
-  const message = ref(props.chatItem.message)
+  const emits = defineEmits(['updatedMsg'])
+  const message = ref('')
   const isRight = computed(() => props.chatItem.sender === 'USER')
+
+  watchEffect(() => {
+    message.value = props.chatItem.message
+    emits('updatedMsg')
+  })
 </script>
 
 <template>

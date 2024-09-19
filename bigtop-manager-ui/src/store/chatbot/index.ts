@@ -239,12 +239,14 @@ export default defineStore(
     }
 
     const onMessageReceive = ({ event }: AxiosProgressEvent) => {
+      loading.value = true
       messageReciver.value = event.target.responseText
         .replace(/data:\s*/g, '')
         .trim()
     }
 
     const onMessageComplete = (res: string | undefined) => {
+      loading.value = false
       messageReciver.value = ''
       cancelSseConnect()
       updateThreadChatHistory('AI', (res || '').replace(/data:\s*/g, '').trim())
