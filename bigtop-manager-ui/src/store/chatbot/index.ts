@@ -15,7 +15,6 @@ import {
 import type {
   AuthorizedPlatform,
   SupportedPlatForm,
-  CredentialFormItem,
   ChatThread,
   ChatThreadCondition,
   Platform,
@@ -24,6 +23,8 @@ import type {
   Sender,
   ChatThreadDelCondition
 } from '@/api/chatbot/types'
+import type { Option } from '@/components/chatbot/select-menu.vue'
+
 import { sendChatMessage } from '@/api/sse'
 import { AxiosProgressEvent, Canceler } from 'axios'
 import { useI18n } from 'vue-i18n'
@@ -36,7 +37,6 @@ export default defineStore(
     const chatThreads = ref<ChatThread[]>([])
     const authorizedPlatforms = ref<AuthorizedPlatform[]>([])
     const supportedPlatForms = ref<SupportedPlatForm[]>([])
-    const credentialFormModel = ref<CredentialFormItem[]>([])
     const chatThreadHistory = ref<ChatThreadHistoryItem[]>([])
 
     const currPlatform = ref<AuthorizedPlatform>()
@@ -45,6 +45,11 @@ export default defineStore(
     const isExpand = ref(false)
     const canceler = ref<Canceler>()
     const messageReciver = ref('')
+    const currPage = ref<Option>({
+      action: 'SUPPORTED_PLATFORM_SELECT',
+      name: ''
+    })
+    const afterPages = ref<Option[]>([currPage.value])
 
     function setWindowExpandStatus(status: boolean) {
       isExpand.value = status
@@ -94,7 +99,12 @@ export default defineStore(
     async function fetchSupportedPlatforms() {
       try {
         const data = await getSupportedPlatforms()
-        supportedPlatForms.value = data
+        const authorizedPlatformNames = authorizedPlatforms.value.map(
+          (v) => v.platformName
+        )
+        supportedPlatForms.value = data.filter((val) => {
+          return !authorizedPlatformNames.includes(val.name)
+        })
       } catch (error) {
         console.log('error :>> ', error)
       }
@@ -108,7 +118,7 @@ export default defineStore(
         const data = await getCredentialFormModelofPlatform(
           currPlatform.value?.platformId
         )
-        credentialFormModel.value = data
+        return data
       } catch (error) {
         console.log('error :>> ', error)
       }
@@ -149,6 +159,7 @@ export default defineStore(
 
     async function fetchCreateChatThread(platfromInfo: ChatThreadCondition) {
       try {
+        chatThreadHistory.value = []
         const data = await createChatThread(platfromInfo)
         const threadInfo = {
           ...data,
@@ -231,6 +242,8 @@ export default defineStore(
     }
 
     return {
+      currPage,
+      afterPages,
       messageReciver,
       loading,
       isExpand,
@@ -240,7 +253,6 @@ export default defineStore(
       chatThreadHistory,
       authorizedPlatforms,
       supportedPlatForms,
-      credentialFormModel,
       updateCurrPlatform,
       updateCurrThread,
       updateThreadChatHistory,

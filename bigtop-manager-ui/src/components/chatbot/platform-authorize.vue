@@ -24,6 +24,7 @@
   import { useI18n } from 'vue-i18n'
   import type { SelectData, Option } from './select-menu.vue'
   import type { FormInstance } from 'ant-design-vue'
+  import { CredentialFormItem, SupportedPlatForm } from '@/api/chatbot/types'
 
   interface PlatformAuthorizeProps {
     currPage?: Option
@@ -34,14 +35,14 @@
   const chatbot = useChatbotStore()
   const formRef = ref<FormInstance>()
   const formState = ref<FormState>({})
+  const credentialFormModel = ref<CredentialFormItem[]>([])
   const props = defineProps<PlatformAuthorizeProps>()
   const emits = defineEmits(['update:currPage'])
   const { currPage } = toRefs(props)
-  const { loading, supportedPlatForms, credentialFormModel } =
-    storeToRefs(chatbot)
+  const { loading, supportedPlatForms } = storeToRefs(chatbot)
 
   const formattedOptions = computed<Option[]>(() =>
-    supportedPlatForms.value.map((v) => ({
+    supportedPlatForms.value.map((v: SupportedPlatForm) => ({
       ...v,
       action: 'PLATFORM_AUTH'
     }))
@@ -76,7 +77,8 @@
       platformName: name,
       supportModels
     })
-    await chatbot.fetchCredentialFormModelofPlatform()
+    credentialFormModel.value =
+      (await chatbot.fetchCredentialFormModelofPlatform()) as CredentialFormItem[]
     emits('update:currPage', { ...option, action: type })
   }
 

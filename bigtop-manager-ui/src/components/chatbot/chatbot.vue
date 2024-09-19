@@ -24,44 +24,33 @@
   import useChatbotStore from '@/store/chatbot/index'
   import { getSvgUrl } from '@/utils/tools'
   import { storeToRefs } from 'pinia'
-  import { ref, watch, computed, unref } from 'vue'
-  import type { Option } from './select-menu.vue'
+  import { ref, computed, unref, watchEffect } from 'vue'
 
   const chatbot = useChatbotStore()
   const visible = ref(false)
-  const currPage = ref<Option>({
-    action: 'SUPPORTED_PLATFORM_SELECT',
-    name: ''
-  })
-  const afterPages = ref<Option[]>([currPage.value])
-  const { currThread, isExpand } = storeToRefs(chatbot)
+  const { currThread, isExpand, currPage, afterPages } = storeToRefs(chatbot)
   const style = {
     width: '100%',
     boxSizing: 'border-box',
     padding: '24px'
   }
 
-  watch(
-    () => currPage.value,
-    (val) => {
-      const actions = afterPages.value.map((v) => v.action)
-      if (visible.value) {
-        if (!actions?.includes(val?.action)) {
-          afterPages.value?.push(val)
-        }
-        if (val?.action === 'PLATFORM_MANAGEMENT') {
-          chatbot.fetchSupportedPlatforms()
-        } else if (val?.action === 'SUPPORTED_PLATFORM_SELECT') {
-          chatbot.fetchAuthorizedPlatforms()
-        } else if (val?.action === 'ChAT_THREAD_MANAGEMENT') {
-          chatbot.fetchChatThreads()
-        }
+  watchEffect(() => {
+    const actions = afterPages.value.map((v) => v?.action)
+    const currAct = currPage.value?.action
+    if (visible.value) {
+      if (!actions?.includes(currAct)) {
+        afterPages.value?.push(currPage.value)
       }
-    },
-    {
-      immediate: true
+      if (currAct === 'PLATFORM_MANAGEMENT') {
+        chatbot.fetchSupportedPlatforms()
+      } else if (currAct === 'SUPPORTED_PLATFORM_SELECT') {
+        chatbot.fetchAuthorizedPlatforms()
+      } else if (currAct === 'ChAT_THREAD_MANAGEMENT') {
+        chatbot.fetchChatThreads()
+      }
     }
-  )
+  })
 
   const showBack = computed(
     () =>
@@ -102,13 +91,15 @@
       action: 'SUPPORTED_PLATFORM_SELECT',
       name: ''
     }
+    chatbot.chatThreadHistory = []
     afterPages.value = [currPage.value]
   }
 
   const onHistory = () => {
     afterPages.value = unref(afterPages).filter(
-      (page) => page.action == 'ChAT_THREAD_MANAGEMENT'
+      (page) => page?.action == 'ChAT_THREAD_MANAGEMENT'
     )
+    chatbot.chatThreadHistory = []
     currPage.value = afterPages.value[afterPages.value.length - 1]
   }
 

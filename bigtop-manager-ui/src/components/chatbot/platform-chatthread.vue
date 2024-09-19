@@ -20,7 +20,7 @@
   import SelectMenu from './select-menu.vue'
   import useChatbotStore from '@/store/chatbot/index'
   import { storeToRefs } from 'pinia'
-  import { toRefs, computed } from 'vue'
+  import { toRefs, computed, h } from 'vue'
   import type { SelectData, Option } from './select-menu.vue'
   import type {
     Platform,
@@ -28,6 +28,8 @@
     ChatThread
   } from '@/api/chatbot/types'
   import { useI18n } from 'vue-i18n'
+  import { Modal } from 'ant-design-vue/es/components'
+  import { ExclamationCircleFilled } from '@ant-design/icons-vue/lib/icons'
 
   interface PreChatPorps {
     currPage?: Option
@@ -50,10 +52,10 @@
   ])
 
   const formattedOptions = computed<Option[]>(() => {
-    return chatThreads.value.map((v, idx) => ({
+    return chatThreads.value.map((v) => ({
       ...v,
       id: v.threadId,
-      name: t('ai.thread_name', [idx]),
+      name: t('ai.thread_name', [v.threadId]),
       action: 'SELSECT_THREAD_TO_CHAT'
     }))
   })
@@ -76,13 +78,14 @@
     }
   ])
 
-  const onSelect = (type: string, option: Option) => {
+  const onSelect = async (type: string, option: Option) => {
     if (type == 'ChAT_THREAD_MANAGEMENT') {
       const newPlatFrom = {
         ...currPlatform.value,
         currModel: option.name
       } as Platform
       chatbot.updateCurrPlatform(newPlatFrom)
+      emits('update:currPage', { ...currPage.value, action: type })
     }
 
     if (type == 'PLATFORM_CHAT') {
@@ -94,22 +97,30 @@
           createTime,
           updateTime
         } as ChatThread)
+        emits('update:currPage', { ...currPage.value, action: type })
       }
       if (option.action === 'CREATE_THREAD_TO_CHAT') {
         const platformInfo = {
           platformId: currPlatform.value?.platformId,
           model: currPlatform.value?.currModel
         } as ChatThreadCondition
-        chatbot.fetchCreateChatThread(platformInfo)
+        await chatbot.fetchCreateChatThread(platformInfo)
+        emits('update:currPage', { ...currPage.value, action: type })
       }
     }
-
-    emits('update:currPage', { ...currPage.value, action: type })
   }
 
   const onRemove = (option: Option) => {
-    const { threadId, platformId } = option
-    chatbot.fetchDelChatThread({ threadId, platformId })
+    Modal.confirm({
+      title: t('common.delete_confirm_title'),
+      icon: h(ExclamationCircleFilled),
+      content: t('common.delete_confirm_content', [option.name]),
+      async onOk() {
+        const { threadId, platformId } = option
+        await chatbot.fetchDelChatThread({ threadId, platformId })
+        chatbot.fetchChatThreads()
+      }
+    })
   }
 </script>
 
@@ -123,7 +134,11 @@
     </template>
     <template v-if="currPage?.action === 'ChAT_THREAD_MANAGEMENT'">
       <select-menu
-        :select-data="ChAT_THREAD_MANAGEMENT"
+        :select-data="
+          chatThreads.length < 10
+            ? ChAT_THREAD_MANAGEMENT
+            : ChAT_THREAD_MANAGEMENT.splice(0, 1)
+        "
         @remove="onRemove"
         @select="onSelect('PLATFORM_CHAT', $event)"
       />

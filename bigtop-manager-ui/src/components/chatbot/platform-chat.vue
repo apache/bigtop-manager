@@ -45,19 +45,20 @@
   )
 
   watch(
-    [visible, isExpand],
+    [visible, isExpand, currPage],
     async (val) => {
       if (!val[0]) {
         return
       }
       if (currPage.value?.action == 'PLATFORM_CHAT') {
-        chatbot.fetchThreadChatHistory()
+        await chatbot.fetchThreadChatHistory()
+        await nextTick()
+        scrollToBottom(document.querySelector('.chat-container') as HTMLElement)
       }
-      await nextTick()
-      scrollToBottom(document.querySelector('.chat-container') as HTMLElement)
     },
     {
-      immediate: true
+      immediate: true,
+      deep: true
     }
   )
 
