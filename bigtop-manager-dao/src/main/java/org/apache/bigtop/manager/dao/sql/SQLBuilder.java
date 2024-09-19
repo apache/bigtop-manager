@@ -403,7 +403,12 @@ public class SQLBuilder {
                                     .append("' THEN NULL ");
                         }
                     }
-                    caseClause.append("ELSE \"").append(entry.getValue()).append("\" ");
+                    if (caseClause.toString().endsWith("CASE ")) {
+                        caseClause.append("WHEN TRUE THEN ");
+                    } else {
+                        caseClause.append("ELSE ");
+                    }
+                    caseClause.append(entry.getValue()).append(" ");
                     caseClause.append("END");
                     setClauses.put(entry.getValue(), caseClause);
                 }
