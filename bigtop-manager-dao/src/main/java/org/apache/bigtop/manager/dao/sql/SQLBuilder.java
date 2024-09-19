@@ -37,6 +37,7 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -298,6 +299,96 @@ public class SQLBuilder {
                     sql.SET("\"" + getEquals(entry.getValue() + "\"", entry.getKey()));
                 }
                 sql.WHERE(getEquals(tableMetaData.getPkColumn(), tableMetaData.getPkProperty()));
+                break;
+            }
+            default: {
+                log.error("Unsupported data source");
+            }
+        }
+
+        return sql.toString();
+    }
+
+    public static String escapeSingleQuote(String input) {
+        if (input != null) {
+            return input.replace("'", "''");
+        }
+        return null;
+    }
+
+    public static <Entity> String partialUpdateList(
+            TableMetaData tableMetaData, List<Entity> entities, String databaseId) {
+        if (entities == null || entities.isEmpty()) {
+            throw new IllegalArgumentException("Entities list must not be null or empty");
+        }
+
+        Class<?> entityClass = entities.get(0).getClass();
+        Map<String, String> fieldColumnMap = tableMetaData.getFieldColumnMap();
+
+        SQL sql = new SQL();
+        switch (DBType.toType(databaseId)) {
+            case MYSQL: {
+                StringBuilder sqlBuilder = new StringBuilder();
+                sqlBuilder
+                        .append("UPDATE ")
+                        .append(tableMetaData.getTableName())
+                        .append(" SET ");
+                Map<String, StringBuilder> setClauses = new LinkedHashMap<>();
+                String primaryKey = "id";
+                for (Map.Entry<String, String> entry : fieldColumnMap.entrySet()) {
+                    log.info("entry: {}", entry);
+                    log.info("primaryKey: {}", tableMetaData.getPkProperty());
+                    // Ignore primary key
+                    if (Objects.equals(entry.getKey(), tableMetaData.getPkProperty())) {
+                        primaryKey = entry.getValue();
+                        continue;
+                    }
+
+                    StringBuilder caseClause = new StringBuilder();
+                    caseClause.append(entry.getValue()).append(" = CASE ");
+                    log.info(caseClause.toString());
+                    for (Entity entity : entities) {
+                        PropertyDescriptor ps = BeanUtils.getPropertyDescriptor(entityClass, entry.getKey());
+                        if (ps == null || ps.getReadMethod() == null) {
+                            continue;
+                        }
+
+                        Object value = ReflectionUtils.invokeMethod(ps.getReadMethod(), entity);
+                        if (!ObjectUtils.isEmpty(value)) {
+                            PropertyDescriptor pkPs =
+                                    BeanUtils.getPropertyDescriptor(entityClass, tableMetaData.getPkProperty());
+                            Object pkValue = ReflectionUtils.invokeMethod(pkPs.getReadMethod(), entity);
+
+                            caseClause
+                                    .append("WHEN ")
+                                    .append(primaryKey)
+                                    .append(" = '")
+                                    .append(pkValue.toString())
+                                    .append("' THEN '")
+                                    .append(escapeSingleQuote(value.toString()))
+                                    .append("' ");
+                        }
+                    }
+
+                    caseClause.append("END");
+                    setClauses.put(entry.getValue(), caseClause);
+                }
+                sqlBuilder.append(String.join(", ", setClauses.values()));
+
+                sqlBuilder.append(" WHERE ").append(primaryKey).append(" IN (");
+                String pkValues = entities.stream()
+                        .map(entity -> {
+                            PropertyDescriptor pkPs =
+                                    BeanUtils.getPropertyDescriptor(entityClass, tableMetaData.getPkProperty());
+                            Object pkValue = ReflectionUtils.invokeMethod(pkPs.getReadMethod(), entity);
+                            return "'" + pkValue.toString() + "'";
+                        })
+                        .collect(Collectors.joining(", "));
+
+                sqlBuilder.append(pkValues).append(")");
+                return sqlBuilder.toString();
+            }
+            case POSTGRESQL: {
                 break;
             }
             default: {

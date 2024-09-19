@@ -71,6 +71,19 @@ public class BaseSqlProvider {
         return SQLBuilder.partialUpdate(tableMetaData, entity, databaseId);
     }
 
+    public <Entity> String partialUpdateByIds(List<Entity> entities, ProviderContext context) {
+        Assert.notNull(entities, "entities must not be null");
+        Assert.notEmpty(entities, "entities list must not be empty");
+
+        String databaseId = context.getDatabaseId();
+
+        Class<?> entityClass = entities.get(0).getClass();
+
+        TableMetaData tableMetaData = TableMetaData.forClass(entityClass);
+
+        return SQLBuilder.partialUpdateList(tableMetaData, entities, databaseId);
+    }
+
     public <Entity> String updateById(Entity entity, ProviderContext context) {
         Assert.notNull(entity, "entity must not null");
 

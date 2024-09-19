@@ -30,7 +30,5 @@ public interface RepoDao extends BaseDao<RepoPO> {
 
     Optional<RepoPO> findByRepoName(@Param("repoName") String clusterName);
 
-    int saveAll(@Param("clusters") List<RepoPO> repos);
-
     List<RepoPO> findAllByClusterId(@Param("clusterId") Long clusterId);
 }

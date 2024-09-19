@@ -40,14 +40,6 @@
         limit 1
     </select>
 
-    <insert id="saveAll" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        insert into repo (base_url, os, arch, repo_id, repo_name, repo_type, cluster_id, create_by, update_by, create_time, update_time)
-        values
-        <foreach collection='clusters' item='cluster' separator=','>
-            (#{cluster.baseUrl},#{cluster.os},#{cluster.arch},#{cluster.repoId},#{cluster.repoName},#{cluster.repoType},#{cluster.clusterId},#{cluster.createBy},#{cluster.updateBy},#{cluster.createTime},#{cluster.updateTime})
-        </foreach>
-    </insert>
-
     <select id="findAllByClusterId" parameterType="java.lang.Long"
             resultType="org.apache.bigtop.manager.dao.po.RepoPO">
         select
