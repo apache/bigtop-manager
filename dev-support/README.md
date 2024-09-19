@@ -30,38 +30,31 @@ yum install -y git docker
 ```
 ### **Step 2**: Download Bigtop Manager source
 ```shell
-git clone https://github.com/kevinw66/bigtop-manager.git
+git clone https://github.com/apache/bigtop-manager.git
 ```
 > You need to change the `node.version` in the `pom.xml` file under the `bigtop-manager-ui` module to `16.x` if you are using CentOS-7.
 
-### **Step 3**: Enter workspace
-**RHEL (Rocky 8) :**
-```shell
-cd bigtop-manager/dev-support/docker/rocky8/
-```
-### **Step 4**: Build develop basic image
+### **Step 3**: Build develop basic image
 Run the setup command, you will get `bigtop-manager/develop:trunk-rocky-8` image. It has the enviroment needed to compile Bigtop-Manager and run servers such as Bigtop-Manager Server, Bigtop-Manager Agent, Mysql, etc.
 
 **RHEL (Rocky 8) :**
 ```shell
-./build-image.sh
+/bin/bash dev-support/docker/image/build.sh trunk-rocky-8
 ```
-### **Step 5**: Build source & create cluster
+### **Step 4**: Build source & create cluster
 * Bigtop Manager UI、Bigtop Manager Server Debug Port、MariaDB Server are also exposed to local ports: 8080、5005、3306.
 * Docker hostnames are: bigtop-manager-server、bigtop-manager-agent-01、bigtop-manager-agent-02.
 
 **RHEL (Rocky 8) :**
 ```shell
-./build-containers.sh
+/bin/bash dev-support/docker/containers/build-containers.sh -e postgres -c 3 -o trunk-rocky-8 [--skip-build]
 ```
-### **Step 6**: Insert data to Database
-Copy SQL on `dev-support/example/bigtop_manager/user.sql` and run on mysql database `bigtop_manager` which is installed in container bigtop-manager-server.
-### **Step 7**: Access Web UI
+### **Step 5**: Access Web UI
 Now you can access Web UI which exposes on `http://localhost:8080`. Log in with username `admin` and password `admin`.
-### **Step 8**: Clear cluster
+### **Step 6**: Clear cluster
 Clean up the containers when you are done developing or testing.
 
 **RHEL (Rocky 8) :**
 ```shell
-./clear-containers.sh
+/bin/bash dev-support/docker/containers/build-containers.sh -d
 ```
