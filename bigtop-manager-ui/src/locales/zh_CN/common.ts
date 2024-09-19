@@ -58,5 +58,11 @@ export default {
   notification: '通知',
   copy: '复制',
   copy_success: '复制成功',
-  copy_fail: '复制失败'
+  copy_fail: '复制失败',
+  delete_success: '删除成功',
+  delete_fail: '删除失败',
+  delete_confirm_title: '删除确认',
+  delete_confirm_content: '删除后无法恢复，确定要删除 {0} 吗？',
+  no_options: '暂无选项',
+  loadingText_verifying: '校验中'
 }

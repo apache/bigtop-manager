@@ -58,5 +58,12 @@ export default {
   notification: 'Notification',
   copy: 'Copy',
   copy_success: 'Copy success!',
-  copy_fail: 'Copy failed!'
+  copy_fail: 'Copy failed!',
+  delete_success: 'Delete success!',
+  delete_fail: 'Delete failed!',
+  delete_confirm_title: 'Delete Confirm',
+  delete_confirm_content:
+    'Delete will not be recoverable, are you sure you want to delete {0} ?',
+  no_options: 'No options',
+  loadingText_verifying: 'Verifying'
 }

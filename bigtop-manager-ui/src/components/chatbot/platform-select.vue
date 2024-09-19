@@ -11,16 +11,20 @@
 <script setup lang="ts">
   import { storeToRefs } from 'pinia'
   import SelectMenu from './select-menu.vue'
-  import { computed } from 'vue'
+  import { computed, h } from 'vue'
   import useChatbot from './chatbot'
   import type { AuthorizedPlatform } from '@/api/chatbot/types'
   import type { SelectData, Option } from './select-menu.vue'
+  import { useI18n } from 'vue-i18n'
+  import { Modal } from 'ant-design-vue/es/components'
+  import { ExclamationCircleFilled } from '@ant-design/icons-vue/lib/icons'
 
   interface PlatformSelectProps {
     currPage?: Option
   }
 
   defineProps<PlatformSelectProps>()
+  const { t } = useI18n()
   const chatbot = useChatbot()
   const { authorizedPlatforms } = storeToRefs(chatbot)
   const emits = defineEmits(['update:currPage'])
@@ -38,18 +42,18 @@
 
   const platformSelects = computed<SelectData[]>(() => [
     {
-      subTitle: '请选择下列已授权的平台',
-      emptyOptionsText: '暂无授权平台',
+      subTitle: t('ai.select_authorized_platform'),
+      emptyOptionsText: t('ai.no_authorized_platform'),
       hasDel: true,
       options: formattedOptions.value
     },
     {
-      subTitle: '或者你可以',
+      subTitle: t('ai.or_you_can'),
       hasDel: false,
       options: [
         {
           action: 'PLATFORM_MANAGEMENT',
-          name: '授权新平台'
+          name: t('ai.authorize_new_platform')
         }
       ]
     }
@@ -64,8 +68,15 @@
   }
 
   const onRemove = (option: Option) => {
-    const { id: platformId } = option
-    chatbot.fetchDelAuthorizedPlatform(platformId)
+    Modal.confirm({
+      title: t('common.delete_confirm_title'),
+      icon: h(ExclamationCircleFilled),
+      content: t('common.delete_confirm_content', [option.name]),
+      onOk() {
+        const { id: platformId } = option
+        chatbot.fetchDelAuthorizedPlatform(platformId)
+      }
+    })
   }
 </script>
 

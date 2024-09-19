@@ -1,11 +1,9 @@
 <template>
   <a-float-button type="default" @click="() => visibleWindow()">
     <template #icon>
-      <img
-        class="robot-icon"
-        :src="getSvgUrl('robot', 'chatbot')"
-        alt="ai chat"
-      />
+      <div class="chatbot-icon">
+        <img :src="getSvgUrl('robot', 'chatbot')" alt="ai chat" />
+      </div>
     </template>
   </a-float-button>
 
@@ -62,7 +60,6 @@
               :is="getCompName"
               v-bind="{ style }"
               v-model:currPage="currPage"
-              :is-expand="isExpand"
               :visible="visible"
             ></component>
           </keep-alive>
@@ -76,12 +73,12 @@
   import PlatformSelect from './platform-select.vue'
   import PlatformAuthorize from './platform-authorize.vue'
   import PlatformChat from './platform-chat.vue'
-  import PreChat from './pre-chat.vue'
+  import PlatformChatThread from './platform-chatthread.vue'
   import useChatbot from './chatbot'
   import { getSvgUrl } from '@/utils/tools'
   import { storeToRefs } from 'pinia'
   import type { Option } from './select-menu.vue'
-  import { ref, computed, watchEffect, unref } from 'vue'
+  import { ref, watch, computed, unref } from 'vue'
 
   const chatbot = useChatbot()
   const visible = ref(false)
@@ -97,30 +94,27 @@
     padding: '24px'
   }
 
-  watchEffect(async () => {
-    const actions = afterPages.value.map((v) => v.action)
-    if (visible.value) {
-      if (!actions?.includes(currPage.value?.action)) {
-        afterPages.value?.push(currPage.value)
+  watch(
+    () => currPage.value,
+    (val) => {
+      const actions = afterPages.value.map((v) => v.action)
+      if (visible.value) {
+        if (!actions?.includes(val?.action)) {
+          afterPages.value?.push(val)
+        }
+        if (val?.action === 'PLATFORM_MANAGEMENT') {
+          chatbot.fetchSupportedPlatforms()
+        } else if (val?.action === 'SUPPORTED_PLATFORM_SELECT') {
+          chatbot.fetchAuthorizedPlatforms()
+        } else if (val?.action === 'ChAT_THREAD_MANAGEMENT') {
+          chatbot.fetchChatThreads()
+        }
       }
-      if (currPage.value?.action === 'PLATFORM_MANAGEMENT') {
-        // todo 获取可支持的平台列表
-        await chatbot.fetchSupportedPlatforms()
-      }
-      if (currPage.value?.action === 'PLATFORM_AUTH') {
-        // todo 获取可支持的平台授权表单
-        await chatbot.fetchCredentialFormModelofPlatform()
-      }
-      if (currPage.value?.action === 'SUPPORTED_PLATFORM_SELECT') {
-        //todo 获取已授权的平台列表
-        await chatbot.fetchAuthorizedPlatforms()
-      }
-      if (currPage.value?.action === 'ChAT_THREAD_MANAGEMENT') {
-        //todo 获取已创建的聊天线程
-        await chatbot.fetchChatThreads()
-      }
+    },
+    {
+      immediate: true
     }
-  })
+  )
 
   const showBack = computed(
     () =>
@@ -135,13 +129,11 @@
       case 'SUPPORTED_PLATFORM_SELECT':
         return PlatformSelect
       case 'PLATFORM_MANAGEMENT':
-        return PlatformAuthorize
       case 'PLATFORM_AUTH':
         return PlatformAuthorize
       case 'PLATFORM_MODEL':
-        return PreChat
       case 'ChAT_THREAD_MANAGEMENT':
-        return PreChat
+        return PlatformChatThread
       case 'PLATFORM_CHAT':
         return PlatformChat
       default:
@@ -187,6 +179,9 @@
     position: fixed;
     bottom: 10%;
     right: 0;
+    &-icon {
+      @include flexbox($justify: center, $align: center);
+    }
   }
 
   .chatbot-expand {

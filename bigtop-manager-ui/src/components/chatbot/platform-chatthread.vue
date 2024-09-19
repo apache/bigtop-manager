@@ -27,11 +27,13 @@
     ChatThreadCondition,
     ChatThread
   } from '@/api/chatbot/types'
+  import { useI18n } from 'vue-i18n'
 
   interface PreChatPorps {
     currPage?: Option
   }
 
+  const { t } = useI18n()
   const chatbot = useChatbot()
   const props = defineProps<PreChatPorps>()
   const emits = defineEmits(['update:currPage'])
@@ -40,7 +42,7 @@
 
   const PLATFORM_MODEL = computed<SelectData[]>(() => [
     {
-      subTitle: '请选择您要使用的模型',
+      subTitle: t('ai.select_model'),
       options: currPlatform.value?.supportModels
         .split(',')
         .map((v) => ({ name: v, action: '' }))
@@ -51,24 +53,24 @@
     return chatThreads.value.map((v, idx) => ({
       ...v,
       id: v.threadId,
-      name: `线程${idx}`,
+      name: t('ai.thread_name', [idx]),
       action: 'SELSECT_THREAD_TO_CHAT'
     }))
   })
 
   const ChAT_THREAD_MANAGEMENT = computed<SelectData[]>(() => [
     {
-      subTitle: '请选择下面的线程进入聊天',
+      subTitle: t('ai.select_thread_to_chat'),
       hasDel: true,
       options: formattedOptions.value
     },
     {
-      subTitle: '或者你可以',
+      subTitle: t('ai.or_you_can'),
       hasDel: false,
       options: [
         {
           action: 'CREATE_THREAD_TO_CHAT',
-          name: '创建新线程'
+          name: t('ai.create_new_thread')
         }
       ]
     }

@@ -21,14 +21,18 @@ import type {
   Platform,
   ChatThreadHistoryItem,
   AuthCredential,
-  Sender
+  Sender,
+  ChatThreadDelCondition
 } from '@/api/chatbot/types'
 import { sendChatMessage } from '@/api/sse'
 import { AxiosProgressEvent, Canceler } from 'axios'
+import { useI18n } from 'vue-i18n'
+import { message } from 'ant-design-vue'
 
 export default defineStore(
   'chatbot',
   () => {
+    const { t } = useI18n()
     const chatThreads = ref<ChatThread[]>([])
     const authorizedPlatforms = ref<AuthorizedPlatform[]>([])
     const supportedPlatForms = ref<SupportedPlatForm[]>([])
@@ -132,9 +136,10 @@ export default defineStore(
         if (!currPlatform.value?.platformId) {
           return
         }
+        const { currModel, platformId } = currPlatform.value
         const data = await getChatThreads({
-          model: currPlatform.value.currModel as string,
-          platformId: currPlatform.value.platformId
+          model: currModel as string,
+          platformId
         })
         chatThreads.value = data
       } catch (error) {
@@ -147,7 +152,7 @@ export default defineStore(
         const data = await createChatThread(platfromInfo)
         const threadInfo = {
           ...data,
-          threadName: `线程${chatThreads.value.length}`
+          threadName: t('ai.thread_name', [chatThreads.value.length])
         }
         updateThreads(threadInfo)
         updateCurrThread(threadInfo)
@@ -183,38 +188,32 @@ export default defineStore(
       }
     }
 
-    async function fetchDelAuthorizedPlatform() {
+    async function fetchDelAuthorizedPlatform(platformId: string | number) {
       try {
-        const platformId = currPlatform.value?.platformId as string | number
-        const data = await delAuthorizedPlatform(platformId as string)
-        if (data) {
-          console.log('删除成功 :>> ')
-        } else {
-          console.log('删除失败 :>> ')
-        }
+        const data = await delAuthorizedPlatform(platformId)
+        message[`${data ? 'success' : 'error'}`](
+          data ? t('common.delete_success') : t('common.delete_fail')
+        )
+        data && fetchAuthorizedPlatforms()
       } catch (error) {
         console.log('error :>> ', error)
       }
     }
-    async function fetchDelChatThread() {
+    async function fetchDelChatThread(payload: ChatThreadDelCondition) {
       try {
-        const data = await delChatThread({
-          platformId: currPlatform.value?.platformId as string | number,
-          threadId: currThread.value?.threadId as string | number
-        })
-        if (data) {
-          console.log('删除成功 :>> ')
-        } else {
-          console.log('删除失败 :>> ')
-        }
+        const data = await delChatThread(payload)
+        message[`${data ? 'success' : 'error'}`](
+          data ? t('common.delete_success') : t('common.delete_fail')
+        )
       } catch (error) {
         console.log('error :>> ', error)
       }
     }
 
     const onMessageReceive = ({ event }: AxiosProgressEvent) => {
-      const str = event.target.responseText.replace(/data:\s*/g, '').trim()
-      messageReciver.value = str
+      messageReciver.value = event.target.responseText
+        .replace(/data:\s*/g, '')
+        .trim()
     }
 
     const onMessageComplete = (res: string | undefined) => {

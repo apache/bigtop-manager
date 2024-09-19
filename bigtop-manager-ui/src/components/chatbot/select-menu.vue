@@ -7,7 +7,7 @@
           <div v-if="!item.options || item.options.length == 0">
             <slot name="empty-text">
               <div class="select-item-empty">
-                {{ item.emptyOptionsText || '暂无选项' }}
+                {{ item.emptyOptionsText || $t('common.no_options') }}
               </div>
             </slot>
           </div>

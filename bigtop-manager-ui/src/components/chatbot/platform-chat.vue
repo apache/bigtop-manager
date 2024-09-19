@@ -45,20 +45,22 @@
   import { message } from 'ant-design-vue/es/components'
   import { ref, watch, computed, watchEffect, toRefs, nextTick } from 'vue'
   import ChatMsgItem from './chat-msg-item.vue'
+  import { useI18n } from 'vue-i18n'
 
   interface PlatfromChatPorps {
     currPage?: Option
     visible: boolean
-    isExpand: boolean
   }
 
+  const { t } = useI18n()
   const chatbot = useChatbot()
   const inputText = ref('')
   const isMessageFullyReceived = ref(true)
   const msgInputRef = ref<HTMLInputElement | null>(null)
   const props = defineProps<PlatfromChatPorps>()
-  const { visible, isExpand } = toRefs(props)
-  const { currPlatform, chatThreadHistory } = storeToRefs(chatbot)
+  const { visible } = toRefs(props)
+  const { currPlatform, chatThreadHistory, isExpand } = storeToRefs(chatbot)
+
   const sendable = computed(
     () => inputText.value != '' && isMessageFullyReceived.value
   )
@@ -100,7 +102,7 @@
   const sendMessage = () => {
     isMessageFullyReceived.value = false
     if (inputText.value === '') {
-      message.warning('请输入内容')
+      message.warning(t('ai.empty_message'))
       return
     }
     chatbot.updateThreadChatHistory('USER', inputText.value as string)

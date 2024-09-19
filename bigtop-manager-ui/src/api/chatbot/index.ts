@@ -90,7 +90,9 @@ export const getThreadChatHistory = (
   })
 }
 
-export const delAuthorizedPlatform = (platformId: string): Promise<boolean> => {
+export const delAuthorizedPlatform = (
+  platformId: string | number
+): Promise<boolean> => {
   return request({
     method: 'delete',
     url: `/chatbot/platforms/${platformId}`

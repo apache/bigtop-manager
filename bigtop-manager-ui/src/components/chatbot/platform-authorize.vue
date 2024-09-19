@@ -34,7 +34,7 @@
     </template>
     <footer v-if="currPage?.action == 'PLATFORM_AUTH'">
       <a-button :loading="loading" type="primary" @click="onCheck">{{
-        loading ? '校验中' : '确认'
+        loading ? $t('common.loadingText_verifying') : $t('common.confirm')
       }}</a-button>
     </footer>
   </div>
@@ -47,12 +47,14 @@
   import { computed, ref, toRefs, watchEffect, toRaw } from 'vue'
   import type { SelectData, Option } from './select-menu.vue'
   import type { FormInstance } from 'ant-design-vue'
+  import { useI18n } from 'vue-i18n'
 
   interface PlatformAuthorizeProps {
     currPage?: Option
   }
   type FormState = { [key: string]: string }
 
+  const { t } = useI18n()
   const chatbot = useChatbot()
   const formRef = ref<FormInstance>()
   const formState = ref<FormState>({})
@@ -73,7 +75,7 @@
   const PLATFORM_MANAGEMENT = computed<SelectData[]>(() => {
     return [
       {
-        subTitle: '请选择下列要授权的平台',
+        subTitle: t('ai.select_platform_to_authorize'),
         options: formattedOptions.value
       }
     ]
@@ -81,7 +83,7 @@
 
   const PLATFORM_AUTH = computed<SelectData[]>(() => [
     {
-      subTitle: `您正在授权 ${currPage.value?.name} 平台, 请填写下列信息`,
+      subTitle: t('ai.authorizing_platform', [currPage.value?.name]),
       options: []
     }
   ])
@@ -93,8 +95,9 @@
     }, {} as FormState)
   })
 
-  const onSelect = (type: string, option: Option) => {
+  const onSelect = async (type: string, option: Option) => {
     const { id, name, supportModels } = option
+    await chatbot.fetchCredentialFormModelofPlatform()
     chatbot.updateCurrPlatform({
       platformId: id,
       platformName: name,
