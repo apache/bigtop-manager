@@ -1,74 +1,21 @@
-<template>
-  <a-float-button type="default" @click="() => visibleWindow()">
-    <template #icon>
-      <div class="chatbot-icon">
-        <img :src="getSvgUrl('robot', 'chatbot')" alt="ai chat" />
-      </div>
-    </template>
-  </a-float-button>
-
-  <teleport to="body">
-    <div :class="[isExpand ? 'chatbot-expand' : 'chatbot']">
-      <a-spin :spinning="false">
-        <a-card
-          v-show="visible"
-          class="base-model"
-          :class="[isExpand ? 'chat-model-expand' : 'chat-model']"
-        >
-          <template #title>
-            <header>
-              <div class="header-left">
-                <img
-                  v-if="showBack"
-                  :src="getSvgUrl('left', 'chatbot')"
-                  alt="back"
-                  @click="onBack"
-                />
-                <img
-                  v-if="showChatPageOption && !isExpand"
-                  :src="getSvgUrl('home', 'chatbot')"
-                  alt="home"
-                  @click="onHome"
-                />
-              </div>
-              <div v-if="showChatPageOption" class="header-middle">
-                {{ currThread?.threadName }}
-              </div>
-              <div class="header-right">
-                <template v-if="showChatPageOption">
-                  <img
-                    :src="getSvgUrl('history', 'chatbot')"
-                    alt="history"
-                    @click="onHistory"
-                  />
-                  <img
-                    :src="getSvgUrl('full-screen', 'chatbot')"
-                    alt="full-screen"
-                    @click="onFullScreen"
-                  />
-                </template>
-                <img
-                  :src="getSvgUrl('close', 'chatbot')"
-                  alt="close"
-                  @click="visibleWindow(true)"
-                />
-              </div>
-            </header>
-          </template>
-          <keep-alive>
-            <component
-              :is="getCompName"
-              v-bind="{ style }"
-              v-model:currPage="currPage"
-              :visible="visible"
-            ></component>
-          </keep-alive>
-        </a-card>
-      </a-spin>
-    </div>
-  </teleport>
-</template>
-
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one
+  ~ or more contributor license agreements.  See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership.  The ASF licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+-->
 <script setup lang="ts">
   import PlatformSelect from './platform-select.vue'
   import PlatformAuthorize from './platform-authorize.vue'
@@ -169,6 +116,77 @@
     chatbot.setWindowExpandStatus(!isExpand.value)
   }
 </script>
+
+<template>
+  <a-float-button type="default" @click="() => visibleWindow()">
+    <template #icon>
+      <div class="chatbot-icon">
+        <img :src="getSvgUrl('robot', 'chatbot')" alt="ai chat" />
+      </div>
+    </template>
+  </a-float-button>
+
+  <teleport to="body">
+    <div :class="[isExpand ? 'chatbot-expand' : 'chatbot']">
+      <a-spin :spinning="false">
+        <a-card
+          v-show="visible"
+          class="base-model"
+          :class="[isExpand ? 'chat-model-expand' : 'chat-model']"
+        >
+          <template #title>
+            <header>
+              <div class="header-left">
+                <img
+                  v-if="showBack"
+                  :src="getSvgUrl('left', 'chatbot')"
+                  alt="back"
+                  @click="onBack"
+                />
+                <img
+                  v-if="showChatPageOption && !isExpand"
+                  :src="getSvgUrl('home', 'chatbot')"
+                  alt="home"
+                  @click="onHome"
+                />
+              </div>
+              <div v-if="showChatPageOption" class="header-middle">
+                {{ currThread?.threadName }}
+              </div>
+              <div class="header-right">
+                <template v-if="showChatPageOption">
+                  <img
+                    :src="getSvgUrl('history', 'chatbot')"
+                    alt="history"
+                    @click="onHistory"
+                  />
+                  <img
+                    :src="getSvgUrl('full-screen', 'chatbot')"
+                    alt="full-screen"
+                    @click="onFullScreen"
+                  />
+                </template>
+                <img
+                  :src="getSvgUrl('close', 'chatbot')"
+                  alt="close"
+                  @click="visibleWindow(true)"
+                />
+              </div>
+            </header>
+          </template>
+          <keep-alive>
+            <component
+              :is="getCompName"
+              v-bind="{ style }"
+              v-model:currPage="currPage"
+              :visible="visible"
+            ></component>
+          </keep-alive>
+        </a-card>
+      </a-spin>
+    </div>
+  </teleport>
+</template>
 
 <style lang="scss" scoped>
   img {

@@ -1,3 +1,101 @@
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one
+  ~ or more contributor license agreements.  See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership.  The ASF licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+-->
+<script setup lang="ts">
+  import useChatbot from './chatbot'
+  import { storeToRefs } from 'pinia'
+  import { getSvgUrl, scrollToBottom } from '@/utils/tools'
+  import type { Option } from './select-menu.vue'
+  import { message } from 'ant-design-vue/es/components'
+  import { ref, watch, nextTick, computed, toRefs } from 'vue'
+  import ChatMsgItem from './chat-msg-item.vue'
+  import { useI18n } from 'vue-i18n'
+
+  interface PlatfromChatPorps {
+    currPage?: Option
+    visible: boolean
+  }
+
+  const { t } = useI18n()
+  const chatbot = useChatbot()
+  const inputText = ref('')
+  const isMessageFullyReceived = ref(true)
+  const msgInputRef = ref<HTMLInputElement | null>(null)
+  const props = defineProps<PlatfromChatPorps>()
+  const { visible, currPage } = toRefs(props)
+  const { currPlatform, chatThreadHistory, isExpand } = storeToRefs(chatbot)
+
+  const sendable = computed(
+    () => inputText.value != '' && isMessageFullyReceived.value
+  )
+
+  watch(
+    [visible, isExpand],
+    async (val) => {
+      if (!val[0]) {
+        return
+      }
+      if (currPage.value?.action == 'PLATFORM_CHAT') {
+        chatbot.fetchThreadChatHistory()
+      }
+      await nextTick()
+      scrollToBottom(document.querySelector('.chat-container') as HTMLElement)
+    },
+    {
+      immediate: true
+    }
+  )
+
+  const onInput = (e: Event) => {
+    inputText.value = (e.target as Element)?.textContent || ''
+  }
+
+  const reciveMessage = async () => {
+    try {
+      const res = await chatbot.fetchSendChatMessage(inputText.value)
+      isMessageFullyReceived.value = res as boolean
+      inputText.value = ''
+      scrollToBottom(document.querySelector('.chat-container') as HTMLElement)
+    } catch (error) {
+      console.log('recived message:>> ', error)
+    } finally {
+      isMessageFullyReceived.value = true
+      scrollToBottom(document.querySelector('.chat-container') as HTMLElement)
+    }
+  }
+
+  const clearUpInputContent = () => {
+    msgInputRef.value!.innerHTML = ''
+  }
+
+  const sendMessage = () => {
+    isMessageFullyReceived.value = false
+    if (inputText.value === '') {
+      message.warning(t('ai.empty_message'))
+      return
+    }
+    chatbot.updateThreadChatHistory('USER', inputText.value as string)
+    scrollToBottom(document.querySelector('.chat-container') as HTMLElement)
+    clearUpInputContent()
+    reciveMessage()
+  }
+</script>
+
 <template>
   <div class="platfrom-chat">
     <section class="chat-container">
@@ -36,81 +134,6 @@
     </footer>
   </div>
 </template>
-
-<script setup lang="ts">
-  import useChatbot from './chatbot'
-  import { storeToRefs } from 'pinia'
-  import { getSvgUrl, scrollToBottom } from '@/utils/tools'
-  import type { Option } from './select-menu.vue'
-  import { message } from 'ant-design-vue/es/components'
-  import { ref, watch, computed, watchEffect, toRefs, nextTick } from 'vue'
-  import ChatMsgItem from './chat-msg-item.vue'
-  import { useI18n } from 'vue-i18n'
-
-  interface PlatfromChatPorps {
-    currPage?: Option
-    visible: boolean
-  }
-
-  const { t } = useI18n()
-  const chatbot = useChatbot()
-  const inputText = ref('')
-  const isMessageFullyReceived = ref(true)
-  const msgInputRef = ref<HTMLInputElement | null>(null)
-  const props = defineProps<PlatfromChatPorps>()
-  const { visible } = toRefs(props)
-  const { currPlatform, chatThreadHistory, isExpand } = storeToRefs(chatbot)
-
-  const sendable = computed(
-    () => inputText.value != '' && isMessageFullyReceived.value
-  )
-
-  watchEffect(async () => {
-    if (props.currPage?.action == 'PLATFORM_CHAT' && visible.value) {
-      chatbot.fetchThreadChatHistory()
-      await nextTick()
-      scrollToBottom(document.querySelector('.chat-container') as HTMLElement)
-    }
-  })
-
-  watch(isExpand, () => {
-    scrollToBottom(document.querySelector('.chat-container') as HTMLElement)
-  })
-
-  const onInput = (e: Event) => {
-    inputText.value = (e.target as Element)?.textContent || ''
-  }
-
-  const reciveMessage = async () => {
-    try {
-      const res = await chatbot.fetchSendChatMessage(inputText.value)
-      isMessageFullyReceived.value = res as boolean
-      inputText.value = ''
-      scrollToBottom(document.querySelector('.chat-container') as HTMLElement)
-    } catch (error) {
-      console.log('recived message:>> ', error)
-    } finally {
-      isMessageFullyReceived.value = true
-      scrollToBottom(document.querySelector('.chat-container') as HTMLElement)
-    }
-  }
-
-  const clearUpInputContent = () => {
-    msgInputRef.value!.innerHTML = ''
-  }
-
-  const sendMessage = () => {
-    isMessageFullyReceived.value = false
-    if (inputText.value === '') {
-      message.warning(t('ai.empty_message'))
-      return
-    }
-    chatbot.updateThreadChatHistory('USER', inputText.value as string)
-    scrollToBottom(document.querySelector('.chat-container') as HTMLElement)
-    clearUpInputContent()
-    reciveMessage()
-  }
-</script>
 
 <style lang="scss" scoped>
   .platfrom-chat {
