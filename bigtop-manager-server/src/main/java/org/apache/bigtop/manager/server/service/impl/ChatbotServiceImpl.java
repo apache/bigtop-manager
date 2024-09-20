@@ -217,6 +217,11 @@ public class ChatbotServiceImpl implements ChatbotService {
                 List<ChatThreadPO> chatThreadPOS = chatThreadDao.findAllByPlatformId(authorizedPlatformPO.getId());
                 chatThreadPOS.forEach(chatThread -> chatThread.setIsDeleted(true));
                 chatThreadDao.partialUpdateByIds(chatThreadPOS);
+                for (ChatThreadPO chatThreadPO : chatThreadPOS) {
+                    List<ChatMessagePO> chatMessagePOS = chatMessageDao.findAllByThreadId(chatThreadPO.getId());
+                    chatMessagePOS.forEach(chatMessage -> chatMessage.setIsDeleted(true));
+                    chatMessageDao.partialUpdateByIds(chatMessagePOS);
+                }
                 return true;
             }
         }

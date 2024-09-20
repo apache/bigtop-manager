@@ -32,6 +32,7 @@ import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class PersistentChatMemoryStore implements ChatMemoryStore {
@@ -80,7 +81,10 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
         if (chatMessages.isEmpty()) {
             return new ArrayList<>();
         } else {
-            return chatMessages.stream().map(this::convertToChatMessage).collect(Collectors.toList());
+            return chatMessages.stream()
+                    .map(this::convertToChatMessage)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
         }
     }
 

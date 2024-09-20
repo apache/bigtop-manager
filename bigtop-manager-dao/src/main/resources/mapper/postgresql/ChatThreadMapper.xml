@@ -48,18 +48,13 @@
 
     <insert id="saveWithThreadInfo" parameterType="org.apache.bigtop.manager.dao.po.ChatThreadPO" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO llm_chat_thread (platform_id, user_id, model, thread_info)
-        VALUES (#{platformId}, #{userId}, #{model}, #{threadInfo, typeHandler=org.apache.bigtop.manager.dao.handler.JsonTypeHandler})
-            ON DUPLICATE KEY UPDATE
-            platform_id = VALUES(platform_id),
-            user_id = VALUES(user_id),
-            model = VALUES(model),
-            thread_info = VALUES(thread_info)
+        VALUES (#{platformId}, #{userId}, #{model}, #{threadInfo, typeHandler=org.apache.bigtop.manager.dao.handler.JsonTypeHandler}::json)
     </insert>
 
     <select id="findAllByPlatformId" resultType="org.apache.bigtop.manager.dao.po.ChatThreadPO">
         SELECT *
         FROM llm_chat_thread
-        WHERE platform_id = #{platformId} AND is_deleted = 0
+        WHERE platform_id = #{platformId} AND is_deleted = false
     </select>
 
 </mapper>
