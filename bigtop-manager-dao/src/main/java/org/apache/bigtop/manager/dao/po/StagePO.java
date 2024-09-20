@@ -37,10 +37,10 @@ public class StagePO extends BasePO implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "state")
+    @Column(name = "state", nullable = false)
     private String state;
 
     @Column(name = "order")
@@ -55,7 +55,7 @@ public class StagePO extends BasePO implements Serializable {
     @Column(name = "context")
     private String context;
 
-    @Column(name = "job_id")
+    @Column(name = "job_id", nullable = false)
     private Long jobId;
 
     @Column(name = "cluster_id")

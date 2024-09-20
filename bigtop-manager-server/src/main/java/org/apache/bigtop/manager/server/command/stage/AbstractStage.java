@@ -76,7 +76,7 @@ public abstract class AbstractStage implements Stage {
     @Override
     public void beforeRun() {
         stagePO.setState(JobState.PROCESSING.getName());
-        stageDao.updateById(stagePO);
+        stageDao.partialUpdateById(stagePO);
     }
 
     @Override
@@ -121,14 +121,14 @@ public abstract class AbstractStage implements Stage {
     public void onSuccess() {
         StagePO stagePO = getStagePO();
         stagePO.setState(JobState.SUCCESSFUL.getName());
-        stageDao.updateById(stagePO);
+        stageDao.partialUpdateById(stagePO);
     }
 
     @Override
     public void onFailure() {
         StagePO stagePO = getStagePO();
         stagePO.setState(JobState.FAILED.getName());
-        stageDao.updateById(stagePO);
+        stageDao.partialUpdateById(stagePO);
     }
 
     @Override

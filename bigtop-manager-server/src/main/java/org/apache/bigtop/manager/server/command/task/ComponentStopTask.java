@@ -43,7 +43,7 @@ public class ComponentStopTask extends AbstractComponentTask {
         HostComponentPO hostComponentPO =
                 hostComponentDao.findByClusterIdAndComponentNameAndHostname(clusterId, componentName, hostname);
         hostComponentPO.setState(MaintainState.STOPPED.getName());
-        hostComponentDao.updateById(hostComponentPO);
+        hostComponentDao.partialUpdateById(hostComponentPO);
     }
 
     @Override

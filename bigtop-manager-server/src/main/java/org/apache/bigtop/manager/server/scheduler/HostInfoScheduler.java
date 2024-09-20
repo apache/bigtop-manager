@@ -75,6 +75,6 @@ public class HostInfoScheduler {
             hostPO.setState(MaintainState.STOPPED.getName());
         }
 
-        hostDao.updateById(hostPO);
+        hostDao.partialUpdateById(hostPO);
     }
 }

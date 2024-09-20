@@ -31,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.Collection;
+import java.util.List;
 
 @Slf4j
 public class BaseSqlProvider {
@@ -46,6 +47,43 @@ public class BaseSqlProvider {
         return SQLBuilder.insert(tableMetaData, entity, databaseId);
     }
 
+    public <Entity> String insertList(List<Entity> entities, ProviderContext context) {
+        Assert.notNull(entities, "entities must not be null");
+        Assert.notEmpty(entities, "entities list must not be empty");
+
+        String databaseId = context.getDatabaseId();
+
+        Class<?> entityClass = entities.get(0).getClass();
+
+        TableMetaData tableMetaData = TableMetaData.forClass(entityClass);
+
+        return SQLBuilder.insertList(tableMetaData, entities, databaseId);
+    }
+
+    public <Entity> String partialUpdateById(Entity entity, ProviderContext context) {
+        Assert.notNull(entity, "entity must not null");
+
+        String databaseId = context.getDatabaseId();
+
+        Class<?> entityClass = entity.getClass();
+        TableMetaData tableMetaData = TableMetaData.forClass(entityClass);
+
+        return SQLBuilder.update(tableMetaData, entity, databaseId, true);
+    }
+
+    public <Entity> String partialUpdateByIds(List<Entity> entities, ProviderContext context) {
+        Assert.notNull(entities, "entities must not be null");
+        Assert.notEmpty(entities, "entities list must not be empty");
+
+        String databaseId = context.getDatabaseId();
+
+        Class<?> entityClass = entities.get(0).getClass();
+
+        TableMetaData tableMetaData = TableMetaData.forClass(entityClass);
+
+        return SQLBuilder.updateList(tableMetaData, entities, databaseId, true);
+    }
+
     public <Entity> String updateById(Entity entity, ProviderContext context) {
         Assert.notNull(entity, "entity must not null");
 
@@ -54,7 +92,20 @@ public class BaseSqlProvider {
         Class<?> entityClass = entity.getClass();
         TableMetaData tableMetaData = TableMetaData.forClass(entityClass);
 
-        return SQLBuilder.update(tableMetaData, entity, databaseId);
+        return SQLBuilder.update(tableMetaData, entity, databaseId, false);
+    }
+
+    public <Entity> String updateByIds(List<Entity> entities, ProviderContext context) {
+        Assert.notNull(entities, "entities must not be null");
+        Assert.notEmpty(entities, "entities list must not be empty");
+
+        String databaseId = context.getDatabaseId();
+
+        Class<?> entityClass = entities.get(0).getClass();
+
+        TableMetaData tableMetaData = TableMetaData.forClass(entityClass);
+
+        return SQLBuilder.updateList(tableMetaData, entities, databaseId, false);
     }
 
     public String selectById(Serializable id, ProviderContext context) {

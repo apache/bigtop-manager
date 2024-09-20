@@ -110,15 +110,15 @@ public class JobServiceImpl implements JobService {
         for (StagePO stagePO : jobPO.getStages()) {
             for (TaskPO taskPO : stagePO.getTasks()) {
                 taskPO.setState(JobState.PENDING.getName());
-                taskDao.updateById(taskPO);
+                taskDao.partialUpdateById(taskPO);
             }
 
             stagePO.setState(JobState.PENDING.getName());
-            stageDao.updateById(stagePO);
+            stageDao.partialUpdateById(stagePO);
         }
 
         jobPO.setState(JobState.PENDING.getName());
-        jobDao.updateById(jobPO);
+        jobDao.partialUpdateById(jobPO);
     }
 
     private Job recreateJob(JobPO jobPO) {

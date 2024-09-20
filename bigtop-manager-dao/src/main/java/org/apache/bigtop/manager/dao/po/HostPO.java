@@ -69,7 +69,7 @@ public class HostPO extends BasePO implements Serializable {
     @Column(name = "state")
     private String state;
 
-    @Column(name = "cluster_id")
+    @Column(name = "cluster_id", nullable = false)
     private Long clusterId;
 
     @Transient

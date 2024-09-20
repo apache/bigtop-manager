@@ -37,12 +37,12 @@ public class ChatMessagePO extends BasePO implements Serializable {
     @Column(name = "message", nullable = false, length = 255)
     private String message;
 
-    @Column(name = "sender")
+    @Column(name = "sender", nullable = false)
     private String sender;
 
-    @Column(name = "user_id")
+    @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @Column(name = "thread_id")
+    @Column(name = "thread_id", nullable = false)
     private Long threadId;
 }

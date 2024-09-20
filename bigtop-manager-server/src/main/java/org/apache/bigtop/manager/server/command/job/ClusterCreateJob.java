@@ -77,22 +77,22 @@ public class ClusterCreateJob extends AbstractJob {
 
         // Update cluster state to installed
         clusterPO.setState(MaintainState.INSTALLED.getName());
-        clusterDao.updateById(clusterPO);
+        clusterDao.partialUpdateById(clusterPO);
 
         // Link job to cluster after cluster successfully added
         JobPO jobPO = getJobPO();
         jobPO.setClusterId(clusterPO.getId());
-        jobDao.updateById(jobPO);
+        jobDao.partialUpdateById(jobPO);
 
         for (Stage stage : getStages()) {
             StagePO stagePO = stage.getStagePO();
             stagePO.setClusterId(clusterPO.getId());
-            stageDao.updateById(stagePO);
+            stageDao.partialUpdateById(stagePO);
 
             for (Task task : stage.getTasks()) {
                 TaskPO taskPO = task.getTaskPO();
                 taskPO.setClusterId(clusterPO.getId());
-                taskDao.updateById(taskPO);
+                taskDao.partialUpdateById(taskPO);
             }
         }
     }
