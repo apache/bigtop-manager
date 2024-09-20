@@ -20,7 +20,11 @@
 package org.apache.bigtop.manager.dao.sql;
 
 import org.apache.bigtop.manager.common.utils.ClassUtils;
+import org.apache.bigtop.manager.dao.annotations.CreateBy;
+import org.apache.bigtop.manager.dao.annotations.CreateTime;
 import org.apache.bigtop.manager.dao.annotations.QueryCondition;
+import org.apache.bigtop.manager.dao.annotations.UpdateBy;
+import org.apache.bigtop.manager.dao.annotations.UpdateTime;
 import org.apache.bigtop.manager.dao.enums.DBType;
 
 import org.apache.ibatis.jdbc.SQL;
@@ -297,7 +301,10 @@ public class SQLBuilder {
                         if (ps == null || ps.getReadMethod() == null) {
                             continue;
                         }
-
+                        Field field = ReflectionUtils.findField(entityClass, entry.getKey());
+                        if (field == null || checkBaseField(field)) {
+                            continue;
+                        }
                         Object value = ReflectionUtils.invokeMethod(ps.getReadMethod(), entity);
                         PropertyDescriptor pkPs =
                                 BeanUtils.getPropertyDescriptor(entityClass, tableMetaData.getPkProperty());
@@ -316,12 +323,9 @@ public class SQLBuilder {
                                     .append(escapeSingleQuote(value.toString()))
                                     .append("' ");
                         } else if (!partial) {
-                            Field field = ReflectionUtils.findField(entityClass, entry.getKey());
-                            if (field != null) {
-                                Column column = field.getAnnotation(Column.class);
-                                if (column != null && !column.nullable() && value == null) {
-                                    continue;
-                                }
+                            Column column = field.getAnnotation(Column.class);
+                            if (column != null && !column.nullable() && value == null) {
+                                continue;
                             }
                             caseClause
                                     .append("WHEN ")
@@ -368,7 +372,10 @@ public class SQLBuilder {
                         primaryKey = keywordsFormat(entry.getValue(), DBType.POSTGRESQL);
                         continue;
                     }
-
+                    Field field = ReflectionUtils.findField(entityClass, entry.getKey());
+                    if (field == null || checkBaseField(field)) {
+                        continue;
+                    }
                     StringBuilder caseClause = new StringBuilder();
                     caseClause
                             .append(keywordsFormat(entry.getValue(), DBType.POSTGRESQL))
@@ -397,12 +404,9 @@ public class SQLBuilder {
                                     .append(escapeSingleQuote(value.toString()))
                                     .append("' ");
                         } else if (!partial) {
-                            Field field = ReflectionUtils.findField(entityClass, entry.getKey());
-                            if (field != null) {
-                                Column column = field.getAnnotation(Column.class);
-                                if (column != null && !column.nullable() && value == null) {
-                                    continue;
-                                }
+                            Column column = field.getAnnotation(Column.class);
+                            if (column != null && !column.nullable() && value == null) {
+                                continue;
                             }
                             caseClause
                                     .append("WHEN ")
@@ -635,6 +639,13 @@ public class SQLBuilder {
             return input.replace("'", "''");
         }
         return null;
+    }
+
+    private static boolean checkBaseField(Field field) {
+        return field.isAnnotationPresent(CreateBy.class)
+                || field.isAnnotationPresent(CreateTime.class)
+                || field.isAnnotationPresent(UpdateBy.class)
+                || field.isAnnotationPresent(UpdateTime.class);
     }
 
     private static <Condition> SQL mysqlCondition(Condition condition, TableMetaData tableMetaData)
