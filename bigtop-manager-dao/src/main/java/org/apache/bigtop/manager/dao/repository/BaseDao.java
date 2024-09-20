@@ -42,7 +42,7 @@ public interface BaseDao<Entity> {
     int save(Entity entity);
 
     /**
-     * Insert all of the entity.
+     * Insert all entities.
      */
     @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     @InsertProvider(type = BaseSqlProvider.class, method = "insertList")
@@ -61,13 +61,13 @@ public interface BaseDao<Entity> {
     int updateById(Entity entity);
 
     /**
-     * Partially update the entity by primary key.
+     * Partially update the entities by primary key.
      */
     @UpdateProvider(type = BaseSqlProvider.class, method = "partialUpdateByIds")
     int partialUpdateByIds(List<Entity> entities);
 
     /**
-     * Fully update the entity by primary key.
+     * Fully update the entities by primary key.
      */
     @UpdateProvider(type = BaseSqlProvider.class, method = "updateByIds")
     int updateByIds(List<Entity> entities);
