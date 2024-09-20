@@ -111,7 +111,7 @@ public class SQLBuilder {
         SQL sql = new SQL();
         switch (DBType.toType(databaseId)) {
             case MYSQL: {
-                sql.INSERT_INTO(tableMetaData.getTableName());
+                sql.INSERT_INTO(keywordsFormat(tableMetaData.getTableName(), DBType.MYSQL));
 
                 boolean firstRow = true;
                 int idx = 0;
@@ -130,7 +130,7 @@ public class SQLBuilder {
                         if (!ObjectUtils.isEmpty(value)) {
                             if (firstRow) {
                                 sql.VALUES(
-                                        "`" + entry.getValue() + "`",
+                                        keywordsFormat(entry.getValue(), DBType.MYSQL),
                                         getTokenParam("arg0[" + idx + "]." + entry.getKey()));
                             }
                             values.add(getTokenParam("arg0[" + idx + "]." + entry.getKey()));
@@ -147,7 +147,7 @@ public class SQLBuilder {
                 break;
             }
             case POSTGRESQL: {
-                sql.INSERT_INTO("\"" + tableMetaData.getTableName() + "\"");
+                sql.INSERT_INTO(keywordsFormat(tableMetaData.getTableName(), DBType.POSTGRESQL));
 
                 boolean firstRow = true;
                 List<String> columns = new ArrayList<>();
@@ -167,7 +167,7 @@ public class SQLBuilder {
                         if (!ObjectUtils.isEmpty(value)) {
                             if (firstRow) {
                                 sql.VALUES(
-                                        "\"" + entry.getValue() + "\"",
+                                        keywordsFormat(entry.getValue(), DBType.POSTGRESQL),
                                         getTokenParam("arg0[" + idx + "]." + entry.getKey()));
                             }
                             values.add(getTokenParam("arg0[" + idx + "]." + entry.getKey()));
@@ -277,19 +277,21 @@ public class SQLBuilder {
             case MYSQL: {
                 sqlBuilder
                         .append("UPDATE ")
-                        .append(tableMetaData.getTableName())
+                        .append(keywordsFormat(tableMetaData.getTableName(), DBType.MYSQL))
                         .append(" SET ");
                 Map<String, StringBuilder> setClauses = new LinkedHashMap<>();
-                String primaryKey = "id";
+                String primaryKey = keywordsFormat("id", DBType.MYSQL);
                 for (Map.Entry<String, String> entry : fieldColumnMap.entrySet()) {
                     // Ignore primary key
                     if (Objects.equals(entry.getKey(), tableMetaData.getPkProperty())) {
-                        primaryKey = entry.getValue();
+                        primaryKey = keywordsFormat(entry.getValue(), DBType.MYSQL);
                         continue;
                     }
 
                     StringBuilder caseClause = new StringBuilder();
-                    caseClause.append(entry.getValue()).append(" = CASE ");
+                    caseClause
+                            .append(keywordsFormat(entry.getValue(), DBType.MYSQL))
+                            .append(" = CASE ");
                     for (Entity entity : entities) {
                         PropertyDescriptor ps = BeanUtils.getPropertyDescriptor(entityClass, entry.getKey());
                         if (ps == null || ps.getReadMethod() == null) {
@@ -329,7 +331,10 @@ public class SQLBuilder {
                                     .append("' THEN NULL ");
                         }
                     }
-                    caseClause.append("ELSE ").append(entry.getValue()).append(" ");
+                    caseClause
+                            .append("ELSE ")
+                            .append(keywordsFormat(entry.getValue(), DBType.MYSQL))
+                            .append(" ");
                     caseClause.append("END");
                     setClauses.put(entry.getValue(), caseClause);
                 }
@@ -356,16 +361,18 @@ public class SQLBuilder {
                         .append("\"")
                         .append(" SET ");
                 Map<String, StringBuilder> setClauses = new LinkedHashMap<>();
-                String primaryKey = "\"id\"";
+                String primaryKey = keywordsFormat("id", DBType.POSTGRESQL);
                 for (Map.Entry<String, String> entry : fieldColumnMap.entrySet()) {
                     // Ignore primary key
                     if (Objects.equals(entry.getKey(), tableMetaData.getPkProperty())) {
-                        primaryKey = "\"" + entry.getValue() + "\"";
+                        primaryKey = keywordsFormat(entry.getValue(), DBType.POSTGRESQL);
                         continue;
                     }
 
                     StringBuilder caseClause = new StringBuilder();
-                    caseClause.append(entry.getValue()).append(" = CASE ");
+                    caseClause
+                            .append(keywordsFormat(entry.getValue(), DBType.POSTGRESQL))
+                            .append(" = CASE ");
 
                     for (Entity entity : entities) {
                         PropertyDescriptor ps = BeanUtils.getPropertyDescriptor(entityClass, entry.getKey());
@@ -410,7 +417,9 @@ public class SQLBuilder {
                     } else {
                         caseClause.append("ELSE ");
                     }
-                    caseClause.append(entry.getValue()).append(" ");
+                    caseClause
+                            .append(keywordsFormat(entry.getValue(), DBType.POSTGRESQL))
+                            .append(" ");
                     caseClause.append("END");
                     setClauses.put(entry.getValue(), caseClause);
                 }
