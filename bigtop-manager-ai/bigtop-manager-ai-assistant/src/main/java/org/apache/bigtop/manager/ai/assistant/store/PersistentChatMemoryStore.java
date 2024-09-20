@@ -33,12 +33,13 @@ import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class PersistentChatMemoryStore implements ChatMemoryStore {
 
     private final ChatThreadDao chatThreadDao;
     private final ChatMessageDao chatMessageDao;
+
+    private final List<ChatMessage> systemMessages = new ArrayList<>();
 
     public PersistentChatMemoryStore(ChatThreadDao chatThreadDao, ChatMessageDao chatMessageDao) {
         this.chatThreadDao = chatThreadDao;
@@ -78,19 +79,25 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
     @Override
     public List<ChatMessage> getMessages(Object threadId) {
         List<ChatMessagePO> chatMessages = chatMessageDao.findAllByThreadId((Long) threadId);
-        if (chatMessages.isEmpty()) {
-            return new ArrayList<>();
-        } else {
-            return chatMessages.stream()
+        List<ChatMessage> allChatMessages = new ArrayList<>(systemMessages);
+        if (!chatMessages.isEmpty()) {
+            allChatMessages.addAll(chatMessages.stream()
                     .map(this::convertToChatMessage)
                     .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
+                    .toList());
         }
+        return allChatMessages;
     }
 
     @Override
     public void updateMessages(Object threadId, List<ChatMessage> messages) {
-        ChatMessagePO chatMessagePO = convertToChatMessagePO(messages.get(messages.size() - 1), (Long) threadId);
+        ChatMessage newMessage = messages.get(messages.size() - 1);
+        if (newMessage.type().equals(ChatMessageType.SYSTEM)) {
+            SystemMessage systemMessage = (SystemMessage) newMessage;
+            systemMessages.add(systemMessage);
+            return;
+        }
+        ChatMessagePO chatMessagePO = convertToChatMessagePO(newMessage, (Long) threadId);
         if (chatMessagePO == null) {
             return;
         }
@@ -102,5 +109,9 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
         List<ChatMessagePO> chatMessagePOS = chatMessageDao.findAllByThreadId((Long) threadId);
         chatMessagePOS.forEach(chatMessage -> chatMessage.setIsDeleted(true));
         chatMessageDao.partialUpdateByIds(chatMessagePOS);
+    }
+
+    public PersistentChatMemoryStore clone() {
+        return new PersistentChatMemoryStore(chatThreadDao, chatMessageDao);
     }
 }

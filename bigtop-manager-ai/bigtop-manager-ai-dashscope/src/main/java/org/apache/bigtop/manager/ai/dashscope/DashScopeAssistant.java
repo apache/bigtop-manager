@@ -88,7 +88,7 @@ public class DashScopeAssistant extends AbstractAIAssistant {
         return streamMessage.toString();
     }
 
-    private void saveMessage(String message, MessageType sender) {
+    private void addMessage(String message, MessageType sender) {
         ChatMessage chatMessage;
         if (sender.equals(MessageType.AI)) {
             chatMessage = new AiMessage(message);
@@ -131,7 +131,7 @@ public class DashScopeAssistant extends AbstractAIAssistant {
         } catch (NoApiKeyException | InputRequiredException | InvalidateParameter e) {
             throw new RuntimeException(e);
         }
-        saveMessage(systemPrompt, MessageType.SYSTEM);
+        addMessage(systemPrompt, MessageType.SYSTEM);
     }
 
     public static Builder builder() {
@@ -140,7 +140,7 @@ public class DashScopeAssistant extends AbstractAIAssistant {
 
     @Override
     public Flux<String> streamAsk(String userMessage) {
-        saveMessage(userMessage, MessageType.USER);
+        addMessage(userMessage, MessageType.USER);
         TextMessageParam textMessageParam = TextMessageParam.builder()
                 .apiKey(dashScopeThreadParam.getApiKey())
                 .role(Role.USER.getValue())
@@ -174,13 +174,13 @@ public class DashScopeAssistant extends AbstractAIAssistant {
                     return message;
                 })
                 .doOnComplete(() -> {
-                    saveMessage(finalMessage.toString(), MessageType.AI);
+                    addMessage(finalMessage.toString(), MessageType.AI);
                 });
     }
 
     @Override
     public String ask(String userMessage) {
-        saveMessage(userMessage, MessageType.USER);
+        addMessage(userMessage, MessageType.USER);
         TextMessageParam textMessageParam = TextMessageParam.builder()
                 .apiKey(dashScopeThreadParam.getApiKey())
                 .role(Role.USER.getValue())
@@ -244,7 +244,7 @@ public class DashScopeAssistant extends AbstractAIAssistant {
             ContentText contentText = (ContentText) content;
             finalMessage.append(contentText.getText().getValue());
         }
-        saveMessage(finalMessage.toString(), MessageType.AI);
+        addMessage(finalMessage.toString(), MessageType.AI);
         return finalMessage.toString();
     }
 
