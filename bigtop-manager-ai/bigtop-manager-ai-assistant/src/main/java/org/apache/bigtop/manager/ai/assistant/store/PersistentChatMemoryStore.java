@@ -27,6 +27,7 @@ import org.apache.bigtop.manager.dao.repository.ChatThreadDao;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.ChatMessageType;
+import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 
