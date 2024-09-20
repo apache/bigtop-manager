@@ -13,7 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM rockylinux:8
+FROM OS:VERSION
+
+MAINTAINER dev@bigtop.apache.org
 
 RUN yum -y install sudo wget openssh-clients openssh-server vim mariadb mariadb-server net-tools chrony krb5-server krb5-libs krb5-workstation git rpm-build python3 procps-ng
 RUN wget https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_linux-x64_bin.tar.gz -O /tmp/jdk.tar.gz --no-check-certificate \
@@ -29,5 +31,3 @@ RUN wget https://raw.githubusercontent.com/gdraheim/docker-systemctl-replacement
 RUN /bin/sed -i 's,#   StrictHostKeyChecking ask,StrictHostKeyChecking no,g' /etc/ssh/ssh_config
 
 RUN ssh-keygen -f "/root/.ssh/id_rsa" -N ""
-
-EXPOSE 1-65535
