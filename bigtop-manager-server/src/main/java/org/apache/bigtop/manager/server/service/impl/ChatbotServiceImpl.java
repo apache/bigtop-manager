@@ -21,7 +21,7 @@ package org.apache.bigtop.manager.server.service.impl;
 import org.apache.bigtop.manager.ai.assistant.GeneralAssistantFactory;
 import org.apache.bigtop.manager.ai.assistant.provider.AIAssistantConfig;
 import org.apache.bigtop.manager.ai.assistant.store.PersistentChatMemoryStore;
-import org.apache.bigtop.manager.ai.core.enums.MessageSender;
+import org.apache.bigtop.manager.ai.core.enums.MessageType;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistantFactory;
@@ -137,7 +137,7 @@ public class ChatbotServiceImpl implements ChatbotService {
     @Override
     public List<PlatformAuthorizedVO> authorizedPlatforms() {
         List<PlatformAuthorizedVO> authorizedPlatforms = new ArrayList<>();
-        List<PlatformAuthorizedPO> authorizedPlatformPOs = platformAuthorizedDao.findAll();
+        List<PlatformAuthorizedPO> authorizedPlatformPOs = platformAuthorizedDao.findAllPlatform();
         for (PlatformAuthorizedPO authorizedPlatformPO : authorizedPlatformPOs) {
             PlatformPO platformPO = platformDao.findById(authorizedPlatformPO.getPlatformId());
             authorizedPlatforms.add(PlatformAuthorizedConverter.INSTANCE.fromPO2VO(authorizedPlatformPO, platformPO));
@@ -209,10 +209,14 @@ public class ChatbotServiceImpl implements ChatbotService {
 
     @Override
     public boolean deleteAuthorizedPlatform(Long platformId) {
-        List<PlatformAuthorizedPO> authorizedPlatformPOs = platformAuthorizedDao.findAll();
+        List<PlatformAuthorizedPO> authorizedPlatformPOs = platformAuthorizedDao.findAllPlatform();
         for (PlatformAuthorizedPO authorizedPlatformPO : authorizedPlatformPOs) {
             if (authorizedPlatformPO.getId().equals(platformId)) {
-                platformAuthorizedDao.deleteById(authorizedPlatformPO.getId());
+                authorizedPlatformPO.setIsDeleted(true);
+                platformAuthorizedDao.partialUpdateById(authorizedPlatformPO);
+                List<ChatThreadPO> chatThreadPOS = chatThreadDao.findAllByPlatformId(authorizedPlatformPO.getId());
+                chatThreadPOS.forEach(chatThread -> chatThread.setIsDeleted(true));
+                chatThreadDao.partialUpdateByIds(chatThreadPOS);
                 return true;
             }
         }
@@ -253,7 +257,11 @@ public class ChatbotServiceImpl implements ChatbotService {
         for (ChatThreadPO chatThreadPO : chatThreadPOS) {
             if (chatThreadPO.getId().equals(threadId)
                     && chatThreadPO.getPlatformId().equals(platformId)) {
-                chatThreadDao.deleteById(threadId);
+                chatThreadPO.setIsDeleted(true);
+                chatThreadDao.partialUpdateById(chatThreadPO);
+                List<ChatMessagePO> chatMessagePOS = chatMessageDao.findAllByThreadId(threadId);
+                chatMessagePOS.forEach(chatMessage -> chatMessage.setIsDeleted(true));
+                chatMessageDao.partialUpdateByIds(chatMessagePOS);
                 return true;
             }
         }
@@ -312,7 +320,7 @@ public class ChatbotServiceImpl implements ChatbotService {
     @Override
     public List<ChatMessageVO> history(Long platformId, Long threadId) {
         List<ChatMessageVO> chatMessages = new ArrayList<>();
-        ChatThreadPO chatThreadPO = chatThreadDao.findById(threadId);
+        ChatThreadPO chatThreadPO = chatThreadDao.findByThreadId(threadId);
         if (chatThreadPO == null) {
             throw new ApiException(ApiExceptionEnum.CHAT_THREAD_NOT_FOUND);
         }
@@ -323,11 +331,11 @@ public class ChatbotServiceImpl implements ChatbotService {
         List<ChatMessagePO> chatMessagePOs = chatMessageDao.findAllByThreadId(threadId);
         for (ChatMessagePO chatMessagePO : chatMessagePOs) {
             ChatMessageVO chatMessageVO = ChatMessageConverter.INSTANCE.fromPO2VO(chatMessagePO);
-            MessageSender sender = chatMessageVO.getSender();
+            MessageType sender = chatMessageVO.getSender();
             if (sender == null) {
                 continue;
             }
-            if (sender.equals(MessageSender.USER) || sender.equals(MessageSender.AI)) {
+            if (sender.equals(MessageType.USER) || sender.equals(MessageType.AI)) {
                 chatMessages.add(chatMessageVO);
             }
         }

@@ -26,14 +26,14 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Getter
-public enum MessageSender {
+public enum MessageType {
     USER("user"),
     AI("ai"),
     SYSTEM("system");
 
     private final String value;
 
-    MessageSender(String value) {
+    MessageType(String value) {
         this.value = value;
     }
 
@@ -41,13 +41,13 @@ public enum MessageSender {
         return Arrays.stream(values()).map(item -> item.value).collect(Collectors.toList());
     }
 
-    public static MessageSender getMessageSender(String value) {
+    public static MessageType getMessageSender(String value) {
         if (Objects.isNull(value) || value.isEmpty()) {
             return null;
         }
-        for (MessageSender messageSender : MessageSender.values()) {
-            if (messageSender.value.equals(value)) {
-                return messageSender;
+        for (MessageType messageType : MessageType.values()) {
+            if (messageType.value.equals(value)) {
+                return messageType;
             }
         }
 

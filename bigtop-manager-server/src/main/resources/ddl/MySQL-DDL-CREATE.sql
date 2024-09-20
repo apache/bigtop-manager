@@ -328,6 +328,7 @@ CREATE TABLE `llm_platform_authorized`
     `id`          BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
     `platform_id` BIGINT(20) UNSIGNED NOT NULL,
     `credentials` JSON                NOT NULL,
+    `is_deleted`  TINYINT(1)          DEFAULT 0 NULL,
     `create_time` DATETIME            DEFAULT CURRENT_TIMESTAMP,
     `update_time` DATETIME            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `create_by`   BIGINT              DEFAULT NULL,
@@ -342,6 +343,7 @@ CREATE TABLE `llm_chat_thread`
     `platform_id` BIGINT(20) UNSIGNED NOT NULL,
     `user_id`     BIGINT(20) UNSIGNED NOT NULL,
     `model`       VARCHAR(255)        NOT NULL,
+    `is_deleted`  TINYINT(1)          DEFAULT 0 NULL,
     `thread_info` JSON                DEFAULT NULL,
     `create_time` DATETIME            DEFAULT CURRENT_TIMESTAMP,
     `update_time` DATETIME            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -359,6 +361,7 @@ CREATE TABLE `llm_chat_message`
     `user_id`     BIGINT(20) UNSIGNED NOT NULL,
     `message`     TEXT                NOT NULL,
     `sender`      VARCHAR(50)         NOT NULL,
+    `is_deleted`  TINYINT(1)          DEFAULT 0 NULL,
     `create_time` DATETIME            DEFAULT CURRENT_TIMESTAMP,
     `update_time` DATETIME            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `create_by`   BIGINT              DEFAULT NULL,
@@ -376,5 +379,5 @@ VALUES (1, now(), now(), 'Administrator', '21232f297a57a5a743894a0e4a801fc3', tr
 INSERT INTO bigtop_manager.llm_platform (id, credential, name, support_models)
 VALUES
 (1, '{"apiKey": "API Key"}', 'OpenAI', 'gpt-3.5-turbo,gpt-4,gpt-4o,gpt-3.5-turbo-16k,gpt-4-turbo-preview,gpt-4-32k,gpt-4o-mini'),
-(2, '{"apiKey": "API Key"}', 'DashScope', 'qwen-max,qwen-plus,qwen-turbo'),
+(2, '{"apiKey": "API Key"}', 'DashScope', 'qwen-1.8b-chat,qwen-max,qwen-plus,qwen-turbo'),
 (3, '{"apiKey": "API Key", "secretKey": "Secret Key"}', 'QianFan','Yi-34B-Chat,ERNIE-4.0-8K,ERNIE-3.5-128K,ERNIE-Speed-8K,Llama-2-7B-Chat,Fuyu-8B');

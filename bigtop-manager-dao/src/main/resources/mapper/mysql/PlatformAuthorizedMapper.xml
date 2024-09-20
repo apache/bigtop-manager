@@ -31,15 +31,19 @@
     </resultMap>
 
     <select id="findByPlatformId" resultMap="PlatformAuthorizedResultMap">
-        SELECT * FROM llm_platform_authorized WHERE id = #{id}
+        SELECT * FROM llm_platform_authorized WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+    <select id="findAllPlatform" resultMap="PlatformAuthorizedResultMap">
+        SELECT * FROM llm_platform_authorized WHERE is_deleted = 0
     </select>
 
     <insert id="saveWithCredentials" parameterType="org.apache.bigtop.manager.dao.po.PlatformAuthorizedPO" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO llm_platform_authorized (platform_id, credentials)
         VALUES (#{platformId}, #{credentials, typeHandler=org.apache.bigtop.manager.dao.handler.JsonTypeHandler})
-            ON DUPLICATE KEY UPDATE
-                                 platform_id = VALUES(platform_id),
-                                 credentials = VALUES(credentials)
+        ON DUPLICATE KEY UPDATE
+        platform_id = VALUES(platform_id),
+        credentials = VALUES(credentials)
     </insert>
 
 </mapper>
