@@ -19,6 +19,7 @@
 package org.apache.bigtop.manager.server.controller;
 
 import org.apache.bigtop.manager.server.model.dto.PlatformDTO;
+import org.apache.bigtop.manager.server.model.req.ChatbotMessageReq;
 import org.apache.bigtop.manager.server.model.req.PlatformReq;
 import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
 import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
@@ -174,12 +175,14 @@ class ChatbotControllerTest {
     void talk() {
         Long platformId = 1L;
         Long threadId = 1L;
-        String message = "Hello";
+        ChatbotMessageReq messageReq = new ChatbotMessageReq();
+        messageReq.setMessage("Hello");
 
         SseEmitter emitter = new SseEmitter();
-        when(chatbotService.talk(eq(platformId), eq(threadId), eq(message))).thenReturn(emitter);
+        when(chatbotService.talk(eq(platformId), eq(threadId), eq(messageReq.getMessage())))
+                .thenReturn(emitter);
 
-        SseEmitter result = chatbotController.talk(platformId, threadId, message);
+        SseEmitter result = chatbotController.talk(platformId, threadId, messageReq);
 
         assertEquals(emitter, result);
     }

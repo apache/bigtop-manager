@@ -45,4 +45,7 @@ public class ChatMessagePO extends BasePO implements Serializable {
 
     @Column(name = "thread_id", nullable = false)
     private Long threadId;
+
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
 }

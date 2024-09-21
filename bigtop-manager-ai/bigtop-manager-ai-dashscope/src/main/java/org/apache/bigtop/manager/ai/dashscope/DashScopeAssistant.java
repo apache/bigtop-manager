@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.ai.dashscope;
 
 import org.apache.bigtop.manager.ai.core.AbstractAIAssistant;
-import org.apache.bigtop.manager.ai.core.enums.MessageSender;
+import org.apache.bigtop.manager.ai.core.enums.MessageType;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 
@@ -88,13 +88,13 @@ public class DashScopeAssistant extends AbstractAIAssistant {
         return streamMessage.toString();
     }
 
-    private void saveMessage(String message, MessageSender sender) {
+    private void addMessage(String message, MessageType sender) {
         ChatMessage chatMessage;
-        if (sender.equals(MessageSender.AI)) {
+        if (sender.equals(MessageType.AI)) {
             chatMessage = new AiMessage(message);
-        } else if (sender.equals(MessageSender.USER)) {
+        } else if (sender.equals(MessageType.USER)) {
             chatMessage = new UserMessage(message);
-        } else if (sender.equals(MessageSender.SYSTEM)) {
+        } else if (sender.equals(MessageType.SYSTEM)) {
             chatMessage = new SystemMessage(message);
         } else {
             return;
@@ -131,7 +131,7 @@ public class DashScopeAssistant extends AbstractAIAssistant {
         } catch (NoApiKeyException | InputRequiredException | InvalidateParameter e) {
             throw new RuntimeException(e);
         }
-        saveMessage(systemPrompt, MessageSender.SYSTEM);
+        addMessage(systemPrompt, MessageType.SYSTEM);
     }
 
     public static Builder builder() {
@@ -140,7 +140,7 @@ public class DashScopeAssistant extends AbstractAIAssistant {
 
     @Override
     public Flux<String> streamAsk(String userMessage) {
-        saveMessage(userMessage, MessageSender.USER);
+        addMessage(userMessage, MessageType.USER);
         TextMessageParam textMessageParam = TextMessageParam.builder()
                 .apiKey(dashScopeThreadParam.getApiKey())
                 .role(Role.USER.getValue())
@@ -174,13 +174,13 @@ public class DashScopeAssistant extends AbstractAIAssistant {
                     return message;
                 })
                 .doOnComplete(() -> {
-                    saveMessage(finalMessage.toString(), MessageSender.AI);
+                    addMessage(finalMessage.toString(), MessageType.AI);
                 });
     }
 
     @Override
     public String ask(String userMessage) {
-        saveMessage(userMessage, MessageSender.USER);
+        addMessage(userMessage, MessageType.USER);
         TextMessageParam textMessageParam = TextMessageParam.builder()
                 .apiKey(dashScopeThreadParam.getApiKey())
                 .role(Role.USER.getValue())
@@ -244,7 +244,7 @@ public class DashScopeAssistant extends AbstractAIAssistant {
             ContentText contentText = (ContentText) content;
             finalMessage.append(contentText.getText().getValue());
         }
-        saveMessage(finalMessage.toString(), MessageSender.AI);
+        addMessage(finalMessage.toString(), MessageType.AI);
         return finalMessage.toString();
     }
 

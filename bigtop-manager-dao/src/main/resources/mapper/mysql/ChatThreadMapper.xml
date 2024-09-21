@@ -33,16 +33,17 @@
         SELECT *
         FROM llm_chat_thread
         WHERE user_id = #{userId}
+        AND is_deleted = 0
     </select>
 
     <select id="findAllByPlatformAuthorizedIdAndUserId" resultType="org.apache.bigtop.manager.dao.po.ChatThreadPO">
         SELECT *
         FROM llm_chat_thread
-        WHERE platform_id = #{platformId} AND user_id = #{userId}
+        WHERE platform_id = #{platformId} AND user_id = #{userId} AND is_deleted = 0
     </select>
 
     <select id="findByThreadId" resultMap="ChatThreadResultMap">
-        SELECT * FROM llm_chat_thread WHERE id = #{id}
+        SELECT * FROM llm_chat_thread WHERE id = #{id} AND is_deleted = 0
     </select>
 
     <insert id="saveWithThreadInfo" parameterType="org.apache.bigtop.manager.dao.po.ChatThreadPO" useGeneratedKeys="true" keyProperty="id">
@@ -54,5 +55,11 @@
             model = VALUES(model),
             thread_info = VALUES(thread_info)
     </insert>
+
+    <select id="findAllByPlatformId" resultType="org.apache.bigtop.manager.dao.po.ChatThreadPO">
+        SELECT *
+        FROM llm_chat_thread
+        WHERE platform_id = #{platformId} AND is_deleted = 0
+    </select>
 
 </mapper>

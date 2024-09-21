@@ -19,6 +19,7 @@
 package org.apache.bigtop.manager.ai.assistant;
 
 import org.apache.bigtop.manager.ai.assistant.provider.LocSystemPromptProvider;
+import org.apache.bigtop.manager.ai.assistant.store.PersistentChatMemoryStore;
 import org.apache.bigtop.manager.ai.core.AbstractAIAssistantFactory;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.enums.SystemPrompt;
@@ -70,7 +71,10 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
                     case QIANFAN -> QianFanAssistant.builder();
                 };
         AIAssistant aiAssistant = builder.id(id)
-                .memoryStore((id == null) ? new InMemoryChatMemoryStore() : chatMemoryStore)
+                .memoryStore(
+                        (id == null)
+                                ? new InMemoryChatMemoryStore()
+                                : ((PersistentChatMemoryStore) chatMemoryStore).clone())
                 .withConfigProvider(assistantConfig)
                 .build();
 

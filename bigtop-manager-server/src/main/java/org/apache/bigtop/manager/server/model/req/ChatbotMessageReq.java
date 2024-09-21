@@ -16,37 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.dao.po;
+package org.apache.bigtop.manager.server.model.req;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import java.io.Serializable;
-import java.util.Map;
+import jakarta.validation.constraints.NotEmpty;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-@Table(name = "llm_chat_thread")
-public class ChatThreadPO extends BasePO implements Serializable {
-    @Id
-    @Column(name = "id")
-    private Long id;
-
-    @Column(name = "model", nullable = false, length = 255)
-    private String model;
-
-    @Column(name = "thread_info", columnDefinition = "json")
-    private Map<String, String> threadInfo;
-
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
-
-    @Column(name = "platform_id", nullable = false)
-    private Long platformId;
-
-    @Column(name = "is_deleted")
-    private Boolean isDeleted;
+public class ChatbotMessageReq {
+    @NotEmpty
+    private String message;
 }

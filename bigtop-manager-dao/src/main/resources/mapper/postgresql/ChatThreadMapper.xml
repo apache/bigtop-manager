@@ -33,26 +33,28 @@
         SELECT *
         FROM llm_chat_thread
         WHERE user_id = #{userId}
+        AND is_deleted = false
     </select>
 
     <select id="findAllByPlatformAuthorizedIdAndUserId" resultType="org.apache.bigtop.manager.dao.po.ChatThreadPO">
         SELECT *
         FROM llm_chat_thread
-        WHERE platform_id = #{platformId} AND user_id = #{userId}
+        WHERE platform_id = #{platformId} AND user_id = #{userId} AND is_deleted = false
     </select>
 
     <select id="findByThreadId" resultMap="ChatThreadResultMap">
-        SELECT * FROM llm_chat_thread WHERE id = #{id}
+        SELECT * FROM llm_chat_thread WHERE id = #{id} AND is_deleted = false
     </select>
 
     <insert id="saveWithThreadInfo" parameterType="org.apache.bigtop.manager.dao.po.ChatThreadPO" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO llm_chat_thread (platform_id, user_id, model, thread_info)
-        VALUES (#{platformId}, #{userId}, #{model}, #{threadInfo, typeHandler=org.apache.bigtop.manager.dao.handler.JsonTypeHandler})
-            ON DUPLICATE KEY UPDATE
-            platform_id = VALUES(platform_id),
-            user_id = VALUES(user_id),
-            model = VALUES(model),
-            thread_info = VALUES(thread_info)
+        VALUES (#{platformId}, #{userId}, #{model}, #{threadInfo, typeHandler=org.apache.bigtop.manager.dao.handler.JsonTypeHandler}::json)
     </insert>
+
+    <select id="findAllByPlatformId" resultType="org.apache.bigtop.manager.dao.po.ChatThreadPO">
+        SELECT *
+        FROM llm_chat_thread
+        WHERE platform_id = #{platformId} AND is_deleted = false
+    </select>
 
 </mapper>
