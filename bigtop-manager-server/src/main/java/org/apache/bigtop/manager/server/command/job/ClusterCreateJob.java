@@ -74,7 +74,8 @@ public class ClusterCreateJob extends AbstractJob {
     @Override
     public void onSuccess() {
         super.onSuccess();
-        ClusterPO clusterPO = clusterDao.findById(getJobContext().getCommandDTO().getClusterId());
+        ClusterPO clusterPO =
+                clusterDao.findById(getJobContext().getCommandDTO().getClusterId());
 
         // Update cluster state to installed
         clusterPO.setState(MaintainState.INSTALLED.getName());

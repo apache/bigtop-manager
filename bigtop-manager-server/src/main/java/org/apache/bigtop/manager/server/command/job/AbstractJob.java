@@ -54,6 +54,7 @@ public abstract class AbstractJob implements Job {
 
     @Getter
     protected JobContext jobContext;
+
     protected List<Stage> stages;
 
     protected ClusterPO clusterPO;
