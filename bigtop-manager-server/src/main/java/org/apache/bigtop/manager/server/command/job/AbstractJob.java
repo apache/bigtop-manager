@@ -38,6 +38,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 public abstract class AbstractJob implements Job {
@@ -68,7 +70,9 @@ public abstract class AbstractJob implements Job {
         if (jobContext.getJobId() != null) {
             persistState();
             List<StagePO> stagePOs = stageDao.findByJobId(jobContext.getJobId());
-            jobContext.setStagePOS(stagePOs);
+            Map<Integer, Long> existsStageMap =
+                    stagePOs.stream().collect(Collectors.toMap(StagePO::getOrder, StagePO::getId));
+            jobContext.setExistsStageMap(existsStageMap);
 
         } else {
             JobPO jobPO = new JobPO();

@@ -60,16 +60,8 @@ public abstract class AbstractStage implements Stage {
         state = JobState.PENDING;
 
         // obtain all tasks
-        List<StagePO> stagePOs = stageContext.getStagePOs();
-        if (stagePOs != null && !stagePOs.isEmpty()) {
-            for (StagePO stagePO : stagePOs) {
-                if (getStageContext().getOrder() == stagePO.getOrder()) {
-                    stageContext.setStageId(stagePO.getId());
-                    break;
-                }
-            }
+        if (getStageContext().isRetry()) {
             persistState();
-
         } else {
             StagePO stagePO = new StagePO();
             stagePO.setState(getState().getName());
@@ -88,7 +80,7 @@ public abstract class AbstractStage implements Stage {
 
         beforeCreateTasks();
 
-        if (stagePOs != null && !stagePOs.isEmpty()) {
+        if (getStageContext().isRetry()) {
             List<TaskPO> taskPOS = taskDao.findByStageId(stageContext.getStageId());
             for (TaskPO taskPO : taskPOS) {
                 TaskContext taskContext = TaskContext.fromStageContext(stageContext);

@@ -19,7 +19,6 @@
 package org.apache.bigtop.manager.server.command.stage;
 
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.po.StagePO;
 import org.apache.bigtop.manager.server.command.job.JobContext;
 import org.apache.bigtop.manager.server.model.dto.CommandDTO;
 import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
@@ -31,6 +30,7 @@ import org.apache.bigtop.manager.server.model.dto.command.HostCommandDTO;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Data
@@ -60,30 +60,33 @@ public class StageContext {
 
     private List<RepoDTO> repoInfoList;
 
-    private List<StagePO> stagePOs;
+    private boolean retry = false;
 
     public static StageContext fromJobContext(JobContext jobContext) {
         return fromCommandDTO(
                 jobContext.getCommandDTO(),
                 jobContext.getJobId(),
-                jobContext.getStagePOS(),
+                jobContext.getExistsStageMap(),
                 jobContext.getAtomicInteger());
     }
 
     public static StageContext fromPayload(
-            String payload, Long jobId, List<StagePO> stagePOs, AtomicInteger atomicInteger) {
+            String payload, Long jobId, Map<Integer, Long> existsStageMap, AtomicInteger atomicInteger) {
         CommandDTO commandDTO = JsonUtils.readFromString(payload, CommandDTO.class);
-        return fromCommandDTO(commandDTO, jobId, stagePOs, atomicInteger);
+        return fromCommandDTO(commandDTO, jobId, existsStageMap, atomicInteger);
     }
 
     public static StageContext fromCommandDTO(
-            CommandDTO commandDTO, Long jobId, List<StagePO> stagePOs, AtomicInteger atomicInteger) {
+            CommandDTO commandDTO, Long jobId, Map<Integer, Long> existsStageMap, AtomicInteger atomicInteger) {
         StageContext context = new StageContext();
         // auto-Increment
         context.setOrder(atomicInteger.incrementAndGet());
         context.setClusterId(commandDTO.getClusterId());
         context.setJobId(jobId);
-        context.setStagePOs(stagePOs);
+        if (existsStageMap != null && !existsStageMap.isEmpty() && existsStageMap.containsKey(context.getOrder())) {
+            context.setStageId(existsStageMap.get(context.getOrder()));
+            context.setRetry(true);
+        }
 
         switch (commandDTO.getCommandLevel()) {
             case CLUSTER -> fromClusterCommandPayload(context, commandDTO);

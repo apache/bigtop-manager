@@ -18,12 +18,11 @@
  */
 package org.apache.bigtop.manager.server.command.job;
 
-import org.apache.bigtop.manager.dao.po.StagePO;
 import org.apache.bigtop.manager.server.model.dto.CommandDTO;
 
 import lombok.Data;
 
-import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Data
@@ -34,7 +33,7 @@ public class JobContext {
     /* internal */
     private Long jobId;
 
-    private List<StagePO> stagePOS;
+    private Map<Integer, Long> existsStageMap;
 
     private final AtomicInteger atomicInteger = new AtomicInteger(0);
     /* internal */
