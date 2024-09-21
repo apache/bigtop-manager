@@ -60,12 +60,10 @@ public abstract class AbstractComponentStage extends AbstractStage {
         return stageContext.getComponentDTO().getComponentName();
     }
 
-    protected TaskContext createTaskContext(String hostname) {
+    protected TaskContext createTaskContext(TaskContext taskContext) {
         ServiceDTO serviceDTO = stageContext.getServiceDTO();
         ComponentDTO componentDTO = stageContext.getComponentDTO();
 
-        TaskContext taskContext = new TaskContext();
-        taskContext.setHostname(hostname);
         taskContext.setClusterId(clusterPO.getId());
         taskContext.setClusterName(clusterPO.getClusterName());
         taskContext.setServiceName(serviceDTO.getServiceName());

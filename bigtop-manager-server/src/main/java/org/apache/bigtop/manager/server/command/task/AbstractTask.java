@@ -31,26 +31,53 @@ import org.apache.bigtop.manager.grpc.utils.ProtobufUtil;
 import org.apache.bigtop.manager.server.grpc.GrpcClient;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public abstract class AbstractTask implements Task {
 
+    @Getter
+    @Setter
+    private JobState state;
+
     protected TaskDao taskDao;
 
+    @Getter
     protected TaskContext taskContext;
 
     protected CommandRequest commandRequest;
 
-    /**
-     * Do not use this directly, please use {@link #getTaskPO()} to make sure it's initialized.
-     */
-    private TaskPO taskPO;
-
     public AbstractTask(TaskContext taskContext) {
+        injectBeans();
         this.taskContext = taskContext;
 
-        injectBeans();
+        state = JobState.PENDING;
+        if (taskContext.getTaskId() != null) {
+            persistState();
+        } else {
+            TaskPO taskPO = new TaskPO();
+            taskPO.setState(getState().getName());
+            taskPO.setJobId(taskContext.getJobId());
+            taskPO.setStageId(taskContext.getStageId());
+            taskPO.setClusterId(taskContext.getClusterId());
+
+            taskPO.setName(getName());
+            taskPO.setContext(JsonUtils.writeAsString(taskContext));
+            taskPO.setStackName(taskContext.getStackName());
+            taskPO.setStackVersion(taskContext.getStackVersion());
+            taskPO.setHostname(taskContext.getHostname());
+            taskPO.setServiceName(taskContext.getServiceName());
+            taskPO.setServiceUser(taskContext.getServiceUser());
+            taskPO.setComponentName(taskContext.getComponentName());
+            taskPO.setCommand(getCommand().getName());
+            taskPO.setCustomCommand(getCustomCommand());
+
+            taskDao.save(taskPO);
+
+            taskContext.setTaskId(taskPO.getId());
+        }
     }
 
     protected void injectBeans() {
@@ -66,12 +93,6 @@ public abstract class AbstractTask implements Task {
     protected abstract CommandRequest getCommandRequest();
 
     @Override
-    public void beforeRun() {
-        taskPO.setState(JobState.PROCESSING.getName());
-        taskDao.partialUpdateById(taskPO);
-    }
-
-    @Override
     public Boolean run() {
         boolean taskSuccess;
 
@@ -79,7 +100,7 @@ public abstract class AbstractTask implements Task {
             beforeRun();
 
             CommandRequest.Builder builder = CommandRequest.newBuilder(getCommandRequest());
-            builder.setTaskId(getTaskPO().getId());
+            builder.setTaskId(taskContext.getTaskId());
             commandRequest = builder.build();
 
             CommandServiceGrpc.CommandServiceBlockingStub stub = GrpcClient.getBlockingStub(
@@ -102,47 +123,16 @@ public abstract class AbstractTask implements Task {
     }
 
     @Override
-    public void onSuccess() {
-        TaskPO taskPO = getTaskPO();
-        taskPO.setContent(ProtobufUtil.toJson(commandRequest));
-        taskPO.setState(JobState.SUCCESSFUL.getName());
-        taskDao.partialUpdateById(taskPO);
-    }
-
-    @Override
-    public void onFailure() {
-        TaskPO taskPO = getTaskPO();
-        taskPO.setContent(ProtobufUtil.toJson(commandRequest));
-        taskPO.setState(JobState.FAILED.getName());
-        taskDao.partialUpdateById(taskPO);
-    }
-
-    @Override
-    public TaskContext getTaskContext() {
-        return taskContext;
-    }
-
-    @Override
-    public void loadTaskPO(TaskPO taskPO) {
-        this.taskPO = taskPO;
-    }
-
-    @Override
-    public TaskPO getTaskPO() {
-        if (taskPO == null) {
-            taskPO = new TaskPO();
-            taskPO.setName(getName());
-            taskPO.setContext(JsonUtils.writeAsString(taskContext));
-            taskPO.setStackName(taskContext.getStackName());
-            taskPO.setStackVersion(taskContext.getStackVersion());
-            taskPO.setHostname(taskContext.getHostname());
-            taskPO.setServiceName(taskContext.getServiceName());
-            taskPO.setServiceUser(taskContext.getServiceUser());
-            taskPO.setComponentName(taskContext.getComponentName());
-            taskPO.setCommand(getCommand().getName());
-            taskPO.setCustomCommand(getCustomCommand());
+    public void persistState() {
+        TaskPO taskPO = taskDao.findOptionalById(taskContext.getTaskId())
+                .orElseThrow(() -> new RuntimeException("Task not found"));
+        taskPO.setState(getState().getName());
+        if (commandRequest != null) {
+            taskPO.setContent(ProtobufUtil.toJson(commandRequest));
         }
-
-        return taskPO;
+        if (taskContext.getClusterId() != null) {
+            taskPO.setClusterId(taskContext.getClusterId());
+        }
+        taskDao.partialUpdateById(taskPO);
     }
 }

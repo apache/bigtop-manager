@@ -20,9 +20,6 @@ package org.apache.bigtop.manager.server.command.job;
 
 import org.apache.bigtop.manager.common.enums.MaintainState;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
-import org.apache.bigtop.manager.dao.po.JobPO;
-import org.apache.bigtop.manager.dao.po.StagePO;
-import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.server.command.stage.CacheFileUpdateStage;
 import org.apache.bigtop.manager.server.command.stage.HostCheckStage;
 import org.apache.bigtop.manager.server.command.stage.Stage;
@@ -32,6 +29,7 @@ import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 import org.apache.bigtop.manager.server.model.converter.ClusterConverter;
 import org.apache.bigtop.manager.server.model.dto.ClusterDTO;
 import org.apache.bigtop.manager.server.model.dto.CommandDTO;
+import org.apache.bigtop.manager.server.model.vo.ClusterVO;
 import org.apache.bigtop.manager.server.service.ClusterService;
 
 public class ClusterCreateJob extends AbstractJob {
@@ -51,9 +49,8 @@ public class ClusterCreateJob extends AbstractJob {
 
     @Override
     protected void createStages() {
-        StageContext stageContext = StageContext.fromCommandDTO(jobContext.getCommandDTO());
-        stages.add(new HostCheckStage(stageContext));
-        stages.add(new CacheFileUpdateStage(stageContext));
+        stages.add(new HostCheckStage(StageContext.fromJobContext(jobContext)));
+        stages.add(new CacheFileUpdateStage(StageContext.fromJobContext(jobContext)));
     }
 
     @Override
@@ -63,38 +60,25 @@ public class ClusterCreateJob extends AbstractJob {
         // Save cluster
         CommandDTO commandDTO = jobContext.getCommandDTO();
         ClusterDTO clusterDTO = ClusterConverter.INSTANCE.fromCommand2DTO(commandDTO.getClusterCommand());
-        clusterService.save(clusterDTO);
+        ClusterVO clusterVO = clusterService.save(clusterDTO);
+        getJobContext().getCommandDTO().setClusterId(clusterVO.getId());
+
+        for (Stage stage : stages) {
+            stage.getStageContext().setClusterId(clusterVO.getId());
+            for (Task task : stage.getTasks()) {
+                task.getTaskContext().setClusterId(clusterVO.getId());
+            }
+        }
     }
 
     @Override
     public void onSuccess() {
         super.onSuccess();
-
-        CommandDTO commandDTO = jobContext.getCommandDTO();
-        ClusterPO clusterPO = clusterDao
-                .findByClusterName(commandDTO.getClusterCommand().getClusterName())
-                .orElse(new ClusterPO());
+        ClusterPO clusterPO = clusterDao.findById(getJobContext().getCommandDTO().getClusterId());
 
         // Update cluster state to installed
         clusterPO.setState(MaintainState.INSTALLED.getName());
         clusterDao.partialUpdateById(clusterPO);
-
-        // Link job to cluster after cluster successfully added
-        JobPO jobPO = getJobPO();
-        jobPO.setClusterId(clusterPO.getId());
-        jobDao.partialUpdateById(jobPO);
-
-        for (Stage stage : getStages()) {
-            StagePO stagePO = stage.getStagePO();
-            stagePO.setClusterId(clusterPO.getId());
-            stageDao.partialUpdateById(stagePO);
-
-            for (Task task : stage.getTasks()) {
-                TaskPO taskPO = task.getTaskPO();
-                taskPO.setClusterId(clusterPO.getId());
-                taskDao.partialUpdateById(taskPO);
-            }
-        }
     }
 
     @Override

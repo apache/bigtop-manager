@@ -23,6 +23,11 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.apache.bigtop.manager.dao.repository.TaskDao">
 
+    <sql id="baseColumns">
+        id, state, name, context, command, hostname, custom_command, service_user, content, stack_name, stack_version,
+        service_name, component_name, job_id, stage_id, cluster_id, create_time, update_time
+    </sql>
+
     <update id="updateStateByIds" parameterType="java.util.List">
         UPDATE task
         SET "state" = CASE
@@ -35,5 +40,17 @@
             #{item.id}
         </foreach>
     </update>
+
+    <select id="findByStageId" parameterType="java.lang.Long" resultType="org.apache.bigtop.manager.dao.po.TaskPO">
+        select
+        <include refid="baseColumns"/>
+        from
+        task
+        <where>
+            <if test="stageId != 0">
+                stage_id = #{stageId}
+            </if>
+        </where>
+    </select>
 
 </mapper>

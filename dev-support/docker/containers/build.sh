@@ -115,8 +115,8 @@ create_container() {
       docker exec ${container} bash -c "nohup /bin/bash /opt/bigtop-manager-server/bin/start.sh --debug > /dev/null 2>&1 &"
     fi
     docker exec ${container} bash -c "nohup /bin/bash /opt/bigtop-manager-agent/bin/start.sh --debug > /dev/null 2>&1 &"
-    log "All Service Started!!!"
   done
+  log "All Service Started!!!"
 
 }
 

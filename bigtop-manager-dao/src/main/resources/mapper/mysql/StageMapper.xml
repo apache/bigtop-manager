@@ -23,6 +23,10 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.apache.bigtop.manager.dao.repository.StageDao">
 
+    <sql id="baseColumns">
+        id, state, name, `order`, context, service_name, component_name, job_id, cluster_id, create_time, update_time
+    </sql>
+
     <update id="updateStateByIds" parameterType="java.util.List">
         UPDATE stage
         SET `state` = CASE
@@ -35,5 +39,17 @@
             #{item.id}
         </foreach>
     </update>
+
+    <select id="findByJobId" parameterType="java.lang.Long" resultType="org.apache.bigtop.manager.dao.po.StagePO">
+        select
+        <include refid="baseColumns"/>
+        from
+        stage
+        <where>
+            <if test="jobId != 0">
+                job_id = #{jobId}
+            </if>
+        </where>
+    </select>
 
 </mapper>

@@ -19,6 +19,7 @@
 package org.apache.bigtop.manager.server.command.task;
 
 import org.apache.bigtop.manager.common.enums.Command;
+import org.apache.bigtop.manager.server.command.stage.StageContext;
 
 import lombok.Data;
 
@@ -26,6 +27,14 @@ import java.util.Map;
 
 @Data
 public class TaskContext {
+
+    /* internal */
+    private Long jobId;
+
+    private Long stageId;
+
+    private Long taskId;
+    /* internal */
 
     private Long clusterId;
 
@@ -53,4 +62,12 @@ public class TaskContext {
 
     // Extra properties for specific tasks
     protected Map<String, Object> properties;
+
+    public static TaskContext fromStageContext(StageContext stageContext) {
+        TaskContext taskContext = new TaskContext();
+        taskContext.setJobId(stageContext.getJobId());
+        taskContext.setStageId(stageContext.getStageId());
+        taskContext.setClusterId(stageContext.getClusterId());
+        return taskContext;
+    }
 }

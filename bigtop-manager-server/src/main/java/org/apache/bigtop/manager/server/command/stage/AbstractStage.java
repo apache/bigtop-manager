@@ -21,10 +21,15 @@ package org.apache.bigtop.manager.server.command.stage;
 import org.apache.bigtop.manager.common.enums.JobState;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.StagePO;
+import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.dao.repository.StageDao;
+import org.apache.bigtop.manager.dao.repository.TaskDao;
 import org.apache.bigtop.manager.server.command.task.Task;
+import org.apache.bigtop.manager.server.command.task.TaskContext;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -34,36 +39,80 @@ import java.util.concurrent.CompletableFuture;
 @Slf4j
 public abstract class AbstractStage implements Stage {
 
-    protected StageDao stageDao;
+    @Getter
+    @Setter
+    private JobState state;
 
+    protected StageDao stageDao;
+    protected TaskDao taskDao;
+
+    @Getter
     protected StageContext stageContext;
+
+    @Getter
     protected List<Task> tasks;
 
-    /**
-     * Do not use this directly, please use {@link #getStagePO()} to make sure it's initialized.
-     */
-    private StagePO stagePO;
-
     public AbstractStage(StageContext stageContext) {
+        injectBeans();
         this.stageContext = stageContext;
         this.tasks = new ArrayList<>();
 
-        injectBeans();
+        state = JobState.PENDING;
+
+        // obtain all tasks
+        List<StagePO> stagePOs = stageContext.getStagePOs();
+        if (stagePOs != null && !stagePOs.isEmpty()) {
+            for (StagePO stagePO : stagePOs) {
+                if (getStageContext().getOrder() == stagePO.getOrder()) {
+                    stageContext.setStageId(stagePO.getId());
+                    break;
+                }
+            }
+            persistState();
+
+        } else {
+            StagePO stagePO = new StagePO();
+            stagePO.setState(getState().getName());
+            stagePO.setJobId(stageContext.getJobId());
+            stagePO.setClusterId(stageContext.getClusterId());
+
+            stagePO.setOrder(getStageContext().getOrder());
+            stagePO.setName(getName());
+            stagePO.setServiceName(getServiceName());
+            stagePO.setComponentName(getComponentName());
+            stagePO.setContext(JsonUtils.writeAsString(stageContext));
+            stageDao.save(stagePO);
+
+            stageContext.setStageId(stagePO.getId());
+        }
 
         beforeCreateTasks();
 
-        for (String hostname : stageContext.getHostnames()) {
-            tasks.add(createTask(hostname));
+        if (stagePOs != null && !stagePOs.isEmpty()) {
+            List<TaskPO> taskPOS = taskDao.findByStageId(stageContext.getStageId());
+            for (TaskPO taskPO : taskPOS) {
+                TaskContext taskContext = TaskContext.fromStageContext(stageContext);
+                taskContext.setTaskId(taskPO.getId());
+                taskContext.setHostname(taskPO.getHostname());
+                tasks.add(createTask(taskContext));
+            }
+        } else {
+            for (String hostname : stageContext.getHostnames()) {
+                TaskContext taskContext = TaskContext.fromStageContext(stageContext);
+                taskContext.setHostname(hostname);
+                tasks.add(createTask(taskContext));
+            }
         }
     }
 
     protected void injectBeans() {
         this.stageDao = SpringContextHolder.getBean(StageDao.class);
+        this.taskDao = SpringContextHolder.getBean(TaskDao.class);
     }
 
     protected abstract void beforeCreateTasks();
 
-    protected abstract Task createTask(String hostname);
+    protected abstract Task createTask(TaskContext taskContext);
 
     protected String getServiceName() {
         return "cluster";
@@ -71,12 +120,6 @@ public abstract class AbstractStage implements Stage {
 
     protected String getComponentName() {
         return "agent";
-    }
-
-    @Override
-    public void beforeRun() {
-        stagePO.setState(JobState.PROCESSING.getName());
-        stageDao.partialUpdateById(stagePO);
     }
 
     @Override
@@ -118,44 +161,31 @@ public abstract class AbstractStage implements Stage {
     }
 
     @Override
-    public void onSuccess() {
-        StagePO stagePO = getStagePO();
-        stagePO.setState(JobState.SUCCESSFUL.getName());
+    public void persistState() {
+        StagePO stagePO = stageDao.findOptionalById(stageContext.getStageId())
+                .orElseThrow(() -> new RuntimeException("Stage not found"));
+        stagePO.setState(getState().getName());
+
+        if (stageContext.getClusterId() != null) {
+            stagePO.setClusterId(stageContext.getClusterId());
+        }
+
         stageDao.partialUpdateById(stagePO);
+    }
+
+    @Override
+    public void cancelRemainingTasks() {
+        for (Task task : tasks) {
+            if (task.getState() == JobState.PENDING) {
+                task.setState(JobState.CANCELED);
+                task.persistState();
+            }
+        }
     }
 
     @Override
     public void onFailure() {
-        StagePO stagePO = getStagePO();
-        stagePO.setState(JobState.FAILED.getName());
-        stageDao.partialUpdateById(stagePO);
-    }
-
-    @Override
-    public StageContext getStageContext() {
-        return stageContext;
-    }
-
-    @Override
-    public List<Task> getTasks() {
-        return tasks;
-    }
-
-    @Override
-    public void loadStagePO(StagePO stagePO) {
-        this.stagePO = stagePO;
-    }
-
-    @Override
-    public StagePO getStagePO() {
-        if (stagePO == null) {
-            stagePO = new StagePO();
-            stagePO.setName(getName());
-            stagePO.setServiceName(getServiceName());
-            stagePO.setComponentName(getComponentName());
-            stagePO.setContext(JsonUtils.writeAsString(stageContext));
-        }
-
-        return stagePO;
+        Stage.super.onFailure();
+        cancelRemainingTasks();
     }
 }

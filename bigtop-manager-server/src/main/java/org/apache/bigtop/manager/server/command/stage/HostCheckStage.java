@@ -52,9 +52,7 @@ public class HostCheckStage extends AbstractStage {
     }
 
     @Override
-    protected Task createTask(String hostname) {
-        TaskContext taskContext = new TaskContext();
-        taskContext.setHostname(hostname);
+    protected Task createTask(TaskContext taskContext) {
         taskContext.setClusterId(stageContext.getClusterId());
         taskContext.setClusterName(stageContext.getClusterName());
         taskContext.setStackName(stageContext.getStackName());

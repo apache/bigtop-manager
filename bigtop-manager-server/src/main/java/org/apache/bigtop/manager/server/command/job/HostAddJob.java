@@ -45,9 +45,8 @@ public class HostAddJob extends AbstractJob {
 
     @Override
     protected void createStages() {
-        StageContext stageContext = StageContext.fromCommandDTO(jobContext.getCommandDTO());
-        stages.add(new HostCheckStage(stageContext));
-        stages.add(new CacheFileUpdateStage(stageContext));
+        stages.add(new HostCheckStage(StageContext.fromJobContext(jobContext)));
+        stages.add(new CacheFileUpdateStage(StageContext.fromJobContext(jobContext)));
     }
 
     @Override

@@ -19,6 +19,8 @@
 package org.apache.bigtop.manager.server.command.stage;
 
 import org.apache.bigtop.manager.common.utils.JsonUtils;
+import org.apache.bigtop.manager.dao.po.StagePO;
+import org.apache.bigtop.manager.server.command.job.JobContext;
 import org.apache.bigtop.manager.server.model.dto.CommandDTO;
 import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
 import org.apache.bigtop.manager.server.model.dto.RepoDTO;
@@ -29,9 +31,18 @@ import org.apache.bigtop.manager.server.model.dto.command.HostCommandDTO;
 import lombok.Data;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Data
 public class StageContext {
+
+    /* internal */
+    private int order;
+
+    private Long jobId;
+
+    private Long stageId;
+    /* internal */
 
     private Long clusterId;
 
@@ -49,14 +60,30 @@ public class StageContext {
 
     private List<RepoDTO> repoInfoList;
 
-    public static StageContext fromPayload(String payload) {
-        CommandDTO commandDTO = JsonUtils.readFromString(payload, CommandDTO.class);
-        return fromCommandDTO(commandDTO);
+    private List<StagePO> stagePOs;
+
+    public static StageContext fromJobContext(JobContext jobContext) {
+        return fromCommandDTO(
+                jobContext.getCommandDTO(),
+                jobContext.getJobId(),
+                jobContext.getStagePOS(),
+                jobContext.getAtomicInteger());
     }
 
-    public static StageContext fromCommandDTO(CommandDTO commandDTO) {
+    public static StageContext fromPayload(
+            String payload, Long jobId, List<StagePO> stagePOs, AtomicInteger atomicInteger) {
+        CommandDTO commandDTO = JsonUtils.readFromString(payload, CommandDTO.class);
+        return fromCommandDTO(commandDTO, jobId, stagePOs, atomicInteger);
+    }
+
+    public static StageContext fromCommandDTO(
+            CommandDTO commandDTO, Long jobId, List<StagePO> stagePOs, AtomicInteger atomicInteger) {
         StageContext context = new StageContext();
+        // auto-Increment
+        context.setOrder(atomicInteger.incrementAndGet());
         context.setClusterId(commandDTO.getClusterId());
+        context.setJobId(jobId);
+        context.setStagePOs(stagePOs);
 
         switch (commandDTO.getCommandLevel()) {
             case CLUSTER -> fromClusterCommandPayload(context, commandDTO);

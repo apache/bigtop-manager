@@ -21,19 +21,13 @@ package org.apache.bigtop.manager.server.service.impl;
 import org.apache.bigtop.manager.common.enums.JobState;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.JobPO;
-import org.apache.bigtop.manager.dao.po.StagePO;
-import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.dao.repository.JobDao;
-import org.apache.bigtop.manager.dao.repository.StageDao;
-import org.apache.bigtop.manager.dao.repository.TaskDao;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
 import org.apache.bigtop.manager.server.command.factory.JobFactories;
 import org.apache.bigtop.manager.server.command.factory.JobFactory;
 import org.apache.bigtop.manager.server.command.job.Job;
 import org.apache.bigtop.manager.server.command.job.JobContext;
 import org.apache.bigtop.manager.server.command.scheduler.JobScheduler;
-import org.apache.bigtop.manager.server.command.stage.Stage;
-import org.apache.bigtop.manager.server.command.task.Task;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.model.converter.JobConverter;
@@ -57,12 +51,6 @@ public class JobServiceImpl implements JobService {
 
     @Resource
     private JobDao jobDao;
-
-    @Resource
-    private StageDao stageDao;
-
-    @Resource
-    private TaskDao taskDao;
 
     @Resource
     private JobScheduler jobScheduler;
@@ -99,78 +87,18 @@ public class JobServiceImpl implements JobService {
             throw new ApiException(ApiExceptionEnum.JOB_NOT_RETRYABLE);
         }
 
-        resetJobStatusInDB(jobPO);
-        Job job = recreateJob(jobPO);
-        jobScheduler.submit(job);
-
-        return JobConverter.INSTANCE.fromPO2VO(jobPO);
-    }
-
-    private void resetJobStatusInDB(JobPO jobPO) {
-        for (StagePO stagePO : jobPO.getStages()) {
-            for (TaskPO taskPO : stagePO.getTasks()) {
-                taskPO.setState(JobState.PENDING.getName());
-                taskDao.partialUpdateById(taskPO);
-            }
-
-            stagePO.setState(JobState.PENDING.getName());
-            stageDao.partialUpdateById(stagePO);
-        }
-
-        jobPO.setState(JobState.PENDING.getName());
-        jobDao.partialUpdateById(jobPO);
-    }
-
-    private Job recreateJob(JobPO jobPO) {
+        // Create job
         JobContext jobContext = JsonUtils.readFromString(jobPO.getContext(), JobContext.class);
         CommandIdentifier commandIdentifier = new CommandIdentifier(
                 jobContext.getCommandDTO().getCommandLevel(),
                 jobContext.getCommandDTO().getCommand());
         JobFactory jobFactory = JobFactories.getJobFactory(commandIdentifier);
+
+        jobContext.setJobId(id);
         Job job = jobFactory.createJob(jobContext);
 
-        job.loadJobPO(jobPO);
-        for (int i = 0; i < job.getStages().size(); i++) {
-            Stage stage = job.getStages().get(i);
-            StagePO stagePO = findCorrectStagePO(jobPO.getStages(), i + 1);
-            if (stagePO == null) {
-                throw new ApiException(ApiExceptionEnum.JOB_NOT_RETRYABLE);
-            }
+        jobScheduler.submit(job);
 
-            stage.loadStagePO(stagePO);
-
-            for (int j = 0; j < stage.getTasks().size(); j++) {
-                Task task = stage.getTasks().get(j);
-                TaskPO taskPO = findCorrectTaskPO(
-                        stagePO.getTasks(), task.getTaskContext().getHostname());
-                if (taskPO == null) {
-                    throw new ApiException(ApiExceptionEnum.JOB_NOT_RETRYABLE);
-                }
-
-                task.loadTaskPO(taskPO);
-            }
-        }
-
-        return job;
-    }
-
-    private StagePO findCorrectStagePO(List<StagePO> stagePOList, Integer order) {
-        for (StagePO stagePO : stagePOList) {
-            if (stagePO.getOrder().equals(order)) {
-                return stagePO;
-            }
-        }
-
-        return null;
-    }
-
-    private TaskPO findCorrectTaskPO(List<TaskPO> taskPOList, String hostname) {
-        for (TaskPO taskPO : taskPOList) {
-            if (taskPO.getHostname().equals(hostname)) {
-                return taskPO;
-            }
-        }
-
-        return null;
+        return JobConverter.INSTANCE.fromPO2VO(jobPO);
     }
 }

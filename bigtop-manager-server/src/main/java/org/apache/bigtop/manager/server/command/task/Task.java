@@ -18,23 +18,8 @@
  */
 package org.apache.bigtop.manager.server.command.task;
 
-import org.apache.bigtop.manager.dao.po.TaskPO;
+import org.apache.bigtop.manager.server.command.BehaviorNode;
 
-public interface Task {
-
-    String getName();
-
-    void beforeRun();
-
-    Boolean run();
-
-    void onSuccess();
-
-    void onFailure();
-
+public interface Task extends BehaviorNode {
     TaskContext getTaskContext();
-
-    void loadTaskPO(TaskPO taskPO);
-
-    TaskPO getTaskPO();
 }

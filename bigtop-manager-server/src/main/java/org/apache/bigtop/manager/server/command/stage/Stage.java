@@ -18,28 +18,16 @@
  */
 package org.apache.bigtop.manager.server.command.stage;
 
-import org.apache.bigtop.manager.dao.po.StagePO;
+import org.apache.bigtop.manager.server.command.BehaviorNode;
 import org.apache.bigtop.manager.server.command.task.Task;
 
 import java.util.List;
 
-public interface Stage {
+public interface Stage extends BehaviorNode {
 
-    String getName();
-
-    void beforeRun();
-
-    Boolean run();
-
-    void onSuccess();
-
-    void onFailure();
-
-    StageContext getStageContext();
+    void cancelRemainingTasks();
 
     List<Task> getTasks();
 
-    void loadStagePO(StagePO stagePO);
-
-    StagePO getStagePO();
+    StageContext getStageContext();
 }

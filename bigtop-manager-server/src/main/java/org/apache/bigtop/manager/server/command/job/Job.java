@@ -18,28 +18,8 @@
  */
 package org.apache.bigtop.manager.server.command.job;
 
-import org.apache.bigtop.manager.dao.po.JobPO;
-import org.apache.bigtop.manager.server.command.stage.Stage;
+import org.apache.bigtop.manager.server.command.BehaviorNode;
 
-import java.util.List;
-
-public interface Job {
-
-    String getName();
-
-    void beforeRun();
-
-    void run();
-
-    void onSuccess();
-
-    void onFailure();
-
+public interface Job extends BehaviorNode {
     JobContext getJobContext();
-
-    List<Stage> getStages();
-
-    void loadJobPO(JobPO jobPO);
-
-    JobPO getJobPO();
 }

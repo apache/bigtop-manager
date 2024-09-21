@@ -23,24 +23,28 @@ import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.JobPO;
 import org.apache.bigtop.manager.dao.po.StagePO;
-import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.dao.repository.ClusterDao;
 import org.apache.bigtop.manager.dao.repository.JobDao;
 import org.apache.bigtop.manager.dao.repository.StackDao;
 import org.apache.bigtop.manager.dao.repository.StageDao;
 import org.apache.bigtop.manager.dao.repository.TaskDao;
 import org.apache.bigtop.manager.server.command.stage.Stage;
-import org.apache.bigtop.manager.server.command.task.Task;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.LinkedBlockingQueue;
 
 @Slf4j
 public abstract class AbstractJob implements Job {
+
+    @Getter
+    @Setter
+    private JobState state;
 
     protected StackDao stackDao;
     protected ClusterDao clusterDao;
@@ -48,21 +52,34 @@ public abstract class AbstractJob implements Job {
     protected StageDao stageDao;
     protected TaskDao taskDao;
 
+    @Getter
     protected JobContext jobContext;
     protected List<Stage> stages;
 
     protected ClusterPO clusterPO;
 
-    /**
-     * Do not use this directly, please use {@link #getJobPO()} to make sure it's initialized.
-     */
-    private JobPO jobPO;
-
     public AbstractJob(JobContext jobContext) {
+        injectBeans();
         this.jobContext = jobContext;
         this.stages = new ArrayList<>();
 
-        injectBeans();
+        state = JobState.PENDING;
+        if (jobContext.getJobId() != null) {
+            persistState();
+            List<StagePO> stagePOs = stageDao.findByJobId(jobContext.getJobId());
+            jobContext.setStagePOS(stagePOs);
+
+        } else {
+            JobPO jobPO = new JobPO();
+            jobPO.setState(getState().getName());
+            jobPO.setClusterId(jobContext.getCommandDTO().getClusterId());
+
+            jobPO.setName(getName());
+            jobPO.setContext(JsonUtils.writeAsString(jobContext));
+            jobDao.save(jobPO);
+
+            jobContext.setJobId(jobPO.getId());
+        }
 
         beforeCreateStages();
 
@@ -86,23 +103,17 @@ public abstract class AbstractJob implements Job {
     protected abstract void createStages();
 
     @Override
-    public void beforeRun() {
-        jobPO.setState(JobState.PROCESSING.getName());
-        jobDao.partialUpdateById(jobPO);
-    }
-
-    @Override
-    public void run() {
+    public Boolean run() {
         boolean success = true;
 
         try {
             beforeRun();
 
-            LinkedBlockingQueue<Stage> queue = new LinkedBlockingQueue<>(stages);
-            while (!queue.isEmpty()) {
-                Stage stage = queue.poll();
-                Boolean stageSuccess = stage.run();
+            // Execute in order
+            stages.sort(Comparator.comparingInt(x -> x.getStageContext().getOrder()));
 
+            for (Stage stage : stages) {
+                Boolean stageSuccess = stage.run();
                 if (!stageSuccess) {
                     success = false;
                     break;
@@ -118,68 +129,37 @@ public abstract class AbstractJob implements Job {
         } else {
             onFailure();
         }
+
+        return success;
     }
 
     @Override
-    public void onSuccess() {
-        JobPO jobPO = getJobPO();
-        jobPO.setState(JobState.SUCCESSFUL.getName());
+    public void persistState() {
+        JobPO jobPO =
+                jobDao.findOptionalById(jobContext.getJobId()).orElseThrow(() -> new RuntimeException("Job not found"));
+        jobPO.setState(getState().getName());
+        jobPO.setClusterId(jobContext.getCommandDTO().getClusterId());
+
+        if (jobContext.getCommandDTO().getClusterId() != null) {
+            jobPO.setClusterId(jobContext.getCommandDTO().getClusterId());
+        }
+
         jobDao.partialUpdateById(jobPO);
+    }
+
+    private void cancelRemainingStages() {
+        for (Stage stage : stages) {
+            if (stage.getState() == JobState.PENDING) {
+                stage.setState(JobState.CANCELED);
+                stage.persistState();
+                stage.cancelRemainingTasks();
+            }
+        }
     }
 
     @Override
     public void onFailure() {
-        JobPO jobPO = getJobPO();
-        List<StagePO> stagePOList = new ArrayList<>();
-        List<TaskPO> taskPOList = new ArrayList<>();
-
-        jobPO.setState(JobState.FAILED.getName());
-
-        for (Stage stage : getStages()) {
-            StagePO stagePO = stage.getStagePO();
-            if (JobState.fromString(stagePO.getState()) == JobState.PENDING) {
-                stagePO.setState(JobState.CANCELED.getName());
-                stagePOList.add(stagePO);
-
-                for (Task task : stage.getTasks()) {
-                    TaskPO taskPO = task.getTaskPO();
-                    taskPO.setState(JobState.CANCELED.getName());
-                    taskPOList.add(taskPO);
-                }
-            }
-        }
-        if (!taskPOList.isEmpty()) {
-            taskDao.updateStateByIds(taskPOList);
-        }
-        if (!stagePOList.isEmpty()) {
-            stageDao.updateStateByIds(stagePOList);
-        }
-        jobDao.partialUpdateById(jobPO);
-    }
-
-    @Override
-    public JobContext getJobContext() {
-        return jobContext;
-    }
-
-    @Override
-    public List<Stage> getStages() {
-        return stages;
-    }
-
-    @Override
-    public void loadJobPO(JobPO jobPO) {
-        this.jobPO = jobPO;
-    }
-
-    @Override
-    public JobPO getJobPO() {
-        if (jobPO == null) {
-            jobPO = new JobPO();
-            jobPO.setName(getName());
-            jobPO.setContext(JsonUtils.writeAsString(jobContext));
-        }
-
-        return jobPO;
+        Job.super.onFailure();
+        cancelRemainingStages();
     }
 }

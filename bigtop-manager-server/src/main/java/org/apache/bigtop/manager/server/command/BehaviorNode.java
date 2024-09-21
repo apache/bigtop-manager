@@ -16,18 +16,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.vo;
+package org.apache.bigtop.manager.server.command;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.apache.bigtop.manager.common.enums.JobState;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class CommandVO {
+public interface BehaviorNode {
 
-    private Long id;
+    String getName();
 
-    private String state;
+    JobState getState();
+
+    void setState(JobState state);
+
+    void persistState();
+
+    default void beforeRun() {
+        setState(JobState.PROCESSING);
+        persistState();
+    }
+
+    Boolean run();
+
+    default void onSuccess() {
+        setState(JobState.SUCCESSFUL);
+        persistState();
+    }
+
+    default void onFailure() {
+        setState(JobState.FAILED);
+        persistState();
+    }
 }
