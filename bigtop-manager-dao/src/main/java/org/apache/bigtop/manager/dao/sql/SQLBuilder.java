@@ -335,8 +335,12 @@ public class SQLBuilder {
                                     .append("' THEN NULL ");
                         }
                     }
+                    if (caseClause.toString().endsWith("CASE ")) {
+                        caseClause.append("WHEN TRUE THEN ");
+                    } else {
+                        caseClause.append("ELSE ");
+                    }
                     caseClause
-                            .append("ELSE ")
                             .append(keywordsFormat(entry.getValue(), DBType.MYSQL))
                             .append(" ");
                     caseClause.append("END");
