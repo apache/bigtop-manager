@@ -21,6 +21,7 @@ package org.apache.bigtop.manager.server.controller;
 import org.apache.bigtop.manager.server.model.converter.PlatformConverter;
 import org.apache.bigtop.manager.server.model.dto.PlatformDTO;
 import org.apache.bigtop.manager.server.model.req.ChatbotMessageReq;
+import org.apache.bigtop.manager.server.model.req.ChatbotThreadReq;
 import org.apache.bigtop.manager.server.model.req.PlatformReq;
 import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
 import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
@@ -110,6 +111,19 @@ public class ChatbotController {
     public SseEmitter talk(
             @PathVariable Long platformId, @PathVariable Long threadId, @RequestBody ChatbotMessageReq messageReq) {
         return chatbotService.talk(platformId, threadId, messageReq.getMessage());
+    }
+
+    @Operation(summary = "get name", description = "Get name of the thread")
+    @GetMapping("platforms/{platformId}/threads/{threadId}/name")
+    public ResponseEntity<ChatThreadVO> getThreadName(@PathVariable Long platformId, @PathVariable Long threadId) {
+        return ResponseEntity.success(chatbotService.getThreadName(platformId, threadId));
+    }
+
+    @Operation(summary = "get name", description = "Get name of the thread")
+    @PostMapping("platforms/{platformId}/threads/{threadId}/name")
+    public ResponseEntity<Boolean> setThreadName(
+            @PathVariable Long platformId, @PathVariable Long threadId, @RequestBody ChatbotThreadReq threadReq) {
+        return ResponseEntity.success(chatbotService.setThreadName(platformId, threadId, threadReq.getNewName()));
     }
 
     @Operation(summary = "history", description = "Get chat records")

@@ -112,6 +112,23 @@ public class ChatbotServiceImpl implements ChatbotService {
                         threadId);
     }
 
+    private AIAssistant getAIAssistant(Long platformId, Long threadId) {
+        ChatThreadPO chatThreadPO = chatThreadDao.findByThreadId(threadId);
+        Long userId = SessionUserHolder.getUserId();
+        if (!Objects.equals(userId, chatThreadPO.getUserId())) {
+            throw new ApiException(ApiExceptionEnum.CHAT_THREAD_NOT_FOUND);
+        }
+        PlatformAuthorizedPO platformAuthorizedPO = platformAuthorizedDao.findByPlatformId(platformId);
+        if (platformAuthorizedPO == null || !platformAuthorizedPO.getId().equals(chatThreadPO.getPlatformId())) {
+            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED);
+        }
+
+        PlatformPO platformPO = platformDao.findById(platformAuthorizedPO.getPlatformId());
+        PlatformAuthorizedDTO platformAuthorizedDTO = new PlatformAuthorizedDTO(
+                platformPO.getName(), platformAuthorizedPO.getCredentials(), chatThreadPO.getModel());
+        return buildAIAssistant(platformAuthorizedDTO, chatThreadPO.getId(), chatThreadPO.getThreadInfo());
+    }
+
     private Boolean testAuthorization(PlatformAuthorizedDTO platformAuthorizedDTO) {
         AIAssistant aiAssistant = getAiAssistantFactory()
                 .create(
@@ -289,21 +306,7 @@ public class ChatbotServiceImpl implements ChatbotService {
 
     @Override
     public SseEmitter talk(Long platformId, Long threadId, String message) {
-        ChatThreadPO chatThreadPO = chatThreadDao.findByThreadId(threadId);
-        Long userId = SessionUserHolder.getUserId();
-        if (!Objects.equals(userId, chatThreadPO.getUserId())) {
-            throw new ApiException(ApiExceptionEnum.CHAT_THREAD_NOT_FOUND);
-        }
-        PlatformAuthorizedPO platformAuthorizedPO = platformAuthorizedDao.findByPlatformId(platformId);
-        if (platformAuthorizedPO == null) {
-            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED);
-        }
-
-        PlatformPO platformPO = platformDao.findById(platformAuthorizedPO.getPlatformId());
-        PlatformAuthorizedDTO platformAuthorizedDTO = new PlatformAuthorizedDTO(
-                platformPO.getName(), platformAuthorizedPO.getCredentials(), chatThreadPO.getModel());
-        AIAssistant aiAssistant =
-                buildAIAssistant(platformAuthorizedDTO, chatThreadPO.getId(), chatThreadPO.getThreadInfo());
+        AIAssistant aiAssistant = getAIAssistant(platformId, threadId);
         Flux<String> stringFlux = aiAssistant.streamAsk(message);
 
         SseEmitter emitter = new SseEmitter();
@@ -345,5 +348,34 @@ public class ChatbotServiceImpl implements ChatbotService {
             }
         }
         return chatMessages;
+    }
+
+    @Override
+    public ChatThreadVO getThreadName(Long platformId, Long threadId) {
+        AIAssistant aiAssistant = getAIAssistant(platformId, threadId);
+        ChatThreadPO chatThreadPO = chatThreadDao.findByThreadId(threadId);
+        String threadName = aiAssistant.getThreadName();
+        if (threadName == null) {
+            threadName = "Unnamed thread " + threadId;
+        }
+        chatThreadPO.setName(threadName);
+        chatThreadDao.partialUpdateById(chatThreadPO);
+        return ChatThreadConverter.INSTANCE.fromPO2VO(chatThreadPO);
+    }
+
+    @Override
+    public boolean setThreadName(Long platformId, Long threadId, String newName) {
+        ChatThreadPO chatThreadPO = chatThreadDao.findByThreadId(threadId);
+        Long userId = SessionUserHolder.getUserId();
+        if (!Objects.equals(userId, chatThreadPO.getUserId())) {
+            throw new ApiException(ApiExceptionEnum.CHAT_THREAD_NOT_FOUND);
+        }
+        PlatformAuthorizedPO platformAuthorizedPO = platformAuthorizedDao.findByPlatformId(platformId);
+        if (platformAuthorizedPO == null || !platformAuthorizedPO.getId().equals(chatThreadPO.getPlatformId())) {
+            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED);
+        }
+        chatThreadPO.setName(newName);
+        chatThreadDao.partialUpdateById(chatThreadPO);
+        return true;
     }
 }

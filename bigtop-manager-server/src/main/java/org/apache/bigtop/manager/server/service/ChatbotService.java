@@ -50,4 +50,8 @@ public interface ChatbotService {
     SseEmitter talk(Long platformId, Long threadId, String message);
 
     List<ChatMessageVO> history(Long platformId, Long threadId);
+
+    ChatThreadVO getThreadName(Long platformId, Long threadId);
+
+    boolean setThreadName(Long platformId, Long threadId, String newName);
 }

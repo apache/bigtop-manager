@@ -16,23 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.vo;
+package org.apache.bigtop.manager.server.model.req;
 
 import lombok.Data;
 
+import jakarta.validation.constraints.NotEmpty;
+
 @Data
-public class ChatThreadVO {
-    private Long threadId;
-
-    private Long platformId;
-
-    private String model;
-
-    private String name;
-
-    private String createTime;
-
-    private String updateTime;
-
-    public ChatThreadVO() {}
+public class ChatbotThreadReq {
+    @NotEmpty
+    private String newName;
 }
