@@ -87,6 +87,7 @@ public interface AIAssistant {
      * @return
      */
     void setThreadNameGenerator(String threadNameGenerator);
+
     /**
      * Get the name of the chat thread
      * @return
