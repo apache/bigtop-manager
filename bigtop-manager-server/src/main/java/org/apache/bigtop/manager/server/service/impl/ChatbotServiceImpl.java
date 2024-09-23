@@ -369,10 +369,7 @@ public class ChatbotServiceImpl implements ChatbotService {
         }
         chatThreadPO.setName(threadName);
         chatThreadDao.partialUpdateById(chatThreadPO);
-        log.info("Thread name1: {}", chatThreadPO);
-        ChatThreadVO chatThreadVo = ChatThreadConverter.INSTANCE.fromPO2VO(chatThreadPO);
-        log.info("Thread name2: {}", chatThreadVo);
-        return chatThreadVo;
+        return ChatThreadConverter.INSTANCE.fromPO2VO(chatThreadPO);
     }
 
     @Override
