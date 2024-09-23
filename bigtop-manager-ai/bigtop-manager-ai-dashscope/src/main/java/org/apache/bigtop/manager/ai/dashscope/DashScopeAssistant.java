@@ -19,7 +19,6 @@
 package org.apache.bigtop.manager.ai.dashscope;
 
 import org.apache.bigtop.manager.ai.core.AbstractAIAssistant;
-import org.apache.bigtop.manager.ai.core.enums.MessageType;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 
@@ -50,7 +49,6 @@ import com.alibaba.dashscope.threads.runs.Run;
 import com.alibaba.dashscope.threads.runs.RunParam;
 import com.alibaba.dashscope.threads.runs.Runs;
 import dev.langchain4j.data.message.AiMessage;
-import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.internal.ValidationUtils;
@@ -88,20 +86,6 @@ public class DashScopeAssistant extends AbstractAIAssistant {
         return streamMessage.toString();
     }
 
-    private void addMessage(String message, MessageType sender) {
-        ChatMessage chatMessage;
-        if (sender.equals(MessageType.AI)) {
-            chatMessage = new AiMessage(message);
-        } else if (sender.equals(MessageType.USER)) {
-            chatMessage = new UserMessage(message);
-        } else if (sender.equals(MessageType.SYSTEM)) {
-            chatMessage = new SystemMessage(message);
-        } else {
-            return;
-        }
-        chatMemory.add(chatMessage);
-    }
-
     @Override
     public PlatformType getPlatform() {
         return PlatformType.DASH_SCOPE;
@@ -131,7 +115,7 @@ public class DashScopeAssistant extends AbstractAIAssistant {
         } catch (NoApiKeyException | InputRequiredException | InvalidateParameter e) {
             throw new RuntimeException(e);
         }
-        addMessage(systemPrompt, MessageType.SYSTEM);
+        chatMemory.add(SystemMessage.systemMessage(systemPrompt));
     }
 
     public static Builder builder() {
@@ -140,7 +124,7 @@ public class DashScopeAssistant extends AbstractAIAssistant {
 
     @Override
     public Flux<String> streamAsk(String userMessage) {
-        addMessage(userMessage, MessageType.USER);
+        chatMemory.add(UserMessage.from(userMessage));
         TextMessageParam textMessageParam = TextMessageParam.builder()
                 .apiKey(dashScopeThreadParam.getApiKey())
                 .role(Role.USER.getValue())
@@ -174,13 +158,11 @@ public class DashScopeAssistant extends AbstractAIAssistant {
                     return message;
                 })
                 .doOnComplete(() -> {
-                    addMessage(finalMessage.toString(), MessageType.AI);
+                    chatMemory.add(AiMessage.from(finalMessage.toString()));
                 });
     }
 
-    @Override
-    public String ask(String userMessage) {
-        addMessage(userMessage, MessageType.USER);
+    public String runAsk(String userMessage) {
         TextMessageParam textMessageParam = TextMessageParam.builder()
                 .apiKey(dashScopeThreadParam.getApiKey())
                 .role(Role.USER.getValue())
@@ -244,7 +226,6 @@ public class DashScopeAssistant extends AbstractAIAssistant {
             ContentText contentText = (ContentText) content;
             finalMessage.append(contentText.getText().getValue());
         }
-        addMessage(finalMessage.toString(), MessageType.AI);
         return finalMessage.toString();
     }
 

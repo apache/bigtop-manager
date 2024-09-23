@@ -82,4 +82,8 @@ public class LocSystemPromptProvider implements SystemPromptProvider {
             return text;
         }
     }
+
+    public String getThreadNameGenerator() {
+        return getSystemMessage(SystemPrompt.THREAD_NAME_GENERATOR);
+    }
 }

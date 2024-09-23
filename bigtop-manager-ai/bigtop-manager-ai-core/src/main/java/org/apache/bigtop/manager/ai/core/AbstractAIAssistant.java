@@ -21,6 +21,9 @@ package org.apache.bigtop.manager.ai.core;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
 
+import dev.langchain4j.data.message.AiMessage;
+import dev.langchain4j.data.message.ChatMessage;
+import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 
@@ -28,19 +31,51 @@ public abstract class AbstractAIAssistant implements AIAssistant {
 
     protected static final Integer MEMORY_LEN = 10;
     protected final ChatMemory chatMemory;
+    private String threadNameGenerator;
 
     protected AbstractAIAssistant(ChatMemory chatMemory) {
         this.chatMemory = chatMemory;
     }
 
     @Override
+    public String ask(String chatMessage) {
+        chatMemory.add(UserMessage.from(chatMessage));
+        String aiMessage = runAsk(chatMessage);
+        chatMemory.add(AiMessage.from(aiMessage));
+        return aiMessage;
+    }
+
+    @Override
     public boolean test() {
-        return ask("1+1=") != null;
+        return runAsk("1+1=") != null;
+    }
+
+    @Override
+    public String getThreadName() {
+        if (threadNameGenerator == null) {
+            return null;
+        }
+        boolean hasUserMessage = false;
+        for (ChatMessage message : chatMemory.messages()) {
+            if (message instanceof UserMessage) {
+                hasUserMessage = true;
+                break;
+            }
+        }
+        if (!hasUserMessage) {
+            return null;
+        }
+        return runAsk(threadNameGenerator);
     }
 
     @Override
     public Object getId() {
         return chatMemory.id();
+    }
+
+    @Override
+    public void setThreadNameGenerator(String threadNameGenerator) {
+        this.threadNameGenerator = threadNameGenerator;
     }
 
     public abstract static class Builder implements AIAssistant.Builder {

@@ -83,12 +83,9 @@ public class QianFanAssistant extends AbstractAIAssistant {
     }
 
     @Override
-    public String ask(String chatMessage) {
-        chatMemory.add(UserMessage.from(chatMessage));
+    public String runAsk(String chatMessage) {
         Response<AiMessage> generate = chatLanguageModel.generate(chatMemory.messages());
-        String aiMessage = generate.content().text();
-        chatMemory.add(AiMessage.from(aiMessage));
-        return aiMessage;
+        return generate.content().text();
     }
 
     @Override

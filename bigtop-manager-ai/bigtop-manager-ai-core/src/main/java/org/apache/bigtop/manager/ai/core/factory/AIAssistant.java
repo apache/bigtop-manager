@@ -51,6 +51,12 @@ public interface AIAssistant {
     String ask(String userMessage);
 
     /**
+     * This is a conversation based on blocking output.
+     * @param message
+     * @return
+     */
+    String runAsk(String message);
+    /**
      * This is used to get the AIAssistant's Platform
      * @return
      */
@@ -75,6 +81,13 @@ public interface AIAssistant {
      * @return
      */
     boolean test();
+
+    void setThreadNameGenerator(String threadNameGenerator);
+    /**
+     * Get the name of the chat thread
+     * @return
+     */
+    String getThreadName();
 
     interface Builder {
         Builder id(Object id);

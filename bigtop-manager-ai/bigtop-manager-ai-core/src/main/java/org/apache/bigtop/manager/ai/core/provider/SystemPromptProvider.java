@@ -28,4 +28,6 @@ public interface SystemPromptProvider {
     String getSystemMessage();
 
     String getLanguagePrompt(String locale);
+
+    String getThreadNameGenerator();
 }

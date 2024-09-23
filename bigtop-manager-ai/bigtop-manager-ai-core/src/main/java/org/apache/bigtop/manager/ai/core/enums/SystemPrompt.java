@@ -24,7 +24,8 @@ import lombok.Getter;
 public enum SystemPrompt {
     DEFAULT_PROMPT("default"),
     BIGDATA_PROFESSOR("big-data-professor"),
-    LANGUAGE_PROMPT("language-prompt");
+    LANGUAGE_PROMPT("language-prompt"),
+    THREAD_NAME_GENERATOR("thread-name-generator");
     ;
 
     private final String value;
