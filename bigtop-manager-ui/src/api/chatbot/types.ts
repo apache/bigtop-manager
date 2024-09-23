@@ -16,6 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+export interface ChatbotConfig {
+  platformId?: string | number
+  platformName?: string
+  supportModels?: string
+  model?: string
+  threadId?: string | number
+  threadName?: string
+  createTime?: string
+  updateTime?: string
+}
 export interface Platform {
   platformId: string | number
   platformName: string
@@ -74,7 +85,7 @@ export interface ChatThreadHistoryCondition {
   threadId: string | number
 }
 
-export interface sendChatMessageCondition extends ChatThreadHistoryCondition {
+export interface SendChatMessageCondition extends ChatThreadHistoryCondition {
   message: string
 }
 

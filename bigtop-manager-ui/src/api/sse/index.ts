@@ -20,7 +20,7 @@
 import axios, { type AxiosProgressEvent, type CancelTokenSource } from 'axios'
 import request from '@/api/request.ts'
 import type { chatMessagesRes, LogsRes } from './types'
-import type { sendChatMessageCondition } from '@/api/chatbot/types'
+import type { SendChatMessageCondition } from '@/api/chatbot/types'
 
 export const getLogs = (
   clusterId: number,
@@ -42,7 +42,7 @@ export const getLogs = (
   return { promise, cancel: source.cancel }
 }
 export const sendChatMessage = (
-  data: sendChatMessageCondition,
+  data: SendChatMessageCondition,
   func: Function
 ): chatMessagesRes => {
   const source: CancelTokenSource = axios.CancelToken.source()
