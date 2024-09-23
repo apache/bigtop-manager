@@ -28,7 +28,7 @@ public class ChatThreadVO {
 
     private String model;
 
-    private String name;
+    private String threadName;
 
     private String createTime;
 

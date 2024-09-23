@@ -68,6 +68,7 @@ public enum ApiExceptionEnum {
     CREDIT_INCORRECT(19003, LocaleKeys.CREDIT_INCORRECT),
     MODEL_NOT_SUPPORTED(19004, LocaleKeys.MODEL_NOT_SUPPORTED),
     CHAT_THREAD_NOT_FOUND(19005, LocaleKeys.CHAT_THREAD_NOT_FOUND),
+    THREAD_NAME_TOO_LONG(19006, LocaleKeys.THREAD_NAME_TOO_LONG),
     ;
 
     private final Integer code;

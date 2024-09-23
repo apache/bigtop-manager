@@ -30,6 +30,7 @@ import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 public abstract class AbstractAIAssistant implements AIAssistant {
 
     protected static final Integer MEMORY_LEN = 10;
+    protected static final Integer THREAD_NAME_LEN = 100;
     protected final ChatMemory chatMemory;
     private String threadNameGenerator;
 
@@ -65,7 +66,8 @@ public abstract class AbstractAIAssistant implements AIAssistant {
         if (!hasUserMessage) {
             return null;
         }
-        return runAsk(threadNameGenerator);
+        String threadName = runAsk(threadNameGenerator);
+        return threadName.length() > THREAD_NAME_LEN ? threadName.substring(0, THREAD_NAME_LEN) : threadName;
     }
 
     @Override

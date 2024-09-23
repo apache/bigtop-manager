@@ -31,5 +31,6 @@ public interface ChatThreadConverter {
     ChatThreadConverter INSTANCE = Mappers.getMapper(ChatThreadConverter.class);
 
     @Mapping(source = "id", target = "threadId")
+    @Mapping(source = "name", target = "threadName")
     ChatThreadVO fromPO2VO(ChatThreadPO platformAuthorizedPO);
 }

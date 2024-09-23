@@ -360,11 +360,17 @@ public class ChatbotServiceImpl implements ChatbotService {
         }
         chatThreadPO.setName(threadName);
         chatThreadDao.partialUpdateById(chatThreadPO);
-        return ChatThreadConverter.INSTANCE.fromPO2VO(chatThreadPO);
+        log.info("Thread name1: {}", chatThreadPO);
+        ChatThreadVO chatThreadVo = ChatThreadConverter.INSTANCE.fromPO2VO(chatThreadPO);
+        log.info("Thread name2: {}", chatThreadVo);
+        return chatThreadVo;
     }
 
     @Override
     public boolean setThreadName(Long platformId, Long threadId, String newName) {
+        if (newName.length() > 100) {
+            throw new ApiException(ApiExceptionEnum.THREAD_NAME_TOO_LONG);
+        }
         ChatThreadPO chatThreadPO = chatThreadDao.findByThreadId(threadId);
         Long userId = SessionUserHolder.getUserId();
         if (!Objects.equals(userId, chatThreadPO.getUserId())) {

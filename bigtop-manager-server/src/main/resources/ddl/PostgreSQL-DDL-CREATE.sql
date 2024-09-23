@@ -354,6 +354,7 @@ CREATE TABLE llm_chat_thread
     platform_id BIGINT CHECK (platform_id > 0) NOT NULL,
     user_id     BIGINT CHECK (user_id > 0)     NOT NULL,
     model       VARCHAR(255)                   NOT NULL,
+    name        VARCHAR(255)                   DEFAULT NULL,
     thread_info JSON         DEFAULT NULL,
     is_deleted  BOOLEAN      DEFAULT FALSE,
     create_time TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,

@@ -51,7 +51,7 @@ public interface AIAssistant {
     String ask(String userMessage);
 
     /**
-     * This is a conversation based on blocking output.
+     * Have a conversation that will not be saved.
      * @param message
      * @return
      */
@@ -82,6 +82,10 @@ public interface AIAssistant {
      */
     boolean test();
 
+    /**
+     * Set prompt for generating thread name.
+     * @return
+     */
     void setThreadNameGenerator(String threadNameGenerator);
     /**
      * Get the name of the chat thread
