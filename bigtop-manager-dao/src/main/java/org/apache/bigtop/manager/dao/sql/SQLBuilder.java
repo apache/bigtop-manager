@@ -291,7 +291,10 @@ public class SQLBuilder {
                         primaryKey = keywordsFormat(entry.getValue(), DBType.MYSQL);
                         continue;
                     }
-
+                    Field field = ReflectionUtils.findField(entityClass, entry.getKey());
+                    if (field == null || checkBaseField(field)) {
+                        continue;
+                    }
                     StringBuilder caseClause = new StringBuilder();
                     caseClause
                             .append(keywordsFormat(entry.getValue(), DBType.MYSQL))
@@ -299,10 +302,6 @@ public class SQLBuilder {
                     for (Entity entity : entities) {
                         PropertyDescriptor ps = BeanUtils.getPropertyDescriptor(entityClass, entry.getKey());
                         if (ps == null || ps.getReadMethod() == null) {
-                            continue;
-                        }
-                        Field field = ReflectionUtils.findField(entityClass, entry.getKey());
-                        if (field == null || checkBaseField(field)) {
                             continue;
                         }
                         Object value = ReflectionUtils.invokeMethod(ps.getReadMethod(), entity);
@@ -364,9 +363,7 @@ public class SQLBuilder {
             case POSTGRESQL: {
                 sqlBuilder
                         .append("UPDATE ")
-                        .append("\"")
-                        .append(tableMetaData.getTableName())
-                        .append("\"")
+                        .append(keywordsFormat(tableMetaData.getTableName(), DBType.POSTGRESQL))
                         .append(" SET ");
                 Map<String, StringBuilder> setClauses = new LinkedHashMap<>();
                 String primaryKey = keywordsFormat("id", DBType.POSTGRESQL);
