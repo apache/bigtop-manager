@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserService {
         Long id = SessionUserHolder.getUserId();
         UserPO userPO = userDao.findOptionalById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.NEED_LOGIN));
         userPO.setNickname(userDTO.getNickname());
-        userDao.updateById(userPO);
+        userDao.partialUpdateById(userPO);
         return UserConverter.INSTANCE.fromPO2VO(userPO);
     }
 }

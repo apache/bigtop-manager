@@ -68,7 +68,7 @@ public abstract class AbstractTask implements Task {
     @Override
     public void beforeRun() {
         taskPO.setState(JobState.PROCESSING.getName());
-        taskDao.updateById(taskPO);
+        taskDao.partialUpdateById(taskPO);
     }
 
     @Override
@@ -106,7 +106,7 @@ public abstract class AbstractTask implements Task {
         TaskPO taskPO = getTaskPO();
         taskPO.setContent(ProtobufUtil.toJson(commandRequest));
         taskPO.setState(JobState.SUCCESSFUL.getName());
-        taskDao.updateById(taskPO);
+        taskDao.partialUpdateById(taskPO);
     }
 
     @Override
@@ -114,7 +114,7 @@ public abstract class AbstractTask implements Task {
         TaskPO taskPO = getTaskPO();
         taskPO.setContent(ProtobufUtil.toJson(commandRequest));
         taskPO.setState(JobState.FAILED.getName());
-        taskDao.updateById(taskPO);
+        taskDao.partialUpdateById(taskPO);
     }
 
     @Override

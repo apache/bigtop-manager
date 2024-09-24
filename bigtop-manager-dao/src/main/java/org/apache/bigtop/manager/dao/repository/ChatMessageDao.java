@@ -26,6 +26,4 @@ import java.util.List;
 
 public interface ChatMessageDao extends BaseDao<ChatMessagePO> {
     List<ChatMessagePO> findAllByThreadId(@Param("threadId") Long threadId);
-
-    void deleteByThreadId(@Param("threadId") Long threadId);
 }

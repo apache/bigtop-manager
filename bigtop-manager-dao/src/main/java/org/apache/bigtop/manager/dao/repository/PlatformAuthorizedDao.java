@@ -22,8 +22,12 @@ import org.apache.bigtop.manager.dao.po.PlatformAuthorizedPO;
 
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 public interface PlatformAuthorizedDao extends BaseDao<PlatformAuthorizedPO> {
     PlatformAuthorizedPO findByPlatformId(@Param("id") Long platformId);
 
     void saveWithCredentials(PlatformAuthorizedPO platformAuthorizedPO);
+
+    List<PlatformAuthorizedPO> findAllPlatform();
 }

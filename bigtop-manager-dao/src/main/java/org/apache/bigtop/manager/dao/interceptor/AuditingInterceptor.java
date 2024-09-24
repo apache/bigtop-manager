@@ -72,7 +72,9 @@ public class AuditingInterceptor implements Interceptor {
             Collection<Object> objects;
             if (parameter instanceof MapperMethod.ParamMap) {
                 MapperMethod.ParamMap<Object> paramMap = ((MapperMethod.ParamMap<Object>) parameter);
-                if (paramMap.get("param1") instanceof Collection) {
+                if (!paramMap.containsKey("param1") && paramMap.containsKey("arg0")) {
+                    objects = ((Collection<Object>) paramMap.get("arg0"));
+                } else if (paramMap.get("param1") instanceof Collection) {
                     objects = ((Collection<Object>) paramMap.get("param1"));
                 } else {
                     objects = Collections.singletonList(paramMap.get("param1"));

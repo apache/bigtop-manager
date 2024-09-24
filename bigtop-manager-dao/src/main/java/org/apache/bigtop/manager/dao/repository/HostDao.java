@@ -28,8 +28,6 @@ import java.util.List;
 
 public interface HostDao extends BaseDao<HostPO> {
 
-    int saveAll(@Param("hosts") List<HostPO> hosts);
-
     HostPO findByHostname(@Param("hostname") String hostname);
 
     List<HostPO> findAllByHostnameIn(@Param("hostnames") Collection<String> hostnames);

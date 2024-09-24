@@ -94,7 +94,7 @@ public class ConfigServiceImpl implements ConfigService {
         if (shouldUpdateConfig(existConfigs, configs)) {
             // Unselect current config
             currentConfig.setSelected(false);
-            serviceConfigDao.updateById(currentConfig);
+            serviceConfigDao.partialUpdateById(currentConfig);
 
             // Create a new config
             String configDesc = "Update config for " + servicePO.getServiceName();

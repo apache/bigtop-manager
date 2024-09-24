@@ -99,7 +99,7 @@ public class HostServiceImpl implements HostService {
     public HostVO update(Long id, HostDTO hostDTO) {
         HostPO hostPO = HostConverter.INSTANCE.fromDTO2PO(hostDTO);
         hostPO.setId(id);
-        hostDao.updateById(hostPO);
+        hostDao.partialUpdateById(hostPO);
 
         return HostConverter.INSTANCE.fromPO2VO(hostPO);
     }

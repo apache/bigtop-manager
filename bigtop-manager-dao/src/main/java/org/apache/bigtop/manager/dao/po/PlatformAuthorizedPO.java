@@ -39,6 +39,9 @@ public class PlatformAuthorizedPO extends BasePO implements Serializable {
     @Column(name = "credentials", columnDefinition = "json", nullable = false)
     private Map<String, String> credentials;
 
-    @Column(name = "platform_id")
+    @Column(name = "platform_id", nullable = false)
     private Long platformId;
+
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
 }

@@ -20,6 +20,7 @@ package org.apache.bigtop.manager.server.controller;
 
 import org.apache.bigtop.manager.server.model.converter.PlatformConverter;
 import org.apache.bigtop.manager.server.model.dto.PlatformDTO;
+import org.apache.bigtop.manager.server.model.req.ChatbotMessageReq;
 import org.apache.bigtop.manager.server.model.req.PlatformReq;
 import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
 import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
@@ -66,7 +67,7 @@ public class ChatbotController {
         return ResponseEntity.success(chatbotService.authorizedPlatforms());
     }
 
-    @Operation(summary = "platforms", description = "Get authorized platforms")
+    @Operation(summary = "platforms", description = "Get platform auth credentials")
     @GetMapping("/platforms/{platformId}/auth/credential")
     public ResponseEntity<List<PlatformAuthCredentialVO>> platformsAuthCredential(@PathVariable Long platformId) {
         return ResponseEntity.success(chatbotService.platformsAuthCredential(platformId));
@@ -106,8 +107,9 @@ public class ChatbotController {
 
     @Operation(summary = "talk", description = "Talk with Chatbot")
     @PostMapping("platforms/{platformId}/threads/{threadId}/talk")
-    public SseEmitter talk(@PathVariable Long platformId, @PathVariable Long threadId, @RequestParam String message) {
-        return chatbotService.talk(platformId, threadId, message);
+    public SseEmitter talk(
+            @PathVariable Long platformId, @PathVariable Long threadId, @RequestBody ChatbotMessageReq messageReq) {
+        return chatbotService.talk(platformId, threadId, messageReq.getMessage());
     }
 
     @Operation(summary = "history", description = "Get chat records")

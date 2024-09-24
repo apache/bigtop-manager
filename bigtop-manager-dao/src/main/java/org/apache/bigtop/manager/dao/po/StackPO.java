@@ -35,9 +35,9 @@ public class StackPO extends BasePO implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "stack_name")
+    @Column(name = "stack_name", nullable = false)
     private String stackName;
 
-    @Column(name = "stack_version")
+    @Column(name = "stack_version", nullable = false)
     private String stackVersion;
 }

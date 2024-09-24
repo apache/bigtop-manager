@@ -26,11 +26,7 @@
         SELECT *
         FROM llm_chat_message
         WHERE thread_id = #{threadId}
+        AND is_deleted = false
     </select>
-
-    <delete id="deleteByThreadId">
-        DELETE FROM llm_chat_message
-        WHERE thread_id = #{threadId}
-    </delete>
 
 </mapper>

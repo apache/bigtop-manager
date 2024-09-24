@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.server.model.converter;
 
-import org.apache.bigtop.manager.ai.core.enums.MessageSender;
+import org.apache.bigtop.manager.ai.core.enums.MessageType;
 import org.apache.bigtop.manager.dao.po.ChatMessagePO;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
@@ -32,12 +32,12 @@ public interface ChatMessageConverter {
 
     ChatMessageVO fromPO2VO(ChatMessagePO chatMessagePO);
 
-    default MessageSender mapStringToMessageSender(String sender) {
+    default MessageType mapStringToMessageSender(String sender) {
         if (sender == null) {
             return null;
         }
         try {
-            return MessageSender.valueOf(sender.toUpperCase());
+            return MessageType.valueOf(sender.toUpperCase());
         } catch (IllegalArgumentException e) {
             return null;
         }

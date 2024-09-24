@@ -43,7 +43,7 @@ public class ComponentInstallTask extends AbstractComponentTask {
         HostComponentPO hostComponentPO =
                 hostComponentDao.findByClusterIdAndComponentNameAndHostname(clusterId, componentName, hostname);
         hostComponentPO.setState(MaintainState.INSTALLED.getName());
-        hostComponentDao.updateById(hostComponentPO);
+        hostComponentDao.partialUpdateById(hostComponentPO);
     }
 
     @Override
