@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite --open --mode development",
-    "build": "vue-tsc && vite build --mode production",
+    "build": "vue-tsc && vite build --mode production --base=/",
     "preview": "vite preview",
     "lint": "eslint src --fix --ext .ts,.tsx,.vue",
     "prettier": "prettier --write \"src/**/*.{vue,ts,tsx}\"",
