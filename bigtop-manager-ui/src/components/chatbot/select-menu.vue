@@ -18,7 +18,7 @@
 -->
 <script setup lang="ts">
   import { CloseOutlined } from '@ant-design/icons-vue'
-  import { defineProps, toRefs } from 'vue'
+  import { toRefs } from 'vue'
 
   export type Option = {
     nextPage: string
@@ -78,12 +78,14 @@
               <span>
                 {{ option.name }}
               </span>
-              <CloseOutlined
+              <div
                 v-show="item.isDeletable"
-                :key="option"
+                :key="idx"
                 class="select-item-del"
                 @click.stop="onRemove(option)"
-              />
+              >
+                <CloseOutlined />
+              </div>
             </li>
           </template>
         </slot>
