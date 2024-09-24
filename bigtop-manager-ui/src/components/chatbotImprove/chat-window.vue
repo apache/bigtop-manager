@@ -38,18 +38,19 @@
   }
 
   const { t } = useI18n()
-  const inputText = ref('')
   const {
     loading,
     messageReciver,
     fetchSendChatMessage,
     fetchThreadChatHistory
   } = useChatBot()
+  const inputText = ref('')
   const isMessageFullyReceived = ref(true)
   const tempHistory = ref<ChatThreadHistoryItem[]>([])
   const msgInputRef = ref<HTMLInputElement | null>(null)
   const props = defineProps<PlatfromChatPorps>()
   const { visible, currPage, chatPayload } = toRefs(props)
+
   const sendable = computed(
     () => inputText.value != '' && isMessageFullyReceived.value
   )

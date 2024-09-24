@@ -35,7 +35,7 @@
   const { t } = useI18n()
   const {
     loading,
-    btnLoading,
+    checkLoading,
     testAuthofPlatform,
     fetchCredentialFormModelofPlatform
   } = useChatBot()
@@ -83,7 +83,7 @@
         nextPage: 'model-selector'
       })
     }
-    btnLoading.value = false
+    checkLoading.value = false
   }
 
   const onCheck = async () => {
@@ -127,7 +127,7 @@
       </select-menu>
     </a-spin>
     <footer>
-      <a-button :loading="btnLoading" type="primary" @click="onCheck">{{
+      <a-button :loading="checkLoading" type="primary" @click="onCheck">{{
         loading ? $t('common.loadingText_verifying') : $t('common.confirm')
       }}</a-button>
     </footer>

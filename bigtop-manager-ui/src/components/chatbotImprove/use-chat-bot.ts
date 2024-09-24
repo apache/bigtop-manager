@@ -44,7 +44,7 @@ const useChatBot = () => {
   const { t } = useI18n()
   const isExpand = ref(false)
   const loading = ref(false)
-  const btnLoading = ref(false)
+  const checkLoading = ref(false)
   const canceler = ref<Canceler>()
   const messageReciver = ref('')
 
@@ -68,8 +68,10 @@ const useChatBot = () => {
       const data = await getAuthorizedPlatforms()
       return Promise.resolve(data)
     } catch (error) {
-      loading.value = false
       console.log('error :>> ', error)
+      return []
+    } finally {
+      loading.value = false
     }
   }
 
@@ -79,8 +81,10 @@ const useChatBot = () => {
       const data = await getSupportedPlatforms()
       return Promise.resolve(data)
     } catch (error) {
-      loading.value = false
       console.log('error :>> ', error)
+      return []
+    } finally {
+      loading.value = false
     }
   }
 
@@ -92,8 +96,10 @@ const useChatBot = () => {
       const data = await getCredentialFormModelofPlatform(platformId)
       return Promise.resolve(data)
     } catch (error) {
-      loading.value = false
       console.log('error :>> ', error)
+      return []
+    } finally {
+      loading.value = false
     }
   }
 
@@ -102,14 +108,14 @@ const useChatBot = () => {
     authFormData: T
   ) {
     try {
-      btnLoading.value = true
+      checkLoading.value = true
       const data = await validateAuthCredentials({
         platformId,
         authCredentials: formatAuthCredentials<T>(authFormData)
       })
       return Promise.resolve(data)
     } catch (error) {
-      btnLoading.value = false
+      checkLoading.value = false
       console.log('error :>> ', error)
     }
   }
@@ -123,8 +129,10 @@ const useChatBot = () => {
       })
       return Promise.resolve(data)
     } catch (error) {
-      loading.value = false
       console.log('error :>> ', error)
+      return []
+    } finally {
+      loading.value = false
     }
   }
 
@@ -134,8 +142,9 @@ const useChatBot = () => {
       const data = await createChatThread(platfromInfo)
       return Promise.resolve(data)
     } catch (error) {
-      loading.value = false
       console.log('error :>> ', error)
+    } finally {
+      loading.value = false
     }
   }
 
@@ -148,8 +157,10 @@ const useChatBot = () => {
       const data = await getThreadChatHistory({ platformId, threadId })
       return Promise.resolve(data)
     } catch (error) {
-      loading.value = false
       console.log('error :>> ', error)
+      return []
+    } finally {
+      loading.value = false
     }
   }
 
@@ -171,8 +182,9 @@ const useChatBot = () => {
         data ? t('common.delete_success') : t('common.delete_fail')
       )
     } catch (error) {
-      loading.value = false
       console.log('error :>> ', error)
+    } finally {
+      loading.value = false
     }
   }
   async function fetchDelChatThread(payload: ChatThreadDelCondition) {
@@ -183,8 +195,9 @@ const useChatBot = () => {
         data ? t('common.delete_success') : t('common.delete_fail')
       )
     } catch (error) {
-      loading.value = false
       console.log('error :>> ', error)
+    } finally {
+      loading.value = false
     }
   }
 
@@ -211,7 +224,7 @@ const useChatBot = () => {
   return {
     messageReciver,
     loading,
-    btnLoading,
+    checkLoading,
     setWindowExpandStatus,
     fetchSupportedPlatforms,
     fetchCredentialFormModelofPlatform,

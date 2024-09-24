@@ -18,7 +18,7 @@
 -->
 <script setup lang="ts">
   import { getSvgUrl } from '@/utils/tools'
-  import { ref, computed, watch, watchEffect } from 'vue'
+  import { ref, computed, watchEffect } from 'vue'
   import PlatformAuthSelector from './platform-auth-selector.vue'
   import PlatformSelection from './platform-selection.vue'
   import PlatformAuthForm from './platform-auth-form.vue'
@@ -27,6 +27,7 @@
   import chatWindow from './chat-window.vue'
   import type { Option } from './select-menu.vue'
   import type { ChatbotConfig } from '@/api/chatbot/types'
+  import { useSessionStorage } from '@vueuse/core'
 
   const pages: Record<string, any> = {
     'platform-auth-selector': PlatformAuthSelector,
@@ -36,25 +37,23 @@
     'thread-selector': ThreadSelector,
     'chat-window': chatWindow
   }
+  const style: Record<string, string> = {
+    width: '100%',
+    boxSizing: 'border-box',
+    padding: '24px'
+  }
+  const withoutBack = ['chat-window', 'platform-auth-selector']
 
   const visible = ref(false)
   const isExpand = ref(false)
   const currPage = ref<Option>({ nextPage: 'platform-auth-selector' })
   const afterPages = ref<Option[]>([currPage.value])
-  const chatPayload = ref<ChatbotConfig>({})
-  const style = {
-    width: '100%',
-    boxSizing: 'border-box',
-    padding: '24px'
-  }
+  const chatPayload = useSessionStorage<ChatbotConfig>('chatbot-payload', {})
 
   const getCompName = computed(() => pages[currPage.value.nextPage])
-  const showBack = computed(() =>
-    ['chat-window', 'platform-auth-selector'].includes(currPage.value.nextPage)
-  )
-  const showChatPageOption = computed(
-    () => 'chat-window' === currPage.value?.nextPage
-  )
+  const showBack = computed(() => withoutBack.includes(currPage.value.nextPage))
+  const showChatOps = computed(() => 'chat-window' === currPage.value?.nextPage)
+
   const visibleWindow = (close = false) => {
     close ? (visible.value = false) : (visible.value = !visible.value)
   }
@@ -74,16 +73,6 @@
     }
     resetPageStatus()
   })
-
-  watch(
-    () => chatPayload.value,
-    (val) => {
-      console.log('val :>> ', val)
-    },
-    {
-      deep: true
-    }
-  )
 
   const onBack = () => {
     afterPages.value.pop()
@@ -110,70 +99,64 @@
 
   <teleport to="body">
     <div :class="[isExpand ? 'chatbot-expand' : 'chatbot']">
-      <a-spin :spinning="false">
-        <a-card
-          v-show="visible"
-          class="base-model"
-          :class="[isExpand ? 'chat-model-expand' : 'chat-model']"
-        >
-          <template #title>
-            <header>
-              <div class="header-left">
+      <a-card
+        v-show="visible"
+        class="base-model"
+        :class="[isExpand ? 'chat-model-expand' : 'chat-model']"
+      >
+        <template #title>
+          <header>
+            <div class="header-left">
+              <img
+                v-if="!showBack"
+                :src="getSvgUrl('left', 'chatbot')"
+                alt="back"
+                @click="onBack"
+              />
+              <img
+                v-if="showChatOps && !isExpand"
+                :src="getSvgUrl('home', 'chatbot')"
+                alt="home"
+                @click="onHome"
+              />
+            </div>
+            <div v-if="showChatOps" class="header-middle"> </div>
+            <div class="header-right">
+              <template v-if="showChatOps">
                 <img
-                  v-if="!showBack"
-                  :src="getSvgUrl('left', 'chatbot')"
-                  alt="back"
-                  @click="onBack"
+                  :src="getSvgUrl('history', 'chatbot')"
+                  alt="history"
+                  @click="onHistory"
                 />
                 <img
-                  v-if="showChatPageOption && !isExpand"
-                  :src="getSvgUrl('home', 'chatbot')"
-                  alt="home"
-                  @click="onHome"
+                  :src="getSvgUrl('full-screen', 'chatbot')"
+                  alt="full-screen"
+                  @click="onFullScreen"
                 />
-              </div>
-              <div v-if="showChatPageOption" class="header-middle"> </div>
-              <div class="header-right">
-                <template v-if="showChatPageOption">
-                  <img
-                    :src="getSvgUrl('history', 'chatbot')"
-                    alt="history"
-                    @click="onHistory"
-                  />
-                  <img
-                    :src="getSvgUrl('full-screen', 'chatbot')"
-                    alt="full-screen"
-                    @click="onFullScreen"
-                  />
-                </template>
-                <img
-                  :src="getSvgUrl('close', 'chatbot')"
-                  alt="close"
-                  @click="visibleWindow(true)"
-                />
-              </div>
-            </header>
-          </template>
-          <keep-alive>
-            <component
-              :is="getCompName"
-              v-bind="{ style }"
-              v-model:currPage="currPage"
-              v-model:chat-payload="chatPayload"
-              :visible="visible"
-            ></component>
-          </keep-alive>
-        </a-card>
-      </a-spin>
+              </template>
+              <img
+                :src="getSvgUrl('close', 'chatbot')"
+                alt="close"
+                @click="visibleWindow(true)"
+              />
+            </div>
+          </header>
+        </template>
+        <keep-alive>
+          <component
+            :is="getCompName"
+            v-bind="{ style }"
+            v-model:currPage="currPage"
+            v-model:chat-payload="chatPayload"
+            :visible="visible"
+          ></component>
+        </keep-alive>
+      </a-card>
     </div>
   </teleport>
 </template>
 
 <style lang="scss" scoped>
-  img {
-    cursor: pointer;
-  }
-
   .chatbot {
     position: fixed;
     bottom: 10%;
@@ -221,6 +204,10 @@
       padding: 0;
       @include flexbox($direction: column);
       overflow: auto;
+    }
+
+    img {
+      cursor: pointer;
     }
 
     header {
