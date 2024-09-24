@@ -21,19 +21,19 @@
   import { defineProps, toRefs } from 'vue'
 
   export type Option = {
-    action: string
-    name: string
-  } & {
+    nextPage: string
+    id?: string | number
+    name?: string
     [key: string]: any
   }
 
   export interface SelectData {
-    subTitle?: string
-    action?: string
-    hasDel?: boolean
+    title?: string
+    isDeletable?: boolean
     emptyOptionsText?: string
     options?: Option[]
   }
+
   interface SelectBoxProps {
     selectData?: SelectData[]
   }
@@ -59,7 +59,7 @@
   <ul class="select">
     <li v-for="(item, index) of selectData" :key="index" class="select-item">
       <ul>
-        <label class="select-item-label">{{ item.subTitle }}</label>
+        <label class="select-item-label">{{ item.title }}</label>
         <slot name="select-custom-content">
           <div v-if="!item.options || item.options.length == 0">
             <slot name="empty-text">
@@ -79,7 +79,7 @@
                 {{ option.name }}
               </span>
               <CloseOutlined
-                v-show="item.hasDel"
+                v-show="item.isDeletable"
                 :key="option"
                 class="select-item-del"
                 @click.stop="onRemove(option)"

@@ -42,15 +42,11 @@ import { message } from 'ant-design-vue'
 
 const useChatBot = () => {
   const { t } = useI18n()
-  const isExpand = ref(false)
   const loading = ref(false)
+  const receiving = ref(false)
   const checkLoading = ref(false)
   const canceler = ref<Canceler>()
   const messageReciver = ref('')
-
-  function setWindowExpandStatus(status: boolean) {
-    isExpand.value = status
-  }
 
   function formatAuthCredentials<T extends Object>(
     authFormData: T
@@ -207,11 +203,11 @@ const useChatBot = () => {
       .trim()
   }
 
-  const onMessageComplete = (res: string | undefined) => {
-    console.log('res :>> ', res)
+  const onMessageComplete = () => {
+    const formatResultMsg = messageReciver.value
     messageReciver.value = ''
     cancelSseConnect()
-    return Promise.resolve(true)
+    return Promise.resolve({ message: formatResultMsg, state: true })
   }
 
   const cancelSseConnect = () => {
@@ -224,8 +220,8 @@ const useChatBot = () => {
   return {
     messageReciver,
     loading,
+    receiving,
     checkLoading,
-    setWindowExpandStatus,
     fetchSupportedPlatforms,
     fetchCredentialFormModelofPlatform,
     testAuthofPlatform,

@@ -17,57 +17,64 @@
   ~ under the License.
 -->
 <script setup lang="ts">
-  import useChatbotStore from '@/store/chatbot/index'
-  import { storeToRefs } from 'pinia'
   import { getSvgUrl, scrollToBottom } from '@/utils/tools'
   import { message } from 'ant-design-vue/es/components'
-  import { ref, watch, nextTick, computed, toRefs } from 'vue'
-  import ChatMsgItem from './chat-msg-item.vue'
+  import { ref, computed, toRefs, watchEffect, watch, onActivated } from 'vue'
   import { useI18n } from 'vue-i18n'
   import type { Option } from './select-menu.vue'
-  import { ChatThreadHistoryItem } from '@/api/chatbot/types'
+  import {
+    ChatbotConfig,
+    ChatThreadHistoryItem,
+    SendChatMessageCondition,
+    Sender
+  } from '@/api/chatbot/types'
+  import ChatMsgItem from './chat-msg-item.vue'
+  import useChatBot from '@/composables/use-chat-bot'
 
   interface PlatfromChatPorps {
-    currPage?: Option
     visible: boolean
+    isExpand: boolean
+    chatPayload: ChatbotConfig
+    currPage?: Option
   }
 
+  const {
+    loading,
+    receiving,
+    messageReciver,
+    fetchSendChatMessage,
+    fetchThreadChatHistory
+  } = useChatBot()
   const { t } = useI18n()
-  const chatbot = useChatbotStore()
   const inputText = ref('')
-  const isMessageFullyReceived = ref(true)
+  const isMessageReceived = ref(true)
+  const tempHistory = ref<ChatThreadHistoryItem[]>([])
   const msgInputRef = ref<HTMLInputElement | null>(null)
   const props = defineProps<PlatfromChatPorps>()
-  const { visible, currPage } = toRefs(props)
-  const { currPlatform, chatThreadHistory, isExpand, messageReciver, loading } =
-    storeToRefs(chatbot)
+  const { visible, currPage, isExpand, chatPayload } = toRefs(props)
 
   const sendable = computed(
-    () => inputText.value != '' && isMessageFullyReceived.value
+    () => inputText.value != '' && isMessageReceived.value
   )
-
   const tempMsg = computed<ChatThreadHistoryItem>(() => ({
     sender: 'AI',
-    message: messageReciver.value
+    message: messageReciver.value || '...'
   }))
 
-  watch(
-    [visible, isExpand, currPage],
-    async (val) => {
-      if (!val[0]) {
-        return
-      }
-      if (currPage.value?.action == 'PLATFORM_CHAT') {
-        await chatbot.fetchThreadChatHistory()
-        await nextTick()
-        handleScrollToBottom()
-      }
-    },
-    {
-      immediate: true,
-      deep: true
+  watch(isExpand, () => handleScrollToBottom())
+
+  watchEffect(async () => {
+    if (currPage.value?.nextPage === 'chat-window' && visible.value) {
+      const { platformId, threadId } = chatPayload.value
+      const data = await fetchThreadChatHistory(
+        platformId as string | number,
+        threadId as string | number
+      )
+      tempHistory.value = data as ChatThreadHistoryItem[]
+      loading.value = false
+      handleScrollToBottom()
     }
-  )
+  })
 
   const onInput = (e: Event) => {
     inputText.value = (e.target as Element)?.textContent || ''
@@ -75,15 +82,33 @@
 
   const reciveMessage = async () => {
     try {
-      const res = await chatbot.fetchSendChatMessage(inputText.value)
-      isMessageFullyReceived.value = res as boolean
-      inputText.value = ''
+      receiving.value = true
+      const { threadId, platformId } = chatPayload.value
+      const res = await fetchSendChatMessage({
+        platformId,
+        threadId,
+        message: inputText.value
+      } as SendChatMessageCondition)
+      if (res) {
+        isMessageReceived.value = res.state
+        updateThreadChatHistory('AI', res.message as string)
+        inputText.value = ''
+        receiving.value = false
+      }
     } catch (error) {
-      console.log('recived message:>> ', error)
+      console.log('error', error)
     } finally {
-      isMessageFullyReceived.value = true
+      isMessageReceived.value = true
       handleScrollToBottom()
     }
+  }
+
+  const updateThreadChatHistory = (sender: Sender, message: string) => {
+    tempHistory.value.push({
+      sender,
+      message,
+      createTime: new Date().toISOString()
+    })
   }
 
   const clearUpInputContent = () => {
@@ -91,12 +116,12 @@
   }
 
   const sendMessage = () => {
-    isMessageFullyReceived.value = false
+    isMessageReceived.value = false
     if (inputText.value === '') {
       message.warning(t('ai.empty_message'))
       return
     }
-    chatbot.updateThreadChatHistory('USER', inputText.value as string)
+    updateThreadChatHistory('USER', inputText.value as string)
     handleScrollToBottom()
     clearUpInputContent()
     reciveMessage()
@@ -105,18 +130,23 @@
   const handleScrollToBottom = () => {
     scrollToBottom(document.querySelector('.chat-container') as HTMLElement)
   }
+
+  onActivated(() => {
+    tempHistory.value = []
+    inputText.value = ''
+  })
 </script>
 
 <template>
   <div class="platfrom-chat">
     <section class="chat-container">
       <chat-msg-item
-        v-for="(chatItem, index) of chatThreadHistory"
+        v-for="(chatItem, index) of tempHistory"
         :key="index"
         :chat-item="chatItem"
       />
       <chat-msg-item
-        v-if="loading"
+        v-if="receiving"
         :chat-item="tempMsg"
         @updated-msg="handleScrollToBottom"
       />
@@ -145,7 +175,7 @@
         </div>
       </div>
       <section>
-        {{ `${currPlatform?.platformName} ${currPlatform?.currModel}` }}
+        {{ `${chatPayload?.platformName} ${chatPayload?.model}` }}
       </section>
     </footer>
   </div>
@@ -162,6 +192,7 @@
       flex: 1 1 0%;
       overflow: auto;
       padding: 0 14px;
+      scroll-behavior: smooth;
     }
 
     .msg-wrp {

@@ -56,7 +56,7 @@
 </script>
 
 <template>
-  <div class="pre-chat">
+  <div class="model-selector">
     <select-menu :select-data="platformModel" @select="onSelect" />
   </div>
 </template>

@@ -17,68 +17,54 @@
   ~ under the License.
 -->
 <script setup lang="ts">
-  import PlatformSelect from './platform-select.vue'
-  import PlatformAuthorize from './platform-authorize.vue'
-  import PlatformChat from './platform-chat.vue'
-  import PlatformChatThread from './platform-chatthread.vue'
-  import useChatbotStore from '@/store/chatbot/index'
   import { getSvgUrl } from '@/utils/tools'
-  import { storeToRefs } from 'pinia'
-  import { ref, computed, unref, watchEffect } from 'vue'
+  import { ref, computed, watchEffect, watch } from 'vue'
+  import { useSessionStorage } from '@vueuse/core'
+  import PlatformAuthSelector from './platform-auth-selector.vue'
+  import PlatformSelection from './platform-selection.vue'
+  import PlatformAuthForm from './platform-auth-form.vue'
+  import ModelSelector from './model-selector.vue'
+  import ThreadSelector from './thread-selector.vue'
+  import chatWindow from './chat-window.vue'
+  import type { Option } from './select-menu.vue'
+  import type { ChatbotConfig } from '@/api/chatbot/types'
 
-  const chatbot = useChatbotStore()
-  const visible = ref(false)
-  const { currThread, isExpand, currPage, afterPages } = storeToRefs(chatbot)
-  const style = {
+  const pages: Record<string, any> = {
+    'platform-auth-selector': PlatformAuthSelector,
+    'platform-selection': PlatformSelection,
+    'platform-auth-form': PlatformAuthForm,
+    'model-selector': ModelSelector,
+    'thread-selector': ThreadSelector,
+    'chat-window': chatWindow
+  }
+  const style: Record<string, string> = {
     width: '100%',
     boxSizing: 'border-box',
     padding: '24px'
   }
+  const withoutBack = ['chat-window', 'platform-auth-selector']
 
-  watchEffect(() => {
-    const actions = afterPages.value.map((v) => v?.action)
-    const currAct = currPage.value?.action
-    if (visible.value) {
-      if (!actions?.includes(currAct)) {
-        afterPages.value?.push(currPage.value)
-      }
-      if (currAct === 'PLATFORM_MANAGEMENT') {
-        chatbot.fetchSupportedPlatforms()
-      } else if (currAct === 'SUPPORTED_PLATFORM_SELECT') {
-        chatbot.fetchAuthorizedPlatforms()
-      } else if (currAct === 'ChAT_THREAD_MANAGEMENT') {
-        chatbot.fetchChatThreads()
-      }
-    }
-  })
+  const visible = ref(false)
+  const currPage = ref<Option>({ nextPage: 'platform-auth-selector' })
+  const afterPages = ref<Option[]>([currPage.value])
+  const chatPayload = useSessionStorage<ChatbotConfig>('chatbot-payload', {})
+  const isExpand = useSessionStorage('is-expand', false)
 
+  const getCompName = computed(() => pages[currPage.value.nextPage])
+  const showChatOps = computed(() => 'chat-window' === currPage.value?.nextPage)
   const showBack = computed(
     () =>
-      'PLATFORM_CHAT' != currPage.value?.action && afterPages.value.length > 1
+      withoutBack.includes(currPage.value.nextPage) ||
+      afterPages.value.length == 1
   )
-  const showChatPageOption = computed(
-    () => 'PLATFORM_CHAT' === currPage.value?.action
-  )
-
-  const getCompName = computed(() => {
-    switch (currPage.value?.action) {
-      case 'SUPPORTED_PLATFORM_SELECT':
-        return PlatformSelect
-      case 'PLATFORM_MANAGEMENT':
-      case 'PLATFORM_AUTH':
-        return PlatformAuthorize
-      case 'PLATFORM_MODEL':
-      case 'ChAT_THREAD_MANAGEMENT':
-        return PlatformChatThread
-      case 'PLATFORM_CHAT':
-        return PlatformChat
-      default:
-        return PlatformSelect
-    }
-  })
 
   const visibleWindow = (close = false) => {
     close ? (visible.value = false) : (visible.value = !visible.value)
+  }
+
+  const resetPageStatus = () => {
+    currPage.value = { nextPage: 'platform-auth-selector' }
+    afterPages.value = []
   }
 
   const onBack = () => {
@@ -86,26 +72,29 @@
     currPage.value = afterPages.value[afterPages.value.length - 1]
   }
 
-  const onHome = () => {
-    currPage.value = {
-      action: 'SUPPORTED_PLATFORM_SELECT',
-      name: ''
-    }
-    chatbot.chatThreadHistory = []
+  const skipStep = (nextPage: string) => {
+    currPage.value = { nextPage }
     afterPages.value = [currPage.value]
   }
 
-  const onHistory = () => {
-    afterPages.value = unref(afterPages).filter(
-      (page) => page?.action == 'ChAT_THREAD_MANAGEMENT'
-    )
-    chatbot.chatThreadHistory = []
-    currPage.value = afterPages.value[afterPages.value.length - 1]
+  const onFullScreen = () => {
+    isExpand.value = !isExpand.value
   }
 
-  const onFullScreen = () => {
-    chatbot.setWindowExpandStatus(!isExpand.value)
-  }
+  watch(visible, (val) => {
+    val && chatPayload.value.threadId && skipStep('chat-window')
+  })
+
+  watchEffect(() => {
+    if (visible.value) {
+      const nextPage = afterPages.value.map((v) => v?.nextPage)
+      if (!nextPage?.includes(currPage.value.nextPage)) {
+        afterPages.value?.push(currPage.value)
+      }
+      return
+    }
+    resetPageStatus()
+  })
 </script>
 
 <template>
@@ -119,71 +108,67 @@
 
   <teleport to="body">
     <div :class="[isExpand ? 'chatbot-expand' : 'chatbot']">
-      <a-spin :spinning="false">
-        <a-card
-          v-show="visible"
-          class="base-model"
-          :class="[isExpand ? 'chat-model-expand' : 'chat-model']"
-        >
-          <template #title>
-            <header>
-              <div class="header-left">
+      <a-card
+        v-show="visible"
+        class="base-model"
+        :class="[isExpand ? 'chat-model-expand' : 'chat-model']"
+      >
+        <template #title>
+          <header>
+            <div class="header-left">
+              <img
+                v-if="!showBack"
+                :src="getSvgUrl('left', 'chatbot')"
+                alt="back"
+                @click="onBack"
+              />
+              <img
+                v-if="showChatOps && !isExpand"
+                :src="getSvgUrl('home', 'chatbot')"
+                alt="home"
+                @click="resetPageStatus"
+              />
+            </div>
+            <div v-if="showChatOps" class="header-middle">
+              {{ chatPayload?.threadName }}
+            </div>
+            <div class="header-right">
+              <template v-if="showChatOps">
                 <img
-                  v-if="showBack"
-                  :src="getSvgUrl('left', 'chatbot')"
-                  alt="back"
-                  @click="onBack"
+                  :src="getSvgUrl('history', 'chatbot')"
+                  alt="history"
+                  @click="skipStep('thread-selector')"
                 />
                 <img
-                  v-if="showChatPageOption && !isExpand"
-                  :src="getSvgUrl('home', 'chatbot')"
-                  alt="home"
-                  @click="onHome"
+                  :src="getSvgUrl('full-screen', 'chatbot')"
+                  alt="full-screen"
+                  @click="onFullScreen"
                 />
-              </div>
-              <div v-if="showChatPageOption" class="header-middle">
-                {{ currThread?.threadName }}
-              </div>
-              <div class="header-right">
-                <template v-if="showChatPageOption">
-                  <img
-                    :src="getSvgUrl('history', 'chatbot')"
-                    alt="history"
-                    @click="onHistory"
-                  />
-                  <img
-                    :src="getSvgUrl('full-screen', 'chatbot')"
-                    alt="full-screen"
-                    @click="onFullScreen"
-                  />
-                </template>
-                <img
-                  :src="getSvgUrl('close', 'chatbot')"
-                  alt="close"
-                  @click="visibleWindow(true)"
-                />
-              </div>
-            </header>
-          </template>
-          <keep-alive>
-            <component
-              :is="getCompName"
-              v-bind="{ style }"
-              v-model:currPage="currPage"
-              :visible="visible"
-            ></component>
-          </keep-alive>
-        </a-card>
-      </a-spin>
+              </template>
+              <img
+                :src="getSvgUrl('close', 'chatbot')"
+                alt="close"
+                @click="visibleWindow(true)"
+              />
+            </div>
+          </header>
+        </template>
+        <keep-alive>
+          <component
+            :is="getCompName"
+            v-bind="{ style }"
+            v-model:currPage="currPage"
+            v-model:chat-payload="chatPayload"
+            :visible="visible"
+            :is-expand="isExpand"
+          ></component>
+        </keep-alive>
+      </a-card>
     </div>
   </teleport>
 </template>
 
 <style lang="scss" scoped>
-  img {
-    cursor: pointer;
-  }
-
   .chatbot {
     position: fixed;
     bottom: 10%;
@@ -231,6 +216,10 @@
       padding: 0;
       @include flexbox($direction: column);
       overflow: auto;
+    }
+
+    img {
+      cursor: pointer;
     }
 
     header {

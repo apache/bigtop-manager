@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
   import { HomeOutlined } from '@ant-design/icons-vue'
-  import Chatbot from '@/components/chatbotImprove/chatbot.vue'
+  import Chatbot from '@/components/chatbot/chatbot.vue'
 </script>
 
 <template>

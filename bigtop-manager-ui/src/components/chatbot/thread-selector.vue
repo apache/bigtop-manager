@@ -18,8 +18,16 @@
 -->
 <script setup lang="ts">
   import SelectMenu from './select-menu.vue'
-  import useChatBot from './use-chat-bot'
-  import { toRefs, computed, h, ref, watchEffect, toRaw } from 'vue'
+  import useChatBot from '@/composables/use-chat-bot'
+  import {
+    toRefs,
+    computed,
+    h,
+    ref,
+    watchEffect,
+    toRaw,
+    onActivated
+  } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { Modal } from 'ant-design-vue/es/components'
   import { ExclamationCircleFilled } from '@ant-design/icons-vue/lib/icons'
@@ -36,9 +44,13 @@
     currPage?: Option
   }
 
+  const {
+    loading,
+    fetchChatThreads,
+    fetchCreateChatThread,
+    fetchDelChatThread
+  } = useChatBot()
   const { t } = useI18n()
-  const { fetchChatThreads, fetchCreateChatThread, fetchDelChatThread } =
-    useChatBot()
   const props = defineProps<PreChatPorps>()
   const { currPage, visible, chatPayload } = toRefs(props)
   const chatThreads = ref<ChatThread[]>([])
@@ -120,19 +132,25 @@
       }
     })
   }
+
+  onActivated(() => {
+    chatThreads.value = []
+  })
 </script>
 
 <template>
-  <div class="pre-chat">
-    <select-menu
-      :select-data="
-        chatThreads.length < 10
-          ? chatThreadsSelectData
-          : chatThreadsSelectData.splice(0, 1)
-      "
-      @remove="onRemove"
-      @select="onSelect"
-    />
+  <div>
+    <a-spin :spinning="loading">
+      <select-menu
+        :select-data="
+          chatThreads.length < 10
+            ? chatThreadsSelectData
+            : chatThreadsSelectData.splice(0, 1)
+        "
+        @remove="onRemove"
+        @select="onSelect"
+      />
+    </a-spin>
   </div>
 </template>
 

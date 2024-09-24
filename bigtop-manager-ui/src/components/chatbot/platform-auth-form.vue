@@ -18,7 +18,7 @@
 -->
 <script setup lang="ts">
   import SelectMenu from './select-menu.vue'
-  import useChatBot from './use-chat-bot'
+  import useChatBot from '@/composables/use-chat-bot'
   import { computed, ref, toRaw, toRefs, watchEffect } from 'vue'
   import { useI18n } from 'vue-i18n'
   import type { SelectData, Option } from './select-menu.vue'
@@ -100,7 +100,7 @@
 </script>
 
 <template>
-  <div class="platform-authorize">
+  <div class="platform-auth-form">
     <a-spin :spinning="loading">
       <select-menu :select-data="platformAuthForm">
         <template #select-custom-content>
@@ -135,7 +135,7 @@
 </template>
 
 <style lang="scss" scoped>
-  .platform-authorize {
+  .platform-auth-form {
     height: 100%;
     @include flexbox($direction: column, $justify: space-between);
   }

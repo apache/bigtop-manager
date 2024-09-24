@@ -18,7 +18,7 @@
 -->
 <script setup lang="ts">
   import SelectMenu from './select-menu.vue'
-  import useChatBot from './use-chat-bot'
+  import useChatBot from '@/composables/use-chat-bot'
   import { computed, h, onActivated, ref, toRaw, toRefs, watch } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { Modal } from 'ant-design-vue/es/components'
