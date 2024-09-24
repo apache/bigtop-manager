@@ -78,12 +78,14 @@
               <span>
                 {{ option.name }}
               </span>
-              <CloseOutlined
+              <div
                 v-show="item.isDeletable"
-                :key="option"
+                :key="idx"
                 class="select-item-del"
                 @click.stop="onRemove(option)"
-              />
+              >
+                <CloseOutlined />
+              </div>
             </li>
           </template>
         </slot>
