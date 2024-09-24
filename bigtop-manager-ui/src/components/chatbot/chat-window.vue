@@ -189,9 +189,8 @@
     padding: 4px !important;
 
     section {
-      flex: 1 1 0%;
-      overflow: auto;
-      padding: 0 14px;
+      flex: 1 1 auto;
+      overflow-y: auto;
       scroll-behavior: smooth;
     }
 

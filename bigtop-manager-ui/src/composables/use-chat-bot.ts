@@ -199,8 +199,11 @@ const useChatBot = () => {
 
   const onMessageReceive = ({ event }: AxiosProgressEvent) => {
     messageReciver.value = event.target.responseText
-      .replace(/data:\s*/g, '')
-      .trim()
+      .split('data:')
+      .map((s: string) => {
+        return s.trimEnd()
+      })
+      .join('')
   }
 
   const onMessageComplete = () => {

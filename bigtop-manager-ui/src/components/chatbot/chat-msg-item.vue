@@ -19,6 +19,7 @@
 <script setup lang="ts">
   import { computed, ref, watchEffect } from 'vue'
   import { getSvgUrl } from '@/utils/tools'
+  import { parseMDByHighlight } from '@/utils/render'
   import { ChatThreadHistoryItem } from '@/api/chatbot/types'
 
   interface Props {
@@ -44,7 +45,7 @@
       <img :src="getSvgUrl('user', 'chatbot')" />
     </section>
     <article class="chat-item-msg">
-      <div>{{ message }}</div>
+      <div class="markdown-body" v-html="parseMDByHighlight(message)"></div>
     </article>
   </div>
 </template>
@@ -63,12 +64,11 @@
 
   .chat-item {
     display: flex;
-    width: 100%;
     margin-top: 44px;
     margin-bottom: 44px;
     &-msg {
       @include flexbox($justify: center, $align: center);
-      background-color: #e9e9e9;
+      background-color: #f7f7f7;
       border-radius: 8px;
       padding: 8px;
     }
