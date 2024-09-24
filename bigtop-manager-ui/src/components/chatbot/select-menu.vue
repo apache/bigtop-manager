@@ -18,7 +18,7 @@
 -->
 <script setup lang="ts">
   import { CloseOutlined } from '@ant-design/icons-vue'
-  import { defineProps, toRefs } from 'vue'
+  import { toRefs } from 'vue'
 
   export type Option = {
     nextPage: string
