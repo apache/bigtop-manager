@@ -18,8 +18,6 @@
 -->
 <script setup lang="ts">
   import { computed, ref, watchEffect } from 'vue'
-  import { getSvgUrl } from '@/utils/tools'
-  import { parseMDByHighlight } from '@/utils/render'
   import { ChatThreadHistoryItem } from '@/api/chatbot/types'
 
   interface Props {
@@ -38,40 +36,60 @@
 
 <template>
   <div class="chat-item" :class="[isRight ? 'chat-r' : '']">
-    <section v-if="!isRight" class="chat-assistant">
-      <img :src="getSvgUrl('robot', 'chatbot')" />
-    </section>
-    <section v-else class="chat-user">
-      <img :src="getSvgUrl('user', 'chatbot')" />
-    </section>
-    <article class="chat-item-msg">
-      <div class="markdown-body" v-html="parseMDByHighlight(message)"></div>
+    <div class="chat-item-avatar">
+      <section v-if="!isRight" class="chat-assistant">
+        <svg-icon name="robot" style="margin: 0" />
+      </section>
+      <section v-else class="chat-user">
+        <svg-icon name="user" style="margin: 0" />
+      </section>
+    </div>
+    <article class="chat-item-msg" :class="[isRight ? 'msg-r' : 'msg-l']">
+      <div class="msg-wrp">{{ message }}</div>
     </article>
   </div>
 </template>
 
 <style lang="scss" scoped>
   .chat-head {
-    display: flex;
-    flex-shrink: 0;
+    @include flexbox($justify: center, $align: center);
     width: 32px;
     height: 32px;
     border-radius: 50%;
     border: 1px solid rgb(207, 207, 207);
     overflow: hidden;
-    padding: 4px;
   }
 
   .chat-item {
+    flex: 1;
+    margin: 22px 0;
+    box-sizing: border-box;
     display: flex;
-    margin-top: 44px;
-    margin-bottom: 44px;
-    &-msg {
-      @include flexbox($justify: center, $align: center);
-      background-color: #f7f7f7;
-      border-radius: 8px;
-      padding: 8px;
+    &-avatar {
+      flex: 0 0 44px;
+      @include flexbox($justify: center);
     }
+    &-msg {
+      width: 100%;
+      display: flex;
+      box-sizing: border-box;
+      .msg-wrp {
+        height: auto;
+        padding: 10px;
+        border-radius: 8px;
+        align-items: flex-start;
+        background-color: #e9e9e9;
+      }
+    }
+  }
+
+  .msg-r {
+    justify-content: flex-end;
+    padding-left: 44px;
+  }
+
+  .msg-l {
+    padding-right: 44px;
   }
 
   .chat-r {
@@ -80,10 +98,8 @@
 
   .chat-assistant {
     @extend .chat-head;
-    margin-right: 8px;
   }
   .chat-user {
     @extend .chat-head;
-    margin-left: 8px;
   }
 </style>
