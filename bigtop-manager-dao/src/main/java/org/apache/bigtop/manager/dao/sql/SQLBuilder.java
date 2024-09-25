@@ -241,7 +241,6 @@ public class SQLBuilder {
                     if (Objects.equals(entry.getKey(), tableMetaData.getPkProperty())) {
                         continue;
                     }
-
                     PropertyDescriptor ps = BeanUtils.getPropertyDescriptor(entityClass, entry.getKey());
                     if (ps == null || ps.getReadMethod() == null) {
                         continue;
