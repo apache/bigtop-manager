@@ -192,12 +192,14 @@
       flex: 1 1 0%;
       overflow: auto;
       scroll-behavior: smooth;
+      background-color: #e8e8e8;
     }
 
     .msg-wrp {
       @include flexbox($align: center);
       border: 1px solid #e5e7eb;
-      border-radius: 16px;
+      border-bottom-left-radius: 8px;
+      border-bottom-right-radius: 8px;
       padding: 6px;
       overflow: hidden;
       .ant-input {

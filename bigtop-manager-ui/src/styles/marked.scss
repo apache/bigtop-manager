@@ -4,8 +4,11 @@
 .markdown-body {
   background-color: inherit;
   color: #333333;
-  border-radius: 10px;
   box-sizing: border-box;
+  font-size: 1em;
+  pre {
+    border-radius: 8px;
+  }
 }
 
 .markdown-body h1,
@@ -30,8 +33,4 @@
 
 .markdown-body ul li {
   margin-bottom: 10px;
-}
-
-.markdown-body pre {
-  padding: 0;
 }
