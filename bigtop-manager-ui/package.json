@@ -27,6 +27,7 @@
     "pinia": "^2.1.6",
     "pinia-plugin-persistedstate": "^3.2.0",
     "vue": "^3.4.37",
+    "vue-dompurify-html": "^5.1.0",
     "vue-i18n": "^9.2.2",
     "vue-router": "^4.2.4"
   },

@@ -91,7 +91,12 @@
 </script>
 
 <template>
-  <div v-upgradeCodeBlock class="markdown-body" v-html="markdownContent"> </div>
+  <div
+    v-upgradeCodeBlock
+    v-dompurify-html="markdownContent"
+    class="markdown-body"
+  >
+  </div>
 </template>
 
 <style lang="scss" scoped></style>
