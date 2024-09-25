@@ -189,7 +189,6 @@
     padding: 4px !important;
 
     .chat-container {
-      @include flexbox($direction: column, $justify: center);
       flex: 1 1 0%;
       overflow: auto;
       scroll-behavior: smooth;
