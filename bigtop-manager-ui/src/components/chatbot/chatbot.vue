@@ -17,7 +17,6 @@
   ~ under the License.
 -->
 <script setup lang="ts">
-  import { getSvgUrl } from '@/utils/tools'
   import { ref, computed, watchEffect, watch } from 'vue'
   import { useSessionStorage } from '@vueuse/core'
   import PlatformAuthSelector from './platform-auth-selector.vue'
@@ -101,7 +100,7 @@
   <a-float-button type="default" @click="() => visibleWindow()">
     <template #icon>
       <div class="chatbot-icon">
-        <img :src="getSvgUrl('robot', 'chatbot')" alt="ai chat" />
+        <svg-icon name="robot" style="margin: 0" />
       </div>
     </template>
   </a-float-button>
@@ -116,16 +115,10 @@
         <template #title>
           <header>
             <div class="header-left">
-              <img
-                v-if="!showBack"
-                :src="getSvgUrl('left', 'chatbot')"
-                alt="back"
-                @click="onBack"
-              />
-              <img
+              <svg-icon v-if="!showBack" name="left" @click="onBack" />
+              <svg-icon
                 v-if="showChatOps && !isExpand"
-                :src="getSvgUrl('home', 'chatbot')"
-                alt="home"
+                name="home"
                 @click="resetPageStatus"
               />
             </div>
@@ -134,22 +127,10 @@
             </div>
             <div class="header-right">
               <template v-if="showChatOps">
-                <img
-                  :src="getSvgUrl('history', 'chatbot')"
-                  alt="history"
-                  @click="skipStep('thread-selector')"
-                />
-                <img
-                  :src="getSvgUrl('full-screen', 'chatbot')"
-                  alt="full-screen"
-                  @click="onFullScreen"
-                />
+                <svg-icon name="history" @click="skipStep('thread-selector')" />
+                <svg-icon name="full-screen" @click="onFullScreen" />
               </template>
-              <img
-                :src="getSvgUrl('close', 'chatbot')"
-                alt="close"
-                @click="visibleWindow(true)"
-              />
+              <svg-icon name="close" @click="visibleWindow(true)" />
             </div>
           </header>
         </template>
@@ -218,10 +199,6 @@
       overflow: auto;
     }
 
-    img {
-      cursor: pointer;
-    }
-
     header {
       box-sizing: border-box;
       display: flex;
@@ -242,9 +219,6 @@
 
       &-right {
         @include flexbox($justify: flex-end, $align: center);
-        img {
-          margin-left: 10px;
-        }
       }
     }
   }

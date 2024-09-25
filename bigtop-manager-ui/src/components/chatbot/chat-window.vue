@@ -17,7 +17,7 @@
   ~ under the License.
 -->
 <script setup lang="ts">
-  import { getSvgUrl, scrollToBottom } from '@/utils/tools'
+  import { scrollToBottom } from '@/utils/tools'
   import { message } from 'ant-design-vue/es/components'
   import { ref, computed, toRefs, watchEffect, watch, onActivated } from 'vue'
   import { useI18n } from 'vue-i18n'
@@ -167,9 +167,9 @@
             class="msg-input-send"
             @click="sendMessage"
           >
-            <img
-              :src="getSvgUrl(sendable ? 'send' : 'send-disabled', 'chatbot')"
-              alt="send"
+            <svg-icon
+              :name="sendable ? 'send' : 'send-disabled'"
+              style="margin: 0"
             />
           </a-button>
         </div>
@@ -188,10 +188,10 @@
     height: 100%;
     padding: 4px !important;
 
-    section {
+    .chat-container {
+      @include flexbox($direction: column, $justify: center);
       flex: 1 1 0%;
       overflow: auto;
-      padding: 0 14px;
       scroll-behavior: smooth;
     }
 
