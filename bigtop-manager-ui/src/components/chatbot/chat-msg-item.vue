@@ -60,6 +60,7 @@
     border-radius: 50%;
     overflow: hidden;
     background-color: #fff;
+    border: 1px solid #e8e8e8;
   }
 
   .chat-item {

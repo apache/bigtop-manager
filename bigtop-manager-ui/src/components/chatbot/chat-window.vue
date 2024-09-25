@@ -192,7 +192,7 @@
       flex: 1 1 0%;
       overflow: auto;
       scroll-behavior: smooth;
-      background-color: #e8e8e8;
+      background-color: #f8f8f8;
     }
 
     .msg-wrp {
