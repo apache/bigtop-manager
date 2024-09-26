@@ -36,7 +36,7 @@
   const {
     loading,
     checkLoading,
-    testAuthofPlatform,
+    testAuthPlatform,
     fetchCredentialFormModelofPlatform
   } = useChatBot()
   const props = defineProps<PlatformAutFormProps>()
@@ -73,7 +73,7 @@
 
   const onSuccess = async () => {
     const { platformId } = chatPayload.value
-    const isPass = await testAuthofPlatform(
+    const isPass = await testAuthPlatform(
       platformId as string | number,
       toRaw(formState.value)
     )

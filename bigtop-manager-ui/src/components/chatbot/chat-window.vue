@@ -31,7 +31,7 @@
   import ChatMsgItem from './chat-msg-item.vue'
   import useChatBot from '@/composables/use-chat-bot'
 
-  interface PlatfromChatPorps {
+  interface PlatformChatPorps {
     visible: boolean
     isExpand: boolean
     chatPayload: ChatbotConfig
@@ -50,7 +50,7 @@
   const isMessageReceived = ref(true)
   const tempHistory = ref<ChatThreadHistoryItem[]>([])
   const msgInputRef = ref<HTMLInputElement | null>(null)
-  const props = defineProps<PlatfromChatPorps>()
+  const props = defineProps<PlatformChatPorps>()
   const { visible, currPage, isExpand, chatPayload } = toRefs(props)
 
   const sendable = computed(

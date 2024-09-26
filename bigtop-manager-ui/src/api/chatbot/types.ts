@@ -36,7 +36,7 @@ export interface Platform {
 
 export type AuthorizedPlatform = Platform
 
-export interface SupportedPlatForm extends Platform {
+export interface SupportedPlatform extends Platform {
   id: string | number
   name: string
   supportModels: string

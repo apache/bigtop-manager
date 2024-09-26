@@ -99,7 +99,7 @@ const useChatBot = () => {
     }
   }
 
-  async function testAuthofPlatform<T extends Object>(
+  async function testAuthPlatform<T extends Object>(
     platformId: string | number,
     authFormData: T
   ) {
@@ -224,7 +224,7 @@ const useChatBot = () => {
     checkLoading,
     fetchSupportedPlatforms,
     fetchCredentialFormModelofPlatform,
-    testAuthofPlatform,
+    testAuthPlatform,
     fetchCreateChatThread,
     fetchChatThreads,
     fetchAuthorizedPlatforms,

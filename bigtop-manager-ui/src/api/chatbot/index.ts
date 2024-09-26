@@ -20,7 +20,7 @@
 import request from '@/api/request.ts'
 import {
   AuthorizedPlatform,
-  SupportedPlatForm,
+  SupportedPlatform,
   CredentialFormItem,
   AuthCredentialTestParams,
   AuthTestResult,
@@ -37,7 +37,7 @@ export const getAuthorizedPlatforms = (): Promise<AuthorizedPlatform[]> => {
     url: '/chatbot/platforms/authorized'
   })
 }
-export const getSupportedPlatforms = (): Promise<SupportedPlatForm[]> => {
+export const getSupportedPlatforms = (): Promise<SupportedPlatform[]> => {
   return request({
     method: 'get',
     url: '/chatbot/platforms'

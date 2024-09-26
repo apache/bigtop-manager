@@ -22,7 +22,7 @@
   import { computed, watch, ref, toRefs, toRaw } from 'vue'
   import { useI18n } from 'vue-i18n'
   import type { SelectData, Option } from './select-menu.vue'
-  import type { ChatbotConfig, SupportedPlatForm } from '@/api/chatbot/types'
+  import type { ChatbotConfig, SupportedPlatform } from '@/api/chatbot/types'
 
   interface PlatformSelection {
     visible: boolean
@@ -34,17 +34,17 @@
   const { loading, fetchSupportedPlatforms } = useChatBot()
   const props = defineProps<PlatformSelection>()
   const { visible, currPage, chatPayload } = toRefs(props)
-  const supportedPlatForms = ref<SupportedPlatForm[]>([])
+  const supportedPlatforms = ref<SupportedPlatform[]>([])
   const emits = defineEmits(['update:currPage', 'update:chatPayload'])
 
   const getSupportedPlatforms = async () => {
     const data = await fetchSupportedPlatforms()
-    supportedPlatForms.value = data as SupportedPlatForm[]
+    supportedPlatforms.value = data as SupportedPlatform[]
     loading.value = false
   }
 
   const formattedOptions = computed<Option[]>(() => {
-    return supportedPlatForms.value.map((platform: SupportedPlatForm) => ({
+    return supportedPlatforms.value.map((platform: SupportedPlatform) => ({
       ...platform,
       nextPage: 'platform-auth-form'
     })) as Option[]
