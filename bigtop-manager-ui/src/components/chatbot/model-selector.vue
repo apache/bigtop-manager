@@ -23,14 +23,14 @@
   import type { SelectData, Option } from './select-menu.vue'
   import type { ChatbotConfig } from '@/api/chatbot/types'
 
-  interface PreChatPorps {
+  interface PreChatProps {
     visible: boolean
     chatPayload: ChatbotConfig
     currPage?: Option
   }
 
   const { t } = useI18n()
-  const props = defineProps<PreChatPorps>()
+  const props = defineProps<PreChatProps>()
   const { chatPayload } = toRefs(props)
   const emits = defineEmits(['update:currPage', 'update:chatPayload'])
 

@@ -38,7 +38,7 @@
     ChatThreadDelCondition
   } from '@/api/chatbot/types'
 
-  interface PreChatPorps {
+  interface PreChatProps {
     visible: boolean
     chatPayload: ChatbotConfig
     currPage?: Option
@@ -51,7 +51,7 @@
     fetchDelChatThread
   } = useChatBot()
   const { t } = useI18n()
-  const props = defineProps<PreChatPorps>()
+  const props = defineProps<PreChatProps>()
   const { currPage, visible, chatPayload } = toRefs(props)
   const chatThreads = ref<ChatThread[]>([])
   const emits = defineEmits(['update:currPage', 'update:chatPayload'])

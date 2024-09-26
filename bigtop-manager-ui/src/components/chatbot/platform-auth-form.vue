@@ -25,7 +25,7 @@
   import type { FormInstance } from 'ant-design-vue'
   import type { ChatbotConfig, CredentialFormItem } from '@/api/chatbot/types'
 
-  interface PlatformAutFormProps {
+  interface PlatformAuthFormProps {
     visible: boolean
     chatPayload: ChatbotConfig
     currPage?: Option
@@ -37,9 +37,9 @@
     loading,
     checkLoading,
     testAuthPlatform,
-    fetchCredentialFormModelofPlatform
+    fetchCredentialFormModelOfPlatform
   } = useChatBot()
-  const props = defineProps<PlatformAutFormProps>()
+  const props = defineProps<PlatformAuthFormProps>()
   const { currPage, visible, chatPayload } = toRefs(props)
   const formRef = ref<FormInstance>()
   const formState = ref<FormState>({})
@@ -63,7 +63,7 @@
   watchEffect(async () => {
     if (currPage.value?.nextPage === 'platform-auth-form' && visible.value) {
       const { platformId } = chatPayload.value
-      const data = await fetchCredentialFormModelofPlatform(
+      const data = await fetchCredentialFormModelOfPlatform(
         platformId as string | number
       )
       credentialFormModel.value = data as CredentialFormItem[]
