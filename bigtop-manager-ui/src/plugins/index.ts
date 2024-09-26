@@ -23,7 +23,7 @@ import pinia from '@/store'
 import i18n from '@/locales'
 import Antd, { message } from 'ant-design-vue'
 import components from '@/components/common'
-
+import VueDOMPurifyHTML from 'vue-dompurify-html'
 interface PluginOptions {
   antdMessageMaxCount: number
 }
@@ -35,6 +35,7 @@ export default {
     app.use(pinia)
     app.use(i18n)
     app.use(components)
+    app.use(VueDOMPurifyHTML) // xss defense
     message.config({ maxCount: options.antdMessageMaxCount })
   }
 }

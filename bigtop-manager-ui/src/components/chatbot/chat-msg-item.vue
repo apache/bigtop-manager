@@ -37,15 +37,17 @@
 <template>
   <div class="chat-item" :class="[isRight ? 'chat-r' : '']">
     <div class="chat-item-avatar">
-      <section v-if="!isRight" class="chat-assistant">
+      <section v-if="!isRight" class="chat-head">
         <svg-icon name="robot" style="margin: 0" />
       </section>
-      <section v-else class="chat-user">
+      <section v-else class="chat-head">
         <svg-icon name="user" style="margin: 0" />
       </section>
     </div>
     <article class="chat-item-msg" :class="[isRight ? 'msg-r' : 'msg-l']">
-      <div class="msg-wrp">{{ message }}</div>
+      <div class="msg-wrp">
+        <mark-view :mark-raw="message" />
+      </div>
     </article>
   </div>
 </template>
@@ -56,8 +58,9 @@
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    border: 1px solid rgb(207, 207, 207);
     overflow: hidden;
+    background-color: #fff;
+    border: 1px solid #e8e8e8;
   }
 
   .chat-item {
@@ -70,20 +73,23 @@
       @include flexbox($justify: center);
     }
     &-msg {
-      width: 100%;
       display: flex;
+      width: calc(100% - 40px - 4px);
       box-sizing: border-box;
       .msg-wrp {
         height: auto;
-        padding: 10px;
+        width: 100%;
+        padding: 8px;
         border-radius: 8px;
         align-items: flex-start;
-        background-color: #e9e9e9;
+        border: 1px solid #e8e8e8;
+        background-color: #fff;
       }
     }
   }
 
   .msg-r {
+    width: auto;
     justify-content: flex-end;
     padding-left: 44px;
   }
@@ -94,12 +100,5 @@
 
   .chat-r {
     flex-direction: row-reverse;
-  }
-
-  .chat-assistant {
-    @extend .chat-head;
-  }
-  .chat-user {
-    @extend .chat-head;
   }
 </style>
