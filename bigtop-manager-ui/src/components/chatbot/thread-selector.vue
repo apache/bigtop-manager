@@ -82,6 +82,7 @@
       ]
     }
   ])
+
   const getAllChatThreads = async () => {
     const { platformId, model } = chatPayload.value
     const data = (await fetchChatThreads(
