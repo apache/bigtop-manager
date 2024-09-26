@@ -84,9 +84,9 @@
   ])
 
   const getAllChatThreads = async () => {
-    const { platformId, model } = chatPayload.value
+    const { authId, model } = chatPayload.value
     const data = (await fetchChatThreads(
-      platformId as string | number,
+      authId as string | number,
       model as string
     )) as ChatThread[]
     chatThreads.value = data
@@ -107,7 +107,7 @@
       })
     } else {
       const data = (await fetchCreateChatThread({
-        platformId: chatPayload.value.platformId as string | number,
+        authId: chatPayload.value.authId as string | number,
         model: chatPayload.value.model as string
       })) as ChatThread
       emits('update:chatPayload', {
@@ -124,10 +124,10 @@
       icon: h(ExclamationCircleFilled),
       content: t('common.delete_confirm_content', [option.name]),
       async onOk() {
-        const { threadId, platformId } = chatPayload.value
+        const { threadId, authId } = chatPayload.value
         await fetchDelChatThread({
           threadId,
-          platformId
+          authId
         } as ChatThreadDelCondition)
         getAllChatThreads()
       }

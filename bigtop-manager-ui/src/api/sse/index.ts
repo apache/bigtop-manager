@@ -49,7 +49,7 @@ export const sendChatMessage = (
 
   const promise = request({
     method: 'post',
-    url: `/chatbot/platforms/${data.platformId}/threads/${data.threadId}/talk`,
+    url: `/chatbot/auth-platforms/${data.authId}/threads/${data.threadId}/talk`,
     responseType: 'stream',
     data: {
       message: data.message

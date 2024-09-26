@@ -44,7 +44,7 @@
   const formRef = ref<FormInstance>()
   const formState = ref<FormState>({})
   const credentialFormModel = ref<CredentialFormItem[]>([])
-  const emits = defineEmits(['update:currPage'])
+  const emits = defineEmits(['update:currPage', 'update:chatPayload'])
 
   const platformAuthForm = computed<SelectData[]>(() => [
     {
@@ -62,9 +62,9 @@
 
   watchEffect(async () => {
     if (currPage.value?.nextPage === 'platform-auth-form' && visible.value) {
-      const { platformId } = chatPayload.value
+      const { authId } = chatPayload.value
       const data = await fetchCredentialFormModelOfPlatform(
-        platformId as string | number
+        authId as string | number
       )
       credentialFormModel.value = data as CredentialFormItem[]
       loading.value = false
@@ -72,15 +72,24 @@
   })
 
   const onSuccess = async () => {
-    const { platformId } = chatPayload.value
-    const isPass = await testAuthPlatform(
-      platformId as string | number,
+    const { authId } = chatPayload.value
+    const data = await testAuthPlatform(
+      authId as string | number,
       toRaw(formState.value)
     )
-    if (isPass) {
+    if (data) {
+      const { id: authId, platformName, supportModels } = data
       emits('update:currPage', {
         ...currPage.value,
         nextPage: 'model-selector'
+      })
+      emits('update:chatPayload', {
+        ...toRaw(chatPayload.value),
+        ...{
+          authId,
+          platformName,
+          supportModels
+        }
       })
     }
     checkLoading.value = false

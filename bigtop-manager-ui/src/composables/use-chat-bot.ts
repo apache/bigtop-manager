@@ -116,12 +116,12 @@ const useChatBot = () => {
     }
   }
 
-  async function fetchChatThreads(platformId: string | number, model: string) {
+  async function fetchChatThreads(authId: string | number, model: string) {
     try {
       loading.value = true
       const data = await getChatThreads({
         model,
-        platformId
+        authId
       })
       return Promise.resolve(data)
     } catch (error) {
@@ -145,12 +145,12 @@ const useChatBot = () => {
   }
 
   async function fetchThreadChatHistory(
-    platformId: string | number,
+    authId: string | number,
     threadId: string | number
   ) {
     try {
       loading.value = true
-      const data = await getThreadChatHistory({ platformId, threadId })
+      const data = await getThreadChatHistory({ authId, threadId })
       return Promise.resolve(data)
     } catch (error) {
       console.log('error :>> ', error)

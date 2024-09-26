@@ -42,7 +42,7 @@
   const formattedOptions = computed<Option[]>(() =>
     authorizedPlatforms.value.map((v: AuthorizedPlatform) => ({
       ...v,
-      id: v.platformId,
+      id: v.id,
       name: v.platformName,
       nextPage: 'model-selector'
     }))
@@ -83,7 +83,7 @@
     if (option.nextPage === 'model-selector') {
       const transformedData = {
         ...toRaw(chatPayload.value),
-        platformId: option.id,
+        authId: option.id,
         platformName: option.name,
         supportModels: option.supportModels
       }
@@ -98,8 +98,8 @@
       icon: h(ExclamationCircleFilled),
       content: t('common.delete_confirm_content', [option.name]),
       async onOk() {
-        const { id: platformId } = option
-        await fetchDelAuthorizedPlatform(platformId as string | number)
+        const { id: authId } = option
+        await fetchDelAuthorizedPlatform(authId as string | number)
         getAllAuthorizedPlatforms()
         loading.value = false
       }

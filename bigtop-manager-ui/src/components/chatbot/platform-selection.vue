@@ -74,7 +74,7 @@
   const onSelect = async (option: Option) => {
     const transformedData = {
       ...toRaw(chatPayload.value),
-      platformId: option.id,
+      authId: option.id,
       platformName: option.name,
       supportModels: option.supportModels
     }

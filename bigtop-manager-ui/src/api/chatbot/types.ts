@@ -18,7 +18,7 @@
  */
 
 export interface ChatbotConfig {
-  platformId?: string | number
+  authId?: string | number
   platformName?: string
   supportModels?: string
   model?: string
@@ -28,6 +28,7 @@ export interface ChatbotConfig {
   updateTime?: string
 }
 export interface Platform {
+  id: string | number
   platformId: string | number
   platformName: string
   supportModels: string
@@ -46,7 +47,7 @@ export interface CredentialFormItem {
   displayName: string
 }
 export interface ChatThreadCondition {
-  platformId: string | number
+  authId: string | number
   model: string
 }
 
@@ -68,6 +69,7 @@ export interface AuthCredentialTestParams {
 }
 
 export interface AuthTestResult {
+  id: string | number
   platformId: string | number
   platformName: string
   supportModels: string
@@ -81,7 +83,7 @@ export interface ChatThreadHistoryItem {
 }
 
 export interface ChatThreadHistoryCondition {
-  platformId: string | number
+  authId: string | number
   threadId: string | number
 }
 

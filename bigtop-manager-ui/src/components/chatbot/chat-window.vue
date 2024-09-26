@@ -65,9 +65,9 @@
 
   watchEffect(async () => {
     if (currPage.value?.nextPage === 'chat-window' && visible.value) {
-      const { platformId, threadId } = chatPayload.value
+      const { authId, threadId } = chatPayload.value
       const data = await fetchThreadChatHistory(
-        platformId as string | number,
+        authId as string | number,
         threadId as string | number
       )
       tempHistory.value = data as ChatThreadHistoryItem[]
@@ -83,9 +83,9 @@
   const reciveMessage = async () => {
     try {
       receiving.value = true
-      const { threadId, platformId } = chatPayload.value
+      const { threadId, authId } = chatPayload.value
       const res = await fetchSendChatMessage({
-        platformId,
+        authId,
         threadId,
         message: inputText.value
       } as SendChatMessageCondition)

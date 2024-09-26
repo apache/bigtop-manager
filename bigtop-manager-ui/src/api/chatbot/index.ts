@@ -34,7 +34,7 @@ import {
 export const getAuthorizedPlatforms = (): Promise<AuthorizedPlatform[]> => {
   return request({
     method: 'get',
-    url: '/chatbot/platforms/authorized'
+    url: '/chatbot/auth-platforms'
   })
 }
 export const getSupportedPlatforms = (): Promise<SupportedPlatform[]> => {
@@ -48,7 +48,7 @@ export const getCredentialFormModelofPlatform = (
 ): Promise<CredentialFormItem[]> => {
   return request({
     method: 'get',
-    url: `/chatbot/platforms/${platformId}/auth/credential`
+    url: `/chatbot/platforms/${platformId}/auth-credentials`
   })
 }
 
@@ -56,8 +56,8 @@ export const validateAuthCredentials = (
   data: AuthCredentialTestParams
 ): Promise<AuthTestResult> => {
   return request({
-    method: 'put',
-    url: '/chatbot/platforms',
+    method: 'post',
+    url: '/chatbot/auth-platforms',
     data
   })
 }
@@ -67,17 +67,18 @@ export const getChatThreads = (
 ): Promise<ChatThread[]> => {
   return request({
     method: 'get',
-    url: `/chatbot/platforms/${params.platformId}/threads`,
-    params
+    url: `/chatbot/auth-platforms/${params.authId}/threads`,
+    params: {
+      model: params.model
+    }
   })
 }
 export const createChatThread = (
-  params: ChatThreadCondition
+  data: ChatThreadCondition
 ): Promise<ChatThread> => {
   return request({
-    method: 'put',
-    url: `/chatbot/platforms/${params.platformId}/threads`,
-    params
+    method: 'post',
+    url: `/chatbot/auth-platforms/${data.authId}/threads?model=${data.model}`
   })
 }
 export const getThreadChatHistory = (
@@ -85,17 +86,16 @@ export const getThreadChatHistory = (
 ): Promise<ChatThreadHistoryItem[]> => {
   return request({
     method: 'get',
-    url: `/chatbot/platforms/${params.platformId}/threads/${params.threadId}/history`,
-    params
+    url: `/chatbot/auth-platforms/${params.authId}/threads/${params.threadId}/history`
   })
 }
 
 export const delAuthorizedPlatform = (
-  platformId: string | number
+  authId: string | number
 ): Promise<boolean> => {
   return request({
     method: 'delete',
-    url: `/chatbot/platforms/${platformId}`
+    url: `/chatbot/auth-platforms/${authId}`
   })
 }
 export const delChatThread = (
@@ -103,6 +103,6 @@ export const delChatThread = (
 ): Promise<boolean> => {
   return request({
     method: 'delete',
-    url: `/chatbot/platforms/${params.platformId}/threads/${params.threadId}`
+    url: `/chatbot/auth-platforms/${params.authId}/threads/${params.threadId}`
   })
 }
