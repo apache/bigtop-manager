@@ -81,7 +81,7 @@ public class ChatbotServiceImpl implements ChatbotService {
 
     private AIAssistantFactory aiAssistantFactory;
 
-    public AIAssistantFactory getAiAssistantFactory() {
+    public AIAssistantFactory getAIAssistantFactory() {
         if (aiAssistantFactory == null) {
             aiAssistantFactory =
                     new GeneralAssistantFactory(new PersistentChatMemoryStore(chatThreadDao, chatMessageDao));
@@ -105,7 +105,7 @@ public class ChatbotServiceImpl implements ChatbotService {
 
     private AIAssistant buildAIAssistant(
             PlatformAuthorizedDTO platformAuthorizedDTO, Long threadId, Map<String, String> configs) {
-        return getAiAssistantFactory()
+        return getAIAssistantFactory()
                 .create(
                         getPlatformType(platformAuthorizedDTO.getPlatformName()),
                         getAIAssistantConfig(platformAuthorizedDTO, configs),
@@ -113,7 +113,7 @@ public class ChatbotServiceImpl implements ChatbotService {
     }
 
     private Boolean testAuthorization(PlatformAuthorizedDTO platformAuthorizedDTO) {
-        AIAssistant aiAssistant = getAiAssistantFactory()
+        AIAssistant aiAssistant = getAIAssistantFactory()
                 .create(
                         getPlatformType(platformAuthorizedDTO.getPlatformName()),
                         getAIAssistantConfig(platformAuthorizedDTO, null));
@@ -215,10 +215,16 @@ public class ChatbotServiceImpl implements ChatbotService {
                 authorizedPlatformPO.setIsDeleted(true);
                 platformAuthorizedDao.partialUpdateById(authorizedPlatformPO);
                 List<ChatThreadPO> chatThreadPOS = chatThreadDao.findAllByPlatformId(authorizedPlatformPO.getId());
+                if (chatThreadPOS.isEmpty()) {
+                    return true;
+                }
                 chatThreadPOS.forEach(chatThread -> chatThread.setIsDeleted(true));
                 chatThreadDao.partialUpdateByIds(chatThreadPOS);
                 for (ChatThreadPO chatThreadPO : chatThreadPOS) {
                     List<ChatMessagePO> chatMessagePOS = chatMessageDao.findAllByThreadId(chatThreadPO.getId());
+                    if (chatMessagePOS.isEmpty()) {
+                        return true;
+                    }
                     chatMessagePOS.forEach(chatMessage -> chatMessage.setIsDeleted(true));
                     chatMessageDao.partialUpdateByIds(chatMessagePOS);
                 }
@@ -265,6 +271,9 @@ public class ChatbotServiceImpl implements ChatbotService {
                 chatThreadPO.setIsDeleted(true);
                 chatThreadDao.partialUpdateById(chatThreadPO);
                 List<ChatMessagePO> chatMessagePOS = chatMessageDao.findAllByThreadId(threadId);
+                if (chatMessagePOS.isEmpty()) {
+                    return true;
+                }
                 chatMessagePOS.forEach(chatMessage -> chatMessage.setIsDeleted(true));
                 chatMessageDao.partialUpdateByIds(chatMessagePOS);
                 return true;

@@ -219,6 +219,9 @@ public class SQLBuilder {
                     }
                     Field field = ReflectionUtils.findField(entityClass, entry.getKey());
                     if (field != null) {
+                        if (checkBaseField(field)) {
+                            continue;
+                        }
                         Column column = field.getAnnotation(Column.class);
                         if (column != null && !column.nullable() && value == null) {
                             continue;
@@ -248,6 +251,9 @@ public class SQLBuilder {
                     }
                     Field field = ReflectionUtils.findField(entityClass, entry.getKey());
                     if (field != null) {
+                        if (checkBaseField(field)) {
+                            continue;
+                        }
                         Column column = field.getAnnotation(Column.class);
                         if (column != null && !column.nullable() && value == null) {
                             continue;
@@ -291,7 +297,10 @@ public class SQLBuilder {
                         primaryKey = keywordsFormat(entry.getValue(), DBType.MYSQL);
                         continue;
                     }
-
+                    Field field = ReflectionUtils.findField(entityClass, entry.getKey());
+                    if (field == null || checkBaseField(field)) {
+                        continue;
+                    }
                     StringBuilder caseClause = new StringBuilder();
                     caseClause
                             .append(keywordsFormat(entry.getValue(), DBType.MYSQL))
@@ -299,10 +308,6 @@ public class SQLBuilder {
                     for (Entity entity : entities) {
                         PropertyDescriptor ps = BeanUtils.getPropertyDescriptor(entityClass, entry.getKey());
                         if (ps == null || ps.getReadMethod() == null) {
-                            continue;
-                        }
-                        Field field = ReflectionUtils.findField(entityClass, entry.getKey());
-                        if (field == null || checkBaseField(field)) {
                             continue;
                         }
                         Object value = ReflectionUtils.invokeMethod(ps.getReadMethod(), entity);
@@ -335,8 +340,12 @@ public class SQLBuilder {
                                     .append("' THEN NULL ");
                         }
                     }
+                    if (caseClause.toString().endsWith("CASE ")) {
+                        caseClause.append("WHEN TRUE THEN ");
+                    } else {
+                        caseClause.append("ELSE ");
+                    }
                     caseClause
-                            .append("ELSE ")
                             .append(keywordsFormat(entry.getValue(), DBType.MYSQL))
                             .append(" ");
                     caseClause.append("END");
