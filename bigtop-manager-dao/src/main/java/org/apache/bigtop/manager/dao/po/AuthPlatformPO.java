@@ -29,8 +29,8 @@ import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Table(name = "llm_platform_authorized")
-public class PlatformAuthorizedPO extends BasePO implements Serializable {
+@Table(name = "llm_auth_platform")
+public class AuthPlatformPO extends BasePO implements Serializable {
 
     @Id
     @Column(name = "id")

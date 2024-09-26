@@ -18,21 +18,14 @@
  */
 package org.apache.bigtop.manager.dao.repository;
 
-import org.apache.bigtop.manager.dao.po.ChatThreadPO;
+import org.apache.bigtop.manager.dao.po.AuthPlatformPO;
 
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
+public interface AuthPlatformDao extends BaseDao<AuthPlatformPO> {
+    AuthPlatformPO findByAuthId(@Param("authId") Long authId);
 
-public interface ChatThreadDao extends BaseDao<ChatThreadPO> {
-    List<ChatThreadPO> findAllByUserId(@Param("userId") Long userId);
+    AuthPlatformPO findByPlatformId(@Param("platformId") Long platformId);
 
-    ChatThreadPO findByThreadId(@Param("id") Long id);
-
-    List<ChatThreadPO> findAllByAuthIdAndUserId(
-            @Param("authId") Long authId, @Param("userId") Long userId);
-
-    void saveWithThreadInfo(ChatThreadPO chatThreadPO);
-
-    List<ChatThreadPO> findAllByAuthId(@Param("authId") Long authId);
+    void saveWithCredentials(AuthPlatformPO authPlatformPO);
 }

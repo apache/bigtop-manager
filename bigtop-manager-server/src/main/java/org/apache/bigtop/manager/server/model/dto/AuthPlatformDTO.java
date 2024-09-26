@@ -16,18 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.dao.repository;
+package org.apache.bigtop.manager.server.model.dto;
 
-import org.apache.bigtop.manager.dao.po.PlatformAuthorizedPO;
-
-import org.apache.ibatis.annotations.Param;
+import jakarta.validation.constraints.NotEmpty;
+import lombok.Data;
+import org.apache.bigtop.manager.server.model.req.AuthCredentialReq;
 
 import java.util.List;
+import java.util.Map;
 
-public interface PlatformAuthorizedDao extends BaseDao<PlatformAuthorizedPO> {
-    PlatformAuthorizedPO findByPlatformId(@Param("id") Long platformId);
+@Data
+public class AuthPlatformDTO {
+    private Long id;
 
-    void saveWithCredentials(PlatformAuthorizedPO platformAuthorizedPO);
+    private Long platformId;
 
-    List<PlatformAuthorizedPO> findAllPlatform();
+    private Map<String, String> authCredentials;
 }

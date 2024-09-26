@@ -333,7 +333,7 @@ CREATE TABLE llm_platform
     PRIMARY KEY (id)
 );
 
-CREATE TABLE llm_platform_authorized
+CREATE TABLE llm_auth_platform
 (
     id          BIGINT CHECK (id > 0)          NOT NULL GENERATED ALWAYS AS IDENTITY,
     platform_id BIGINT CHECK (platform_id > 0) NOT NULL,
@@ -346,11 +346,12 @@ CREATE TABLE llm_platform_authorized
     PRIMARY KEY (id)
 );
 
-CREATE INDEX idx_authorized_platform_id ON llm_platform_authorized (platform_id);
+CREATE INDEX idx_authorized_platform_id ON llm_auth_platform (platform_id);
 
 CREATE TABLE llm_chat_thread
 (
     id          BIGINT CHECK (id > 0)          NOT NULL GENERATED ALWAYS AS IDENTITY,
+    auth_id BIGINT CHECK (auth_id > 0) NOT NULL,
     platform_id BIGINT CHECK (platform_id > 0) NOT NULL,
     user_id     BIGINT CHECK (user_id > 0)     NOT NULL,
     model       VARCHAR(255)                   NOT NULL,
@@ -363,6 +364,7 @@ CREATE TABLE llm_chat_thread
     PRIMARY KEY (id)
 );
 
+CREATE INDEX idx_chatthread_auth_id ON llm_chat_thread (auth_id);
 CREATE INDEX idx_chatthread_platform_id ON llm_chat_thread (platform_id);
 CREATE INDEX idx_chatthread_user_id ON llm_chat_thread (user_id);
 

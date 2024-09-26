@@ -20,26 +20,26 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="org.apache.bigtop.manager.dao.repository.PlatformAuthorizedDao">
+<mapper namespace="org.apache.bigtop.manager.dao.repository.AuthPlatformDao">
 
     <sql id="baseColumns">
         id, credentials, platfotrm_id
     </sql>
 
-    <resultMap id="PlatformAuthorizedResultMap" type="org.apache.bigtop.manager.dao.po.PlatformAuthorizedPO">
+    <resultMap id="PlatformAuthorizedResultMap" type="org.apache.bigtop.manager.dao.po.AuthPlatformPO">
         <result property="credentials" column="credentials" typeHandler="org.apache.bigtop.manager.dao.handler.JsonTypeHandler"/>
     </resultMap>
 
+    <select id="findByAuthId" resultMap="PlatformAuthorizedResultMap">
+        SELECT * FROM llm_auth_platform WHERE id = #{authId} AND is_deleted = 0
+    </select>
+
     <select id="findByPlatformId" resultMap="PlatformAuthorizedResultMap">
-        SELECT * FROM llm_platform_authorized WHERE id = #{id} AND is_deleted = 0
+        SELECT * FROM llm_auth_platform WHERE platform_id = #{platformId} AND is_deleted = 0
     </select>
 
-    <select id="findAllPlatform" resultMap="PlatformAuthorizedResultMap">
-        SELECT * FROM llm_platform_authorized WHERE is_deleted = 0
-    </select>
-
-    <insert id="saveWithCredentials" parameterType="org.apache.bigtop.manager.dao.po.PlatformAuthorizedPO" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO llm_platform_authorized (platform_id, credentials)
+    <insert id="saveWithCredentials" parameterType="org.apache.bigtop.manager.dao.po.AuthPlatformPO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO llm_auth_platform (platform_id, credentials)
         VALUES (#{platformId}, #{credentials, typeHandler=org.apache.bigtop.manager.dao.handler.JsonTypeHandler})
         ON DUPLICATE KEY UPDATE
         platform_id = VALUES(platform_id),

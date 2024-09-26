@@ -16,23 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.vo;
+package org.apache.bigtop.manager.server.model.req;
 
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
-public class PlatformAuthorizedVO {
+public class AuthPlatformReq {
+    private Long id;
+
+    @NotEmpty
     private Long platformId;
 
-    private String platformName;
-
-    private String supportModels;
-
-    public PlatformAuthorizedVO(long platformId, String name, String models) {
-        this.platformId = platformId;
-        this.platformName = name;
-        this.supportModels = models;
-    }
-
-    public PlatformAuthorizedVO() {}
+    @NotEmpty
+    private List<AuthCredentialReq> authCredentials;
 }

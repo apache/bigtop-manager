@@ -18,14 +18,14 @@
  */
 package org.apache.bigtop.manager.server.controller;
 
-import org.apache.bigtop.manager.server.model.converter.PlatformConverter;
-import org.apache.bigtop.manager.server.model.dto.PlatformDTO;
+import org.apache.bigtop.manager.server.model.converter.AuthPlatformConverter;
+import org.apache.bigtop.manager.server.model.dto.AuthPlatformDTO;
+import org.apache.bigtop.manager.server.model.req.AuthPlatformReq;
 import org.apache.bigtop.manager.server.model.req.ChatbotMessageReq;
-import org.apache.bigtop.manager.server.model.req.PlatformReq;
+import org.apache.bigtop.manager.server.model.vo.AuthPlatformVO;
 import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
 import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
 import org.apache.bigtop.manager.server.model.vo.PlatformAuthCredentialVO;
-import org.apache.bigtop.manager.server.model.vo.PlatformAuthorizedVO;
 import org.apache.bigtop.manager.server.model.vo.PlatformVO;
 import org.apache.bigtop.manager.server.service.ChatbotService;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
@@ -55,66 +55,66 @@ public class ChatbotController {
     @Resource
     private ChatbotService chatbotService;
 
-    @Operation(summary = "platforms", description = "Get all platforms")
+    @Operation(summary = "get platforms", description = "Get all platforms")
     @GetMapping("/platforms")
     public ResponseEntity<List<PlatformVO>> platforms() {
         return ResponseEntity.success(chatbotService.platforms());
     }
 
-    @Operation(summary = "platforms", description = "Get authorized platforms")
-    @GetMapping("/platforms/authorized")
-    public ResponseEntity<List<PlatformAuthorizedVO>> authorizedPlatforms() {
+    @Operation(summary = "platform credentials", description = "Get platform auth credentials")
+    @GetMapping("/platforms/{platformId}/auth-credentials")
+    public ResponseEntity<List<PlatformAuthCredentialVO>> platformsAuthCredential(@PathVariable Long platformId) {
+        return ResponseEntity.success(chatbotService.platformsAuthCredentials(platformId));
+    }
+
+    @Operation(summary = "get auth platforms", description = "Get authorized platforms")
+    @GetMapping("/auth-platforms")
+    public ResponseEntity<List<AuthPlatformVO>> authorizedPlatforms() {
         return ResponseEntity.success(chatbotService.authorizedPlatforms());
     }
 
-    @Operation(summary = "platforms", description = "Get platform auth credentials")
-    @GetMapping("/platforms/{platformId}/auth/credential")
-    public ResponseEntity<List<PlatformAuthCredentialVO>> platformsAuthCredential(@PathVariable Long platformId) {
-        return ResponseEntity.success(chatbotService.platformsAuthCredential(platformId));
+    @Operation(summary = "auth platform", description = "Add authorized platforms")
+    @PostMapping("/auth-platforms")
+    public ResponseEntity<AuthPlatformVO> addAuthorizedPlatform(@RequestBody AuthPlatformReq authPlatformReq) {
+        AuthPlatformDTO authPlatformDTO = AuthPlatformConverter.INSTANCE.fromReq2DTO(authPlatformReq);
+        return ResponseEntity.success(chatbotService.addAuthorizedPlatform(authPlatformDTO));
     }
 
-    @Operation(summary = "platforms", description = "Add authorized platforms")
-    @PutMapping("/platforms")
-    public ResponseEntity<PlatformAuthorizedVO> addAuthorizedPlatform(@RequestBody PlatformReq platformReq) {
-        PlatformDTO platformDTO = PlatformConverter.INSTANCE.fromReq2DTO(platformReq);
-        return ResponseEntity.success(chatbotService.addAuthorizedPlatform(platformDTO));
+    @Operation(summary = "delete auth platform", description = "Delete authorized platforms")
+    @DeleteMapping("/auth-platforms/{authId}")
+    public ResponseEntity<Boolean> deleteAuthorizedPlatform(@PathVariable Long authId) {
+        return ResponseEntity.success(chatbotService.deleteAuthorizedPlatform(authId));
     }
 
-    @Operation(summary = "platforms", description = "Delete authorized platforms")
-    @DeleteMapping("/platforms/{platformId}")
-    public ResponseEntity<Boolean> deleteAuthorizedPlatform(@PathVariable Long platformId) {
-        return ResponseEntity.success(chatbotService.deleteAuthorizedPlatform(platformId));
+    @Operation(summary = "new thread", description = "Create a chat threads")
+    @PostMapping("/auth-platforms/{authId}/threads")
+    public ResponseEntity<ChatThreadVO> createChatThreads(@PathVariable Long authId, @RequestParam String model) {
+        return ResponseEntity.success(chatbotService.createChatThreads(authId, model));
     }
 
-    @Operation(summary = "new threads", description = "Create a chat threads")
-    @PutMapping("/platforms/{platformId}/threads")
-    public ResponseEntity<ChatThreadVO> createChatThreads(@PathVariable Long platformId, @RequestParam String model) {
-        return ResponseEntity.success(chatbotService.createChatThreads(platformId, model));
+    @Operation(summary = "delete thread", description = "Delete a chat threads")
+    @DeleteMapping("/auth-platforms/{authId}/threads/{threadId}")
+    public ResponseEntity<Boolean> deleteChatThreads(@PathVariable Long authId, @PathVariable Long threadId) {
+        return ResponseEntity.success(chatbotService.deleteChatThreads(authId, threadId));
     }
 
-    @Operation(summary = "delete threads", description = "Delete a chat threads")
-    @DeleteMapping("platforms/{platformId}/threads/{threadId}")
-    public ResponseEntity<Boolean> deleteChatThreads(@PathVariable Long platformId, @PathVariable Long threadId) {
-        return ResponseEntity.success(chatbotService.deleteChatThreads(platformId, threadId));
-    }
-
-    @Operation(summary = "get", description = "Get all threads of a platform")
-    @GetMapping("platforms/{platformId}/threads")
+    @Operation(summary = "get threads", description = "Get all threads of a auth platform")
+    @GetMapping("/auth-platforms/{authId}/threads")
     public ResponseEntity<List<ChatThreadVO>> getAllChatThreads(
-            @PathVariable Long platformId, @RequestParam String model) {
-        return ResponseEntity.success(chatbotService.getAllChatThreads(platformId, model));
+            @PathVariable Long authId, @RequestParam String model) {
+        return ResponseEntity.success(chatbotService.getAllChatThreads(authId, model));
     }
 
     @Operation(summary = "talk", description = "Talk with Chatbot")
-    @PostMapping("platforms/{platformId}/threads/{threadId}/talk")
+    @PostMapping("/auth-platforms/{authId}/threads/{threadId}/talk")
     public SseEmitter talk(
-            @PathVariable Long platformId, @PathVariable Long threadId, @RequestBody ChatbotMessageReq messageReq) {
-        return chatbotService.talk(platformId, threadId, messageReq.getMessage());
+            @PathVariable Long authId, @PathVariable Long threadId, @RequestBody ChatbotMessageReq messageReq) {
+        return chatbotService.talk(authId, threadId, messageReq.getMessage());
     }
 
     @Operation(summary = "history", description = "Get chat records")
-    @GetMapping("platforms/{platformId}/threads/{threadId}/history")
-    public ResponseEntity<List<ChatMessageVO>> history(@PathVariable Long platformId, @PathVariable Long threadId) {
-        return ResponseEntity.success(chatbotService.history(platformId, threadId));
+    @GetMapping("/auth-platforms/{authId}/threads/{threadId}/history")
+    public ResponseEntity<List<ChatMessageVO>> history(@PathVariable Long authId, @PathVariable Long threadId) {
+        return ResponseEntity.success(chatbotService.history(authId, threadId));
     }
 }

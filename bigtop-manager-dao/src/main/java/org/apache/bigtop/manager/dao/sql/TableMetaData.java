@@ -110,7 +110,6 @@ public class TableMetaData {
         // 获取父类字段
         List<Field> fields = ClassUtils.getFields(clazz);
         for (Field field : fields) {
-
             if (Modifier.isStatic(field.getModifiers())
                     || field.isAnnotationPresent(Transient.class)
                     || !BeanUtils.isSimpleValueType(field.getType())) {

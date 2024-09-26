@@ -24,6 +24,8 @@ import lombok.Data;
 public class ChatThreadVO {
     private Long threadId;
 
+    private Long authId;
+
     private Long platformId;
 
     private String model;

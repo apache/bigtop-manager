@@ -18,22 +18,45 @@
  */
 package org.apache.bigtop.manager.server.model.converter;
 
-import org.apache.bigtop.manager.dao.po.PlatformAuthorizedPO;
+import org.apache.bigtop.manager.dao.po.AuthPlatformPO;
 import org.apache.bigtop.manager.dao.po.PlatformPO;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
-import org.apache.bigtop.manager.server.model.vo.PlatformAuthorizedVO;
+import org.apache.bigtop.manager.server.model.dto.AuthPlatformDTO;
+import org.apache.bigtop.manager.server.model.req.AuthCredentialReq;
+import org.apache.bigtop.manager.server.model.req.AuthPlatformReq;
+import org.apache.bigtop.manager.server.model.vo.AuthPlatformVO;
 
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(config = MapStructSharedConfig.class)
-public interface PlatformAuthorizedConverter {
-    PlatformAuthorizedConverter INSTANCE = Mappers.getMapper(PlatformAuthorizedConverter.class);
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-    @Mapping(target = "platformId", source = "id")
+@Mapper(config = MapStructSharedConfig.class)
+public interface AuthPlatformConverter {
+    AuthPlatformConverter INSTANCE = Mappers.getMapper(AuthPlatformConverter.class);
+
     @Mapping(target = "supportModels", expression = "java(platformPO.getSupportModels())")
     @Mapping(target = "platformName", expression = "java(platformPO.getName())")
-    PlatformAuthorizedVO fromPO2VO(PlatformAuthorizedPO platformAuthorizedPO, @Context PlatformPO platformPO);
+    AuthPlatformVO fromPO2VO(AuthPlatformPO authPlatformPO, @Context PlatformPO platformPO);
+
+    AuthPlatformDTO fromReq2DTO(AuthPlatformReq authPlatformReq);
+
+    default Map<String, String> mapAuthCredentials(List<AuthCredentialReq> authCredentials) {
+        if (authCredentials == null) {
+            return null;
+        }
+        return authCredentials.stream()
+                .collect(Collectors.toMap(AuthCredentialReq::getKey, AuthCredentialReq::getValue));
+    }
+
+    @AfterMapping
+    default void afterMapping(@MappingTarget AuthPlatformDTO authPlatformDTO, AuthPlatformReq authPlatformReq) {
+        authPlatformDTO.setAuthCredentials(mapAuthCredentials(authPlatformReq.getAuthCredentials()));
+    }
 }

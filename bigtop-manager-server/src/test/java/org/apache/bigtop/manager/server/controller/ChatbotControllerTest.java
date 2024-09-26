@@ -18,13 +18,15 @@
  */
 package org.apache.bigtop.manager.server.controller;
 
+import org.apache.bigtop.manager.server.model.dto.AuthPlatformDTO;
 import org.apache.bigtop.manager.server.model.dto.PlatformDTO;
+import org.apache.bigtop.manager.server.model.req.AuthPlatformReq;
 import org.apache.bigtop.manager.server.model.req.ChatbotMessageReq;
 import org.apache.bigtop.manager.server.model.req.PlatformReq;
+import org.apache.bigtop.manager.server.model.vo.AuthPlatformVO;
 import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
 import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
 import org.apache.bigtop.manager.server.model.vo.PlatformAuthCredentialVO;
-import org.apache.bigtop.manager.server.model.vo.PlatformAuthorizedVO;
 import org.apache.bigtop.manager.server.model.vo.PlatformVO;
 import org.apache.bigtop.manager.server.service.ChatbotService;
 import org.apache.bigtop.manager.server.utils.MessageSourceUtils;
@@ -85,10 +87,10 @@ class ChatbotControllerTest {
 
     @Test
     void getAuthorizedPlatforms() {
-        List<PlatformAuthorizedVO> authorizedPlatforms = new ArrayList<>();
+        List<AuthPlatformVO> authorizedPlatforms = new ArrayList<>();
         when(chatbotService.authorizedPlatforms()).thenReturn(authorizedPlatforms);
 
-        ResponseEntity<List<PlatformAuthorizedVO>> response = chatbotController.authorizedPlatforms();
+        ResponseEntity<List<AuthPlatformVO>> response = chatbotController.authorizedPlatforms();
 
         assertTrue(response.isSuccess());
         assertEquals(authorizedPlatforms, response.getData());
@@ -98,7 +100,7 @@ class ChatbotControllerTest {
     void platformsAuthCredential() {
         Long platformId = 1L;
         List<PlatformAuthCredentialVO> credentials = new ArrayList<>();
-        when(chatbotService.platformsAuthCredential(platformId)).thenReturn(credentials);
+        when(chatbotService.platformsAuthCredentials(platformId)).thenReturn(credentials);
 
         ResponseEntity<List<PlatformAuthCredentialVO>> response = chatbotController.platformsAuthCredential(platformId);
 
@@ -108,12 +110,12 @@ class ChatbotControllerTest {
 
     @Test
     void addAuthorizedPlatform() {
-        PlatformReq platformReq = new PlatformReq();
-        PlatformAuthorizedVO authorizedVO = new PlatformAuthorizedVO();
+        AuthPlatformReq authPlatformReq = new AuthPlatformReq();
+        AuthPlatformVO authorizedVO = new AuthPlatformVO();
 
-        when(chatbotService.addAuthorizedPlatform(any(PlatformDTO.class))).thenReturn(authorizedVO);
+        when(chatbotService.addAuthorizedPlatform(any(AuthPlatformDTO.class))).thenReturn(authorizedVO);
 
-        ResponseEntity<PlatformAuthorizedVO> response = chatbotController.addAuthorizedPlatform(platformReq);
+        ResponseEntity<AuthPlatformVO> response = chatbotController.addAuthorizedPlatform(authPlatformReq);
 
         assertTrue(response.isSuccess());
         assertEquals(authorizedVO, response.getData());
