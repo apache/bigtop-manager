@@ -19,10 +19,8 @@
 package org.apache.bigtop.manager.server.controller;
 
 import org.apache.bigtop.manager.server.model.dto.AuthPlatformDTO;
-import org.apache.bigtop.manager.server.model.dto.PlatformDTO;
 import org.apache.bigtop.manager.server.model.req.AuthPlatformReq;
 import org.apache.bigtop.manager.server.model.req.ChatbotMessageReq;
-import org.apache.bigtop.manager.server.model.req.PlatformReq;
 import org.apache.bigtop.manager.server.model.vo.AuthPlatformVO;
 import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
 import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;

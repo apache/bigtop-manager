@@ -18,11 +18,8 @@
  */
 package org.apache.bigtop.manager.server.model.dto;
 
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
-import org.apache.bigtop.manager.server.model.req.AuthCredentialReq;
 
-import java.util.List;
 import java.util.Map;
 
 @Data

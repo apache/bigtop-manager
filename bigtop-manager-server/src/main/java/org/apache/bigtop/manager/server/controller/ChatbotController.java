@@ -34,7 +34,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -100,8 +99,7 @@ public class ChatbotController {
 
     @Operation(summary = "get threads", description = "Get all threads of a auth platform")
     @GetMapping("/auth-platforms/{authId}/threads")
-    public ResponseEntity<List<ChatThreadVO>> getAllChatThreads(
-            @PathVariable Long authId, @RequestParam String model) {
+    public ResponseEntity<List<ChatThreadVO>> getAllChatThreads(@PathVariable Long authId, @RequestParam String model) {
         return ResponseEntity.success(chatbotService.getAllChatThreads(authId, model));
     }
 

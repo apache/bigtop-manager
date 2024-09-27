@@ -29,9 +29,9 @@ import org.apache.bigtop.manager.dao.po.AuthPlatformPO;
 import org.apache.bigtop.manager.dao.po.ChatMessagePO;
 import org.apache.bigtop.manager.dao.po.ChatThreadPO;
 import org.apache.bigtop.manager.dao.po.PlatformPO;
+import org.apache.bigtop.manager.dao.repository.AuthPlatformDao;
 import org.apache.bigtop.manager.dao.repository.ChatMessageDao;
 import org.apache.bigtop.manager.dao.repository.ChatThreadDao;
-import org.apache.bigtop.manager.dao.repository.AuthPlatformDao;
 import org.apache.bigtop.manager.dao.repository.PlatformDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
@@ -41,7 +41,6 @@ import org.apache.bigtop.manager.server.model.converter.ChatMessageConverter;
 import org.apache.bigtop.manager.server.model.converter.ChatThreadConverter;
 import org.apache.bigtop.manager.server.model.converter.PlatformConverter;
 import org.apache.bigtop.manager.server.model.dto.AuthPlatformDTO;
-import org.apache.bigtop.manager.server.model.dto.PlatformAuthorizedDTO;
 import org.apache.bigtop.manager.server.model.vo.AuthPlatformVO;
 import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
 import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
@@ -90,11 +89,11 @@ public class ChatbotServiceImpl implements ChatbotService {
     }
 
     private AIAssistantConfig getAIAssistantConfig(
-            PlatformAuthorizedDTO platformAuthorizedDTO, Map<String, String> configs) {
+            String model, Map<String, String> credentials, Map<String, String> configs) {
         return AIAssistantConfig.builder()
-                .setModel(platformAuthorizedDTO.getModel())
+                .setModel(model)
                 .setLanguage(LocaleContextHolder.getLocale().toString())
-                .addCredentials(platformAuthorizedDTO.getCredentials())
+                .addCredentials(credentials)
                 .addConfigs(configs)
                 .build();
     }
@@ -104,19 +103,18 @@ public class ChatbotServiceImpl implements ChatbotService {
     }
 
     private AIAssistant buildAIAssistant(
-            PlatformAuthorizedDTO platformAuthorizedDTO, Long threadId, Map<String, String> configs) {
+            String platformName,
+            String model,
+            Map<String, String> credentials,
+            Long threadId,
+            Map<String, String> configs) {
         return getAIAssistantFactory()
-                .create(
-                        getPlatformType(platformAuthorizedDTO.getPlatformName()),
-                        getAIAssistantConfig(platformAuthorizedDTO, configs),
-                        threadId);
+                .create(getPlatformType(platformName), getAIAssistantConfig(model, credentials, configs), threadId);
     }
 
-    private Boolean testAuthorization(PlatformAuthorizedDTO platformAuthorizedDTO) {
+    private Boolean testAuthorization(String platformName, String model, Map<String, String> credentials) {
         AIAssistant aiAssistant = getAIAssistantFactory()
-                .create(
-                        getPlatformType(platformAuthorizedDTO.getPlatformName()),
-                        getAIAssistantConfig(platformAuthorizedDTO, null));
+                .create(getPlatformType(platformName), getAIAssistantConfig(model, credentials, null));
         try {
             return aiAssistant.test();
         } catch (Exception e) {
@@ -172,10 +170,8 @@ public class ChatbotServiceImpl implements ChatbotService {
         if (models.isEmpty()) {
             throw new ApiException(ApiExceptionEnum.MODEL_NOT_SUPPORTED);
         }
-        PlatformAuthorizedDTO platformAuthorizedDTO =
-                new PlatformAuthorizedDTO(platformPO.getName(), credentialSet, models.get(0));
 
-        if (!testAuthorization(platformAuthorizedDTO)) {
+        if (!testAuthorization(platformPO.getName(), models.get(0), credentialSet)) {
             throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
         }
 
@@ -184,8 +180,7 @@ public class ChatbotServiceImpl implements ChatbotService {
         authPlatformPO.setPlatformId(platformPO.getId());
 
         authPlatformDao.saveWithCredentials(authPlatformPO);
-        AuthPlatformVO authPlatformVO =
-                AuthPlatformConverter.INSTANCE.fromPO2VO(authPlatformPO, platformPO);
+        AuthPlatformVO authPlatformVO = AuthPlatformConverter.INSTANCE.fromPO2VO(authPlatformPO, platformPO);
         authPlatformVO.setSupportModels(platformPO.getSupportModels());
         authPlatformVO.setPlatformName(platformPO.getName());
         return authPlatformVO;
@@ -249,9 +244,8 @@ public class ChatbotServiceImpl implements ChatbotService {
         chatThreadPO.setAuthId(authPlatformPO.getId());
         chatThreadPO.setPlatformId(authPlatformPO.getPlatformId());
 
-        PlatformAuthorizedDTO platformAuthorizedDTO = new PlatformAuthorizedDTO(
-                platformPO.getName(), authPlatformPO.getCredentials(), chatThreadPO.getModel());
-        AIAssistant aiAssistant = buildAIAssistant(platformAuthorizedDTO, null, null);
+        AIAssistant aiAssistant = buildAIAssistant(
+                platformPO.getName(), chatThreadPO.getModel(), authPlatformPO.getCredentials(), null, null);
         Map<String, String> threadInfo = aiAssistant.createThread();
         chatThreadPO.setThreadInfo(threadInfo);
         chatThreadDao.saveWithThreadInfo(chatThreadPO);
@@ -303,10 +297,12 @@ public class ChatbotServiceImpl implements ChatbotService {
         }
 
         PlatformPO platformPO = platformDao.findById(authPlatformPO.getPlatformId());
-        PlatformAuthorizedDTO platformAuthorizedDTO = new PlatformAuthorizedDTO(
-                platformPO.getName(), authPlatformPO.getCredentials(), chatThreadPO.getModel());
-        AIAssistant aiAssistant =
-                buildAIAssistant(platformAuthorizedDTO, chatThreadPO.getId(), chatThreadPO.getThreadInfo());
+        AIAssistant aiAssistant = buildAIAssistant(
+                platformPO.getName(),
+                chatThreadPO.getModel(),
+                authPlatformPO.getCredentials(),
+                chatThreadPO.getId(),
+                chatThreadPO.getThreadInfo());
         Flux<String> stringFlux = aiAssistant.streamAsk(message);
 
         SseEmitter emitter = new SseEmitter();
