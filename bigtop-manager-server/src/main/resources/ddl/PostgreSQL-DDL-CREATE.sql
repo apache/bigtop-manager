@@ -351,7 +351,7 @@ CREATE INDEX idx_authorized_platform_id ON llm_auth_platform (platform_id);
 CREATE TABLE llm_chat_thread
 (
     id          BIGINT CHECK (id > 0)          NOT NULL GENERATED ALWAYS AS IDENTITY,
-    auth_id BIGINT CHECK (auth_id > 0) NOT NULL,
+    auth_id     BIGINT CHECK (auth_id > 0) NOT NULL,
     platform_id BIGINT CHECK (platform_id > 0) NOT NULL,
     user_id     BIGINT CHECK (user_id > 0)     NOT NULL,
     model       VARCHAR(255)                   NOT NULL,
