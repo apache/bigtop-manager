@@ -43,7 +43,7 @@ export const getSupportedPlatforms = (): Promise<SupportedPlatform[]> => {
     url: '/chatbot/platforms'
   })
 }
-export const getCredentialFormModelofPlatform = (
+export const getCredentialFormModelOfPlatform = (
   platformId: string | number
 ): Promise<CredentialFormItem[]> => {
   return request({

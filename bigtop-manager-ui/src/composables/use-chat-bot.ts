@@ -23,7 +23,7 @@ import {
   delChatThread,
   getAuthorizedPlatforms,
   getChatThreads,
-  getCredentialFormModelofPlatform,
+  getCredentialFormModelOfPlatform,
   getSupportedPlatforms,
   getThreadChatHistory,
   validateAuthCredentials
@@ -89,7 +89,7 @@ const useChatBot = () => {
   ) {
     try {
       loading.value = true
-      const data = await getCredentialFormModelofPlatform(platformId)
+      const data = await getCredentialFormModelOfPlatform(platformId)
       return Promise.resolve(data)
     } catch (error) {
       console.log('error :>> ', error)
