@@ -25,6 +25,7 @@
   color: #333333;
   box-sizing: border-box;
   font-size: 1em;
+
   pre {
     border-radius: 8px;
   }
@@ -52,4 +53,12 @@
 
 .markdown-body ul li {
   margin-bottom: 10px;
+}
+
+.code-block-head {
+  background: #4c4d58;
+  display: flex;
+  justify-content: space-between;
+  padding: 6px;
+  align-items: center;
 }

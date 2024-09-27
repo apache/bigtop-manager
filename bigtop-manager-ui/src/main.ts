@@ -21,7 +21,9 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import plugins from '@/plugins'
 
-import '@/styles/default.css'
+import '@/styles/main.css'
+import '@/styles/scrollbar.scss'
+import '@/styles/marked.scss'
 import 'ant-design-vue/dist/reset.css'
 import 'virtual:svg-icons-register'
 

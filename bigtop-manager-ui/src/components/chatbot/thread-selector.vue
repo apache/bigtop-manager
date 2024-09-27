@@ -65,23 +65,26 @@
     }))
   })
 
-  const chatThreadsSelectData = computed<SelectData[]>(() => [
-    {
-      title: t('ai.select_thread_to_chat'),
-      isDeletable: true,
-      options: formattedOptions.value
-    },
-    {
-      title: t('ai.or_you_can'),
-      isDeletable: false,
-      options: [
-        {
-          nextPage: 'chat-window',
-          name: t('ai.create_new_thread')
-        }
-      ]
-    }
-  ])
+  const chatThreadsSelectData = computed<SelectData[]>(() => {
+    const selectData = [
+      {
+        title: t('ai.select_thread_to_chat'),
+        isDeletable: true,
+        options: formattedOptions.value
+      },
+      {
+        title: t('ai.or_you_can'),
+        isDeletable: false,
+        options: [
+          {
+            nextPage: 'chat-window',
+            name: t('ai.create_new_thread')
+          }
+        ]
+      }
+    ]
+    return chatThreads.value.length === 10 ? [selectData[0]] : selectData
+  })
 
   const getAllChatThreads = async () => {
     const { authId, model } = chatPayload.value
@@ -112,7 +115,8 @@
       })) as ChatThread
       emits('update:chatPayload', {
         ...toRaw(chatPayload.value),
-        ...data
+        ...data,
+        threadName: `Thread ${data.threadId}`
       })
     }
     emits('update:currPage', option)
@@ -124,10 +128,9 @@
       icon: h(ExclamationCircleFilled),
       content: t('common.delete_confirm_content', [option.name]),
       async onOk() {
-        const { threadId, authId } = chatPayload.value
         await fetchDelChatThread({
-          threadId,
-          authId
+          threadId: option.id,
+          authId: chatPayload.value.authId
         } as ChatThreadDelCondition)
         getAllChatThreads()
       }
@@ -143,11 +146,7 @@
   <div>
     <a-spin :spinning="loading">
       <select-menu
-        :select-data="
-          chatThreads.length < 10
-            ? chatThreadsSelectData
-            : chatThreadsSelectData.splice(0, 1)
-        "
+        :select-data="chatThreadsSelectData"
         @remove="onRemove"
         @select="onSelect"
       />
