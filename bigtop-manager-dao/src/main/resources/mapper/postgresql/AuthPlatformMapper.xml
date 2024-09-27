@@ -31,7 +31,7 @@
     </resultMap>
 
     <select id="findByAuthId" resultMap="AuthPlatformResultMap">
-        SELECT * FROM llm_auth_platform WHERE id = #{authId} AND is_deleted = 0
+        SELECT * FROM llm_auth_platform WHERE id = #{authId} AND is_deleted = false
     </select>
 
     <select id="findByPlatformId" resultMap="AuthPlatformResultMap">
