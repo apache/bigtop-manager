@@ -21,3 +21,7 @@ export interface LogsRes {
   promise: Promise<any>
   cancel: () => void
 }
+export interface chatMessagesRes {
+  promise: Promise<any>
+  cancel: () => void
+}

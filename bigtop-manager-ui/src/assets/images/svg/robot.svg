@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one
+  ~ or more contributor license agreements.  See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership.  The ASF licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+-->
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="9" y="18" width="30" height="24" rx="2" fill="none" stroke="#333" stroke-width="2" />
+  <circle cx="17" cy="26" r="2" fill="#333" />
+  <circle cx="31" cy="26" r="2" fill="#333" />
+  <path
+    d="M20 32C18.8954 32 18 32.8954 18 34C18 35.1046 18.8954 36 20 36V32ZM28 36C29.1046 36 30 35.1046 30 34C30 32.8954 29.1046 32 28 32V36ZM20 36H28V32H20V36Z"
+    fill="#333" />
+  <path d="M24 10V18" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M4 26V34" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M44 26V34" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+  <circle cx="24" cy="8" r="2" stroke="#333" stroke-width="4" />
+</svg>

@@ -17,16 +17,40 @@
  * under the License.
  */
 
-import { createApp } from 'vue'
-import App from './App.vue'
-import plugins from '@/plugins'
+* {
+  outline: 0;
+}
 
-import '@/styles/main.css'
-import '@/styles/scrollbar.scss'
-import '@/styles/marked.scss'
-import 'ant-design-vue/dist/reset.css'
-import 'virtual:svg-icons-register'
+html {
+  --text-color: rgba(0, 0, 0, 0.85);
+  --text-color-desc: rgba(0, 0, 0, 0.45);
+  --bg-color: #fff;
+  --hover-color: rgba(0, 0, 0, 0.05);
+  --bg-color-container: #f0f2f5;
+  --c-shadow: 2px 0 8px 0 rgba(29, 35, 41, 0.05);
+}
 
-const app = createApp(App)
-app.use(plugins, { antdMessageMaxCount: 1 })
-app.mount('#app')
+.m-0 {
+  margin: 0;
+}
+
+.p-0 {
+  padding: 0;
+}
+
+.hidden {
+  display: none;
+}
+
+.ant-table-body {
+  overflow-y: auto !important;
+}
+
+#app {
+  width: 100%;
+  box-sizing: border-box;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+}

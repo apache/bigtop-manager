@@ -19,6 +19,7 @@
 
 <script setup lang="ts">
   import { HomeOutlined } from '@ant-design/icons-vue'
+  import Chatbot from '@/components/chatbot/chatbot.vue'
 </script>
 
 <template>
@@ -37,6 +38,7 @@
     <div class="content">
       <router-view />
     </div>
+    <chatbot />
   </a-layout-content>
 </template>
 

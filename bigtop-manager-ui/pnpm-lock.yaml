@@ -26,9 +26,21 @@ dependencies:
   echarts:
     specifier: ^5.4.3
     version: 5.4.3
+  github-markdown-css:
+    specifier: ^5.6.1
+    version: 5.6.1
+  highlight.js:
+    specifier: ^11.10.0
+    version: 11.10.0
   lodash:
     specifier: ^4.17.21
     version: 4.17.21
+  marked:
+    specifier: ^14.1.2
+    version: 14.1.2
+  marked-highlight:
+    specifier: ^2.1.4
+    version: 2.1.4(marked@14.1.2)
   md5:
     specifier: ^2.3.0
     version: 2.3.0
@@ -41,6 +53,9 @@ dependencies:
   vue:
     specifier: ^3.4.37
     version: 3.4.38(typescript@5.0.2)
+  vue-dompurify-html:
+    specifier: ^5.1.0
+    version: 5.1.0(vue@3.4.38)
   vue-i18n:
     specifier: ^9.2.2
     version: 9.2.2(vue@3.4.38)
@@ -2361,6 +2376,10 @@ packages:
       domelementtype: 2.3.0
     dev: true
 
+  /dompurify@3.1.6:
+    resolution: {integrity: sha512-cTOAhc36AalkjtBpfG6O8JimdTMWNXjiePT2xQH/ppBGi/4uIpmj8eKyIkMJErXWARyINV/sB38yf8JCLF5pbQ==}
+    dev: false
+
   /domutils@1.7.0:
     resolution: {integrity: sha512-Lgd2XcJ/NjEw+7tFvfKxOzCYKZsdct5lczQ2ZaQY8Djz7pfAD3Gbp8ySJWtreII/vDlMVmxwa6pHmdxIYgttDg==}
     dependencies:
@@ -3063,6 +3082,11 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
+  /github-markdown-css@5.6.1:
+    resolution: {integrity: sha512-DItLFgHd+s7HQmk63YN4/TdvLeRqk1QP7pPKTTPrDTYoI5x7f/luJWSOZxesmuxBI2srHp8RDyoZd+9WF+WK8Q==}
+    engines: {node: '>=10'}
+    dev: false
+
   /glob-parent@5.1.2:
     resolution: {integrity: sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow==}
     engines: {node: '>= 6'}
@@ -3252,6 +3276,11 @@ packages:
     resolution: {integrity: sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==}
     hasBin: true
     dev: true
+
+  /highlight.js@11.10.0:
+    resolution: {integrity: sha512-SYVnVFswQER+zu1laSya563s+F8VDGt7o35d4utbamowvUNLLMovFqwCLSocpZTz3MgaSRA1IbqRWZv97dtErQ==}
+    engines: {node: '>=12.0.0'}
+    dev: false
 
   /htmlparser2@3.10.1:
     resolution: {integrity: sha512-IgieNijUMbkDovyoKObU1DUhm1iwNYE/fuifEoEHfd1oZKZDaONBSkal7Y01shxsM49R4XaMdGez3WnF9UfiCQ==}
@@ -3823,6 +3852,20 @@ packages:
     dependencies:
       object-visit: 1.0.1
     dev: true
+
+  /marked-highlight@2.1.4(marked@14.1.2):
+    resolution: {integrity: sha512-D1GOkcdzP+1dzjoColL7umojefFrASDuLeyaHS0Zr/Uo9jkr1V6vpLRCzfi1djmEaWyK0SYMFtHnpkZ+cwFT1w==}
+    peerDependencies:
+      marked: '>=4 <15'
+    dependencies:
+      marked: 14.1.2
+    dev: false
+
+  /marked@14.1.2:
+    resolution: {integrity: sha512-f3r0yqpz31VXiDB/wj9GaOB0a2PRLQl6vJmXiFrniNwjkKdvakqJRULhjFKJpxOchlCRiG5fcacoUZY5Xa6PEQ==}
+    engines: {node: '>= 18'}
+    hasBin: true
+    dev: false
 
   /md5@2.3.0:
     resolution: {integrity: sha512-T1GITYmFaKuO91vxyoQMFETst+O71VUPEU3ze5GNzDm0OWdP8v1ziTaAEPUr/3kLsY3Sftgz242A1SetQiDL7g==}
@@ -5738,6 +5781,15 @@ packages:
       '@vue/composition-api':
         optional: true
     dependencies:
+      vue: 3.4.38(typescript@5.0.2)
+    dev: false
+
+  /vue-dompurify-html@5.1.0(vue@3.4.38):
+    resolution: {integrity: sha512-616o2/PBdOLM2bwlRWLdzeEC9NerLkwiudqNgaIJ5vBQWXec+u7Kuzh+45DtQQrids67s4pHnTnJZLVfyPMxbA==}
+    peerDependencies:
+      vue: ^3.0.0
+    dependencies:
+      dompurify: 3.1.6
       vue: 3.4.38(typescript@5.0.2)
     dev: false
 

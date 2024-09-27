@@ -17,16 +17,17 @@
  * under the License.
  */
 
-import { createApp } from 'vue'
-import App from './App.vue'
-import plugins from '@/plugins'
-
-import '@/styles/main.css'
-import '@/styles/scrollbar.scss'
-import '@/styles/marked.scss'
-import 'ant-design-vue/dist/reset.css'
-import 'virtual:svg-icons-register'
-
-const app = createApp(App)
-app.use(plugins, { antdMessageMaxCount: 1 })
-app.mount('#app')
+export default {
+  empty_message: 'Message cannot be empty',
+  select_authorized_platform: 'Please select the following authorized platform',
+  no_authorized_platform: 'No authorized platforms',
+  or_you_can: 'Or you can',
+  authorize_new_platform: 'Authorize New Platform',
+  select_platform_to_authorize: 'Select platform to authorize',
+  authorizing_platform:
+    ' You are authorizing {0} platform, please fill in the following information',
+  select_thread_to_chat: 'Please select the thread to enter chat',
+  select_model: 'Please select the model you want to use',
+  create_new_thread: 'Create New Thread',
+  thread_name: 'Thread {0}'
+}

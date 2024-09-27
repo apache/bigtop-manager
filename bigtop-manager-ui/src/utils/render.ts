@@ -17,16 +17,19 @@
  * under the License.
  */
 
-import { createApp } from 'vue'
-import App from './App.vue'
-import plugins from '@/plugins'
+import { Marked } from 'marked'
+import { markedHighlight } from 'marked-highlight'
+import hljs from 'highlight.js'
 
-import '@/styles/main.css'
-import '@/styles/scrollbar.scss'
-import '@/styles/marked.scss'
-import 'ant-design-vue/dist/reset.css'
-import 'virtual:svg-icons-register'
-
-const app = createApp(App)
-app.use(plugins, { antdMessageMaxCount: 1 })
-app.mount('#app')
+export const parseMDByHighlight = (content: string) => {
+  const marked = new Marked(
+    markedHighlight({
+      langPrefix: 'hljs language-',
+      highlight(code, lang) {
+        const language = hljs.getLanguage(lang) ? lang : 'plaintext'
+        return hljs.highlight(code, { language }).value
+      }
+    })
+  )
+  return marked.parse(content)
+}
