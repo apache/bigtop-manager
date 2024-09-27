@@ -29,10 +29,9 @@ public interface ChatThreadDao extends BaseDao<ChatThreadPO> {
 
     ChatThreadPO findByThreadId(@Param("id") Long id);
 
-    List<ChatThreadPO> findAllByPlatformAuthorizedIdAndUserId(
-            @Param("platformId") Long platformAuthorizedId, @Param("userId") Long userId);
+    List<ChatThreadPO> findAllByAuthIdAndUserId(@Param("authId") Long authId, @Param("userId") Long userId);
 
     void saveWithThreadInfo(ChatThreadPO chatThreadPO);
 
-    List<ChatThreadPO> findAllByPlatformId(@Param("platformId") Long platformId);
+    List<ChatThreadPO> findAllByAuthId(@Param("authId") Long authId);
 }

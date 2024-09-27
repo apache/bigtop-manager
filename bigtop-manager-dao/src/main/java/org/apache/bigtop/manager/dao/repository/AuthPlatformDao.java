@@ -16,31 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.vo;
+package org.apache.bigtop.manager.dao.repository;
 
-import lombok.Data;
+import org.apache.bigtop.manager.dao.po.AuthPlatformPO;
 
-@Data
-public class ChatThreadVO {
-    private Long threadId;
+import org.apache.ibatis.annotations.Param;
 
-    private Long authId;
+public interface AuthPlatformDao extends BaseDao<AuthPlatformPO> {
+    AuthPlatformPO findByAuthId(@Param("authId") Long authId);
 
-    private Long platformId;
+    AuthPlatformPO findByPlatformId(@Param("platformId") Long platformId);
 
-    private String model;
-
-    private String createTime;
-
-    private String updateTime;
-
-    public ChatThreadVO(Long threadId, Long platformId, String model, String createTime) {
-        this.threadId = threadId;
-        this.platformId = platformId;
-        this.model = model;
-        this.createTime = createTime;
-        this.updateTime = createTime;
-    }
-
-    public ChatThreadVO() {}
+    void saveWithCredentials(AuthPlatformPO authPlatformPO);
 }

@@ -22,7 +22,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.apache.bigtop.manager.dao.repository.ChatThreadDao">
     <sql id="baseColumns">
-        id, user_id, platform_id, model
+        id, user_id, auth_id, platform_id, model
     </sql>
 
     <resultMap id="ChatThreadResultMap" type="org.apache.bigtop.manager.dao.po.ChatThreadPO">
@@ -36,10 +36,10 @@
         AND is_deleted = 0
     </select>
 
-    <select id="findAllByPlatformAuthorizedIdAndUserId" resultType="org.apache.bigtop.manager.dao.po.ChatThreadPO">
+    <select id="findAllByAuthIdAndUserId" resultType="org.apache.bigtop.manager.dao.po.ChatThreadPO">
         SELECT *
         FROM llm_chat_thread
-        WHERE platform_id = #{platformId} AND user_id = #{userId} AND is_deleted = 0
+        WHERE auth_id = #{authId} AND user_id = #{userId} AND is_deleted = 0
     </select>
 
     <select id="findByThreadId" resultMap="ChatThreadResultMap">
@@ -47,19 +47,20 @@
     </select>
 
     <insert id="saveWithThreadInfo" parameterType="org.apache.bigtop.manager.dao.po.ChatThreadPO" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO llm_chat_thread (platform_id, user_id, model, thread_info)
-        VALUES (#{platformId}, #{userId}, #{model}, #{threadInfo, typeHandler=org.apache.bigtop.manager.dao.handler.JsonTypeHandler})
+        INSERT INTO llm_chat_thread (auth_id, platform_id, user_id, model, thread_info)
+        VALUES (#{authId}, #{platformId}, #{userId}, #{model}, #{threadInfo, typeHandler=org.apache.bigtop.manager.dao.handler.JsonTypeHandler})
             ON DUPLICATE KEY UPDATE
+            auth_id = VALUES(auth_id),
             platform_id = VALUES(platform_id),
             user_id = VALUES(user_id),
             model = VALUES(model),
             thread_info = VALUES(thread_info)
     </insert>
 
-    <select id="findAllByPlatformId" resultType="org.apache.bigtop.manager.dao.po.ChatThreadPO">
+    <select id="findAllByAuthId" resultType="org.apache.bigtop.manager.dao.po.ChatThreadPO">
         SELECT *
         FROM llm_chat_thread
-        WHERE platform_id = #{platformId} AND is_deleted = 0
+        WHERE auth_id = #{authId} AND is_deleted = 0
     </select>
 
 </mapper>

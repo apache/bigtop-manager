@@ -16,32 +16,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.dao.po;
+package org.apache.bigtop.manager.server.model.vo;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import java.io.Serializable;
-import java.util.Map;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-@Table(name = "llm_platform_authorized")
-public class PlatformAuthorizedPO extends BasePO implements Serializable {
-
-    @Id
-    @Column(name = "id")
+public class AuthPlatformVO {
     private Long id;
 
-    @Column(name = "credentials", columnDefinition = "json", nullable = false)
-    private Map<String, String> credentials;
-
-    @Column(name = "platform_id", nullable = false)
     private Long platformId;
 
-    @Column(name = "is_deleted")
-    private Boolean isDeleted;
+    private String platformName;
+
+    private String supportModels;
+
+    public AuthPlatformVO(long platformId, String name, String models) {
+        this.platformId = platformId;
+        this.platformName = name;
+        this.supportModels = models;
+    }
+
+    public AuthPlatformVO() {}
 }

@@ -323,7 +323,7 @@ CREATE TABLE `llm_platform`
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE `llm_platform_authorized`
+CREATE TABLE `llm_auth_platform`
 (
     `id`          BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
     `platform_id` BIGINT(20) UNSIGNED NOT NULL,
@@ -340,6 +340,7 @@ CREATE TABLE `llm_platform_authorized`
 CREATE TABLE `llm_chat_thread`
 (
     `id`          BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `auth_id`     BIGINT(20) UNSIGNED NOT NULL,
     `platform_id` BIGINT(20) UNSIGNED NOT NULL,
     `user_id`     BIGINT(20) UNSIGNED NOT NULL,
     `model`       VARCHAR(255)        NOT NULL,
@@ -350,6 +351,7 @@ CREATE TABLE `llm_chat_thread`
     `create_by`   BIGINT              DEFAULT NULL,
     `update_by`   BIGINT              DEFAULT NULL,
     PRIMARY KEY (`id`),
+    KEY             `idx_auth_id` (`auth_id`),
     KEY             `idx_platform_id` (`platform_id`),
     KEY             `idx_user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

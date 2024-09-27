@@ -16,23 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.vo;
+package org.apache.bigtop.manager.server.model.dto;
 
 import lombok.Data;
 
+import java.util.Map;
+
 @Data
-public class PlatformAuthorizedVO {
+public class AuthPlatformDTO {
+    private Long id;
+
     private Long platformId;
 
-    private String platformName;
-
-    private String supportModels;
-
-    public PlatformAuthorizedVO(long platformId, String name, String models) {
-        this.platformId = platformId;
-        this.platformName = name;
-        this.supportModels = models;
-    }
-
-    public PlatformAuthorizedVO() {}
+    private Map<String, String> authCredentials;
 }

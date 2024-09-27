@@ -42,6 +42,8 @@ public interface PlatformConverter {
 
     PlatformVO fromPO2VO(PlatformPO platformPO);
 
+    List<PlatformVO> fromPO2VO(List<PlatformPO> platformPOList);
+
     default Map<String, String> mapAuthCredentials(List<AuthCredentialReq> authCredentials) {
         if (authCredentials == null) {
             return null;

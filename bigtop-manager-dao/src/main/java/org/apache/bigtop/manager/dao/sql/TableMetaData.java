@@ -107,10 +107,9 @@ public class TableMetaData {
                 ? clazz.getAnnotation(Table.class).name()
                 : CaseUtils.toUnderScoreCase(clazz.getSimpleName());
 
-        // 获取父类字段
+        // Get parents' fields
         List<Field> fields = ClassUtils.getFields(clazz);
         for (Field field : fields) {
-
             if (Modifier.isStatic(field.getModifiers())
                     || field.isAnnotationPresent(Transient.class)
                     || !BeanUtils.isSimpleValueType(field.getType())) {

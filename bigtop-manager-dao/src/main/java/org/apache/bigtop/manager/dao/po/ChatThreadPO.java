@@ -44,6 +44,9 @@ public class ChatThreadPO extends BasePO implements Serializable {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
+    @Column(name = "auth_id", nullable = false)
+    private Long authId;
+
     @Column(name = "platform_id", nullable = false)
     private Long platformId;
 
