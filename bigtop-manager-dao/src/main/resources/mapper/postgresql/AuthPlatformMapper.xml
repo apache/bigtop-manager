@@ -30,11 +30,11 @@
         <result property="credentials" column="credentials" typeHandler="org.apache.bigtop.manager.dao.handler.JsonTypeHandler"/>
     </resultMap>
 
-    <select id="findByAuthId" resultMap="PlatformAuthorizedResultMap">
+    <select id="findByAuthId" resultMap="AuthPlatformResultMap">
         SELECT * FROM llm_auth_platform WHERE id = #{authId} AND is_deleted = 0
     </select>
 
-    <select id="findByPlatformId" resultMap="PlatformAuthorizedResultMap">
+    <select id="findByPlatformId" resultMap="AuthPlatformResultMap">
         SELECT * FROM llm_auth_platform WHERE platform_id = #{platformId} AND is_deleted = false
     </select>
 
