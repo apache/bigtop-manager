@@ -206,7 +206,7 @@ public class ChatbotServiceImpl implements ChatbotService {
 
     @Override
     public boolean deleteAuthorizedPlatform(Long authId) {
-        AuthPlatformPO authPlatformPO = authPlatformDao.findByAuthId(authId);
+        AuthPlatformPO authPlatformPO = authPlatformDao.findById(authId);
         if (authPlatformPO == null) {
             throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED);
         }
@@ -230,7 +230,7 @@ public class ChatbotServiceImpl implements ChatbotService {
 
     @Override
     public ChatThreadVO createChatThreads(Long authId, String model) {
-        AuthPlatformPO authPlatformPO = authPlatformDao.findByAuthId(authId);
+        AuthPlatformPO authPlatformPO = authPlatformDao.findById(authId);
         if (authPlatformPO == null) {
             throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED);
         }
@@ -244,12 +244,6 @@ public class ChatbotServiceImpl implements ChatbotService {
         ChatThreadDTO chatThreadDTO = new ChatThreadDTO();
         chatThreadDTO.setPlatformId(platformPO.getId());
         chatThreadDTO.setAuthId(authPlatformPO.getId());
-
-        //        ChatThreadPO chatThreadPO = ChatThreadConverter.INSTANCE.fromDTO2PO(chatThreadDTO);
-        //        chatThreadPO.setUserId(userId);
-        //        chatThreadPO.setModel(model);
-        //        chatThreadPO.setAuthId(authPlatformPO.getId());
-        //        chatThreadPO.setPlatformId(authPlatformPO.getPlatformId());
 
         AIAssistant aiAssistant =
                 buildAIAssistant(platformPO.getName(), model, authPlatformDTO.getAuthCredentials(), null, null);
@@ -301,7 +295,7 @@ public class ChatbotServiceImpl implements ChatbotService {
         if (!Objects.equals(userId, chatThreadPO.getUserId())) {
             throw new ApiException(ApiExceptionEnum.CHAT_THREAD_NOT_FOUND);
         }
-        AuthPlatformPO authPlatformPO = authPlatformDao.findByAuthId(authId);
+        AuthPlatformPO authPlatformPO = authPlatformDao.findById(authId);
         if (authPlatformPO == null) {
             throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED);
         }

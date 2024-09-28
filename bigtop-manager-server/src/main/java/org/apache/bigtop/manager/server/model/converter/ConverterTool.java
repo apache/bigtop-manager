@@ -53,10 +53,7 @@ public class ConverterTool {
 
     @Named("map2String")
     public String map2String(Map<String, String> map) {
-        if (map == null || map.isEmpty()) {
-            return null;
-        }
-        return map.toString();
+        return JsonUtils.writeAsString(map);
     }
 
     @Named("jsonString2Map")
