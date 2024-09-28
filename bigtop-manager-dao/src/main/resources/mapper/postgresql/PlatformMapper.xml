@@ -23,7 +23,7 @@
 <mapper namespace="org.apache.bigtop.manager.dao.repository.PlatformDao">
 
     <sql id="baseColumns">
-        id, name, credential, support_models
+        "id", "name", "credential", "support_models"
     </sql>
 
 </mapper>
