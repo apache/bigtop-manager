@@ -26,10 +26,6 @@
         id, credentials, platfotrm_id
     </sql>
 
-    <select id="findByAuthId" resultType="org.apache.bigtop.manager.dao.repository.AuthPlatformDao">
-        SELECT * FROM llm_auth_platform WHERE id = #{authId} AND is_deleted = 0
-    </select>
-
     <select id="findByPlatformId" resultType="org.apache.bigtop.manager.dao.repository.AuthPlatformDao">
         SELECT * FROM llm_auth_platform WHERE platform_id = #{platformId} AND is_deleted = 0
     </select>

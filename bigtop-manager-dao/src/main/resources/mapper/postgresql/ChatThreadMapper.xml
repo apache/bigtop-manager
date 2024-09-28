@@ -38,10 +38,6 @@
         WHERE auth_id = #{authId} AND user_id = #{userId} AND is_deleted = 0
     </select>
 
-    <select id="findByThreadId" resultType="org.apache.bigtop.manager.dao.po.ChatThreadPO">
-        SELECT * FROM llm_chat_thread WHERE id = #{id} AND is_deleted = 0
-    </select>
-
     <select id="findAllByAuthId" resultType="org.apache.bigtop.manager.dao.po.ChatThreadPO">
         SELECT *
         FROM llm_chat_thread
