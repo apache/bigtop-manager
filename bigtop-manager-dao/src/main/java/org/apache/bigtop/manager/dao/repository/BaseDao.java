@@ -65,7 +65,6 @@ public interface BaseDao<Entity> {
     /**
      * Partially update the entities by primary key.
      */
-    @UpdateProvider(type = BaseSqlProvider.class, method = "partialUpdateByIds")
     @Transactional
     default int partialUpdateByIds(List<Entity> entities) {
         for (Entity entity : entities) {
@@ -77,7 +76,6 @@ public interface BaseDao<Entity> {
     /**
      * Fully update the entities by primary key.
      */
-    @UpdateProvider(type = BaseSqlProvider.class, method = "updateByIds")
     @Transactional
     default int updateByIds(List<Entity> entities) {
         for (Entity entity : entities) {
