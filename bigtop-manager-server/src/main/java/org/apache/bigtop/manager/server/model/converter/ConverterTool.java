@@ -27,6 +27,7 @@ import org.mapstruct.Named;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import java.util.List;
+import java.util.Map;
 
 public class ConverterTool {
 
@@ -47,6 +48,19 @@ public class ConverterTool {
 
     @Named("json2PropertyVOList")
     public List<PropertyVO> json2PropertyVOList(String json) {
+        return JsonUtils.readFromString(json, new TypeReference<>() {});
+    }
+
+    @Named("map2String")
+    public String map2String(Map<String, String> map) {
+        if (map == null || map.isEmpty()) {
+            return null;
+        }
+        return map.toString();
+    }
+
+    @Named("jsonString2Map")
+    public Map<String, String> jsonString2Map(String json) {
         return JsonUtils.readFromString(json, new TypeReference<>() {});
     }
 }

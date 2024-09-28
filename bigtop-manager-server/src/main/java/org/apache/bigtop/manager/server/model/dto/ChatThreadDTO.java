@@ -16,18 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.dao.repository;
+package org.apache.bigtop.manager.server.model.dto;
 
-import org.apache.bigtop.manager.dao.po.ChatThreadPO;
+import lombok.Data;
 
-import org.apache.ibatis.annotations.Param;
+import java.util.Map;
 
-import java.util.List;
+@Data
+public class ChatThreadDTO {
+    private Long id;
 
-public interface ChatThreadDao extends BaseDao<ChatThreadPO> {
-    List<ChatThreadPO> findAllByUserId(@Param("userId") Long userId);
+    private Long platformId;
 
-    List<ChatThreadPO> findAllByAuthIdAndUserId(@Param("authId") Long authId, @Param("userId") Long userId);
+    private Long authId;
 
-    List<ChatThreadPO> findAllByAuthId(@Param("authId") Long authId);
+    private Map<String, String> authCredentials;
+
+    private Map<String, String> threadInfo;
 }

@@ -37,7 +37,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Mapper(config = MapStructSharedConfig.class)
+@Mapper(
+        uses = {ConverterTool.class},
+        config = MapStructSharedConfig.class)
 public interface AuthPlatformConverter {
     AuthPlatformConverter INSTANCE = Mappers.getMapper(AuthPlatformConverter.class);
 
@@ -59,4 +61,10 @@ public interface AuthPlatformConverter {
     default void afterMapping(@MappingTarget AuthPlatformDTO authPlatformDTO, AuthPlatformReq authPlatformReq) {
         authPlatformDTO.setAuthCredentials(mapAuthCredentials(authPlatformReq.getAuthCredentials()));
     }
+
+    @Mapping(source = "authCredentials", target = "credentials", qualifiedByName = "map2String")
+    AuthPlatformPO fromDTO2PO(AuthPlatformDTO authPlatformDTO);
+
+    @Mapping(source = "credentials", target = "authCredentials", qualifiedByName = "jsonString2Map")
+    AuthPlatformDTO fromPO2DTO(AuthPlatformPO authPlatformPO);
 }
