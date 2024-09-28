@@ -29,19 +29,19 @@
         SELECT *
         FROM llm_chat_thread
         WHERE user_id = #{userId}
-          AND is_deleted = 0
+          AND is_deleted = false
     </select>
 
     <select id="findAllByAuthIdAndUserId" resultType="org.apache.bigtop.manager.dao.po.ChatThreadPO">
         SELECT *
         FROM llm_chat_thread
-        WHERE auth_id = #{authId} AND user_id = #{userId} AND is_deleted = 0
+        WHERE auth_id = #{authId} AND user_id = #{userId} AND is_deleted = false
     </select>
 
     <select id="findAllByAuthId" resultType="org.apache.bigtop.manager.dao.po.ChatThreadPO">
         SELECT *
         FROM llm_chat_thread
-        WHERE auth_id = #{authId} AND is_deleted = 0
+        WHERE auth_id = #{authId} AND is_deleted = false
     </select>
 
 </mapper>
