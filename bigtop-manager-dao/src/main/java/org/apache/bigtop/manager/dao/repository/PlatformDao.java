@@ -20,6 +20,4 @@ package org.apache.bigtop.manager.dao.repository;
 
 import org.apache.bigtop.manager.dao.po.PlatformPO;
 
-public interface PlatformDao extends BaseDao<PlatformPO> {
-    PlatformPO findByPlatformId(Long id);
-}
+public interface PlatformDao extends BaseDao<PlatformPO> {}

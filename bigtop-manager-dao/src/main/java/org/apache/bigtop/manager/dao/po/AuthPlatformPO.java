@@ -25,7 +25,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.io.Serializable;
-import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -36,8 +35,8 @@ public class AuthPlatformPO extends BasePO implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "credentials", columnDefinition = "json", nullable = false)
-    private Map<String, String> credentials;
+    @Column(name = "credentials", nullable = false)
+    private String credentials;
 
     @Column(name = "platform_id", nullable = false)
     private Long platformId;

@@ -26,21 +26,12 @@
         id, credentials, platfotrm_id
     </sql>
 
-    <resultMap id="AuthPlatformResultMap" type="org.apache.bigtop.manager.dao.po.AuthPlatformPO">
-        <result property="credentials" column="credentials" typeHandler="org.apache.bigtop.manager.dao.handler.JsonTypeHandler"/>
-    </resultMap>
-
-    <select id="findByAuthId" resultMap="AuthPlatformResultMap">
-        SELECT * FROM llm_auth_platform WHERE id = #{authId} AND is_deleted = false
+    <select id="findByAuthId" resultType="org.apache.bigtop.manager.dao.repository.AuthPlatformDao">
+        SELECT * FROM llm_auth_platform WHERE id = #{authId} AND is_deleted = 0
     </select>
 
-    <select id="findByPlatformId" resultMap="AuthPlatformResultMap">
-        SELECT * FROM llm_auth_platform WHERE platform_id = #{platformId} AND is_deleted = false
+    <select id="findByPlatformId" resultType="org.apache.bigtop.manager.dao.repository.AuthPlatformDao">
+        SELECT * FROM llm_auth_platform WHERE platform_id = #{platformId} AND is_deleted = 0
     </select>
-
-    <insert id="saveWithCredentials" parameterType="org.apache.bigtop.manager.dao.po.AuthPlatformPO" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO llm_auth_platform (platform_id, credentials)
-        VALUES (#{platformId}, #{credentials, typeHandler=org.apache.bigtop.manager.dao.handler.JsonTypeHandler}::json)
-    </insert>
 
 </mapper>

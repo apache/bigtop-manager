@@ -23,16 +23,7 @@
 <mapper namespace="org.apache.bigtop.manager.dao.repository.PlatformDao">
 
     <sql id="baseColumns">
-        "id", "name", "credential", "support_models"
+        id, name, credential, support_models
     </sql>
-
-    <!-- Define the resultMap with the custom typeHandler for the credential column -->
-    <resultMap id="PlatformResultMap" type="org.apache.bigtop.manager.dao.po.PlatformPO">
-        <result property="credential" column="credential" typeHandler="org.apache.bigtop.manager.dao.handler.JsonTypeHandler"/>
-    </resultMap>
-
-    <select id="findByPlatformId" resultMap="PlatformResultMap">
-        SELECT * FROM llm_platform WHERE id = #{id}
-    </select>
 
 </mapper>

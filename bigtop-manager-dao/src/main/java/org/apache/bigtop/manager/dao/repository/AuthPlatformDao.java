@@ -26,6 +26,4 @@ public interface AuthPlatformDao extends BaseDao<AuthPlatformPO> {
     AuthPlatformPO findByAuthId(@Param("authId") Long authId);
 
     AuthPlatformPO findByPlatformId(@Param("platformId") Long platformId);
-
-    void saveWithCredentials(AuthPlatformPO authPlatformPO);
 }

@@ -25,7 +25,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.io.Serializable;
-import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -38,8 +37,8 @@ public class ChatThreadPO extends BasePO implements Serializable {
     @Column(name = "model", nullable = false, length = 255)
     private String model;
 
-    @Column(name = "thread_info", columnDefinition = "json")
-    private Map<String, String> threadInfo;
+    @Column(name = "thread_info")
+    private String threadInfo;
 
     @Column(name = "user_id", nullable = false)
     private Long userId;

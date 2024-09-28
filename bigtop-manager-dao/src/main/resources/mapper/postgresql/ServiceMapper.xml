@@ -122,7 +122,7 @@
                 cluster_id = #{clusterId}
             </if>
             <if test="serviceNames != null and serviceNames.size() > 0">
-                and service_name = in
+                and service_name in
                 <foreach collection="serviceNames" item="serviceName" index="index" open="(" close=")" separator=", ">
                     #{serviceName}
                 </foreach>
