@@ -71,19 +71,6 @@ public class BaseSqlProvider {
         return SQLBuilder.update(tableMetaData, entity, databaseId, true);
     }
 
-    public <Entity> String partialUpdateByIds(List<Entity> entities, ProviderContext context) {
-        Assert.notNull(entities, "entities must not be null");
-        Assert.notEmpty(entities, "entities list must not be empty");
-
-        String databaseId = context.getDatabaseId();
-
-        Class<?> entityClass = entities.get(0).getClass();
-
-        TableMetaData tableMetaData = TableMetaData.forClass(entityClass);
-
-        return SQLBuilder.updateList(tableMetaData, entities, databaseId, true);
-    }
-
     public <Entity> String updateById(Entity entity, ProviderContext context) {
         Assert.notNull(entity, "entity must not null");
 
@@ -93,19 +80,6 @@ public class BaseSqlProvider {
         TableMetaData tableMetaData = TableMetaData.forClass(entityClass);
 
         return SQLBuilder.update(tableMetaData, entity, databaseId, false);
-    }
-
-    public <Entity> String updateByIds(List<Entity> entities, ProviderContext context) {
-        Assert.notNull(entities, "entities must not be null");
-        Assert.notEmpty(entities, "entities list must not be empty");
-
-        String databaseId = context.getDatabaseId();
-
-        Class<?> entityClass = entities.get(0).getClass();
-
-        TableMetaData tableMetaData = TableMetaData.forClass(entityClass);
-
-        return SQLBuilder.updateList(tableMetaData, entities, databaseId, false);
     }
 
     public String selectById(Serializable id, ProviderContext context) {

@@ -27,6 +27,8 @@ import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
@@ -64,13 +66,25 @@ public interface BaseDao<Entity> {
      * Partially update the entities by primary key.
      */
     @UpdateProvider(type = BaseSqlProvider.class, method = "partialUpdateByIds")
-    int partialUpdateByIds(List<Entity> entities);
+    @Transactional
+    default int partialUpdateByIds(List<Entity> entities) {
+        for (Entity entity : entities) {
+            partialUpdateById(entity);
+        }
+        return entities.size();
+    }
 
     /**
      * Fully update the entities by primary key.
      */
     @UpdateProvider(type = BaseSqlProvider.class, method = "updateByIds")
-    int updateByIds(List<Entity> entities);
+    @Transactional
+    default int updateByIds(List<Entity> entities) {
+        for (Entity entity : entities) {
+            updateById(entity);
+        }
+        return entities.size();
+    }
 
     /**
      * Query the entity by primary key.
