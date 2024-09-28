@@ -314,7 +314,7 @@ CREATE TABLE `llm_platform`
 (
     `id`             BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
     `name`           VARCHAR(255)        NOT NULL,
-    `credential`     JSON                DEFAULT NULL,
+    `credential`     TEXT                DEFAULT NULL,
     `support_models` VARCHAR(255)        DEFAULT NULL,
     `create_time`    DATETIME            DEFAULT CURRENT_TIMESTAMP,
     `update_time`    DATETIME            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -327,7 +327,7 @@ CREATE TABLE `llm_auth_platform`
 (
     `id`          BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
     `platform_id` BIGINT(20) UNSIGNED NOT NULL,
-    `credentials` JSON                NOT NULL,
+    `credentials` TEXT                NOT NULL,
     `is_deleted`  TINYINT(1)          DEFAULT 0 NULL,
     `create_time` DATETIME            DEFAULT CURRENT_TIMESTAMP,
     `update_time` DATETIME            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -345,7 +345,7 @@ CREATE TABLE `llm_chat_thread`
     `user_id`     BIGINT(20) UNSIGNED NOT NULL,
     `model`       VARCHAR(255)        NOT NULL,
     `is_deleted`  TINYINT(1)          DEFAULT 0 NULL,
-    `thread_info` JSON                DEFAULT NULL,
+    `thread_info` TEXT                DEFAULT NULL,
     `create_time` DATETIME            DEFAULT CURRENT_TIMESTAMP,
     `update_time` DATETIME            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `create_by`   BIGINT              DEFAULT NULL,
