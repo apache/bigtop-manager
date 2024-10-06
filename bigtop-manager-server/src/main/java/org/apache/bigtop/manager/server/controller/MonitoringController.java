@@ -42,6 +42,21 @@ public class MonitoringController {
     @Operation(summary = "agent healthy", description = "agent healthy check")
     @GetMapping("agenthealthy")
     public ResponseEntity<JsonNode> agentHostsHealthyStatus() {
+        // 以json格式返回   响应结果 参数即为数据  数据格式为 json
         return ResponseEntity.success(monitoringService.queryAgentsHealthyStatus());
+    }
+
+    @Operation(summary = "agent Info", description = "agent info query")
+    @GetMapping("agentinfo")
+    public ResponseEntity<JsonNode> queryAgentsInfo() {
+        // 以json格式返回   响应结果 参数即为数据  数据格式为 json
+        return ResponseEntity.success(monitoringService.queryAgentsInfo());
+    }
+
+    @Operation(summary = "agent instant info", description = "agent instant info query")
+    @GetMapping("agentinstinfo")
+    public ResponseEntity<JsonNode> queryAgentsInstStatus() {
+        // 以json格式返回   响应结果 参数即为数据  数据格式为 json
+        return ResponseEntity.success(monitoringService.queryAgentsInstStatus());
     }
 }

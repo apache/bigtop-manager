@@ -39,4 +39,15 @@ public class MonitoringServiceImpl implements MonitoringService {
     public JsonNode queryAgentsHealthyStatus() {
         return prometheusProxy.queryAgentsHealthyStatus();
     }
+
+    @Override
+    public JsonNode queryAgentsInfo() {
+        return prometheusProxy.queryAgentsInfo();
+    }
+
+    @Override
+    public JsonNode queryAgentsInstStatus() {
+        return prometheusProxy.queryAgentsInstStatus();
+    }
+
 }

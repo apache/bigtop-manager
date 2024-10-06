@@ -23,4 +23,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 public interface MonitoringService {
 
     JsonNode queryAgentsHealthyStatus();
+    JsonNode queryAgentsInfo();
+    JsonNode queryAgentsInstStatus();
 }
