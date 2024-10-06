@@ -115,18 +115,21 @@ public class AgentHostMonitoring {
         GlobalMemory memory = hal.getMemory();
         objectNode.put(MEM_IDLE, memory.getAvailable()).put(MEM_TOTAL, memory.getTotal());
         // DISK
-        List<OSFileStore> fileStores = operatingSystem.getFileSystem().getFileStores(true);
+        List<OSFileStore> fileStores = operatingSystem.getFileSystem().getFileStores(true); // 获取挂载点，得到的是文件逻辑存储
         ArrayNode diskArrayNode = json.createArrayNode();
         for (OSFileStore fileStore : fileStores) {
             if (fileStore.getTotalSpace() <= 1024 * 1024 * 1024) {
                 continue;
             }
+            // 只能拿到超过1G的空间占用
             ObjectNode disk = json.createObjectNode();
+            // 获取挂载逻辑卷 和 内存空间tmpfs文件系统
             disk.put(DISK_NAME, fileStore.getVolume());
             disk.put(DISK_TOTAL, fileStore.getTotalSpace());
             disk.put(DISK_IDLE, fileStore.getFreeSpace());
             diskArrayNode.add(disk);
         }
+        // 磁盘IO是物理逻辑
         objectNode.set(DISKS_BASE_INFO, diskArrayNode);
         return objectNode;
     }
@@ -173,7 +176,6 @@ public class AgentHostMonitoring {
             }
         }
     }
-
     public static Map<ArrayList<String>, Map<ArrayList<String>, Double>> getDiskGauge(JsonNode agentMonitoring) {
         BaseAgentGauge gaugeBaseInfo = new BaseAgentGauge(agentMonitoring);
         ArrayList<String> diskGaugeLabels = gaugeBaseInfo.getLabels();
@@ -299,6 +301,7 @@ public class AgentHostMonitoring {
                 .register(registry);
     }
 
+    // 注入数据
     public static void multiGaugeUpdateData(
             MultiGauge multiGauge, Map<ArrayList<String>, Map<ArrayList<String>, Double>> gaugeData) {
         ArrayList<String> tagKeys = null;
@@ -325,6 +328,7 @@ public class AgentHostMonitoring {
                 true);
     }
 
+    // 调用更新数据
     public static void diskMultiGaugeUpdateData(MultiGauge diskMultiGauge) {
         try {
             Map<ArrayList<String>, Map<ArrayList<String>, Double>> diskGauge = getDiskGauge(getHostInfo());
@@ -336,7 +340,10 @@ public class AgentHostMonitoring {
 
     public static void memMultiGaugeUpdateData(MultiGauge memMultiGauge) {
         try {
+            // getHostInfo 获取全部数据
+            // getMEMGauge 解析内存数据
             Map<ArrayList<String>, Map<ArrayList<String>, Double>> diskGauge = getMEMGauge(getHostInfo());
+            // 向a参数注入b数据
             multiGaugeUpdateData(memMultiGauge, diskGauge);
         } catch (UnknownHostException e) {
             throw new RuntimeException("Get agent host monitoring info failed");
