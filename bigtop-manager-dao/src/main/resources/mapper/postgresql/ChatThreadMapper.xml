@@ -29,7 +29,7 @@
         SELECT *
         FROM llm_chat_thread
         WHERE user_id = #{userId}
-          AND is_deleted = false
+        AND is_deleted = false
     </select>
 
     <select id="findAllByAuthIdAndUserId" resultType="org.apache.bigtop.manager.dao.po.ChatThreadPO">
