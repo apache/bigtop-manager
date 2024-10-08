@@ -16,39 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.dao.po;
+package org.apache.bigtop.manager.server.model.dto;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import java.io.Serializable;
+import java.util.Map;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-@Table(name = "llm_chat_thread")
-public class ChatThreadPO extends BasePO implements Serializable {
-    @Id
-    @Column(name = "id")
+public class ChatThreadDTO {
     private Long id;
 
-    @Column(name = "model", nullable = false, length = 255)
-    private String model;
-
-    @Column(name = "thread_info")
-    private String threadInfo;
-
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
-
-    @Column(name = "auth_id", nullable = false)
-    private Long authId;
-
-    @Column(name = "platform_id", nullable = false)
     private Long platformId;
 
-    @Column(name = "is_deleted")
-    private Boolean isDeleted;
+    private Long authId;
+
+    private Map<String, String> authCredentials;
+
+    private Map<String, String> threadInfo;
 }

@@ -20,16 +20,25 @@ package org.apache.bigtop.manager.server.model.converter;
 
 import org.apache.bigtop.manager.dao.po.ChatThreadPO;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
+import org.apache.bigtop.manager.server.model.dto.ChatThreadDTO;
 import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(config = MapStructSharedConfig.class)
+@Mapper(
+        uses = {ConverterTool.class},
+        config = MapStructSharedConfig.class)
 public interface ChatThreadConverter {
     ChatThreadConverter INSTANCE = Mappers.getMapper(ChatThreadConverter.class);
 
     @Mapping(source = "id", target = "threadId")
     ChatThreadVO fromPO2VO(ChatThreadPO platformAuthorizedPO);
+
+    @Mapping(source = "threadInfo", target = "threadInfo", qualifiedByName = "map2String")
+    ChatThreadPO fromDTO2PO(ChatThreadDTO chatThreadDTO);
+
+    @Mapping(source = "threadInfo", target = "threadInfo", qualifiedByName = "jsonString2Map")
+    ChatThreadDTO fromPO2DTO(ChatThreadPO chatThreadPO);
 }

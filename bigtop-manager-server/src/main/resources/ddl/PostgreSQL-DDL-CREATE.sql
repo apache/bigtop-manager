@@ -324,7 +324,7 @@ CREATE TABLE llm_platform
 (
     id             BIGINT CHECK (id > 0) NOT NULL GENERATED ALWAYS AS IDENTITY,
     name           VARCHAR(255)          NOT NULL,
-    credential     JSON         DEFAULT NULL,
+    credential     TEXT         DEFAULT NULL,
     support_models VARCHAR(255) DEFAULT NULL,
     create_time    TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
     update_time    TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP /* ON UPDATE CURRENT_TIMESTAMP */,
@@ -337,7 +337,7 @@ CREATE TABLE llm_auth_platform
 (
     id          BIGINT CHECK (id > 0)          NOT NULL GENERATED ALWAYS AS IDENTITY,
     platform_id BIGINT CHECK (platform_id > 0) NOT NULL,
-    credentials JSON                           NOT NULL,
+    credentials TEXT                           NOT NULL,
     is_deleted  BOOLEAN      DEFAULT FALSE,
     create_time TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
     update_time TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP /* ON UPDATE CURRENT_TIMESTAMP */,
@@ -355,7 +355,7 @@ CREATE TABLE llm_chat_thread
     platform_id BIGINT CHECK (platform_id > 0) NOT NULL,
     user_id     BIGINT CHECK (user_id > 0)     NOT NULL,
     model       VARCHAR(255)                   NOT NULL,
-    thread_info JSON         DEFAULT NULL,
+    thread_info TEXT         DEFAULT NULL,
     is_deleted  BOOLEAN      DEFAULT FALSE,
     create_time TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
     update_time TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP /* ON UPDATE CURRENT_TIMESTAMP */,
