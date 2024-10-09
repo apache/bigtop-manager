@@ -53,4 +53,8 @@ public class AgentApplication {
     @Qualifier("memMultiGauge") public MultiGauge memMultiGauge(MeterRegistry meterRegistry) {
         return AgentHostMonitoring.newMemMultiGauge(meterRegistry);
     }
+    @Bean
+    @Qualifier("diskIOMultiGauge") public MultiGauge diskIOMultiGauge(MeterRegistry meterRegistry) {
+        return AgentHostMonitoring.newDiskIOMultiGauge(meterRegistry);
+    }
 }

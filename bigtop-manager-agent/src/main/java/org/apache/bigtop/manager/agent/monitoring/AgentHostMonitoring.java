@@ -29,10 +29,7 @@ import io.micrometer.core.instrument.Tags;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import oshi.SystemInfo;
-import oshi.hardware.CentralProcessor;
-import oshi.hardware.GlobalMemory;
-import oshi.hardware.HardwareAbstractionLayer;
-import oshi.hardware.NetworkIF;
+import oshi.hardware.*;
 import oshi.software.os.NetworkParams;
 import oshi.software.os.OSFileStore;
 import oshi.software.os.OperatingSystem;
@@ -63,6 +60,12 @@ public class AgentHostMonitoring {
     public static final String CPU_LOAD_AVG_MIN_5 = "cpuLoadAvgMin_5";
     public static final String CPU_LOAD_AVG_MIN_15 = "cpuLoadAvgMin_15";
     public static final String CPU_USAGE = "cpuUsage";
+    public static final String PHYSICAL_DISK_NAME = "physicalDiskName";
+    public static final String DISK_READ_RATE = "diskReadRate";
+    public static final String DISK_WRITE_RATE = "diskWriteRate";
+    public static long[] previousReadBytes;
+    public static long[] previousWriteBytes;
+    public static boolean initialized = false;
 
     private static boolean sameSubnet(String ipAddress, String subnetMask, String gateway) throws UnknownHostException {
         InetAddress inetAddress = InetAddress.getByName(ipAddress);
@@ -121,7 +124,6 @@ public class AgentHostMonitoring {
             if (fileStore.getTotalSpace() <= 1024 * 1024 * 1024) {
                 continue;
             }
-            // 只能拿到超过1G的空间占用
             ObjectNode disk = json.createObjectNode();
             // 获取挂载逻辑卷 和 内存空间tmpfs文件系统
             disk.put(DISK_NAME, fileStore.getVolume());
@@ -129,8 +131,20 @@ public class AgentHostMonitoring {
             disk.put(DISK_IDLE, fileStore.getFreeSpace());
             diskArrayNode.add(disk);
         }
-        // 磁盘IO是物理逻辑
         objectNode.set(DISKS_BASE_INFO, diskArrayNode);
+        // DISK IO init
+        if (!initialized) {
+            List<HWDiskStore> diskStores = si.getHardware().getDiskStores();
+            previousReadBytes = new long[diskStores.size()];
+            previousWriteBytes = new long[diskStores.size()];
+
+            // 初始化为 0
+            for (int i = 0; i < diskStores.size(); i++) {
+                previousReadBytes[i] = 0L;
+                previousWriteBytes[i] = 0L;
+            }
+            initialized = true; // 标记为已初始化
+        }
         return objectNode;
     }
 
@@ -208,7 +222,51 @@ public class AgentHostMonitoring {
         diskGauge.put(diskGaugeLabels, labelValues);
         return diskGauge;
     }
+    public static Map<ArrayList<String>, Map<ArrayList<String>, Double>> getDiskIOGauge(JsonNode agentMonitoring){
+        SystemInfo si = new SystemInfo();
+        BaseAgentGauge gaugeBaseInfo = new BaseAgentGauge(agentMonitoring);
+        ArrayList<String> diskIOGaugeLabels = gaugeBaseInfo.getLabels(); // 获取全部键
+        ArrayList<String> diskIOGaugeLabelsValues = gaugeBaseInfo.getLabelsValues();
+        diskIOGaugeLabels.add(AgentHostMonitoring.PHYSICAL_DISK_NAME); // 填入新键
+        diskIOGaugeLabels.add("diskIO");
+        Map<ArrayList<String>, Double> labelValues = new HashMap<>();
 
+        Util.sleep(1000);
+        List<HWDiskStore> upDiskStores = si.getHardware().getDiskStores();
+        long[] currentReadBytes = new long[upDiskStores.size()];
+        long[] currentWriteBytes = new long[upDiskStores.size()];
+
+        for (int i = 0; i < upDiskStores.size(); i++) {
+            HWDiskStore disk = upDiskStores.get(i);
+            currentReadBytes[i] = disk.getReadBytes();
+            currentWriteBytes[i] = disk.getWriteBytes();
+        }
+
+        for (int i = 0; i < upDiskStores.size(); i++) {
+            long readBytesDelta = Math.abs(currentReadBytes[i] - previousReadBytes[i]);
+            long writeBytesDelta = Math.abs(currentWriteBytes[i] - previousWriteBytes[i]);
+            double readKB = readBytesDelta / 1024.0;
+            double writeKB = writeBytesDelta / 1024.0; //kbs
+            previousReadBytes[i] = currentReadBytes[i];
+            previousWriteBytes[i] = currentWriteBytes[i];
+            // host[name type] value
+            // Disk Read
+            ArrayList<String> diskReadLabelValues = new ArrayList<>(diskIOGaugeLabelsValues);
+            diskReadLabelValues.add(upDiskStores.get(i).getName()); // 名
+            diskReadLabelValues.add(AgentHostMonitoring.DISK_READ_RATE);
+            labelValues.put(diskReadLabelValues,readKB);
+
+            // Disk Write
+            ArrayList<String> diskWriteLabelValues = new ArrayList<>(diskIOGaugeLabelsValues);
+            diskWriteLabelValues.add(upDiskStores.get(i).getName());
+            diskWriteLabelValues.add(AgentHostMonitoring.DISK_WRITE_RATE);
+            labelValues.put(diskWriteLabelValues, writeKB);
+        }
+
+        Map<ArrayList<String>, Map<ArrayList<String>, Double>> diskIOGauge = new HashMap<>();
+        diskIOGauge.put(diskIOGaugeLabels,labelValues);
+        return diskIOGauge;
+    }
     public static Map<ArrayList<String>, Map<ArrayList<String>, Double>> getCPUGauge(JsonNode agentMonitoring) {
 
         SystemInfo si = new SystemInfo();
@@ -300,8 +358,13 @@ public class AgentHostMonitoring {
                 .baseUnit("cpu")
                 .register(registry);
     }
+    public static MultiGauge newDiskIOMultiGauge(MeterRegistry registry) {
+        return MultiGauge.builder("agent_host_monitoring")
+                .description("BigTop Manager Agent Host Monitoring, DiskIO Monitoring")
+                .baseUnit("diskIO")
+                .register(registry);
+    }
 
-    // 注入数据
     public static void multiGaugeUpdateData(
             MultiGauge multiGauge, Map<ArrayList<String>, Map<ArrayList<String>, Double>> gaugeData) {
         ArrayList<String> tagKeys = null;
@@ -328,7 +391,6 @@ public class AgentHostMonitoring {
                 true);
     }
 
-    // 调用更新数据
     public static void diskMultiGaugeUpdateData(MultiGauge diskMultiGauge) {
         try {
             Map<ArrayList<String>, Map<ArrayList<String>, Double>> diskGauge = getDiskGauge(getHostInfo());
@@ -354,6 +416,15 @@ public class AgentHostMonitoring {
         try {
             Map<ArrayList<String>, Map<ArrayList<String>, Double>> diskGauge = getCPUGauge(getHostInfo());
             multiGaugeUpdateData(cpuMultiGauge, diskGauge);
+        } catch (UnknownHostException e) {
+            throw new RuntimeException("Get agent host monitoring info failed");
+        }
+    }
+
+    public static void diskIOMultiGaugeUpdateData(MultiGauge diskIOMultiGauge) {
+        try {
+            Map<ArrayList<String>, Map<ArrayList<String>, Double>> diskGauge = getDiskIOGauge(getHostInfo());
+            multiGaugeUpdateData(diskIOMultiGauge, diskGauge);
         } catch (UnknownHostException e) {
             throw new RuntimeException("Get agent host monitoring info failed");
         }
