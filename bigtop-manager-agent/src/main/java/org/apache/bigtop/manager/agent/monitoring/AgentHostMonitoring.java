@@ -56,6 +56,7 @@ public class AgentHostMonitoring {
     public static final String DISK_NAME = "diskName";
     public static final String DISK_IDLE = "diskFreeSpace";
     public static final String DISK_TOTAL = "diskTotalSpace";
+    public static final String FILE_HANDLE_USAGE_RATE = "fileHandleUsageRate";
     public static final String CPU_LOAD_AVG_MIN_1 = "cpuLoadAvgMin_1";
     public static final String CPU_LOAD_AVG_MIN_5 = "cpuLoadAvgMin_5";
     public static final String CPU_LOAD_AVG_MIN_15 = "cpuLoadAvgMin_15";
@@ -129,6 +130,7 @@ public class AgentHostMonitoring {
             disk.put(DISK_NAME, fileStore.getVolume());
             disk.put(DISK_TOTAL, fileStore.getTotalSpace());
             disk.put(DISK_IDLE, fileStore.getFreeSpace());
+            disk.put(FILE_HANDLE_USAGE_RATE,(double)fileStore.getUsableSpace() / fileStore.getTotalSpace());
             diskArrayNode.add(disk);
         }
         objectNode.set(DISKS_BASE_INFO, diskArrayNode);
@@ -200,6 +202,15 @@ public class AgentHostMonitoring {
         Map<ArrayList<String>, Double> labelValues = new HashMap<>();
         ArrayNode disksInfo = (ArrayNode) agentMonitoring.get(AgentHostMonitoring.DISKS_BASE_INFO);
         disksInfo.forEach(diskJsonNode -> {
+            // Disk File Handle Rate
+            ArrayList<String> diskFileHandleRateLabelValues = new ArrayList<>(diskGaugeLabelsValues);
+            diskFileHandleRateLabelValues.add(
+                    diskJsonNode.get(AgentHostMonitoring.DISK_NAME).asText());
+            diskFileHandleRateLabelValues.add(AgentHostMonitoring.FILE_HANDLE_USAGE_RATE);
+            labelValues.put(
+                    diskFileHandleRateLabelValues,
+                    diskJsonNode.get(AgentHostMonitoring.FILE_HANDLE_USAGE_RATE).asDouble());
+
             // Disk Idle
             ArrayList<String> diskIdleLabelValues = new ArrayList<>(diskGaugeLabelsValues);
             diskIdleLabelValues.add(
@@ -358,6 +369,7 @@ public class AgentHostMonitoring {
                 .baseUnit("cpu")
                 .register(registry);
     }
+
     public static MultiGauge newDiskIOMultiGauge(MeterRegistry registry) {
         return MultiGauge.builder("agent_host_monitoring")
                 .description("BigTop Manager Agent Host Monitoring, DiskIO Monitoring")
