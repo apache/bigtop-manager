@@ -152,6 +152,7 @@ public class PrometheusProxy {
             JsonNode cpuResult = queryAgentCpu(agent.asText());
             JsonNode memResult = queryAgentMemory(agent.asText());
             JsonNode diskResult = queryAgentDisk(agent.asText());
+            JsonNode diskIOResult = queryAgentDiskIO(agent.asText());
             ObjectNode temp = objectMapper.createObjectNode();
 
             // hostInfo
@@ -188,7 +189,8 @@ public class PrometheusProxy {
             temp.put("diskTotalSpace",totalSpace);
             temp.put("diskFreeFileHandle",freeFileHandle);
             temp.put("diskTotalFileHandle",totalFileHandle);
-
+            // DISK IO
+            temp.set("diskIO",diskIOResult.get("diskIO"));
             agentsInfo.add(temp);
         }
 
@@ -252,8 +254,8 @@ public class PrometheusProxy {
         if (result != null){
             JsonNode agentsMem = result.get("data").get("result");
             if(agentsMem.isArray() && !agentsMem.isEmpty()){
-                JsonNode agentMemMetric = agentsMem.get(0).get("metric");
                 JsonNode agentMemValue = agentsMem.get(0).get("value");
+                JsonNode agentMemMetric = agentsMem.get(0).get("metric");
                 ObjectNode agentsInfo = objectMapper.createObjectNode();
                 agentsInfo.put("hostname", agentMemMetric.get("hostname").asText());
                 agentsInfo.put("iPv4addr", agentMemMetric.get("iPv4addr").asText());
@@ -298,6 +300,43 @@ public class PrometheusProxy {
                 }
                 agentDiskInfo.set("diskInfo",tempDiskInfo);
                 return agentDiskInfo;
+            }
+        }
+        return objectMapper.createObjectNode();
+    }
+
+    public JsonNode queryAgentDiskIO(String iPv4addr){
+        ObjectMapper objectMapper = new ObjectMapper();
+        String params = String.format("agent_host_monitoring_diskIO{iPv4addr=\"%s\"}",iPv4addr);
+        JsonNode result = query(params);
+        if (result != null){
+            JsonNode agentDisksResult = result.get("data").get("result");
+            if(agentDisksResult.isArray() && !agentDisksResult.isEmpty()){
+                JsonNode agentDisksValue = agentDisksResult.get(0).get("value");
+                JsonNode agentDisksMetric = agentDisksResult.get(0).get("metric");
+                ObjectNode agentDiskIOInfo = objectMapper.createObjectNode();
+                agentDiskIOInfo.put("hostname", agentDisksMetric.get("hostname").asText())
+                        .put("iPv4addr", agentDisksMetric.get("iPv4addr").asText());
+                LocalDateTime instant = Instant.ofEpochSecond(agentDisksValue.get(0).asLong())
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDateTime();
+                agentDiskIOInfo.put("time", instant.toString());
+
+                ArrayNode tempDiskInfo = objectMapper.createArrayNode();
+                for (JsonNode agent : agentDisksResult) {
+                    JsonNode agentDisk = agent.get("metric");
+                    ObjectNode temp = objectMapper.createObjectNode();
+                    temp.put("physicalDiskName",agentDisk.get("physicalDiskName").asText());
+                    temp.put("physicalDiskUsage", agentDisk.get("diskIO").asText());
+                    if(Objects.equals(agentDisk.get("diskIO").asText(),"physicalDiskWrite")){
+                        temp.put("physicalDiskWrite", agent.get("value").get(1).asLong());
+                    }else {
+                        temp.put("physicalDiskRead", agent.get("value").get(1).asLong());
+                    }
+                    tempDiskInfo.add(temp);
+                }
+                agentDiskIOInfo.set("diskIO",tempDiskInfo);
+                return agentDiskIOInfo;
             }
         }
         return objectMapper.createObjectNode();
