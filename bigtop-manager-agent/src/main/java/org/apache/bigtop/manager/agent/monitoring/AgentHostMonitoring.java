@@ -35,6 +35,8 @@ import oshi.software.os.OSFileStore;
 import oshi.software.os.OperatingSystem;
 import oshi.util.Util;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.UnknownHostException;
@@ -56,14 +58,15 @@ public class AgentHostMonitoring {
     public static final String DISK_NAME = "diskName";
     public static final String DISK_IDLE = "diskFreeSpace";
     public static final String DISK_TOTAL = "diskTotalSpace";
-    public static final String FILE_HANDLE_USAGE_RATE = "fileHandleUsageRate";
+    public static final String FILE_OPEN_DESCRIPTOR = "fileOpenDescriptor";
+    public static final String FILE_TOTAL_DESCRIPTOR = "fileTotalDescriptor";
     public static final String CPU_LOAD_AVG_MIN_1 = "cpuLoadAvgMin_1";
     public static final String CPU_LOAD_AVG_MIN_5 = "cpuLoadAvgMin_5";
     public static final String CPU_LOAD_AVG_MIN_15 = "cpuLoadAvgMin_15";
     public static final String CPU_USAGE = "cpuUsage";
     public static final String PHYSICAL_DISK_NAME = "physicalDiskName";
-    public static final String DISK_READ_RATE = "diskReadRate";
-    public static final String DISK_WRITE_RATE = "diskWriteRate";
+    public static final String DISK_READ = "diskRead";
+    public static final String DISK_WRITE = "diskWrite";
     public static long[] previousReadBytes;
     public static long[] previousWriteBytes;
     public static boolean initialized = false;
@@ -94,22 +97,36 @@ public class AgentHostMonitoring {
         ObjectNode objectNode = json.createObjectNode();
         SystemInfo si = new SystemInfo();
         OperatingSystem operatingSystem = si.getOperatingSystem();
+        OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
         HardwareAbstractionLayer hal = si.getHardware();
 
         NetworkParams networkParams = operatingSystem.getNetworkParams();
         String hostName = networkParams.getHostName();
         String ipv4DefaultGateway = networkParams.getIpv4DefaultGateway();
 
+        // File Descriptor
+        OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
+        long maxFileDescriptors = -1L;
+        long openFileDescriptors = -1L;
+        if (operatingSystemMXBean instanceof com.sun.management.UnixOperatingSystemMXBean) {
+            maxFileDescriptors = ((com.sun.management.UnixOperatingSystemMXBean) operatingSystemMXBean).getMaxFileDescriptorCount();
+            openFileDescriptors = ((com.sun.management.UnixOperatingSystemMXBean) operatingSystemMXBean).getOpenFileDescriptorCount();
+        }
+
         // Agent Host Base Info
         ObjectNode hostInfoNode = json.createObjectNode();
         hostInfoNode
                 .put("hostname", hostName)
-                .put("os", operatingSystem.toString())
+                .put("os", osBean.getName())
+                .put("arch",osBean.getArch())
                 .put("ipv4Gateway", ipv4DefaultGateway)
-                .put("cpu_info", hal.getProcessor().getProcessorIdentifier().getMicroarchitecture())
+                //.put("cpu_info", hal.getProcessor().getProcessorIdentifier().getMicroarchitecture())
+                .put("cpu_info", hal.getProcessor().getProcessorIdentifier().getName())
                 .put("logical_cores", hal.getProcessor().getLogicalProcessorCount())
                 .put("physical_cores", hal.getProcessor().getPhysicalProcessorCount())
-                .put("iPv4addr", getAgentHostIPv4addr(hal, ipv4DefaultGateway));
+                .put("iPv4addr", getAgentHostIPv4addr(hal, ipv4DefaultGateway))
+                .put(FILE_OPEN_DESCRIPTOR,openFileDescriptors)
+                .put(FILE_TOTAL_DESCRIPTOR,maxFileDescriptors);
         objectNode.set(AGENT_BASE_INFO, hostInfoNode);
 
         objectNode.put(BOOT_TIME, operatingSystem.getSystemBootTime());
@@ -119,18 +136,18 @@ public class AgentHostMonitoring {
         GlobalMemory memory = hal.getMemory();
         objectNode.put(MEM_IDLE, memory.getAvailable()).put(MEM_TOTAL, memory.getTotal());
         // DISK
-        List<OSFileStore> fileStores = operatingSystem.getFileSystem().getFileStores(true); // 获取挂载点，得到的是文件逻辑存储
+        List<OSFileStore> fileStores = operatingSystem.getFileSystem().getFileStores(true);
         ArrayNode diskArrayNode = json.createArrayNode();
         for (OSFileStore fileStore : fileStores) {
             if (fileStore.getTotalSpace() <= 1024 * 1024 * 1024) {
                 continue;
             }
             ObjectNode disk = json.createObjectNode();
-            // 获取挂载逻辑卷 和 内存空间tmpfs文件系统
+
             disk.put(DISK_NAME, fileStore.getVolume());
             disk.put(DISK_TOTAL, fileStore.getTotalSpace());
             disk.put(DISK_IDLE, fileStore.getFreeSpace());
-            disk.put(FILE_HANDLE_USAGE_RATE,(double)fileStore.getUsableSpace() / fileStore.getTotalSpace());
+
             diskArrayNode.add(disk);
         }
         objectNode.set(DISKS_BASE_INFO, diskArrayNode);
@@ -202,15 +219,6 @@ public class AgentHostMonitoring {
         Map<ArrayList<String>, Double> labelValues = new HashMap<>();
         ArrayNode disksInfo = (ArrayNode) agentMonitoring.get(AgentHostMonitoring.DISKS_BASE_INFO);
         disksInfo.forEach(diskJsonNode -> {
-            // Disk File Handle Rate
-            ArrayList<String> diskFileHandleRateLabelValues = new ArrayList<>(diskGaugeLabelsValues);
-            diskFileHandleRateLabelValues.add(
-                    diskJsonNode.get(AgentHostMonitoring.DISK_NAME).asText());
-            diskFileHandleRateLabelValues.add(AgentHostMonitoring.FILE_HANDLE_USAGE_RATE);
-            labelValues.put(
-                    diskFileHandleRateLabelValues,
-                    diskJsonNode.get(AgentHostMonitoring.FILE_HANDLE_USAGE_RATE).asDouble());
-
             // Disk Idle
             ArrayList<String> diskIdleLabelValues = new ArrayList<>(diskGaugeLabelsValues);
             diskIdleLabelValues.add(
@@ -219,7 +227,6 @@ public class AgentHostMonitoring {
             labelValues.put(
                     diskIdleLabelValues,
                     diskJsonNode.get(AgentHostMonitoring.DISK_IDLE).asDouble());
-
             // Disk Total
             ArrayList<String> diskTotalLabelValues = new ArrayList<>(diskGaugeLabelsValues);
             diskTotalLabelValues.add(
@@ -264,13 +271,13 @@ public class AgentHostMonitoring {
             // Disk Read
             ArrayList<String> diskReadLabelValues = new ArrayList<>(diskIOGaugeLabelsValues);
             diskReadLabelValues.add(upDiskStores.get(i).getName()); // 名
-            diskReadLabelValues.add(AgentHostMonitoring.DISK_READ_RATE);
+            diskReadLabelValues.add(AgentHostMonitoring.DISK_READ);
             labelValues.put(diskReadLabelValues,readKB);
 
             // Disk Write
             ArrayList<String> diskWriteLabelValues = new ArrayList<>(diskIOGaugeLabelsValues);
             diskWriteLabelValues.add(upDiskStores.get(i).getName());
-            diskWriteLabelValues.add(AgentHostMonitoring.DISK_WRITE_RATE);
+            diskWriteLabelValues.add(AgentHostMonitoring.DISK_WRITE);
             labelValues.put(diskWriteLabelValues, writeKB);
         }
 
