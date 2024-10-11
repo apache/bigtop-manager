@@ -18,32 +18,39 @@
 -->
 
 <script setup lang="ts">
+  import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons-vue'
+  import ClusterInfo from '@/components/cluster-info/index.vue'
+  import JobInfo from '@/components/job-info/index.vue'
+  import AlertInfo from '@/components/alert-info/index.vue'
   import SelectLang from '@/components/select-lang/index.vue'
   import UserAvatar from '@/components/user-avatar/index.vue'
-  import { ref } from 'vue'
-  const spaceSize = ref(24)
+  import { useUIStore } from '@/store/ui'
+  import { storeToRefs } from 'pinia'
+  import { useClusterStore } from '@/store/cluster'
+
+  const uiStore = useUIStore()
+  const clusterStore = useClusterStore()
+  const { siderCollapsed } = storeToRefs(uiStore)
+  const { clusters } = storeToRefs(clusterStore)
 </script>
 
 <template>
   <a-layout-header class="header">
     <div class="header-left">
-      <svg-icon name="big-manager-logo" />
+      <menu-unfold-outlined
+        v-if="siderCollapsed"
+        @click="uiStore.changeCollapsed"
+      />
+      <menu-fold-outlined v-else @click="uiStore.changeCollapsed" />
     </div>
     <div class="header-right">
-      <a-space :size="spaceSize">
-        <user-avatar />
-        <select-lang />
-        <div>
-          <a-button type="primary" class="text-btn">
-            <svg-icon name="github" />
-          </a-button>
-        </div>
-        <div>
-          <a-button type="primary" class="text-btn">
-            <svg-icon name="book" />
-          </a-button>
-        </div>
-      </a-space>
+      <template v-if="clusters.length > 0">
+        <cluster-info />
+        <job-info />
+        <alert-info />
+      </template>
+      <select-lang />
+      <user-avatar />
     </div>
   </a-layout-header>
 </template>
@@ -51,20 +58,18 @@
 <style scoped lang="scss">
   .header {
     @include flexbox($justify: space-between, $align: center);
-    padding: 0 24px 0 10px;
-    height: $layout-header-height;
+    // background: #fff;
+    padding: 0 1rem;
+    height: 48px;
 
     .header-left {
-      @include flexbox($justify: center, $align: center);
-      height: 100%;
-      :deep(.svg-icon) {
-        width: 180px;
-        height: 30px;
-      }
+      font-size: 16px;
+      cursor: pointer;
+      transition: color 0.3s;
     }
 
     .header-right {
-      height: 100%;
+      @include flexbox($justify: end, $align: center);
     }
   }
 </style>

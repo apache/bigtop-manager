@@ -62,10 +62,15 @@
 </script>
 
 <template>
-  <a-layout-sider v-model:collapsed="siderCollapsed" class="sider">
+  <a-layout-sider v-model:collapsed="siderCollapsed" class="sider" width="235">
+    <div class="header">
+      <img class="header-logo" src="@/assets/logo.svg" alt="logo" />
+      <div v-if="!siderCollapsed" class="header-title">Bigtop Manager</div>
+    </div>
     <a-menu
       v-model:selectedKeys="selectedKeys"
       v-model:open-keys="openKeys"
+      theme="dark"
       mode="inline"
     >
       <template v-for="item in siderMenu">
@@ -111,8 +116,23 @@
 
 <style scoped lang="scss">
   .sider {
-    width: $layout-sider-width;
-    background: $layout-sider-bg-color;
+    .header {
+      @include flexbox($justify: center, $align: center);
+      height: 32px;
+      margin: 1rem;
+
+      .header-logo {
+        height: 32px;
+        width: 32px;
+      }
+
+      .header-title {
+        color: #ccc;
+        font-weight: bold;
+        font-size: 16px;
+        margin-left: 1rem;
+      }
+    }
 
     .menu-title-flex {
       @include flexbox($justify: space-between, $align: center);

@@ -1,23 +1,12 @@
-<?xml version="1.0"?>
-<!--
-  ~ Licensed to the Apache Software Foundation (ASF) under one
-  ~ or more contributor license agreements.  See the NOTICE file
-  ~ distributed with this work for additional information
-  ~ regarding copyright ownership.  The ASF licenses this file
-  ~ to you under the Apache License, Version 2.0 (the
-  ~ "License"); you may not use this file except in compliance
-  ~ with the License.  You may obtain a copy of the License at
-  ~
-  ~   http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing,
-  ~ software distributed under the License is distributed on an
-  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-  ~ KIND, either express or implied.  See the License for the
-  ~ specific language governing permissions and limitations
-  ~ under the License.
--->
-<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 32 32">
-  <path fill="currentColor"
-    d="M27.85 29H30l-6-15h-2.35l-6 15h2.15l1.6-4h6.85zm-7.65-6l2.62-6.56L25.45 23zM18 7V5h-7V2H9v3H2v2h10.74a14.71 14.71 0 0 1-3.19 6.18A13.5 13.5 0 0 1 7.26 9h-2.1a16.47 16.47 0 0 0 3 5.58A16.84 16.84 0 0 1 3 18l.75 1.86A18.47 18.47 0 0 0 9.53 16a16.92 16.92 0 0 0 5.76 3.84L16 18a14.48 14.48 0 0 1-5.12-3.37A17.64 17.64 0 0 0 14.8 7z" />
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20" height="20" viewBox="0 0 20 20" fill="none">
+<path    stroke="rgba(255, 255, 255, 1)" stroke-width="1.6666666666666667" stroke-linejoin="round" stroke-linecap="round"  d="M11.7857 15.4167L16.5477 15.4167M17.5 17.5L16.5477 15.4167L17.5 17.5ZM10.8334 17.5L11.7857 15.4167L10.8334 17.5ZM11.7857 15.4167L14.1667 10L16.5477 15.4167L11.7857 15.4167Z">
+</path>
+<path    stroke="rgba(255, 255, 255, 1)" stroke-width="1.6666666666666667" stroke-linejoin="round" stroke-linecap="round"  d="M6.66663 2.5L7.08329 3.75">
+</path>
+<path    stroke="rgba(255, 255, 255, 1)" stroke-width="1.6666666666666667" stroke-linejoin="round" stroke-linecap="round"  d="M2.5 4.58334L11.6667 4.58334">
+</path>
+<path    stroke="rgba(255, 255, 255, 1)" stroke-width="1.6666666666666667" stroke-linejoin="round" stroke-linecap="round"  d="M4.16663 6.66666C4.16663 6.66666 4.91225 9.27537 6.77629 10.7246C8.64029 12.1739 11.6666 13.3333 11.6666 13.3333">
+</path>
+<path    stroke="rgba(255, 255, 255, 1)" stroke-width="1.6666666666666667" stroke-linejoin="round" stroke-linecap="round"  d="M10 4.58334C10 4.58334 9.25438 8.00725 7.39033 9.90942C5.52633 11.8116 2.5 13.3333 2.5 13.3333">
+</path>
 </svg>

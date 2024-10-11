@@ -19,3 +19,16 @@
 
 @import './variables.scss';
 @import './mixins.scss';
+
+
+.text-btn {
+  height: $layout-header-height;
+  border-radius: 0;
+  box-sizing: border-box;
+  @include flexbox($justify: center, $align: center);
+
+  :deep(.svg-icon) {
+    width: 20px;
+    height: 20px;
+  }
+}

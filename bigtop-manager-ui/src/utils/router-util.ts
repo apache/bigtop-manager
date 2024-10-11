@@ -23,11 +23,12 @@ interface RouteModuleType {
 }
 
 type RoutePriorityMap = { [key: string]: number }
+
 export const routePriorityMap: RoutePriorityMap = {
-  Dashboard: 1,
-  Hosts: 2,
-  Services: 3,
-  Cluster: 4
+  Dashboard: -1,
+  Hosts: 3,
+  Services: 2,
+  Cluster: 1
 }
 
 export function mergeRouteModules(

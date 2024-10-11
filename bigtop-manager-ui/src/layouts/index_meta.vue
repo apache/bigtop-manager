@@ -50,13 +50,11 @@
 
 <template>
   <a-layout class="layout">
-    <layout-header />
-    <a-layout>
-      <layout-sider />
-      <a-layout class="layout-inner">
-        <layout-content />
-        <layout-footer />
-      </a-layout>
+    <layout-sider />
+    <a-layout class="layout-inner">
+      <layout-header />
+      <layout-content />
+      <layout-footer />
     </a-layout>
   </a-layout>
 </template>

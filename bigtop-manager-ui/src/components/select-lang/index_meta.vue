@@ -32,9 +32,9 @@
 
 <template>
   <a-dropdown placement="bottom">
-    <a-button type="primary" class="text-btn">
-      <svg-icon name="carbon-language" />
-    </a-button>
+    <div class="icon">
+      <svg-icon name="carbon-language" style="width: 1em; height: 1em" />
+    </div>
     <template #overlay>
       <a-menu :selected-keys="[locale]" @click="handleClick">
         <a-menu-item key="en_US">
@@ -54,4 +54,17 @@
   </a-dropdown>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+  .icon {
+    @include flexbox($justify: center, $align: center);
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 50%;
+    height: 36px;
+    width: 36px;
+
+    &:hover {
+      background-color: var(--hover-color);
+    }
+  }
+</style>

@@ -50,10 +50,10 @@
 
 <template>
   <a-dropdown placement="bottom">
-    <a-button type="primary" class="text-btn">
-      <svg-icon name="avatar" />
-      <span class="name">{{ userVO?.nickname }}</span>
-    </a-button>
+    <div class="icon">
+      <user-outlined />
+      <div class="name">{{ userVO?.nickname }}</div>
+    </div>
     <template #overlay>
       <a-menu>
         <a-menu-item key="about">
@@ -85,7 +85,22 @@
 </template>
 
 <style lang="scss" scoped>
-  .name {
-    margin-left: 4px;
+  .icon {
+    @include flexbox($justify: center, $align: center);
+    font-size: 16px;
+    padding: 0 0.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+    height: 36px;
+
+    &:hover {
+      background-color: var(--hover-color);
+    }
+
+    .name {
+      font-size: 14px;
+      margin-left: 0.5rem;
+      line-height: 36px;
+    }
   }
 </style>

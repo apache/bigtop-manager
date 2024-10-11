@@ -43,6 +43,10 @@ export const useUserStore = defineStore(
     const initMenu = (routes: RouteRecordRaw[]) => {
       const items: MenuItem[] = []
       routes.forEach((route) => {
+        // filter invaible route
+        if (routePriorityMap[`${route.meta?.title}`] == -1) {
+          return
+        }
         const menuItem: MenuItem = {
           key: route.meta?.title?.toLowerCase(),
           to: route.path,
