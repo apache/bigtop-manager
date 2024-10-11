@@ -26,10 +26,10 @@
 
 <template>
   <a-layout-header class="header">
-    <div class="header-left">
+    <div class="header-left common-layout">
       <svg-icon name="big-manager-logo" />
     </div>
-    <div class="header-right">
+    <div class="header-right common-layout">
       <a-space :size="spaceSize">
         <user-avatar />
         <select-lang />
@@ -49,22 +49,20 @@
 </template>
 
 <style scoped lang="scss">
+  .common-layout {
+    @include flexbox($justify: center, $align: center);
+    height: 100%;
+  }
   .header {
     @include flexbox($justify: space-between, $align: center);
     padding: 0 24px 0 10px;
     height: $layout-header-height;
 
     .header-left {
-      @include flexbox($justify: center, $align: center);
-      height: 100%;
       :deep(.svg-icon) {
         width: 180px;
         height: 30px;
       }
-    }
-
-    .header-right {
-      height: 100%;
     }
   }
 </style>
