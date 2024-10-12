@@ -157,12 +157,12 @@ public class AgentHostMonitoring {
             previousReadBytes = new long[diskStores.size()];
             previousWriteBytes = new long[diskStores.size()];
 
-            // 初始化为 0
+            // init 0
             for (int i = 0; i < diskStores.size(); i++) {
                 previousReadBytes[i] = 0L;
                 previousWriteBytes[i] = 0L;
             }
-            initialized = true; // 标记为已初始化
+            initialized = true; // tag
         }
         return objectNode;
     }
@@ -243,9 +243,9 @@ public class AgentHostMonitoring {
     public static Map<ArrayList<String>, Map<ArrayList<String>, Double>> getDiskIOGauge(JsonNode agentMonitoring){
         SystemInfo si = new SystemInfo();
         BaseAgentGauge gaugeBaseInfo = new BaseAgentGauge(agentMonitoring);
-        ArrayList<String> diskIOGaugeLabels = gaugeBaseInfo.getLabels(); // 获取全部键
+        ArrayList<String> diskIOGaugeLabels = gaugeBaseInfo.getLabels();
         ArrayList<String> diskIOGaugeLabelsValues = gaugeBaseInfo.getLabelsValues();
-        diskIOGaugeLabels.add(AgentHostMonitoring.PHYSICAL_DISK_NAME); // 填入新键
+        diskIOGaugeLabels.add(AgentHostMonitoring.PHYSICAL_DISK_NAME);
         diskIOGaugeLabels.add("diskIO");
         Map<ArrayList<String>, Double> labelValues = new HashMap<>();
 
@@ -267,10 +267,10 @@ public class AgentHostMonitoring {
             double writeKB = writeBytesDelta / 1024.0; //kbs
             previousReadBytes[i] = currentReadBytes[i];
             previousWriteBytes[i] = currentWriteBytes[i];
-            // host[name type] value
+
             // Disk Read
             ArrayList<String> diskReadLabelValues = new ArrayList<>(diskIOGaugeLabelsValues);
-            diskReadLabelValues.add(upDiskStores.get(i).getName()); // 名
+            diskReadLabelValues.add(upDiskStores.get(i).getName());
             diskReadLabelValues.add(AgentHostMonitoring.DISK_READ);
             labelValues.put(diskReadLabelValues,readKB);
 
@@ -421,10 +421,7 @@ public class AgentHostMonitoring {
 
     public static void memMultiGaugeUpdateData(MultiGauge memMultiGauge) {
         try {
-            // getHostInfo 获取全部数据
-            // getMEMGauge 解析内存数据
             Map<ArrayList<String>, Map<ArrayList<String>, Double>> diskGauge = getMEMGauge(getHostInfo());
-            // 向a参数注入b数据
             multiGaugeUpdateData(memMultiGauge, diskGauge);
         } catch (UnknownHostException e) {
             throw new RuntimeException("Get agent host monitoring info failed");

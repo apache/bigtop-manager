@@ -53,8 +53,6 @@ public class PrometheusProxy {
                 .post()
                 .uri(uriBuilder -> uriBuilder.path("/api/v1/query").build())
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                //这个只是用来查询节点状态的，与正式的数据无关
-                // 句子的意思是，查询指定job的指定节点的up状态与否
                 .body(BodyInserters.fromFormData("query", "up{job=\"%s\"}".formatted(agentHostJobName))
                         .with("timeout", "10"))
                 .retrieve()
@@ -146,7 +144,7 @@ public class PrometheusProxy {
     public JsonNode queryAgentsInstStatus() {
         ObjectMapper objectMapper = new ObjectMapper();
         ArrayNode agentsInfo = objectMapper.createArrayNode();
-        JsonNode agents = queryAgents().get("iPv4addr"); // 获取全主机
+        JsonNode agents = queryAgents().get("iPv4addr"); // get all host
 
         for(JsonNode agent:agents){
             JsonNode cpuResult = queryAgentCpu(agent.asText());
@@ -225,19 +223,19 @@ public class PrometheusProxy {
                 JsonNode agentCpuMetric = agentCpus.get(0).get("metric");
                 JsonNode agentCpuValue = agentCpus.get(0).get("value");
                 ObjectNode agentInfo = objectMapper.createObjectNode();
-                agentInfo.put("hostname", agentCpuMetric.get("hostname").asText());// 节点名称
+                agentInfo.put("hostname", agentCpuMetric.get("hostname").asText());
                 agentInfo.put("cpuInfo",agentCpuMetric.get("cpu_info").asText());
-                agentInfo.put("iPv4addr", agentCpuMetric.get("iPv4addr").asText());// IPV4地址
+                agentInfo.put("iPv4addr", agentCpuMetric.get("iPv4addr").asText());
                 //temp.put("iPv6addr", agentCpuMetric.get("iPv6addr").asText());
-                agentInfo.put("os", agentCpuMetric.get("os").asText());// 操作系统
-                agentInfo.put("architecture", agentCpuMetric.get("arch").asText());// 系统架构
-                agentInfo.put("physical_cores", agentCpuMetric.get("physical_cores").asText());// 核心数
+                agentInfo.put("os", agentCpuMetric.get("os").asText());
+                agentInfo.put("architecture", agentCpuMetric.get("arch").asText());
+                agentInfo.put("physical_cores", agentCpuMetric.get("physical_cores").asText());
                 agentInfo.put("fileOpenDescriptor",agentCpuMetric.get("fileOpenDescriptor").asLong());
                 agentInfo.put("fileTotalDescriptor",agentCpuMetric.get("fileTotalDescriptor").asLong());
                 LocalDateTime instant = Instant.ofEpochSecond(agentCpuValue.get(0).asLong())
                         .atZone(ZoneId.systemDefault())
                         .toLocalDateTime();
-                agentInfo.put("time", instant.toString()); // 抓取刷新时刻
+                agentInfo.put("time", instant.toString());
                 for (JsonNode agent : agentCpus) {
                     agentInfo.put(agent.get("metric").get("cpuUsage").asText(), agent.get("value").get(1).asDouble()); // cpu 指标值
                 }
