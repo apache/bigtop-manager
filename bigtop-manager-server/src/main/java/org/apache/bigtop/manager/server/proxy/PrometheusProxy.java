@@ -96,7 +96,7 @@ public class PrometheusProxy {
                 for (String value : iPv4addrSet.toArray(new String[0])) {
                     iPv4addrArray.add(value);
                 }
-                return objectMapper.createObjectNode().set("iPv4addr",iPv4addrArray);// IPV4地址
+                return objectMapper.createObjectNode().set("iPv4addr",iPv4addrArray);// iPv4
             }
         }
         return objectMapper.createObjectNode();
@@ -104,7 +104,7 @@ public class PrometheusProxy {
     public JsonNode queryAgentsInfo() {
         ObjectMapper objectMapper = new ObjectMapper();
         ArrayNode agentsInfo = objectMapper.createArrayNode();
-        JsonNode agents = queryAgents().get("iPv4addr"); // 获取全主机
+        JsonNode agents = queryAgents().get("iPv4addr"); // get all host
 
         for(JsonNode agent:agents){
             ObjectNode temp = objectMapper.createObjectNode();
@@ -237,7 +237,7 @@ public class PrometheusProxy {
                         .toLocalDateTime();
                 agentInfo.put("time", instant.toString());
                 for (JsonNode agent : agentCpus) {
-                    agentInfo.put(agent.get("metric").get("cpuUsage").asText(), agent.get("value").get(1).asDouble()); // cpu 指标值
+                    agentInfo.put(agent.get("metric").get("cpuUsage").asText(), agent.get("value").get(1).asDouble()); // cpu metric
                 }
                 return agentInfo;
             }
@@ -262,7 +262,7 @@ public class PrometheusProxy {
                         .toLocalDateTime();
                 agentsInfo.put("time", instant.toString());
                 for (JsonNode agent : agentsMem) {
-                    agentsInfo.put(agent.get("metric").get("memUsage").asText(), agent.get("value").get(1).asLong()); // mem
+                    agentsInfo.put(agent.get("metric").get("memUsage").asText(), agent.get("value").get(1).asLong()); // mem metric
                 }
                 return agentsInfo;
             }
