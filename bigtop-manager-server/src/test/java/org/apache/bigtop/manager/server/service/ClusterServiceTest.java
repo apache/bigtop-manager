@@ -59,6 +59,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class ClusterServiceTest {
+    private static final String CLUSTER_NAME = "TestCluster";
 
     @Mock
     private ClusterDao clusterDao;
@@ -70,7 +71,7 @@ public class ClusterServiceTest {
     private RepoDao repoDao;
 
     @InjectMocks
-    private ClusterServiceImpl clusterService = new ClusterServiceImpl();
+    private ClusterService clusterService = new ClusterServiceImpl();
 
     @Mock
     private HostService hostService;
@@ -83,10 +84,10 @@ public class ClusterServiceTest {
     public void setup() {
         clusterPO = new ClusterPO();
         clusterPO.setId(1L);
-        clusterPO.setClusterName("TestCluster");
+        clusterPO.setClusterName(CLUSTER_NAME);
 
         clusterDTO = new ClusterDTO();
-        clusterDTO.setClusterName("TestCluster");
+        clusterDTO.setClusterName(CLUSTER_NAME);
         clusterDTO.setStackName("TestStack");
         clusterDTO.setStackVersion("1.0.0");
         RepoDTO repoDTO = new RepoDTO();
@@ -110,11 +111,11 @@ public class ClusterServiceTest {
                 assertThrows(ApiException.class, () -> clusterService.get(1L)).getEx());
 
         when(clusterDao.findByIdJoin(any())).thenReturn(clusterPO);
-        assert clusterService.get(1L).getClusterName().equals("TestCluster");
+        assert clusterService.get(1L).getClusterName().equals(CLUSTER_NAME);
 
         ClusterDTO clusterDTO = new ClusterDTO();
-        clusterDTO.setClusterName("TestCluster");
-        assert clusterService.update(1L, clusterDTO).getClusterName().equals("TestCluster");
+        clusterDTO.setClusterName(CLUSTER_NAME);
+        assert clusterService.update(1L, clusterDTO).getClusterName().equals(CLUSTER_NAME);
     }
 
     @Test

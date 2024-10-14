@@ -68,7 +68,7 @@
         <!-- JUnit/Mockito -->
         <junit.version>5.10.3</junit.version>
         <mockito.version>5.12.0</mockito.version>
-        <mock-inlie.version>4.10.0</mock-inlie.version>
+        <mock-inlie.version>5.2.0</mock-inlie.version>
 
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <lombok.version>1.18.30</lombok.version>
