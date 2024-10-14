@@ -59,7 +59,7 @@
   </a-layout>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="less">
   .layout {
     min-height: 100vh;
     &-inner {

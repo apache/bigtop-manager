@@ -189,13 +189,9 @@
   </div>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="less">
   .container {
-    @include flexbox(
-      $direction: column,
-      $justify: space-between,
-      $align: center
-    );
+    .flexbox-mixin(column,null,space-between,center,null);
     align-content: center;
 
     .title {

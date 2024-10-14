@@ -171,9 +171,9 @@
   </div>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="less">
   .login-container {
-    @include flexbox($direction: column);
+    .flexbox-mixin($direction: column);
     height: 100vh;
     overflow: auto;
     background-color: var(--bg-color-container);
@@ -184,7 +184,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      @include flexbox($justify: center, $align: center);
+      .flexbox-mixin($justify: center, $align: center);
 
       .login-main {
         border-radius: 0.25rem;
@@ -199,11 +199,11 @@
         }
 
         .login-header {
-          @include flexbox($justify: space-between, $align: center);
+          .flexbox-mixin($justify: space-between, $align: center);
           padding: 0.5rem 1rem;
 
           .login-header-left {
-            @include flexbox($justify: space-between, $align: center);
+            .flexbox-mixin($justify: space-between, $align: center);
 
             .login-title {
               font-weight: 600;
@@ -244,7 +244,7 @@
           }
 
           .login-body-left {
-            @include flexbox($justify: center, $align: center);
+            .flexbox-mixin($justify: center, $align: center);
             min-height: 520px;
             width: 700px;
             background-color: var(--bg-color-container);
@@ -268,7 +268,7 @@
           }
 
           .login-body-right {
-            @include flexbox(
+            .flexbox-mixin(
               $direction: column,
               $justify: center,
               $align: center
@@ -290,7 +290,7 @@
             .login-body-right-form {
               .login-body-right-form-bottom {
                 margin-bottom: 24px;
-                @include flexbox($justify: space-between, $align: center);
+                .flexbox-mixin($justify: space-between, $align: center);
               }
             }
           }

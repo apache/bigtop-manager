@@ -21,7 +21,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import plugins from '@/plugins'
 
-import '@/styles/main.css'
+import '@/styles/main.scss'
 import '@/styles/scrollbar.scss'
 import '@/styles/marked.scss'
 import 'ant-design-vue/dist/reset.css'

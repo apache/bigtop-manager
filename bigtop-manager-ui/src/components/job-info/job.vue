@@ -281,9 +281,9 @@
   </a-modal>
 </template>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
   .footer-btns {
-    @include flexbox($justify: space-between, $wrap: wrap, $align: center);
+    .flexbox-mixin(null, wrap, space-between, center);
   }
 
   .logs-wait-msg {

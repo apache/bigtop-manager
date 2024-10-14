@@ -84,9 +84,9 @@
   </a-dropdown>
 </template>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
   .icon {
-    @include flexbox($justify: center, $align: center);
+    .flexbox-mixin(null,null,center,center);
     font-size: 16px;
     padding: 0 0.5rem;
     border-radius: 6px;

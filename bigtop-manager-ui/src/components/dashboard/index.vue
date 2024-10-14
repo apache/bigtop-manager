@@ -288,13 +288,12 @@
   </a-watermark>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="less">
   .container {
     min-height: 540px;
 
     .statistics {
-      @include flexbox($justify: space-between, $align: center);
-
+      .flexbox-mixin(null,null,space-between,center);
       .card {
         width: 20%;
         text-align: center;
@@ -309,8 +308,7 @@
     }
 
     .charts {
-      @include flexbox($justify: space-between, $align: center);
-
+      .flexbox-mixin(null,null,space-between,center);
       .chart {
         width: 45%;
         height: 24rem;
@@ -318,7 +316,7 @@
     }
 
     .host-link {
-      @include flexbox($direction: column, $align: end);
+      .flexbox-mixin(column,null,null,end);
       margin-bottom: 1.5rem;
     }
   }

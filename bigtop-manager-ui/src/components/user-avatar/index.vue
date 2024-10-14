@@ -50,10 +50,10 @@
 
 <template>
   <a-dropdown placement="bottom">
-    <a-button type="primary" class="text-btn">
+    <div class="header-item">
       <svg-icon name="avatar" />
       <span class="name">{{ userVO?.nickname }}</span>
-    </a-button>
+    </div>
     <template #overlay>
       <a-menu>
         <a-menu-item key="about">
@@ -84,7 +84,7 @@
   </a-dropdown>
 </template>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
   .name {
     margin-left: 4px;
   }

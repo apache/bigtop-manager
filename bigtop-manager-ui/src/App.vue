@@ -18,22 +18,62 @@
 -->
 
 <script setup lang="ts">
+import { theme as antdTheme } from 'ant-design-vue';
   import { useLocaleStore } from '@/store/locale'
   import { storeToRefs } from 'pinia'
-
+  import { ref } from 'vue';
+  
+  const themes = {
+    default: {
+      token:{
+      },
+      algorithm: antdTheme.defaultAlgorithm,
+    },
+    dark: {
+      token:{
+      },
+      algorithm: antdTheme.darkAlgorithm,
+    },
+    nature:{
+      token:{
+        colorPrimary: 'green',
+      },
+      algorithm: antdTheme.defaultAlgorithm,
+    }
+  };
   const localeStore = useLocaleStore()
   const { antd } = storeToRefs(localeStore)
+
+const theme = ref(themes['default'])
+const triggerTheme = (themeType: keyof typeof themes) => {
+  theme.value = themes[themeType]
+}
+
 </script>
 
 <template>
-  <a-config-provider :locale="antd">
+  <a-config-provider :locale="antd"  :theme="theme">
     <a-app class="app">
       <router-view />
+    <div style="position: fixed; top: 16px; z-index: 10;left: 300px;">
+      <a-button @click="() => triggerTheme('default')">Default</a-button>
+      <a-button @click="() => triggerTheme('dark')">Dark</a-button>
+      <a-button @click="() => triggerTheme('nature')">Nature</a-button>
+    </div>
     </a-app>
   </a-config-provider>
 </template>
 
 <style scoped lang="scss">
+  #app {
+    width: 100%;
+    box-sizing: border-box;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+  }
+
   .app {
     height: 100%;
     > section {

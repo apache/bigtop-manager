@@ -354,9 +354,9 @@
   </div>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="less">
   .dot-rest {
-    @include flexbox($justify: center, $align: center);
+    .flexbox-mixin(null,null,center,center);
   }
 
   .summary-layout {
@@ -400,7 +400,7 @@
     }
 
     .summary-ctx {
-      @include flexbox($wrap: wrap);
+      .flexbox-mixin(null,wrap);
       box-sizing: border-box;
 
       .card {
@@ -423,11 +423,11 @@
           font-size: 1.06rem;
           font-weight: 600;
           margin-bottom: 0.375rem;
-          @include flexbox($justify: space-between, $align: center);
+          .flexbox-mixin(null,null,space-between,center);
         }
 
         .comp-info {
-          @include flexbox($justify: center);
+          .flexbox-mixin(null,null,center);
           margin-bottom: 1.25rem;
 
           .host-name {
@@ -440,7 +440,7 @@
         }
 
         footer {
-          @include flexbox($justify: space-between, $align: center);
+          .flexbox-mixin(null,null,space-between,center);
           .comp-state {
             font-size: 1rem;
             align-items: flex-end;
@@ -455,11 +455,8 @@
   }
 
   .container {
-    @include flexbox(
-      $direction: column,
-      $justify: space-between,
-      $align: center
-    );
+    .flexbox-mixin(column,null,space-between,center);
+
     align-content: center;
     height: 100%;
 
@@ -479,7 +476,7 @@
         text-align: start;
 
         .config-item {
-          @include flexbox($justify: start, $align: center);
+          .flexbox-mixin(null,null,start,center);
           margin-bottom: 1rem;
 
           .config-item-key {

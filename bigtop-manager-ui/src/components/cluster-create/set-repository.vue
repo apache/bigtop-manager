@@ -113,9 +113,9 @@
   </div>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="less">
   .container {
-    @include flexbox($direction: column, $justify: start, $align: center);
+    .flexbox-mixin(column,null,start,center);
     align-content: center;
     height: 100%;
 
@@ -129,7 +129,7 @@
       position: relative;
 
       .editable-cell-input-wrapper {
-        @include flexbox($justify: center, $align: center);
+        .flexbox-mixin(null,null,center,center);
         padding-right: 24px;
 
         .editable-cell-icon-check {
@@ -146,7 +146,7 @@
       }
 
       .editable-cell-text-wrapper {
-        @include flexbox($justify: center, $align: center);
+        .flexbox-mixin(null,null,center,center);
         padding: 5px 24px 5px 5px;
 
         .editable-cell-icon {

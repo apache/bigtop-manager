@@ -59,19 +59,19 @@
   })
 </script>
 
-<style lang="scss" scoped>
-  @mixin dot($width, $height, $color) {
-    width: $width;
-    height: $height;
-    background: $color;
+<style lang="less" scoped>
+  .dot(@width, @height, @color) {
+    width: @width;
+    height: @height;
+    background: @color;
     border-radius: 50%;
   }
   .dot-state {
     &::before {
       content: '';
-      margin: 0 0.375rem 0 0;
+      margin: 8px 0 0;
       display: inline-block;
-      @include dot(var(--state-w), var(--state-h), var(--state-color));
+      .dot(var(--state-w), var(--state-h), var(--state-color));
     }
   }
 </style>

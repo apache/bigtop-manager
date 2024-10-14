@@ -64,7 +64,7 @@
   </div>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="less">
   .account-page-header {
     border: 1px solid rgb(235, 237, 240);
   }

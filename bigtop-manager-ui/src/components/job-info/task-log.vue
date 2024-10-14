@@ -117,15 +117,15 @@
   </div>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="less">
   .logs {
     height: 50vh;
-    @include flexbox($direction: column);
+    .flexbox-mixin(column);
     &_header {
       font-size: 16px;
       font-weight: 600;
       margin: 0 0 10px 0;
-      @include flexbox($justify: space-between);
+      .flexbox-mixin(null,null,space-between);
 
       .copy-button {
         margin-left: 3px;

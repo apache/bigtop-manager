@@ -42,7 +42,7 @@
   </a-layout-content>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="less">
   .container {
     margin: 0 1rem;
     min-height: auto;

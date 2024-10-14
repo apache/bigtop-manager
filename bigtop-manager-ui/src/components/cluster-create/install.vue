@@ -135,9 +135,9 @@
   </div>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="less">
   .container {
-    @include flexbox($direction: column, $justify: start, $align: center);
+    .flexbox-mixin(column,null,start,center);
     align-content: center;
     height: 100%;
 

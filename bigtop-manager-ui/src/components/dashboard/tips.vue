@@ -40,9 +40,9 @@
   </div>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="less">
   .tour {
-    @include flexbox($direction: column, $justify: center, $align: center);
+    .flexbox-mixin(column, null, center,center);
     align-content: center;
     min-height: 540px;
   }

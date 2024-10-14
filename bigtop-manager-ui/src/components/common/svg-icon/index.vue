@@ -40,7 +40,7 @@
   </svg>
 </template>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
   .svg-icon {
     height: 1.2em;
     width: 1.2em;

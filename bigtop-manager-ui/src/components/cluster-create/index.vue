@@ -217,9 +217,9 @@
   </a-modal>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="less">
   .container {
-    @include flexbox($direction: row, $justify: center, $align: center);
+    .flexbox-mixin(null,null,center,center);
 
     .step {
       width: 15%;

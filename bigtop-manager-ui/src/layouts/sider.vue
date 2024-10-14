@@ -109,13 +109,13 @@
   </a-layout-sider>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="less">
   .sider {
-    width: $layout-sider-width;
-    background: $layout-sider-bg-color;
+    width: @layout-header-height;
+    background: @layout-sider-bg-color;
 
     .menu-title-flex {
-      @include flexbox($justify: space-between, $align: center);
+     .flexbox-mixin(null,null,space-between,center);
     }
   }
 </style>

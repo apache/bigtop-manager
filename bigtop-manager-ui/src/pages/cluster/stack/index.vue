@@ -93,7 +93,7 @@
   <cluster-create v-model:open="createWindowOpened" />
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="less">
   .host-page-header {
     border: 1px solid rgb(235, 237, 240);
 
