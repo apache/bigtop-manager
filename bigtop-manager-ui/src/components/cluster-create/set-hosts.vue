@@ -160,9 +160,9 @@
     </a-form>
   </div>
 </template>
-<style scoped lang="less">
+<style scoped lang="scss">
   .container {
-    .flexbox-mixin(column,null,start,center);
+    @include flexbox($direction: column, $justify: start, $align: center);
     height: 100%;
 
     .title {

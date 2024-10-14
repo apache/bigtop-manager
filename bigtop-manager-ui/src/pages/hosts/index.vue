@@ -183,7 +183,7 @@
   </div>
 </template>
 
-<style scoped lang="less">
+<style scoped lang="scss">
   .host-page-header {
     border: 1px solid rgb(235, 237, 240);
 

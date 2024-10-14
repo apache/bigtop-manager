@@ -44,15 +44,15 @@
   </a-layout-header>
 </template>
 
-<style scoped lang="less">
+<style scoped lang="scss">
   .common-layout {
-    .flexbox-mixin(null,null,center,center);
+    @include flexbox($justify: center,$align: center);
     height: 100%;
   }
   .header {
-   .flexbox-mixin(null,null,space-between,center);
+   @include flexbox( $justify: space-between, $align: center);
     padding: 0 24px 0 10px;
-    height: @layout-header-height;
+    height: $layout-header-height;
 
     .header-left {
       :deep(.svg-icon) {

@@ -54,9 +54,9 @@
   </a-dropdown>
 </template>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
   .icon {
-    .flexbox-mixin(null,null,center,center);
+    @include flexbox($justify: center,$align: center);
     font-size: 16px;
     cursor: pointer;
     border-radius: 50%;

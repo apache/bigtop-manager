@@ -164,9 +164,9 @@
   </div>
 </template>
 
-<style scoped lang="less">
+<style scoped lang="scss">
   .container {
-    .flexbox-mixin(column,null,start,center);
+    @include flexbox($direction: column, $justify: start, $align: center);
     align-content: center;
     height: 100%;
 
@@ -178,7 +178,7 @@
 
     .retry {
       justify-content: end;
-      .flexbox-mixin(null,null,end,center);
+      @include flexbox($justify: start, $align: center);
       margin: 0 1rem 1rem 0;
       width: 100%;
 

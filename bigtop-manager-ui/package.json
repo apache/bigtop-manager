@@ -1,6 +1,7 @@
 {
   "name": "bigtop-manager-ui",
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
     "dev": "vite --open --mode development",
     "build": "vue-tsc && vite build --mode production",

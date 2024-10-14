@@ -134,7 +134,7 @@
   </suspense>
 </template>
 
-<style scoped lang="less">
+<style scoped lang="scss">
   .dropdown-text {
     font-size: 24px;
     color: white;

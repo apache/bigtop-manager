@@ -114,10 +114,10 @@
   </a-layout-sider>
 </template>
 
-<style scoped lang="less">
+<style scoped lang="scss">
   .sider {
     .header {
-      .flexbox-mixin(null,null,center,center);
+      @include flexbox($justify: center,$align: center);
       height: 32px;
       margin: 1rem;
 
@@ -135,7 +135,7 @@
     }
 
     .menu-title-flex {
-     .flexbox-mixin(null,null,space-between,center);
+     @include flexbox( $justify: space-between, $align: center);
     }
   }
 </style>

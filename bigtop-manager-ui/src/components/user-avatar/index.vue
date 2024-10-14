@@ -84,7 +84,7 @@
   </a-dropdown>
 </template>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
   .name {
     margin-left: 4px;
   }

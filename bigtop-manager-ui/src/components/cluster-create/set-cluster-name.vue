@@ -71,9 +71,9 @@
   </div>
 </template>
 
-<style scoped lang="less">
+<style scoped lang="scss">
   .container {
-    .flexbox-mixin(column,null,center,center);
+    @include flexbox($direction: column, $justify: center, $align: center);
     align-content: center;
     height: 100%;
   }

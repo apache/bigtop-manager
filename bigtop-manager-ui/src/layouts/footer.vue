@@ -29,7 +29,7 @@
   </a-layout-footer>
 </template>
 
-<style scoped lang="less">
+<style scoped lang="scss">
   .copyright {
     text-align: center;
   }

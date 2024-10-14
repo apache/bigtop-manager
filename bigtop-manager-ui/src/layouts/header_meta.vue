@@ -55,9 +55,9 @@
   </a-layout-header>
 </template>
 
-<style scoped lang="less">
+<style scoped lang="scss">
   .header {
-    .flexbox-mixin(null,null,space-between,center);
+    @include flexbox($justify: space-between, $align: center);
     // background: #fff;
     padding: 0 1rem;
     height: 48px;
@@ -69,7 +69,7 @@
     }
 
     .header-right {
-      .flexbox-mixin(null,null,end,center);
+      @include flexbox($justify: start, $align: center);
     }
   }
 </style>

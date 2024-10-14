@@ -49,9 +49,9 @@
   <cluster-create v-model:open="createWindowOpened" />
 </template>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
   .icon {
-    .flexbox-mixin(null,null,center,center);
+    @include flexbox($justify: center,$align: center);
     padding: 0 0.5rem;
     border-radius: 6px;
     cursor: pointer;
