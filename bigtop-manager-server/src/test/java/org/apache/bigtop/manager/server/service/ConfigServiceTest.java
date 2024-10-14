@@ -19,20 +19,18 @@
 
 package org.apache.bigtop.manager.server.service;
 
-import jakarta.annotation.Resource;
-import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
-import org.apache.bigtop.manager.dao.po.TypeConfigPO;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
+import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
 import org.apache.bigtop.manager.dao.po.ServicePO;
+import org.apache.bigtop.manager.dao.po.TypeConfigPO;
 import org.apache.bigtop.manager.dao.repository.ClusterDao;
-import org.apache.bigtop.manager.dao.repository.ServiceDao;
 import org.apache.bigtop.manager.dao.repository.ServiceConfigDao;
+import org.apache.bigtop.manager.dao.repository.ServiceDao;
 import org.apache.bigtop.manager.dao.repository.TypeConfigDao;
-
 import org.apache.bigtop.manager.server.model.dto.PropertyDTO;
 import org.apache.bigtop.manager.server.model.dto.TypeConfigDTO;
-import org.apache.bigtop.manager.server.service.impl.ComponentServiceImpl;
 import org.apache.bigtop.manager.server.service.impl.ConfigServiceImpl;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -40,10 +38,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -79,7 +75,7 @@ public class ConfigServiceTest {
         PropertyDTO propertyDTO = new PropertyDTO();
         propertyDTO.setName("test");
         typeConfigDTO.setProperties(List.of(propertyDTO));
-        configService.upsert(1L, 1L,List.of(typeConfigDTO));
+        configService.upsert(1L, 1L, List.of(typeConfigDTO));
 
         ServiceConfigPO serviceConfigPO = new ServiceConfigPO();
         TypeConfigPO typeConfigPO = new TypeConfigPO();
@@ -87,8 +83,8 @@ public class ConfigServiceTest {
         typeConfigPO.setPropertiesJson("[]");
         serviceConfigPO.setConfigs(List.of(typeConfigPO));
         serviceConfigPO.setVersion(1);
-        when(serviceConfigDao.findByClusterIdAndServiceIdAndSelectedIsTrue(any(), any())).thenReturn(serviceConfigPO);
-        configService.upsert(1L, 1L,List.of(typeConfigDTO));
-
+        when(serviceConfigDao.findByClusterIdAndServiceIdAndSelectedIsTrue(any(), any()))
+                .thenReturn(serviceConfigPO);
+        configService.upsert(1L, 1L, List.of(typeConfigDTO));
     }
 }
