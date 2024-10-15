@@ -32,8 +32,8 @@
 
 <template>
   <a-dropdown placement="bottom">
-    <div class="header-item">
-      <svg-icon name="carbon-language" />
+    <div class="header-menu-item">
+      <svg-icon name="language" />
     </div>
     <template #overlay>
       <a-menu :selected-keys="[locale]" @click="handleClick">
@@ -54,4 +54,14 @@
   </a-dropdown>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+  .header-menu-item {
+    :deep(.svg-icon) {
+      width: 20px;
+      height: 20px;
+    }
+    &:hover {
+      background-color: var(--color-primary);
+    }
+  }
+</style>

@@ -21,7 +21,7 @@
   import SelectLang from '@/components/select-lang/index.vue'
   import UserAvatar from '@/components/user-avatar/index.vue'
   import { ref } from 'vue'
-  const spaceSize = ref(8)
+  const spaceSize = ref(20)
 </script>
 
 <template>
@@ -32,11 +32,14 @@
     <div class="header-right common-layout">
       <a-space :size="spaceSize">
         <user-avatar />
+        <div class="header-menu-item">
+          <svg-icon name="communication" />
+        </div>
         <select-lang />
-        <div class="header-item">
+        <div class="header-menu-item">
           <svg-icon name="github" />
         </div>
-        <div class="header-item">
+        <div class="header-menu-item">
           <svg-icon name="book" />
         </div>
       </a-space>
@@ -46,11 +49,11 @@
 
 <style scoped lang="scss">
   .common-layout {
-    @include flexbox($justify: center,$align: center);
+    @include flexbox($justify: center, $align: center);
     height: 100%;
   }
   .header {
-   @include flexbox( $justify: space-between, $align: center);
+    @include flexbox($justify: space-between, $align: center);
     padding: 0 24px 0 10px;
     height: $layout-header-height;
 

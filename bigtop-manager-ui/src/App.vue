@@ -18,53 +18,39 @@
 -->
 
 <script setup lang="ts">
-import { theme as antdTheme } from 'ant-design-vue';
-  import { useLocaleStore } from '@/store/locale'
   import { storeToRefs } from 'pinia'
-  import { ref } from 'vue';
-  
-  const themes = {
-    default: {
-      token:{
-      },
-      algorithm: antdTheme.defaultAlgorithm,
-    },
-    dark: {
-      token:{
-      },
-      algorithm: antdTheme.darkAlgorithm,
-    },
-    nature:{
-      token:{
-        colorPrimary: 'green',
-      },
-      algorithm: antdTheme.defaultAlgorithm,
-    }
-  };
+  import { onMounted } from 'vue'
+  import { useLocaleStore } from '@/store/locale'
+  import { useTheme } from './store/theme'
   const localeStore = useLocaleStore()
+  const themeStore = useTheme()
   const { antd } = storeToRefs(localeStore)
+  const { themeMap, themeType } = storeToRefs(themeStore)
 
-const theme = ref(themes['default'])
-const triggerTheme = (themeType: keyof typeof themes) => {
-  theme.value = themes[themeType]
-}
-
+  onMounted(() => {
+    themeStore.injectCssVariablesIntoHead(themeStore.generateCssVariables())
+  })
 </script>
 
 <template>
-  <a-config-provider :locale="antd"  :theme="theme">
+  <a-config-provider :locale="antd" :theme="themeMap[themeType]">
     <a-app class="app">
       <router-view />
-    <div style="position: fixed; top: 16px; z-index: 10;left: 300px;">
-      <a-button @click="() => triggerTheme('default')">Default</a-button>
-      <a-button @click="() => triggerTheme('dark')">Dark</a-button>
-      <a-button @click="() => triggerTheme('nature')">Nature</a-button>
-    </div>
+      <div style="position: fixed; top: 200px; z-index: 10; left: 300px">
+        <a-button @click="() => themeStore.triggerTheme('default')"
+          >Default</a-button
+        >
+        <a-button @click="() => themeStore.triggerTheme('dark')">Dark</a-button>
+        <div class="test"> test </div>
+      </div>
     </a-app>
   </a-config-provider>
 </template>
 
 <style scoped lang="scss">
+  .test {
+    background-color: var(--color-primary);
+  }
   #app {
     width: 100%;
     box-sizing: border-box;

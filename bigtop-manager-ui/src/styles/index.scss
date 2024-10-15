@@ -17,10 +17,23 @@
  * under the License.
  */
 
-@mixin flexbox($direction: null, $wrap: null, $justify: null, $align: null) {
-  display: flex;
-  flex-direction: $direction;
-  flex-wrap: $wrap;
-  justify-content: $justify;
-  align-items: $align;
+@import './variables.scss';
+@import './marked.scss';
+@import './scrollbar.scss';
+
+.header-menu-item {
+  height: $layout-header-height;
+  width: $layout-header-height;
+  border-radius: 0;
+  box-sizing: border-box;
+  cursor: pointer;
+  @include flexbox($justify: center, $align: center);
+  &:hover{
+    background-color: var(--color-primary);
+  }
+
+  :deep(.svg-icon) {
+    width: 20px;
+    height: 20px;
+  }
 }

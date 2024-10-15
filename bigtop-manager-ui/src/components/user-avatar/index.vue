@@ -50,7 +50,7 @@
 
 <template>
   <a-dropdown placement="bottom">
-    <div class="header-item">
+    <div class="header-menu-item">
       <svg-icon name="avatar" />
       <span class="name">{{ userVO?.nickname }}</span>
     </div>
