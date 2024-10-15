@@ -49,5 +49,4 @@ public class MonitoringServiceImpl implements MonitoringService {
     public JsonNode queryAgentsInstStatus() {
         return prometheusProxy.queryAgentsInstStatus();
     }
-
 }
