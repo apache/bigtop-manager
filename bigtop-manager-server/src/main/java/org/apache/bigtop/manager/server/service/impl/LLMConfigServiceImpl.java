@@ -33,6 +33,7 @@ import org.apache.bigtop.manager.dao.repository.ChatMessageDao;
 import org.apache.bigtop.manager.dao.repository.ChatThreadDao;
 import org.apache.bigtop.manager.dao.repository.PlatformDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
+import org.apache.bigtop.manager.server.enums.AuthPlatformStatus;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.model.converter.AuthPlatformConverter;
 import org.apache.bigtop.manager.server.model.converter.PlatformConverter;
@@ -131,7 +132,7 @@ public class LLMConfigServiceImpl implements LLMConfigService {
         List<AuthPlatformVO> authorizedPlatforms = new ArrayList<>();
         List<AuthPlatformPO> authPlatformPOList = authPlatformDao.findAll();
         for (AuthPlatformPO authPlatformPO : authPlatformPOList) {
-            if (authPlatformPO.getIsDeleted()) {
+            if (AuthPlatformStatus.isDeleted(authPlatformPO.getStatus())) {
                 continue;
             }
 
@@ -154,7 +155,11 @@ public class LLMConfigServiceImpl implements LLMConfigService {
 
         authPlatformDTO.setAuthCredentials(credentialSet);
         AuthPlatformPO authPlatformPO = AuthPlatformConverter.INSTANCE.fromDTO2PO(authPlatformDTO);
-        // TODO: set status
+        if (authPlatformDTO.isTest()) {
+            authPlatformPO.setStatus(AuthPlatformStatus.NORMAL.getCode());
+        } else {
+            authPlatformPO.setStatus(AuthPlatformStatus.INACTIVE.getCode());
+        }
         authPlatformDao.save(authPlatformPO);
         return AuthPlatformConverter.INSTANCE.fromPO2VO(authPlatformPO, platformPO);
     }
@@ -178,11 +183,11 @@ public class LLMConfigServiceImpl implements LLMConfigService {
     @Override
     public boolean deleteAuthorizedPlatform(Long authId) {
         AuthPlatformPO authPlatformPO = authPlatformDao.findById(authId);
-        if (authPlatformPO == null || authPlatformPO.getIsDeleted()) {
+        if (authPlatformPO == null || AuthPlatformStatus.isDeleted(authPlatformPO.getStatus())) {
             throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED);
         }
 
-        authPlatformPO.setIsDeleted(true);
+        authPlatformPO.setStatus(AuthPlatformStatus.DELETED.getCode());
         authPlatformDao.partialUpdateById(authPlatformPO);
 
         List<ChatThreadPO> chatThreadPOS = chatThreadDao.findAllByAuthId(authPlatformPO.getId());
@@ -213,7 +218,7 @@ public class LLMConfigServiceImpl implements LLMConfigService {
 
         if (authPlatformDTO.getId() != null) {
             AuthPlatformPO authPlatformPO = authPlatformDao.findById(authPlatformDTO.getId());
-            if (authPlatformPO == null || authPlatformPO.getIsDeleted()) {
+            if (authPlatformPO == null || AuthPlatformStatus.isDeleted(authPlatformPO.getStatus())) {
                 throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED);
             }
             AuthPlatformDTO existAuthPlatformDTO = AuthPlatformConverter.INSTANCE.fromPO2DTO(authPlatformPO);
@@ -228,8 +233,8 @@ public class LLMConfigServiceImpl implements LLMConfigService {
         }
 
         if (authPlatformDTO.getId() != null) {
-            // TODO
             AuthPlatformPO authPlatformPO = AuthPlatformConverter.INSTANCE.fromDTO2PO(authPlatformDTO);
+            authPlatformPO.setStatus(AuthPlatformStatus.NORMAL.getCode());
             authPlatformDao.partialUpdateById(authPlatformPO);
         }
 
@@ -238,7 +243,36 @@ public class LLMConfigServiceImpl implements LLMConfigService {
 
     @Override
     public AuthPlatformVO updateAuthorizedPlatform(AuthPlatformDTO authPlatformDTO) {
-        // TODO
-        return null;
+        AuthPlatformPO authPlatformPO = authPlatformDao.findById(authPlatformDTO.getId());
+        if (authPlatformPO == null || AuthPlatformStatus.isDeleted(authPlatformPO.getStatus())) {
+            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED);
+        }
+
+        AuthPlatformPO newAuthPlatformPO = AuthPlatformConverter.INSTANCE.fromDTO2PO(authPlatformDTO);
+
+        if (AuthPlatformStatus.needSwitch(authPlatformPO.getStatus(), newAuthPlatformPO.getStatus())) {
+            switchPlatform(newAuthPlatformPO.getId());
+            newAuthPlatformPO.setStatus(AuthPlatformStatus.ACTIVE.getCode());
+        }
+
+        authPlatformDao.partialUpdateById(newAuthPlatformPO);
+
+        return AuthPlatformConverter.INSTANCE.fromPO2VO(
+                newAuthPlatformPO, platformDao.findById(newAuthPlatformPO.getPlatformId()));
+    }
+
+    private void switchPlatform(Long id) {
+        List<AuthPlatformPO> authPlatformPOS = authPlatformDao.findAll();
+        for (AuthPlatformPO authPlatformPO : authPlatformPOS) {
+            if (!AuthPlatformStatus.isAvailable(authPlatformPO.getStatus())) {
+                continue;
+            }
+            if (authPlatformPO.getId().equals(id)) {
+                authPlatformPO.setStatus(AuthPlatformStatus.ACTIVE.getCode());
+            } else {
+                authPlatformPO.setStatus(AuthPlatformStatus.NORMAL.getCode());
+            }
+        }
+        authPlatformDao.partialUpdateByIds(authPlatformPOS);
     }
 }

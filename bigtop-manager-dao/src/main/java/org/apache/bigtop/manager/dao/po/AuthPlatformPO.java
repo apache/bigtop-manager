@@ -41,6 +41,15 @@ public class AuthPlatformPO extends BasePO implements Serializable {
     @Column(name = "platform_id", nullable = false)
     private Long platformId;
 
-    @Column(name = "is_deleted")
-    private Boolean isDeleted;
+    @Column(name = "status")
+    private Integer status;
+
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "model")
+    private String model;
+
+    @Column(name = "notes")
+    private String notes;
 }
