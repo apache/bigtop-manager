@@ -148,24 +148,15 @@ public class LLMConfigServiceImpl implements LLMConfigService {
         if (platformPO == null) {
             throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
         }
+
         Map<String, String> credentialSet =
                 getStringMap(authPlatformDTO, PlatformConverter.INSTANCE.fromPO2DTO(platformPO));
-        List<String> models = List.of(platformPO.getSupportModels().split(","));
-        if (models.isEmpty()) {
-            throw new ApiException(ApiExceptionEnum.MODEL_NOT_SUPPORTED);
-        }
-
-        if (!testAuthorization(platformPO.getName(), models.get(0), credentialSet)) {
-            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
-        }
 
         authPlatformDTO.setAuthCredentials(credentialSet);
         AuthPlatformPO authPlatformPO = AuthPlatformConverter.INSTANCE.fromDTO2PO(authPlatformDTO);
+        // TODO: set status
         authPlatformDao.save(authPlatformPO);
-        AuthPlatformVO authPlatformVO = AuthPlatformConverter.INSTANCE.fromPO2VO(authPlatformPO, platformPO);
-        authPlatformVO.setModel(platformPO.getSupportModels());
-        authPlatformVO.setPlatformName(platformPO.getName());
-        return authPlatformVO;
+        return AuthPlatformConverter.INSTANCE.fromPO2VO(authPlatformPO, platformPO);
     }
 
     private static @NotNull Map<String, String> getStringMap(AuthPlatformDTO authPlatformDTO, PlatformDTO platformDTO) {
@@ -206,5 +197,48 @@ public class LLMConfigServiceImpl implements LLMConfigService {
         }
 
         return true;
+    }
+
+    @Override
+    public boolean testAuthorizedPlatform(AuthPlatformDTO authPlatformDTO) {
+        PlatformPO platformPO = platformDao.findById(authPlatformDTO.getPlatformId());
+        if (platformPO == null) {
+            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
+        }
+
+        List<String> supportModels = List.of(platformPO.getSupportModels().split(","));
+        if (supportModels.isEmpty() || !supportModels.contains(authPlatformDTO.getModel())) {
+            throw new ApiException(ApiExceptionEnum.MODEL_NOT_SUPPORTED);
+        }
+
+        if (authPlatformDTO.getId() != null) {
+            AuthPlatformPO authPlatformPO = authPlatformDao.findById(authPlatformDTO.getId());
+            if (authPlatformPO == null || authPlatformPO.getIsDeleted()) {
+                throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED);
+            }
+            AuthPlatformDTO existAuthPlatformDTO = AuthPlatformConverter.INSTANCE.fromPO2DTO(authPlatformPO);
+            authPlatformDTO.setAuthCredentials(existAuthPlatformDTO.getAuthCredentials());
+            authPlatformDTO.setModel(existAuthPlatformDTO.getModel());
+        }
+
+        Map<String, String> credentialSet =
+                getStringMap(authPlatformDTO, PlatformConverter.INSTANCE.fromPO2DTO(platformPO));
+        if (!testAuthorization(platformPO.getName(), authPlatformDTO.getModel(), credentialSet)) {
+            throw new ApiException(ApiExceptionEnum.CREDIT_INCORRECT);
+        }
+
+        if (authPlatformDTO.getId() != null) {
+            // TODO
+            AuthPlatformPO authPlatformPO = AuthPlatformConverter.INSTANCE.fromDTO2PO(authPlatformDTO);
+            authPlatformDao.partialUpdateById(authPlatformPO);
+        }
+
+        return true;
+    }
+
+    @Override
+    public AuthPlatformVO updateAuthorizedPlatform(AuthPlatformDTO authPlatformDTO) {
+        // TODO
+        return null;
     }
 }

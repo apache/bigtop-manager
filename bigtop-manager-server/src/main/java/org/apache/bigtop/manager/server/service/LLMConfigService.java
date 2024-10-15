@@ -36,4 +36,8 @@ public interface LLMConfigService {
     AuthPlatformVO addAuthorizedPlatform(AuthPlatformDTO authPlatformDTO);
 
     boolean deleteAuthorizedPlatform(Long authId);
+
+    boolean testAuthorizedPlatform(AuthPlatformDTO authPlatformDTO);
+
+    AuthPlatformVO updateAuthorizedPlatform(AuthPlatformDTO authPlatformDTO);
 }

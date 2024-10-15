@@ -38,4 +38,6 @@ public class AuthPlatformReq {
     private String model;
 
     private String notes;
+
+    private boolean isTest;
 }
