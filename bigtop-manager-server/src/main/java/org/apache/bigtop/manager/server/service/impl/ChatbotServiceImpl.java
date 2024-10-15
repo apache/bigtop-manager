@@ -39,18 +39,12 @@ import org.apache.bigtop.manager.server.holder.SessionUserHolder;
 import org.apache.bigtop.manager.server.model.converter.AuthPlatformConverter;
 import org.apache.bigtop.manager.server.model.converter.ChatMessageConverter;
 import org.apache.bigtop.manager.server.model.converter.ChatThreadConverter;
-import org.apache.bigtop.manager.server.model.converter.PlatformConverter;
 import org.apache.bigtop.manager.server.model.dto.AuthPlatformDTO;
 import org.apache.bigtop.manager.server.model.dto.ChatThreadDTO;
-import org.apache.bigtop.manager.server.model.dto.PlatformDTO;
-import org.apache.bigtop.manager.server.model.vo.AuthPlatformVO;
 import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
 import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
-import org.apache.bigtop.manager.server.model.vo.PlatformAuthCredentialVO;
-import org.apache.bigtop.manager.server.model.vo.PlatformVO;
 import org.apache.bigtop.manager.server.service.ChatbotService;
 
-import org.jetbrains.annotations.NotNull;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -60,7 +54,6 @@ import reactor.core.publisher.Flux;
 
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -112,120 +105,6 @@ public class ChatbotServiceImpl implements ChatbotService {
             Map<String, String> configs) {
         return getAIAssistantFactory()
                 .create(getPlatformType(platformName), getAIAssistantConfig(model, credentials, configs), threadId);
-    }
-
-    private Boolean testAuthorization(String platformName, String model, Map<String, String> credentials) {
-        AIAssistant aiAssistant = getAIAssistantFactory()
-                .create(getPlatformType(platformName), getAIAssistantConfig(model, credentials, null));
-        try {
-            return aiAssistant.test();
-        } catch (Exception e) {
-            throw new ApiException(ApiExceptionEnum.CREDIT_INCORRECT, e.getMessage());
-        }
-    }
-
-    @Override
-    public List<PlatformVO> platforms() {
-        List<PlatformPO> platformPOs = platformDao.findAll();
-        return PlatformConverter.INSTANCE.fromPO2VO(platformPOs);
-    }
-
-    @Override
-    public List<PlatformAuthCredentialVO> platformsAuthCredentials(Long platformId) {
-        PlatformPO platformPO = platformDao.findById(platformId);
-        if (platformPO == null) {
-            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
-        }
-        List<PlatformAuthCredentialVO> platformAuthCredentialVOs = new ArrayList<>();
-        PlatformDTO platformDTO = PlatformConverter.INSTANCE.fromPO2DTO(platformPO);
-        for (String key : platformDTO.getAuthCredentials().keySet()) {
-            PlatformAuthCredentialVO platformAuthCredentialVO = new PlatformAuthCredentialVO(
-                    key, platformDTO.getAuthCredentials().get(key));
-            platformAuthCredentialVOs.add(platformAuthCredentialVO);
-        }
-        return platformAuthCredentialVOs;
-    }
-
-    @Override
-    public List<AuthPlatformVO> authorizedPlatforms() {
-        List<AuthPlatformVO> authorizedPlatforms = new ArrayList<>();
-        List<AuthPlatformPO> authPlatformPOList = authPlatformDao.findAll();
-        for (AuthPlatformPO authPlatformPO : authPlatformPOList) {
-            if (authPlatformPO.getIsDeleted()) {
-                continue;
-            }
-
-            PlatformPO platformPO = platformDao.findById(authPlatformPO.getPlatformId());
-            authorizedPlatforms.add(AuthPlatformConverter.INSTANCE.fromPO2VO(authPlatformPO, platformPO));
-        }
-
-        return authorizedPlatforms;
-    }
-
-    @Override
-    public AuthPlatformVO addAuthorizedPlatform(AuthPlatformDTO authPlatformDTO) {
-        PlatformPO platformPO = platformDao.findById(authPlatformDTO.getPlatformId());
-        if (platformPO == null) {
-            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
-        }
-        Map<String, String> credentialSet =
-                getStringMap(authPlatformDTO, PlatformConverter.INSTANCE.fromPO2DTO(platformPO));
-        List<String> models = List.of(platformPO.getSupportModels().split(","));
-        if (models.isEmpty()) {
-            throw new ApiException(ApiExceptionEnum.MODEL_NOT_SUPPORTED);
-        }
-
-        if (!testAuthorization(platformPO.getName(), models.get(0), credentialSet)) {
-            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
-        }
-
-        authPlatformDTO.setAuthCredentials(credentialSet);
-        AuthPlatformPO authPlatformPO = AuthPlatformConverter.INSTANCE.fromDTO2PO(authPlatformDTO);
-        authPlatformDao.save(authPlatformPO);
-        AuthPlatformVO authPlatformVO = AuthPlatformConverter.INSTANCE.fromPO2VO(authPlatformPO, platformPO);
-        authPlatformVO.setSupportModels(platformPO.getSupportModels());
-        authPlatformVO.setPlatformName(platformPO.getName());
-        return authPlatformVO;
-    }
-
-    private static @NotNull Map<String, String> getStringMap(AuthPlatformDTO authPlatformDTO, PlatformDTO platformDTO) {
-        if (platformDTO == null) {
-            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
-        }
-        Map<String, String> credentialNeed = platformDTO.getAuthCredentials();
-        Map<String, String> credentialGet = authPlatformDTO.getAuthCredentials();
-        Map<String, String> credentialSet = new HashMap<>();
-        for (String key : credentialNeed.keySet()) {
-            if (!credentialGet.containsKey(key)) {
-                throw new ApiException(ApiExceptionEnum.CREDIT_INCORRECT);
-            }
-            credentialSet.put(key, credentialGet.get(key));
-        }
-        return credentialSet;
-    }
-
-    @Override
-    public boolean deleteAuthorizedPlatform(Long authId) {
-        AuthPlatformPO authPlatformPO = authPlatformDao.findById(authId);
-        if (authPlatformPO == null || authPlatformPO.getIsDeleted()) {
-            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED);
-        }
-
-        authPlatformPO.setIsDeleted(true);
-        authPlatformDao.partialUpdateById(authPlatformPO);
-
-        List<ChatThreadPO> chatThreadPOS = chatThreadDao.findAllByAuthId(authPlatformPO.getId());
-        for (ChatThreadPO chatThreadPO : chatThreadPOS) {
-            chatThreadPO.setIsDeleted(true);
-            chatThreadDao.partialUpdateById(chatThreadPO);
-            List<ChatMessagePO> chatMessagePOS = chatMessageDao.findAllByThreadId(chatThreadPO.getId());
-            for (ChatMessagePO chatMessagePO : chatMessagePOS) {
-                chatMessagePO.setIsDeleted(true);
-                chatMessageDao.partialUpdateById(chatMessagePO);
-            }
-        }
-
-        return true;
     }
 
     @Override

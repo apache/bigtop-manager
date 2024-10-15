@@ -18,28 +18,14 @@
  */
 package org.apache.bigtop.manager.server.service;
 
-import org.apache.bigtop.manager.server.model.dto.AuthPlatformDTO;
-import org.apache.bigtop.manager.server.model.vo.AuthPlatformVO;
 import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
 import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
-import org.apache.bigtop.manager.server.model.vo.PlatformAuthCredentialVO;
-import org.apache.bigtop.manager.server.model.vo.PlatformVO;
 
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.List;
 
 public interface ChatbotService {
-
-    List<PlatformVO> platforms();
-
-    List<PlatformAuthCredentialVO> platformsAuthCredentials(Long platformId);
-
-    List<AuthPlatformVO> authorizedPlatforms();
-
-    AuthPlatformVO addAuthorizedPlatform(AuthPlatformDTO authPlatformDTO);
-
-    boolean deleteAuthorizedPlatform(Long authId);
 
     ChatThreadVO createChatThreads(Long authId, String model);
 

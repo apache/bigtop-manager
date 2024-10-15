@@ -16,26 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.req;
+package org.apache.bigtop.manager.server.service;
 
-import lombok.Data;
+import org.apache.bigtop.manager.server.model.dto.AuthPlatformDTO;
+import org.apache.bigtop.manager.server.model.vo.AuthPlatformVO;
+import org.apache.bigtop.manager.server.model.vo.PlatformAuthCredentialVO;
+import org.apache.bigtop.manager.server.model.vo.PlatformVO;
 
-import jakarta.validation.constraints.NotEmpty;
 import java.util.List;
 
-@Data
-public class AuthPlatformReq {
-    private Long id;
+public interface LLMConfigService {
 
-    @NotEmpty
-    private Long platformId;
+    List<PlatformVO> platforms();
 
-    @NotEmpty
-    private List<AuthCredentialReq> authCredentials;
+    List<PlatformAuthCredentialVO> platformsAuthCredentials(Long platformId);
 
-    private String name;
+    List<AuthPlatformVO> authorizedPlatforms();
 
-    private String model;
+    AuthPlatformVO addAuthorizedPlatform(AuthPlatformDTO authPlatformDTO);
 
-    private String notes;
+    boolean deleteAuthorizedPlatform(Long authId);
 }

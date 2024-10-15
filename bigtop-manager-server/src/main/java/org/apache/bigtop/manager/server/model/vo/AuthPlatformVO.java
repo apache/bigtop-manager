@@ -28,12 +28,18 @@ public class AuthPlatformVO {
 
     private String platformName;
 
-    private String supportModels;
+    private String name;
+
+    private String model;
+
+    private String notes;
+
+    private Integer status;
 
     public AuthPlatformVO(long platformId, String name, String models) {
         this.platformId = platformId;
         this.platformName = name;
-        this.supportModels = models;
+        this.model = models;
     }
 
     public AuthPlatformVO() {}

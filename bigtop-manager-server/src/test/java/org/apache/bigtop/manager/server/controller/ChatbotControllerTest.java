@@ -18,14 +18,9 @@
  */
 package org.apache.bigtop.manager.server.controller;
 
-import org.apache.bigtop.manager.server.model.dto.AuthPlatformDTO;
-import org.apache.bigtop.manager.server.model.req.AuthPlatformReq;
 import org.apache.bigtop.manager.server.model.req.ChatbotMessageReq;
-import org.apache.bigtop.manager.server.model.vo.AuthPlatformVO;
 import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
 import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
-import org.apache.bigtop.manager.server.model.vo.PlatformAuthCredentialVO;
-import org.apache.bigtop.manager.server.model.vo.PlatformVO;
 import org.apache.bigtop.manager.server.service.ChatbotService;
 import org.apache.bigtop.manager.server.utils.MessageSourceUtils;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
@@ -73,72 +68,14 @@ class ChatbotControllerTest {
     }
 
     @Test
-    void getAllPlatforms() {
-        List<PlatformVO> platforms = new ArrayList<>();
-        when(chatbotService.platforms()).thenReturn(platforms);
-
-        ResponseEntity<List<PlatformVO>> response = chatbotController.platforms();
-
-        assertTrue(response.isSuccess());
-        assertEquals(platforms, response.getData());
-    }
-
-    @Test
-    void getAuthorizedPlatforms() {
-        List<AuthPlatformVO> authorizedPlatforms = new ArrayList<>();
-        when(chatbotService.authorizedPlatforms()).thenReturn(authorizedPlatforms);
-
-        ResponseEntity<List<AuthPlatformVO>> response = chatbotController.authorizedPlatforms();
-
-        assertTrue(response.isSuccess());
-        assertEquals(authorizedPlatforms, response.getData());
-    }
-
-    @Test
-    void platformsAuthCredential() {
-        Long platformId = 1L;
-        List<PlatformAuthCredentialVO> credentials = new ArrayList<>();
-        when(chatbotService.platformsAuthCredentials(platformId)).thenReturn(credentials);
-
-        ResponseEntity<List<PlatformAuthCredentialVO>> response = chatbotController.platformsAuthCredential(platformId);
-
-        assertTrue(response.isSuccess());
-        assertEquals(credentials, response.getData());
-    }
-
-    @Test
-    void addAuthorizedPlatform() {
-        AuthPlatformReq authPlatformReq = new AuthPlatformReq();
-        AuthPlatformVO authorizedVO = new AuthPlatformVO();
-
-        when(chatbotService.addAuthorizedPlatform(any(AuthPlatformDTO.class))).thenReturn(authorizedVO);
-
-        ResponseEntity<AuthPlatformVO> response = chatbotController.addAuthorizedPlatform(authPlatformReq);
-
-        assertTrue(response.isSuccess());
-        assertEquals(authorizedVO, response.getData());
-    }
-
-    @Test
-    void deleteAuthorizedPlatform() {
-        Long platformId = 1L;
-        when(chatbotService.deleteAuthorizedPlatform(platformId)).thenReturn(true);
-
-        ResponseEntity<Boolean> response = chatbotController.deleteAuthorizedPlatform(platformId);
-
-        assertTrue(response.isSuccess());
-        assertEquals(true, response.getData());
-    }
-
-    @Test
     void createChatThreads() {
         Long platformId = 1L;
-        String model = "model1";
+        String model = "";
         ChatThreadVO chatThread = new ChatThreadVO();
 
         when(chatbotService.createChatThreads(eq(platformId), eq(model))).thenReturn(chatThread);
 
-        ResponseEntity<ChatThreadVO> response = chatbotController.createChatThreads(platformId, model);
+        ResponseEntity<ChatThreadVO> response = chatbotController.createChatThreads(platformId);
 
         assertTrue(response.isSuccess());
         assertEquals(chatThread, response.getData());
@@ -160,12 +97,12 @@ class ChatbotControllerTest {
     @Test
     void getAllChatThreads() {
         Long platformId = 1L;
-        String model = "model1";
+        String model = "";
         List<ChatThreadVO> chatThreads = new ArrayList<>();
 
         when(chatbotService.getAllChatThreads(eq(platformId), eq(model))).thenReturn(chatThreads);
 
-        ResponseEntity<List<ChatThreadVO>> response = chatbotController.getAllChatThreads(platformId, model);
+        ResponseEntity<List<ChatThreadVO>> response = chatbotController.getAllChatThreads(platformId);
 
         assertTrue(response.isSuccess());
         assertEquals(chatThreads, response.getData());

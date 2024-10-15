@@ -20,22 +20,9 @@ package org.apache.bigtop.manager.server.model.req;
 
 import lombok.Data;
 
-import jakarta.validation.constraints.NotEmpty;
-import java.util.List;
-
 @Data
-public class AuthPlatformReq {
+public class ChatbotThreadReq {
     private Long id;
 
-    @NotEmpty
-    private Long platformId;
-
-    @NotEmpty
-    private List<AuthCredentialReq> authCredentials;
-
     private String name;
-
-    private String model;
-
-    private String notes;
 }
