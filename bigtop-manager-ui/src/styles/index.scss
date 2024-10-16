@@ -21,6 +21,15 @@
 @import './marked.scss';
 @import './scrollbar.scss';
 
+#app {
+  width: 100%;
+  box-sizing: border-box;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+}
+
 .header-menu-item {
   height: $layout-header-height;
   width: $layout-header-height;
@@ -28,7 +37,8 @@
   box-sizing: border-box;
   cursor: pointer;
   @include flexbox($justify: center, $align: center);
-  &:hover{
+
+  &:hover {
     background-color: var(--color-primary);
   }
 

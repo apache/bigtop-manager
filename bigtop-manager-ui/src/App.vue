@@ -22,44 +22,32 @@
   import { onMounted } from 'vue'
   import { useLocaleStore } from '@/store/locale'
   import { useTheme } from './store/theme'
-  const localeStore = useLocaleStore()
   const themeStore = useTheme()
+  const localeStore = useLocaleStore()
   const { antd } = storeToRefs(localeStore)
-  const { themeMap, themeType } = storeToRefs(themeStore)
+  const { themeConfig } = storeToRefs(themeStore)
 
   onMounted(() => {
-    themeStore.injectCssVariablesIntoHead(themeStore.generateCssVariables())
+    themeStore.initTheme()
   })
 </script>
 
 <template>
-  <a-config-provider :locale="antd" :theme="themeMap[themeType]">
+  <a-config-provider :locale="antd" :theme="themeConfig">
     <a-app class="app">
       <router-view />
       <div style="position: fixed; top: 200px; z-index: 10; left: 300px">
-        <a-button @click="() => themeStore.triggerTheme('default')"
+        <a-button @click="themeStore.toggleTheme('default')"
           >Default</a-button
         >
-        <a-button @click="() => themeStore.triggerTheme('dark')">Dark</a-button>
-        <div class="test"> test </div>
-      </div>
+        <a-button @click="themeStore.toggleTheme('dark')">Dark</a-button>
+      <div class="test">test</div>
+    </div>
     </a-app>
   </a-config-provider>
 </template>
 
 <style scoped lang="scss">
-  .test {
-    background-color: var(--color-primary);
-  }
-  #app {
-    width: 100%;
-    box-sizing: border-box;
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-  }
-
   .app {
     height: 100%;
     > section {
