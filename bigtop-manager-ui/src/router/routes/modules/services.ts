@@ -28,13 +28,13 @@ const routes: RouteRecordRaw[] = [
     component:pageView,
     meta: {
       title: 'Services',
-      belong:'Cluster'
+      belong: 'ClusterMange'
     },
     children: [
       {
         name: 'services',
         path: '/services/:serviceName',
-        component: () => import('@/pages/service/index.vue'),
+        component: () => import('@/pages/clusterMange/service/index.vue'),
         meta: {
           title: 'Services',
         }

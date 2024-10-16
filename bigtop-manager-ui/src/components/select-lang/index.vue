@@ -32,7 +32,7 @@
 
 <template>
   <a-dropdown placement="bottom">
-    <div class="header-menu-item">
+    <div class="header-item">
       <svg-icon name="language" />
     </div>
     <template #overlay>
@@ -55,7 +55,7 @@
 </template>
 
 <style lang="scss" scoped>
-  .header-menu-item {
+  .header-item {
     :deep(.svg-icon) {
       width: 20px;
       height: 20px;

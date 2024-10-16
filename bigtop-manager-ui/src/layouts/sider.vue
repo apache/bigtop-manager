@@ -37,7 +37,6 @@
 
   const siderMenu = computed(() =>
    {
-    console.log('menuItems :>> ', menuItems.value);
     return  menuItems.value
       .filter((menuItem) => !menuItem.hidden)
       .sort((pre, next) => (pre.priority ?? 0) - (next.priority ?? 0))

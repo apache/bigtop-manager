@@ -17,33 +17,29 @@
  * under the License.
  */
 
-@import './variables.scss';
-@import './marked.scss';
-@import './scrollbar.scss';
+import { RouteRecordRaw } from 'vue-router'
+import pageView from "@/layouts/index.vue";
 
-#app {
-  width: 100%;
-  box-sizing: border-box;
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-}
-
-.header-item {
-  height: $layout-header-height;
-  border-radius: 0;
-  box-sizing: border-box;
-  padding: 0 16px;
-  cursor: pointer;
-  @include flexbox($justify: center, $align: center);
-
-  &:hover {
-    background-color: var(--color-primary);
+const routes: RouteRecordRaw[] = [
+  {
+    path: '/cluster/',
+    redirect: "/cluster/hosts",
+    component:pageView,
+    meta: {
+      alwaysShow: true,
+      title: 'ModelConfiguration',
+      belong: 'SystemMange'
+    },
+    children: [
+      {
+        path: 'hosts',
+        component: () => import('@/pages/systemMange/model-configuration/index.vue'),
+        meta: {
+          title: 'model-configuration',
+        }
+      }
+    ]
   }
+]
 
-  :deep(.svg-icon) {
-    width: 20px;
-    height: 20px;
-  }
-}
+export { routes }

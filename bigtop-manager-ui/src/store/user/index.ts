@@ -33,11 +33,18 @@ export const useUserStore = defineStore(
   'user',
   () => {
     const userVO = shallowRef<UserVO>()
-
     const clusterStore = useClusterStore()
     const serviceStore = useServiceStore()
     const { selectedCluster } = storeToRefs(clusterStore)
     const { installedServices } = storeToRefs(serviceStore)
+
+    const menuItems = computed(() => {
+      if (selectedCluster.value) {
+        return initMenu(layoutRoutes)
+      } else {
+        return initMenu([])
+      }
+    })
 
     const initMenu = (routes: RouteRecordRaw[]) => {
       const items: MenuItem[] = []
@@ -86,14 +93,6 @@ export const useUserStore = defineStore(
 
       return items
     }
-
-    const menuItems = computed(() => {
-      if (selectedCluster.value) {
-        return initMenu(layoutRoutes)
-      } else {
-        return initMenu([])
-      }
-    })
 
     const getUserInfo = async () => {
       userVO.value = await getCurrentUser()

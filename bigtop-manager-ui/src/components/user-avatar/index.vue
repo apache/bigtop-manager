@@ -50,7 +50,7 @@
 
 <template>
   <a-dropdown placement="bottom">
-    <div class="header-menu-item">
+    <div class="header-item">
       <svg-icon name="avatar" />
       <span class="name">{{ userVO?.nickname }}</span>
     </div>
@@ -86,6 +86,6 @@
 
 <style lang="scss" scoped>
   .name {
-    // margin-left: 4px;
+    color: $color-white;
   }
 </style>

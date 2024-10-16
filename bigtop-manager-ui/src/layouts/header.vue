@@ -20,26 +20,54 @@
 <script setup lang="ts">
   import SelectLang from '@/components/select-lang/index.vue'
   import UserAvatar from '@/components/user-avatar/index.vue'
-  import { ref } from 'vue'
+  import { computed, ref } from 'vue'
+  import {dynamicRoutes} from '@/router/routes/index';
+  import { RouteRecordRaw } from 'vue-router';
+
   const spaceSize = ref(20)
+  const selectedKeys = ref()
+
+  const headerMenus = computed(():Map<string,RouteRecordRaw[]> => {
+    let map = new Map()
+      dynamicRoutes.forEach((route) => {
+      let navName = route.meta?.belong
+      if(navName){
+        const existingNav = map.get(navName) || [];
+        map.set(navName, [...existingNav,route]);
+      }
+     })
+     console.log('map :>> ', map);
+     return map
+  })
+
+
 </script>
 
 <template>
   <a-layout-header class="header">
-    <div class="header-left common-layout">
+    <h1 class="header-left common-layout">
       <svg-icon name="big-manager-logo" />
+    </h1>
+    <div class="header-menu">
+      <a-menu
+        v-model:selectedKeys="selectedKeys"
+        theme="dark"
+        mode="horizontal"
+      >
+        <a-menu-item v-for="([key, value]) of headerMenus.entries()"  :key="key">{{key}}</a-menu-item>
+      </a-menu>
     </div>
     <div class="header-right common-layout">
       <a-space :size="spaceSize">
         <user-avatar />
-        <div class="header-menu-item">
+        <div class="header-item">
           <svg-icon name="communication" />
         </div>
         <select-lang />
-        <div class="header-menu-item">
+        <div class="header-item">
           <svg-icon name="github" />
         </div>
-        <div class="header-menu-item">
+        <div class="header-item">
           <svg-icon name="book" />
         </div>
       </a-space>
@@ -56,12 +84,18 @@
     @include flexbox($justify: space-between, $align: center);
     padding: 0 24px 0 10px;
     height: $layout-header-height;
-
+    .header-menu{
+      flex: 1;
+    }
     .header-left {
       :deep(.svg-icon) {
         width: 180px;
         height: 30px;
       }
+    }
+
+    nav{
+      color: $color-white;
     }
   }
 </style>

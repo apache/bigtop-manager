@@ -22,18 +22,18 @@ import pageView from "@/layouts/index.vue";
 
 const routes: RouteRecordRaw[] = [
   {
-    path: '/cluster/',
-    redirect: "/cluster/hosts",
+    path: '/clusterMange/',
+    redirect: "/clusterMange/hosts",
     component:pageView,
     meta: {
       alwaysShow: true,
       title: 'Hosts',
-      belong:'Cluster'
+      belong: 'ClusterMange'
     },
     children: [
       {
         path: 'hosts',
-        component: () => import('@/pages/hosts/index.vue'),
+        component: () => import('@/pages/clusterMange/hosts/index.vue'),
         meta: {
           title: 'Hosts',
         }

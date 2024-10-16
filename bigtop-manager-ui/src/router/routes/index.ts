@@ -29,12 +29,15 @@ export const dynamicRoutes: RouteRecordRaw[] =
 
 const routes: RouteRecordRaw[] = [
   { path: '/login', component: () => import('@/pages/login/index.vue') },
+  {
+    path: '/',
+    redirect: '/clusterMange',
+  },
   ...dynamicRoutes,
   {
     path: '/:pathMatch(.*)',
     component: () => import('@/pages/error/404.vue')
   }
 ]
-console.log('routes :>> ', routes);
 
 export default routes
