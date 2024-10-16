@@ -66,18 +66,13 @@ public interface AuthPlatformConverter {
         } else {
             authPlatformDTO.setIsActive(null);
         }
+
+        if (authPlatformReq.isTest()) {
+            authPlatformDTO.setIsTested(true);
+        } else {
+            authPlatformDTO.setIsTested(false);
+        }
     }
-    //
-    //    @AfterMapping
-    //    default void setStatus(AuthPlatformDTO authPlatformDTO,@MappingTarget AuthPlatformPO authPlatformPO) {
-    //        if (authPlatformDTO.isActive()) {
-    //            authPlatformPO.setStatus(AuthPlatformStatus.ACTIVE.getCode());
-    //        } else if (!authPlatformDTO.isTest()) {
-    //            authPlatformPO.setStatus(AuthPlatformStatus.INACTIVE.getCode());
-    //        } else {
-    //            authPlatformPO.setStatus(AuthPlatformStatus.NORMAL.getCode());
-    //        }
-    //    }
 
     @Mapping(source = "authCredentials", target = "credentials", qualifiedByName = "map2String")
     AuthPlatformPO fromDTO2PO(AuthPlatformDTO authPlatformDTO);

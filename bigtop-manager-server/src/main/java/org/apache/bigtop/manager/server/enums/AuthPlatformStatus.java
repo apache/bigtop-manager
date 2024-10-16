@@ -58,8 +58,4 @@ public enum AuthPlatformStatus {
     public static boolean isDeleted(int code) {
         return DELETED.code.equals(code);
     }
-
-    public static boolean needSwitch(int oldStatus, int newStatus) {
-        return isNormal(oldStatus) && isActive(newStatus);
-    }
 }

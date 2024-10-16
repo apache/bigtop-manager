@@ -96,8 +96,12 @@ public class LLMConfigServiceImpl implements LLMConfigService {
     }
 
     private Boolean testAuthorization(String platformName, String model, Map<String, String> credentials) {
-        AIAssistant aiAssistant = getAIAssistantFactory()
-                .create(getPlatformType(platformName), getAIAssistantConfig(model, credentials, null));
+        AIAssistantConfig aiAssistantConfig = AIAssistantConfig.builder()
+                .setModel(model)
+                .setLanguage(LocaleContextHolder.getLocale().toString())
+                .addCredentials(credentials)
+                .build();
+        AIAssistant aiAssistant = getAIAssistantFactory().create(getPlatformType(platformName), aiAssistantConfig);
         try {
             return aiAssistant.test();
         } catch (Exception e) {
@@ -160,7 +164,7 @@ public class LLMConfigServiceImpl implements LLMConfigService {
         } else {
             authPlatformPO.setStatus(AuthPlatformStatus.UNAVAILABLE.getCode());
         }
-        log.info("authPlatformPO: {}", authPlatformPO);
+
         authPlatformDao.save(authPlatformPO);
         return AuthPlatformConverter.INSTANCE.fromPO2VO(authPlatformPO, platformPO);
     }
@@ -207,11 +211,15 @@ public class LLMConfigServiceImpl implements LLMConfigService {
 
     @Override
     public boolean testAuthorizedPlatform(AuthPlatformDTO authPlatformDTO) {
+        if (authPlatformDTO.getId() != null) {
+            authPlatformDTO =
+                    AuthPlatformConverter.INSTANCE.fromPO2DTO(authPlatformDao.findById(authPlatformDTO.getId()));
+        }
+
         PlatformPO platformPO = platformDao.findById(authPlatformDTO.getPlatformId());
         if (platformPO == null) {
             throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
         }
-
         List<String> supportModels = List.of(platformPO.getSupportModels().split(","));
         if (supportModels.isEmpty() || !supportModels.contains(authPlatformDTO.getModel())) {
             throw new ApiException(ApiExceptionEnum.MODEL_NOT_SUPPORTED);
@@ -255,13 +263,6 @@ public class LLMConfigServiceImpl implements LLMConfigService {
             authPlatformPO.setStatus(AuthPlatformStatus.UNAVAILABLE.getCode());
         }
         authPlatformPO.setModel(authPlatformDTO.getModel());
-
-        //        AuthPlatformPO newAuthPlatformPO = AuthPlatformConverter.INSTANCE.fromDTO2PO(authPlatformDTO);
-        //        if (AuthPlatformStatus.needSwitch(authPlatformPO.getStatus(), newAuthPlatformPO.getStatus())) {
-        //            switchPlatform(newAuthPlatformPO.getId());
-        //            newAuthPlatformPO.setStatus(AuthPlatformStatus.ACTIVE.getCode());
-        //        }
-
         authPlatformDao.partialUpdateById(authPlatformPO);
 
         return AuthPlatformConverter.INSTANCE.fromPO2VO(
