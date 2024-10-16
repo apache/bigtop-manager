@@ -61,7 +61,7 @@
       height: 20px;
     }
     &:hover {
-      background-color: var(--color-primary);
+      background-color: $color-primary;
     }
   }
 </style>

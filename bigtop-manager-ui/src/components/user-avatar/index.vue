@@ -86,6 +86,6 @@
 
 <style lang="scss" scoped>
   .name {
-    margin-left: 4px;
+    // margin-left: 4px;
   }
 </style>

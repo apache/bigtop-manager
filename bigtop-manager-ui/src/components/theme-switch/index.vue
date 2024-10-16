@@ -7,7 +7,7 @@
   ~ "License"); you may not use this file except in compliance
   ~ with the License.  You may obtain a copy of the License at
   ~
-  ~    https://www.apache.org/licenses/LICENSE-2.0
+  ~   http://www.apache.org/licenses/LICENSE-2.0
   ~
   ~ Unless required by applicable law or agreed to in writing,
   ~ software distributed under the License is distributed on an
@@ -18,33 +18,20 @@
 -->
 
 <script setup lang="ts">
-  import { storeToRefs } from 'pinia'
-  import { onMounted } from 'vue'
-  import { useLocaleStore } from '@/store/locale'
-  import { useTheme } from './store/theme'
+  import { useTheme } from '@/store/theme';
   const themeStore = useTheme()
-  const localeStore = useLocaleStore()
-  const { antd } = storeToRefs(localeStore)
-  const { themeConfig } = storeToRefs(themeStore)
 
-  onMounted(() => {
-    themeStore.initTheme()
-  })
 </script>
 
 <template>
-  <a-config-provider :locale="antd" :theme="themeConfig">
-    <a-app class="app">
-      <router-view />
-    </a-app>
-  </a-config-provider>
+   <div>
+      <a-button @click="themeStore.toggleTheme('default')"
+        >Default</a-button
+      >
+      <a-button @click="themeStore.toggleTheme('dark')">Dark</a-button>
+    </div>
 </template>
 
-<style scoped lang="scss">
-  .app {
-    height: 100%;
-    > section {
-      height: 100%;
-    }
-  }
+<style lang="scss" scoped>
+
 </style>
