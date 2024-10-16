@@ -25,7 +25,7 @@ public enum AuthPlatformStatus {
     DELETED(-1),
     NORMAL(0),
     ACTIVE(1),
-    INACTIVE(2),
+    UNAVAILABLE(2),
     ;
 
     private final Integer code;

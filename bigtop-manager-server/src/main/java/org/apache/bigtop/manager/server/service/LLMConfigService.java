@@ -40,4 +40,6 @@ public interface LLMConfigService {
     boolean testAuthorizedPlatform(AuthPlatformDTO authPlatformDTO);
 
     AuthPlatformVO updateAuthorizedPlatform(AuthPlatformDTO authPlatformDTO);
+
+    AuthPlatformVO switchAuthPlatform(AuthPlatformDTO authPlatformDTO);
 }

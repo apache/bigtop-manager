@@ -88,6 +88,10 @@ public class LLMConfigController {
             @PathVariable Long authId, @RequestBody AuthPlatformReq authPlatformReq) {
         AuthPlatformDTO authPlatformDTO = AuthPlatformConverter.INSTANCE.fromReq2DTO(authPlatformReq);
         authPlatformDTO.setId(authId);
+
+        if (authPlatformDTO.getIsActive() != null) {
+            return ResponseEntity.success(llmConfigService.switchAuthPlatform(authPlatformDTO));
+        }
         return ResponseEntity.success(llmConfigService.updateAuthorizedPlatform(authPlatformDTO));
     }
 

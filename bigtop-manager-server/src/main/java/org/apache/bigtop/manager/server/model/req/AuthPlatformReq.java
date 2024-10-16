@@ -40,4 +40,8 @@ public class AuthPlatformReq {
     private String notes;
 
     private boolean isTest;
+
+    private boolean active;
+
+    private boolean inactive;
 }

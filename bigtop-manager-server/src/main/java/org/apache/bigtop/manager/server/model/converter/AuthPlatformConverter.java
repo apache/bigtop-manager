@@ -43,7 +43,6 @@ import java.util.stream.Collectors;
 public interface AuthPlatformConverter {
     AuthPlatformConverter INSTANCE = Mappers.getMapper(AuthPlatformConverter.class);
 
-    @Mapping(target = "model", expression = "java(platformPO.getSupportModels())")
     @Mapping(target = "platformName", expression = "java(platformPO.getName())")
     AuthPlatformVO fromPO2VO(AuthPlatformPO authPlatformPO, @Context PlatformPO platformPO);
 
@@ -60,7 +59,25 @@ public interface AuthPlatformConverter {
     @AfterMapping
     default void afterMapping(@MappingTarget AuthPlatformDTO authPlatformDTO, AuthPlatformReq authPlatformReq) {
         authPlatformDTO.setAuthCredentials(mapAuthCredentials(authPlatformReq.getAuthCredentials()));
+        if (authPlatformReq.isActive()) {
+            authPlatformDTO.setIsActive(true);
+        } else if (authPlatformReq.isInactive()) {
+            authPlatformDTO.setIsActive(false);
+        } else {
+            authPlatformDTO.setIsActive(null);
+        }
     }
+    //
+    //    @AfterMapping
+    //    default void setStatus(AuthPlatformDTO authPlatformDTO,@MappingTarget AuthPlatformPO authPlatformPO) {
+    //        if (authPlatformDTO.isActive()) {
+    //            authPlatformPO.setStatus(AuthPlatformStatus.ACTIVE.getCode());
+    //        } else if (!authPlatformDTO.isTest()) {
+    //            authPlatformPO.setStatus(AuthPlatformStatus.INACTIVE.getCode());
+    //        } else {
+    //            authPlatformPO.setStatus(AuthPlatformStatus.NORMAL.getCode());
+    //        }
+    //    }
 
     @Mapping(source = "authCredentials", target = "credentials", qualifiedByName = "map2String")
     AuthPlatformPO fromDTO2PO(AuthPlatformDTO authPlatformDTO);

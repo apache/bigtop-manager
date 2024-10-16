@@ -36,5 +36,7 @@ public class AuthPlatformDTO {
 
     private String notes;
 
-    private boolean isTest;
+    private Boolean isTested;
+
+    private Boolean isActive;
 }
