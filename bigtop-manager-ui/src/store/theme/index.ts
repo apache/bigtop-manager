@@ -37,12 +37,12 @@ export const useTheme = defineStore(
   'theme',
   () => {
     const { useToken } = antdTheme
-    const { token: antdToken } = useToken()
+    const { token } = useToken()
     const themeMode = ref<ThemeMode>('default')
     const themeConfig = computed(() => themeMap[themeMode.value])
     
-     // Watch for changes in the antdToken and apply the new CSS variables (antdToken changed is async)
-    watch(antdToken, (newToken) => {
+     // change of theme token is async
+    watch(token, (newToken) => {
       injectCssVariablesIntoHead(generateCssVariables(newToken))
     })
 
@@ -58,7 +58,7 @@ export const useTheme = defineStore(
       return `:root {\n${variables.join('\n')}\n}`
     }
 
-    // Inject style variables in token into style tag
+    // inject style variables in token into style tag
     const injectCssVariablesIntoHead = (cssVariables: string) => {
       let styleElement = document.getElementById('theme-variables')
       if (styleElement) {
@@ -71,7 +71,7 @@ export const useTheme = defineStore(
     }
 
     const initTheme = () => {
-      injectCssVariablesIntoHead(generateCssVariables(antdToken.value))
+      injectCssVariablesIntoHead(generateCssVariables(token.value))
      }
 
     return {
