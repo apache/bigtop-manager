@@ -22,7 +22,6 @@ import { getCurrentUser, updateUser } from '@/api/user'
 import { computed, h, shallowRef } from 'vue'
 import { UserReq, UserVO } from '@/api/user/types.ts'
 import { MenuItem } from '@/store/user/types.ts'
-import { routes as initialRoutes } from '@/router/routes/modules/dashboard.ts'
 import { dynamicRoutes as layoutRoutes } from '@/router/routes/index'
 import { useClusterStore } from '@/store/cluster'
 import { RouteRecordRaw } from 'vue-router'
@@ -50,10 +49,9 @@ export const useUserStore = defineStore(
         const menuItem: MenuItem = {
           key: route.meta?.title?.toLowerCase(),
           to: route.path,
-          title: route.meta?.title,
-          icon: route.meta?.icon,
+          ...route.meta,
           hidden: Boolean(route.meta?.hidden),
-          priority: routePriorityMap[`${route.meta?.title}`] || 0
+          priority: routePriorityMap[`${route.meta?.title}`] || -1
         }
 
         if (route.meta?.title === 'Services') {
@@ -70,7 +68,7 @@ export const useUserStore = defineStore(
               })
             })
           })
-        } else if (route.children !== undefined) {
+        } else if (route.children !== undefined && route?.meta && !route?.meta.alwaysShow) {
           menuItem.children = []
           route.children.forEach((child) => {
             menuItem.children?.push({
@@ -93,7 +91,7 @@ export const useUserStore = defineStore(
       if (selectedCluster.value) {
         return initMenu(layoutRoutes)
       } else {
-        return initMenu(initialRoutes)
+        return initMenu([])
       }
     })
 

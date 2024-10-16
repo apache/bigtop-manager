@@ -17,16 +17,11 @@
  * under the License.
  */
 
-import { VNode } from 'vue'
-
+import { RouteMeta } from 'vue-router'
 type MenuItem = {
   key?: string
   to: string
-  title?: string
-  icon?: VNode
   children?: MenuItem[]
-  hidden?: boolean
-  priority?: number
-}
+} & RouteMeta
 
 export type { MenuItem }

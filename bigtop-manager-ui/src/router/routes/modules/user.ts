@@ -18,19 +18,14 @@
  */
 
 import { RouteRecordRaw } from 'vue-router'
-import {
-  SettingOutlined,
-  UserOutlined,
-  ProfileOutlined
-} from '@ant-design/icons-vue'
-import { h } from 'vue'
+import pageView from "@/layouts/index.vue";
 
 const routes: RouteRecordRaw[] = [
   {
     path: '/user/',
+    redirect: "/user/profile",
+    component:pageView,
     meta: {
-      title: 'user',
-      icon: h(UserOutlined),
       hidden: true
     },
     children: [
@@ -39,7 +34,6 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/pages/user/profile/index.vue'),
         meta: {
           title: 'Profile',
-          icon: h(ProfileOutlined)
         }
       },
       {
@@ -47,7 +41,6 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/pages/user/settings/index.vue'),
         meta: {
           title: 'Settings',
-          icon: h(SettingOutlined)
         }
       }
     ]

@@ -18,19 +18,15 @@
  */
 
 import { RouteRecordRaw } from 'vue-router'
-import {
-  SettingOutlined,
-  BarsOutlined,
-  UserOutlined
-} from '@ant-design/icons-vue'
-import { h } from 'vue'
+import pageView from "@/layouts/index.vue";
 
 const routes: RouteRecordRaw[] = [
   {
-    path: '/cluster/',
+    path: '/',
+    redirect: "/stack",
+    component:pageView,
     meta: {
       title: 'Cluster',
-      icon: h(SettingOutlined)
     },
     children: [
       {
@@ -38,7 +34,6 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/pages/cluster/stack/index.vue'),
         meta: {
           title: 'Stack',
-          icon: h(BarsOutlined)
         }
       },
       {
@@ -46,7 +41,6 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/pages/cluster/account/index.vue'),
         meta: {
           title: 'Account',
-          icon: h(UserOutlined)
         }
       }
     ]

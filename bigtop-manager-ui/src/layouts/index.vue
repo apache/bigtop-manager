@@ -54,7 +54,9 @@
     <a-layout>
       <layout-sider />
       <a-layout class="layout-inner">
-        <layout-content />
+        <layout-content>
+          <router-view />
+        </layout-content>
         <layout-footer />
       </a-layout>
     </a-layout>

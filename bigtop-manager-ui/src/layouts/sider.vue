@@ -36,10 +36,14 @@
   const openKeys = ref<string[]>([])
 
   const siderMenu = computed(() =>
-    menuItems.value
+   {
+    console.log('menuItems :>> ', menuItems.value);
+    return  menuItems.value
       .filter((menuItem) => !menuItem.hidden)
       .sort((pre, next) => (pre.priority ?? 0) - (next.priority ?? 0))
+   }
   )
+
 
   const updateSideBar = () => {
     const splitPath = router.currentRoute.value.path.split('/')

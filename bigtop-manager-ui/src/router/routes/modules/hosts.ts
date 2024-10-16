@@ -18,17 +18,27 @@
  */
 
 import { RouteRecordRaw } from 'vue-router'
-import { DesktopOutlined } from '@ant-design/icons-vue'
-import { h } from 'vue'
+import pageView from "@/layouts/index.vue";
 
 const routes: RouteRecordRaw[] = [
   {
-    path: '/hosts',
-    component: () => import('@/pages/hosts/index.vue'),
+    path: '/cluster/',
+    redirect: "/cluster/hosts",
+    component:pageView,
     meta: {
+      alwaysShow: true,
       title: 'Hosts',
-      icon: h(DesktopOutlined)
-    }
+      belong:'Cluster'
+    },
+    children: [
+      {
+        path: 'hosts',
+        component: () => import('@/pages/hosts/index.vue'),
+        meta: {
+          title: 'Hosts',
+        }
+      }
+    ]
   }
 ]
 

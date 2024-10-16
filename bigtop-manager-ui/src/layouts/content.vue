@@ -18,25 +18,13 @@
 -->
 
 <script setup lang="ts">
-  import { HomeOutlined } from '@ant-design/icons-vue'
   import Chatbot from '@/components/chatbot/chatbot.vue'
 </script>
 
 <template>
   <a-layout-content class="container">
-    <a-breadcrumb class="breadcrumb">
-      <a-breadcrumb-item>
-        <home-outlined />
-      </a-breadcrumb-item>
-      <a-breadcrumb-item
-        v-for="(item, index) in $route.path.substring(1).split('/')"
-        :key="index"
-      >
-        {{ item }}
-      </a-breadcrumb-item>
-    </a-breadcrumb>
     <div class="content">
-      <router-view />
+      <slot></slot>
     </div>
     <chatbot />
   </a-layout-content>
