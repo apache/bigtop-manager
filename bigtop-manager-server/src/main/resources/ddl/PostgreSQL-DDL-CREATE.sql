@@ -348,7 +348,7 @@ CREATE TABLE llm_auth_platform
     update_by   BIGINT       DEFAULT NULL,
     PRIMARY KEY (id)
 );
-COMMENT ON COLUMN "llm_auth_platform".status IS '-1-Deleted, 0-Normal, 1-Active, 2-Inactive';
+COMMENT ON COLUMN "llm_auth_platform".status IS '-1-Deleted, 0-Normal, 1-Active, 2-Unavailable';
 CREATE INDEX idx_authorized_platform_id ON llm_auth_platform (platform_id);
 
 CREATE TABLE llm_chat_thread

@@ -67,7 +67,7 @@ public interface AuthPlatformConverter {
             authPlatformDTO.setIsActive(null);
         }
 
-        if (authPlatformReq.isTest()) {
+        if (authPlatformReq.isTested()) {
             authPlatformDTO.setIsTested(true);
         } else {
             authPlatformDTO.setIsTested(false);
