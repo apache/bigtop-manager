@@ -18,7 +18,7 @@
  */
 
 import { defineStore } from 'pinia'
-import { computed, ref } from 'vue'
+import { computed, ref, toRaw } from 'vue'
 import { dynamicRoutes } from '@/router/routes/index'
 import { RouteRecordRaw } from 'vue-router'
 
@@ -39,14 +39,17 @@ export const useMenuStore = defineStore(
       return map
     })
 
-    const setCurrSiderRoutes = (routes: RouteRecordRaw[]) => {
-      currSiderRoutes.value = routes
+    const updateSiderRoutes = (selectedKeys: string[]) => {
+      const res = [...toRaw(headerMenus.value).keys()].find((v) =>
+        v.includes(selectedKeys[0])
+      )
+      currSiderRoutes.value = headerMenus.value.get(res)
     }
 
     return {
       headerMenus,
       currSiderRoutes,
-      setCurrSiderRoutes
+      updateSiderRoutes
     }
   },
   {

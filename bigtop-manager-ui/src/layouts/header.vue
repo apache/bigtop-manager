@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { ref, toRaw } from 'vue'
+  import { ref, toRaw, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import { useMenuStore } from '@/store/menu'
   import SelectLang from '@/components/select-lang/index.vue'
@@ -31,13 +31,15 @@
     router.currentRoute.value.matched[0].path
   ])
 
+  watch(router.currentRoute, (val) => {
+    selectedKeys.value = [val.matched[0].path]
+    router.push({ path: val.fullPath })
+    menuStore.updateSiderRoutes(toRaw(selectedKeys.value))
+  })
+
   const onSelect = () => {
     router.push({ path: selectedKeys.value[0] })
-    const res = [...toRaw(menuStore.headerMenus).keys()].find((v) =>
-      v.includes(selectedKeys.value[0])
-    )
-    const routes = menuStore.headerMenus.get(res)
-    menuStore.setCurrSiderRoutes(routes)
+    menuStore.updateSiderRoutes(toRaw(selectedKeys.value))
   }
 </script>
 
