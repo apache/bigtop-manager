@@ -43,16 +43,23 @@ public class Environments {
      * @return java home string
      */
     public static String getJavaHome() {
-        // Retrieve the JAVA_HOME environment variable
-        String javaHome = System.getenv("JAVA_HOME");
+        // Retrieve the HADOOP_JAVA_HOME environment variable
+        String hadoopJavaHome = System.getenv("HADOOP_JAVA_HOME");
 
-        // Check if JAVA_HOME is set
-        if (javaHome != null) {
-            return javaHome;
+        if (hadoopJavaHome != null) {
+            return hadoopJavaHome;
         } else {
-            // If JAVA_HOME is not set, use the java.home system property
-            log.info("JAVA_HOME is not set, using java.home system property instead.");
-            return System.getProperty("java.home");
+            // Retrieve the JAVA_HOME environment variable
+            String javaHome = System.getenv("JAVA_HOME");
+
+            // Check if JAVA_HOME is set
+            if (javaHome != null) {
+                return javaHome;
+            } else {
+                // If JAVA_HOME is not set, use the java.home system property
+                log.info("JAVA_HOME is not set, using java.home system property instead.");
+                return System.getProperty("java.home");
+            }
         }
     }
 }

@@ -67,3 +67,40 @@ monitoring:
   prometheus-host: "http://localhost:9090"
   agent-host-job-name: "bm-agent-host"
 ```
+
+## Installation
+Apache Bigtop-Manager need Java 17.  
+Apache Hadoop 3.3 and upper supports Java 8 and Java 11 (runtime only).
+
+So we need to setup both of them, add JAVA_HOME and HADOOP_JAVA_HOME environment variables to all machines (where server and agents will be installed)
+```
+export JAVA_HOME=
+export HADOOP_JAVA_HOME=
+```
+
+### Controlling instances
+
+### Server
+#### Start server
+```
+cd bigtop-manager-server/
+sudo -E nohup ./bin/start.sh --debug >/dev/null 2>&1 &
+```
+
+#### Stop server
+```
+sudo kill -9 $(ps -aux | grep ServerApplication | grep -v grep | awk '{print $2}')
+```
+
+### Agent
+#### Start agent
+```
+cd bigtop-manager-agent/
+sudo -E nohup ./bin/start.sh --debug >/dev/null 2>&1 &
+```
+
+#### Stop agent
+```
+sudo kill -9 $(ps -aux | grep AgentApplication | grep -v grep | awk '{print $2}')
+
+
