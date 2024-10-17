@@ -22,16 +22,16 @@ import pageView from '@/layouts/index.vue'
 
 const routes: RouteRecordRaw[] = [
   {
-    path: '/clusterMange/',
+    path: '/cluster-mange/',
     component: pageView,
-    redirect: '/clusterMange/cluster',
+    redirect: '/cluster-mange/cluster',
     meta: {
       title: '集群管理'
     },
     children: [
       {
-        path: '/clusterMange/cluster/',
-        redirect: '/clusterMange/cluster/stack',
+        path: '/cluster-mange/cluster/',
+        redirect: '/cluster-mange/cluster/stack',
         meta: {
           title: '集群管理'
         },
@@ -39,7 +39,7 @@ const routes: RouteRecordRaw[] = [
           {
             path: 'stack',
             component: () =>
-              import('@/pages/clusterMange/cluster/stack/index.vue'),
+              import('@/pages/cluster-mange/cluster/stack/index.vue'),
             meta: {
               title: 'Stack'
             }
@@ -47,7 +47,7 @@ const routes: RouteRecordRaw[] = [
           {
             path: 'account',
             component: () =>
-              import('@/pages/clusterMange/cluster/account/index.vue'),
+              import('@/pages/cluster-mange/cluster/account/index.vue'),
             meta: {
               title: 'Account'
             }

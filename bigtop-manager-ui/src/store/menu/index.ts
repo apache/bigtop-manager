@@ -31,7 +31,7 @@ export const useMenuStore = defineStore(
       const map = new Map()
       dynamicRoutes.forEach((route) => {
         if (!route.meta?.hidden) {
-          const key = `${route.path}-${route.meta?.title}`
+          const key = `${route.path}_${route.meta?.title}`
           const exist = map.get(key) || []
           map.set(key, [...exist, ...(route.children || [])])
         }

@@ -22,15 +22,15 @@ import pageView from '@/layouts/index.vue'
 
 const routes: RouteRecordRaw[] = [
   {
-    path: '/clusterMange/',
+    path: '/cluster-mange/',
     component: pageView,
     meta: {
       title: '集群管理'
     },
     children: [
       {
-        path: '/clusterMange/hosts',
-        component: () => import('@/pages/clusterMange/hosts/index.vue'),
+        path: '/cluster-mange/hosts',
+        component: () => import('@/pages/cluster-mange/hosts/index.vue'),
         meta: {
           title: '主机管理'
         }

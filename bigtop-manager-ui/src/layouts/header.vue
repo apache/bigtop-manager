@@ -55,9 +55,9 @@
       >
         <a-menu-item
           v-for="key of menuStore.headerMenus?.keys()"
-          :key="key.split('-')[0]"
+          :key="key.split('_')[0]"
         >
-          {{ key.split('-')[1] }}
+          {{ key.split('_')[1] }}
         </a-menu-item>
       </a-menu>
     </div>

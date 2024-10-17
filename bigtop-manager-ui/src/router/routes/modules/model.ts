@@ -22,16 +22,16 @@ import pageView from '@/layouts/index.vue'
 
 const routes: RouteRecordRaw[] = [
   {
-    path: '/systemMange/',
+    path: '/system-mange/',
     component: pageView,
-    redirect: '/systemMange/model',
+    redirect: '/system-mange/model',
     meta: {
       title: '系统管理'
     },
     children: [
       {
-        path: '/systemMange/model',
-        component: () => import('@/pages/systemMange/model/index.vue'),
+        path: '/system-mange/model',
+        component: () => import('@/pages/system-mange/model/index.vue'),
         meta: {
           title: '大模型配置'
         }

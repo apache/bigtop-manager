@@ -56,9 +56,9 @@ export const useUserStore = defineStore(
           return
         }
         const menuItem: MenuItem = {
+          ...route.meta,
           key: route.path,
           to: route.path,
-          ...route.meta,
           hidden: Boolean(route.meta?.hidden),
           priority: routePriorityMap[`${route.meta?.title}`] || -1
         }
@@ -90,7 +90,6 @@ export const useUserStore = defineStore(
         } else {
           menuItem.key = route.path.split('/').at(-1)
         }
-
         items.push(menuItem)
       })
       return items

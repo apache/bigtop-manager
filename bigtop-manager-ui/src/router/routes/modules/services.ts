@@ -22,7 +22,7 @@ import pageView from '@/layouts/index.vue'
 
 const routes: RouteRecordRaw[] = [
   {
-    path: '/clusterMange/',
+    path: '/cluster-mange/',
     component: pageView,
     meta: {
       title: '集群管理'
@@ -30,8 +30,8 @@ const routes: RouteRecordRaw[] = [
     children: [
       {
         name: 'Services',
-        path: '/clusterMange/services/:serviceName',
-        component: () => import('@/pages/clusterMange/service/index.vue'),
+        path: '/cluster-mange/services/:serviceName',
+        component: () => import('@/pages/cluster-mange/service/index.vue'),
         meta: {
           title: '基础服务'
         }
