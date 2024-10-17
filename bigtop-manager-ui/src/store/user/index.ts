@@ -75,7 +75,11 @@ export const useUserStore = defineStore(
               })
             })
           })
-        } else if (route.children !== undefined && route?.meta && !route?.meta.alwaysShow) {
+        } else if (
+          route.children !== undefined &&
+          route?.meta &&
+          !route?.meta.alwaysShow
+        ) {
           menuItem.children = []
           route.children.forEach((child) => {
             menuItem.children?.push({

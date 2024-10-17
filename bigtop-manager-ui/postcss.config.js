@@ -17,15 +17,14 @@
  * under the License.
  */
 
-import autoprefixer from 'autoprefixer';
-import cssnano from 'cssnano';
+const autoprefixer = require('autoprefixer')
+const cssnano = require('cssnano')
 
-export default {
+module.exports = {
   plugins: [
     autoprefixer(),
     cssnano({
-      preset: 'default',
-    }),
-  ],
-};
-
+      preset: 'default'
+    })
+  ]
+}
