@@ -55,50 +55,44 @@
 
 <template>
   <div>
-    <a-page-header class="host-page-header" :title="$t('common.stack')">
+    <a-card class="host-page-header" :title="$t('common.stack')">
       <template #extra>
         <a-button type="primary" @click="createWindowOpened = true">
           {{ $t('service.add') }}
         </a-button>
       </template>
-    </a-page-header>
-    <br />
-
-    <a-table
-      :columns="serviceColumns"
-      :loading="loadingServices"
-      :data-source="mergedServices"
-      :pagination="false"
-    >
-      <template #headerCell="{ column }">
-        <span>{{ $t(column.title) }}</span>
-      </template>
-      <template #bodyCell="{ column, text, record }">
-        <template v-if="column.dataIndex === 'state'">
-          <CheckCircleTwoTone
-            v-if="record.installed"
-            two-tone-color="#52c41a"
-          />
-          <CloseCircleTwoTone v-else two-tone-color="red" />
+    </a-card>
+    <a-card>
+      <a-table
+        :columns="serviceColumns"
+        :loading="loadingServices"
+        :data-source="mergedServices"
+        :pagination="false"
+      >
+        <template #headerCell="{ column }">
+          <span>{{ $t(column.title) }}</span>
         </template>
-        <template v-if="column.dataIndex === 'displayName' && record.installed">
-          <router-link :to="'/services/' + record.serviceName.toLowerCase()">
-            {{ text }}
-          </router-link>
+        <template #bodyCell="{ column, text, record }">
+          <template v-if="column.dataIndex === 'state'">
+            <CheckCircleTwoTone
+              v-if="record.installed"
+              two-tone-color="#52c41a"
+            />
+            <CloseCircleTwoTone v-else two-tone-color="red" />
+          </template>
+          <template
+            v-if="column.dataIndex === 'displayName' && record.installed"
+          >
+            <router-link :to="'/services/' + record.serviceName.toLowerCase()">
+              {{ text }}
+            </router-link>
+          </template>
         </template>
-      </template>
-    </a-table>
+      </a-table>
+    </a-card>
   </div>
 
   <cluster-create v-model:open="createWindowOpened" />
 </template>
 
-<style scoped lang="scss">
-  .host-page-header {
-    border: 1px solid rgb(235, 237, 240);
-
-    .host-selected-span {
-      margin-left: 8px;
-    }
-  }
-</style>
+<style scoped lang="scss"></style>

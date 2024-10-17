@@ -18,11 +18,14 @@
  */
 
 @import './ant-desing-vue.scss';
-// base
+// margin
+$space-lg: 24px;
+$space-md: 16px;
+$space-sm: 8px;
+
 $layout-header-height: 64px;
 $layout-sider-width: 200px;
 $layout-sider-bg-color: #fff;
-
 
 @mixin flexbox($direction: null, $wrap: null, $justify: null, $align: null) {
   display: flex;

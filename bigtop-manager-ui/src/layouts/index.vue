@@ -20,7 +20,6 @@
 <script setup lang="ts">
   import { onMounted, onUnmounted } from 'vue'
   import LayoutFooter from '@/layouts/footer.vue'
-  import LayoutContent from '@/layouts/content.vue'
   import LayoutHeader from '@/layouts/header.vue'
   import LayoutSider from '@/layouts/sider.vue'
   import { useUserStore } from '@/store/user'
@@ -54,19 +53,18 @@
     <a-layout>
       <layout-sider />
       <a-layout class="layout-inner">
-        <layout-content>
-          <router-view />
-        </layout-content>
+        <router-view />
         <layout-footer />
       </a-layout>
     </a-layout>
   </a-layout>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
   .layout {
-    min-height: 100vh;
+    height: 100vh;
     &-inner {
+      padding: $space-lg $space-md;
       overflow: auto;
     }
   }
