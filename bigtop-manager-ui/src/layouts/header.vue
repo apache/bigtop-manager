@@ -18,29 +18,27 @@
 -->
 
 <script setup lang="ts">
+  import { ref, toRaw } from 'vue'
+  import { useRouter } from 'vue-router'
+  import { useMenuStore } from '@/store/menu'
   import SelectLang from '@/components/select-lang/index.vue'
   import UserAvatar from '@/components/user-avatar/index.vue'
-  import { computed, ref } from 'vue'
-  import {dynamicRoutes} from '@/router/routes/index';
-  import { RouteRecordRaw } from 'vue-router';
 
-  const spaceSize = ref(20)
-  const selectedKeys = ref()
+  const menuStore = useMenuStore()
+  const router = useRouter()
+  const spaceSize = ref(16)
+  const selectedKeys = ref<string[]>([
+    router.currentRoute.value.matched[0].path
+  ])
 
-  const headerMenus = computed(():Map<string,RouteRecordRaw[]> => {
-    let map = new Map()
-      dynamicRoutes.forEach((route) => {
-      let navName = route.meta?.belong
-      if(navName){
-        const existingNav = map.get(navName) || [];
-        map.set(navName, [...existingNav,route]);
-      }
-     })
-     console.log('map :>> ', map);
-     return map
-  })
-
-
+  const onSelect = () => {
+    router.push({ path: selectedKeys.value[0] })
+    const res = [...toRaw(menuStore.headerMenus).keys()].find((v) =>
+      v.includes(selectedKeys.value[0])
+    )
+    const routes = menuStore.headerMenus.get(res)
+    menuStore.setCurrSiderRoutes(routes)
+  }
 </script>
 
 <template>
@@ -53,8 +51,14 @@
         v-model:selectedKeys="selectedKeys"
         theme="dark"
         mode="horizontal"
+        @select="onSelect"
       >
-        <a-menu-item v-for="([key, value]) of headerMenus.entries()"  :key="key">{{key}}</a-menu-item>
+        <a-menu-item
+          v-for="key of menuStore.headerMenus?.keys()"
+          :key="key.split('-')[0]"
+        >
+          {{ key.split('-')[1] }}
+        </a-menu-item>
       </a-menu>
     </div>
     <div class="header-right common-layout">
@@ -82,19 +86,20 @@
   }
   .header {
     @include flexbox($justify: space-between, $align: center);
-    padding: 0 24px 0 10px;
+    padding-inline: 0 16px;
     height: $layout-header-height;
-    .header-menu{
+    .header-menu {
       flex: 1;
     }
     .header-left {
+      width: $layout-sider-width;
       :deep(.svg-icon) {
         width: 180px;
         height: 30px;
       }
     }
 
-    nav{
+    nav {
       color: $color-white;
     }
   }

@@ -18,31 +18,41 @@
  */
 
 import { RouteRecordRaw } from 'vue-router'
-import pageView from "@/layouts/index.vue";
+import pageView from '@/layouts/index.vue'
 
 const routes: RouteRecordRaw[] = [
   {
     path: '/clusterMange/',
-    redirect: "/clusterMange/stack",
-    component:pageView,
+    component: pageView,
+    redirect: '/clusterMange/cluster',
     meta: {
-      title: 'Cluster',
-      belong: 'ClusterMange'
+      title: '集群管理'
     },
     children: [
       {
-        path: 'stack',
-        component: () => import('@/pages/clusterMange/cluster/stack/index.vue'),
+        path: '/clusterMange/cluster/',
+        redirect: '/clusterMange/cluster/stack',
         meta: {
-          title: 'Stack',
-        }
-      },
-      {
-        path: 'account',
-        component: () => import('@/pages/clusterMange/cluster/account/index.vue'),
-        meta: {
-          title: 'Account',
-        }
+          title: '集群管理'
+        },
+        children: [
+          {
+            path: 'stack',
+            component: () =>
+              import('@/pages/clusterMange/cluster/stack/index.vue'),
+            meta: {
+              title: 'Stack'
+            }
+          },
+          {
+            path: 'account',
+            component: () =>
+              import('@/pages/clusterMange/cluster/account/index.vue'),
+            meta: {
+              title: 'Account'
+            }
+          }
+        ]
       }
     ]
   }

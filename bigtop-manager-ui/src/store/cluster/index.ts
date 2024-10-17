@@ -38,9 +38,9 @@ export const useClusterStore = defineStore(
         clusterId.value = selectedCluster.value?.id
       }
 
-      console.log('clusters.value: ', clusters.value)
-      console.log('selectedCluster.value: ', selectedCluster.value)
-      console.log('clusterId.value: ', clusterId.value)
+      // console.log('clusters.value: ', clusters.value)
+      // console.log('selectedCluster.value: ', selectedCluster.value)
+      // console.log('clusterId.value: ', clusterId.value)
     }
 
     return { loadClusters, clusters, selectedCluster, clusterId }

@@ -22,8 +22,8 @@ import { getCurrentUser, updateUser } from '@/api/user'
 import { computed, h, shallowRef } from 'vue'
 import { UserReq, UserVO } from '@/api/user/types.ts'
 import { MenuItem } from '@/store/user/types.ts'
-import { dynamicRoutes as layoutRoutes } from '@/router/routes/index'
 import { useClusterStore } from '@/store/cluster'
+import { useMenuStore } from '@/store/menu'
 import { RouteRecordRaw } from 'vue-router'
 import { useServiceStore } from '@/store/service'
 import SvgIcon from '@/components/common/svg-icon/index.vue'
@@ -35,12 +35,14 @@ export const useUserStore = defineStore(
     const userVO = shallowRef<UserVO>()
     const clusterStore = useClusterStore()
     const serviceStore = useServiceStore()
+    const menuStore = useMenuStore()
     const { selectedCluster } = storeToRefs(clusterStore)
     const { installedServices } = storeToRefs(serviceStore)
+    const { currSiderRoutes } = storeToRefs(menuStore)
 
     const menuItems = computed(() => {
       if (selectedCluster.value) {
-        return initMenu(layoutRoutes)
+        return initMenu(currSiderRoutes.value)
       } else {
         return initMenu([])
       }
@@ -54,20 +56,20 @@ export const useUserStore = defineStore(
           return
         }
         const menuItem: MenuItem = {
-          key: route.meta?.title?.toLowerCase(),
+          key: route.path,
           to: route.path,
           ...route.meta,
           hidden: Boolean(route.meta?.hidden),
           priority: routePriorityMap[`${route.meta?.title}`] || -1
         }
 
-        if (route.meta?.title === 'Services') {
+        if (route.name === 'Services') {
           menuItem.children = []
           installedServices.value.forEach((service) => {
             const color = service.isHealthy ? '#52c41a' : '#f5222d'
             menuItem.children?.push({
               key: service.serviceName,
-              to: '/services/' + service.serviceName,
+              to: route.path.replace(':serviceName', `${service.serviceName}`),
               title: service.displayName,
               icon: h(SvgIcon, {
                 name: 'circle-filled',
@@ -75,26 +77,22 @@ export const useUserStore = defineStore(
               })
             })
           })
-        } else if (
-          route.children !== undefined &&
-          route?.meta &&
-          !route?.meta.alwaysShow
-        ) {
+        } else if (route.children !== undefined && route?.meta) {
           menuItem.children = []
           route.children.forEach((child) => {
             menuItem.children?.push({
-              key: child.meta?.title?.toLowerCase(),
+              key: child.path,
               to: route.path + child.path,
               title: child.meta?.title,
               icon: child.meta?.icon
             })
           })
         } else {
+          menuItem.key = route.path.split('/').at(-1)
         }
 
         items.push(menuItem)
       })
-
       return items
     }
 

@@ -291,11 +291,11 @@
             <h2>{{ $t('service.quick_links') }}</h2>
             <ul
               v-if="
-                selectedService.quickLinks &&
-                selectedService.quickLinks.length > 0
+                selectedService?.quickLinks &&
+                selectedService?.quickLinks.length > 0
               "
             >
-              <li v-for="link in selectedService.quickLinks" :key="link.url">
+              <li v-for="link in selectedService?.quickLinks" :key="link.url">
                 <a :href="link.url" target="_blank">{{ link.displayName }}</a>
               </li>
             </ul>

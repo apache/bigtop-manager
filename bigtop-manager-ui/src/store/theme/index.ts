@@ -24,7 +24,7 @@ import { GlobalToken } from 'ant-design-vue/es/theme'
 
 const themeMap = {
   default: {
-    algorithm: antdTheme.defaultAlgorithm 
+    algorithm: antdTheme.defaultAlgorithm
   },
   dark: {
     algorithm: antdTheme.darkAlgorithm
@@ -40,8 +40,8 @@ export const useTheme = defineStore(
     const { token } = useToken()
     const themeMode = ref<ThemeMode>('default')
     const themeConfig = computed(() => themeMap[themeMode.value])
-    
-     // change of theme token is async
+
+    // change of theme token is async
     watch(token, (newToken) => {
       injectCssVariablesIntoHead(generateCssVariables(newToken))
     })
@@ -50,7 +50,7 @@ export const useTheme = defineStore(
       themeMode.value = currTheme
     }
 
-    const generateCssVariables = (token:GlobalToken) => {
+    const generateCssVariables = (token: GlobalToken) => {
       const variables = Object.keys(token).map((key) => {
         const cssVarName = `--${key.replace(/([A-Z])/g, '-$1').toLowerCase()}`
         return `${cssVarName}: ${token[key as keyof typeof token]};`
@@ -72,7 +72,7 @@ export const useTheme = defineStore(
 
     const initTheme = () => {
       injectCssVariablesIntoHead(generateCssVariables(token.value))
-     }
+    }
 
     return {
       themeMode,

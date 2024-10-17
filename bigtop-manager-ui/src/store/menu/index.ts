@@ -17,27 +17,39 @@
  * under the License.
  */
 
+import { defineStore } from 'pinia'
+import { computed, ref } from 'vue'
+import { dynamicRoutes } from '@/router/routes/index'
 import { RouteRecordRaw } from 'vue-router'
-import pageView from '@/layouts/index.vue'
 
-const routes: RouteRecordRaw[] = [
-  {
-    path: '/clusterMange/',
-    component: pageView,
-    meta: {
-      title: '集群管理'
-    },
-    children: [
-      {
-        name: 'Services',
-        path: '/clusterMange/services/:serviceName',
-        component: () => import('@/pages/clusterMange/service/index.vue'),
-        meta: {
-          title: '基础服务'
+export const useMenuStore = defineStore(
+  'menu',
+  () => {
+    const currSiderRoutes = ref<RouteRecordRaw[]>([])
+
+    const headerMenus = computed(() => {
+      const map = new Map()
+      dynamicRoutes.forEach((route) => {
+        if (!route.meta?.hidden) {
+          const key = `${route.path}-${route.meta?.title}`
+          const exist = map.get(key) || []
+          map.set(key, [...exist, ...(route.children || [])])
         }
-      }
-    ]
-  }
-]
+      })
+      return map
+    })
 
-export { routes }
+    const setCurrSiderRoutes = (routes: RouteRecordRaw[]) => {
+      currSiderRoutes.value = routes
+    }
+
+    return {
+      headerMenus,
+      currSiderRoutes,
+      setCurrSiderRoutes
+    }
+  },
+  {
+    persist: true
+  }
+)

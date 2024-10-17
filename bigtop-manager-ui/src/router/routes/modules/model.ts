@@ -18,24 +18,22 @@
  */
 
 import { RouteRecordRaw } from 'vue-router'
-import pageView from "@/layouts/index.vue";
+import pageView from '@/layouts/index.vue'
 
 const routes: RouteRecordRaw[] = [
   {
-    path: '/cluster/',
-    redirect: "/cluster/hosts",
-    component:pageView,
+    path: '/systemMange/',
+    component: pageView,
+    redirect: '/systemMange/model',
     meta: {
-      alwaysShow: true,
-      title: 'ModelConfiguration',
-      belong: 'SystemMange'
+      title: '系统管理'
     },
     children: [
       {
-        path: 'hosts',
-        component: () => import('@/pages/systemMange/model-configuration/index.vue'),
+        path: '/systemMange/model',
+        component: () => import('@/pages/systemMange/model/index.vue'),
         meta: {
-          title: 'model-configuration',
+          title: '大模型配置'
         }
       }
     ]
