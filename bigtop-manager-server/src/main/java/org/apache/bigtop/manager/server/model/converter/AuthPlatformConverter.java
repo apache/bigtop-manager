@@ -61,7 +61,7 @@ public interface AuthPlatformConverter {
         authPlatformDTO.setAuthCredentials(mapAuthCredentials(authPlatformReq.getAuthCredentials()));
         if (authPlatformReq.isActive()) {
             authPlatformDTO.setIsActive(true);
-        } else if (authPlatformReq.isInactive()) {
+        } else if (authPlatformReq.isStop()) {
             authPlatformDTO.setIsActive(false);
         } else {
             authPlatformDTO.setIsActive(null);

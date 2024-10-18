@@ -43,5 +43,5 @@ public class AuthPlatformReq {
 
     private boolean active;
 
-    private boolean inactive;
+    private boolean stop;
 }
