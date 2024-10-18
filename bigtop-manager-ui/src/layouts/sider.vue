@@ -18,11 +18,11 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onMounted, ref, watch } from 'vue'
+  import { onMounted, ref, watch } from 'vue'
   import { useUIStore } from '@/store/ui'
   import { useMenuStore } from '@/store/menu/index'
   import { storeToRefs } from 'pinia'
-  import { type RouterLink, useRouter } from 'vue-router'
+  import { useRouter } from 'vue-router'
 
   const uiStore = useUIStore()
   const menuStore = useMenuStore()
@@ -34,25 +34,24 @@
   const selectedKeys = ref<string[]>([])
   const openKeys = ref<string[]>([])
 
-  const siderMenu = computed(() => {
-    const res = siderMenus.value
-      .filter((menuItem) => !menuItem.hidden)
-      .sort((pre, next) => (pre.priority ?? 0) - (next.priority ?? 0))
-    return res
-  })
-
   const updateSideBar = () => {
     const splitPath = router.currentRoute.value.path.split('/')
-    const selectedKey = splitPath[splitPath.length - 1]
-    selectedKeys.value = [selectedKey]
+    const [len, isClusters] = [splitPath.length, splitPath.includes('clusters')]
+    selectedKeys.value = [splitPath[isClusters ? len - 2 : len - 1]]
+
     if (splitPath.length > 2) {
-      openKeys.value = [splitPath[1]]
+      openKeys.value = [splitPath[3]]
     } else {
       openKeys.value = []
     }
   }
 
-  watch(router.currentRoute, () => {
+  const onSelect = ({ item }: any) => {
+    router.push({ path: item.to })
+  }
+
+  watch(router.currentRoute, (val) => {
+    console.log('val :>> ', val)
     updateSideBar()
   })
 
@@ -67,33 +66,9 @@
       v-model:selectedKeys="selectedKeys"
       v-model:open-keys="openKeys"
       mode="inline"
+      :items="siderMenus"
+      @select="onSelect"
     >
-      <template v-for="item in siderMenu">
-        <template v-if="item.children">
-          <a-sub-menu :key="item.key">
-            <template #title>
-              <component :is="() => item.icon" />
-              <span>
-                {{ item.title }}
-              </span>
-            </template>
-            <a-menu-item v-for="subItem in item.children" :key="subItem.key">
-              <component :is="() => subItem.icon" />
-              <span>
-                <router-link :to="subItem.to">{{ subItem.title }}</router-link>
-              </span>
-            </a-menu-item>
-          </a-sub-menu>
-        </template>
-        <template v-else>
-          <a-menu-item :key="item.key">
-            <component :is="() => item.icon" />
-            <span>
-              <router-link :to="item.to">{{ item.title }}</router-link>
-            </span>
-          </a-menu-item>
-        </template>
-      </template>
     </a-menu>
   </a-layout-sider>
 </template>

@@ -29,7 +29,7 @@ const routes: RouteRecordRaw[] = [
     },
     children: [
       {
-        path: 'hosts',
+        path: '/cluster-mange/hosts',
         component: () => import('@/pages/cluster-mange/hosts/index.vue'),
         meta: {
           title: '主机管理'

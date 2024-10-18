@@ -30,34 +30,11 @@ const routes: RouteRecordRaw[] = [
     children: [
       {
         name: 'Clusters',
-        path: '/cluster-mange/clusters/:cluster',
+        path: '/cluster-mange/clusters/:cluster/:id',
         component: () => import('@/pages/cluster-mange/cluster/index.vue'),
         meta: {
           title: '集群管理'
         }
-        // path: '/cluster-mange/cluster/',
-        // redirect: '/cluster-mange/cluster/stack',
-        // meta: {
-        //   title: '集群管理'
-        // }
-        // children: [
-        //   {
-        //     path: 'stack',
-        //     component: () =>
-        //       import('@/pages/cluster-mange/cluster/stack/index.vue'),
-        //     meta: {
-        //       title: 'Stack'
-        //     }
-        //   },
-        //   {
-        //     path: 'account',
-        //     component: () =>
-        //       import('@/pages/cluster-mange/cluster/account/index.vue'),
-        //     meta: {
-        //       title: 'Account'
-        //     }
-        //   }
-        // ]
       }
     ]
   }

@@ -18,39 +18,39 @@
 -->
 
 <script setup lang="ts">
-  import { ref, toRaw, watch } from 'vue'
+  import { onMounted, ref, toRaw } from 'vue'
   import { useRouter } from 'vue-router'
   import { useMenuStore } from '@/store/menu'
+  import { useClusterStore } from '@/store/cluster'
   import SelectLang from '@/components/select-lang/index.vue'
   import UserAvatar from '@/components/user-avatar/index.vue'
-  import { storeToRefs } from 'pinia'
-  import { useClusterStore } from '@/store/cluster'
 
-  const menuStore = useMenuStore()
   const router = useRouter()
+  const menuStore = useMenuStore()
   const clusterStore = useClusterStore()
   const spaceSize = ref(16)
   const selectedKeys = ref<string[]>([
     router.currentRoute.value.matched[0].path
   ])
-  const { clusters } = storeToRefs(clusterStore)
 
-  watch(
-    router.currentRoute,
-    (val) => {
-      selectedKeys.value = [val.matched[0].path]
-      menuStore.updateSiderRoutes(toRaw(selectedKeys.value), val.fullPath)
-    },
-    { immediate: true }
-  )
-
-  const onSelect = () => {
-    const isCluster = selectedKeys.value.includes('/cluster-mange/')
+  const onSelect = async () => {
+    const isCluster = selectedKeys.value[0] == '/cluster-mange/'
+    if (isCluster) {
+      await clusterStore.loadClusters()
+    }
+    const cluster = clusterStore.clusters[0]
     const path = isCluster
-      ? `${selectedKeys.value[0]}clusters/${clusters.value[0].clusterName}`
+      ? `${selectedKeys.value[0]}clusters/${cluster?.clusterName}/${cluster.id}`
       : selectedKeys.value[0]
     menuStore.updateSiderRoutes(toRaw(selectedKeys.value), path)
   }
+
+  onMounted(() => {
+    menuStore.updateSiderRoutes(
+      toRaw(selectedKeys.value),
+      router.currentRoute.value.fullPath
+    )
+  })
 </script>
 
 <template>

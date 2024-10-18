@@ -18,30 +18,19 @@
  */
 
 import type { Router } from 'vue-router'
-import type { ServiceVO } from '@/api/service/types.ts'
-import { storeToRefs } from 'pinia'
-import { useServiceStore } from '@/store/service'
 import { useClusterStore } from '@/store/cluster'
+
 function setCommonGuard(router: Router) {
-  router.beforeEach(async (to) => {
-    if (to.name === 'services') {
+  router.beforeEach(async (to, _from, next) => {
+    // redirect to the default cluster path
+    if (to.path === '/cluster-mange') {
       const clusterStore = useClusterStore()
-      const serviceStore = useServiceStore()
-      const { clusterId } = storeToRefs(clusterStore)
-      const { installedServices } = storeToRefs(serviceStore)
-
-      if (clusterId.value === 0) {
-        await clusterStore.loadClusters()
-        await serviceStore.loadServices()
-      }
-
-      const installedServiceNames = installedServices.value.map(
-        (service: ServiceVO) => service.serviceName
-      )
-
-      if (!installedServiceNames.includes(to.params.serviceName as string)) {
-        return '/404'
-      }
+      await clusterStore.loadClusters()
+      const cluster = clusterStore.clusters[0]
+      const path = `${to.path}/clusters/${cluster?.clusterName}/${cluster.id}`
+      next({ path })
+    } else {
+      next()
     }
   })
 }

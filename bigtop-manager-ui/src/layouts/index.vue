@@ -24,26 +24,26 @@
   import LayoutSider from '@/layouts/sider.vue'
   import { useUserStore } from '@/store/user'
   import { useClusterStore } from '@/store/cluster'
-  import { useServiceStore } from '@/store/service'
-  import { useComponentStore } from '@/store/component'
-  import { useConfigStore } from '@/store/config'
+  // import { useServiceStore } from '@/store/service'
+  // import { useComponentStore } from '@/store/component'
+  // import { useConfigStore } from '@/store/config'
 
   const userStore = useUserStore()
   const clusterStore = useClusterStore()
-  const serviceStore = useServiceStore()
-  const componentStore = useComponentStore()
-  const configStore = useConfigStore()
+  // const serviceStore = useServiceStore()
+  // const componentStore = useComponentStore()
+  // const configStore = useConfigStore()
 
   onMounted(() => {
     userStore.getUserInfo()
     clusterStore.loadClusters()
-    serviceStore.loadServices()
-    componentStore.resumeIntervalFn()
-    configStore.loadLatestConfigs()
+    // serviceStore.loadServices()
+    // componentStore.resumeIntervalFn()
+    // configStore.loadLatestConfigs()
   })
 
   onUnmounted(() => {
-    componentStore.pauseIntervalFn()
+    // componentStore.pauseIntervalFn()
   })
 </script>
 

@@ -21,5 +21,7 @@ import { RouteMeta } from 'vue-router'
 export type MenuItem = {
   key?: string
   to: string
+  label: string
+  title?: string
   children?: MenuItem[]
 } & RouteMeta

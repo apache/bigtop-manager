@@ -22,15 +22,6 @@ interface RouteModuleType {
   routes: RouteRecordRaw[]
 }
 
-type RoutePriorityMap = { [key: string]: number }
-
-export const routePriorityMap: RoutePriorityMap = {
-  Hosts: 3,
-  Services: 2,
-  Cluster: 1,
-  Model: 1
-}
-
 export function mergeRouteModules(
   routeModules: Record<string, unknown>
 ): RouteRecordRaw[] {

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-card></a-card>
+    <a-card>{{ $route.params }}</a-card>
   </div>
 </template>
 
