@@ -20,14 +20,21 @@
 import { defineStore } from 'pinia'
 import { computed, ref, toRaw } from 'vue'
 import { dynamicRoutes } from '@/router/routes/index'
-import { RouteRecordRaw } from 'vue-router'
+import { routePriorityMap } from '@/utils/router-util'
+import { useClusterStore } from '@/store/cluster/index'
+import { type MenuItem } from './types'
+import { type RouteRecordRaw, useRouter } from 'vue-router'
 
 export const useMenuStore = defineStore(
   'menu',
   () => {
+    const router = useRouter()
+    const clusterStore = useClusterStore()
     const currSiderRoutes = ref<RouteRecordRaw[]>([])
+    const siderMenus = computed(() => initSiderMenu(currSiderRoutes.value))
+    const headerMenus = computed(() => splitDynamicRoutesToCreateHeaderMenus())
 
-    const headerMenus = computed(() => {
+    const splitDynamicRoutesToCreateHeaderMenus = () => {
       const map = new Map()
       dynamicRoutes.forEach((route) => {
         if (!route.meta?.hidden) {
@@ -37,22 +44,69 @@ export const useMenuStore = defineStore(
         }
       })
       return map
-    })
+    }
 
-    const updateSiderRoutes = (selectedKeys: string[]) => {
+    const updateSiderRoutes = (selectedKeys: string[], to?: string) => {
       const res = [...toRaw(headerMenus.value).keys()].find((v) =>
         v.includes(selectedKeys[0])
       )
-      currSiderRoutes.value = headerMenus.value.get(res)
+      currSiderRoutes.value = headerMenus.value.get(res) || []
+      router.push({ path: to || selectedKeys[0] })
+    }
+
+    const initSiderMenuItem = (route: RouteRecordRaw): MenuItem => {
+      return {
+        ...route.meta,
+        key: route.path,
+        to: route.path,
+        hidden: Boolean(route.meta?.hidden),
+        priority: routePriorityMap[`${route.meta?.title}`] || -1,
+        children:
+          route.children !== undefined || route.name === 'Clusters'
+            ? []
+            : undefined
+      }
+    }
+
+    const initSiderMenu = (routes: RouteRecordRaw[]) => {
+      return routes.reduce((pre, route) => {
+        // filter invaible route
+        if (routePriorityMap[`${route.meta?.title}`] == -1) {
+          return pre
+        }
+        const menuItem = initSiderMenuItem(route)
+        if (route.name === 'Clusters') {
+          clusterStore.clusters.forEach((cluster) => {
+            menuItem.children?.push({
+              key: cluster.clusterName,
+              to: route.path.replace(':cluster', `${cluster.clusterName}`),
+              title: cluster.clusterName
+            })
+          })
+        } else if (route.children !== undefined) {
+          route.children.forEach((child) => {
+            menuItem.children?.push({
+              key: child.path,
+              to: `${route.path}${child.path}`,
+              title: child.meta?.title,
+              icon: child.meta?.icon
+            })
+          })
+        } else {
+          menuItem.key = route.path.split('/').at(-1)
+        }
+        pre.push(menuItem)
+        return pre
+      }, [] as MenuItem[])
     }
 
     return {
+      siderMenus,
       headerMenus,
-      currSiderRoutes,
       updateSiderRoutes
     }
   },
   {
-    persist: true
+    persist: false
   }
 )

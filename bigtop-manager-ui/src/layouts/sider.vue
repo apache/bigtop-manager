@@ -20,23 +20,22 @@
 <script setup lang="ts">
   import { computed, onMounted, ref, watch } from 'vue'
   import { useUIStore } from '@/store/ui'
-  import { useUserStore } from '@/store/user'
+  import { useMenuStore } from '@/store/menu/index'
   import { storeToRefs } from 'pinia'
-  import { RouterLink, useRouter } from 'vue-router'
-  import ServiceDropdown from '@/components/service/service-dropdown.vue'
+  import { type RouterLink, useRouter } from 'vue-router'
 
   const uiStore = useUIStore()
-  const userStore = useUserStore()
+  const menuStore = useMenuStore()
   const router = useRouter()
 
   const { siderCollapsed } = storeToRefs(uiStore)
-  const { menuItems } = storeToRefs(userStore)
+  const { siderMenus } = storeToRefs(menuStore)
 
   const selectedKeys = ref<string[]>([])
   const openKeys = ref<string[]>([])
 
   const siderMenu = computed(() => {
-    const res = menuItems.value
+    const res = siderMenus.value
       .filter((menuItem) => !menuItem.hidden)
       .sort((pre, next) => (pre.priority ?? 0) - (next.priority ?? 0))
     return res
@@ -73,20 +72,9 @@
         <template v-if="item.children">
           <a-sub-menu :key="item.key">
             <template #title>
-              <div v-if="item.title === 'Services'" class="menu-title-flex">
-                <span>
-                  <component :is="() => item.icon" />
-                  <span>
-                    {{ item.title }}
-                  </span>
-                </span>
-                <service-dropdown />
-              </div>
-              <span v-else>
-                <component :is="() => item.icon" />
-                <span>
-                  {{ item.title }}
-                </span>
+              <component :is="() => item.icon" />
+              <span>
+                {{ item.title }}
               </span>
             </template>
             <a-menu-item v-for="subItem in item.children" :key="subItem.key">

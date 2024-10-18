@@ -24,35 +24,40 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/cluster-mange/',
     component: pageView,
-    redirect: '/cluster-mange/cluster',
     meta: {
       title: '集群管理'
     },
     children: [
       {
-        path: '/cluster-mange/cluster/',
-        redirect: '/cluster-mange/cluster/stack',
+        name: 'Clusters',
+        path: '/cluster-mange/clusters/:cluster',
+        component: () => import('@/pages/cluster-mange/cluster/index.vue'),
         meta: {
           title: '集群管理'
-        },
-        children: [
-          {
-            path: 'stack',
-            component: () =>
-              import('@/pages/cluster-mange/cluster/stack/index.vue'),
-            meta: {
-              title: 'Stack'
-            }
-          },
-          {
-            path: 'account',
-            component: () =>
-              import('@/pages/cluster-mange/cluster/account/index.vue'),
-            meta: {
-              title: 'Account'
-            }
-          }
-        ]
+        }
+        // path: '/cluster-mange/cluster/',
+        // redirect: '/cluster-mange/cluster/stack',
+        // meta: {
+        //   title: '集群管理'
+        // }
+        // children: [
+        //   {
+        //     path: 'stack',
+        //     component: () =>
+        //       import('@/pages/cluster-mange/cluster/stack/index.vue'),
+        //     meta: {
+        //       title: 'Stack'
+        //     }
+        //   },
+        //   {
+        //     path: 'account',
+        //     component: () =>
+        //       import('@/pages/cluster-mange/cluster/account/index.vue'),
+        //     meta: {
+        //       title: 'Account'
+        //     }
+        //   }
+        // ]
       }
     ]
   }

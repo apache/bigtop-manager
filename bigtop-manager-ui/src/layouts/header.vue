@@ -23,23 +23,33 @@
   import { useMenuStore } from '@/store/menu'
   import SelectLang from '@/components/select-lang/index.vue'
   import UserAvatar from '@/components/user-avatar/index.vue'
+  import { storeToRefs } from 'pinia'
+  import { useClusterStore } from '@/store/cluster'
 
   const menuStore = useMenuStore()
   const router = useRouter()
+  const clusterStore = useClusterStore()
   const spaceSize = ref(16)
   const selectedKeys = ref<string[]>([
     router.currentRoute.value.matched[0].path
   ])
+  const { clusters } = storeToRefs(clusterStore)
 
-  watch(router.currentRoute, (val) => {
-    selectedKeys.value = [val.matched[0].path]
-    router.push({ path: val.fullPath })
-    menuStore.updateSiderRoutes(toRaw(selectedKeys.value))
-  })
+  watch(
+    router.currentRoute,
+    (val) => {
+      selectedKeys.value = [val.matched[0].path]
+      menuStore.updateSiderRoutes(toRaw(selectedKeys.value), val.fullPath)
+    },
+    { immediate: true }
+  )
 
   const onSelect = () => {
-    router.push({ path: selectedKeys.value[0] })
-    menuStore.updateSiderRoutes(toRaw(selectedKeys.value))
+    const isCluster = selectedKeys.value.includes('/cluster-mange/')
+    const path = isCluster
+      ? `${selectedKeys.value[0]}clusters/${clusters.value[0].clusterName}`
+      : selectedKeys.value[0]
+    menuStore.updateSiderRoutes(toRaw(selectedKeys.value), path)
   }
 </script>
 

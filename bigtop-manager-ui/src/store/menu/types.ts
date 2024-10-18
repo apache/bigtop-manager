@@ -18,10 +18,8 @@
  */
 
 import { RouteMeta } from 'vue-router'
-type MenuItem = {
+export type MenuItem = {
   key?: string
   to: string
   children?: MenuItem[]
 } & RouteMeta
-
-export type { MenuItem }
