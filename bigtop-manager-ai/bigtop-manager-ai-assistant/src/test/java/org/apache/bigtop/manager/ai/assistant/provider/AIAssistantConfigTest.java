@@ -48,7 +48,7 @@ public class AIAssistantConfigTest {
         credentials.put("api key", "123456");
 
         configs = new HashMap<>();
-        configs.put("timeout", "30s");
+        configs.put("threadId", "123456");
     }
 
     @Test
@@ -81,11 +81,11 @@ public class AIAssistantConfigTest {
     public void testBuilderAddsSingleConfig() {
         AIAssistantConfig config = builder.setModel(model)
                 .setLanguage(language)
-                .addConfig("timeout", "60s")
+                .addConfig("threadId", "123")
                 .build();
 
         assertNotNull(config);
-        assertEquals("60s", config.getConfigs().get("timeout"));
+        assertEquals("123", config.getConfigs().get("threadId"));
     }
 
     @Test
