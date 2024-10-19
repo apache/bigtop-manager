@@ -88,10 +88,6 @@ public class LLMConfigController {
             @PathVariable Long authId, @RequestBody AuthPlatformReq authPlatformReq) {
         AuthPlatformDTO authPlatformDTO = AuthPlatformConverter.INSTANCE.fromReq2DTO(authPlatformReq);
         authPlatformDTO.setId(authId);
-
-        if (authPlatformDTO.getIsActive() != null) {
-            return ResponseEntity.success(llmConfigService.switchAuthPlatform(authPlatformDTO));
-        }
         return ResponseEntity.success(llmConfigService.updateAuthorizedPlatform(authPlatformDTO));
     }
 
@@ -99,5 +95,17 @@ public class LLMConfigController {
     @DeleteMapping("/auth-platforms/{authId}")
     public ResponseEntity<Boolean> deleteAuthorizedPlatform(@PathVariable Long authId) {
         return ResponseEntity.success(llmConfigService.deleteAuthorizedPlatform(authId));
+    }
+
+    @Operation(summary = "enable auth platform", description = "Enable authorized platforms")
+    @PostMapping("/auth-platforms/{authId}/enable")
+    public ResponseEntity<Boolean> enableAuthorizedPlatform(@PathVariable Long authId) {
+        return ResponseEntity.success(llmConfigService.enableAuthorizedPlatform(authId));
+    }
+
+    @Operation(summary = "disable auth platform", description = "Disable authorized platforms")
+    @PostMapping("/auth-platforms/{authId}/disable")
+    public ResponseEntity<Boolean> disableAuthorizedPlatform(@PathVariable Long authId) {
+        return ResponseEntity.success(llmConfigService.disableAuthorizedPlatform(authId));
     }
 }

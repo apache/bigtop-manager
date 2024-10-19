@@ -37,11 +37,7 @@ public class AuthPlatformReq {
 
     private String model;
 
-    private String notes;
+    private String desc;
 
     private boolean isTested;
-
-    private boolean active;
-
-    private boolean stop;
 }

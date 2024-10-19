@@ -41,5 +41,7 @@ public interface LLMConfigService {
 
     AuthPlatformVO updateAuthorizedPlatform(AuthPlatformDTO authPlatformDTO);
 
-    AuthPlatformVO switchAuthPlatform(AuthPlatformDTO authPlatformDTO);
+    boolean enableAuthorizedPlatform(Long authId);
+
+    boolean disableAuthorizedPlatform(Long authId);
 }

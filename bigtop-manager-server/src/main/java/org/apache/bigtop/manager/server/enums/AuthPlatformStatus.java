@@ -22,7 +22,7 @@ import lombok.Getter;
 
 @Getter
 public enum AuthPlatformStatus {
-    NORMAL(0),
+    AVAILABLE(0),
     ACTIVE(1),
     UNAVAILABLE(2),
     ;
@@ -39,18 +39,18 @@ public enum AuthPlatformStatus {
                 return status;
             }
         }
-        return NORMAL;
+        return UNAVAILABLE;
     }
 
-    public static boolean isNormal(int code) {
-        return NORMAL.code.equals(code);
+    public static boolean isAvailable(int code) {
+        return AVAILABLE.code.equals(code);
     }
 
     public static boolean isActive(int code) {
         return ACTIVE.code.equals(code);
     }
 
-    public static boolean isAvailable(int code) {
-        return isNormal(code) || isActive(code);
+    public static boolean available(int code) {
+        return isAvailable(code) || isActive(code);
     }
 }

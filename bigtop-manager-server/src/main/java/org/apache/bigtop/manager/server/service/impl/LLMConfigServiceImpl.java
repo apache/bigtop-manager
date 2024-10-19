@@ -109,6 +109,21 @@ public class LLMConfigServiceImpl implements LLMConfigService {
         }
     }
 
+    private void switchActivePlatform(Long id) {
+        List<AuthPlatformPO> authPlatformPOS = authPlatformDao.findAll();
+        for (AuthPlatformPO authPlatformPO : authPlatformPOS) {
+            if (!AuthPlatformStatus.available(authPlatformPO.getStatus())) {
+                continue;
+            }
+            if (authPlatformPO.getId().equals(id)) {
+                authPlatformPO.setStatus(AuthPlatformStatus.ACTIVE.getCode());
+            } else {
+                authPlatformPO.setStatus(AuthPlatformStatus.AVAILABLE.getCode());
+            }
+        }
+        authPlatformDao.partialUpdateByIds(authPlatformPOS);
+    }
+
     @Override
     public List<PlatformVO> platforms() {
         List<PlatformPO> platformPOs = platformDao.findAll();
@@ -160,7 +175,7 @@ public class LLMConfigServiceImpl implements LLMConfigService {
         authPlatformDTO.setAuthCredentials(credentialSet);
         AuthPlatformPO authPlatformPO = AuthPlatformConverter.INSTANCE.fromDTO2PO(authPlatformDTO);
         if (authPlatformDTO.getIsTested()) {
-            authPlatformPO.setStatus(AuthPlatformStatus.NORMAL.getCode());
+            authPlatformPO.setStatus(AuthPlatformStatus.AVAILABLE.getCode());
         } else {
             authPlatformPO.setStatus(AuthPlatformStatus.UNAVAILABLE.getCode());
         }
@@ -243,7 +258,7 @@ public class LLMConfigServiceImpl implements LLMConfigService {
 
         if (authPlatformDTO.getId() != null) {
             AuthPlatformPO authPlatformPO = AuthPlatformConverter.INSTANCE.fromDTO2PO(authPlatformDTO);
-            authPlatformPO.setStatus(AuthPlatformStatus.NORMAL.getCode());
+            authPlatformPO.setStatus(AuthPlatformStatus.AVAILABLE.getCode());
             authPlatformDao.partialUpdateById(authPlatformPO);
         }
 
@@ -258,7 +273,7 @@ public class LLMConfigServiceImpl implements LLMConfigService {
         }
 
         authPlatformPO.setName(authPlatformDTO.getName());
-        authPlatformPO.setNotes(authPlatformDTO.getNotes());
+        authPlatformPO.setDesc(authPlatformDTO.getDesc());
         if (!authPlatformPO.getModel().equals(authPlatformDTO.getModel())) {
             authPlatformPO.setStatus(AuthPlatformStatus.UNAVAILABLE.getCode());
         }
@@ -270,35 +285,35 @@ public class LLMConfigServiceImpl implements LLMConfigService {
     }
 
     @Override
-    public AuthPlatformVO switchAuthPlatform(AuthPlatformDTO authPlatformDTO) {
-        AuthPlatformPO authPlatformPO = authPlatformDao.findById(authPlatformDTO.getId());
+    public boolean enableAuthorizedPlatform(Long authId) {
+        AuthPlatformPO authPlatformPO = authPlatformDao.findById(authId);
         if (authPlatformPO == null || authPlatformPO.getIsDeleted()) {
             throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED);
         }
 
-        if (authPlatformDTO.getIsActive() && AuthPlatformStatus.isAvailable(authPlatformPO.getStatus())) {
-            switchActivePlatform(authPlatformPO.getId());
-        } else if (!authPlatformDTO.getIsActive() && AuthPlatformStatus.isActive(authPlatformPO.getStatus())) {
-            authPlatformPO.setStatus(AuthPlatformStatus.NORMAL.getCode());
-            authPlatformDao.partialUpdateById(authPlatformPO);
+        if (!AuthPlatformStatus.available(authPlatformPO.getStatus())) {
+            return false;
         }
-        return AuthPlatformConverter.INSTANCE.fromPO2VO(
-                authPlatformDao.findById(authPlatformDTO.getId()),
-                platformDao.findById(authPlatformPO.getPlatformId()));
+
+        if (AuthPlatformStatus.isActive(authPlatformPO.getStatus())) {
+            return true;
+        }
+        switchActivePlatform(authPlatformPO.getId());
+        return true;
     }
 
-    private void switchActivePlatform(Long id) {
-        List<AuthPlatformPO> authPlatformPOS = authPlatformDao.findAll();
-        for (AuthPlatformPO authPlatformPO : authPlatformPOS) {
-            if (!AuthPlatformStatus.isAvailable(authPlatformPO.getStatus())) {
-                continue;
-            }
-            if (authPlatformPO.getId().equals(id)) {
-                authPlatformPO.setStatus(AuthPlatformStatus.ACTIVE.getCode());
-            } else {
-                authPlatformPO.setStatus(AuthPlatformStatus.NORMAL.getCode());
-            }
+    @Override
+    public boolean disableAuthorizedPlatform(Long authId) {
+        AuthPlatformPO authPlatformPO = authPlatformDao.findById(authId);
+        if (authPlatformPO == null || authPlatformPO.getIsDeleted()) {
+            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED);
         }
-        authPlatformDao.partialUpdateByIds(authPlatformPOS);
+        AuthPlatformStatus authPlatformStatus = AuthPlatformStatus.fromCode(authPlatformPO.getStatus());
+        if (authPlatformStatus.equals(AuthPlatformStatus.ACTIVE)) {
+            authPlatformPO.setStatus(AuthPlatformStatus.AVAILABLE.getCode());
+            return true;
+        }
+        authPlatformPO.setStatus(authPlatformStatus.getCode());
+        return true;
     }
 }

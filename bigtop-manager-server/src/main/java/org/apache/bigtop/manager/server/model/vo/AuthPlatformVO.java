@@ -32,15 +32,9 @@ public class AuthPlatformVO {
 
     private String model;
 
-    private String notes;
+    private String desc;
 
     private Integer status;
-
-    public AuthPlatformVO(long platformId, String name, String models) {
-        this.platformId = platformId;
-        this.platformName = name;
-        this.model = models;
-    }
 
     public AuthPlatformVO() {}
 }

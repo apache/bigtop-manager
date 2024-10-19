@@ -34,9 +34,7 @@ public class AuthPlatformDTO {
 
     private String model;
 
-    private String notes;
+    private String desc;
 
     private Boolean isTested;
-
-    private Boolean isActive;
 }

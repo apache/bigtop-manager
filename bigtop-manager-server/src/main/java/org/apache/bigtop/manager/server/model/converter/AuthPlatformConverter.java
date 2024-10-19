@@ -59,19 +59,6 @@ public interface AuthPlatformConverter {
     @AfterMapping
     default void afterMapping(@MappingTarget AuthPlatformDTO authPlatformDTO, AuthPlatformReq authPlatformReq) {
         authPlatformDTO.setAuthCredentials(mapAuthCredentials(authPlatformReq.getAuthCredentials()));
-        if (authPlatformReq.isActive()) {
-            authPlatformDTO.setIsActive(true);
-        } else if (authPlatformReq.isStop()) {
-            authPlatformDTO.setIsActive(false);
-        } else {
-            authPlatformDTO.setIsActive(null);
-        }
-
-        if (authPlatformReq.isTested()) {
-            authPlatformDTO.setIsTested(true);
-        } else {
-            authPlatformDTO.setIsTested(false);
-        }
     }
 
     @Mapping(source = "authCredentials", target = "credentials", qualifiedByName = "map2String")

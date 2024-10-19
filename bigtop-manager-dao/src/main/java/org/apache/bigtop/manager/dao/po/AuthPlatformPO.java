@@ -53,6 +53,6 @@ public class AuthPlatformPO extends BasePO implements Serializable {
     @Column(name = "model")
     private String model;
 
-    @Column(name = "notes")
-    private String notes;
+    @Column(name = "desc")
+    private String desc;
 }
