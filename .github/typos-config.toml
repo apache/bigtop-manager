@@ -2,7 +2,3 @@
 ser = "ser"
 emmit = "emmit"
 Auxilliary = "Auxilliary"
-
-# [type.po]
-# extend-glob = ["*.vue"]
-# check-file = false
