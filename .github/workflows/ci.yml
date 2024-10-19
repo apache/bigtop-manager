@@ -24,6 +24,18 @@ jobs:
           cache: 'maven'
       - run: ./mvnw clean spotless:check
 
+  spellcheck:
+    name: "Check code spelling"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - run: cargo install typos-cli
+      - run: typos --config .github/typos.toml
+
   unit-tests-java:
     name: "Run unit test(Java)"
     runs-on: ubuntu-latest
