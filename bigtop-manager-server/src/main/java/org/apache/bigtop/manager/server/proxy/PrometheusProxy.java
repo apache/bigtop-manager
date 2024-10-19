@@ -128,17 +128,7 @@ public class PrometheusProxy {
             temp.put("memIdle", memResult.get("memIdle").asLong());
             temp.put("memTotal", memResult.get("memTotal").asLong());
             // DISK
-            long totalSpace = 0;
-            long freeSpace = 0;
-            for (JsonNode disk : diskResult.get("diskInfo")) {
-                if (Objects.equals(disk.get("diskUsage").asText(), "diskTotalSpace")) {
-                    totalSpace += disk.get("diskValue").asLong();
-                } else if (Objects.equals(disk.get("diskUsage").asText(), "diskFreeSpace")) {
-                    freeSpace += disk.get("diskValue").asLong();
-                }
-            }
-            temp.put("diskFreeSpace", freeSpace);
-            temp.put("diskTotalSpace", totalSpace);
+            temp.set("diskSpace", diskResult.get("diskInfo"));
             agentsInfo.add(temp);
         }
 
@@ -172,25 +162,7 @@ public class PrometheusProxy {
             temp.put("memIdle", memResult.get("memIdle").asLong());
             temp.put("memTotal", memResult.get("memTotal").asLong());
             // DISK
-            long totalSpace = 0;
-            long freeSpace = 0;
-            long totalFileHandle = 0;
-            long freeFileHandle = 0;
-            for (JsonNode disk : diskResult.get("diskInfo")) {
-                if (Objects.equals(disk.get("diskUsage").asText(), "diskTotalSpace")) {
-                    totalSpace += disk.get("diskValue").asLong();
-                } else if (Objects.equals(disk.get("diskUsage").asText(), "diskFreeSpace")) {
-                    freeSpace += disk.get("diskValue").asLong();
-                } else if (Objects.equals(disk.get("diskUsage").asText(), "diskTotalFileHandle")) {
-                    totalFileHandle += disk.get("diskValue").asLong();
-                } else if (Objects.equals(disk.get("diskUsage").asText(), "diskFreeFileHandle")) {
-                    freeFileHandle += disk.get("diskValue").asLong();
-                }
-            }
-            temp.put("diskFreeSpace", freeSpace);
-            temp.put("diskTotalSpace", totalSpace);
-            temp.put("diskFreeFileHandle", freeFileHandle);
-            temp.put("diskTotalFileHandle", totalFileHandle);
+            temp.set("diskSpace", diskResult.get("diskInfo"));
             // DISK IO
             temp.set("diskIO", diskIOResult.get("diskIO"));
             agentsInfo.add(temp);
