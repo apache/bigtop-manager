@@ -41,14 +41,6 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
     private final SystemPromptProvider systemPromptProvider;
     private final ChatMemoryStore chatMemoryStore;
 
-    public GeneralAssistantFactory() {
-        this(new LocSystemPromptProvider(), new InMemoryChatMemoryStore());
-    }
-
-    public GeneralAssistantFactory(SystemPromptProvider systemPromptProvider) {
-        this(systemPromptProvider, new InMemoryChatMemoryStore());
-    }
-
     public GeneralAssistantFactory(ChatMemoryStore chatMemoryStore) {
         this(new LocSystemPromptProvider(), chatMemoryStore);
     }
