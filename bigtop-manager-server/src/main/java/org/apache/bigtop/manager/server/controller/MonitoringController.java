@@ -42,6 +42,19 @@ public class MonitoringController {
     @Operation(summary = "agent healthy", description = "agent healthy check")
     @GetMapping("agenthealthy")
     public ResponseEntity<JsonNode> agentHostsHealthyStatus() {
+        // json for response
         return ResponseEntity.success(monitoringService.queryAgentsHealthyStatus());
+    }
+
+    @Operation(summary = "agent Info", description = "agent info query")
+    @GetMapping("agentinfo")
+    public ResponseEntity<JsonNode> queryAgentsInfo() {
+        return ResponseEntity.success(monitoringService.queryAgentsInfo());
+    }
+
+    @Operation(summary = "agent instant info", description = "agent instant info query")
+    @GetMapping("agentinstinfo")
+    public ResponseEntity<JsonNode> queryAgentsInstStatus() {
+        return ResponseEntity.success(monitoringService.queryAgentsInstStatus());
     }
 }
