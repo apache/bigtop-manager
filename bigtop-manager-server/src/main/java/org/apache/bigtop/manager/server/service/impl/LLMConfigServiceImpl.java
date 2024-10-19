@@ -136,7 +136,7 @@ public class LLMConfigServiceImpl implements LLMConfigService {
         List<AuthPlatformVO> authorizedPlatforms = new ArrayList<>();
         List<AuthPlatformPO> authPlatformPOList = authPlatformDao.findAll();
         for (AuthPlatformPO authPlatformPO : authPlatformPOList) {
-            if (AuthPlatformStatus.isDeleted(authPlatformPO.getStatus())) {
+            if (authPlatformPO.getIsDeleted()) {
                 continue;
             }
 
@@ -188,11 +188,11 @@ public class LLMConfigServiceImpl implements LLMConfigService {
     @Override
     public boolean deleteAuthorizedPlatform(Long authId) {
         AuthPlatformPO authPlatformPO = authPlatformDao.findById(authId);
-        if (authPlatformPO == null || AuthPlatformStatus.isDeleted(authPlatformPO.getStatus())) {
+        if (authPlatformPO == null || authPlatformPO.getIsDeleted()) {
             throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED);
         }
 
-        authPlatformPO.setStatus(AuthPlatformStatus.DELETED.getCode());
+        authPlatformPO.setIsDeleted(true);
         authPlatformDao.partialUpdateById(authPlatformPO);
 
         List<ChatThreadPO> chatThreadPOS = chatThreadDao.findAllByAuthId(authPlatformPO.getId());
@@ -227,7 +227,7 @@ public class LLMConfigServiceImpl implements LLMConfigService {
 
         if (authPlatformDTO.getId() != null) {
             AuthPlatformPO authPlatformPO = authPlatformDao.findById(authPlatformDTO.getId());
-            if (authPlatformPO == null || AuthPlatformStatus.isDeleted(authPlatformPO.getStatus())) {
+            if (authPlatformPO == null || authPlatformPO.getIsDeleted()) {
                 throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED);
             }
             AuthPlatformDTO existAuthPlatformDTO = AuthPlatformConverter.INSTANCE.fromPO2DTO(authPlatformPO);
@@ -253,7 +253,7 @@ public class LLMConfigServiceImpl implements LLMConfigService {
     @Override
     public AuthPlatformVO updateAuthorizedPlatform(AuthPlatformDTO authPlatformDTO) {
         AuthPlatformPO authPlatformPO = authPlatformDao.findById(authPlatformDTO.getId());
-        if (authPlatformPO == null || AuthPlatformStatus.isDeleted(authPlatformPO.getStatus())) {
+        if (authPlatformPO == null || authPlatformPO.getIsDeleted()) {
             throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED);
         }
 
@@ -272,7 +272,7 @@ public class LLMConfigServiceImpl implements LLMConfigService {
     @Override
     public AuthPlatformVO switchAuthPlatform(AuthPlatformDTO authPlatformDTO) {
         AuthPlatformPO authPlatformPO = authPlatformDao.findById(authPlatformDTO.getId());
-        if (authPlatformPO == null || AuthPlatformStatus.isDeleted(authPlatformPO.getStatus())) {
+        if (authPlatformPO == null || authPlatformPO.getIsDeleted()) {
             throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED);
         }
 

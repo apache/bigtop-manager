@@ -34,7 +34,6 @@ import org.apache.bigtop.manager.dao.repository.ChatMessageDao;
 import org.apache.bigtop.manager.dao.repository.ChatThreadDao;
 import org.apache.bigtop.manager.dao.repository.PlatformDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
-import org.apache.bigtop.manager.server.enums.AuthPlatformStatus;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.holder.SessionUserHolder;
 import org.apache.bigtop.manager.server.model.converter.AuthPlatformConverter;
@@ -111,7 +110,7 @@ public class ChatbotServiceImpl implements ChatbotService {
     @Override
     public ChatThreadVO createChatThreads(Long authId, String model) {
         AuthPlatformPO authPlatformPO = authPlatformDao.findById(authId);
-        if (authPlatformPO == null || AuthPlatformStatus.isDeleted(authPlatformPO.getStatus())) {
+        if (authPlatformPO == null || authPlatformPO.getIsDeleted()) {
             throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED);
         }
         AuthPlatformDTO authPlatformDTO = AuthPlatformConverter.INSTANCE.fromPO2DTO(authPlatformPO);
@@ -176,7 +175,7 @@ public class ChatbotServiceImpl implements ChatbotService {
             throw new ApiException(ApiExceptionEnum.CHAT_THREAD_NOT_FOUND);
         }
         AuthPlatformPO authPlatformPO = authPlatformDao.findById(authId);
-        if (authPlatformPO == null || AuthPlatformStatus.isDeleted(authPlatformPO.getStatus())) {
+        if (authPlatformPO == null || authPlatformPO.getIsDeleted()) {
             throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED);
         }
         AuthPlatformDTO authPlatformDTO = AuthPlatformConverter.INSTANCE.fromPO2DTO(authPlatformPO);

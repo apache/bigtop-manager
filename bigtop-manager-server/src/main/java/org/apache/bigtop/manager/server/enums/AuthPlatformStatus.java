@@ -22,7 +22,6 @@ import lombok.Getter;
 
 @Getter
 public enum AuthPlatformStatus {
-    DELETED(-1),
     NORMAL(0),
     ACTIVE(1),
     UNAVAILABLE(2),
@@ -53,9 +52,5 @@ public enum AuthPlatformStatus {
 
     public static boolean isAvailable(int code) {
         return isNormal(code) || isActive(code);
-    }
-
-    public static boolean isDeleted(int code) {
-        return DELETED.code.equals(code);
     }
 }

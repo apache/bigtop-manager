@@ -338,6 +338,7 @@ CREATE TABLE llm_auth_platform
     id          BIGINT CHECK (id > 0)          NOT NULL GENERATED ALWAYS AS IDENTITY,
     platform_id BIGINT CHECK (platform_id > 0) NOT NULL,
     credentials TEXT                           NOT NULL,
+    is_deleted  BOOLEAN             DEFAULT FALSE,
     status      SMALLINT            DEFAULT 0,
     model       VARCHAR(255)        NOT NULL,
     name        VARCHAR(255)        NOT NULL,
@@ -348,7 +349,7 @@ CREATE TABLE llm_auth_platform
     update_by   BIGINT       DEFAULT NULL,
     PRIMARY KEY (id)
 );
-COMMENT ON COLUMN "llm_auth_platform".status IS '-1-Deleted, 0-Normal, 1-Active, 2-Unavailable';
+COMMENT ON COLUMN "llm_auth_platform".status IS '0-Normal, 1-Active, 2-Unavailable';
 CREATE INDEX idx_authorized_platform_id ON llm_auth_platform (platform_id);
 
 CREATE TABLE llm_chat_thread
