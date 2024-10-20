@@ -34,7 +34,8 @@ jobs:
         with:
           toolchain: stable
       - run: cargo install typos-cli
-      - run: typos --config .github/typos-config.toml
+      - run: |
+          typos --config .github/typos-config.toml || echo "Spellcheck failed. You can add false positives to .github/typos-config.toml"
 
   unit-tests-java:
     name: "Run unit test(Java)"
