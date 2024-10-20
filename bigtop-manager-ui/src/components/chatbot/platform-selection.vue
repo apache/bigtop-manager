@@ -50,7 +50,7 @@
     })) as Option[]
   })
 
-  const platformSeletions = computed<SelectData[]>(() => [
+  const platformSelections = computed<SelectData[]>(() => [
     {
       title: t('ai.select_platform_to_authorize'),
       hasDel: false,
@@ -86,7 +86,7 @@
 <template>
   <div class="platform-selection">
     <a-spin :spinning="loading">
-      <select-menu :select-data="platformSeletions" @select="onSelect" />
+      <select-menu :select-data="platformSelections" @select="onSelect" />
     </a-spin>
   </div>
 </template>

@@ -46,7 +46,7 @@ const useChatBot = () => {
   const receiving = ref(false)
   const checkLoading = ref(false)
   const canceler = ref<Canceler>()
-  const messageReciver = ref('')
+  const messageReceiver = ref('')
 
   function formatAuthCredentials<T extends Object>(
     authFormData: T
@@ -132,10 +132,10 @@ const useChatBot = () => {
     }
   }
 
-  async function fetchCreateChatThread(platfromInfo: ChatThreadCondition) {
+  async function fetchCreateChatThread(platformInfo: ChatThreadCondition) {
     try {
       loading.value = true
-      const data = await createChatThread(platfromInfo)
+      const data = await createChatThread(platformInfo)
       return Promise.resolve(data)
     } catch (error) {
       console.log('error :>> ', error)
@@ -198,7 +198,7 @@ const useChatBot = () => {
   }
 
   const onMessageReceive = ({ event }: AxiosProgressEvent) => {
-    messageReciver.value = event.target.responseText
+    messageReceiver.value = event.target.responseText
       .split('data:')
       .map((s: string) => {
         return s.trimEnd()
@@ -207,8 +207,8 @@ const useChatBot = () => {
   }
 
   const onMessageComplete = () => {
-    const formatResultMsg = messageReciver.value
-    messageReciver.value = ''
+    const formatResultMsg = messageReceiver.value
+    messageReceiver.value = ''
     cancelSseConnect()
     return Promise.resolve({ message: formatResultMsg, state: true })
   }
@@ -221,7 +221,7 @@ const useChatBot = () => {
   }
 
   return {
-    messageReciver,
+    messageReceiver,
     loading,
     receiving,
     checkLoading,

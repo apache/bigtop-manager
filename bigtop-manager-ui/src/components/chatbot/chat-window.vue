@@ -41,7 +41,7 @@
   const {
     loading,
     receiving,
-    messageReciver,
+    messageReceiver,
     fetchSendChatMessage,
     fetchThreadChatHistory
   } = useChatBot()
@@ -58,7 +58,7 @@
   )
   const tempMsg = computed<ChatThreadHistoryItem>(() => ({
     sender: 'AI',
-    message: messageReciver.value || '...'
+    message: messageReceiver.value || '...'
   }))
 
   watch(isExpand, () => handleScrollToBottom())
@@ -80,7 +80,7 @@
     inputText.value = (e.target as Element)?.textContent || ''
   }
 
-  const reciveMessage = async () => {
+  const receiveMessage = async () => {
     try {
       receiving.value = true
       const { threadId, authId } = chatPayload.value
@@ -124,7 +124,7 @@
     updateThreadChatHistory('USER', inputText.value as string)
     handleScrollToBottom()
     clearUpInputContent()
-    reciveMessage()
+    receiveMessage()
   }
 
   const handleScrollToBottom = () => {
@@ -138,7 +138,7 @@
 </script>
 
 <template>
-  <div class="platfrom-chat">
+  <div class="platform-chat">
     <section class="chat-container">
       <chat-msg-item
         v-for="(chatItem, index) of tempHistory"
@@ -182,7 +182,7 @@
 </template>
 
 <style lang="scss" scoped>
-  .platfrom-chat {
+  .platform-chat {
     @include flexbox($direction: column, $justify: space-between);
     position: relative;
     height: 100%;

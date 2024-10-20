@@ -38,7 +38,7 @@ mvn clean package -DskipTests
 2. Run SQL DDL Script at `bigtop-manager-server/src/main/resources/ddl/MySQL-DDL-CREATE.sql`
 3. Insert Test SQL Data at `dev-support/example/bigtop_manager/user.sql`
 4. Start bigtop-manager-server `bigtop-manager-server/src/main/java/org/apache/bigtop/manager/server/ServerApplication.java`
-5. Start bigtop-manager-agent `similiar with run bm-server`
+5. Start bigtop-manager-agent `similar with run bm-server`
 6. Start bigtop-manager-ui `configure nodejs environmment, default folder is bigtop-manager-ui/node, then run with package.json`
 7. Visit `http://localhost:5173/`, default login user & password are `"admin"`
 
