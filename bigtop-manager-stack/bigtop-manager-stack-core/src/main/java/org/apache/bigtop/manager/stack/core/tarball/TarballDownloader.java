@@ -38,18 +38,7 @@ public class TarballDownloader {
             int responseCode = httpConn.getResponseCode();
 
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                String fileName = "";
-                String disposition = httpConn.getHeaderField("Content-Disposition");
-
-                if (disposition != null) {
-                    int index = disposition.indexOf("filename=");
-                    if (index > 0) {
-                        fileName = disposition.substring(index + 10, disposition.length() - 1);
-                    }
-                } else {
-                    fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
-                }
-
+                String fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
                 InputStream inputStream = httpConn.getInputStream();
                 String saveFilePath = saveDir + File.separator + fileName;
 
