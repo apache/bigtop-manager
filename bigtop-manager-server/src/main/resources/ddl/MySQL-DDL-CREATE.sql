@@ -329,7 +329,7 @@ CREATE TABLE `llm_auth_platform`
     `platform_id` BIGINT(20) UNSIGNED NOT NULL,
     `credentials` TEXT                NOT NULL,
     `is_deleted`  TINYINT(1)          DEFAULT 0 NULL,
-    `status`      SMALLINT            DEFAULT 0 COMMENT '0-Available, 1-Active, 2-Unavailable',
+    `status`      SMALLINT            DEFAULT 0 COMMENT '1-Active, 2-Available, 3-Unavailable',
     `model`       VARCHAR(255)        NOT NULL,
     `name`        VARCHAR(255)        NOT NULL,
     `desc`        VARCHAR(255)        NOT NULL,

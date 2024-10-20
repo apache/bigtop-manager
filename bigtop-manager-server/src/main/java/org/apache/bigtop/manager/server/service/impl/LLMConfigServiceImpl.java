@@ -285,7 +285,7 @@ public class LLMConfigServiceImpl implements LLMConfigService {
     }
 
     @Override
-    public boolean enableAuthorizedPlatform(Long authId) {
+    public boolean activateAuthorizedPlatform(Long authId) {
         AuthPlatformPO authPlatformPO = authPlatformDao.findById(authId);
         if (authPlatformPO == null || authPlatformPO.getIsDeleted()) {
             throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED);
@@ -303,7 +303,7 @@ public class LLMConfigServiceImpl implements LLMConfigService {
     }
 
     @Override
-    public boolean disableAuthorizedPlatform(Long authId) {
+    public boolean deactivateAuthorizedPlatform(Long authId) {
         AuthPlatformPO authPlatformPO = authPlatformDao.findById(authId);
         if (authPlatformPO == null || authPlatformPO.getIsDeleted()) {
             throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED);

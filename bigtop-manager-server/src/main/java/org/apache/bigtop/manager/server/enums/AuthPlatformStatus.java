@@ -22,9 +22,9 @@ import lombok.Getter;
 
 @Getter
 public enum AuthPlatformStatus {
-    AVAILABLE(0),
     ACTIVE(1),
-    UNAVAILABLE(2),
+    AVAILABLE(2),
+    UNAVAILABLE(3),
     ;
 
     private final Integer code;

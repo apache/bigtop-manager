@@ -97,15 +97,15 @@ public class LLMConfigController {
         return ResponseEntity.success(llmConfigService.deleteAuthorizedPlatform(authId));
     }
 
-    @Operation(summary = "enable auth platform", description = "Enable authorized platforms")
-    @PostMapping("/auth-platforms/{authId}/enable")
-    public ResponseEntity<Boolean> enableAuthorizedPlatform(@PathVariable Long authId) {
-        return ResponseEntity.success(llmConfigService.enableAuthorizedPlatform(authId));
+    @Operation(summary = "activate auth platform", description = "Activate authorized platforms")
+    @PostMapping("/auth-platforms/{authId}/activate")
+    public ResponseEntity<Boolean> activateAuthorizedPlatform(@PathVariable Long authId) {
+        return ResponseEntity.success(llmConfigService.activateAuthorizedPlatform(authId));
     }
 
-    @Operation(summary = "disable auth platform", description = "Disable authorized platforms")
-    @PostMapping("/auth-platforms/{authId}/disable")
-    public ResponseEntity<Boolean> disableAuthorizedPlatform(@PathVariable Long authId) {
-        return ResponseEntity.success(llmConfigService.disableAuthorizedPlatform(authId));
+    @Operation(summary = "deactivate auth platform", description = "Deactivate authorized platforms")
+    @PostMapping("/auth-platforms/{authId}/deactivate")
+    public ResponseEntity<Boolean> deactivateAuthorizedPlatform(@PathVariable Long authId) {
+        return ResponseEntity.success(llmConfigService.deactivateAuthorizedPlatform(authId));
     }
 }
