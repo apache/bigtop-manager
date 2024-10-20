@@ -39,5 +39,5 @@ public class AuthPlatformReq {
 
     private String desc;
 
-    private boolean isTested;
+    private boolean testPassed;
 }

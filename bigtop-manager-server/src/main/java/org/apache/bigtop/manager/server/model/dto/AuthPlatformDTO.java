@@ -36,5 +36,5 @@ public class AuthPlatformDTO {
 
     private String desc;
 
-    private Boolean isTested;
+    private Boolean testPassed;
 }

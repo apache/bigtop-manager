@@ -174,7 +174,7 @@ public class LLMConfigServiceImpl implements LLMConfigService {
 
         authPlatformDTO.setAuthCredentials(credentialSet);
         AuthPlatformPO authPlatformPO = AuthPlatformConverter.INSTANCE.fromDTO2PO(authPlatformDTO);
-        if (authPlatformDTO.getIsTested()) {
+        if (authPlatformDTO.getTestPassed()) {
             authPlatformPO.setStatus(AuthPlatformStatus.AVAILABLE.getCode());
         } else {
             authPlatformPO.setStatus(AuthPlatformStatus.UNAVAILABLE.getCode());
