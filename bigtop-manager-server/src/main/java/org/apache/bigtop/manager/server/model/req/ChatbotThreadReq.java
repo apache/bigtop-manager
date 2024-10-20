@@ -16,24 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.service;
+package org.apache.bigtop.manager.server.model.req;
 
-import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
-import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
+import lombok.Data;
 
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+@Data
+public class ChatbotThreadReq {
+    private Long id;
 
-import java.util.List;
-
-public interface ChatbotService {
-
-    ChatThreadVO createChatThreads(Long authId, String model);
-
-    boolean deleteChatThreads(Long authId, Long threadId);
-
-    List<ChatThreadVO> getAllChatThreads(Long platformId, String model);
-
-    SseEmitter talk(Long authId, Long threadId, String message);
-
-    List<ChatMessageVO> history(Long platformId, Long threadId);
+    private String name;
 }

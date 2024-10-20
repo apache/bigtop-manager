@@ -18,22 +18,30 @@
  */
 package org.apache.bigtop.manager.server.service;
 
-import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
-import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
-
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import org.apache.bigtop.manager.server.model.dto.AuthPlatformDTO;
+import org.apache.bigtop.manager.server.model.vo.AuthPlatformVO;
+import org.apache.bigtop.manager.server.model.vo.PlatformAuthCredentialVO;
+import org.apache.bigtop.manager.server.model.vo.PlatformVO;
 
 import java.util.List;
 
-public interface ChatbotService {
+public interface LLMConfigService {
 
-    ChatThreadVO createChatThreads(Long authId, String model);
+    List<PlatformVO> platforms();
 
-    boolean deleteChatThreads(Long authId, Long threadId);
+    List<PlatformAuthCredentialVO> platformsAuthCredentials(Long platformId);
 
-    List<ChatThreadVO> getAllChatThreads(Long platformId, String model);
+    List<AuthPlatformVO> authorizedPlatforms();
 
-    SseEmitter talk(Long authId, Long threadId, String message);
+    AuthPlatformVO addAuthorizedPlatform(AuthPlatformDTO authPlatformDTO);
 
-    List<ChatMessageVO> history(Long platformId, Long threadId);
+    boolean deleteAuthorizedPlatform(Long authId);
+
+    boolean testAuthorizedPlatform(AuthPlatformDTO authPlatformDTO);
+
+    AuthPlatformVO updateAuthorizedPlatform(AuthPlatformDTO authPlatformDTO);
+
+    boolean activateAuthorizedPlatform(Long authId);
+
+    boolean deactivateAuthorizedPlatform(Long authId);
 }

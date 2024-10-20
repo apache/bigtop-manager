@@ -32,4 +32,12 @@ public class AuthPlatformReq {
 
     @NotEmpty
     private List<AuthCredentialReq> authCredentials;
+
+    private String name;
+
+    private String model;
+
+    private String desc;
+
+    private boolean testPassed;
 }

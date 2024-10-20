@@ -43,7 +43,6 @@ import java.util.stream.Collectors;
 public interface AuthPlatformConverter {
     AuthPlatformConverter INSTANCE = Mappers.getMapper(AuthPlatformConverter.class);
 
-    @Mapping(target = "supportModels", expression = "java(platformPO.getSupportModels())")
     @Mapping(target = "platformName", expression = "java(platformPO.getName())")
     AuthPlatformVO fromPO2VO(AuthPlatformPO authPlatformPO, @Context PlatformPO platformPO);
 

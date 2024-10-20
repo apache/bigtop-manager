@@ -29,4 +29,12 @@ public class AuthPlatformDTO {
     private Long platformId;
 
     private Map<String, String> authCredentials;
+
+    private String name;
+
+    private String model;
+
+    private String desc;
+
+    private Boolean testPassed;
 }
