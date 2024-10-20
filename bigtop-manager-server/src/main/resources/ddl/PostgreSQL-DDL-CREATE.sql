@@ -342,7 +342,7 @@ CREATE TABLE llm_auth_platform
     status      SMALLINT            DEFAULT 0,
     model       VARCHAR(255)        NOT NULL,
     name        VARCHAR(255)        NOT NULL,
-    desc        VARCHAR(255)        NOT NULL,
+    "desc"      VARCHAR(255)        NOT NULL,
     create_time TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
     update_time TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP /* ON UPDATE CURRENT_TIMESTAMP */,
     create_by   BIGINT       DEFAULT NULL,
