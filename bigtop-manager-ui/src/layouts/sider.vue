@@ -18,57 +18,51 @@
 -->
 
 <script setup lang="ts">
-  import { onMounted, ref, watch } from 'vue'
-  import { useUIStore } from '@/store/ui'
-  import { useMenuStore } from '@/store/menu/index'
-  import { storeToRefs } from 'pinia'
-  import { useRouter } from 'vue-router'
+  import { useNavigation } from '@/composables/use-menu'
+  import { computed, watch } from 'vue'
 
-  const uiStore = useUIStore()
-  const menuStore = useMenuStore()
-  const router = useRouter()
+  const { headerSelectedKey, headerMenus, sideMenuSelectedKey, onSiderClick } =
+    useNavigation()
 
-  const { siderCollapsed } = storeToRefs(uiStore)
-  const { siderMenus } = storeToRefs(menuStore)
-
-  const selectedKeys = ref<string[]>([])
-  const openKeys = ref<string[]>([])
-
-  const updateSideBar = () => {
-    const splitPath = router.currentRoute.value.path.split('/')
-    const [len, isClusters] = [splitPath.length, splitPath.includes('clusters')]
-    selectedKeys.value = [splitPath[isClusters ? len - 2 : len - 1]]
-
-    if (splitPath.length > 2) {
-      openKeys.value = [splitPath[3]]
-    } else {
-      openKeys.value = []
-    }
-  }
-
-  const onSelect = ({ item }: any) => {
-    router.push({ path: item.to })
-  }
-
-  watch(router.currentRoute, (val) => {
-    console.log('val :>> ', val)
-    updateSideBar()
+  const siderMenus = computed(() => {
+    const res = headerMenus.value.filter(
+      (v) => v.path === headerSelectedKey.value
+    )
+    return res[0]?.children ? res[0].children : []
   })
 
-  onMounted(async () => {
-    updateSideBar()
+  watch(siderMenus, (value) => {
+    console.log('value :>> ', value)
   })
 </script>
 
 <template>
-  <a-layout-sider v-model:collapsed="siderCollapsed" class="sider">
+  <a-layout-sider class="sider">
     <a-menu
-      v-model:selectedKeys="selectedKeys"
-      v-model:open-keys="openKeys"
+      :selected-keys="[sideMenuSelectedKey]"
       mode="inline"
-      :items="siderMenus"
-      @select="onSelect"
+      @select="onSiderClick"
     >
+      <template v-for="route in siderMenus">
+        <a-sub-menu
+          v-if="route.children"
+          :key="route.path"
+          :title="route.meta?.title"
+        >
+          <a-menu-item
+            v-for="child in route.children"
+            :key="child.path"
+            :path="child.path"
+          >
+            {{ child.meta?.title }}
+          </a-menu-item>
+        </a-sub-menu>
+        <template v-else>
+          <a-menu-item :key="route.path">
+            {{ route.meta?.title }}
+          </a-menu-item>
+        </template>
+      </template>
     </a-menu>
   </a-layout-sider>
 </template>

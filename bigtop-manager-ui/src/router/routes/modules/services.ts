@@ -29,6 +29,7 @@ const routes: RouteRecordRaw[] = [
     },
     children: [
       {
+        name: 'Services',
         path: '/cluster-mange/services',
         component: () => import('@/pages/cluster-mange/service/index.vue'),
         meta: {

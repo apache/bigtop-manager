@@ -18,38 +18,15 @@
 -->
 
 <script setup lang="ts">
-  import { onMounted, ref, toRaw } from 'vue'
-  import { useRouter } from 'vue-router'
-  import { useMenuStore } from '@/store/menu'
-  import { useClusterStore } from '@/store/cluster'
+  import { onMounted, ref } from 'vue'
   import SelectLang from '@/components/select-lang/index.vue'
   import UserAvatar from '@/components/user-avatar/index.vue'
+  import { useNavigation } from '@/composables/use-menu'
 
-  const router = useRouter()
-  const menuStore = useMenuStore()
-  const clusterStore = useClusterStore()
+  const { headerSelectedKey, headerMenus, onHeaderClick } = useNavigation()
   const spaceSize = ref(16)
-  const selectedKeys = ref<string[]>([
-    router.currentRoute.value.matched[0].path
-  ])
-
-  const onSelect = async () => {
-    const isCluster = selectedKeys.value[0] == '/cluster-mange/'
-    if (isCluster) {
-      await clusterStore.loadClusters()
-    }
-    const cluster = clusterStore.clusters[0]
-    const path = isCluster
-      ? `${selectedKeys.value[0]}clusters/${cluster?.clusterName}/${cluster.id}`
-      : selectedKeys.value[0]
-    menuStore.updateSiderRoutes(toRaw(selectedKeys.value), path)
-  }
-
   onMounted(() => {
-    menuStore.updateSiderRoutes(
-      toRaw(selectedKeys.value),
-      router.currentRoute.value.fullPath
-    )
+    console.log('headerMenus.value :>> ', headerMenus.value)
   })
 </script>
 
@@ -60,16 +37,13 @@
     </h1>
     <div class="header-menu">
       <a-menu
-        v-model:selectedKeys="selectedKeys"
+        :selected-keys="[headerSelectedKey]"
         theme="dark"
         mode="horizontal"
-        @select="onSelect"
+        @select="onHeaderClick"
       >
-        <a-menu-item
-          v-for="key of menuStore.headerMenus?.keys()"
-          :key="key.split('_')[0]"
-        >
-          {{ key.split('_')[1] }}
+        <a-menu-item v-for="route of headerMenus" :key="route.path">
+          {{ route.meta?.title }}
         </a-menu-item>
       </a-menu>
     </div>

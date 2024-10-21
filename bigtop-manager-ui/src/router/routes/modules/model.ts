@@ -30,6 +30,7 @@ const routes: RouteRecordRaw[] = [
     },
     children: [
       {
+        name: 'Model',
         path: '/system-mange/model',
         component: () => import('@/pages/system-mange/model/index.vue'),
         meta: {

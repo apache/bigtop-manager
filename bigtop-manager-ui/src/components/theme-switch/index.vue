@@ -18,20 +18,15 @@
 -->
 
 <script setup lang="ts">
-  import { useTheme } from '@/store/theme';
+  import { useTheme } from '@/store/theme'
   const themeStore = useTheme()
-
 </script>
 
 <template>
-   <div>
-      <a-button @click="themeStore.toggleTheme('default')"
-        >Default</a-button
-      >
-      <a-button @click="themeStore.toggleTheme('dark')">Dark</a-button>
-    </div>
+  <div>
+    <a-button @click="themeStore.toggleTheme('default')">Default</a-button>
+    <a-button @click="themeStore.toggleTheme('dark')">Dark</a-button>
+  </div>
 </template>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

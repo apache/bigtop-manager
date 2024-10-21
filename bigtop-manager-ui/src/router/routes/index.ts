@@ -31,7 +31,7 @@ const routes: RouteRecordRaw[] = [
   { path: '/login', component: () => import('@/pages/login/index.vue') },
   {
     path: '/',
-    redirect: '/cluster-mange'
+    redirect: '/cluster-mange/'
   },
   ...dynamicRoutes,
   {

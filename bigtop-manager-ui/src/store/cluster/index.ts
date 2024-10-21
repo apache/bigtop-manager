@@ -20,7 +20,7 @@
 import { defineStore } from 'pinia'
 import { ClusterVO } from '@/api/cluster/types.ts'
 import { ref } from 'vue'
-import { getClusters } from '@/api/cluster'
+// import { getClusters } from '@/api/cluster'
 
 export const useClusterStore = defineStore(
   'cluster',
@@ -28,7 +28,8 @@ export const useClusterStore = defineStore(
     const clusters = ref<ClusterVO[]>([])
 
     const loadClusters = async () => {
-      clusters.value = await getClusters()
+      // clusters.value = await getClusters()
+      clusters.value = (await Promise.resolve([])) as any
       clusters.value.push({
         id: 2,
         clusterName: 'test',
