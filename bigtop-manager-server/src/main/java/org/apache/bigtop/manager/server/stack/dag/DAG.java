@@ -448,7 +448,7 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
         // save the node whose degree is not 0
         Map<Node, Integer> notZeroIndegreeNodeMap = new HashMap<>();
 
-        // Scan all the vertices and push vertexes with an entry degree of 0 to queue
+        // Scan all the vertices and push vertices with an entry degree of 0 to queue
         for (Map.Entry<Node, NodeInfo> vertices : nodesMap.entrySet()) {
             Node node = vertices.getKey();
             int inDegree = getIndegree(node);

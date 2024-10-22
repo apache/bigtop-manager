@@ -35,7 +35,7 @@ git clone https://github.com/apache/bigtop-manager.git
 > You need to change the `node.version` in the `pom.xml` file under the `bigtop-manager-ui` module to `16.x` if you are using CentOS-7.
 
 ### **Step 3**: Build develop basic image
-Run the setup command, you will get `bigtop-manager/develop:trunk-rocky-8` image. It has the enviroment needed to compile Bigtop-Manager and run servers such as Bigtop-Manager Server, Bigtop-Manager Agent, Mysql, etc.
+Run the setup command, you will get `bigtop-manager/develop:trunk-rocky-8` image. It has the environment needed to compile Bigtop-Manager and run servers such as Bigtop-Manager Server, Bigtop-Manager Agent, Mysql, etc.
 
 **RHEL (Rocky 8) :**
 ```shell
