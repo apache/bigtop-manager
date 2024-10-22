@@ -30,14 +30,6 @@ export const useClusterStore = defineStore(
     const loadClusters = async () => {
       // clusters.value = await getClusters()
       clusters.value = (await Promise.resolve([])) as any
-      clusters.value.push({
-        id: 2,
-        clusterName: 'test',
-        clusterType: 1,
-        stackName: 'infra',
-        stackVersion: '1.0.0',
-        selected: true
-      })
     }
 
     return {

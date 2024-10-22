@@ -17,95 +17,117 @@
  * under the License.
  */
 
-import { defineStore } from 'pinia'
-import { computed, reactive, ref, toRaw } from 'vue'
+import { ref } from 'vue'
+import { useRouter, RouteRecordRaw, useRoute } from 'vue-router'
 import { dynamicRoutes } from '@/router/routes/index'
-import { useClusterStore } from '@/store/cluster/index'
-import { type MenuItem } from './types'
-import { type RouteRecordRaw, useRouter } from 'vue-router'
+import { defineStore } from 'pinia'
 
 export const useMenuStore = defineStore(
   'menu',
   () => {
     const router = useRouter()
-    const clusterStore = useClusterStore()
-    const reactiveRoutes = reactive(dynamicRoutes)
-    const currSiderRoutes = ref<RouteRecordRaw[]>([])
-    const siderMenus = computed(() => initSiderMenu(currSiderRoutes.value))
-    const headerMenus = computed(() => splitDynamicRoutesToCreateHeaderMenus())
+    const route = useRoute()
+    const headerSelectedKey = ref('')
+    const siderMenuSelectedKey = ref('')
+    const headerMenus = ref<RouteRecordRaw[]>([])
+    const siderMenus = ref<RouteRecordRaw[]>([])
+    const dynamicRoutesParams = ref<RouteRecordRaw[]>([])
+    const baseRoutesMap = ref<Map<string, RouteRecordRaw[]>>(new Map())
 
-    const splitDynamicRoutesToCreateHeaderMenus = () => {
-      const map = new Map()
-      reactiveRoutes.forEach((route) => {
+    function setBaseRoutesMap() {
+      dynamicRoutes.forEach((route) => {
         if (!route.meta?.hidden) {
-          const key = `${route.path}_${route.meta?.title}`
-          const exist = map.get(key) || []
-          map.set(key, [...exist, ...(route.children || [])])
+          const exist = baseRoutesMap.value.get(route.path) || []
+          baseRoutesMap.value.set(route.path, [
+            ...exist,
+            ...(route.children || [])
+          ])
         }
       })
-      return map
     }
 
-    const updateSiderRoutes = (selectedKeys: string[], to?: string) => {
-      const res = [...toRaw(headerMenus.value).keys()].find((v) =>
-        v.includes(selectedKeys[0])
-      )
-      currSiderRoutes.value = headerMenus.value.get(res) || []
-      router.push({ path: to || selectedKeys[0] })
-    }
+    async function setupDynamicRoutes() {
+      const dynamicParams = (await new Promise((resolve) => {
+        setTimeout(() => {
+          resolve([
+            { cluster: 'cluster1', id: '101' },
+            { cluster: 'cluster2', id: '102' }
+          ])
+        }, 1000)
+      })) as any
 
-    const initSiderMenuItem = (route: RouteRecordRaw): MenuItem => {
-      const menuItem: MenuItem = {
-        ...route.meta,
-        key: route.name === 'Clusters' ? route.path.split('/')[2] : route.path,
-        to: route.path,
-        label: route.meta?.title || '',
-        hidden: Boolean(route.meta?.hidden)
-      }
-      if (route.children !== undefined || route.name === 'Clusters') {
-        menuItem.children = []
-      }
-      return menuItem
-    }
-
-    const initSiderMenu = (routes: RouteRecordRaw[]) => {
-      return routes.reduce((pre, route) => {
-        const menuItem = initSiderMenuItem(route)
-        if (route.name === 'Clusters') {
-          clusterStore.clusters.forEach((cluster) => {
-            menuItem.to = menuItem.to.replace(
-              ':cluster',
-              `${menuItem?.clusterName}/${clusterStore.clusters[0].id}`
-            )
-            menuItem.children?.push({
-              key: cluster?.clusterName,
-              to: route.path.replace(':cluster', `${cluster?.clusterName}`),
-              title: cluster?.clusterName,
-              label: cluster?.clusterName
-            })
-          })
-        } else if (route.children !== undefined) {
-          route.children.forEach((child) => {
-            menuItem.children?.push({
-              key: child.path,
-              to: `${route.path}${child.path}`,
-              title: child.meta?.title,
-              icon: child.meta?.icon,
-              label: child.meta?.title || ''
-            })
-          })
-        } else {
-          menuItem.key = route.path.split('/').at(-1)
+      dynamicRoutesParams.value = dynamicParams.map((param: any) => {
+        const dynamicRoute = {
+          name: `Cluster_${param.cluster}_${param.id}`,
+          path: '/clusters/:cluster/:id'.replace(
+            ':cluster/:id',
+            `${param.cluster}/${param.id}`
+          ),
+          component: () => import('@/pages/cluster-mange/cluster/index.vue'),
+          meta: { title: `${param.cluster}` }
         }
-        pre.push(menuItem)
-        return pre
-      }, [] as MenuItem[])
+        return dynamicRoute
+      })
+      setupMenus()
+    }
+
+    function injectDynamicRoutesParams() {
+      siderMenus.value.forEach((v) => {
+        if (v.name === 'Clusters') {
+          v.children = [...dynamicRoutesParams.value]
+        }
+      })
+    }
+
+    function findActivePath(menu: RouteRecordRaw): string {
+      return menu.children ? findActivePath(menu.children[0]) : menu.path
+    }
+
+    function setupMenus() {
+      const currheadPath = route.matched[0].path
+      const activeMenus = baseRoutesMap.value.get(currheadPath)
+
+      headerMenus.value = dynamicRoutes
+      headerSelectedKey.value =
+        currheadPath || [...baseRoutesMap.value.keys()][0]
+
+      siderMenus.value = currheadPath
+        ? (activeMenus as RouteRecordRaw[])
+        : [...baseRoutesMap.value.values()][0]
+      injectDynamicRoutesParams()
+
+      const filterPath = route.matched[route.matched.length - 1].path
+      if ([...baseRoutesMap.value.keys()].includes(filterPath)) {
+        siderMenuSelectedKey.value = findActivePath(siderMenus.value[0])
+      } else {
+        siderMenuSelectedKey.value = route.path
+      }
+
+      router.push(siderMenuSelectedKey.value)
+    }
+
+    function onHeaderClick(key: string) {
+      headerSelectedKey.value = key
+      siderMenus.value = baseRoutesMap.value.get(key) || []
+      injectDynamicRoutesParams()
+      siderMenuSelectedKey.value = findActivePath(siderMenus.value[0])
+      router.push(siderMenuSelectedKey.value)
+    }
+
+    function onSiderClick(key: string) {
+      siderMenuSelectedKey.value = key
+      router.push(key)
     }
 
     return {
-      siderMenus,
+      headerSelectedKey,
+      siderMenuSelectedKey,
       headerMenus,
-      updateSiderRoutes
+      siderMenus,
+      onHeaderClick,
+      onSiderClick,
+      setBaseRoutesMap,
+      setupDynamicRoutes
     }
   },
   {

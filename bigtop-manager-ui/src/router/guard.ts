@@ -18,20 +18,10 @@
  */
 
 import type { Router } from 'vue-router'
-import { useClusterStore } from '@/store/cluster'
 
 function setCommonGuard(router: Router) {
   router.beforeEach(async (to, _from, next) => {
-    // redirect to the default cluster path
-    if (to.path === '/cluster-mange') {
-      const clusterStore = useClusterStore()
-      await clusterStore.loadClusters()
-      const cluster = clusterStore.clusters[0]
-      const path = `${to.path}/clusters/${cluster?.clusterName}/${cluster.id}`
-      next({ path })
-    } else {
-      next()
-    }
+    next()
   })
 }
 

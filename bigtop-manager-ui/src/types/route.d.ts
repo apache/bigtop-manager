@@ -25,10 +25,9 @@ declare module 'vue-router' {
     title?: string
     icon?: VNode
     hidden?: boolean
-    priority?: number
-    alwaysShow?:boolean
-    belong?:string
-    noCache?:boolean
-    activeMenu?:string
+    alwaysShow?: boolean
+    belong?: string
+    noCache?: boolean
+    activeMenu?: string
   }
 }

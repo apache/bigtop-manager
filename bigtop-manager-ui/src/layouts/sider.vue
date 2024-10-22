@@ -18,16 +18,31 @@
 -->
 
 <script setup lang="ts">
-  import { ref, watch } from 'vue'
+  import { toRefs } from 'vue'
   import { RouteRecordRaw } from 'vue-router'
+  import { useRouter } from 'vue-router'
 
-  const sideMenuSelectedKey = ref('')
-  const siderMenus = ref<RouteRecordRaw[]>([])
-  const onSiderClick = () => {}
+  interface Props {
+    sideMenuSelectedKey: string
+    siderMenus: RouteRecordRaw[]
+  }
 
-  watch(siderMenus, (value) => {
-    console.log('value :>> ', value)
+  const props = withDefaults(defineProps<Props>(), {
+    sideMenuSelectedKey: '',
+    siderMenus: () => []
   })
+  const { sideMenuSelectedKey, siderMenus } = toRefs(props)
+  const router = useRouter()
+  const emits = defineEmits(['onSiderClick'])
+
+  const addCluster = () => {
+    router.push({ path: '/clusters/add' })
+    onSiderClick({ key: '/clusters/add' })
+  }
+
+  const onSiderClick = ({ key }: any) => {
+    emits('onSiderClick', key)
+  }
 </script>
 
 <template>
@@ -52,12 +67,16 @@
           </a-menu-item>
         </a-sub-menu>
         <template v-else>
-          <a-menu-item :key="route.path">
+          <a-menu-item v-if="!route.meta?.hidden" :key="route.path">
             {{ route.meta?.title }}
           </a-menu-item>
         </template>
       </template>
     </a-menu>
+    <a-divider />
+    <div class="add-option">
+      <a-button type="primary" ghost @click="addCluster">添加集群</a-button>
+    </div>
   </a-layout-sider>
 </template>
 
@@ -68,6 +87,11 @@
 
     .menu-title-flex {
       @include flexbox($justify: space-between, $align: center);
+    }
+    .add-option {
+      width: 160px;
+      display: flex;
+      justify-content: center;
     }
   }
 </style>

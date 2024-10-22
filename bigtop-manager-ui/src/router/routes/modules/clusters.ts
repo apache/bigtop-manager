@@ -30,10 +30,19 @@ const routes: RouteRecordRaw[] = [
     children: [
       {
         name: 'Clusters',
-        path: '/cluster-mange/clusters/:cluster/:id',
+        path: '/clusters/:cluster/:id',
         component: () => import('@/pages/cluster-mange/cluster/index.vue'),
         meta: {
           title: '集群管理'
+        }
+      },
+      {
+        name: 'AddClusters',
+        path: '/clusters/add',
+        component: () => import('@/pages/cluster-mange/cluster/add.vue'),
+        meta: {
+          hidden: true,
+          title: '新增集群'
         }
       }
     ]

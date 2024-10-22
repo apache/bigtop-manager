@@ -18,17 +18,24 @@
 -->
 
 <script setup lang="ts">
-  import { onMounted, ref } from 'vue'
+  import { ref, toRefs } from 'vue'
   import SelectLang from '@/components/select-lang/index.vue'
   import UserAvatar from '@/components/user-avatar/index.vue'
   import { RouteRecordRaw } from 'vue-router'
-
-  const headerMenus = ref<RouteRecordRaw[]>([])
-  const headerSelectedKey = ref('')
-  const onHeaderClick = () => {}
-
+  interface Props {
+    headerSelectedKey: string
+    headerMenus: RouteRecordRaw[]
+  }
+  const props = withDefaults(defineProps<Props>(), {
+    headerSelectedKey: '',
+    headerMenus: () => []
+  })
+  const { headerSelectedKey, headerMenus } = toRefs(props)
   const spaceSize = ref(16)
-  onMounted(() => {})
+  const emits = defineEmits(['onHeaderClick'])
+  const onHeaderClick = ({ key }: any) => {
+    emits('onHeaderClick', key)
+  }
 </script>
 
 <template>

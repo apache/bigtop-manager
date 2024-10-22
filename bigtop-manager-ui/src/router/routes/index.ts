@@ -28,7 +28,10 @@ export const dynamicRoutes: RouteRecordRaw[] =
   mergeRouteModules(dynamicRoutesFiles)
 
 const routes: RouteRecordRaw[] = [
-  { path: '/login', component: () => import('@/pages/login/index.vue') },
+  {
+    path: '/login',
+    component: () => import('@/pages/login/index.vue')
+  },
   {
     path: '/',
     redirect: '/cluster-mange/'
