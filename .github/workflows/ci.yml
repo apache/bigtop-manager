@@ -25,17 +25,14 @@ jobs:
       - run: ./mvnw clean spotless:check
 
   spellcheck:
-    name: "Check code spelling"
+    name: "Check typos"
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-      - run: cargo install typos-cli
-      - run: |
-          typos --config .github/typos-config.toml || echo "Spellcheck failed. You can add false positives to .github/typos-config.toml"
+      - uses: crate-ci/typos@master
+      - with:
+          config: .github/typos-config.toml
 
   unit-tests-java:
     name: "Run unit test(Java)"
