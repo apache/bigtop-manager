@@ -21,13 +21,14 @@
   import { onMounted, ref } from 'vue'
   import SelectLang from '@/components/select-lang/index.vue'
   import UserAvatar from '@/components/user-avatar/index.vue'
-  import { useNavigation } from '@/composables/use-menu'
+  import { RouteRecordRaw } from 'vue-router'
 
-  const { headerSelectedKey, headerMenus, onHeaderClick } = useNavigation()
+  const headerMenus = ref<RouteRecordRaw[]>([])
+  const headerSelectedKey = ref('')
+  const onHeaderClick = () => {}
+
   const spaceSize = ref(16)
-  onMounted(() => {
-    console.log('headerMenus.value :>> ', headerMenus.value)
-  })
+  onMounted(() => {})
 </script>
 
 <template>

@@ -18,18 +18,12 @@
 -->
 
 <script setup lang="ts">
-  import { useNavigation } from '@/composables/use-menu'
-  import { computed, watch } from 'vue'
+  import { ref, watch } from 'vue'
+  import { RouteRecordRaw } from 'vue-router'
 
-  const { headerSelectedKey, headerMenus, sideMenuSelectedKey, onSiderClick } =
-    useNavigation()
-
-  const siderMenus = computed(() => {
-    const res = headerMenus.value.filter(
-      (v) => v.path === headerSelectedKey.value
-    )
-    return res[0]?.children ? res[0].children : []
-  })
+  const sideMenuSelectedKey = ref('')
+  const siderMenus = ref<RouteRecordRaw[]>([])
+  const onSiderClick = () => {}
 
   watch(siderMenus, (value) => {
     console.log('value :>> ', value)

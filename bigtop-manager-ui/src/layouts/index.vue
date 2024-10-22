@@ -24,8 +24,6 @@
   import LayoutSider from '@/layouts/sider.vue'
   import { useUserStore } from '@/store/user'
   import { useClusterStore } from '@/store/cluster'
-  import { useNavigation } from '@/composables/use-menu'
-  const { siderMenus } = useNavigation()
   // import { useServiceStore } from '@/store/service'
   // import { useComponentStore } from '@/store/component'
   // import { useConfigStore } from '@/store/config'
@@ -55,7 +53,6 @@
     <a-layout>
       <layout-sider />
       <a-layout class="layout-inner">
-        {{ siderMenus }}
         <router-view />
         <layout-footer />
       </a-layout>
