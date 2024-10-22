@@ -18,6 +18,7 @@
  */
 package org.apache.bigtop.manager.server.service;
 
+import org.apache.bigtop.manager.server.model.dto.ChatThreadDTO;
 import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
 import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
 
@@ -27,13 +28,15 @@ import java.util.List;
 
 public interface ChatbotService {
 
-    ChatThreadVO createChatThreads(Long authId, String model);
+    ChatThreadVO createChatThread(ChatThreadDTO chatThreadDTO);
 
-    boolean deleteChatThreads(Long authId, Long threadId);
+    boolean deleteChatThread(Long threadId);
 
-    List<ChatThreadVO> getAllChatThreads(Long platformId, String model);
+    List<ChatThreadVO> getAllChatThreads();
 
-    SseEmitter talk(Long authId, Long threadId, String message);
+    SseEmitter talk(Long threadId, String message);
 
-    List<ChatMessageVO> history(Long platformId, Long threadId);
+    List<ChatMessageVO> history(Long threadId);
+
+    ChatThreadVO updateChatThread(ChatThreadDTO chatThreadDTO);
 }

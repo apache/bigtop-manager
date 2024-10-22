@@ -30,6 +30,8 @@ public class ChatThreadDTO {
 
     private Long authId;
 
+    private String name;
+
     private Map<String, String> authCredentials;
 
     private Map<String, String> threadInfo;

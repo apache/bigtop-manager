@@ -65,6 +65,10 @@ public enum LocaleKeys {
     MODEL_NOT_SUPPORTED("model.not.supported"),
     CHAT_THREAD_NOT_FOUND("chat.thread.not.found"),
 
+    NO_PLATFORM_IN_USE("no.platform.in.use"),
+    PLATFORM_NOT_IN_USE("platform.not.in.use"),
+    PLATFORM_IS_ACTIVE("platform.is.active"),
+    
     FILE_UPLOAD_FAILED("file.upload.failed"),
     ;
 

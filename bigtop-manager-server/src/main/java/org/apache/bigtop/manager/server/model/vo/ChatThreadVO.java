@@ -28,19 +28,11 @@ public class ChatThreadVO {
 
     private Long platformId;
 
-    private String model;
+    private String name;
 
     private String createTime;
 
     private String updateTime;
-
-    public ChatThreadVO(Long threadId, Long platformId, String model, String createTime) {
-        this.threadId = threadId;
-        this.platformId = platformId;
-        this.model = model;
-        this.createTime = createTime;
-        this.updateTime = createTime;
-    }
 
     public ChatThreadVO() {}
 }

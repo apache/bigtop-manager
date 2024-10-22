@@ -21,6 +21,7 @@ package org.apache.bigtop.manager.server.model.converter;
 import org.apache.bigtop.manager.dao.po.ChatThreadPO;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.dto.ChatThreadDTO;
+import org.apache.bigtop.manager.server.model.req.ChatbotThreadReq;
 import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
 
 import org.mapstruct.Mapper;
@@ -41,4 +42,6 @@ public interface ChatThreadConverter {
 
     @Mapping(source = "threadInfo", target = "threadInfo", qualifiedByName = "jsonString2Map")
     ChatThreadDTO fromPO2DTO(ChatThreadPO chatThreadPO);
+
+    ChatThreadDTO fromReq2DTO(ChatbotThreadReq chatbotThreadReq);
 }

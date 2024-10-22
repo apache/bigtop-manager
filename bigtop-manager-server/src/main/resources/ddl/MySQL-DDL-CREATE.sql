@@ -353,18 +353,16 @@ CREATE TABLE `llm_chat_thread`
 (
     `id`          BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
     `auth_id`     BIGINT(20) UNSIGNED NOT NULL,
-    `platform_id` BIGINT(20) UNSIGNED NOT NULL,
     `user_id`     BIGINT(20) UNSIGNED NOT NULL,
-    `model`       VARCHAR(255)        NOT NULL,
     `is_deleted`  TINYINT(1)          DEFAULT 0 NULL,
     `thread_info` TEXT                DEFAULT NULL,
+    `name`        VARCHAR(255)        DEFAULT NULL,
     `create_time` DATETIME            DEFAULT CURRENT_TIMESTAMP,
     `update_time` DATETIME            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `create_by`   BIGINT              DEFAULT NULL,
     `update_by`   BIGINT              DEFAULT NULL,
     PRIMARY KEY (`id`),
     KEY             `idx_auth_id` (`auth_id`),
-    KEY             `idx_platform_id` (`platform_id`),
     KEY             `idx_user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

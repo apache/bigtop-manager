@@ -18,6 +18,8 @@
  */
 package org.apache.bigtop.manager.server.controller;
 
+import org.apache.bigtop.manager.server.model.converter.ChatThreadConverter;
+import org.apache.bigtop.manager.server.model.dto.ChatThreadDTO;
 import org.apache.bigtop.manager.server.model.req.ChatbotMessageReq;
 import org.apache.bigtop.manager.server.model.req.ChatbotThreadReq;
 import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
@@ -50,40 +52,42 @@ public class ChatbotController {
     private ChatbotService chatbotService;
 
     @Operation(summary = "new thread", description = "Create a chat threads")
-    @PostMapping("/auth-platforms/{authId}/threads")
-    public ResponseEntity<ChatThreadVO> createChatThreads(@PathVariable Long authId) {
-        return ResponseEntity.success(chatbotService.createChatThreads(authId, ""));
+    @PostMapping("/threads")
+    public ResponseEntity<ChatThreadVO> createChatThread(@RequestBody ChatbotThreadReq chatbotThreadReq) {
+        ChatThreadDTO chatThreadDTO = ChatThreadConverter.INSTANCE.fromReq2DTO(chatbotThreadReq);
+        return ResponseEntity.success(chatbotService.createChatThread(chatThreadDTO));
     }
 
     @Operation(summary = "update thread", description = "Update a chat threads")
-    @PutMapping("/auth-platforms/{authId}/threads")
-    public ResponseEntity<ChatThreadVO> updateChatThreads(
-            @PathVariable Long authId, @RequestBody ChatbotThreadReq chatbotThreadReq) {
-        return ResponseEntity.success(chatbotService.createChatThreads(authId, ""));
+    @PutMapping("/threads/{threadId}")
+    public ResponseEntity<ChatThreadVO> updateChatThread(
+            @PathVariable Long threadId, @RequestBody ChatbotThreadReq chatbotThreadReq) {
+        ChatThreadDTO chatThreadDTO = ChatThreadConverter.INSTANCE.fromReq2DTO(chatbotThreadReq);
+        chatThreadDTO.setId(threadId);
+        return ResponseEntity.success(chatbotService.updateChatThread(chatThreadDTO));
     }
 
     @Operation(summary = "delete thread", description = "Delete a chat threads")
-    @DeleteMapping("/auth-platforms/{authId}/threads/{threadId}")
-    public ResponseEntity<Boolean> deleteChatThreads(@PathVariable Long authId, @PathVariable Long threadId) {
-        return ResponseEntity.success(chatbotService.deleteChatThreads(authId, threadId));
+    @DeleteMapping("/threads/{threadId}")
+    public ResponseEntity<Boolean> deleteChatThread(@PathVariable Long threadId) {
+        return ResponseEntity.success(chatbotService.deleteChatThread(threadId));
     }
 
     @Operation(summary = "get threads", description = "Get all threads of a auth platform")
-    @GetMapping("/auth-platforms/{authId}/threads")
-    public ResponseEntity<List<ChatThreadVO>> getAllChatThreads(@PathVariable Long authId) {
-        return ResponseEntity.success(chatbotService.getAllChatThreads(authId, ""));
+    @GetMapping("/threads")
+    public ResponseEntity<List<ChatThreadVO>> getAllChatThreads() {
+        return ResponseEntity.success(chatbotService.getAllChatThreads());
     }
 
     @Operation(summary = "talk", description = "Talk with Chatbot")
-    @PostMapping("/auth-platforms/{authId}/threads/{threadId}/talk")
-    public SseEmitter talk(
-            @PathVariable Long authId, @PathVariable Long threadId, @RequestBody ChatbotMessageReq messageReq) {
-        return chatbotService.talk(authId, threadId, messageReq.getMessage());
+    @PostMapping("/threads/{threadId}/talk")
+    public SseEmitter talk(@PathVariable Long threadId, @RequestBody ChatbotMessageReq messageReq) {
+        return chatbotService.talk(threadId, messageReq.getMessage());
     }
 
     @Operation(summary = "history", description = "Get chat records")
-    @GetMapping("/auth-platforms/{authId}/threads/{threadId}/history")
-    public ResponseEntity<List<ChatMessageVO>> history(@PathVariable Long authId, @PathVariable Long threadId) {
-        return ResponseEntity.success(chatbotService.history(authId, threadId));
+    @GetMapping("/threads/{threadId}/history")
+    public ResponseEntity<List<ChatMessageVO>> history(@PathVariable Long threadId) {
+        return ResponseEntity.success(chatbotService.history(threadId));
     }
 }

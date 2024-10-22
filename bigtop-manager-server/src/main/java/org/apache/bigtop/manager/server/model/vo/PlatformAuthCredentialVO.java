@@ -26,6 +26,8 @@ public class PlatformAuthCredentialVO {
 
     private String displayName;
 
+    private String description;
+
     public PlatformAuthCredentialVO(String name, String displayName) {
         this.name = name;
         this.displayName = displayName;
