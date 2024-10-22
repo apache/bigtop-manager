@@ -39,6 +39,30 @@ public class HostPO extends BasePO implements Serializable {
     @Column(name = "hostname")
     private String hostname;
 
+    @Column(name = "ssh_user")
+    private String sshUser;
+
+    @Column(name = "ssh_port")
+    private Integer sshPort;
+
+    @Column(name = "auth_type")
+    private Integer authType;
+
+    @Column(name = "ssh_password")
+    private String sshPassword;
+
+    @Column(name = "ssh_key_string")
+    private String sshKeyString;
+
+    @Column(name = "ssh_key_filename")
+    private String sshKeyFilename;
+
+    @Column(name = "ssh_key_password")
+    private String sshKeyPassword;
+
+    @Column(name = "grpc_port")
+    private Integer grpcPort;
+
     @Column(name = "ipv4")
     private String ipv4;
 
@@ -66,13 +90,21 @@ public class HostPO extends BasePO implements Serializable {
     @Column(name = "total_disk")
     private Long totalDisk;
 
-    @Column(name = "state")
-    private String state;
+    @Column(name = "desc")
+    private String desc;
+
+    @Column(name = "status")
+    private Integer status;
+
+    @Column(name = "err_info")
+    private String errInfo;
 
     @Column(name = "cluster_id", nullable = false)
     private Long clusterId;
 
     @Transient
-    @Column(name = "cluster_name")
     private String clusterName;
+
+    @Transient
+    private Integer componentNum;
 }

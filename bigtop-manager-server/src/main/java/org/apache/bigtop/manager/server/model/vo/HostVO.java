@@ -25,9 +25,23 @@ public class HostVO {
 
     private Long id;
 
-    private String clusterName;
-
     private String hostname;
+
+    private String sshUser;
+
+    private Integer sshPort;
+
+    private Integer authType;
+
+    private String sshPassword;
+
+    private String sshKeyString;
+
+    private String sshKeyFilename;
+
+    private String sshKeyPassword;
+
+    private Integer grpcPort;
 
     private String ipv4;
 
@@ -47,5 +61,13 @@ public class HostVO {
 
     private Long totalDisk;
 
-    private String state;
+    private String desc;
+
+    private Integer status;
+
+    private String errInfo;
+
+    private String clusterName;
+
+    private Integer componentNum;
 }

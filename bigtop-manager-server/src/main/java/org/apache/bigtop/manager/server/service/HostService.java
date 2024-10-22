@@ -18,8 +18,10 @@
  */
 package org.apache.bigtop.manager.server.service;
 
+import org.apache.bigtop.manager.dao.query.HostQuery;
 import org.apache.bigtop.manager.server.model.dto.HostDTO;
 import org.apache.bigtop.manager.server.model.vo.HostVO;
+import org.apache.bigtop.manager.server.model.vo.PageVO;
 
 import java.util.List;
 
@@ -30,7 +32,9 @@ public interface HostService {
      *
      * @return Hosts
      */
-    List<HostVO> list(Long clusterId);
+    PageVO<HostVO> list(Long clusterId, HostQuery hostQuery);
+
+    List<HostVO> add(Long clusterId, HostDTO hostDTO);
 
     /**
      * Save a host
@@ -51,7 +55,7 @@ public interface HostService {
      *
      * @return Host
      */
-    HostVO update(Long id, HostDTO hostDTO);
+    HostVO update(Long id, Long clusterId, HostDTO hostDTO);
 
     /**
      * Delete a host
@@ -63,8 +67,8 @@ public interface HostService {
     /**
      * Check hosts connection
      *
-     * @param hostnames hostname list
+     * @param hostDTO host infos
      * @return true if all hosts are able to connect
      */
-    Boolean checkConnection(List<String> hostnames);
+    Boolean checkConnection(HostDTO hostDTO);
 }

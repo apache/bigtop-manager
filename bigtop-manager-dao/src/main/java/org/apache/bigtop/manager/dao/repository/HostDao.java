@@ -20,6 +20,7 @@
 package org.apache.bigtop.manager.dao.repository;
 
 import org.apache.bigtop.manager.dao.po.HostPO;
+import org.apache.bigtop.manager.dao.query.HostQuery;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -35,4 +36,8 @@ public interface HostDao extends BaseDao<HostPO> {
     List<HostPO> findAllByClusterId(@Param("clusterId") Long clusterId);
 
     HostPO findByIdJoin(@Param("id") Long id);
+
+    List<HostPO> findByQuery(@Param("query") HostQuery query);
+
+    HostPO findDetailsById(@Param("id") Long id);
 }

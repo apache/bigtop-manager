@@ -16,18 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.req;
+package org.apache.bigtop.manager.server.enums;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
+import lombok.Getter;
 
-import jakarta.validation.constraints.NotEmpty;
-import java.util.List;
+@Getter
+public enum HostStatus {
+    HEALTHY(1),
+    UNHEALTHY(2),
+    UNKNOWN(3),
+    ;
 
-@Data
-public class HostnamesReq {
+    private final Integer code;
 
-    @NotEmpty
-    @Schema(example = "[host1, host2]")
-    private List<String> hostnames;
+    HostStatus(Integer code) {
+        this.code = code;
+    }
+
+    public static HostStatus fromCode(Integer code) {
+        for (HostStatus status : HostStatus.values()) {
+            if (status.code.equals(code)) {
+                return status;
+            }
+        }
+
+        return UNKNOWN;
+    }
 }

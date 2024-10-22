@@ -219,4 +219,9 @@
         on clu.stack_id = st.id
     </select>
 
+    <select id="countByHostId" resultType="java.lang.Integer">
+        select count(*)
+        from host_component
+        where host_id = #{hostId}
+    </select>
 </mapper>

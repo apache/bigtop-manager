@@ -48,6 +48,7 @@
         <oshi-core.version>6.4.11</oshi-core.version>
         <micrometer.version>1.12.4</micrometer.version>
         <jdbc.dm.version>8.1.2.192</jdbc.dm.version>
+        <sshd.version>2.14.0</sshd.version>
         <langchain4j.version>0.33.0</langchain4j.version>
         <dashscope.version>2.16.3</dashscope.version>
         <mybatis-spring-boot-starter.version>3.0.3</mybatis-spring-boot-starter.version>
@@ -177,6 +178,13 @@
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-core</artifactId>
                 <version>${micrometer.version}</version>
+            </dependency>
+
+            <!-- sshd -->
+            <dependency>
+                <groupId>org.apache.sshd</groupId>
+                <artifactId>sshd-core</artifactId>
+                <version>${sshd.version}</version>
             </dependency>
 
             <dependency>
