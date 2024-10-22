@@ -16,29 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.agent.utils;
+package org.apache.bigtop.manager.dao.query;
 
-import org.apache.bigtop.manager.common.utils.Environments;
+import lombok.Data;
 
-import org.apache.commons.lang3.SystemUtils;
+@Data
+public class HostQuery {
 
-import java.io.File;
+    private String hostnameLike;
 
-public class LogFileUtils {
+    private Long clusterId;
 
-    public static String getLogFilePath(Long taskId) {
-        String baseDir;
-        if (Environments.isDevMode()) {
-            baseDir = SystemUtils.getUserDir().getPath();
-        } else {
-            File file = new File(LogFileUtils.class
-                    .getProtectionDomain()
-                    .getCodeSource()
-                    .getLocation()
-                    .getPath());
-            baseDir = file.getParentFile().getParentFile().getPath();
-        }
+    private String ipv4Like;
 
-        return baseDir + File.separator + "tasklogs" + File.separator + "task-" + taskId + ".log";
-    }
+    private Integer status;
 }

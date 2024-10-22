@@ -18,10 +18,11 @@
  */
 package org.apache.bigtop.manager.server.controller;
 
+import org.apache.bigtop.manager.dao.query.HostQuery;
 import org.apache.bigtop.manager.server.model.dto.HostDTO;
 import org.apache.bigtop.manager.server.model.req.HostReq;
-import org.apache.bigtop.manager.server.model.req.HostnamesReq;
 import org.apache.bigtop.manager.server.model.vo.HostVO;
+import org.apache.bigtop.manager.server.model.vo.PageVO;
 import org.apache.bigtop.manager.server.service.HostService;
 import org.apache.bigtop.manager.server.utils.MessageSourceUtils;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
@@ -35,9 +36,6 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.Arrays;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -72,10 +70,11 @@ class HostControllerTest {
     @Test
     void listReturnsAllHosts() {
         Long clusterId = 1L;
-        List<HostVO> hosts = Arrays.asList(new HostVO(), new HostVO());
-        when(hostService.list(clusterId)).thenReturn(hosts);
+        PageVO<HostVO> hosts = new PageVO<>();
+        HostQuery hostQuery = new HostQuery();
+        when(hostService.list(clusterId, hostQuery)).thenReturn(hosts);
 
-        ResponseEntity<List<HostVO>> response = hostController.list(clusterId);
+        ResponseEntity<PageVO<HostVO>> response = hostController.list(clusterId, hostQuery);
 
         assertTrue(response.isSuccess());
         assertEquals(hosts, response.getData());
@@ -100,7 +99,7 @@ class HostControllerTest {
         Long hostId = 1L;
         HostReq hostReq = new HostReq();
         HostVO updatedHost = new HostVO();
-        when(hostService.update(anyLong(), any(HostDTO.class))).thenReturn(updatedHost);
+        when(hostService.update(anyLong(), anyLong(), any(HostDTO.class))).thenReturn(updatedHost);
 
         ResponseEntity<HostVO> response = hostController.update(clusterId, hostId, hostReq);
 
@@ -123,11 +122,10 @@ class HostControllerTest {
     @Test
     void checkConnectionReturnsSuccess() {
         Long clusterId = 1L;
-        HostnamesReq hostnamesReq = new HostnamesReq();
-        hostnamesReq.setHostnames(Arrays.asList("host1", "host2"));
-        when(hostService.checkConnection(hostnamesReq.getHostnames())).thenReturn(true);
+        HostReq hostReq = new HostReq();
+        when(hostService.checkConnection(any(HostDTO.class))).thenReturn(true);
 
-        ResponseEntity<Boolean> response = hostController.checkConnection(clusterId, hostnamesReq);
+        ResponseEntity<Boolean> response = hostController.checkConnection(clusterId, hostReq);
 
         assertTrue(response.isSuccess());
         assertTrue(response.getData());
@@ -136,12 +134,13 @@ class HostControllerTest {
     @Test
     void listReturnsEmptyForInvalidClusterId() {
         Long clusterId = 999L;
-        when(hostService.list(clusterId)).thenReturn(List.of());
+        HostQuery hostQuery = new HostQuery();
+        when(hostService.list(clusterId, hostQuery)).thenReturn(new PageVO<>());
 
-        ResponseEntity<List<HostVO>> response = hostController.list(clusterId);
+        ResponseEntity<PageVO<HostVO>> response = hostController.list(clusterId, hostQuery);
 
         assertTrue(response.isSuccess());
-        assertTrue(response.getData().isEmpty());
+        assertNull(response.getData().getContent());
     }
 
     @Test
@@ -161,7 +160,7 @@ class HostControllerTest {
         Long clusterId = 1L;
         Long hostId = 999L;
         HostReq hostReq = new HostReq();
-        when(hostService.update(anyLong(), any(HostDTO.class))).thenReturn(null);
+        when(hostService.update(anyLong(), anyLong(), any(HostDTO.class))).thenReturn(null);
 
         ResponseEntity<HostVO> response = hostController.update(clusterId, hostId, hostReq);
 
@@ -184,11 +183,10 @@ class HostControllerTest {
     @Test
     void checkConnectionReturnsFalseForInvalidHostnames() {
         Long clusterId = 1L;
-        HostnamesReq hostnamesReq = new HostnamesReq();
-        hostnamesReq.setHostnames(Arrays.asList("invalidHost1", "invalidHost2"));
-        when(hostService.checkConnection(hostnamesReq.getHostnames())).thenReturn(false);
+        HostReq hostReq = new HostReq();
+        when(hostService.checkConnection(any(HostDTO.class))).thenReturn(false);
 
-        ResponseEntity<Boolean> response = hostController.checkConnection(clusterId, hostnamesReq);
+        ResponseEntity<Boolean> response = hostController.checkConnection(clusterId, hostReq);
 
         assertTrue(response.isSuccess());
         assertFalse(response.getData());

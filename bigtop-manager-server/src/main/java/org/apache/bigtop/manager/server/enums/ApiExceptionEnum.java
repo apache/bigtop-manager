@@ -39,6 +39,7 @@ public enum ApiExceptionEnum {
     HOST_ASSIGNED(12001, LocaleKeys.HOST_ASSIGNED),
     HOST_NOT_CONNECTED(12002, LocaleKeys.HOST_NOT_CONNECTED),
     HOST_UNABLE_TO_CONNECT(12003, LocaleKeys.HOST_UNABLE_TO_CONNECT),
+    HOST_HAS_COMPONENTS(12004, LocaleKeys.HOST_HAS_COMPONENTS),
 
     // Stack Exceptions -- 13000 ~ 13999
     STACK_NOT_FOUND(13000, LocaleKeys.STACK_NOT_FOUND),
@@ -68,6 +69,9 @@ public enum ApiExceptionEnum {
     CREDIT_INCORRECT(19003, LocaleKeys.CREDIT_INCORRECT),
     MODEL_NOT_SUPPORTED(19004, LocaleKeys.MODEL_NOT_SUPPORTED),
     CHAT_THREAD_NOT_FOUND(19005, LocaleKeys.CHAT_THREAD_NOT_FOUND),
+
+    // File Exceptions -- 30000 ~ 30999
+    FILE_UPLOAD_FAILED(30000, LocaleKeys.FILE_UPLOAD_FAILED),
     ;
 
     private final Integer code;

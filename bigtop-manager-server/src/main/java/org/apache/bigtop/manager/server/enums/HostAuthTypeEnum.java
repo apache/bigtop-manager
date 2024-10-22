@@ -16,31 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.dto;
+package org.apache.bigtop.manager.server.enums;
 
-import lombok.Data;
+import lombok.Getter;
 
-import java.util.List;
+@Getter
+public enum HostAuthTypeEnum {
+    PASSWORD(1),
+    KEY(2),
+    NO_AUTH(3),
+    ;
 
-@Data
-public class HostDTO {
-    private List<String> hostnames;
+    private final Integer code;
 
-    private String sshUser;
+    HostAuthTypeEnum(Integer code) {
+        this.code = code;
+    }
 
-    private Integer sshPort;
+    public static HostAuthTypeEnum fromCode(Integer code) {
+        for (HostAuthTypeEnum status : HostAuthTypeEnum.values()) {
+            if (status.code.equals(code)) {
+                return status;
+            }
+        }
 
-    private Integer authType;
-
-    private String sshPassword;
-
-    private String sshKeyString;
-
-    private String sshKeyFilename;
-
-    private String sshKeyPassword;
-
-    private Integer grpcPort;
-
-    private String desc;
+        throw new IllegalArgumentException("Invalid HostAuthTypeEnum code: " + code);
+    }
 }

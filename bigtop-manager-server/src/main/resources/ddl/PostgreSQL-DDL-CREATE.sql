@@ -128,27 +128,36 @@ CREATE TABLE host
     id                   BIGINT CHECK (id > 0)         NOT NULL GENERATED ALWAYS AS IDENTITY,
     cluster_id           BIGINT CHECK (cluster_id > 0) NOT NULL,
     hostname             VARCHAR(255) DEFAULT NULL,
+    ssh_user             VARCHAR(255) DEFAULT NULL,
+    ssh_port             INT DEFAULT NULL,
+    auth_type            INT DEFAULT NULL,
+    ssh_password         VARCHAR(255) DEFAULT NULL,
+    ssh_key_string       TEXT DEFAULT NULL,
+    ssh_key_filename     VARCHAR(255) DEFAULT NULL,
+    ssh_key_password     VARCHAR(255) DEFAULT NULL,
+    grpc_port            INT DEFAULT NULL,
     ipv4                 VARCHAR(32)  DEFAULT NULL,
     ipv6                 VARCHAR(32)  DEFAULT NULL,
     arch                 VARCHAR(32)  DEFAULT NULL,
     os                   VARCHAR(32)  DEFAULT NULL,
-    processor_count      INT          DEFAULT NULL,
-    physical_memory      BIGINT       DEFAULT NULL,
-    state                VARCHAR(32)  DEFAULT NULL,
-    create_time          TIMESTAMP(0) DEFAULT NULL,
-    update_time          TIMESTAMP(0) DEFAULT NULL,
-    available_processors INTEGER,
-    create_by            BIGINT,
+    available_processors INT,
     free_disk            BIGINT,
     free_memory_size     BIGINT,
     total_disk           BIGINT,
     total_memory_size    BIGINT,
+    "desc"               VARCHAR(255)  DEFAULT NULL,
+    status               INT  DEFAULT NULL,
+    err_info             VARCHAR(255)  DEFAULT NULL,
+    create_time          TIMESTAMP(0) DEFAULT NULL,
+    update_time          TIMESTAMP(0) DEFAULT NULL,
+    create_by            BIGINT,
     update_by            BIGINT,
     PRIMARY KEY (id),
     CONSTRAINT uk_hostname UNIQUE (hostname, cluster_id)
 );
 
-COMMENT ON COLUMN host.physical_memory IS 'Total Physical Memory(Bytes)';
+COMMENT ON COLUMN host.auth_type IS '1-password, 2-key, 3-no_auth';
+COMMENT ON COLUMN host.status IS '1-healthy, 2-unhealthy, 3-unknown';
 
 DROP INDEX IF EXISTS idx_host_cluster_id;
 CREATE INDEX idx_host_cluster_id ON host (cluster_id);

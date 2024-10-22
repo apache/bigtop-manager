@@ -28,6 +28,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Mapper(config = MapStructSharedConfig.class)
 public interface HostConverter {
@@ -36,9 +37,19 @@ public interface HostConverter {
 
     HostDTO fromReq2DTO(HostReq hostReq);
 
-    HostPO fromDTO2PO(HostDTO hostDTO);
-
     HostVO fromPO2VO(HostPO hostPO);
 
     List<HostVO> fromPO2VO(List<HostPO> hostPOList);
+
+    HostPO fromDTO2POWithoutHostname(HostDTO hostDTO);
+
+    default List<HostPO> fromDTO2POList(HostDTO hostDTO) {
+        return hostDTO.getHostnames().stream()
+                .map(hostname -> {
+                    HostPO hostPO = fromDTO2POWithoutHostname(hostDTO);
+                    hostPO.setHostname(hostname);
+                    return hostPO;
+                })
+                .collect(Collectors.toList());
+    }
 }

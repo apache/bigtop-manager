@@ -48,4 +48,6 @@ public interface HostComponentDao extends BaseDao<HostComponentPO> {
 
     List<HostComponentPO> findAllByClusterIdAndServiceId(
             @Param("clusterId") Long clusterId, @Param("serviceId") Long serviceId);
+
+    Integer countByHostId(@Param("hostId") Long hostId);
 }

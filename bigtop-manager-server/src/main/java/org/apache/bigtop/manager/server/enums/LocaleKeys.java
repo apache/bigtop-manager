@@ -41,6 +41,7 @@ public enum LocaleKeys {
     HOST_ASSIGNED("host.assigned"),
     HOST_NOT_CONNECTED("host.not.connected"),
     HOST_UNABLE_TO_CONNECT("host.unable.to.connect"),
+    HOST_HAS_COMPONENTS("host.has.components"),
 
     STACK_NOT_FOUND("stack.not.found"),
 
@@ -64,7 +65,7 @@ public enum LocaleKeys {
     MODEL_NOT_SUPPORTED("model.not.supported"),
     CHAT_THREAD_NOT_FOUND("chat.thread.not.found"),
 
-    CHAT_LANGUAGE_PROMPT("chat.language.prompt"),
+    FILE_UPLOAD_FAILED("file.upload.failed"),
     ;
 
     private final String key;
