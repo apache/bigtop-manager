@@ -24,7 +24,7 @@ jobs:
           cache: 'maven'
       - run: ./mvnw clean spotless:check
 
-  spellcheck:
+  check-typos:
     name: "Check typos"
     runs-on: ubuntu-latest
     timeout-minutes: 10
