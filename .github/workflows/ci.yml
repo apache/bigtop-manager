@@ -32,7 +32,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: crate-ci/typos@master
         with:
-          config: .github/typos-config.toml
+          config: .github/typos.toml
 
   unit-tests-java:
     name: "Run unit test(Java)"
