@@ -140,7 +140,7 @@ class HostControllerTest {
         ResponseEntity<PageVO<HostVO>> response = hostController.list(clusterId, hostQuery);
 
         assertTrue(response.isSuccess());
-        assertTrue(response.getData().getContent().isEmpty());
+        assertNull(response.getData().getContent());
     }
 
     @Test
