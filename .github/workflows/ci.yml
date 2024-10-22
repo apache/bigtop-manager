@@ -24,6 +24,16 @@ jobs:
           cache: 'maven'
       - run: ./mvnw clean spotless:check
 
+  check-typos:
+    name: "Check typos"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: crate-ci/typos@master
+        with:
+          config: .github/typos.toml
+
   unit-tests-java:
     name: "Run unit test(Java)"
     runs-on: ubuntu-latest

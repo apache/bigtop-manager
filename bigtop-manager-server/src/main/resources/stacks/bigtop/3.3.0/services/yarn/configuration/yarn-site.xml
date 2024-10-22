@@ -121,7 +121,7 @@
         <name>yarn.nodemanager.aux-services</name>
         <value>mapreduce_shuffle</value>
         <description>
-            Auxilliary services of NodeManager.
+            Auxiliary services of NodeManager.
             A valid service name should only contain a-zA-Z0-9_ and can not start with numbers
         </description>
     </property>
