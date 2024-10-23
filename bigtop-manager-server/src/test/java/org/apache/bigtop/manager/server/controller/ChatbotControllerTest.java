@@ -19,6 +19,7 @@
 package org.apache.bigtop.manager.server.controller;
 
 import org.apache.bigtop.manager.server.model.req.ChatbotMessageReq;
+import org.apache.bigtop.manager.server.model.req.ChatbotThreadReq;
 import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
 import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
 import org.apache.bigtop.manager.server.service.ChatbotService;
@@ -68,27 +69,23 @@ class ChatbotControllerTest {
     }
 
     @Test
-    void createChatThreads() {
-        Long platformId = 1L;
-        String model = "";
+    void createChatThread() {
         ChatThreadVO chatThread = new ChatThreadVO();
+        when(chatbotService.createChatThread(any())).thenReturn(chatThread);
 
-        when(chatbotService.createChatThreads(eq(platformId), eq(model))).thenReturn(chatThread);
-
-        ResponseEntity<ChatThreadVO> response = chatbotController.createChatThreads(platformId);
+        ResponseEntity<ChatThreadVO> response = chatbotController.createChatThread(new ChatbotThreadReq());
 
         assertTrue(response.isSuccess());
         assertEquals(chatThread, response.getData());
     }
 
     @Test
-    void deleteChatThreads() {
-        Long platformId = 1L;
+    void deleteChatThread() {
         Long threadId = 1L;
 
-        when(chatbotService.deleteChatThreads(platformId, threadId)).thenReturn(true);
+        when(chatbotService.deleteChatThread(threadId)).thenReturn(true);
 
-        ResponseEntity<Boolean> response = chatbotController.deleteChatThreads(platformId, threadId);
+        ResponseEntity<Boolean> response = chatbotController.deleteChatThread(threadId);
 
         assertTrue(response.isSuccess());
         assertEquals(true, response.getData());
@@ -96,13 +93,11 @@ class ChatbotControllerTest {
 
     @Test
     void getAllChatThreads() {
-        Long platformId = 1L;
-        String model = "";
         List<ChatThreadVO> chatThreads = new ArrayList<>();
 
-        when(chatbotService.getAllChatThreads(eq(platformId), eq(model))).thenReturn(chatThreads);
+        when(chatbotService.getAllChatThreads()).thenReturn(chatThreads);
 
-        ResponseEntity<List<ChatThreadVO>> response = chatbotController.getAllChatThreads(platformId);
+        ResponseEntity<List<ChatThreadVO>> response = chatbotController.getAllChatThreads();
 
         assertTrue(response.isSuccess());
         assertEquals(chatThreads, response.getData());
@@ -110,29 +105,26 @@ class ChatbotControllerTest {
 
     @Test
     void talk() {
-        Long platformId = 1L;
         Long threadId = 1L;
         ChatbotMessageReq messageReq = new ChatbotMessageReq();
         messageReq.setMessage("Hello");
 
         SseEmitter emitter = new SseEmitter();
-        when(chatbotService.talk(eq(platformId), eq(threadId), eq(messageReq.getMessage())))
-                .thenReturn(emitter);
+        when(chatbotService.talk(eq(threadId), eq(messageReq.getMessage()))).thenReturn(emitter);
 
-        SseEmitter result = chatbotController.talk(platformId, threadId, messageReq);
+        SseEmitter result = chatbotController.talk(threadId, messageReq);
 
         assertEquals(emitter, result);
     }
 
     @Test
     void history() {
-        Long platformId = 1L;
         Long threadId = 1L;
         List<ChatMessageVO> history = new ArrayList<>();
 
-        when(chatbotService.history(platformId, threadId)).thenReturn(history);
+        when(chatbotService.history(threadId)).thenReturn(history);
 
-        ResponseEntity<List<ChatMessageVO>> response = chatbotController.history(platformId, threadId);
+        ResponseEntity<List<ChatMessageVO>> response = chatbotController.history(threadId);
 
         assertTrue(response.isSuccess());
         assertEquals(history, response.getData());
