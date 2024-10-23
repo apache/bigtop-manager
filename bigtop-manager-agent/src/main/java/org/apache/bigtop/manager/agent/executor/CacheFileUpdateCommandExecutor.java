@@ -18,17 +18,15 @@
  */
 package org.apache.bigtop.manager.agent.executor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.common.constants.MessageConstants;
 import org.apache.bigtop.manager.common.message.entity.payload.CacheMessagePayload;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.common.utils.ProjectPathUtils;
 import org.apache.bigtop.manager.grpc.generated.CommandType;
-
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import lombok.extern.slf4j.Slf4j;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -64,7 +62,10 @@ public class CacheFileUpdateCommandExecutor extends AbstractCommandExecutor {
                 Files.createDirectories(p);
             } catch (Exception e) {
                 log.error("Create directory failed: {}", cacheDir, e);
-                throw new RuntimeException("Create directory failed: " + cacheDir, e);
+                commandReplyBuilder.setCode(MessageConstants.FAIL_CODE);
+                commandReplyBuilder.setResult(
+                        MessageFormat.format("Create directory {0}, failed: {1}", cacheDir, e.getMessage()));
+                return;
             }
         }
 
