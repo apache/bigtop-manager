@@ -36,8 +36,8 @@
   const emits = defineEmits(['onSiderClick'])
 
   const addCluster = () => {
-    router.push({ path: '/clusters/add' })
-    onSiderClick({ key: '/clusters/add' })
+    router.push({ name: 'AddClusters' })
+    onSiderClick({ key: '/cluster-mange/add' })
   }
 
   const onSiderClick = ({ key }: any) => {
@@ -84,6 +84,7 @@
   .sider {
     width: $layout-header-height;
     background: $layout-sider-bg-color;
+    overflow: auto;
 
     .menu-title-flex {
       @include flexbox($justify: space-between, $align: center);
@@ -92,6 +93,7 @@
       width: 160px;
       display: flex;
       justify-content: center;
+      padding-bottom: $space-lg;
     }
   }
 </style>

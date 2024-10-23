@@ -22,7 +22,7 @@ import pageView from '@/layouts/index.vue'
 
 const routes: RouteRecordRaw[] = [
   {
-    path: '/cluster-mange/',
+    path: '/cluster-mange',
     component: pageView,
     meta: {
       title: '集群管理'
@@ -30,15 +30,25 @@ const routes: RouteRecordRaw[] = [
     children: [
       {
         name: 'Clusters',
-        path: '/clusters/:cluster/:id',
+        path: '/cluster-mange/clusters',
         component: () => import('@/pages/cluster-mange/cluster/index.vue'),
         meta: {
           title: '集群管理'
-        }
+        },
+        children: [
+          {
+            name: 'ClusterDetail',
+            path: ':cluster/:id',
+            component: pageView,
+            meta: {
+              title: '集群详情'
+            }
+          }
+        ]
       },
       {
         name: 'AddClusters',
-        path: '/clusters/add',
+        path: '/cluster-mange/add',
         component: () => import('@/pages/cluster-mange/cluster/add.vue'),
         meta: {
           hidden: true,

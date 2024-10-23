@@ -17,23 +17,10 @@
   ~ under the License.
 -->
 
-<script setup lang="ts">
-  import { useMenuStore } from '@/store/menu'
-  const menuStore = useMenuStore()
-  const onSave = () => {
-    menuStore.updateSiderMenu()
-  }
-  const onDel = () => {
-    menuStore.updateSiderMenu(true)
-  }
-</script>
+<script setup lang="ts"></script>
 
 <template>
-  <div>
-    <div> add & del</div>
-    <a-button @click="onSave">保存</a-button>
-    <a-button @click="onDel">删除</a-button>
-  </div>
+  <div>detail </div>
 </template>
 
 <style scoped></style>

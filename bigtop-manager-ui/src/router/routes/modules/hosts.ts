@@ -35,6 +35,16 @@ const routes: RouteRecordRaw[] = [
         meta: {
           title: '主机管理'
         }
+        // children: [
+        //   {
+        //     name: 'AddHost',
+        //     path: '/cluster-mange/hosts/list',
+        //     component: () => import('@/pages/cluster-mange/hosts/index.vue'),
+        //     meta: {
+        //       hidden: true,
+        //     }
+        //   }
+        // ]
       }
     ]
   }

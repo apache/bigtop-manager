@@ -26,18 +26,58 @@ export const useClusterStore = defineStore(
   'cluster',
   () => {
     const clusters = ref<ClusterVO[]>([])
+    const count = ref(0)
+
+    const generateRandomDataArray = () => {
+      const dataArray = []
+      for (let i = 0; i < count.value; i++) {
+        dataArray.push({
+          id: i,
+          clusterName: `Cluster-${i}`,
+          clusterType: Math.floor(Math.random() * 10),
+          stackName: `Stack-${i}`,
+          stackVersion: `Version-${i}`,
+          selected: Math.random() < 0.5
+        })
+      }
+      return dataArray
+    }
+
+    const addCluster = async () => {
+      count.value = count.value + 1
+      return await loadClusters()
+    }
+
+    const delCluster = async () => {
+      if (count.value < 0) {
+        count.value = 0
+        return
+      }
+      count.value = count.value - 1
+      return await loadClusters()
+    }
 
     const loadClusters = async () => {
       // clusters.value = await getClusters()
-      clusters.value = (await Promise.resolve([])) as any
+      clusters.value = (await new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(generateRandomDataArray())
+        }, 1000)
+      })) as ClusterVO[]
     }
 
     return {
       clusters,
+      count,
+      addCluster,
+      delCluster,
       loadClusters
     }
   },
   {
-    persist: false
+    persist: {
+      storage: sessionStorage, // 指定使用 sessionStorage
+      paths: ['clusters', 'count'] // 指定需要持久化的状态
+    }
   }
 )
