@@ -278,10 +278,7 @@ public class LLMConfigServiceImpl implements LLMConfigService {
 
         authPlatformPO.setName(authPlatformDTO.getName());
         authPlatformPO.setDesc(authPlatformDTO.getDesc());
-        if (!authPlatformPO.getModel().equals(authPlatformDTO.getModel())) {
-            authPlatformPO.setStatus(AuthPlatformStatus.UNAVAILABLE.getCode());
-        }
-        authPlatformPO.setModel(authPlatformDTO.getModel());
+
         authPlatformDao.partialUpdateById(authPlatformPO);
 
         return AuthPlatformConverter.INSTANCE.fromPO2VO(
