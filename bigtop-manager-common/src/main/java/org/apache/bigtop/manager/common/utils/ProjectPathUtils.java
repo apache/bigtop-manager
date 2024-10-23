@@ -38,6 +38,10 @@ public class ProjectPathUtils {
         return getProjectStoreDir() + File.separator + "keys";
     }
 
+    public static String getAgentCachePath() {
+        return getProjectStoreDir() + File.separator + "agent-caches";
+    }
+
     private static String getProjectBaseDir() {
         if (Environments.isDevMode()) {
             return SystemUtils.getUserDir().getPath();
