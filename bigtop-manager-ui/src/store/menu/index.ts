@@ -84,15 +84,16 @@ export const useMenuStore = defineStore(
     }
 
     function injectDynamicRoutesParams() {
-      siderMenus.value.forEach((v) => {
-        if (v.name === 'Clusters') {
-          if (dynamicRoutesParams.value.length == 0) {
-            Reflect.deleteProperty(v, 'children')
-          } else {
-            v.children = [...dynamicRoutesParams.value]
+      siderMenus.value &&
+        siderMenus.value?.forEach((v) => {
+          if (v.name === 'Clusters') {
+            if (dynamicRoutesParams.value.length == 0) {
+              Reflect.deleteProperty(v, 'children')
+            } else {
+              v.children = [...dynamicRoutesParams.value]
+            }
           }
-        }
-      })
+        })
     }
 
     function setupMenus() {
