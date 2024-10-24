@@ -20,7 +20,7 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div> </div>
+  <div>host </div>
 </template>
 
 <style scoped lang="scss"></style>

@@ -31,7 +31,7 @@ const routes: RouteRecordRaw[] = [
     children: [
       {
         name: 'Model',
-        path: '/system-mange/model',
+        path: 'model',
         component: () => import('@/pages/system-mange/model/index.vue'),
         meta: {
           title: '大模型配置'

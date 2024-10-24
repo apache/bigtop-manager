@@ -18,26 +18,26 @@
 -->
 
 <script setup lang="ts">
+  import { MenuItem } from '@/store/menu'
   import { toRefs } from 'vue'
-  import { RouteRecordRaw } from 'vue-router'
   import { useRouter } from 'vue-router'
 
   interface Props {
-    sideMenuSelectedKey: string
-    siderMenus: RouteRecordRaw[]
+    siderMenuSelectedKey: string
+    siderMenus: MenuItem[]
   }
 
   const props = withDefaults(defineProps<Props>(), {
-    sideMenuSelectedKey: '',
+    siderMenuSelectedKey: '',
     siderMenus: () => []
   })
-  const { sideMenuSelectedKey, siderMenus } = toRefs(props)
+
+  const { siderMenuSelectedKey, siderMenus } = toRefs(props)
   const router = useRouter()
   const emits = defineEmits(['onSiderClick'])
 
   const addCluster = () => {
-    router.push({ name: 'AddClusters' })
-    onSiderClick({ key: '/cluster-mange/add' })
+    router.push({ name: 'ClusterAdd' })
   }
 
   const onSiderClick = ({ key }: any) => {
@@ -48,27 +48,28 @@
 <template>
   <a-layout-sider class="sider">
     <a-menu
-      :selected-keys="[sideMenuSelectedKey]"
+      :selected-keys="[siderMenuSelectedKey]"
       mode="inline"
       @select="onSiderClick"
     >
-      <template v-for="route in siderMenus">
+      <template v-for="menuItem in siderMenus" :key="menuItem.key">
         <a-sub-menu
-          v-if="route.children"
-          :key="route.path"
-          :title="route.meta?.title"
+          v-if="menuItem.children && menuItem.children.length"
+          :key="menuItem.key"
         >
-          <a-menu-item
-            v-for="child in route.children"
-            :key="child.path"
-            :path="child.path"
-          >
-            {{ child.meta?.title }}
+          <template #title>
+            <i :class="menuItem.icon" />
+            <span>{{ menuItem.label }}</span>
+          </template>
+          <a-menu-item v-for="child in menuItem.children" :key="child.key">
+            <i :class="child.icon" />
+            <span>{{ child.label }}</span>
           </a-menu-item>
         </a-sub-menu>
         <template v-else>
-          <a-menu-item v-if="!route.meta?.hidden" :key="route.path">
-            {{ route.meta?.title }}
+          <a-menu-item :key="menuItem.key">
+            <i :class="menuItem.icon" />
+            <span>{{ menuItem.label }}</span>
           </a-menu-item>
         </template>
       </template>

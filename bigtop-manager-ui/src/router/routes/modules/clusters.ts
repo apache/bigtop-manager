@@ -24,14 +24,15 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/cluster-mange',
     component: pageView,
+    redirect: '/cluster-mange/clusters',
     meta: {
       title: '集群管理'
     },
     children: [
       {
         name: 'Clusters',
-        path: '/cluster-mange/clusters',
-        component: () => import('@/pages/cluster-mange/cluster/index.vue'),
+        path: 'clusters',
+        redirect: '',
         meta: {
           title: '集群管理'
         },
@@ -39,21 +40,22 @@ const routes: RouteRecordRaw[] = [
           {
             name: 'ClusterDetail',
             path: ':cluster/:id',
-            component: pageView,
+            component: () => import('@/pages/cluster-mange/cluster/index.vue'),
             meta: {
+              hidden: true,
               title: '集群详情'
+            }
+          },
+          {
+            name: 'ClusterAdd',
+            path: 'add',
+            component: () => import('@/pages/cluster-mange/cluster/add.vue'),
+            meta: {
+              hidden: true,
+              title: '新增集群'
             }
           }
         ]
-      },
-      {
-        name: 'AddClusters',
-        path: '/cluster-mange/add',
-        component: () => import('@/pages/cluster-mange/cluster/add.vue'),
-        meta: {
-          hidden: true,
-          title: '新增集群'
-        }
       }
     ]
   }

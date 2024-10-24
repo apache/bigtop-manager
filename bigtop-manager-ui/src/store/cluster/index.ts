@@ -45,7 +45,7 @@ export const useClusterStore = defineStore(
 
     const addCluster = async () => {
       count.value = count.value + 1
-      return await loadClusters()
+      await loadClusters()
     }
 
     const delCluster = async () => {
@@ -54,7 +54,7 @@ export const useClusterStore = defineStore(
         return
       }
       count.value = count.value - 1
-      return await loadClusters()
+      await loadClusters()
     }
 
     const loadClusters = async () => {
@@ -76,8 +76,8 @@ export const useClusterStore = defineStore(
   },
   {
     persist: {
-      storage: sessionStorage, // 指定使用 sessionStorage
-      paths: ['clusters', 'count'] // 指定需要持久化的状态
+      storage: sessionStorage,
+      paths: ['clusters', 'count']
     }
   }
 )

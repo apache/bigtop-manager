@@ -18,26 +18,32 @@
 -->
 
 <script setup lang="ts">
-  import { onMounted } from 'vue'
+  import { onMounted, computed } from 'vue'
   import LayoutFooter from '@/layouts/footer.vue'
   import LayoutHeader from '@/layouts/header.vue'
   import LayoutSider from '@/layouts/sider.vue'
   import { useUserStore } from '@/store/user'
   import { useClusterStore } from '@/store/cluster'
-  import { useMenuStore } from '@/store/menu/index'
+  import { SPECIAL_ROUTES, useMenuStore } from '@/store/menu/index'
   import { storeToRefs } from 'pinia'
+  import { useRoute } from 'vue-router'
 
+  const route = useRoute()
   const userStore = useUserStore()
   const menuStore = useMenuStore()
   const clusterStore = useClusterStore()
+  const { clusters } = storeToRefs(clusterStore)
   const { headerSelectedKey, headerMenus, siderMenuSelectedKey, siderMenus } =
     storeToRefs(menuStore)
+
+  const showDefaultPage = computed(
+    () => clusters.value.length == 0 && route.path == SPECIAL_ROUTES
+  )
 
   onMounted(async () => {
     userStore.getUserInfo()
     await clusterStore.loadClusters()
     menuStore.setBaseRoutesMap()
-    menuStore.setupDynamicRoutes()
   })
 </script>
 
@@ -50,11 +56,12 @@
     />
     <a-layout>
       <layout-sider
-        :side-menu-selected-key="siderMenuSelectedKey"
+        :sider-menu-selected-key="siderMenuSelectedKey"
         :sider-menus="siderMenus"
         @on-sider-click="menuStore.onSiderClick"
       />
       <a-layout class="layout-inner">
+        <div v-if="showDefaultPage"> default content </div>
         <router-view />
         <layout-footer />
       </a-layout>

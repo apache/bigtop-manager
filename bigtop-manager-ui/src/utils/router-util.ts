@@ -43,7 +43,8 @@ function getMergeRoutes<T extends RouteRecordRaw>(routes: T[]): T[] {
         path: `/${firstLevelPath}/`,
         component: route.component,
         meta: route.meta,
-        children: []
+        children: [],
+        redirect: route.redirect || undefined
       })
     }
     if (route.children) {

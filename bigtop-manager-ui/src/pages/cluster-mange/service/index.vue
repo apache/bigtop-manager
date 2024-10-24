@@ -17,7 +17,7 @@
   ~ under the License.
 -->
 <template>
-  <div> 2222 </div>
+  <div> service </div>
 </template>
 
 <script setup lang="ts"></script>

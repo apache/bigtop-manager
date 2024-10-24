@@ -17,12 +17,21 @@
  * under the License.
  */
 
-import { computed, ref, watch } from 'vue'
-import { useRouter, RouteRecordRaw, useRoute } from 'vue-router'
-import { dynamicRoutes } from '@/router/routes/index'
+import { computed, ref, watchEffect } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { dynamicRoutes as dr } from '@/router/routes/index'
 import { defineStore, storeToRefs } from 'pinia'
 import { useClusterStore } from '@/store/cluster/index'
-import { ClusterVO } from '@/api/cluster/types'
+
+export const SPECIAL_ROUTES = '/cluster-mange/clusters'
+export interface MenuItem {
+  icon: string
+  key: string
+  label: string
+  title: string
+  name?: string
+  children?: MenuItem[]
+}
 
 export const useMenuStore = defineStore(
   'menu',
@@ -32,93 +41,87 @@ export const useMenuStore = defineStore(
     const clusterStore = useClusterStore()
     const { clusters } = storeToRefs(clusterStore)
 
-    const headerSelectedKey = ref('')
-    const siderMenuSelectedKey = ref('')
-    const siderMenus = ref<RouteRecordRaw[]>([])
-    const dynamicRoutesParams = ref<RouteRecordRaw[]>([])
-    const baseRoutesMap = ref<Map<string, RouteRecordRaw[]>>(new Map())
+    const baseRoutesMap = ref<Map<string, MenuItem[]>>(new Map())
+    const headerMenus = ref(dr.filter((v) => v.meta?.title && !v.meta.hidden))
+    const headerSelectedKey = ref(headerMenus.value[0].path)
 
-    const headerMenus = computed(() =>
-      dynamicRoutes.filter((v) => v.meta?.title && !v.meta.hidden)
-    )
+    const hasCluster = computed(() => clusters.value.length > 0)
+    const siderMenus = computed((): MenuItem[] => {
+      const formatSider = baseRoutesMap.value.get(headerSelectedKey.value)
+      if (formatSider) {
+        return hasCluster.value
+          ? addSiderItemByClusters(formatSider as MenuItem[])
+          : formatSider
+      }
+      return []
+    })
+    const siderMenuSelectedKey = ref(findActivePath(siderMenus.value[0]))
 
-    const isNoCluster = computed(
-      () =>
-        route.matched.at(-1)?.path.includes(':cluster/:id') &&
-        clusters.value.length == 0
-    )
-
-    watch(route, () => {
-      setupMenus()
+    watchEffect(() => {
+      headerSelectedKey.value = route.matched[0].path
+      if (hasCluster.value && route.path == SPECIAL_ROUTES) {
+        siderMenuSelectedKey.value = findActivePath(siderMenus.value[0])
+        siderMenuSelectedKey.value && router.push(siderMenuSelectedKey.value)
+      } else {
+        siderMenuSelectedKey.value = route.path
+      }
     })
 
+    function addSiderItemByClusters(formatSider: MenuItem[]) {
+      return formatSider.map((item) => {
+        if (item.name == 'Clusters') {
+          item.children = clusters.value.map((v) => {
+            return {
+              icon: '',
+              key: `${item.key}/${v.clusterName}/${v.id}`,
+              label: v.clusterName,
+              title: v.clusterName
+            }
+          })
+        }
+        return item
+      })
+    }
+
+    function formatRouteToMenu(tree: any[], upPath = ''): MenuItem[] {
+      return tree
+        .filter(({ meta }) => !meta?.hidden)
+        .map(({ path, name, meta, children }) => {
+          const fullPath = `${upPath}${path}`
+          return {
+            icon: '',
+            key: fullPath,
+            label: meta.title || '',
+            title: meta.title || '',
+            name: name || '',
+            children:
+              children && children.length > 0
+                ? formatRouteToMenu(children, fullPath)
+                : []
+          }
+        })
+    }
+
     function setBaseRoutesMap() {
-      dynamicRoutes.forEach((route) => {
+      dr.forEach((route) => {
         if (!route.meta?.hidden) {
           const exist = baseRoutesMap.value.get(route.path) || []
           baseRoutesMap.value.set(route.path, [
             ...exist,
-            ...(route.children || [])
+            ...formatRouteToMenu(route.children || [], route.path)
           ])
         }
       })
     }
 
-    function findActivePath(menu: RouteRecordRaw): string {
-      return menu?.children ? findActivePath(menu.children[0]) : menu?.path
-    }
-
-    function createRoutesByDynamicRoutesParams() {
-      dynamicRoutesParams.value = clusters.value.map((param: ClusterVO) => {
-        const dynamicRoute = {
-          name: `Cluster_${param.clusterName}_${param.id}`,
-          path: '/cluster-mange/clusters/:cluster/:id'.replace(
-            ':cluster/:id',
-            `${param.clusterName}/${param.id}`
-          ),
-          component: () => import('@/pages/cluster-mange/cluster/detail.vue'),
-          meta: { title: `${param.clusterName}` }
-        }
-        return dynamicRoute
-      })
-    }
-
-    function injectDynamicRoutesParams() {
-      siderMenus.value &&
-        siderMenus.value?.forEach((v) => {
-          if (v.name === 'Clusters') {
-            if (dynamicRoutesParams.value.length == 0) {
-              Reflect.deleteProperty(v, 'children')
-            } else {
-              v.children = [...dynamicRoutesParams.value]
-            }
-          }
-        })
-    }
-
-    function setupMenus() {
-      const matched = route.matched
-      const activeMenus = baseRoutesMap.value.get(matched[0].path)
-      const baseRoutesMapKeys = [...baseRoutesMap.value.keys()]
-      const baseRoutesMapValues = [...baseRoutesMap.value.values()]
-      headerSelectedKey.value = matched[0].path || baseRoutesMapKeys[0]
-      siderMenus.value = matched[0].path
-        ? (activeMenus as RouteRecordRaw[])
-        : baseRoutesMapValues[0]
-      injectDynamicRoutesParams()
-      const filterPath = matched[matched.length - 1].path
-      if (baseRoutesMapKeys.includes(filterPath) || isNoCluster.value) {
-        siderMenuSelectedKey.value = findActivePath(siderMenus.value[0])
-      } else {
-        siderMenuSelectedKey.value = route.path
-      }
-      router.replace(siderMenuSelectedKey.value)
+    function findActivePath(menu: MenuItem): string {
+      return menu?.children && menu?.children.length > 0
+        ? findActivePath(menu.children[0])
+        : menu?.key
     }
 
     function onHeaderClick(key: string) {
       headerSelectedKey.value = key
-      siderMenus.value = baseRoutesMap.value.get(key) || []
-      injectDynamicRoutesParams()
       siderMenuSelectedKey.value = findActivePath(siderMenus.value[0])
       router.push(siderMenuSelectedKey.value)
     }
@@ -132,26 +135,19 @@ export const useMenuStore = defineStore(
       isDelete
         ? await clusterStore.delCluster()
         : await clusterStore.addCluster()
-      createRoutesByDynamicRoutesParams()
-      injectDynamicRoutesParams()
-      siderMenuSelectedKey.value = dynamicRoutesParams.value.at(-1)?.path || ''
+      siderMenuSelectedKey.value =
+        siderMenus.value[0].children?.at(-1)?.key || SPECIAL_ROUTES
       router.push(siderMenuSelectedKey.value)
     }
 
-    function setupDynamicRoutes() {
-      createRoutesByDynamicRoutesParams()
-      setupMenus()
-    }
-
     return {
-      headerSelectedKey,
-      siderMenuSelectedKey,
       headerMenus,
       siderMenus,
+      headerSelectedKey,
+      siderMenuSelectedKey,
+      setBaseRoutesMap,
       onHeaderClick,
       onSiderClick,
-      setBaseRoutesMap,
-      setupDynamicRoutes,
       updateSiderMenu
     }
   },

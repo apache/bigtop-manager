@@ -30,7 +30,7 @@ const routes: RouteRecordRaw[] = [
     children: [
       {
         name: 'Hosts',
-        path: '/cluster-mange/hosts',
+        path: 'hosts',
         component: () => import('@/pages/cluster-mange/hosts/index.vue'),
         meta: {
           title: '主机管理'
