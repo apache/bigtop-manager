@@ -17,9 +17,16 @@
   ~ under the License.
 -->
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+  import { useRouter } from 'vue-router'
+  const router = useRouter()
+  const addHost = () => {
+    router.push({ name: 'AddHost' })
+  }
+</script>
 
 <template>
+  <a-button @click="addHost">add host</a-button>
   <div>host </div>
 </template>
 

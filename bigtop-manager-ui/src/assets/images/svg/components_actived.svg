@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-  <!--
+<!--
   ~ Licensed to the Apache Software Foundation (ASF) under one
   ~ or more contributor license agreements.  See the NOTICE file
   ~ distributed with this work for additional information
@@ -17,7 +17,10 @@
   ~ specific language governing permissions and limitations
   ~ under the License.
 -->
-<svg width="24" height="24" viewBox="0 0 48 48" fill="none"
-  xmlns="http://www.w3.org/2000/svg">
-  <path d="M31 36L19 24L31 12" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
+  viewBox="0 0 16 16" fill="none">
+  <path
+    d="M1.33334 8.00001L1.33334 4.00001L4.33334 4.00001L4.33334 3.33334C4.33334 2.22877 5.22878 1.33334 6.33334 1.33334C7.43791 1.33334 8.33334 2.22877 8.33334 3.33334L8.33334 4.00001L11.3333 4.00001L11.3333 8.00001L12.6667 8.00001C13.7712 8.00001 14.6667 8.89544 14.6667 10C14.6667 11.1046 13.7712 12 12.6667 12L11.3333 12L11.3333 14.6667L1.33334 14.6667L1.33334 12L2.66668 12C3.77124 12 4.66668 11.1046 4.66668 10C4.66668 8.89544 3.77124 8.00001 2.66668 8.00001L1.33334 8.00001Z"
+    stroke="rgba(22, 119, 255, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round">
+  </path>
 </svg>

@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~ Licensed to the Apache Software Foundation (ASF) under one
   ~ or more contributor license agreements.  See the NOTICE file
@@ -17,7 +17,10 @@
   ~ specific language governing permissions and limitations
   ~ under the License.
 -->
-<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 1024 1024">
-  <path fill="currentColor"
-    d="M252.068571 906.496h520.283429c89.581714 0 134.144-44.562286 134.144-132.845714V250.331429c0-88.283429-44.562286-132.845714-134.144-132.845715H252.068571c-89.142857 0-134.582857 44.141714-134.582857 132.845715V773.668571c0 88.704 45.44 132.845714 134.582857 132.845715z" />
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
+  viewBox="0 0 16 16" fill="none">
+  <path
+    d="M1.33333 8.00001L1.33333 4.00001L4.33333 4.00001L4.33333 3.33334C4.33333 2.22877 5.22877 1.33334 6.33333 1.33334C7.4379 1.33334 8.33333 2.22877 8.33333 3.33334L8.33333 4.00001L11.3333 4.00001L11.3333 8.00001L12.6667 8.00001C13.7712 8.00001 14.6667 8.89544 14.6667 10C14.6667 11.1046 13.7712 12 12.6667 12L11.3333 12L11.3333 14.6667L1.33333 14.6667L1.33333 12L2.66667 12C3.77123 12 4.66667 11.1046 4.66667 10C4.66667 8.89544 3.77123 8.00001 2.66667 8.00001L1.33333 8.00001Z"
+    stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round">
+  </path>
 </svg>

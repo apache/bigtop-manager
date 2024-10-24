@@ -18,9 +18,9 @@
 -->
 
 <script setup lang="ts">
-  import { MenuItem } from '@/store/menu'
   import { toRefs } from 'vue'
-  import { useRouter } from 'vue-router'
+  import { useRouter, useRoute } from 'vue-router'
+  import type { MenuItem } from '@/store/menu'
 
   interface Props {
     siderMenuSelectedKey: string
@@ -34,7 +34,20 @@
 
   const { siderMenuSelectedKey, siderMenus } = toRefs(props)
   const router = useRouter()
+  const route = useRoute()
   const emits = defineEmits(['onSiderClick'])
+
+  const toggleActivedIcon = (menuItem: MenuItem) => {
+    const { key, icon } = menuItem
+    const routePath = route.matched.at(-1)?.path
+    let pass = false
+    if (routePath?.includes('/:cluster/:id')) {
+      pass = key == routePath.replace('/:cluster/:id', '')
+      return pass ? `${icon}_actived` : icon
+    } else {
+      return key == siderMenuSelectedKey.value ? `${icon}_actived` : icon
+    }
+  }
 
   const addCluster = () => {
     router.push({ name: 'ClusterAdd' })
@@ -57,18 +70,21 @@
           v-if="menuItem.children && menuItem.children.length"
           :key="menuItem.key"
         >
+          <template #icon>
+            <svg-icon :name="toggleActivedIcon(menuItem)" />
+          </template>
           <template #title>
-            <i :class="menuItem.icon" />
             <span>{{ menuItem.label }}</span>
           </template>
           <a-menu-item v-for="child in menuItem.children" :key="child.key">
-            <i :class="child.icon" />
             <span>{{ child.label }}</span>
           </a-menu-item>
         </a-sub-menu>
         <template v-else>
           <a-menu-item :key="menuItem.key">
-            <i :class="menuItem.icon" />
+            <template #icon>
+              <svg-icon :name="toggleActivedIcon(menuItem)" />
+            </template>
             <span>{{ menuItem.label }}</span>
           </a-menu-item>
         </template>

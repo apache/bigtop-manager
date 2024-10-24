@@ -30,6 +30,7 @@ export interface MenuItem {
   label: string
   title: string
   name?: string
+  activeMenu?: string
   children?: MenuItem[]
 }
 
@@ -58,12 +59,14 @@ export const useMenuStore = defineStore(
     const siderMenuSelectedKey = ref(findActivePath(siderMenus.value[0]))
 
     watchEffect(() => {
+      // resolve highlight menu
+      const activeMenu = route.meta.activeMenu || route.path
       headerSelectedKey.value = route.matched[0].path
       if (hasCluster.value && route.path == SPECIAL_ROUTES) {
         siderMenuSelectedKey.value = findActivePath(siderMenus.value[0])
         siderMenuSelectedKey.value && router.push(siderMenuSelectedKey.value)
       } else {
-        siderMenuSelectedKey.value = route.path
+        siderMenuSelectedKey.value = activeMenu
       }
     })
 
@@ -75,7 +78,8 @@ export const useMenuStore = defineStore(
               icon: '',
               key: `${item.key}/${v.clusterName}/${v.id}`,
               label: v.clusterName,
-              title: v.clusterName
+              title: v.clusterName,
+              activeMenu: item.key
             }
           })
         }
@@ -89,7 +93,7 @@ export const useMenuStore = defineStore(
         .map(({ path, name, meta, children }) => {
           const fullPath = `${upPath}${path}`
           return {
-            icon: '',
+            icon: meta.icon,
             key: fullPath,
             label: meta.title || '',
             title: meta.title || '',

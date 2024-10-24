@@ -33,6 +33,7 @@ const routes: RouteRecordRaw[] = [
         path: 'services',
         component: () => import('@/pages/cluster-mange/service/index.vue'),
         meta: {
+          icon: 'services',
           title: '基础服务'
         }
       }

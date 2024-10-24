@@ -31,20 +31,31 @@ const routes: RouteRecordRaw[] = [
       {
         name: 'Hosts',
         path: 'hosts',
-        component: () => import('@/pages/cluster-mange/hosts/index.vue'),
+        redirect: '/cluster-mange/hosts/list',
         meta: {
+          icon: 'hosts',
           title: '主机管理'
-        }
-        // children: [
-        //   {
-        //     name: 'AddHost',
-        //     path: '/cluster-mange/hosts/list',
-        //     component: () => import('@/pages/cluster-mange/hosts/index.vue'),
-        //     meta: {
-        //       hidden: true,
-        //     }
-        //   }
-        // ]
+        },
+        children: [
+          {
+            name: 'List',
+            path: 'list',
+            component: () => import('@/pages/cluster-mange/hosts/index.vue'),
+            meta: {
+              hidden: true,
+              activeMenu: '/cluster-mange/hosts'
+            }
+          },
+          {
+            name: 'AddHost',
+            path: 'addhost',
+            component: () => import('@/pages/cluster-mange/hosts/add.vue'),
+            meta: {
+              hidden: true,
+              activeMenu: '/cluster-mange/hosts'
+            }
+          }
+        ]
       }
     ]
   }
