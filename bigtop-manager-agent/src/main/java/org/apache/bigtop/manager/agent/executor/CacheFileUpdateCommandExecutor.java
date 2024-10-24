@@ -18,12 +18,11 @@
  */
 package org.apache.bigtop.manager.agent.executor;
 
-import org.apache.bigtop.manager.common.constants.Constants;
 import org.apache.bigtop.manager.common.constants.MessageConstants;
 import org.apache.bigtop.manager.common.message.entity.payload.CacheMessagePayload;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
+import org.apache.bigtop.manager.common.utils.ProjectPathUtils;
 import org.apache.bigtop.manager.grpc.generated.CommandType;
-import org.apache.bigtop.manager.stack.core.utils.linux.LinuxFileUtils;
 
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -31,6 +30,9 @@ import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.MessageFormat;
 
 import static org.apache.bigtop.manager.common.constants.CacheFiles.CLUSTER_INFO;
@@ -55,9 +57,19 @@ public class CacheFileUpdateCommandExecutor extends AbstractCommandExecutor {
     public void doExecute() {
         CacheMessagePayload cacheMessagePayload =
                 JsonUtils.readFromString(commandRequest.getPayload(), CacheMessagePayload.class);
-        String cacheDir = Constants.STACK_CACHE_DIR;
-
-        LinuxFileUtils.createDirectories(cacheDir, "root", "root", "rwxr-xr-x", false);
+        String cacheDir = ProjectPathUtils.getAgentCachePath();
+        Path p = Paths.get(cacheDir);
+        if (!Files.exists(p)) {
+            try {
+                Files.createDirectories(p);
+            } catch (Exception e) {
+                log.error("Create directory failed: {}", cacheDir, e);
+                commandReplyBuilder.setCode(MessageConstants.FAIL_CODE);
+                commandReplyBuilder.setResult(
+                        MessageFormat.format("Create directory {0}, failed: {1}", cacheDir, e.getMessage()));
+                return;
+            }
+        }
 
         JsonUtils.writeToFile(cacheDir + SETTINGS_INFO, cacheMessagePayload.getSettings());
         JsonUtils.writeToFile(cacheDir + CONFIGURATIONS_INFO, cacheMessagePayload.getConfigurations());
