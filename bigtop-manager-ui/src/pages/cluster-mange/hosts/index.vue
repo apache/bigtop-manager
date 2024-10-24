@@ -27,7 +27,7 @@
 
 <template>
   <a-button @click="addHost">add host</a-button>
-  <div>host </div>
+  <div>host list</div>
 </template>
 
 <style scoped lang="scss"></style>

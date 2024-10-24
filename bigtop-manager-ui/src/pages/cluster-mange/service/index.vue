@@ -16,10 +16,11 @@
   ~ specific language governing permissions and limitations
   ~ under the License.
 -->
-<template>
-  <div> service </div>
-</template>
 
 <script setup lang="ts"></script>
+
+<template>
+  <div> service list</div>
+</template>
 
 <style scoped></style>
