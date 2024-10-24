@@ -38,14 +38,14 @@
   const emits = defineEmits(['onSiderClick'])
 
   const toggleActivedIcon = (menuItem: MenuItem) => {
+    const matchStr = '/:cluster/:id'
     const { key, icon } = menuItem
     const routePath = route.matched.at(-1)?.path
-    let pass = false
-    if (routePath?.includes('/:cluster/:id')) {
-      pass = key == routePath.replace('/:cluster/:id', '')
-      return pass ? `${icon}_actived` : icon
+
+    if (routePath?.includes(matchStr)) {
+      return key === routePath.replace(matchStr, '') ? `${icon}_actived` : icon
     } else {
-      return key == siderMenuSelectedKey.value ? `${icon}_actived` : icon
+      return key === siderMenuSelectedKey.value ? `${icon}_actived` : icon
     }
   }
 
