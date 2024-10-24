@@ -20,7 +20,7 @@
 import type { Router } from 'vue-router'
 
 function setCommonGuard(router: Router) {
-  router.beforeEach(async (to, _from, next) => {
+  router.beforeEach(async (_to, _from, next) => {
     next()
   })
 }

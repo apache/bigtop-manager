@@ -1,12 +1,37 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20" height="20" viewBox="0 0 20 20" fill="none">
-<path    stroke="rgba(255, 255, 255, 1)" stroke-width="1.6666666666666667" stroke-linejoin="round" stroke-linecap="round"  d="M11.7857 15.4167L16.5477 15.4167M17.5 17.5L16.5477 15.4167L17.5 17.5ZM10.8334 17.5L11.7857 15.4167L10.8334 17.5ZM11.7857 15.4167L14.1667 10L16.5477 15.4167L11.7857 15.4167Z">
-</path>
-<path    stroke="rgba(255, 255, 255, 1)" stroke-width="1.6666666666666667" stroke-linejoin="round" stroke-linecap="round"  d="M6.66663 2.5L7.08329 3.75">
-</path>
-<path    stroke="rgba(255, 255, 255, 1)" stroke-width="1.6666666666666667" stroke-linejoin="round" stroke-linecap="round"  d="M2.5 4.58334L11.6667 4.58334">
-</path>
-<path    stroke="rgba(255, 255, 255, 1)" stroke-width="1.6666666666666667" stroke-linejoin="round" stroke-linecap="round"  d="M4.16663 6.66666C4.16663 6.66666 4.91225 9.27537 6.77629 10.7246C8.64029 12.1739 11.6666 13.3333 11.6666 13.3333">
-</path>
-<path    stroke="rgba(255, 255, 255, 1)" stroke-width="1.6666666666666667" stroke-linejoin="round" stroke-linecap="round"  d="M10 4.58334C10 4.58334 9.25438 8.00725 7.39033 9.90942C5.52633 11.8116 2.5 13.3333 2.5 13.3333">
-</path>
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one
+  ~ or more contributor license agreements.  See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership.  The ASF licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20" height="20"
+  viewBox="0 0 20 20" fill="none">
+  <path stroke="rgba(255, 255, 255, 1)" stroke-width="1.6666666666666667" stroke-linejoin="round" stroke-linecap="round"
+    d="M11.7857 15.4167L16.5477 15.4167M17.5 17.5L16.5477 15.4167L17.5 17.5ZM10.8334 17.5L11.7857 15.4167L10.8334 17.5ZM11.7857 15.4167L14.1667 10L16.5477 15.4167L11.7857 15.4167Z">
+  </path>
+  <path stroke="rgba(255, 255, 255, 1)" stroke-width="1.6666666666666667" stroke-linejoin="round" stroke-linecap="round"
+    d="M6.66663 2.5L7.08329 3.75">
+  </path>
+  <path stroke="rgba(255, 255, 255, 1)" stroke-width="1.6666666666666667" stroke-linejoin="round" stroke-linecap="round"
+    d="M2.5 4.58334L11.6667 4.58334">
+  </path>
+  <path stroke="rgba(255, 255, 255, 1)" stroke-width="1.6666666666666667" stroke-linejoin="round" stroke-linecap="round"
+    d="M4.16663 6.66666C4.16663 6.66666 4.91225 9.27537 6.77629 10.7246C8.64029 12.1739 11.6666 13.3333 11.6666 13.3333">
+  </path>
+  <path stroke="rgba(255, 255, 255, 1)" stroke-width="1.6666666666666667" stroke-linejoin="round" stroke-linecap="round"
+    d="M10 4.58334C10 4.58334 9.25438 8.00725 7.39033 9.90942C5.52633 11.8116 2.5 13.3333 2.5 13.3333">
+  </path>
 </svg>
