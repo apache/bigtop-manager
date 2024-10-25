@@ -77,7 +77,7 @@ export const useMenuStore = defineStore(
         if (item.name == 'Clusters') {
           item.children = clusters.value.map((v) => {
             return {
-              icon: '🟢',
+              icon: '',
               key: `${item.key}/${v.clusterName}/${v.id}`,
               label: v.clusterName,
               title: v.clusterName,
