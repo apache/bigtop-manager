@@ -60,8 +60,8 @@ CREATE TABLE `user`
     `password`    VARCHAR(32) DEFAULT NULL,
     `nickname`    VARCHAR(32) DEFAULT NULL,
     `status`      BIT(1)      DEFAULT 1 COMMENT '0-Disable, 1-Enable',
-    `create_time` DATETIME    DEFAULT NULL,
-    `update_time` DATETIME    DEFAULT NULL,
+    `create_time` DATETIME    DEFAULT NULL DEFAULT CURRENT_TIMESTAMP,
+    `update_time` DATETIME    DEFAULT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `create_by`   BIGINT,
     `update_by`   BIGINT,
     PRIMARY KEY (`id`),
@@ -152,8 +152,8 @@ CREATE TABLE `host`
     `desc`                 VARCHAR(255) DEFAULT NULL,
     `status`               INTEGER  DEFAULT NULL COMMENT '1-healthy, 2-unhealthy, 3-unknown',
     `err_info`             VARCHAR(255) DEFAULT NULL,
-    `create_time`          DATETIME     DEFAULT NULL,
-    `update_time`          DATETIME     DEFAULT NULL,
+    `create_time`          DATETIME     DEFAULT CURRENT_TIMESTAMP,
+    `update_time`          DATETIME     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `create_by`            BIGINT,
     `update_by`            BIGINT,
     PRIMARY KEY (`id`),
@@ -164,20 +164,15 @@ CREATE TABLE `host`
 CREATE TABLE `repo`
 (
     `id`          BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `cluster_id`  BIGINT(20) UNSIGNED NOT NULL,
-    `os`          VARCHAR(32) DEFAULT NULL,
+    `name`        VARCHAR(32) DEFAULT NULL,
     `arch`        VARCHAR(32) DEFAULT NULL,
     `base_url`    VARCHAR(64) DEFAULT NULL,
-    `repo_id`     VARCHAR(32) DEFAULT NULL,
-    `repo_name`   VARCHAR(64) DEFAULT NULL,
-    `repo_type`   VARCHAR(64) DEFAULT NULL,
-    `create_time` DATETIME    DEFAULT NULL,
-    `update_time` DATETIME    DEFAULT NULL,
+    `type`        INT DEFAULT NULL COMMENT '1-services, 2-tools',
+    `create_time` DATETIME    DEFAULT CURRENT_TIMESTAMP,
+    `update_time` DATETIME    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `create_by`   BIGINT,
     `update_by`   BIGINT,
-    PRIMARY KEY (`id`),
-    KEY           `idx_cluster_id` (`cluster_id`),
-    UNIQUE KEY `uk_repo_id` (`repo_id`, `os`, `arch`, `cluster_id`)
+    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `stack`
@@ -384,12 +379,19 @@ CREATE TABLE `llm_chat_message`
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Adding default admin user
-INSERT INTO bigtop_manager.user (id, create_time, update_time, nickname, password, status, username)
-VALUES (1, now(), now(), 'Administrator', '21232f297a57a5a743894a0e4a801fc3', true, 'admin');
+INSERT INTO user (username, password, nickname, status)
+VALUES ('admin', '21232f297a57a5a743894a0e4a801fc3', 'Administrator', true);
+
+INSERT INTO repo (name, arch, base_url, type)
+VALUES
+('Service tarballs', 'x86_64', 'http://your-repo/', 1),
+('Service tarballs', 'aarch64', 'http://your-repo/', 1),
+('BM tools', 'x86_64', 'http://your-repo/', 2),
+('BM tools', 'aarch64', 'http://your-repo/', 2);
 
 -- Adding default llm platform
-INSERT INTO bigtop_manager.llm_platform (id, credential, name, support_models)
+INSERT INTO llm_platform (credential, name, support_models)
 VALUES
-(1, '{"apiKey": "API Key"}', 'OpenAI', 'gpt-3.5-turbo,gpt-4,gpt-4o,gpt-3.5-turbo-16k,gpt-4-turbo-preview,gpt-4-32k,gpt-4o-mini'),
-(2, '{"apiKey": "API Key"}', 'DashScope', 'qwen-1.8b-chat,qwen-max,qwen-plus,qwen-turbo'),
-(3, '{"apiKey": "API Key", "secretKey": "Secret Key"}', 'QianFan','Yi-34B-Chat,ERNIE-4.0-8K,ERNIE-3.5-128K,ERNIE-Speed-8K,Llama-2-7B-Chat,Fuyu-8B');
+('{"apiKey": "API Key"}', 'OpenAI', 'gpt-3.5-turbo,gpt-4,gpt-4o,gpt-3.5-turbo-16k,gpt-4-turbo-preview,gpt-4-32k,gpt-4o-mini'),
+('{"apiKey": "API Key"}', 'DashScope', 'qwen-1.8b-chat,qwen-max,qwen-plus,qwen-turbo'),
+('{"apiKey": "API Key", "secretKey": "Secret Key"}', 'QianFan','Yi-34B-Chat,ERNIE-4.0-8K,ERNIE-3.5-128K,ERNIE-Speed-8K,Llama-2-7B-Chat,Fuyu-8B');

@@ -27,15 +27,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class RepoReq {
 
-    private String repoId;
-
-    private String repoName;
-
-    private String repoType;
+    private Integer id;
 
     private String baseUrl;
-
-    private String os;
-
-    private String arch;
 }

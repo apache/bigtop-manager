@@ -23,15 +23,11 @@ import lombok.Data;
 @Data
 public class RepoVO {
 
-    private String repoId;
+    private Integer id;
 
-    private String repoName;
-
-    private String repoType;
-
-    private String baseUrl;
-
-    private String os;
+    private String name;
 
     private String arch;
+
+    private String baseUrl;
 }

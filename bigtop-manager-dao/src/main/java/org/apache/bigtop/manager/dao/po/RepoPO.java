@@ -35,24 +35,15 @@ public class RepoPO extends BasePO implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "base_url")
-    private String baseUrl;
-
-    @Column(name = "os")
-    private String os;
+    @Column(name = "name")
+    private String name;
 
     @Column(name = "arch")
     private String arch;
 
-    @Column(name = "repo_id")
-    private String repoId;
+    @Column(name = "base_url")
+    private String baseUrl;
 
-    @Column(name = "repo_name")
-    private String repoName;
-
-    @Column(name = "repo_type")
-    private String repoType;
-
-    @Column(name = "cluster_id", nullable = false)
-    private Long clusterId;
+    @Column(name = "type")
+    private Integer type;
 }

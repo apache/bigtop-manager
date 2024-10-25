@@ -103,8 +103,7 @@ public abstract class BaseParams implements Params {
     @Override
     public RepoInfo repo() {
         return LocalSettings.repos().stream()
-                .filter(r -> OSDetection.getOS().equals(r.getOs())
-                        && OSDetection.getArch().equals(r.getArch()))
+                .filter(r -> OSDetection.getArch().equals(r.getArch()))
                 .findFirst()
                 .orElseThrow(() -> new StackException(
                         "Cannot find repo for os: [{}] and arch: [{}]", OSDetection.getOS(), OSDetection.getArch()));
@@ -115,8 +114,7 @@ public abstract class BaseParams implements Params {
         RepoInfo repo = this.repo();
         List<PackageInfo> packageInfoList = new ArrayList<>();
         for (PackageSpecificInfo packageSpecificInfo : this.commandPayload.getPackageSpecifics()) {
-            if (!packageSpecificInfo.getOs().contains(repo.getOs())
-                    || !packageSpecificInfo.getArch().contains(repo.getArch())) {
+            if (packageSpecificInfo.getArch().contains(repo.getArch())) {
                 continue;
             }
 

@@ -16,38 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.stack.model;
+package org.apache.bigtop.manager.server.service;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.apache.bigtop.manager.server.model.dto.RepoDTO;
+import org.apache.bigtop.manager.server.model.vo.RepoVO;
 
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlElement;
+import java.util.List;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@XmlAccessorType(XmlAccessType.FIELD)
-public class RepoModel {
+public interface RepoService {
 
-    @XmlElement(name = "repo-id")
-    private String repoId;
+    List<RepoVO> list();
 
-    @XmlElement(name = "repo-name")
-    private String repoName;
-
-    /**
-     * Type of repositories, values can be 'binary', 'tarball'.
-     */
-    @XmlElement(name = "repo-type")
-    private String repoType;
-
-    @XmlElement(name = "base-url")
-    private String baseUrl;
-
-    private String os;
-
-    private String arch;
+    List<RepoVO> update(List<RepoDTO> repoDTOList);
 }

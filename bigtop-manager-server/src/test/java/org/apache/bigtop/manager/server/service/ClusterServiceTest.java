@@ -92,7 +92,6 @@ public class ClusterServiceTest {
         clusterDTO.setStackVersion("1.0.0");
         RepoDTO repoDTO = new RepoDTO();
         repoDTO.setArch("x86_64");
-        repoDTO.setOs("test");
         clusterDTO.setRepoInfoList(List.of(repoDTO));
         StackDTO stackDTO = new StackDTO();
         stackDTO.setStackName("TestStack");
@@ -124,7 +123,6 @@ public class ClusterServiceTest {
         when(hostService.batchSave(any(), any())).thenReturn(null);
         RepoPO repoPO = new RepoPO();
         repoPO.setArch("x86_64");
-        repoPO.setOs("test");
         when(repoDao.findAllByClusterId(any())).thenReturn(List.of(repoPO));
         try (MockedStatic<StackUtils> mockedStackUtils = mockStatic(StackUtils.class, CALLS_REAL_METHODS)) {
             mockedStackUtils.when(StackUtils::getStackKeyMap).thenReturn(mockStackKeyMap);
