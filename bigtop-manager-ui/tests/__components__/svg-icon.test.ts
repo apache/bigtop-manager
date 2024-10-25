@@ -38,12 +38,10 @@ describe('SvgIcon', () => {
       props: {
         name: 'home',
         prefix: 'vietest',
-        color: 'yellow',
-        className: 'home'
+        color: 'yellow'
       }
     })
     expect(wrapper.find('use').attributes()['href']).toBe('#vietest-home')
     expect(wrapper.find('use').attributes().fill).toBe('yellow')
-    expect(wrapper.find('svg').classes()).toEqual(['svg-icon', 'home'])
   })
 })

@@ -18,17 +18,46 @@
  */
 
 import { RouteRecordRaw } from 'vue-router'
-import { DesktopOutlined } from '@ant-design/icons-vue'
-import { h } from 'vue'
+import pageView from '@/layouts/index.vue'
 
 const routes: RouteRecordRaw[] = [
   {
-    path: '/hosts',
-    component: () => import('@/pages/hosts/index.vue'),
+    path: '/cluster-mange/',
+    component: pageView,
     meta: {
-      title: 'Hosts',
-      icon: h(DesktopOutlined)
-    }
+      title: '集群管理'
+    },
+    children: [
+      {
+        name: 'Hosts',
+        path: 'hosts',
+        redirect: '/cluster-mange/hosts/list',
+        meta: {
+          icon: 'hosts',
+          title: '主机管理'
+        },
+        children: [
+          {
+            name: 'List',
+            path: 'list',
+            component: () => import('@/pages/cluster-mange/hosts/index.vue'),
+            meta: {
+              hidden: true,
+              activeMenu: '/cluster-mange/hosts'
+            }
+          },
+          {
+            name: 'AddHost',
+            path: 'addhost',
+            component: () => import('@/pages/cluster-mange/hosts/add.vue'),
+            meta: {
+              hidden: true,
+              activeMenu: '/cluster-mange/hosts'
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
 

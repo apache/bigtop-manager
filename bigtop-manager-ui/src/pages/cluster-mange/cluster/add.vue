@@ -18,34 +18,22 @@
 -->
 
 <script setup lang="ts">
-  import { computed } from 'vue'
-
-  interface SvgIconProps {
-    prefix?: string
-    name: string
-    color?: string
+  import { useMenuStore } from '@/store/menu'
+  const menuStore = useMenuStore()
+  const onSave = () => {
+    menuStore.updateSiderMenu()
   }
-
-  const props = withDefaults(defineProps<SvgIconProps>(), {
-    prefix: 'icon',
-    color: '#000'
-  })
-
-  const symbolId = computed(() => `#${props.prefix}-${props.name}`)
+  const onDel = () => {
+    menuStore.updateSiderMenu(true)
+  }
 </script>
 
 <template>
-  <svg class="svg-icon" aria-hidden="true">
-    <use :xlink:href="symbolId" :fill="color" />
-  </svg>
+  <div>
+    <div> add & del</div>
+    <a-button @click="onSave">保存</a-button>
+    <a-button @click="onDel">删除</a-button>
+  </div>
 </template>
 
-<style lang="scss" scoped>
-  .svg-icon {
-    height: 1.2em;
-    width: 1.2em;
-    margin: 0 6px;
-    vertical-align: -0.25em;
-    overflow: hidden;
-  }
-</style>
+<style scoped></style>

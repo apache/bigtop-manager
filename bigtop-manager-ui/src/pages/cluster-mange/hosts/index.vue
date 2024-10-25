@@ -18,34 +18,16 @@
 -->
 
 <script setup lang="ts">
-  import { computed } from 'vue'
-
-  interface SvgIconProps {
-    prefix?: string
-    name: string
-    color?: string
+  import { useRouter } from 'vue-router'
+  const router = useRouter()
+  const addHost = () => {
+    router.push({ name: 'AddHost' })
   }
-
-  const props = withDefaults(defineProps<SvgIconProps>(), {
-    prefix: 'icon',
-    color: '#000'
-  })
-
-  const symbolId = computed(() => `#${props.prefix}-${props.name}`)
 </script>
 
 <template>
-  <svg class="svg-icon" aria-hidden="true">
-    <use :xlink:href="symbolId" :fill="color" />
-  </svg>
+  <a-button @click="addHost">add host</a-button>
+  <div>host list</div>
 </template>
 
-<style lang="scss" scoped>
-  .svg-icon {
-    height: 1.2em;
-    width: 1.2em;
-    margin: 0 6px;
-    vertical-align: -0.25em;
-    overflow: hidden;
-  }
-</style>
+<style scoped lang="scss"></style>

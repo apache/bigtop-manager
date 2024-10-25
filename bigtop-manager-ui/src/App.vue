@@ -18,15 +18,22 @@
 -->
 
 <script setup lang="ts">
-  import { useLocaleStore } from '@/store/locale'
   import { storeToRefs } from 'pinia'
-
+  import { onMounted } from 'vue'
+  import { useLocaleStore } from '@/store/locale'
+  import { useTheme } from './store/theme'
+  const themeStore = useTheme()
   const localeStore = useLocaleStore()
   const { antd } = storeToRefs(localeStore)
+  const { themeConfig } = storeToRefs(themeStore)
+
+  onMounted(() => {
+    themeStore.initTheme()
+  })
 </script>
 
 <template>
-  <a-config-provider :locale="antd">
+  <a-config-provider :locale="antd" :theme="themeConfig">
     <a-app class="app">
       <router-view />
     </a-app>
@@ -35,9 +42,6 @@
 
 <style scoped lang="scss">
   .app {
-    height: 100%;
-    > section {
-      height: 100%;
-    }
+    overflow: hidden;
   }
 </style>

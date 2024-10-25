@@ -22,14 +22,6 @@ interface RouteModuleType {
   routes: RouteRecordRaw[]
 }
 
-type RoutePriorityMap = { [key: string]: number }
-export const routePriorityMap: RoutePriorityMap = {
-  Dashboard: 1,
-  Hosts: 2,
-  Services: 3,
-  Cluster: 4
-}
-
 export function mergeRouteModules(
   routeModules: Record<string, unknown>
 ): RouteRecordRaw[] {
@@ -39,5 +31,30 @@ export function mergeRouteModules(
     mergedRoutes.push(...moduleRoutes)
   }
 
-  return mergedRoutes
+  return getMergeRoutes(mergedRoutes)
+}
+
+function getMergeRoutes<T extends RouteRecordRaw>(routes: T[]): T[] {
+  const mergedMap = new Map()
+  routes.forEach((route: T) => {
+    const firstLevelPath = route.path.split('/')[1]
+    if (!mergedMap.has(firstLevelPath)) {
+      mergedMap.set(firstLevelPath, {
+        path: `/${firstLevelPath}/`,
+        component: route.component,
+        meta: route.meta,
+        children: [],
+        redirect: route.redirect || undefined
+      })
+    }
+    if (route.children) {
+      const existingRoute = mergedMap.get(firstLevelPath)
+      route.children.forEach((child) => {
+        if (!existingRoute.children.some((c: T) => c.path === child.path)) {
+          existingRoute.children.push(child)
+        }
+      })
+    }
+  })
+  return Array.from(mergedMap.values())
 }

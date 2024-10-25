@@ -54,7 +54,7 @@
       }
 
       message.success(i18n.t('login.login_success'))
-      await router.push('/dashboard')
+      await router.push('/')
     } catch (e) {
       console.warn(e)
     } finally {

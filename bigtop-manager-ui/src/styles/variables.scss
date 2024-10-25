@@ -17,34 +17,20 @@
  * under the License.
  */
 
-import { RouteRecordRaw } from 'vue-router'
-import pageView from '@/layouts/index.vue'
+@import './ant-design-vue.scss';
+// margin
+$space-lg: 24px;
+$space-md: 16px;
+$space-sm: 8px;
 
-const routes: RouteRecordRaw[] = [
-  {
-    path: '/user/',
-    redirect: '/user/profile',
-    component: pageView,
-    meta: {
-      hidden: true
-    },
-    children: [
-      {
-        path: 'profile',
-        component: () => import('@/pages/user/profile/index.vue'),
-        meta: {
-          title: 'Profile'
-        }
-      },
-      {
-        path: 'settings',
-        component: () => import('@/pages/user/settings/index.vue'),
-        meta: {
-          title: 'Settings'
-        }
-      }
-    ]
-  }
-]
+$layout-header-height: 64px;
+$layout-sider-width: 200px;
+$layout-sider-bg-color: #fff;
 
-export { routes }
+@mixin flexbox($direction: null, $wrap: null, $justify: null, $align: null) {
+  display: flex;
+  flex-direction: $direction;
+  flex-wrap: $wrap;
+  justify-content: $justify;
+  align-items: $align;
+}

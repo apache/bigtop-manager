@@ -22,41 +22,21 @@ import pageView from '@/layouts/index.vue'
 
 const routes: RouteRecordRaw[] = [
   {
-    path: '/cluster-mange',
+    path: '/system-mange/',
     component: pageView,
-    redirect: '/cluster-mange/clusters',
+    redirect: '/system-mange/model',
     meta: {
-      title: '集群管理'
+      title: '系统管理'
     },
     children: [
       {
-        name: 'Clusters',
-        path: 'clusters',
-        redirect: '',
+        name: 'Model',
+        path: 'model',
+        component: () => import('@/pages/system-mange/model/index.vue'),
         meta: {
-          icon: 'clusters',
-          title: '集群管理'
-        },
-        children: [
-          {
-            name: 'ClusterDetail',
-            path: ':cluster/:id',
-            component: () => import('@/pages/cluster-mange/cluster/index.vue'),
-            meta: {
-              hidden: true,
-              title: '集群详情'
-            }
-          },
-          {
-            name: 'ClusterAdd',
-            path: 'add',
-            component: () => import('@/pages/cluster-mange/cluster/add.vue'),
-            meta: {
-              hidden: true,
-              title: '新增集群'
-            }
-          }
-        ]
+          icon: 'model',
+          title: '大模型配置'
+        }
       }
     ]
   }

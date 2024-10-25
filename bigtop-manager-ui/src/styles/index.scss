@@ -17,34 +17,33 @@
  * under the License.
  */
 
-import { RouteRecordRaw } from 'vue-router'
-import pageView from '@/layouts/index.vue'
+@import './variables.scss';
+@import './marked.scss';
+@import './scrollbar.scss';
 
-const routes: RouteRecordRaw[] = [
-  {
-    path: '/user/',
-    redirect: '/user/profile',
-    component: pageView,
-    meta: {
-      hidden: true
-    },
-    children: [
-      {
-        path: 'profile',
-        component: () => import('@/pages/user/profile/index.vue'),
-        meta: {
-          title: 'Profile'
-        }
-      },
-      {
-        path: 'settings',
-        component: () => import('@/pages/user/settings/index.vue'),
-        meta: {
-          title: 'Settings'
-        }
-      }
-    ]
+#app {
+  width: 100%;
+  box-sizing: border-box;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.header-item {
+  height: $layout-header-height;
+  border-radius: 0;
+  box-sizing: border-box;
+  padding: 0 16px;
+  cursor: pointer;
+  @include flexbox($justify: center, $align: center);
+
+  &:hover {
+    background-color: var(--color-primary);
   }
-]
 
-export { routes }
+  :deep(.svg-icon) {
+    width: 20px;
+    height: 20px;
+  }
+}

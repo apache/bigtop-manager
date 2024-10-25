@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~ Licensed to the Apache Software Foundation (ASF) under one
   ~ or more contributor license agreements.  See the NOTICE file
@@ -16,36 +17,10 @@
   ~ specific language governing permissions and limitations
   ~ under the License.
 -->
-
-<script setup lang="ts">
-  import { computed } from 'vue'
-
-  interface SvgIconProps {
-    prefix?: string
-    name: string
-    color?: string
-  }
-
-  const props = withDefaults(defineProps<SvgIconProps>(), {
-    prefix: 'icon',
-    color: '#000'
-  })
-
-  const symbolId = computed(() => `#${props.prefix}-${props.name}`)
-</script>
-
-<template>
-  <svg class="svg-icon" aria-hidden="true">
-    <use :xlink:href="symbolId" :fill="color" />
-  </svg>
-</template>
-
-<style lang="scss" scoped>
-  .svg-icon {
-    height: 1.2em;
-    width: 1.2em;
-    margin: 0 6px;
-    vertical-align: -0.25em;
-    overflow: hidden;
-  }
-</style>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
+  viewBox="0 0 16 16" fill="none">
+  <path
+    d="M1.33334 8.00001L1.33334 4.00001L4.33334 4.00001L4.33334 3.33334C4.33334 2.22877 5.22878 1.33334 6.33334 1.33334C7.43791 1.33334 8.33334 2.22877 8.33334 3.33334L8.33334 4.00001L11.3333 4.00001L11.3333 8.00001L12.6667 8.00001C13.7712 8.00001 14.6667 8.89544 14.6667 10C14.6667 11.1046 13.7712 12 12.6667 12L11.3333 12L11.3333 14.6667L1.33334 14.6667L1.33334 12L2.66668 12C3.77124 12 4.66668 11.1046 4.66668 10C4.66668 8.89544 3.77124 8.00001 2.66668 8.00001L1.33334 8.00001Z"
+    stroke="rgba(22, 119, 255, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round">
+  </path>
+</svg>

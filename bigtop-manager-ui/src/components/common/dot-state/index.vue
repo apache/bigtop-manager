@@ -69,7 +69,7 @@
   .dot-state {
     &::before {
       content: '';
-      margin: 0 0.375rem 0 0;
+      margin: 8px 0 0;
       display: inline-block;
       @include dot(var(--state-w), var(--state-h), var(--state-color));
     }

@@ -18,18 +18,26 @@
  */
 
 import { RouteRecordRaw } from 'vue-router'
-import { AppstoreOutlined } from '@ant-design/icons-vue'
-import { h } from 'vue'
+import pageView from '@/layouts/index.vue'
 
 const routes: RouteRecordRaw[] = [
   {
-    name: 'services',
-    path: '/services/:serviceName',
-    component: () => import('@/pages/service/index.vue'),
+    path: '/cluster-mange/',
+    component: pageView,
     meta: {
-      title: 'Services',
-      icon: h(AppstoreOutlined)
-    }
+      title: '集群管理'
+    },
+    children: [
+      {
+        name: 'Services',
+        path: 'services',
+        component: () => import('@/pages/cluster-mange/service/index.vue'),
+        meta: {
+          icon: 'services',
+          title: '基础服务'
+        }
+      }
+    ]
   }
 ]
 

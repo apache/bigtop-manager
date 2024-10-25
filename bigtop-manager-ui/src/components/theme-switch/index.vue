@@ -18,34 +18,15 @@
 -->
 
 <script setup lang="ts">
-  import { computed } from 'vue'
-
-  interface SvgIconProps {
-    prefix?: string
-    name: string
-    color?: string
-  }
-
-  const props = withDefaults(defineProps<SvgIconProps>(), {
-    prefix: 'icon',
-    color: '#000'
-  })
-
-  const symbolId = computed(() => `#${props.prefix}-${props.name}`)
+  import { useTheme } from '@/store/theme'
+  const themeStore = useTheme()
 </script>
 
 <template>
-  <svg class="svg-icon" aria-hidden="true">
-    <use :xlink:href="symbolId" :fill="color" />
-  </svg>
+  <div>
+    <a-button @click="themeStore.toggleTheme('default')">Default</a-button>
+    <a-button @click="themeStore.toggleTheme('dark')">Dark</a-button>
+  </div>
 </template>
 
-<style lang="scss" scoped>
-  .svg-icon {
-    height: 1.2em;
-    width: 1.2em;
-    margin: 0 6px;
-    vertical-align: -0.25em;
-    overflow: hidden;
-  }
-</style>
+<style lang="scss" scoped></style>

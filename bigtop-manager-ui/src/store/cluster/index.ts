@@ -20,30 +20,64 @@
 import { defineStore } from 'pinia'
 import { ClusterVO } from '@/api/cluster/types.ts'
 import { ref } from 'vue'
-import { getClusters } from '@/api/cluster'
+// import { getClusters } from '@/api/cluster'
 
 export const useClusterStore = defineStore(
   'cluster',
   () => {
     const clusters = ref<ClusterVO[]>([])
-    const selectedCluster = ref<ClusterVO | undefined>()
-    const clusterId = ref<number>(0)
+    const count = ref(0)
 
-    const loadClusters = async () => {
-      clusters.value = await getClusters()
-      if (clusters.value.length > 0) {
-        selectedCluster.value = clusters.value.filter(
-          (cluster) => cluster.selected
-        )[0]
-        clusterId.value = selectedCluster.value?.id
+    const generateRandomDataArray = () => {
+      const dataArray = []
+      for (let i = 0; i < count.value; i++) {
+        dataArray.push({
+          id: i,
+          clusterName: `Cluster-${i}`,
+          clusterType: Math.floor(Math.random() * 10),
+          stackName: `Stack-${i}`,
+          stackVersion: `Version-${i}`,
+          selected: Math.random() < 0.5
+        })
       }
-
-      console.log('clusters.value: ', clusters.value)
-      console.log('selectedCluster.value: ', selectedCluster.value)
-      console.log('clusterId.value: ', clusterId.value)
+      return dataArray
     }
 
-    return { loadClusters, clusters, selectedCluster, clusterId }
+    const addCluster = async () => {
+      count.value = count.value + 1
+      await loadClusters()
+    }
+
+    const delCluster = async () => {
+      if (count.value < 0) {
+        count.value = 0
+        return
+      }
+      count.value = count.value - 1
+      await loadClusters()
+    }
+
+    const loadClusters = async () => {
+      // clusters.value = await getClusters()
+      clusters.value = (await new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(generateRandomDataArray())
+        }, 1000)
+      })) as ClusterVO[]
+    }
+
+    return {
+      clusters,
+      count,
+      addCluster,
+      delCluster,
+      loadClusters
+    }
   },
-  { persist: false }
+  {
+    persist: {
+      storage: sessionStorage,
+      paths: ['clusters', 'count']
+    }
+  }
 )

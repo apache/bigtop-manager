@@ -18,13 +18,15 @@
  */
 
 import 'vue-router'
-import { VNode } from 'vue'
 
 declare module 'vue-router' {
   interface RouteMeta {
     title?: string
-    icon?: VNode
+    icon?: string
     hidden?: boolean
-    priority?: number
+    alwaysShow?: boolean
+    belong?: string
+    noCache?: boolean
+    activeMenu?: string
   }
 }
