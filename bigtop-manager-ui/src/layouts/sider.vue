@@ -78,6 +78,7 @@
             <span>{{ menuItem.label }}</span>
           </template>
           <a-menu-item v-for="child in menuItem.children" :key="child.key">
+            <span style="margin: 0 6px">{{ child.icon }}</span>
             <span>{{ child.label }}</span>
           </a-menu-item>
         </a-sub-menu>
@@ -93,25 +94,49 @@
     </a-menu>
     <a-divider />
     <div class="add-option">
-      <a-button type="primary" ghost @click="addCluster">添加集群</a-button>
+      <a-button type="primary" ghost @click="addCluster">
+        <svg-icon name="plus" />
+        <label>添加集群</label>
+      </a-button>
     </div>
   </a-layout-sider>
 </template>
 
 <style scoped lang="scss">
+  @mixin reset-sider-menu {
+    width: 100%;
+    border-radius: 0;
+    margin-inline: 0 !important;
+    padding: 0 0 0 14px !important;
+  }
   .sider {
     width: $layout-header-height;
     background: $layout-sider-bg-color;
     overflow: auto;
 
-    .menu-title-flex {
-      @include flexbox($justify: space-between, $align: center);
+    :deep(.ant-menu-submenu-title) {
+      @include reset-sider-menu();
     }
+
+    :deep(.ant-menu-item) {
+      @include reset-sider-menu();
+    }
+
+    :deep(.ant-menu-item-selected) {
+      border-right: 2px solid $color-primary;
+    }
+
     .add-option {
-      width: 160px;
+      width: 100%;
       display: flex;
       justify-content: center;
       padding-bottom: $space-lg;
+      button {
+        width: 160px;
+        label {
+          margin-left: 6px;
+        }
+      }
     }
   }
 </style>

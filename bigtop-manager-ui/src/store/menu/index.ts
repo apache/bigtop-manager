@@ -22,6 +22,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { dynamicRoutes as dr } from '@/router/routes/index'
 import { defineStore, storeToRefs } from 'pinia'
 import { useClusterStore } from '@/store/cluster/index'
+import lodash from 'lodash'
 
 export const SPECIAL_ROUTES = '/cluster-mange/clusters'
 export interface MenuItem {
@@ -48,7 +49,8 @@ export const useMenuStore = defineStore(
 
     const hasCluster = computed(() => clusters.value.length > 0)
     const siderMenus = computed((): MenuItem[] => {
-      const formatSider = baseRoutesMap.value.get(headerSelectedKey.value)
+      const siderMenuTemplate = baseRoutesMap.value.get(headerSelectedKey.value)
+      const formatSider = lodash.cloneDeep([...(siderMenuTemplate || [])])
       if (formatSider) {
         return hasCluster.value
           ? addSiderItemByClusters(formatSider as MenuItem[])
@@ -75,7 +77,7 @@ export const useMenuStore = defineStore(
         if (item.name == 'Clusters') {
           item.children = clusters.value.map((v) => {
             return {
-              icon: '',
+              icon: '🟢',
               key: `${item.key}/${v.clusterName}/${v.id}`,
               label: v.clusterName,
               title: v.clusterName,
