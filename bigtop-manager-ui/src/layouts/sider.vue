@@ -37,15 +37,16 @@
   const route = useRoute()
   const emits = defineEmits(['onSiderClick'])
 
-  const toggleActivedIcon = (menuItem: MenuItem) => {
+  const toggleActivatedIcon = (menuItem: MenuItem) => {
     const matchStr = '/:cluster/:id'
     const { key, icon } = menuItem
     const routePath = route.matched.at(-1)?.path
-
     if (routePath?.includes(matchStr)) {
-      return key === routePath.replace(matchStr, '') ? `${icon}_actived` : icon
+      return key === routePath.replace(matchStr, '')
+        ? `${icon}_activated`
+        : icon
     } else {
-      return key === siderMenuSelectedKey.value ? `${icon}_actived` : icon
+      return key === siderMenuSelectedKey.value ? `${icon}_activated` : icon
     }
   }
 
@@ -71,7 +72,7 @@
           :key="menuItem.key"
         >
           <template #icon>
-            <svg-icon :name="toggleActivedIcon(menuItem)" />
+            <svg-icon :name="toggleActivatedIcon(menuItem)" />
           </template>
           <template #title>
             <span>{{ menuItem.label }}</span>
@@ -83,7 +84,7 @@
         <template v-else>
           <a-menu-item :key="menuItem.key">
             <template #icon>
-              <svg-icon :name="toggleActivedIcon(menuItem)" />
+              <svg-icon :name="toggleActivatedIcon(menuItem)" />
             </template>
             <span>{{ menuItem.label }}</span>
           </a-menu-item>
