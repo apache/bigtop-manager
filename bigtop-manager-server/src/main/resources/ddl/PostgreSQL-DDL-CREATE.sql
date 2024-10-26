@@ -41,8 +41,8 @@ CREATE TABLE "user"
     password    VARCHAR(32)  DEFAULT NULL,
     nickname    VARCHAR(32)  DEFAULT NULL,
     status      BOOLEAN          DEFAULT TRUE,
-    create_time TIMESTAMP(0) DEFAULT NULL,
-    update_time TIMESTAMP(0) DEFAULT NULL,
+    create_time TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
+    update_time TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
     create_by   BIGINT,
     update_by   BIGINT,
     PRIMARY KEY (id),
@@ -148,8 +148,8 @@ CREATE TABLE host
     "desc"               VARCHAR(255)  DEFAULT NULL,
     status               INT  DEFAULT NULL,
     err_info             VARCHAR(255)  DEFAULT NULL,
-    create_time          TIMESTAMP(0) DEFAULT NULL,
-    update_time          TIMESTAMP(0) DEFAULT NULL,
+    create_time          TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
+    update_time          TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
     create_by            BIGINT,
     update_by            BIGINT,
     PRIMARY KEY (id),
@@ -165,23 +165,18 @@ CREATE INDEX idx_host_cluster_id ON host (cluster_id);
 CREATE TABLE repo
 (
     id          BIGINT CHECK (id > 0)         NOT NULL GENERATED ALWAYS AS IDENTITY,
-    cluster_id  BIGINT CHECK (cluster_id > 0) NOT NULL,
-    os          VARCHAR(32)  DEFAULT NULL,
+    name        VARCHAR(32)  DEFAULT NULL,
     arch        VARCHAR(32)  DEFAULT NULL,
     base_url    VARCHAR(64)  DEFAULT NULL,
-    repo_id     VARCHAR(32)  DEFAULT NULL,
-    repo_name   VARCHAR(64)  DEFAULT NULL,
-    repo_type   VARCHAR(64)  DEFAULT NULL,
-    create_time TIMESTAMP(0) DEFAULT NULL,
-    update_time TIMESTAMP(0) DEFAULT NULL,
+    type        INTEGER  DEFAULT NULL,
+    create_time TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
+    update_time TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
     create_by   BIGINT,
     update_by   BIGINT,
-    PRIMARY KEY (id),
-    CONSTRAINT uk_repo_id UNIQUE (repo_id, os, arch, cluster_id)
+    PRIMARY KEY (id)
 );
 
-DROP INDEX IF EXISTS idx_cluster_id;
-CREATE INDEX idx_cluster_id ON repo (cluster_id);
+COMMENT ON COLUMN repo.type IS '1-services, 2-tools';
 
 CREATE TABLE stack
 (
@@ -397,10 +392,17 @@ CREATE TABLE llm_chat_message
 CREATE INDEX idx_thread_id ON llm_chat_message (thread_id);
 CREATE INDEX idx_message_user_id ON llm_chat_message (user_id);
 
-INSERT INTO "user" (create_time, update_time, nickname, password, status, username)
-VALUES (now(), now(), 'Administrator', '21232f297a57a5a743894a0e4a801fc3', true, 'admin');
+INSERT INTO "user" (username, password, nickname, status)
+VALUES ('admin', '21232f297a57a5a743894a0e4a801fc3', 'Administrator', true);
 
-INSERT INTO llm_platform (credential, NAME, support_models)
+INSERT INTO repo (name, arch, base_url, type)
+VALUES
+('Service tarballs', 'x86_64', 'http://your-repo/', 1),
+('Service tarballs', 'aarch64', 'http://your-repo/', 1),
+('BM tools', 'x86_64', 'http://your-repo/', 2),
+('BM tools', 'aarch64', 'http://your-repo/', 2);
+
+INSERT INTO llm_platform (credential, name, support_models)
 VALUES
 ('{"apiKey": "API Key"}','OpenAI','gpt-3.5-turbo,gpt-4,gpt-4o,gpt-3.5-turbo-16k,gpt-4-turbo-preview,gpt-4-32k,gpt-4o-mini'),
 ('{"apiKey": "API Key"}','DashScope','qwen-1.8b-chat,qwen-max,qwen-plus,qwen-turbo'),

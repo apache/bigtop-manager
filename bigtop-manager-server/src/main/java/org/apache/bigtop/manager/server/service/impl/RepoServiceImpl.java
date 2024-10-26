@@ -16,38 +16,35 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.converter;
+package org.apache.bigtop.manager.server.service.impl;
 
-import org.apache.bigtop.manager.common.message.entity.pojo.RepoInfo;
 import org.apache.bigtop.manager.dao.po.RepoPO;
-import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
+import org.apache.bigtop.manager.dao.repository.RepoDao;
+import org.apache.bigtop.manager.server.model.converter.RepoConverter;
 import org.apache.bigtop.manager.server.model.dto.RepoDTO;
-import org.apache.bigtop.manager.server.model.req.RepoReq;
 import org.apache.bigtop.manager.server.model.vo.RepoVO;
+import org.apache.bigtop.manager.server.service.RepoService;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
+import org.springframework.stereotype.Service;
 
+import jakarta.annotation.Resource;
 import java.util.List;
 
-@Mapper(config = MapStructSharedConfig.class)
-public interface RepoConverter {
+@Service
+public class RepoServiceImpl implements RepoService {
 
-    RepoConverter INSTANCE = Mappers.getMapper(RepoConverter.class);
+    @Resource
+    private RepoDao repoDao;
 
-    RepoDTO fromReq2DTO(RepoReq repoReq);
+    @Override
+    public List<RepoVO> list() {
+        return RepoConverter.INSTANCE.fromPO2VO(repoDao.findAll());
+    }
 
-    List<RepoDTO> fromReq2DTO(List<RepoReq> repoReqList);
-
-    RepoPO fromDTO2PO(RepoDTO repoDTO);
-
-    List<RepoPO> fromDTO2PO(List<RepoDTO> repoDTOList);
-
-    RepoVO fromPO2VO(RepoPO repoPO);
-
-    List<RepoVO> fromPO2VO(List<RepoPO> repoPOList);
-
-    RepoInfo fromPO2Message(RepoPO repoPO);
-
-    List<RepoInfo> fromDTO2Message(List<RepoDTO> repoDTOs);
+    @Override
+    public List<RepoVO> update(List<RepoDTO> repoDTOList) {
+        List<RepoPO> repoPOList = RepoConverter.INSTANCE.fromDTO2PO(repoDTOList);
+        repoDao.partialUpdateByIds(repoPOList);
+        return list();
+    }
 }

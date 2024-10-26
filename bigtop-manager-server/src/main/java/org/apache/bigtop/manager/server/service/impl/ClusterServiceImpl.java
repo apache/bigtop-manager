@@ -95,13 +95,12 @@ public class ClusterServiceImpl implements ClusterService {
         hostService.batchSave(clusterPO.getId(), clusterDTO.getHostnames());
 
         // Save repo
-        List<RepoPO> repoPOList = RepoConverter.INSTANCE.fromDTO2PO(clusterDTO.getRepoInfoList(), clusterPO);
+        List<RepoPO> repoPOList = RepoConverter.INSTANCE.fromDTO2PO(clusterDTO.getRepoInfoList());
         List<RepoPO> oldrepoPOList = repoDao.findAllByClusterId(clusterPO.getId());
 
         for (RepoPO repoPO : repoPOList) {
             for (RepoPO oldRepoPO : oldrepoPOList) {
-                if (oldRepoPO.getArch().equals(repoPO.getArch())
-                        && oldRepoPO.getOs().equals(repoPO.getOs())) {
+                if (oldRepoPO.getArch().equals(repoPO.getArch())) {
                     repoPO.setId(oldRepoPO.getId());
                 }
             }
