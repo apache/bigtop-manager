@@ -18,5 +18,5 @@
  */
 
 export default {
-  service: '服务管理'
+  service: '基础服务'
 }

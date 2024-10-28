@@ -18,5 +18,5 @@
  */
 
 export default {
-  component: '组件管理'
+  component: '组件信息'
 }
