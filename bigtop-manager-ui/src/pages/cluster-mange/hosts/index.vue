@@ -26,8 +26,10 @@
 </script>
 
 <template>
-  <a-button @click="addHost">create host</a-button>
-  <div>host list</div>
+  <div>
+    <a-button @click="addHost">create host</a-button>
+    <div>host list</div>
+  </div>
 </template>
 
 <style scoped lang="scss"></style>
