@@ -18,6 +18,6 @@
  */
 
 export default {
-  log_await_message: '获取日志中 ',
-  log_complete_message: '完成 !'
+  system: 'System',
+  llm_config: 'LLM Config'
 }

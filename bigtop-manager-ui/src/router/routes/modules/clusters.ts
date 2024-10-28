@@ -26,7 +26,7 @@ const routes: RouteRecordRaw[] = [
     component: pageView,
     redirect: '/cluster-mange/clusters',
     meta: {
-      title: '集群管理'
+      title: 'cluster.cluster'
     },
     children: [
       {
@@ -35,7 +35,7 @@ const routes: RouteRecordRaw[] = [
         redirect: '',
         meta: {
           icon: 'clusters',
-          title: '集群管理'
+          title: 'cluster.cluster'
         },
         children: [
           {
@@ -43,17 +43,62 @@ const routes: RouteRecordRaw[] = [
             path: ':cluster/:id',
             component: () => import('@/pages/cluster-mange/cluster/index.vue'),
             meta: {
-              hidden: true,
-              title: '集群详情'
+              hidden: true
             }
           },
           {
-            name: 'ClusterAdd',
-            path: 'add',
-            component: () => import('@/pages/cluster-mange/cluster/add.vue'),
+            name: 'ClusterCreate',
+            path: 'create',
+            component: () => import('@/pages/cluster-mange/cluster/create.vue'),
+            meta: {
+              hidden: true
+            }
+          }
+        ]
+      },
+      {
+        name: 'Services',
+        path: 'services',
+        component: () => import('@/pages/cluster-mange/service/index.vue'),
+        meta: {
+          icon: 'services',
+          title: 'service.service'
+        }
+      },
+      {
+        name: 'Components',
+        path: 'components',
+        component: () => import('@/pages/cluster-mange/components/index.vue'),
+        meta: {
+          icon: 'components',
+          title: 'component.component'
+        }
+      },
+      {
+        name: 'Hosts',
+        path: 'hosts',
+        redirect: '/cluster-mange/hosts/list',
+        meta: {
+          icon: 'hosts',
+          title: 'host.host'
+        },
+        children: [
+          {
+            name: 'List',
+            path: 'list',
+            component: () => import('@/pages/cluster-mange/hosts/index.vue'),
             meta: {
               hidden: true,
-              title: '新增集群'
+              activeMenu: '/cluster-mange/hosts'
+            }
+          },
+          {
+            name: 'HostCreate',
+            path: 'addhost',
+            component: () => import('@/pages/cluster-mange/hosts/create.vue'),
+            meta: {
+              hidden: true,
+              activeMenu: '/cluster-mange/hosts'
             }
           }
         ]

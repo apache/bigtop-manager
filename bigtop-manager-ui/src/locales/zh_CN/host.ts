@@ -17,28 +17,6 @@
  * under the License.
  */
 
-import { RouteRecordRaw } from 'vue-router'
-import pageView from '@/layouts/index.vue'
-
-const routes: RouteRecordRaw[] = [
-  {
-    path: '/cluster-mange/',
-    component: pageView,
-    meta: {
-      title: '集群管理'
-    },
-    children: [
-      {
-        name: 'Services',
-        path: 'services',
-        component: () => import('@/pages/cluster-mange/service/index.vue'),
-        meta: {
-          icon: 'services',
-          title: '基础服务'
-        }
-      }
-    ]
-  }
-]
-
-export { routes }
+export default {
+  host: '主机管理'
+}

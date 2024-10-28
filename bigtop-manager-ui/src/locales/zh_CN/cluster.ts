@@ -18,23 +18,6 @@
  */
 
 export default {
-  switch: '切换集群',
-  create: '创建集群',
-  set_cluster_name: '设置集群名称',
-  set_cluster_name_title: '让我们来开始吧',
-  set_cluster_name_sub_title: '请跟随后续步骤来创建你的集群',
-  set_cluster_name_input: '输入你的集群名',
-  set_cluster_name_valid: '集群名不能为空',
-  choose_stack: '选择组件栈',
-  set_repository: '设置源',
-  set_hosts: '设置节点',
-  set_hosts_placeholder: '请输入主机名，每行一个。',
-  set_hosts_valid: '主机名不能为空。',
-  show_hosts_resolved: '解析后的主机名列表',
-  not_exist_title: '集群不存在',
-  not_exist_sub_title: '集群不存在，请先创建',
-  create_success_title: '创建成功',
-  create_success_sub_title: '集群已创建成功，快点开始使用吧',
-  create_fail_title: '创建失败',
-  create_fail_sub_title: '集群创建失败，请重试'
+  cluster: '集群管理',
+  create: '添加集群'
 }

@@ -20,7 +20,7 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div>host add </div>
+  <div>host create </div>
 </template>
 
 <style scoped></style>

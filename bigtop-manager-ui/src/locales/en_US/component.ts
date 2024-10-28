@@ -18,15 +18,5 @@
  */
 
 export default {
-  host: 'Host',
-  host_selected: 'Selected {0} hosts',
-  host_restart: 'Restart Hosts',
-  host_stop: 'Stop Hosts',
-  add: 'Add Host',
-  hostname: 'Hostname',
-  cluster_name: 'Cluster Name',
-  ipv4: 'IPv4',
-  cores: 'CPU Cores',
-  ram: 'RAM',
-  disk: 'Disk'
+  component: 'Component'
 }

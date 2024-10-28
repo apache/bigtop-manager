@@ -22,15 +22,19 @@
   import SelectLang from '@/components/select-lang/index.vue'
   import UserAvatar from '@/components/user-avatar/index.vue'
   import { RouteRecordRaw } from 'vue-router'
+
   interface Props {
     headerSelectedKey: string
     headerMenus: RouteRecordRaw[]
   }
+
   const props = withDefaults(defineProps<Props>(), {
     headerSelectedKey: '',
     headerMenus: () => []
   })
+
   const { headerSelectedKey, headerMenus } = toRefs(props)
+  const githubUrl = import.meta.env.VITE_GITHUB_URL
   const spaceSize = ref(16)
   const emits = defineEmits(['onHeaderClick'])
   const onHeaderClick = ({ key }: any) => {
@@ -51,7 +55,7 @@
         @select="onHeaderClick"
       >
         <a-menu-item v-for="route of headerMenus" :key="route.path">
-          {{ route.meta?.title }}
+          {{ $t(route.meta?.title || '') }}
         </a-menu-item>
       </a-menu>
     </div>
@@ -63,7 +67,9 @@
         </div>
         <select-lang />
         <div class="header-item">
-          <svg-icon name="github" />
+          <a :href="githubUrl" target="_blank">
+            <svg-icon name="github" />
+          </a>
         </div>
         <div class="header-item">
           <svg-icon name="book" />

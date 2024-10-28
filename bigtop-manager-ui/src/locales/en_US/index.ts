@@ -21,18 +21,18 @@ import common from '@/locales/en_US/common.ts'
 import login from '@/locales/en_US/login'
 import user from '@/locales/en_US/user.ts'
 import cluster from '@/locales/en_US/cluster.ts'
-import hosts from '@/locales/en_US/hosts.ts'
+import host from '@/locales/en_US/host'
 import service from '@/locales/en_US/service.ts'
-import job from '@/locales/en_US/job.ts'
-import ai from '@/locales/en_US/ai.ts'
+import system from '@/locales/en_US/system'
+import component from './component'
 
 export default {
   common,
   login,
   user,
   cluster,
-  hosts,
+  host,
+  component,
   service,
-  job,
-  ai
+  system
 }

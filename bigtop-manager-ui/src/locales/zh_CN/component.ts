@@ -18,6 +18,5 @@
  */
 
 export default {
-  log_await_message: 'Waiting for more logs',
-  log_complete_message: 'Done!'
+  component: '组件管理'
 }

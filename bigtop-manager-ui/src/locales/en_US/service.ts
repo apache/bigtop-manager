@@ -18,35 +18,5 @@
  */
 
 export default {
-  start_all: 'Start All',
-  stop_all: 'Stop All',
-  restart_all: 'Restart All',
-  start_service: 'Start Service',
-  stop_service: 'Stop Service',
-  restart_service: 'Restart Service',
-  start_all_services: 'Are you sure you want to start all services?',
-  stop_all_services: 'Are you sure you want to stop all services?',
-  restart_all_services: 'Are you sure you want to restart all services?',
-  start_service_warn: 'Are you sure you want to start {0} service?',
-  stop_service_warn: 'Are you sure you want to stop {0} service?',
-  restart_service_warn: 'Are you sure you want to restart {0} service?',
-  add: 'Add service',
-  service: 'Service',
-  service_name: 'Service Name',
-  service_selected: 'Selected {0} Services',
-  service_account: 'Service Account',
-  service_user: 'Service User',
-  service_group: 'Service Group',
-  choose_services: 'Choose Services',
-  assign_components: 'Assign Components',
-  configure_services: 'Configure Services',
-  add_success_title: 'Congratulations!',
-  add_success_sub_title: 'Service added successfully, please enjoy it.',
-  add_fail_title: 'Oh no!',
-  add_fail_sub_title: 'Service added failed, please retry it.',
-  summary: 'Summary',
-  config: 'Config',
-  components: 'Components',
-  quick_links: 'Quick Links',
-  no_link: 'No Link'
+  service: 'Service'
 }

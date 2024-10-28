@@ -18,35 +18,5 @@
  */
 
 export default {
-  start_all: '启动所有',
-  stop_all: '停止所有',
-  restart_all: '重启所有',
-  start_service: '启动服务',
-  stop_service: '停止服务',
-  restart_service: '重启服务',
-  start_all_services: '是否确认启动所有服务？',
-  stop_all_services: '是否确认停止所有服务？',
-  restart_all_services: '是否确认重启所有服务？',
-  start_service_warn: '是否确认启动 {0} ？',
-  stop_service_warn: '是否确认停止 {0} ？',
-  restart_service_warn: '是否确认重启 {0}？',
-  add: '新增服务',
-  service: '服务',
-  service_name: '服务名称',
-  service_selected: '已选择 {0} 个服务',
-  service_account: '服务账号',
-  service_user: '服务所属用户',
-  service_group: '服务所属用户组',
-  choose_services: '选择服务',
-  assign_components: '分配组件',
-  configure_services: '配置服务',
-  create_success_title: '新增成功',
-  create_success_sub_title: '组件新增成功，快点开始使用吧',
-  create_fail_title: '新增失败',
-  create_fail_sub_title: '组件新增失败，请重试',
-  summary: '总览',
-  config: '配置',
-  components: '组件',
-  quick_links: '快速链接',
-  no_link: '无'
+  service: '服务管理'
 }

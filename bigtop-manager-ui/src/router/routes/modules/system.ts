@@ -17,17 +17,29 @@
  * under the License.
  */
 
-export default {
-  empty_message: 'Message cannot be empty',
-  select_authorized_platform: 'Please select the following authorized platform',
-  no_authorized_platform: 'No authorized platforms',
-  or_you_can: 'Or you can',
-  authorize_new_platform: 'Authorize New Platform',
-  select_platform_to_authorize: 'Select platform to authorize',
-  authorizing_platform:
-    ' You are authorizing {0} platform, please fill in the following information',
-  select_thread_to_chat: 'Please select the thread to enter chat',
-  select_model: 'Please select the model you want to use',
-  create_new_thread: 'Create New Thread',
-  thread_name: 'Thread {0}'
-}
+import { RouteRecordRaw } from 'vue-router'
+import pageView from '@/layouts/index.vue'
+
+const routes: RouteRecordRaw[] = [
+  {
+    path: '/system-mange/',
+    component: pageView,
+    redirect: '/system-mange/model',
+    meta: {
+      title: 'system.system'
+    },
+    children: [
+      {
+        name: 'Model',
+        path: 'model',
+        component: () => import('@/pages/system-mange/model/index.vue'),
+        meta: {
+          icon: 'model',
+          title: 'system.llm_config'
+        }
+      }
+    ]
+  }
+]
+
+export { routes }

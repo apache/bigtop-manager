@@ -51,7 +51,7 @@
   }
 
   const addCluster = () => {
-    router.push({ name: 'ClusterAdd' })
+    router.push({ name: 'ClusterCreate' })
   }
 
   const onSiderClick = ({ key }: any) => {
@@ -75,7 +75,7 @@
             <svg-icon :name="toggleActivatedIcon(menuItem)" />
           </template>
           <template #title>
-            <span>{{ menuItem.label }}</span>
+            <span>{{ $t(menuItem.label) }}</span>
           </template>
           <a-menu-item v-for="child in menuItem.children" :key="child.key">
             <span style="margin: 0 6px">{{ child.icon }}</span>
@@ -87,16 +87,16 @@
             <template #icon>
               <svg-icon :name="toggleActivatedIcon(menuItem)" />
             </template>
-            <span>{{ menuItem.label }}</span>
+            <span>{{ $t(menuItem.label) }}</span>
           </a-menu-item>
         </template>
       </template>
     </a-menu>
     <a-divider />
-    <div class="add-option">
+    <div class="create-option">
       <a-button type="primary" ghost @click="addCluster">
         <svg-icon name="plus" />
-        <label>添加集群</label>
+        <label>{{ $t('cluster.create') }}</label>
       </a-button>
     </div>
   </a-layout-sider>
@@ -126,7 +126,7 @@
       border-right: 2px solid $color-primary;
     }
 
-    .add-option {
+    .create-option {
       width: 100%;
       display: flex;
       justify-content: center;

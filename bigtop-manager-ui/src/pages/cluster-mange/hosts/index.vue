@@ -21,12 +21,12 @@
   import { useRouter } from 'vue-router'
   const router = useRouter()
   const addHost = () => {
-    router.push({ name: 'AddHost' })
+    router.push({ name: 'HostCreate' })
   }
 </script>
 
 <template>
-  <a-button @click="addHost">add host</a-button>
+  <a-button @click="addHost">create host</a-button>
   <div>host list</div>
 </template>
 
