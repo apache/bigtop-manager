@@ -18,52 +18,68 @@
 -->
 
 <script setup lang="ts">
-  import { onMounted, onUnmounted } from 'vue'
+  import { onMounted } from 'vue'
   import LayoutFooter from '@/layouts/footer.vue'
-  import LayoutContent from '@/layouts/content.vue'
   import LayoutHeader from '@/layouts/header.vue'
   import LayoutSider from '@/layouts/sider.vue'
   import { useUserStore } from '@/store/user'
   import { useClusterStore } from '@/store/cluster'
-  import { useServiceStore } from '@/store/service'
-  import { useComponentStore } from '@/store/component'
-  import { useConfigStore } from '@/store/config'
+  import { useMenuStore } from '@/store/menu/index'
+  import { storeToRefs } from 'pinia'
 
   const userStore = useUserStore()
+  const menuStore = useMenuStore()
   const clusterStore = useClusterStore()
-  const serviceStore = useServiceStore()
-  const componentStore = useComponentStore()
-  const configStore = useConfigStore()
+  const { headerSelectedKey, headerMenus, siderMenuSelectedKey, siderMenus } =
+    storeToRefs(menuStore)
 
-  onMounted(() => {
+  onMounted(async () => {
     userStore.getUserInfo()
-    clusterStore.loadClusters()
-    serviceStore.loadServices()
-    componentStore.resumeIntervalFn()
-    configStore.loadLatestConfigs()
-  })
-
-  onUnmounted(() => {
-    componentStore.pauseIntervalFn()
+    await clusterStore.loadClusters()
+    menuStore.setBaseRoutesMap()
   })
 </script>
 
 <template>
   <a-layout class="layout">
-    <layout-sider />
-    <a-layout class="layout-inner">
-      <layout-header />
-      <layout-content />
-      <layout-footer />
+    <layout-header
+      :header-selected-key="headerSelectedKey"
+      :header-menus="headerMenus"
+      @on-header-click="menuStore.onHeaderClick"
+    />
+    <a-layout>
+      <layout-sider
+        :sider-menu-selected-key="siderMenuSelectedKey"
+        :sider-menus="siderMenus"
+        @on-sider-click="menuStore.onSiderClick"
+      />
+      <a-layout class="layout-inner">
+        <router-view v-slot="{ Component }">
+          <transition name="fade" mode="out-in">
+            <component :is="Component" />
+          </transition>
+        </router-view>
+        <layout-footer />
+      </a-layout>
     </a-layout>
   </a-layout>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
   .layout {
-    min-height: 100vh;
+    height: 100vh;
     &-inner {
+      padding: $space-lg $space-md;
       overflow: auto;
     }
+  }
+
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity 0.4s;
+  }
+  .fade-enter,
+  .fade-leave-to {
+    opacity: 0;
   }
 </style>

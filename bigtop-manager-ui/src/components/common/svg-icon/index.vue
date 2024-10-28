@@ -24,26 +24,18 @@
     prefix?: string
     name: string
     color?: string
-    className?: string
   }
 
   const props = withDefaults(defineProps<SvgIconProps>(), {
     prefix: 'icon',
-    color: '#000',
-    className: ''
+    color: '#000'
   })
 
   const symbolId = computed(() => `#${props.prefix}-${props.name}`)
-  const svgClass = computed(() => {
-    if (props.className) {
-      return `svg-icon ${props.className}`
-    }
-    return 'svg-icon'
-  })
 </script>
 
 <template>
-  <svg :class="svgClass" aria-hidden="true">
+  <svg class="svg-icon" aria-hidden="true">
     <use :xlink:href="symbolId" :fill="color" />
   </svg>
 </template>

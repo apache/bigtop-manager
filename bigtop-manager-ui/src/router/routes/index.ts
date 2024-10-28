@@ -28,13 +28,15 @@ export const dynamicRoutes: RouteRecordRaw[] =
   mergeRouteModules(dynamicRoutesFiles)
 
 const routes: RouteRecordRaw[] = [
-  { path: '/login', component: () => import('@/pages/login/index.vue') },
+  {
+    path: '/login',
+    component: () => import('@/pages/login/index.vue')
+  },
   {
     path: '/',
-    redirect: '/dashboard',
-    component: () => import('@/layouts/index.vue'),
-    children: [...dynamicRoutes]
+    redirect: '/cluster-mange/'
   },
+  ...dynamicRoutes,
   {
     path: '/:pathMatch(.*)',
     component: () => import('@/pages/error/404.vue')
