@@ -19,7 +19,7 @@
 
 export default {
   cluster: '集群管理',
-  service: '基础服务',
+  infra: '基础服务',
   component: '组件信息',
   host: '主机管理',
   create: '添加集群',

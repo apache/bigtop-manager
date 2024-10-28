@@ -20,7 +20,7 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div> service list</div>
+  <div> infra list</div>
 </template>
 
 <style scoped></style>

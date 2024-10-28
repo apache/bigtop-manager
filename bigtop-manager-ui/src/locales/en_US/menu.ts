@@ -19,7 +19,7 @@
 
 export default {
   cluster: 'Cluster',
-  service: 'Service',
+  infra: 'Infrastructure',
   component: 'Component',
   host: 'Host',
   create: 'Create Cluster',

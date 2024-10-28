@@ -65,12 +65,13 @@ const routes: RouteRecordRaw[] = [
         ]
       },
       {
-        name: 'Services',
-        path: 'services',
-        component: () => import('@/pages/cluster-mange/service/index.vue'),
+        name: 'Infrastructures',
+        path: 'infrastructures',
+        component: () =>
+          import('@/pages/cluster-mange/infrastructures/index.vue'),
         meta: {
-          icon: 'services',
-          title: 'menu.service'
+          icon: 'infrastructures',
+          title: 'menu.infra'
         }
       },
       {
