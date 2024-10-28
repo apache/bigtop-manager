@@ -30,6 +30,14 @@ const routes: RouteRecordRaw[] = [
     },
     children: [
       {
+        name: 'Default',
+        path: 'default',
+        component: () => import('@/layouts/default.vue'),
+        meta: {
+          hidden: true
+        }
+      },
+      {
         name: 'Clusters',
         path: 'clusters',
         redirect: '',

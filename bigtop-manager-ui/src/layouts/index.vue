@@ -18,27 +18,20 @@
 -->
 
 <script setup lang="ts">
-  import { onMounted, computed } from 'vue'
+  import { onMounted } from 'vue'
   import LayoutFooter from '@/layouts/footer.vue'
   import LayoutHeader from '@/layouts/header.vue'
   import LayoutSider from '@/layouts/sider.vue'
   import { useUserStore } from '@/store/user'
   import { useClusterStore } from '@/store/cluster'
-  import { SPECIAL_ROUTES, useMenuStore } from '@/store/menu/index'
+  import { useMenuStore } from '@/store/menu/index'
   import { storeToRefs } from 'pinia'
-  import { useRoute } from 'vue-router'
 
-  const route = useRoute()
   const userStore = useUserStore()
   const menuStore = useMenuStore()
   const clusterStore = useClusterStore()
-  const { clusters } = storeToRefs(clusterStore)
   const { headerSelectedKey, headerMenus, siderMenuSelectedKey, siderMenus } =
     storeToRefs(menuStore)
-
-  const showDefaultPage = computed(
-    () => clusters.value.length == 0 && route.path == SPECIAL_ROUTES
-  )
 
   onMounted(async () => {
     userStore.getUserInfo()
@@ -61,7 +54,6 @@
         @on-sider-click="menuStore.onSiderClick"
       />
       <a-layout class="layout-inner">
-        <div v-if="showDefaultPage"> default content </div>
         <router-view v-slot="{ Component }">
           <transition name="fade" mode="out-in">
             <component :is="Component" />

@@ -17,24 +17,10 @@
   ~ under the License.
 -->
 
-<script setup lang="ts">
-  import dayjs from 'dayjs'
-</script>
+<script setup lang="ts"></script>
 
 <template>
-  <a-layout-footer>
-    <div class="copyright">
-      {{ `Copyright ©2011-${dayjs().year()}` }}
-      <a href="https://www.apache.org" target="_blank">
-        The Apache Software Foundation
-      </a>
-      . All rights reserved.
-    </div>
-  </a-layout-footer>
+  <div>default content</div>
 </template>
 
-<style scoped lang="scss">
-  .copyright {
-    text-align: center;
-  }
-</style>
+<style scoped lang="scss"></style>

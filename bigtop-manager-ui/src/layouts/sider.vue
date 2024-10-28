@@ -21,6 +21,7 @@
   import { toRefs } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
   import type { MenuItem } from '@/store/menu'
+  import { SPECIAL_ROUTE_NAME } from '@/store/menu/index'
 
   interface Props {
     siderMenuSelectedKey: string
@@ -68,7 +69,7 @@
     >
       <template v-for="menuItem in siderMenus" :key="menuItem.key">
         <a-sub-menu
-          v-if="menuItem.children && menuItem.children.length"
+          v-if="menuItem.children && menuItem.name === SPECIAL_ROUTE_NAME"
           :key="menuItem.key"
         >
           <template #icon>
@@ -133,8 +134,9 @@
       padding-bottom: $space-lg;
       button {
         width: 160px;
+        @include flexbox($align: center);
         label {
-          margin-left: 6px;
+          margin-left: 10px;
         }
       }
     }

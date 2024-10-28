@@ -24,7 +24,9 @@ import { defineStore, storeToRefs } from 'pinia'
 import { useClusterStore } from '@/store/cluster/index'
 import lodash from 'lodash'
 
-export const SPECIAL_ROUTES = '/cluster-mange/clusters'
+export const SPECIAL_ROUTE_NAME = 'Clusters'
+export const SPECIAL_ROUTE_PATH = '/cluster-mange/clusters'
+
 export interface MenuItem {
   icon: string
   key: string
@@ -64,9 +66,14 @@ export const useMenuStore = defineStore(
       // resolve highlight menu
       const activeMenu = route.meta.activeMenu || route.path
       headerSelectedKey.value = route.matched[0].path
-      if (hasCluster.value && route.path == SPECIAL_ROUTES) {
-        siderMenuSelectedKey.value = findActivePath(siderMenus.value[0])
-        siderMenuSelectedKey.value && router.push(siderMenuSelectedKey.value)
+      if (route.name == SPECIAL_ROUTE_NAME) {
+        if (hasCluster.value) {
+          siderMenuSelectedKey.value = findActivePath(siderMenus.value[0])
+          siderMenuSelectedKey.value && router.push(siderMenuSelectedKey.value)
+        } else {
+          siderMenuSelectedKey.value = ''
+          router.replace({ name: 'Default' })
+        }
       } else {
         siderMenuSelectedKey.value = activeMenu
       }
@@ -74,7 +81,7 @@ export const useMenuStore = defineStore(
 
     function addSiderItemByClusters(formatSider: MenuItem[]) {
       return formatSider.map((item) => {
-        if (item.name == 'Clusters') {
+        if (item.name == SPECIAL_ROUTE_NAME) {
           item.children = clusters.value.map((v) => {
             return {
               icon: '',
@@ -128,6 +135,9 @@ export const useMenuStore = defineStore(
 
     function onHeaderClick(key: string) {
       headerSelectedKey.value = key
+      if (!hasCluster.value && route.name == SPECIAL_ROUTE_NAME) {
+        return
+      }
       siderMenuSelectedKey.value = findActivePath(siderMenus.value[0])
       router.push(siderMenuSelectedKey.value)
     }
@@ -142,7 +152,7 @@ export const useMenuStore = defineStore(
         ? await clusterStore.delCluster()
         : await clusterStore.addCluster()
       siderMenuSelectedKey.value =
-        siderMenus.value[0].children?.at(-1)?.key || SPECIAL_ROUTES
+        siderMenus.value[0].children?.at(-1)?.key || SPECIAL_ROUTE_PATH
       router.push(siderMenuSelectedKey.value)
     }
 
