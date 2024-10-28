@@ -21,20 +21,16 @@ package org.apache.bigtop.manager.server.service.impl;
 import org.apache.bigtop.manager.common.enums.MaintainState;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.RepoPO;
-import org.apache.bigtop.manager.dao.po.StackPO;
 import org.apache.bigtop.manager.dao.repository.ClusterDao;
 import org.apache.bigtop.manager.dao.repository.RepoDao;
-import org.apache.bigtop.manager.dao.repository.StackDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.model.converter.ClusterConverter;
 import org.apache.bigtop.manager.server.model.converter.RepoConverter;
 import org.apache.bigtop.manager.server.model.dto.ClusterDTO;
-import org.apache.bigtop.manager.server.model.dto.StackDTO;
 import org.apache.bigtop.manager.server.model.vo.ClusterVO;
 import org.apache.bigtop.manager.server.service.ClusterService;
 import org.apache.bigtop.manager.server.service.HostService;
-import org.apache.bigtop.manager.server.utils.StackUtils;
 
 import org.springframework.stereotype.Service;
 
@@ -55,9 +51,6 @@ public class ClusterServiceImpl implements ClusterService {
     private RepoDao repoDao;
 
     @Resource
-    private StackDao stackDao;
-
-    @Resource
     private HostService hostService;
 
     @Override
@@ -74,12 +67,7 @@ public class ClusterServiceImpl implements ClusterService {
     @Override
     public ClusterVO save(ClusterDTO clusterDTO) {
         // Save cluster
-        StackPO stackPO =
-                stackDao.findByStackNameAndStackVersion(clusterDTO.getStackName(), clusterDTO.getStackVersion());
-        StackDTO stackDTO = StackUtils.getStackKeyMap()
-                .get(StackUtils.fullStackName(clusterDTO.getStackName(), clusterDTO.getStackVersion()))
-                .getLeft();
-        ClusterPO clusterPO = ClusterConverter.INSTANCE.fromDTO2PO(clusterDTO, stackDTO, stackPO);
+        ClusterPO clusterPO = ClusterConverter.INSTANCE.fromDTO2PO(clusterDTO);
         clusterPO.setSelected(clusterDao.count() == 0);
         clusterPO.setState(MaintainState.UNINSTALLED.getName());
 

@@ -67,7 +67,6 @@ CREATE TABLE cluster
     state         VARCHAR(255),
     update_by     BIGINT,
     user_group    VARCHAR(255),
-    stack_id      BIGINT,
     PRIMARY KEY (id),
     CONSTRAINT uk_cluster_name UNIQUE (cluster_name)
 );
@@ -78,7 +77,6 @@ COMMENT ON COLUMN cluster.cluster_type IS '1-Physical Machine, 2-Kubernetes';
 COMMENT ON COLUMN cluster.selected IS '0-Disable, 1-Enable';
 
 DROP INDEX IF EXISTS idx_cluster_stack_id;
-CREATE INDEX idx_cluster_stack_id ON cluster (stack_id);
 
 CREATE TABLE component
 (
@@ -177,19 +175,6 @@ CREATE TABLE repo
 );
 
 COMMENT ON COLUMN repo.type IS '1-services, 2-tools';
-
-CREATE TABLE stack
-(
-    id            BIGINT CHECK (id > 0) NOT NULL GENERATED ALWAYS AS IDENTITY,
-    stack_name    VARCHAR(32)           NOT NULL,
-    stack_version VARCHAR(32)           NOT NULL,
-    create_time   TIMESTAMP(0) DEFAULT NULL,
-    update_time   TIMESTAMP(0) DEFAULT NULL,
-    create_by     BIGINT,
-    update_by     BIGINT,
-    PRIMARY KEY (id),
-    CONSTRAINT uk_stack UNIQUE (stack_name, stack_version)
-);
 
 CREATE TABLE task
 (

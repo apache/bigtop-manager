@@ -84,10 +84,8 @@ CREATE TABLE `cluster`
     `state`         VARCHAR(255),
     `update_by`     BIGINT,
     `user_group`    VARCHAR(255),
-    `stack_id`      BIGINT,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_cluster_name` (`cluster_name`),
-    KEY `idx_cluster_stack_id` (`stack_id`)
+    UNIQUE KEY `uk_cluster_name` (`cluster_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `component`
@@ -174,19 +172,6 @@ CREATE TABLE `repo`
     `update_by`   BIGINT,
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE `stack`
-(
-    `id`             BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `stack_name`     VARCHAR(32) NOT NULL,
-    `stack_version`  VARCHAR(32) NOT NULL,
-    `create_time`    DATETIME DEFAULT NULL,
-    `update_time`    DATETIME DEFAULT NULL,
-    `create_by`      BIGINT,
-    `update_by`      BIGINT,
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_stack` (`stack_name`, `stack_version`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 CREATE TABLE `task`
 (

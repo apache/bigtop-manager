@@ -39,8 +39,6 @@ public class ServiceVO {
 
     private String serviceUser;
 
-    private String serviceGroup;
-
     private List<String> requiredServices;
 
     private Boolean isClient;

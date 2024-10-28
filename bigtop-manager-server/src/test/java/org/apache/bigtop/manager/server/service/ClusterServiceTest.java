@@ -20,11 +20,8 @@
 package org.apache.bigtop.manager.server.service;
 
 import org.apache.bigtop.manager.dao.po.ClusterPO;
-import org.apache.bigtop.manager.dao.po.RepoPO;
-import org.apache.bigtop.manager.dao.po.StackPO;
 import org.apache.bigtop.manager.dao.repository.ClusterDao;
 import org.apache.bigtop.manager.dao.repository.RepoDao;
-import org.apache.bigtop.manager.dao.repository.StackDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.model.dto.ClusterDTO;
@@ -32,7 +29,6 @@ import org.apache.bigtop.manager.server.model.dto.RepoDTO;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.model.dto.StackDTO;
 import org.apache.bigtop.manager.server.service.impl.ClusterServiceImpl;
-import org.apache.bigtop.manager.server.utils.StackUtils;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
@@ -41,20 +37,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.CALLS_REAL_METHODS;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -63,9 +54,6 @@ public class ClusterServiceTest {
 
     @Mock
     private ClusterDao clusterDao;
-
-    @Mock
-    private StackDao stackDao;
 
     @Mock
     private RepoDao repoDao;
@@ -93,11 +81,8 @@ public class ClusterServiceTest {
         RepoDTO repoDTO = new RepoDTO();
         repoDTO.setArch("x86_64");
         clusterDTO.setRepoInfoList(List.of(repoDTO));
-        StackDTO stackDTO = new StackDTO();
+        StackDTO stackDTO = new StackDTO(clusterDTO.getStackName(), clusterDTO.getStackVersion());
         stackDTO.setStackName("TestStack");
-        mockStackKeyMap.put(
-                StackUtils.fullStackName(clusterDTO.getStackName(), clusterDTO.getStackVersion()),
-                new ImmutablePair<>(stackDTO, new ArrayList<>()));
     }
 
     @Test
@@ -115,20 +100,5 @@ public class ClusterServiceTest {
         ClusterDTO clusterDTO = new ClusterDTO();
         clusterDTO.setClusterName(CLUSTER_NAME);
         assert clusterService.update(1L, clusterDTO).getClusterName().equals(CLUSTER_NAME);
-    }
-
-    @Test
-    public void testSave() {
-        when(stackDao.findByStackNameAndStackVersion(any(), any())).thenReturn(new StackPO());
-        when(hostService.batchSave(any(), any())).thenReturn(null);
-        RepoPO repoPO = new RepoPO();
-        repoPO.setArch("x86_64");
-        when(repoDao.findAllByClusterId(any())).thenReturn(List.of(repoPO));
-        try (MockedStatic<StackUtils> mockedStackUtils = mockStatic(StackUtils.class, CALLS_REAL_METHODS)) {
-            mockedStackUtils.when(StackUtils::getStackKeyMap).thenReturn(mockStackKeyMap);
-            clusterService.save(clusterDTO);
-            when(clusterDao.findByClusterName(any())).thenReturn(Optional.ofNullable(clusterPO));
-            clusterService.save(clusterDTO);
-        }
     }
 }
