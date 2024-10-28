@@ -20,8 +20,8 @@
 <script setup lang="ts">
   import { toRefs } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
-  import type { MenuItem } from '@/store/menu'
   import { SPECIAL_ROUTE_NAME } from '@/store/menu/index'
+  import { useMenuStore, type MenuItem } from '@/store/menu'
 
   interface Props {
     siderMenuSelectedKey: string
@@ -36,6 +36,7 @@
   const { siderMenuSelectedKey, siderMenus } = toRefs(props)
   const router = useRouter()
   const route = useRoute()
+  const menuStore = useMenuStore()
   const emits = defineEmits(['onSiderClick'])
 
   const toggleActivatedIcon = (menuItem: MenuItem) => {
@@ -93,12 +94,14 @@
         </template>
       </template>
     </a-menu>
-    <a-divider />
-    <div class="create-option">
-      <a-button type="primary" ghost @click="addCluster">
-        <svg-icon name="plus" />
-        <label>{{ $t('cluster.create') }}</label>
-      </a-button>
+    <div v-show="menuStore.isClusterCreateVisible">
+      <a-divider />
+      <div class="create-option">
+        <a-button type="primary" ghost @click="addCluster">
+          <svg-icon name="plus" />
+          <label>{{ $t('menu.create') }}</label>
+        </a-button>
+      </div>
     </div>
   </a-layout-sider>
 </template>
@@ -107,8 +110,8 @@
   @mixin reset-sider-menu {
     width: 100%;
     border-radius: 0;
-    margin-inline: 0 !important;
     padding: 0 0 0 14px !important;
+    margin: 4px 0 0 0 !important;
   }
   .sider {
     width: $layout-header-height;

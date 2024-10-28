@@ -26,7 +26,7 @@ const routes: RouteRecordRaw[] = [
     component: pageView,
     redirect: '/cluster-mange/clusters',
     meta: {
-      title: 'cluster.cluster'
+      title: 'menu.cluster'
     },
     children: [
       {
@@ -43,7 +43,7 @@ const routes: RouteRecordRaw[] = [
         redirect: '',
         meta: {
           icon: 'clusters',
-          title: 'cluster.cluster'
+          title: 'menu.cluster'
         },
         children: [
           {
@@ -70,7 +70,7 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/pages/cluster-mange/service/index.vue'),
         meta: {
           icon: 'services',
-          title: 'service.service'
+          title: 'menu.service'
         }
       },
       {
@@ -79,7 +79,7 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/pages/cluster-mange/components/index.vue'),
         meta: {
           icon: 'components',
-          title: 'component.component'
+          title: 'menu.component'
         }
       },
       {
@@ -88,7 +88,7 @@ const routes: RouteRecordRaw[] = [
         redirect: '/cluster-mange/hosts/list',
         meta: {
           icon: 'hosts',
-          title: 'host.host'
+          title: 'menu.host'
         },
         children: [
           {

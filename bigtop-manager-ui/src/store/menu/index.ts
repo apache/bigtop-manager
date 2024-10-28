@@ -50,6 +50,9 @@ export const useMenuStore = defineStore(
     const headerSelectedKey = ref(headerMenus.value[0].path)
 
     const hasCluster = computed(() => clusters.value.length > 0)
+    const isClusterCreateVisible = computed(() =>
+      SPECIAL_ROUTE_PATH.includes(route.matched[0].path)
+    )
     const siderMenus = computed((): MenuItem[] => {
       const siderMenuTemplate = baseRoutesMap.value.get(headerSelectedKey.value)
       const formatSider = lodash.cloneDeep([...(siderMenuTemplate || [])])
@@ -60,6 +63,7 @@ export const useMenuStore = defineStore(
       }
       return []
     })
+
     const siderMenuSelectedKey = ref(findActivePath(siderMenus.value[0]))
 
     watchEffect(() => {
@@ -164,7 +168,8 @@ export const useMenuStore = defineStore(
       setBaseRoutesMap,
       onHeaderClick,
       onSiderClick,
-      updateSiderMenu
+      updateSiderMenu,
+      isClusterCreateVisible
     }
   },
   {

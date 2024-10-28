@@ -26,7 +26,7 @@ const routes: RouteRecordRaw[] = [
     component: pageView,
     redirect: '/system-mange/model',
     meta: {
-      title: 'system.system'
+      title: 'menu.system'
     },
     children: [
       {
@@ -35,7 +35,7 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/pages/system-mange/model/index.vue'),
         meta: {
           icon: 'model',
-          title: 'system.llm_config'
+          title: 'menu.llm_config'
         }
       }
     ]

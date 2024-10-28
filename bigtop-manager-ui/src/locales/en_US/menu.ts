@@ -18,5 +18,11 @@
  */
 
 export default {
-  service: 'Service'
+  cluster: 'Cluster',
+  service: 'Service',
+  component: 'Component',
+  host: 'Host',
+  create: 'Create Cluster',
+  system: 'System',
+  llm_config: 'LLM Config'
 }
