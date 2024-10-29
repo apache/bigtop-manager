@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import { computed, ref, watchPostEffect } from 'vue'
+import { computed, ref, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { dynamicRoutes as dr } from '@/router/routes/index'
 import { defineStore, storeToRefs } from 'pinia'
@@ -71,7 +71,7 @@ export const useMenuStore = defineStore(
     })
     const siderMenuSelectedKey = ref(findActivePath(siderMenus.value[0]))
 
-    watchPostEffect(() => {
+    watchEffect(() => {
       // resolve highlight menu
       const activeMenu = route.meta.activeMenu || route.path
       const matchedNames = [SPECIAL_ROUTE_NAME, DEFAULT_ROUTE_NAME]
