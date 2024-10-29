@@ -19,8 +19,11 @@
 
 <script setup lang="ts">
   import { toRefs } from 'vue'
-  import { useRouter, useRoute } from 'vue-router'
-  import { SPECIAL_ROUTE_NAME } from '@/store/menu/index'
+  import { useRouter } from 'vue-router'
+  import {
+    SPECIAL_ROUTE_NAME,
+    SPECIAL_ROUTE_PATH
+  } from '@/router/routes/modules/clusters'
   import { useMenuStore, type MenuItem } from '@/store/menu'
 
   interface Props {
@@ -35,18 +38,13 @@
 
   const { siderMenuSelectedKey, siderMenus } = toRefs(props)
   const router = useRouter()
-  const route = useRoute()
   const menuStore = useMenuStore()
   const emits = defineEmits(['onSiderClick'])
 
   const toggleActivatedIcon = (menuItem: MenuItem) => {
-    const matchStr = '/:cluster/:id'
     const { key, icon } = menuItem
-    const routePath = route.matched.at(-1)?.path
-    if (routePath?.includes(matchStr)) {
-      return key === routePath.replace(matchStr, '')
-        ? `${icon}_activated`
-        : icon
+    if (menuStore.isDynamicRouteMatched) {
+      return key === SPECIAL_ROUTE_PATH ? `${icon}_activated` : icon
     } else {
       return key === siderMenuSelectedKey.value ? `${icon}_activated` : icon
     }

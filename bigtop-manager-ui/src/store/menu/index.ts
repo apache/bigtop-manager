@@ -17,15 +17,19 @@
  * under the License.
  */
 
-import { computed, ref, watchEffect } from 'vue'
+import { computed, ref, watchPostEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { dynamicRoutes as dr } from '@/router/routes/index'
 import { defineStore, storeToRefs } from 'pinia'
 import { useClusterStore } from '@/store/cluster/index'
-import lodash from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
 
-export const SPECIAL_ROUTE_NAME = 'Clusters'
-export const SPECIAL_ROUTE_PATH = '/cluster-mange/clusters'
+import {
+  DEFAULT_ROUTE_NAME,
+  DYNAMIC_ROUTE_MATCH,
+  SPECIAL_ROUTE_NAME,
+  SPECIAL_ROUTE_PATH
+} from '@/router/routes/modules/clusters'
 
 export interface MenuItem {
   icon: string
@@ -53,38 +57,46 @@ export const useMenuStore = defineStore(
     const isClusterCreateVisible = computed(() =>
       SPECIAL_ROUTE_PATH.includes(route.matched[0].path)
     )
-    const siderMenus = computed((): MenuItem[] => {
-      const siderMenuTemplate = baseRoutesMap.value.get(headerSelectedKey.value)
-      const formatSider = lodash.cloneDeep([...(siderMenuTemplate || [])])
-      if (formatSider) {
-        return hasCluster.value
-          ? addSiderItemByClusters(formatSider as MenuItem[])
-          : formatSider
-      }
-      return []
+    const isDynamicRouteMatched = computed(() => {
+      return route.matched.at(-1)?.path.includes(DYNAMIC_ROUTE_MATCH)
     })
-
+    const siderMenus = computed((): MenuItem[] => {
+      const siderMenuTemplate =
+        baseRoutesMap.value.get(headerSelectedKey.value) || []
+      const formatSider = cloneDeep(siderMenuTemplate)
+      if (hasCluster.value) {
+        updateSiderItemByClusters(formatSider as MenuItem[])
+      }
+      return formatSider
+    })
     const siderMenuSelectedKey = ref(findActivePath(siderMenus.value[0]))
 
-    watchEffect(() => {
+    watchPostEffect(() => {
       // resolve highlight menu
       const activeMenu = route.meta.activeMenu || route.path
+      const matchedNames = [SPECIAL_ROUTE_NAME, DEFAULT_ROUTE_NAME]
       headerSelectedKey.value = route.matched[0].path
-      if (route.name == SPECIAL_ROUTE_NAME) {
+
+      if (
+        matchedNames.includes(route.name as string) ||
+        isDynamicRouteMatched.value
+      ) {
         if (hasCluster.value) {
-          siderMenuSelectedKey.value = findActivePath(siderMenus.value[0])
+          siderMenuSelectedKey.value = isDynamicRouteMatched.value
+            ? activeMenu
+            : findActivePath(siderMenus.value[0])
           siderMenuSelectedKey.value && router.push(siderMenuSelectedKey.value)
         } else {
           siderMenuSelectedKey.value = ''
-          router.replace({ name: 'Default' })
+          router.replace({ name: DEFAULT_ROUTE_NAME })
         }
       } else {
         siderMenuSelectedKey.value = activeMenu
       }
     })
 
-    function addSiderItemByClusters(formatSider: MenuItem[]) {
-      return formatSider.map((item) => {
+    function updateSiderItemByClusters(formatSider: MenuItem[]) {
+      formatSider.forEach((item) => {
         if (item.name == SPECIAL_ROUTE_NAME) {
           item.children = clusters.value.map((v) => {
             return {
@@ -96,7 +108,6 @@ export const useMenuStore = defineStore(
             }
           })
         }
-        return item
       })
     }
 
@@ -165,11 +176,12 @@ export const useMenuStore = defineStore(
       siderMenus,
       headerSelectedKey,
       siderMenuSelectedKey,
+      isClusterCreateVisible,
+      isDynamicRouteMatched,
       setBaseRoutesMap,
       onHeaderClick,
       onSiderClick,
-      updateSiderMenu,
-      isClusterCreateVisible
+      updateSiderMenu
     }
   },
   {

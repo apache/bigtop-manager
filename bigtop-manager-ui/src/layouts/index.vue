@@ -35,7 +35,10 @@
 
   onMounted(async () => {
     userStore.getUserInfo()
-    await clusterStore.loadClusters()
+    clusterStore.loadClusters()
+    // setInterval(() => {
+    //   clusterStore.addCluster()
+    // }, 5000)
     menuStore.setBaseRoutesMap()
   })
 </script>
