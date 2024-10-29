@@ -18,9 +18,6 @@
  */
 package org.apache.bigtop.manager.server.utils;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.server.exception.ApiException;
@@ -36,7 +33,13 @@ import org.apache.bigtop.manager.server.stack.dag.DAG;
 import org.apache.bigtop.manager.server.stack.dag.DagGraphEdge;
 import org.apache.bigtop.manager.server.stack.model.ServiceModel;
 import org.apache.bigtop.manager.server.stack.xml.ServiceMetainfoXml;
+
 import org.apache.commons.lang3.EnumUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.net.URL;
@@ -80,7 +83,6 @@ public class StackUtils {
     private static void parseStack() {
         File stacksFolder = loadStacksFolder();
         File[] stackFolders = Optional.ofNullable(stacksFolder.listFiles()).orElse(new File[0]);
-        Map<StackDTO, List<ServiceDTO>> stackMap = new HashMap<>();
 
         for (File stackFolder : stackFolders) {
             String stackName = stackFolder.getName();
@@ -123,7 +125,9 @@ public class StackUtils {
         ServiceMetainfoXml serviceMetainfoXml =
                 JaxbUtils.readFromPath(file.getAbsolutePath() + "/" + META_FILE, ServiceMetainfoXml.class);
         ServiceModel serviceModel = serviceMetainfoXml.getService();
-        return ServiceConverter.INSTANCE.fromModel2DTO(serviceModel);
+        ServiceDTO serviceDTO = ServiceConverter.INSTANCE.fromModel2DTO(serviceModel);
+        serviceDTO.setServiceDesc(StringUtils.strip(serviceDTO.getServiceDesc()));
+        return serviceDTO;
     }
 
     private static void parseServiceConfigurations(File file, String serviceName) {

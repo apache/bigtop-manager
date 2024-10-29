@@ -39,5 +39,7 @@ public class ServiceDTO {
 
     private List<ComponentDTO> components;
 
+    private List<TypeConfigDTO> configs;
+
     private List<String> requiredServices;
 }

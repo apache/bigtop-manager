@@ -39,6 +39,10 @@ public class ServiceVO {
 
     private String serviceUser;
 
+    private List<ComponentVO> components;
+
+    private List<TypeConfigVO> configs;
+
     private List<String> requiredServices;
 
     private Boolean isClient;
