@@ -38,7 +38,7 @@
             </repo>
             <repo>
                 <repo-id>Infra-1.0.0</repo-id>
-                <repo-name>Infra-1.0.0 for RockyLinux-8 x86_64</repo-name>
+                <repo-name>Infra-1.0.0 for openEuler-22.03 aarch64</repo-name>
                 <repo-type>tarball</repo-type>
                 <os>openeuler22</os>
                 <arch>aarch64</arch>
