@@ -75,7 +75,7 @@ public class PrometheusServerScript extends AbstractServerScript {
     @Override
     public ShellResult stop(Params params) {
         PrometheusParams prometheusParams = (PrometheusParams) params;
-        String cmd = MessageFormat.format("pgrep -f {0}/prometheus", prometheusParams.serviceHome());
+        String cmd = MessageFormat.format("pkill -f {0}/prometheus", prometheusParams.serviceHome());
         try {
             return LinuxOSUtils.sudoExecCmd(cmd, prometheusParams.user());
         } catch (Exception e) {

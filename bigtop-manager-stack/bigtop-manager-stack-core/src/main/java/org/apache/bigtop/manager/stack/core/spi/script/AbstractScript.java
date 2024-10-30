@@ -46,6 +46,7 @@ public abstract class AbstractScript implements Script {
         List<PackageInfo> packages = params.packages();
         String stackHome = params.stackHome();
         String serviceHome = params.serviceHome();
+
         for (PackageInfo packageInfo : packages) {
             Integer skipLevels = Integer.parseInt(properties.getProperty(PROPERTY_KEY_SKIP_LEVELS, "0"));
             TarballUtils.installPackage(repo.getBaseUrl(), stackHome, serviceHome, packageInfo, skipLevels);
