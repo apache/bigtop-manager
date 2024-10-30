@@ -35,13 +35,13 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
 import reactor.core.publisher.FluxSink;
 
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -103,11 +103,11 @@ class JobControllerTest {
         Long taskId = 1L;
         Long clusterId = 1L;
         doAnswer(invocation -> {
-            FluxSink<String> sink = invocation.getArgument(1);
-            sink.next("log message");
-            sink.complete();
-            return null;
-        })
+                    FluxSink<String> sink = invocation.getArgument(1);
+                    sink.next("log message");
+                    sink.complete();
+                    return null;
+                })
                 .when(taskLogService)
                 .registerSink(eq(taskId), any());
 
@@ -121,10 +121,10 @@ class JobControllerTest {
         Long taskId = 1L;
         Long clusterId = 1L;
         doAnswer(invocation -> {
-            FluxSink<String> sink = invocation.getArgument(1);
-            sink.error(new RuntimeException("Test exception"));
-            return null;
-        })
+                    FluxSink<String> sink = invocation.getArgument(1);
+                    sink.error(new RuntimeException("Test exception"));
+                    return null;
+                })
                 .when(taskLogService)
                 .registerSink(eq(taskId), any());
 
@@ -138,10 +138,10 @@ class JobControllerTest {
         Long taskId = 1L;
         Long clusterId = 1L;
         doAnswer(invocation -> {
-            FluxSink<String> sink = invocation.getArgument(1);
-            sink.complete();
-            return null;
-        })
+                    FluxSink<String> sink = invocation.getArgument(1);
+                    sink.complete();
+                    return null;
+                })
                 .when(taskLogService)
                 .registerSink(eq(taskId), any());
 

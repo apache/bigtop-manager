@@ -23,9 +23,7 @@ import org.apache.bigtop.manager.dao.po.JobPO;
 
 import org.apache.ibatis.annotations.Param;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 public interface JobDao extends BaseDao<JobPO> {
 
