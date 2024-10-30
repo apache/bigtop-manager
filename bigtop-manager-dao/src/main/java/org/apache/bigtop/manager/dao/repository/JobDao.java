@@ -29,11 +29,5 @@ import java.util.Optional;
 
 public interface JobDao extends BaseDao<JobPO> {
 
-    List<JobPO> findAllByClusterId(@Param("clusterId") Long clusterId);
-
-    List<JobPO> findAllByIdsJoin(@Param("ids") Collection<Long> ids);
-
-    Optional<JobPO> findByIdJoin(@Param("id") Long id);
-
-    List<JobPO> findAllByClusterIsNull();
+    List<JobPO> findByClusterId(@Param("clusterId") Long clusterId);
 }

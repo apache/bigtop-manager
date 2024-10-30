@@ -40,12 +40,14 @@ import org.apache.bigtop.manager.server.model.converter.JobConverter;
 import org.apache.bigtop.manager.server.model.query.PageQuery;
 import org.apache.bigtop.manager.server.model.vo.JobVO;
 import org.apache.bigtop.manager.server.model.vo.PageVO;
+import org.apache.bigtop.manager.server.model.vo.StageVO;
+import org.apache.bigtop.manager.server.model.vo.TaskVO;
 import org.apache.bigtop.manager.server.service.JobService;
-import org.apache.bigtop.manager.server.utils.ClusterUtils;
 import org.apache.bigtop.manager.server.utils.PageUtils;
 
 import org.springframework.stereotype.Service;
 
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
@@ -68,33 +70,47 @@ public class JobServiceImpl implements JobService {
     private JobScheduler jobScheduler;
 
     @Override
-    public PageVO<JobVO> list(Long clusterId) {
+    public PageVO<JobVO> jobs(Long clusterId) {
         PageQuery pageQuery = PageUtils.getPageQuery();
-
-        PageHelper.startPage(pageQuery.getPageNum(), pageQuery.getPageSize(), pageQuery.getOrderBy());
-        List<JobPO> jobPOList;
-        if (ClusterUtils.isNoneCluster(clusterId)) {
-            jobPOList = jobDao.findAllByClusterIsNull();
-        } else {
-            jobPOList = jobDao.findAllByClusterId(clusterId);
+        try (Page<?> ignored =
+                PageHelper.startPage(pageQuery.getPageNum(), pageQuery.getPageSize(), pageQuery.getOrderBy())) {
+            List<JobPO> jobPOList = jobDao.findByClusterId(clusterId);
+            PageInfo<JobPO> pageInfo = new PageInfo<>(jobPOList);
+            return PageVO.of(pageInfo);
+        } finally {
+            PageHelper.clearPage();
         }
-        PageInfo<JobPO> pageInfo = new PageInfo<>(jobPOList);
-        List<JobPO> allByIdsJoin =
-                jobDao.findAllByIdsJoin(jobPOList.stream().map(JobPO::getId).toList());
-        pageInfo.setList(allByIdsJoin);
-
-        return PageVO.of(pageInfo);
     }
 
     @Override
-    public JobVO get(Long id) {
-        JobPO jobPO = jobDao.findByIdJoin(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.JOB_NOT_FOUND));
-        return JobConverter.INSTANCE.fromPO2VO(jobPO);
+    public PageVO<StageVO> stages(Long jobId) {
+        PageQuery pageQuery = PageUtils.getPageQuery();
+        try (Page<?> ignored =
+                PageHelper.startPage(pageQuery.getPageNum(), pageQuery.getPageSize(), pageQuery.getOrderBy())) {
+            List<StagePO> stagePOList = stageDao.findByJobId(jobId);
+            PageInfo<StagePO> pageInfo = new PageInfo<>(stagePOList);
+            return PageVO.of(pageInfo);
+        } finally {
+            PageHelper.clearPage();
+        }
+    }
+
+    @Override
+    public PageVO<TaskVO> tasks(Long stageId) {
+        PageQuery pageQuery = PageUtils.getPageQuery();
+        try (Page<?> ignored =
+                PageHelper.startPage(pageQuery.getPageNum(), pageQuery.getPageSize(), pageQuery.getOrderBy())) {
+            List<TaskPO> taskPOList = taskDao.findByStageId(stageId);
+            PageInfo<TaskPO> pageInfo = new PageInfo<>(taskPOList);
+            return PageVO.of(pageInfo);
+        } finally {
+            PageHelper.clearPage();
+        }
     }
 
     @Override
     public JobVO retry(Long id) {
-        JobPO jobPO = jobDao.findByIdJoin(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.JOB_NOT_FOUND));
+        JobPO jobPO = jobDao.findOptionalById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.JOB_NOT_FOUND));
         if (JobState.fromString(jobPO.getState()) != JobState.FAILED) {
             throw new ApiException(ApiExceptionEnum.JOB_NOT_RETRYABLE);
         }
@@ -107,8 +123,8 @@ public class JobServiceImpl implements JobService {
     }
 
     private void resetJobStatusInDB(JobPO jobPO) {
-        for (StagePO stagePO : jobPO.getStages()) {
-            for (TaskPO taskPO : stagePO.getTasks()) {
+        for (StagePO stagePO : stageDao.findByJobId(jobPO.getId())) {
+            for (TaskPO taskPO : taskDao.findByStageId(stagePO.getId())) {
                 taskPO.setState(JobState.PENDING.getName());
                 taskDao.partialUpdateById(taskPO);
             }
@@ -130,19 +146,21 @@ public class JobServiceImpl implements JobService {
         Job job = jobFactory.createJob(jobContext);
 
         job.loadJobPO(jobPO);
+        List<StagePO> stagePOList = stageDao.findByJobId(jobPO.getId());
         for (int i = 0; i < job.getStages().size(); i++) {
             Stage stage = job.getStages().get(i);
-            StagePO stagePO = findCorrectStagePO(jobPO.getStages(), i + 1);
+            StagePO stagePO = findCorrectStagePO(stagePOList, i + 1);
             if (stagePO == null) {
                 throw new ApiException(ApiExceptionEnum.JOB_NOT_RETRYABLE);
             }
 
             stage.loadStagePO(stagePO);
+            List<TaskPO> taskPOList = taskDao.findByStageId(stagePO.getId());
 
             for (int j = 0; j < stage.getTasks().size(); j++) {
                 Task task = stage.getTasks().get(j);
                 TaskPO taskPO = findCorrectTaskPO(
-                        stagePO.getTasks(), task.getTaskContext().getHostname());
+                        taskPOList, task.getTaskContext().getHostname());
                 if (taskPO == null) {
                     throw new ApiException(ApiExceptionEnum.JOB_NOT_RETRYABLE);
                 }
