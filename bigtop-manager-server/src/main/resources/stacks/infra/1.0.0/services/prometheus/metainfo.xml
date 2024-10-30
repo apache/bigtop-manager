@@ -61,6 +61,20 @@
                     </package>
                 </packages>
             </package-specific>
+            <package-specific>
+                <operating-systems>
+                    <os>openeuler22</os>
+                </operating-systems>
+                <architectures>
+                    <arch>aarch64</arch>
+                </architectures>
+                <packages>
+                    <package>
+                        <name>prometheus-2.55.0-rc.0.linux-arm64.tar.gz</name>
+                        <checksum>SHA-256:a25d8fae86ff1acd95e70405d1227142d1a8a214767c2db26a2289c97b80ec2b</checksum>
+                    </package>
+                </packages>
+            </package-specific>
         </package-specifics>
     </service>
 </metainfo>
