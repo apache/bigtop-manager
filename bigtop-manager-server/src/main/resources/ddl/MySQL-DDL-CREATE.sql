@@ -173,47 +173,67 @@ CREATE TABLE `repo`
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE `job`
+(
+    `id`          BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `name`        VARCHAR(255),
+    `context`     TEXT    NOT NULL,
+    `state`       VARCHAR(32) NOT NULL,
+    `cluster_id`  BIGINT(20) UNSIGNED DEFAULT NULL,
+    `create_time` DATETIME    DEFAULT CURRENT_TIMESTAMP,
+    `update_time` DATETIME    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `create_by`   BIGINT,
+    `update_by`   BIGINT,
+    PRIMARY KEY (`id`),
+    KEY           `idx_cluster_id` (`cluster_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `stage`
+(
+    `id`             BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `name`           VARCHAR(32) NOT NULL,
+    `service_name`   VARCHAR(255),
+    `component_name` VARCHAR(255),
+    `context`        TEXT,
+    `order`          INTEGER,
+    `state`          VARCHAR(32) NOT NULL,
+    `cluster_id`     BIGINT(20) UNSIGNED DEFAULT NULL,
+    `job_id`         BIGINT(20) UNSIGNED NOT NULL,
+    `create_time`    DATETIME    DEFAULT CURRENT_TIMESTAMP,
+    `update_time`    DATETIME    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `create_by`      BIGINT,
+    `update_by`      BIGINT,
+    PRIMARY KEY (`id`),
+    KEY              `idx_cluster_id` (`cluster_id`),
+    KEY              `idx_job_id` (`job_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE `task`
 (
     `id`              BIGINT NOT NULL AUTO_INCREMENT,
-    `command`         VARCHAR(255),
-    `component_name`  VARCHAR(255),
-    `content`         TEXT,
-    `context`         TEXT NOT NULL,
-    `create_by`       BIGINT,
-    `create_time`     DATETIME,
-    `custom_command`  VARCHAR(255),
-    `hostname`        VARCHAR(255),
     `name`            VARCHAR(255),
+    `hostname`        VARCHAR(255),
     `service_name`    VARCHAR(255),
     `service_user`    VARCHAR(255),
+    `component_name`  VARCHAR(255),
+    `command`         VARCHAR(255),
+    `custom_command`  VARCHAR(255),
+    `content`         TEXT,
+    `context`         TEXT NOT NULL,
     `stack_name`      VARCHAR(255),
     `stack_version`   VARCHAR(255),
     `state`           VARCHAR(255),
-    `update_by`       BIGINT,
-    `update_time`     DATETIME,
     `cluster_id`      BIGINT,
     `job_id`          BIGINT,
     `stage_id`        BIGINT,
+    `create_time`     DATETIME    DEFAULT CURRENT_TIMESTAMP,
+    `update_time`     DATETIME    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `create_by`       BIGINT,
+    `update_by`       BIGINT,
     PRIMARY KEY (id),
     KEY               idx_task_cluster_id (cluster_id),
     KEY               idx_task_job_id (job_id),
     KEY               idx_task_stage_id (stage_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE `job`
-(
-    `id`          BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `cluster_id`  BIGINT(20) UNSIGNED DEFAULT NULL,
-    `state`       VARCHAR(32) NOT NULL,
-    `context`     TEXT    NOT NULL,
-    `create_time` DATETIME DEFAULT NULL,
-    `update_time` DATETIME DEFAULT NULL,
-    `create_by`   BIGINT,
-    `name`        VARCHAR(255),
-    `update_by`   BIGINT,
-    PRIMARY KEY (`id`),
-    KEY           `idx_cluster_id` (`cluster_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `type_config`
@@ -276,26 +296,6 @@ CREATE TABLE `setting`
     `update_by`   BIGINT,
     `update_time` DATETIME,
     PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE `stage`
-(
-    `id`             BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `name`           VARCHAR(32) NOT NULL,
-    `cluster_id`     BIGINT(20) UNSIGNED DEFAULT NULL,
-    `job_id`         BIGINT(20) UNSIGNED NOT NULL,
-    `state`          VARCHAR(32) NOT NULL,
-    `create_time`    DATETIME DEFAULT NULL,
-    `update_time`    DATETIME DEFAULT NULL,
-    `component_name` VARCHAR(255),
-    `context`        TEXT,
-    `create_by`      BIGINT,
-    `order`          INTEGER,
-    `service_name`   VARCHAR(255),
-    `update_by`      BIGINT,
-    PRIMARY KEY (`id`),
-    KEY              `idx_cluster_id` (`cluster_id`),
-    KEY              `idx_job_id` (`job_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `llm_platform`

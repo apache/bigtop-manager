@@ -176,28 +176,65 @@ CREATE TABLE repo
 
 COMMENT ON COLUMN repo.type IS '1-services, 2-tools';
 
+CREATE TABLE job
+(
+    id          BIGINT CHECK (id > 0) NOT NULL GENERATED ALWAYS AS IDENTITY,
+    name        VARCHAR(255),
+    context     TEXT                  NOT NULL,
+    state       VARCHAR(32)           NOT NULL,
+    cluster_id  BIGINT CHECK (cluster_id > 0) DEFAULT NULL,
+    create_time TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
+    update_time TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
+    create_by   BIGINT,
+    update_by   BIGINT,
+    PRIMARY KEY (id)
+);
+
+CREATE INDEX idx_job_cluster_id ON job (cluster_id);
+
+CREATE TABLE stage
+(
+    id             BIGINT CHECK (id > 0)     NOT NULL GENERATED ALWAYS AS IDENTITY,
+    name           VARCHAR(32)               NOT NULL,
+    service_name   VARCHAR(255),
+    component_name VARCHAR(255),
+    context        TEXT,
+    "order"        INTEGER,
+    state          VARCHAR(32)               NOT NULL,
+    cluster_id     BIGINT CHECK (cluster_id > 0) DEFAULT NULL,
+    job_id         BIGINT CHECK (job_id > 0) NOT NULL,
+    create_time    TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
+    update_time    TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
+    create_by      BIGINT,
+    update_by      BIGINT,
+    PRIMARY KEY (id)
+);
+
+CREATE INDEX idx_stage_cluster_id ON stage (cluster_id);
+CREATE INDEX idx_job_id ON stage (job_id);
+
 CREATE TABLE task
 (
     id             BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY,
-    command        VARCHAR(255),
-    component_name VARCHAR(255),
-    content        TEXT,
-    context        TEXT   NOT NULL,
-    create_by      BIGINT,
-    create_time    TIMESTAMP(0),
-    custom_command VARCHAR(255),
-    hostname       VARCHAR(255),
     name           VARCHAR(255),
+    hostname       VARCHAR(255),
     service_name   VARCHAR(255),
     service_user   VARCHAR(255),
+    component_name VARCHAR(255),
+    command        VARCHAR(255),
+    custom_command VARCHAR(255),
+    content        TEXT,
+    context        TEXT NOT NULL,
     stack_name     VARCHAR(255),
     stack_version  VARCHAR(255),
     state          VARCHAR(255),
-    update_by      BIGINT,
-    update_time    TIMESTAMP(0),
     cluster_id     BIGINT,
     job_id         BIGINT,
     stage_id       BIGINT,
+    create_time    TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
+    update_time    TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
+    create_by      BIGINT,
+    update_by      BIGINT,
     PRIMARY KEY (id)
 );
 
@@ -207,22 +244,6 @@ DROP INDEX IF EXISTS idx_task_stage_id;
 CREATE INDEX idx_task_cluster_id ON task (cluster_id);
 CREATE INDEX idx_task_job_id ON task (job_id);
 CREATE INDEX idx_task_stage_id ON task (stage_id);
-
-CREATE TABLE job
-(
-    id          BIGINT CHECK (id > 0) NOT NULL GENERATED ALWAYS AS IDENTITY,
-    cluster_id  BIGINT CHECK (cluster_id > 0) DEFAULT NULL,
-    state       VARCHAR(32)           NOT NULL,
-    context     TEXT                  NOT NULL,
-    create_time TIMESTAMP(0)                  DEFAULT NULL,
-    update_time TIMESTAMP(0)                  DEFAULT NULL,
-    create_by   BIGINT,
-    name        VARCHAR(255),
-    update_by   BIGINT,
-    PRIMARY KEY (id)
-);
-
-CREATE INDEX idx_job_cluster_id ON job (cluster_id);
 
 CREATE TABLE type_config
 (
@@ -287,27 +308,6 @@ CREATE TABLE setting
     update_time TIMESTAMP(0),
     PRIMARY KEY (id)
 );
-
-CREATE TABLE stage
-(
-    id             BIGINT CHECK (id > 0)     NOT NULL GENERATED ALWAYS AS IDENTITY,
-    name           VARCHAR(32)               NOT NULL,
-    cluster_id     BIGINT CHECK (cluster_id > 0) DEFAULT NULL,
-    job_id         BIGINT CHECK (job_id > 0) NOT NULL,
-    state          VARCHAR(32)               NOT NULL,
-    create_time    TIMESTAMP(0)                  DEFAULT NULL,
-    update_time    TIMESTAMP(0)                  DEFAULT NULL,
-    component_name VARCHAR(255),
-    context        TEXT,
-    create_by      BIGINT,
-    "order"        INTEGER,
-    service_name   VARCHAR(255),
-    update_by      BIGINT,
-    PRIMARY KEY (id)
-);
-
-CREATE INDEX idx_stage_cluster_id ON stage (cluster_id);
-CREATE INDEX idx_job_id ON stage (job_id);
 
 CREATE TABLE llm_platform
 (
