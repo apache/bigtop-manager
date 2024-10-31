@@ -18,26 +18,16 @@
  */
 package org.apache.bigtop.manager.server.model.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.util.List;
+import lombok.EqualsAndHashCode;
 
 @Data
+@AllArgsConstructor
+@EqualsAndHashCode
 public class StackDTO {
 
     private String stackName;
 
     private String stackVersion;
-
-    private String scope;
-
-    private String root;
-
-    private String userGroup;
-
-    private String packages;
-
-    private String repoTemplate;
-
-    private List<RepoDTO> repos;
 }

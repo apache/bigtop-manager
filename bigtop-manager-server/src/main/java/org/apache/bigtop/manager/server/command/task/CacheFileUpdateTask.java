@@ -48,12 +48,7 @@ import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 import org.apache.bigtop.manager.server.model.converter.RepoConverter;
 import org.apache.bigtop.manager.server.model.dto.PropertyDTO;
 import org.apache.bigtop.manager.server.model.dto.RepoDTO;
-import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
-import org.apache.bigtop.manager.server.model.dto.StackDTO;
 import org.apache.bigtop.manager.server.utils.StackConfigUtils;
-import org.apache.bigtop.manager.server.utils.StackUtils;
-
-import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
@@ -213,11 +208,6 @@ public class CacheFileUpdateTask extends AbstractTask {
         userMap = new HashMap<>();
         settingsMap = new HashMap<>();
 
-        String fullStackName = StackUtils.fullStackName(taskContext.getStackName(), taskContext.getStackVersion());
-        ImmutablePair<StackDTO, List<ServiceDTO>> immutablePair =
-                StackUtils.getStackKeyMap().get(fullStackName);
-        StackDTO stackDTO = immutablePair.getLeft();
-
         Map<String, Object> properties = taskContext.getProperties();
 
         repoList = RepoConverter.INSTANCE.fromDTO2Message((List<RepoDTO>) properties.get("repoInfoList"));
@@ -225,10 +215,6 @@ public class CacheFileUpdateTask extends AbstractTask {
         clusterInfo.setClusterName(taskContext.getClusterName());
         clusterInfo.setStackName(taskContext.getStackName());
         clusterInfo.setStackVersion(taskContext.getStackVersion());
-        clusterInfo.setUserGroup(stackDTO.getUserGroup());
-        clusterInfo.setRepoTemplate(stackDTO.getRepoTemplate());
-        clusterInfo.setRoot(stackDTO.getRoot());
-        clusterInfo.setPackages(List.of(stackDTO.getPackages().split(",")));
 
         List<String> hostnames = (List<String>) properties.get("hostnames");
         hostMap.put(Constants.ALL_HOST_KEY, new HashSet<>(hostnames));
