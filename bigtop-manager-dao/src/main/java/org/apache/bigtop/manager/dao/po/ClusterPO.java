@@ -60,9 +60,6 @@ public class ClusterPO extends BasePO implements Serializable {
     @Column(name = "selected")
     private Boolean selected;
 
-    @Column(name = "stack_id")
-    private Long stackId;
-
     @Transient
     @Column(name = "stack_name")
     private String stackName;

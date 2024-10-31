@@ -24,6 +24,8 @@ import org.apache.bigtop.manager.server.stack.model.AttrsModel;
 import org.apache.bigtop.manager.server.stack.model.PropertyModel;
 import org.apache.bigtop.manager.server.stack.xml.ConfigurationXml;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,9 +55,9 @@ public class StackConfigUtils {
     private static PropertyDTO getPropertyDTO(PropertyModel propertyModel) {
         PropertyDTO propertyDTO = new PropertyDTO();
         propertyDTO.setDisplayName(propertyModel.getDisplayName());
-        propertyDTO.setDesc(propertyModel.getDesc());
+        propertyDTO.setDesc(StringUtils.strip(propertyModel.getDesc()));
         propertyDTO.setName(propertyModel.getName());
-        propertyDTO.setValue(propertyModel.getValue());
+        propertyDTO.setValue(StringUtils.strip(propertyModel.getValue()));
         if (propertyModel.getAttrs() != null) {
             AttrsModel attrsModel = propertyModel.getAttrs();
             AttrsDTO attrsDTO = new AttrsDTO();

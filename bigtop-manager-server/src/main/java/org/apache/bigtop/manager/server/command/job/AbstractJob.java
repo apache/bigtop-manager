@@ -26,7 +26,6 @@ import org.apache.bigtop.manager.dao.po.StagePO;
 import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.dao.repository.ClusterDao;
 import org.apache.bigtop.manager.dao.repository.JobDao;
-import org.apache.bigtop.manager.dao.repository.StackDao;
 import org.apache.bigtop.manager.dao.repository.StageDao;
 import org.apache.bigtop.manager.dao.repository.TaskDao;
 import org.apache.bigtop.manager.server.command.stage.Stage;
@@ -42,7 +41,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 @Slf4j
 public abstract class AbstractJob implements Job {
 
-    protected StackDao stackDao;
     protected ClusterDao clusterDao;
     protected JobDao jobDao;
     protected StageDao stageDao;
@@ -70,7 +68,6 @@ public abstract class AbstractJob implements Job {
     }
 
     protected void injectBeans() {
-        this.stackDao = SpringContextHolder.getBean(StackDao.class);
         this.clusterDao = SpringContextHolder.getBean(ClusterDao.class);
 
         this.jobDao = SpringContextHolder.getBean(JobDao.class);
