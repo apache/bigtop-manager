@@ -30,6 +30,4 @@ public class StackVO {
     private String stackVersion;
 
     private List<ServiceVO> services;
-
-    private List<RepoVO> repos;
 }
