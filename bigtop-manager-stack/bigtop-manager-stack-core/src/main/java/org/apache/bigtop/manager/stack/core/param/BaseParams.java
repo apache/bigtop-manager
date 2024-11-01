@@ -106,7 +106,7 @@ public abstract class BaseParams implements Params {
                 .filter(r -> OSDetection.getArch().equals(r.getArch()))
                 .findFirst()
                 .orElseThrow(() -> new StackException(
-                        "Cannot find repo for os: [{}] and arch: [{}]", OSDetection.getOS(), OSDetection.getArch()));
+                        "Cannot find repo for os: [{0}] and arch: [{1}]", OSDetection.getOS(), OSDetection.getArch()));
     }
 
     @Override
