@@ -84,6 +84,7 @@ CREATE TABLE `cluster`
     `state`         VARCHAR(255),
     `update_by`     BIGINT,
     `user_group`    VARCHAR(255),
+    `stack_id` BIGINT NULL,
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_cluster_name` (`cluster_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -187,6 +188,21 @@ CREATE TABLE `job`
     PRIMARY KEY (`id`),
     KEY           `idx_cluster_id` (`cluster_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE stack (
+	`id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`stack_name` VARCHAR(255) NULL,
+	`stack_version` VARCHAR(255) NULL,
+    `create_by`   BIGINT,
+    `create_time` DATETIME    DEFAULT CURRENT_TIMESTAMP,
+    `update_by`   BIGINT,
+    `update_time` DATETIME    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY `idx_stack_name` (`stack_name`),
+    KEY `idx_stack_version` (`stack_version`)
+);
+
 
 CREATE TABLE `stage`
 (

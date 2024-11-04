@@ -67,6 +67,7 @@ CREATE TABLE cluster
     state         VARCHAR(255),
     update_by     BIGINT,
     user_group    VARCHAR(255),
+    stack_id BIGINT NULL,
     PRIMARY KEY (id),
     CONSTRAINT uk_cluster_name UNIQUE (cluster_name)
 );
@@ -191,6 +192,24 @@ CREATE TABLE job
 );
 
 CREATE INDEX idx_job_cluster_id ON job (cluster_id);
+
+
+CREATE TABLE stack (
+	id BIGINT CHECK (id > 0) NOT NULL GENERATED ALWAYS AS IDENTITY,
+	stack_name VARCHAR(255) NULL,
+	stack_version VARCHAR(255) NULL,
+    create_by   BIGINT,
+    create_time TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
+    update_by   BIGINT,
+    update_time TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (id)
+);
+
+DROP INDEX IF EXISTS idx_stack_stack_name;
+DROP INDEX IF EXISTS idx_stack_stack_version;
+CREATE INDEX idx_stack_stack_name ON task (stack_name);
+CREATE INDEX idx_stack_stack_version ON task (stack_version);
+
 
 CREATE TABLE stage
 (
