@@ -32,9 +32,9 @@ public interface HostService {
      *
      * @return Hosts
      */
-    PageVO<HostVO> list(Long clusterId, HostQuery hostQuery);
+    PageVO<HostVO> list(HostQuery hostQuery);
 
-    List<HostVO> add(Long clusterId, HostDTO hostDTO);
+    List<HostVO> add(HostDTO hostDTO);
 
     /**
      * Save a host
@@ -55,7 +55,7 @@ public interface HostService {
      *
      * @return Host
      */
-    HostVO update(Long id, Long clusterId, HostDTO hostDTO);
+    HostVO update(Long id, HostDTO hostDTO);
 
     /**
      * Delete a host

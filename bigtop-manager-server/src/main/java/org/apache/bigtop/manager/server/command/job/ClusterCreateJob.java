@@ -18,25 +18,28 @@
  */
 package org.apache.bigtop.manager.server.command.job;
 
-import org.apache.bigtop.manager.common.enums.MaintainState;
-import org.apache.bigtop.manager.dao.po.ClusterPO;
+import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.po.JobPO;
 import org.apache.bigtop.manager.dao.po.StagePO;
 import org.apache.bigtop.manager.dao.po.TaskPO;
+import org.apache.bigtop.manager.dao.repository.HostDao;
 import org.apache.bigtop.manager.server.command.stage.CacheFileUpdateStage;
 import org.apache.bigtop.manager.server.command.stage.HostCheckStage;
 import org.apache.bigtop.manager.server.command.stage.Stage;
 import org.apache.bigtop.manager.server.command.stage.StageContext;
 import org.apache.bigtop.manager.server.command.task.Task;
+import org.apache.bigtop.manager.server.enums.HealthyStatusEnum;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 import org.apache.bigtop.manager.server.model.converter.ClusterConverter;
 import org.apache.bigtop.manager.server.model.dto.ClusterDTO;
 import org.apache.bigtop.manager.server.model.dto.CommandDTO;
-import org.apache.bigtop.manager.server.service.ClusterService;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ClusterCreateJob extends AbstractJob {
 
-    private ClusterService clusterService;
+    private HostDao hostDao;
 
     public ClusterCreateJob(JobContext jobContext) {
         super(jobContext);
@@ -46,7 +49,7 @@ public class ClusterCreateJob extends AbstractJob {
     protected void injectBeans() {
         super.injectBeans();
 
-        this.clusterService = SpringContextHolder.getBean(ClusterService.class);
+        hostDao = SpringContextHolder.getBean(HostDao.class);
     }
 
     @Override
@@ -60,26 +63,50 @@ public class ClusterCreateJob extends AbstractJob {
     public void beforeRun() {
         super.beforeRun();
 
-        // Save cluster
-        CommandDTO commandDTO = jobContext.getCommandDTO();
-        ClusterDTO clusterDTO = ClusterConverter.INSTANCE.fromCommand2DTO(commandDTO.getClusterCommand());
-        clusterService.save(clusterDTO);
+        saveCluster();
+
+        linkHostToCluster();
+
+        linkJobToCluster();
     }
 
     @Override
     public void onSuccess() {
         super.onSuccess();
+    }
 
+    @Override
+    public String getName() {
+        return "Create cluster";
+    }
+
+    private void saveCluster() {
         CommandDTO commandDTO = jobContext.getCommandDTO();
-        ClusterPO clusterPO = clusterDao
-                .findByClusterName(commandDTO.getClusterCommand().getClusterName())
-                .orElse(new ClusterPO());
+        ClusterDTO clusterDTO = ClusterConverter.INSTANCE.fromCommand2DTO(commandDTO.getClusterCommand());
+        clusterPO = clusterDao.findByName(clusterDTO.getName());
+        if (clusterPO == null) {
+            clusterPO = ClusterConverter.INSTANCE.fromDTO2PO(clusterDTO);
+        }
 
-        // Update cluster state to installed
-        clusterPO.setState(MaintainState.INSTALLED.getName());
-        clusterDao.partialUpdateById(clusterPO);
+        clusterPO.setStatus(HealthyStatusEnum.UNHEALTHY.getCode());
+        clusterDao.save(clusterPO);
+    }
 
-        // Link job to cluster after cluster successfully added
+    private void linkHostToCluster() {
+        CommandDTO commandDTO = jobContext.getCommandDTO();
+        List<Long> ids = commandDTO.getClusterCommand().getHostIds();
+        List<HostPO> hostPOList = new ArrayList<>();
+        for (Long id : ids) {
+            HostPO hostPO = new HostPO();
+            hostPO.setId(id);
+            hostPO.setClusterId(clusterPO.getId());
+            hostPOList.add(hostPO);
+        }
+
+        hostDao.partialUpdateByIds(hostPOList);
+    }
+
+    private void linkJobToCluster() {
         JobPO jobPO = getJobPO();
         jobPO.setClusterId(clusterPO.getId());
         jobDao.partialUpdateById(jobPO);
@@ -95,10 +122,5 @@ public class ClusterCreateJob extends AbstractJob {
                 taskDao.partialUpdateById(taskPO);
             }
         }
-    }
-
-    @Override
-    public String getName() {
-        return "Create cluster";
     }
 }

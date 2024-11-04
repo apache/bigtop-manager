@@ -35,7 +35,7 @@ public enum LocaleKeys {
     LOGIN_ACCOUNT_DISABLED("login.account.disabled"),
 
     CLUSTER_NOT_FOUND("cluster.not.found"),
-    CLUSTER_IS_INSTALLED("cluster.is.installed"),
+    CLUSTER_EXISTS("cluster.exists"),
 
     HOST_NOT_FOUND("host.not.found"),
     HOST_ASSIGNED("host.assigned"),

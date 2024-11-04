@@ -62,7 +62,7 @@ public abstract class AbstractComponentTask extends AbstractTask {
         commandPayload.setStackName(taskContext.getStackName());
         commandPayload.setStackVersion(taskContext.getStackVersion());
         commandPayload.setComponentName(taskContext.getComponentName());
-        commandPayload.setRoot(taskContext.getRoot());
+        commandPayload.setRootDir(taskContext.getRootDir());
         commandPayload.setHostname(taskContext.getHostname());
 
         Map<String, Object> properties = taskContext.getProperties();

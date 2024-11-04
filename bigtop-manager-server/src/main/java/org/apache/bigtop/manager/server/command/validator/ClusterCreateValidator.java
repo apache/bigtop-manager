@@ -31,7 +31,6 @@ import org.springframework.stereotype.Component;
 
 import jakarta.annotation.Resource;
 import java.util.List;
-import java.util.Optional;
 
 @Component
 public class ClusterCreateValidator implements CommandValidator {
@@ -47,12 +46,12 @@ public class ClusterCreateValidator implements CommandValidator {
     @Override
     public void validate(ValidatorContext context) {
         ClusterCommandDTO clusterCommand = context.getCommandDTO().getClusterCommand();
-        String clusterName = clusterCommand.getClusterName();
+        String clusterName = clusterCommand.getName();
 
-        Optional<ClusterPO> clusterOptional = clusterDao.findByClusterName(clusterName);
+        ClusterPO clusterPO = clusterDao.findByName(clusterName);
 
-        if (clusterOptional.isPresent()) {
-            throw new ApiException(ApiExceptionEnum.CLUSTER_IS_INSTALLED, clusterName);
+        if (clusterPO == null) {
+            throw new ApiException(ApiExceptionEnum.CLUSTER_EXISTS, clusterName);
         }
     }
 }

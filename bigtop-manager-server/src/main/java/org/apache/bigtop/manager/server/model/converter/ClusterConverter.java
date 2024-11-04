@@ -28,6 +28,8 @@ import org.apache.bigtop.manager.server.model.vo.ClusterVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
+import java.util.List;
+
 @Mapper(config = MapStructSharedConfig.class)
 public interface ClusterConverter {
 
@@ -41,5 +43,7 @@ public interface ClusterConverter {
 
     ClusterDTO fromPO2DTO(ClusterPO clusterPO);
 
-    ClusterVO fromEntity2VO(ClusterPO clusterPO);
+    ClusterVO fromPO2VO(ClusterPO clusterPO);
+
+    List<ClusterVO> fromPO2VO(List<ClusterPO> clusterPOList);
 }

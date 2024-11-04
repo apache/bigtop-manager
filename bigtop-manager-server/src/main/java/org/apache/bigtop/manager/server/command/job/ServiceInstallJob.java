@@ -139,9 +139,6 @@ public class ServiceInstallJob extends AbstractServiceJob {
         String serviceName = serviceCommand.getServiceName();
         ClusterPO clusterPO = clusterDao.findByIdJoin(clusterId);
 
-        String stackName = clusterPO.getStackName();
-        String stackVersion = clusterPO.getStackVersion();
-
         // 1. Persist service and components
         if (servicePO == null) {
             ServiceDTO serviceDTO = StackUtils.getServiceDTO(serviceName);

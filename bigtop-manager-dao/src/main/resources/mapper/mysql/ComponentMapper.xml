@@ -52,7 +52,7 @@
         <include refid="baseColumnsV2">
             <property name="alias" value="r"/>
         </include>
-        ,c.cluster_name, s.service_name
+        ,c.name as cluster_name, s.service_name
         from
         component r
         inner join cluster c

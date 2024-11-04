@@ -24,22 +24,32 @@
 <mapper namespace="org.apache.bigtop.manager.dao.repository.ClusterDao">
 
     <sql id="baseColumns">
-        id, cluster_name, cluster_type, root, user_group, packages, repo_template, state, selected, stack_id
+        id, name, desc, type, user_group, root_dir, status
     </sql>
     <sql id="baseColumnsV2">
-        ${alias}.id, ${alias}.cluster_name, ${alias}.cluster_type, ${alias}.root, ${alias}.user_group, ${alias}.packages, ${alias}.repo_template, ${alias}.state, ${alias}.selected, ${alias}.stack_id
+        ${alias}.id, ${alias}.name, ${alias}.desc, ${alias}.type, ${alias}.user_group, ${alias}.root_dir, ${alias}.status
     </sql>
 
-    <select id="findByClusterName" resultType="org.apache.bigtop.manager.dao.po.ClusterPO">
+    <select id="findDetailsById" resultType="org.apache.bigtop.manager.dao.po.ClusterPO">
+        select
+        <include refid="baseColumnsV2">
+            <property name="alias" value="c"/>
+        </include>, u.nickname as create_user,
+        count(h.id) as total_host, sum(h.available_processors) as total_processor,
+        sum(h.total_memory_size) as total_memory, sum(h.total_disk) as total_disk
+        from
+        cluster c left join user u on c.create_by = u.id
+        left join host h on c.id = h.cluster_id
+        where c.id = #{id}
+        limit 1
+    </select>
+
+    <select id="findByName" resultType="org.apache.bigtop.manager.dao.po.ClusterPO">
         select
         <include refid="baseColumns"/>
         from
         cluster
-        <where>
-            <if test="clusterName!=null">
-                cluster_name=#{clusterName}
-            </if>
-        </where>
+        where name = #{name}
         limit 1
     </select>
 
@@ -64,18 +74,4 @@
             </if>
         </where>
     </select>
-
-    <select id="findAllByJoin"
-            resultType="org.apache.bigtop.manager.dao.po.ClusterPO">
-        select
-        <include refid="baseColumnsV2">
-            <property name="alias" value="r"/>
-        </include>
-        , s.stack_name, s.stack_version
-        from
-        cluster r
-        inner join stack s
-        on r.stack_id = s.id
-    </select>
-
 </mapper>

@@ -25,12 +25,7 @@ import org.apache.bigtop.manager.dao.repository.RepoDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.model.dto.ClusterDTO;
-import org.apache.bigtop.manager.server.model.dto.RepoDTO;
-import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
-import org.apache.bigtop.manager.server.model.dto.StackDTO;
 import org.apache.bigtop.manager.server.service.impl.ClusterServiceImpl;
-
-import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,9 +34,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -61,33 +54,18 @@ public class ClusterServiceTest {
     @InjectMocks
     private ClusterService clusterService = new ClusterServiceImpl();
 
-    @Mock
-    private HostService hostService;
-
     private ClusterPO clusterPO;
-    private ClusterDTO clusterDTO;
-    Map<String, ImmutablePair<StackDTO, List<ServiceDTO>>> mockStackKeyMap = new HashMap<>();
 
     @BeforeEach
     public void setup() {
         clusterPO = new ClusterPO();
         clusterPO.setId(1L);
-        clusterPO.setClusterName(CLUSTER_NAME);
-
-        clusterDTO = new ClusterDTO();
-        clusterDTO.setClusterName(CLUSTER_NAME);
-        clusterDTO.setStackName("TestStack");
-        clusterDTO.setStackVersion("1.0.0");
-        RepoDTO repoDTO = new RepoDTO();
-        repoDTO.setArch("x86_64");
-        clusterDTO.setRepoInfoList(List.of(repoDTO));
-        StackDTO stackDTO = new StackDTO(clusterDTO.getStackName(), clusterDTO.getStackVersion());
-        stackDTO.setStackName("TestStack");
+        clusterPO.setName(CLUSTER_NAME);
     }
 
     @Test
     public void testListAndGetAndUpdate() {
-        when(clusterDao.findAllByJoin()).thenReturn(List.of(clusterPO));
+        when(clusterDao.findAll()).thenReturn(List.of(clusterPO));
         assert clusterService.list().size() == 1;
 
         assertEquals(
@@ -95,10 +73,10 @@ public class ClusterServiceTest {
                 assertThrows(ApiException.class, () -> clusterService.get(1L)).getEx());
 
         when(clusterDao.findByIdJoin(any())).thenReturn(clusterPO);
-        assert clusterService.get(1L).getClusterName().equals(CLUSTER_NAME);
+        assert clusterService.get(1L).getName().equals(CLUSTER_NAME);
 
         ClusterDTO clusterDTO = new ClusterDTO();
-        clusterDTO.setClusterName(CLUSTER_NAME);
-        assert clusterService.update(1L, clusterDTO).getClusterName().equals(CLUSTER_NAME);
+        clusterDTO.setName(CLUSTER_NAME);
+        assert clusterService.update(1L, clusterDTO).getName().equals(CLUSTER_NAME);
     }
 }
