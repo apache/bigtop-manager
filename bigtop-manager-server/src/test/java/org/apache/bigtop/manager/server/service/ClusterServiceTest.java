@@ -72,7 +72,7 @@ public class ClusterServiceTest {
                 ApiExceptionEnum.CLUSTER_NOT_FOUND,
                 assertThrows(ApiException.class, () -> clusterService.get(1L)).getEx());
 
-        when(clusterDao.findByIdJoin(any())).thenReturn(clusterPO);
+        when(clusterDao.findDetailsById(any())).thenReturn(clusterPO);
         assert clusterService.get(1L).getName().equals(CLUSTER_NAME);
 
         ClusterDTO clusterDTO = new ClusterDTO();
