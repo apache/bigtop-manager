@@ -58,9 +58,7 @@
       />
       <a-layout class="layout-inner">
         <router-view v-slot="{ Component }">
-          <transition name="fade" mode="out-in">
-            <component :is="Component" />
-          </transition>
+          <component :is="Component" />
         </router-view>
         <layout-footer />
       </a-layout>
@@ -75,14 +73,5 @@
       padding: $space-lg $space-md;
       overflow: auto;
     }
-  }
-
-  .fade-enter-active,
-  .fade-leave-active {
-    transition: opacity 0.4s;
-  }
-  .fade-enter,
-  .fade-leave-to {
-    opacity: 0;
   }
 </style>

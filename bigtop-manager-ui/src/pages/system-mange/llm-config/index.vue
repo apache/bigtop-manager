@@ -17,10 +17,27 @@
   ~ under the License.
 -->
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+  import LlmCard from './components/llm-card.vue'
+</script>
 
 <template>
-  <div>model list</div>
+  <div class="llm-config">
+    <a-typography-title :level="5">大模型配置</a-typography-title>
+    <div class="llm-config-content">
+      <llm-card />
+      <llm-card :is-config="false" />
+    </div>
+  </div>
 </template>
 
-<style scoped></style>
+<style lang="scss" scoped>
+  .llm-config {
+    padding: $space-md;
+    background-color: $color-bg-base;
+    @include flexbox($direction: column, $gap: $space-sm);
+    &-content {
+      @include flexbox($wrap: wrap, $gap: $space-md);
+    }
+  }
+</style>
