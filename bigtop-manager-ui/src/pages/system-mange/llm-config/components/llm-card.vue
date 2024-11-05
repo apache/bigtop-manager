@@ -92,8 +92,9 @@
     border: 1px solid $color-border;
     border-radius: $border-radius-sm;
     padding: $space-md;
+    font-size: 12px;
     :deep(.ant-typography) {
-      font-size: 12px;
+      font-size: inherit;
     }
   }
 
@@ -116,9 +117,7 @@
     &-item {
       @include flexbox($justify: space-between, $gap: 0 $space-lg);
       flex: 0 0 26px;
-      font-size: 12px;
       border-bottom: 1px solid $color-split;
-
       & div:first-child {
         flex-shrink: 0;
       }
