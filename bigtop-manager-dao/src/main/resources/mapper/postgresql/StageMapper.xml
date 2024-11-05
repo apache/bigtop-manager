@@ -23,6 +23,13 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.apache.bigtop.manager.dao.repository.StageDao">
 
+    <select id="findByJobId" resultType="org.apache.bigtop.manager.dao.po.StagePO">
+        SELECT *
+        FROM stage
+        WHERE job_id = #{jobId}
+        ORDER BY "order" ASC
+    </select>
+
     <update id="updateStateByIds" parameterType="java.util.List">
         UPDATE "stage"
         SET "state" = CASE

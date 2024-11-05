@@ -54,7 +54,19 @@ public class PrometheusServerScript extends AbstractServerScript {
                 "nohup {0}/prometheus --config.file={0}/prometheus.yml --storage.tsdb.path={0}/data > {0}/nohup.out 2>&1 &",
                 prometheusParams.serviceHome());
         try {
-            return LinuxOSUtils.sudoExecCmd(cmd, prometheusParams.user());
+            LinuxOSUtils.sudoExecCmd(cmd, prometheusParams.user());
+            long startTime = System.currentTimeMillis();
+            long maxWaitTime = 5000;
+            long pollInterval = 500;
+
+            while (System.currentTimeMillis() - startTime < maxWaitTime) {
+                ShellResult statusResult = status(params);
+                if (statusResult.getExitCode() == 0) {
+                    return statusResult;
+                }
+                Thread.sleep(pollInterval);
+            }
+            return status(params);
         } catch (Exception e) {
             throw new StackException(e);
         }
@@ -63,7 +75,7 @@ public class PrometheusServerScript extends AbstractServerScript {
     @Override
     public ShellResult stop(Params params) {
         PrometheusParams prometheusParams = (PrometheusParams) params;
-        String cmd = "pkill -f prometheus";
+        String cmd = MessageFormat.format("pkill -f {0}/prometheus", prometheusParams.serviceHome());
         try {
             return LinuxOSUtils.sudoExecCmd(cmd, prometheusParams.user());
         } catch (Exception e) {
@@ -73,7 +85,8 @@ public class PrometheusServerScript extends AbstractServerScript {
 
     @Override
     public ShellResult status(Params params) {
-        String cmd = "pgrep -f prometheus";
+        PrometheusParams prometheusParams = (PrometheusParams) params;
+        String cmd = MessageFormat.format("pgrep -f {0}/prometheus", prometheusParams.serviceHome());
         try {
             ShellResult result = LinuxOSUtils.execCmd(cmd);
             if (result.getExitCode() == 0) {

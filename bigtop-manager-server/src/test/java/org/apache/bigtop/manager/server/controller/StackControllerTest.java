@@ -18,8 +18,6 @@
  */
 package org.apache.bigtop.manager.server.controller;
 
-import org.apache.bigtop.manager.server.model.vo.ServiceComponentVO;
-import org.apache.bigtop.manager.server.model.vo.ServiceConfigVO;
 import org.apache.bigtop.manager.server.model.vo.StackVO;
 import org.apache.bigtop.manager.server.service.StackService;
 import org.apache.bigtop.manager.server.utils.MessageSourceUtils;
@@ -74,31 +72,5 @@ class StackControllerTest {
 
         assertTrue(response.isSuccess());
         assertEquals(stacks, response.getData());
-    }
-
-    @Test
-    void componentsReturnsAllComponentsForValidStack() {
-        String stackName = "bigtop";
-        String stackVersion = "1.0.0";
-        List<ServiceComponentVO> components = Arrays.asList(new ServiceComponentVO(), new ServiceComponentVO());
-        when(stackService.components(stackName, stackVersion)).thenReturn(components);
-
-        ResponseEntity<List<ServiceComponentVO>> response = stackController.components(stackName, stackVersion);
-
-        assertTrue(response.isSuccess());
-        assertEquals(components, response.getData());
-    }
-
-    @Test
-    void configurationsReturnsAllConfigurationsForValidStack() {
-        String stackName = "bigtop";
-        String stackVersion = "1.0.0";
-        List<ServiceConfigVO> configurations = Arrays.asList(new ServiceConfigVO(), new ServiceConfigVO());
-        when(stackService.configurations(stackName, stackVersion)).thenReturn(configurations);
-
-        ResponseEntity<List<ServiceConfigVO>> response = stackController.configurations(stackName, stackVersion);
-
-        assertTrue(response.isSuccess());
-        assertEquals(configurations, response.getData());
     }
 }

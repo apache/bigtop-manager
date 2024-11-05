@@ -22,7 +22,6 @@ import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.ServicePO;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
-import org.apache.bigtop.manager.server.model.dto.StackDTO;
 import org.apache.bigtop.manager.server.model.vo.ServiceVO;
 import org.apache.bigtop.manager.server.stack.model.ServiceModel;
 
@@ -32,7 +31,6 @@ import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Mapper(
         uses = {ComponentConverter.class, ConverterTool.class},
@@ -51,15 +49,6 @@ public interface ServiceConverter {
 
     List<ServiceVO> fromDTO2VO(List<ServiceDTO> serviceDTOList);
 
-    @Mapping(target = "serviceGroup", source = "stackDTO.userGroup")
-    ServiceVO fromDTO2VO(ServiceDTO serviceDTO, StackDTO stackDTO);
-
-    default List<ServiceVO> fromDTO2VO(List<ServiceDTO> serviceDTOList, StackDTO stackDTO) {
-        return serviceDTOList.stream()
-                .map(serviceDTO -> fromDTO2VO(serviceDTO, stackDTO))
-                .collect(Collectors.toList());
-    }
-
     @Mapping(target = "serviceName", source = "name")
     @Mapping(target = "serviceDesc", source = "desc")
     @Mapping(target = "serviceVersion", source = "version")
@@ -67,7 +56,6 @@ public interface ServiceConverter {
     ServiceDTO fromModel2DTO(ServiceModel serviceModel);
 
     @Mapping(target = "requiredServices", source = "requiredServices", qualifiedByName = "json2List")
-    @Mapping(target = "serviceGroup", source = "userGroup")
     ServiceVO fromPO2VO(ServicePO servicePO);
 
     List<ServiceVO> fromPO2VO(List<ServicePO> servicePOList);

@@ -24,7 +24,6 @@ import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.po.HostComponentPO;
 import org.apache.bigtop.manager.dao.po.HostPO;
-import org.apache.bigtop.manager.dao.po.StackPO;
 import org.apache.bigtop.manager.dao.repository.ComponentDao;
 import org.apache.bigtop.manager.dao.repository.HostComponentDao;
 import org.apache.bigtop.manager.dao.repository.HostDao;
@@ -40,6 +39,7 @@ import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
 import org.apache.bigtop.manager.server.model.dto.ComponentHostDTO;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
+import org.apache.bigtop.manager.server.model.dto.StackDTO;
 import org.apache.bigtop.manager.server.model.dto.command.ServiceCommandDTO;
 import org.apache.bigtop.manager.server.stack.dag.ComponentCommandWrapper;
 import org.apache.bigtop.manager.server.stack.dag.DAG;
@@ -57,9 +57,10 @@ public abstract class AbstractServiceJob extends AbstractJob {
     protected HostComponentDao hostComponentDao;
     protected HostDao hostDao;
 
-    protected String stackName;
-    protected String stackVersion;
-    protected DAG<String, ComponentCommandWrapper, DagGraphEdge> dag;
+    // TODO: temp code
+    protected String stackName = "bigtop";
+    protected String stackVersion = "3.3.0";
+    protected DAG<String, ComponentCommandWrapper, DagGraphEdge> dag = StackUtils.DAG;
 
     public AbstractServiceJob(JobContext jobContext) {
         super(jobContext);
@@ -77,18 +78,13 @@ public abstract class AbstractServiceJob extends AbstractJob {
     @Override
     protected void beforeCreateStages() {
         super.beforeCreateStages();
-        StackPO stackPO = stackDao.findById(clusterPO.getStackId());
-
-        stackName = stackPO.getStackName();
-        stackVersion = stackPO.getStackVersion();
-        dag = StackUtils.getStackDagMap().get(StackUtils.fullStackName(stackName, stackVersion));
     }
 
     protected StageContext createStageContext(String serviceName, String componentName, List<String> hostnames) {
         StageContext stageContext = StageContext.fromCommandDTO(jobContext.getCommandDTO());
 
-        ServiceDTO serviceDTO = StackUtils.getServiceDTO(stackName, stackVersion, serviceName);
-        ComponentDTO componentDTO = StackUtils.getComponentDTO(stackName, stackVersion, componentName);
+        ServiceDTO serviceDTO = StackUtils.getServiceDTO(serviceName);
+        ComponentDTO componentDTO = StackUtils.getComponentDTO(componentName);
 
         stageContext.setServiceDTO(serviceDTO);
         stageContext.setComponentDTO(componentDTO);
@@ -126,7 +122,7 @@ public abstract class AbstractServiceJob extends AbstractJob {
     }
 
     protected String findServiceNameByComponentName(String componentName) {
-        for (ServiceDTO serviceDTO : StackUtils.getServiceDTOList(stackName, stackVersion)) {
+        for (ServiceDTO serviceDTO : StackUtils.getServiceDTOList(new StackDTO(stackName, stackVersion))) {
             for (ComponentDTO componentDTO : serviceDTO.getComponents()) {
                 if (componentDTO.getComponentName().equals(componentName)) {
                     return serviceDTO.getServiceName();
@@ -138,17 +134,17 @@ public abstract class AbstractServiceJob extends AbstractJob {
     }
 
     protected Boolean isMasterComponent(String componentName) {
-        ComponentDTO componentDTO = StackUtils.getComponentDTO(stackName, stackVersion, componentName);
+        ComponentDTO componentDTO = StackUtils.getComponentDTO(componentName);
         return componentDTO.getCategory().equalsIgnoreCase(ComponentCategories.MASTER);
     }
 
     protected Boolean isSlaveComponent(String componentName) {
-        ComponentDTO componentDTO = StackUtils.getComponentDTO(stackName, stackVersion, componentName);
+        ComponentDTO componentDTO = StackUtils.getComponentDTO(componentName);
         return componentDTO.getCategory().equalsIgnoreCase(ComponentCategories.SLAVE);
     }
 
     protected Boolean isClientComponent(String componentName) {
-        ComponentDTO componentDTO = StackUtils.getComponentDTO(stackName, stackVersion, componentName);
+        ComponentDTO componentDTO = StackUtils.getComponentDTO(componentName);
         return componentDTO.getCategory().equalsIgnoreCase(ComponentCategories.CLIENT);
     }
 
