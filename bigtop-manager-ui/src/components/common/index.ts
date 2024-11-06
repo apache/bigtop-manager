@@ -20,10 +20,11 @@
 import type { App } from 'vue'
 import SvgIcon from './svg-icon/index.vue'
 import MarkView from './markdown-view/index.vue'
-
+import AppModal from './app-modal/index.vue'
 const comments = {
   SvgIcon,
-  MarkView
+  MarkView,
+  AppModal
 }
 
 const install = (app: App) => {

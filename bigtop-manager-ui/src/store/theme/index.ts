@@ -22,11 +22,28 @@ import { computed, ref, watch } from 'vue'
 import { theme as antdTheme } from 'ant-design-vue'
 import { GlobalToken } from 'ant-design-vue/es/theme'
 
+const componentsConfigProvider = {
+  Modal: {
+    paddingContentHorizontalLG: 16,
+    paddingLG: 16,
+    paddingMD: 16,
+    colorTextHeading: 'rgba(0, 0,.0,1)',
+    fontWeightStrong: 500,
+    marginXS: 16
+  },
+  Form: {
+    controlHeightSM: 24,
+    marginLG: 16
+  }
+}
+
 const themeMap = {
   default: {
+    components: componentsConfigProvider,
     algorithm: antdTheme.defaultAlgorithm
   },
   dark: {
+    components: componentsConfigProvider,
     algorithm: antdTheme.darkAlgorithm
   }
 }

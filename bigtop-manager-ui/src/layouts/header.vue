@@ -45,7 +45,7 @@
 <template>
   <a-layout-header class="header">
     <h1 class="header-left common-layout">
-      <svg-icon name="big-manager-logo" />
+      <svg-icon name="bigmanager_logo" />
     </h1>
     <div class="header-menu">
       <a-menu

@@ -34,7 +34,7 @@ const routes: RouteRecordRaw[] = [
         path: 'llm-config',
         component: () => import('@/pages/system-mange/llm-config/index.vue'),
         meta: {
-          icon: 'model',
+          icon: 'llm_config',
           title: 'menu.llm_config'
         }
       }

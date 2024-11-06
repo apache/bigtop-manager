@@ -18,28 +18,168 @@
 -->
 
 <script setup lang="ts">
+  import { MenuItemType } from 'ant-design-vue/es/menu/src/interface'
+  import { computed, shallowRef, toRaw, toRefs } from 'vue'
+
+  type Status = 0 | 1 | 2
+
+  type AcionKeys = '1' | '2' | '3' | '4'
+
+  export type ExtraItem = { llmConfig: LlmConfig; action: AcionKeys }
+
+  interface BaseConfig {
+    platform: string
+    model: string
+    remark: string
+  }
+
+  interface LlmDescriptionItem {
+    label: string
+    code: keyof BaseConfig
+  }
+
+  interface LlmConfig extends BaseConfig {
+    id: number | string
+    title: string
+    status: Status
+  }
+
+  interface LlmStatusItem {
+    status: Status
+    text: string
+    type: string
+    actionKeys: string
+  }
+
+  interface ExtraActionItem extends MenuItemType {
+    key: AcionKeys
+    danger?: boolean
+  }
+
   interface Props {
+    llmConfig?: LlmConfig
     loading?: boolean
     isConfig?: boolean
   }
 
   interface Emits {
+    (event: 'onCreate'): void
     (event: 'update:loading', value: boolean): void
+    (event: 'onExtraClick', value: ExtraItem): void
   }
 
   const props = withDefaults(defineProps<Props>(), {
     loading: false,
-    isConfig: true
+    isConfig: true,
+    llmConfig: () => {
+      return {
+        id: 0,
+        title: 'defaultTitle',
+        status: 0,
+        platform: 'defaultPlatform',
+        model: 'defaultModel',
+        remark: 'defaultMark'
+      }
+    }
+  })
+  const emits = defineEmits<Emits>()
+  const { llmConfig, isConfig, loading } = toRefs(props)
+
+  const llmDescriptions = shallowRef<LlmDescriptionItem[]>([
+    {
+      label: 'llmConfig.platform',
+      code: 'platform'
+    },
+    {
+      label: 'llmConfig.model',
+      code: 'model'
+    },
+    {
+      label: 'llmConfig.remark',
+      code: 'remark'
+    }
+  ])
+
+  const llmStatus = shallowRef<LlmStatusItem[]>([
+    {
+      status: 0,
+      text: 'llmConfig.unavailable',
+      type: 'error',
+      actionKeys: '2, 3, 4'
+    },
+    {
+      status: 1,
+      text: 'llmConfig.in_use',
+      type: 'success',
+      actionKeys: '1, 3, 4'
+    },
+    {
+      status: 2,
+      text: 'llmConfig.available',
+      type: 'processing',
+      actionKeys: '2, 3, 4'
+    }
+  ])
+
+  const menuItems = shallowRef<ExtraActionItem[]>([
+    {
+      key: '1',
+      label: 'common.disable',
+      disabled: false
+    },
+    {
+      key: '2',
+      label: 'common.enable',
+      disabled: false
+    },
+    {
+      key: '3',
+      label: 'common.edit',
+      disabled: false
+    },
+    {
+      key: '4',
+      disabled: false,
+      danger: true,
+      label: 'common.delete'
+    }
+  ])
+
+  const currStatus = computed(() => llmConfig.value?.status)
+  const getLlmStatus = computed(
+    () => llmStatus.value.filter(({ status }) => status == currStatus.value)[0]
+  )
+  const getLlmActions = computed(() => {
+    return menuItems.value.reduce(
+      (acc, item) => {
+        if (getLlmStatus.value.actionKeys.includes(item.key as string)) {
+          const updatedItem = { ...item }
+          if (
+            (currStatus.value === 1 && item.key === '4') ||
+            (currStatus.value === 0 && item.key === '2')
+          ) {
+            updatedItem.disabled = true
+          }
+          acc.push(updatedItem)
+        }
+        return acc
+      },
+      [] as typeof menuItems.value
+    )
   })
 
-  defineEmits<Emits>()
+  const handleCreateLlmConfig = () => {
+    emits('onCreate')
+  }
 
-  const llmDescriptions = ['平台', '模型', '备注']
+  const handleClickAction = ({ key }: { key: AcionKeys }) => {
+    emits('onExtraClick', { llmConfig: toRaw(llmConfig.value), action: key })
+  }
 </script>
 
 <template>
   <div class="llm-card">
-    <template v-if="props.isConfig">
+    <template v-if="isConfig">
       <a-skeleton active :loading="loading">
         <div class="llm-card-header">
           <div class="llm-card-header-title">
@@ -51,41 +191,65 @@
             />
             <a-typography-text
               :style="{ width: '72px' }"
-              :ellipsis="{ tooltip: '我是名字!' }"
-              content="名字名字名字名字名字名字"
+              :ellipsis="{ tooltip: llmConfig?.title }"
+              :content="llmConfig?.title"
             />
-            <!-- <a-tag color="success">使用中</a-tag> -->
-            <a-tag color="processing">可用</a-tag>
-            <!-- <a-tag color="error">不可用</a-tag> -->
+            <a-tag :color="getLlmStatus?.type">
+              {{ $t(getLlmStatus?.text) }}
+            </a-tag>
           </div>
-          <a-button type="text" size="small" shape="circle">
-            <template #icon>
-              <svg-icon name="more" />
+          <a-dropdown :trigger="['click']">
+            <a-button type="text" size="small" shape="circle">
+              <template #icon>
+                <svg-icon name="more" />
+              </template>
+            </a-button>
+            <template #overlay>
+              <a-menu @click="handleClickAction">
+                <a-menu-item
+                  v-for="{ key, label, danger, disabled } in getLlmActions"
+                  :key="key"
+                  :danger="danger"
+                  :disabled="disabled"
+                  :title="label"
+                >
+                  {{ $t(label) }}
+                </a-menu-item>
+              </a-menu>
             </template>
-          </a-button>
+          </a-dropdown>
         </div>
         <div class="llm-card-desc">
           <div
-            v-for="desc in llmDescriptions"
-            :key="desc"
+            v-for="{ label, code } in llmDescriptions"
+            :key="code"
             class="llm-card-desc-item"
           >
-            <div>{{ desc }}</div>
+            <div>{{ $t(label) }}</div>
             <a-typography-text
               type="secondary"
-              :ellipsis="{ tooltip: '我是描述!' }"
-              content="描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述"
+              :ellipsis="{ tooltip: llmConfig ? llmConfig[code] : '--' }"
+              :content="llmConfig ? llmConfig[code] : '--'"
             />
           </div>
         </div>
       </a-skeleton>
     </template>
-    <template v-else></template>
+    <template v-else>
+      <div class="llm-card-action" @click="handleCreateLlmConfig">
+        <svg-icon name="plus_dark" />
+        <a-typography-text
+          type="secondary"
+          :content="$t('llmConfig.create_authorization')"
+        />
+      </div>
+    </template>
   </div>
 </template>
 
 <style lang="scss" scoped>
   .llm-card {
+    position: relative;
     flex-shrink: 0;
     width: 260px;
     height: 166px;
@@ -121,6 +285,23 @@
       & div:first-child {
         flex-shrink: 0;
       }
+    }
+  }
+
+  .llm-card-action {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    .svg-icon {
+      width: 36px;
+      height: 36px;
     }
   }
 </style>

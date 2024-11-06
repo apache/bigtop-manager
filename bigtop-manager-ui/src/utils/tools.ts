@@ -48,6 +48,10 @@ export const copyText = (text: string): Promise<any> => {
   })
 }
 
+export const usePngImage = (imageName: string): string => {
+  return new URL(`../assets/images/${imageName}.png`, import.meta.url).href
+}
+
 export const scrollToBottom = (container: HTMLElement | null) => {
   if (!container) {
     return

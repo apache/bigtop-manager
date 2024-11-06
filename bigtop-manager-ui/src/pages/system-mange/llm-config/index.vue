@@ -18,16 +18,34 @@
 -->
 
 <script setup lang="ts">
-  import LlmCard from './components/llm-card.vue'
+  import { ref } from 'vue'
+  import LlmCard, { type ExtraItem } from './components/llm-card.vue'
+  import UpdateLlmConfig from './components/update-llm-config.vue'
+
+  const open = ref(false)
+  const title = ref('')
+
+  const onCreate = () => {
+    title.value = 'llmConfig.create_authorization'
+    open.value = true
+  }
+
+  const onExtraClick = (item: ExtraItem) => {
+    item.action == '3' && (title.value = 'llmConfig.edit_authorization')
+    open.value = true
+  }
 </script>
 
 <template>
   <div class="llm-config">
-    <a-typography-title :level="5">大模型配置</a-typography-title>
+    <a-typography-title :level="5">
+      {{ $t('llmConfig.llm_config') }}
+    </a-typography-title>
     <div class="llm-config-content">
-      <llm-card />
-      <llm-card :is-config="false" />
+      <llm-card @on-extra-click="onExtraClick" />
+      <llm-card :is-config="false" @on-create="onCreate" />
     </div>
+    <update-llm-config v-model:open="open" :title="title" />
   </div>
 </template>
 
