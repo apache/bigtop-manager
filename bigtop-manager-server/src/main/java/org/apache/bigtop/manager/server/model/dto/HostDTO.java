@@ -26,6 +26,8 @@ import java.util.List;
 public class HostDTO {
     private List<String> hostnames;
 
+    private Long clusterId;
+
     private String sshUser;
 
     private Integer sshPort;

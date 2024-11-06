@@ -57,7 +57,7 @@
         <include refid="baseColumnsV2">
             <property name="alias" value="hc"/>
         </include>
-        , c.service_id, c.component_name, c.display_name, c.category, s.service_name, clus.cluster_name, ht.hostname
+        , c.service_id, c.component_name, c.display_name, c.category, s.service_name, clus.name as cluster_name, ht.hostname
         from
         host_component hc
         inner join (select * from component
@@ -148,7 +148,7 @@
         <include refid="baseColumnsV2">
             <property name="alias" value="hc"/>
         </include>
-        , c.service_id, c.component_name, c.display_name, c.category, s.service_name, clus.cluster_name, ht.hostname
+        , c.service_id, c.component_name, c.display_name, c.category, s.service_name, clus.name as cluster_name, ht.hostname
         from
         host_component hc
         inner join component c
@@ -176,7 +176,7 @@
         <include refid="baseColumnsV2">
             <property name="alias" value="hc"/>
         </include>
-            , c.service_id, c.component_name, c.display_name, c.category, s.service_name, clus.cluster_name, ht.hostname
+            , c.service_id, c.component_name, c.display_name, c.category, s.service_name, clus.name as cluster_name, ht.hostname
         from
         host_component hc
         inner join (select * from component
@@ -201,7 +201,7 @@
         <include refid="baseColumnsV2">
             <property name="alias" value="hc"/>
         </include>
-        ,st.stack_name,st.stack_version,ser.service_name,ser.service_user,clu.root,c.component_name,c.command_script,hst.hostname
+        ,ser.service_name,ser.service_user,clu.root_dir,c.component_name,c.command_script,hst.hostname
         from
         host_component hc
         inner join host hst
@@ -215,8 +215,6 @@
         inner join
         service ser
         on c.service_id=ser.id and c.cluster_id = ser.cluster_id
-        inner join stack st
-        on clu.stack_id = st.id
     </select>
 
     <select id="countByHostId" resultType="java.lang.Integer">

@@ -54,27 +54,24 @@ COMMENT ON COLUMN "user".status IS '0-Disable, 1-Enable';
 CREATE TABLE cluster
 (
     id            BIGINT CHECK (id > 0) NOT NULL GENERATED ALWAYS AS IDENTITY,
-    cluster_name  VARCHAR(255)                      DEFAULT NULL,
-    cluster_desc  VARCHAR(255)                      DEFAULT NULL,
-    cluster_type  SMALLINT CHECK (cluster_type > 0) DEFAULT 1,
-    selected      BOOLEAN                               DEFAULT TRUE,
-    create_time   TIMESTAMP(0)                      DEFAULT NULL,
-    update_time   TIMESTAMP(0)                      DEFAULT NULL,
-    create_by     BIGINT,
-    packages      VARCHAR(255),
-    repo_template VARCHAR(255),
-    root          VARCHAR(255),
-    state         VARCHAR(255),
-    update_by     BIGINT,
+    name          VARCHAR(255)                      DEFAULT NULL,
+    "desc"        VARCHAR(255)                      DEFAULT NULL,
+    type          INT CHECK (cluster.type > 0) DEFAULT 1,
     user_group    VARCHAR(255),
+    root_dir      VARCHAR(255),
+    status        INT DEFAULT NULL,
+    create_time   TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
+    update_time   TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
+    create_by     BIGINT,
+    update_by     BIGINT,
     PRIMARY KEY (id),
-    CONSTRAINT uk_cluster_name UNIQUE (cluster_name)
+    CONSTRAINT uk_name UNIQUE (name)
 );
 
-COMMENT ON COLUMN cluster.cluster_name IS 'Cluster Name';
-COMMENT ON COLUMN cluster.cluster_desc IS 'Cluster Description';
-COMMENT ON COLUMN cluster.cluster_type IS '1-Physical Machine, 2-Kubernetes';
-COMMENT ON COLUMN cluster.selected IS '0-Disable, 1-Enable';
+COMMENT ON COLUMN cluster.name IS 'Cluster Name';
+COMMENT ON COLUMN cluster."desc" IS 'Cluster Description';
+COMMENT ON COLUMN cluster.type IS '1-Physical Machine, 2-Kubernetes';
+COMMENT ON COLUMN cluster.status IS '1-healthy, 2-unhealthy, 3-unknown';
 
 DROP INDEX IF EXISTS idx_cluster_stack_id;
 

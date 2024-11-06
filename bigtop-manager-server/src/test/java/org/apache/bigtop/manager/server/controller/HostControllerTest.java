@@ -69,12 +69,11 @@ class HostControllerTest {
 
     @Test
     void listReturnsAllHosts() {
-        Long clusterId = 1L;
         PageVO<HostVO> hosts = new PageVO<>();
         HostQuery hostQuery = new HostQuery();
-        when(hostService.list(clusterId, hostQuery)).thenReturn(hosts);
+        when(hostService.list(hostQuery)).thenReturn(hosts);
 
-        ResponseEntity<PageVO<HostVO>> response = hostController.list(clusterId, hostQuery);
+        ResponseEntity<PageVO<HostVO>> response = hostController.list(hostQuery);
 
         assertTrue(response.isSuccess());
         assertEquals(hosts, response.getData());
@@ -82,12 +81,11 @@ class HostControllerTest {
 
     @Test
     void getReturnsHost() {
-        Long clusterId = 1L;
         Long hostId = 1L;
         HostVO host = new HostVO();
         when(hostService.get(hostId)).thenReturn(host);
 
-        ResponseEntity<HostVO> response = hostController.get(hostId, clusterId);
+        ResponseEntity<HostVO> response = hostController.get(hostId);
 
         assertTrue(response.isSuccess());
         assertEquals(host, response.getData());
@@ -95,13 +93,12 @@ class HostControllerTest {
 
     @Test
     void updateReturnsUpdatedHost() {
-        Long clusterId = 1L;
         Long hostId = 1L;
         HostReq hostReq = new HostReq();
         HostVO updatedHost = new HostVO();
-        when(hostService.update(anyLong(), anyLong(), any(HostDTO.class))).thenReturn(updatedHost);
+        when(hostService.update(anyLong(), any(HostDTO.class))).thenReturn(updatedHost);
 
-        ResponseEntity<HostVO> response = hostController.update(clusterId, hostId, hostReq);
+        ResponseEntity<HostVO> response = hostController.update(hostId, hostReq);
 
         assertTrue(response.isSuccess());
         assertEquals(updatedHost, response.getData());
@@ -109,11 +106,10 @@ class HostControllerTest {
 
     @Test
     void deleteReturnsSuccess() {
-        Long clusterId = 1L;
         Long hostId = 1L;
         when(hostService.delete(hostId)).thenReturn(true);
 
-        ResponseEntity<Boolean> response = hostController.delete(clusterId, hostId);
+        ResponseEntity<Boolean> response = hostController.delete(hostId);
 
         assertTrue(response.isSuccess());
         assertTrue(response.getData());
@@ -121,11 +117,10 @@ class HostControllerTest {
 
     @Test
     void checkConnectionReturnsSuccess() {
-        Long clusterId = 1L;
         HostReq hostReq = new HostReq();
         when(hostService.checkConnection(any(HostDTO.class))).thenReturn(true);
 
-        ResponseEntity<Boolean> response = hostController.checkConnection(clusterId, hostReq);
+        ResponseEntity<Boolean> response = hostController.checkConnection(hostReq);
 
         assertTrue(response.isSuccess());
         assertTrue(response.getData());
@@ -133,11 +128,10 @@ class HostControllerTest {
 
     @Test
     void listReturnsEmptyForInvalidClusterId() {
-        Long clusterId = 999L;
         HostQuery hostQuery = new HostQuery();
-        when(hostService.list(clusterId, hostQuery)).thenReturn(new PageVO<>());
+        when(hostService.list(hostQuery)).thenReturn(new PageVO<>());
 
-        ResponseEntity<PageVO<HostVO>> response = hostController.list(clusterId, hostQuery);
+        ResponseEntity<PageVO<HostVO>> response = hostController.list(hostQuery);
 
         assertTrue(response.isSuccess());
         assertNull(response.getData().getContent());
@@ -145,11 +139,10 @@ class HostControllerTest {
 
     @Test
     void getReturnsNullForInvalidHostId() {
-        Long clusterId = 1L;
         Long hostId = 999L;
         when(hostService.get(hostId)).thenReturn(null);
 
-        ResponseEntity<HostVO> response = hostController.get(hostId, clusterId);
+        ResponseEntity<HostVO> response = hostController.get(hostId);
 
         assertTrue(response.isSuccess());
         assertNull(response.getData());
@@ -157,12 +150,11 @@ class HostControllerTest {
 
     @Test
     void updateReturnsNullForInvalidHostId() {
-        Long clusterId = 1L;
         Long hostId = 999L;
         HostReq hostReq = new HostReq();
-        when(hostService.update(anyLong(), anyLong(), any(HostDTO.class))).thenReturn(null);
+        when(hostService.update(anyLong(), any(HostDTO.class))).thenReturn(null);
 
-        ResponseEntity<HostVO> response = hostController.update(clusterId, hostId, hostReq);
+        ResponseEntity<HostVO> response = hostController.update(hostId, hostReq);
 
         assertTrue(response.isSuccess());
         assertNull(response.getData());
@@ -170,11 +162,10 @@ class HostControllerTest {
 
     @Test
     void deleteReturnsFalseForInvalidHostId() {
-        Long clusterId = 1L;
         Long hostId = 999L;
         when(hostService.delete(hostId)).thenReturn(false);
 
-        ResponseEntity<Boolean> response = hostController.delete(clusterId, hostId);
+        ResponseEntity<Boolean> response = hostController.delete(hostId);
 
         assertTrue(response.isSuccess());
         assertFalse(response.getData());
@@ -182,11 +173,10 @@ class HostControllerTest {
 
     @Test
     void checkConnectionReturnsFalseForInvalidHostnames() {
-        Long clusterId = 1L;
         HostReq hostReq = new HostReq();
         when(hostService.checkConnection(any(HostDTO.class))).thenReturn(false);
 
-        ResponseEntity<Boolean> response = hostController.checkConnection(clusterId, hostReq);
+        ResponseEntity<Boolean> response = hostController.checkConnection(hostReq);
 
         assertTrue(response.isSuccess());
         assertFalse(response.getData());

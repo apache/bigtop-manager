@@ -70,22 +70,19 @@ CREATE TABLE `user`
 
 CREATE TABLE `cluster`
 (
-    `id`            BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `cluster_name`  VARCHAR(255) DEFAULT NULL COMMENT 'Cluster Name',
-    `cluster_desc`  VARCHAR(255) DEFAULT NULL COMMENT 'Cluster Description',
-    `cluster_type`  SMALLINT UNSIGNED DEFAULT 1 COMMENT '1-Physical Machine, 2-Kubernetes',
-    `selected`      BIT(1)       DEFAULT 1 COMMENT '0-Disable, 1-Enable',
-    `create_time`   DATETIME     DEFAULT NULL,
-    `update_time`   DATETIME     DEFAULT NULL,
-    `create_by`     BIGINT,
-    `packages`      VARCHAR(255),
-    `repo_template` VARCHAR(255),
-    `root`          VARCHAR(255),
-    `state`         VARCHAR(255),
-    `update_by`     BIGINT,
-    `user_group`    VARCHAR(255),
+    `id`                   BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `name`                 VARCHAR(255) DEFAULT NULL COMMENT 'Cluster Name',
+    `desc`                 VARCHAR(255) DEFAULT NULL COMMENT 'Cluster Description',
+    `type`                 INTEGER DEFAULT 1 COMMENT '1-Physical Machine, 2-Kubernetes',
+    `user_group`           VARCHAR(255),
+    `root_dir`             VARCHAR(255),
+    `status`               INTEGER DEFAULT NULL COMMENT '1-healthy, 2-unhealthy, 3-unknown',
+    `create_time`          DATETIME     DEFAULT CURRENT_TIMESTAMP,
+    `update_time`          DATETIME     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `create_by`            BIGINT,
+    `update_by`            BIGINT,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_cluster_name` (`cluster_name`)
+    UNIQUE KEY `uk_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `component`

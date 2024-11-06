@@ -49,7 +49,7 @@ public class TaskContext {
 
     private String customCommand;
 
-    private String root;
+    private String rootDir;
 
     // Extra properties for specific tasks
     protected Map<String, Object> properties;

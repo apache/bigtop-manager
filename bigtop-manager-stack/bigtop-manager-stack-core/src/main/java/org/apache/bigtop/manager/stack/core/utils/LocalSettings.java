@@ -32,7 +32,6 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Slf4j
 public class LocalSettings {
@@ -97,8 +96,7 @@ public class LocalSettings {
     }
 
     public static List<String> packages() {
-        ClusterInfo cluster = cluster();
-        return Optional.ofNullable(cluster.getPackages()).orElse(List.of());
+        return List.of();
     }
 
     public static List<RepoInfo> repos() {

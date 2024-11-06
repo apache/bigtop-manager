@@ -54,7 +54,7 @@
         <include refid="baseColumnsV2">
             <property name="alias" value="h"/>
         </include>
-        ,clus.cluster_name
+        ,clus.name as cluster_name
         from
         (select * from host
         <where>
@@ -75,7 +75,7 @@
         <include refid="baseColumnsV2">
             <property name="alias" value="h"/>
         </include>
-        ,clus.cluster_name
+        ,clus.name as cluster_name
         from
         host h
         left join cluster clus
@@ -102,7 +102,7 @@
         select
         <include refid="baseColumnsV2">
             <property name="alias" value="h"/>
-        </include>, c.cluster_name, count(hc.id) as component_num
+        </include>, c.name as cluster_name, count(hc.id) as component_num
         from host h
         left join cluster c on h.cluster_id = c.id
         left join host_component hc on h.id = hc.host_id
@@ -127,7 +127,7 @@
         select
         <include refid="baseColumnsV2">
             <property name="alias" value="h"/>
-        </include>, c.cluster_name, count(hc.id) as component_num
+        </include>, c.name as cluster_name, count(hc.id) as component_num
         from host h
         left join cluster c on h.cluster_id = c.id
         left join host_component hc on h.id = hc.host_id

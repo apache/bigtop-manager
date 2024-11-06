@@ -118,10 +118,6 @@ public class CacheFileUpdateTask extends AbstractTask {
         ClusterPO clusterPO = clusterDao.findByIdJoin(taskContext.getClusterId());
 
         Long clusterId = clusterPO.getId();
-        String clusterName = clusterPO.getClusterName();
-
-        String stackName = clusterPO.getStackName();
-        String stackVersion = clusterPO.getStackVersion();
 
         List<ServicePO> servicePOList = serviceDao.findAllByClusterId(clusterId);
         List<ServiceConfigPO> serviceConfigPOList =
@@ -132,13 +128,8 @@ public class CacheFileUpdateTask extends AbstractTask {
         List<HostPO> hostPOList = hostDao.findAllByClusterId(clusterId);
 
         clusterInfo = new ClusterInfo();
-        clusterInfo.setClusterName(clusterName);
-        clusterInfo.setStackName(stackName);
-        clusterInfo.setStackVersion(stackVersion);
         clusterInfo.setUserGroup(clusterPO.getUserGroup());
-        clusterInfo.setRepoTemplate(clusterPO.getRepoTemplate());
-        clusterInfo.setRoot(clusterPO.getRoot());
-        clusterInfo.setPackages(List.of(clusterPO.getPackages().split(",")));
+        clusterInfo.setRootDir(clusterPO.getRootDir());
 
         serviceConfigMap = new HashMap<>();
         for (ServiceConfigPO serviceConfigPO : serviceConfigPOList) {
@@ -212,9 +203,6 @@ public class CacheFileUpdateTask extends AbstractTask {
 
         repoList = RepoConverter.INSTANCE.fromDTO2Message((List<RepoDTO>) properties.get("repoInfoList"));
         clusterInfo = new ClusterInfo();
-        clusterInfo.setClusterName(taskContext.getClusterName());
-        clusterInfo.setStackName(taskContext.getStackName());
-        clusterInfo.setStackVersion(taskContext.getStackVersion());
 
         List<String> hostnames = (List<String>) properties.get("hostnames");
         hostMap.put(Constants.ALL_HOST_KEY, new HashSet<>(hostnames));

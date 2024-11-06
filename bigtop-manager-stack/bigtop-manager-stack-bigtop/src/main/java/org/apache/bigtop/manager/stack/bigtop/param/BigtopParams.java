@@ -32,14 +32,14 @@ public abstract class BigtopParams extends BaseParams {
     public String stackBinDir() {
         String stackName = this.commandPayload.getStackName();
         String stackVersion = this.commandPayload.getStackVersion();
-        String root = this.commandPayload.getRoot();
+        String root = this.commandPayload.getRootDir();
         return MessageFormat.format("{0}/{1}/{2}/usr/bin", root, stackName.toLowerCase(), stackVersion);
     }
 
     public String stackLibDir() {
         String stackName = this.commandPayload.getStackName();
         String stackVersion = this.commandPayload.getStackVersion();
-        String root = this.commandPayload.getRoot();
+        String root = this.commandPayload.getRootDir();
         return MessageFormat.format("{0}/{1}/{2}/usr/lib", root, stackName.toLowerCase(), stackVersion);
     }
 
