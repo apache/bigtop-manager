@@ -29,7 +29,8 @@ const componentsConfigProvider = {
     paddingMD: 16,
     colorTextHeading: 'rgba(0, 0,.0,1)',
     fontWeightStrong: 500,
-    marginXS: 16
+    marginXS: 16,
+    marginSM: 30
   },
   Form: {
     controlHeightSM: 24,

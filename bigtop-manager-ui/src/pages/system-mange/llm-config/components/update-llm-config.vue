@@ -24,7 +24,6 @@
   interface Props {
     open: boolean
     title?: string
-    bodyHeight?: number | string
   }
 
   interface Emits {
@@ -37,8 +36,7 @@
 
   const props = withDefaults(defineProps<Props>(), {
     title: '',
-    open: false,
-    bodyHeight: '100%'
+    open: false
   })
 
   const { open, title } = toRefs(props)
@@ -62,26 +60,41 @@
 
 <template>
   <div class="update-llm-config">
-    <app-modal
-      v-model:open="open"
+    <a-modal
+      :open="open"
       :width="480"
       :title="$t(title)"
       :mask-closable="false"
       :destroy-on-close="true"
-      :footer="null"
       @ok="handleOk"
       @cancel="handleCancel"
     >
-      <template #body>
-        <auto-from />
+      <auto-from />
+      <template #footer>
+        <footer>
+          <a-space size="middle">
+            <a-button type="primary" @click="handleTest">
+              {{ $t('llmConfig.availability') }}
+            </a-button>
+          </a-space>
+          <a-space size="middle">
+            <a-button @click="handleCancel">
+              {{ $t('common.cancel') }}
+            </a-button>
+            <a-button type="primary" @click="handleOk">
+              {{ $t('common.confirm') }}
+            </a-button>
+          </a-space>
+        </footer>
       </template>
-      <template #footer-left>
-        <a-button type="primary" @click="handleTest">
-          {{ $t('llmConfig.availability') }}
-        </a-button>
-      </template>
-    </app-modal>
+    </a-modal>
   </div>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+  footer {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+  }
+</style>

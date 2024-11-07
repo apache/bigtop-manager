@@ -21,11 +21,16 @@
   import { MenuItemType } from 'ant-design-vue/es/menu/src/interface'
   import { computed, shallowRef, toRaw, toRefs } from 'vue'
 
+  enum Acions {
+    disable = '1',
+    enable = '2',
+    edit = '3',
+    delete = '4'
+  }
+
   type Status = 0 | 1 | 2
-
-  type AcionKeys = '1' | '2' | '3' | '4'
-
-  export type ExtraItem = { llmConfig: LlmConfig; action: AcionKeys }
+  type AcionsKeys = keyof typeof Acions
+  export type ExtraItem = { llmConfig: LlmConfig; action: AcionsKeys }
 
   interface BaseConfig {
     platform: string
@@ -52,7 +57,7 @@
   }
 
   interface ExtraActionItem extends MenuItemType {
-    key: AcionKeys
+    key: AcionsKeys
     danger?: boolean
   }
 
@@ -123,22 +128,22 @@
 
   const menuItems = shallowRef<ExtraActionItem[]>([
     {
-      key: '1',
+      key: 'disable',
       label: 'common.disable',
       disabled: false
     },
     {
-      key: '2',
+      key: 'enable',
       label: 'common.enable',
       disabled: false
     },
     {
-      key: '3',
+      key: 'edit',
       label: 'common.edit',
       disabled: false
     },
     {
-      key: '4',
+      key: 'delete',
       disabled: false,
       danger: true,
       label: 'common.delete'
@@ -152,11 +157,11 @@
   const getLlmActions = computed(() => {
     return menuItems.value.reduce(
       (acc, item) => {
-        if (getLlmStatus.value.actionKeys.includes(item.key as string)) {
+        if (getLlmStatus.value.actionKeys.includes(Acions[item.key])) {
           const updatedItem = { ...item }
           if (
-            (currStatus.value === 1 && item.key === '4') ||
-            (currStatus.value === 0 && item.key === '2')
+            (currStatus.value === 1 && item.key === 'delete') ||
+            (currStatus.value === 0 && item.key === 'enable')
           ) {
             updatedItem.disabled = true
           }
@@ -172,8 +177,11 @@
     emits('onCreate')
   }
 
-  const handleClickAction = ({ key }: { key: AcionKeys }) => {
-    emits('onExtraClick', { llmConfig: toRaw(llmConfig.value), action: key })
+  const handleClickAction = ({ key }: { key: AcionsKeys }) => {
+    emits('onExtraClick', {
+      llmConfig: toRaw(llmConfig.value),
+      action: key
+    })
   }
 </script>
 
