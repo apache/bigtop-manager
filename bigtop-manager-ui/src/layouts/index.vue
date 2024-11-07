@@ -57,9 +57,7 @@
         @on-sider-click="menuStore.onSiderClick"
       />
       <a-layout class="layout-inner">
-        <router-view v-slot="{ Component }">
-          <component :is="Component" />
-        </router-view>
+        <router-view />
         <layout-footer />
       </a-layout>
     </a-layout>

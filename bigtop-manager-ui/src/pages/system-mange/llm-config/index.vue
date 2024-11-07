@@ -31,7 +31,7 @@
   }
 
   const onExtraClick = (item: ExtraItem) => {
-    if (item.action == 'edit') {
+    if (item.action === 'edit') {
       title.value = 'llmConfig.edit_authorization'
       open.value = true
     }

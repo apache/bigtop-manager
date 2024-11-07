@@ -21,7 +21,7 @@
   import { MenuItemType } from 'ant-design-vue/es/menu/src/interface'
   import { computed, shallowRef, toRaw, toRefs } from 'vue'
 
-  enum Acions {
+  enum Actions {
     disable = '1',
     enable = '2',
     edit = '3',
@@ -29,7 +29,7 @@
   }
 
   type Status = 0 | 1 | 2
-  type AcionsKeys = keyof typeof Acions
+  type AcionsKeys = keyof typeof Actions
   export type ExtraItem = { llmConfig: LlmConfig; action: AcionsKeys }
 
   interface BaseConfig {
@@ -53,7 +53,7 @@
     status: Status
     text: string
     type: string
-    actionKeys: string
+    actionKeys: Actions[]
   }
 
   interface ExtraActionItem extends MenuItemType {
@@ -110,19 +110,19 @@
       status: 0,
       text: 'llmConfig.unavailable',
       type: 'error',
-      actionKeys: '2, 3, 4'
+      actionKeys: [Actions.enable, Actions.edit, Actions.delete]
     },
     {
       status: 1,
       text: 'llmConfig.in_use',
       type: 'success',
-      actionKeys: '1, 3, 4'
+      actionKeys: [Actions.disable, Actions.edit, Actions.delete]
     },
     {
       status: 2,
       text: 'llmConfig.available',
       type: 'processing',
-      actionKeys: '2, 3, 4'
+      actionKeys: [Actions.enable, Actions.edit, Actions.delete]
     }
   ])
 
@@ -155,22 +155,19 @@
     () => llmStatus.value.filter(({ status }) => status == currStatus.value)[0]
   )
   const getLlmActions = computed(() => {
-    return menuItems.value.reduce(
-      (acc, item) => {
-        if (getLlmStatus.value.actionKeys.includes(Acions[item.key])) {
-          const updatedItem = { ...item }
-          if (
-            (currStatus.value === 1 && item.key === 'delete') ||
-            (currStatus.value === 0 && item.key === 'enable')
-          ) {
-            updatedItem.disabled = true
-          }
-          acc.push(updatedItem)
+    return menuItems.value.reduce((acc, item) => {
+      if (getLlmStatus.value.actionKeys.includes(Actions[item.key])) {
+        const updatedItem = { ...item }
+        if (
+          (currStatus.value === 1 && item.key === 'delete') ||
+          (currStatus.value === 0 && item.key === 'enable')
+        ) {
+          updatedItem.disabled = true
         }
-        return acc
-      },
-      [] as typeof menuItems.value
-    )
+        acc.push(updatedItem)
+      }
+      return acc
+    }, [] as ExtraActionItem[])
   })
 
   const handleCreateLlmConfig = () => {
