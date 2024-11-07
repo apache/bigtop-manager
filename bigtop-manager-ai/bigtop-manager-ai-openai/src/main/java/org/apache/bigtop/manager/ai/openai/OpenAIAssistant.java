@@ -34,12 +34,16 @@ import dev.langchain4j.model.chat.StreamingChatLanguageModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
 import dev.langchain4j.model.output.Response;
+import lombok.Getter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 
 public class OpenAIAssistant extends AbstractAIAssistant {
 
+    @Getter
     private final ChatLanguageModel chatLanguageModel;
+
+    @Getter
     private final StreamingChatLanguageModel streamingChatLanguageModel;
 
     private static final String BASE_URL = "https://api.chatanywhere.tech/v1";

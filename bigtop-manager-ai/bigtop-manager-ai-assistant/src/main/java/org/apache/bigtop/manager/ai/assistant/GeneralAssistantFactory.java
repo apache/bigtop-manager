@@ -33,9 +33,8 @@ import org.apache.bigtop.manager.ai.qianfan.QianFanAssistant;
 
 import org.apache.commons.lang3.NotImplementedException;
 
-import dev.langchain4j.internal.ValidationUtils;
 import dev.langchain4j.model.chat.ChatLanguageModel;
-import dev.langchain4j.model.openai.OpenAiChatModel;
+import dev.langchain4j.model.chat.StreamingChatLanguageModel;
 import dev.langchain4j.service.AiServices;
 import dev.langchain4j.service.tool.ToolProvider;
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
@@ -97,17 +96,30 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
     public AIAssistant createWithTools(
             PlatformType platformType, AIAssistantConfigProvider assistantConfig, ToolProvider toolProvider) {
         AIAssistant aiAssistant = create(platformType, assistantConfig, null);
-        String model = ValidationUtils.ensureNotNull(assistantConfig.getModel(), "model");
-        String apiKey =
-                ValidationUtils.ensureNotNull(assistantConfig.getCredentials().get("apiKey"), "apiKey");
-        String BASE_URL = "https://api.chatanywhere.tech/v1";
-        ChatLanguageModel openAiChatModel = OpenAiChatModel.builder()
-                .apiKey(apiKey)
-                .baseUrl(BASE_URL)
-                .modelName(model)
-                .build();
+        ChatLanguageModel chatLanguageModel;
+        StreamingChatLanguageModel streamingChatLanguageModel;
+
+        switch (platformType) {
+            case OPENAI -> {
+                OpenAIAssistant openAIAssistant = (OpenAIAssistant) aiAssistant;
+                chatLanguageModel = openAIAssistant.getChatLanguageModel();
+                streamingChatLanguageModel = openAIAssistant.getStreamingChatLanguageModel();
+            }
+            case DASH_SCOPE -> {
+                chatLanguageModel = null;
+                streamingChatLanguageModel = null;
+            }
+            case QIANFAN -> {
+                QianFanAssistant qianFanAssistant = (QianFanAssistant) aiAssistant;
+                chatLanguageModel = qianFanAssistant.getChatLanguageModel();
+                streamingChatLanguageModel = qianFanAssistant.getStreamingChatLanguageModel();
+            }
+            default -> throw new IllegalArgumentException("Unsupported platform type: " + platformType);
+        }
+
         return AiServices.builder(AIAssistant.class)
-                .chatLanguageModel(openAiChatModel)
+                .chatLanguageModel(chatLanguageModel)
+                .streamingChatLanguageModel(streamingChatLanguageModel)
                 .toolProvider(toolProvider)
                 .build();
     }

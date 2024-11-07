@@ -35,13 +35,18 @@ import dev.langchain4j.model.chat.StreamingChatLanguageModel;
 import dev.langchain4j.model.output.Response;
 import dev.langchain4j.model.qianfan.QianfanChatModel;
 import dev.langchain4j.model.qianfan.QianfanStreamingChatModel;
+import lombok.Getter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 
 public class QianFanAssistant extends AbstractAIAssistant {
 
+    @Getter
     private final ChatLanguageModel chatLanguageModel;
+
+    @Getter
     private final StreamingChatLanguageModel streamingChatLanguageModel;
+
     private SystemMessage systemMessage;
 
     public QianFanAssistant(
