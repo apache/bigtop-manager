@@ -29,4 +29,6 @@ public interface LLMAgentService {
     List<String> getChatbotCommands();
 
     SseEmitter talk(Long threadId, ChatbotCommand command, String message);
+
+    Boolean activateIntelligentAlert();
 }

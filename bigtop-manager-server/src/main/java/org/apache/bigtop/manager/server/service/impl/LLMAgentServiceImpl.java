@@ -26,7 +26,6 @@ import org.apache.bigtop.manager.dao.po.AuthPlatformPO;
 import org.apache.bigtop.manager.dao.po.ChatThreadPO;
 import org.apache.bigtop.manager.dao.po.PlatformPO;
 import org.apache.bigtop.manager.dao.repository.AuthPlatformDao;
-import org.apache.bigtop.manager.dao.repository.ChatMessageDao;
 import org.apache.bigtop.manager.dao.repository.ChatThreadDao;
 import org.apache.bigtop.manager.dao.repository.PlatformDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
@@ -40,6 +39,8 @@ import org.apache.bigtop.manager.server.model.dto.AuthPlatformDTO;
 import org.apache.bigtop.manager.server.model.dto.ChatThreadDTO;
 import org.apache.bigtop.manager.server.service.LLMAgentService;
 import org.apache.bigtop.manager.server.tools.AgentToolsProvider;
+
+import org.apache.commons.lang3.NotImplementedException;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -59,9 +60,6 @@ public class LLMAgentServiceImpl implements LLMAgentService {
 
     @Resource
     private ChatThreadDao chatThreadDao;
-
-    @Resource
-    private ChatMessageDao chatMessageDao;
 
     private AIAssistantConfig getAIAssistantConfig(
             String model, Map<String, String> credentials, Map<String, String> configs) {
@@ -141,5 +139,10 @@ public class LLMAgentServiceImpl implements LLMAgentService {
             System.out.println("Data has been sent, performing post-send actions.");
         });
         return emitter;
+    }
+
+    @Override
+    public Boolean activateIntelligentAlert() {
+        throw new NotImplementedException("Intelligent Alert Not Implemented");
     }
 }

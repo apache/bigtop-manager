@@ -39,8 +39,7 @@ import reactor.core.publisher.FluxSink;
 
 public class OpenAIAssistant extends AbstractAIAssistant {
 
-    private static final String BASE_URL = "https://api.chatanywhere.tech/v1";
-    //    private static final String BASE_URL = "https://api.openai.com/v1";
+    private static final String BASE_URL = "https://api.openai.com/v1";
 
     public OpenAIAssistant(
             ChatLanguageModel chatLanguageModel,

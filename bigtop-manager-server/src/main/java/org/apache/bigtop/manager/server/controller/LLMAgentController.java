@@ -19,10 +19,13 @@
 package org.apache.bigtop.manager.server.controller;
 
 import org.apache.bigtop.manager.server.service.LLMAgentService;
+import org.apache.bigtop.manager.server.utils.ResponseEntity;
 
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.annotation.Resource;
@@ -33,4 +36,10 @@ import jakarta.annotation.Resource;
 public class LLMAgentController {
     @Resource
     private LLMAgentService llmAgentService;
+
+    @Operation(summary = "activate intelligent alert ", description = "Activate Intelligent Alert ")
+    @PostMapping("/alert/activate")
+    public ResponseEntity<Boolean> activateIntelligentAlert() {
+        return ResponseEntity.success(llmAgentService.activateIntelligentAlert());
+    }
 }
