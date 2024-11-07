@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import { computed, ref, watchEffect } from 'vue'
+import { computed, ref, watchPostEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { dynamicRoutes as dr } from '@/router/routes/index'
 import { defineStore, storeToRefs } from 'pinia'
@@ -71,29 +71,32 @@ export const useMenuStore = defineStore(
     })
     const siderMenuSelectedKey = ref(findActivePath(siderMenus.value[0]))
 
-    watchEffect(() => {
+    watchPostEffect(() => {
       // resolve highlight menu
       const activeMenu = route.meta.activeMenu || route.path
       const matchedNames = [SPECIAL_ROUTE_NAME, DEFAULT_ROUTE_NAME]
       headerSelectedKey.value = route.matched[0].path
 
-      if (
-        matchedNames.includes(route.name as string) ||
-        isDynamicRouteMatched.value
-      ) {
-        if (hasCluster.value) {
-          siderMenuSelectedKey.value = isDynamicRouteMatched.value
-            ? activeMenu
-            : findActivePath(siderMenus.value[0])
-          siderMenuSelectedKey.value && router.push(siderMenuSelectedKey.value)
+      if (matchedNames.includes(route.name as string)) {
+        if (hasCluster.value && isDynamicRouteMatched.value) {
+          siderMenuSelectedKey.value = findActivePath(siderMenus.value[0])
         } else {
-          siderMenuSelectedKey.value = ''
-          router.replace({ name: DEFAULT_ROUTE_NAME })
+          siderMenuSelectedKey.value = activeMenu
+          redirectRouterToDefault()
         }
       } else {
+        if (!activeMenu || (isDynamicRouteMatched.value && !hasCluster.value)) {
+          redirectRouterToDefault()
+          return
+        }
         siderMenuSelectedKey.value = activeMenu
       }
     })
+
+    function redirectRouterToDefault() {
+      siderMenuSelectedKey.value = ''
+      router.replace({ name: DEFAULT_ROUTE_NAME })
+    }
 
     function updateSiderItemByClusters(formatSider: MenuItem[]) {
       formatSider.forEach((item) => {
