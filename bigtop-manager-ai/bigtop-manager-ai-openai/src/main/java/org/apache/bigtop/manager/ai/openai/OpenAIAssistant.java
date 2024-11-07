@@ -34,19 +34,13 @@ import dev.langchain4j.model.chat.StreamingChatLanguageModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
 import dev.langchain4j.model.output.Response;
-import lombok.Getter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 
 public class OpenAIAssistant extends AbstractAIAssistant {
 
-    @Getter
-    private final ChatLanguageModel chatLanguageModel;
-
-    @Getter
-    private final StreamingChatLanguageModel streamingChatLanguageModel;
-
     private static final String BASE_URL = "https://api.chatanywhere.tech/v1";
+    //    private static final String BASE_URL = "https://api.openai.com/v1";
 
     public OpenAIAssistant(
             ChatLanguageModel chatLanguageModel,
@@ -106,20 +100,31 @@ public class OpenAIAssistant extends AbstractAIAssistant {
 
     public static class Builder extends AbstractAIAssistant.Builder {
 
-        public AIAssistant build() {
+        @Override
+        public ChatLanguageModel getChatLanguageModel() {
             String model = ValidationUtils.ensureNotNull(configProvider.getModel(), "model");
             String apiKey = ValidationUtils.ensureNotNull(
                     configProvider.getCredentials().get("apiKey"), "apiKey");
-            ChatLanguageModel openAiChatModel = OpenAiChatModel.builder()
+            return OpenAiChatModel.builder()
                     .apiKey(apiKey)
                     .baseUrl(BASE_URL)
                     .modelName(model)
                     .build();
-            StreamingChatLanguageModel openaiStreamChatModel = OpenAiStreamingChatModel.builder()
+        }
+
+        @Override
+        public StreamingChatLanguageModel getStreamingChatLanguageModel() {
+            String model = ValidationUtils.ensureNotNull(configProvider.getModel(), "model");
+            String apiKey = ValidationUtils.ensureNotNull(
+                    configProvider.getCredentials().get("apiKey"), "apiKey");
+            return OpenAiStreamingChatModel.builder()
                     .apiKey(apiKey)
                     .baseUrl(BASE_URL)
                     .modelName(model)
                     .build();
+        }
+
+        public AIAssistant build() {
             MessageWindowChatMemory.Builder builder = MessageWindowChatMemory.builder()
                     .chatMemoryStore(chatMemoryStore)
                     .maxMessages(MEMORY_LEN);
@@ -127,7 +132,7 @@ public class OpenAIAssistant extends AbstractAIAssistant {
                 builder.id(id);
             }
             MessageWindowChatMemory chatMemory = builder.build();
-            return new OpenAIAssistant(openAiChatModel, openaiStreamChatModel, chatMemory);
+            return new OpenAIAssistant(getChatLanguageModel(), getStreamingChatLanguageModel(), chatMemory);
         }
     }
 }

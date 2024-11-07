@@ -22,12 +22,17 @@ import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
 
 import dev.langchain4j.memory.ChatMemory;
+import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.chat.StreamingChatLanguageModel;
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 
 public abstract class AbstractAIAssistant implements AIAssistant {
 
     protected static final Integer MEMORY_LEN = 10;
     protected final ChatMemory chatMemory;
+
+    protected ChatLanguageModel chatLanguageModel;
+    protected StreamingChatLanguageModel streamingChatLanguageModel;
 
     protected AbstractAIAssistant(ChatMemory chatMemory) {
         this.chatMemory = chatMemory;

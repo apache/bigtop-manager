@@ -95,27 +95,16 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
     @Override
     public AIAssistant createWithTools(
             PlatformType platformType, AIAssistantConfigProvider assistantConfig, ToolProvider toolProvider) {
-        AIAssistant aiAssistant = create(platformType, assistantConfig, null);
-        ChatLanguageModel chatLanguageModel;
-        StreamingChatLanguageModel streamingChatLanguageModel;
-
-        switch (platformType) {
-            case OPENAI -> {
-                OpenAIAssistant openAIAssistant = (OpenAIAssistant) aiAssistant;
-                chatLanguageModel = openAIAssistant.getChatLanguageModel();
-                streamingChatLanguageModel = openAIAssistant.getStreamingChatLanguageModel();
-            }
-            case DASH_SCOPE -> {
-                chatLanguageModel = null;
-                streamingChatLanguageModel = null;
-            }
-            case QIANFAN -> {
-                QianFanAssistant qianFanAssistant = (QianFanAssistant) aiAssistant;
-                chatLanguageModel = qianFanAssistant.getChatLanguageModel();
-                streamingChatLanguageModel = qianFanAssistant.getStreamingChatLanguageModel();
-            }
-            default -> throw new IllegalArgumentException("Unsupported platform type: " + platformType);
-        }
+        AIAssistant.Builder builder =
+                switch (platformType) {
+                    case OPENAI -> OpenAIAssistant.builder();
+                    case DASH_SCOPE -> DashScopeAssistant.builder();
+                    case QIANFAN -> QianFanAssistant.builder();
+                };
+        /// TODO: Only a portion of the models of DashScope support the API of OpenAI
+        ChatLanguageModel chatLanguageModel =
+                builder.withConfigProvider(assistantConfig).getChatLanguageModel();
+        StreamingChatLanguageModel streamingChatLanguageModel = builder.getStreamingChatLanguageModel();
 
         return AiServices.builder(AIAssistant.class)
                 .chatLanguageModel(chatLanguageModel)

@@ -117,21 +117,6 @@ public class QianFanAssistant extends AbstractAIAssistant {
     public static class Builder extends AbstractAIAssistant.Builder {
 
         public AIAssistant build() {
-            String model = ValidationUtils.ensureNotNull(configProvider.getModel(), "model");
-            String apiKey = ValidationUtils.ensureNotNull(
-                    configProvider.getCredentials().get("apiKey"), "apiKey");
-            String secretKey = ValidationUtils.ensureNotNull(
-                    configProvider.getCredentials().get("secretKey"), "secretKey");
-            ChatLanguageModel qianfanChatModel = QianfanChatModel.builder()
-                    .apiKey(apiKey)
-                    .secretKey(secretKey)
-                    .modelName(model)
-                    .build();
-            StreamingChatLanguageModel qianfanStreamChatModel = QianfanStreamingChatModel.builder()
-                    .apiKey(apiKey)
-                    .secretKey(secretKey)
-                    .modelName(model)
-                    .build();
             MessageWindowChatMemory.Builder builder = MessageWindowChatMemory.builder()
                     .chatMemoryStore(chatMemoryStore)
                     .maxMessages(MEMORY_LEN);
@@ -139,7 +124,35 @@ public class QianFanAssistant extends AbstractAIAssistant {
                 builder.id(id);
             }
             MessageWindowChatMemory chatMemory = builder.build();
-            return new QianFanAssistant(qianfanChatModel, qianfanStreamChatModel, chatMemory);
+            return new QianFanAssistant(getChatLanguageModel(), getStreamingChatLanguageModel(), chatMemory);
+        }
+
+        @Override
+        public ChatLanguageModel getChatLanguageModel() {
+            String model = ValidationUtils.ensureNotNull(configProvider.getModel(), "model");
+            String apiKey = ValidationUtils.ensureNotNull(
+                    configProvider.getCredentials().get("apiKey"), "apiKey");
+            String secretKey = ValidationUtils.ensureNotNull(
+                    configProvider.getCredentials().get("secretKey"), "secretKey");
+            return QianfanChatModel.builder()
+                    .apiKey(apiKey)
+                    .secretKey(secretKey)
+                    .modelName(model)
+                    .build();
+        }
+
+        @Override
+        public StreamingChatLanguageModel getStreamingChatLanguageModel() {
+            String model = ValidationUtils.ensureNotNull(configProvider.getModel(), "model");
+            String apiKey = ValidationUtils.ensureNotNull(
+                    configProvider.getCredentials().get("apiKey"), "apiKey");
+            String secretKey = ValidationUtils.ensureNotNull(
+                    configProvider.getCredentials().get("secretKey"), "secretKey");
+            return QianfanStreamingChatModel.builder()
+                    .apiKey(apiKey)
+                    .secretKey(secretKey)
+                    .modelName(model)
+                    .build();
         }
     }
 }

@@ -56,6 +56,10 @@ import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.internal.ValidationUtils;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
+import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.chat.StreamingChatLanguageModel;
+import dev.langchain4j.model.dashscope.QwenChatModel;
+import dev.langchain4j.model.dashscope.QwenStreamingChatModel;
 import io.reactivex.Flowable;
 import reactor.core.publisher.Flux;
 
@@ -318,6 +322,25 @@ public class DashScopeAssistant extends AbstractAIAssistant {
             }
             MessageWindowChatMemory chatMemory = builder.build();
             return new DashScopeAssistant(chatMemory, param);
+        }
+
+        @Override
+        public ChatLanguageModel getChatLanguageModel() {
+            String model = ValidationUtils.ensureNotNull(configProvider.getModel(), "model");
+            String apiKey = ValidationUtils.ensureNotNull(
+                    configProvider.getCredentials().get("apiKey"), "apiKey");
+            return QwenChatModel.builder().apiKey(apiKey).modelName(model).build();
+        }
+
+        @Override
+        public StreamingChatLanguageModel getStreamingChatLanguageModel() {
+            String model = ValidationUtils.ensureNotNull(configProvider.getModel(), "model");
+            String apiKey = ValidationUtils.ensureNotNull(
+                    configProvider.getCredentials().get("apiKey"), "apiKey");
+            return QwenStreamingChatModel.builder()
+                    .apiKey(apiKey)
+                    .modelName(model)
+                    .build();
         }
     }
 }
