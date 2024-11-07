@@ -21,22 +21,7 @@ import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import { theme as antdTheme } from 'ant-design-vue'
 import { GlobalToken } from 'ant-design-vue/es/theme'
-
-const componentsConfigProvider = {
-  Modal: {
-    paddingContentHorizontalLG: 16,
-    paddingLG: 16,
-    paddingMD: 16,
-    colorTextHeading: 'rgba(0, 0,.0,1)',
-    fontWeightStrong: 500,
-    marginXS: 16,
-    marginSM: 30
-  },
-  Form: {
-    controlHeightSM: 24,
-    marginLG: 16
-  }
-}
+import { componentsConfigProvider } from './config'
 
 const themeMap = {
   default: {
