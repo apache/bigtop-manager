@@ -18,9 +18,15 @@
  */
 package org.apache.bigtop.manager.server.service;
 
+import org.apache.bigtop.manager.server.enums.ChatbotCommand;
+
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
 import java.util.List;
 
 public interface LLMAgentService {
 
     List<String> getChatbotCommands();
+
+    SseEmitter talk(Long threadId, ChatbotCommand command, String message);
 }

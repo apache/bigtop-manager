@@ -42,4 +42,21 @@ public enum ChatbotCommand {
         }
         return commands;
     }
+
+    public static ChatbotCommand getCommand(String cmd) {
+        for (ChatbotCommand command : ChatbotCommand.values()) {
+            if (command.cmd.equals(cmd)) {
+                return command;
+            }
+        }
+        return null;
+    }
+
+    public static ChatbotCommand getCommandFromMessage(String message) {
+        if (message.startsWith("/")) {
+            String[] parts = message.split(" ");
+            return getCommand(parts[0].substring(1));
+        }
+        return null;
+    }
 }

@@ -26,4 +26,6 @@ import jakarta.validation.constraints.NotEmpty;
 public class ChatbotMessageReq {
     @NotEmpty
     private String message;
+
+    private String command;
 }

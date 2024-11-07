@@ -18,6 +18,14 @@
  */
 package org.apache.bigtop.manager.ai.core;
 
+import org.apache.bigtop.manager.ai.core.enums.PlatformType;
+import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistantFactory;
+import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
 
-public abstract class AbstractAIAssistantFactory implements AIAssistantFactory {}
+import dev.langchain4j.service.tool.ToolProvider;
+
+public abstract class AbstractAIAssistantFactory implements AIAssistantFactory {
+    public abstract AIAssistant createWithTools(
+            PlatformType platformType, AIAssistantConfigProvider assistantConfig, ToolProvider toolProvider);
+}

@@ -33,6 +33,8 @@ import org.apache.bigtop.manager.ai.qianfan.QianFanAssistant;
 
 import org.apache.commons.lang3.NotImplementedException;
 
+import dev.langchain4j.service.AiServices;
+import dev.langchain4j.service.tool.ToolProvider;
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 import dev.langchain4j.store.memory.chat.InMemoryChatMemoryStore;
 
@@ -43,6 +45,10 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
 
     public GeneralAssistantFactory(ChatMemoryStore chatMemoryStore) {
         this(new LocSystemPromptProvider(), chatMemoryStore);
+    }
+
+    public GeneralAssistantFactory() {
+        this(new LocSystemPromptProvider(), new InMemoryChatMemoryStore());
     }
 
     public GeneralAssistantFactory(SystemPromptProvider systemPromptProvider, ChatMemoryStore chatMemoryStore) {
@@ -82,6 +88,15 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
     @Override
     public AIAssistant create(PlatformType platformType, AIAssistantConfigProvider assistantConfig, Object id) {
         return createWithPrompt(platformType, assistantConfig, id, SystemPrompt.DEFAULT_PROMPT);
+    }
+
+    @Override
+    public AIAssistant createWithTools(
+            PlatformType platformType, AIAssistantConfigProvider assistantConfig, ToolProvider toolProvider) {
+        AIAssistant aiAssistant = create(platformType, assistantConfig, null);
+        return AiServices.builder(aiAssistant.getClass())
+                .toolProvider(toolProvider)
+                .build();
     }
 
     @Override
