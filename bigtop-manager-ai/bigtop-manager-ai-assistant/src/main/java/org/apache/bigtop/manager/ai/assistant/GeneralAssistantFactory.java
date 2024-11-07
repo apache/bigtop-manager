@@ -18,9 +18,6 @@
  */
 package org.apache.bigtop.manager.ai.assistant;
 
-import dev.langchain4j.internal.ValidationUtils;
-import dev.langchain4j.model.chat.ChatLanguageModel;
-import dev.langchain4j.model.openai.OpenAiChatModel;
 import org.apache.bigtop.manager.ai.assistant.provider.LocSystemPromptProvider;
 import org.apache.bigtop.manager.ai.assistant.store.PersistentChatMemoryStore;
 import org.apache.bigtop.manager.ai.core.AbstractAIAssistantFactory;
@@ -36,6 +33,9 @@ import org.apache.bigtop.manager.ai.qianfan.QianFanAssistant;
 
 import org.apache.commons.lang3.NotImplementedException;
 
+import dev.langchain4j.internal.ValidationUtils;
+import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.service.AiServices;
 import dev.langchain4j.service.tool.ToolProvider;
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
@@ -98,8 +98,8 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
             PlatformType platformType, AIAssistantConfigProvider assistantConfig, ToolProvider toolProvider) {
         AIAssistant aiAssistant = create(platformType, assistantConfig, null);
         String model = ValidationUtils.ensureNotNull(assistantConfig.getModel(), "model");
-        String apiKey = ValidationUtils.ensureNotNull(
-                assistantConfig.getCredentials().get("apiKey"), "apiKey");
+        String apiKey =
+                ValidationUtils.ensureNotNull(assistantConfig.getCredentials().get("apiKey"), "apiKey");
         String BASE_URL = "https://api.chatanywhere.tech/v1";
         ChatLanguageModel openAiChatModel = OpenAiChatModel.builder()
                 .apiKey(apiKey)

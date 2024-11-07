@@ -19,22 +19,18 @@
 package org.apache.bigtop.manager.server.tools;
 
 import org.apache.bigtop.manager.dao.po.ClusterPO;
-import org.apache.bigtop.manager.dao.repository.ClusterDao;
 import org.apache.bigtop.manager.server.model.converter.ClusterConverter;
 
 import dev.langchain4j.agent.tool.Tool;
 import dev.langchain4j.agent.tool.ToolSpecification;
 import dev.langchain4j.service.tool.ToolExecutor;
 
-import jakarta.annotation.Resource;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class ClusterInfoTools {
-    
+
     @Tool("Get cluster list")
     public Map<ToolSpecification, ToolExecutor> list() {
         ToolSpecification toolSpecification = ToolSpecification.builder()
