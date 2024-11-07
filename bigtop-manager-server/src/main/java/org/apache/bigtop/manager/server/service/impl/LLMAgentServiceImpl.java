@@ -41,6 +41,7 @@ import org.apache.bigtop.manager.server.model.dto.ChatThreadDTO;
 import org.apache.bigtop.manager.server.service.LLMAgentService;
 import org.apache.bigtop.manager.server.tools.AgentToolsProvider;
 
+import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import jakarta.annotation.Resource;
@@ -48,6 +49,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+@Service
 public class LLMAgentServiceImpl implements LLMAgentService {
     @Resource
     private PlatformDao platformDao;

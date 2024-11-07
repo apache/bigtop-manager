@@ -18,6 +18,9 @@
  */
 package org.apache.bigtop.manager.ai.assistant;
 
+import dev.langchain4j.internal.ValidationUtils;
+import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.openai.OpenAiChatModel;
 import org.apache.bigtop.manager.ai.assistant.provider.LocSystemPromptProvider;
 import org.apache.bigtop.manager.ai.assistant.store.PersistentChatMemoryStore;
 import org.apache.bigtop.manager.ai.core.AbstractAIAssistantFactory;
@@ -94,7 +97,17 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
     public AIAssistant createWithTools(
             PlatformType platformType, AIAssistantConfigProvider assistantConfig, ToolProvider toolProvider) {
         AIAssistant aiAssistant = create(platformType, assistantConfig, null);
-        return AiServices.builder(aiAssistant.getClass())
+        String model = ValidationUtils.ensureNotNull(assistantConfig.getModel(), "model");
+        String apiKey = ValidationUtils.ensureNotNull(
+                assistantConfig.getCredentials().get("apiKey"), "apiKey");
+        String BASE_URL = "https://api.chatanywhere.tech/v1";
+        ChatLanguageModel openAiChatModel = OpenAiChatModel.builder()
+                .apiKey(apiKey)
+                .baseUrl(BASE_URL)
+                .modelName(model)
+                .build();
+        return AiServices.builder(AIAssistant.class)
+                .chatLanguageModel(openAiChatModel)
                 .toolProvider(toolProvider)
                 .build();
     }

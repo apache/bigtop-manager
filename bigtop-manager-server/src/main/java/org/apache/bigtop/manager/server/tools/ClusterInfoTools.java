@@ -27,13 +27,14 @@ import dev.langchain4j.agent.tool.ToolSpecification;
 import dev.langchain4j.service.tool.ToolExecutor;
 
 import jakarta.annotation.Resource;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class ClusterInfoTools {
-    @Resource
-    private ClusterDao clusterDao;
-
+    
     @Tool("Get cluster list")
     public Map<ToolSpecification, ToolExecutor> list() {
         ToolSpecification toolSpecification = ToolSpecification.builder()
@@ -41,9 +42,14 @@ public class ClusterInfoTools {
                 .description("Get cluster list")
                 .build();
         ToolExecutor toolExecutor = (toolExecutionRequest, memoryId) -> {
-            List<ClusterPO> clusterPOList = clusterDao.findAll();
+            List<ClusterPO> clusterPOList = new ArrayList<>();
+            ClusterPO mockClusterPO = new ClusterPO();
+            mockClusterPO.setId(1L);
+            mockClusterPO.setName("mock-cluster");
+            clusterPOList.add(mockClusterPO);
             return ClusterConverter.INSTANCE.fromPO2VO(clusterPOList).toString();
         };
+
         return Map.of(toolSpecification, toolExecutor);
     }
 }
