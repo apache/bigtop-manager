@@ -16,24 +16,3 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import type { App } from 'vue'
-import SvgIcon from './svg-icon/index.vue'
-import MarkView from './markdown-view/index.vue'
-import AutoForm from './auto-form/index.vue'
-
-const comments = {
-  SvgIcon,
-  MarkView,
-  AutoForm
-}
-
-const install = (app: App) => {
-  for (const [key, comp] of Object.entries(comments)) {
-    app.component(key, comp)
-  }
-}
-
-export default {
-  install
-}

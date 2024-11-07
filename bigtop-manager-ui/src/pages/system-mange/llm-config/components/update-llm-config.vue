@@ -19,7 +19,8 @@
 
 <script setup lang="ts">
   import { ref, toRefs, watchPostEffect } from 'vue'
-  import AutoFrom, { FormItemState } from './auto-from.vue'
+  import AutoFrom from '@/components/common/auto-form/index.vue'
+  import type { FormItemState } from '@/components/common/auto-form/types'
   import { usePngImage } from '@/utils/tools'
 
   type AutoFromInstance = InstanceType<typeof AutoFrom>

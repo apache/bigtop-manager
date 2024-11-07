@@ -19,46 +19,7 @@
 
 <script lang="ts" setup>
   import { computed, onMounted, ref, toRaw, watch } from 'vue'
-  import type { FormItemProps } from 'ant-design-vue'
-  import type { ColProps } from 'ant-design-vue/es/grid/Col'
-
-  type FormState = Record<string, unknown>
-
-  export interface FormItemState {
-    type: string
-    field: string
-    slot?: string
-    slotLabel?: string
-    defaultValue?: string
-    fieldMap?: { label: string; value: string }
-    formItemProps?: FormItemProps
-    controlProps?: any
-    defaultOptionsMap?: unknown[]
-    on?: any
-  }
-
-  export interface FormOptions {
-    hideOk: boolean
-    hideCancel: boolean
-    okText: string
-    cancelText: string
-  }
-
-  interface Props {
-    formValue: Record<string, unknown>
-    formItems: FormItemState[]
-    formOptions?: FormOptions
-    labelCol?: ColProps
-    wrapperCol?: ColProps
-    formDisabled?: boolean
-    disabledItems?: string[]
-    hiddenItems?: string[]
-    showButton?: boolean
-  }
-
-  interface Emits {
-    (event: 'update:formValue', formValue: Record<string, unknown>): void
-  }
+  import { Emits, FormState, Props } from './types'
 
   const props = withDefaults(defineProps<Props>(), {
     showButton: true,
