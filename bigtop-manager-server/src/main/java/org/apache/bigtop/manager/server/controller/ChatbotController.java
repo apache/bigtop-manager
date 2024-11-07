@@ -25,6 +25,7 @@ import org.apache.bigtop.manager.server.model.req.ChatbotThreadReq;
 import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
 import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
 import org.apache.bigtop.manager.server.service.ChatbotService;
+import org.apache.bigtop.manager.server.service.LLMAgentService;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -50,6 +51,9 @@ public class ChatbotController {
 
     @Resource
     private ChatbotService chatbotService;
+
+    @Resource
+    private LLMAgentService llmAgentService;
 
     @Operation(summary = "new thread", description = "Create a chat threads")
     @PostMapping("/threads")
@@ -89,5 +93,11 @@ public class ChatbotController {
     @GetMapping("/threads/{threadId}/history")
     public ResponseEntity<List<ChatMessageVO>> history(@PathVariable Long threadId) {
         return ResponseEntity.success(chatbotService.history(threadId));
+    }
+
+    @Operation(summary = "get commands", description = "Get all commands")
+    @GetMapping("/commands")
+    public ResponseEntity<List<String>> getCommands() {
+        return ResponseEntity.success(llmAgentService.getChatbotCommands());
     }
 }
