@@ -39,6 +39,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 
 public class QianFanAssistant extends AbstractAIAssistant {
+
+    private final ChatLanguageModel chatLanguageModel;
+    private final StreamingChatLanguageModel streamingChatLanguageModel;
     private SystemMessage systemMessage;
 
     public QianFanAssistant(

@@ -39,6 +39,9 @@ import reactor.core.publisher.FluxSink;
 
 public class OpenAIAssistant extends AbstractAIAssistant {
 
+    private final ChatLanguageModel chatLanguageModel;
+    private final StreamingChatLanguageModel streamingChatLanguageModel;
+
     private static final String BASE_URL = "https://api.openai.com/v1";
 
     public OpenAIAssistant(
