@@ -82,39 +82,50 @@
     })
   }
 
+  const getFormValidation = async () => {
+    try {
+      await formRef.value.validateFields()
+      return Promise.resolve(true)
+    } catch (error) {
+      console.log('Failed:', error)
+      return Promise.resolve(false)
+    }
+  }
+
   const setOptionsVal = (field: string, list: unknown[]) => {
     optionsMap.value[field] = list
   }
 
-  const setFormValue = (form: FormState) => {
-    let oldForm = { ...toRaw(formState.value) }
+  const setFormValue = <T,>(form: FormState<T>) => {
+    const oldForm = { ...toRaw(formState.value) }
     formState.value = { ...oldForm, ...form }
-  }
-
-  const onSubmit = () => {
-    formRef.value
-      .validate()
-      .then(() => {
-        emits('update:formValue', toRaw(formState.value))
-      })
-      .catch((error: Error) => {
-        console.log('error', error)
-      })
   }
 
   const resetForm = () => {
     formRef.value.resetFields()
   }
 
-  const onReset = () => {}
+  const onSubmit = async () => {
+    try {
+      await formRef.value.validateFields()
+      emits('onSubmit', true)
+    } catch (error) {
+      console.log('Failed:', error)
+      emits('onSubmit', false)
+    }
+  }
+
+  const onReset = () => {
+    resetForm()
+  }
 
   onMounted(() => {
     initForm()
   })
 
   defineExpose({
-    onSubmit,
     resetForm,
+    getFormValidation,
     setOptionsVal,
     setFormValue
   })

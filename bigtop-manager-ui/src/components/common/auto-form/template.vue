@@ -22,15 +22,18 @@
   import { computed, onMounted, onUnmounted, ref, watchPostEffect } from 'vue'
   import { usePngImage } from '@/utils/tools'
   import { useI18n } from 'vue-i18n'
-  import type { FormItemState } from '@/components/common/auto-form/types'
+  import type {
+    FormItemState,
+    FormState
+  } from '@/components/common/auto-form/types'
 
   type AutoFromInstance = InstanceType<typeof AutoFrom>
 
   const { t } = useI18n()
   const helper = usePngImage('helper')
   const autoFormRef = ref<AutoFromInstance | null>(null)
-  const formValue = ref({})
-  const formItems = computed((): FormItemState[] => [
+  const formValue = ref<FormState>({})
+  const getFormItems = computed((): FormItemState[] => [
     {
       type: 'input',
       field: 'name',
@@ -163,7 +166,7 @@
   <auto-from
     ref="autoFormRef"
     v-model:form-value="formValue"
-    :form-items="formItems"
+    :form-items="getFormItems"
     :show-button="false"
     :hidden-items="['type']"
   >

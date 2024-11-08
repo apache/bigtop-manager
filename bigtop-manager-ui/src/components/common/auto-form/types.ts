@@ -18,7 +18,9 @@
  */
 import type { FormItemProps, ColProps } from 'ant-design-vue'
 
-export type FormState = Record<string, unknown>
+export type BaseType = Record<string, unknown>
+
+export type FormState<T = BaseType> = T
 
 export interface FormItemState {
   type: string
@@ -41,7 +43,7 @@ export interface FormOptions {
 }
 
 export interface Props {
-  formValue: Record<string, unknown>
+  formValue: FormState
   formItems: FormItemState[]
   formOptions?: FormOptions
   labelCol?: ColProps
@@ -53,5 +55,6 @@ export interface Props {
 }
 
 export interface Emits {
-  (event: 'update:formValue', formValue: Record<string, unknown>): void
+  (event: 'update:formValue', formValue: FormState): void
+  (event: 'onSubmit', validate: boolean): void
 }

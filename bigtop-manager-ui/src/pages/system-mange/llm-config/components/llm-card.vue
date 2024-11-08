@@ -50,17 +50,17 @@
 
   // api type----------start--------------
 
-  type Status = 0 | 1 | 2
+  export type Status = 0 | 1 | 2
 
-  interface BaseConfig {
+  export interface BaseConfig {
     platform: string
     model: string
     remark: string
   }
 
-  interface LlmConfig extends BaseConfig {
+  export interface LlmConfig extends BaseConfig {
     id: number | string
-    title: string
+    name: string
     status: Status
   }
 
@@ -84,7 +84,7 @@
     llmConfig: () => {
       return {
         id: 0,
-        title: 'defaultTitle',
+        name: 'defaultTitle',
         status: 0,
         platform: 'defaultPlatform',
         model: 'defaultModel',
@@ -201,8 +201,8 @@
             />
             <a-typography-text
               :style="{ width: '72px' }"
-              :ellipsis="{ tooltip: llmConfig?.title }"
-              :content="llmConfig?.title"
+              :ellipsis="{ tooltip: llmConfig?.name }"
+              :content="llmConfig?.name"
             />
             <a-tag :color="getLlmStatus?.type">
               {{ $t(getLlmStatus?.text) }}
@@ -250,7 +250,7 @@
         <svg-icon name="plus_dark" />
         <a-typography-text
           type="secondary"
-          :content="$t('llmConfig.create_authorization')"
+          :content="$t('llmConfig.add_authorization')"
         />
       </div>
     </template>

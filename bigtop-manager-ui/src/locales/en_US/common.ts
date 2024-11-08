@@ -68,5 +68,6 @@ export default {
   delete_confirm_content:
     'Delete will not be recoverable, are you sure you want to delete {0} ?',
   no_options: 'No options',
-  loadingText_verifying: 'Verifying'
+  loadingText_verifying: 'Verifying',
+  enter_error: 'Enter {0}'
 }

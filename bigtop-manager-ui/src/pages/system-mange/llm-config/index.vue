@@ -22,18 +22,20 @@
   import LlmCard, { type ExtraItem } from './components/llm-card.vue'
   import UpdateLlmConfig from './components/update-llm-config.vue'
 
-  const open = ref(false)
-  const title = ref('')
+  const llmConfigRef = ref<InstanceType<typeof UpdateLlmConfig> | null>(null)
 
   const onCreate = () => {
-    title.value = 'llmConfig.create_authorization'
-    open.value = true
+    llmConfigRef.value?.handleOpen({
+      title: 'llmConfig.add_authorization'
+    })
   }
 
   const onExtraClick = (item: ExtraItem) => {
     if (item.action === 'edit') {
-      title.value = 'llmConfig.edit_authorization'
-      open.value = true
+      llmConfigRef.value?.handleOpen({
+        title: 'llmConfig.edit_authorization',
+        metaData: item.llmConfig
+      })
     }
   }
 </script>
@@ -47,7 +49,7 @@
       <llm-card @on-extra-click="onExtraClick" />
       <llm-card :is-config="false" @on-create="onCreate" />
     </div>
-    <update-llm-config v-model:open="open" :title="title" />
+    <update-llm-config ref="llmConfigRef" />
   </div>
 </template>
 

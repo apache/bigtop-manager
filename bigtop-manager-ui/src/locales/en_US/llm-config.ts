@@ -18,13 +18,13 @@
  */
 export default {
   llm_config: 'Large Model Configuration',
-  create_authorization: 'Add Authorization',
-  edit_authorization: 'Edit Authorization',
-  availability: 'Test Availability',
+  add_authorization: 'Add authorization',
+  edit_authorization: 'Edit authorization',
+  availability: 'Test availability',
   unavailable: 'Unavailable',
   in_use: 'In Use',
   available: 'Available',
-  llm_config_name: 'Name',
+  name: 'Name',
   platform: 'Platform',
   model: 'Model',
   remark: 'Remark'

@@ -18,19 +18,23 @@
  */
 
 import type { App } from 'vue'
-import SvgIcon from './svg-icon/index.vue'
-import MarkView from './markdown-view/index.vue'
-import AutoForm from './auto-form/index.vue'
 
-const comments = {
-  SvgIcon,
-  MarkView,
-  AutoForm
+const kebabToCamel = (kebab: string): string => {
+  return kebab
+    .replace(/-./g, (match) => match.charAt(1).toUpperCase())
+    .replace(/^./, (match) => match.toUpperCase())
 }
 
 const install = (app: App) => {
-  for (const [key, comp] of Object.entries(comments)) {
-    app.component(key, comp)
+  const components = import.meta.glob('../../components/common/**/index.vue', {
+    eager: true
+  }) as any
+  for (const path in components) {
+    const component = components[path].default
+    const componentName = kebabToCamel(path.split('/')[1])
+    if (componentName) {
+      app.component(componentName, component)
+    }
   }
 }
 

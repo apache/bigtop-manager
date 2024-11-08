@@ -18,13 +18,13 @@
  */
 export default {
   llm_config: '大模型配置',
-  create_authorization: '新增授权',
+  add_authorization: '新增授权',
   edit_authorization: '编辑授权',
   availability: '测试可用性',
   unavailable: '不可用',
   in_use: '使用中',
   available: '可用',
-  llm_config_name: '名字',
+  name: '名字',
   platform: '平台',
   model: '模型',
   remark: '备注'

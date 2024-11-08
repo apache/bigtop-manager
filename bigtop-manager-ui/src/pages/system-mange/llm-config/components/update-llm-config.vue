@@ -18,56 +18,81 @@
 -->
 
 <script setup lang="ts">
-  import { computed, ref, toRefs, watchPostEffect } from 'vue'
-  import AutoFrom from '@/components/common/auto-form/index.vue'
-  import type { FormItemState } from '@/components/common/auto-form/types'
+  import { computed, ref } from 'vue'
   import { useI18n } from 'vue-i18n'
+  import AutoForm from '@/components/common/auto-form/index.vue'
+  import type {
+    BaseType,
+    FormItemState,
+    FormState
+  } from '@/components/common/auto-form/types'
+  import type { LlmConfig } from './llm-card.vue'
 
-  type AutoFromInstance = InstanceType<typeof AutoFrom>
-
-  interface Props {
-    open: boolean
-    title?: string
-  }
+  type AutoFromInstance = InstanceType<typeof AutoForm>
 
   interface Emits {
-    (event: 'update:open', value: boolean): void
-    (event: 'update:loading', value: boolean): void
     (event: 'onOk'): void
     (event: 'onTest'): void
-    (event: 'onCancel'): void
   }
 
-  const props = withDefaults(defineProps<Props>(), {
-    title: '',
-    open: false
-  })
+  interface Payload {
+    title: string
+    metaData?: LlmConfig
+  }
 
   const emits = defineEmits<Emits>()
   const { t } = useI18n()
-  const { open, title } = toRefs(props)
+  const loading = ref(false)
+  const loadingTest = ref(false)
+  const open = ref(false)
+  const title = ref('')
+  const formValue = ref<FormState<LlmConfig | BaseType>>({})
   const autoFormRef = ref<AutoFromInstance | null>(null)
-  const formValue = ref({})
-  const formItems = computed((): FormItemState[] => [
+
+  const getFormDisabled = computed(() => loading.value || loadingTest.value)
+  const getFormItems = computed((): FormItemState[] => [
     {
       type: 'input',
       field: 'name',
       formItemProps: {
         name: 'name',
-        label: t('llmConfig.llm_config_name'),
-        rules: [{ required: true, message: '请输入名字', trigger: 'blur' }]
+        label: t('llmConfig.name'),
+        rules: [
+          {
+            required: true,
+            message: t('common.enter_error', [
+              `${t('llmConfig.name')}`.toLowerCase()
+            ]),
+            trigger: 'blur'
+          }
+        ]
       },
       controlProps: {
-        placeholder: '请输入你的名字'
+        placeholder: t('common.enter_error', [
+          `${t('llmConfig.name')}`.toLowerCase()
+        ])
       }
     },
     {
       type: 'input',
-      field: 'platfrom',
+      field: 'platform',
       formItemProps: {
-        name: 'platfrom',
-        label: '平台',
-        rules: [{ required: true, message: '请输入平台', trigger: 'blur' }]
+        name: 'platform',
+        label: t('llmConfig.platform'),
+        rules: [
+          {
+            required: true,
+            message: t('common.enter_error', [
+              t('llmConfig.platform').toLowerCase()
+            ]),
+            trigger: 'blur'
+          }
+        ]
+      },
+      controlProps: {
+        placeholder: t('common.enter_error', [
+          t('llmConfig.platform').toLowerCase()
+        ])
       }
     },
     {
@@ -76,7 +101,16 @@
       formItemProps: {
         name: 'apiKey',
         label: 'API Key',
-        rules: [{ required: true, message: '请输入API Key', trigger: 'blur' }]
+        rules: [
+          {
+            required: true,
+            message: t('common.enter_error', ['API Key']),
+            trigger: 'blur'
+          }
+        ]
+      },
+      controlProps: {
+        placeholder: t('common.enter_error', ['API Key'])
       }
     },
     {
@@ -84,8 +118,21 @@
       field: 'model',
       formItemProps: {
         name: 'model',
-        label: '模型',
-        rules: [{ required: true, message: '请输入模型', trigger: 'blur' }]
+        label: t('llmConfig.model'),
+        rules: [
+          {
+            required: true,
+            message: t('common.enter_error', [
+              t('llmConfig.model').toLowerCase()
+            ]),
+            trigger: 'blur'
+          }
+        ]
+      },
+      controlProps: {
+        placeholder: t('common.enter_error', [
+          t('llmConfig.model').toLowerCase()
+        ])
       }
     },
     {
@@ -93,31 +140,73 @@
       field: 'remark',
       formItemProps: {
         name: 'remark',
-        label: '备注',
-        rules: [{ required: true, message: '请输入备注', trigger: 'blur' }]
+        label: t('llmConfig.remark'),
+        rules: [
+          {
+            required: true,
+            message: t('common.enter_error', [t('llmConfig.remark')]),
+            trigger: 'blur'
+          }
+        ]
+      },
+      controlProps: {
+        placeholder: t('common.enter_error', [t('llmConfig.remark')])
       }
     }
   ])
 
-  watchPostEffect(() => {
-    !open.value && autoFormRef.value?.resetForm()
-  })
+  const handleOpen = async (payload: Payload) => {
+    open.value = true
+    title.value = payload.title
+    payload.metaData && (formValue.value = payload.metaData)
+  }
 
-  const handleOk = () => {
-    console.log('formValue.value :>> ', formValue.value)
-    // formValue.value = {}
-    emits('onOk')
-    // emits('update:open', false)
+  const handleOk = async () => {
+    addAuthorization()
   }
 
   const handleTest = () => {
-    emits('onTest')
+    testAuthorization()
   }
 
   const handleCancel = () => {
+    title.value = ''
     formValue.value = {}
-    emits('onCancel')
-    emits('update:open', false)
+    autoFormRef.value?.resetForm()
+    open.value = false
+  }
+
+  defineExpose({
+    handleOpen
+  })
+
+  const addAuthorization = async () => {
+    try {
+      const validate = await autoFormRef.value?.getFormValidation()
+      if (!validate) return
+      loading.value = true
+      setTimeout(() => {
+        // api
+        console.log('formValue.value :>> ', formValue.value)
+        loading.value = false
+        handleCancel()
+        emits('onOk')
+      }, 1000)
+    } catch (error) {
+      console.log('error :>> ', error)
+    }
+  }
+
+  const testAuthorization = () => {
+    try {
+      loadingTest.value = true
+      setTimeout(() => {
+        loadingTest.value = false
+      }, 1000)
+      emits('onTest')
+    } catch (error) {
+      console.log('error :>> ', error)
+    }
   }
 </script>
 
@@ -126,30 +215,41 @@
     <a-modal
       :open="open"
       :width="480"
-      :title="$t(title)"
+      :title="title && $t(title)"
       :mask-closable="false"
       :destroy-on-close="true"
       @ok="handleOk"
       @cancel="handleCancel"
     >
-      <auto-from
+      <auto-form
         ref="autoFormRef"
         v-model:form-value="formValue"
-        :form-items="formItems"
         :show-button="false"
+        :form-items="getFormItems"
+        :form-disabled="getFormDisabled"
       />
       <template #footer>
         <footer>
           <a-space size="middle">
-            <a-button type="primary" @click="handleTest">
+            <a-button
+              :disabled="loading"
+              :loading="loadingTest"
+              type="primary"
+              @click="handleTest"
+            >
               {{ $t('llmConfig.availability') }}
             </a-button>
           </a-space>
           <a-space size="middle">
-            <a-button @click="handleCancel">
+            <a-button :disabled="getFormDisabled" @click="handleCancel">
               {{ $t('common.cancel') }}
             </a-button>
-            <a-button type="primary" @click="handleOk">
+            <a-button
+              :disabled="loadingTest"
+              :loading="loading"
+              type="primary"
+              @click="handleOk"
+            >
               {{ $t('common.confirm') }}
             </a-button>
           </a-space>
