@@ -24,6 +24,7 @@ export default {
   unavailable: '不可用',
   in_use: '使用中',
   available: '可用',
+  llm_config_name: '名字',
   platform: '平台',
   model: '模型',
   remark: '备注'

@@ -72,7 +72,8 @@
 
   const initForm = () => {
     const newForm: FormState = {}
-    props.formItems.forEach(({ field, defaultValue }) => {
+    props.formItems.forEach((item) => {
+      const { field, defaultValue } = item
       newForm[field] = defaultValue || ''
     })
     Object.assign(formState.value, {
@@ -129,7 +130,7 @@
       :wrapper-col="props.wrapperCol"
       :disabled="props.formDisabled"
     >
-      <div v-for="item in formItems" :key="item.field">
+      <div v-for="item in props.formItems" :key="item.field">
         <slot :="{ item, state: formState }" :name="item.field">
           <a-form-item
             v-if="!props.hiddenItems.includes(item.field)"

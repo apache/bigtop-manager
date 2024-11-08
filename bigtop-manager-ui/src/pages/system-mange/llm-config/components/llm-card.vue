@@ -28,25 +28,12 @@
     delete = '4'
   }
 
-  type Status = 0 | 1 | 2
   type AcionsKeys = keyof typeof Actions
   export type ExtraItem = { llmConfig: LlmConfig; action: AcionsKeys }
-
-  interface BaseConfig {
-    platform: string
-    model: string
-    remark: string
-  }
 
   interface LlmDescriptionItem {
     label: string
     code: keyof BaseConfig
-  }
-
-  interface LlmConfig extends BaseConfig {
-    id: number | string
-    title: string
-    status: Status
   }
 
   interface LlmStatusItem {
@@ -60,6 +47,24 @@
     key: AcionsKeys
     danger?: boolean
   }
+
+  // api type----------start--------------
+
+  type Status = 0 | 1 | 2
+
+  interface BaseConfig {
+    platform: string
+    model: string
+    remark: string
+  }
+
+  interface LlmConfig extends BaseConfig {
+    id: number | string
+    title: string
+    status: Status
+  }
+
+  // api type----------end-------------
 
   interface Props {
     llmConfig?: LlmConfig

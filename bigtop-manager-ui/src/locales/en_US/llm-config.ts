@@ -24,7 +24,8 @@ export default {
   unavailable: 'Unavailable',
   in_use: 'In Use',
   available: 'Available',
-  platform: 'platform',
-  model: 'model',
-  remark: 'remark'
+  llm_config_name: 'Name',
+  platform: 'Platform',
+  model: 'Model',
+  remark: 'Remark'
 }
