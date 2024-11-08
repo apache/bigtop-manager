@@ -18,23 +18,65 @@
 -->
 
 <script setup lang="ts">
-  import { ref } from 'vue'
-  import LlmCard, { type ExtraItem } from './components/llm-card.vue'
-  import UpdateLlmConfig from './components/update-llm-config.vue'
+  import { h, ref } from 'vue'
+  import { Modal } from 'ant-design-vue'
+  import LlmItem, { LlmConfig, type ExtraItem } from './components/llm-item.vue'
+  import addLlmItem from './components/add-llm-item.vue'
+  import { ExclamationCircleOutlined } from '@ant-design/icons-vue'
+  import { useI18n } from 'vue-i18n'
 
-  const llmConfigRef = ref<InstanceType<typeof UpdateLlmConfig> | null>(null)
+  const [modal, contextHolder] = Modal.useModal()
+  const { t } = useI18n()
+  const addLlmItemRef = ref<InstanceType<typeof addLlmItem> | null>(null)
+  const llmConfigList = ref<LlmConfig[]>([
+    {
+      id: 1,
+      name: 'Title-1',
+      status: 0,
+      platform: 'Platform-1',
+      model: 'Model-1',
+      remark: 'Remark-1'
+    },
+    {
+      id: 2,
+      name: 'Title-2',
+      status: 1,
+      platform: 'Platform-2',
+      model: 'Model-2',
+      remark: 'Remark-2'
+    },
+    {
+      id: 3,
+      name: 'Title-2',
+      status: 2,
+      platform: 'Platform-3',
+      model: 'Model-3',
+      remark: 'Remark-3'
+    }
+  ])
 
   const onCreate = () => {
-    llmConfigRef.value?.handleOpen({
-      title: 'llmConfig.add_authorization'
+    addLlmItemRef.value?.handleOpen({
+      mode: 'add'
     })
   }
 
   const onExtraClick = (item: ExtraItem) => {
     if (item.action === 'edit') {
-      llmConfigRef.value?.handleOpen({
-        title: 'llmConfig.edit_authorization',
+      addLlmItemRef.value?.handleOpen({
+        mode: item.action,
         metaData: item.llmConfig
+      })
+    } else if (item.action === 'delete') {
+      modal.confirm({
+        title: t('llmConfig.delete_authorization'),
+        icon: h(ExclamationCircleOutlined, { style: 'margin:16px' }),
+        onOk() {
+          console.log('OK')
+        },
+        onCancel() {
+          console.log('Cancel')
+        }
       })
     }
   }
@@ -46,10 +88,16 @@
       {{ $t('llmConfig.llm_config') }}
     </a-typography-title>
     <div class="llm-config-content">
-      <llm-card @on-extra-click="onExtraClick" />
-      <llm-card :is-config="false" @on-create="onCreate" />
+      <llm-item
+        v-for="item in llmConfigList"
+        :key="item.id"
+        :llm-config="item"
+        @on-extra-click="onExtraClick"
+      />
+      <llm-item :is-config="false" @on-create="onCreate" />
     </div>
-    <update-llm-config ref="llmConfigRef" />
+    <add-llm-item ref="addLlmItemRef" />
+    <contextHolder />
   </div>
 </template>
 

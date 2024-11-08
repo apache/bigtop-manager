@@ -26,9 +26,14 @@
     FormItemState,
     FormState
   } from '@/components/common/auto-form/types'
-  import type { LlmConfig } from './llm-card.vue'
+  import type { LlmConfig } from './llm-item.vue'
 
   type AutoFromInstance = InstanceType<typeof AutoForm>
+
+  enum Mode {
+    edit = 'llmConfig.edit_authorization',
+    add = 'llmConfig.add_authorization'
+  }
 
   interface Emits {
     (event: 'onOk'): void
@@ -36,7 +41,7 @@
   }
 
   interface Payload {
-    title: string
+    mode: keyof typeof Mode
     metaData?: LlmConfig
   }
 
@@ -45,7 +50,8 @@
   const loading = ref(false)
   const loadingTest = ref(false)
   const open = ref(false)
-  const title = ref('')
+  const title = ref(Mode.add)
+  const mode = ref<keyof typeof Mode>('add')
   const formValue = ref<FormState<LlmConfig | BaseType>>({})
   const autoFormRef = ref<AutoFromInstance | null>(null)
 
@@ -154,10 +160,14 @@
       }
     }
   ])
+  const getDisabledItems = computed(() =>
+    mode.value === 'edit' ? ['platform', 'model', 'apiKey'] : []
+  )
 
   const handleOpen = async (payload: Payload) => {
     open.value = true
-    title.value = payload.title
+    title.value = Mode[payload.mode]
+    mode.value = payload.mode
     payload.metaData && (formValue.value = payload.metaData)
   }
 
@@ -170,7 +180,7 @@
   }
 
   const handleCancel = () => {
-    title.value = ''
+    title.value = Mode.add
     formValue.value = {}
     autoFormRef.value?.resetForm()
     open.value = false
@@ -227,6 +237,7 @@
         :show-button="false"
         :form-items="getFormItems"
         :form-disabled="getFormDisabled"
+        :disabled-items="getDisabledItems"
       />
       <template #footer>
         <footer>

@@ -49,7 +49,7 @@ export interface Props {
   labelCol?: ColProps
   wrapperCol?: ColProps
   formDisabled?: boolean
-  disabledItems?: string[]
+  disabledItems?: string[] | null
   hiddenItems?: string[]
   showButton?: boolean
 }

@@ -23,7 +23,7 @@
 
   const props = withDefaults(defineProps<Props>(), {
     showButton: true,
-    disabledItems: () => [],
+    disabledItems: null, // Has higher priority than controlProps of formItems
     hiddenItems: () => [],
     labelCol: () => {
       return { span: 7 }
@@ -152,6 +152,11 @@
               v-if="item.type == 'input'"
               v-model:value="formState[item.field]"
               v-bind="item.controlProps"
+              :disabled="
+                disabledItems
+                  ? disabledItems.includes(item.field)
+                  : item.controlProps.disabled
+              "
               v-on="item.on || {}"
             />
 
@@ -160,6 +165,11 @@
               v-if="item.type == 'textarea'"
               v-model:value="formState[item.field]"
               v-bind="item.controlProps"
+              :disabled="
+                disabledItems
+                  ? disabledItems.includes(item.field)
+                  : item.controlProps.disabled
+              "
               v-on="item.on || {}"
             />
 
@@ -168,6 +178,11 @@
               v-if="item.type == 'select'"
               v-model:value="formState[item.field]"
               v-bind="item.controlProps"
+              :disabled="
+                disabledItems
+                  ? disabledItems.includes(item.field)
+                  : item.controlProps.disabled
+              "
               v-on="item.on || {}"
             >
               <a-select-option
@@ -188,6 +203,11 @@
               v-if="item.type == 'radio'"
               v-model:value="formState[item.field]"
               v-bind="item.controlProps"
+              :disabled="
+                disabledItems
+                  ? disabledItems.includes(item.field)
+                  : item.controlProps.disabled
+              "
               v-on="item.on || {}"
             >
               <a-radio
