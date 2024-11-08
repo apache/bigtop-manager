@@ -33,6 +33,7 @@
       id: 1,
       name: 'Title-1',
       status: 0,
+      apiKey: 'xxxxxx-1',
       platform: 'Platform-1',
       model: 'Model-1',
       remark: 'Remark-1'
@@ -41,6 +42,7 @@
       id: 2,
       name: 'Title-2',
       status: 1,
+      apiKey: 'xxxxxx-2',
       platform: 'Platform-2',
       model: 'Model-2',
       remark: 'Remark-2'
@@ -49,6 +51,7 @@
       id: 3,
       name: 'Title-2',
       status: 2,
+      apiKey: 'xxxxxx-3',
       platform: 'Platform-3',
       model: 'Model-3',
       remark: 'Remark-3'

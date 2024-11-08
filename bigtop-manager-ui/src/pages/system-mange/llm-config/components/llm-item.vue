@@ -62,6 +62,7 @@
     id: number | string
     name: string
     status: Status
+    apiKey: string
   }
 
   // api type----------end-------------
@@ -86,6 +87,7 @@
         id: 0,
         name: 'defaultTitle',
         status: 0,
+        apiKey: 'defaultAipKey',
         platform: 'defaultPlatform',
         model: 'defaultModel',
         remark: 'defaultMark'
