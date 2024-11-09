@@ -19,18 +19,16 @@
 package org.apache.bigtop.manager.server.model.converter;
 
 import org.apache.bigtop.manager.dao.po.ClusterPO;
-import org.apache.bigtop.manager.dao.po.StackPO;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.dto.ClusterDTO;
-import org.apache.bigtop.manager.server.model.dto.StackDTO;
 import org.apache.bigtop.manager.server.model.dto.command.ClusterCommandDTO;
 import org.apache.bigtop.manager.server.model.req.ClusterReq;
 import org.apache.bigtop.manager.server.model.vo.ClusterVO;
 
-import org.mapstruct.Context;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
+
+import java.util.List;
 
 @Mapper(config = MapStructSharedConfig.class)
 public interface ClusterConverter {
@@ -45,10 +43,7 @@ public interface ClusterConverter {
 
     ClusterDTO fromPO2DTO(ClusterPO clusterPO);
 
-    ClusterVO fromEntity2VO(ClusterPO clusterPO);
+    ClusterVO fromPO2VO(ClusterPO clusterPO);
 
-    @Mapping(target = "stackName", expression = "java(stackPO.getStackName())")
-    @Mapping(target = "stackVersion", expression = "java(stackPO.getStackVersion())")
-    @Mapping(target = "stackId", expression = "java(stackPO.getId())")
-    ClusterPO fromDTO2PO(ClusterDTO clusterDTO, StackDTO stackDTO, @Context StackPO stackPO);
+    List<ClusterVO> fromPO2VO(List<ClusterPO> clusterPOList);
 }

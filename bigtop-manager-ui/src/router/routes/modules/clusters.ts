@@ -18,36 +18,99 @@
  */
 
 import { RouteRecordRaw } from 'vue-router'
-import {
-  SettingOutlined,
-  BarsOutlined,
-  UserOutlined
-} from '@ant-design/icons-vue'
-import { h } from 'vue'
+import pageView from '@/layouts/index.vue'
 
 const routes: RouteRecordRaw[] = [
   {
-    path: '/cluster/',
+    path: '/cluster-mange',
+    component: pageView,
+    redirect: '/cluster-mange/clusters',
     meta: {
-      title: 'Cluster',
-      icon: h(SettingOutlined)
+      title: 'menu.cluster'
     },
     children: [
       {
-        path: 'stack',
-        component: () => import('@/pages/cluster/stack/index.vue'),
+        name: 'Default',
+        path: 'default',
+        component: () => import('@/layouts/default.vue'),
         meta: {
-          title: 'Stack',
-          icon: h(BarsOutlined)
+          hidden: true
         }
       },
       {
-        path: 'account',
-        component: () => import('@/pages/cluster/account/index.vue'),
+        name: 'Clusters',
+        path: 'clusters',
+        redirect: '',
         meta: {
-          title: 'Account',
-          icon: h(UserOutlined)
+          icon: 'clusters',
+          title: 'menu.cluster'
+        },
+        children: [
+          {
+            name: 'ClusterDetail',
+            path: ':cluster/:id',
+            component: () => import('@/pages/cluster-mange/cluster/index.vue'),
+            meta: {
+              hidden: true
+            }
+          },
+          {
+            name: 'ClusterCreate',
+            path: 'create',
+            component: () => import('@/pages/cluster-mange/cluster/create.vue'),
+            meta: {
+              hidden: true
+            }
+          }
+        ]
+      },
+      {
+        name: 'Infrastructures',
+        path: 'infrastructures',
+        component: () =>
+          import('@/pages/cluster-mange/infrastructures/index.vue'),
+        meta: {
+          icon: 'infrastructures',
+          title: 'menu.infra'
         }
+      },
+      {
+        name: 'Components',
+        path: 'components',
+        component: () => import('@/pages/cluster-mange/components/index.vue'),
+        meta: {
+          icon: 'components',
+          title: 'menu.component'
+        }
+      },
+      {
+        name: 'Hosts',
+        path: 'hosts',
+        redirect: '/cluster-mange/hosts/list',
+        meta: {
+          icon: 'hosts',
+          title: 'menu.host'
+        },
+        children: [
+          {
+            name: 'List',
+            path: 'list',
+            component: () => import('@/pages/cluster-mange/hosts/index.vue'),
+            meta: {
+              hidden: true,
+              activeMenu: '/cluster-mange/hosts'
+            }
+          },
+          {
+            name: 'HostCreate',
+            path: 'addhost',
+            component: () => import('@/pages/cluster-mange/hosts/create.vue'),
+            meta: {
+              hidden: true,
+              activeMenu: '/cluster-mange/hosts'
+            }
+          }
+        ]
       }
     ]
   }

@@ -18,8 +18,6 @@
  */
 package org.apache.bigtop.manager.server.model.req.command;
 
-import org.apache.bigtop.manager.server.model.req.RepoReq;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -32,22 +30,20 @@ public class ClusterCommandReq {
 
     @NotEmpty
     @Schema(example = "c1")
-    private String clusterName;
+    private String name;
+
+    @Schema(example = "desc")
+    private String desc;
 
     @NotNull @Schema(example = "1")
-    private Integer clusterType;
+    private Integer type;
 
-    @NotEmpty
-    @Schema(example = "bigtop")
-    private String stackName;
+    @Schema(example = "hadoop")
+    private String userGroup;
 
-    @NotEmpty
-    @Schema(example = "3.3.0")
-    private String stackVersion;
+    @Schema(example = "/opt")
+    private String rootDir;
 
-    @NotEmpty
-    private List<RepoReq> repoInfoList;
-
-    @NotEmpty
-    private List<String> hostnames;
+    @Schema(example = "[1, 2]")
+    private List<Long> hostIds;
 }

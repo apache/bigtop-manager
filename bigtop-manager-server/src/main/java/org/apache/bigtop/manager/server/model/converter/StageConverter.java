@@ -26,6 +26,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
+import java.util.List;
+
 @Mapper(
         uses = {TaskConverter.class},
         config = MapStructSharedConfig.class)
@@ -36,4 +38,6 @@ public interface StageConverter {
     @Mapping(target = "createTime", source = "createTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
     @Mapping(target = "updateTime", source = "updateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
     StageVO fromPO2VO(StagePO stagePO);
+
+    List<StageVO> fromPO2VO(List<StagePO> stagePOList);
 }

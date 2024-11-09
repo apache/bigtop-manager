@@ -19,7 +19,6 @@
 package org.apache.bigtop.manager.server.command.validator;
 
 import org.apache.bigtop.manager.common.enums.Command;
-import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.ServicePO;
 import org.apache.bigtop.manager.dao.repository.ClusterDao;
 import org.apache.bigtop.manager.dao.repository.ServiceDao;
@@ -37,6 +36,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.Resource;
+import java.util.HashSet;
 import java.util.List;
 
 @Component
@@ -59,15 +59,12 @@ public class RequiredServicesValidator implements CommandValidator {
         List<ServiceCommandDTO> serviceCommands = commandDTO.getServiceCommands();
 
         Long clusterId = commandDTO.getClusterId();
-        ClusterPO clusterPO = clusterDao.findByIdJoin(clusterId);
-        String stackName = clusterPO.getStackName();
-        String stackVersion = clusterPO.getStackVersion();
 
         List<String> serviceNames =
                 serviceCommands.stream().map(ServiceCommandDTO::getServiceName).toList();
         for (ServiceCommandDTO serviceCommand : serviceCommands) {
             String serviceName = serviceCommand.getServiceName();
-            ServiceDTO serviceDTO = StackUtils.getServiceDTO(stackName, stackVersion, serviceName);
+            ServiceDTO serviceDTO = StackUtils.getServiceDTO(serviceName);
             List<String> requiredServices = serviceDTO.getRequiredServices();
             if (CollectionUtils.isEmpty(requiredServices)) {
                 return;
@@ -79,7 +76,7 @@ public class RequiredServicesValidator implements CommandValidator {
 
             requiredServices.removeAll(list);
 
-            if (!serviceNames.containsAll(requiredServices)) {
+            if (!new HashSet<>(serviceNames).containsAll(requiredServices)) {
                 throw new ApiException(ApiExceptionEnum.SERVICE_REQUIRED_NOT_FOUND, String.join(",", requiredServices));
             }
         }

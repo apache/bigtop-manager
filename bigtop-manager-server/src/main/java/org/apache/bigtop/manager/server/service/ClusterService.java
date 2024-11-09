@@ -33,13 +33,6 @@ public interface ClusterService {
     List<ClusterVO> list();
 
     /**
-     * Save a cluster
-     *
-     * @return Cluster
-     */
-    ClusterVO save(ClusterDTO clusterDTO);
-
-    /**
      * Get a cluster
      *
      * @return Cluster

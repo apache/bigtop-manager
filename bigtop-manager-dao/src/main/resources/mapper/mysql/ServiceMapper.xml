@@ -58,7 +58,7 @@
         <include refid="baseColumnsV2">
             <property name="alias" value="s"/>
         </include>
-        , clus.cluster_name, clus.user_group, c.component_name, c.category, c.quick_link, c.id as cid
+        , clus.name as cluster_name, clus.user_group, c.component_name, c.category, c.quick_link, c.id as cid
         from
         (select * from service
         <where>
@@ -81,7 +81,7 @@
         <include refid="baseColumnsV2">
             <property name="alias" value="s"/>
         </include>
-        , clus.cluster_name, clus.user_group
+        , clus.name as cluster_name, clus.user_group
         from
         (select * from service
         <where>
@@ -122,7 +122,7 @@
                 cluster_id = #{clusterId}
             </if>
             <if test="serviceNames != null and serviceNames.size() > 0">
-                and service_name = in
+                and service_name in
                 <foreach collection="serviceNames" item="serviceName" index="index" open="(" close=")" separator=", ">
                     #{serviceName}
                 </foreach>

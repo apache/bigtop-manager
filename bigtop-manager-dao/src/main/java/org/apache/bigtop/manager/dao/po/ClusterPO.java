@@ -36,38 +36,36 @@ public class ClusterPO extends BasePO implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "cluster_name")
-    private String clusterName;
+    @Column(name = "name")
+    private String name;
 
-    @Column(name = "cluster_type")
-    private Integer clusterType;
+    @Column(name = "desc")
+    private String desc;
 
-    @Column(name = "root")
-    private String root;
+    @Column(name = "type")
+    private Integer type;
 
     @Column(name = "user_group")
     private String userGroup;
 
-    @Column(name = "packages")
-    private String packages;
+    @Column(name = "root_dir")
+    private String rootDir;
 
-    @Column(name = "repo_template")
-    private String repoTemplate;
-
-    @Column(name = "state")
-    private String state;
-
-    @Column(name = "selected")
-    private Boolean selected;
-
-    @Column(name = "stack_id")
-    private Long stackId;
+    @Column(name = "status")
+    private Integer status;
 
     @Transient
-    @Column(name = "stack_name")
-    private String stackName;
+    private String createUser;
 
     @Transient
-    @Column(name = "stack_version")
-    private String stackVersion;
+    private Long totalHost;
+
+    @Transient
+    private Long totalProcessor;
+
+    @Transient
+    private Long totalMemory;
+
+    @Transient
+    private Long totalDisk;
 }

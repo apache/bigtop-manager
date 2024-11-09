@@ -22,7 +22,6 @@ import org.apache.bigtop.manager.common.message.entity.pojo.PackageInfo;
 import org.apache.bigtop.manager.common.message.entity.pojo.RepoInfo;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.stack.core.param.Params;
-import org.apache.bigtop.manager.stack.core.utils.PackageUtils;
 import org.apache.bigtop.manager.stack.core.utils.TarballUtils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -35,9 +34,6 @@ import java.util.Properties;
 @Slf4j
 public abstract class AbstractScript implements Script {
 
-    public static final String REPO_TYPE_BINARY = "binary";
-    public static final String REPO_TYPE_TARBALL = "tarball";
-
     public static final String PROPERTY_KEY_SKIP_LEVELS = "skipLevels";
 
     @Override
@@ -46,23 +42,6 @@ public abstract class AbstractScript implements Script {
     }
 
     public ShellResult install(Params params, Properties properties) {
-        if (params.repo().getRepoType().equals(REPO_TYPE_BINARY)) {
-            return installBinary(params);
-        } else if (params.repo().getRepoType().equals(REPO_TYPE_TARBALL)) {
-            return installTarball(params, properties);
-        } else {
-            log.error("Unsupported repo type: {}", params.repo().getRepoType());
-            return ShellResult.fail();
-        }
-    }
-
-    private ShellResult installBinary(Params params) {
-        List<PackageInfo> packages = params.packages();
-        List<String> packageNames = packages.stream().map(PackageInfo::getName).toList();
-        return PackageUtils.install(packageNames);
-    }
-
-    private ShellResult installTarball(Params params, Properties properties) {
         RepoInfo repo = params.repo();
         List<PackageInfo> packages = params.packages();
         String stackHome = params.stackHome();

@@ -27,6 +27,7 @@ import org.apache.bigtop.manager.server.model.vo.PlatformVO;
 
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
@@ -34,7 +35,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Mapper(config = MapStructSharedConfig.class)
+@Mapper(
+        uses = {ConverterTool.class},
+        config = MapStructSharedConfig.class)
 public interface PlatformConverter {
     PlatformConverter INSTANCE = Mappers.getMapper(PlatformConverter.class);
 
@@ -56,4 +59,7 @@ public interface PlatformConverter {
     default void afterMapping(@MappingTarget PlatformDTO platformDTO, PlatformReq platformReq) {
         platformDTO.setAuthCredentials(mapAuthCredentials(platformReq.getAuthCredentials()));
     }
+
+    @Mapping(source = "credential", target = "authCredentials", qualifiedByName = "jsonString2Map")
+    PlatformDTO fromPO2DTO(PlatformPO platformPO);
 }

@@ -31,112 +31,13 @@
         ${alias}.id, ${alias}.state, ${alias}.name, ${alias}.context, ${alias}.cluster_id, ${alias}.create_time, ${alias}.update_time
     </sql>
 
-    <resultMap id="jobMap" type="org.apache.bigtop.manager.dao.po.JobPO">
-        <id column="id" property="id"/>
-        <result column="state" property="state"/>
-        <result column="name" property="name"/>
-        <result column="context" property="context"/>
-        <result column="cluster_id" property="clusterId"/>
-        <result column="create_time" property="createTime"/>
-        <result column="update_time" property="updateTime"/>
-        <collection property="stages" ofType="org.apache.bigtop.manager.dao.po.StagePO">
-            <id column="s_id" property="id"/>
-            <result column="s_state" property="state"/>
-            <result column="s_name" property="name"/>
-            <result column="order" property="order"/>
-            <result column="service_name" property="serviceName"/>
-            <result column="component_name" property="componentName"/>
-            <result column="cluster_id" property="clusterId"/>
-            <result column="job_id" property="jobId"/>
-            <result column="create_time" property="createTime"/>
-            <result column="update_time" property="updateTime"/>
-            <collection property="tasks" ofType="org.apache.bigtop.manager.dao.po.TaskPO">
-                <id column="t_id" property="id"/>
-                <result column="state" property="state"/>
-                <result column="t_name" property="name"/>
-                <result column="t_state" property="state"/>
-                <result column="service_name" property="serviceName"/>
-                <result column="component_name" property="componentName"/>
-                <result column="command" property="command"/>
-                <result column="custom_command" property="customCommand"/>
-                <result column="hostname" property="hostname"/>
-                <result column="stack_name" property="stackName"/>
-                <result column="stack_version" property="stackVersion"/>
-                <result column="service_user" property="serviceUser"/>
-                <result column="content" property="content"/>
-                <result column="stage_id" property="stageId"/>
-                <result column="job_id" property="jobId"/>
-                <result column="cluster_id" property="clusterId"/>
-                <result column="create_time" property="createTime"/>
-                <result column="update_time" property="updateTime"/>
-            </collection>
-        </collection>
-    </resultMap>
-
-    <select id="findAllByIdsJoin" parameterType="java.lang.Long" resultMap="jobMap">
-        select
-        <include refid="baseColumnsV2">
-            <property name="alias" value="h"/>
-        </include>
-        , st.id as s_id, st.name as s_name, st.state as s_state, st.order
-        , tk.id as t_id, tk.name as t_name, tk.state as t_state, tk.hostname
-        from
-        (select * from job
-        <where>
-            <if test="ids != null">
-                id in
-                <foreach collection="ids" item="id" index="index" open="(" close=")" separator=",">
-                    #{id}
-                </foreach>
-            </if>
-        </where>
-        ) h
-        inner join stage st
-        on h.id = st.job_id
-        inner join task tk
-        on tk.job_id = h.id and st.id = tk.stage_id
-        order by h.id desc
-    </select>
-
-    <select id="findByIdJoin" parameterType="java.lang.Long" resultMap="jobMap">
-        select
-        <include refid="baseColumnsV2">
-            <property name="alias" value="h"/>
-        </include>
-        , st.id as s_id, st.name as s_name, st.state as s_state, st.order
-        , tk.id as t_id, tk.name as t_name, tk.state as t_state, tk.hostname
-        from
-        (select * from job
-        <where>
-            <if test="id != 0">
-                id = #{id}
-            </if>
-        </where>
-        ) h
-        inner join stage st
-        on h.id = st.job_id
-        inner join task tk
-        on tk.job_id = h.id and st.id = tk.stage_id
-    </select>
-
-    <select id="findAllByClusterId" parameterType="java.lang.Long" resultType="org.apache.bigtop.manager.dao.po.JobPO">
+    <select id="findByClusterId" parameterType="java.lang.Long" resultType="org.apache.bigtop.manager.dao.po.JobPO">
         select
         <include refid="baseColumns"/>
         from
         job
-        <where>
-            <if test="clusterId != 0">
-                cluster_id = #{clusterId}
-            </if>
-        </where>
-    </select>
-
-    <select id="findAllByClusterIsNull"
-            resultType="org.apache.bigtop.manager.dao.po.JobPO">
-        select
-        <include refid="baseColumns"/>
-        from
-        job where cluster_id is null
+        where
+        cluster_id = #{clusterId}
     </select>
 
 </mapper>

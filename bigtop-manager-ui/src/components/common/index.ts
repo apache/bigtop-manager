@@ -19,12 +19,10 @@
 
 import type { App } from 'vue'
 import SvgIcon from './svg-icon/index.vue'
-import DotState from './dot-state/index.vue'
 import MarkView from './markdown-view/index.vue'
 
 const comments = {
   SvgIcon,
-  DotState,
   MarkView
 }
 

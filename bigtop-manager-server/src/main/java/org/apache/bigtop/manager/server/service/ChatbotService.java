@@ -18,12 +18,9 @@
  */
 package org.apache.bigtop.manager.server.service;
 
-import org.apache.bigtop.manager.server.model.dto.AuthPlatformDTO;
-import org.apache.bigtop.manager.server.model.vo.AuthPlatformVO;
+import org.apache.bigtop.manager.server.model.dto.ChatThreadDTO;
 import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
 import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
-import org.apache.bigtop.manager.server.model.vo.PlatformAuthCredentialVO;
-import org.apache.bigtop.manager.server.model.vo.PlatformVO;
 
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -31,23 +28,15 @@ import java.util.List;
 
 public interface ChatbotService {
 
-    List<PlatformVO> platforms();
+    ChatThreadVO createChatThread(ChatThreadDTO chatThreadDTO);
 
-    List<PlatformAuthCredentialVO> platformsAuthCredentials(Long platformId);
+    boolean deleteChatThread(Long threadId);
 
-    List<AuthPlatformVO> authorizedPlatforms();
+    List<ChatThreadVO> getAllChatThreads();
 
-    AuthPlatformVO addAuthorizedPlatform(AuthPlatformDTO authPlatformDTO);
+    SseEmitter talk(Long threadId, String message);
 
-    boolean deleteAuthorizedPlatform(Long authId);
+    List<ChatMessageVO> history(Long threadId);
 
-    ChatThreadVO createChatThreads(Long authId, String model);
-
-    boolean deleteChatThreads(Long authId, Long threadId);
-
-    List<ChatThreadVO> getAllChatThreads(Long platformId, String model);
-
-    SseEmitter talk(Long authId, Long threadId, String message);
-
-    List<ChatMessageVO> history(Long platformId, Long threadId);
+    ChatThreadVO updateChatThread(ChatThreadDTO chatThreadDTO);
 }

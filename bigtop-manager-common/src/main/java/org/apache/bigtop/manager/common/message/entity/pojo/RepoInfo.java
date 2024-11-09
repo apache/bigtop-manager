@@ -27,17 +27,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class RepoInfo {
 
-    private String repoId;
-
-    private String repoName;
-
-    private String repoType;
-
-    private String baseUrl;
-
-    private String os;
+    private String name;
 
     private String arch;
 
-    private String mirrorList;
+    private String baseUrl;
+
+    private Integer type;
 }

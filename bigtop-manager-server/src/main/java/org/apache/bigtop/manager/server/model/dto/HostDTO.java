@@ -20,10 +20,29 @@ package org.apache.bigtop.manager.server.model.dto;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class HostDTO {
+    private List<String> hostnames;
 
     private Long clusterId;
 
-    private String hostname;
+    private String sshUser;
+
+    private Integer sshPort;
+
+    private Integer authType;
+
+    private String sshPassword;
+
+    private String sshKeyString;
+
+    private String sshKeyFilename;
+
+    private String sshKeyPassword;
+
+    private Integer grpcPort;
+
+    private String desc;
 }

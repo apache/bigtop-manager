@@ -23,16 +23,13 @@ import org.apache.bigtop.manager.dao.po.ClusterPO;
 
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
-import java.util.Optional;
-
 public interface ClusterDao extends BaseDao<ClusterPO> {
 
-    Optional<ClusterPO> findByClusterName(@Param("clusterName") String clusterName);
+    ClusterPO findDetailsById(@Param("id") Long id);
+
+    ClusterPO findByName(@Param("name") String name);
 
     Integer count();
 
     ClusterPO findByIdJoin(@Param("clusterId") Long clusterId);
-
-    List<ClusterPO> findAllByJoin();
 }

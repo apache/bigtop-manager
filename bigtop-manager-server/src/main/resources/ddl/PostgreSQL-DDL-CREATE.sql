@@ -41,8 +41,8 @@ CREATE TABLE "user"
     password    VARCHAR(32)  DEFAULT NULL,
     nickname    VARCHAR(32)  DEFAULT NULL,
     status      BOOLEAN          DEFAULT TRUE,
-    create_time TIMESTAMP(0) DEFAULT NULL,
-    update_time TIMESTAMP(0) DEFAULT NULL,
+    create_time TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
+    update_time TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
     create_by   BIGINT,
     update_by   BIGINT,
     PRIMARY KEY (id),
@@ -54,31 +54,26 @@ COMMENT ON COLUMN "user".status IS '0-Disable, 1-Enable';
 CREATE TABLE cluster
 (
     id            BIGINT CHECK (id > 0) NOT NULL GENERATED ALWAYS AS IDENTITY,
-    cluster_name  VARCHAR(255)                      DEFAULT NULL,
-    cluster_desc  VARCHAR(255)                      DEFAULT NULL,
-    cluster_type  SMALLINT CHECK (cluster_type > 0) DEFAULT 1,
-    selected      BOOLEAN                               DEFAULT TRUE,
-    create_time   TIMESTAMP(0)                      DEFAULT NULL,
-    update_time   TIMESTAMP(0)                      DEFAULT NULL,
-    create_by     BIGINT,
-    packages      VARCHAR(255),
-    repo_template VARCHAR(255),
-    root          VARCHAR(255),
-    state         VARCHAR(255),
-    update_by     BIGINT,
+    name          VARCHAR(255)                      DEFAULT NULL,
+    "desc"        VARCHAR(255)                      DEFAULT NULL,
+    type          INT CHECK (cluster.type > 0) DEFAULT 1,
     user_group    VARCHAR(255),
-    stack_id      BIGINT,
+    root_dir      VARCHAR(255),
+    status        INT DEFAULT NULL,
+    create_time   TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
+    update_time   TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
+    create_by     BIGINT,
+    update_by     BIGINT,
     PRIMARY KEY (id),
-    CONSTRAINT uk_cluster_name UNIQUE (cluster_name)
+    CONSTRAINT uk_name UNIQUE (name)
 );
 
-COMMENT ON COLUMN cluster.cluster_name IS 'Cluster Name';
-COMMENT ON COLUMN cluster.cluster_desc IS 'Cluster Description';
-COMMENT ON COLUMN cluster.cluster_type IS '1-Physical Machine, 2-Kubernetes';
-COMMENT ON COLUMN cluster.selected IS '0-Disable, 1-Enable';
+COMMENT ON COLUMN cluster.name IS 'Cluster Name';
+COMMENT ON COLUMN cluster."desc" IS 'Cluster Description';
+COMMENT ON COLUMN cluster.type IS '1-Physical Machine, 2-Kubernetes';
+COMMENT ON COLUMN cluster.status IS '1-healthy, 2-unhealthy, 3-unknown';
 
 DROP INDEX IF EXISTS idx_cluster_stack_id;
-CREATE INDEX idx_cluster_stack_id ON cluster (stack_id);
 
 CREATE TABLE component
 (
@@ -128,27 +123,36 @@ CREATE TABLE host
     id                   BIGINT CHECK (id > 0)         NOT NULL GENERATED ALWAYS AS IDENTITY,
     cluster_id           BIGINT CHECK (cluster_id > 0) NOT NULL,
     hostname             VARCHAR(255) DEFAULT NULL,
+    ssh_user             VARCHAR(255) DEFAULT NULL,
+    ssh_port             INT DEFAULT NULL,
+    auth_type            INT DEFAULT NULL,
+    ssh_password         VARCHAR(255) DEFAULT NULL,
+    ssh_key_string       TEXT DEFAULT NULL,
+    ssh_key_filename     VARCHAR(255) DEFAULT NULL,
+    ssh_key_password     VARCHAR(255) DEFAULT NULL,
+    grpc_port            INT DEFAULT NULL,
     ipv4                 VARCHAR(32)  DEFAULT NULL,
     ipv6                 VARCHAR(32)  DEFAULT NULL,
     arch                 VARCHAR(32)  DEFAULT NULL,
     os                   VARCHAR(32)  DEFAULT NULL,
-    processor_count      INT          DEFAULT NULL,
-    physical_memory      BIGINT       DEFAULT NULL,
-    state                VARCHAR(32)  DEFAULT NULL,
-    create_time          TIMESTAMP(0) DEFAULT NULL,
-    update_time          TIMESTAMP(0) DEFAULT NULL,
-    available_processors INTEGER,
-    create_by            BIGINT,
+    available_processors INT,
     free_disk            BIGINT,
     free_memory_size     BIGINT,
     total_disk           BIGINT,
     total_memory_size    BIGINT,
+    "desc"               VARCHAR(255)  DEFAULT NULL,
+    status               INT  DEFAULT NULL,
+    err_info             VARCHAR(255)  DEFAULT NULL,
+    create_time          TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
+    update_time          TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
+    create_by            BIGINT,
     update_by            BIGINT,
     PRIMARY KEY (id),
     CONSTRAINT uk_hostname UNIQUE (hostname, cluster_id)
 );
 
-COMMENT ON COLUMN host.physical_memory IS 'Total Physical Memory(Bytes)';
+COMMENT ON COLUMN host.auth_type IS '1-password, 2-key, 3-no_auth';
+COMMENT ON COLUMN host.status IS '1-healthy, 2-unhealthy, 3-unknown';
 
 DROP INDEX IF EXISTS idx_host_cluster_id;
 CREATE INDEX idx_host_cluster_id ON host (cluster_id);
@@ -156,59 +160,78 @@ CREATE INDEX idx_host_cluster_id ON host (cluster_id);
 CREATE TABLE repo
 (
     id          BIGINT CHECK (id > 0)         NOT NULL GENERATED ALWAYS AS IDENTITY,
-    cluster_id  BIGINT CHECK (cluster_id > 0) NOT NULL,
-    os          VARCHAR(32)  DEFAULT NULL,
+    name        VARCHAR(32)  DEFAULT NULL,
     arch        VARCHAR(32)  DEFAULT NULL,
     base_url    VARCHAR(64)  DEFAULT NULL,
-    repo_id     VARCHAR(32)  DEFAULT NULL,
-    repo_name   VARCHAR(64)  DEFAULT NULL,
-    repo_type   VARCHAR(64)  DEFAULT NULL,
-    create_time TIMESTAMP(0) DEFAULT NULL,
-    update_time TIMESTAMP(0) DEFAULT NULL,
+    type        INTEGER  DEFAULT NULL,
+    create_time TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
+    update_time TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
     create_by   BIGINT,
     update_by   BIGINT,
-    PRIMARY KEY (id),
-    CONSTRAINT uk_repo_id UNIQUE (repo_id, os, arch, cluster_id)
+    PRIMARY KEY (id)
 );
 
-DROP INDEX IF EXISTS idx_cluster_id;
-CREATE INDEX idx_cluster_id ON repo (cluster_id);
+COMMENT ON COLUMN repo.type IS '1-services, 2-tools';
 
-CREATE TABLE stack
+CREATE TABLE job
 (
-    id            BIGINT CHECK (id > 0) NOT NULL GENERATED ALWAYS AS IDENTITY,
-    stack_name    VARCHAR(32)           NOT NULL,
-    stack_version VARCHAR(32)           NOT NULL,
-    create_time   TIMESTAMP(0) DEFAULT NULL,
-    update_time   TIMESTAMP(0) DEFAULT NULL,
-    create_by     BIGINT,
-    update_by     BIGINT,
-    PRIMARY KEY (id),
-    CONSTRAINT uk_stack UNIQUE (stack_name, stack_version)
+    id          BIGINT CHECK (id > 0) NOT NULL GENERATED ALWAYS AS IDENTITY,
+    name        VARCHAR(255),
+    context     TEXT                  NOT NULL,
+    state       VARCHAR(32)           NOT NULL,
+    cluster_id  BIGINT CHECK (cluster_id > 0) DEFAULT NULL,
+    create_time TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
+    update_time TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
+    create_by   BIGINT,
+    update_by   BIGINT,
+    PRIMARY KEY (id)
 );
+
+CREATE INDEX idx_job_cluster_id ON job (cluster_id);
+
+CREATE TABLE stage
+(
+    id             BIGINT CHECK (id > 0)     NOT NULL GENERATED ALWAYS AS IDENTITY,
+    name           VARCHAR(32)               NOT NULL,
+    service_name   VARCHAR(255),
+    component_name VARCHAR(255),
+    context        TEXT,
+    "order"        INTEGER,
+    state          VARCHAR(32)               NOT NULL,
+    cluster_id     BIGINT CHECK (cluster_id > 0) DEFAULT NULL,
+    job_id         BIGINT CHECK (job_id > 0) NOT NULL,
+    create_time    TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
+    update_time    TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
+    create_by      BIGINT,
+    update_by      BIGINT,
+    PRIMARY KEY (id)
+);
+
+CREATE INDEX idx_stage_cluster_id ON stage (cluster_id);
+CREATE INDEX idx_job_id ON stage (job_id);
 
 CREATE TABLE task
 (
     id             BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY,
-    command        VARCHAR(255),
-    component_name VARCHAR(255),
-    content        TEXT,
-    context        TEXT   NOT NULL,
-    create_by      BIGINT,
-    create_time    TIMESTAMP(0),
-    custom_command VARCHAR(255),
-    hostname       VARCHAR(255),
     name           VARCHAR(255),
+    hostname       VARCHAR(255),
     service_name   VARCHAR(255),
     service_user   VARCHAR(255),
+    component_name VARCHAR(255),
+    command        VARCHAR(255),
+    custom_command VARCHAR(255),
+    content        TEXT,
+    context        TEXT NOT NULL,
     stack_name     VARCHAR(255),
     stack_version  VARCHAR(255),
     state          VARCHAR(255),
-    update_by      BIGINT,
-    update_time    TIMESTAMP(0),
     cluster_id     BIGINT,
     job_id         BIGINT,
     stage_id       BIGINT,
+    create_time    TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
+    update_time    TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
+    create_by      BIGINT,
+    update_by      BIGINT,
     PRIMARY KEY (id)
 );
 
@@ -218,22 +241,6 @@ DROP INDEX IF EXISTS idx_task_stage_id;
 CREATE INDEX idx_task_cluster_id ON task (cluster_id);
 CREATE INDEX idx_task_job_id ON task (job_id);
 CREATE INDEX idx_task_stage_id ON task (stage_id);
-
-CREATE TABLE job
-(
-    id          BIGINT CHECK (id > 0) NOT NULL GENERATED ALWAYS AS IDENTITY,
-    cluster_id  BIGINT CHECK (cluster_id > 0) DEFAULT NULL,
-    state       VARCHAR(32)           NOT NULL,
-    context     TEXT                  NOT NULL,
-    create_time TIMESTAMP(0)                  DEFAULT NULL,
-    update_time TIMESTAMP(0)                  DEFAULT NULL,
-    create_by   BIGINT,
-    name        VARCHAR(255),
-    update_by   BIGINT,
-    PRIMARY KEY (id)
-);
-
-CREATE INDEX idx_job_cluster_id ON job (cluster_id);
 
 CREATE TABLE type_config
 (
@@ -299,32 +306,11 @@ CREATE TABLE setting
     PRIMARY KEY (id)
 );
 
-CREATE TABLE stage
-(
-    id             BIGINT CHECK (id > 0)     NOT NULL GENERATED ALWAYS AS IDENTITY,
-    name           VARCHAR(32)               NOT NULL,
-    cluster_id     BIGINT CHECK (cluster_id > 0) DEFAULT NULL,
-    job_id         BIGINT CHECK (job_id > 0) NOT NULL,
-    state          VARCHAR(32)               NOT NULL,
-    create_time    TIMESTAMP(0)                  DEFAULT NULL,
-    update_time    TIMESTAMP(0)                  DEFAULT NULL,
-    component_name VARCHAR(255),
-    context        TEXT,
-    create_by      BIGINT,
-    "order"        INTEGER,
-    service_name   VARCHAR(255),
-    update_by      BIGINT,
-    PRIMARY KEY (id)
-);
-
-CREATE INDEX idx_stage_cluster_id ON stage (cluster_id);
-CREATE INDEX idx_job_id ON stage (job_id);
-
 CREATE TABLE llm_platform
 (
     id             BIGINT CHECK (id > 0) NOT NULL GENERATED ALWAYS AS IDENTITY,
     name           VARCHAR(255)          NOT NULL,
-    credential     JSON         DEFAULT NULL,
+    credential     TEXT         DEFAULT NULL,
     support_models VARCHAR(255) DEFAULT NULL,
     create_time    TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
     update_time    TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP /* ON UPDATE CURRENT_TIMESTAMP */,
@@ -337,25 +323,28 @@ CREATE TABLE llm_auth_platform
 (
     id          BIGINT CHECK (id > 0)          NOT NULL GENERATED ALWAYS AS IDENTITY,
     platform_id BIGINT CHECK (platform_id > 0) NOT NULL,
-    credentials JSON                           NOT NULL,
-    is_deleted  BOOLEAN      DEFAULT FALSE,
+    credentials TEXT                           NOT NULL,
+    is_deleted  BOOLEAN             DEFAULT FALSE,
+    status      SMALLINT            DEFAULT 0,
+    model       VARCHAR(255)        NOT NULL,
+    name        VARCHAR(255)        NOT NULL,
+    "desc"      VARCHAR(255)        NOT NULL,
     create_time TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
     update_time TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP /* ON UPDATE CURRENT_TIMESTAMP */,
     create_by   BIGINT       DEFAULT NULL,
     update_by   BIGINT       DEFAULT NULL,
     PRIMARY KEY (id)
 );
-
+COMMENT ON COLUMN "llm_auth_platform".status IS '1-Active, 2-Available, 3-Unavailable';
 CREATE INDEX idx_authorized_platform_id ON llm_auth_platform (platform_id);
 
 CREATE TABLE llm_chat_thread
 (
     id          BIGINT CHECK (id > 0)          NOT NULL GENERATED ALWAYS AS IDENTITY,
-    auth_id     BIGINT CHECK (auth_id > 0) NOT NULL,
-    platform_id BIGINT CHECK (platform_id > 0) NOT NULL,
+    auth_id     BIGINT CHECK (auth_id > 0)     NOT NULL,
     user_id     BIGINT CHECK (user_id > 0)     NOT NULL,
-    model       VARCHAR(255)                   NOT NULL,
-    thread_info JSON         DEFAULT NULL,
+    thread_info TEXT         DEFAULT NULL,
+    name        VARCHAR(255) DEFAULT NULL,
     is_deleted  BOOLEAN      DEFAULT FALSE,
     create_time TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
     update_time TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP /* ON UPDATE CURRENT_TIMESTAMP */,
@@ -365,7 +354,6 @@ CREATE TABLE llm_chat_thread
 );
 
 CREATE INDEX idx_chatthread_auth_id ON llm_chat_thread (auth_id);
-CREATE INDEX idx_chatthread_platform_id ON llm_chat_thread (platform_id);
 CREATE INDEX idx_chatthread_user_id ON llm_chat_thread (user_id);
 
 CREATE TABLE llm_chat_message
@@ -386,10 +374,17 @@ CREATE TABLE llm_chat_message
 CREATE INDEX idx_thread_id ON llm_chat_message (thread_id);
 CREATE INDEX idx_message_user_id ON llm_chat_message (user_id);
 
-INSERT INTO "user" (create_time, update_time, nickname, password, status, username)
-VALUES (now(), now(), 'Administrator', '21232f297a57a5a743894a0e4a801fc3', true, 'admin');
+INSERT INTO "user" (username, password, nickname, status)
+VALUES ('admin', '21232f297a57a5a743894a0e4a801fc3', 'Administrator', true);
 
-INSERT INTO llm_platform (credential, NAME, support_models)
+INSERT INTO repo (name, arch, base_url, type)
+VALUES
+('Service tarballs', 'x86_64', 'http://your-repo/', 1),
+('Service tarballs', 'aarch64', 'http://your-repo/', 1),
+('BM tools', 'x86_64', 'http://your-repo/', 2),
+('BM tools', 'aarch64', 'http://your-repo/', 2);
+
+INSERT INTO llm_platform (credential, name, support_models)
 VALUES
 ('{"apiKey": "API Key"}','OpenAI','gpt-3.5-turbo,gpt-4,gpt-4o,gpt-3.5-turbo-16k,gpt-4-turbo-preview,gpt-4-32k,gpt-4o-mini'),
 ('{"apiKey": "API Key"}','DashScope','qwen-1.8b-chat,qwen-max,qwen-plus,qwen-turbo'),

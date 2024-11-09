@@ -1,4 +1,4 @@
-<?xml version="1.0" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~ Licensed to the Apache Software Foundation (ASF) under one
   ~ or more contributor license agreements.  See the NOTICE file
@@ -17,13 +17,12 @@
   ~ specific language governing permissions and limitations
   ~ under the License.
 -->
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg t="1722394248439" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1160"
-  xmlns:xlink="http://www.w3.org/1999/xlink" width="1em" height="1em">
-  <path
-    d="M512 853.333333c-25.6 0-42.666667-17.066667-42.666667-42.666666V213.333333c0-25.6 17.066667-42.666667 42.666667-42.666666s42.666667 17.066667 42.666667 42.666666v597.333334c0 25.6-17.066667 42.666667-42.666667 42.666666z"
-    p-id="1161"></path>
-  <path
-    d="M810.666667 554.666667H213.333333c-25.6 0-42.666667-17.066667-42.666666-42.666667s17.066667-42.666667 42.666666-42.666667h597.333334c25.6 0 42.666667 17.066667 42.666666 42.666667s-17.066667 42.666667-42.666666 42.666667z"
-    p-id="1162"></path>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
+  viewBox="0 0 16 16" fill="none">
+  <path stroke="rgba(22, 119, 255, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
+    d="M8.02017 3.33334L8.00797 12.6667">
+  </path>
+  <path stroke="rgba(22, 119, 255, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
+    d="M3.33333 8L12.6667 8">
+  </path>
 </svg>

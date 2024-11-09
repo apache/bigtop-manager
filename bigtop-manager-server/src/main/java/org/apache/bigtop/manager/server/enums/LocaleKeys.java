@@ -35,12 +35,13 @@ public enum LocaleKeys {
     LOGIN_ACCOUNT_DISABLED("login.account.disabled"),
 
     CLUSTER_NOT_FOUND("cluster.not.found"),
-    CLUSTER_IS_INSTALLED("cluster.is.installed"),
+    CLUSTER_EXISTS("cluster.exists"),
 
     HOST_NOT_FOUND("host.not.found"),
     HOST_ASSIGNED("host.assigned"),
     HOST_NOT_CONNECTED("host.not.connected"),
     HOST_UNABLE_TO_CONNECT("host.unable.to.connect"),
+    HOST_HAS_COMPONENTS("host.has.components"),
 
     STACK_NOT_FOUND("stack.not.found"),
 
@@ -63,8 +64,11 @@ public enum LocaleKeys {
     CREDIT_INCORRECT("credit.incorrect"),
     MODEL_NOT_SUPPORTED("model.not.supported"),
     CHAT_THREAD_NOT_FOUND("chat.thread.not.found"),
+    NO_PLATFORM_IN_USE("no.platform.in.use"),
+    PLATFORM_NOT_IN_USE("platform.not.in.use"),
+    PLATFORM_IS_ACTIVE("platform.is.active"),
 
-    CHAT_LANGUAGE_PROMPT("chat.language.prompt"),
+    FILE_UPLOAD_FAILED("file.upload.failed"),
     ;
 
     private final String key;

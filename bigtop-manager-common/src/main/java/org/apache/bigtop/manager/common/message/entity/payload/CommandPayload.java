@@ -52,7 +52,7 @@ public class CommandPayload extends BasePayload {
 
     private String stackVersion;
 
-    private String root;
+    private String rootDir;
 
     private String componentName;
 

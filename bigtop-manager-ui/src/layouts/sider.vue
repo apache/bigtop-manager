@@ -18,124 +18,130 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onMounted, ref, watch } from 'vue'
-  import { useUIStore } from '@/store/ui'
-  import { useUserStore } from '@/store/user'
-  import { storeToRefs } from 'pinia'
-  import { RouterLink, useRouter } from 'vue-router'
-  import ServiceDropdown from '@/components/service/service-dropdown.vue'
+  import { toRefs } from 'vue'
+  import { useRouter, useRoute } from 'vue-router'
+  import { SPECIAL_ROUTE_NAME } from '@/store/menu/index'
+  import { useMenuStore, type MenuItem } from '@/store/menu'
 
-  const uiStore = useUIStore()
-  const userStore = useUserStore()
+  interface Props {
+    siderMenuSelectedKey: string
+    siderMenus: MenuItem[]
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    siderMenuSelectedKey: '',
+    siderMenus: () => []
+  })
+
+  const { siderMenuSelectedKey, siderMenus } = toRefs(props)
   const router = useRouter()
+  const route = useRoute()
+  const menuStore = useMenuStore()
+  const emits = defineEmits(['onSiderClick'])
 
-  const { siderCollapsed } = storeToRefs(uiStore)
-  const { menuItems } = storeToRefs(userStore)
-
-  const selectedKeys = ref<string[]>([])
-  const openKeys = ref<string[]>([])
-
-  const siderMenu = computed(() =>
-    menuItems.value
-      .filter((menuItem) => !menuItem.hidden)
-      .sort((pre, next) => (pre.priority ?? 0) - (next.priority ?? 0))
-  )
-
-  const updateSideBar = () => {
-    const splitPath = router.currentRoute.value.path.split('/')
-    const selectedKey = splitPath[splitPath.length - 1]
-    selectedKeys.value = [selectedKey]
-    if (splitPath.length > 2) {
-      openKeys.value = [splitPath[1]]
+  const toggleActivatedIcon = (menuItem: MenuItem) => {
+    const matchStr = '/:cluster/:id'
+    const { key, icon } = menuItem
+    const routePath = route.matched.at(-1)?.path
+    if (routePath?.includes(matchStr)) {
+      return key === routePath.replace(matchStr, '')
+        ? `${icon}_activated`
+        : icon
     } else {
-      openKeys.value = []
+      return key === siderMenuSelectedKey.value ? `${icon}_activated` : icon
     }
   }
 
-  watch(router.currentRoute, () => {
-    updateSideBar()
-  })
+  const addCluster = () => {
+    router.push({ name: 'ClusterCreate' })
+  }
 
-  onMounted(async () => {
-    updateSideBar()
-  })
+  const onSiderClick = ({ key }: any) => {
+    emits('onSiderClick', key)
+  }
 </script>
 
 <template>
-  <a-layout-sider v-model:collapsed="siderCollapsed" class="sider" width="235">
-    <div class="header">
-      <img class="header-logo" src="@/assets/logo.svg" alt="logo" />
-      <div v-if="!siderCollapsed" class="header-title">Bigtop Manager</div>
-    </div>
+  <a-layout-sider class="sider">
     <a-menu
-      v-model:selectedKeys="selectedKeys"
-      v-model:open-keys="openKeys"
-      theme="dark"
+      :selected-keys="[siderMenuSelectedKey]"
       mode="inline"
+      @select="onSiderClick"
     >
-      <template v-for="item in siderMenu">
-        <template v-if="item.children">
-          <a-sub-menu :key="item.key">
-            <template #title>
-              <div v-if="item.title === 'Services'" class="menu-title-flex">
-                <span>
-                  <component :is="() => item.icon" />
-                  <span>
-                    {{ item.title }}
-                  </span>
-                </span>
-                <service-dropdown />
-              </div>
-              <span v-else>
-                <component :is="() => item.icon" />
-                <span>
-                  {{ item.title }}
-                </span>
-              </span>
-            </template>
-            <a-menu-item v-for="subItem in item.children" :key="subItem.key">
-              <component :is="() => subItem.icon" />
-              <span>
-                <router-link :to="subItem.to">{{ subItem.title }}</router-link>
-              </span>
-            </a-menu-item>
-          </a-sub-menu>
-        </template>
+      <template v-for="menuItem in siderMenus" :key="menuItem.key">
+        <a-sub-menu
+          v-if="menuItem.children && menuItem.name === SPECIAL_ROUTE_NAME"
+          :key="menuItem.key"
+        >
+          <template #icon>
+            <svg-icon :name="toggleActivatedIcon(menuItem)" />
+          </template>
+          <template #title>
+            <span>{{ $t(menuItem.label) }}</span>
+          </template>
+          <a-menu-item v-for="child in menuItem.children" :key="child.key">
+            <span style="margin: 0 6px">{{ child.icon }}</span>
+            <span>{{ child.label }}</span>
+          </a-menu-item>
+        </a-sub-menu>
         <template v-else>
-          <a-menu-item :key="item.key">
-            <component :is="() => item.icon" />
-            <span>
-              <router-link :to="item.to">{{ item.title }}</router-link>
-            </span>
+          <a-menu-item :key="menuItem.key">
+            <template #icon>
+              <svg-icon :name="toggleActivatedIcon(menuItem)" />
+            </template>
+            <span>{{ $t(menuItem.label) }}</span>
           </a-menu-item>
         </template>
       </template>
     </a-menu>
+    <div v-show="menuStore.isClusterCreateVisible">
+      <a-divider />
+      <div class="create-option">
+        <a-button type="primary" ghost @click="addCluster">
+          <svg-icon name="plus" />
+          <label>{{ $t('menu.create') }}</label>
+        </a-button>
+      </div>
+    </div>
   </a-layout-sider>
 </template>
 
 <style scoped lang="scss">
+  @mixin reset-sider-menu {
+    width: 100%;
+    border-radius: 0;
+    padding: 0 0 0 14px !important;
+    margin: 4px 0 0 0 !important;
+  }
   .sider {
-    .header {
-      @include flexbox($justify: center, $align: center);
-      height: 32px;
-      margin: 1rem;
+    width: $layout-header-height;
+    background: $layout-sider-bg-color;
+    overflow: auto;
 
-      .header-logo {
-        height: 32px;
-        width: 32px;
-      }
-
-      .header-title {
-        color: #ccc;
-        font-weight: bold;
-        font-size: 16px;
-        margin-left: 1rem;
-      }
+    :deep(.ant-menu-submenu-title) {
+      @include reset-sider-menu();
     }
 
-    .menu-title-flex {
-      @include flexbox($justify: space-between, $align: center);
+    :deep(.ant-menu-item) {
+      @include reset-sider-menu();
+    }
+
+    :deep(.ant-menu-item-selected) {
+      border-right: 2px solid $color-primary;
+    }
+
+    .create-option {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      padding-bottom: $space-lg;
+      button {
+        width: 160px;
+        @include flexbox($align: center);
+        label {
+          margin-left: 10px;
+        }
+      }
     }
   }
 </style>

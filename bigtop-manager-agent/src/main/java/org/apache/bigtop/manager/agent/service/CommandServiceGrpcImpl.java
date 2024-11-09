@@ -21,7 +21,7 @@ package org.apache.bigtop.manager.agent.service;
 import org.apache.bigtop.manager.agent.cache.Caches;
 import org.apache.bigtop.manager.agent.executor.CommandExecutor;
 import org.apache.bigtop.manager.agent.executor.CommandExecutors;
-import org.apache.bigtop.manager.agent.utils.LogFileUtils;
+import org.apache.bigtop.manager.common.utils.ProjectPathUtils;
 import org.apache.bigtop.manager.grpc.generated.CommandReply;
 import org.apache.bigtop.manager.grpc.generated.CommandRequest;
 import org.apache.bigtop.manager.grpc.generated.CommandServiceGrpc;
@@ -64,7 +64,7 @@ public class CommandServiceGrpcImpl extends CommandServiceGrpc.CommandServiceImp
     }
 
     private void truncateLogFile(Long taskId) {
-        String filePath = LogFileUtils.getLogFilePath(taskId);
+        String filePath = ProjectPathUtils.getLogFilePath(taskId);
         File file = new File(filePath);
         if (file.exists()) {
             try (RandomAccessFile rf = new RandomAccessFile(file, "rw")) {

@@ -18,7 +18,6 @@
  */
 package org.apache.bigtop.manager.server.scheduler;
 
-import org.apache.bigtop.manager.common.enums.MaintainState;
 import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.repository.HostDao;
 import org.apache.bigtop.manager.grpc.generated.HostInfoReply;
@@ -68,11 +67,8 @@ public class HostInfoScheduler {
             hostPO.setTotalMemorySize(reply.getTotalMemorySize());
             hostPO.setFreeDisk(reply.getFreeDisk());
             hostPO.setTotalDisk(reply.getTotalDisk());
-
-            hostPO.setState(MaintainState.STARTED.getName());
         } catch (Exception e) {
-            log.error("Error getting host info", e);
-            hostPO.setState(MaintainState.STOPPED.getName());
+            log.error("Error getting host info for {}", hostname, e);
         }
 
         hostDao.partialUpdateById(hostPO);

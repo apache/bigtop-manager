@@ -19,14 +19,13 @@
 package org.apache.bigtop.manager.server.model.converter;
 
 import org.apache.bigtop.manager.common.message.entity.pojo.RepoInfo;
-import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.RepoPO;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.dto.RepoDTO;
+import org.apache.bigtop.manager.server.model.req.RepoReq;
+import org.apache.bigtop.manager.server.model.vo.RepoVO;
 
-import org.mapstruct.Context;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -36,11 +35,17 @@ public interface RepoConverter {
 
     RepoConverter INSTANCE = Mappers.getMapper(RepoConverter.class);
 
-    @Mapping(target = "clusterId", expression = "java(clusterPO.getId())")
-    RepoPO fromDTO2PO(RepoDTO repoDTO, @Context ClusterPO clusterPO);
+    RepoDTO fromReq2DTO(RepoReq repoReq);
 
-    @Mapping(target = "clusterId", expression = "java(clusterPO.getId())")
-    List<RepoPO> fromDTO2PO(List<RepoDTO> repoDTOList, @Context ClusterPO clusterPO);
+    List<RepoDTO> fromReq2DTO(List<RepoReq> repoReqList);
+
+    RepoPO fromDTO2PO(RepoDTO repoDTO);
+
+    List<RepoPO> fromDTO2PO(List<RepoDTO> repoDTOList);
+
+    RepoVO fromPO2VO(RepoPO repoPO);
+
+    List<RepoVO> fromPO2VO(List<RepoPO> repoPOList);
 
     RepoInfo fromPO2Message(RepoPO repoPO);
 

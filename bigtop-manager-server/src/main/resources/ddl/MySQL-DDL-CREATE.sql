@@ -39,7 +39,7 @@ DEALLOCATE PREPARE statement;
 CREATE TABLE `audit_log`
 (
     `id`                BIGINT NOT NULL AUTO_INCREMENT,
-    `args`              LONGTEXT,
+    `args`              TEXT,
     `create_by`         BIGINT,
     `create_time`       DATETIME,
     `operation_desc`    VARCHAR(255),
@@ -60,8 +60,8 @@ CREATE TABLE `user`
     `password`    VARCHAR(32) DEFAULT NULL,
     `nickname`    VARCHAR(32) DEFAULT NULL,
     `status`      BIT(1)      DEFAULT 1 COMMENT '0-Disable, 1-Enable',
-    `create_time` DATETIME    DEFAULT NULL,
-    `update_time` DATETIME    DEFAULT NULL,
+    `create_time` DATETIME    DEFAULT NULL DEFAULT CURRENT_TIMESTAMP,
+    `update_time` DATETIME    DEFAULT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `create_by`   BIGINT,
     `update_by`   BIGINT,
     PRIMARY KEY (`id`),
@@ -70,24 +70,19 @@ CREATE TABLE `user`
 
 CREATE TABLE `cluster`
 (
-    `id`            BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `cluster_name`  VARCHAR(255) DEFAULT NULL COMMENT 'Cluster Name',
-    `cluster_desc`  VARCHAR(255) DEFAULT NULL COMMENT 'Cluster Description',
-    `cluster_type`  SMALLINT UNSIGNED DEFAULT 1 COMMENT '1-Physical Machine, 2-Kubernetes',
-    `selected`      BIT(1)       DEFAULT 1 COMMENT '0-Disable, 1-Enable',
-    `create_time`   DATETIME     DEFAULT NULL,
-    `update_time`   DATETIME     DEFAULT NULL,
-    `create_by`     BIGINT,
-    `packages`      VARCHAR(255),
-    `repo_template` VARCHAR(255),
-    `root`          VARCHAR(255),
-    `state`         VARCHAR(255),
-    `update_by`     BIGINT,
-    `user_group`    VARCHAR(255),
-    `stack_id`      BIGINT,
+    `id`                   BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `name`                 VARCHAR(255) DEFAULT NULL COMMENT 'Cluster Name',
+    `desc`                 VARCHAR(255) DEFAULT NULL COMMENT 'Cluster Description',
+    `type`                 INTEGER DEFAULT 1 COMMENT '1-Physical Machine, 2-Kubernetes',
+    `user_group`           VARCHAR(255),
+    `root_dir`             VARCHAR(255),
+    `status`               INTEGER DEFAULT NULL COMMENT '1-healthy, 2-unhealthy, 3-unknown',
+    `create_time`          DATETIME     DEFAULT CURRENT_TIMESTAMP,
+    `update_time`          DATETIME     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `create_by`            BIGINT,
+    `update_by`            BIGINT,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_cluster_name` (`cluster_name`),
-    KEY `idx_cluster_stack_id` (`stack_id`)
+    UNIQUE KEY `uk_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `component`
@@ -98,7 +93,7 @@ CREATE TABLE `component`
     `component_name`  VARCHAR(255),
     `create_by`       BIGINT,
     `create_time`     DATETIME,
-    `custom_commands` LONGTEXT,
+    `custom_commands` TEXT,
     `display_name`    VARCHAR(255),
     `quick_link`      VARCHAR(255),
     `cardinality`     VARCHAR(255),
@@ -132,21 +127,29 @@ CREATE TABLE `host`
     `id`                   BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
     `cluster_id`           BIGINT(20) UNSIGNED NOT NULL,
     `hostname`             VARCHAR(255) DEFAULT NULL,
+    `ssh_user`             VARCHAR(255) DEFAULT NULL,
+    `ssh_port`             INTEGER DEFAULT NULL,
+    `auth_type`            INTEGER DEFAULT NULL COMMENT '1-password, 2-key, 3-no_auth',
+    `ssh_password`         VARCHAR(255) DEFAULT NULL,
+    `ssh_key_string`       TEXT DEFAULT NULL,
+    `ssh_key_filename`     VARCHAR(255) DEFAULT NULL,
+    `ssh_key_password`     VARCHAR(255) DEFAULT NULL,
+    `grpc_port`            INTEGER DEFAULT NULL,
     `ipv4`                 VARCHAR(32)  DEFAULT NULL,
     `ipv6`                 VARCHAR(32)  DEFAULT NULL,
     `arch`                 VARCHAR(32)  DEFAULT NULL,
     `os`                   VARCHAR(32)  DEFAULT NULL,
-    `processor_count`      INT          DEFAULT NULL,
-    `physical_memory`      BIGINT       DEFAULT NULL COMMENT 'Total Physical Memory(Bytes)',
-    `state`                VARCHAR(32)  DEFAULT NULL,
-    `create_time`          DATETIME     DEFAULT NULL,
-    `update_time`          DATETIME     DEFAULT NULL,
     `available_processors` INTEGER,
-    `create_by`            BIGINT,
     `free_disk`            BIGINT,
     `free_memory_size`     BIGINT,
     `total_disk`           BIGINT,
     `total_memory_size`    BIGINT,
+    `desc`                 VARCHAR(255) DEFAULT NULL,
+    `status`               INTEGER  DEFAULT NULL COMMENT '1-healthy, 2-unhealthy, 3-unknown',
+    `err_info`             VARCHAR(255) DEFAULT NULL,
+    `create_time`          DATETIME     DEFAULT CURRENT_TIMESTAMP,
+    `update_time`          DATETIME     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `create_by`            BIGINT,
     `update_by`            BIGINT,
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_hostname` (`hostname`, `cluster_id`),
@@ -156,76 +159,78 @@ CREATE TABLE `host`
 CREATE TABLE `repo`
 (
     `id`          BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `cluster_id`  BIGINT(20) UNSIGNED NOT NULL,
-    `os`          VARCHAR(32) DEFAULT NULL,
+    `name`        VARCHAR(32) DEFAULT NULL,
     `arch`        VARCHAR(32) DEFAULT NULL,
     `base_url`    VARCHAR(64) DEFAULT NULL,
-    `repo_id`     VARCHAR(32) DEFAULT NULL,
-    `repo_name`   VARCHAR(64) DEFAULT NULL,
-    `repo_type`   VARCHAR(64) DEFAULT NULL,
-    `create_time` DATETIME    DEFAULT NULL,
-    `update_time` DATETIME    DEFAULT NULL,
+    `type`        INT DEFAULT NULL COMMENT '1-services, 2-tools',
+    `create_time` DATETIME    DEFAULT CURRENT_TIMESTAMP,
+    `update_time` DATETIME    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `create_by`   BIGINT,
     `update_by`   BIGINT,
-    PRIMARY KEY (`id`),
-    KEY           `idx_cluster_id` (`cluster_id`),
-    UNIQUE KEY `uk_repo_id` (`repo_id`, `os`, `arch`, `cluster_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE `stack`
-(
-    `id`             BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `stack_name`     VARCHAR(32) NOT NULL,
-    `stack_version`  VARCHAR(32) NOT NULL,
-    `create_time`    DATETIME DEFAULT NULL,
-    `update_time`    DATETIME DEFAULT NULL,
-    `create_by`      BIGINT,
-    `update_by`      BIGINT,
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_stack` (`stack_name`, `stack_version`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
-
-CREATE TABLE `task`
-(
-    `id`              BIGINT NOT NULL AUTO_INCREMENT,
-    `command`         VARCHAR(255),
-    `component_name`  VARCHAR(255),
-    `content`         LONGTEXT,
-    `context`         LONGTEXT NOT NULL,
-    `create_by`       BIGINT,
-    `create_time`     DATETIME,
-    `custom_command`  VARCHAR(255),
-    `hostname`        VARCHAR(255),
-    `name`            VARCHAR(255),
-    `service_name`    VARCHAR(255),
-    `service_user`    VARCHAR(255),
-    `stack_name`      VARCHAR(255),
-    `stack_version`   VARCHAR(255),
-    `state`           VARCHAR(255),
-    `update_by`       BIGINT,
-    `update_time`     DATETIME,
-    `cluster_id`      BIGINT,
-    `job_id`          BIGINT,
-    `stage_id`        BIGINT,
-    PRIMARY KEY (id),
-    KEY               idx_task_cluster_id (cluster_id),
-    KEY               idx_task_job_id (job_id),
-    KEY               idx_task_stage_id (stage_id)
+    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `job`
 (
     `id`          BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `cluster_id`  BIGINT(20) UNSIGNED DEFAULT NULL,
-    `state`       VARCHAR(32) NOT NULL,
-    `context`     LONGTEXT    NOT NULL,
-    `create_time` DATETIME DEFAULT NULL,
-    `update_time` DATETIME DEFAULT NULL,
-    `create_by`   BIGINT,
     `name`        VARCHAR(255),
+    `context`     TEXT    NOT NULL,
+    `state`       VARCHAR(32) NOT NULL,
+    `cluster_id`  BIGINT(20) UNSIGNED DEFAULT NULL,
+    `create_time` DATETIME    DEFAULT CURRENT_TIMESTAMP,
+    `update_time` DATETIME    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `create_by`   BIGINT,
     `update_by`   BIGINT,
     PRIMARY KEY (`id`),
     KEY           `idx_cluster_id` (`cluster_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `stage`
+(
+    `id`             BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `name`           VARCHAR(32) NOT NULL,
+    `service_name`   VARCHAR(255),
+    `component_name` VARCHAR(255),
+    `context`        TEXT,
+    `order`          INTEGER,
+    `state`          VARCHAR(32) NOT NULL,
+    `cluster_id`     BIGINT(20) UNSIGNED DEFAULT NULL,
+    `job_id`         BIGINT(20) UNSIGNED NOT NULL,
+    `create_time`    DATETIME    DEFAULT CURRENT_TIMESTAMP,
+    `update_time`    DATETIME    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `create_by`      BIGINT,
+    `update_by`      BIGINT,
+    PRIMARY KEY (`id`),
+    KEY              `idx_cluster_id` (`cluster_id`),
+    KEY              `idx_job_id` (`job_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `task`
+(
+    `id`              BIGINT NOT NULL AUTO_INCREMENT,
+    `name`            VARCHAR(255),
+    `hostname`        VARCHAR(255),
+    `service_name`    VARCHAR(255),
+    `service_user`    VARCHAR(255),
+    `component_name`  VARCHAR(255),
+    `command`         VARCHAR(255),
+    `custom_command`  VARCHAR(255),
+    `content`         TEXT,
+    `context`         TEXT NOT NULL,
+    `stack_name`      VARCHAR(255),
+    `stack_version`   VARCHAR(255),
+    `state`           VARCHAR(255),
+    `cluster_id`      BIGINT,
+    `job_id`          BIGINT,
+    `stage_id`        BIGINT,
+    `create_time`     DATETIME    DEFAULT CURRENT_TIMESTAMP,
+    `update_time`     DATETIME    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `create_by`       BIGINT,
+    `update_by`       BIGINT,
+    PRIMARY KEY (id),
+    KEY               idx_task_cluster_id (cluster_id),
+    KEY               idx_task_job_id (job_id),
+    KEY               idx_task_stage_id (stage_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `type_config`
@@ -233,7 +238,7 @@ CREATE TABLE `type_config`
     `id`                BIGINT NOT NULL AUTO_INCREMENT,
     `create_by`         BIGINT,
     `create_time`       DATETIME,
-    `properties_json`   LONGTEXT,
+    `properties_json`   TEXT,
     `type_name`         VARCHAR(255),
     `update_by`         BIGINT,
     `update_time`       DATETIME,
@@ -281,7 +286,7 @@ CREATE TABLE `service_config`
 CREATE TABLE `setting`
 (
     `id`          BIGINT NOT NULL AUTO_INCREMENT,
-    `config_data` LONGTEXT,
+    `config_data` TEXT,
     `create_by`   BIGINT,
     `create_time` DATETIME,
     `type_name`   VARCHAR(255),
@@ -290,31 +295,11 @@ CREATE TABLE `setting`
     PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE `stage`
-(
-    `id`             BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `name`           VARCHAR(32) NOT NULL,
-    `cluster_id`     BIGINT(20) UNSIGNED DEFAULT NULL,
-    `job_id`         BIGINT(20) UNSIGNED NOT NULL,
-    `state`          VARCHAR(32) NOT NULL,
-    `create_time`    DATETIME DEFAULT NULL,
-    `update_time`    DATETIME DEFAULT NULL,
-    `component_name` VARCHAR(255),
-    `context`        LONGTEXT,
-    `create_by`      BIGINT,
-    `order`          INTEGER,
-    `service_name`   VARCHAR(255),
-    `update_by`      BIGINT,
-    PRIMARY KEY (`id`),
-    KEY              `idx_cluster_id` (`cluster_id`),
-    KEY              `idx_job_id` (`job_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
 CREATE TABLE `llm_platform`
 (
     `id`             BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
     `name`           VARCHAR(255)        NOT NULL,
-    `credential`     JSON                DEFAULT NULL,
+    `credential`     TEXT                DEFAULT NULL,
     `support_models` VARCHAR(255)        DEFAULT NULL,
     `create_time`    DATETIME            DEFAULT CURRENT_TIMESTAMP,
     `update_time`    DATETIME            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -327,8 +312,12 @@ CREATE TABLE `llm_auth_platform`
 (
     `id`          BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
     `platform_id` BIGINT(20) UNSIGNED NOT NULL,
-    `credentials` JSON                NOT NULL,
+    `credentials` TEXT                NOT NULL,
     `is_deleted`  TINYINT(1)          DEFAULT 0 NULL,
+    `status`      SMALLINT            DEFAULT 0 COMMENT '1-Active, 2-Available, 3-Unavailable',
+    `model`       VARCHAR(255)        NOT NULL,
+    `name`        VARCHAR(255)        NOT NULL,
+    `desc`        VARCHAR(255)        NOT NULL,
     `create_time` DATETIME            DEFAULT CURRENT_TIMESTAMP,
     `update_time` DATETIME            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `create_by`   BIGINT              DEFAULT NULL,
@@ -341,18 +330,16 @@ CREATE TABLE `llm_chat_thread`
 (
     `id`          BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
     `auth_id`     BIGINT(20) UNSIGNED NOT NULL,
-    `platform_id` BIGINT(20) UNSIGNED NOT NULL,
     `user_id`     BIGINT(20) UNSIGNED NOT NULL,
-    `model`       VARCHAR(255)        NOT NULL,
     `is_deleted`  TINYINT(1)          DEFAULT 0 NULL,
-    `thread_info` JSON                DEFAULT NULL,
+    `thread_info` TEXT                DEFAULT NULL,
+    `name`        VARCHAR(255)        DEFAULT NULL,
     `create_time` DATETIME            DEFAULT CURRENT_TIMESTAMP,
     `update_time` DATETIME            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `create_by`   BIGINT              DEFAULT NULL,
     `update_by`   BIGINT              DEFAULT NULL,
     PRIMARY KEY (`id`),
     KEY             `idx_auth_id` (`auth_id`),
-    KEY             `idx_platform_id` (`platform_id`),
     KEY             `idx_user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -374,12 +361,19 @@ CREATE TABLE `llm_chat_message`
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Adding default admin user
-INSERT INTO bigtop_manager.user (id, create_time, update_time, nickname, password, status, username)
-VALUES (1, now(), now(), 'Administrator', '21232f297a57a5a743894a0e4a801fc3', true, 'admin');
+INSERT INTO user (username, password, nickname, status)
+VALUES ('admin', '21232f297a57a5a743894a0e4a801fc3', 'Administrator', true);
+
+INSERT INTO repo (name, arch, base_url, type)
+VALUES
+('Service tarballs', 'x86_64', 'http://your-repo/', 1),
+('Service tarballs', 'aarch64', 'http://your-repo/', 1),
+('BM tools', 'x86_64', 'http://your-repo/', 2),
+('BM tools', 'aarch64', 'http://your-repo/', 2);
 
 -- Adding default llm platform
-INSERT INTO bigtop_manager.llm_platform (id, credential, name, support_models)
+INSERT INTO llm_platform (credential, name, support_models)
 VALUES
-(1, '{"apiKey": "API Key"}', 'OpenAI', 'gpt-3.5-turbo,gpt-4,gpt-4o,gpt-3.5-turbo-16k,gpt-4-turbo-preview,gpt-4-32k,gpt-4o-mini'),
-(2, '{"apiKey": "API Key"}', 'DashScope', 'qwen-1.8b-chat,qwen-max,qwen-plus,qwen-turbo'),
-(3, '{"apiKey": "API Key", "secretKey": "Secret Key"}', 'QianFan','Yi-34B-Chat,ERNIE-4.0-8K,ERNIE-3.5-128K,ERNIE-Speed-8K,Llama-2-7B-Chat,Fuyu-8B');
+('{"apiKey": "API Key"}', 'OpenAI', 'gpt-3.5-turbo,gpt-4,gpt-4o,gpt-3.5-turbo-16k,gpt-4-turbo-preview,gpt-4-32k,gpt-4o-mini'),
+('{"apiKey": "API Key"}', 'DashScope', 'qwen-1.8b-chat,qwen-max,qwen-plus,qwen-turbo'),
+('{"apiKey": "API Key", "secretKey": "Secret Key"}', 'QianFan','Yi-34B-Chat,ERNIE-4.0-8K,ERNIE-3.5-128K,ERNIE-Speed-8K,Llama-2-7B-Chat,Fuyu-8B');

@@ -71,11 +71,11 @@ public class StageContext {
     private static void fromClusterCommandPayload(StageContext context, CommandDTO commandDTO) {
         ClusterCommandDTO clusterCommand = commandDTO.getClusterCommand();
 
-        context.setClusterName(clusterCommand.getClusterName());
-        context.setStackName(clusterCommand.getStackName());
-        context.setStackVersion(clusterCommand.getStackVersion());
-        context.setHostnames(clusterCommand.getHostnames());
-        context.setRepoInfoList(clusterCommand.getRepoInfoList());
+        context.setClusterName(clusterCommand.getName());
+        //        context.setStackName(clusterCommand.getStackName());
+        //        context.setStackVersion(clusterCommand.getStackVersion());
+        //        context.setHostnames(clusterCommand.getHostnames());
+        //        context.setRepoInfoList(clusterCommand.getRepoInfoList());
     }
 
     private static void fromHostCommandPayload(StageContext context, CommandDTO commandDTO) {

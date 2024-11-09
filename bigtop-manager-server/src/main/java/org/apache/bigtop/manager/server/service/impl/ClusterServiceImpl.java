@@ -18,30 +18,20 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
-import org.apache.bigtop.manager.common.enums.MaintainState;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
-import org.apache.bigtop.manager.dao.po.RepoPO;
-import org.apache.bigtop.manager.dao.po.StackPO;
 import org.apache.bigtop.manager.dao.repository.ClusterDao;
-import org.apache.bigtop.manager.dao.repository.RepoDao;
-import org.apache.bigtop.manager.dao.repository.StackDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.model.converter.ClusterConverter;
-import org.apache.bigtop.manager.server.model.converter.RepoConverter;
 import org.apache.bigtop.manager.server.model.dto.ClusterDTO;
-import org.apache.bigtop.manager.server.model.dto.StackDTO;
 import org.apache.bigtop.manager.server.model.vo.ClusterVO;
 import org.apache.bigtop.manager.server.service.ClusterService;
-import org.apache.bigtop.manager.server.service.HostService;
-import org.apache.bigtop.manager.server.utils.StackUtils;
 
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
 
 import jakarta.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -51,75 +41,21 @@ public class ClusterServiceImpl implements ClusterService {
     @Resource
     private ClusterDao clusterDao;
 
-    @Resource
-    private RepoDao repoDao;
-
-    @Resource
-    private StackDao stackDao;
-
-    @Resource
-    private HostService hostService;
-
     @Override
     public List<ClusterVO> list() {
-        List<ClusterVO> clusterVOList = new ArrayList<>();
-        clusterDao.findAllByJoin().forEach(cluster -> {
-            ClusterVO clusterVO = ClusterConverter.INSTANCE.fromEntity2VO(cluster);
-            clusterVOList.add(clusterVO);
-        });
-
-        return clusterVOList;
-    }
-
-    @Override
-    public ClusterVO save(ClusterDTO clusterDTO) {
-        // Save cluster
-        StackPO stackPO =
-                stackDao.findByStackNameAndStackVersion(clusterDTO.getStackName(), clusterDTO.getStackVersion());
-        StackDTO stackDTO = StackUtils.getStackKeyMap()
-                .get(StackUtils.fullStackName(clusterDTO.getStackName(), clusterDTO.getStackVersion()))
-                .getLeft();
-        ClusterPO clusterPO = ClusterConverter.INSTANCE.fromDTO2PO(clusterDTO, stackDTO, stackPO);
-        clusterPO.setSelected(clusterDao.count() == 0);
-        clusterPO.setState(MaintainState.UNINSTALLED.getName());
-
-        ClusterPO oldClusterPO =
-                clusterDao.findByClusterName(clusterDTO.getClusterName()).orElse(new ClusterPO());
-        if (oldClusterPO.getId() != null) {
-            clusterPO.setId(oldClusterPO.getId());
-            clusterDao.partialUpdateById(clusterPO);
-        } else {
-            clusterDao.save(clusterPO);
-        }
-
-        hostService.batchSave(clusterPO.getId(), clusterDTO.getHostnames());
-
-        // Save repo
-        List<RepoPO> repoPOList = RepoConverter.INSTANCE.fromDTO2PO(clusterDTO.getRepoInfoList(), clusterPO);
-        List<RepoPO> oldrepoPOList = repoDao.findAllByClusterId(clusterPO.getId());
-
-        for (RepoPO repoPO : repoPOList) {
-            for (RepoPO oldRepoPO : oldrepoPOList) {
-                if (oldRepoPO.getArch().equals(repoPO.getArch())
-                        && oldRepoPO.getOs().equals(repoPO.getOs())) {
-                    repoPO.setId(oldRepoPO.getId());
-                }
-            }
-        }
-
-        repoDao.saveAll(repoPOList);
-        return ClusterConverter.INSTANCE.fromEntity2VO(clusterPO);
+        List<ClusterPO> clusterPOList = clusterDao.findAll();
+        return ClusterConverter.INSTANCE.fromPO2VO(clusterPOList);
     }
 
     @Override
     public ClusterVO get(Long id) {
-        ClusterPO clusterPO = clusterDao.findByIdJoin(id);
+        ClusterPO clusterPO = clusterDao.findDetailsById(id);
 
         if (clusterPO == null) {
             throw new ApiException(ApiExceptionEnum.CLUSTER_NOT_FOUND);
         }
 
-        return ClusterConverter.INSTANCE.fromEntity2VO(clusterPO);
+        return ClusterConverter.INSTANCE.fromPO2VO(clusterPO);
     }
 
     @Override
@@ -128,6 +64,6 @@ public class ClusterServiceImpl implements ClusterService {
         clusterPO.setId(id);
         clusterDao.partialUpdateById(clusterPO);
 
-        return ClusterConverter.INSTANCE.fromEntity2VO(clusterPO);
+        return get(id);
     }
 }

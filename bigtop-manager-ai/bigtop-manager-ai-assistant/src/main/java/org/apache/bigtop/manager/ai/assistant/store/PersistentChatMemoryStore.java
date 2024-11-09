@@ -71,7 +71,7 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
         } else {
             return null;
         }
-        ChatThreadPO chatThreadPO = chatThreadDao.findByThreadId(chatThreadId);
+        ChatThreadPO chatThreadPO = chatThreadDao.findById(chatThreadId);
         chatMessagePO.setUserId(chatThreadPO.getUserId());
         chatMessagePO.setThreadId(chatThreadId);
         return chatMessagePO;

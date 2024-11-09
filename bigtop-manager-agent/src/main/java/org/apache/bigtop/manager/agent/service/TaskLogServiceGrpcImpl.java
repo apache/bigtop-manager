@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.agent.service;
 
 import org.apache.bigtop.manager.agent.cache.Caches;
-import org.apache.bigtop.manager.agent.utils.LogFileUtils;
+import org.apache.bigtop.manager.common.utils.ProjectPathUtils;
 import org.apache.bigtop.manager.grpc.generated.TaskLogReply;
 import org.apache.bigtop.manager.grpc.generated.TaskLogRequest;
 import org.apache.bigtop.manager.grpc.generated.TaskLogServiceGrpc;
@@ -38,7 +38,7 @@ public class TaskLogServiceGrpcImpl extends TaskLogServiceGrpc.TaskLogServiceImp
 
     @Override
     public void getLog(TaskLogRequest request, StreamObserver<TaskLogReply> responseObserver) {
-        String path = LogFileUtils.getLogFilePath(request.getTaskId());
+        String path = ProjectPathUtils.getLogFilePath(request.getTaskId());
         try (RandomAccessFile file = new RandomAccessFile(path, "r")) {
             // Read from beginning
             long fileLength = file.length();

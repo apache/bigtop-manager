@@ -48,7 +48,7 @@ public class ComponentStatusServiceGrpcImpl extends ComponentStatusServiceGrpc.C
             commandPayload.setServiceUser(request.getServiceUser());
             commandPayload.setComponentName(request.getComponentName());
             commandPayload.setCommandScript(JsonUtils.readFromString(request.getCommandScript(), ScriptInfo.class));
-            commandPayload.setRoot(request.getRoot());
+            commandPayload.setRootDir(request.getRoot());
             commandPayload.setStackName(request.getStackName());
             commandPayload.setStackVersion(request.getStackVersion());
             ShellResult shellResult = StackExecutor.execute(commandPayload);
