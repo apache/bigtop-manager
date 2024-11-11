@@ -204,9 +204,12 @@
 
   const onPlatformChange = () => {
     const { platformId } = formValue.value
+    const selectItems = platforms.value.find((item) => item.id === platformId)
     formValue.value.model = ''
-    const selectItems = platforms.value.filter((item) => item.id === platformId)
-    autoFormRef.value?.setOptionsVal('model', selectItems)
+    autoFormRef.value?.setOptionsVal(
+      'model',
+      selectItems?.supportModels as string[]
+    )
   }
 
   defineExpose({
