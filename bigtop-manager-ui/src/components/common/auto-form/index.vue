@@ -191,10 +191,16 @@
                 []"
                 :key="childIndex"
                 :value="
-                  child[(item.fieldMap && item.fieldMap.value) || 'value']
+                  typeof child === 'string'
+                    ? child
+                    : child[(item.fieldMap && item.fieldMap.value) || 'value']
                 "
               >
-                {{ child[(item.fieldMap && item.fieldMap.label) || 'label'] }}
+                {{
+                  typeof child === 'string'
+                    ? child
+                    : child[(item.fieldMap && item.fieldMap.label) || 'label']
+                }}
               </a-select-option>
             </a-select>
 

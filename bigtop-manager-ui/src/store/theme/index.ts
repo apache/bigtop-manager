@@ -36,7 +36,7 @@ const themeMap = {
 
 type ThemeMode = keyof typeof themeMap
 
-export const useTheme = defineStore(
+export const useThemeStore = defineStore(
   'theme',
   () => {
     const { useToken } = antdTheme

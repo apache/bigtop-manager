@@ -43,7 +43,7 @@
 
   interface LlmStatusItem {
     text: string
-    type: string
+    type: 'success' | 'processing' | 'error'
     actionKeys: Actions[]
     status: AuthPlatformStatus
   }
@@ -72,6 +72,7 @@
       return {}
     }
   })
+
   const emits = defineEmits<Emits>()
   const { llmConfig, isConfig, loading } = toRefs(props)
 

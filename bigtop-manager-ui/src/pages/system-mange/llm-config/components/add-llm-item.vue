@@ -27,6 +27,7 @@
     FormState
   } from '@/components/common/auto-form/types'
   import { AuthorizedPlatform } from '@/api/llm-config/types'
+  import { useLlmConfig } from '@/composables/use-llm-config'
 
   type AutoFromInstance = InstanceType<typeof AutoForm>
 
@@ -47,6 +48,7 @@
 
   const emits = defineEmits<Emits>()
   const { t } = useI18n()
+  const { getPlatforms, platforms } = useLlmConfig()
   const loading = ref(false)
   const loadingTest = ref(false)
   const open = ref(false)
@@ -80,10 +82,15 @@
       }
     },
     {
-      type: 'input',
-      field: 'platformName',
+      type: 'select',
+      field: 'platformId',
+      defaultValue: '',
+      fieldMap: {
+        label: 'name',
+        value: 'id'
+      },
       formItemProps: {
-        name: 'platformName',
+        name: 'platformId',
         label: t('llmConfig.platform_name'),
         rules: [
           {
@@ -99,6 +106,9 @@
         placeholder: t('common.enter_error', [
           t('llmConfig.platform_name').toLowerCase()
         ])
+      },
+      on: {
+        change: onPlatformChange
       }
     },
     {
@@ -120,7 +130,7 @@
       }
     },
     {
-      type: 'input',
+      type: 'select',
       field: 'model',
       formItemProps: {
         name: 'model',
@@ -161,7 +171,7 @@
     }
   ])
   const getDisabledItems = computed(() =>
-    mode.value === 'EDIT' ? ['platformName', 'model', 'apiKey'] : []
+    mode.value === 'EDIT' ? ['platformId', 'model', 'apiKey'] : []
   )
 
   const handleOpen = async (payload: Payload) => {
@@ -169,6 +179,8 @@
     title.value = Mode[payload.mode]
     mode.value = payload.mode
     payload.metaData && (formValue.value = payload.metaData)
+    await getPlatforms()
+    handleAutoFormConfig()
   }
 
   const handleOk = async () => {
@@ -184,6 +196,17 @@
     formValue.value = {}
     autoFormRef.value?.resetForm()
     open.value = false
+  }
+
+  const handleAutoFormConfig = () => {
+    autoFormRef.value?.setOptionsVal('platformId', platforms.value)
+  }
+
+  const onPlatformChange = () => {
+    const { platformId } = formValue.value
+    formValue.value.model = ''
+    const selectItems = platforms.value.filter((item) => item.id === platformId)
+    autoFormRef.value?.setOptionsVal('model', selectItems)
   }
 
   defineExpose({

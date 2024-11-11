@@ -18,7 +18,7 @@
  */
 
 import request from '@/api/request.ts'
-import { ResponseEntity } from '@/api/types'
+import {} from '@/api/types'
 import {
   Key,
   Platform,
@@ -27,16 +27,14 @@ import {
   UpdateAuthorizedPlatformConfig
 } from './types'
 
-export const getPlatforms = (): Promise<ResponseEntity<Platform[]>> => {
+export const getPlatforms = (): Promise<Platform[]> => {
   return request({
     method: 'get',
     url: '/llm/config/platforms'
   })
 }
 
-export const getAuthorizedPlatforms = (): Promise<
-  ResponseEntity<AuthorizedPlatform[]>
-> => {
+export const getAuthorizedPlatforms = (): Promise<AuthorizedPlatform[]> => {
   return request({
     method: 'get',
     url: '/llm/config/auth-platforms'
@@ -45,7 +43,7 @@ export const getAuthorizedPlatforms = (): Promise<
 
 export const getPlatformCredentials = (
   platformId: Key
-): Promise<ResponseEntity<PlatformCredential[]>> => {
+): Promise<PlatformCredential[]> => {
   return request({
     method: 'get',
     url: `/llm/config/platforms/${platformId}/auth-credentials`
@@ -54,7 +52,7 @@ export const getPlatformCredentials = (
 
 export const addAuthorizedPlatform = (
   data: UpdateAuthorizedPlatformConfig
-): Promise<ResponseEntity<AuthorizedPlatform>> => {
+): Promise<AuthorizedPlatform> => {
   return request({
     method: 'post',
     url: '/llm/config/auth-platforms',
@@ -64,34 +62,28 @@ export const addAuthorizedPlatform = (
 
 export const updateAuthPlatform = (
   authId: Key
-): Promise<ResponseEntity<UpdateAuthorizedPlatformConfig>> => {
+): Promise<UpdateAuthorizedPlatformConfig> => {
   return request({
     method: 'put',
     url: `/llm/config/auth-platforms/${authId}`
   })
 }
 
-export const deleteAuthPlatform = (
-  authId: Key
-): Promise<ResponseEntity<boolean>> => {
+export const deleteAuthPlatform = (authId: Key): Promise<boolean> => {
   return request({
     method: 'delete',
     url: `/llm/config/auth-platforms/${authId}`
   })
 }
 
-export const deactivateAuthorizedPlatform = (
-  authId: Key
-): Promise<ResponseEntity<boolean>> => {
+export const deactivateAuthorizedPlatform = (authId: Key): Promise<boolean> => {
   return request({
     method: 'post',
     url: `/llm/config/auth-platforms/${authId}/deactivate`
   })
 }
 
-export const activateAuthorizedPlatform = (
-  authId: Key
-): Promise<ResponseEntity<boolean>> => {
+export const activateAuthorizedPlatform = (authId: Key): Promise<boolean> => {
   return request({
     method: 'post',
     url: `/llm/config/auth-platforms/${authId}/activate`
@@ -100,7 +92,7 @@ export const activateAuthorizedPlatform = (
 
 export const testAuthorizedPlatform = (
   data: UpdateAuthorizedPlatformConfig
-): Promise<ResponseEntity<boolean>> => {
+): Promise<boolean> => {
   return request({
     method: 'post',
     url: '/llm/config/auth-platforms/test',
