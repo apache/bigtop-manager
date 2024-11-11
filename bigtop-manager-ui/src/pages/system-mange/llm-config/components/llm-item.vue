@@ -18,29 +18,34 @@
 -->
 
 <script setup lang="ts">
+  import {
+    AuthorizedPlatform,
+    AuthorizedPlatformDesc,
+    AuthPlatformStatus
+  } from '@/api/llm-config/types'
   import { MenuItemType } from 'ant-design-vue/es/menu/src/interface'
   import { computed, shallowRef, toRaw, toRefs } from 'vue'
 
   enum Actions {
-    disable = '1',
-    enable = '2',
-    edit = '3',
-    delete = '4'
+    DISABLED = '1',
+    ENABLE = '2',
+    EDIT = '3',
+    DELETE = '4'
   }
 
   type AcionsKeys = keyof typeof Actions
-  export type ExtraItem = { llmConfig: LlmConfig; action: AcionsKeys }
+  export type ExtraItem = { llmConfig: AuthorizedPlatform; action: AcionsKeys }
 
   interface LlmDescriptionItem {
     label: string
-    code: keyof BaseConfig
+    code: keyof AuthorizedPlatformDesc
   }
 
   interface LlmStatusItem {
-    status: Status
     text: string
     type: string
     actionKeys: Actions[]
+    status: AuthPlatformStatus
   }
 
   interface ExtraActionItem extends MenuItemType {
@@ -48,27 +53,8 @@
     danger?: boolean
   }
 
-  // api type----------start--------------
-
-  export type Status = 0 | 1 | 2
-
-  export interface BaseConfig {
-    platform: string
-    model: string
-    remark: string
-  }
-
-  export interface LlmConfig extends BaseConfig {
-    id: number | string
-    name: string
-    status: Status
-    apiKey: string
-  }
-
-  // api type----------end-------------
-
   interface Props {
-    llmConfig?: LlmConfig
+    llmConfig?: AuthorizedPlatform | Record<string, unknown>
     loading?: boolean
     isConfig?: boolean
   }
@@ -83,15 +69,7 @@
     loading: false,
     isConfig: true,
     llmConfig: () => {
-      return {
-        id: 0,
-        name: 'defaultTitle',
-        status: 0,
-        apiKey: 'defaultAipKey',
-        platform: 'defaultPlatform',
-        model: 'defaultModel',
-        remark: 'defaultMark'
-      }
+      return {}
     }
   })
   const emits = defineEmits<Emits>()
@@ -99,8 +77,8 @@
 
   const llmDescriptions = shallowRef<LlmDescriptionItem[]>([
     {
-      label: 'llmConfig.platform',
-      code: 'platform'
+      label: 'llmConfig.platform_name',
+      code: 'platformName'
     },
     {
       label: 'llmConfig.model',
@@ -108,49 +86,49 @@
     },
     {
       label: 'llmConfig.remark',
-      code: 'remark'
+      code: 'desc'
     }
   ])
 
   const llmStatus = shallowRef<LlmStatusItem[]>([
     {
-      status: 0,
-      text: 'llmConfig.unavailable',
-      type: 'error',
-      actionKeys: [Actions.enable, Actions.edit, Actions.delete]
-    },
-    {
-      status: 1,
-      text: 'llmConfig.in_use',
+      status: AuthPlatformStatus.ACTIVE,
+      text: 'llmConfig.active',
       type: 'success',
-      actionKeys: [Actions.disable, Actions.edit, Actions.delete]
+      actionKeys: [Actions.DISABLED, Actions.EDIT, Actions.DELETE]
     },
     {
-      status: 2,
+      status: AuthPlatformStatus.AVAILABLE,
       text: 'llmConfig.available',
       type: 'processing',
-      actionKeys: [Actions.enable, Actions.edit, Actions.delete]
+      actionKeys: [Actions.ENABLE, Actions.EDIT, Actions.DELETE]
+    },
+    {
+      status: AuthPlatformStatus.UNAVAILABLE,
+      text: 'llmConfig.unavailable',
+      type: 'error',
+      actionKeys: [Actions.ENABLE, Actions.EDIT, Actions.DELETE]
     }
   ])
 
   const menuItems = shallowRef<ExtraActionItem[]>([
     {
-      key: 'disable',
-      label: 'common.disable',
+      key: 'DISABLED',
+      label: 'common.disabled',
       disabled: false
     },
     {
-      key: 'enable',
+      key: 'ENABLE',
       label: 'common.enable',
       disabled: false
     },
     {
-      key: 'edit',
+      key: 'EDIT',
       label: 'common.edit',
       disabled: false
     },
     {
-      key: 'delete',
+      key: 'DELETE',
       disabled: false,
       danger: true,
       label: 'common.delete'
@@ -166,8 +144,8 @@
       if (getLlmStatus.value.actionKeys.includes(Actions[item.key])) {
         const updatedItem = { ...item }
         if (
-          (currStatus.value === 1 && item.key === 'delete') ||
-          (currStatus.value === 0 && item.key === 'enable')
+          (currStatus.value === 2 && item.key === 'DELETE') ||
+          (currStatus.value === 1 && item.key === 'ENABLE')
         ) {
           updatedItem.disabled = true
         }
@@ -183,7 +161,7 @@
 
   const handleClickAction = ({ key }: { key: AcionsKeys }) => {
     emits('onExtraClick', {
-      llmConfig: toRaw(llmConfig.value),
+      llmConfig: toRaw(llmConfig.value) as AuthorizedPlatform,
       action: key
     })
   }

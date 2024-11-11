@@ -19,58 +19,31 @@
 
 <script setup lang="ts">
   import { h, ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { Modal } from 'ant-design-vue'
-  import LlmItem, { LlmConfig, type ExtraItem } from './components/llm-item.vue'
+  import LlmItem, { type ExtraItem } from './components/llm-item.vue'
   import addLlmItem from './components/add-llm-item.vue'
   import { ExclamationCircleOutlined } from '@ant-design/icons-vue'
-  import { useI18n } from 'vue-i18n'
+  import { AuthorizedPlatform } from '@/api/llm-config/types'
 
-  const [modal, contextHolder] = Modal.useModal()
   const { t } = useI18n()
+  const [modal, contextHolder] = Modal.useModal()
   const addLlmItemRef = ref<InstanceType<typeof addLlmItem> | null>(null)
-  const llmConfigList = ref<LlmConfig[]>([
-    {
-      id: 1,
-      name: 'Title-1',
-      status: 0,
-      apiKey: 'xxxxxx-1',
-      platform: 'Platform-1',
-      model: 'Model-1',
-      remark: 'Remark-1'
-    },
-    {
-      id: 2,
-      name: 'Title-2',
-      status: 1,
-      apiKey: 'xxxxxx-2',
-      platform: 'Platform-2',
-      model: 'Model-2',
-      remark: 'Remark-2'
-    },
-    {
-      id: 3,
-      name: 'Title-2',
-      status: 2,
-      apiKey: 'xxxxxx-3',
-      platform: 'Platform-3',
-      model: 'Model-3',
-      remark: 'Remark-3'
-    }
-  ])
+  const llmConfigList = ref<AuthorizedPlatform[]>([])
 
   const onCreate = () => {
     addLlmItemRef.value?.handleOpen({
-      mode: 'add'
+      mode: 'ADD'
     })
   }
 
   const onExtraClick = (item: ExtraItem) => {
-    if (item.action === 'edit') {
+    if (item.action === 'EDIT') {
       addLlmItemRef.value?.handleOpen({
         mode: item.action,
         metaData: item.llmConfig
       })
-    } else if (item.action === 'delete') {
+    } else if (item.action === 'DELETE') {
       modal.confirm({
         title: t('llmConfig.delete_authorization'),
         icon: h(ExclamationCircleOutlined, { style: 'margin:16px' }),

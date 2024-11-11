@@ -26,13 +26,13 @@
     FormItemState,
     FormState
   } from '@/components/common/auto-form/types'
-  import type { LlmConfig } from './llm-item.vue'
+  import { AuthorizedPlatform } from '@/api/llm-config/types'
 
   type AutoFromInstance = InstanceType<typeof AutoForm>
 
   enum Mode {
-    edit = 'llmConfig.edit_authorization',
-    add = 'llmConfig.add_authorization'
+    EDIT = 'llmConfig.edit_authorization',
+    ADD = 'llmConfig.add_authorization'
   }
 
   interface Emits {
@@ -42,7 +42,7 @@
 
   interface Payload {
     mode: keyof typeof Mode
-    metaData?: LlmConfig
+    metaData?: AuthorizedPlatform
   }
 
   const emits = defineEmits<Emits>()
@@ -50,9 +50,9 @@
   const loading = ref(false)
   const loadingTest = ref(false)
   const open = ref(false)
-  const title = ref(Mode.add)
-  const mode = ref<keyof typeof Mode>('add')
-  const formValue = ref<FormState<LlmConfig | BaseType>>({})
+  const title = ref(Mode.ADD)
+  const mode = ref<keyof typeof Mode>('ADD')
+  const formValue = ref<FormState<AuthorizedPlatform | BaseType>>({})
   const autoFormRef = ref<AutoFromInstance | null>(null)
 
   const getFormDisabled = computed(() => loading.value || loadingTest.value)
@@ -81,15 +81,15 @@
     },
     {
       type: 'input',
-      field: 'platform',
+      field: 'platformName',
       formItemProps: {
-        name: 'platform',
-        label: t('llmConfig.platform'),
+        name: 'platformName',
+        label: t('llmConfig.platform_name'),
         rules: [
           {
             required: true,
             message: t('common.enter_error', [
-              t('llmConfig.platform').toLowerCase()
+              t('llmConfig.platform_name').toLowerCase()
             ]),
             trigger: 'blur'
           }
@@ -97,7 +97,7 @@
       },
       controlProps: {
         placeholder: t('common.enter_error', [
-          t('llmConfig.platform').toLowerCase()
+          t('llmConfig.platform_name').toLowerCase()
         ])
       }
     },
@@ -143,25 +143,25 @@
     },
     {
       type: 'textarea',
-      field: 'remark',
+      field: 'desc',
       formItemProps: {
-        name: 'remark',
-        label: t('llmConfig.remark'),
+        name: 'desc',
+        label: t('llmConfig.desc'),
         rules: [
           {
             required: true,
-            message: t('common.enter_error', [t('llmConfig.remark')]),
+            message: t('common.enter_error', [t('llmConfig.desc')]),
             trigger: 'blur'
           }
         ]
       },
       controlProps: {
-        placeholder: t('common.enter_error', [t('llmConfig.remark')])
+        placeholder: t('common.enter_error', [t('llmConfig.desc')])
       }
     }
   ])
   const getDisabledItems = computed(() =>
-    mode.value === 'edit' ? ['platform', 'model', 'apiKey'] : []
+    mode.value === 'EDIT' ? ['platformName', 'model', 'apiKey'] : []
   )
 
   const handleOpen = async (payload: Payload) => {
@@ -180,7 +180,7 @@
   }
 
   const handleCancel = () => {
-    title.value = Mode.add
+    title.value = Mode.ADD
     formValue.value = {}
     autoFormRef.value?.resetForm()
     open.value = false

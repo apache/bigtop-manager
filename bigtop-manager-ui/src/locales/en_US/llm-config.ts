@@ -22,11 +22,11 @@ export default {
   edit_authorization: 'Edit authorization',
   availability: 'Test availability',
   unavailable: 'Unavailable',
-  in_use: 'In Use',
+  active: 'Active',
   available: 'Available',
   name: 'Name',
-  platform: 'Platform',
+  platform_name: 'Platform',
   model: 'Model',
-  remark: 'Remark',
+  desc: 'Remark',
   delete_authorization: 'Are you sure delete this authorization ?'
 }
