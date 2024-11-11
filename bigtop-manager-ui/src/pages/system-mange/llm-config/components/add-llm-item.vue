@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { computed, ref } from 'vue'
+  import { computed, ref, watch } from 'vue'
   import { useI18n } from 'vue-i18n'
   import AutoForm from '@/components/common/auto-form/index.vue'
   import type {
@@ -48,17 +48,28 @@
 
   const emits = defineEmits<Emits>()
   const { t } = useI18n()
-  const { getPlatforms, platforms } = useLlmConfig()
-  const loading = ref(false)
-  const loadingTest = ref(false)
+  const {
+    loading,
+    loadingTest,
+    currPlatForm,
+    platforms,
+    formCredentials,
+    getFormDisabled,
+    getPlatforms,
+    getPlatformCredentials,
+    resetState
+  } = useLlmConfig()
+
   const open = ref(false)
   const title = ref(Mode.ADD)
   const mode = ref<keyof typeof Mode>('ADD')
   const formValue = ref<FormState<AuthorizedPlatform | BaseType>>({})
   const autoFormRef = ref<AutoFromInstance | null>(null)
 
-  const getFormDisabled = computed(() => loading.value || loadingTest.value)
-  const getFormItems = computed((): FormItemState[] => [
+  const getDisabledItems = computed(() =>
+    mode.value === 'EDIT' ? ['platformId', 'model'] : []
+  )
+  const getBaseFormItems = computed((): FormItemState[] => [
     {
       type: 'input',
       field: 'name',
@@ -112,24 +123,6 @@
       }
     },
     {
-      type: 'input',
-      field: 'apiKey',
-      formItemProps: {
-        name: 'apiKey',
-        label: 'API Key',
-        rules: [
-          {
-            required: true,
-            message: t('common.enter_error', ['API Key']),
-            trigger: 'blur'
-          }
-        ]
-      },
-      controlProps: {
-        placeholder: t('common.enter_error', ['API Key'])
-      }
-    },
-    {
       type: 'select',
       field: 'model',
       formItemProps: {
@@ -170,9 +163,49 @@
       }
     }
   ])
-  const getDisabledItems = computed(() =>
-    mode.value === 'EDIT' ? ['platformId', 'model', 'apiKey'] : []
+  const getFormItems = computed((): FormItemState[] => {
+    const res = formCredentials.value?.map((v) => {
+      return createNewFormItem(v.name, v.displayName)
+    }) as FormItemState[]
+    const tmpBaseFormItems = [...getBaseFormItems.value]
+    res && res.length > 0 && tmpBaseFormItems.splice(2, 0, ...res)
+    return tmpBaseFormItems
+  })
+
+  watch(open, (newVal) => {
+    if (!newVal) {
+      resetState()
+    }
+  })
+
+  watch(
+    formValue,
+    (newVal) => {
+      currPlatForm.value = newVal
+    },
+    { deep: true }
   )
+
+  const createNewFormItem = (field: string, label: string): FormItemState => {
+    return {
+      type: 'input',
+      field,
+      formItemProps: {
+        name: field,
+        label,
+        rules: [
+          {
+            required: true,
+            message: t('common.enter_error', [`${field}`]),
+            trigger: 'blur'
+          }
+        ]
+      },
+      controlProps: {
+        placeholder: t('common.enter_error', [`${field}`])
+      }
+    }
+  }
 
   const handleOpen = async (payload: Payload) => {
     open.value = true
@@ -203,9 +236,10 @@
   }
 
   const onPlatformChange = () => {
-    const { platformId } = formValue.value
+    const { platformId, model } = formValue.value
     const selectItems = platforms.value.find((item) => item.id === platformId)
-    formValue.value.model = ''
+    model != '' && (formValue.value.model = '')
+    getPlatformCredentials()
     autoFormRef.value?.setOptionsVal(
       'model',
       selectItems?.supportModels as string[]

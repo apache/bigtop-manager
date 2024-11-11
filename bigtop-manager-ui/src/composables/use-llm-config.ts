@@ -17,8 +17,9 @@
  * under the License.
  */
 
-import { type Ref, ref } from 'vue'
+import { computed, ComputedRef, type Ref, ref } from 'vue'
 import * as llmServer from '@/api/llm-config/index'
+import { AuthorizedPlatform, PlatformCredential } from '@/api/llm-config/types'
 
 interface Platforms {
   id: number
@@ -28,13 +29,24 @@ interface Platforms {
 
 interface UseLlmConfig {
   loading: Ref<boolean>
+  loadingTest: Ref<boolean>
+  currPlatForm: Ref<AuthorizedPlatform[] | Record<string, unknown>>
   platforms: Ref<Platforms[]>
+  formCredentials: Ref<PlatformCredential[] | any[]>
+  getFormDisabled: ComputedRef<boolean>
   getPlatforms: () => Promise<void>
+  getPlatformCredentials: () => Promise<void>
+  addAuthorizedPlatform: () => Promise<void>
+  resetState: () => void
 }
 
 export function useLlmConfig(): UseLlmConfig {
   const loading = ref<boolean>(false)
+  const loadingTest = ref<boolean>(false)
+  const currPlatForm = ref<AuthorizedPlatform | Record<string, unknown>>({})
+  const formCredentials = ref<PlatformCredential[]>([])
   const platforms = ref<Platforms[]>([])
+  const getFormDisabled = computed(() => loading.value || loadingTest.value)
 
   const getPlatforms = async () => {
     try {
@@ -45,10 +57,46 @@ export function useLlmConfig(): UseLlmConfig {
           supportModels: platform.supportModels.split(',')
         } as Platforms
       })
-    } catch (err) {
-      console.log('error :>> ', err)
+    } catch (error) {
+      console.log('error :>> ', error)
     }
   }
 
-  return { loading, platforms, getPlatforms }
+  const getPlatformCredentials = async () => {
+    try {
+      const { platformId } = currPlatForm.value
+      if (platformId == undefined) return
+      const data = await llmServer.getPlatformCredentials(platformId as string)
+      formCredentials.value = data
+    } catch (error) {
+      console.log('error :>> ', error)
+    }
+  }
+
+  const addAuthorizedPlatform = async () => {
+    try {
+    } catch (error) {
+      console.log('error :>> ', error)
+    }
+  }
+
+  const resetState = () => {
+    loading.value = false
+    currPlatForm.value = {}
+    formCredentials.value = []
+    platforms.value = []
+  }
+
+  return {
+    loading,
+    loadingTest,
+    currPlatForm,
+    formCredentials,
+    platforms,
+    getFormDisabled,
+    getPlatforms,
+    getPlatformCredentials,
+    addAuthorizedPlatform,
+    resetState
+  }
 }

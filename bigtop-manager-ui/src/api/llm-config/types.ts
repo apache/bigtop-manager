@@ -25,6 +25,9 @@ export enum AuthPlatformStatus {
   UNAVAILABLE = 3
 }
 
+type AuthPlatformStatusValues =
+  (typeof AuthPlatformStatus)[keyof typeof AuthPlatformStatus]
+
 export interface Platform {
   id: Key
   name: string
@@ -41,7 +44,7 @@ export interface AuthorizedPlatform extends AuthorizedPlatformDesc {
   id: Key
   platformId: Key
   name: string
-  status: AuthPlatformStatus
+  status: AuthPlatformStatusValues
 }
 
 export interface PlatformCredential {
