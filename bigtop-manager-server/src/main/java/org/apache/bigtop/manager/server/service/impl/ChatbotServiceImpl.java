@@ -274,4 +274,17 @@ public class ChatbotServiceImpl implements ChatbotService {
 
         return ChatThreadConverter.INSTANCE.fromPO2VO(chatThreadPO);
     }
+
+    @Override
+    public ChatThreadVO getChatThread(Long threadId) {
+        ChatThreadPO chatThreadPO = chatThreadDao.findById(threadId);
+        if (chatThreadPO == null || chatThreadPO.getIsDeleted()) {
+            throw new ApiException(ApiExceptionEnum.CHAT_THREAD_NOT_FOUND);
+        }
+        Long userId = SessionUserHolder.getUserId();
+        if (!chatThreadPO.getUserId().equals(userId)) {
+            throw new ApiException(ApiExceptionEnum.PERMISSION_DENIED);
+        }
+        return ChatThreadConverter.INSTANCE.fromPO2VO(chatThreadPO);
+    }
 }

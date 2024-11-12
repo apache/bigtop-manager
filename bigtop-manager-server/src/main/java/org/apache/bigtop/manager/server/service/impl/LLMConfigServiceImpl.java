@@ -317,4 +317,14 @@ public class LLMConfigServiceImpl implements LLMConfigService {
         }
         return true;
     }
+
+    @Override
+    public AuthPlatformVO getAuthorizedPlatform(Long authId) {
+        AuthPlatformPO authPlatformPO = authPlatformDao.findById(authId);
+        if (authPlatformPO == null || authPlatformPO.getIsDeleted()) {
+            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
+        }
+        return AuthPlatformConverter.INSTANCE.fromPO2VO(
+                authPlatformPO, platformDao.findById(authPlatformPO.getPlatformId()));
+    }
 }

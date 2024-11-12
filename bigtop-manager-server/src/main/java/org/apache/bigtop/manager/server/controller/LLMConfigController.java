@@ -50,7 +50,7 @@ public class LLMConfigController {
     @Resource
     private LLMConfigService llmConfigService;
 
-    @Operation(summary = "get platforms", description = "Get all platforms")
+    @Operation(summary = "list platforms", description = "List all platforms")
     @GetMapping("/platforms")
     public ResponseEntity<List<PlatformVO>> platforms() {
         return ResponseEntity.success(llmConfigService.platforms());
@@ -62,7 +62,7 @@ public class LLMConfigController {
         return ResponseEntity.success(llmConfigService.platformsAuthCredentials(platformId));
     }
 
-    @Operation(summary = "get auth platforms", description = "Get authorized platforms")
+    @Operation(summary = "list auth platforms", description = "List authorized platforms")
     @GetMapping("/auth-platforms")
     public ResponseEntity<List<AuthPlatformVO>> authorizedPlatforms() {
         return ResponseEntity.success(llmConfigService.authorizedPlatforms());
@@ -89,6 +89,12 @@ public class LLMConfigController {
         AuthPlatformDTO authPlatformDTO = AuthPlatformConverter.INSTANCE.fromReq2DTO(authPlatformReq);
         authPlatformDTO.setId(authId);
         return ResponseEntity.success(llmConfigService.updateAuthorizedPlatform(authPlatformDTO));
+    }
+
+    @Operation(summary = "get auth platform", description = "Get authorized platforms")
+    @GetMapping("/auth-platforms/{authId}")
+    public ResponseEntity<AuthPlatformVO> getAuthorizedPlatform(@PathVariable Long authId) {
+        return ResponseEntity.success(llmConfigService.getAuthorizedPlatform(authId));
     }
 
     @Operation(summary = "delete auth platform", description = "Delete authorized platforms")

@@ -73,7 +73,13 @@ public class ChatbotController {
         return ResponseEntity.success(chatbotService.deleteChatThread(threadId));
     }
 
-    @Operation(summary = "get threads", description = "Get all threads of a auth platform")
+    @Operation(summary = "get thread", description = "Get a chat threads")
+    @GetMapping("/threads/{threadId}")
+    public ResponseEntity<ChatThreadVO> getChatThread(@PathVariable Long threadId) {
+        return ResponseEntity.success(chatbotService.getChatThread(threadId));
+    }
+
+    @Operation(summary = "list threads", description = "List all threads of a auth platform")
     @GetMapping("/threads")
     public ResponseEntity<List<ChatThreadVO>> getAllChatThreads() {
         return ResponseEntity.success(chatbotService.getAllChatThreads());
