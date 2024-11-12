@@ -18,9 +18,7 @@
  */
 
 import request from '@/api/request.ts'
-import {} from '@/api/types'
 import {
-  Key,
   Platform,
   PlatformCredential,
   AuthorizedPlatform,
@@ -42,7 +40,7 @@ export const getAuthorizedPlatforms = (): Promise<AuthorizedPlatform[]> => {
 }
 
 export const getPlatformCredentials = (
-  platformId: Key
+  platformId: number
 ): Promise<PlatformCredential[]> => {
   return request({
     method: 'get',
@@ -61,7 +59,7 @@ export const addAuthorizedPlatform = (
 }
 
 export const updateAuthPlatform = (
-  authId: Key
+  authId: number
 ): Promise<UpdateAuthorizedPlatformConfig> => {
   return request({
     method: 'put',
@@ -69,21 +67,25 @@ export const updateAuthPlatform = (
   })
 }
 
-export const deleteAuthPlatform = (authId: Key): Promise<boolean> => {
+export const deleteAuthPlatform = (authId: number): Promise<boolean> => {
   return request({
     method: 'delete',
     url: `/llm/config/auth-platforms/${authId}`
   })
 }
 
-export const deactivateAuthorizedPlatform = (authId: Key): Promise<boolean> => {
+export const deactivateAuthorizedPlatform = (
+  authId: number
+): Promise<boolean> => {
   return request({
     method: 'post',
     url: `/llm/config/auth-platforms/${authId}/deactivate`
   })
 }
 
-export const activateAuthorizedPlatform = (authId: Key): Promise<boolean> => {
+export const activateAuthorizedPlatform = (
+  authId: number
+): Promise<boolean> => {
   return request({
     method: 'post',
     url: `/llm/config/auth-platforms/${authId}/activate`

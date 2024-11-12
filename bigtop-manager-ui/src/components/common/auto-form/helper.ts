@@ -17,17 +17,17 @@
  * under the License.
  */
 
-export const componentsConfigProvider = {
-  Modal: {
-    marginLG: 16,
-    paddingMD: 16,
-    paddingLG: 16,
-    paddingContentHorizontalLG: 16,
-    colorTextHeading: 'rgba(0, 0,.0,1)',
-    fontWeightStrong: 500
-  },
-  Form: {
-    controlHeightSM: 24,
-    marginLG: 16
-  }
+import { FormItemState } from '@/components/common/auto-form/types'
+
+export function addFormItemEvents(
+  formItems: FormItemState[],
+  field: string,
+  events: any
+) {
+  return formItems.map((item) => {
+    if (item.field === field) {
+      item['on'] = events
+    }
+    return item
+  })
 }

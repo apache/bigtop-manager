@@ -86,7 +86,7 @@
       code: 'model'
     },
     {
-      label: 'llmConfig.remark',
+      label: 'llmConfig.desc',
       code: 'desc'
     }
   ])
@@ -202,7 +202,7 @@
                   :key="key"
                   :danger="danger"
                   :disabled="disabled"
-                  :title="label"
+                  :title="$t(label)"
                 >
                   {{ $t(label) }}
                 </a-menu-item>

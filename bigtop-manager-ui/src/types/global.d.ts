@@ -17,17 +17,10 @@
  * under the License.
  */
 
-export const componentsConfigProvider = {
-  Modal: {
-    marginLG: 16,
-    paddingMD: 16,
-    paddingLG: 16,
-    paddingContentHorizontalLG: 16,
-    colorTextHeading: 'rgba(0, 0,.0,1)',
-    fontWeightStrong: 500
-  },
-  Form: {
-    controlHeightSM: 24,
-    marginLG: 16
+import AutoForm from '@/components/common/auto-form/index.vue'
+
+declare global {
+  namespace Comp {
+    type AutoFormInstance = InstanceType<typeof AutoForm>
   }
 }

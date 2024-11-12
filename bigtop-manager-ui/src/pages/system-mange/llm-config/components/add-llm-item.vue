@@ -18,18 +18,9 @@
 -->
 
 <script setup lang="ts">
-  import { computed, ref, watch } from 'vue'
-  import { useI18n } from 'vue-i18n'
-  import AutoForm from '@/components/common/auto-form/index.vue'
-  import type {
-    BaseType,
-    FormItemState,
-    FormState
-  } from '@/components/common/auto-form/types'
+  import { computed, ref, watchEffect } from 'vue'
   import { AuthorizedPlatform } from '@/api/llm-config/types'
-  import { useLlmConfig } from '@/composables/use-llm-config'
-
-  type AutoFromInstance = InstanceType<typeof AutoForm>
+  import { useLlmConfig } from '@/composables/llm-config/use-llm-config'
 
   enum Mode {
     EDIT = 'llmConfig.edit_authorization',
@@ -47,237 +38,66 @@
   }
 
   const emits = defineEmits<Emits>()
-  const { t } = useI18n()
-  const {
-    loading,
-    loadingTest,
-    currPlatForm,
-    platforms,
-    formCredentials,
-    getFormDisabled,
-    getPlatforms,
-    getPlatformCredentials,
-    resetState
-  } = useLlmConfig()
 
   const open = ref(false)
   const title = ref(Mode.ADD)
   const mode = ref<keyof typeof Mode>('ADD')
-  const formValue = ref<FormState<AuthorizedPlatform | BaseType>>({})
-  const autoFormRef = ref<AutoFromInstance | null>(null)
+  const autoFormRef = ref<Comp.AutoFormInstance | null>(null)
+  const {
+    loading,
+    loadingTest,
+    currPlatForm,
+    getFormDisabled,
+    getFormItems,
+    getPlatforms,
+    addAuthorizedPlatform,
+    testAuthorizedPlatform,
+    resetState
+  } = useLlmConfig(autoFormRef)
 
   const getDisabledItems = computed(() =>
     mode.value === 'EDIT' ? ['platformId', 'model'] : []
   )
-  const getBaseFormItems = computed((): FormItemState[] => [
-    {
-      type: 'input',
-      field: 'name',
-      formItemProps: {
-        name: 'name',
-        label: t('llmConfig.name'),
-        rules: [
-          {
-            required: true,
-            message: t('common.enter_error', [
-              `${t('llmConfig.name')}`.toLowerCase()
-            ]),
-            trigger: 'blur'
-          }
-        ]
-      },
-      controlProps: {
-        placeholder: t('common.enter_error', [
-          `${t('llmConfig.name')}`.toLowerCase()
-        ])
-      }
-    },
-    {
-      type: 'select',
-      field: 'platformId',
-      defaultValue: '',
-      fieldMap: {
-        label: 'name',
-        value: 'id'
-      },
-      formItemProps: {
-        name: 'platformId',
-        label: t('llmConfig.platform_name'),
-        rules: [
-          {
-            required: true,
-            message: t('common.enter_error', [
-              t('llmConfig.platform_name').toLowerCase()
-            ]),
-            trigger: 'blur'
-          }
-        ]
-      },
-      controlProps: {
-        placeholder: t('common.enter_error', [
-          t('llmConfig.platform_name').toLowerCase()
-        ])
-      },
-      on: {
-        change: onPlatformChange
-      }
-    },
-    {
-      type: 'select',
-      field: 'model',
-      formItemProps: {
-        name: 'model',
-        label: t('llmConfig.model'),
-        rules: [
-          {
-            required: true,
-            message: t('common.enter_error', [
-              t('llmConfig.model').toLowerCase()
-            ]),
-            trigger: 'blur'
-          }
-        ]
-      },
-      controlProps: {
-        placeholder: t('common.enter_error', [
-          t('llmConfig.model').toLowerCase()
-        ])
-      }
-    },
-    {
-      type: 'textarea',
-      field: 'desc',
-      formItemProps: {
-        name: 'desc',
-        label: t('llmConfig.desc'),
-        rules: [
-          {
-            required: true,
-            message: t('common.enter_error', [t('llmConfig.desc')]),
-            trigger: 'blur'
-          }
-        ]
-      },
-      controlProps: {
-        placeholder: t('common.enter_error', [t('llmConfig.desc')])
-      }
-    }
-  ])
-  const getFormItems = computed((): FormItemState[] => {
-    const res = formCredentials.value?.map((v) => {
-      return createNewFormItem(v.name, v.displayName)
-    }) as FormItemState[]
-    const tmpBaseFormItems = [...getBaseFormItems.value]
-    res && res.length > 0 && tmpBaseFormItems.splice(2, 0, ...res)
-    return tmpBaseFormItems
+
+  watchEffect(() => {
+    !open.value && resetState()
   })
-
-  watch(open, (newVal) => {
-    if (!newVal) {
-      resetState()
-    }
-  })
-
-  watch(
-    formValue,
-    (newVal) => {
-      currPlatForm.value = newVal
-    },
-    { deep: true }
-  )
-
-  const createNewFormItem = (field: string, label: string): FormItemState => {
-    return {
-      type: 'input',
-      field,
-      formItemProps: {
-        name: field,
-        label,
-        rules: [
-          {
-            required: true,
-            message: t('common.enter_error', [`${field}`]),
-            trigger: 'blur'
-          }
-        ]
-      },
-      controlProps: {
-        placeholder: t('common.enter_error', [`${field}`])
-      }
-    }
-  }
 
   const handleOpen = async (payload: Payload) => {
     open.value = true
     title.value = Mode[payload.mode]
     mode.value = payload.mode
-    payload.metaData && (formValue.value = payload.metaData)
-    await getPlatforms()
-    handleAutoFormConfig()
+    payload.metaData && (currPlatForm.value = payload.metaData)
+    getPlatforms()
   }
 
   const handleOk = async () => {
-    addAuthorization()
+    try {
+      const validate = await autoFormRef.value?.getFormValidation()
+      if (!validate) return
+      await addAuthorizedPlatform()
+      handleCancel()
+      emits('onOk')
+    } catch (error) {
+      console.log('error :>> ', error)
+    }
   }
 
-  const handleTest = () => {
-    testAuthorization()
+  const handleTest = async () => {
+    await testAuthorizedPlatform()
+    emits('onTest')
   }
 
   const handleCancel = () => {
     title.value = Mode.ADD
-    formValue.value = {}
+    currPlatForm.value = {}
     autoFormRef.value?.resetForm()
     open.value = false
-  }
-
-  const handleAutoFormConfig = () => {
-    autoFormRef.value?.setOptionsVal('platformId', platforms.value)
-  }
-
-  const onPlatformChange = () => {
-    const { platformId, model } = formValue.value
-    const selectItems = platforms.value.find((item) => item.id === platformId)
-    model != '' && (formValue.value.model = '')
-    getPlatformCredentials()
-    autoFormRef.value?.setOptionsVal(
-      'model',
-      selectItems?.supportModels as string[]
-    )
   }
 
   defineExpose({
     handleOpen
   })
-
-  const addAuthorization = async () => {
-    try {
-      const validate = await autoFormRef.value?.getFormValidation()
-      if (!validate) return
-      loading.value = true
-      setTimeout(() => {
-        // api
-        console.log('formValue.value :>> ', formValue.value)
-        loading.value = false
-        handleCancel()
-        emits('onOk')
-      }, 1000)
-    } catch (error) {
-      console.log('error :>> ', error)
-    }
-  }
-
-  const testAuthorization = () => {
-    try {
-      loadingTest.value = true
-      setTimeout(() => {
-        loadingTest.value = false
-      }, 1000)
-      emits('onTest')
-    } catch (error) {
-      console.log('error :>> ', error)
-    }
-  }
 </script>
 
 <template>
@@ -293,7 +113,7 @@
     >
       <auto-form
         ref="autoFormRef"
-        v-model:form-value="formValue"
+        v-model:form-value="currPlatForm"
         :show-button="false"
         :form-items="getFormItems"
         :form-disabled="getFormDisabled"

@@ -18,9 +18,7 @@
  */
 import type { FormItemProps, ColProps } from 'ant-design-vue'
 
-export type BaseType = Record<string, unknown>
-
-export type FormState<T = BaseType> = T
+export type FormState<T = Record<string, any>> = T
 
 export interface FormItemState {
   type: string

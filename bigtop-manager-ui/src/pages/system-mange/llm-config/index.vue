@@ -18,18 +18,18 @@
 -->
 
 <script setup lang="ts">
-  import { h, ref } from 'vue'
-  import { useI18n } from 'vue-i18n'
-  import { Modal } from 'ant-design-vue'
+  import { onMounted, ref } from 'vue'
   import LlmItem, { type ExtraItem } from './components/llm-item.vue'
   import addLlmItem from './components/add-llm-item.vue'
-  import { ExclamationCircleOutlined } from '@ant-design/icons-vue'
-  import { AuthorizedPlatform } from '@/api/llm-config/types'
+  import { useLlmConfig } from '@/composables/llm-config/use-llm-config'
 
-  const { t } = useI18n()
-  const [modal, contextHolder] = Modal.useModal()
   const addLlmItemRef = ref<InstanceType<typeof addLlmItem> | null>(null)
-  const llmConfigList = ref<AuthorizedPlatform[]>([])
+  const {
+    loading,
+    authorizedPlatforms,
+    getAuthorizedPlatforms,
+    deleteAuthPlatform
+  } = useLlmConfig()
 
   const onCreate = () => {
     addLlmItemRef.value?.handleOpen({
@@ -44,37 +44,37 @@
         metaData: item.llmConfig
       })
     } else if (item.action === 'DELETE') {
-      modal.confirm({
-        title: t('llmConfig.delete_authorization'),
-        icon: h(ExclamationCircleOutlined, { style: 'margin:16px' }),
-        onOk() {
-          console.log('OK')
-        },
-        onCancel() {
-          console.log('Cancel')
-        }
-      })
+      deleteAuthPlatform()
     }
   }
+
+  onMounted(() => {
+    getAuthorizedPlatforms()
+  })
 </script>
 
 <template>
-  <div class="llm-config">
-    <a-typography-title :level="5">
-      {{ $t('llmConfig.llm_config') }}
-    </a-typography-title>
-    <div class="llm-config-content">
-      <llm-item
-        v-for="item in llmConfigList"
-        :key="item.id"
-        :llm-config="item"
-        @on-extra-click="onExtraClick"
+  <a-spin :spinning="loading">
+    <div class="llm-config">
+      <a-typography-title :level="5">
+        {{ $t('llmConfig.llm_config') }}
+      </a-typography-title>
+      <div class="llm-config-content">
+        <llm-item
+          v-for="item in authorizedPlatforms"
+          :key="item.id"
+          :llm-config="item"
+          @on-extra-click="onExtraClick"
+        />
+        <llm-item :is-config="false" @on-create="onCreate" />
+      </div>
+      <add-llm-item
+        ref="addLlmItemRef"
+        @on-test="getAuthorizedPlatforms"
+        @on-ok="getAuthorizedPlatforms"
       />
-      <llm-item :is-config="false" @on-create="onCreate" />
     </div>
-    <add-llm-item ref="addLlmItemRef" />
-    <contextHolder />
-  </div>
+  </a-spin>
 </template>
 
 <style lang="scss" scoped>

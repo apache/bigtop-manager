@@ -17,8 +17,6 @@
  * under the License.
  */
 
-export type Key = number | string
-
 export enum AuthPlatformStatus {
   ACTIVE = 1,
   AVAILABLE = 2,
@@ -29,7 +27,7 @@ type AuthPlatformStatusValues =
   (typeof AuthPlatformStatus)[keyof typeof AuthPlatformStatus]
 
 export interface Platform {
-  id: Key
+  id: number
   name: string
   supportModels: string
 }
@@ -41,8 +39,8 @@ export interface AuthorizedPlatformDesc {
 }
 
 export interface AuthorizedPlatform extends AuthorizedPlatformDesc {
-  id: Key
-  platformId: Key
+  id: number
+  platformId: number
   name: string
   status: AuthPlatformStatusValues
 }
