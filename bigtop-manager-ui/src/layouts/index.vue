@@ -39,7 +39,7 @@
     // setInterval(() => {
     //   clusterStore.addCluster()
     // }, 5000)
-    menuStore.setBaseRoutesMap()
+    menuStore.setUpMenu()
   })
 </script>
 

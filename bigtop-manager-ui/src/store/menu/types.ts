@@ -16,48 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-export enum AuthPlatformStatus {
-  ACTIVE = 1,
-  AVAILABLE = 2,
-  UNAVAILABLE = 3
-}
-
-export type AuthPlatformStatusType =
-  | AuthPlatformStatus.ACTIVE
-  | AuthPlatformStatus.AVAILABLE
-  | AuthPlatformStatus.UNAVAILABLE
-
-export interface Platform {
-  id: number
-  name: string
-  supportModels: string
-}
-
-export interface AuthorizedPlatformDesc {
-  platformName: string
-  model: string
-  desc: string
-}
-
-export interface AuthorizedPlatform extends AuthorizedPlatformDesc {
-  id: number
-  platformId: number
-  name: string
-  status: AuthPlatformStatusType
-}
-
-export interface PlatformCredential {
-  name: string
-  displayName: string
-}
-
-export interface AuthCredential {
+export interface MenuItem {
+  icon: string
   key: string
-  value: string
-}
-
-export interface UpdateAuthorizedPlatformConfig extends AuthorizedPlatform {
-  authCredentials: AuthCredential[]
-  testPassed: boolean
+  label: string
+  title: string
+  name?: string
+  activeMenu?: string
+  children?: MenuItem[]
 }

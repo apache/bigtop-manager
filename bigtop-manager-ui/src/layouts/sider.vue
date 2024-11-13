@@ -20,11 +20,9 @@
 <script setup lang="ts">
   import { toRefs } from 'vue'
   import { useRouter } from 'vue-router'
-  import {
-    SPECIAL_ROUTE_NAME,
-    SPECIAL_ROUTE_PATH
-  } from '@/router/routes/modules/clusters'
-  import { useMenuStore, type MenuItem } from '@/store/menu'
+  import { RouteExceptions } from '@/router/routes/modules/clusters'
+  import { useMenuStore } from '@/store/menu'
+  import type { MenuItem } from '@/store/menu/types'
 
   interface Props {
     siderMenuSelectedKey: string
@@ -44,7 +42,9 @@
   const toggleActivatedIcon = (menuItem: MenuItem) => {
     const { key, icon } = menuItem
     if (menuStore.isDynamicRouteMatched) {
-      return key === SPECIAL_ROUTE_PATH ? `${icon}_activated` : icon
+      return key === RouteExceptions.SPECIAL_ROUTE_PATH
+        ? `${icon}_activated`
+        : icon
     } else {
       return key === siderMenuSelectedKey.value ? `${icon}_activated` : icon
     }
@@ -68,7 +68,10 @@
     >
       <template v-for="menuItem in siderMenus" :key="menuItem.key">
         <a-sub-menu
-          v-if="menuItem.children && menuItem.name === SPECIAL_ROUTE_NAME"
+          v-if="
+            menuItem.children &&
+            menuItem.name === RouteExceptions.SPECIAL_ROUTE_NAME
+          "
           :key="menuItem.key"
         >
           <template #icon>

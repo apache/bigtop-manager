@@ -20,22 +20,24 @@
 import { RouteRecordRaw } from 'vue-router'
 import pageView from '@/layouts/index.vue'
 
-export const DEFAULT_ROUTE_NAME = 'Default'
-export const DYNAMIC_ROUTE_MATCH = ':cluster/:id'
-export const SPECIAL_ROUTE_NAME = 'Clusters'
-export const SPECIAL_ROUTE_PATH = '/cluster-mange/clusters'
+export enum RouteExceptions {
+  DEFAULT_ROUTE_NAME = 'Default',
+  DYNAMIC_ROUTE_MATCH = ':cluster/:id',
+  SPECIAL_ROUTE_NAME = 'Clusters',
+  SPECIAL_ROUTE_PATH = '/cluster-mange/clusters'
+}
 
 const routes: RouteRecordRaw[] = [
   {
     path: '/cluster-mange',
     component: pageView,
-    redirect: SPECIAL_ROUTE_PATH,
+    redirect: RouteExceptions.SPECIAL_ROUTE_PATH,
     meta: {
       title: 'menu.cluster'
     },
     children: [
       {
-        name: DEFAULT_ROUTE_NAME,
+        name: RouteExceptions.DEFAULT_ROUTE_NAME,
         path: 'default',
         component: () => import('@/layouts/default.vue'),
         meta: {
@@ -43,7 +45,7 @@ const routes: RouteRecordRaw[] = [
         }
       },
       {
-        name: SPECIAL_ROUTE_NAME,
+        name: RouteExceptions.SPECIAL_ROUTE_NAME,
         path: 'clusters',
         redirect: '',
         meta: {
@@ -53,7 +55,7 @@ const routes: RouteRecordRaw[] = [
         children: [
           {
             name: 'ClusterDetail',
-            path: DYNAMIC_ROUTE_MATCH,
+            path: RouteExceptions.DYNAMIC_ROUTE_MATCH,
             component: () => import('@/pages/cluster-mange/cluster/index.vue'),
             meta: {
               hidden: true

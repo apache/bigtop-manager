@@ -18,22 +18,23 @@
 -->
 
 <script setup lang="ts">
+  import { computed, shallowRef, toRefs } from 'vue'
   import {
-    AuthorizedPlatform,
-    AuthorizedPlatformDesc,
-    AuthPlatformStatus
+    AuthPlatformStatus,
+    type AuthorizedPlatform,
+    type AuthorizedPlatformDesc,
+    type AuthPlatformStatusType
   } from '@/api/llm-config/types'
-  import { MenuItemType } from 'ant-design-vue/es/menu/src/interface'
-  import { computed, shallowRef, toRaw, toRefs } from 'vue'
+  import type { MenuItemType } from 'ant-design-vue/es/menu/src/interface'
 
   enum Actions {
-    DISABLED = '1',
+    DISABLE = '1',
     ENABLE = '2',
     EDIT = '3',
     DELETE = '4'
   }
 
-  type AcionsKeys = keyof typeof Actions
+  export type AcionsKeys = keyof typeof Actions
   export type ExtraItem = { llmConfig: AuthorizedPlatform; action: AcionsKeys }
 
   interface LlmDescriptionItem {
@@ -45,7 +46,7 @@
     text: string
     type: 'success' | 'processing' | 'error'
     actionKeys: Actions[]
-    status: AuthPlatformStatus
+    status: AuthPlatformStatusType
   }
 
   interface ExtraActionItem extends MenuItemType {
@@ -91,31 +92,10 @@
     }
   ])
 
-  const llmStatus = shallowRef<LlmStatusItem[]>([
+  const extraActions = shallowRef<ExtraActionItem[]>([
     {
-      status: AuthPlatformStatus.ACTIVE,
-      text: 'llmConfig.active',
-      type: 'success',
-      actionKeys: [Actions.DISABLED, Actions.EDIT, Actions.DELETE]
-    },
-    {
-      status: AuthPlatformStatus.AVAILABLE,
-      text: 'llmConfig.available',
-      type: 'processing',
-      actionKeys: [Actions.ENABLE, Actions.EDIT, Actions.DELETE]
-    },
-    {
-      status: AuthPlatformStatus.UNAVAILABLE,
-      text: 'llmConfig.unavailable',
-      type: 'error',
-      actionKeys: [Actions.ENABLE, Actions.EDIT, Actions.DELETE]
-    }
-  ])
-
-  const menuItems = shallowRef<ExtraActionItem[]>([
-    {
-      key: 'DISABLED',
-      label: 'common.disabled',
+      key: 'DISABLE',
+      label: 'common.disable',
       disabled: false
     },
     {
@@ -136,25 +116,48 @@
     }
   ])
 
-  const currStatus = computed(() => llmConfig.value?.status)
-  const getLlmStatus = computed(
-    () => llmStatus.value.filter(({ status }) => status == currStatus.value)[0]
+  const llmStatus = shallowRef<LlmStatusItem[]>([
+    {
+      status: AuthPlatformStatus.ACTIVE,
+      text: 'llmConfig.active',
+      type: 'success',
+      actionKeys: [Actions.DISABLE, Actions.EDIT, Actions.DELETE]
+    },
+    {
+      status: AuthPlatformStatus.AVAILABLE,
+      text: 'llmConfig.available',
+      type: 'processing',
+      actionKeys: [Actions.ENABLE, Actions.EDIT, Actions.DELETE]
+    },
+    {
+      status: AuthPlatformStatus.UNAVAILABLE,
+      text: 'llmConfig.unavailable',
+      type: 'error',
+      actionKeys: [Actions.ENABLE, Actions.EDIT, Actions.DELETE]
+    }
+  ])
+
+  const currStatus = computed(
+    () => llmConfig.value?.status as AuthPlatformStatusType
+  )
+  const getLlmStatus = computed(() =>
+    llmStatus.value.find(({ status }) => status == currStatus.value)
   )
   const getLlmActions = computed(() => {
-    return menuItems.value.reduce((acc, item) => {
-      if (getLlmStatus.value.actionKeys.includes(Actions[item.key])) {
-        const updatedItem = { ...item }
-        if (
-          (currStatus.value === 2 && item.key === 'DELETE') ||
-          (currStatus.value === 1 && item.key === 'ENABLE')
-        ) {
-          updatedItem.disabled = true
-        }
-        acc.push(updatedItem)
-      }
-      return acc
-    }, [] as ExtraActionItem[])
+    const actionKeysSet = new Set(getLlmStatus.value?.actionKeys)
+    return extraActions.value
+      .filter((item) => actionKeysSet.has(Actions[item.key]))
+      .map((item) => ({
+        ...item,
+        disabled: isDisable(item.key) || isEnable(item.key)
+      }))
   })
+
+  const isDisable = (key: AcionsKeys): boolean =>
+    currStatus.value === AuthPlatformStatus.UNAVAILABLE && key === 'ENABLE'
+
+  const isEnable = (key: AcionsKeys): boolean =>
+    currStatus.value === AuthPlatformStatus.ACTIVE && key === 'DELETE'
 
   const handleCreateLlmConfig = () => {
     emits('onCreate')
@@ -162,7 +165,7 @@
 
   const handleClickAction = ({ key }: { key: AcionsKeys }) => {
     emits('onExtraClick', {
-      llmConfig: toRaw(llmConfig.value) as AuthorizedPlatform,
+      llmConfig: llmConfig.value as AuthorizedPlatform,
       action: key
     })
   }
@@ -186,7 +189,7 @@
               :content="llmConfig?.name"
             />
             <a-tag :color="getLlmStatus?.type">
-              {{ $t(getLlmStatus?.text) }}
+              {{ $t(getLlmStatus?.text as string) }}
             </a-tag>
           </div>
           <a-dropdown :trigger="['click']">

@@ -58,12 +58,22 @@ export const addAuthorizedPlatform = (
   })
 }
 
-export const updateAuthPlatform = (
+export const getAuthPlatformDetail = (
   authId: number
 ): Promise<UpdateAuthorizedPlatformConfig> => {
   return request({
-    method: 'put',
+    method: 'get',
     url: `/llm/config/auth-platforms/${authId}`
+  })
+}
+
+export const updateAuthPlatform = (
+  data: UpdateAuthorizedPlatformConfig
+): Promise<UpdateAuthorizedPlatformConfig> => {
+  return request({
+    method: 'put',
+    url: `/llm/config/auth-platforms/${data.id}`,
+    data
   })
 }
 

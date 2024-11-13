@@ -18,9 +18,13 @@
 -->
 
 <script setup lang="ts">
+  import { storeToRefs } from 'pinia'
   import { computed, ref, watchEffect } from 'vue'
   import { AuthorizedPlatform } from '@/api/llm-config/types'
-  import { useLlmConfig } from '@/composables/llm-config/use-llm-config'
+  import { useFormItem } from '@/store/llm-config/config'
+  import { useLlmConfigStore } from '@/store/llm-config/index'
+  import { addFormItemEvents } from '@/components/common/auto-form/helper'
+  import type { FormItemState } from '@/components/common/auto-form/types'
 
   enum Mode {
     EDIT = 'llmConfig.edit_authorization',
@@ -32,67 +36,82 @@
     (event: 'onTest'): void
   }
 
-  interface Payload {
-    mode: keyof typeof Mode
-    metaData?: AuthorizedPlatform
-  }
-
   const emits = defineEmits<Emits>()
 
+  const llmConfigStore = useLlmConfigStore()
+  const { formItemConfig, createNewFormItem } = useFormItem()
+
   const open = ref(false)
-  const title = ref(Mode.ADD)
   const mode = ref<keyof typeof Mode>('ADD')
   const autoFormRef = ref<Comp.AutoFormInstance | null>(null)
   const {
     loading,
     loadingTest,
     currPlatForm,
+    platforms,
     getFormDisabled,
-    getFormItems,
-    getPlatforms,
-    addAuthorizedPlatform,
-    testAuthorizedPlatform,
-    resetState
-  } = useLlmConfig(autoFormRef)
+    formCredentials
+  } = storeToRefs(llmConfigStore)
 
   const getDisabledItems = computed(() =>
     mode.value === 'EDIT' ? ['platformId', 'model'] : []
   )
-
-  watchEffect(() => {
-    !open.value && resetState()
+  const getBaseFormItems = computed(() =>
+    addFormItemEvents(formItemConfig, 'platformId', {
+      change: onPlatformChange
+    })
+  )
+  const getFormItems = computed((): FormItemState[] => {
+    const tmpBaseFormItems = [...getBaseFormItems.value]
+    const newFormItems = formCredentials.value?.map((v) =>
+      createNewFormItem('input', v.name, v.displayName)
+    ) as FormItemState[]
+    if (newFormItems) {
+      newFormItems.length > 0 && tmpBaseFormItems.splice(2, 0, ...newFormItems)
+    }
+    return tmpBaseFormItems
   })
 
-  const handleOpen = async (payload: Payload) => {
+  watchEffect(() => {
+    !open.value && llmConfigStore.resetState()
+  })
+
+  const handleOpen = async (payload?: AuthorizedPlatform) => {
     open.value = true
-    title.value = Mode[payload.mode]
-    mode.value = payload.mode
-    payload.metaData && (currPlatForm.value = payload.metaData)
-    getPlatforms()
+    mode.value = payload ? 'EDIT' : 'ADD'
+    payload && (currPlatForm.value = payload)
+    await llmConfigStore.getPlatforms()
+    autoFormRef?.value?.setOptionsVal('platformId', platforms.value)
   }
 
   const handleOk = async () => {
-    try {
-      const validate = await autoFormRef.value?.getFormValidation()
-      if (!validate) return
-      await addAuthorizedPlatform()
+    const validate = await autoFormRef.value?.getFormValidation()
+    if (!validate) return
+    const success = await llmConfigStore.addAuthorizedPlatform()
+    if (success) {
       handleCancel()
       emits('onOk')
-    } catch (error) {
-      console.log('error :>> ', error)
     }
   }
 
   const handleTest = async () => {
-    await testAuthorizedPlatform()
-    emits('onTest')
+    const success = await llmConfigStore.testAuthorizedPlatform()
+    success && emits('onTest')
   }
 
   const handleCancel = () => {
-    title.value = Mode.ADD
-    currPlatForm.value = {}
     autoFormRef.value?.resetForm()
     open.value = false
+  }
+
+  const onPlatformChange = async () => {
+    const { platformId, model } = currPlatForm.value
+    const item = platforms.value.find((item) => item.id === platformId)
+    if (!model) {
+      currPlatForm.value.model = ''
+    }
+    await llmConfigStore.getPlatformCredentials()
+    autoFormRef?.value?.setOptionsVal('model', item?.supportModels || [])
   }
 
   defineExpose({
@@ -105,7 +124,7 @@
     <a-modal
       :open="open"
       :width="480"
-      :title="title && $t(title)"
+      :title="Mode[mode] && $t(Mode[mode])"
       :mask-closable="false"
       :destroy-on-close="true"
       @ok="handleOk"
