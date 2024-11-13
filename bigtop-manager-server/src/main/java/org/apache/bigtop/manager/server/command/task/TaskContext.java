@@ -19,6 +19,7 @@
 package org.apache.bigtop.manager.server.command.task;
 
 import org.apache.bigtop.manager.common.enums.Command;
+import org.apache.bigtop.manager.server.model.dto.HostDTO;
 
 import lombok.Data;
 
@@ -31,11 +32,7 @@ public class TaskContext {
 
     private String clusterName;
 
-    private String hostname;
-
-    private String stackName;
-
-    private String stackVersion;
+    private HostDTO hostDTO;
 
     private String serviceName;
 

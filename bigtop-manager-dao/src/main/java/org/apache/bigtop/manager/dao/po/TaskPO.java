@@ -38,14 +38,14 @@ public class TaskPO extends BasePO implements Serializable {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "context", nullable = false)
-    private String context;
-
-    @Column(name = "state")
-    private String state;
+    @Column(name = "hostname")
+    private String hostname;
 
     @Column(name = "service_name")
     private String serviceName;
+
+    @Column(name = "service_user")
+    private String serviceUser;
 
     @Column(name = "component_name")
     private String componentName;
@@ -56,27 +56,21 @@ public class TaskPO extends BasePO implements Serializable {
     @Column(name = "custom_command")
     private String customCommand;
 
-    @Column(name = "hostname")
-    private String hostname;
-
-    @Column(name = "stack_name")
-    private String stackName;
-
-    @Column(name = "stack_version")
-    private String stackVersion;
-
-    @Column(name = "service_user")
-    private String serviceUser;
-
     @Column(name = "content")
     private String content;
 
-    @Column(name = "stage_id")
-    private Long stageId;
+    @Column(name = "context", nullable = false)
+    private String context;
+
+    @Column(name = "state")
+    private String state;
+
+    @Column(name = "cluster_id")
+    private Long clusterId;
 
     @Column(name = "job_id")
     private Long jobId;
 
-    @Column(name = "cluster_id")
-    private Long clusterId;
+    @Column(name = "stage_id")
+    private Long stageId;
 }

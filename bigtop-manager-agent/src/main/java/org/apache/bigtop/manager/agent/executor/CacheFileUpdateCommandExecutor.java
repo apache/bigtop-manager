@@ -80,7 +80,6 @@ public class CacheFileUpdateCommandExecutor extends AbstractCommandExecutor {
         JsonUtils.writeToFile(cacheDir + CLUSTER_INFO, cacheMessagePayload.getClusterInfo());
 
         commandReplyBuilder.setCode(MessageConstants.SUCCESS_CODE);
-        commandReplyBuilder.setResult(
-                MessageFormat.format("Host [{0}] cached successful!!!", commandRequest.getHostname()));
+        commandReplyBuilder.setResult("Successfully cached files");
     }
 }

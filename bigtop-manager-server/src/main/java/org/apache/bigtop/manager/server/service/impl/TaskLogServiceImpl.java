@@ -19,7 +19,9 @@
 package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.common.enums.JobState;
+import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.po.TaskPO;
+import org.apache.bigtop.manager.dao.repository.HostDao;
 import org.apache.bigtop.manager.dao.repository.TaskDao;
 import org.apache.bigtop.manager.grpc.generated.TaskLogReply;
 import org.apache.bigtop.manager.grpc.generated.TaskLogRequest;
@@ -40,9 +42,14 @@ public class TaskLogServiceImpl implements TaskLogService {
     @Resource
     private TaskDao taskDao;
 
+    @Resource
+    private HostDao hostDao;
+
     public void registerSink(Long taskId, FluxSink<String> sink) {
         TaskPO taskPO = taskDao.findById(taskId);
-        String hostname = taskPO.getHostname();
+        HostPO hostPO = hostDao.findByHostname(taskPO.getHostname());
+        String hostname = hostPO.getHostname();
+        Integer grpcPort = hostPO.getGrpcPort();
 
         if (JobState.fromString(taskPO.getState()) == JobState.PENDING
                 || JobState.fromString(taskPO.getState()) == JobState.CANCELED) {
@@ -55,7 +62,7 @@ public class TaskLogServiceImpl implements TaskLogService {
                     .start();
         } else {
             TaskLogServiceGrpc.TaskLogServiceStub asyncStub =
-                    GrpcClient.getAsyncStub(hostname, TaskLogServiceGrpc.TaskLogServiceStub.class);
+                    GrpcClient.getAsyncStub(hostname, grpcPort, TaskLogServiceGrpc.TaskLogServiceStub.class);
             TaskLogRequest request =
                     TaskLogRequest.newBuilder().setTaskId(taskId).build();
             asyncStub.getLog(request, new LogReader(sink));

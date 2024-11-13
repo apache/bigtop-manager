@@ -52,7 +52,6 @@ public abstract class AbstractCommandExecutor implements CommandExecutor {
             log.error("Run command failed, {}", request, e);
         }
 
-        commandReplyBuilder.setHostname(request.getHostname());
         commandReplyBuilder.setTaskId(request.getTaskId());
         return commandReplyBuilder.build();
     }

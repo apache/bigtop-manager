@@ -42,13 +42,10 @@ public class HostCheckTask extends AbstractTask {
 
     @Override
     protected CommandRequest getCommandRequest() {
-        String hostname = taskContext.getHostname();
         HostCheckPayload messagePayload = new HostCheckPayload();
-        messagePayload.setHostname(hostname);
 
         CommandRequest.Builder builder = CommandRequest.newBuilder();
         builder.setType(CommandType.HOST_CHECK);
-        builder.setHostname(hostname);
         builder.setPayload(JsonUtils.writeAsString(messagePayload));
 
         return builder.build();
@@ -56,6 +53,6 @@ public class HostCheckTask extends AbstractTask {
 
     @Override
     public String getName() {
-        return "Check host " + taskContext.getHostname();
+        return "Check host " + taskContext.getHostDTO().getHostname();
     }
 }

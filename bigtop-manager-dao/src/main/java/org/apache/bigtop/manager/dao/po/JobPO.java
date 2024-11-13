@@ -25,7 +25,6 @@ import lombok.ToString;
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.util.List;
@@ -39,9 +38,6 @@ public class JobPO extends BasePO implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "state", nullable = false)
-    private String state;
-
     @Column(name = "name")
     private String name;
 
@@ -49,10 +45,12 @@ public class JobPO extends BasePO implements Serializable {
     @Column(name = "context", nullable = false)
     private String context;
 
+    @Column(name = "state", nullable = false)
+    private String state;
+
     @Column(name = "cluster_id")
     private Long clusterId;
 
     @ToString.Exclude
-    @OneToMany(mappedBy = "jobPO")
     private List<StagePO> stages;
 }

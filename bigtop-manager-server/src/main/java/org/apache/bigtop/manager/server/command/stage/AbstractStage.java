@@ -21,9 +21,12 @@ package org.apache.bigtop.manager.server.command.stage;
 import org.apache.bigtop.manager.common.enums.JobState;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.StagePO;
+import org.apache.bigtop.manager.dao.repository.HostDao;
 import org.apache.bigtop.manager.dao.repository.StageDao;
 import org.apache.bigtop.manager.server.command.task.Task;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
+import org.apache.bigtop.manager.server.model.converter.HostConverter;
+import org.apache.bigtop.manager.server.model.dto.HostDTO;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,6 +38,7 @@ import java.util.concurrent.CompletableFuture;
 public abstract class AbstractStage implements Stage {
 
     protected StageDao stageDao;
+    protected HostDao hostDao;
 
     protected StageContext stageContext;
     protected List<Task> tasks;
@@ -52,18 +56,20 @@ public abstract class AbstractStage implements Stage {
 
         beforeCreateTasks();
 
-        for (String hostname : stageContext.getHostnames()) {
-            tasks.add(createTask(hostname));
+        List<HostDTO> hostDTOList = HostConverter.INSTANCE.fromPO2DTO(hostDao.findByIds(stageContext.getHostIds()));
+        for (HostDTO hostDTO : hostDTOList) {
+            tasks.add(createTask(hostDTO));
         }
     }
 
     protected void injectBeans() {
         this.stageDao = SpringContextHolder.getBean(StageDao.class);
+        this.hostDao = SpringContextHolder.getBean(HostDao.class);
     }
 
     protected abstract void beforeCreateTasks();
 
-    protected abstract Task createTask(String hostname);
+    protected abstract Task createTask(HostDTO hostDTO);
 
     protected String getServiceName() {
         return "cluster";
