@@ -22,6 +22,8 @@ import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.enums.SystemPrompt;
 import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
 
+import dev.langchain4j.service.tool.ToolProvider;
+
 public interface AIAssistantFactory {
 
     AIAssistant createWithPrompt(
@@ -33,5 +35,6 @@ public interface AIAssistantFactory {
         return create(platformType, assistantConfig, null);
     }
 
-    ToolBox createToolBox(PlatformType platformType);
+    AIAssistant createWithTools(
+            PlatformType platformType, AIAssistantConfigProvider assistantConfig, Long id, ToolProvider toolProvider);
 }

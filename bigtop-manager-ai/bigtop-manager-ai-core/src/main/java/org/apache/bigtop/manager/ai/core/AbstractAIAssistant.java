@@ -22,6 +22,7 @@ import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
 
 import dev.langchain4j.memory.ChatMemory;
+import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 
 public abstract class AbstractAIAssistant implements AIAssistant {
@@ -64,6 +65,16 @@ public abstract class AbstractAIAssistant implements AIAssistant {
         public Builder memoryStore(ChatMemoryStore chatMemoryStore) {
             this.chatMemoryStore = chatMemoryStore;
             return this;
+        }
+
+        public MessageWindowChatMemory getChatMemory() {
+            MessageWindowChatMemory.Builder builder = MessageWindowChatMemory.builder()
+                    .chatMemoryStore(chatMemoryStore)
+                    .maxMessages(MEMORY_LEN);
+            if (id != null) {
+                builder.id(id);
+            }
+            return builder.build();
         }
     }
 }

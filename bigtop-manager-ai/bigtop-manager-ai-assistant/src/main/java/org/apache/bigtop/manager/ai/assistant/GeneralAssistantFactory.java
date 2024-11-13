@@ -19,43 +19,38 @@
 package org.apache.bigtop.manager.ai.assistant;
 
 import org.apache.bigtop.manager.ai.assistant.provider.LocSystemPromptProvider;
-import org.apache.bigtop.manager.ai.assistant.store.PersistentChatMemoryStore;
+import org.apache.bigtop.manager.ai.assistant.store.ChatMemoryStoreProvider;
 import org.apache.bigtop.manager.ai.core.AbstractAIAssistantFactory;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.enums.SystemPrompt;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
-import org.apache.bigtop.manager.ai.core.factory.ToolBox;
 import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
 import org.apache.bigtop.manager.ai.core.provider.SystemPromptProvider;
 import org.apache.bigtop.manager.ai.dashscope.DashScopeAssistant;
 import org.apache.bigtop.manager.ai.openai.OpenAIAssistant;
 import org.apache.bigtop.manager.ai.qianfan.QianFanAssistant;
 
-import org.apache.commons.lang3.NotImplementedException;
-
-import dev.langchain4j.model.chat.ChatLanguageModel;
-import dev.langchain4j.model.chat.StreamingChatLanguageModel;
 import dev.langchain4j.service.AiServices;
 import dev.langchain4j.service.tool.ToolProvider;
-import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 import dev.langchain4j.store.memory.chat.InMemoryChatMemoryStore;
 
 public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
 
     private final SystemPromptProvider systemPromptProvider;
-    private final ChatMemoryStore chatMemoryStore;
+    private final ChatMemoryStoreProvider chatMemoryStoreProvider;
 
-    public GeneralAssistantFactory(ChatMemoryStore chatMemoryStore) {
-        this(new LocSystemPromptProvider(), chatMemoryStore);
+    public GeneralAssistantFactory(ChatMemoryStoreProvider chatMemoryStoreProvider) {
+        this(new LocSystemPromptProvider(), chatMemoryStoreProvider);
     }
 
     public GeneralAssistantFactory() {
-        this(new LocSystemPromptProvider(), new InMemoryChatMemoryStore());
+        this(new LocSystemPromptProvider(), new ChatMemoryStoreProvider(null, null));
     }
 
-    public GeneralAssistantFactory(SystemPromptProvider systemPromptProvider, ChatMemoryStore chatMemoryStore) {
+    public GeneralAssistantFactory(
+            SystemPromptProvider systemPromptProvider, ChatMemoryStoreProvider chatMemoryStoreProvider) {
         this.systemPromptProvider = systemPromptProvider;
-        this.chatMemoryStore = chatMemoryStore;
+        this.chatMemoryStoreProvider = chatMemoryStoreProvider;
     }
 
     @Override
@@ -74,7 +69,7 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
                 .memoryStore(
                         (id == null)
                                 ? new InMemoryChatMemoryStore()
-                                : ((PersistentChatMemoryStore) chatMemoryStore).clone())
+                                : chatMemoryStoreProvider.createPersistentChatMemoryStore())
                 .withConfigProvider(assistantConfig)
                 .build();
 
@@ -94,27 +89,26 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
 
     @Override
     public AIAssistant createWithTools(
-            PlatformType platformType, AIAssistantConfigProvider assistantConfig, ToolProvider toolProvider) {
+            PlatformType platformType, AIAssistantConfigProvider assistantConfig, Long id, ToolProvider toolProvider) {
         AIAssistant.Builder builder =
                 switch (platformType) {
                     case OPENAI -> OpenAIAssistant.builder();
                     case DASH_SCOPE -> DashScopeAssistant.builder();
                     case QIANFAN -> QianFanAssistant.builder();
                 };
+        builder = builder.id(id)
+                .memoryStore(
+                        (id == null)
+                                ? new InMemoryChatMemoryStore()
+                                : chatMemoryStoreProvider.createAiServiceChatMemoryStore())
+                .withConfigProvider(assistantConfig);
         /// TODO: Only a portion of the models of DashScope support the API of OpenAI
-        ChatLanguageModel chatLanguageModel =
-                builder.withConfigProvider(assistantConfig).getChatLanguageModel();
-        StreamingChatLanguageModel streamingChatLanguageModel = builder.getStreamingChatLanguageModel();
 
         return AiServices.builder(AIAssistant.class)
-                .chatLanguageModel(chatLanguageModel)
-                .streamingChatLanguageModel(streamingChatLanguageModel)
+                .chatLanguageModel(builder.getChatLanguageModel())
+                .streamingChatLanguageModel(builder.getStreamingChatLanguageModel())
+                .chatMemory(builder.getChatMemory())
                 .toolProvider(toolProvider)
                 .build();
-    }
-
-    @Override
-    public ToolBox createToolBox(PlatformType platformType) {
-        throw new NotImplementedException("ToolBox is not implemented for GeneralAssistantFactory");
     }
 }

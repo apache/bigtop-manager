@@ -20,7 +20,7 @@ package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.ai.assistant.GeneralAssistantFactory;
 import org.apache.bigtop.manager.ai.assistant.provider.AIAssistantConfig;
-import org.apache.bigtop.manager.ai.assistant.store.PersistentChatMemoryStore;
+import org.apache.bigtop.manager.ai.assistant.store.ChatMemoryStoreProvider;
 import org.apache.bigtop.manager.ai.core.enums.MessageType;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
@@ -35,6 +35,7 @@ import org.apache.bigtop.manager.dao.repository.ChatThreadDao;
 import org.apache.bigtop.manager.dao.repository.PlatformDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.enums.AuthPlatformStatus;
+import org.apache.bigtop.manager.server.enums.ChatbotCommand;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.holder.SessionUserHolder;
 import org.apache.bigtop.manager.server.model.converter.AuthPlatformConverter;
@@ -45,6 +46,7 @@ import org.apache.bigtop.manager.server.model.dto.ChatThreadDTO;
 import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
 import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
 import org.apache.bigtop.manager.server.service.ChatbotService;
+import org.apache.bigtop.manager.server.tools.AgentToolsProvider;
 
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
@@ -89,7 +91,7 @@ public class ChatbotServiceImpl implements ChatbotService {
     public AIAssistantFactory getAIAssistantFactory() {
         if (aiAssistantFactory == null) {
             aiAssistantFactory =
-                    new GeneralAssistantFactory(new PersistentChatMemoryStore(chatThreadDao, chatMessageDao));
+                    new GeneralAssistantFactory(new ChatMemoryStoreProvider(chatThreadDao, chatMessageDao));
         }
         return aiAssistantFactory;
     }
@@ -123,9 +125,19 @@ public class ChatbotServiceImpl implements ChatbotService {
             String model,
             Map<String, String> credentials,
             Long threadId,
-            Map<String, String> configs) {
-        return getAIAssistantFactory()
-                .create(getPlatformType(platformName), getAIAssistantConfig(model, credentials, configs), threadId);
+            Map<String, String> configs,
+            ChatbotCommand command) {
+        if (command == null) {
+            return getAIAssistantFactory()
+                    .create(getPlatformType(platformName), getAIAssistantConfig(model, credentials, configs), threadId);
+        } else {
+            return getAIAssistantFactory()
+                    .createWithTools(
+                            getPlatformType(platformName),
+                            getAIAssistantConfig(model, credentials, configs),
+                            threadId,
+                            new AgentToolsProvider(command));
+        }
     }
 
     @Override
@@ -142,7 +154,12 @@ public class ChatbotServiceImpl implements ChatbotService {
         chatThreadDTO.setAuthId(authPlatformPO.getId());
 
         AIAssistant aiAssistant = buildAIAssistant(
-                platformPO.getName(), authPlatformDTO.getModel(), authPlatformDTO.getAuthCredentials(), null, null);
+                platformPO.getName(),
+                authPlatformDTO.getModel(),
+                authPlatformDTO.getAuthCredentials(),
+                null,
+                null,
+                null);
         Map<String, String> threadInfo = aiAssistant.createThread();
         chatThreadDTO.setThreadInfo(threadInfo);
         ChatThreadPO chatThreadPO = ChatThreadConverter.INSTANCE.fromDTO2PO(chatThreadDTO);
@@ -214,7 +231,8 @@ public class ChatbotServiceImpl implements ChatbotService {
                 authPlatformDTO.getModel(),
                 authPlatformDTO.getAuthCredentials(),
                 chatThreadPO.getId(),
-                chatThreadDTO.getThreadInfo());
+                chatThreadDTO.getThreadInfo(),
+                null);
         Flux<String> stringFlux = aiAssistant.streamAsk(message);
 
         SseEmitter emitter = new SseEmitter();
@@ -230,6 +248,47 @@ public class ChatbotServiceImpl implements ChatbotService {
                 emitter::complete);
 
         emitter.onTimeout(emitter::complete);
+        return emitter;
+    }
+
+    @Override
+    public SseEmitter talkWithTools(Long threadId, ChatbotCommand command, String message) {
+        ChatThreadPO chatThreadPO = chatThreadDao.findById(threadId);
+        Long userId = SessionUserHolder.getUserId();
+        if (!Objects.equals(userId, chatThreadPO.getUserId()) || chatThreadPO.getIsDeleted()) {
+            throw new ApiException(ApiExceptionEnum.CHAT_THREAD_NOT_FOUND);
+        }
+        AuthPlatformPO authPlatformPO = getActiveAuthPlatform();
+        if (authPlatformPO == null
+                || authPlatformPO.getIsDeleted()
+                || !authPlatformPO.getId().equals(chatThreadPO.getAuthId())) {
+            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_IN_USE);
+        }
+
+        AuthPlatformDTO authPlatformDTO = AuthPlatformConverter.INSTANCE.fromPO2DTO(authPlatformPO);
+        ChatThreadDTO chatThreadDTO = ChatThreadConverter.INSTANCE.fromPO2DTO(chatThreadPO);
+        PlatformPO platformPO = platformDao.findById(authPlatformPO.getPlatformId());
+        AIAssistant aiAssistant = buildAIAssistant(
+                platformPO.getName(),
+                authPlatformDTO.getModel(),
+                authPlatformDTO.getAuthCredentials(),
+                chatThreadDTO.getId(),
+                chatThreadDTO.getThreadInfo(),
+                command);
+
+        log.info("message: {}", message);
+        String result = aiAssistant.ask(message);
+        SseEmitter emitter = new SseEmitter(30_000L);
+        try {
+            emitter.send(result);
+            emitter.complete();
+        } catch (Exception e) {
+            emitter.completeWithError(e);
+        }
+
+        emitter.onCompletion(() -> {
+            System.out.println("Data has been sent, performing post-send actions.");
+        });
         return emitter;
     }
 
@@ -273,5 +332,10 @@ public class ChatbotServiceImpl implements ChatbotService {
         chatThreadDao.partialUpdateById(chatThreadPO);
 
         return ChatThreadConverter.INSTANCE.fromPO2VO(chatThreadPO);
+    }
+
+    @Override
+    public List<String> getChatbotCommands() {
+        return ChatbotCommand.getAllCommands();
     }
 }

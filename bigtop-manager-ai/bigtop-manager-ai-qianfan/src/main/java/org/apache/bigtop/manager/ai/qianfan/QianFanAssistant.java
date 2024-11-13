@@ -28,7 +28,6 @@ import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.internal.ValidationUtils;
 import dev.langchain4j.memory.ChatMemory;
-import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.StreamingResponseHandler;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.chat.StreamingChatLanguageModel;
@@ -112,14 +111,7 @@ public class QianFanAssistant extends AbstractAIAssistant {
     public static class Builder extends AbstractAIAssistant.Builder {
 
         public AIAssistant build() {
-            MessageWindowChatMemory.Builder builder = MessageWindowChatMemory.builder()
-                    .chatMemoryStore(chatMemoryStore)
-                    .maxMessages(MEMORY_LEN);
-            if (id != null) {
-                builder.id(id);
-            }
-            MessageWindowChatMemory chatMemory = builder.build();
-            return new QianFanAssistant(getChatLanguageModel(), getStreamingChatLanguageModel(), chatMemory);
+            return new QianFanAssistant(getChatLanguageModel(), getStreamingChatLanguageModel(), getChatMemory());
         }
 
         @Override
