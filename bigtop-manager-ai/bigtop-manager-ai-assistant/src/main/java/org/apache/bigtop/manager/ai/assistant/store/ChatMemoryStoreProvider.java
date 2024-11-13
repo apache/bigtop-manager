@@ -33,6 +33,10 @@ public class ChatMemoryStoreProvider {
         this.chatMessageDao = chatMessageDao;
     }
 
+    public ChatMemoryStoreProvider() {
+        this(null, null);
+    }
+
     public ChatMemoryStore createPersistentChatMemoryStore() {
         if (chatThreadDao == null || chatMessageDao == null) {
             return new InMemoryChatMemoryStore();

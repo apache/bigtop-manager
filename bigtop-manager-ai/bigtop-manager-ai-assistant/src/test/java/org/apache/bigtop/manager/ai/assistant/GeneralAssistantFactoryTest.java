@@ -18,14 +18,12 @@
  */
 package org.apache.bigtop.manager.ai.assistant;
 
-import org.apache.bigtop.manager.ai.assistant.store.PersistentChatMemoryStore;
+import org.apache.bigtop.manager.ai.assistant.store.ChatMemoryStoreProvider;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
 import org.apache.bigtop.manager.ai.core.provider.SystemPromptProvider;
 import org.apache.bigtop.manager.ai.openai.OpenAIAssistant;
-
-import org.apache.commons.lang3.NotImplementedException;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,12 +32,9 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
 
-import dev.langchain4j.store.memory.chat.ChatMemoryStore;
-
 import java.util.Map;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -51,9 +46,6 @@ class GeneralAssistantFactoryTest {
     private SystemPromptProvider systemPromptProvider;
 
     @Mock
-    private ChatMemoryStore chatMemoryStore;
-
-    @Mock
     private AIAssistantConfigProvider assistantConfigProvider;
 
     @InjectMocks
@@ -62,8 +54,7 @@ class GeneralAssistantFactoryTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        chatMemoryStore = new PersistentChatMemoryStore(null, null);
-        generalAssistantFactory = new GeneralAssistantFactory(systemPromptProvider, chatMemoryStore);
+        generalAssistantFactory = new GeneralAssistantFactory(systemPromptProvider, new ChatMemoryStoreProvider());
         Map<String, String> credentials = Map.of("apiKey", "123456");
         when(assistantConfigProvider.getModel()).thenReturn("model");
         when(assistantConfigProvider.getCredentials()).thenReturn(credentials);
@@ -84,11 +75,8 @@ class GeneralAssistantFactoryTest {
 
             PlatformType platformType = PlatformType.OPENAI;
             generalAssistantFactory.create(platformType, assistantConfigProvider);
-            generalAssistantFactory = new GeneralAssistantFactory(chatMemoryStore);
+            generalAssistantFactory = new GeneralAssistantFactory(new ChatMemoryStoreProvider());
             generalAssistantFactory.create(platformType, assistantConfigProvider, UUID.randomUUID());
-            assertThrows(NotImplementedException.class, () -> {
-                generalAssistantFactory.createToolBox(platformType);
-            });
         }
     }
 }
