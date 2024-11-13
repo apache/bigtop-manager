@@ -17,11 +17,6 @@
 # under the License.
 #
 
-bigtop:
-  manager:
-    grpc:
-      port: 8835
-
 spring:
   banner:
     charset: utf-8
