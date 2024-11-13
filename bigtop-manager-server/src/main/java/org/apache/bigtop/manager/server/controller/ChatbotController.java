@@ -83,15 +83,10 @@ public class ChatbotController {
     @Operation(summary = "talk", description = "Talk with Chatbot")
     @PostMapping("/threads/{threadId}/talk")
     public SseEmitter talk(@PathVariable Long threadId, @RequestBody ChatbotMessageReq messageReq) {
-        ChatbotCommand command;
-        if (messageReq.getCommand() == null) {
-            command = ChatbotCommand.getCommandFromMessage(messageReq.getMessage());
-            if (command != null) {
-                messageReq.setMessage(
-                        messageReq.getMessage().substring(command.getCmd().length() + 2));
-            }
-        } else {
-            command = ChatbotCommand.getCommand(messageReq.getCommand());
+        ChatbotCommand command = ChatbotCommand.getCommandFromMessage(messageReq.getMessage());
+        if (command != null) {
+            messageReq.setMessage(
+                    messageReq.getMessage().substring(command.getCmd().length() + 2));
         }
         if (command != null) {
             return chatbotService.talkWithTools(threadId, command, messageReq.getMessage());

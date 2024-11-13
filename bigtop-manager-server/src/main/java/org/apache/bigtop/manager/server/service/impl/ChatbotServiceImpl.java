@@ -204,8 +204,7 @@ public class ChatbotServiceImpl implements ChatbotService {
         return chatThreads;
     }
 
-    @Override
-    public SseEmitter talk(Long threadId, String message) {
+    private AIAssistant prepareTalk(Long threadId, ChatbotCommand command, String message) {
         ChatThreadPO chatThreadPO = chatThreadDao.findById(threadId);
         Long userId = SessionUserHolder.getUserId();
         if (!Objects.equals(userId, chatThreadPO.getUserId()) || chatThreadPO.getIsDeleted()) {
@@ -218,21 +217,21 @@ public class ChatbotServiceImpl implements ChatbotService {
             throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_IN_USE);
         }
 
-        if (chatThreadPO.getName() == null) {
-            chatThreadPO.setName(getNameFromMessage(message));
-            chatThreadDao.partialUpdateById(chatThreadPO);
-        }
-
         AuthPlatformDTO authPlatformDTO = AuthPlatformConverter.INSTANCE.fromPO2DTO(authPlatformPO);
         ChatThreadDTO chatThreadDTO = ChatThreadConverter.INSTANCE.fromPO2DTO(chatThreadPO);
         PlatformPO platformPO = platformDao.findById(authPlatformPO.getPlatformId());
-        AIAssistant aiAssistant = buildAIAssistant(
+        return buildAIAssistant(
                 platformPO.getName(),
                 authPlatformDTO.getModel(),
                 authPlatformDTO.getAuthCredentials(),
-                chatThreadPO.getId(),
+                threadId,
                 chatThreadDTO.getThreadInfo(),
-                null);
+                command);
+    }
+
+    @Override
+    public SseEmitter talk(Long threadId, String message) {
+        AIAssistant aiAssistant = prepareTalk(threadId, null, message);
         Flux<String> stringFlux = aiAssistant.streamAsk(message);
 
         SseEmitter emitter = new SseEmitter();
@@ -253,42 +252,16 @@ public class ChatbotServiceImpl implements ChatbotService {
 
     @Override
     public SseEmitter talkWithTools(Long threadId, ChatbotCommand command, String message) {
-        ChatThreadPO chatThreadPO = chatThreadDao.findById(threadId);
-        Long userId = SessionUserHolder.getUserId();
-        if (!Objects.equals(userId, chatThreadPO.getUserId()) || chatThreadPO.getIsDeleted()) {
-            throw new ApiException(ApiExceptionEnum.CHAT_THREAD_NOT_FOUND);
-        }
-        AuthPlatformPO authPlatformPO = getActiveAuthPlatform();
-        if (authPlatformPO == null
-                || authPlatformPO.getIsDeleted()
-                || !authPlatformPO.getId().equals(chatThreadPO.getAuthId())) {
-            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_IN_USE);
-        }
+        AIAssistant aiAssistant = prepareTalk(threadId, command, message);
 
-        AuthPlatformDTO authPlatformDTO = AuthPlatformConverter.INSTANCE.fromPO2DTO(authPlatformPO);
-        ChatThreadDTO chatThreadDTO = ChatThreadConverter.INSTANCE.fromPO2DTO(chatThreadPO);
-        PlatformPO platformPO = platformDao.findById(authPlatformPO.getPlatformId());
-        AIAssistant aiAssistant = buildAIAssistant(
-                platformPO.getName(),
-                authPlatformDTO.getModel(),
-                authPlatformDTO.getAuthCredentials(),
-                chatThreadDTO.getId(),
-                chatThreadDTO.getThreadInfo(),
-                command);
-
-        log.info("message: {}", message);
         String result = aiAssistant.ask(message);
-        SseEmitter emitter = new SseEmitter(30_000L);
+        SseEmitter emitter = new SseEmitter();
         try {
             emitter.send(result);
             emitter.complete();
         } catch (Exception e) {
             emitter.completeWithError(e);
         }
-
-        emitter.onCompletion(() -> {
-            System.out.println("Data has been sent, performing post-send actions.");
-        });
         return emitter;
     }
 

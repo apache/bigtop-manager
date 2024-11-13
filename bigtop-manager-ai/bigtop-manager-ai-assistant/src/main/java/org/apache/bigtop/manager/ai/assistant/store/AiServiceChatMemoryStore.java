@@ -32,7 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 public class AiServiceChatMemoryStore extends PersistentChatMemoryStore {
-    private final Map<Object, List<ChatMessage>> messagesByMemoryId = new ConcurrentHashMap();
+    private final Map<Object, List<ChatMessage>> messagesByMemoryId = new ConcurrentHashMap<>();
 
     public AiServiceChatMemoryStore(ChatThreadDao chatThreadDao, ChatMessageDao chatMessageDao) {
         super(chatThreadDao, chatMessageDao);
