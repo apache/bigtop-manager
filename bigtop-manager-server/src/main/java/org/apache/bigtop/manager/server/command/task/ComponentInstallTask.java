@@ -39,7 +39,7 @@ public class ComponentInstallTask extends AbstractComponentTask {
 
         Long clusterId = taskContext.getClusterId();
         String componentName = taskContext.getComponentName();
-        String hostname = taskContext.getHostname();
+        String hostname = taskContext.getHostDTO().getHostname();
         HostComponentPO hostComponentPO =
                 hostComponentDao.findByClusterIdAndComponentNameAndHostname(clusterId, componentName, hostname);
         hostComponentPO.setState(MaintainState.INSTALLED.getName());
@@ -48,6 +48,7 @@ public class ComponentInstallTask extends AbstractComponentTask {
 
     @Override
     public String getName() {
-        return "Install " + taskContext.getComponentDisplayName() + " on " + taskContext.getHostname();
+        return "Install " + taskContext.getComponentDisplayName() + " on "
+                + taskContext.getHostDTO().getHostname();
     }
 }

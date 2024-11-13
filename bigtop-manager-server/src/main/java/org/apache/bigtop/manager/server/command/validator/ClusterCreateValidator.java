@@ -50,7 +50,7 @@ public class ClusterCreateValidator implements CommandValidator {
 
         ClusterPO clusterPO = clusterDao.findByName(clusterName);
 
-        if (clusterPO == null) {
+        if (clusterPO != null) {
             throw new ApiException(ApiExceptionEnum.CLUSTER_EXISTS, clusterName);
         }
     }

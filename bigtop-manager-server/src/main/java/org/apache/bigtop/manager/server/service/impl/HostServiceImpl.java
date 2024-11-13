@@ -80,7 +80,7 @@ public class HostServiceImpl implements HostService {
 
     @Override
     public List<HostVO> add(HostDTO hostDTO) {
-        List<HostPO> hostPOList = HostConverter.INSTANCE.fromDTO2POList(hostDTO);
+        List<HostPO> hostPOList = HostConverter.INSTANCE.fromDTO2POListUsingHostnames(hostDTO);
         for (HostPO hostPO : hostPOList) {
             hostPO.setStatus(HealthyStatusEnum.UNKNOWN.getCode());
         }
@@ -127,7 +127,7 @@ public class HostServiceImpl implements HostService {
 
     @Override
     public HostVO update(Long id, HostDTO hostDTO) {
-        HostPO hostPO = HostConverter.INSTANCE.fromDTO2POWithoutHostname(hostDTO);
+        HostPO hostPO = HostConverter.INSTANCE.fromDTO2PO(hostDTO);
         hostPO.setId(id);
         hostDao.partialUpdateById(hostPO);
         return get(id);

@@ -64,7 +64,9 @@ public class ComponentStatusScheduler {
                     .setStackVersion(hostComponentPO.getStackVersion())
                     .build();
             ComponentStatusServiceGrpc.ComponentStatusServiceBlockingStub blockingStub = GrpcClient.getBlockingStub(
-                    hostComponentPO.getHostname(), ComponentStatusServiceGrpc.ComponentStatusServiceBlockingStub.class);
+                    hostComponentPO.getHostname(),
+                    hostComponentPO.getGrpcPort(),
+                    ComponentStatusServiceGrpc.ComponentStatusServiceBlockingStub.class);
             ComponentStatusReply reply = blockingStub.getComponentStatus(request);
 
             // Status 0 means the service is running

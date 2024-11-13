@@ -125,7 +125,7 @@ CREATE TABLE `host_component`
 CREATE TABLE `host`
 (
     `id`                   BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `cluster_id`           BIGINT(20) UNSIGNED NOT NULL,
+    `cluster_id`           BIGINT(20) UNSIGNED DEFAULT NULL,
     `hostname`             VARCHAR(255) DEFAULT NULL,
     `ssh_user`             VARCHAR(255) DEFAULT NULL,
     `ssh_port`             INTEGER DEFAULT NULL,
@@ -217,8 +217,6 @@ CREATE TABLE `task`
     `custom_command`  VARCHAR(255),
     `content`         TEXT,
     `context`         TEXT NOT NULL,
-    `stack_name`      VARCHAR(255),
-    `stack_version`   VARCHAR(255),
     `state`           VARCHAR(255),
     `cluster_id`      BIGINT,
     `job_id`          BIGINT,

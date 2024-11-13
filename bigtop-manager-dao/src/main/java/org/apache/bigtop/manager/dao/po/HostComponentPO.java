@@ -92,4 +92,8 @@ public class HostComponentPO extends BasePO implements Serializable {
     @Transient
     @Column(name = "hostname")
     private String hostname;
+
+    @Transient
+    @Column(name = "grpc_port")
+    private Integer grpcPort;
 }

@@ -20,7 +20,6 @@ package org.apache.bigtop.manager.server.grpc;
 
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
-import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 
 import io.grpc.CallOptions;
 import io.grpc.Channel;
@@ -48,45 +47,38 @@ public class GrpcClient {
     private static final Map<String, Map<String, AbstractAsyncStub<?>>> ASYNC_STUBS = new ConcurrentHashMap<>();
     private static final Map<String, Map<String, AbstractFutureStub<?>>> FUTURE_STUBS = new ConcurrentHashMap<>();
 
-    public static ManagedChannel createChannel(String host) {
-        int port = SpringContextHolder.getApplicationContext()
-                .getEnvironment()
-                .getRequiredProperty("bigtop.manager.grpc.port", Integer.class);
-        return createChannel(host, port);
-    }
-
     public static Boolean isChannelAlive(String host) {
         ManagedChannel channel = CHANNELS.get(host);
         return channel != null && !channel.isShutdown() && !channel.isTerminated();
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends AbstractBlockingStub<T>> T getBlockingStub(String host, Class<T> clazz) {
+    public static <T extends AbstractBlockingStub<T>> T getBlockingStub(String host, Integer grpcPort, Class<T> clazz) {
         Map<String, AbstractBlockingStub<?>> innerMap =
                 BLOCKING_STUBS.computeIfAbsent(host, k -> new ConcurrentHashMap<>());
         return (T) innerMap.computeIfAbsent(clazz.getName(), k -> {
-            T instance = T.newStub(getFactory(clazz), getChannel(host));
+            T instance = T.newStub(getFactory(clazz), getChannel(host, grpcPort));
             log.info("Instance: {} created.", k);
             return instance;
         });
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends AbstractAsyncStub<T>> T getAsyncStub(String host, Class<T> clazz) {
+    public static <T extends AbstractAsyncStub<T>> T getAsyncStub(String host, Integer grpcPort, Class<T> clazz) {
         Map<String, AbstractAsyncStub<?>> innerMap = ASYNC_STUBS.computeIfAbsent(host, k -> new ConcurrentHashMap<>());
         return (T) innerMap.computeIfAbsent(clazz.getName(), k -> {
-            T instance = T.newStub(getFactory(clazz), getChannel(host));
+            T instance = T.newStub(getFactory(clazz), getChannel(host, grpcPort));
             log.info("Instance: {} created.", k);
             return instance;
         });
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends AbstractFutureStub<T>> T getFutureStub(String host, Class<T> clazz) {
+    public static <T extends AbstractFutureStub<T>> T getFutureStub(String host, Integer grpcPort, Class<T> clazz) {
         Map<String, AbstractFutureStub<?>> innerMap =
                 FUTURE_STUBS.computeIfAbsent(host, k -> new ConcurrentHashMap<>());
         return (T) innerMap.computeIfAbsent(clazz.getName(), k -> {
-            T instance = T.newStub(getFactory(clazz), getChannel(host));
+            T instance = T.newStub(getFactory(clazz), getChannel(host, grpcPort));
             log.info("Instance: {} created.", k);
             return instance;
         });
@@ -119,11 +111,11 @@ public class GrpcClient {
         }
     }
 
-    private static ManagedChannel getChannel(String host) {
+    private static ManagedChannel getChannel(String host, Integer grpcPort) {
         if (isChannelAlive(host)) {
             return CHANNELS.get(host);
         } else {
-            return createChannel(host);
+            return createChannel(host, grpcPort);
         }
     }
 

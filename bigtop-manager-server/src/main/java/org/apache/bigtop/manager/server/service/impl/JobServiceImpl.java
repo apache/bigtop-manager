@@ -159,8 +159,8 @@ public class JobServiceImpl implements JobService {
 
             for (int j = 0; j < stage.getTasks().size(); j++) {
                 Task task = stage.getTasks().get(j);
-                TaskPO taskPO =
-                        findCorrectTaskPO(taskPOList, task.getTaskContext().getHostname());
+                TaskPO taskPO = findCorrectTaskPO(
+                        taskPOList, task.getTaskContext().getHostDTO().getHostname());
                 if (taskPO == null) {
                     throw new ApiException(ApiExceptionEnum.JOB_NOT_RETRYABLE);
                 }

@@ -20,6 +20,7 @@ package org.apache.bigtop.manager.server.command.stage;
 
 import org.apache.bigtop.manager.server.command.task.ComponentStopTask;
 import org.apache.bigtop.manager.server.command.task.Task;
+import org.apache.bigtop.manager.server.model.dto.HostDTO;
 
 public class ComponentStopStage extends AbstractComponentStage {
 
@@ -28,8 +29,8 @@ public class ComponentStopStage extends AbstractComponentStage {
     }
 
     @Override
-    protected Task createTask(String hostname) {
-        return new ComponentStopTask(createTaskContext(hostname));
+    protected Task createTask(HostDTO hostDTO) {
+        return new ComponentStopTask(createTaskContext(hostDTO));
     }
 
     @Override
