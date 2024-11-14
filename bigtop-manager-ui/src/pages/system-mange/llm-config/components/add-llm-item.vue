@@ -19,10 +19,9 @@
 
 <script setup lang="ts">
   import { storeToRefs } from 'pinia'
-  import { computed, ref, watchEffect } from 'vue'
+  import { computed, ref, shallowRef, watchEffect } from 'vue'
   import { useFormItemConfig } from '@/store/llm-config/config'
   import { useLlmConfigStore } from '@/store/llm-config/index'
-  import { addFormItemEvents } from '@/components/common/auto-form/helper'
   import type { FormItemState } from '@/components/common/auto-form/types'
   import type { AuthorizedPlatform } from '@/api/llm-config/types'
 
@@ -44,48 +43,52 @@
   const open = ref(false)
   const mode = ref<keyof typeof Mode>('ADD')
   const autoFormRef = ref<Comp.AutoFormInstance | null>(null)
+  const disableFormKeys = shallowRef(['platformId', 'model'])
   const {
     loading,
     loadingTest,
     currPlatForm,
+    formKeys,
     platforms,
     isDisabled,
-    formCredentials
+    formCredentials,
+    supportModels
   } = storeToRefs(llmConfigStore)
 
-  const disabledItems = computed(() => {
-    const collectDisabled = formCredentials.value.map((v) => v.name)
-    return mode.value === 'EDIT'
-      ? ['platformId', 'model'].concat(collectDisabled)
-      : []
-  })
-  const baseFormItems = computed(() =>
-    addFormItemEvents(formItemConfig, 'platformId', {
-      change: onPlatformChange
-    })
+  const isEdit = computed(() => mode.value === 'EDIT')
+  const disabledItems = computed(() =>
+    isEdit.value ? [...disableFormKeys.value, ...formKeys.value] : []
   )
   const formItems = computed((): FormItemState[] => {
-    const tmpBaseFormItems = [...baseFormItems.value]
-    const newFormItems = formCredentials.value?.map((v) =>
-      createNewFormItem('input', v.name, v.displayName)
-    ) as FormItemState[]
-    if (newFormItems) {
-      newFormItems.length > 0 && tmpBaseFormItems.splice(2, 0, ...newFormItems)
-    }
-    return tmpBaseFormItems
+    const newFormItems =
+      formCredentials.value?.map((v) =>
+        createNewFormItem('input', v.name, v.displayName)
+      ) ?? []
+    return [
+      ...formItemConfig.value.slice(0, 2),
+      ...newFormItems,
+      ...formItemConfig.value.slice(2)
+    ]
   })
 
   watchEffect(() => {
     !open.value && llmConfigStore.resetState()
   })
 
+  const bindConfigToFormItems = () => {
+    autoFormRef?.value?.setOptions('platformId', platforms.value)
+    autoFormRef?.value?.setFormItemEvents('platformId', {
+      change: onPlatformChange
+    })
+  }
+
   const handleOpen = async (payload?: AuthorizedPlatform) => {
     open.value = true
     mode.value = payload ? 'EDIT' : 'ADD'
     currPlatForm.value = payload ?? currPlatForm.value
     await llmConfigStore.getPlatforms()
-    autoFormRef?.value?.setOptionsVal('platformId', platforms.value)
-    mode.value === 'EDIT' && llmConfigStore.getAuthPlatformDetail()
+    bindConfigToFormItems()
+    isEdit.value && llmConfigStore.getAuthPlatformDetail()
   }
 
   const handleOk = async () => {
@@ -109,17 +112,11 @@
   }
 
   const onPlatformChange = async () => {
-    const { platformId, model } = currPlatForm.value
-    const item = platforms.value.find((item) => item.id === platformId)
-    resetPlatformModel(model as string)
-    await llmConfigStore.getPlatformCredentials()
-    autoFormRef?.value?.setOptionsVal('model', item?.supportModels || [])
-  }
-
-  const resetPlatformModel = (model: string | undefined) => {
-    if (!model) {
+    if (currPlatForm.value.model) {
       currPlatForm.value.model = undefined
     }
+    await llmConfigStore.getPlatformCredentials()
+    autoFormRef?.value?.setOptions('model', supportModels.value || [])
   }
 
   defineExpose({

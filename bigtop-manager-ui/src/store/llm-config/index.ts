@@ -48,21 +48,27 @@ export const useLlmConfigStore = defineStore(
     const formCredentials = ref<PlatformCredential[]>([])
     const authorizedPlatforms = ref<AuthorizedPlatform[]>([])
     const currPlatForm = ref<CurrPlatForm>({})
+
+    const formKeys = computed(() => formCredentials.value.map((v) => v.name))
     const isDisabled = computed(() => loading.value || loadingTest.value)
+    const supportModels = computed(() => {
+      const { platformId } = currPlatForm.value
+      return platforms.value.find((item) => item.id === platformId)
+        ?.supportModels
+    })
     const authCredentials = computed(() =>
-      formCredentials.value.map((v: PlatformCredential) => ({
+      formCredentials.value.map((v) => ({
         key: v.name,
         value: currPlatForm.value[`${v.name as CurrPlatFormKeys}`] as string
       }))
     )
-    const authorizedPlatformConfig = computed(
-      () =>
-        ({
-          ...currPlatForm.value,
-          testPassed: testPassed.value,
-          authCredentials: authCredentials.value
-        }) as UpdateAuthorizedPlatformConfig
-    )
+    const authorizedPlatformConfig = computed(() => {
+      return {
+        ...currPlatForm.value,
+        testPassed: testPassed.value,
+        authCredentials: authCredentials.value
+      } as UpdateAuthorizedPlatformConfig
+    })
 
     const getAuthorizedPlatforms = async () => {
       loading.value = true
@@ -171,8 +177,10 @@ export const useLlmConfigStore = defineStore(
       loading,
       loadingTest,
       currPlatForm,
+      formKeys,
       formCredentials,
       authorizedPlatforms,
+      supportModels,
       platforms,
       isDisabled,
       getPlatforms,

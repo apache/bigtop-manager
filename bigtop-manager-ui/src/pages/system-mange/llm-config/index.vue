@@ -32,8 +32,8 @@
 
   const { t } = useI18n()
   const llmConfigStore = useLlmConfigStore()
-  const { loading, authorizedPlatforms } = storeToRefs(llmConfigStore)
   const addLlmItemRef = ref<InstanceType<typeof addLlmItem> | null>(null)
+  const { loading, authorizedPlatforms } = storeToRefs(llmConfigStore)
 
   const actionsMap: Record<ActionKeys, (config: AuthorizedPlatform) => void> = {
     EDIT: (config) => {
@@ -57,12 +57,11 @@
   }
 
   const extraActionClick = (item: ExtraItem) => {
-    const { llmConfig, action } = item
-    const actionHandler = actionsMap[action]
+    const actionHandler = actionsMap[item.action]
     if (actionHandler) {
-      actionHandler(llmConfig)
+      actionHandler(item.llmConfig)
     } else {
-      console.warn(`Unknown action: ${action}`)
+      console.warn(`Unknown action: ${item.action}`)
     }
   }
 

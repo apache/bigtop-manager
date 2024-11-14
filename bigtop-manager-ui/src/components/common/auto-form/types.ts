@@ -30,7 +30,6 @@ export interface FormItemState {
   formItemProps?: FormItemProps
   controlProps?: any
   defaultOptionsMap?: unknown[]
-  on?: any
 }
 
 export interface FormOptions {

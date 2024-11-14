@@ -18,11 +18,12 @@
  */
 
 import { FormItemState } from '@/components/common/auto-form/types'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 export function useFormItemConfig() {
   const { t } = useI18n()
-  const formItemConfig: FormItemState[] = [
+  const formItemConfig = computed((): FormItemState[] => [
     {
       type: 'input',
       field: 'name',
@@ -112,7 +113,7 @@ export function useFormItemConfig() {
         placeholder: t('common.enter_error', [t('llmConfig.desc')])
       }
     }
-  ]
+  ])
   const createNewFormItem = (
     type: string,
     field: string,

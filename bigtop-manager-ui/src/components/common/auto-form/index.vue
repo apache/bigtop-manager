@@ -38,8 +38,7 @@
         okText: 'Submit',
         cancelText: 'Reset'
       }
-    },
-    on: () => ({})
+    }
   })
 
   const emits = defineEmits<Emits>()
@@ -47,7 +46,8 @@
   const formRef = ref()
   const formState = ref<FormState>({})
   const tmpCacheFormState = ref<FormState>({})
-  const optionsMap = ref<Record<string, unknown>>({})
+  const optionMap = ref<Record<string, unknown>>({})
+  const formItemEvents = ref<Record<string, unknown>>({})
   const { formValue } = toRefs(props)
 
   const ruleFormTmpResolve = computed({
@@ -93,8 +93,12 @@
     }
   }
 
-  const setOptionsVal = (field: string, list: unknown[]) => {
-    optionsMap.value[field] = list
+  const setOptions = (field: string, list: unknown[]) => {
+    optionMap.value[field] = list
+  }
+
+  const setFormItemEvents = (field: string, events: any) => {
+    formItemEvents.value[field] = events
   }
 
   const setFormValue = <T,>(form: FormState<T>) => {
@@ -127,7 +131,8 @@
   defineExpose({
     resetForm,
     getFormValidation,
-    setOptionsVal,
+    setOptions,
+    setFormItemEvents,
     setFormValue
   })
 </script>
@@ -158,7 +163,7 @@
                   ? disabledItems.includes(item.field)
                   : item.controlProps.disabled
               "
-              v-on="item.on || {}"
+              v-on="formItemEvents[item.field] || {}"
             />
 
             <!-- textarea  -->
@@ -171,7 +176,7 @@
                   ? disabledItems.includes(item.field)
                   : item.controlProps.disabled
               "
-              v-on="item.on || {}"
+              v-on="formItemEvents[item.field] || {}"
             />
 
             <!-- select -->
@@ -184,10 +189,10 @@
                   ? disabledItems.includes(item.field)
                   : item.controlProps.disabled
               "
-              v-on="item.on || {}"
+              v-on="formItemEvents[item.field] || {}"
             >
               <a-select-option
-                v-for="(child, childIndex) in optionsMap[item.field] ||
+                v-for="(child, childIndex) in optionMap[item.field] ||
                 item.defaultOptionsMap ||
                 []"
                 :key="childIndex"
@@ -215,10 +220,10 @@
                   ? disabledItems.includes(item.field)
                   : item.controlProps.disabled
               "
-              v-on="item.on || {}"
+              v-on="formItemEvents[item.field] || {}"
             >
               <a-radio
-                v-for="(child, childIndex) in optionsMap[item.field] ||
+                v-for="(child, childIndex) in optionMap[item.field] ||
                 item.defaultOptionsMap ||
                 []"
                 :key="childIndex"
