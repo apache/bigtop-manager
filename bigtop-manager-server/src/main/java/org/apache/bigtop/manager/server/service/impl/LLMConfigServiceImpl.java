@@ -324,6 +324,7 @@ public class LLMConfigServiceImpl implements LLMConfigService {
         if (authPlatformPO == null || authPlatformPO.getIsDeleted()) {
             throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
         }
+
         return AuthPlatformConverter.INSTANCE.fromPO2VO(
                 authPlatformPO, platformDao.findById(authPlatformPO.getPlatformId()));
     }
