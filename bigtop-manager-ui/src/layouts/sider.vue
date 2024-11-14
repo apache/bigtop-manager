@@ -20,7 +20,7 @@
 <script setup lang="ts">
   import { toRefs } from 'vue'
   import { useRouter } from 'vue-router'
-  import { RouteExceptions } from '@/router/routes/modules/clusters'
+  import { RouteExceptions } from '@/enums'
   import { useMenuStore } from '@/store/menu'
   import type { MenuItem } from '@/store/menu/types'
 

@@ -22,11 +22,10 @@ import { useRoute, useRouter } from 'vue-router'
 import { dynamicRoutes as dr } from '@/router/routes/index'
 import { defineStore, storeToRefs } from 'pinia'
 import { useClusterStore } from '@/store/cluster/index'
-import cloneDeep from 'lodash/cloneDeep'
-
-import { RouteExceptions } from '@/router/routes/modules/clusters'
+import { RouteExceptions } from '@/enums'
 import { findActivePath } from './helper'
 import type { MenuItem } from './types'
+import cloneDeep from 'lodash/cloneDeep'
 
 export const useMenuStore = defineStore(
   'menu',

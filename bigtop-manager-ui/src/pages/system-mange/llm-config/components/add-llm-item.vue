@@ -20,11 +20,11 @@
 <script setup lang="ts">
   import { storeToRefs } from 'pinia'
   import { computed, ref, watchEffect } from 'vue'
-  import { AuthorizedPlatform } from '@/api/llm-config/types'
-  import { useFormItem } from '@/store/llm-config/config'
+  import { useFormItemConfig } from '@/store/llm-config/config'
   import { useLlmConfigStore } from '@/store/llm-config/index'
   import { addFormItemEvents } from '@/components/common/auto-form/helper'
   import type { FormItemState } from '@/components/common/auto-form/types'
+  import type { AuthorizedPlatform } from '@/api/llm-config/types'
 
   enum Mode {
     EDIT = 'llmConfig.edit_authorization',
@@ -39,7 +39,7 @@
   const emits = defineEmits<Emits>()
 
   const llmConfigStore = useLlmConfigStore()
-  const { formItemConfig, createNewFormItem } = useFormItem()
+  const { formItemConfig, createNewFormItem } = useFormItemConfig()
 
   const open = ref(false)
   const mode = ref<keyof typeof Mode>('ADD')
@@ -53,9 +53,12 @@
     formCredentials
   } = storeToRefs(llmConfigStore)
 
-  const getDisabledItems = computed(() =>
-    mode.value === 'EDIT' ? ['platformId', 'model'] : []
-  )
+  const getDisabledItems = computed(() => {
+    const collectDisabled = formCredentials.value.map((v) => v.name)
+    return mode.value === 'EDIT'
+      ? ['platformId', 'model'].concat(collectDisabled)
+      : []
+  })
   const getBaseFormItems = computed(() =>
     addFormItemEvents(formItemConfig, 'platformId', {
       change: onPlatformChange
@@ -79,9 +82,10 @@
   const handleOpen = async (payload?: AuthorizedPlatform) => {
     open.value = true
     mode.value = payload ? 'EDIT' : 'ADD'
-    payload && (currPlatForm.value = payload)
+    currPlatForm.value = payload ?? currPlatForm.value
     await llmConfigStore.getPlatforms()
     autoFormRef?.value?.setOptionsVal('platformId', platforms.value)
+    mode.value === 'EDIT' && llmConfigStore.getAuthPlatformDetail()
   }
 
   const handleOk = async () => {
@@ -107,11 +111,15 @@
   const onPlatformChange = async () => {
     const { platformId, model } = currPlatForm.value
     const item = platforms.value.find((item) => item.id === platformId)
+    resetPlatformModel(model as string)
+    await llmConfigStore.getPlatformCredentials()
+    autoFormRef?.value?.setOptionsVal('model', item?.supportModels || [])
+  }
+
+  const resetPlatformModel = (model: string | undefined) => {
     if (!model) {
       currPlatForm.value.model = ''
     }
-    await llmConfigStore.getPlatformCredentials()
-    autoFormRef?.value?.setOptionsVal('model', item?.supportModels || [])
   }
 
   defineExpose({

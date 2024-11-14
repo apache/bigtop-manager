@@ -34,8 +34,8 @@
     DELETE = '4'
   }
 
-  export type AcionsKeys = keyof typeof Actions
-  export type ExtraItem = { llmConfig: AuthorizedPlatform; action: AcionsKeys }
+  export type ActionKeys = keyof typeof Actions
+  export type ExtraItem = { llmConfig: AuthorizedPlatform; action: ActionKeys }
 
   interface LlmDescriptionItem {
     label: string
@@ -45,33 +45,31 @@
   interface LlmStatusItem {
     text: string
     type: 'success' | 'processing' | 'error'
-    actionKeys: Actions[]
+    actionKeys: ActionKeys[]
     status: AuthPlatformStatusType
   }
 
   interface ExtraActionItem extends MenuItemType {
-    key: AcionsKeys
+    key: ActionKeys
     danger?: boolean
   }
 
   interface Props {
-    llmConfig?: AuthorizedPlatform | Record<string, unknown>
+    llmConfig?: AuthorizedPlatform | Record<string, string>
     loading?: boolean
     isConfig?: boolean
   }
 
   interface Emits {
-    (event: 'onCreate'): void
+    (event: 'createLlmConfig'): void
     (event: 'update:loading', value: boolean): void
-    (event: 'onExtraClick', value: ExtraItem): void
+    (event: 'extraActionClick', value: ExtraItem): void
   }
 
   const props = withDefaults(defineProps<Props>(), {
     loading: false,
     isConfig: true,
-    llmConfig: () => {
-      return {}
-    }
+    llmConfig: () => ({})
   })
 
   const emits = defineEmits<Emits>()
@@ -121,50 +119,53 @@
       status: AuthPlatformStatus.ACTIVE,
       text: 'llmConfig.active',
       type: 'success',
-      actionKeys: [Actions.DISABLE, Actions.EDIT, Actions.DELETE]
+      actionKeys: ['DISABLE', 'EDIT', 'DELETE']
     },
     {
       status: AuthPlatformStatus.AVAILABLE,
       text: 'llmConfig.available',
       type: 'processing',
-      actionKeys: [Actions.ENABLE, Actions.EDIT, Actions.DELETE]
+      actionKeys: ['ENABLE', 'EDIT', 'DELETE']
     },
     {
       status: AuthPlatformStatus.UNAVAILABLE,
       text: 'llmConfig.unavailable',
       type: 'error',
-      actionKeys: [Actions.ENABLE, Actions.EDIT, Actions.DELETE]
+      actionKeys: ['ENABLE', 'EDIT', 'DELETE']
     }
   ])
 
-  const currStatus = computed(
-    () => llmConfig.value?.status as AuthPlatformStatusType
-  )
+  const currStatus = computed(() => llmConfig.value?.status)
+  const actionKeysSet = computed(() => new Set(getLlmStatus.value?.actionKeys))
   const getLlmStatus = computed(() =>
-    llmStatus.value.find(({ status }) => status == currStatus.value)
+    llmStatus.value.find(({ status }) => status === currStatus.value)
   )
   const getLlmActions = computed(() => {
-    const actionKeysSet = new Set(getLlmStatus.value?.actionKeys)
     return extraActions.value
-      .filter((item) => actionKeysSet.has(Actions[item.key]))
+      .filter((item) => actionKeysSet.value.has(item.key))
       .map((item) => ({
         ...item,
-        disabled: isDisable(item.key) || isEnable(item.key)
+        disabled: getActionDisabled(item.key)
       }))
   })
 
-  const isDisable = (key: AcionsKeys): boolean =>
+  const ellipsis = computed(() => (llmConfig.value ? true : false))
+
+  const getActionDisabled = (key: ActionKeys): boolean =>
+    isDisable(key) || isEnable(key)
+
+  const isDisable = (key: ActionKeys): boolean =>
     currStatus.value === AuthPlatformStatus.UNAVAILABLE && key === 'ENABLE'
 
-  const isEnable = (key: AcionsKeys): boolean =>
+  const isEnable = (key: ActionKeys): boolean =>
     currStatus.value === AuthPlatformStatus.ACTIVE && key === 'DELETE'
 
   const handleCreateLlmConfig = () => {
-    emits('onCreate')
+    emits('createLlmConfig')
   }
 
-  const handleClickAction = ({ key }: { key: AcionsKeys }) => {
-    emits('onExtraClick', {
+  const handleClickAction = ({ key }: { key: ActionKeys }) => {
+    emits('extraActionClick', {
       llmConfig: llmConfig.value as AuthorizedPlatform,
       action: key
     })
@@ -177,15 +178,20 @@
       <a-skeleton active :loading="loading">
         <div class="llm-card-header">
           <div class="llm-card-header-left">
+            <a-skeleton-avatar v-if="true" shape="square" :size="24" />
             <a-image
+              v-else
               :width="24"
               :height="24"
               src="https://www.antdv.com/#error"
-              fallback="data:image/png;base64,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"
             />
-            <div class="llm-card-header-text">{{ llmConfig?.name }}</div>
+            <a-typography-text
+              class="llm-card-header-left-text"
+              :ellipsis="llmConfig?.name ? { tooltip: llmConfig?.name } : false"
+              :content="`${llmConfig?.name}`"
+            />
             <a-tag :color="getLlmStatus?.type">
-              {{ $t(getLlmStatus?.text as string) }}
+              {{ $t(getLlmStatus?.text || '--') }}
             </a-tag>
           </div>
           <a-dropdown :trigger="['click']">
@@ -209,19 +215,20 @@
             </template>
           </a-dropdown>
         </div>
-        <div class="llm-card-desc">
-          <div
+        <div class="llm-card-body">
+          <a-typography-paragraph
             v-for="{ label, code } in llmDescriptions"
             :key="code"
-            class="llm-card-desc-item"
+            class="llm-card-desc"
           >
-            <div>{{ $t(label) }}</div>
-            <a-typography-text
+            <a-typography-text>{{ $t(label) }}</a-typography-text>
+            <a-typography-paragraph
               type="secondary"
-              :ellipsis="{ tooltip: llmConfig ? llmConfig[code] : '--' }"
-              :content="llmConfig ? llmConfig[code] : '--'"
+              class="llm-card-desc-text"
+              :ellipsis="ellipsis ? { tooltip: llmConfig[code] } : false"
+              :content="`${llmConfig ? llmConfig[code] : '--'}`"
             />
-          </div>
+          </a-typography-paragraph>
         </div>
       </a-skeleton>
     </template>
@@ -247,8 +254,10 @@
     border-radius: $border-radius-sm;
     padding: $space-md;
     font-size: 12px;
+    overflow: hidden;
     :deep(.ant-typography) {
       font-size: inherit;
+      margin-bottom: 0px !important;
     }
   }
 
@@ -259,28 +268,33 @@
       display: flex;
       align-items: center;
       gap: $space-sm;
+      &-text {
+        max-width: 100px;
+        flex: 1;
+      }
     }
-    &-text {
-      max-width: 80px;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
+
     .svg-icon {
       margin: 0;
       line-height: 24px;
     }
   }
 
+  .llm-card-body {
+    display: grid;
+    gap: $space-sm;
+  }
+
   .llm-card-desc {
-    @include flexbox($direction: column, $gap: $space-sm);
-    &-item {
-      @include flexbox($justify: space-between, $gap: 0 $space-lg);
-      flex: 0 0 26px;
-      border-bottom: 1px solid $color-split;
-      & div:first-child {
-        flex-shrink: 0;
-      }
+    width: 100%;
+    border-bottom: 1px solid $color-split;
+    padding-bottom: 6px;
+
+    @include flexbox($justify: space-between, $gap: $space-lg);
+    &-text {
+      width: 0;
+      flex: 1;
+      text-align: end;
     }
   }
 

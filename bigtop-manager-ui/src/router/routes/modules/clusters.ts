@@ -18,14 +18,8 @@
  */
 
 import { RouteRecordRaw } from 'vue-router'
+import { RouteExceptions } from '@/enums'
 import pageView from '@/layouts/index.vue'
-
-export enum RouteExceptions {
-  DEFAULT_ROUTE_NAME = 'Default',
-  DYNAMIC_ROUTE_MATCH = ':cluster/:id',
-  SPECIAL_ROUTE_NAME = 'Clusters',
-  SPECIAL_ROUTE_PATH = '/cluster-mange/clusters'
-}
 
 const routes: RouteRecordRaw[] = [
   {
@@ -123,4 +117,4 @@ const routes: RouteRecordRaw[] = [
   }
 ]
 
-export { routes }
+export { routes, RouteExceptions }

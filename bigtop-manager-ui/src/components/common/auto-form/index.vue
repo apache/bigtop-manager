@@ -18,7 +18,7 @@
 -->
 
 <script lang="ts" setup>
-  import { computed, onMounted, ref, toRaw, watch } from 'vue'
+  import { computed, onMounted, ref, toRaw, toRefs, watch } from 'vue'
   import { Emits, FormState, Props } from './types'
 
   const props = withDefaults(defineProps<Props>(), {
@@ -39,7 +39,7 @@
         cancelText: 'Reset'
       }
     },
-    on: () => {}
+    on: () => ({})
   })
 
   const emits = defineEmits<Emits>()
@@ -48,11 +48,12 @@
   const formState = ref<FormState>({})
   const tmpCacheFormState = ref<FormState>({})
   const optionsMap = ref<Record<string, unknown>>({})
+  const { formValue } = toRefs(props)
 
   const ruleFormTmpResolve = computed({
     get() {
-      const len = Object.keys(props.formValue).length
-      return len ? props.formValue : tmpCacheFormState.value
+      const len = Object.keys(formValue.value).length
+      return len ? formValue.value : tmpCacheFormState.value
     },
     set(val) {
       tmpCacheFormState.value = val || {}
@@ -74,7 +75,7 @@
     const newForm: FormState = {}
     props.formItems.forEach((item) => {
       const { field, defaultValue } = item
-      newForm[field] = defaultValue || ''
+      newForm[field] = defaultValue || undefined
     })
     Object.assign(formState.value, {
       ...newForm,

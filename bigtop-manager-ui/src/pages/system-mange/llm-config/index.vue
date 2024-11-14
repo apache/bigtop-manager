@@ -19,23 +19,23 @@
 
 <script setup lang="ts">
   import { onMounted, ref } from 'vue'
-  import addLlmItem from './components/add-llm-item.vue'
+  import { storeToRefs } from 'pinia'
   import { useLlmConfigStore } from '@/store/llm-config/index'
   import { Modal } from 'ant-design-vue'
   import { useI18n } from 'vue-i18n'
   import LlmItem, {
-    type AcionsKeys,
+    type ActionKeys,
     type ExtraItem
   } from './components/llm-item.vue'
   import type { AuthorizedPlatform } from '@/api/llm-config/types'
-  import { storeToRefs } from 'pinia'
+  import addLlmItem from './components/add-llm-item.vue'
 
-  const addLlmItemRef = ref<InstanceType<typeof addLlmItem> | null>(null)
   const { t } = useI18n()
   const llmConfigStore = useLlmConfigStore()
   const { loading, authorizedPlatforms } = storeToRefs(llmConfigStore)
+  const addLlmItemRef = ref<InstanceType<typeof addLlmItem> | null>(null)
 
-  const actionsMap: Record<AcionsKeys, (config: AuthorizedPlatform) => void> = {
+  const actionsMap: Record<ActionKeys, (config: AuthorizedPlatform) => void> = {
     EDIT: (config) => {
       addLlmItemRef.value?.handleOpen(config)
     },
@@ -52,11 +52,11 @@
     }
   }
 
-  const onCreate = () => {
+  const createLlmConfig = () => {
     addLlmItemRef.value?.handleOpen()
   }
 
-  const onExtraClick = (item: ExtraItem) => {
+  const extraActionClick = (item: ExtraItem) => {
     const { llmConfig, action } = item
     const actionHandler = actionsMap[action]
     if (actionHandler) {
@@ -92,9 +92,9 @@
           v-for="item in authorizedPlatforms"
           :key="item.id"
           :llm-config="item"
-          @on-extra-click="onExtraClick"
+          @extra-action-click="extraActionClick"
         />
-        <llm-item :is-config="false" @on-create="onCreate" />
+        <llm-item :is-config="false" @create-llm-config="createLlmConfig" />
       </div>
       <add-llm-item
         ref="addLlmItemRef"

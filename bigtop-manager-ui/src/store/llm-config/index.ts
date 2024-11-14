@@ -80,6 +80,17 @@ export const useLlmConfigStore = defineStore(
       }
     }
 
+    const getAuthPlatformDetail = async () => {
+      try {
+        const authId = currPlatForm.value.id as number
+        await getPlatformCredentials()
+        const data = await llmServer.getAuthPlatformDetail(authId)
+        Object.assign(currPlatForm.value, data.authCredentials)
+      } catch (error) {
+        console.log('error :>> ', error)
+      }
+    }
+
     const addAuthorizedPlatform = async () => {
       loading.value = true
       const params = getAuthorizedPlatformConfig()
@@ -166,6 +177,7 @@ export const useLlmConfigStore = defineStore(
       platforms,
       getFormDisabled,
       getPlatforms,
+      getAuthPlatformDetail,
       getAuthorizedPlatforms,
       getPlatformCredentials,
       addAuthorizedPlatform,

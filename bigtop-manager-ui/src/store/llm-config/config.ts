@@ -20,7 +20,7 @@
 import { FormItemState } from '@/components/common/auto-form/types'
 import { useI18n } from 'vue-i18n'
 
-export function useFormItem() {
+export function useFormItemConfig() {
   const { t } = useI18n()
   const formItemConfig: FormItemState[] = [
     {
