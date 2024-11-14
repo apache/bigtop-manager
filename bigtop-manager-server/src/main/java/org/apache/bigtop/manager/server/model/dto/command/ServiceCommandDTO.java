@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.server.model.dto.command;
 
 import org.apache.bigtop.manager.server.model.dto.ComponentHostDTO;
-import org.apache.bigtop.manager.server.model.dto.TypeConfigDTO;
+import org.apache.bigtop.manager.server.model.dto.ServiceConfigDTO;
 
 import lombok.Data;
 
@@ -39,5 +39,5 @@ public class ServiceCommandDTO implements Serializable {
 
     private List<ComponentHostDTO> componentHosts;
 
-    private List<TypeConfigDTO> configs;
+    private List<ServiceConfigDTO> configs;
 }

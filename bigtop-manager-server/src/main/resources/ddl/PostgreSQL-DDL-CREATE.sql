@@ -75,49 +75,6 @@ COMMENT ON COLUMN cluster.status IS '1-healthy, 2-unhealthy, 3-unknown';
 
 DROP INDEX IF EXISTS idx_cluster_stack_id;
 
-CREATE TABLE component
-(
-    id              BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY,
-    category        VARCHAR(255),
-    command_script  VARCHAR(255),
-    component_name  VARCHAR(255),
-    create_by       BIGINT,
-    create_time     TIMESTAMP(0),
-    custom_commands TEXT,
-    display_name    VARCHAR(255),
-    quick_link      VARCHAR(255),
-    cardinality     VARCHAR(255),
-    update_by       BIGINT,
-    update_time     TIMESTAMP(0),
-    cluster_id      BIGINT,
-    service_id      BIGINT,
-    PRIMARY KEY (id),
-    CONSTRAINT uk_component_name UNIQUE (component_name, cluster_id)
-);
-
-DROP INDEX IF EXISTS idx_component_cluster_id;
-DROP INDEX IF EXISTS idx_component_service_id;
-CREATE INDEX idx_component_cluster_id ON component (cluster_id);
-CREATE INDEX idx_component_service_id ON component (service_id);
-
-CREATE TABLE host_component
-(
-    id           BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY,
-    create_by    BIGINT,
-    create_time  TIMESTAMP(0),
-    state        VARCHAR(255),
-    update_by    BIGINT,
-    update_time  TIMESTAMP(0),
-    component_id BIGINT,
-    host_id      BIGINT,
-    PRIMARY KEY (id)
-);
-
-DROP INDEX IF EXISTS idx_hc_component_id;
-DROP INDEX IF EXISTS idx_hc_host_id;
-CREATE INDEX idx_hc_component_id ON host_component (component_id);
-CREATE INDEX idx_hc_host_id ON host_component (host_id);
-
 CREATE TABLE host
 (
     id                   BIGINT CHECK (id > 0)         NOT NULL GENERATED ALWAYS AS IDENTITY,
@@ -172,6 +129,103 @@ CREATE TABLE repo
 );
 
 COMMENT ON COLUMN repo.type IS '1-services, 2-tools';
+
+CREATE TABLE service
+(
+    id                BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY,
+    display_name      VARCHAR(255),
+    package_specifics VARCHAR(1024),
+    required_services VARCHAR(255),
+    service_desc      VARCHAR(1024),
+    service_name      VARCHAR(255),
+    service_user      VARCHAR(255),
+    service_version   VARCHAR(255),
+    cluster_id        BIGINT,
+    create_time       TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
+    update_time       TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
+    create_by         BIGINT,
+    update_by         BIGINT,
+    PRIMARY KEY (id),
+    CONSTRAINT uk_service_name UNIQUE (service_name, cluster_id)
+);
+
+CREATE INDEX idx_service_cluster_id ON service (cluster_id);
+
+CREATE TABLE service_config
+(
+    id                BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY,
+    name              VARCHAR(255),
+    properties_json   TEXT,
+    cluster_id        BIGINT,
+    service_id        BIGINT,
+    create_time       TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
+    update_time       TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
+    create_by         BIGINT,
+    update_by         BIGINT,
+    PRIMARY KEY (id)
+);
+
+CREATE INDEX idx_sc_cluster_id ON service_config (cluster_id);
+CREATE INDEX idx_sc_service_id ON service_config (service_id);
+
+CREATE TABLE service_config_snapshot
+(
+    id                BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY,
+    name              VARCHAR(255),
+    "desc"            VARCHAR(255),
+    config_json       TEXT,
+    service_id        BIGINT,
+    create_time       TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
+    update_time       TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
+    create_by         BIGINT,
+    update_by         BIGINT,
+    PRIMARY KEY (id)
+);
+
+CREATE INDEX idx_scs_service_id ON service_config_snapshot (service_id);
+
+CREATE TABLE component
+(
+    id              BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY,
+    category        VARCHAR(255),
+    command_script  VARCHAR(255),
+    component_name  VARCHAR(255),
+    custom_commands TEXT,
+    display_name    VARCHAR(255),
+    quick_link      VARCHAR(255),
+    cardinality     VARCHAR(255),
+    cluster_id      BIGINT,
+    service_id      BIGINT,
+    create_time     TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
+    update_time     TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
+    create_by       BIGINT,
+    update_by       BIGINT,
+    PRIMARY KEY (id),
+    CONSTRAINT uk_component_name UNIQUE (component_name, cluster_id)
+);
+
+DROP INDEX IF EXISTS idx_component_cluster_id;
+DROP INDEX IF EXISTS idx_component_service_id;
+CREATE INDEX idx_component_cluster_id ON component (cluster_id);
+CREATE INDEX idx_component_service_id ON component (service_id);
+
+CREATE TABLE host_component
+(
+    id           BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY,
+    state        VARCHAR(255),
+    component_id BIGINT,
+    host_id      BIGINT,
+    create_time  TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
+    update_time  TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
+    create_by    BIGINT,
+    update_by    BIGINT,
+    PRIMARY KEY (id)
+);
+
+DROP INDEX IF EXISTS idx_hc_component_id;
+DROP INDEX IF EXISTS idx_hc_host_id;
+CREATE INDEX idx_hc_component_id ON host_component (component_id);
+CREATE INDEX idx_hc_host_id ON host_component (host_id);
 
 CREATE TABLE job
 (
@@ -239,58 +293,6 @@ DROP INDEX IF EXISTS idx_task_stage_id;
 CREATE INDEX idx_task_cluster_id ON task (cluster_id);
 CREATE INDEX idx_task_job_id ON task (job_id);
 CREATE INDEX idx_task_stage_id ON task (stage_id);
-
-CREATE TABLE type_config
-(
-    id                BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY,
-    create_by         BIGINT,
-    create_time       TIMESTAMP(0),
-    properties_json   TEXT,
-    type_name         VARCHAR(255),
-    update_by         BIGINT,
-    update_time       TIMESTAMP(0),
-    service_config_id BIGINT,
-    PRIMARY KEY (id)
-);
-
-CREATE TABLE service
-(
-    id                BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY,
-    create_by         BIGINT,
-    create_time       TIMESTAMP(0),
-    display_name      VARCHAR(255),
-    package_specifics VARCHAR(1024),
-    required_services VARCHAR(255),
-    service_desc      VARCHAR(1024),
-    service_name      VARCHAR(255),
-    service_user      VARCHAR(255),
-    service_version   VARCHAR(255),
-    update_by         BIGINT,
-    update_time       TIMESTAMP(0),
-    cluster_id        BIGINT,
-    PRIMARY KEY (id),
-    CONSTRAINT uk_service_name UNIQUE (service_name, cluster_id)
-);
-
-CREATE INDEX idx_service_cluster_id ON service (cluster_id);
-
-CREATE TABLE service_config
-(
-    id          BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY,
-    config_desc VARCHAR(255),
-    create_by   BIGINT,
-    create_time TIMESTAMP(0),
-    selected    BOOLEAN default FALSE,
-    update_by   BIGINT,
-    update_time TIMESTAMP(0),
-    version     INTEGER,
-    cluster_id  BIGINT,
-    service_id  BIGINT,
-    PRIMARY KEY (id)
-);
-
-CREATE INDEX idx_sc_cluster_id ON service_config (cluster_id);
-CREATE INDEX idx_sc_service_id ON service_config (service_id);
 
 CREATE TABLE setting
 (

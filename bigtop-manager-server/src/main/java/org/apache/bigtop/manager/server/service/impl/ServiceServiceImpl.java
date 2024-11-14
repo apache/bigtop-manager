@@ -24,22 +24,29 @@ import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.po.HostComponentPO;
 import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
+import org.apache.bigtop.manager.dao.po.ServiceConfigSnapshotPO;
 import org.apache.bigtop.manager.dao.po.ServicePO;
-import org.apache.bigtop.manager.dao.po.TypeConfigPO;
 import org.apache.bigtop.manager.dao.repository.HostComponentDao;
 import org.apache.bigtop.manager.dao.repository.ServiceConfigDao;
+import org.apache.bigtop.manager.dao.repository.ServiceConfigSnapshotDao;
 import org.apache.bigtop.manager.dao.repository.ServiceDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
+import org.apache.bigtop.manager.server.model.converter.ServiceConfigConverter;
+import org.apache.bigtop.manager.server.model.converter.ServiceConfigSnapshotConverter;
 import org.apache.bigtop.manager.server.model.converter.ServiceConverter;
-import org.apache.bigtop.manager.server.model.converter.TypeConfigConverter;
 import org.apache.bigtop.manager.server.model.dto.PropertyDTO;
 import org.apache.bigtop.manager.server.model.dto.QuickLinkDTO;
-import org.apache.bigtop.manager.server.model.dto.TypeConfigDTO;
+import org.apache.bigtop.manager.server.model.dto.ServiceConfigDTO;
+import org.apache.bigtop.manager.server.model.req.ServiceConfigReq;
+import org.apache.bigtop.manager.server.model.req.ServiceConfigSnapshotReq;
 import org.apache.bigtop.manager.server.model.vo.QuickLinkVO;
+import org.apache.bigtop.manager.server.model.vo.ServiceConfigSnapshotVO;
+import org.apache.bigtop.manager.server.model.vo.ServiceConfigVO;
 import org.apache.bigtop.manager.server.model.vo.ServiceVO;
 import org.apache.bigtop.manager.server.service.ServiceService;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import org.springframework.stereotype.Service;
@@ -48,6 +55,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -64,6 +72,9 @@ public class ServiceServiceImpl implements ServiceService {
 
     @Resource
     private ServiceConfigDao serviceConfigDao;
+
+    @Resource
+    private ServiceConfigSnapshotDao serviceConfigSnapshotDao;
 
     @Override
     public List<ServiceVO> list(Long clusterId) {
@@ -117,21 +128,92 @@ public class ServiceServiceImpl implements ServiceService {
         return ServiceConverter.INSTANCE.fromPO2VO(servicePO);
     }
 
+    @Override
+    public List<ServiceConfigVO> listConf(Long clusterId, Long serviceId) {
+        List<ServiceConfigPO> list = serviceConfigDao.findByServiceId(serviceId);
+        if (CollectionUtils.isEmpty(list)) {
+            return List.of();
+        } else {
+            return ServiceConfigConverter.INSTANCE.fromPO2VO(list);
+        }
+    }
+
+    @Override
+    public List<ServiceConfigVO> updateConf(Long clusterId, Long serviceId, List<ServiceConfigReq> reqs) {
+        List<ServiceConfigPO> list = new ArrayList<>();
+        for (ServiceConfigReq req : reqs) {
+            ServiceConfigPO serviceConfigPO = new ServiceConfigPO();
+            serviceConfigPO.setId(req.getId());
+            serviceConfigPO.setPropertiesJson(JsonUtils.writeAsString(req.getProperties()));
+            list.add(serviceConfigPO);
+        }
+
+        serviceConfigDao.partialUpdateByIds(list);
+        return listConf(clusterId, serviceId);
+    }
+
+    @Override
+    public List<ServiceConfigSnapshotVO> listConfSnapshots(Long clusterId, Long serviceId) {
+        List<ServiceConfigSnapshotPO> list = serviceConfigSnapshotDao.findByServiceId(serviceId);
+        if (CollectionUtils.isEmpty(list)) {
+            return List.of();
+        } else {
+            return ServiceConfigSnapshotConverter.INSTANCE.fromPO2VO(list);
+        }
+    }
+
+    @Override
+    public ServiceConfigSnapshotVO takeConfSnapshot(Long clusterId, Long serviceId, ServiceConfigSnapshotReq req) {
+        List<ServiceConfigPO> list = serviceConfigDao.findByServiceId(serviceId);
+        Map<String, String> confMap = new HashMap<>();
+        for (ServiceConfigPO serviceConfigPO : list) {
+            confMap.put(serviceConfigPO.getName(), serviceConfigPO.getPropertiesJson());
+        }
+
+        String confJson = JsonUtils.writeAsString(confMap);
+        ServiceConfigSnapshotPO serviceConfigSnapshotPO = new ServiceConfigSnapshotPO();
+        serviceConfigSnapshotPO.setName(req.getName());
+        serviceConfigSnapshotPO.setDesc(req.getDesc());
+        serviceConfigSnapshotPO.setConfigJson(confJson);
+        serviceConfigSnapshotPO.setServiceId(serviceId);
+        serviceConfigSnapshotDao.save(serviceConfigSnapshotPO);
+        return ServiceConfigSnapshotConverter.INSTANCE.fromPO2VO(serviceConfigSnapshotPO);
+    }
+
+    @Override
+    public List<ServiceConfigVO> recoveryConfSnapshot(Long clusterId, Long serviceId, Long snapshotId) {
+        ServiceConfigSnapshotPO serviceConfigSnapshotPO = serviceConfigSnapshotDao.findById(snapshotId);
+        Map<String, String> confMap = JsonUtils.readFromString(serviceConfigSnapshotPO.getConfigJson());
+        List<ServiceConfigPO> list = serviceConfigDao.findByServiceId(serviceId);
+        for (ServiceConfigPO serviceConfigPO : list) {
+            String value = confMap.get(serviceConfigPO.getName());
+            if (value != null) {
+                serviceConfigPO.setPropertiesJson(value);
+            }
+        }
+
+        serviceConfigDao.updateByIds(list);
+        return ServiceConfigConverter.INSTANCE.fromPO2VO(list);
+    }
+
+    @Override
+    public Boolean deleteConfSnapshot(Long clusterId, Long serviceId, Long snapshotId) {
+        return serviceConfigSnapshotDao.deleteById(snapshotId);
+    }
+
     private List<QuickLinkVO> resolveQuickLink(
             List<HostComponentPO> hostComponentPOList, String quickLinkJson, Long clusterId, Long serviceId) {
         List<QuickLinkVO> quickLinkVOList = new ArrayList<>();
 
         QuickLinkDTO quickLinkDTO = JsonUtils.readFromString(quickLinkJson, QuickLinkDTO.class);
 
-        ServiceConfigPO serviceConfigPO =
-                serviceConfigDao.findByClusterIdAndServiceIdAndSelectedIsTrue(clusterId, serviceId);
-        List<TypeConfigPO> typeConfigPOList = serviceConfigPO.getConfigs();
+        List<ServiceConfigPO> serviceConfigPOList = serviceConfigDao.findByServiceId(serviceId);
 
         String httpPort = quickLinkDTO.getHttpPortDefault();
         // Use HTTP for now, need to handle https in the future
-        for (TypeConfigPO typeConfigPO : typeConfigPOList) {
-            TypeConfigDTO typeConfigDTO = TypeConfigConverter.INSTANCE.fromPO2DTO(typeConfigPO);
-            for (PropertyDTO propertyDTO : typeConfigDTO.getProperties()) {
+        for (ServiceConfigPO serviceConfigPO : serviceConfigPOList) {
+            ServiceConfigDTO serviceConfigDTO = ServiceConfigConverter.INSTANCE.fromPO2DTO(serviceConfigPO);
+            for (PropertyDTO propertyDTO : serviceConfigDTO.getProperties()) {
                 if (propertyDTO.getName().equals(quickLinkDTO.getHttpPortProperty())) {
 
                     httpPort = propertyDTO.getValue().contains(":")

@@ -16,28 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.service;
+package org.apache.bigtop.manager.server.model.req;
 
-import org.apache.bigtop.manager.server.model.dto.TypeConfigDTO;
-import org.apache.bigtop.manager.server.model.vo.ServiceConfigVO;
+import lombok.Data;
 
-import java.util.List;
+import java.io.Serializable;
 
-public interface ConfigService {
+@Data
+public class ServiceConfigSnapshotReq implements Serializable {
 
-    /**
-     * Get all version configurations.
-     *
-     * @return configurations
-     */
-    List<ServiceConfigVO> list(Long clusterId);
+    private String name;
 
-    /**
-     * Get all latest configurations.
-     *
-     * @return configurations
-     */
-    List<ServiceConfigVO> latest(Long clusterId);
-
-    void upsert(Long clusterId, Long serviceId, List<TypeConfigDTO> configs);
+    private String desc;
 }

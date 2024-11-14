@@ -20,7 +20,7 @@ package org.apache.bigtop.manager.server.model.req.command;
 
 import org.apache.bigtop.manager.server.config.CommandGroupSequenceProvider;
 import org.apache.bigtop.manager.server.model.req.ComponentHostReq;
-import org.apache.bigtop.manager.server.model.req.TypeConfigReq;
+import org.apache.bigtop.manager.server.model.req.ServiceConfigReq;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -51,5 +51,5 @@ public class ServiceCommandReq {
 
     @NotEmpty(groups = {CommandGroupSequenceProvider.ServiceInstallCommandGroup.class})
     @Schema(description = "Configs for service")
-    private List<@Valid TypeConfigReq> configs;
+    private List<@Valid ServiceConfigReq> configs;
 }

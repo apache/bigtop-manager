@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *    https://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -16,31 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.dao.po;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+package org.apache.bigtop.manager.dao.repository;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import java.io.Serializable;
+import org.apache.bigtop.manager.dao.po.ServiceConfigSnapshotPO;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-@Table(name = "type_config")
-public class TypeConfigPO extends BasePO implements Serializable {
+import org.apache.ibatis.annotations.Param;
 
-    @Id
-    @Column(name = "id")
-    private Long id;
+import java.util.List;
 
-    @Column(name = "type_name")
-    private String typeName;
+public interface ServiceConfigSnapshotDao extends BaseDao<ServiceConfigSnapshotPO> {
 
-    @Column(name = "properties_json")
-    private String propertiesJson;
-
-    @Column(name = "service_config_id")
-    private Long serviceConfigId;
+    List<ServiceConfigSnapshotPO> findByServiceId(@Param("serviceId") Long serviceId);
 }

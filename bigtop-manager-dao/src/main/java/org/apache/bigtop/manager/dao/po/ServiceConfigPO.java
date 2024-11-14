@@ -20,14 +20,12 @@ package org.apache.bigtop.manager.dao.po;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import java.io.Serializable;
-import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -38,23 +36,23 @@ public class ServiceConfigPO extends BasePO implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "config_desc")
-    private String configDesc;
+    /**
+     * Config file name, eg: zookeeper-env, hdfs-site
+     */
+    @Column(name = "name")
+    private String name;
 
-    @Column(name = "version")
-    private Integer version;
-
-    @Column(name = "selected")
-    private Boolean selected;
-
-    @ToString.Exclude
-    private List<TypeConfigPO> configs;
-
-    @Column(name = "service_id")
-    private Long serviceId;
+    /**
+     * Properties json, represents by key-value pair belongs to a config file
+     */
+    @Column(name = "properties_json")
+    private String propertiesJson;
 
     @Column(name = "cluster_id")
     private Long clusterId;
+
+    @Column(name = "service_id")
+    private Long serviceId;
 
     @Transient
     @Column(name = "service_name")

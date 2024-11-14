@@ -16,16 +16,38 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.vo;
+package org.apache.bigtop.manager.dao.po;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import java.util.List;
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import java.io.Serializable;
 
 @Data
-public class TypeConfigVO {
+@EqualsAndHashCode(callSuper = true)
+@Table(name = "service_config_snapshot")
+public class ServiceConfigSnapshotPO extends BasePO implements Serializable {
 
-    private String typeName;
+    @Id
+    @Column(name = "id")
+    private Long id;
 
-    private List<PropertyVO> properties;
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "desc")
+    private String desc;
+
+    /**
+     * Config json, not like properties json in {@link ServiceConfigPO}
+     * this is json for a service, which contains all config file name and it's properties
+     */
+    @Column(name = "config_json")
+    private String configJson;
+
+    @Column(name = "service_id")
+    private Long serviceId;
 }

@@ -78,10 +78,11 @@ class ServiceControllerTest {
     @Test
     void getReturnsServiceById() {
         Long id = 1L;
+        Long clusterId = 1L;
         ServiceVO service = new ServiceVO();
         when(serviceService.get(id)).thenReturn(service);
 
-        ResponseEntity<ServiceVO> response = serviceController.get(id);
+        ResponseEntity<ServiceVO> response = serviceController.get(clusterId, id);
 
         assertTrue(response.isSuccess());
         assertEquals(service, response.getData());
@@ -90,9 +91,10 @@ class ServiceControllerTest {
     @Test
     void getReturnsNotFoundForInvalidId() {
         Long id = 999L;
+        Long clusterId = 1L;
         when(serviceService.get(id)).thenReturn(null);
 
-        ResponseEntity<ServiceVO> response = serviceController.get(id);
+        ResponseEntity<ServiceVO> response = serviceController.get(clusterId, id);
 
         assertTrue(response.isSuccess());
         assertNull(response.getData());

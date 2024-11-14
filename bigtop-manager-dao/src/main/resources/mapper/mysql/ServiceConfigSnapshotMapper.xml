@@ -21,35 +21,20 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="org.apache.bigtop.manager.dao.repository.ServiceConfigDao">
+<mapper namespace="org.apache.bigtop.manager.dao.repository.ServiceConfigSnapshotDao">
 
     <sql id="baseColumns">
-        id, name, properties_json, cluster_id, service_id, create_time, update_time
+        id, name, `desc`, config_json, service_id, create_time, update_time
     </sql>
 
     <sql id="baseColumnsV2">
-        ${alias}.id, ${alias}.name, ${alias}.properties_json, ${alias}.cluster_id, ${alias}.service_id, ${alias}.create_time, ${alias}.update_time
+        ${alias}.id, ${alias}.name, ${alias}.`desc`, ${alias}.config_json, ${alias}.service_id, ${alias}.create_time, ${alias}.update_time
     </sql>
 
-    <select id="findByServiceId" resultType="org.apache.bigtop.manager.dao.po.ServiceConfigPO">
+    <select id="findByServiceId" resultType="org.apache.bigtop.manager.dao.po.ServiceConfigSnapshotPO">
         SELECT
-        <include refid="baseColumnsV2">
-            <property name="alias" value="sc"/>
-        </include>, s.service_name
-        FROM service_config sc
-        LEFT JOIN service s
-        ON sc.service_id = s.id
-        WHERE sc.service_id = #{serviceId}
-    </select>
-
-    <select id="findByClusterId" resultType="org.apache.bigtop.manager.dao.po.ServiceConfigPO">
-        SELECT
-        <include refid="baseColumnsV2">
-            <property name="alias" value="sc"/>
-        </include>, s.service_name
-        FROM service_config sc
-        LEFT JOIN service s
-        ON sc.service_id = s.id
-        WHERE sc.cluster_id = #{clusterId}
+        <include refid="baseColumns" />
+        FROM service_config_snapshot
+        WHERE service_id = #{serviceId}
     </select>
 </mapper>

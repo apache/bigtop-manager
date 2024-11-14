@@ -32,7 +32,6 @@ import org.apache.bigtop.manager.dao.po.RepoPO;
 import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
 import org.apache.bigtop.manager.dao.po.ServicePO;
 import org.apache.bigtop.manager.dao.po.SettingPO;
-import org.apache.bigtop.manager.dao.po.TypeConfigPO;
 import org.apache.bigtop.manager.dao.repository.ClusterDao;
 import org.apache.bigtop.manager.dao.repository.ComponentDao;
 import org.apache.bigtop.manager.dao.repository.HostComponentDao;
@@ -45,10 +44,6 @@ import org.apache.bigtop.manager.grpc.generated.CommandRequest;
 import org.apache.bigtop.manager.grpc.generated.CommandType;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 import org.apache.bigtop.manager.server.model.converter.RepoConverter;
-import org.apache.bigtop.manager.server.model.dto.PropertyDTO;
-import org.apache.bigtop.manager.server.utils.StackConfigUtils;
-
-import com.fasterxml.jackson.core.type.TypeReference;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -118,8 +113,7 @@ public class CacheFileUpdateTask extends AbstractTask {
         Long clusterId = clusterPO.getId();
 
         List<ServicePO> servicePOList = serviceDao.findAllByClusterId(clusterId);
-        List<ServiceConfigPO> serviceConfigPOList =
-                serviceConfigDao.findAllByClusterIdAndSelectedIsTrue(clusterPO.getId());
+        List<ServiceConfigPO> serviceConfigPOList = serviceConfigDao.findByClusterId(clusterPO.getId());
         List<HostComponentPO> hostComponentPOList = hostComponentDao.findAllByClusterId(clusterId);
         List<RepoPO> repoPOList = repoDao.findAllByClusterId(clusterPO.getId());
         Iterable<SettingPO> settings = settingDao.findAll();
@@ -131,20 +125,14 @@ public class CacheFileUpdateTask extends AbstractTask {
 
         serviceConfigMap = new HashMap<>();
         for (ServiceConfigPO serviceConfigPO : serviceConfigPOList) {
-            for (TypeConfigPO typeConfigPO : serviceConfigPO.getConfigs()) {
-                List<PropertyDTO> properties =
-                        JsonUtils.readFromString(typeConfigPO.getPropertiesJson(), new TypeReference<>() {});
-                String configMapStr = JsonUtils.writeAsString(StackConfigUtils.extractConfigMap(properties));
-
-                if (serviceConfigMap.containsKey(serviceConfigPO.getServiceName())) {
-                    serviceConfigMap
-                            .get(serviceConfigPO.getServiceName())
-                            .put(typeConfigPO.getTypeName(), configMapStr);
-                } else {
-                    Map<String, Object> hashMap = new HashMap<>();
-                    hashMap.put(typeConfigPO.getTypeName(), configMapStr);
-                    serviceConfigMap.put(serviceConfigPO.getServiceName(), hashMap);
-                }
+            if (serviceConfigMap.containsKey(serviceConfigPO.getServiceName())) {
+                serviceConfigMap
+                        .get(serviceConfigPO.getServiceName())
+                        .put(serviceConfigPO.getName(), serviceConfigPO.getPropertiesJson());
+            } else {
+                Map<String, Object> hashMap = new HashMap<>();
+                hashMap.put(serviceConfigPO.getName(), serviceConfigPO.getPropertiesJson());
+                serviceConfigMap.put(serviceConfigPO.getServiceName(), hashMap);
             }
         }
 
