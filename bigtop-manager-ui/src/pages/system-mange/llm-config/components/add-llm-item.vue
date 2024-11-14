@@ -49,23 +49,23 @@
     loadingTest,
     currPlatForm,
     platforms,
-    getFormDisabled,
+    isDisabled,
     formCredentials
   } = storeToRefs(llmConfigStore)
 
-  const getDisabledItems = computed(() => {
+  const disabledItems = computed(() => {
     const collectDisabled = formCredentials.value.map((v) => v.name)
     return mode.value === 'EDIT'
       ? ['platformId', 'model'].concat(collectDisabled)
       : []
   })
-  const getBaseFormItems = computed(() =>
+  const baseFormItems = computed(() =>
     addFormItemEvents(formItemConfig, 'platformId', {
       change: onPlatformChange
     })
   )
-  const getFormItems = computed((): FormItemState[] => {
-    const tmpBaseFormItems = [...getBaseFormItems.value]
+  const formItems = computed((): FormItemState[] => {
+    const tmpBaseFormItems = [...baseFormItems.value]
     const newFormItems = formCredentials.value?.map((v) =>
       createNewFormItem('input', v.name, v.displayName)
     ) as FormItemState[]
@@ -118,7 +118,7 @@
 
   const resetPlatformModel = (model: string | undefined) => {
     if (!model) {
-      currPlatForm.value.model = ''
+      currPlatForm.value.model = undefined
     }
   }
 
@@ -142,9 +142,9 @@
         ref="autoFormRef"
         v-model:form-value="currPlatForm"
         :show-button="false"
-        :form-items="getFormItems"
-        :form-disabled="getFormDisabled"
-        :disabled-items="getDisabledItems"
+        :form-items="formItems"
+        :form-disabled="isDisabled"
+        :disabled-items="disabledItems"
       />
       <template #footer>
         <footer>
@@ -159,7 +159,7 @@
             </a-button>
           </a-space>
           <a-space size="middle">
-            <a-button :disabled="getFormDisabled" @click="handleCancel">
+            <a-button :disabled="isDisabled" @click="handleCancel">
               {{ $t('common.cancel') }}
             </a-button>
             <a-button

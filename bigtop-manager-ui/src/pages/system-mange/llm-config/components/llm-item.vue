@@ -114,7 +114,7 @@
     }
   ])
 
-  const llmStatus = shallowRef<LlmStatusItem[]>([
+  const llmStatusConfig = shallowRef<LlmStatusItem[]>([
     {
       status: AuthPlatformStatus.ACTIVE,
       text: 'llmConfig.active',
@@ -136,11 +136,12 @@
   ])
 
   const currStatus = computed(() => llmConfig.value?.status)
-  const actionKeysSet = computed(() => new Set(getLlmStatus.value?.actionKeys))
-  const getLlmStatus = computed(() =>
-    llmStatus.value.find(({ status }) => status === currStatus.value)
+  const actionKeysSet = computed(() => new Set(llmStatus.value?.actionKeys))
+  const ellipsis = computed(() => (llmConfig.value ? true : false))
+  const llmStatus = computed(() =>
+    llmStatusConfig.value.find(({ status }) => status === currStatus.value)
   )
-  const getLlmActions = computed(() => {
+  const llmActions = computed(() => {
     return extraActions.value
       .filter((item) => actionKeysSet.value.has(item.key))
       .map((item) => ({
@@ -148,8 +149,6 @@
         disabled: getActionDisabled(item.key)
       }))
   })
-
-  const ellipsis = computed(() => (llmConfig.value ? true : false))
 
   const getActionDisabled = (key: ActionKeys): boolean =>
     isDisable(key) || isEnable(key)
@@ -190,8 +189,8 @@
               :ellipsis="llmConfig?.name ? { tooltip: llmConfig?.name } : false"
               :content="`${llmConfig?.name}`"
             />
-            <a-tag :color="getLlmStatus?.type">
-              {{ $t(getLlmStatus?.text || '--') }}
+            <a-tag :color="llmStatus?.type">
+              {{ $t(llmStatus?.text || '--') }}
             </a-tag>
           </div>
           <a-dropdown :trigger="['click']">
@@ -203,7 +202,7 @@
             <template #overlay>
               <a-menu @click="handleClickAction">
                 <a-menu-item
-                  v-for="{ key, label, danger, disabled } in getLlmActions"
+                  v-for="{ key, label, danger, disabled } in llmActions"
                   :key="key"
                   :danger="danger"
                   :disabled="disabled"

@@ -29,13 +29,14 @@ import type {
 
 import type { FormState } from '@/components/common/auto-form/types'
 
-interface Platform {
+type BaseType = Record<string, unknown>
+type CurrPlatForm = FormState<AuthorizedPlatform | BaseType>
+type CurrPlatFormKeys = keyof CurrPlatForm
+type Platform = {
   id: number
   name: string
   supportModels: string[]
 }
-
-type BaseType = Record<string, unknown>
 
 export const useLlmConfigStore = defineStore(
   'llmConfig',
@@ -46,8 +47,22 @@ export const useLlmConfigStore = defineStore(
     const platforms = ref<Platform[]>([])
     const formCredentials = ref<PlatformCredential[]>([])
     const authorizedPlatforms = ref<AuthorizedPlatform[]>([])
-    const currPlatForm = ref<FormState<AuthorizedPlatform | BaseType>>({})
-    const getFormDisabled = computed(() => loading.value || loadingTest.value)
+    const currPlatForm = ref<CurrPlatForm>({})
+    const isDisabled = computed(() => loading.value || loadingTest.value)
+    const authCredentials = computed(() =>
+      formCredentials.value.map((v: PlatformCredential) => ({
+        key: v.name,
+        value: currPlatForm.value[`${v.name as CurrPlatFormKeys}`] as string
+      }))
+    )
+    const authorizedPlatformConfig = computed(
+      () =>
+        ({
+          ...currPlatForm.value,
+          testPassed: testPassed.value,
+          authCredentials: authCredentials.value
+        }) as UpdateAuthorizedPlatformConfig
+    )
 
     const getAuthorizedPlatforms = async () => {
       loading.value = true
@@ -93,9 +108,10 @@ export const useLlmConfigStore = defineStore(
 
     const addAuthorizedPlatform = async () => {
       loading.value = true
-      const params = getAuthorizedPlatformConfig()
       try {
-        return await llmServer.addAuthorizedPlatform(params)
+        return await llmServer.addAuthorizedPlatform(
+          authorizedPlatformConfig.value
+        )
       } catch (error) {
         console.log('error :>> ', error)
         return false
@@ -106,9 +122,10 @@ export const useLlmConfigStore = defineStore(
 
     const updateAuthPlatform = async () => {
       loading.value = true
-      const params = getAuthorizedPlatformConfig()
       try {
-        return await llmServer.updateAuthPlatform(params)
+        return await llmServer.updateAuthPlatform(
+          authorizedPlatformConfig.value
+        )
       } catch (error) {
         console.log('error :>> ', error)
         return false
@@ -119,9 +136,10 @@ export const useLlmConfigStore = defineStore(
 
     const testAuthorizedPlatform = async () => {
       loadingTest.value = true
-      const params = getAuthorizedPlatformConfig()
       try {
-        return await llmServer.testAuthorizedPlatform(params)
+        return await llmServer.testAuthorizedPlatform(
+          authorizedPlatformConfig.value
+        )
       } catch (error) {
         console.log('error :>> ', error)
         return false
@@ -142,25 +160,6 @@ export const useLlmConfigStore = defineStore(
       return await llmServer.activateAuthorizedPlatform(authId)
     }
 
-    const getAuthCredentials = () => {
-      return formCredentials.value.map((v: PlatformCredential) => {
-        return {
-          key: v.name,
-          value: currPlatForm.value[
-            `${v.name as keyof typeof currPlatForm.value}`
-          ] as string
-        }
-      })
-    }
-
-    const getAuthorizedPlatformConfig = () => {
-      return {
-        ...currPlatForm.value,
-        testPassed: testPassed.value,
-        authCredentials: getAuthCredentials()
-      } as UpdateAuthorizedPlatformConfig
-    }
-
     const resetState = () => {
       loading.value = false
       currPlatForm.value = {}
@@ -175,7 +174,7 @@ export const useLlmConfigStore = defineStore(
       formCredentials,
       authorizedPlatforms,
       platforms,
-      getFormDisabled,
+      isDisabled,
       getPlatforms,
       getAuthPlatformDetail,
       getAuthorizedPlatforms,

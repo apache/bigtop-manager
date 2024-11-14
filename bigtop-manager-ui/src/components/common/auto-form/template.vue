@@ -33,7 +33,7 @@
   const helper = usePngImage('helper')
   const autoFormRef = ref<AutoFromInstance | null>(null)
   const formValue = ref<FormState>({})
-  const getFormItems = computed((): FormItemState[] => [
+  const formItems = computed((): FormItemState[] => [
     {
       type: 'input',
       field: 'name',
@@ -166,7 +166,7 @@
   <auto-from
     ref="autoFormRef"
     v-model:form-value="formValue"
-    :form-items="getFormItems"
+    :form-items="formItems"
     :show-button="false"
     :hidden-items="['type']"
   >
