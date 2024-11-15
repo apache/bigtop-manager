@@ -24,6 +24,8 @@
   import { useLlmConfigStore } from '@/store/llm-config/index'
   import type { FormItemState } from '@/components/common/auto-form/types'
   import type { AuthorizedPlatform } from '@/api/llm-config/types'
+  import { message } from 'ant-design-vue'
+  import { useI18n } from 'vue-i18n'
 
   enum Mode {
     EDIT = 'llmConfig.edit_authorization',
@@ -32,11 +34,11 @@
 
   interface Emits {
     (event: 'onOk'): void
-    (event: 'onTest'): void
   }
 
   const emits = defineEmits<Emits>()
 
+  const { t } = useI18n()
   const llmConfigStore = useLlmConfigStore()
   const { formItemConfig, createNewFormItem } = useFormItemConfig()
 
@@ -75,7 +77,7 @@
     !open.value && llmConfigStore.resetState()
   })
 
-  const bindConfigToFormItems = () => {
+  const bindPropToFormItems = () => {
     autoFormRef?.value?.setOptions('platformId', platforms.value)
     autoFormRef?.value?.setFormItemEvents('platformId', {
       change: onPlatformChange
@@ -87,7 +89,7 @@
     mode.value = payload ? 'EDIT' : 'ADD'
     currPlatForm.value = payload ?? currPlatForm.value
     await llmConfigStore.getPlatforms()
-    bindConfigToFormItems()
+    bindPropToFormItems()
     isEdit.value && llmConfigStore.getAuthPlatformDetail()
   }
 
@@ -96,6 +98,8 @@
     if (!validate) return
     const success = await llmConfigStore.addAuthorizedPlatform()
     if (success) {
+      const text = isEdit.value ? 'common.update_success' : 'common.created'
+      message.success(t(text))
       handleCancel()
       emits('onOk')
     }
@@ -103,7 +107,9 @@
 
   const handleTest = async () => {
     const success = await llmConfigStore.testAuthorizedPlatform()
-    success && emits('onTest')
+    if (success) {
+      message.success(t('common.test_success'))
+    }
   }
 
   const handleCancel = () => {

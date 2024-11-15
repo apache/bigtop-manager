@@ -21,7 +21,7 @@
   import { onMounted, ref } from 'vue'
   import { storeToRefs } from 'pinia'
   import { useLlmConfigStore } from '@/store/llm-config/index'
-  import { Modal } from 'ant-design-vue'
+  import { message, Modal } from 'ant-design-vue'
   import { useI18n } from 'vue-i18n'
   import LlmItem, {
     type ActionKeys,
@@ -44,11 +44,17 @@
     },
     ENABLE: async ({ id }) => {
       const success = await llmConfigStore.activateAuthorizedPlatform(id)
-      success && llmConfigStore.getAuthorizedPlatforms()
+      if (success) {
+        llmConfigStore.getAuthorizedPlatforms()
+        message.success(t('common.status_change_success'))
+      }
     },
     DISABLE: async ({ id }) => {
       const success = await llmConfigStore.deactivateAuthorizedPlatform(id)
-      success && llmConfigStore.getAuthorizedPlatforms()
+      if (success) {
+        llmConfigStore.getAuthorizedPlatforms()
+        message.success(t('common.status_change_success'))
+      }
     }
   }
 
@@ -70,7 +76,10 @@
       title: t('llmConfig.delete_authorization'),
       async onOk() {
         const success = await llmConfigStore.deleteAuthPlatform(authId)
-        success && llmConfigStore.getAuthorizedPlatforms()
+        if (success) {
+          llmConfigStore.getAuthorizedPlatforms()
+          message.success(t('common.delete_success'))
+        }
       }
     })
   }
@@ -97,7 +106,6 @@
       </div>
       <add-llm-item
         ref="addLlmItemRef"
-        @on-test="llmConfigStore.getAuthorizedPlatforms"
         @on-ok="llmConfigStore.getAuthorizedPlatforms"
       />
     </div>

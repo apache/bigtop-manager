@@ -105,8 +105,7 @@
       },
       controlProps: {
         placeholder: '请选择资源组'
-      },
-      on: {}
+      }
     },
     {
       type: 'textarea',
@@ -149,7 +148,7 @@
   ]
 
   onMounted(() => {
-    autoFormRef.value?.setOptionsVal('resGroupId', resourceList)
+    autoFormRef.value?.setOptions('resGroupId', resourceList)
   })
 
   onUnmounted(() => {
@@ -157,7 +156,7 @@
   })
 
   watchPostEffect(() => {
-    autoFormRef.value?.setOptionsVal('resGroupId', resourceList)
+    autoFormRef.value?.setOptions('resGroupId', resourceList)
     autoFormRef.value?.resetForm()
   })
 </script>
