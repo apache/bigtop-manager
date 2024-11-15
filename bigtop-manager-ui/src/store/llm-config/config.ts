@@ -60,7 +60,7 @@ export function useFormItemConfig() {
         rules: [
           {
             required: true,
-            message: t('common.enter_error', [
+            message: t('common.select_error', [
               t('llmConfig.platform_name').toLowerCase()
             ]),
             trigger: 'blur'
@@ -68,7 +68,7 @@ export function useFormItemConfig() {
         ]
       },
       controlProps: {
-        placeholder: t('common.enter_error', [
+        placeholder: t('common.select_error', [
           t('llmConfig.platform_name').toLowerCase()
         ])
       }
@@ -82,7 +82,7 @@ export function useFormItemConfig() {
         rules: [
           {
             required: true,
-            message: t('common.enter_error', [
+            message: t('common.select_error', [
               t('llmConfig.model').toLowerCase()
             ]),
             trigger: 'blur'
@@ -90,7 +90,7 @@ export function useFormItemConfig() {
         ]
       },
       controlProps: {
-        placeholder: t('common.enter_error', [
+        placeholder: t('common.select_error', [
           t('llmConfig.model').toLowerCase()
         ])
       }

@@ -72,5 +72,6 @@ export default {
     'Delete will not be recoverable, are you sure you want to delete {0} ?',
   no_options: 'No options',
   loadingText_verifying: 'Verifying',
-  enter_error: 'Enter {0}'
+  enter_error: 'Please enter {0}',
+  select_error: 'Please select {0}'
 }
