@@ -59,11 +59,8 @@ public abstract class AbstractComponentTask extends AbstractTask {
         commandPayload.setServiceName(taskContext.getServiceName());
         commandPayload.setCommand(getCommand());
         commandPayload.setServiceUser(taskContext.getServiceUser());
-        commandPayload.setStackName(taskContext.getStackName());
-        commandPayload.setStackVersion(taskContext.getStackVersion());
         commandPayload.setComponentName(taskContext.getComponentName());
-        commandPayload.setRoot(taskContext.getRoot());
-        commandPayload.setHostname(taskContext.getHostname());
+        commandPayload.setRootDir(taskContext.getRootDir());
 
         Map<String, Object> properties = taskContext.getProperties();
 
@@ -75,7 +72,6 @@ public abstract class AbstractComponentTask extends AbstractTask {
 
         CommandRequest.Builder builder = CommandRequest.newBuilder();
         builder.setType(CommandType.COMPONENT);
-        builder.setHostname(taskContext.getHostname());
         builder.setPayload(JsonUtils.writeAsString(commandPayload));
 
         return builder.build();

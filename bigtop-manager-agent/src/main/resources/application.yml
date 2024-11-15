@@ -17,11 +17,6 @@
 # under the License.
 #
 
-bigtop:
-  manager:
-    grpc:
-      port: 8835
-
 spring:
   banner:
     charset: utf-8
@@ -30,12 +25,12 @@ spring:
   main:
     banner-mode: log
 
-grpc:
-  server:
-    port: ${bigtop.manager.grpc.port}
-
 server:
   port: 8081
+
+grpc:
+  server:
+    port: 8835
 
 logging:
   level:

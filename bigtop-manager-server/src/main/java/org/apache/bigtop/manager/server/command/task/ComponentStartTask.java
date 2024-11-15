@@ -39,7 +39,7 @@ public class ComponentStartTask extends AbstractComponentTask {
 
         Long clusterId = taskContext.getClusterId();
         String componentName = taskContext.getComponentName();
-        String hostname = taskContext.getHostname();
+        String hostname = taskContext.getHostDTO().getHostname();
         HostComponentPO hostComponentPO =
                 hostComponentDao.findByClusterIdAndComponentNameAndHostname(clusterId, componentName, hostname);
         hostComponentPO.setState(MaintainState.STARTED.getName());
@@ -48,6 +48,7 @@ public class ComponentStartTask extends AbstractComponentTask {
 
     @Override
     public String getName() {
-        return "Start " + taskContext.getComponentDisplayName() + " on " + taskContext.getHostname();
+        return "Start " + taskContext.getComponentDisplayName() + " on "
+                + taskContext.getHostDTO().getHostname();
     }
 }

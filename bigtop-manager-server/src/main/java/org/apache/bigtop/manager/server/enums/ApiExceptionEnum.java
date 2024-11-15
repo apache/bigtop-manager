@@ -32,7 +32,7 @@ public enum ApiExceptionEnum {
 
     // Cluster Exceptions -- 11000 ~ 11999
     CLUSTER_NOT_FOUND(11000, LocaleKeys.CLUSTER_NOT_FOUND),
-    CLUSTER_IS_INSTALLED(11001, LocaleKeys.CLUSTER_IS_INSTALLED),
+    CLUSTER_EXISTS(11001, LocaleKeys.CLUSTER_EXISTS),
 
     // Host Exceptions -- 12000 ~ 12999
     HOST_NOT_FOUND(12000, LocaleKeys.HOST_NOT_FOUND),

@@ -25,15 +25,25 @@ public class ClusterVO {
 
     private Long id;
 
-    private String clusterName;
+    private String name;
 
-    private Integer clusterType;
+    private String desc;
 
-    private String stackName;
+    private Integer type;
 
-    private String stackVersion;
+    private String userGroup;
 
-    private Boolean selected;
+    private String rootDir;
 
-    private String state;
+    private Integer status;
+
+    private String createUser;
+
+    private Long totalHost;
+
+    private Long totalProcessor;
+
+    private Long totalMemory;
+
+    private Long totalDisk;
 }

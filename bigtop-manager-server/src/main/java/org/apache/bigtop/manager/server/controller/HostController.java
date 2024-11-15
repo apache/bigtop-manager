@@ -47,9 +47,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import java.util.List;
 
-@Tag(name = "Cluster Host Controller")
+@Tag(name = "Host Controller")
 @RestController
-@RequestMapping("/clusters/{clusterId}/hosts")
+@RequestMapping("/hosts")
 public class HostController {
 
     @Resource
@@ -67,41 +67,39 @@ public class HostController {
                 schema = @Schema(type = "string", defaultValue = "asc"))
     })
     @GetMapping
-    public ResponseEntity<PageVO<HostVO>> list(@PathVariable Long clusterId, HostQuery hostQuery) {
-        return ResponseEntity.success(hostService.list(clusterId, hostQuery));
+    public ResponseEntity<PageVO<HostVO>> list(HostQuery hostQuery) {
+        return ResponseEntity.success(hostService.list(hostQuery));
     }
 
     @Operation(summary = "add", description = "Add a host")
     @PostMapping
-    public ResponseEntity<List<HostVO>> add(@PathVariable Long clusterId, @RequestBody @Validated HostReq hostReq) {
+    public ResponseEntity<List<HostVO>> add(@RequestBody @Validated HostReq hostReq) {
         HostDTO hostDTO = HostConverter.INSTANCE.fromReq2DTO(hostReq);
-        return ResponseEntity.success(hostService.add(clusterId, hostDTO));
+        return ResponseEntity.success(hostService.add(hostDTO));
     }
 
     @Operation(summary = "get", description = "Get a host")
     @GetMapping("/{id}")
-    public ResponseEntity<HostVO> get(@PathVariable Long id, @PathVariable Long clusterId) {
+    public ResponseEntity<HostVO> get(@PathVariable Long id) {
         return ResponseEntity.success(hostService.get(id));
     }
 
     @Operation(summary = "update", description = "Update a host")
     @PutMapping("/{id}")
-    public ResponseEntity<HostVO> update(
-            @PathVariable Long clusterId, @PathVariable Long id, @RequestBody @Validated HostReq hostReq) {
+    public ResponseEntity<HostVO> update(@PathVariable Long id, @RequestBody @Validated HostReq hostReq) {
         HostDTO hostDTO = HostConverter.INSTANCE.fromReq2DTO(hostReq);
-        return ResponseEntity.success(hostService.update(id, clusterId, hostDTO));
+        return ResponseEntity.success(hostService.update(id, hostDTO));
     }
 
     @Operation(summary = "delete", description = "Delete a host")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> delete(@PathVariable Long clusterId, @PathVariable Long id) {
+    public ResponseEntity<Boolean> delete(@PathVariable Long id) {
         return ResponseEntity.success(hostService.delete(id));
     }
 
     @Operation(summary = "Check connection", description = "Check connection for hosts")
     @PostMapping("/check-connection")
-    public ResponseEntity<Boolean> checkConnection(
-            @PathVariable Long clusterId, @RequestBody @Validated HostReq hostReq) {
+    public ResponseEntity<Boolean> checkConnection(@RequestBody @Validated HostReq hostReq) {
         HostDTO hostDTO = HostConverter.INSTANCE.fromReq2DTO(hostReq);
         return ResponseEntity.success(hostService.checkConnection(hostDTO));
     }

@@ -29,6 +29,9 @@ public class HostReq {
     @Schema(example = "[host1, host2]")
     private List<String> hostnames;
 
+    @Schema(example = "1")
+    private Long clusterId;
+
     @Schema(example = "root")
     private String sshUser;
 

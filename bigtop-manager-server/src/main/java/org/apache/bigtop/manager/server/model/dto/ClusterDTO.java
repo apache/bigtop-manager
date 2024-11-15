@@ -20,20 +20,16 @@ package org.apache.bigtop.manager.server.model.dto;
 
 import lombok.Data;
 
-import java.util.List;
-
 @Data
 public class ClusterDTO {
 
-    private String clusterName;
+    private String name;
 
-    private Integer clusterType;
+    private String desc;
 
-    private String stackName;
+    private Integer type;
 
-    private String stackVersion;
+    private String userGroup;
 
-    private List<RepoDTO> repoInfoList;
-
-    private List<String> hostnames;
+    private String rootDir;
 }

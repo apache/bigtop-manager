@@ -133,7 +133,7 @@ public abstract class BaseParams implements Params {
     public String stackHome() {
         String stackName = this.commandPayload.getStackName();
         String stackVersion = this.commandPayload.getStackVersion();
-        String root = this.commandPayload.getRoot();
+        String root = this.commandPayload.getRootDir();
         return MessageFormat.format("{0}/{1}/{2}", root, stackName.toLowerCase(), stackVersion);
     }
 }

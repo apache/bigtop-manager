@@ -37,16 +37,20 @@ public interface HostConverter {
 
     HostDTO fromReq2DTO(HostReq hostReq);
 
+    HostDTO fromPO2DTO(HostPO hostPO);
+
+    List<HostDTO> fromPO2DTO(List<HostPO> hostPOList);
+
     HostVO fromPO2VO(HostPO hostPO);
 
     List<HostVO> fromPO2VO(List<HostPO> hostPOList);
 
-    HostPO fromDTO2POWithoutHostname(HostDTO hostDTO);
+    HostPO fromDTO2PO(HostDTO hostDTO);
 
-    default List<HostPO> fromDTO2POList(HostDTO hostDTO) {
+    default List<HostPO> fromDTO2POListUsingHostnames(HostDTO hostDTO) {
         return hostDTO.getHostnames().stream()
                 .map(hostname -> {
-                    HostPO hostPO = fromDTO2POWithoutHostname(hostDTO);
+                    HostPO hostPO = fromDTO2PO(hostDTO);
                     hostPO.setHostname(hostname);
                     return hostPO;
                 })

@@ -30,6 +30,7 @@ import org.apache.bigtop.manager.grpc.generated.CommandServiceGrpc;
 import org.apache.bigtop.manager.grpc.utils.ProtobufUtil;
 import org.apache.bigtop.manager.server.grpc.GrpcClient;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
+import org.apache.bigtop.manager.server.model.dto.HostDTO;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -82,8 +83,9 @@ public abstract class AbstractTask implements Task {
             builder.setTaskId(getTaskPO().getId());
             commandRequest = builder.build();
 
+            HostDTO hostDTO = taskContext.getHostDTO();
             CommandServiceGrpc.CommandServiceBlockingStub stub = GrpcClient.getBlockingStub(
-                    taskContext.getHostname(), CommandServiceGrpc.CommandServiceBlockingStub.class);
+                    hostDTO.getHostname(), hostDTO.getGrpcPort(), CommandServiceGrpc.CommandServiceBlockingStub.class);
             CommandReply reply = stub.exec(commandRequest);
 
             taskSuccess = reply != null && reply.getCode() == MessageConstants.SUCCESS_CODE;
@@ -133,9 +135,7 @@ public abstract class AbstractTask implements Task {
             taskPO = new TaskPO();
             taskPO.setName(getName());
             taskPO.setContext(JsonUtils.writeAsString(taskContext));
-            taskPO.setStackName(taskContext.getStackName());
-            taskPO.setStackVersion(taskContext.getStackVersion());
-            taskPO.setHostname(taskContext.getHostname());
+            taskPO.setHostname(taskContext.getHostDTO().getHostname());
             taskPO.setServiceName(taskContext.getServiceName());
             taskPO.setServiceUser(taskContext.getServiceUser());
             taskPO.setComponentName(taskContext.getComponentName());

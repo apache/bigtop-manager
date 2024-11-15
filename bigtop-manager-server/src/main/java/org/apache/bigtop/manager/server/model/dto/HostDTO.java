@@ -24,7 +24,16 @@ import java.util.List;
 
 @Data
 public class HostDTO {
+    // Used when converted from Req
     private List<String> hostnames;
+
+    // Used when converted from PO
+    private Long id;
+
+    // Used when converted from PO
+    private String hostname;
+
+    private Long clusterId;
 
     private String sshUser;
 

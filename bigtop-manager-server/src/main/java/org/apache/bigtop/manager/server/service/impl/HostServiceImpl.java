@@ -24,8 +24,8 @@ import org.apache.bigtop.manager.dao.query.HostQuery;
 import org.apache.bigtop.manager.dao.repository.HostComponentDao;
 import org.apache.bigtop.manager.dao.repository.HostDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
+import org.apache.bigtop.manager.server.enums.HealthyStatusEnum;
 import org.apache.bigtop.manager.server.enums.HostAuthTypeEnum;
-import org.apache.bigtop.manager.server.enums.HostStatus;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.model.converter.HostConverter;
 import org.apache.bigtop.manager.server.model.dto.HostDTO;
@@ -62,7 +62,7 @@ public class HostServiceImpl implements HostService {
     private HostComponentDao hostComponentDao;
 
     @Override
-    public PageVO<HostVO> list(Long clusterId, HostQuery hostQuery) {
+    public PageVO<HostVO> list(HostQuery hostQuery) {
         PageQuery pageQuery = PageUtils.getPageQuery();
         try (Page<?> ignored =
                 PageHelper.startPage(pageQuery.getPageNum(), pageQuery.getPageSize(), pageQuery.getOrderBy())) {
@@ -79,11 +79,10 @@ public class HostServiceImpl implements HostService {
     }
 
     @Override
-    public List<HostVO> add(Long clusterId, HostDTO hostDTO) {
-        List<HostPO> hostPOList = HostConverter.INSTANCE.fromDTO2POList(hostDTO);
+    public List<HostVO> add(HostDTO hostDTO) {
+        List<HostPO> hostPOList = HostConverter.INSTANCE.fromDTO2POListUsingHostnames(hostDTO);
         for (HostPO hostPO : hostPOList) {
-            hostPO.setClusterId(clusterId);
-            hostPO.setStatus(HostStatus.UNKNOWN.getCode());
+            hostPO.setStatus(HealthyStatusEnum.UNKNOWN.getCode());
         }
 
         hostDao.saveAll(hostPOList);
@@ -102,7 +101,7 @@ public class HostServiceImpl implements HostService {
             HostPO hostPO = new HostPO();
             hostPO.setHostname(hostname);
             hostPO.setClusterId(clusterId);
-            hostPO.setStatus(HostStatus.UNKNOWN.getCode());
+            hostPO.setStatus(HealthyStatusEnum.UNKNOWN.getCode());
 
             if (hostInMap.containsKey(hostname)) {
                 hostPO.setId(hostInMap.get(hostname).getId());
@@ -127,8 +126,8 @@ public class HostServiceImpl implements HostService {
     }
 
     @Override
-    public HostVO update(Long id, Long clusterId, HostDTO hostDTO) {
-        HostPO hostPO = HostConverter.INSTANCE.fromDTO2POWithoutHostname(hostDTO);
+    public HostVO update(Long id, HostDTO hostDTO) {
+        HostPO hostPO = HostConverter.INSTANCE.fromDTO2PO(hostDTO);
         hostPO.setId(id);
         hostDao.partialUpdateById(hostPO);
         return get(id);

@@ -21,7 +21,7 @@ package org.apache.bigtop.manager.server.enums;
 import lombok.Getter;
 
 @Getter
-public enum HostStatus {
+public enum HealthyStatusEnum {
     HEALTHY(1),
     UNHEALTHY(2),
     UNKNOWN(3),
@@ -29,12 +29,12 @@ public enum HostStatus {
 
     private final Integer code;
 
-    HostStatus(Integer code) {
+    HealthyStatusEnum(Integer code) {
         this.code = code;
     }
 
-    public static HostStatus fromCode(Integer code) {
-        for (HostStatus status : HostStatus.values()) {
+    public static HealthyStatusEnum fromCode(Integer code) {
+        for (HealthyStatusEnum status : HealthyStatusEnum.values()) {
             if (status.code.equals(code)) {
                 return status;
             }

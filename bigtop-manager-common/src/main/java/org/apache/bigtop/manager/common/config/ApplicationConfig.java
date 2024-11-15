@@ -18,10 +18,7 @@
  */
 package org.apache.bigtop.manager.common.config;
 
-import org.apache.bigtop.manager.common.config.application.GrpcConfig;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.context.annotation.Configuration;
 
 import lombok.Data;
@@ -29,8 +26,4 @@ import lombok.Data;
 @Data
 @Configuration
 @ConfigurationProperties(prefix = "bigtop.manager")
-public class ApplicationConfig {
-
-    @NestedConfigurationProperty
-    private GrpcConfig grpc;
-}
+public class ApplicationConfig {}

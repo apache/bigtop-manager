@@ -18,7 +18,6 @@
  */
 package org.apache.bigtop.manager.server.command.task;
 
-import org.apache.bigtop.manager.common.constants.Constants;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.message.entity.payload.CacheMessagePayload;
 import org.apache.bigtop.manager.common.message.entity.pojo.ClusterInfo;
@@ -47,7 +46,6 @@ import org.apache.bigtop.manager.grpc.generated.CommandType;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 import org.apache.bigtop.manager.server.model.converter.RepoConverter;
 import org.apache.bigtop.manager.server.model.dto.PropertyDTO;
-import org.apache.bigtop.manager.server.model.dto.RepoDTO;
 import org.apache.bigtop.manager.server.utils.StackConfigUtils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -118,10 +116,6 @@ public class CacheFileUpdateTask extends AbstractTask {
         ClusterPO clusterPO = clusterDao.findByIdJoin(taskContext.getClusterId());
 
         Long clusterId = clusterPO.getId();
-        String clusterName = clusterPO.getClusterName();
-
-        String stackName = clusterPO.getStackName();
-        String stackVersion = clusterPO.getStackVersion();
 
         List<ServicePO> servicePOList = serviceDao.findAllByClusterId(clusterId);
         List<ServiceConfigPO> serviceConfigPOList =
@@ -132,13 +126,8 @@ public class CacheFileUpdateTask extends AbstractTask {
         List<HostPO> hostPOList = hostDao.findAllByClusterId(clusterId);
 
         clusterInfo = new ClusterInfo();
-        clusterInfo.setClusterName(clusterName);
-        clusterInfo.setStackName(stackName);
-        clusterInfo.setStackVersion(stackVersion);
         clusterInfo.setUserGroup(clusterPO.getUserGroup());
-        clusterInfo.setRepoTemplate(clusterPO.getRepoTemplate());
-        clusterInfo.setRoot(clusterPO.getRoot());
-        clusterInfo.setPackages(List.of(clusterPO.getPackages().split(",")));
+        clusterInfo.setRootDir(clusterPO.getRootDir());
 
         serviceConfigMap = new HashMap<>();
         for (ServiceConfigPO serviceConfigPO : serviceConfigPOList) {
@@ -207,17 +196,8 @@ public class CacheFileUpdateTask extends AbstractTask {
         hostMap = new HashMap<>();
         userMap = new HashMap<>();
         settingsMap = new HashMap<>();
-
-        Map<String, Object> properties = taskContext.getProperties();
-
-        repoList = RepoConverter.INSTANCE.fromDTO2Message((List<RepoDTO>) properties.get("repoInfoList"));
+        repoList = new ArrayList<>();
         clusterInfo = new ClusterInfo();
-        clusterInfo.setClusterName(taskContext.getClusterName());
-        clusterInfo.setStackName(taskContext.getStackName());
-        clusterInfo.setStackVersion(taskContext.getStackVersion());
-
-        List<String> hostnames = (List<String>) properties.get("hostnames");
-        hostMap.put(Constants.ALL_HOST_KEY, new HashSet<>(hostnames));
     }
 
     @Override
@@ -233,7 +213,6 @@ public class CacheFileUpdateTask extends AbstractTask {
     @Override
     protected CommandRequest getCommandRequest() {
         CacheMessagePayload messagePayload = new CacheMessagePayload();
-        messagePayload.setHostname(taskContext.getHostname());
         messagePayload.setClusterInfo(clusterInfo);
         messagePayload.setConfigurations(serviceConfigMap);
         messagePayload.setClusterHostInfo(hostMap);
@@ -244,7 +223,6 @@ public class CacheFileUpdateTask extends AbstractTask {
 
         CommandRequest.Builder builder = CommandRequest.newBuilder();
         builder.setType(CommandType.UPDATE_CACHE_FILES);
-        builder.setHostname(taskContext.getHostname());
         builder.setPayload(JsonUtils.writeAsString(messagePayload));
 
         return builder.build();
@@ -252,6 +230,6 @@ public class CacheFileUpdateTask extends AbstractTask {
 
     @Override
     public String getName() {
-        return "Update cache files on " + taskContext.getHostname();
+        return "Update cache files on " + taskContext.getHostDTO().getHostname();
     }
 }
