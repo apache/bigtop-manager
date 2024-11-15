@@ -18,7 +18,6 @@
 -->
 
 <script setup lang="ts">
-  import AutoFrom from '@/components/common/auto-form/index.vue'
   import { computed, onMounted, onUnmounted, ref, watchPostEffect } from 'vue'
   import { usePngImage } from '@/utils/tools'
   import { useI18n } from 'vue-i18n'
@@ -27,11 +26,9 @@
     FormState
   } from '@/components/common/auto-form/types'
 
-  type AutoFromInstance = InstanceType<typeof AutoFrom>
-
   const { t } = useI18n()
   const helper = usePngImage('helper')
-  const autoFormRef = ref<AutoFromInstance | null>(null)
+  const autoFormRef = ref<Comp.AutoFormInstance | null>(null)
   const formValue = ref<FormState>({})
   const formItems = computed((): FormItemState[] => [
     {
@@ -55,9 +52,9 @@
     },
     {
       type: 'input',
-      field: 'platfrom',
+      field: 'platform',
       formItemProps: {
-        name: 'platfrom',
+        name: 'platform',
         label: '平台',
         rules: [{ required: true, message: '请输入平台', trigger: 'blur' }]
       }
