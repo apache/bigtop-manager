@@ -18,8 +18,8 @@
 -->
 
 <script setup lang="ts">
-  import { useTheme } from '@/store/theme'
-  const themeStore = useTheme()
+  import { useThemeStore } from '@/store/theme'
+  const themeStore = useThemeStore()
 </script>
 
 <template>

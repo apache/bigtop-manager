@@ -25,6 +25,9 @@ export default {
   action: '操作',
   status: '状态',
   edit: '编辑',
+  delete: '删除',
+  disable: '停用',
+  enable: '使用',
   submit: '提交',
   retry: '重试',
   cancel: '取消',
@@ -46,6 +49,9 @@ export default {
   stack: '组件栈',
   stage: '阶段',
   progress: '进度',
+  created: '创建成功',
+  status_change_success: '状态更新成功',
+  test_success: '测试成功',
   update_success: '更新成功',
   update_fail: '更新失败',
   error_unknown: '未知错误',
@@ -64,5 +70,7 @@ export default {
   delete_confirm_title: '删除确认',
   delete_confirm_content: '删除后无法恢复，确定要删除 {0} 吗？',
   no_options: '暂无选项',
-  loadingText_verifying: '校验中'
+  loading_text_verifying: '校验中',
+  enter_error: '请输入{0}',
+  select_error: '请选择{0}'
 }

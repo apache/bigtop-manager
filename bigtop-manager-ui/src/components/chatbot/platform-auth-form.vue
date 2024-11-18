@@ -137,7 +137,7 @@
     </a-spin>
     <footer>
       <a-button :loading="checkLoading" type="primary" @click="onCheck">{{
-        loading ? $t('common.loadingText_verifying') : $t('common.confirm')
+        loading ? $t('common.loading_text_verifying') : $t('common.confirm')
       }}</a-button>
     </footer>
   </div>

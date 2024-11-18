@@ -17,16 +17,10 @@
  * under the License.
  */
 
-import common from '@/locales/en_US/common.ts'
-import menu from '@/locales/en_US/menu.ts'
-import login from '@/locales/en_US/login'
-import user from '@/locales/en_US/user.ts'
-import llmConfig from '@/locales/en_US/llm-config.ts'
+import { MenuItem } from './types'
 
-export default {
-  common,
-  menu,
-  login,
-  user,
-  llmConfig
+export const findActivePath = (menu: MenuItem): string | undefined => {
+  return menu?.children && menu?.children.length > 0
+    ? findActivePath(menu.children[0])
+    : menu?.key
 }

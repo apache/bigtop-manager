@@ -17,16 +17,17 @@
  * under the License.
  */
 
-import common from '@/locales/en_US/common.ts'
-import menu from '@/locales/en_US/menu.ts'
-import login from '@/locales/en_US/login'
-import user from '@/locales/en_US/user.ts'
-import llmConfig from '@/locales/en_US/llm-config.ts'
-
-export default {
-  common,
-  menu,
-  login,
-  user,
-  llmConfig
+export const componentsConfigProvider = {
+  Modal: {
+    marginLG: 16,
+    paddingMD: 16,
+    paddingLG: 16,
+    paddingContentHorizontalLG: 16,
+    colorTextHeading: 'rgba(0, 0,.0,1)',
+    fontWeightStrong: 500
+  },
+  Form: {
+    controlHeightSM: 24,
+    marginLG: 16
+  }
 }

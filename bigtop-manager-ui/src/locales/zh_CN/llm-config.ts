@@ -16,17 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import common from '@/locales/en_US/common.ts'
-import menu from '@/locales/en_US/menu.ts'
-import login from '@/locales/en_US/login'
-import user from '@/locales/en_US/user.ts'
-import llmConfig from '@/locales/en_US/llm-config.ts'
-
 export default {
-  common,
-  menu,
-  login,
-  user,
-  llmConfig
+  add_authorization: '新增授权',
+  edit_authorization: '编辑授权',
+  test: '测试',
+  unavailable: '不可用',
+  active: '使用中',
+  available: '可用',
+  name: '名字',
+  platform_name: '平台',
+  model: '模型',
+  desc: '备注',
+  delete_authorization: '确认要删除授权吗 ?'
 }

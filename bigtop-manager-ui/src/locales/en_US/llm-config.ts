@@ -16,17 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import common from '@/locales/en_US/common.ts'
-import menu from '@/locales/en_US/menu.ts'
-import login from '@/locales/en_US/login'
-import user from '@/locales/en_US/user.ts'
-import llmConfig from '@/locales/en_US/llm-config.ts'
-
 export default {
-  common,
-  menu,
-  login,
-  user,
-  llmConfig
+  add_authorization: 'Add authorization',
+  edit_authorization: 'Edit authorization',
+  test: 'Test',
+  unavailable: 'Unavailable',
+  active: 'Active',
+  available: 'Available',
+  name: 'Name',
+  platform_name: 'Platform',
+  model: 'Model',
+  desc: 'Remark',
+  delete_authorization: 'Are you sure delete this authorization ?'
 }
