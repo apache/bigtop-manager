@@ -38,16 +38,16 @@
         name: 'name',
         label: t('xxxx.name'),
         rules: [
-          { required: true, message: '请输入名字', trigger: 'blur' },
-          { min: 3, max: 50, message: '长度3-50', trigger: 'blur' },
+          { required: true, message: t('xxxx'), trigger: 'blur' },
+          { min: 3, max: 50, message: t('xxxx'), trigger: 'blur' },
           {
             pattern: /^[0-9a-zA-Z_]{1,}$/,
-            message: '请输入正确的名字，字母/数字/下划线,'
+            message: t('xxxx')
           }
         ]
       },
       controlProps: {
-        placeholder: '请输入你的名字'
+        placeholder: t('xxxx')
       }
     },
     {
@@ -55,8 +55,8 @@
       field: 'platform',
       formItemProps: {
         name: 'platform',
-        label: '平台',
-        rules: [{ required: true, message: '请输入平台', trigger: 'blur' }]
+        label: t('xxxx'),
+        rules: [{ required: true, message: t('xxxx'), trigger: 'blur' }]
       }
     },
     {
@@ -65,7 +65,7 @@
       formItemProps: {
         name: 'apiKey',
         label: 'API Key',
-        rules: [{ required: true, message: '请输入API Key', trigger: 'blur' }]
+        rules: [{ required: true, message: t('xxxx'), trigger: 'blur' }]
       }
     },
     {
@@ -73,18 +73,18 @@
       field: 'model',
       formItemProps: {
         name: 'model',
-        label: '模型',
-        rules: [{ required: true, message: '请输入模型', trigger: 'blur' }]
+        label: t('xxxx'),
+        rules: [{ required: true, message: t('xxxx'), trigger: 'blur' }]
       }
     },
     {
       type: 'input',
       field: 'port',
       slot: 'port',
-      slotLabel: 'gRPC端口',
+      slotLabel: t('xxxx'),
       formItemProps: {
         name: 'port',
-        rules: [{ required: true, message: '请输入备注', trigger: 'blur' }]
+        rules: [{ required: true, message: t('xxxx'), trigger: 'blur' }]
       }
     },
     {
@@ -97,11 +97,11 @@
       },
       formItemProps: {
         name: 'resGroupId',
-        label: '选择资源组',
-        rules: [{ required: true, message: '请选择资源组', trigger: 'blur' }]
+        label: t('xxxx'),
+        rules: [{ required: true, message: t('xxxx'), trigger: 'blur' }]
       },
       controlProps: {
-        placeholder: '请选择资源组'
+        placeholder: t('xxxx')
       }
     },
     {
@@ -109,8 +109,8 @@
       field: 'remark',
       formItemProps: {
         name: 'remark',
-        label: '备注',
-        rules: [{ required: true, message: '请输入备注', trigger: 'blur' }]
+        label: t('xxxx'),
+        rules: [{ required: true, message: t('xxxx'), trigger: 'blur' }]
       }
     },
     {
@@ -118,28 +118,28 @@
       field: 'type',
       defaultValue: '0',
       defaultOptionsMap: [
-        { value: '0', label: '向导' },
-        { value: '1', label: '脚本' }
+        { value: '0', label: t('xxxx') },
+        { value: '1', label: t('xxxx') }
       ],
       formItemProps: {
         name: 'type',
-        label: '创建类型',
-        rules: [{ required: true, message: '请选择创建类型', trigger: 'blur' }]
+        label: t('xxxx'),
+        rules: [{ required: true, message: t('xxxx'), trigger: 'blur' }]
       }
     }
   ])
 
   const resourceList = [
     {
-      name: '资源组1',
+      name: 'xxx1',
       resourceGroupId: 'id_001'
     },
     {
-      name: '资源组2',
+      name: 'xxx2',
       resourceGroupId: 'id_002'
     },
     {
-      name: '资源组3',
+      name: 'xxx3',
       resourceGroupId: 'id_003'
     }
   ]

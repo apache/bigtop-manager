@@ -70,7 +70,7 @@ export default {
   delete_confirm_title: '删除确认',
   delete_confirm_content: '删除后无法恢复，确定要删除 {0} 吗？',
   no_options: '暂无选项',
-  loadingText_verifying: '校验中',
+  loading_text_verifying: '校验中',
   enter_error: '请输入{0}',
   select_error: '请选择{0}'
 }

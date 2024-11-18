@@ -49,7 +49,7 @@
   const {
     loading,
     loadingTest,
-    currPlatForm,
+    currPlatform,
     formKeys,
     platforms,
     isDisabled,
@@ -87,7 +87,7 @@
   const handleOpen = async (payload?: AuthorizedPlatform) => {
     open.value = true
     mode.value = payload ? 'EDIT' : 'ADD'
-    currPlatForm.value = payload ?? currPlatForm.value
+    currPlatform.value = payload ?? currPlatform.value
     await llmConfigStore.getPlatforms()
     bindPropToFormItems()
     isEdit.value && llmConfigStore.getAuthPlatformDetail()
@@ -118,8 +118,8 @@
   }
 
   const onPlatformChange = async () => {
-    if (currPlatForm.value.model) {
-      currPlatForm.value.model = undefined
+    if (currPlatform.value.model) {
+      currPlatform.value.model = undefined
     }
     await llmConfigStore.getPlatformCredentials()
     autoFormRef?.value?.setOptions('model', supportModels.value || [])
@@ -143,7 +143,7 @@
     >
       <auto-form
         ref="autoFormRef"
-        v-model:form-value="currPlatForm"
+        v-model:form-value="currPlatform"
         :show-button="false"
         :form-items="formItems"
         :form-disabled="isDisabled"

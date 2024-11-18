@@ -71,7 +71,7 @@ export default {
   delete_confirm_content:
     'Delete will not be recoverable, are you sure you want to delete {0} ?',
   no_options: 'No options',
-  loadingText_verifying: 'Verifying',
+  loading_text_verifying: 'Verifying',
   enter_error: 'Please enter {0}',
   select_error: 'Please select {0}'
 }

@@ -71,7 +71,7 @@
     }
   }
 
-  const handleDeleteLlmConfig = (authId: number) => {
+  const handleDeleteLlmConfig = (authId: string | number) => {
     Modal.confirm({
       title: t('llmConfig.delete_authorization'),
       async onOk() {
@@ -93,7 +93,7 @@
   <a-spin :spinning="loading">
     <div class="llm-config">
       <a-typography-title :level="5">
-        {{ $t('llmConfig.llm_config') }}
+        {{ $t('menu.llm_config') }}
       </a-typography-title>
       <div class="llm-config-content">
         <llm-item

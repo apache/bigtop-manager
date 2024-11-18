@@ -23,13 +23,21 @@ export enum AuthPlatformStatus {
   UNAVAILABLE = 3
 }
 
+export enum LlmLogo {
+  'open_ai' = 1,
+  'dash_scope' = 2,
+  'qian_fan' = 3
+}
+
+export type LlmLogoFlag = `${LlmLogo}`
+
 export type AuthPlatformStatusType =
   | AuthPlatformStatus.ACTIVE
   | AuthPlatformStatus.AVAILABLE
   | AuthPlatformStatus.UNAVAILABLE
 
 export interface Platform {
-  id: number
+  id: LlmLogoFlag
   name: string
   supportModels: string
 }
@@ -41,8 +49,8 @@ export interface AuthorizedPlatformDesc {
 }
 
 export interface AuthorizedPlatform extends AuthorizedPlatformDesc {
-  id: number
-  platformId: number
+  id: number | string
+  platformId: LlmLogoFlag
   name: string
   status: AuthPlatformStatusType
 }

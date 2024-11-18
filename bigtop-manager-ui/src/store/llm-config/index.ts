@@ -23,6 +23,7 @@ import * as llmServer from '@/api/llm-config/index'
 
 import type {
   AuthorizedPlatform,
+  LlmLogoFlag,
   PlatformCredential,
   UpdateAuthorizedPlatformConfig
 } from '@/api/llm-config/types'
@@ -30,10 +31,10 @@ import type {
 import type { FormState } from '@/components/common/auto-form/types'
 
 type BaseType = Record<string, unknown>
-type CurrPlatForm = FormState<AuthorizedPlatform | BaseType>
-type CurrPlatFormKeys = keyof CurrPlatForm
+type currPlatform = FormState<AuthorizedPlatform | BaseType>
+type currPlatformKeys = keyof currPlatform
 type Platform = {
-  id: number
+  id: LlmLogoFlag
   name: string
   supportModels: string[]
 }
@@ -47,24 +48,24 @@ export const useLlmConfigStore = defineStore(
     const platforms = ref<Platform[]>([])
     const formCredentials = ref<PlatformCredential[]>([])
     const authorizedPlatforms = ref<AuthorizedPlatform[]>([])
-    const currPlatForm = ref<CurrPlatForm>({})
+    const currPlatform = ref<currPlatform>({})
 
     const formKeys = computed(() => formCredentials.value.map((v) => v.name))
     const isDisabled = computed(() => loading.value || loadingTest.value)
     const supportModels = computed(() => {
-      const { platformId } = currPlatForm.value
+      const { platformId } = currPlatform.value
       return platforms.value.find((item) => item.id === platformId)
         ?.supportModels
     })
     const authCredentials = computed(() =>
       formCredentials.value.map((v) => ({
         key: v.name,
-        value: currPlatForm.value[`${v.name as CurrPlatFormKeys}`] as string
+        value: currPlatform.value[`${v.name as currPlatformKeys}`] as string
       }))
     )
     const authorizedPlatformConfig = computed(() => {
       return {
-        ...currPlatForm.value,
+        ...currPlatform.value,
         testPassed: testPassed.value,
         authCredentials: authCredentials.value
       } as UpdateAuthorizedPlatformConfig
@@ -93,7 +94,7 @@ export const useLlmConfigStore = defineStore(
 
     const getPlatformCredentials = async () => {
       try {
-        const platformId = currPlatForm.value.platformId as number
+        const platformId = currPlatform.value.platformId as number
         formCredentials.value =
           await llmServer.getPlatformCredentials(platformId)
       } catch (error) {
@@ -103,10 +104,10 @@ export const useLlmConfigStore = defineStore(
 
     const getAuthPlatformDetail = async () => {
       try {
-        const authId = currPlatForm.value.id as number
+        const authId = currPlatform.value.id as number
         await getPlatformCredentials()
         const data = await llmServer.getAuthPlatformDetail(authId)
-        Object.assign(currPlatForm.value, data.authCredentials)
+        Object.assign(currPlatform.value, data.authCredentials)
       } catch (error) {
         console.log('error :>> ', error)
       }
@@ -154,21 +155,21 @@ export const useLlmConfigStore = defineStore(
       }
     }
 
-    const deleteAuthPlatform = async (authId: number) => {
-      return await llmServer.deleteAuthPlatform(authId)
+    const deleteAuthPlatform = async (authId: number | string) => {
+      return await llmServer.deleteAuthPlatform(authId as number)
     }
 
-    const deactivateAuthorizedPlatform = async (authId: number) => {
-      return await llmServer.deactivateAuthorizedPlatform(authId)
+    const deactivateAuthorizedPlatform = async (authId: number | string) => {
+      return await llmServer.deactivateAuthorizedPlatform(authId as number)
     }
 
-    const activateAuthorizedPlatform = async (authId: number) => {
-      return await llmServer.activateAuthorizedPlatform(authId)
+    const activateAuthorizedPlatform = async (authId: number | string) => {
+      return await llmServer.activateAuthorizedPlatform(authId as number)
     }
 
     const resetState = () => {
       loading.value = false
-      currPlatForm.value = {}
+      currPlatform.value = {}
       formCredentials.value = []
       platforms.value = []
     }
@@ -176,7 +177,7 @@ export const useLlmConfigStore = defineStore(
     return {
       loading,
       loadingTest,
-      currPlatForm,
+      currPlatform,
       formKeys,
       formCredentials,
       authorizedPlatforms,

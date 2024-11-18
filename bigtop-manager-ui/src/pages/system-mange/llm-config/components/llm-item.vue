@@ -21,11 +21,14 @@
   import { computed, shallowRef, toRefs } from 'vue'
   import {
     AuthPlatformStatus,
+    LlmLogo,
+    type LlmLogoFlag,
     type AuthorizedPlatform,
     type AuthorizedPlatformDesc,
     type AuthPlatformStatusType
   } from '@/api/llm-config/types'
   import type { MenuItemType } from 'ant-design-vue/es/menu/src/interface'
+  import { usePngImage } from '@/utils/tools'
 
   enum Actions {
     DISABLE = '1',
@@ -177,12 +180,10 @@
       <a-skeleton active :loading="loading">
         <div class="llm-card-header">
           <div class="llm-card-header-left">
-            <a-skeleton-avatar v-if="true" shape="square" :size="24" />
             <a-image
-              v-else
               :width="24"
               :height="24"
-              src="https://www.antdv.com/#error"
+              :src="usePngImage(LlmLogo[llmConfig.platformId as LlmLogoFlag])"
             />
             <a-typography-text
               class="llm-card-header-left-text"

@@ -17,7 +17,6 @@
  * under the License.
  */
 export default {
-  llm_config: 'Large Model Configuration',
   add_authorization: 'Add authorization',
   edit_authorization: 'Edit authorization',
   availability: 'Test availability',

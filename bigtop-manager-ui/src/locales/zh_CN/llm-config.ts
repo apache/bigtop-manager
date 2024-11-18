@@ -17,7 +17,6 @@
  * under the License.
  */
 export default {
-  llm_config: '大模型配置',
   add_authorization: '新增授权',
   edit_authorization: '编辑授权',
   availability: '测试可用性',
