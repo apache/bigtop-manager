@@ -311,6 +311,7 @@ public class ChatbotServiceImpl implements ChatbotService {
     public List<String> getChatbotCommands() {
         return ChatbotCommand.getAllCommands();
     }
+
     @Override
     public ChatThreadVO getChatThread(Long threadId) {
         ChatThreadPO chatThreadPO = chatThreadDao.findById(threadId);

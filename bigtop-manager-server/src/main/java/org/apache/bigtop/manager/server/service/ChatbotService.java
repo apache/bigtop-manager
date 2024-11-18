@@ -44,6 +44,6 @@ public interface ChatbotService {
     ChatThreadVO updateChatThread(ChatThreadDTO chatThreadDTO);
 
     List<String> getChatbotCommands();
-    
+
     ChatThreadVO getChatThread(Long threadId);
 }
