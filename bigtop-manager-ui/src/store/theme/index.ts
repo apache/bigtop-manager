@@ -21,19 +21,22 @@ import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import { theme as antdTheme } from 'ant-design-vue'
 import { GlobalToken } from 'ant-design-vue/es/theme'
+import { componentsConfigProvider } from './config'
 
 const themeMap = {
   default: {
+    components: componentsConfigProvider,
     algorithm: antdTheme.defaultAlgorithm
   },
   dark: {
+    components: componentsConfigProvider,
     algorithm: antdTheme.darkAlgorithm
   }
 }
 
 type ThemeMode = keyof typeof themeMap
 
-export const useTheme = defineStore(
+export const useThemeStore = defineStore(
   'theme',
   () => {
     const { useToken } = antdTheme

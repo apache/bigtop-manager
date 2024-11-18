@@ -20,8 +20,10 @@ package org.apache.bigtop.manager.common.message.entity.payload;
 
 import lombok.Data;
 
+import java.util.UUID;
+
 @Data
 public class BasePayload {
 
-    private String hostname;
+    private final String requestId = UUID.randomUUID().toString().replaceAll("-", "");
 }

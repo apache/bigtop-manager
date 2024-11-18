@@ -40,12 +40,6 @@ public class StagePO extends BasePO implements Serializable {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "state", nullable = false)
-    private String state;
-
-    @Column(name = "order")
-    private Integer order;
-
     @Column(name = "service_name")
     private String serviceName;
 
@@ -55,11 +49,17 @@ public class StagePO extends BasePO implements Serializable {
     @Column(name = "context")
     private String context;
 
-    @Column(name = "job_id", nullable = false)
-    private Long jobId;
+    @Column(name = "order")
+    private Integer order;
+
+    @Column(name = "state", nullable = false)
+    private String state;
 
     @Column(name = "cluster_id")
     private Long clusterId;
+
+    @Column(name = "job_id", nullable = false)
+    private Long jobId;
 
     @ToString.Exclude
     private List<TaskPO> tasks;

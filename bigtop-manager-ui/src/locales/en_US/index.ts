@@ -21,10 +21,12 @@ import common from '@/locales/en_US/common.ts'
 import menu from '@/locales/en_US/menu.ts'
 import login from '@/locales/en_US/login'
 import user from '@/locales/en_US/user.ts'
+import llmConfig from '@/locales/en_US/llm-config.ts'
 
 export default {
   common,
   menu,
   login,
-  user
+  user,
+  llmConfig
 }

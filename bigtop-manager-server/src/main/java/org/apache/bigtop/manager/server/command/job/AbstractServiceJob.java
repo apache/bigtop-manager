@@ -88,9 +88,6 @@ public abstract class AbstractServiceJob extends AbstractJob {
 
         stageContext.setServiceDTO(serviceDTO);
         stageContext.setComponentDTO(componentDTO);
-        stageContext.setStackName(stackName);
-        stageContext.setStackVersion(stackVersion);
-        stageContext.setHostnames(hostnames);
 
         return stageContext;
     }
@@ -164,8 +161,6 @@ public abstract class AbstractServiceJob extends AbstractJob {
 
     protected void createCacheStage() {
         StageContext stageContext = StageContext.fromPayload(JsonUtils.writeAsString(jobContext.getCommandDTO()));
-        stageContext.setStackName(stackName);
-        stageContext.setStackVersion(stackVersion);
         stages.add(new CacheFileUpdateStage(stageContext));
     }
 

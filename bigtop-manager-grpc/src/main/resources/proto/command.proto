@@ -34,14 +34,12 @@ enum CommandType {
 
 message CommandRequest {
   string payload = 1;
-  string hostname = 2;
-  int64 task_id = 3;
-  CommandType type = 4;
+  int64 task_id = 2;
+  CommandType type = 3;
 }
 
 message CommandReply {
   int32 code = 1;
   string result = 2;
-  string hostname = 3;
-  int64 task_id = 4;
+  int64 task_id = 3;
 }

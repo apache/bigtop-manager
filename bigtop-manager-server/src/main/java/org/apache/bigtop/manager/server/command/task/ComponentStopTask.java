@@ -39,7 +39,7 @@ public class ComponentStopTask extends AbstractComponentTask {
 
         Long clusterId = taskContext.getClusterId();
         String componentName = taskContext.getComponentName();
-        String hostname = taskContext.getHostname();
+        String hostname = taskContext.getHostDTO().getHostname();
         HostComponentPO hostComponentPO =
                 hostComponentDao.findByClusterIdAndComponentNameAndHostname(clusterId, componentName, hostname);
         hostComponentPO.setState(MaintainState.STOPPED.getName());
@@ -48,6 +48,7 @@ public class ComponentStopTask extends AbstractComponentTask {
 
     @Override
     public String getName() {
-        return "Stop " + taskContext.getComponentDisplayName() + " on " + taskContext.getHostname();
+        return "Stop " + taskContext.getComponentDisplayName() + " on "
+                + taskContext.getHostDTO().getHostname();
     }
 }

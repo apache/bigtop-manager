@@ -16,12 +16,5 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.common.config.application;
 
-import lombok.Data;
-
-@Data
-public class GrpcConfig {
-
-    private Integer port;
-}
+export * from './route-exceptions'

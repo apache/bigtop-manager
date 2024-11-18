@@ -121,7 +121,7 @@ CREATE INDEX idx_hc_host_id ON host_component (host_id);
 CREATE TABLE host
 (
     id                   BIGINT CHECK (id > 0)         NOT NULL GENERATED ALWAYS AS IDENTITY,
-    cluster_id           BIGINT CHECK (cluster_id > 0) NOT NULL,
+    cluster_id           BIGINT DEFAULT NULL,
     hostname             VARCHAR(255) DEFAULT NULL,
     ssh_user             VARCHAR(255) DEFAULT NULL,
     ssh_port             INT DEFAULT NULL,
@@ -222,8 +222,6 @@ CREATE TABLE task
     custom_command VARCHAR(255),
     content        TEXT,
     context        TEXT NOT NULL,
-    stack_name     VARCHAR(255),
-    stack_version  VARCHAR(255),
     state          VARCHAR(255),
     cluster_id     BIGINT,
     job_id         BIGINT,

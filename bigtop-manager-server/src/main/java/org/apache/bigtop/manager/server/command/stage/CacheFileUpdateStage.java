@@ -20,11 +20,10 @@ package org.apache.bigtop.manager.server.command.stage;
 
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.dao.po.HostPO;
-import org.apache.bigtop.manager.dao.repository.HostDao;
 import org.apache.bigtop.manager.server.command.task.CacheFileUpdateTask;
 import org.apache.bigtop.manager.server.command.task.Task;
 import org.apache.bigtop.manager.server.command.task.TaskContext;
-import org.apache.bigtop.manager.server.holder.SpringContextHolder;
+import org.apache.bigtop.manager.server.model.dto.HostDTO;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,8 +32,6 @@ import java.util.Map;
 
 public class CacheFileUpdateStage extends AbstractStage {
 
-    private HostDao hostDao;
-
     public CacheFileUpdateStage(StageContext stageContext) {
         super(stageContext);
     }
@@ -42,34 +39,30 @@ public class CacheFileUpdateStage extends AbstractStage {
     @Override
     protected void injectBeans() {
         super.injectBeans();
-
-        this.hostDao = SpringContextHolder.getBean(HostDao.class);
     }
 
     @Override
     protected void beforeCreateTasks() {
-        List<String> hostnames = new ArrayList<>();
+        List<Long> hostIds = new ArrayList<>();
 
         if (stageContext.getClusterId() == null) {
-            hostnames.addAll(stageContext.getHostnames());
+            hostIds.addAll(stageContext.getHostIds() == null ? List.of() : stageContext.getHostIds());
         } else {
-            hostnames.addAll(stageContext.getHostnames() == null ? List.of() : stageContext.getHostnames());
-            hostnames.addAll(hostDao.findAllByClusterId(stageContext.getClusterId()).stream()
-                    .map(HostPO::getHostname)
+            hostIds.addAll(stageContext.getHostIds() == null ? List.of() : stageContext.getHostIds());
+            hostIds.addAll(hostDao.findAllByClusterId(stageContext.getClusterId()).stream()
+                    .map(HostPO::getId)
                     .toList());
         }
 
-        stageContext.setHostnames(hostnames);
+        stageContext.setHostIds(hostIds);
     }
 
     @Override
-    protected Task createTask(String hostname) {
+    protected Task createTask(HostDTO hostDTO) {
         TaskContext taskContext = new TaskContext();
-        taskContext.setHostname(hostname);
+        taskContext.setHostDTO(hostDTO);
         taskContext.setClusterId(stageContext.getClusterId());
         taskContext.setClusterName(stageContext.getClusterName());
-        taskContext.setStackName(stageContext.getStackName());
-        taskContext.setStackVersion(stageContext.getStackVersion());
         taskContext.setServiceName("cluster");
         taskContext.setServiceUser("root");
         taskContext.setComponentName("agent");
@@ -78,8 +71,6 @@ public class CacheFileUpdateStage extends AbstractStage {
         taskContext.setCustomCommand("update_cache_files");
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put("repoInfoList", stageContext.getRepoInfoList());
-        properties.put("hostnames", stageContext.getHostnames());
         taskContext.setProperties(properties);
 
         return new CacheFileUpdateTask(taskContext);

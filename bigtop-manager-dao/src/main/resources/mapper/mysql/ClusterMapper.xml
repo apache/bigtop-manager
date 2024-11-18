@@ -24,10 +24,10 @@
 <mapper namespace="org.apache.bigtop.manager.dao.repository.ClusterDao">
 
     <sql id="baseColumns">
-        id, name, desc, type, user_group, root_dir, status
+        id, name, `desc`, type, user_group, root_dir, status
     </sql>
     <sql id="baseColumnsV2">
-        ${alias}.id, ${alias}.name, ${alias}.desc, ${alias}.type, ${alias}.user_group, ${alias}.root_dir, ${alias}.status
+        ${alias}.id, ${alias}.name, ${alias}.`desc`, ${alias}.type, ${alias}.user_group, ${alias}.root_dir, ${alias}.status
     </sql>
 
     <select id="findDetailsById" resultType="org.apache.bigtop.manager.dao.po.ClusterPO">

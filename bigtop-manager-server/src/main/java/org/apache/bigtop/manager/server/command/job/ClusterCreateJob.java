@@ -88,7 +88,7 @@ public class ClusterCreateJob extends AbstractJob {
             clusterPO = ClusterConverter.INSTANCE.fromDTO2PO(clusterDTO);
         }
 
-        clusterPO.setStatus(HealthyStatusEnum.UNHEALTHY.getCode());
+        clusterPO.setStatus(HealthyStatusEnum.HEALTHY.getCode());
         clusterDao.save(clusterPO);
     }
 

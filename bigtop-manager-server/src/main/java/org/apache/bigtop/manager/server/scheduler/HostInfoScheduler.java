@@ -53,9 +53,10 @@ public class HostInfoScheduler {
 
     private void getHostInfo(HostPO hostPO) {
         String hostname = hostPO.getHostname();
+        Integer grpcPort = hostPO.getGrpcPort();
         try {
-            HostInfoServiceGrpc.HostInfoServiceBlockingStub stub =
-                    GrpcClient.getBlockingStub(hostname, HostInfoServiceGrpc.HostInfoServiceBlockingStub.class);
+            HostInfoServiceGrpc.HostInfoServiceBlockingStub stub = GrpcClient.getBlockingStub(
+                    hostname, grpcPort, HostInfoServiceGrpc.HostInfoServiceBlockingStub.class);
             HostInfoReply reply = stub.getHostInfo(HostInfoRequest.newBuilder().build());
 
             hostPO.setArch(reply.getArch());
