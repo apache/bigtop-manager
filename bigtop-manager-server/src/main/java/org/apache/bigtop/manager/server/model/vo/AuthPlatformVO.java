@@ -20,6 +20,8 @@ package org.apache.bigtop.manager.server.model.vo;
 
 import lombok.Data;
 
+import java.util.Map;
+
 @Data
 public class AuthPlatformVO {
     private Long id;
@@ -35,6 +37,8 @@ public class AuthPlatformVO {
     private String desc;
 
     private Integer status;
+
+    private Map<String, String> authCredentials;
 
     public AuthPlatformVO() {}
 }
