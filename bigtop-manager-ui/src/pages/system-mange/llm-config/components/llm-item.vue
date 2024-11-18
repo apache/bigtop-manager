@@ -183,6 +183,7 @@
             <a-image
               :width="24"
               :height="24"
+              :preview="false"
               :src="usePngImage(LlmLogo[llmConfig.platformId as LlmLogoFlag])"
             />
             <a-typography-text

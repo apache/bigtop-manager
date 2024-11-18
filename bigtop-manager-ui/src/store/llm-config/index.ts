@@ -63,13 +63,14 @@ export const useLlmConfigStore = defineStore(
         value: currPlatform.value[`${v.name as currPlatformKeys}`] as string
       }))
     )
-    const authorizedPlatformConfig = computed(() => {
+
+    const getAuthorizedPlatformConfig = () => {
       return {
         ...currPlatform.value,
         testPassed: testPassed.value,
         authCredentials: authCredentials.value
       } as UpdateAuthorizedPlatformConfig
-    })
+    }
 
     const getAuthorizedPlatforms = async () => {
       loading.value = true
@@ -115,10 +116,9 @@ export const useLlmConfigStore = defineStore(
 
     const addAuthorizedPlatform = async () => {
       loading.value = true
+      const authorizedPlatformConfig = getAuthorizedPlatformConfig()
       try {
-        return await llmServer.addAuthorizedPlatform(
-          authorizedPlatformConfig.value
-        )
+        return await llmServer.addAuthorizedPlatform(authorizedPlatformConfig)
       } catch (error) {
         console.log('error :>> ', error)
         return false
@@ -129,10 +129,9 @@ export const useLlmConfigStore = defineStore(
 
     const updateAuthPlatform = async () => {
       loading.value = true
+      const authorizedPlatformConfig = getAuthorizedPlatformConfig()
       try {
-        return await llmServer.updateAuthPlatform(
-          authorizedPlatformConfig.value
-        )
+        return await llmServer.updateAuthPlatform(authorizedPlatformConfig)
       } catch (error) {
         console.log('error :>> ', error)
         return false
@@ -143,10 +142,13 @@ export const useLlmConfigStore = defineStore(
 
     const testAuthorizedPlatform = async () => {
       loadingTest.value = true
+      const authorizedPlatformConfig = getAuthorizedPlatformConfig()
       try {
-        return await llmServer.testAuthorizedPlatform(
-          authorizedPlatformConfig.value
+        const data = await llmServer.testAuthorizedPlatform(
+          authorizedPlatformConfig
         )
+        testPassed.value = data
+        return data
       } catch (error) {
         console.log('error :>> ', error)
         return false

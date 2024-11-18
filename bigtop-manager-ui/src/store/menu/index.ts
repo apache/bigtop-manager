@@ -43,10 +43,10 @@ export const useMenuStore = defineStore(
     const isClusterCreateVisible = computed(() =>
       RouteExceptions.SPECIAL_ROUTE_PATH.includes(route.matched[0].path)
     )
-    const isDynamicRouteMatched = computed(
-      () =>
-        route.matched.at(-1)?.path.includes(RouteExceptions.DYNAMIC_ROUTE_MATCH)
-    )
+    const isDynamicRouteMatched = computed(() => {
+      const path = route.matched.at(-1)?.path
+      return path?.includes(RouteExceptions.DYNAMIC_ROUTE_MATCH)
+    })
     const siderMenus = computed((): MenuItem[] => {
       const siderMenuTemplate =
         baseRoutesMap.value.get(headerSelectedKey.value) || []
@@ -167,6 +167,10 @@ export const useMenuStore = defineStore(
       setBaseRoutesMap()
     }
 
+    const cleanUpMenu = () => {
+      baseRoutesMap.value.clear()
+    }
+
     return {
       headerMenus,
       siderMenus,
@@ -175,6 +179,7 @@ export const useMenuStore = defineStore(
       isClusterCreateVisible,
       isDynamicRouteMatched,
       setUpMenu,
+      cleanUpMenu,
       setBaseRoutesMap,
       onHeaderClick,
       onSiderClick,

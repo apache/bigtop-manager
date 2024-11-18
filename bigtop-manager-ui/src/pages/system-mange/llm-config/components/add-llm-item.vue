@@ -96,7 +96,10 @@
   const handleOk = async () => {
     const validate = await autoFormRef.value?.getFormValidation()
     if (!validate) return
-    const success = await llmConfigStore.addAuthorizedPlatform()
+    const api = isEdit.value
+      ? llmConfigStore.updateAuthPlatform
+      : llmConfigStore.addAuthorizedPlatform
+    const success = await api()
     if (success) {
       const text = isEdit.value ? 'common.update_success' : 'common.created'
       message.success(t(text))
@@ -158,7 +161,7 @@
               type="primary"
               @click="handleTest"
             >
-              {{ $t('llmConfig.availability') }}
+              {{ $t('llmConfig.test') }}
             </a-button>
           </a-space>
           <a-space size="middle">

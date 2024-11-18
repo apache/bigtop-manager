@@ -19,7 +19,7 @@
 export default {
   add_authorization: 'Add authorization',
   edit_authorization: 'Edit authorization',
-  availability: 'Test availability',
+  test: 'Test',
   unavailable: 'Unavailable',
   active: 'Active',
   available: 'Available',

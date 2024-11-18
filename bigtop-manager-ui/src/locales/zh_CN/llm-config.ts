@@ -19,7 +19,7 @@
 export default {
   add_authorization: '新增授权',
   edit_authorization: '编辑授权',
-  availability: '测试可用性',
+  test: '测试',
   unavailable: '不可用',
   active: '使用中',
   available: '可用',
