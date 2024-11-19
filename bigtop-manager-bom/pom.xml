@@ -49,8 +49,7 @@
         <micrometer.version>1.12.4</micrometer.version>
         <jdbc.dm.version>8.1.2.192</jdbc.dm.version>
         <sshd.version>2.14.0</sshd.version>
-        <langchain4j.version>0.33.0</langchain4j.version>
-        <dashscope.version>2.16.3</dashscope.version>
+        <langchain4j.version>0.35.0</langchain4j.version>
         <mybatis-spring-boot-starter.version>3.0.3</mybatis-spring-boot-starter.version>
         <pagehelper-spring-boot-starter.version>2.1.0</pagehelper-spring-boot-starter.version>
     </properties>
@@ -258,13 +257,13 @@
                 <version>${langchain4j.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>dashscope-sdk-java</artifactId>
-                <version>${dashscope.version}</version>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j-qianfan</artifactId>
+                <version>${langchain4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>dev.langchain4j</groupId>
-                <artifactId>langchain4j-qianfan</artifactId>
+                <artifactId>langchain4j-dashscope</artifactId>
                 <version>${langchain4j.version}</version>
             </dependency>
         </dependencies>
