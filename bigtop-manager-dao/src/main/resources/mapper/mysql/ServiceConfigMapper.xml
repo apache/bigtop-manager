@@ -24,95 +24,33 @@
 <mapper namespace="org.apache.bigtop.manager.dao.repository.ServiceConfigDao">
 
     <sql id="baseColumns">
-        id, config_desc, version, selected, service_id, cluster_id, create_time, update_time
+        id, name, properties_json, cluster_id, service_id, create_time, update_time
     </sql>
 
     <sql id="baseColumnsV2">
-        ${alias}.id, ${alias}.config_desc, ${alias}.version, ${alias}.selected, ${alias}.service_id, ${alias}.cluster_id, ${alias}.create_time, ${alias}.update_time
+        ${alias}.id, ${alias}.name, ${alias}.properties_json, ${alias}.cluster_id, ${alias}.service_id, ${alias}.create_time, ${alias}.update_time
     </sql>
 
-    <resultMap id="serviceConfigMap" type="org.apache.bigtop.manager.dao.po.ServiceConfigPO">
-        <id column="id" property="id"/>
-        <result column="config_desc" property="configDesc"/>
-        <result column="version" property="version"/>
-        <result column="selected" property="selected"/>
-        <result column="service_id" property="serviceId"/>
-        <result column="cluster_id" property="clusterId"/>
-        <result column="create_time" property="createTime"/>
-        <result column="update_time" property="updateTime"/>
-        <result column="service_name" property="serviceName"/>
-        <collection property="configs" ofType="org.apache.bigtop.manager.dao.po.TypeConfigPO">
-            <id column="tc_id" property="id"/>
-            <result column="type_name" property="typeName"/>
-            <result column="properties_json" property="propertiesJson"/>
-        </collection>
-    </resultMap>
-
-    <select id="findAllByClusterId" parameterType="java.lang.Long" resultMap="serviceConfigMap">
-        select
+    <select id="findByServiceId" resultType="org.apache.bigtop.manager.dao.po.ServiceConfigPO">
+        SELECT
         <include refid="baseColumnsV2">
-            <property name="alias" value="r"/>
-        </include>
-        , s.service_name, tc.type_name, tc.properties_json, tc.id as tc_id
-        from
-        (select * from service_config
-        <where>
-            <if test="clusterId != 0">
-                cluster_id = #{clusterId}
-            </if>
-        </where>
-        ) r
-        inner join service s
-        on r.service_id = s.id
-        inner join type_config tc
-        on r.id = tc.service_config_id
-        order by version desc
+            <property name="alias" value="sc"/>
+        </include>, s.service_name
+        FROM service_config sc
+        LEFT JOIN service s
+        ON sc.service_id = s.id
+        WHERE sc.service_id = #{serviceId}
     </select>
 
-    <select id="findByClusterIdAndServiceIdAndSelectedIsTrue" resultMap="serviceConfigMap">
-        select
+    <select id="findByClusterId" resultType="org.apache.bigtop.manager.dao.po.ServiceConfigPO">
+        SELECT
         <include refid="baseColumnsV2">
-            <property name="alias" value="r"/>
-        </include>
-        , s.service_name, tc.type_name, tc.properties_json
-        from
-        (select * from service_config
-        <where>
-            selected = 1
-            <if test="clusterId != 0">
-                and cluster_id = #{clusterId}
-            </if>
-            <if test="serviceId != 0">
-                and service_id = #{serviceId}
-            </if>
-        </where>
-        ) r
-        inner join service s
-        on r.service_id = s.id
-        inner join type_config tc
-        on r.id = tc.service_config_id
-        limit 1
-    </select>
-
-    <select id="findAllByClusterIdAndSelectedIsTrue" resultMap="serviceConfigMap">
-        select
-        <include refid="baseColumnsV2">
-            <property name="alias" value="r"/>
-        </include>
-        , s.service_name, tc.type_name, tc.properties_json
-        from
-        (select * from service_config
-        <where>
-        selected = 1
-            <if test="clusterId != 0">
-                and cluster_id = #{clusterId}
-            </if>
-        </where>
-        ) r
-        inner join service s
-        on r.service_id = s.id
-        inner join type_config tc
-        on r.id = tc.service_config_id
+            <property name="alias" value="sc"/>
+        </include>, s.service_name
+        FROM service_config sc
+        LEFT JOIN service s
+        ON sc.service_id = s.id
+        WHERE sc.cluster_id = #{clusterId}
     </select>
 
 </mapper>

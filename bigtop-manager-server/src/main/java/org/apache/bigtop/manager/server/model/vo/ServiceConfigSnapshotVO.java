@@ -16,17 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.dto;
+package org.apache.bigtop.manager.server.model.vo;
 
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.List;
 
 @Data
-public class TypeConfigDTO implements Serializable {
+public class ServiceConfigSnapshotVO implements Serializable {
 
-    private String typeName;
+    private Long id;
 
-    private List<PropertyDTO> properties;
+    private String name;
+
+    private String desc;
+
+    private String configJson;
 }

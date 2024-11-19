@@ -41,7 +41,7 @@ public class ServiceVO {
 
     private List<ComponentVO> components;
 
-    private List<TypeConfigVO> configs;
+    private List<ServiceConfigVO> configs;
 
     private List<String> requiredServices;
 

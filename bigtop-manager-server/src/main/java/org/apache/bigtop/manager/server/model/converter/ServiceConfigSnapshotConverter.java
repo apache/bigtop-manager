@@ -18,35 +18,26 @@
  */
 package org.apache.bigtop.manager.server.model.converter;
 
-import org.apache.bigtop.manager.dao.po.TypeConfigPO;
+import org.apache.bigtop.manager.dao.po.ServiceConfigSnapshotPO;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
-import org.apache.bigtop.manager.server.model.dto.TypeConfigDTO;
-import org.apache.bigtop.manager.server.model.vo.TypeConfigVO;
+import org.apache.bigtop.manager.server.model.dto.ServiceConfigSnapshotDTO;
+import org.apache.bigtop.manager.server.model.vo.ServiceConfigSnapshotVO;
 
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper(
-        uses = {ConverterTool.class},
-        config = MapStructSharedConfig.class)
-public interface TypeConfigConverter {
+@Mapper(config = MapStructSharedConfig.class)
+public interface ServiceConfigSnapshotConverter {
 
-    TypeConfigConverter INSTANCE = Mappers.getMapper(TypeConfigConverter.class);
+    ServiceConfigSnapshotConverter INSTANCE = Mappers.getMapper(ServiceConfigSnapshotConverter.class);
 
-    @Mapping(target = "properties", source = "propertiesJson", qualifiedByName = "json2PropertyDTOList")
-    TypeConfigDTO fromPO2DTO(TypeConfigPO typeConfigPO);
+    ServiceConfigSnapshotDTO fromPO2DTO(ServiceConfigSnapshotPO serviceConfigSnapshotPO);
 
-    List<TypeConfigDTO> fromPO2DTO(List<TypeConfigPO> typeConfigPOList);
+    List<ServiceConfigSnapshotDTO> fromPO2DTO(List<ServiceConfigSnapshotPO> serviceConfigSnapshotPOList);
 
-    TypeConfigVO fromDTO2VO(TypeConfigDTO typeConfigDTO);
+    ServiceConfigSnapshotVO fromPO2VO(ServiceConfigSnapshotPO serviceConfigSnapshotPO);
 
-    List<TypeConfigVO> fromDTO2VO(List<TypeConfigDTO> typeConfigDTOList);
-
-    @Mapping(target = "properties", source = "propertiesJson", qualifiedByName = "json2PropertyVOList")
-    TypeConfigVO fromPO2VO(TypeConfigPO typeConfigPO);
-
-    List<TypeConfigVO> fromPO2VO(List<TypeConfigPO> typeConfigPOList);
+    List<ServiceConfigSnapshotVO> fromPO2VO(List<ServiceConfigSnapshotPO> serviceConfigSnapshotPOList);
 }

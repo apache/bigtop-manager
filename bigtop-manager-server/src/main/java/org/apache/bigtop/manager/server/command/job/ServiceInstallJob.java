@@ -34,7 +34,6 @@ import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
 import org.apache.bigtop.manager.server.model.dto.ComponentHostDTO;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.model.dto.command.ServiceCommandDTO;
-import org.apache.bigtop.manager.server.service.ConfigService;
 import org.apache.bigtop.manager.server.utils.StackUtils;
 
 import java.util.ArrayList;
@@ -42,7 +41,6 @@ import java.util.List;
 
 public class ServiceInstallJob extends AbstractServiceJob {
 
-    private ConfigService configService;
     private ServiceDao serviceDao;
     private HostDao hostDao;
 
@@ -54,7 +52,6 @@ public class ServiceInstallJob extends AbstractServiceJob {
     protected void injectBeans() {
         super.injectBeans();
 
-        this.configService = SpringContextHolder.getBean(ConfigService.class);
         this.serviceDao = SpringContextHolder.getBean(ServiceDao.class);
         this.hostDao = SpringContextHolder.getBean(HostDao.class);
     }
@@ -146,8 +143,7 @@ public class ServiceInstallJob extends AbstractServiceJob {
             serviceDao.save(servicePO);
         }
 
-        // 2. Update configs
-        configService.upsert(clusterId, servicePO.getId(), serviceCommand.getConfigs());
+        // TODO 2. Update configs
 
         for (ComponentHostDTO componentHostDTO : serviceCommand.getComponentHosts()) {
             String componentName = componentHostDTO.getComponentName();

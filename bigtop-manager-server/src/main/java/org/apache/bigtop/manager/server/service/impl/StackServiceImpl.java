@@ -22,7 +22,6 @@ import org.apache.bigtop.manager.server.model.converter.ServiceConverter;
 import org.apache.bigtop.manager.server.model.converter.StackConverter;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.model.dto.StackDTO;
-import org.apache.bigtop.manager.server.model.dto.TypeConfigDTO;
 import org.apache.bigtop.manager.server.model.vo.StackVO;
 import org.apache.bigtop.manager.server.service.StackService;
 import org.apache.bigtop.manager.server.utils.StackUtils;
@@ -47,8 +46,7 @@ public class StackServiceImpl implements StackService {
             StackDTO stackDTO = entry.getKey();
             List<ServiceDTO> serviceDTOList = entry.getValue();
             for (ServiceDTO serviceDTO : serviceDTOList) {
-                List<TypeConfigDTO> configs = StackUtils.SERVICE_CONFIG_MAP.get(serviceDTO.getServiceName());
-                serviceDTO.setConfigs(configs);
+                serviceDTO.setConfigs(StackUtils.SERVICE_CONFIG_MAP.get(serviceDTO.getServiceName()));
             }
 
             StackVO stackVO = StackConverter.INSTANCE.fromDTO2VO(stackDTO);
