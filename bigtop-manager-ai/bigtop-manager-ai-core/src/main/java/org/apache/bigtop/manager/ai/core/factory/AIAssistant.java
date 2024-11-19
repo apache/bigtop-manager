@@ -27,9 +27,6 @@ import dev.langchain4j.model.chat.StreamingChatLanguageModel;
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 import reactor.core.publisher.Flux;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public interface AIAssistant {
 
     /**
@@ -58,14 +55,6 @@ public interface AIAssistant {
      * @return
      */
     PlatformType getPlatform();
-
-    /**
-     * This is used to create a thread
-     * @return
-     */
-    default Map<String, String> createThread() {
-        return new HashMap<>();
-    }
 
     /**
      * This is used to set system prompt

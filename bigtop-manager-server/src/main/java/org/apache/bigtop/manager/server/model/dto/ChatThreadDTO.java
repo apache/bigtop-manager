@@ -33,6 +33,4 @@ public class ChatThreadDTO {
     private String name;
 
     private Map<String, String> authCredentials;
-
-    private Map<String, String> threadInfo;
 }

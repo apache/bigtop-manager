@@ -330,7 +330,6 @@ CREATE TABLE `llm_chat_thread`
     `auth_id`     BIGINT(20) UNSIGNED NOT NULL,
     `user_id`     BIGINT(20) UNSIGNED NOT NULL,
     `is_deleted`  TINYINT(1)          DEFAULT 0 NULL,
-    `thread_info` TEXT                DEFAULT NULL,
     `name`        VARCHAR(255)        DEFAULT NULL,
     `create_time` DATETIME            DEFAULT CURRENT_TIMESTAMP,
     `update_time` DATETIME            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

@@ -104,13 +104,11 @@ public class ChatbotServiceImpl implements ChatbotService {
         return null;
     }
 
-    private AIAssistantConfig getAIAssistantConfig(
-            String model, Map<String, String> credentials, Map<String, String> configs) {
+    private AIAssistantConfig getAIAssistantConfig(String model, Map<String, String> credentials) {
         return AIAssistantConfig.builder()
                 .setModel(model)
                 .setLanguage(LocaleContextHolder.getLocale().toString())
                 .addCredentials(credentials)
-                .addConfigs(configs)
                 .build();
     }
 
@@ -119,13 +117,9 @@ public class ChatbotServiceImpl implements ChatbotService {
     }
 
     private AIAssistant buildAIAssistant(
-            String platformName,
-            String model,
-            Map<String, String> credentials,
-            Long threadId,
-            Map<String, String> configs) {
+            String platformName, String model, Map<String, String> credentials, Long threadId) {
         return getAIAssistantFactory()
-                .create(getPlatformType(platformName), getAIAssistantConfig(model, credentials, configs), threadId);
+                .create(getPlatformType(platformName), getAIAssistantConfig(model, credentials), threadId);
     }
 
     @Override
@@ -141,10 +135,6 @@ public class ChatbotServiceImpl implements ChatbotService {
         chatThreadDTO.setPlatformId(platformPO.getId());
         chatThreadDTO.setAuthId(authPlatformPO.getId());
 
-        AIAssistant aiAssistant = buildAIAssistant(
-                platformPO.getName(), authPlatformDTO.getModel(), authPlatformDTO.getAuthCredentials(), null, null);
-        Map<String, String> threadInfo = aiAssistant.createThread();
-        chatThreadDTO.setThreadInfo(threadInfo);
         ChatThreadPO chatThreadPO = ChatThreadConverter.INSTANCE.fromDTO2PO(chatThreadDTO);
         chatThreadPO.setUserId(userId);
         chatThreadDao.save(chatThreadPO);
@@ -213,8 +203,7 @@ public class ChatbotServiceImpl implements ChatbotService {
                 platformPO.getName(),
                 authPlatformDTO.getModel(),
                 authPlatformDTO.getAuthCredentials(),
-                chatThreadPO.getId(),
-                chatThreadDTO.getThreadInfo());
+                chatThreadPO.getId());
         Flux<String> stringFlux = aiAssistant.streamAsk(message);
 
         SseEmitter emitter = new SseEmitter();
