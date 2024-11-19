@@ -108,7 +108,7 @@ CREATE TABLE `host`
     `total_disk`           BIGINT,
     `total_memory_size`    BIGINT,
     `desc`                 VARCHAR(255) DEFAULT NULL,
-    `status`               INTEGER  DEFAULT NULL COMMENT '1-healthy, 2-unhealthy, 3-unknown',
+    `status`               INTEGER DEFAULT NULL COMMENT '1-healthy, 2-unhealthy, 3-unknown',
     `err_info`             VARCHAR(255) DEFAULT NULL,
     `create_time`          DATETIME     DEFAULT CURRENT_TIMESTAMP,
     `update_time`          DATETIME     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -136,21 +136,22 @@ CREATE TABLE `repo`
 CREATE TABLE `service`
 (
     `id`                BIGINT NOT NULL AUTO_INCREMENT,
-    `display_name`      VARCHAR(255),
-    `package_specifics` VARCHAR(1024),
-    `required_services` VARCHAR(255),
-    `service_desc`      VARCHAR(1024),
-    `service_name`      VARCHAR(255),
-    `service_user`      VARCHAR(255),
-    `service_version`   VARCHAR(255),
+    `name`              VARCHAR(255) DEFAULT NULL,
+    `display_name`      VARCHAR(255) DEFAULT NULL,
+    `desc`              VARCHAR(1024) DEFAULT NULL,
+    `user`              VARCHAR(255) DEFAULT NULL,
+    `version`           VARCHAR(255) DEFAULT NULL,
+    `stack`             VARCHAR(255) DEFAULT NULL,
+    `need_restart`      BOOLEAN DEFAULT FALSE,
     `cluster_id`        BIGINT,
+    `status`            INTEGER DEFAULT NULL COMMENT '1-healthy, 2-unhealthy, 3-unknown',
     `create_time`       DATETIME    DEFAULT CURRENT_TIMESTAMP,
     `update_time`       DATETIME    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `create_by`         BIGINT,
     `update_by`         BIGINT,
     PRIMARY KEY (id),
     KEY                 idx_service_cluster_id (cluster_id),
-    UNIQUE KEY `uk_service_name` (`service_name`, `cluster_id`)
+    UNIQUE KEY `uk_service_name` (`name`, `cluster_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `service_config`

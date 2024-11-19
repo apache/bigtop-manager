@@ -18,39 +18,39 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
-import org.apache.bigtop.manager.common.constants.ComponentCategories;
-import org.apache.bigtop.manager.common.enums.MaintainState;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.po.HostComponentPO;
 import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
 import org.apache.bigtop.manager.dao.po.ServiceConfigSnapshotPO;
 import org.apache.bigtop.manager.dao.po.ServicePO;
-import org.apache.bigtop.manager.dao.repository.HostComponentDao;
+import org.apache.bigtop.manager.dao.query.ServiceQuery;
 import org.apache.bigtop.manager.dao.repository.ServiceConfigDao;
 import org.apache.bigtop.manager.dao.repository.ServiceConfigSnapshotDao;
 import org.apache.bigtop.manager.dao.repository.ServiceDao;
-import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
-import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.model.converter.ServiceConfigConverter;
 import org.apache.bigtop.manager.server.model.converter.ServiceConfigSnapshotConverter;
 import org.apache.bigtop.manager.server.model.converter.ServiceConverter;
 import org.apache.bigtop.manager.server.model.dto.PropertyDTO;
 import org.apache.bigtop.manager.server.model.dto.QuickLinkDTO;
 import org.apache.bigtop.manager.server.model.dto.ServiceConfigDTO;
+import org.apache.bigtop.manager.server.model.query.PageQuery;
 import org.apache.bigtop.manager.server.model.req.ServiceConfigReq;
 import org.apache.bigtop.manager.server.model.req.ServiceConfigSnapshotReq;
+import org.apache.bigtop.manager.server.model.vo.PageVO;
 import org.apache.bigtop.manager.server.model.vo.QuickLinkVO;
 import org.apache.bigtop.manager.server.model.vo.ServiceConfigSnapshotVO;
 import org.apache.bigtop.manager.server.model.vo.ServiceConfigVO;
 import org.apache.bigtop.manager.server.model.vo.ServiceVO;
 import org.apache.bigtop.manager.server.service.ServiceService;
+import org.apache.bigtop.manager.server.utils.PageUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import org.springframework.stereotype.Service;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 
 import jakarta.annotation.Resource;
@@ -58,7 +58,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -68,64 +67,27 @@ public class ServiceServiceImpl implements ServiceService {
     private ServiceDao serviceDao;
 
     @Resource
-    private HostComponentDao hostComponentDao;
-
-    @Resource
     private ServiceConfigDao serviceConfigDao;
 
     @Resource
     private ServiceConfigSnapshotDao serviceConfigSnapshotDao;
 
     @Override
-    public List<ServiceVO> list(Long clusterId) {
-        List<ServiceVO> res = new ArrayList<>();
-
-        List<ServicePO> servicePOList = serviceDao.findAllByClusterId(clusterId);
-        List<HostComponentPO> allByClusterId = hostComponentDao.findAllByClusterId(clusterId);
-        Map<Long, List<HostComponentPO>> serviceIdToHostComponent =
-                allByClusterId.stream().collect(Collectors.groupingBy(HostComponentPO::getServiceId));
-        Map<Long, List<HostComponentPO>> componentIdToHostComponent =
-                allByClusterId.stream().collect(Collectors.groupingBy(HostComponentPO::getComponentId));
-
-        for (ServicePO servicePO : servicePOList) {
-            Long serviceId = servicePO.getId();
-            ServiceVO serviceVO = ServiceConverter.INSTANCE.fromPO2VO(servicePO);
-            List<ComponentPO> components = servicePO.getComponents();
-            serviceVO.setQuickLinks(new ArrayList<>());
-
-            for (ComponentPO componentPO : components) {
-                Long componentId = componentPO.getId();
-                List<HostComponentPO> hostComponentPOList = componentIdToHostComponent.get(componentId);
-
-                String quickLink = componentPO.getQuickLink();
-                if (StringUtils.isNotBlank(quickLink)) {
-                    List<QuickLinkVO> quickLinkVOList =
-                            resolveQuickLink(hostComponentPOList, quickLink, clusterId, serviceId);
-                    serviceVO.getQuickLinks().addAll(quickLinkVOList);
-                }
-            }
-            boolean isClient = components.stream()
-                    .allMatch(componentPO -> componentPO.getCategory().equalsIgnoreCase(ComponentCategories.CLIENT));
-            boolean isHealthy = serviceIdToHostComponent.get(serviceId).stream().allMatch(hostComponentPO -> {
-                MaintainState expectedState = hostComponentPO.getCategory().equalsIgnoreCase(ComponentCategories.CLIENT)
-                        ? MaintainState.INSTALLED
-                        : MaintainState.STARTED;
-                return hostComponentPO.getState().equals(expectedState.getName());
-            });
-
-            serviceVO.setIsClient(isClient);
-            serviceVO.setIsHealthy(isHealthy);
-            res.add(serviceVO);
+    public PageVO<ServiceVO> list(ServiceQuery query) {
+        PageQuery pageQuery = PageUtils.getPageQuery();
+        try (Page<?> ignored =
+                PageHelper.startPage(pageQuery.getPageNum(), pageQuery.getPageSize(), pageQuery.getOrderBy())) {
+            List<ServicePO> servicePOList = serviceDao.findByQuery(query);
+            PageInfo<ServicePO> pageInfo = new PageInfo<>(servicePOList);
+            return PageVO.of(pageInfo);
+        } finally {
+            PageHelper.clearPage();
         }
-
-        return res;
     }
 
     @Override
     public ServiceVO get(Long id) {
-        ServicePO servicePO =
-                serviceDao.findByIdJoin(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.SERVICE_NOT_FOUND));
-        return ServiceConverter.INSTANCE.fromPO2VO(servicePO);
+        return ServiceConverter.INSTANCE.fromPO2VO(serviceDao.findById(id));
     }
 
     @Override

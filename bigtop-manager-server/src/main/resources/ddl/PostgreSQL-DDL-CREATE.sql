@@ -73,8 +73,6 @@ COMMENT ON COLUMN cluster."desc" IS 'Cluster Description';
 COMMENT ON COLUMN cluster.type IS '1-Physical Machine, 2-Kubernetes';
 COMMENT ON COLUMN cluster.status IS '1-healthy, 2-unhealthy, 3-unknown';
 
-DROP INDEX IF EXISTS idx_cluster_stack_id;
-
 CREATE TABLE host
 (
     id                   BIGINT CHECK (id > 0)         NOT NULL GENERATED ALWAYS AS IDENTITY,
@@ -133,21 +131,24 @@ COMMENT ON COLUMN repo.type IS '1-services, 2-tools';
 CREATE TABLE service
 (
     id                BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY,
-    display_name      VARCHAR(255),
-    package_specifics VARCHAR(1024),
-    required_services VARCHAR(255),
-    service_desc      VARCHAR(1024),
-    service_name      VARCHAR(255),
-    service_user      VARCHAR(255),
-    service_version   VARCHAR(255),
+    name              VARCHAR(255) DEFAULT NULL,
+    display_name      VARCHAR(255) DEFAULT NULL,
+    "desc"            VARCHAR(1024) DEFAULT NULL,
+    "user"            VARCHAR(255) DEFAULT NULL,
+    version           VARCHAR(255) DEFAULT NULL,
+    stack             VARCHAR(255) DEFAULT NULL,
+    need_restart      BOOLEAN DEFAULT FALSE,
     cluster_id        BIGINT,
+    status            INTEGER DEFAULT NULL,
     create_time       TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
     update_time       TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
     create_by         BIGINT,
     update_by         BIGINT,
     PRIMARY KEY (id),
-    CONSTRAINT uk_service_name UNIQUE (service_name, cluster_id)
+    CONSTRAINT uk_service_name UNIQUE (name, cluster_id)
 );
+
+COMMENT ON COLUMN service.status IS '1-healthy, 2-unhealthy, 3-unknown';
 
 CREATE INDEX idx_service_cluster_id ON service (cluster_id);
 

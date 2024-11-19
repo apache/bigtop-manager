@@ -18,16 +18,13 @@
  */
 package org.apache.bigtop.manager.server.model.converter;
 
-import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.ServicePO;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.model.vo.ServiceVO;
 import org.apache.bigtop.manager.server.stack.model.ServiceModel;
 
-import org.mapstruct.Context;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -39,23 +36,14 @@ public interface ServiceConverter {
 
     ServiceConverter INSTANCE = Mappers.getMapper(ServiceConverter.class);
 
-    @Mapping(target = "packageSpecifics", source = "packageSpecifics", qualifiedByName = "obj2Json")
-    @Mapping(target = "requiredServices", source = "requiredServices", qualifiedByName = "obj2Json")
-    @Mapping(target = "clusterId", expression = "java(clusterPO.getId())")
-    @Mapping(target = "components", ignore = true)
-    ServicePO fromDTO2PO(ServiceDTO serviceDTO, @Context ClusterPO clusterPO);
+    ServicePO fromDTO2PO(ServiceDTO serviceDTO);
 
     ServiceVO fromDTO2VO(ServiceDTO serviceDTO);
 
     List<ServiceVO> fromDTO2VO(List<ServiceDTO> serviceDTOList);
 
-    @Mapping(target = "serviceName", source = "name")
-    @Mapping(target = "serviceDesc", source = "desc")
-    @Mapping(target = "serviceVersion", source = "version")
-    @Mapping(target = "serviceUser", source = "user")
     ServiceDTO fromModel2DTO(ServiceModel serviceModel);
 
-    @Mapping(target = "requiredServices", source = "requiredServices", qualifiedByName = "json2List")
     ServiceVO fromPO2VO(ServicePO servicePO);
 
     List<ServiceVO> fromPO2VO(List<ServicePO> servicePOList);

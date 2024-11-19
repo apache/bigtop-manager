@@ -71,8 +71,7 @@ public class RequiredServicesValidator implements CommandValidator {
             }
 
             List<ServicePO> servicePOList = serviceDao.findByClusterIdAndServiceNameIn(clusterId, requiredServices);
-            List<String> list =
-                    servicePOList.stream().map(ServicePO::getServiceName).toList();
+            List<String> list = servicePOList.stream().map(ServicePO::getName).toList();
 
             requiredServices.removeAll(list);
 
