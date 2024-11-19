@@ -18,8 +18,10 @@
  */
 package org.apache.bigtop.manager.server.service;
 
+import org.apache.bigtop.manager.dao.query.ServiceQuery;
 import org.apache.bigtop.manager.server.model.req.ServiceConfigReq;
 import org.apache.bigtop.manager.server.model.req.ServiceConfigSnapshotReq;
+import org.apache.bigtop.manager.server.model.vo.PageVO;
 import org.apache.bigtop.manager.server.model.vo.ServiceConfigSnapshotVO;
 import org.apache.bigtop.manager.server.model.vo.ServiceConfigVO;
 import org.apache.bigtop.manager.server.model.vo.ServiceVO;
@@ -29,11 +31,11 @@ import java.util.List;
 public interface ServiceService {
 
     /**
-     * Get all stacks.
+     * Get services by query.
      *
-     * @return Stacks
+     * @return services
      */
-    List<ServiceVO> list(Long clusterId);
+    PageVO<ServiceVO> list(ServiceQuery query);
 
     /**
      * Get a service.

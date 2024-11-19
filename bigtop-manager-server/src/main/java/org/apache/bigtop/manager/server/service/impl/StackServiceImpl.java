@@ -46,7 +46,7 @@ public class StackServiceImpl implements StackService {
             StackDTO stackDTO = entry.getKey();
             List<ServiceDTO> serviceDTOList = entry.getValue();
             for (ServiceDTO serviceDTO : serviceDTOList) {
-                serviceDTO.setConfigs(StackUtils.SERVICE_CONFIG_MAP.get(serviceDTO.getServiceName()));
+                serviceDTO.setConfigs(StackUtils.SERVICE_CONFIG_MAP.get(serviceDTO.getName()));
             }
 
             StackVO stackVO = StackConverter.INSTANCE.fromDTO2VO(stackDTO);

@@ -201,7 +201,7 @@
         <include refid="baseColumnsV2">
             <property name="alias" value="hc"/>
         </include>
-        ,ser.service_name,ser.service_user,clu.root_dir,c.component_name,c.command_script,hst.hostname, hst.grpc_port
+        ,ser.name as service_name,ser.user as service_user,clu.root_dir,c.component_name,c.command_script,hst.hostname, hst.grpc_port
         from
         host_component hc
         inner join host hst

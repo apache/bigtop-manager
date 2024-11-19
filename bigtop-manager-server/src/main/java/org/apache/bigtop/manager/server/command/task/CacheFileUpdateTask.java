@@ -112,7 +112,7 @@ public class CacheFileUpdateTask extends AbstractTask {
 
         Long clusterId = clusterPO.getId();
 
-        List<ServicePO> servicePOList = serviceDao.findAllByClusterId(clusterId);
+        List<ServicePO> servicePOList = serviceDao.findByClusterId(clusterId);
         List<ServiceConfigPO> serviceConfigPOList = serviceConfigDao.findByClusterId(clusterPO.getId());
         List<HostComponentPO> hostComponentPOList = hostComponentDao.findAllByClusterId(clusterId);
         List<RepoPO> repoPOList = repoDao.findAllByClusterId(clusterPO.getId());
@@ -158,7 +158,7 @@ public class CacheFileUpdateTask extends AbstractTask {
         });
 
         userMap = new HashMap<>();
-        servicePOList.forEach(x -> userMap.put(x.getServiceName(), x.getServiceUser()));
+        servicePOList.forEach(x -> userMap.put(x.getName(), x.getUser()));
 
         settingsMap = new HashMap<>();
         settings.forEach(x -> settingsMap.put(x.getTypeName(), x.getConfigData()));

@@ -139,7 +139,8 @@ public class ServiceInstallJob extends AbstractServiceJob {
         // 1. Persist service and components
         if (servicePO == null) {
             ServiceDTO serviceDTO = StackUtils.getServiceDTO(serviceName);
-            servicePO = ServiceConverter.INSTANCE.fromDTO2PO(serviceDTO, clusterPO);
+            servicePO = ServiceConverter.INSTANCE.fromDTO2PO(serviceDTO);
+            servicePO.setClusterId(clusterId);
             serviceDao.save(servicePO);
         }
 

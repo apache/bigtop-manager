@@ -18,8 +18,10 @@
  */
 package org.apache.bigtop.manager.server.controller;
 
+import org.apache.bigtop.manager.dao.query.ServiceQuery;
 import org.apache.bigtop.manager.server.model.req.ServiceConfigReq;
 import org.apache.bigtop.manager.server.model.req.ServiceConfigSnapshotReq;
+import org.apache.bigtop.manager.server.model.vo.PageVO;
 import org.apache.bigtop.manager.server.model.vo.ServiceConfigSnapshotVO;
 import org.apache.bigtop.manager.server.model.vo.ServiceConfigVO;
 import org.apache.bigtop.manager.server.model.vo.ServiceVO;
@@ -35,6 +37,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 
@@ -50,10 +56,20 @@ public class ServiceController {
     @Resource
     private ServiceService serviceService;
 
-    @Operation(summary = "list", description = "List services")
+    @Parameters({
+        @Parameter(in = ParameterIn.QUERY, name = "pageNum", schema = @Schema(type = "integer", defaultValue = "1")),
+        @Parameter(in = ParameterIn.QUERY, name = "pageSize", schema = @Schema(type = "integer", defaultValue = "10")),
+        @Parameter(in = ParameterIn.QUERY, name = "orderBy", schema = @Schema(type = "string", defaultValue = "id")),
+        @Parameter(
+                in = ParameterIn.QUERY,
+                name = "sort",
+                description = "asc/desc",
+                schema = @Schema(type = "string", defaultValue = "asc"))
+    })
+    @Operation(summary = "list", description = "List hosts")
     @GetMapping
-    public ResponseEntity<List<ServiceVO>> list(@PathVariable Long clusterId) {
-        return ResponseEntity.success(serviceService.list(clusterId));
+    public ResponseEntity<PageVO<ServiceVO>> list(@PathVariable Long clusterId, @RequestBody ServiceQuery query) {
+        return ResponseEntity.success(serviceService.list(query));
     }
 
     @Operation(summary = "get", description = "Get a service")

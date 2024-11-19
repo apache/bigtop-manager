@@ -16,26 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.vo;
+package org.apache.bigtop.manager.dao.query;
 
 import lombok.Data;
 
 @Data
-public class ServiceVO {
-
-    private Long id;
+public class ServiceQuery {
 
     private String name;
 
-    private String displayName;
-
-    private String desc;
-
-    private String user;
-
-    private String version;
-
-    private String stack;
+    private Long clusterId;
 
     private Boolean needRestart;
 

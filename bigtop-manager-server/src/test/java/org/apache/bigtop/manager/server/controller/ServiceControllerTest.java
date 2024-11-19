@@ -18,6 +18,8 @@
  */
 package org.apache.bigtop.manager.server.controller;
 
+import org.apache.bigtop.manager.dao.query.ServiceQuery;
+import org.apache.bigtop.manager.server.model.vo.PageVO;
 import org.apache.bigtop.manager.server.model.vo.ServiceVO;
 import org.apache.bigtop.manager.server.service.ServiceService;
 import org.apache.bigtop.manager.server.utils.MessageSourceUtils;
@@ -32,9 +34,6 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.Arrays;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -66,10 +65,11 @@ class ServiceControllerTest {
 
     @Test
     void listReturnsAllServices() {
-        List<ServiceVO> services = Arrays.asList(new ServiceVO(), new ServiceVO());
+        ServiceQuery query = new ServiceQuery();
+        PageVO<ServiceVO> services = new PageVO<>();
         when(serviceService.list(any())).thenReturn(services);
 
-        ResponseEntity<List<ServiceVO>> response = serviceController.list(1L);
+        ResponseEntity<PageVO<ServiceVO>> response = serviceController.list(1L, query);
 
         assertTrue(response.isSuccess());
         assertEquals(services, response.getData());

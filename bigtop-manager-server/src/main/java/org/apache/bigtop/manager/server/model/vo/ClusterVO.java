@@ -41,6 +41,8 @@ public class ClusterVO {
 
     private Long totalHost;
 
+    private Long totalService;
+
     private Long totalProcessor;
 
     private Long totalMemory;

@@ -20,17 +20,17 @@
 package org.apache.bigtop.manager.dao.repository;
 
 import org.apache.bigtop.manager.dao.po.ServicePO;
+import org.apache.bigtop.manager.dao.query.ServiceQuery;
 
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ServiceDao extends BaseDao<ServicePO> {
 
-    List<ServicePO> findAllByClusterId(@Param("clusterId") Long clusterId);
+    List<ServicePO> findByQuery(@Param("query") ServiceQuery query);
 
-    Optional<ServicePO> findByIdJoin(@Param("id") Long id);
+    List<ServicePO> findByClusterId(@Param("clusterId") Long clusterId);
 
     ServicePO findByClusterIdAndServiceName(
             @Param("clusterId") Long clusterId, @Param("serviceName") String serviceName);

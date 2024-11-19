@@ -112,7 +112,7 @@ public class StackUtils {
                 ServiceDTO serviceDTO = parseServiceMetaInfo(file);
                 services.add(serviceDTO);
 
-                parseServiceConfigurations(file, serviceDTO.getServiceName());
+                parseServiceConfigurations(file, serviceDTO.getName());
 
                 parseDag(file);
             }
@@ -126,7 +126,7 @@ public class StackUtils {
                 JaxbUtils.readFromPath(file.getAbsolutePath() + "/" + META_FILE, ServiceMetainfoXml.class);
         ServiceModel serviceModel = serviceMetainfoXml.getService();
         ServiceDTO serviceDTO = ServiceConverter.INSTANCE.fromModel2DTO(serviceModel);
-        serviceDTO.setServiceDesc(StringUtils.strip(serviceDTO.getServiceDesc()));
+        serviceDTO.setDesc(StringUtils.strip(serviceDTO.getDesc()));
         return serviceDTO;
     }
 
@@ -211,7 +211,7 @@ public class StackUtils {
     public static StackDTO getServiceStack(String serviceName) {
         for (Map.Entry<StackDTO, List<ServiceDTO>> entry : STACK_SERVICE_MAP.entrySet()) {
             for (ServiceDTO serviceDTO : entry.getValue()) {
-                if (serviceDTO.getServiceName().equals(serviceName)) {
+                if (serviceDTO.getName().equals(serviceName)) {
                     return entry.getKey();
                 }
             }
@@ -232,7 +232,7 @@ public class StackUtils {
     public static ServiceDTO getServiceDTO(String serviceName) {
         for (Map.Entry<StackDTO, List<ServiceDTO>> entry : STACK_SERVICE_MAP.entrySet()) {
             for (ServiceDTO serviceDTO : entry.getValue()) {
-                if (serviceDTO.getServiceName().equals(serviceName)) {
+                if (serviceDTO.getName().equals(serviceName)) {
                     return serviceDTO;
                 }
             }

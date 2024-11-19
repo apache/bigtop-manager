@@ -61,6 +61,9 @@ public class ClusterPO extends BasePO implements Serializable {
     private Long totalHost;
 
     @Transient
+    private Long totalService;
+
+    @Transient
     private Long totalProcessor;
 
     @Transient

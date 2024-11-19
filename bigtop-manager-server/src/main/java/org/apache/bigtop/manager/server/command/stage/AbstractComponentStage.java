@@ -53,7 +53,7 @@ public abstract class AbstractComponentStage extends AbstractStage {
 
     @Override
     protected String getServiceName() {
-        return stageContext.getServiceDTO().getServiceName();
+        return stageContext.getServiceDTO().getName();
     }
 
     @Override
@@ -69,10 +69,10 @@ public abstract class AbstractComponentStage extends AbstractStage {
         taskContext.setHostDTO(hostDTO);
         taskContext.setClusterId(clusterPO.getId());
         taskContext.setClusterName(clusterPO.getName());
-        taskContext.setServiceName(serviceDTO.getServiceName());
+        taskContext.setServiceName(serviceDTO.getName());
         taskContext.setComponentName(componentDTO.getComponentName());
         taskContext.setComponentDisplayName(componentDTO.getDisplayName());
-        taskContext.setServiceUser(serviceDTO.getServiceUser());
+        taskContext.setServiceUser(serviceDTO.getUser());
         taskContext.setRootDir(clusterPO.getRootDir());
 
         Map<String, Object> properties = new HashMap<>();
