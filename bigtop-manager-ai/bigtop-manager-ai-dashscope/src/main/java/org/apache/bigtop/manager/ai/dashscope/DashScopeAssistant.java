@@ -46,7 +46,7 @@ public class DashScopeAssistant extends AbstractAIAssistant {
 
     @Override
     public PlatformType getPlatform() {
-        return PlatformType.OPENAI;
+        return PlatformType.DASH_SCOPE;
     }
 
     public static Builder builder() {
