@@ -16,26 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.vo;
+package org.apache.bigtop.manager.dao.query;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Data
-public class HostComponentVO {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class ComponentQuery {
 
-    private Long id;
+    private String name;
 
-    private String componentName;
+    private Long clusterId;
 
-    private String displayName;
-
-    private String category;
-
-    private String serviceName;
-
-    private String clusterName;
+    private Long hostId;
 
     private String hostname;
 
-    private String state;
+    private Long serviceId;
+
+    private List<String> serviceNames;
 }

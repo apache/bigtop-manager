@@ -188,45 +188,25 @@ CREATE INDEX idx_scs_service_id ON service_config_snapshot (service_id);
 CREATE TABLE component
 (
     id              BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY,
-    category        VARCHAR(255),
-    command_script  VARCHAR(255),
-    component_name  VARCHAR(255),
-    custom_commands TEXT,
+    name            VARCHAR(255),
     display_name    VARCHAR(255),
-    quick_link      VARCHAR(255),
-    cardinality     VARCHAR(255),
     cluster_id      BIGINT,
+    host_id         BIGINT,
     service_id      BIGINT,
+    status          INTEGER DEFAULT NULL,
     create_time     TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
     update_time     TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
     create_by       BIGINT,
     update_by       BIGINT,
-    PRIMARY KEY (id),
-    CONSTRAINT uk_component_name UNIQUE (component_name, cluster_id)
-);
-
-DROP INDEX IF EXISTS idx_component_cluster_id;
-DROP INDEX IF EXISTS idx_component_service_id;
-CREATE INDEX idx_component_cluster_id ON component (cluster_id);
-CREATE INDEX idx_component_service_id ON component (service_id);
-
-CREATE TABLE host_component
-(
-    id           BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY,
-    state        VARCHAR(255),
-    component_id BIGINT,
-    host_id      BIGINT,
-    create_time  TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
-    update_time  TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
-    create_by    BIGINT,
-    update_by    BIGINT,
     PRIMARY KEY (id)
 );
 
-DROP INDEX IF EXISTS idx_hc_component_id;
-DROP INDEX IF EXISTS idx_hc_host_id;
-CREATE INDEX idx_hc_component_id ON host_component (component_id);
-CREATE INDEX idx_hc_host_id ON host_component (host_id);
+DROP INDEX IF EXISTS idx_component_cluster_id;
+DROP INDEX IF EXISTS idx_component_host_id;
+DROP INDEX IF EXISTS idx_component_service_id;
+CREATE INDEX idx_component_cluster_id ON component (cluster_id);
+CREATE INDEX idx_component_host_id ON component (host_id);
+CREATE INDEX idx_component_service_id ON component (service_id);
 
 CREATE TABLE job
 (

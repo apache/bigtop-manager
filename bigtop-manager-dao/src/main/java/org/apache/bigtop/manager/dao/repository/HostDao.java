@@ -29,15 +29,13 @@ import java.util.List;
 
 public interface HostDao extends BaseDao<HostPO> {
 
+    List<HostPO> findByQuery(@Param("query") HostQuery query);
+
+    HostPO findDetailsById(@Param("id") Long id);
+
     HostPO findByHostname(@Param("hostname") String hostname);
 
     List<HostPO> findAllByHostnameIn(@Param("hostnames") Collection<String> hostnames);
 
     List<HostPO> findAllByClusterId(@Param("clusterId") Long clusterId);
-
-    HostPO findByIdJoin(@Param("id") Long id);
-
-    List<HostPO> findByQuery(@Param("query") HostQuery query);
-
-    HostPO findDetailsById(@Param("id") Long id);
 }

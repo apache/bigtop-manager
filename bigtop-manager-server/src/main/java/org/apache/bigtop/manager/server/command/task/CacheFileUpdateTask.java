@@ -26,15 +26,14 @@ import org.apache.bigtop.manager.common.message.entity.pojo.RepoInfo;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
-import org.apache.bigtop.manager.dao.po.HostComponentPO;
 import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.po.RepoPO;
 import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
 import org.apache.bigtop.manager.dao.po.ServicePO;
 import org.apache.bigtop.manager.dao.po.SettingPO;
+import org.apache.bigtop.manager.dao.query.ComponentQuery;
 import org.apache.bigtop.manager.dao.repository.ClusterDao;
 import org.apache.bigtop.manager.dao.repository.ComponentDao;
-import org.apache.bigtop.manager.dao.repository.HostComponentDao;
 import org.apache.bigtop.manager.dao.repository.HostDao;
 import org.apache.bigtop.manager.dao.repository.RepoDao;
 import org.apache.bigtop.manager.dao.repository.ServiceConfigDao;
@@ -58,7 +57,6 @@ import static org.apache.bigtop.manager.common.constants.Constants.ALL_HOST_KEY;
 public class CacheFileUpdateTask extends AbstractTask {
 
     private ClusterDao clusterDao;
-    private HostComponentDao hostComponentDao;
     private ServiceDao serviceDao;
     private ServiceConfigDao serviceConfigDao;
     private RepoDao repoDao;
@@ -83,7 +81,6 @@ public class CacheFileUpdateTask extends AbstractTask {
         super.injectBeans();
 
         this.clusterDao = SpringContextHolder.getBean(ClusterDao.class);
-        this.hostComponentDao = SpringContextHolder.getBean(HostComponentDao.class);
         this.serviceDao = SpringContextHolder.getBean(ServiceDao.class);
         this.serviceConfigDao = SpringContextHolder.getBean(ServiceConfigDao.class);
         this.repoDao = SpringContextHolder.getBean(RepoDao.class);
@@ -112,9 +109,12 @@ public class CacheFileUpdateTask extends AbstractTask {
 
         Long clusterId = clusterPO.getId();
 
+        ComponentQuery componentQuery =
+                ComponentQuery.builder().clusterId(clusterId).build();
+
         List<ServicePO> servicePOList = serviceDao.findByClusterId(clusterId);
         List<ServiceConfigPO> serviceConfigPOList = serviceConfigDao.findByClusterId(clusterPO.getId());
-        List<HostComponentPO> hostComponentPOList = hostComponentDao.findAllByClusterId(clusterId);
+        List<ComponentPO> componentPOList = componentDao.findByQuery(componentQuery);
         List<RepoPO> repoPOList = repoDao.findAllByClusterId(clusterPO.getId());
         Iterable<SettingPO> settings = settingDao.findAll();
         List<HostPO> hostPOList = hostDao.findAllByClusterId(clusterId);
@@ -137,15 +137,15 @@ public class CacheFileUpdateTask extends AbstractTask {
         }
 
         hostMap = new HashMap<>();
-        hostComponentPOList.forEach(x -> {
-            if (hostMap.containsKey(x.getComponentName())) {
-                hostMap.get(x.getComponentName()).add(x.getHostname());
+        componentPOList.forEach(x -> {
+            if (hostMap.containsKey(x.getName())) {
+                hostMap.get(x.getName()).add(x.getHostname());
             } else {
                 Set<String> set = new HashSet<>();
                 set.add(x.getHostname());
-                hostMap.put(x.getComponentName(), set);
+                hostMap.put(x.getName(), set);
             }
-            hostMap.get(x.getComponentName()).add(x.getHostname());
+            hostMap.get(x.getName()).add(x.getHostname());
         });
 
         Set<String> hostNameSet = hostPOList.stream().map(HostPO::getHostname).collect(Collectors.toSet());
@@ -162,19 +162,6 @@ public class CacheFileUpdateTask extends AbstractTask {
 
         settingsMap = new HashMap<>();
         settings.forEach(x -> settingsMap.put(x.getTypeName(), x.getConfigData()));
-
-        componentInfoMap = new HashMap<>();
-        List<ComponentPO> componentPOList = componentDao.findAllJoinService();
-        componentPOList.forEach(c -> {
-            ComponentInfo componentInfo = new ComponentInfo();
-            componentInfo.setComponentName(c.getComponentName());
-            componentInfo.setCommandScript(c.getCommandScript());
-            componentInfo.setDisplayName(c.getDisplayName());
-            componentInfo.setCategory(c.getCategory());
-            componentInfo.setCustomCommands(c.getCustomCommands());
-            componentInfo.setServiceName(c.getServiceName());
-            componentInfoMap.put(c.getComponentName(), componentInfo);
-        });
     }
 
     @SuppressWarnings("unchecked")

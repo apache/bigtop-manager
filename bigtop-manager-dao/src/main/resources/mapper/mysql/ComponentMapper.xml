@@ -24,86 +24,62 @@
 <mapper namespace="org.apache.bigtop.manager.dao.repository.ComponentDao">
 
     <sql id="baseColumns">
-        id, component_name, display_name, command_script, custom_commands, category, quick_link, cardinality, service_id, cluster_id
+        id, name, display_name, service_id, host_id, status
     </sql>
+
     <sql id="baseColumnsV2">
-        ${alias}.id, ${alias}.component_name, ${alias}.display_name, ${alias}.command_script, ${alias}.custom_commands, ${alias}.category, ${alias}.quick_link, ${alias}.cardinality, ${alias}.service_id, ${alias}.cluster_id
+        ${alias}.id, ${alias}.name, ${alias}.display_name, ${alias}.service_id, ${alias}.host_id, ${alias}.status
     </sql>
 
-    <select id="findByClusterIdAndComponentName"
-            resultType="org.apache.bigtop.manager.dao.po.ComponentPO">
-        select
-        <include refid="baseColumns"/>
-        from
-        component
-        <where>
-            <if test="componentName != null">
-                component_name = #{componentName}
-            </if>
-            <if test="clusterId != 0">
-                and cluster_id = #{clusterId}
-            </if>
-        </where>
+    <select id="countByHostId" resultType="long">
+        select count(*)
+        from component
+        where host_id = #{hostId}
     </select>
 
-    <select id="findAllByClusterId"
-            resultType="org.apache.bigtop.manager.dao.po.ComponentPO">
+    <select id="findByQuery" resultType="org.apache.bigtop.manager.dao.po.ComponentPO">
         select
         <include refid="baseColumnsV2">
-            <property name="alias" value="r"/>
-        </include>
-        ,c.name as cluster_name, s.service_name
+            <property name="alias" value="comp"/>
+        </include>, s.name as service_name, s.display_name as service_display_name, s.stack, h.hostname
         from
-        component r
-        inner join cluster c
-        on r.cluster_id = c.id
-        inner join service s
-        on r.service_id = s.id
+        component comp
+        left join service s on comp.service_id = s.id
+        left join host h on comp.host_id = h.id
         <where>
-            <if test="clusterId != 0">
-                r.cluster_id = #{clusterId}
+            <if test="query.name != null and query.name != ''">
+                and comp.name = #{query.name}
             </if>
-        </where>
-    </select>
-
-    <select id="findAllByClusterIdAndServiceServiceNameIn"
-            resultType="org.apache.bigtop.manager.dao.po.ComponentPO">
-        select
-        <include refid="baseColumnsV2">
-            <property name="alias" value="r"/>
-        </include>
-        from
-        (select * from component
-        <where>
-            <if test="clusterId != 0">
-                cluster_id = #{clusterId}
+            <if test="query.clusterId != null">
+                and comp.cluster_id = #{query.clusterId}
             </if>
-        </where>
-        ) r
-        inner join (select * from service
-        <where>
-            <if test="serviceNames != null">
-                service_name in
-                <foreach collection="serviceNames" item="serviceName" index="index" open="(" close=")" separator=",">
+            <if test="query.hostId != null">
+                and comp.host_id = #{query.hostId}
+            </if>
+            <if test="query.hostname != null and query.hostname != ''">
+                and h.hostname = #{query.hostname}
+            </if>
+            <if test="query.serviceId != null">
+                and comp.service_id = #{query.serviceId}
+            </if>
+            <if test="query.serviceNames != null and query.serviceNames.size() > 0">
+                and s.name in
+                <foreach collection="query.serviceNames" item="serviceName" index="index" open="(" close=")" separator=",">
                     #{serviceName}
                 </foreach>
             </if>
         </where>
-        ) s
-        on r.service_id = s.id and r.cluster_id = s.cluster_id
     </select>
 
-    <select id="findAllJoinService"
-            resultType="org.apache.bigtop.manager.dao.po.ComponentPO">
+    <select id="findDetailsById" resultType="org.apache.bigtop.manager.dao.po.ComponentPO">
         select
         <include refid="baseColumnsV2">
-            <property name="alias" value="r"/>
-        </include>
-            , s.service_name
+            <property name="alias" value="comp"/>
+        </include>, s.name as service_name, s.display_name as service_display_name, s.stack, h.hostname
         from
-        component r
-        inner join service s
-        on r.service_id = s.id and r.cluster_id = s.cluster_id
+        component comp
+        left join service s on comp.service_id = s.id
+        left join host h on comp.host_id = h.id
+        where comp.id = #{id}
     </select>
-
 </mapper>

@@ -66,9 +66,9 @@ public class ServiceController {
                 description = "asc/desc",
                 schema = @Schema(type = "string", defaultValue = "asc"))
     })
-    @Operation(summary = "list", description = "List hosts")
+    @Operation(summary = "list", description = "List services")
     @GetMapping
-    public ResponseEntity<PageVO<ServiceVO>> list(@PathVariable Long clusterId, @RequestBody ServiceQuery query) {
+    public ResponseEntity<PageVO<ServiceVO>> list(ServiceQuery query) {
         return ResponseEntity.success(serviceService.list(query));
     }
 

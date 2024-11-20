@@ -18,40 +18,28 @@
  */
 package org.apache.bigtop.manager.server.model.converter;
 
-import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
-import org.apache.bigtop.manager.dao.po.ServicePO;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
 import org.apache.bigtop.manager.server.model.vo.ComponentVO;
 import org.apache.bigtop.manager.server.stack.model.ComponentModel;
 
-import org.mapstruct.Context;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper(
-        uses = {ConverterTool.class},
-        config = MapStructSharedConfig.class)
+@Mapper(config = MapStructSharedConfig.class)
 public interface ComponentConverter {
 
     ComponentConverter INSTANCE = Mappers.getMapper(ComponentConverter.class);
 
-    @Mapping(target = "commandScript", source = "commandScript", qualifiedByName = "obj2Json")
-    @Mapping(target = "customCommands", source = "customCommands", qualifiedByName = "obj2Json")
-    @Mapping(target = "quickLink", source = "quickLink", qualifiedByName = "obj2Json")
-    @Mapping(target = "serviceId", expression = "java(servicePO.getId())")
-    @Mapping(target = "clusterId", expression = "java(clusterPO.getId())")
-    ComponentPO fromDTO2PO(ComponentDTO componentDTO, @Context ServicePO servicePO, @Context ClusterPO clusterPO);
+    ComponentPO fromDTO2PO(ComponentDTO componentDTO);
 
     ComponentVO fromDTO2VO(ComponentDTO componentDTO);
 
     List<ComponentVO> fromDTO2VO(List<ComponentDTO> componentDTOList);
 
-    @Mapping(target = "componentName", source = "name")
     ComponentDTO fromModel2DTO(ComponentModel componentModel);
 
     ComponentVO fromPO2VO(ComponentPO componentPO);

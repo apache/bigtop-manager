@@ -24,7 +24,7 @@ import org.apache.bigtop.manager.common.message.entity.pojo.PackageInfo;
 import org.apache.bigtop.manager.common.message.entity.pojo.PackageSpecificInfo;
 import org.apache.bigtop.manager.common.message.entity.pojo.ScriptInfo;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.repository.HostComponentDao;
+import org.apache.bigtop.manager.dao.repository.ComponentDao;
 import org.apache.bigtop.manager.grpc.generated.CommandRequest;
 import org.apache.bigtop.manager.grpc.generated.CommandType;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
@@ -39,7 +39,7 @@ import java.util.Map;
 
 public abstract class AbstractComponentTask extends AbstractTask {
 
-    protected HostComponentDao hostComponentDao;
+    protected ComponentDao componentDao;
 
     public AbstractComponentTask(TaskContext taskContext) {
         super(taskContext);
@@ -49,7 +49,7 @@ public abstract class AbstractComponentTask extends AbstractTask {
     protected void injectBeans() {
         super.injectBeans();
 
-        this.hostComponentDao = SpringContextHolder.getBean(HostComponentDao.class);
+        this.componentDao = SpringContextHolder.getBean(ComponentDao.class);
     }
 
     @Override

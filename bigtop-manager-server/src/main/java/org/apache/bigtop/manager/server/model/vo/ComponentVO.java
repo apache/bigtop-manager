@@ -25,15 +25,25 @@ public class ComponentVO {
 
     private Long id;
 
-    private String componentName;
+    private String name;
 
     private String displayName;
 
-    private String category;
+    private Long serviceId;
 
     private String serviceName;
 
-    private String clusterName;
+    private String serviceDisplayName;
+
+    private String stack;
+
+    private String hostname;
+
+    private String category;
 
     private String cardinality;
+
+    private Integer status;
+
+    private QuickLinkVO quickLink;
 }

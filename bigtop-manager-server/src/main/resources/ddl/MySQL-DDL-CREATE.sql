@@ -188,38 +188,20 @@ CREATE TABLE `service_config_snapshot`
 CREATE TABLE `component`
 (
     `id`              BIGINT NOT NULL AUTO_INCREMENT,
-    `category`        VARCHAR(255),
-    `command_script`  VARCHAR(255),
-    `component_name`  VARCHAR(255),
-    `custom_commands` TEXT,
+    `name`            VARCHAR(255),
     `display_name`    VARCHAR(255),
-    `quick_link`      VARCHAR(255),
-    `cardinality`     VARCHAR(255),
     `cluster_id`      BIGINT,
+    `host_id`         BIGINT,
     `service_id`      BIGINT,
+    `status`          INTEGER DEFAULT NULL COMMENT '1-healthy, 2-unhealthy, 3-unknown',
     `create_time`     DATETIME    DEFAULT CURRENT_TIMESTAMP,
     `update_time`     DATETIME    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `create_by`       BIGINT,
     `update_by`       BIGINT,
     PRIMARY KEY (id),
     KEY               `idx_component_cluster_id` (cluster_id),
-    KEY               `idx_component_service_id` (service_id),
-    UNIQUE KEY `uk_component_name` (`component_name`, `cluster_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE `host_component`
-(
-    `id`           BIGINT NOT NULL AUTO_INCREMENT,
-    `state`        VARCHAR(255),
-    `component_id` BIGINT,
-    `host_id`      BIGINT,
-    `create_time`  DATETIME    DEFAULT CURRENT_TIMESTAMP,
-    `update_time`  DATETIME    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `create_by`    BIGINT,
-    `update_by`    BIGINT,
-    PRIMARY KEY (id),
-    KEY            `idx_hc_component_id` (component_id),
-    KEY            `idx_hc_host_id` (host_id)
+    KEY               `idx_component_host_id` (host_id),
+    KEY               `idx_component_service_id` (service_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `job`
