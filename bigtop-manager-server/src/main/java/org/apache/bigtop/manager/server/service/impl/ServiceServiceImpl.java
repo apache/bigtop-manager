@@ -157,37 +157,4 @@ public class ServiceServiceImpl implements ServiceService {
     public Boolean deleteConfSnapshot(Long clusterId, Long serviceId, Long snapshotId) {
         return serviceConfigSnapshotDao.deleteById(snapshotId);
     }
-
-    //    private List<QuickLinkVO> resolveQuickLink(
-    //            List<HostComponentPO> hostComponentPOList, String quickLinkJson, Long clusterId, Long serviceId) {
-    //        List<QuickLinkVO> quickLinkVOList = new ArrayList<>();
-    //
-    //        QuickLinkDTO quickLinkDTO = JsonUtils.readFromString(quickLinkJson, QuickLinkDTO.class);
-    //
-    //        List<ServiceConfigPO> serviceConfigPOList = serviceConfigDao.findByServiceId(serviceId);
-    //
-    //        String httpPort = quickLinkDTO.getHttpPortDefault();
-    //        // Use HTTP for now, need to handle https in the future
-    //        for (ServiceConfigPO serviceConfigPO : serviceConfigPOList) {
-    //            ServiceConfigDTO serviceConfigDTO = ServiceConfigConverter.INSTANCE.fromPO2DTO(serviceConfigPO);
-    //            for (PropertyDTO propertyDTO : serviceConfigDTO.getProperties()) {
-    //                if (propertyDTO.getName().equals(quickLinkDTO.getHttpPortProperty())) {
-    //
-    //                    httpPort = propertyDTO.getValue().contains(":")
-    //                            ? propertyDTO.getValue().split(":")[1]
-    //                            : propertyDTO.getValue();
-    //                }
-    //            }
-    //        }
-    //
-    //        for (HostComponentPO hostComponentPO : hostComponentPOList) {
-    //            QuickLinkVO quickLinkVO = new QuickLinkVO();
-    //            quickLinkVO.setDisplayName(quickLinkDTO.getDisplayName());
-    //            String url = "http://" + hostComponentPO.getHostname() + ":" + httpPort;
-    //            quickLinkVO.setUrl(url);
-    //            quickLinkVOList.add(quickLinkVO);
-    //        }
-    //
-    //        return quickLinkVOList;
-    //    }
 }
