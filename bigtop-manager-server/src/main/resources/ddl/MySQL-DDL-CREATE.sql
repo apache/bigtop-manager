@@ -85,43 +85,6 @@ CREATE TABLE `cluster`
     UNIQUE KEY `uk_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE `component`
-(
-    `id`              BIGINT NOT NULL AUTO_INCREMENT,
-    `category`        VARCHAR(255),
-    `command_script`  VARCHAR(255),
-    `component_name`  VARCHAR(255),
-    `create_by`       BIGINT,
-    `create_time`     DATETIME,
-    `custom_commands` TEXT,
-    `display_name`    VARCHAR(255),
-    `quick_link`      VARCHAR(255),
-    `cardinality`     VARCHAR(255),
-    `update_by`       BIGINT,
-    `update_time`     DATETIME,
-    `cluster_id`      BIGINT,
-    `service_id`      BIGINT,
-    PRIMARY KEY (id),
-    KEY               `idx_component_cluster_id` (cluster_id),
-    KEY               `idx_component_service_id` (service_id),
-    UNIQUE KEY `uk_component_name` (`component_name`, `cluster_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE `host_component`
-(
-    `id`           BIGINT NOT NULL AUTO_INCREMENT,
-    `create_by`    BIGINT,
-    `create_time`  DATETIME,
-    `state`        VARCHAR(255),
-    `update_by`    BIGINT,
-    `update_time`  DATETIME,
-    `component_id` BIGINT,
-    `host_id`      BIGINT,
-    PRIMARY KEY (id),
-    KEY            `idx_hc_component_id` (component_id),
-    KEY            `idx_hc_host_id` (host_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
 CREATE TABLE `host`
 (
     `id`                   BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -145,7 +108,7 @@ CREATE TABLE `host`
     `total_disk`           BIGINT,
     `total_memory_size`    BIGINT,
     `desc`                 VARCHAR(255) DEFAULT NULL,
-    `status`               INTEGER  DEFAULT NULL COMMENT '1-healthy, 2-unhealthy, 3-unknown',
+    `status`               INTEGER DEFAULT NULL COMMENT '1-healthy, 2-unhealthy, 3-unknown',
     `err_info`             VARCHAR(255) DEFAULT NULL,
     `create_time`          DATETIME     DEFAULT CURRENT_TIMESTAMP,
     `update_time`          DATETIME     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -168,6 +131,95 @@ CREATE TABLE `repo`
     `create_by`   BIGINT,
     `update_by`   BIGINT,
     PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `service`
+(
+    `id`                BIGINT NOT NULL AUTO_INCREMENT,
+    `name`              VARCHAR(255) DEFAULT NULL,
+    `display_name`      VARCHAR(255) DEFAULT NULL,
+    `desc`              VARCHAR(1024) DEFAULT NULL,
+    `user`              VARCHAR(255) DEFAULT NULL,
+    `version`           VARCHAR(255) DEFAULT NULL,
+    `stack`             VARCHAR(255) DEFAULT NULL,
+    `need_restart`      BOOLEAN DEFAULT FALSE,
+    `cluster_id`        BIGINT,
+    `status`            INTEGER DEFAULT NULL COMMENT '1-healthy, 2-unhealthy, 3-unknown',
+    `create_time`       DATETIME    DEFAULT CURRENT_TIMESTAMP,
+    `update_time`       DATETIME    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `create_by`         BIGINT,
+    `update_by`         BIGINT,
+    PRIMARY KEY (id),
+    KEY                 idx_service_cluster_id (cluster_id),
+    UNIQUE KEY `uk_service_name` (`name`, `cluster_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `service_config`
+(
+    `id`                BIGINT NOT NULL AUTO_INCREMENT,
+    `name`              VARCHAR(255),
+    `properties_json`   TEXT,
+    `cluster_id`        BIGINT,
+    `service_id`        BIGINT,
+    `create_time`       DATETIME    DEFAULT CURRENT_TIMESTAMP,
+    `update_time`       DATETIME    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `create_by`         BIGINT,
+    `update_by`         BIGINT,
+    PRIMARY KEY (id),
+    KEY           idx_sc_cluster_id (cluster_id),
+    KEY           idx_sc_service_id (service_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `service_config_snapshot`
+(
+    `id`                BIGINT NOT NULL AUTO_INCREMENT,
+    `name`              VARCHAR(255),
+    `desc`              VARCHAR(255),
+    `config_json`       TEXT,
+    `service_id`        BIGINT,
+    `create_time`       DATETIME    DEFAULT CURRENT_TIMESTAMP,
+    `update_time`       DATETIME    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `create_by`         BIGINT,
+    `update_by`         BIGINT,
+    PRIMARY KEY (id),
+    KEY           idx_scs_service_id (service_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `component`
+(
+    `id`              BIGINT NOT NULL AUTO_INCREMENT,
+    `category`        VARCHAR(255),
+    `command_script`  VARCHAR(255),
+    `component_name`  VARCHAR(255),
+    `custom_commands` TEXT,
+    `display_name`    VARCHAR(255),
+    `quick_link`      VARCHAR(255),
+    `cardinality`     VARCHAR(255),
+    `cluster_id`      BIGINT,
+    `service_id`      BIGINT,
+    `create_time`     DATETIME    DEFAULT CURRENT_TIMESTAMP,
+    `update_time`     DATETIME    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `create_by`       BIGINT,
+    `update_by`       BIGINT,
+    PRIMARY KEY (id),
+    KEY               `idx_component_cluster_id` (cluster_id),
+    KEY               `idx_component_service_id` (service_id),
+    UNIQUE KEY `uk_component_name` (`component_name`, `cluster_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `host_component`
+(
+    `id`           BIGINT NOT NULL AUTO_INCREMENT,
+    `state`        VARCHAR(255),
+    `component_id` BIGINT,
+    `host_id`      BIGINT,
+    `create_time`  DATETIME    DEFAULT CURRENT_TIMESTAMP,
+    `update_time`  DATETIME    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `create_by`    BIGINT,
+    `update_by`    BIGINT,
+    PRIMARY KEY (id),
+    KEY            `idx_hc_component_id` (component_id),
+    KEY            `idx_hc_host_id` (host_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `job`
@@ -231,56 +283,6 @@ CREATE TABLE `task`
     KEY               idx_task_stage_id (stage_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE `type_config`
-(
-    `id`                BIGINT NOT NULL AUTO_INCREMENT,
-    `create_by`         BIGINT,
-    `create_time`       DATETIME,
-    `properties_json`   TEXT,
-    `type_name`         VARCHAR(255),
-    `update_by`         BIGINT,
-    `update_time`       DATETIME,
-    `service_config_id` BIGINT,
-    PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE `service`
-(
-    `id`                BIGINT NOT NULL AUTO_INCREMENT,
-    `create_by`         BIGINT,
-    `create_time`       DATETIME,
-    `display_name`      VARCHAR(255),
-    `package_specifics` VARCHAR(1024),
-    `required_services` VARCHAR(255),
-    `service_desc`      VARCHAR(1024),
-    `service_name`      VARCHAR(255),
-    `service_user`      VARCHAR(255),
-    `service_version`   VARCHAR(255),
-    `update_by`         BIGINT,
-    `update_time`       DATETIME,
-    `cluster_id`        BIGINT,
-    PRIMARY KEY (id),
-    KEY                 idx_service_cluster_id (cluster_id),
-    UNIQUE KEY `uk_service_name` (`service_name`, `cluster_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE `service_config`
-(
-    `id`          BIGINT NOT NULL AUTO_INCREMENT,
-    `config_desc` VARCHAR(255),
-    `create_by`   BIGINT,
-    `create_time` DATETIME,
-    `selected`    TINYINT(1) default 0,
-    `update_by`   BIGINT,
-    `update_time` DATETIME,
-    `version`     INTEGER,
-    `cluster_id`  BIGINT,
-    `service_id`  BIGINT,
-    PRIMARY KEY (id),
-    KEY           idx_sc_cluster_id (cluster_id),
-    KEY           idx_sc_service_id (service_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
 CREATE TABLE `setting`
 (
     `id`          BIGINT NOT NULL AUTO_INCREMENT,
@@ -330,7 +332,6 @@ CREATE TABLE `llm_chat_thread`
     `auth_id`     BIGINT(20) UNSIGNED NOT NULL,
     `user_id`     BIGINT(20) UNSIGNED NOT NULL,
     `is_deleted`  TINYINT(1)          DEFAULT 0 NULL,
-    `thread_info` TEXT                DEFAULT NULL,
     `name`        VARCHAR(255)        DEFAULT NULL,
     `create_time` DATETIME            DEFAULT CURRENT_TIMESTAMP,
     `update_time` DATETIME            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

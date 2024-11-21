@@ -20,34 +20,24 @@ package org.apache.bigtop.manager.server.model.vo;
 
 import lombok.Data;
 
-import java.util.List;
-
 @Data
 public class ServiceVO {
 
     private Long id;
 
-    private String serviceName;
+    private String name;
 
     private String displayName;
 
-    private String serviceDesc;
+    private String desc;
 
-    private String serviceVersion;
+    private String user;
 
-    private String clusterName;
+    private String version;
 
-    private String serviceUser;
+    private String stack;
 
-    private List<ComponentVO> components;
+    private Boolean needRestart;
 
-    private List<TypeConfigVO> configs;
-
-    private List<String> requiredServices;
-
-    private Boolean isClient;
-
-    private Boolean isHealthy;
-
-    private List<QuickLinkVO> quickLinks;
+    private Integer status;
 }

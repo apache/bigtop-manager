@@ -16,21 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.ai.dashscope;
+package org.apache.bigtop.manager.server.model.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
-public class DashScopeThreadParam {
-    private Object threadId;
+import java.io.Serializable;
 
-    private String assistantId;
+@Data
+public class ServiceConfigSnapshotDTO implements Serializable {
 
-    private String assistantThreadId;
+    private Long id;
 
-    private String model;
+    private String name;
 
-    private String apiKey;
+    private String desc;
+
+    private String configJson;
 }

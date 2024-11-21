@@ -20,14 +20,11 @@ package org.apache.bigtop.manager.dao.po;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 import java.io.Serializable;
-import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -38,38 +35,30 @@ public class ServicePO extends BasePO implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "service_name")
-    private String serviceName;
+    @Column(name = "name")
+    private String name;
 
     @Column(name = "display_name")
     private String displayName;
 
-    @Column(name = "service_desc")
-    private String serviceDesc;
+    @Column(name = "desc")
+    private String desc;
 
-    @Column(name = "service_version")
-    private String serviceVersion;
+    @Column(name = "user")
+    private String user;
 
-    @Column(name = "package_specifics")
-    private String packageSpecifics;
+    @Column(name = "version")
+    private String version;
 
-    @Column(name = "service_user")
-    private String serviceUser;
+    @Column(name = "stack")
+    private String stack;
 
-    @Column(name = "required_services")
-    private String requiredServices;
+    @Column(name = "need_restart")
+    private Boolean needRestart;
 
     @Column(name = "cluster_id")
     private Long clusterId;
 
-    @Transient
-    @Column(name = "cluster_name")
-    private String clusterName;
-
-    @Transient
-    @Column(name = "user_group")
-    private String userGroup;
-
-    @ToString.Exclude
-    private List<ComponentPO> components;
+    @Column(name = "status")
+    private Integer status;
 }

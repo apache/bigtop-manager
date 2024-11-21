@@ -36,8 +36,6 @@ import org.apache.bigtop.manager.server.service.HostService;
 import org.apache.bigtop.manager.server.utils.PageUtils;
 import org.apache.bigtop.manager.server.utils.RemoteSSHUtils;
 
-import org.apache.commons.collections4.CollectionUtils;
-
 import org.springframework.stereotype.Service;
 
 import com.github.pagehelper.Page;
@@ -67,10 +65,6 @@ public class HostServiceImpl implements HostService {
         try (Page<?> ignored =
                 PageHelper.startPage(pageQuery.getPageNum(), pageQuery.getPageSize(), pageQuery.getOrderBy())) {
             List<HostPO> hostPOList = hostDao.findByQuery(hostQuery);
-            if (CollectionUtils.isEmpty(hostPOList)) {
-                throw new ApiException(ApiExceptionEnum.HOST_NOT_FOUND);
-            }
-
             PageInfo<HostPO> pageInfo = new PageInfo<>(hostPOList);
             return PageVO.of(pageInfo);
         } finally {

@@ -122,7 +122,7 @@ public abstract class AbstractServiceJob extends AbstractJob {
         for (ServiceDTO serviceDTO : StackUtils.getServiceDTOList(new StackDTO(stackName, stackVersion))) {
             for (ComponentDTO componentDTO : serviceDTO.getComponents()) {
                 if (componentDTO.getComponentName().equals(componentName)) {
-                    return serviceDTO.getServiceName();
+                    return serviceDTO.getName();
                 }
             }
         }

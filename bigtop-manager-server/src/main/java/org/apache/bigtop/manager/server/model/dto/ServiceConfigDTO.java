@@ -26,11 +26,9 @@ import java.util.List;
 @Data
 public class ServiceConfigDTO implements Serializable {
 
-    private String serviceName;
+    private Long id;
 
-    private String configDesc;
+    private String name;
 
-    private Integer version;
-
-    private List<TypeConfigDTO> configs;
+    private List<PropertyDTO> properties;
 }

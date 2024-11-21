@@ -19,6 +19,13 @@
 
 package org.apache.bigtop.manager.dao.repository;
 
-import org.apache.bigtop.manager.dao.po.TypeConfigPO;
+import org.apache.bigtop.manager.dao.po.ServiceConfigSnapshotPO;
 
-public interface TypeConfigDao extends BaseDao<TypeConfigPO> {}
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+
+public interface ServiceConfigSnapshotDao extends BaseDao<ServiceConfigSnapshotPO> {
+
+    List<ServiceConfigSnapshotPO> findByServiceId(@Param("serviceId") Long serviceId);
+}

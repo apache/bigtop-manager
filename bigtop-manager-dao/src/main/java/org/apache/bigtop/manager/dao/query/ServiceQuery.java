@@ -16,31 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.dao.po;
+package org.apache.bigtop.manager.dao.query;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import java.io.Serializable;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-@Table(name = "type_config")
-public class TypeConfigPO extends BasePO implements Serializable {
+public class ServiceQuery {
 
-    @Id
-    @Column(name = "id")
-    private Long id;
+    private String name;
 
-    @Column(name = "type_name")
-    private String typeName;
+    private Long clusterId;
 
-    @Column(name = "properties_json")
-    private String propertiesJson;
+    private Boolean needRestart;
 
-    @Column(name = "service_config_id")
-    private Long serviceConfigId;
+    private Integer status;
 }

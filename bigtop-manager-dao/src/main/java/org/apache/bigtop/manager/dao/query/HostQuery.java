@@ -23,11 +23,11 @@ import lombok.Data;
 @Data
 public class HostQuery {
 
-    private String hostnameLike;
+    private String hostname;
 
     private Long clusterId;
 
-    private String ipv4Like;
+    private String ipv4;
 
     private Integer status;
 }

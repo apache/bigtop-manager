@@ -107,14 +107,14 @@
         left join cluster c on h.cluster_id = c.id
         left join host_component hc on h.id = hc.host_id
         <where>
-            <if test="query.hostnameLike != null and query.hostnameLike != ''">
-                and h.hostname like concat('%', #{query.hostnameLike}, '%')
+            <if test="query.hostname != null and query.hostname != ''">
+                and h.hostname like concat('%', #{query.hostname}, '%')
             </if>
             <if test="query.clusterId != null">
                 and h.cluster_id = #{query.clusterId}
             </if>
-            <if test="query.ipv4Like != null and query.ipv4Like != ''">
-                and h.ipv4 like concat('%', #{query.ipv4Like}, '%')
+            <if test="query.ipv4 != null and query.ipv4 != ''">
+                and h.ipv4 like concat('%', #{query.ipv4}, '%')
             </if>
             <if test="query.status != null">
                 and h.status = #{query.status}
