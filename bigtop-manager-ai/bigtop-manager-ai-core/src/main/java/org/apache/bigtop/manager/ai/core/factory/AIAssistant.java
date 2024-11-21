@@ -21,11 +21,11 @@ package org.apache.bigtop.manager.ai.core.factory;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
 
+import dev.langchain4j.memory.ChatMemory;
+import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.chat.StreamingChatLanguageModel;
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 import reactor.core.publisher.Flux;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public interface AIAssistant {
 
@@ -57,14 +57,6 @@ public interface AIAssistant {
     PlatformType getPlatform();
 
     /**
-     * This is used to create a thread
-     * @return
-     */
-    default Map<String, String> createThread() {
-        return new HashMap<>();
-    }
-
-    /**
      * This is used to set system prompt
      * @return
      */
@@ -84,5 +76,11 @@ public interface AIAssistant {
         Builder withConfigProvider(AIAssistantConfigProvider configProvider);
 
         AIAssistant build();
+
+        ChatLanguageModel getChatLanguageModel();
+
+        StreamingChatLanguageModel getStreamingChatLanguageModel();
+
+        ChatMemory getChatMemory();
     }
 }
