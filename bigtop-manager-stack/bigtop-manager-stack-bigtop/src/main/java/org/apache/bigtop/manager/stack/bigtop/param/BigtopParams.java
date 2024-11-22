@@ -30,17 +30,11 @@ public abstract class BigtopParams extends BaseParams {
     }
 
     public String stackBinDir() {
-        String stackName = this.commandPayload.getStackName();
-        String stackVersion = this.commandPayload.getStackVersion();
-        String root = this.commandPayload.getRootDir();
-        return MessageFormat.format("{0}/{1}/{2}/usr/bin", root, stackName.toLowerCase(), stackVersion);
+        return "";
     }
 
     public String stackLibDir() {
-        String stackName = this.commandPayload.getStackName();
-        String stackVersion = this.commandPayload.getStackVersion();
-        String root = this.commandPayload.getRootDir();
-        return MessageFormat.format("{0}/{1}/{2}/usr/lib", root, stackName.toLowerCase(), stackVersion);
+        return "";
     }
 
     /**
@@ -48,7 +42,8 @@ public abstract class BigtopParams extends BaseParams {
      */
     @Override
     public String serviceHome() {
+        String rootDir = this.commandPayload.getRootDir();
         String service = this.commandPayload.getServiceName();
-        return stackLibDir() + "/" + service.toLowerCase();
+        return rootDir + "/" + service.toLowerCase();
     }
 }

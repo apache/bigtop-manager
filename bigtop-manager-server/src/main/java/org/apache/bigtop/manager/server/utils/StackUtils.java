@@ -19,6 +19,7 @@
 package org.apache.bigtop.manager.server.utils;
 
 import org.apache.bigtop.manager.common.enums.Command;
+import org.apache.bigtop.manager.common.utils.CaseUtils;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.exception.ServerException;
@@ -208,6 +209,10 @@ public class StackUtils {
         return file;
     }
 
+    public static String getFullStackName(StackDTO stackDTO) {
+        return CaseUtils.toCamelCase(stackDTO.getStackName()) + "-" + stackDTO.getStackVersion();
+    }
+
     public static StackDTO getServiceStack(String serviceName) {
         for (Map.Entry<StackDTO, List<ServiceDTO>> entry : STACK_SERVICE_MAP.entrySet()) {
             for (ServiceDTO serviceDTO : entry.getValue()) {
@@ -253,5 +258,19 @@ public class StackUtils {
         }
 
         throw new ServerException("Component not found: " + componentName);
+    }
+
+    public static ServiceDTO getServiceDTOByComponentName(String componentName) {
+        for (Map.Entry<StackDTO, List<ServiceDTO>> entry : STACK_SERVICE_MAP.entrySet()) {
+            for (ServiceDTO serviceDTO : entry.getValue()) {
+                for (ComponentDTO componentDTO : serviceDTO.getComponents()) {
+                    if (componentDTO.getName().equals(componentName)) {
+                        return serviceDTO;
+                    }
+                }
+            }
+        }
+
+        throw new ServerException("Service not found by component name: " + componentName);
     }
 }

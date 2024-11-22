@@ -16,42 +16,32 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.command.validator;
+package org.apache.bigtop.manager.server.command.factory.component;
 
 import org.apache.bigtop.manager.common.enums.Command;
-import org.apache.bigtop.manager.dao.po.ClusterPO;
-import org.apache.bigtop.manager.dao.repository.ClusterDao;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
-import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
+import org.apache.bigtop.manager.server.command.job.Job;
+import org.apache.bigtop.manager.server.command.job.JobContext;
 import org.apache.bigtop.manager.server.enums.CommandLevel;
-import org.apache.bigtop.manager.server.exception.ApiException;
-import org.apache.bigtop.manager.server.model.dto.command.ClusterCommandDTO;
 
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.Resource;
-import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
-public class ClusterCreateValidator implements CommandValidator {
-
-    @Resource
-    private ClusterDao clusterDao;
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+public class ComponentAddJobFactory extends AbstractComponentJobFactory {
 
     @Override
-    public List<CommandIdentifier> getCommandIdentifiers() {
-        return List.of(new CommandIdentifier(CommandLevel.CLUSTER, Command.CREATE));
+    public CommandIdentifier getCommandIdentifier() {
+        return new CommandIdentifier(CommandLevel.COMPONENT, Command.ADD);
     }
 
     @Override
-    public void validate(ValidatorContext context) {
-        ClusterCommandDTO clusterCommand = context.getCommandDTO().getClusterCommand();
-        String clusterName = clusterCommand.getName();
-
-        ClusterPO clusterPO = clusterDao.findByName(clusterName);
-
-        if (clusterPO != null) {
-            throw new ApiException(ApiExceptionEnum.CLUSTER_EXISTS, clusterName);
-        }
+    public Job createJob(JobContext jobContext) {
+        return null;
     }
 }

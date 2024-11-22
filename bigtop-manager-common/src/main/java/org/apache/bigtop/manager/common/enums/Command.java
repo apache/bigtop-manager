@@ -28,11 +28,9 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum Command {
-    CREATE("create", "Create"),
+    ADD("add", "Add"),
 
-    INSTALL("install", "Install"),
-
-    UNINSTALL("uninstall", "Uninstall"),
+    REMOVE("remove", "Remove"),
 
     START("start", "Start"),
 

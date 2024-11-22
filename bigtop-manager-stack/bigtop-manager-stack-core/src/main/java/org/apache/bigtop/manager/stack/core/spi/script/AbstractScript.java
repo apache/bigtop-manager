@@ -37,11 +37,11 @@ public abstract class AbstractScript implements Script {
     public static final String PROPERTY_KEY_SKIP_LEVELS = "skipLevels";
 
     @Override
-    public ShellResult install(Params params) {
-        return this.install(params, new Properties());
+    public ShellResult add(Params params) {
+        return this.add(params, new Properties());
     }
 
-    public ShellResult install(Params params, Properties properties) {
+    public ShellResult add(Params params, Properties properties) {
         RepoInfo repo = params.repo();
         List<PackageInfo> packages = params.packages();
         String stackHome = params.stackHome();

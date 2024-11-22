@@ -26,4 +26,6 @@ import lombok.Data;
 public class JobContext {
 
     private CommandDTO commandDTO;
+
+    private Boolean retryFlag;
 }

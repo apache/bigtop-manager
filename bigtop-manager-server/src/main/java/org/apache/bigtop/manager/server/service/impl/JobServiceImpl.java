@@ -139,6 +139,7 @@ public class JobServiceImpl implements JobService {
 
     private Job recreateJob(JobPO jobPO) {
         JobContext jobContext = JsonUtils.readFromString(jobPO.getContext(), JobContext.class);
+        jobContext.setRetryFlag(true);
         CommandIdentifier commandIdentifier = new CommandIdentifier(
                 jobContext.getCommandDTO().getCommandLevel(),
                 jobContext.getCommandDTO().getCommand());

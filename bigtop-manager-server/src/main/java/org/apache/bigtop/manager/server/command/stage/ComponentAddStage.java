@@ -18,23 +18,23 @@
  */
 package org.apache.bigtop.manager.server.command.stage;
 
-import org.apache.bigtop.manager.server.command.task.ComponentInstallTask;
+import org.apache.bigtop.manager.server.command.task.ComponentAddTask;
 import org.apache.bigtop.manager.server.command.task.Task;
 import org.apache.bigtop.manager.server.model.dto.HostDTO;
 
-public class ComponentInstallStage extends AbstractComponentStage {
+public class ComponentAddStage extends AbstractComponentStage {
 
-    public ComponentInstallStage(StageContext stageContext) {
+    public ComponentAddStage(StageContext stageContext) {
         super(stageContext);
     }
 
     @Override
     protected Task createTask(HostDTO hostDTO) {
-        return new ComponentInstallTask(createTaskContext(hostDTO));
+        return new ComponentAddTask(createTaskContext(hostDTO));
     }
 
     @Override
     public String getName() {
-        return "Install " + stageContext.getComponentDTO().getDisplayName();
+        return "Add " + stageContext.getComponentDTO().getDisplayName();
     }
 }

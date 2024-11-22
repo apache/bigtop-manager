@@ -16,15 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.scheduler;
+package org.apache.bigtop.manager.server.timer;
 
 import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.repository.HostDao;
 import org.apache.bigtop.manager.grpc.generated.HostInfoReply;
 import org.apache.bigtop.manager.grpc.generated.HostInfoRequest;
 import org.apache.bigtop.manager.grpc.generated.HostInfoServiceGrpc;
+import org.apache.bigtop.manager.server.enums.HealthyStatusEnum;
 import org.apache.bigtop.manager.server.grpc.GrpcClient;
 
+import org.apache.bigtop.manager.server.utils.ClusterUtils;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -37,7 +39,7 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
-public class HostInfoScheduler {
+public class HostInfoTimer {
 
     @Resource
     private HostDao hostDao;
@@ -52,6 +54,10 @@ public class HostInfoScheduler {
     }
 
     private void getHostInfo(HostPO hostPO) {
+        if (ClusterUtils.isNoneCluster(hostPO.getClusterId())) {
+            return;
+        }
+
         String hostname = hostPO.getHostname();
         Integer grpcPort = hostPO.getGrpcPort();
         try {
@@ -68,7 +74,10 @@ public class HostInfoScheduler {
             hostPO.setTotalMemorySize(reply.getTotalMemorySize());
             hostPO.setFreeDisk(reply.getFreeDisk());
             hostPO.setTotalDisk(reply.getTotalDisk());
+            hostPO.setStatus(HealthyStatusEnum.HEALTHY.getCode());
         } catch (Exception e) {
+            hostPO.setStatus(HealthyStatusEnum.UNHEALTHY.getCode());
+            hostPO.setErrInfo(e.toString());
             log.error("Error getting host info for {}", hostname, e);
         }
 

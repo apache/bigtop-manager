@@ -27,8 +27,6 @@ public class JobVO {
 
     private Long id;
 
-    private List<StageVO> stages;
-
     private String state;
 
     private String name;

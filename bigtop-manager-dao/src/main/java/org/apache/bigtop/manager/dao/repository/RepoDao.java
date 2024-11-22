@@ -28,7 +28,4 @@ import java.util.Optional;
 
 public interface RepoDao extends BaseDao<RepoPO> {
 
-    Optional<RepoPO> findByRepoName(@Param("repoName") String clusterName);
-
-    List<RepoPO> findAllByClusterId(@Param("clusterId") Long clusterId);
 }

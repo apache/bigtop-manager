@@ -37,11 +37,11 @@ import org.apache.bigtop.manager.server.model.dto.CommandDTO;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ClusterCreateJob extends AbstractJob {
+public class ClusterAddJob extends AbstractJob {
 
     private HostDao hostDao;
 
-    public ClusterCreateJob(JobContext jobContext) {
+    public ClusterAddJob(JobContext jobContext) {
         super(jobContext);
     }
 
@@ -62,6 +62,11 @@ public class ClusterCreateJob extends AbstractJob {
     @Override
     public void beforeRun() {
         super.beforeRun();
+    }
+
+    @Override
+    public void onSuccess() {
+        super.onSuccess();
 
         saveCluster();
 
@@ -71,13 +76,8 @@ public class ClusterCreateJob extends AbstractJob {
     }
 
     @Override
-    public void onSuccess() {
-        super.onSuccess();
-    }
-
-    @Override
     public String getName() {
-        return "Create cluster";
+        return "Add cluster";
     }
 
     private void saveCluster() {
