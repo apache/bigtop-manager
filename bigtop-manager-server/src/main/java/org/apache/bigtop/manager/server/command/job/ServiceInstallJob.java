@@ -18,12 +18,11 @@
  */
 package org.apache.bigtop.manager.server.command.job;
 
-import org.apache.bigtop.manager.common.enums.MaintainState;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
-import org.apache.bigtop.manager.dao.po.HostComponentPO;
 import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.po.ServicePO;
+import org.apache.bigtop.manager.dao.query.ComponentQuery;
 import org.apache.bigtop.manager.dao.repository.HostDao;
 import org.apache.bigtop.manager.dao.repository.ServiceDao;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
@@ -35,6 +34,8 @@ import org.apache.bigtop.manager.server.model.dto.ComponentHostDTO;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.model.dto.command.ServiceCommandDTO;
 import org.apache.bigtop.manager.server.utils.StackUtils;
+
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -96,11 +97,12 @@ public class ServiceInstallJob extends AbstractServiceJob {
                 if (componentHost.getComponentName().equals(componentName)) {
                     List<String> hostnames = new ArrayList<>(componentHost.getHostnames());
                     if (serviceCommand.getInstalled()) {
-                        List<String> existHostnames = hostComponentDao
-                                .findAllByClusterIdAndComponentNameAndHostnameIn(
-                                        clusterPO.getId(), componentName, hostnames)
-                                .stream()
-                                .map(HostComponentPO::getHostname)
+                        ComponentQuery componentQuery = ComponentQuery.builder()
+                                .clusterId(clusterPO.getId())
+                                .name(componentName)
+                                .build();
+                        List<String> existHostnames = componentDao.findByQuery(componentQuery).stream()
+                                .map(ComponentPO::getHostname)
                                 .toList();
 
                         hostnames.removeAll(existHostnames);
@@ -148,27 +150,24 @@ public class ServiceInstallJob extends AbstractServiceJob {
 
         for (ComponentHostDTO componentHostDTO : serviceCommand.getComponentHosts()) {
             String componentName = componentHostDTO.getComponentName();
+            List<String> hostnames = componentHostDTO.getHostnames();
+            List<HostPO> hostPOList = hostDao.findAllByHostnameIn(hostnames);
 
-            // 3. Persist component
-            ComponentPO componentPO = componentDao.findByClusterIdAndComponentName(clusterId, componentName);
-            if (componentPO == null) {
-                ComponentDTO componentDTO = StackUtils.getComponentDTO(componentName);
-                componentPO = ComponentConverter.INSTANCE.fromDTO2PO(componentDTO, servicePO, clusterPO);
-                componentDao.save(componentPO);
-            }
-
-            // 4. Persist hostComponent
-            for (String hostname : componentHostDTO.getHostnames()) {
-                HostComponentPO hostComponentPO =
-                        hostComponentDao.findByClusterIdAndComponentNameAndHostname(clusterId, componentName, hostname);
-                if (hostComponentPO == null) {
-                    HostPO hostPO = hostDao.findByHostname(hostname);
-
-                    hostComponentPO = new HostComponentPO();
-                    hostComponentPO.setHostId(hostPO.getId());
-                    hostComponentPO.setComponentId(componentPO.getId());
-                    hostComponentPO.setState(MaintainState.UNINSTALLED.getName());
-                    hostComponentDao.save(hostComponentPO);
+            // 3. Persist components
+            for (HostPO hostPO : hostPOList) {
+                ComponentQuery componentQuery = ComponentQuery.builder()
+                        .clusterId(clusterPO.getId())
+                        .hostId(hostPO.getId())
+                        .name(componentName)
+                        .build();
+                List<ComponentPO> componentPOList = componentDao.findByQuery(componentQuery);
+                if (CollectionUtils.isEmpty(componentPOList)) {
+                    ComponentDTO componentDTO = StackUtils.getComponentDTO(componentName);
+                    ComponentPO componentPO = ComponentConverter.INSTANCE.fromDTO2PO(componentDTO);
+                    componentPO.setClusterId(clusterPO.getId());
+                    componentPO.setHostId(hostPO.getId());
+                    componentPO.setServiceId(servicePO.getId());
+                    componentDao.save(componentPO);
                 }
             }
         }

@@ -20,6 +20,7 @@
 package org.apache.bigtop.manager.dao.repository;
 
 import org.apache.bigtop.manager.dao.po.ComponentPO;
+import org.apache.bigtop.manager.dao.query.ComponentQuery;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -27,15 +28,9 @@ import java.util.List;
 
 public interface ComponentDao extends BaseDao<ComponentPO> {
 
-    ComponentPO findByClusterIdAndComponentName(
-            @Param("clusterId") Long clusterId, @Param("componentName") String componentName);
+    Long countByHostId(@Param("hostId") Long hostId);
 
-    ComponentPO findByIdJoin(@Param("id") Long id);
+    List<ComponentPO> findByQuery(@Param("query") ComponentQuery query);
 
-    List<ComponentPO> findAllByClusterId(@Param("clusterId") Long clusterId);
-
-    List<ComponentPO> findAllJoinService();
-
-    List<ComponentPO> findAllByClusterIdAndServiceServiceNameIn(
-            @Param("clusterId") Long clusterId, @Param("serviceNames") List<String> serviceNames);
+    ComponentPO findDetailsById(@Param("id") Long id);
 }

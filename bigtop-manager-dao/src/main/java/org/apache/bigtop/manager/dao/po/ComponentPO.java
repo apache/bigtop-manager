@@ -36,38 +36,33 @@ public class ComponentPO extends BasePO implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "component_name")
-    private String componentName;
+    @Column(name = "name")
+    private String name;
 
     @Column(name = "display_name")
     private String displayName;
 
-    @Column(name = "command_script")
-    private String commandScript;
+    @Column(name = "cluster_id")
+    private Long clusterId;
 
-    @Column(name = "custom_commands")
-    private String customCommands;
-
-    @Column(name = "category")
-    private String category;
-
-    @Column(name = "quick_link")
-    private String quickLink;
-
-    @Column(name = "cardinality")
-    private String cardinality;
+    @Column(name = "host_id")
+    private Long hostId;
 
     @Column(name = "service_id")
     private Long serviceId;
 
-    @Column(name = "cluster_id")
-    private Long clusterId;
+    @Column(name = "status")
+    private Integer status;
 
     @Transient
-    @Column(name = "service_name")
     private String serviceName;
 
     @Transient
-    @Column(name = "cluster_name")
-    private String clusterName;
+    private String serviceDisplayName;
+
+    @Transient
+    private String stack;
+
+    @Transient
+    private String hostname;
 }

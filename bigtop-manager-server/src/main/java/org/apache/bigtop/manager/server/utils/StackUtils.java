@@ -245,7 +245,7 @@ public class StackUtils {
         for (Map.Entry<StackDTO, List<ServiceDTO>> entry : STACK_SERVICE_MAP.entrySet()) {
             for (ServiceDTO serviceDTO : entry.getValue()) {
                 for (ComponentDTO componentDTO : serviceDTO.getComponents()) {
-                    if (componentDTO.getComponentName().equals(componentName)) {
+                    if (componentDTO.getName().equals(componentName)) {
                         return componentDTO;
                     }
                 }

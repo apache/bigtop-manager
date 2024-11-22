@@ -18,9 +18,15 @@
  */
 package org.apache.bigtop.manager.dao.query;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class HostQuery {
 
     private String hostname;
