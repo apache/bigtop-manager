@@ -25,8 +25,8 @@ import org.apache.bigtop.manager.grpc.generated.HostInfoRequest;
 import org.apache.bigtop.manager.grpc.generated.HostInfoServiceGrpc;
 import org.apache.bigtop.manager.server.enums.HealthyStatusEnum;
 import org.apache.bigtop.manager.server.grpc.GrpcClient;
-
 import org.apache.bigtop.manager.server.utils.ClusterUtils;
+
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;

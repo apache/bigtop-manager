@@ -22,7 +22,6 @@ import org.apache.bigtop.manager.common.constants.ComponentCategories;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
-import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.query.ComponentQuery;
 import org.apache.bigtop.manager.dao.repository.ComponentDao;
 import org.apache.bigtop.manager.dao.repository.HostDao;
@@ -30,9 +29,9 @@ import org.apache.bigtop.manager.dao.repository.ServiceConfigDao;
 import org.apache.bigtop.manager.dao.repository.ServiceConfigSnapshotDao;
 import org.apache.bigtop.manager.dao.repository.ServiceDao;
 import org.apache.bigtop.manager.server.command.stage.CacheFileUpdateStage;
+import org.apache.bigtop.manager.server.command.stage.ComponentAddStage;
 import org.apache.bigtop.manager.server.command.stage.ComponentCheckStage;
 import org.apache.bigtop.manager.server.command.stage.ComponentConfigureStage;
-import org.apache.bigtop.manager.server.command.stage.ComponentAddStage;
 import org.apache.bigtop.manager.server.command.stage.ComponentStartStage;
 import org.apache.bigtop.manager.server.command.stage.ComponentStopStage;
 import org.apache.bigtop.manager.server.command.stage.StageContext;
@@ -92,7 +91,8 @@ public abstract class AbstractServiceJob extends AbstractJob {
 
     protected List<String> getTodoListForCommand(Command command) {
         try {
-            List<String> orderedList = StackUtils.DAG.getAllNodesList().isEmpty() ? new ArrayList<>() : StackUtils.DAG.topologicalSort();
+            List<String> orderedList =
+                    StackUtils.DAG.getAllNodesList().isEmpty() ? new ArrayList<>() : StackUtils.DAG.topologicalSort();
             List<String> componentNames = getComponentNames();
             List<String> componentCommandNames = new ArrayList<>(componentNames.stream()
                     .map(x -> x + "-" + command.name().toUpperCase())

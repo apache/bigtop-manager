@@ -19,8 +19,6 @@
 package org.apache.bigtop.manager.server.model.vo;
 
 import lombok.Data;
-import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
-import org.apache.bigtop.manager.server.model.dto.ServiceConfigDTO;
 
 import java.util.List;
 

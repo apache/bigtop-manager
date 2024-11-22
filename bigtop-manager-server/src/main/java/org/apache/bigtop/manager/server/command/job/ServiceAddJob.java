@@ -37,7 +37,6 @@ import org.apache.bigtop.manager.server.model.dto.StackDTO;
 import org.apache.bigtop.manager.server.model.dto.command.ServiceCommandDTO;
 import org.apache.bigtop.manager.server.utils.StackUtils;
 
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

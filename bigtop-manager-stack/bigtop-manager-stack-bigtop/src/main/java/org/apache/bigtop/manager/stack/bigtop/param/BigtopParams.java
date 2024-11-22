@@ -21,8 +21,6 @@ package org.apache.bigtop.manager.stack.bigtop.param;
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
 import org.apache.bigtop.manager.stack.core.param.BaseParams;
 
-import java.text.MessageFormat;
-
 public abstract class BigtopParams extends BaseParams {
 
     protected BigtopParams(CommandPayload commandPayload) {

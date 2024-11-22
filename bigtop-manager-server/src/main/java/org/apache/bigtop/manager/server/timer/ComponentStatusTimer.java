@@ -33,17 +33,17 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 
 @Slf4j
-//@Component
+// @Component
 public class ComponentStatusTimer {
 
-//    @Resource
+    //    @Resource
     private ComponentDao componentDao;
 
-//    @Resource
+    //    @Resource
     private HostDao hostDao;
 
-//    @Async
-//    @Scheduled(fixedDelay = 30, timeUnit = TimeUnit.SECONDS)
+    //    @Async
+    //    @Scheduled(fixedDelay = 30, timeUnit = TimeUnit.SECONDS)
     public void execute() {
         List<ComponentPO> componentPOList = componentDao.findAll();
         for (ComponentPO componentPO : componentPOList) {
