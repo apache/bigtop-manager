@@ -27,7 +27,6 @@ import org.apache.bigtop.manager.dao.repository.ChatThreadDao;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.ChatMessageType;
-import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 import lombok.extern.slf4j.Slf4j;
@@ -44,8 +43,6 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
     private final Map<Object, List<ChatMessage>> messagesByMemoryId = new ConcurrentHashMap<>();
     protected final ChatThreadDao chatThreadDao;
     protected final ChatMessageDao chatMessageDao;
-
-    private final List<ChatMessage> systemMessages = new ArrayList<>();
 
     public PersistentChatMemoryStore(ChatThreadDao chatThreadDao, ChatMessageDao chatMessageDao) {
         this.chatThreadDao = chatThreadDao;
@@ -89,7 +86,7 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
     public List<ChatMessage> getMessages(Object threadId) {
         List<ChatMessage> messages = this.messagesByMemoryId.get(threadId);
         List<ChatMessagePO> chatMessages = chatMessageDao.findAllByThreadId((Long) threadId);
-        List<ChatMessage> allChatMessages = new ArrayList<>(systemMessages);
+        List<ChatMessage> allChatMessages = new ArrayList<>();
         if (!chatMessages.isEmpty()) {
             allChatMessages.addAll(chatMessages.stream()
                     .map(this::convertToChatMessage)
@@ -106,11 +103,6 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
     public void updateMessages(Object threadId, List<ChatMessage> messages) {
         this.messagesByMemoryId.put(threadId, messages);
         ChatMessage newMessage = messages.get(messages.size() - 1);
-        if (newMessage.type().equals(ChatMessageType.SYSTEM)) {
-            SystemMessage systemMessage = (SystemMessage) newMessage;
-            systemMessages.add(systemMessage);
-            return;
-        }
         ChatMessagePO chatMessagePO = convertToChatMessagePO(newMessage, (Long) threadId);
         if (chatMessagePO == null) {
             return;
