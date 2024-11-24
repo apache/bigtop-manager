@@ -35,7 +35,7 @@
         SELECT
         <include refid="baseColumnsV2">
             <property name="alias" value="sc"/>
-        </include>, s.service_name
+        </include>, s.name as service_name
         FROM service_config sc
         LEFT JOIN service s
         ON sc.service_id = s.id
@@ -46,7 +46,7 @@
         SELECT
         <include refid="baseColumnsV2">
             <property name="alias" value="sc"/>
-        </include>, s.service_name
+        </include>, s.name as service_name
         FROM service_config sc
         LEFT JOIN service s
         ON sc.service_id = s.id

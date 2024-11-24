@@ -18,12 +18,14 @@
  */
 package org.apache.bigtop.manager.server.scheduler;
 
-import org.apache.bigtop.manager.common.enums.MaintainState;
-import org.apache.bigtop.manager.dao.po.HostComponentPO;
-import org.apache.bigtop.manager.dao.repository.HostComponentDao;
+import org.apache.bigtop.manager.dao.po.ComponentPO;
+import org.apache.bigtop.manager.dao.po.HostPO;
+import org.apache.bigtop.manager.dao.repository.ComponentDao;
+import org.apache.bigtop.manager.dao.repository.HostDao;
 import org.apache.bigtop.manager.grpc.generated.ComponentStatusReply;
 import org.apache.bigtop.manager.grpc.generated.ComponentStatusRequest;
 import org.apache.bigtop.manager.grpc.generated.ComponentStatusServiceGrpc;
+import org.apache.bigtop.manager.server.enums.HealthyStatusEnum;
 import org.apache.bigtop.manager.server.grpc.GrpcClient;
 
 import org.springframework.scheduling.annotation.Async;
@@ -41,45 +43,35 @@ import java.util.concurrent.TimeUnit;
 public class ComponentStatusScheduler {
 
     @Resource
-    private HostComponentDao hostComponentDao;
+    private ComponentDao componentDao;
+
+    @Resource
+    private HostDao hostDao;
 
     @Async
     @Scheduled(fixedDelay = 30, timeUnit = TimeUnit.SECONDS)
     public void execute() {
-        List<HostComponentPO> hostComponentPOList = hostComponentDao.findAllJoin();
-        for (HostComponentPO hostComponentPO : hostComponentPOList) {
-            // Only check services which should be in running
-            if (!List.of(MaintainState.STARTED, MaintainState.STOPPED)
-                    .contains(MaintainState.fromString(hostComponentPO.getState()))) {
-                continue;
-            }
-
+        List<ComponentPO> componentPOList = componentDao.findAll();
+        for (ComponentPO componentPO : componentPOList) {
+            HostPO hostPO = hostDao.findById(componentPO.getHostId());
+            // TODO need to build the correct request
             ComponentStatusRequest request = ComponentStatusRequest.newBuilder()
-                    .setServiceName(hostComponentPO.getServiceName())
-                    .setServiceUser(hostComponentPO.getServiceUser())
-                    .setComponentName(hostComponentPO.getComponentName())
-                    .setCommandScript(hostComponentPO.getCommandScript())
-                    .setRoot(hostComponentPO.getRoot())
-                    .setStackName(hostComponentPO.getStackName())
-                    .setStackVersion(hostComponentPO.getStackVersion())
+                    //                    .setServiceName(hostComponentPO.getServiceName())
+                    //                    .setServiceUser(hostComponentPO.getServiceUser())
+                    //                    .setComponentName(hostComponentPO.getComponentName())
+                    //                    .setCommandScript(hostComponentPO.getCommandScript())
                     .build();
             ComponentStatusServiceGrpc.ComponentStatusServiceBlockingStub blockingStub = GrpcClient.getBlockingStub(
-                    hostComponentPO.getHostname(),
-                    hostComponentPO.getGrpcPort(),
+                    hostPO.getHostname(),
+                    hostPO.getGrpcPort(),
                     ComponentStatusServiceGrpc.ComponentStatusServiceBlockingStub.class);
             ComponentStatusReply reply = blockingStub.getComponentStatus(request);
 
             // Status 0 means the service is running
-            if (reply.getStatus() == 0
-                    && MaintainState.fromString(hostComponentPO.getState()) == MaintainState.STOPPED) {
-                hostComponentPO.setState(MaintainState.STARTED.getName());
-                hostComponentDao.partialUpdateById(hostComponentPO);
-            }
-
-            if (reply.getStatus() != 0
-                    && MaintainState.fromString(hostComponentPO.getState()) == MaintainState.STARTED) {
-                hostComponentPO.setState(MaintainState.STOPPED.getName());
-                hostComponentDao.partialUpdateById(hostComponentPO);
+            if (reply.getStatus() == 0) {
+                componentPO.setStatus(HealthyStatusEnum.HEALTHY.getCode());
+            } else {
+                componentPO.setStatus(HealthyStatusEnum.UNHEALTHY.getCode());
             }
         }
     }

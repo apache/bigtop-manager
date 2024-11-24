@@ -21,7 +21,7 @@ package org.apache.bigtop.manager.server.service.impl;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.query.HostQuery;
-import org.apache.bigtop.manager.dao.repository.HostComponentDao;
+import org.apache.bigtop.manager.dao.repository.ComponentDao;
 import org.apache.bigtop.manager.dao.repository.HostDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.enums.HealthyStatusEnum;
@@ -57,7 +57,7 @@ public class HostServiceImpl implements HostService {
     private HostDao hostDao;
 
     @Resource
-    private HostComponentDao hostComponentDao;
+    private ComponentDao componentDao;
 
     @Override
     public PageVO<HostVO> list(HostQuery hostQuery) {
@@ -129,7 +129,7 @@ public class HostServiceImpl implements HostService {
 
     @Override
     public Boolean delete(Long id) {
-        if (hostComponentDao.countByHostId(id) > 0) {
+        if (componentDao.countByHostId(id) > 0) {
             throw new ApiException(ApiExceptionEnum.HOST_HAS_COMPONENTS);
         }
 

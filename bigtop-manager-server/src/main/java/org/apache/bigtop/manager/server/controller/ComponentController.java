@@ -18,7 +18,9 @@
  */
 package org.apache.bigtop.manager.server.controller;
 
+import org.apache.bigtop.manager.dao.query.ComponentQuery;
 import org.apache.bigtop.manager.server.model.vo.ComponentVO;
+import org.apache.bigtop.manager.server.model.vo.PageVO;
 import org.apache.bigtop.manager.server.service.ComponentService;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
 
@@ -28,11 +30,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 
 import jakarta.annotation.Resource;
-import java.util.List;
 
 @Slf4j
 @Tag(name = "Cluster Component Controller")
@@ -43,15 +48,25 @@ public class ComponentController {
     @Resource
     private ComponentService componentService;
 
+    @Parameters({
+        @Parameter(in = ParameterIn.QUERY, name = "pageNum", schema = @Schema(type = "integer", defaultValue = "1")),
+        @Parameter(in = ParameterIn.QUERY, name = "pageSize", schema = @Schema(type = "integer", defaultValue = "10")),
+        @Parameter(in = ParameterIn.QUERY, name = "orderBy", schema = @Schema(type = "string", defaultValue = "id")),
+        @Parameter(
+                in = ParameterIn.QUERY,
+                name = "sort",
+                description = "asc/desc",
+                schema = @Schema(type = "string", defaultValue = "asc"))
+    })
     @Operation(summary = "list", description = "List components")
     @GetMapping
-    public ResponseEntity<List<ComponentVO>> list(@PathVariable Long clusterId) {
-        return ResponseEntity.success(componentService.list(clusterId));
+    public ResponseEntity<PageVO<ComponentVO>> list(ComponentQuery query) {
+        return ResponseEntity.success(componentService.list(query));
     }
 
     @Operation(summary = "get", description = "Get a component")
     @GetMapping("/{id}")
-    public ResponseEntity<ComponentVO> get(@PathVariable Long id) {
+    public ResponseEntity<ComponentVO> get(@PathVariable Long clusterId, @PathVariable Long id) {
         return ResponseEntity.success(componentService.get(id));
     }
 }

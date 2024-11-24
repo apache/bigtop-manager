@@ -58,7 +58,7 @@ public abstract class AbstractComponentStage extends AbstractStage {
 
     @Override
     protected String getComponentName() {
-        return stageContext.getComponentDTO().getComponentName();
+        return stageContext.getComponentDTO().getName();
     }
 
     protected TaskContext createTaskContext(HostDTO hostDTO) {
@@ -70,7 +70,7 @@ public abstract class AbstractComponentStage extends AbstractStage {
         taskContext.setClusterId(clusterPO.getId());
         taskContext.setClusterName(clusterPO.getName());
         taskContext.setServiceName(serviceDTO.getName());
-        taskContext.setComponentName(componentDTO.getComponentName());
+        taskContext.setComponentName(componentDTO.getName());
         taskContext.setComponentDisplayName(componentDTO.getDisplayName());
         taskContext.setServiceUser(serviceDTO.getUser());
         taskContext.setRootDir(clusterPO.getRootDir());

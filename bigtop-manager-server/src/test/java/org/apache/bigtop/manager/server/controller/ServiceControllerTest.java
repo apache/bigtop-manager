@@ -69,7 +69,7 @@ class ServiceControllerTest {
         PageVO<ServiceVO> services = new PageVO<>();
         when(serviceService.list(any())).thenReturn(services);
 
-        ResponseEntity<PageVO<ServiceVO>> response = serviceController.list(1L, query);
+        ResponseEntity<PageVO<ServiceVO>> response = serviceController.list(query);
 
         assertTrue(response.isSuccess());
         assertEquals(services, response.getData());

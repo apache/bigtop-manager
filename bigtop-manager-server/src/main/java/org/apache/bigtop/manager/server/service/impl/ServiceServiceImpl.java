@@ -19,7 +19,6 @@
 package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.po.HostComponentPO;
 import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
 import org.apache.bigtop.manager.dao.po.ServiceConfigSnapshotPO;
 import org.apache.bigtop.manager.dao.po.ServicePO;
@@ -30,14 +29,10 @@ import org.apache.bigtop.manager.dao.repository.ServiceDao;
 import org.apache.bigtop.manager.server.model.converter.ServiceConfigConverter;
 import org.apache.bigtop.manager.server.model.converter.ServiceConfigSnapshotConverter;
 import org.apache.bigtop.manager.server.model.converter.ServiceConverter;
-import org.apache.bigtop.manager.server.model.dto.PropertyDTO;
-import org.apache.bigtop.manager.server.model.dto.QuickLinkDTO;
-import org.apache.bigtop.manager.server.model.dto.ServiceConfigDTO;
 import org.apache.bigtop.manager.server.model.query.PageQuery;
 import org.apache.bigtop.manager.server.model.req.ServiceConfigReq;
 import org.apache.bigtop.manager.server.model.req.ServiceConfigSnapshotReq;
 import org.apache.bigtop.manager.server.model.vo.PageVO;
-import org.apache.bigtop.manager.server.model.vo.QuickLinkVO;
 import org.apache.bigtop.manager.server.model.vo.ServiceConfigSnapshotVO;
 import org.apache.bigtop.manager.server.model.vo.ServiceConfigVO;
 import org.apache.bigtop.manager.server.model.vo.ServiceVO;
@@ -161,38 +156,5 @@ public class ServiceServiceImpl implements ServiceService {
     @Override
     public Boolean deleteConfSnapshot(Long clusterId, Long serviceId, Long snapshotId) {
         return serviceConfigSnapshotDao.deleteById(snapshotId);
-    }
-
-    private List<QuickLinkVO> resolveQuickLink(
-            List<HostComponentPO> hostComponentPOList, String quickLinkJson, Long clusterId, Long serviceId) {
-        List<QuickLinkVO> quickLinkVOList = new ArrayList<>();
-
-        QuickLinkDTO quickLinkDTO = JsonUtils.readFromString(quickLinkJson, QuickLinkDTO.class);
-
-        List<ServiceConfigPO> serviceConfigPOList = serviceConfigDao.findByServiceId(serviceId);
-
-        String httpPort = quickLinkDTO.getHttpPortDefault();
-        // Use HTTP for now, need to handle https in the future
-        for (ServiceConfigPO serviceConfigPO : serviceConfigPOList) {
-            ServiceConfigDTO serviceConfigDTO = ServiceConfigConverter.INSTANCE.fromPO2DTO(serviceConfigPO);
-            for (PropertyDTO propertyDTO : serviceConfigDTO.getProperties()) {
-                if (propertyDTO.getName().equals(quickLinkDTO.getHttpPortProperty())) {
-
-                    httpPort = propertyDTO.getValue().contains(":")
-                            ? propertyDTO.getValue().split(":")[1]
-                            : propertyDTO.getValue();
-                }
-            }
-        }
-
-        for (HostComponentPO hostComponentPO : hostComponentPOList) {
-            QuickLinkVO quickLinkVO = new QuickLinkVO();
-            quickLinkVO.setDisplayName(quickLinkDTO.getDisplayName());
-            String url = "http://" + hostComponentPO.getHostname() + ":" + httpPort;
-            quickLinkVO.setUrl(url);
-            quickLinkVOList.add(quickLinkVO);
-        }
-
-        return quickLinkVOList;
     }
 }
