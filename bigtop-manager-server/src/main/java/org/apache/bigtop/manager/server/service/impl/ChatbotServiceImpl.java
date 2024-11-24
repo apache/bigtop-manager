@@ -121,8 +121,14 @@ public class ChatbotServiceImpl implements ChatbotService {
     private AIAssistant buildAIAssistant(
             String platformName, String model, Map<String, String> credentials, Long threadId, ChatbotCommand command) {
         if (command == null) {
+//            return getAIAssistantFactory()
+//                    .create(getPlatformType(platformName), getAIAssistantConfig(model, credentials), threadId);
             return getAIAssistantFactory()
-                    .create(getPlatformType(platformName), getAIAssistantConfig(model, credentials), threadId);
+                    .createWithTools(
+                            getPlatformType(platformName),
+                            getAIAssistantConfig(model, credentials),
+                            threadId,
+                            null);
         } else {
             return getAIAssistantFactory()
                     .createWithTools(
@@ -202,7 +208,7 @@ public class ChatbotServiceImpl implements ChatbotService {
         }
 
         AuthPlatformDTO authPlatformDTO = AuthPlatformConverter.INSTANCE.fromPO2DTO(authPlatformPO);
-        ChatThreadDTO chatThreadDTO = ChatThreadConverter.INSTANCE.fromPO2DTO(chatThreadPO);
+
         PlatformPO platformPO = platformDao.findById(authPlatformPO.getPlatformId());
         return buildAIAssistant(
                 platformPO.getName(),

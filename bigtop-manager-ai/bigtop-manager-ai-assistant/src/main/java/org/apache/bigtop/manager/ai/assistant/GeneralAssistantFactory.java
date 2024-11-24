@@ -43,10 +43,6 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
         this(new LocSystemPromptProvider(), chatMemoryStoreProvider);
     }
 
-    public GeneralAssistantFactory() {
-        this(new LocSystemPromptProvider(), new ChatMemoryStoreProvider(null, null));
-    }
-
     public GeneralAssistantFactory(
             SystemPromptProvider systemPromptProvider, ChatMemoryStoreProvider chatMemoryStoreProvider) {
         this.systemPromptProvider = systemPromptProvider;
@@ -102,7 +98,6 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
                                 ? new InMemoryChatMemoryStore()
                                 : chatMemoryStoreProvider.createAiServiceChatMemoryStore())
                 .withConfigProvider(assistantConfig);
-        /// TODO: Only a portion of the models of DashScope support the API of OpenAI
 
         return AiServices.builder(AIAssistant.class)
                 .chatLanguageModel(builder.getChatLanguageModel())
