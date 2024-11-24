@@ -32,7 +32,7 @@ import dev.langchain4j.service.AiServices;
 
 public class OpenAIAssistant extends AbstractAIAssistant {
 
-    private static final String BASE_URL = "https://api.chatanywhere.tech/v1";
+    private static final String BASE_URL = "https://api.openai.com/v1";
 
     public OpenAIAssistant(ChatMemory chatMemory, AIAssistant.Service aiServices) {
         super(chatMemory, aiServices);

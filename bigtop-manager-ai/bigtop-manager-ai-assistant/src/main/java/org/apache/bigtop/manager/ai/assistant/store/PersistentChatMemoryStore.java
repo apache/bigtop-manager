@@ -99,7 +99,6 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
         if (messages != null) {
             allChatMessages.addAll(messages);
         }
-        log.info(allChatMessages.toString());
         return allChatMessages;
     }
 
