@@ -34,11 +34,14 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 public class PersistentChatMemoryStore implements ChatMemoryStore {
 
+    private final Map<Object, List<ChatMessage>> messagesByMemoryId = new ConcurrentHashMap<>();
     protected final ChatThreadDao chatThreadDao;
     protected final ChatMessageDao chatMessageDao;
 
@@ -84,6 +87,7 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
 
     @Override
     public List<ChatMessage> getMessages(Object threadId) {
+        List<ChatMessage> messages = this.messagesByMemoryId.get(threadId);
         List<ChatMessagePO> chatMessages = chatMessageDao.findAllByThreadId((Long) threadId);
         List<ChatMessage> allChatMessages = new ArrayList<>(systemMessages);
         if (!chatMessages.isEmpty()) {
@@ -92,11 +96,16 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
                     .filter(Objects::nonNull)
                     .toList());
         }
+        if (messages != null) {
+            allChatMessages.addAll(messages);
+        }
+        log.info(allChatMessages.toString());
         return allChatMessages;
     }
 
     @Override
     public void updateMessages(Object threadId, List<ChatMessage> messages) {
+        this.messagesByMemoryId.put(threadId, messages);
         ChatMessage newMessage = messages.get(messages.size() - 1);
         if (newMessage.type().equals(ChatMessageType.SYSTEM)) {
             SystemMessage systemMessage = (SystemMessage) newMessage;

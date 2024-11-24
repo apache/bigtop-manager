@@ -40,6 +40,8 @@ public class AiServiceChatMemoryStore extends PersistentChatMemoryStore {
 
     @Override
     public List<ChatMessage> getMessages(Object memoryId) {
+        List<ChatMessage> messages = this.messagesByMemoryId.get(memoryId);
+        log.info("getMessages: {}", messages);
         return this.messagesByMemoryId.computeIfAbsent(memoryId, (ignored) -> new ArrayList<>());
     }
 
