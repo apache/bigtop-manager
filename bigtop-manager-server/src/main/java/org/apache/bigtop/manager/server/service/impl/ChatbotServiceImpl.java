@@ -35,7 +35,6 @@ import org.apache.bigtop.manager.dao.repository.ChatThreadDao;
 import org.apache.bigtop.manager.dao.repository.PlatformDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.enums.AuthPlatformStatus;
-import org.apache.bigtop.manager.server.enums.ChatbotCommand;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.holder.SessionUserHolder;
 import org.apache.bigtop.manager.server.model.converter.AuthPlatformConverter;
@@ -46,7 +45,6 @@ import org.apache.bigtop.manager.server.model.dto.ChatThreadDTO;
 import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
 import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
 import org.apache.bigtop.manager.server.service.ChatbotService;
-import org.apache.bigtop.manager.server.tools.AgentToolsProvider;
 
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
@@ -119,22 +117,10 @@ public class ChatbotServiceImpl implements ChatbotService {
     }
 
     private AIAssistant buildAIAssistant(
-            String platformName, String model, Map<String, String> credentials, Long threadId, ChatbotCommand command) {
-        if (command == null) {
-            //            return getAIAssistantFactory()
-            //                    .create(getPlatformType(platformName), getAIAssistantConfig(model, credentials),
-            // threadId);
-            return getAIAssistantFactory()
-                    .createWithTools(
-                            getPlatformType(platformName), getAIAssistantConfig(model, credentials), threadId, null);
-        } else {
-            return getAIAssistantFactory()
-                    .createWithTools(
-                            getPlatformType(platformName),
-                            getAIAssistantConfig(model, credentials),
-                            threadId,
-                            new AgentToolsProvider(command));
-        }
+            String platformName, String model, Map<String, String> credentials, Long threadId) {
+        return getAIAssistantFactory()
+                .createAiService(
+                        getPlatformType(platformName), getAIAssistantConfig(model, credentials), threadId, null);
     }
 
     @Override
@@ -143,7 +129,7 @@ public class ChatbotServiceImpl implements ChatbotService {
         if (authPlatformPO == null || authPlatformPO.getIsDeleted()) {
             throw new ApiException(ApiExceptionEnum.NO_PLATFORM_IN_USE);
         }
-        AuthPlatformDTO authPlatformDTO = AuthPlatformConverter.INSTANCE.fromPO2DTO(authPlatformPO);
+
         Long userId = SessionUserHolder.getUserId();
         PlatformPO platformPO = platformDao.findById(authPlatformPO.getPlatformId());
 
@@ -192,7 +178,7 @@ public class ChatbotServiceImpl implements ChatbotService {
         return chatThreads;
     }
 
-    private AIAssistant prepareTalk(Long threadId, ChatbotCommand command, String message) {
+    private AIAssistant prepareTalk(Long threadId) {
         ChatThreadPO chatThreadPO = chatThreadDao.findById(threadId);
         Long userId = SessionUserHolder.getUserId();
         if (!Objects.equals(userId, chatThreadPO.getUserId()) || chatThreadPO.getIsDeleted()) {
@@ -209,38 +195,14 @@ public class ChatbotServiceImpl implements ChatbotService {
 
         PlatformPO platformPO = platformDao.findById(authPlatformPO.getPlatformId());
         return buildAIAssistant(
-                platformPO.getName(),
-                authPlatformDTO.getModel(),
-                authPlatformDTO.getAuthCredentials(),
-                threadId,
-                command);
+                platformPO.getName(), authPlatformDTO.getModel(), authPlatformDTO.getAuthCredentials(), threadId);
     }
 
     @Override
     public SseEmitter talk(Long threadId, String message) {
-        AIAssistant aiAssistant = prepareTalk(threadId, null, message);
+        AIAssistant aiAssistant = prepareTalk(threadId);
         Flux<String> stringFlux = aiAssistant.streamAsk(message);
 
-        SseEmitter emitter = new SseEmitter();
-        stringFlux.subscribe(
-                s -> {
-                    try {
-                        emitter.send(s);
-                    } catch (Exception e) {
-                        emitter.completeWithError(e);
-                    }
-                },
-                Throwable::printStackTrace,
-                emitter::complete);
-
-        emitter.onTimeout(emitter::complete);
-        return emitter;
-    }
-
-    @Override
-    public SseEmitter talkWithTools(Long threadId, ChatbotCommand command, String message) {
-        AIAssistant aiAssistant = prepareTalk(threadId, command, message);
-        Flux<String> stringFlux = aiAssistant.streamAsk(message);
         SseEmitter emitter = new SseEmitter();
         stringFlux.subscribe(
                 s -> {
@@ -297,11 +259,6 @@ public class ChatbotServiceImpl implements ChatbotService {
         chatThreadDao.partialUpdateById(chatThreadPO);
 
         return ChatThreadConverter.INSTANCE.fromPO2VO(chatThreadPO);
-    }
-
-    @Override
-    public List<String> getChatbotCommands() {
-        return ChatbotCommand.getAllCommands();
     }
 
     @Override

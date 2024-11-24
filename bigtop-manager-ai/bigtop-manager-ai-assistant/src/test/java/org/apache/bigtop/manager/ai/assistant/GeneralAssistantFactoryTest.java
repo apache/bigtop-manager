@@ -33,7 +33,6 @@ import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Map;
-import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -76,7 +75,7 @@ class GeneralAssistantFactoryTest {
             PlatformType platformType = PlatformType.OPENAI;
             generalAssistantFactory.create(platformType, assistantConfigProvider);
             generalAssistantFactory = new GeneralAssistantFactory(new ChatMemoryStoreProvider());
-            generalAssistantFactory.create(platformType, assistantConfigProvider, UUID.randomUUID());
+            generalAssistantFactory.create(platformType, assistantConfigProvider);
         }
     }
 }

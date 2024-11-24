@@ -30,9 +30,11 @@ import org.apache.bigtop.manager.ai.dashscope.DashScopeAssistant;
 import org.apache.bigtop.manager.ai.openai.OpenAIAssistant;
 import org.apache.bigtop.manager.ai.qianfan.QianFanAssistant;
 
-import dev.langchain4j.service.AiServices;
 import dev.langchain4j.service.tool.ToolProvider;
 import dev.langchain4j.store.memory.chat.InMemoryChatMemoryStore;
+
+import java.util.Collections;
+import java.util.List;
 
 public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
 
@@ -54,38 +56,8 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
             PlatformType platformType,
             AIAssistantConfigProvider assistantConfig,
             Object id,
-            SystemPrompt systemPrompts) {
-        AIAssistant.Builder builder =
-                switch (platformType) {
-                    case OPENAI -> OpenAIAssistant.builder();
-                    case DASH_SCOPE -> DashScopeAssistant.builder();
-                    case QIANFAN -> QianFanAssistant.builder();
-                };
-        AIAssistant aiAssistant = builder.id(id)
-                .memoryStore(
-                        (id == null)
-                                ? new InMemoryChatMemoryStore()
-                                : chatMemoryStoreProvider.createPersistentChatMemoryStore())
-                .withConfigProvider(assistantConfig)
-                .build();
-
-        String systemPrompt = systemPromptProvider.getSystemMessage(systemPrompts);
-        aiAssistant.setSystemPrompt(systemPrompt);
-        String locale = assistantConfig.getLanguage();
-        if (locale != null) {
-            aiAssistant.setSystemPrompt(systemPromptProvider.getLanguagePrompt(locale));
-        }
-        return aiAssistant;
-    }
-
-    @Override
-    public AIAssistant create(PlatformType platformType, AIAssistantConfigProvider assistantConfig, Object id) {
-        return createWithPrompt(platformType, assistantConfig, id, SystemPrompt.DEFAULT_PROMPT);
-    }
-
-    @Override
-    public AIAssistant createWithTools(
-            PlatformType platformType, AIAssistantConfigProvider assistantConfig, Long id, ToolProvider toolProvider) {
+            ToolProvider toolProvider,
+            SystemPrompt systemPrompt) {
         AIAssistant.Builder builder =
                 switch (platformType) {
                     case OPENAI -> OpenAIAssistant.builder();
@@ -96,14 +68,25 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
                 .memoryStore(
                         (id == null)
                                 ? new InMemoryChatMemoryStore()
-                                : chatMemoryStoreProvider.createAiServiceChatMemoryStore())
-                .withConfigProvider(assistantConfig);
+                                : chatMemoryStoreProvider.createPersistentChatMemoryStore())
+                .withConfigProvider(assistantConfig)
+                .withToolProvider(toolProvider);
 
-        return AiServices.builder(AIAssistant.class)
-                .chatLanguageModel(builder.getChatLanguageModel())
-                .streamingChatLanguageModel(builder.getStreamingChatLanguageModel())
-                .chatMemory(builder.getChatMemory())
-                .toolProvider(toolProvider)
-                .build();
+        List<String> systemPrompts = new java.util.ArrayList<>(
+                Collections.singletonList(systemPromptProvider.getSystemMessage(systemPrompt)));
+        String locale = assistantConfig.getLanguage();
+        if (locale != null) {
+            systemPrompts.add(systemPromptProvider.getLanguagePrompt(locale));
+        }
+
+        builder.withSystemPrompt(systemPromptProvider.getSystemMessages(systemPrompts));
+
+        return builder.build();
+    }
+
+    @Override
+    public AIAssistant createAiService(
+            PlatformType platformType, AIAssistantConfigProvider assistantConfig, Long id, ToolProvider toolProvider) {
+        return createWithPrompt(platformType, assistantConfig, id, toolProvider, SystemPrompt.DEFAULT_PROMPT);
     }
 }

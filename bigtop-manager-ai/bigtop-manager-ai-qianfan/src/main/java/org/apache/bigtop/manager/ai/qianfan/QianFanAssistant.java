@@ -22,38 +22,18 @@ import org.apache.bigtop.manager.ai.core.AbstractAIAssistant;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 
-import dev.langchain4j.data.message.ChatMessage;
-import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.internal.ValidationUtils;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.chat.StreamingChatLanguageModel;
 import dev.langchain4j.model.qianfan.QianfanChatModel;
 import dev.langchain4j.model.qianfan.QianfanStreamingChatModel;
+import dev.langchain4j.service.AiServices;
 
 public class QianFanAssistant extends AbstractAIAssistant {
 
-    private SystemMessage systemMessage;
-
-    public QianFanAssistant(
-            ChatLanguageModel chatLanguageModel,
-            StreamingChatLanguageModel streamingChatLanguageModel,
-            ChatMemory chatMemory) {
-        super(chatLanguageModel, streamingChatLanguageModel, chatMemory);
-        for (ChatMessage chatMessage : chatMemory.messages()) {
-            if (chatMessage instanceof SystemMessage) {
-                this.systemMessage = (SystemMessage) chatMessage;
-            }
-        }
-    }
-
-    @Override
-    public void setSystemPrompt(String systemPrompt) {
-        // Multiple system messages are not supported
-        if (this.systemMessage == null) {
-            this.systemMessage = SystemMessage.systemMessage(systemPrompt);
-            chatMemory.add(this.systemMessage);
-        }
+    public QianFanAssistant(ChatMemory chatMemory, AIAssistant.Service aiServices) {
+        super(chatMemory, aiServices);
     }
 
     @Override
@@ -68,7 +48,19 @@ public class QianFanAssistant extends AbstractAIAssistant {
     public static class Builder extends AbstractAIAssistant.Builder {
 
         public AIAssistant build() {
-            return new QianFanAssistant(getChatLanguageModel(), getStreamingChatLanguageModel(), getChatMemory());
+            AIAssistant.Service aiService = AiServices.builder(AIAssistant.Service.class)
+                    .chatLanguageModel(getChatLanguageModel())
+                    .streamingChatLanguageModel(getStreamingChatLanguageModel())
+                    .chatMemory(getChatMemory())
+                    .toolProvider(toolProvider)
+                    .systemMessageProvider(threadId -> {
+                        if (threadId != null) {
+                            return systemPrompt;
+                        }
+                        return null;
+                    })
+                    .build();
+            return new QianFanAssistant(getChatMemory(), aiService);
         }
 
         @Override

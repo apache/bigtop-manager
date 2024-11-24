@@ -43,12 +43,4 @@ public class ChatMemoryStoreProvider {
         }
         return new PersistentChatMemoryStore(chatThreadDao, chatMessageDao);
     }
-
-    public ChatMemoryStore createAiServiceChatMemoryStore() {
-        if (chatThreadDao == null || chatMessageDao == null) {
-            return new InMemoryChatMemoryStore();
-        }
-        return new PersistentChatMemoryStore(chatThreadDao, chatMessageDao);
-        //        return new AiServiceChatMemoryStore(chatThreadDao, chatMessageDao);
-    }
 }

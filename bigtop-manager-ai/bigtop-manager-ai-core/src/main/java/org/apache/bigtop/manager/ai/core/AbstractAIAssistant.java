@@ -21,32 +21,20 @@ package org.apache.bigtop.manager.ai.core;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
 
-import dev.langchain4j.data.message.AiMessage;
-import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
-import dev.langchain4j.model.StreamingResponseHandler;
-import dev.langchain4j.model.chat.ChatLanguageModel;
-import dev.langchain4j.model.chat.StreamingChatLanguageModel;
-import dev.langchain4j.model.output.Response;
+import dev.langchain4j.service.tool.ToolProvider;
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.FluxSink;
 
 public abstract class AbstractAIAssistant implements AIAssistant {
-
-    protected final ChatLanguageModel chatLanguageModel;
-    protected final StreamingChatLanguageModel streamingChatLanguageModel;
+    protected final AIAssistant.Service aiServices;
     protected static final Integer MEMORY_LEN = 10;
     protected final ChatMemory chatMemory;
 
-    protected AbstractAIAssistant(
-            ChatLanguageModel chatLanguageModel,
-            StreamingChatLanguageModel streamingChatLanguageModel,
-            ChatMemory chatMemory) {
-        this.chatLanguageModel = chatLanguageModel;
-        this.streamingChatLanguageModel = streamingChatLanguageModel;
+    protected AbstractAIAssistant(ChatMemory chatMemory, AIAssistant.Service aiServices) {
         this.chatMemory = chatMemory;
+        this.aiServices = aiServices;
     }
 
     @Override
@@ -61,35 +49,12 @@ public abstract class AbstractAIAssistant implements AIAssistant {
 
     @Override
     public Flux<String> streamAsk(String chatMessage) {
-        chatMemory.add(UserMessage.from(chatMessage));
-        return Flux.create(
-                emitter -> streamingChatLanguageModel.generate(chatMemory.messages(), new StreamingResponseHandler<>() {
-                    @Override
-                    public void onNext(String token) {
-                        emitter.next(token);
-                    }
-
-                    @Override
-                    public void onError(Throwable error) {
-                        emitter.error(error);
-                    }
-
-                    @Override
-                    public void onComplete(Response<AiMessage> response) {
-                        StreamingResponseHandler.super.onComplete(response);
-                        chatMemory.add(response.content());
-                    }
-                }),
-                FluxSink.OverflowStrategy.BUFFER);
+        return aiServices.streamChat(chatMessage);
     }
 
     @Override
     public String ask(String chatMessage) {
-        chatMemory.add(UserMessage.from(chatMessage));
-        Response<AiMessage> generate = chatLanguageModel.generate(chatMemory.messages());
-        String aiMessage = generate.content().text();
-        chatMemory.add(AiMessage.from(aiMessage));
-        return aiMessage;
+        return aiServices.chat(chatMessage);
     }
 
     public abstract static class Builder implements AIAssistant.Builder {
@@ -98,7 +63,20 @@ public abstract class AbstractAIAssistant implements AIAssistant {
         protected ChatMemoryStore chatMemoryStore;
         protected AIAssistantConfigProvider configProvider;
 
+        protected ToolProvider toolProvider;
+        protected String systemPrompt;
+
         public Builder() {}
+
+        public Builder withToolProvider(ToolProvider toolProvider) {
+            this.toolProvider = toolProvider;
+            return this;
+        }
+
+        public Builder withSystemPrompt(String systemPrompt) {
+            this.systemPrompt = systemPrompt;
+            return this;
+        }
 
         public Builder withConfigProvider(AIAssistantConfigProvider configProvider) {
             this.configProvider = configProvider;
