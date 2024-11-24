@@ -240,15 +240,20 @@ public class ChatbotServiceImpl implements ChatbotService {
     @Override
     public SseEmitter talkWithTools(Long threadId, ChatbotCommand command, String message) {
         AIAssistant aiAssistant = prepareTalk(threadId, command, message);
-
-        String result = aiAssistant.ask(message);
+        Flux<String> stringFlux = aiAssistant.streamAsk(message);
         SseEmitter emitter = new SseEmitter();
-        try {
-            emitter.send(result);
-            emitter.complete();
-        } catch (Exception e) {
-            emitter.completeWithError(e);
-        }
+        stringFlux.subscribe(
+                s -> {
+                    try {
+                        emitter.send(s);
+                    } catch (Exception e) {
+                        emitter.completeWithError(e);
+                    }
+                },
+                Throwable::printStackTrace,
+                emitter::complete);
+
+        emitter.onTimeout(emitter::complete);
         return emitter;
     }
 
