@@ -121,14 +121,12 @@ public class ChatbotServiceImpl implements ChatbotService {
     private AIAssistant buildAIAssistant(
             String platformName, String model, Map<String, String> credentials, Long threadId, ChatbotCommand command) {
         if (command == null) {
-//            return getAIAssistantFactory()
-//                    .create(getPlatformType(platformName), getAIAssistantConfig(model, credentials), threadId);
+            //            return getAIAssistantFactory()
+            //                    .create(getPlatformType(platformName), getAIAssistantConfig(model, credentials),
+            // threadId);
             return getAIAssistantFactory()
                     .createWithTools(
-                            getPlatformType(platformName),
-                            getAIAssistantConfig(model, credentials),
-                            threadId,
-                            null);
+                            getPlatformType(platformName), getAIAssistantConfig(model, credentials), threadId, null);
         } else {
             return getAIAssistantFactory()
                     .createWithTools(
