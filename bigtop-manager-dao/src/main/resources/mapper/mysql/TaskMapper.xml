@@ -29,18 +29,4 @@
         WHERE stage_id = #{stageId}
         ORDER BY id asc
     </select>
-
-    <update id="updateStateByIds" parameterType="java.util.List">
-        UPDATE task
-        SET `state` = CASE
-        <foreach collection="tasks" item="item" index="index">
-            WHEN id = #{item.id} THEN #{item.state}
-        </foreach>
-        END
-        WHERE id IN
-        <foreach collection="tasks" index="index" item="item" open="(" separator="," close=")">
-            #{item.id}
-        </foreach>
-    </update>
-
 </mapper>

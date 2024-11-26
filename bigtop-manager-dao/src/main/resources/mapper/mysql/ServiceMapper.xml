@@ -60,36 +60,36 @@
         cluster_id = #{clusterId}
     </select>
 
-    <select id="findByClusterIdAndServiceName"
+    <select id="findByClusterIdAndName"
             resultType="org.apache.bigtop.manager.dao.po.ServicePO">
         select
         <include refid="baseColumns"/>
         from
         service
         <where>
-            <if test="clusterId != 0">
+            <if test="clusterId != null">
                 cluster_id = #{clusterId}
             </if>
-            <if test="serviceName != null">
-                and service_name = #{serviceName}
+            <if test="name != null and name != ''">
+                and name = #{name}
             </if>
         </where>
     </select>
 
-    <select id="findByClusterIdAndServiceNameIn"
+    <select id="findByClusterIdAndNames"
             resultType="org.apache.bigtop.manager.dao.po.ServicePO">
         select
         <include refid="baseColumns"/>
         from
         service
         <where>
-            <if test="clusterId != 0">
+            <if test="clusterId != null">
                 cluster_id = #{clusterId}
             </if>
-            <if test="serviceNames != null and serviceNames.size() > 0">
-                and service_name in
-                <foreach collection="serviceNames" item="serviceName" index="index" open="(" close=")" separator=", ">
-                    #{serviceName}
+            <if test="names != null and names.size() > 0">
+                and name in
+                <foreach collection="names" item="name" index="index" open="(" close=")" separator=", ">
+                    #{name}
                 </foreach>
             </if>
         </where>

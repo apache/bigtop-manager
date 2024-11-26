@@ -18,20 +18,23 @@
  */
 package org.apache.bigtop.manager.server.command.task;
 
+import org.apache.bigtop.manager.common.constants.ComponentCategories;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.query.ComponentQuery;
 import org.apache.bigtop.manager.server.enums.HealthyStatusEnum;
+import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
+import org.apache.bigtop.manager.server.utils.StackUtils;
 
-public class ComponentInstallTask extends AbstractComponentTask {
+public class ComponentAddTask extends AbstractComponentTask {
 
-    public ComponentInstallTask(TaskContext taskContext) {
+    public ComponentAddTask(TaskContext taskContext) {
         super(taskContext);
     }
 
     @Override
     protected Command getCommand() {
-        return Command.INSTALL;
+        return Command.ADD;
     }
 
     @Override
@@ -43,13 +46,22 @@ public class ComponentInstallTask extends AbstractComponentTask {
         ComponentQuery componentQuery =
                 ComponentQuery.builder().hostname(hostname).name(componentName).build();
         ComponentPO componentPO = componentDao.findByQuery(componentQuery).get(0);
-        componentPO.setStatus(HealthyStatusEnum.UNKNOWN.getCode());
+
+        ComponentDTO componentDTO = StackUtils.getComponentDTO(componentName);
+        if (componentDTO.getCategory().equalsIgnoreCase(ComponentCategories.CLIENT)) {
+            // Client components should always be healthy after added
+            componentPO.setStatus(HealthyStatusEnum.HEALTHY.getCode());
+        } else {
+            // Master/Slave components need to start before being healthy
+            componentPO.setStatus(HealthyStatusEnum.UNHEALTHY.getCode());
+        }
+
         componentDao.partialUpdateById(componentPO);
     }
 
     @Override
     public String getName() {
-        return "Install " + taskContext.getComponentDisplayName() + " on "
+        return "Add " + taskContext.getComponentDisplayName() + " on "
                 + taskContext.getHostDTO().getHostname();
     }
 }

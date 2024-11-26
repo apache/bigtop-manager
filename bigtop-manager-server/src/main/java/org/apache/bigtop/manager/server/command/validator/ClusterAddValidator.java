@@ -19,47 +19,39 @@
 package org.apache.bigtop.manager.server.command.validator;
 
 import org.apache.bigtop.manager.common.enums.Command;
-import org.apache.bigtop.manager.dao.po.HostPO;
-import org.apache.bigtop.manager.dao.repository.HostDao;
+import org.apache.bigtop.manager.dao.po.ClusterPO;
+import org.apache.bigtop.manager.dao.repository.ClusterDao;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.enums.CommandLevel;
 import org.apache.bigtop.manager.server.exception.ApiException;
-import org.apache.bigtop.manager.server.model.dto.CommandDTO;
-import org.apache.bigtop.manager.server.model.dto.command.ServiceCommandDTO;
+import org.apache.bigtop.manager.server.model.dto.command.ClusterCommandDTO;
 
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.Resource;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Component
-public class ServiceHostValidator implements CommandValidator {
+public class ClusterAddValidator implements CommandValidator {
 
     @Resource
-    private HostDao hostDao;
+    private ClusterDao clusterDao;
 
     @Override
     public List<CommandIdentifier> getCommandIdentifiers() {
-        return List.of(new CommandIdentifier(CommandLevel.SERVICE, Command.INSTALL));
+        return List.of(new CommandIdentifier(CommandLevel.CLUSTER, Command.ADD));
     }
 
     @Override
     public void validate(ValidatorContext context) {
-        CommandDTO commandDTO = context.getCommandDTO();
-        List<ServiceCommandDTO> serviceCommands = commandDTO.getServiceCommands();
+        ClusterCommandDTO clusterCommand = context.getCommandDTO().getClusterCommand();
+        String clusterName = clusterCommand.getName();
 
-        Set<String> hostnameSet = serviceCommands.stream()
-                .flatMap(x -> x.getComponentHosts().stream())
-                .flatMap(x -> x.getHostnames().stream())
-                .collect(Collectors.toSet());
+        ClusterPO clusterPO = clusterDao.findByName(clusterName);
 
-        List<HostPO> hostnames = hostDao.findAllByHostnameIn(hostnameSet);
-
-        if (hostnames.size() != hostnameSet.size()) {
-            throw new ApiException(ApiExceptionEnum.HOST_NOT_FOUND);
+        if (clusterPO != null) {
+            throw new ApiException(ApiExceptionEnum.CLUSTER_EXISTS, clusterName);
         }
     }
 }

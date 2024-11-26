@@ -35,7 +35,7 @@ public interface HostDao extends BaseDao<HostPO> {
 
     HostPO findByHostname(@Param("hostname") String hostname);
 
-    List<HostPO> findAllByHostnameIn(@Param("hostnames") Collection<String> hostnames);
+    List<HostPO> findAllByHostnames(@Param("hostnames") Collection<String> hostnames);
 
     List<HostPO> findAllByClusterId(@Param("clusterId") Long clusterId);
 }

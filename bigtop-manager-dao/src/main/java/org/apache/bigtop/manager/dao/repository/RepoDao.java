@@ -21,14 +21,4 @@ package org.apache.bigtop.manager.dao.repository;
 
 import org.apache.bigtop.manager.dao.po.RepoPO;
 
-import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
-import java.util.Optional;
-
-public interface RepoDao extends BaseDao<RepoPO> {
-
-    Optional<RepoPO> findByRepoName(@Param("repoName") String clusterName);
-
-    List<RepoPO> findAllByClusterId(@Param("clusterId") Long clusterId);
-}
+public interface RepoDao extends BaseDao<RepoPO> {}

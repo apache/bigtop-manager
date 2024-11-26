@@ -34,11 +34,11 @@ import java.util.Properties;
 public class PrometheusServerScript extends AbstractServerScript {
 
     @Override
-    public ShellResult install(Params params) {
+    public ShellResult add(Params params) {
         Properties properties = new Properties();
         properties.setProperty(PROPERTY_KEY_SKIP_LEVELS, "1");
 
-        return super.install(params, properties);
+        return super.add(params, properties);
     }
 
     @Override

@@ -30,6 +30,4 @@ public interface ClusterDao extends BaseDao<ClusterPO> {
     ClusterPO findByName(@Param("name") String name);
 
     Integer count();
-
-    ClusterPO findByIdJoin(@Param("clusterId") Long clusterId);
 }

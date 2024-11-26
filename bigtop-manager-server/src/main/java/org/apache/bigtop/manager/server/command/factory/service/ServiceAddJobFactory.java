@@ -22,7 +22,7 @@ import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
 import org.apache.bigtop.manager.server.command.job.Job;
 import org.apache.bigtop.manager.server.command.job.JobContext;
-import org.apache.bigtop.manager.server.command.job.ServiceInstallJob;
+import org.apache.bigtop.manager.server.command.job.ServiceAddJob;
 import org.apache.bigtop.manager.server.enums.CommandLevel;
 
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -34,15 +34,15 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class ServiceInstallJobFactory extends AbstractServiceJobFactory {
+public class ServiceAddJobFactory extends AbstractServiceJobFactory {
 
     @Override
     public CommandIdentifier getCommandIdentifier() {
-        return new CommandIdentifier(CommandLevel.SERVICE, Command.INSTALL);
+        return new CommandIdentifier(CommandLevel.SERVICE, Command.ADD);
     }
 
     @Override
     public Job createJob(JobContext jobContext) {
-        return new ServiceInstallJob(jobContext);
+        return new ServiceAddJob(jobContext);
     }
 }
