@@ -18,7 +18,6 @@
  */
 package org.apache.bigtop.manager.server.command.stage;
 
-import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.server.command.task.HostCheckTask;
 import org.apache.bigtop.manager.server.command.task.Task;
 import org.apache.bigtop.manager.server.command.task.TaskContext;
@@ -48,8 +47,6 @@ public class HostCheckStage extends AbstractStage {
         taskContext.setServiceUser("root");
         taskContext.setComponentName("agent");
         taskContext.setComponentDisplayName("Agent");
-        taskContext.setCommand(Command.CUSTOM);
-        taskContext.setCustomCommand("check_host");
 
         return new HostCheckTask(taskContext);
     }

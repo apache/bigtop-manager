@@ -18,7 +18,6 @@
  */
 package org.apache.bigtop.manager.server.command.stage;
 
-import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.server.command.task.CacheFileUpdateTask;
 import org.apache.bigtop.manager.server.command.task.Task;
@@ -63,14 +62,15 @@ public class CacheFileUpdateStage extends AbstractStage {
         taskContext.setHostDTO(hostDTO);
         taskContext.setClusterId(stageContext.getClusterId());
         taskContext.setClusterName(stageContext.getClusterName());
+        taskContext.setUserGroup(stageContext.getUserGroup());
+        taskContext.setRootDir(stageContext.getRootDir());
         taskContext.setServiceName("cluster");
         taskContext.setServiceUser("root");
         taskContext.setComponentName("agent");
         taskContext.setComponentDisplayName("Agent");
-        taskContext.setCommand(Command.CUSTOM);
-        taskContext.setCustomCommand("update_cache_files");
 
         Map<String, Object> properties = new HashMap<>();
+        properties.put("hostIds", stageContext.getHostIds());
         taskContext.setProperties(properties);
 
         return new CacheFileUpdateTask(taskContext);

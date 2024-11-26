@@ -32,6 +32,8 @@ import org.apache.bigtop.manager.server.model.dto.CustomCommandDTO;
 import org.apache.bigtop.manager.server.model.dto.PackageDTO;
 import org.apache.bigtop.manager.server.model.dto.PackageSpecificDTO;
 import org.apache.bigtop.manager.server.model.dto.ScriptDTO;
+import org.apache.bigtop.manager.server.model.dto.StackDTO;
+import org.apache.bigtop.manager.server.utils.StackUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,12 +57,15 @@ public abstract class AbstractComponentTask extends AbstractTask {
     @Override
     @SuppressWarnings("unchecked")
     protected CommandRequest getCommandRequest() {
+        StackDTO stackDTO = StackUtils.getServiceStack(taskContext.getServiceName());
         CommandPayload commandPayload = new CommandPayload();
         commandPayload.setServiceName(taskContext.getServiceName());
-        commandPayload.setCommand(getCommand());
-        commandPayload.setServiceUser(taskContext.getServiceUser());
         commandPayload.setComponentName(taskContext.getComponentName());
-        commandPayload.setRootDir(taskContext.getRootDir());
+        commandPayload.setServiceUser(taskContext.getServiceUser());
+        commandPayload.setStackName(stackDTO.getStackName());
+        commandPayload.setStackVersion(stackDTO.getStackVersion());
+        commandPayload.setCommand(getCommand());
+        commandPayload.setCustomCommand(getCustomCommand());
 
         Map<String, Object> properties = taskContext.getProperties();
 
@@ -97,7 +102,6 @@ public abstract class AbstractComponentTask extends AbstractTask {
         List<PackageSpecificInfo> packageSpecificInfos = new ArrayList<>();
         for (PackageSpecificDTO packageSpecificDTO : packageSpecificDTOList) {
             PackageSpecificInfo packageSpecificInfo = new PackageSpecificInfo();
-            packageSpecificInfo.setOs(packageSpecificDTO.getOs());
             packageSpecificInfo.setArch(packageSpecificDTO.getArch());
             List<PackageInfo> packageInfoList = new ArrayList<>();
             for (PackageDTO packageDTO : packageSpecificDTO.getPackages()) {

@@ -20,6 +20,7 @@ package org.apache.bigtop.manager.stack.bigtop.param;
 
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
 import org.apache.bigtop.manager.stack.core.param.BaseParams;
+import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
 
 public abstract class BigtopParams extends BaseParams {
 
@@ -40,7 +41,7 @@ public abstract class BigtopParams extends BaseParams {
      */
     @Override
     public String serviceHome() {
-        String rootDir = this.commandPayload.getRootDir();
+        String rootDir = LocalSettings.cluster().getRootDir();
         String service = this.commandPayload.getServiceName();
         return rootDir + "/" + service.toLowerCase();
     }
