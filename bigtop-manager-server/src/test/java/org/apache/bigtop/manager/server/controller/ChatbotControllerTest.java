@@ -110,7 +110,7 @@ class ChatbotControllerTest {
         messageReq.setMessage("Hello");
 
         SseEmitter emitter = new SseEmitter();
-        when(chatbotService.talk(eq(threadId), null, eq(messageReq.getMessage())))
+        when(chatbotService.talk(eq(threadId), any(), eq(messageReq.getMessage())))
                 .thenReturn(emitter);
 
         SseEmitter result = chatbotController.talk(threadId, messageReq);
