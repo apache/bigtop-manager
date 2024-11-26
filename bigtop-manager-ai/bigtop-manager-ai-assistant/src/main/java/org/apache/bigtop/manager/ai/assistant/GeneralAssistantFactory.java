@@ -72,8 +72,7 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
                 .withConfigProvider(assistantConfig)
                 .withToolProvider(toolProvider);
 
-        List<String> systemPrompts = new java.util.ArrayList<>(
-                Collections.singletonList(systemPromptProvider.getSystemMessage(systemPrompt)));
+        List<String> systemPrompts = Collections.singletonList(systemPromptProvider.getSystemMessage(systemPrompt));
         String locale = assistantConfig.getLanguage();
         if (locale != null) {
             systemPrompts.add(systemPromptProvider.getLanguagePrompt(locale));

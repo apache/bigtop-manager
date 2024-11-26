@@ -49,7 +49,7 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
         this.chatMessageDao = chatMessageDao;
     }
 
-    ChatMessage convertToChatMessage(ChatMessagePO chatMessagePO) {
+    private ChatMessage convertToChatMessage(ChatMessagePO chatMessagePO) {
         String sender = chatMessagePO.getSender().toLowerCase();
         if (sender.equals(MessageType.AI.getValue())) {
             return new AiMessage(chatMessagePO.getMessage());
@@ -60,7 +60,7 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
         }
     }
 
-    ChatMessagePO convertToChatMessagePO(ChatMessage chatMessage, Long chatThreadId) {
+    private ChatMessagePO convertToChatMessagePO(ChatMessage chatMessage, Long chatThreadId) {
         ChatMessagePO chatMessagePO = new ChatMessagePO();
         if (chatMessage.type().equals(ChatMessageType.AI)) {
             chatMessagePO.setSender(MessageType.AI.getValue());
