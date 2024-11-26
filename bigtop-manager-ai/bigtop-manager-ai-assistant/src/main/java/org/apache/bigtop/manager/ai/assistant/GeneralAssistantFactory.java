@@ -33,7 +33,6 @@ import org.apache.bigtop.manager.ai.qianfan.QianFanAssistant;
 import dev.langchain4j.service.tool.ToolProvider;
 import dev.langchain4j.store.memory.chat.InMemoryChatMemoryStore;
 
-import java.util.Collections;
 import java.util.List;
 
 public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
@@ -72,7 +71,8 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
                 .withConfigProvider(assistantConfig)
                 .withToolProvider(toolProvider);
 
-        List<String> systemPrompts = Collections.singletonList(systemPromptProvider.getSystemMessage(systemPrompt));
+        List<String> systemPrompts = new java.util.ArrayList<>();
+        systemPrompts.add(systemPromptProvider.getSystemMessage(systemPrompt));
         String locale = assistantConfig.getLanguage();
         if (locale != null) {
             systemPrompts.add(systemPromptProvider.getLanguagePrompt(locale));
