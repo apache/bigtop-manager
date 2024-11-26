@@ -32,8 +32,16 @@ public class AgentToolsProvider implements ToolProvider {
         this.chatbotCommand = chatbotCommand;
     }
 
+    public AgentToolsProvider() {
+        this.chatbotCommand = null;
+    }
+
     @Override
     public ToolProviderResult provideTools(ToolProviderRequest toolProviderRequest) {
+        if (chatbotCommand == null) {
+            ClusterInfoTools clusterInfoTools = new ClusterInfoTools();
+            return ToolProviderResult.builder().addAll(clusterInfoTools.list()).build();
+        }
         if (chatbotCommand.equals(ChatbotCommand.INFO)) {
             ClusterInfoTools clusterInfoTools = new ClusterInfoTools();
             return ToolProviderResult.builder().addAll(clusterInfoTools.list()).build();

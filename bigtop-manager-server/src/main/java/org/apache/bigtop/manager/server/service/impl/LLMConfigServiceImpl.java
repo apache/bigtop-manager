@@ -24,6 +24,7 @@ import org.apache.bigtop.manager.ai.assistant.store.ChatMemoryStoreProvider;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistantFactory;
+import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.AuthPlatformPO;
 import org.apache.bigtop.manager.dao.po.ChatMessagePO;
 import org.apache.bigtop.manager.dao.po.ChatThreadPO;
@@ -48,6 +49,11 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
+import dev.langchain4j.agent.tool.JsonSchemaProperty;
+import dev.langchain4j.agent.tool.ToolSpecification;
+import dev.langchain4j.service.tool.ToolExecutor;
+import dev.langchain4j.service.tool.ToolProvider;
+import dev.langchain4j.service.tool.ToolProviderResult;
 import lombok.extern.slf4j.Slf4j;
 
 import jakarta.annotation.Resource;
@@ -73,6 +79,9 @@ public class LLMConfigServiceImpl implements LLMConfigService {
 
     private AIAssistantFactory aiAssistantFactory;
 
+    private static final String TEST_FLAG = "ZmxhZw==";
+    private static final String TEST_KEY = "bm";
+
     public AIAssistantFactory getAIAssistantFactory() {
         if (aiAssistantFactory == null) {
             aiAssistantFactory =
@@ -96,14 +105,43 @@ public class LLMConfigServiceImpl implements LLMConfigService {
     }
 
     private Boolean testAuthorization(String platformName, String model, Map<String, String> credentials) {
-        AIAssistantConfig aiAssistantConfig = AIAssistantConfig.builder()
-                .setModel(model)
-                .setLanguage(LocaleContextHolder.getLocale().toString())
-                .addCredentials(credentials)
-                .build();
+        Boolean result = testFuncCalling(platformName, model, credentials);
+        log.info("Test func calling result: {}", result);
+        AIAssistantConfig aiAssistantConfig = getAIAssistantConfig(model, credentials, null);
         AIAssistant aiAssistant = getAIAssistantFactory().create(getPlatformType(platformName), aiAssistantConfig);
         try {
             return aiAssistant.test();
+        } catch (Exception e) {
+            throw new ApiException(ApiExceptionEnum.CREDIT_INCORRECT, e.getMessage());
+        }
+    }
+
+    private Boolean testFuncCalling(String platformName, String model, Map<String, String> credentials) {
+        ToolProvider toolProvider = (toolProviderRequest) -> {
+            ToolSpecification toolSpecification = ToolSpecification.builder()
+                    .name("getFlag")
+                    .description("Get flag based on key")
+                    .addParameter("key", JsonSchemaProperty.STRING, JsonSchemaProperty.description("Lowercase key"))
+                    .build();
+            ToolExecutor toolExecutor = (toolExecutionRequest, memoryId) -> {
+                Map<String, Object> arguments = JsonUtils.readFromString(toolExecutionRequest.arguments());
+                String key = arguments.get("key").toString();
+                if (key.equals(TEST_KEY)) {
+                    return TEST_FLAG;
+                }
+                return null;
+            };
+
+            return ToolProviderResult.builder()
+                    .add(toolSpecification, toolExecutor)
+                    .build();
+        };
+
+        AIAssistantConfig aiAssistantConfig = getAIAssistantConfig(model, credentials, null);
+        AIAssistant aiAssistant = getAIAssistantFactory()
+                .createAiService(getPlatformType(platformName), aiAssistantConfig, null, toolProvider);
+        try {
+            return aiAssistant.ask("What is the flag of " + TEST_KEY).contains(TEST_FLAG);
         } catch (Exception e) {
             throw new ApiException(ApiExceptionEnum.CREDIT_INCORRECT, e.getMessage());
         }
