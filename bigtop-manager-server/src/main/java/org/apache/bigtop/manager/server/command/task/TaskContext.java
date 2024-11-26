@@ -40,11 +40,10 @@ public class TaskContext {
 
     private String componentName;
 
+    // This is for display purpose for task info(eg. task name) only
     private String componentDisplayName;
 
-    private Command command;
-
-    private String customCommand;
+    private String userGroup;
 
     private String rootDir;
 

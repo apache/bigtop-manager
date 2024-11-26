@@ -30,7 +30,6 @@ import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.po.RepoPO;
 import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
 import org.apache.bigtop.manager.dao.po.ServicePO;
-import org.apache.bigtop.manager.dao.po.SettingPO;
 import org.apache.bigtop.manager.dao.query.ComponentQuery;
 import org.apache.bigtop.manager.dao.repository.ClusterDao;
 import org.apache.bigtop.manager.dao.repository.ComponentDao;
@@ -38,11 +37,13 @@ import org.apache.bigtop.manager.dao.repository.HostDao;
 import org.apache.bigtop.manager.dao.repository.RepoDao;
 import org.apache.bigtop.manager.dao.repository.ServiceConfigDao;
 import org.apache.bigtop.manager.dao.repository.ServiceDao;
-import org.apache.bigtop.manager.dao.repository.SettingDao;
 import org.apache.bigtop.manager.grpc.generated.CommandRequest;
 import org.apache.bigtop.manager.grpc.generated.CommandType;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 import org.apache.bigtop.manager.server.model.converter.RepoConverter;
+import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
+import org.apache.bigtop.manager.server.model.dto.StackDTO;
+import org.apache.bigtop.manager.server.utils.StackUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,10 +58,8 @@ import static org.apache.bigtop.manager.common.constants.Constants.ALL_HOST_KEY;
 public class CacheFileUpdateTask extends AbstractTask {
 
     private ClusterDao clusterDao;
-    private ServiceDao serviceDao;
     private ServiceConfigDao serviceConfigDao;
     private RepoDao repoDao;
-    private SettingDao settingDao;
     private HostDao hostDao;
     private ComponentDao componentDao;
 
@@ -81,10 +80,8 @@ public class CacheFileUpdateTask extends AbstractTask {
         super.injectBeans();
 
         this.clusterDao = SpringContextHolder.getBean(ClusterDao.class);
-        this.serviceDao = SpringContextHolder.getBean(ServiceDao.class);
         this.serviceConfigDao = SpringContextHolder.getBean(ServiceConfigDao.class);
         this.repoDao = SpringContextHolder.getBean(RepoDao.class);
-        this.settingDao = SpringContextHolder.getBean(SettingDao.class);
         this.hostDao = SpringContextHolder.getBean(HostDao.class);
         this.componentDao = SpringContextHolder.getBean(ComponentDao.class);
     }
@@ -104,20 +101,19 @@ public class CacheFileUpdateTask extends AbstractTask {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void genFullCaches() {
-        ClusterPO clusterPO = clusterDao.findById(taskContext.getClusterId());
-
-        Long clusterId = clusterPO.getId();
+        Long clusterId = taskContext.getClusterId();
+        List<Long> hostIds = (List<Long>) taskContext.getProperties().get("hostIds");
+        ClusterPO clusterPO = clusterDao.findById(clusterId);
 
         ComponentQuery componentQuery =
                 ComponentQuery.builder().clusterId(clusterId).build();
 
-        List<ServicePO> servicePOList = serviceDao.findByClusterId(clusterId);
         List<ServiceConfigPO> serviceConfigPOList = serviceConfigDao.findByClusterId(clusterPO.getId());
         List<ComponentPO> componentPOList = componentDao.findByQuery(componentQuery);
         List<RepoPO> repoPOList = repoDao.findAll();
-        Iterable<SettingPO> settings = settingDao.findAll();
-        List<HostPO> hostPOList = hostDao.findAllByClusterId(clusterId);
+        List<HostPO> hostPOList = hostDao.findByIds(hostIds);
 
         clusterInfo = new ClusterInfo();
         clusterInfo.setUserGroup(clusterPO.getUserGroup());
@@ -158,21 +154,43 @@ public class CacheFileUpdateTask extends AbstractTask {
         });
 
         userMap = new HashMap<>();
-        servicePOList.forEach(x -> userMap.put(x.getName(), x.getUser()));
-
-        settingsMap = new HashMap<>();
-        settings.forEach(x -> settingsMap.put(x.getTypeName(), x.getConfigData()));
+        for (StackDTO stackDTO : StackUtils.getAllStacks()) {
+            for (ServiceDTO serviceDTO : StackUtils.getServiceDTOList(stackDTO)) {
+                userMap.put(serviceDTO.getName(), serviceDTO.getUser());
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")
     private void genEmptyCaches() {
+        List<Long> hostIds = (List<Long>) taskContext.getProperties().get("hostIds");
+
+        List<RepoPO> repoPOList = repoDao.findAll();
+        List<HostPO> hostPOList = hostDao.findByIds(hostIds);
+
         componentInfoMap = new HashMap<>();
         serviceConfigMap = new HashMap<>();
-        hostMap = new HashMap<>();
-        userMap = new HashMap<>();
-        settingsMap = new HashMap<>();
-        repoList = new ArrayList<>();
+
         clusterInfo = new ClusterInfo();
+        clusterInfo.setUserGroup(taskContext.getUserGroup());
+        clusterInfo.setRootDir(taskContext.getRootDir());
+
+        hostMap = new HashMap<>();
+        Set<String> hostNameSet = hostPOList.stream().map(HostPO::getHostname).collect(Collectors.toSet());
+        hostMap.put(ALL_HOST_KEY, hostNameSet);
+
+        repoList = new ArrayList<>();
+        repoPOList.forEach(repoPO -> {
+            RepoInfo repoInfo = RepoConverter.INSTANCE.fromPO2Message(repoPO);
+            repoList.add(repoInfo);
+        });
+
+        userMap = new HashMap<>();
+        for (StackDTO stackDTO : StackUtils.getAllStacks()) {
+            for (ServiceDTO serviceDTO : StackUtils.getServiceDTOList(stackDTO)) {
+                userMap.put(serviceDTO.getName(), serviceDTO.getUser());
+            }
+        }
     }
 
     @Override

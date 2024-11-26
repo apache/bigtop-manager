@@ -275,18 +275,6 @@ CREATE INDEX idx_task_cluster_id ON task (cluster_id);
 CREATE INDEX idx_task_job_id ON task (job_id);
 CREATE INDEX idx_task_stage_id ON task (stage_id);
 
-CREATE TABLE setting
-(
-    id          BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY,
-    config_data TEXT,
-    create_by   BIGINT,
-    create_time TIMESTAMP(0),
-    type_name   VARCHAR(255),
-    update_by   BIGINT,
-    update_time TIMESTAMP(0),
-    PRIMARY KEY (id)
-);
-
 CREATE TABLE llm_platform
 (
     id             BIGINT CHECK (id > 0) NOT NULL GENERATED ALWAYS AS IDENTITY,

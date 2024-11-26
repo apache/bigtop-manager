@@ -52,8 +52,6 @@ public class CommandPayload extends BasePayload {
 
     private String stackVersion;
 
-    private String rootDir;
-
     private String componentName;
 
     private List<PackageSpecificInfo> packageSpecifics;

@@ -63,14 +63,15 @@ public class CacheFileUpdateStage extends AbstractStage {
         taskContext.setHostDTO(hostDTO);
         taskContext.setClusterId(stageContext.getClusterId());
         taskContext.setClusterName(stageContext.getClusterName());
+        taskContext.setUserGroup(stageContext.getUserGroup());
+        taskContext.setRootDir(stageContext.getRootDir());
         taskContext.setServiceName("cluster");
         taskContext.setServiceUser("root");
         taskContext.setComponentName("agent");
         taskContext.setComponentDisplayName("Agent");
-        taskContext.setCommand(Command.CUSTOM);
-        taskContext.setCustomCommand("update_cache_files");
 
         Map<String, Object> properties = new HashMap<>();
+        properties.put("hostIds", stageContext.getHostIds());
         taskContext.setProperties(properties);
 
         return new CacheFileUpdateTask(taskContext);

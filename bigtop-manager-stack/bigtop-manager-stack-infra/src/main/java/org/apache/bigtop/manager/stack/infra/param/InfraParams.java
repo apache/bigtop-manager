@@ -31,13 +31,4 @@ public abstract class InfraParams extends BaseParams {
     protected InfraParams(CommandPayload commandPayload) {
         super(commandPayload);
     }
-
-    /**
-     * service home dir
-     */
-    @Override
-    public String serviceHome() {
-        String service = this.commandPayload.getServiceName();
-        return MessageFormat.format("{0}/{1}", stackHome(), service.toLowerCase());
-    }
 }

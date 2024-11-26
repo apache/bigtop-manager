@@ -265,18 +265,6 @@ CREATE TABLE `task`
     KEY               idx_task_stage_id (stage_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE `setting`
-(
-    `id`          BIGINT NOT NULL AUTO_INCREMENT,
-    `config_data` TEXT,
-    `create_by`   BIGINT,
-    `create_time` DATETIME,
-    `type_name`   VARCHAR(255),
-    `update_by`   BIGINT,
-    `update_time` DATETIME,
-    PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
 CREATE TABLE `llm_platform`
 (
     `id`             BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
