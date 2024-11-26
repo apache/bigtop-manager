@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one
+  ~ or more contributor license agreements.  See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership.  The ASF licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
+  viewBox="0 0 16 16" fill="none">
+  <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
+    d="M1.93945 2.24243L1.93945 4.66667L4.3637 4.66667">
+  </path>
+  <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
+    d="M1.33337 8.00004C1.33337 11.6819 4.31814 14.6667 8.00004 14.6667C11.6819 14.6667 14.6667 11.6819 14.6667 8.00004C14.6667 4.31814 11.6819 1.33337 8.00004 1.33337C5.53271 1.33337 3.37841 2.67374 2.22563 4.66607">
+  </path>
+  <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
+    d="M8.00162 4L8.00122 8.00293L10.8277 10.8294">
+  </path>
+</svg>

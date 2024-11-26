@@ -21,11 +21,17 @@
   import { ref, toRefs } from 'vue'
   import SelectLang from '@/components/select-lang/index.vue'
   import UserAvatar from '@/components/user-avatar/index.vue'
+  import AiAssistant from '@/components/ai-assistant/index.vue'
+
   import { RouteRecordRaw } from 'vue-router'
 
   interface Props {
     headerSelectedKey: string
     headerMenus: RouteRecordRaw[]
+  }
+
+  interface Emits {
+    (event: 'onHeaderClick', key: string): void
   }
 
   const props = withDefaults(defineProps<Props>(), {
@@ -36,9 +42,16 @@
   const { headerSelectedKey, headerMenus } = toRefs(props)
   const githubUrl = import.meta.env.VITE_GITHUB_URL
   const spaceSize = ref(16)
-  const emits = defineEmits(['onHeaderClick'])
-  const onHeaderClick = ({ key }: any) => {
+  const aiAssistantRef = ref<InstanceType<typeof AiAssistant> | null>(null)
+
+  const emits = defineEmits<Emits>()
+
+  const handleHeaderSelect = ({ key }: any) => {
     emits('onHeaderClick', key)
+  }
+
+  const handleCommunication = () => {
+    aiAssistantRef.value?.openDrawer()
   }
 </script>
 
@@ -52,7 +65,7 @@
         :selected-keys="[headerSelectedKey]"
         theme="dark"
         mode="horizontal"
-        @select="onHeaderClick"
+        @select="handleHeaderSelect"
       >
         <a-menu-item v-for="route of headerMenus" :key="route.path">
           {{ $t(route.meta?.title || '') }}
@@ -62,7 +75,7 @@
     <div class="header-right common-layout">
       <a-space :size="spaceSize">
         <user-avatar />
-        <div class="header-item">
+        <div class="header-item" @click="handleCommunication">
           <svg-icon name="communication" />
         </div>
         <select-lang />
@@ -76,6 +89,7 @@
         </div>
       </a-space>
     </div>
+    <ai-assistant ref="aiAssistantRef" />
   </a-layout-header>
 </template>
 
@@ -86,7 +100,7 @@
   }
   .header {
     @include flexbox($justify: space-between, $align: center);
-    padding-inline: 0 16px;
+    padding-inline: 0 $space-md;
     height: $layout-header-height;
     .header-menu {
       flex: 1;
