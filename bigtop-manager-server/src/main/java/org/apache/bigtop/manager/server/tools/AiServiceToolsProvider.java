@@ -24,24 +24,20 @@ import dev.langchain4j.service.tool.ToolProvider;
 import dev.langchain4j.service.tool.ToolProviderRequest;
 import dev.langchain4j.service.tool.ToolProviderResult;
 
-public class AgentToolsProvider implements ToolProvider {
+public class AiServiceToolsProvider implements ToolProvider {
 
     ChatbotCommand chatbotCommand;
 
-    public AgentToolsProvider(ChatbotCommand chatbotCommand) {
+    public AiServiceToolsProvider(ChatbotCommand chatbotCommand) {
         this.chatbotCommand = chatbotCommand;
     }
 
-    public AgentToolsProvider() {
+    public AiServiceToolsProvider() {
         this.chatbotCommand = null;
     }
 
     @Override
     public ToolProviderResult provideTools(ToolProviderRequest toolProviderRequest) {
-        if (chatbotCommand == null) {
-            ClusterInfoTools clusterInfoTools = new ClusterInfoTools();
-            return ToolProviderResult.builder().addAll(clusterInfoTools.list()).build();
-        }
         if (chatbotCommand.equals(ChatbotCommand.INFO)) {
             ClusterInfoTools clusterInfoTools = new ClusterInfoTools();
             return ToolProviderResult.builder().addAll(clusterInfoTools.list()).build();

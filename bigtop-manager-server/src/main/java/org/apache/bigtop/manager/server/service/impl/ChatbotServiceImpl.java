@@ -46,7 +46,7 @@ import org.apache.bigtop.manager.server.model.dto.ChatThreadDTO;
 import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
 import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
 import org.apache.bigtop.manager.server.service.ChatbotService;
-import org.apache.bigtop.manager.server.tools.AgentToolsProvider;
+import org.apache.bigtop.manager.server.tools.AiServiceToolsProvider;
 
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
@@ -130,7 +130,7 @@ public class ChatbotServiceImpl implements ChatbotService {
                             getPlatformType(platformName),
                             getAIAssistantConfig(model, credentials),
                             threadId,
-                            new AgentToolsProvider(command));
+                            new AiServiceToolsProvider(command));
         }
     }
 
