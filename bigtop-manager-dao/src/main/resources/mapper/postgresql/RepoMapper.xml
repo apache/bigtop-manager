@@ -24,33 +24,6 @@
 <mapper namespace="org.apache.bigtop.manager.dao.repository.RepoDao">
 
     <sql id="baseColumns">
-        id, base_url, os, arch, repo_id, repo_name, repo_type, cluster_id
+        id, name, arch, base_url, type
     </sql>
-
-    <select id="findByRepoName" resultType="org.apache.bigtop.manager.dao.po.RepoPO">
-        select
-        <include refid="baseColumns"/>
-        from
-        repo
-        <where>
-            <if test="repoName!=null">
-                repo_name=#{repoName}
-            </if>
-        </where>
-        limit 1
-    </select>
-
-    <select id="findAllByClusterId" parameterType="java.lang.Long"
-            resultType="org.apache.bigtop.manager.dao.po.RepoPO">
-        select
-        <include refid="baseColumns"/>
-        from
-        repo
-        <where>
-            <if test="clusterId != 0">
-                cluster_id = #{clusterId}
-            </if>
-        </where>
-    </select>
-
 </mapper>

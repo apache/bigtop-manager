@@ -41,6 +41,11 @@ public interface ServiceConfigConverter {
 
     List<ServiceConfigDTO> fromPO2DTO(List<ServiceConfigPO> serviceConfigPOList);
 
+    @Mapping(target = "propertiesJson", source = "properties", qualifiedByName = "obj2Json")
+    ServiceConfigPO fromDTO2PO(ServiceConfigDTO serviceConfigDTO);
+
+    List<ServiceConfigPO> fromDTO2PO(List<ServiceConfigDTO> serviceConfigDTOList);
+
     @Mapping(target = "properties", source = "propertiesJson", qualifiedByName = "json2PropertyVOList")
     ServiceConfigVO fromPO2VO(ServiceConfigPO serviceConfigPO);
 

@@ -105,7 +105,7 @@ public class CacheFileUpdateTask extends AbstractTask {
     }
 
     private void genFullCaches() {
-        ClusterPO clusterPO = clusterDao.findByIdJoin(taskContext.getClusterId());
+        ClusterPO clusterPO = clusterDao.findById(taskContext.getClusterId());
 
         Long clusterId = clusterPO.getId();
 
@@ -115,7 +115,7 @@ public class CacheFileUpdateTask extends AbstractTask {
         List<ServicePO> servicePOList = serviceDao.findByClusterId(clusterId);
         List<ServiceConfigPO> serviceConfigPOList = serviceConfigDao.findByClusterId(clusterPO.getId());
         List<ComponentPO> componentPOList = componentDao.findByQuery(componentQuery);
-        List<RepoPO> repoPOList = repoDao.findAllByClusterId(clusterPO.getId());
+        List<RepoPO> repoPOList = repoDao.findAll();
         Iterable<SettingPO> settings = settingDao.findAll();
         List<HostPO> hostPOList = hostDao.findAllByClusterId(clusterId);
 

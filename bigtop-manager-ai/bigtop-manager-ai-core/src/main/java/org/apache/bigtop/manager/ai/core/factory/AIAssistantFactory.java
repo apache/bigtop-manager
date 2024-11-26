@@ -27,14 +27,16 @@ import dev.langchain4j.service.tool.ToolProvider;
 public interface AIAssistantFactory {
 
     AIAssistant createWithPrompt(
-            PlatformType platformType, AIAssistantConfigProvider assistantConfig, Object id, SystemPrompt systemPrompt);
-
-    AIAssistant create(PlatformType platformType, AIAssistantConfigProvider assistantConfig, Object id);
+            PlatformType platformType,
+            AIAssistantConfigProvider assistantConfig,
+            Object id,
+            ToolProvider toolProvider,
+            SystemPrompt systemPrompt);
 
     default AIAssistant create(PlatformType platformType, AIAssistantConfigProvider assistantConfig) {
-        return create(platformType, assistantConfig, null);
+        return createAiService(platformType, assistantConfig, null, null);
     }
 
-    AIAssistant createWithTools(
+    AIAssistant createAiService(
             PlatformType platformType, AIAssistantConfigProvider assistantConfig, Long id, ToolProvider toolProvider);
 }

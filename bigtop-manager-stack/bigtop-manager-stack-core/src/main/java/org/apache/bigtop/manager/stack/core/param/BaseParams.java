@@ -58,7 +58,7 @@ public abstract class BaseParams implements Params {
         this.commandPayload = commandPayload;
 
         Command command = commandPayload.getCommand();
-        if (command == Command.INSTALL) {
+        if (command == Command.ADD) {
             return;
         }
         // Global Parameters Injection

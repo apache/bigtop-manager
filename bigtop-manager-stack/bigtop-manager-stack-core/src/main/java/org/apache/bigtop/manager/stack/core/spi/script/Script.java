@@ -33,7 +33,7 @@ public interface Script extends PrioritySPI {
      * @param params the parameters required for installation
      * @return a ShellResult object containing the result of the installation process
      */
-    ShellResult install(Params params);
+    ShellResult add(Params params);
 
     /**
      * Configure the component.
@@ -69,6 +69,8 @@ public interface Script extends PrioritySPI {
 
     /**
      * Check the healthy status of the component.
+     * A simple status check which will only check if the process is running
+     * use {@link #check(Params)} to check the real healthy status of the component with smoke tests.
      *
      * @param params the parameters required to check the status
      * @return a ShellResult(0 for healthy, -1 for unhealthy) object containing the result of the status check
@@ -76,8 +78,7 @@ public interface Script extends PrioritySPI {
     ShellResult status(Params params);
 
     /**
-     * Check component.
-     * Usually we will run smoke tests for component to see if it works as expected.
+     * Run smoke tests for component to see if it works as expected.
      *
      * @param params the parameters required to check the component
      * @return a ShellResult object indicating success

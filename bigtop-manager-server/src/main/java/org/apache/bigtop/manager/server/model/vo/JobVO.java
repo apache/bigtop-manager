@@ -20,14 +20,10 @@ package org.apache.bigtop.manager.server.model.vo;
 
 import lombok.Data;
 
-import java.util.List;
-
 @Data
 public class JobVO {
 
     private Long id;
-
-    private List<StageVO> stages;
 
     private String state;
 

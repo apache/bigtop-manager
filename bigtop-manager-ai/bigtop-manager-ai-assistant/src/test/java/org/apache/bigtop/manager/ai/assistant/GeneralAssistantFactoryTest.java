@@ -33,7 +33,6 @@ import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Map;
-import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -68,6 +67,8 @@ class GeneralAssistantFactoryTest {
         when(mockBuilder.id(any())).thenReturn(mockBuilder);
         when(mockBuilder.memoryStore(any())).thenReturn(mockBuilder);
         when(mockBuilder.withConfigProvider(any())).thenReturn(mockBuilder);
+        when(mockBuilder.withToolProvider(any())).thenReturn(mockBuilder);
+        when(mockBuilder.withSystemPrompt(any())).thenReturn(mockBuilder);
         when(mockBuilder.build()).thenReturn(mock(AIAssistant.class));
 
         try (MockedStatic<OpenAIAssistant> openAIAssistantMockedStatic = mockStatic(OpenAIAssistant.class)) {
@@ -76,7 +77,7 @@ class GeneralAssistantFactoryTest {
             PlatformType platformType = PlatformType.OPENAI;
             generalAssistantFactory.create(platformType, assistantConfigProvider);
             generalAssistantFactory = new GeneralAssistantFactory(new ChatMemoryStoreProvider());
-            generalAssistantFactory.create(platformType, assistantConfigProvider, UUID.randomUUID());
+            generalAssistantFactory.create(platformType, assistantConfigProvider);
         }
     }
 }

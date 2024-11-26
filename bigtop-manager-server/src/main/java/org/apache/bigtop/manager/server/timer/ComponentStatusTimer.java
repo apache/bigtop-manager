@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.scheduler;
+package org.apache.bigtop.manager.server.timer;
 
 import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.po.HostPO;
@@ -28,28 +28,22 @@ import org.apache.bigtop.manager.grpc.generated.ComponentStatusServiceGrpc;
 import org.apache.bigtop.manager.server.enums.HealthyStatusEnum;
 import org.apache.bigtop.manager.server.grpc.GrpcClient;
 
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-
 import lombok.extern.slf4j.Slf4j;
 
-import jakarta.annotation.Resource;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
-@Component
-public class ComponentStatusScheduler {
+// @Component
+public class ComponentStatusTimer {
 
-    @Resource
+    //    @Resource
     private ComponentDao componentDao;
 
-    @Resource
+    //    @Resource
     private HostDao hostDao;
 
-    @Async
-    @Scheduled(fixedDelay = 30, timeUnit = TimeUnit.SECONDS)
+    //    @Async
+    //    @Scheduled(fixedDelay = 30, timeUnit = TimeUnit.SECONDS)
     public void execute() {
         List<ComponentPO> componentPOList = componentDao.findAll();
         for (ComponentPO componentPO : componentPOList) {

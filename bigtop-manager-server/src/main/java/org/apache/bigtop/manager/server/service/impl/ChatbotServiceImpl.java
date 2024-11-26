@@ -143,7 +143,7 @@ public class ChatbotServiceImpl implements ChatbotService {
         if (authPlatformPO == null || authPlatformPO.getIsDeleted()) {
             throw new ApiException(ApiExceptionEnum.NO_PLATFORM_IN_USE);
         }
-        AuthPlatformDTO authPlatformDTO = AuthPlatformConverter.INSTANCE.fromPO2DTO(authPlatformPO);
+
         Long userId = SessionUserHolder.getUserId();
         PlatformPO platformPO = platformDao.findById(authPlatformPO.getPlatformId());
 

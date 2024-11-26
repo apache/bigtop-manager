@@ -22,28 +22,20 @@ import org.apache.bigtop.manager.ai.core.AbstractAIAssistant;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 
-import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.internal.ValidationUtils;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.chat.StreamingChatLanguageModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
+import dev.langchain4j.service.AiServices;
 
 public class OpenAIAssistant extends AbstractAIAssistant {
 
     private static final String BASE_URL = "https://api.chatanywhere.tech/v1";
 
-    public OpenAIAssistant(
-            ChatLanguageModel chatLanguageModel,
-            StreamingChatLanguageModel streamingChatLanguageModel,
-            ChatMemory chatMemory) {
-        super(chatLanguageModel, streamingChatLanguageModel, chatMemory);
-    }
-
-    @Override
-    public void setSystemPrompt(String systemPrompt) {
-        chatMemory.add(SystemMessage.systemMessage(systemPrompt));
+    public OpenAIAssistant(ChatMemory chatMemory, AIAssistant.Service aiServices) {
+        super(chatMemory, aiServices);
     }
 
     @Override
@@ -82,7 +74,19 @@ public class OpenAIAssistant extends AbstractAIAssistant {
         }
 
         public AIAssistant build() {
-            return new OpenAIAssistant(getChatLanguageModel(), getStreamingChatLanguageModel(), getChatMemory());
+            AIAssistant.Service aiService = AiServices.builder(AIAssistant.Service.class)
+                    .chatLanguageModel(getChatLanguageModel())
+                    .streamingChatLanguageModel(getStreamingChatLanguageModel())
+                    .chatMemory(getChatMemory())
+                    .toolProvider(toolProvider)
+                    .systemMessageProvider(threadId -> {
+                        if (threadId != null) {
+                            return systemPrompt;
+                        }
+                        return null;
+                    })
+                    .build();
+            return new OpenAIAssistant(getChatMemory(), aiService);
         }
     }
 }

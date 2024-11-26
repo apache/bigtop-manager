@@ -75,6 +75,7 @@ public class CommandServiceImpl implements CommandService {
         // Create job
         JobContext jobContext = new JobContext();
         jobContext.setCommandDTO(commandDTO);
+        jobContext.setRetryFlag(false);
         JobFactory jobFactory = JobFactories.getJobFactory(commandIdentifier);
         Job job = jobFactory.createJob(jobContext);
 

@@ -85,7 +85,7 @@ public class HostServiceImpl implements HostService {
 
     @Override
     public List<HostVO> batchSave(Long clusterId, List<String> hostnames) {
-        List<HostPO> hostnameIn = hostDao.findAllByHostnameIn(hostnames);
+        List<HostPO> hostnameIn = hostDao.findAllByHostnames(hostnames);
         List<HostPO> hostPOList = new ArrayList<>();
 
         Map<String, HostPO> hostInMap =

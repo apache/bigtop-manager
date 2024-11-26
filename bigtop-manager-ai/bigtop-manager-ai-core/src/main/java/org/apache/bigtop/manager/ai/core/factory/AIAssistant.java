@@ -24,6 +24,7 @@ import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.chat.StreamingChatLanguageModel;
+import dev.langchain4j.service.tool.ToolProvider;
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 import reactor.core.publisher.Flux;
 
@@ -57,16 +58,16 @@ public interface AIAssistant {
     PlatformType getPlatform();
 
     /**
-     * This is used to set system prompt
-     * @return
-     */
-    void setSystemPrompt(String systemPrompt);
-
-    /**
      * This is used to test whether the configuration is correct
      * @return
      */
     boolean test();
+
+    interface Service {
+        String chat(String userMessage);
+
+        Flux<String> streamChat(String userMessage);
+    }
 
     interface Builder {
         Builder id(Object id);
@@ -74,6 +75,10 @@ public interface AIAssistant {
         Builder memoryStore(ChatMemoryStore memoryStore);
 
         Builder withConfigProvider(AIAssistantConfigProvider configProvider);
+
+        Builder withToolProvider(ToolProvider toolProvider);
+
+        Builder withSystemPrompt(String systemPrompt);
 
         AIAssistant build();
 
