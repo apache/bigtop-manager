@@ -18,7 +18,6 @@
  */
 package org.apache.bigtop.manager.server.command.stage;
 
-import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.server.command.task.HostCheckTask;
 import org.apache.bigtop.manager.server.command.task.Task;
 import org.apache.bigtop.manager.server.command.task.TaskContext;

@@ -40,16 +40,17 @@ public class ProjectPathUtils {
     }
 
     public static String getServerStackPath() {
-        return getProjectResourcesPath() + File.separator + "stacks";
+        return getProjectResourcesDir() + File.separator + "stacks";
     }
 
     public static String getAgentCachePath() {
         return getProjectStoreDir() + File.separator + "agent-caches";
     }
 
-    private static String getProjectResourcesPath() {
+    private static String getProjectResourcesDir() {
         if (Environments.isDevMode()) {
-            return Objects.requireNonNull(ProjectPathUtils.class.getResource("/")).getPath();
+            return Objects.requireNonNull(ProjectPathUtils.class.getResource("/"))
+                    .getPath();
         } else {
             File file = new File(ProjectPathUtils.class
                     .getProtectionDomain()
