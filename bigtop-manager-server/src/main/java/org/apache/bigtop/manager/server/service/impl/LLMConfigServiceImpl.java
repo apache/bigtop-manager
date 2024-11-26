@@ -20,7 +20,7 @@ package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.ai.assistant.GeneralAssistantFactory;
 import org.apache.bigtop.manager.ai.assistant.provider.AIAssistantConfig;
-import org.apache.bigtop.manager.ai.assistant.store.PersistentChatMemoryStore;
+import org.apache.bigtop.manager.ai.assistant.store.ChatMemoryStoreProvider;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistantFactory;
@@ -76,7 +76,7 @@ public class LLMConfigServiceImpl implements LLMConfigService {
     public AIAssistantFactory getAIAssistantFactory() {
         if (aiAssistantFactory == null) {
             aiAssistantFactory =
-                    new GeneralAssistantFactory(new PersistentChatMemoryStore(chatThreadDao, chatMessageDao));
+                    new GeneralAssistantFactory(new ChatMemoryStoreProvider(chatThreadDao, chatMessageDao));
         }
         return aiAssistantFactory;
     }

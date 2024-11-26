@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.List;
 import java.util.Objects;
 
 @Slf4j
@@ -81,5 +82,14 @@ public class LocSystemPromptProvider implements SystemPromptProvider {
         } else {
             return text;
         }
+    }
+
+    @Override
+    public String getSystemMessages(List<String> systemPrompts) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < systemPrompts.size(); i++) {
+            stringBuilder.append(String.format("prompt%d: %s\n", i + 1, systemPrompts.get(i)));
+        }
+        return stringBuilder.toString();
     }
 }

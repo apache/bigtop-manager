@@ -27,20 +27,22 @@ import org.apache.bigtop.manager.dao.repository.ChatThreadDao;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.ChatMessageType;
-import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
+@Slf4j
 public class PersistentChatMemoryStore implements ChatMemoryStore {
 
-    private final ChatThreadDao chatThreadDao;
-    private final ChatMessageDao chatMessageDao;
-
-    private final List<ChatMessage> systemMessages = new ArrayList<>();
+    private final Map<Object, List<ChatMessage>> messagesByMemoryId = new ConcurrentHashMap<>();
+    protected final ChatThreadDao chatThreadDao;
+    protected final ChatMessageDao chatMessageDao;
 
     public PersistentChatMemoryStore(ChatThreadDao chatThreadDao, ChatMessageDao chatMessageDao) {
         this.chatThreadDao = chatThreadDao;
@@ -63,6 +65,9 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
         if (chatMessage.type().equals(ChatMessageType.AI)) {
             chatMessagePO.setSender(MessageType.AI.getValue());
             AiMessage aiMessage = (AiMessage) chatMessage;
+            if (aiMessage.text() == null) {
+                return null;
+            }
             chatMessagePO.setMessage(aiMessage.text());
         } else if (chatMessage.type().equals(ChatMessageType.USER)) {
             chatMessagePO.setSender(MessageType.USER.getValue());
@@ -79,25 +84,25 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
 
     @Override
     public List<ChatMessage> getMessages(Object threadId) {
+        List<ChatMessage> messages = this.messagesByMemoryId.get(threadId);
         List<ChatMessagePO> chatMessages = chatMessageDao.findAllByThreadId((Long) threadId);
-        List<ChatMessage> allChatMessages = new ArrayList<>(systemMessages);
+        List<ChatMessage> allChatMessages = new ArrayList<>();
         if (!chatMessages.isEmpty()) {
             allChatMessages.addAll(chatMessages.stream()
                     .map(this::convertToChatMessage)
                     .filter(Objects::nonNull)
                     .toList());
         }
+        if (messages != null) {
+            allChatMessages.addAll(messages);
+        }
         return allChatMessages;
     }
 
     @Override
     public void updateMessages(Object threadId, List<ChatMessage> messages) {
+        this.messagesByMemoryId.put(threadId, messages);
         ChatMessage newMessage = messages.get(messages.size() - 1);
-        if (newMessage.type().equals(ChatMessageType.SYSTEM)) {
-            SystemMessage systemMessage = (SystemMessage) newMessage;
-            systemMessages.add(systemMessage);
-            return;
-        }
         ChatMessagePO chatMessagePO = convertToChatMessagePO(newMessage, (Long) threadId);
         if (chatMessagePO == null) {
             return;
@@ -110,9 +115,5 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
         List<ChatMessagePO> chatMessagePOS = chatMessageDao.findAllByThreadId((Long) threadId);
         chatMessagePOS.forEach(chatMessage -> chatMessage.setIsDeleted(true));
         chatMessageDao.partialUpdateByIds(chatMessagePOS);
-    }
-
-    public PersistentChatMemoryStore clone() {
-        return new PersistentChatMemoryStore(chatThreadDao, chatMessageDao);
     }
 }

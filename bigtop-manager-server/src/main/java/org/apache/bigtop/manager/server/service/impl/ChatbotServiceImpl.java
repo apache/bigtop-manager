@@ -20,7 +20,7 @@ package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.ai.assistant.GeneralAssistantFactory;
 import org.apache.bigtop.manager.ai.assistant.provider.AIAssistantConfig;
-import org.apache.bigtop.manager.ai.assistant.store.PersistentChatMemoryStore;
+import org.apache.bigtop.manager.ai.assistant.store.ChatMemoryStoreProvider;
 import org.apache.bigtop.manager.ai.core.enums.MessageType;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
@@ -89,7 +89,7 @@ public class ChatbotServiceImpl implements ChatbotService {
     public AIAssistantFactory getAIAssistantFactory() {
         if (aiAssistantFactory == null) {
             aiAssistantFactory =
-                    new GeneralAssistantFactory(new PersistentChatMemoryStore(chatThreadDao, chatMessageDao));
+                    new GeneralAssistantFactory(new ChatMemoryStoreProvider(chatThreadDao, chatMessageDao));
         }
         return aiAssistantFactory;
     }
@@ -119,7 +119,8 @@ public class ChatbotServiceImpl implements ChatbotService {
     private AIAssistant buildAIAssistant(
             String platformName, String model, Map<String, String> credentials, Long threadId) {
         return getAIAssistantFactory()
-                .create(getPlatformType(platformName), getAIAssistantConfig(model, credentials), threadId);
+                .createAiService(
+                        getPlatformType(platformName), getAIAssistantConfig(model, credentials), threadId, null);
     }
 
     @Override
@@ -128,7 +129,7 @@ public class ChatbotServiceImpl implements ChatbotService {
         if (authPlatformPO == null || authPlatformPO.getIsDeleted()) {
             throw new ApiException(ApiExceptionEnum.NO_PLATFORM_IN_USE);
         }
-        AuthPlatformDTO authPlatformDTO = AuthPlatformConverter.INSTANCE.fromPO2DTO(authPlatformPO);
+
         Long userId = SessionUserHolder.getUserId();
         PlatformPO platformPO = platformDao.findById(authPlatformPO.getPlatformId());
 
@@ -177,8 +178,7 @@ public class ChatbotServiceImpl implements ChatbotService {
         return chatThreads;
     }
 
-    @Override
-    public SseEmitter talk(Long threadId, String message) {
+    private AIAssistant prepareTalk(Long threadId) {
         ChatThreadPO chatThreadPO = chatThreadDao.findById(threadId);
         Long userId = SessionUserHolder.getUserId();
         if (!Objects.equals(userId, chatThreadPO.getUserId()) || chatThreadPO.getIsDeleted()) {
@@ -191,19 +191,16 @@ public class ChatbotServiceImpl implements ChatbotService {
             throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_IN_USE);
         }
 
-        if (chatThreadPO.getName() == null) {
-            chatThreadPO.setName(getNameFromMessage(message));
-            chatThreadDao.partialUpdateById(chatThreadPO);
-        }
-
         AuthPlatformDTO authPlatformDTO = AuthPlatformConverter.INSTANCE.fromPO2DTO(authPlatformPO);
-        ChatThreadDTO chatThreadDTO = ChatThreadConverter.INSTANCE.fromPO2DTO(chatThreadPO);
+
         PlatformPO platformPO = platformDao.findById(authPlatformPO.getPlatformId());
-        AIAssistant aiAssistant = buildAIAssistant(
-                platformPO.getName(),
-                authPlatformDTO.getModel(),
-                authPlatformDTO.getAuthCredentials(),
-                chatThreadPO.getId());
+        return buildAIAssistant(
+                platformPO.getName(), authPlatformDTO.getModel(), authPlatformDTO.getAuthCredentials(), threadId);
+    }
+
+    @Override
+    public SseEmitter talk(Long threadId, String message) {
+        AIAssistant aiAssistant = prepareTalk(threadId);
         Flux<String> stringFlux = aiAssistant.streamAsk(message);
 
         SseEmitter emitter = new SseEmitter();
