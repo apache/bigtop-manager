@@ -93,11 +93,9 @@ public class ChatbotController {
         if (command != null) {
             messageReq.setMessage(
                     messageReq.getMessage().substring(command.getCmd().length() + 2));
+            return chatbotService.talk(threadId, command, messageReq.getMessage());
         }
-        if (command != null) {
-            return chatbotService.talkWithTools(threadId, command, messageReq.getMessage());
-        }
-        return chatbotService.talk(threadId, messageReq.getMessage());
+        return chatbotService.talk(threadId, null, messageReq.getMessage());
     }
 
     @Operation(summary = "history", description = "Get chat records")

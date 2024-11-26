@@ -35,9 +35,7 @@ public interface ChatbotService {
 
     List<ChatThreadVO> getAllChatThreads();
 
-    SseEmitter talk(Long threadId, String message);
-
-    SseEmitter talkWithTools(Long threadId, ChatbotCommand command, String message);
+    SseEmitter talk(Long threadId, ChatbotCommand command, String message);
 
     List<ChatMessageVO> history(Long threadId);
 

@@ -121,15 +121,12 @@ public class ChatbotServiceImpl implements ChatbotService {
     private AIAssistant buildAIAssistant(
             String platformName, String model, Map<String, String> credentials, Long threadId, ChatbotCommand command) {
         if (command == null) {
-            //            return getAIAssistantFactory()
-            //                    .create(getPlatformType(platformName), getAIAssistantConfig(model, credentials),
-            // threadId);
             return getAIAssistantFactory()
-                    .createWithTools(
+                    .createAiService(
                             getPlatformType(platformName), getAIAssistantConfig(model, credentials), threadId, null);
         } else {
             return getAIAssistantFactory()
-                    .createWithTools(
+                    .createAiService(
                             getPlatformType(platformName),
                             getAIAssistantConfig(model, credentials),
                             threadId,
@@ -217,30 +214,14 @@ public class ChatbotServiceImpl implements ChatbotService {
     }
 
     @Override
-    public SseEmitter talk(Long threadId, String message) {
-        AIAssistant aiAssistant = prepareTalk(threadId, null, message);
-        Flux<String> stringFlux = aiAssistant.streamAsk(message);
-
-        SseEmitter emitter = new SseEmitter();
-        stringFlux.subscribe(
-                s -> {
-                    try {
-                        emitter.send(s);
-                    } catch (Exception e) {
-                        emitter.completeWithError(e);
-                    }
-                },
-                Throwable::printStackTrace,
-                emitter::complete);
-
-        emitter.onTimeout(emitter::complete);
-        return emitter;
-    }
-
-    @Override
-    public SseEmitter talkWithTools(Long threadId, ChatbotCommand command, String message) {
+    public SseEmitter talk(Long threadId, ChatbotCommand command, String message) {
         AIAssistant aiAssistant = prepareTalk(threadId, command, message);
-        Flux<String> stringFlux = aiAssistant.streamAsk(message);
+        Flux<String> stringFlux;
+        if (command == null) {
+            stringFlux = aiAssistant.streamAsk(message);
+        } else {
+            stringFlux = Flux.just(aiAssistant.ask(message));
+        }
         SseEmitter emitter = new SseEmitter();
         stringFlux.subscribe(
                 s -> {
