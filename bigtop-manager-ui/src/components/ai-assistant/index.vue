@@ -17,13 +17,22 @@
   ~ under the License.
   -->
 <script setup lang="ts">
-  import { ref } from 'vue'
+  import { ref, shallowReactive } from 'vue'
   import EmptyContent from './empty-content.vue'
   import ChatInput from './chat-input.vue'
 
   const open = ref(false)
   const title = ref('AI 助理')
   const actions = ref(['plus_gray', 'history', 'full_screen', 'close'])
+  const drawerStyleConfig = shallowReactive({
+    contentWrapperStyle: {
+      top: '64px'
+    },
+    footerStyle: {
+      border: 'none',
+      paddingBottom: '26px'
+    }
+  })
 
   const afterOpenChange = (bool: boolean) => {
     console.log('open', bool)
@@ -50,7 +59,7 @@
     :mask="false"
     :width="450"
     placement="right"
-    :content-wrapper-style="{ top: '64px' }"
+    v-bind="drawerStyleConfig"
     @after-open-change="afterOpenChange"
   >
     <template #extra>
@@ -67,9 +76,12 @@
       </a-space>
     </template>
     <div class="ai-assistant">
-      <empty-content />
-      <chat-input />
+      <empty-content v-if="false" />
+      <div v-for="idx in 100" :key="idx">{{ idx }}</div>
     </div>
+    <template #footer>
+      <chat-input />
+    </template>
   </a-drawer>
 </template>
 

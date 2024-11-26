@@ -22,6 +22,7 @@ import App from './App.vue'
 import plugins from '@/plugins'
 import 'ant-design-vue/dist/reset.css'
 import 'virtual:svg-icons-register'
+import '@/styles/scrollbar.scss'
 
 const app = createApp(App)
 app.use(plugins, { antdMessageMaxCount: 1 })
