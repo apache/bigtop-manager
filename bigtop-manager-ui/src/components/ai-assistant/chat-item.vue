@@ -16,33 +16,52 @@
   ~ specific language governing permissions and limitations
   ~ under the License.
   -->
+<script setup lang="ts">
+  interface Props {
+    sender?: string
+    message?: string
+  }
 
-<script setup lang="ts"></script>
+  defineProps<Props>()
+</script>
+
 <template>
-  <div class="chat-input">
-    <a-textarea
-      :bordered="false"
-      :autosize="{ minRows: 1, maxRows: 6 }"
-      placeholder="请输入你的问题"
-    />
-    <a-button type="text" shape="circle">
-      <template #icon>
-        <svg-icon name="send" />
-      </template>
-    </a-button>
+  <div class="chat-item">
+    <div class="chat-item-avatar">
+      <svg-icon name="chat_avatar" />
+    </div>
+    <div class="chat-item-message">
+      <p>
+        {{ $props.message }}
+      </p>
+    </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
-  .chat-input {
-    margin: 0 auto;
-    width: 100%;
-    max-width: 800px;
+  .chat-item {
+    gap: $space-md;
     display: flex;
-    border: 1px solid $color-fill;
-    border-radius: $space-sm;
-    min-height: 40px;
-    align-items: center;
-    padding-inline-end: 10px;
+    &-avatar {
+      width: 32px;
+      height: 32px;
+      flex-shrink: 0;
+      border: 1px solid #e5e5e5;
+      border-radius: 50%;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    &-message {
+      flex: 1;
+      border-radius: 4px;
+      background-color: #f7f9fc;
+      p {
+        margin: 0;
+        line-height: 22px;
+        padding: 9px $space-md;
+      }
+    }
   }
 </style>

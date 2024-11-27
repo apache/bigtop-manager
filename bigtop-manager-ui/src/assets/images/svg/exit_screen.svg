@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~ Licensed to the Apache Software Foundation (ASF) under one
   ~ or more contributor license agreements.  See the NOTICE file
@@ -15,34 +16,19 @@
   ~ KIND, either express or implied.  See the License for the
   ~ specific language governing permissions and limitations
   ~ under the License.
-  -->
-
-<script setup lang="ts"></script>
-<template>
-  <div class="chat-input">
-    <a-textarea
-      :bordered="false"
-      :autosize="{ minRows: 1, maxRows: 6 }"
-      placeholder="请输入你的问题"
-    />
-    <a-button type="text" shape="circle">
-      <template #icon>
-        <svg-icon name="send" />
-      </template>
-    </a-button>
-  </div>
-</template>
-
-<style lang="scss" scoped>
-  .chat-input {
-    margin: 0 auto;
-    width: 100%;
-    max-width: 800px;
-    display: flex;
-    border: 1px solid $color-fill;
-    border-radius: $space-sm;
-    min-height: 40px;
-    align-items: center;
-    padding-inline-end: 10px;
-  }
-</style>
+-->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
+  viewBox="0 0 16 16" fill="none">
+  <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
+    d="M11 2L11 5L14 5">
+  </path>
+  <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
+    d="M5 2L5 5L2 5">
+  </path>
+  <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
+    d="M5 14L5 11L2 11">
+  </path>
+  <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
+    d="M11 14L11 11L13.9665 11">
+  </path>
+</svg>
