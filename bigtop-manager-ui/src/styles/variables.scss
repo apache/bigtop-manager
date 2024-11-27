@@ -23,14 +23,21 @@ $space-lg: 24px;
 $space-md: 16px;
 $space-sm: 8px;
 
+// radius
+$border-radius-sm: 8px;
+
+// border
+$color-border: #E5E5E5;
+
 $layout-header-height: 64px;
 $layout-sider-width: 200px;
-$layout-sider-bg-color: #fff;
+$layout-sider-bg-color: $color-bg-base;
 
-@mixin flexbox($direction: null, $wrap: null, $justify: null, $align: null) {
+@mixin flexbox($direction: null, $wrap: null, $justify: null, $align: null, $gap:null) {
   display: flex;
   flex-direction: $direction;
   flex-wrap: $wrap;
   justify-content: $justify;
   align-items: $align;
+  gap: $gap;
 }

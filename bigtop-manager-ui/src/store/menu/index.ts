@@ -22,20 +22,10 @@ import { useRoute, useRouter } from 'vue-router'
 import { dynamicRoutes as dr } from '@/router/routes/index'
 import { defineStore, storeToRefs } from 'pinia'
 import { useClusterStore } from '@/store/cluster/index'
-import lodash from 'lodash'
-
-export const SPECIAL_ROUTE_NAME = 'Clusters'
-export const SPECIAL_ROUTE_PATH = '/cluster-mange/clusters'
-
-export interface MenuItem {
-  icon: string
-  key: string
-  label: string
-  title: string
-  name?: string
-  activeMenu?: string
-  children?: MenuItem[]
-}
+import { RouteExceptions } from '@/enums'
+import { findActivePath } from './helper'
+import type { MenuItem } from './types'
+import cloneDeep from 'lodash/cloneDeep'
 
 export const useMenuStore = defineStore(
   'menu',
@@ -51,41 +41,57 @@ export const useMenuStore = defineStore(
 
     const hasCluster = computed(() => clusters.value.length > 0)
     const isClusterCreateVisible = computed(() =>
-      SPECIAL_ROUTE_PATH.includes(route.matched[0].path)
+      RouteExceptions.SPECIAL_ROUTE_PATH.includes(route.matched[0].path)
     )
+    const isDynamicRouteMatched = computed(() => {
+      const path = route.matched.at(-1)?.path
+      return path?.includes(RouteExceptions.DYNAMIC_ROUTE_MATCH)
+    })
     const siderMenus = computed((): MenuItem[] => {
-      const siderMenuTemplate = baseRoutesMap.value.get(headerSelectedKey.value)
-      const formatSider = lodash.cloneDeep([...(siderMenuTemplate || [])])
-      if (formatSider) {
-        return hasCluster.value
-          ? addSiderItemByClusters(formatSider as MenuItem[])
-          : formatSider
+      const siderMenuTemplate =
+        baseRoutesMap.value.get(headerSelectedKey.value) || []
+      const formatSider = cloneDeep(siderMenuTemplate)
+      if (hasCluster.value) {
+        updateSiderItemByClusters(formatSider as MenuItem[])
       }
-      return []
+      return formatSider
     })
 
     const siderMenuSelectedKey = ref(findActivePath(siderMenus.value[0]))
 
+    const redirectRouterToDefault = () => {
+      siderMenuSelectedKey.value = ''
+      router.replace({ name: RouteExceptions.DEFAULT_ROUTE_NAME })
+    }
+
     watchEffect(() => {
       // resolve highlight menu
       const activeMenu = route.meta.activeMenu || route.path
+      const matchedNames = [
+        RouteExceptions.SPECIAL_ROUTE_NAME,
+        RouteExceptions.DEFAULT_ROUTE_NAME
+      ] as string[]
       headerSelectedKey.value = route.matched[0].path
-      if (route.name == SPECIAL_ROUTE_NAME) {
-        if (hasCluster.value) {
+
+      if (matchedNames.includes(route.name as string)) {
+        if (hasCluster.value && isDynamicRouteMatched.value) {
           siderMenuSelectedKey.value = findActivePath(siderMenus.value[0])
-          siderMenuSelectedKey.value && router.push(siderMenuSelectedKey.value)
         } else {
-          siderMenuSelectedKey.value = ''
-          router.replace({ name: 'Default' })
+          siderMenuSelectedKey.value = activeMenu
+          redirectRouterToDefault()
         }
       } else {
+        if (!activeMenu || (isDynamicRouteMatched.value && !hasCluster.value)) {
+          redirectRouterToDefault()
+          return
+        }
         siderMenuSelectedKey.value = activeMenu
       }
     })
 
-    function addSiderItemByClusters(formatSider: MenuItem[]) {
-      return formatSider.map((item) => {
-        if (item.name == SPECIAL_ROUTE_NAME) {
+    const updateSiderItemByClusters = (formatSider: MenuItem[]) => {
+      formatSider.forEach((item) => {
+        if (item.name == RouteExceptions.SPECIAL_ROUTE_NAME) {
           item.children = clusters.value.map((v) => {
             return {
               icon: '',
@@ -96,11 +102,10 @@ export const useMenuStore = defineStore(
             }
           })
         }
-        return item
       })
     }
 
-    function formatRouteToMenu(tree: any[], upPath = ''): MenuItem[] {
+    const formatRouteToMenu = (tree: any[], upPath = ''): MenuItem[] => {
       return tree
         .filter(({ meta }) => !meta?.hidden)
         .map(({ path, name, meta, children }) => {
@@ -119,7 +124,7 @@ export const useMenuStore = defineStore(
         })
     }
 
-    function setBaseRoutesMap() {
+    const setBaseRoutesMap = () => {
       dr.forEach((route) => {
         if (!route.meta?.hidden) {
           const exist = baseRoutesMap.value.get(route.path) || []
@@ -131,33 +136,39 @@ export const useMenuStore = defineStore(
       })
     }
 
-    function findActivePath(menu: MenuItem): string {
-      return menu?.children && menu?.children.length > 0
-        ? findActivePath(menu.children[0])
-        : menu?.key
-    }
-
-    function onHeaderClick(key: string) {
+    const onHeaderClick = (key: string) => {
       headerSelectedKey.value = key
-      if (!hasCluster.value && route.name == SPECIAL_ROUTE_NAME) {
+      if (
+        !hasCluster.value &&
+        route.name == RouteExceptions.SPECIAL_ROUTE_NAME
+      ) {
         return
       }
       siderMenuSelectedKey.value = findActivePath(siderMenus.value[0])
-      router.push(siderMenuSelectedKey.value)
+      siderMenuSelectedKey.value && router.push(siderMenuSelectedKey.value)
     }
 
-    function onSiderClick(key: string) {
+    const onSiderClick = (key: string) => {
       siderMenuSelectedKey.value = key
       router.push(key)
     }
 
-    async function updateSiderMenu(isDelete = false) {
+    const updateSiderMenu = async (isDelete = false) => {
       isDelete
         ? await clusterStore.delCluster()
         : await clusterStore.addCluster()
       siderMenuSelectedKey.value =
-        siderMenus.value[0].children?.at(-1)?.key || SPECIAL_ROUTE_PATH
+        siderMenus.value[0].children?.at(-1)?.key ||
+        RouteExceptions.SPECIAL_ROUTE_PATH
       router.push(siderMenuSelectedKey.value)
+    }
+
+    const setUpMenu = () => {
+      setBaseRoutesMap()
+    }
+
+    const cleanUpMenu = () => {
+      baseRoutesMap.value.clear()
     }
 
     return {
@@ -165,11 +176,14 @@ export const useMenuStore = defineStore(
       siderMenus,
       headerSelectedKey,
       siderMenuSelectedKey,
+      isClusterCreateVisible,
+      isDynamicRouteMatched,
+      setUpMenu,
+      cleanUpMenu,
       setBaseRoutesMap,
       onHeaderClick,
       onSiderClick,
-      updateSiderMenu,
-      isClusterCreateVisible
+      updateSiderMenu
     }
   },
   {

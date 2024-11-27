@@ -22,15 +22,16 @@ import org.apache.bigtop.manager.common.constants.ComponentCategories;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
-import org.apache.bigtop.manager.dao.po.HostComponentPO;
-import org.apache.bigtop.manager.dao.po.HostPO;
+import org.apache.bigtop.manager.dao.query.ComponentQuery;
 import org.apache.bigtop.manager.dao.repository.ComponentDao;
-import org.apache.bigtop.manager.dao.repository.HostComponentDao;
 import org.apache.bigtop.manager.dao.repository.HostDao;
+import org.apache.bigtop.manager.dao.repository.ServiceConfigDao;
+import org.apache.bigtop.manager.dao.repository.ServiceConfigSnapshotDao;
+import org.apache.bigtop.manager.dao.repository.ServiceDao;
 import org.apache.bigtop.manager.server.command.stage.CacheFileUpdateStage;
+import org.apache.bigtop.manager.server.command.stage.ComponentAddStage;
 import org.apache.bigtop.manager.server.command.stage.ComponentCheckStage;
 import org.apache.bigtop.manager.server.command.stage.ComponentConfigureStage;
-import org.apache.bigtop.manager.server.command.stage.ComponentInstallStage;
 import org.apache.bigtop.manager.server.command.stage.ComponentStartStage;
 import org.apache.bigtop.manager.server.command.stage.ComponentStopStage;
 import org.apache.bigtop.manager.server.command.stage.StageContext;
@@ -39,11 +40,7 @@ import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
 import org.apache.bigtop.manager.server.model.dto.ComponentHostDTO;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
-import org.apache.bigtop.manager.server.model.dto.StackDTO;
 import org.apache.bigtop.manager.server.model.dto.command.ServiceCommandDTO;
-import org.apache.bigtop.manager.server.stack.dag.ComponentCommandWrapper;
-import org.apache.bigtop.manager.server.stack.dag.DAG;
-import org.apache.bigtop.manager.server.stack.dag.DagGraphEdge;
 import org.apache.bigtop.manager.server.utils.StackUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -53,14 +50,11 @@ import java.util.List;
 
 public abstract class AbstractServiceJob extends AbstractJob {
 
+    protected ServiceDao serviceDao;
+    protected ServiceConfigDao serviceConfigDao;
+    protected ServiceConfigSnapshotDao serviceConfigSnapshotDao;
     protected ComponentDao componentDao;
-    protected HostComponentDao hostComponentDao;
     protected HostDao hostDao;
-
-    // TODO: temp code
-    protected String stackName = "bigtop";
-    protected String stackVersion = "3.3.0";
-    protected DAG<String, ComponentCommandWrapper, DagGraphEdge> dag = StackUtils.DAG;
 
     public AbstractServiceJob(JobContext jobContext) {
         super(jobContext);
@@ -70,8 +64,10 @@ public abstract class AbstractServiceJob extends AbstractJob {
     protected void injectBeans() {
         super.injectBeans();
 
+        this.serviceDao = SpringContextHolder.getBean(ServiceDao.class);
+        this.serviceConfigDao = SpringContextHolder.getBean(ServiceConfigDao.class);
+        this.serviceConfigSnapshotDao = SpringContextHolder.getBean(ServiceConfigSnapshotDao.class);
         this.componentDao = SpringContextHolder.getBean(ComponentDao.class);
-        this.hostComponentDao = SpringContextHolder.getBean(HostComponentDao.class);
         this.hostDao = SpringContextHolder.getBean(HostDao.class);
     }
 
@@ -80,24 +76,23 @@ public abstract class AbstractServiceJob extends AbstractJob {
         super.beforeCreateStages();
     }
 
-    protected StageContext createStageContext(String serviceName, String componentName, List<String> hostnames) {
+    protected StageContext createStageContext(String serviceName, String componentName, List<Long> hostIds) {
         StageContext stageContext = StageContext.fromCommandDTO(jobContext.getCommandDTO());
 
         ServiceDTO serviceDTO = StackUtils.getServiceDTO(serviceName);
         ComponentDTO componentDTO = StackUtils.getComponentDTO(componentName);
 
+        stageContext.setHostIds(hostIds);
         stageContext.setServiceDTO(serviceDTO);
         stageContext.setComponentDTO(componentDTO);
-        stageContext.setStackName(stackName);
-        stageContext.setStackVersion(stackVersion);
-        stageContext.setHostnames(hostnames);
 
         return stageContext;
     }
 
     protected List<String> getTodoListForCommand(Command command) {
         try {
-            List<String> orderedList = dag.getAllNodesList().isEmpty() ? new ArrayList<>() : dag.topologicalSort();
+            List<String> orderedList =
+                    StackUtils.DAG.getAllNodesList().isEmpty() ? new ArrayList<>() : StackUtils.DAG.topologicalSort();
             List<String> componentNames = getComponentNames();
             List<String> componentCommandNames = new ArrayList<>(componentNames.stream()
                     .map(x -> x + "-" + command.name().toUpperCase())
@@ -115,22 +110,17 @@ public abstract class AbstractServiceJob extends AbstractJob {
 
     protected List<String> getComponentNames() {
         List<String> serviceNames = getServiceNames();
-        List<ComponentPO> componentPOList =
-                componentDao.findAllByClusterIdAndServiceServiceNameIn(clusterPO.getId(), serviceNames);
+        ComponentQuery componentQuery = ComponentQuery.builder()
+                .clusterId(clusterPO.getId())
+                .serviceNames(serviceNames)
+                .build();
+        List<ComponentPO> componentPOList = componentDao.findByQuery(componentQuery);
 
-        return componentPOList.stream().map(ComponentPO::getComponentName).toList();
+        return componentPOList.stream().map(ComponentPO::getName).distinct().toList();
     }
 
     protected String findServiceNameByComponentName(String componentName) {
-        for (ServiceDTO serviceDTO : StackUtils.getServiceDTOList(new StackDTO(stackName, stackVersion))) {
-            for (ComponentDTO componentDTO : serviceDTO.getComponents()) {
-                if (componentDTO.getComponentName().equals(componentName)) {
-                    return serviceDTO.getServiceName();
-                }
-            }
-        }
-
-        return null;
+        return StackUtils.getServiceDTOByComponentName(componentName).getName();
     }
 
     protected Boolean isMasterComponent(String componentName) {
@@ -148,56 +138,49 @@ public abstract class AbstractServiceJob extends AbstractJob {
         return componentDTO.getCategory().equalsIgnoreCase(ComponentCategories.CLIENT);
     }
 
-    protected List<String> findHostnamesByComponentName(String componentName) {
-        List<HostComponentPO> hostComponentPOList =
-                hostComponentDao.findAllByClusterIdAndComponentName(clusterPO.getId(), componentName);
-        if (hostComponentPOList == null) {
+    protected List<Long> findHostIdsByComponentName(String componentName) {
+        ComponentQuery componentQuery = ComponentQuery.builder()
+                .clusterId(clusterPO.getId())
+                .name(componentName)
+                .build();
+        List<ComponentPO> componentPOList = componentDao.findByQuery(componentQuery);
+        if (componentPOList == null) {
             return new ArrayList<>();
         } else {
-
-            List<HostPO> hostPOList = hostDao.findByIds(
-                    hostComponentPOList.stream().map(HostComponentPO::getHostId).toList());
-
-            return hostPOList.stream().map(HostPO::getHostname).toList();
+            return componentPOList.stream().map(ComponentPO::getHostId).toList();
         }
     }
 
     protected void createCacheStage() {
         StageContext stageContext = StageContext.fromPayload(JsonUtils.writeAsString(jobContext.getCommandDTO()));
-        stageContext.setStackName(stackName);
-        stageContext.setStackVersion(stackVersion);
         stages.add(new CacheFileUpdateStage(stageContext));
     }
 
-    protected void createInstallStages() {
-        List<String> todoList = getTodoListForCommand(Command.INSTALL);
+    protected void createAddStages() {
+        List<String> todoList = getTodoListForCommand(Command.ADD);
 
         for (String componentCommand : todoList) {
             String[] split = componentCommand.split("-");
             String componentName = split[0];
             String serviceName = findServiceNameByComponentName(componentName);
-            List<String> hostnames = findHostnamesByComponentName(componentName);
-            if (CollectionUtils.isEmpty(hostnames)) {
+            List<Long> hostIds = findHostIdsByComponentName(componentName);
+            if (CollectionUtils.isEmpty(hostIds)) {
                 continue;
             }
 
-            StageContext stageContext = createStageContext(serviceName, componentName, hostnames);
-            stages.add(new ComponentInstallStage(stageContext));
+            StageContext stageContext = createStageContext(serviceName, componentName, hostIds);
+            stages.add(new ComponentAddStage(stageContext));
         }
     }
 
     protected void createConfigureStages() {
         for (ServiceCommandDTO serviceCommand : jobContext.getCommandDTO().getServiceCommands()) {
-            if (serviceCommand.getInstalled()) {
-                continue;
-            }
-
             for (ComponentHostDTO componentHost : serviceCommand.getComponentHosts()) {
                 String serviceName = serviceCommand.getServiceName();
                 String componentName = componentHost.getComponentName();
-                List<String> hostnames = componentHost.getHostnames();
+                List<Long> hostIds = componentHost.getHostIds();
 
-                StageContext stageContext = createStageContext(serviceName, componentName, hostnames);
+                StageContext stageContext = createStageContext(serviceName, componentName, hostIds);
                 stages.add(new ComponentConfigureStage(stageContext));
             }
         }
@@ -215,12 +198,12 @@ public abstract class AbstractServiceJob extends AbstractJob {
                 continue;
             }
 
-            List<String> hostnames = findHostnamesByComponentName(componentName);
-            if (CollectionUtils.isEmpty(hostnames)) {
+            List<Long> hostIds = findHostIdsByComponentName(componentName);
+            if (CollectionUtils.isEmpty(hostIds)) {
                 continue;
             }
 
-            StageContext stageContext = createStageContext(serviceName, componentName, hostnames);
+            StageContext stageContext = createStageContext(serviceName, componentName, hostIds);
             stages.add(new ComponentStartStage(stageContext));
         }
     }
@@ -237,12 +220,12 @@ public abstract class AbstractServiceJob extends AbstractJob {
                 continue;
             }
 
-            List<String> hostnames = findHostnamesByComponentName(componentName);
-            if (CollectionUtils.isEmpty(hostnames)) {
+            List<Long> hostIds = findHostIdsByComponentName(componentName);
+            if (CollectionUtils.isEmpty(hostIds)) {
                 continue;
             }
 
-            StageContext stageContext = createStageContext(serviceName, componentName, hostnames);
+            StageContext stageContext = createStageContext(serviceName, componentName, hostIds);
             stages.add(new ComponentStopStage(stageContext));
         }
     }
@@ -259,12 +242,12 @@ public abstract class AbstractServiceJob extends AbstractJob {
                 continue;
             }
 
-            List<String> hostnames = findHostnamesByComponentName(componentName);
-            if (CollectionUtils.isEmpty(hostnames)) {
+            List<Long> hostIds = findHostIdsByComponentName(componentName);
+            if (CollectionUtils.isEmpty(hostIds)) {
                 continue;
             }
 
-            StageContext stageContext = createStageContext(serviceName, componentName, List.of(hostnames.get(0)));
+            StageContext stageContext = createStageContext(serviceName, componentName, List.of(hostIds.get(0)));
             stages.add(new ComponentCheckStage(stageContext));
         }
     }

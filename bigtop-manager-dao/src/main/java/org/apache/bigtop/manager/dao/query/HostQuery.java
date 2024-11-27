@@ -18,16 +18,22 @@
  */
 package org.apache.bigtop.manager.dao.query;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class HostQuery {
 
-    private String hostnameLike;
+    private String hostname;
 
     private Long clusterId;
 
-    private String ipv4Like;
+    private String ipv4;
 
     private Integer status;
 }

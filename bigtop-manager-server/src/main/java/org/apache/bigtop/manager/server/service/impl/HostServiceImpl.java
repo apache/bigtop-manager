@@ -21,7 +21,7 @@ package org.apache.bigtop.manager.server.service.impl;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.query.HostQuery;
-import org.apache.bigtop.manager.dao.repository.HostComponentDao;
+import org.apache.bigtop.manager.dao.repository.ComponentDao;
 import org.apache.bigtop.manager.dao.repository.HostDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.enums.HealthyStatusEnum;
@@ -35,8 +35,6 @@ import org.apache.bigtop.manager.server.model.vo.PageVO;
 import org.apache.bigtop.manager.server.service.HostService;
 import org.apache.bigtop.manager.server.utils.PageUtils;
 import org.apache.bigtop.manager.server.utils.RemoteSSHUtils;
-
-import org.apache.commons.collections4.CollectionUtils;
 
 import org.springframework.stereotype.Service;
 
@@ -59,7 +57,7 @@ public class HostServiceImpl implements HostService {
     private HostDao hostDao;
 
     @Resource
-    private HostComponentDao hostComponentDao;
+    private ComponentDao componentDao;
 
     @Override
     public PageVO<HostVO> list(HostQuery hostQuery) {
@@ -67,10 +65,6 @@ public class HostServiceImpl implements HostService {
         try (Page<?> ignored =
                 PageHelper.startPage(pageQuery.getPageNum(), pageQuery.getPageSize(), pageQuery.getOrderBy())) {
             List<HostPO> hostPOList = hostDao.findByQuery(hostQuery);
-            if (CollectionUtils.isEmpty(hostPOList)) {
-                throw new ApiException(ApiExceptionEnum.HOST_NOT_FOUND);
-            }
-
             PageInfo<HostPO> pageInfo = new PageInfo<>(hostPOList);
             return PageVO.of(pageInfo);
         } finally {
@@ -80,7 +74,7 @@ public class HostServiceImpl implements HostService {
 
     @Override
     public List<HostVO> add(HostDTO hostDTO) {
-        List<HostPO> hostPOList = HostConverter.INSTANCE.fromDTO2POList(hostDTO);
+        List<HostPO> hostPOList = HostConverter.INSTANCE.fromDTO2POListUsingHostnames(hostDTO);
         for (HostPO hostPO : hostPOList) {
             hostPO.setStatus(HealthyStatusEnum.UNKNOWN.getCode());
         }
@@ -91,7 +85,7 @@ public class HostServiceImpl implements HostService {
 
     @Override
     public List<HostVO> batchSave(Long clusterId, List<String> hostnames) {
-        List<HostPO> hostnameIn = hostDao.findAllByHostnameIn(hostnames);
+        List<HostPO> hostnameIn = hostDao.findAllByHostnames(hostnames);
         List<HostPO> hostPOList = new ArrayList<>();
 
         Map<String, HostPO> hostInMap =
@@ -127,7 +121,7 @@ public class HostServiceImpl implements HostService {
 
     @Override
     public HostVO update(Long id, HostDTO hostDTO) {
-        HostPO hostPO = HostConverter.INSTANCE.fromDTO2POWithoutHostname(hostDTO);
+        HostPO hostPO = HostConverter.INSTANCE.fromDTO2PO(hostDTO);
         hostPO.setId(id);
         hostDao.partialUpdateById(hostPO);
         return get(id);
@@ -135,7 +129,7 @@ public class HostServiceImpl implements HostService {
 
     @Override
     public Boolean delete(Long id) {
-        if (hostComponentDao.countByHostId(id) > 0) {
+        if (componentDao.countByHostId(id) > 0) {
             throw new ApiException(ApiExceptionEnum.HOST_HAS_COMPONENTS);
         }
 

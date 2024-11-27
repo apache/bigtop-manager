@@ -51,14 +51,14 @@ public class ChatbotController {
     @Resource
     private ChatbotService chatbotService;
 
-    @Operation(summary = "new thread", description = "Create a chat threads")
+    @Operation(summary = "new thread", description = "Create a chat thread")
     @PostMapping("/threads")
     public ResponseEntity<ChatThreadVO> createChatThread(@RequestBody ChatbotThreadReq chatbotThreadReq) {
         ChatThreadDTO chatThreadDTO = ChatThreadConverter.INSTANCE.fromReq2DTO(chatbotThreadReq);
         return ResponseEntity.success(chatbotService.createChatThread(chatThreadDTO));
     }
 
-    @Operation(summary = "update thread", description = "Update a chat threads")
+    @Operation(summary = "update thread", description = "Update a chat thread")
     @PutMapping("/threads/{threadId}")
     public ResponseEntity<ChatThreadVO> updateChatThread(
             @PathVariable Long threadId, @RequestBody ChatbotThreadReq chatbotThreadReq) {
@@ -67,13 +67,19 @@ public class ChatbotController {
         return ResponseEntity.success(chatbotService.updateChatThread(chatThreadDTO));
     }
 
-    @Operation(summary = "delete thread", description = "Delete a chat threads")
+    @Operation(summary = "delete thread", description = "Delete a chat thread")
     @DeleteMapping("/threads/{threadId}")
     public ResponseEntity<Boolean> deleteChatThread(@PathVariable Long threadId) {
         return ResponseEntity.success(chatbotService.deleteChatThread(threadId));
     }
 
-    @Operation(summary = "get threads", description = "Get all threads of a auth platform")
+    @Operation(summary = "get thread", description = "Get a chat thread")
+    @GetMapping("/threads/{threadId}")
+    public ResponseEntity<ChatThreadVO> getChatThread(@PathVariable Long threadId) {
+        return ResponseEntity.success(chatbotService.getChatThread(threadId));
+    }
+
+    @Operation(summary = "list threads", description = "List all threads of a auth platform")
     @GetMapping("/threads")
     public ResponseEntity<List<ChatThreadVO>> getAllChatThreads() {
         return ResponseEntity.success(chatbotService.getAllChatThreads());

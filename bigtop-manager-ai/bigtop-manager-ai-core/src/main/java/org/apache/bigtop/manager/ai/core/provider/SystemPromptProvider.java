@@ -20,6 +20,8 @@ package org.apache.bigtop.manager.ai.core.provider;
 
 import org.apache.bigtop.manager.ai.core.enums.SystemPrompt;
 
+import java.util.List;
+
 public interface SystemPromptProvider {
 
     String getSystemMessage(SystemPrompt systemPrompt);
@@ -28,4 +30,6 @@ public interface SystemPromptProvider {
     String getSystemMessage();
 
     String getLanguagePrompt(String locale);
+
+    String getSystemMessages(List<String> systemPrompts);
 }

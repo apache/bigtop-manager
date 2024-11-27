@@ -18,21 +18,16 @@
  */
 package org.apache.bigtop.manager.server.model.req;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 
 @Data
 public class ServiceConfigReq {
 
-    @NotBlank
-    @Schema(example = "ZOOKEEPER")
-    private String serviceName;
+    private Long id;
 
-    private String configDesc;
+    private String name;
 
-    private List<@Valid TypeConfigReq> configs;
+    private List<PropertyReq> properties;
 }

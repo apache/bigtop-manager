@@ -136,9 +136,5 @@ class PersistentChatMemoryStoreTest {
         assertEquals(1, result.size());
         assertTrue(result.get(0) instanceof SystemMessage);
         assertEquals("Hello from System", ((SystemMessage) result.get(0)).text());
-
-        persistentChatMemoryStore = persistentChatMemoryStore.clone();
-        result = persistentChatMemoryStore.getMessages(threadId);
-        assertEquals(0, result.size());
     }
 }

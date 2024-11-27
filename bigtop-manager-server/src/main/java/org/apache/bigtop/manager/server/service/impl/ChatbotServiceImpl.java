@@ -20,7 +20,7 @@ package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.ai.assistant.GeneralAssistantFactory;
 import org.apache.bigtop.manager.ai.assistant.provider.AIAssistantConfig;
-import org.apache.bigtop.manager.ai.assistant.store.PersistentChatMemoryStore;
+import org.apache.bigtop.manager.ai.assistant.store.ChatMemoryStoreProvider;
 import org.apache.bigtop.manager.ai.core.enums.MessageType;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
@@ -89,7 +89,7 @@ public class ChatbotServiceImpl implements ChatbotService {
     public AIAssistantFactory getAIAssistantFactory() {
         if (aiAssistantFactory == null) {
             aiAssistantFactory =
-                    new GeneralAssistantFactory(new PersistentChatMemoryStore(chatThreadDao, chatMessageDao));
+                    new GeneralAssistantFactory(new ChatMemoryStoreProvider(chatThreadDao, chatMessageDao));
         }
         return aiAssistantFactory;
     }
@@ -104,13 +104,11 @@ public class ChatbotServiceImpl implements ChatbotService {
         return null;
     }
 
-    private AIAssistantConfig getAIAssistantConfig(
-            String model, Map<String, String> credentials, Map<String, String> configs) {
+    private AIAssistantConfig getAIAssistantConfig(String model, Map<String, String> credentials) {
         return AIAssistantConfig.builder()
                 .setModel(model)
                 .setLanguage(LocaleContextHolder.getLocale().toString())
                 .addCredentials(credentials)
-                .addConfigs(configs)
                 .build();
     }
 
@@ -119,13 +117,10 @@ public class ChatbotServiceImpl implements ChatbotService {
     }
 
     private AIAssistant buildAIAssistant(
-            String platformName,
-            String model,
-            Map<String, String> credentials,
-            Long threadId,
-            Map<String, String> configs) {
+            String platformName, String model, Map<String, String> credentials, Long threadId) {
         return getAIAssistantFactory()
-                .create(getPlatformType(platformName), getAIAssistantConfig(model, credentials, configs), threadId);
+                .createAiService(
+                        getPlatformType(platformName), getAIAssistantConfig(model, credentials), threadId, null);
     }
 
     @Override
@@ -134,17 +129,13 @@ public class ChatbotServiceImpl implements ChatbotService {
         if (authPlatformPO == null || authPlatformPO.getIsDeleted()) {
             throw new ApiException(ApiExceptionEnum.NO_PLATFORM_IN_USE);
         }
-        AuthPlatformDTO authPlatformDTO = AuthPlatformConverter.INSTANCE.fromPO2DTO(authPlatformPO);
+
         Long userId = SessionUserHolder.getUserId();
         PlatformPO platformPO = platformDao.findById(authPlatformPO.getPlatformId());
 
         chatThreadDTO.setPlatformId(platformPO.getId());
         chatThreadDTO.setAuthId(authPlatformPO.getId());
 
-        AIAssistant aiAssistant = buildAIAssistant(
-                platformPO.getName(), authPlatformDTO.getModel(), authPlatformDTO.getAuthCredentials(), null, null);
-        Map<String, String> threadInfo = aiAssistant.createThread();
-        chatThreadDTO.setThreadInfo(threadInfo);
         ChatThreadPO chatThreadPO = ChatThreadConverter.INSTANCE.fromDTO2PO(chatThreadDTO);
         chatThreadPO.setUserId(userId);
         chatThreadDao.save(chatThreadPO);
@@ -187,8 +178,7 @@ public class ChatbotServiceImpl implements ChatbotService {
         return chatThreads;
     }
 
-    @Override
-    public SseEmitter talk(Long threadId, String message) {
+    private AIAssistant prepareTalk(Long threadId) {
         ChatThreadPO chatThreadPO = chatThreadDao.findById(threadId);
         Long userId = SessionUserHolder.getUserId();
         if (!Objects.equals(userId, chatThreadPO.getUserId()) || chatThreadPO.getIsDeleted()) {
@@ -201,20 +191,16 @@ public class ChatbotServiceImpl implements ChatbotService {
             throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_IN_USE);
         }
 
-        if (chatThreadPO.getName() == null) {
-            chatThreadPO.setName(getNameFromMessage(message));
-            chatThreadDao.partialUpdateById(chatThreadPO);
-        }
-
         AuthPlatformDTO authPlatformDTO = AuthPlatformConverter.INSTANCE.fromPO2DTO(authPlatformPO);
-        ChatThreadDTO chatThreadDTO = ChatThreadConverter.INSTANCE.fromPO2DTO(chatThreadPO);
+
         PlatformPO platformPO = platformDao.findById(authPlatformPO.getPlatformId());
-        AIAssistant aiAssistant = buildAIAssistant(
-                platformPO.getName(),
-                authPlatformDTO.getModel(),
-                authPlatformDTO.getAuthCredentials(),
-                chatThreadPO.getId(),
-                chatThreadDTO.getThreadInfo());
+        return buildAIAssistant(
+                platformPO.getName(), authPlatformDTO.getModel(), authPlatformDTO.getAuthCredentials(), threadId);
+    }
+
+    @Override
+    public SseEmitter talk(Long threadId, String message) {
+        AIAssistant aiAssistant = prepareTalk(threadId);
         Flux<String> stringFlux = aiAssistant.streamAsk(message);
 
         SseEmitter emitter = new SseEmitter();
@@ -272,6 +258,19 @@ public class ChatbotServiceImpl implements ChatbotService {
         chatThreadPO.setName(chatThreadDTO.getName());
         chatThreadDao.partialUpdateById(chatThreadPO);
 
+        return ChatThreadConverter.INSTANCE.fromPO2VO(chatThreadPO);
+    }
+
+    @Override
+    public ChatThreadVO getChatThread(Long threadId) {
+        ChatThreadPO chatThreadPO = chatThreadDao.findById(threadId);
+        if (chatThreadPO == null || chatThreadPO.getIsDeleted()) {
+            throw new ApiException(ApiExceptionEnum.CHAT_THREAD_NOT_FOUND);
+        }
+        Long userId = SessionUserHolder.getUserId();
+        if (!chatThreadPO.getUserId().equals(userId)) {
+            throw new ApiException(ApiExceptionEnum.PERMISSION_DENIED);
+        }
         return ChatThreadConverter.INSTANCE.fromPO2VO(chatThreadPO);
     }
 }

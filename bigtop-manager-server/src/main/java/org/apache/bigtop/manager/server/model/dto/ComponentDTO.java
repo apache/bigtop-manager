@@ -25,7 +25,7 @@ import java.util.List;
 @Data
 public class ComponentDTO {
 
-    private String componentName;
+    private String name;
 
     private String displayName;
 

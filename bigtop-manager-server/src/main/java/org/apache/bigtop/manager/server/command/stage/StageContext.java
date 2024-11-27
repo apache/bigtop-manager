@@ -21,10 +21,8 @@ package org.apache.bigtop.manager.server.command.stage;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.server.model.dto.CommandDTO;
 import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
-import org.apache.bigtop.manager.server.model.dto.RepoDTO;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.model.dto.command.ClusterCommandDTO;
-import org.apache.bigtop.manager.server.model.dto.command.HostCommandDTO;
 
 import lombok.Data;
 
@@ -37,17 +35,15 @@ public class StageContext {
 
     private String clusterName;
 
-    private String stackName;
+    private String userGroup;
 
-    private String stackVersion;
+    private String rootDir;
 
-    private List<String> hostnames;
+    private List<Long> hostIds;
 
     private ServiceDTO serviceDTO;
 
     private ComponentDTO componentDTO;
-
-    private List<RepoDTO> repoInfoList;
 
     public static StageContext fromPayload(String payload) {
         CommandDTO commandDTO = JsonUtils.readFromString(payload, CommandDTO.class);
@@ -72,18 +68,13 @@ public class StageContext {
         ClusterCommandDTO clusterCommand = commandDTO.getClusterCommand();
 
         context.setClusterName(clusterCommand.getName());
-        //        context.setStackName(clusterCommand.getStackName());
-        //        context.setStackVersion(clusterCommand.getStackVersion());
-        //        context.setHostnames(clusterCommand.getHostnames());
-        //        context.setRepoInfoList(clusterCommand.getRepoInfoList());
+        context.setHostIds(clusterCommand.getHostIds());
+        context.setUserGroup(clusterCommand.getUserGroup());
+        context.setRootDir(clusterCommand.getRootDir());
     }
 
     private static void fromHostCommandPayload(StageContext context, CommandDTO commandDTO) {
-        List<HostCommandDTO> hostCommands = commandDTO.getHostCommands();
-
-        List<String> hostnames =
-                hostCommands.stream().map(HostCommandDTO::getHostname).toList();
-        context.setHostnames(hostnames);
+        // No need to set anything here, we should deal with this in the host job factory
     }
 
     private static void fromServiceCommandPayload(StageContext context, CommandDTO commandDTO) {

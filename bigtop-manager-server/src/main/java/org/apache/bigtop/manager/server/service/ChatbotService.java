@@ -39,4 +39,6 @@ public interface ChatbotService {
     List<ChatMessageVO> history(Long threadId);
 
     ChatThreadVO updateChatThread(ChatThreadDTO chatThreadDTO);
+
+    ChatThreadVO getChatThread(Long threadId);
 }

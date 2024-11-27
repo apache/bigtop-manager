@@ -20,8 +20,7 @@ package org.apache.bigtop.manager.stack.bigtop.param;
 
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
 import org.apache.bigtop.manager.stack.core.param.BaseParams;
-
-import java.text.MessageFormat;
+import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
 
 public abstract class BigtopParams extends BaseParams {
 
@@ -30,17 +29,11 @@ public abstract class BigtopParams extends BaseParams {
     }
 
     public String stackBinDir() {
-        String stackName = this.commandPayload.getStackName();
-        String stackVersion = this.commandPayload.getStackVersion();
-        String root = this.commandPayload.getRootDir();
-        return MessageFormat.format("{0}/{1}/{2}/usr/bin", root, stackName.toLowerCase(), stackVersion);
+        return "";
     }
 
     public String stackLibDir() {
-        String stackName = this.commandPayload.getStackName();
-        String stackVersion = this.commandPayload.getStackVersion();
-        String root = this.commandPayload.getRootDir();
-        return MessageFormat.format("{0}/{1}/{2}/usr/lib", root, stackName.toLowerCase(), stackVersion);
+        return "";
     }
 
     /**
@@ -48,7 +41,8 @@ public abstract class BigtopParams extends BaseParams {
      */
     @Override
     public String serviceHome() {
+        String rootDir = LocalSettings.cluster().getRootDir();
         String service = this.commandPayload.getServiceName();
-        return stackLibDir() + "/" + service.toLowerCase();
+        return rootDir + "/" + service.toLowerCase();
     }
 }

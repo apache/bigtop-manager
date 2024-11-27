@@ -18,17 +18,12 @@
  */
 package org.apache.bigtop.manager.server.command.stage;
 
-import org.apache.bigtop.manager.common.enums.Command;
-import org.apache.bigtop.manager.dao.po.ClusterPO;
-import org.apache.bigtop.manager.dao.repository.ClusterDao;
 import org.apache.bigtop.manager.server.command.task.HostCheckTask;
 import org.apache.bigtop.manager.server.command.task.Task;
 import org.apache.bigtop.manager.server.command.task.TaskContext;
-import org.apache.bigtop.manager.server.holder.SpringContextHolder;
+import org.apache.bigtop.manager.server.model.dto.HostDTO;
 
 public class HostCheckStage extends AbstractStage {
-
-    private ClusterDao clusterDao;
 
     public HostCheckStage(StageContext stageContext) {
         super(stageContext);
@@ -37,31 +32,21 @@ public class HostCheckStage extends AbstractStage {
     @Override
     protected void injectBeans() {
         super.injectBeans();
-
-        this.clusterDao = SpringContextHolder.getBean(ClusterDao.class);
     }
 
     @Override
-    protected void beforeCreateTasks() {
-        if (stageContext.getClusterId() != null) {
-            ClusterPO clusterPO = clusterDao.findByIdJoin(stageContext.getClusterId());
-        }
-    }
+    protected void beforeCreateTasks() {}
 
     @Override
-    protected Task createTask(String hostname) {
+    protected Task createTask(HostDTO hostDTO) {
         TaskContext taskContext = new TaskContext();
-        taskContext.setHostname(hostname);
+        taskContext.setHostDTO(hostDTO);
         taskContext.setClusterId(stageContext.getClusterId());
         taskContext.setClusterName(stageContext.getClusterName());
-        taskContext.setStackName(stageContext.getStackName());
-        taskContext.setStackVersion(stageContext.getStackVersion());
         taskContext.setServiceName("cluster");
         taskContext.setServiceUser("root");
         taskContext.setComponentName("agent");
         taskContext.setComponentDisplayName("Agent");
-        taskContext.setCommand(Command.CUSTOM);
-        taskContext.setCustomCommand("check_host");
 
         return new HostCheckTask(taskContext);
     }

@@ -39,7 +39,7 @@ public class CommandGroupSequenceProvider implements DefaultGroupSequenceProvide
 
             switch (commandLevel) {
                 case SERVICE:
-                    if (bean.getCommand() == Command.INSTALL) {
+                    if (bean.getCommand() == Command.ADD) {
                         defaultGroupSequence.add(ServiceInstallCommandGroup.class);
                     } else {
                         defaultGroupSequence.add(ServiceCommandGroup.class);

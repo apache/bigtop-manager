@@ -27,27 +27,25 @@ public class ServiceVO {
 
     private Long id;
 
-    private String serviceName;
+    private String name;
 
     private String displayName;
 
-    private String serviceDesc;
+    private String desc;
 
-    private String serviceVersion;
+    private String version;
 
-    private String clusterName;
+    private String user;
 
-    private String serviceUser;
+    private String stack;
+
+    private Boolean needRestart;
+
+    private Integer status;
 
     private List<ComponentVO> components;
 
-    private List<TypeConfigVO> configs;
+    private List<ServiceConfigVO> configs;
 
     private List<String> requiredServices;
-
-    private Boolean isClient;
-
-    private Boolean isHealthy;
-
-    private List<QuickLinkVO> quickLinks;
 }

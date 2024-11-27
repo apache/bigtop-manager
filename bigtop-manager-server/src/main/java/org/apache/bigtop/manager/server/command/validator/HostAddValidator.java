@@ -42,7 +42,7 @@ public class HostAddValidator implements CommandValidator {
 
     @Override
     public List<CommandIdentifier> getCommandIdentifiers() {
-        return List.of(new CommandIdentifier(CommandLevel.HOST, Command.INSTALL));
+        return List.of(new CommandIdentifier(CommandLevel.HOST, Command.ADD));
     }
 
     @Override
@@ -51,7 +51,7 @@ public class HostAddValidator implements CommandValidator {
                 .map(HostCommandDTO::getHostname)
                 .toList();
 
-        List<HostPO> hostPOList = hostDao.findAllByHostnameIn(hostnames);
+        List<HostPO> hostPOList = hostDao.findAllByHostnames(hostnames);
         if (CollectionUtils.isNotEmpty(hostPOList)) {
             List<String> existsHostnames =
                     hostPOList.stream().map(HostPO::getHostname).toList();

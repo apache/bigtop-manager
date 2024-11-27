@@ -22,73 +22,20 @@ import org.apache.bigtop.manager.ai.core.AbstractAIAssistant;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 
-import dev.langchain4j.data.message.AiMessage;
-import dev.langchain4j.data.message.SystemMessage;
-import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.internal.ValidationUtils;
 import dev.langchain4j.memory.ChatMemory;
-import dev.langchain4j.memory.chat.MessageWindowChatMemory;
-import dev.langchain4j.model.StreamingResponseHandler;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.chat.StreamingChatLanguageModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
-import dev.langchain4j.model.output.Response;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.FluxSink;
+import dev.langchain4j.service.AiServices;
 
 public class OpenAIAssistant extends AbstractAIAssistant {
 
-    private final ChatLanguageModel chatLanguageModel;
-    private final StreamingChatLanguageModel streamingChatLanguageModel;
-
     private static final String BASE_URL = "https://api.openai.com/v1";
 
-    public OpenAIAssistant(
-            ChatLanguageModel chatLanguageModel,
-            StreamingChatLanguageModel streamingChatLanguageModel,
-            ChatMemory chatMemory) {
-        super(chatMemory);
-        this.chatLanguageModel = chatLanguageModel;
-        this.streamingChatLanguageModel = streamingChatLanguageModel;
-    }
-
-    @Override
-    public Flux<String> streamAsk(String chatMessage) {
-        chatMemory.add(UserMessage.from(chatMessage));
-        return Flux.create(
-                emitter -> streamingChatLanguageModel.generate(chatMemory.messages(), new StreamingResponseHandler<>() {
-                    @Override
-                    public void onNext(String token) {
-                        emitter.next(token);
-                    }
-
-                    @Override
-                    public void onError(Throwable error) {
-                        emitter.error(error);
-                    }
-
-                    @Override
-                    public void onComplete(Response<AiMessage> response) {
-                        StreamingResponseHandler.super.onComplete(response);
-                        chatMemory.add(response.content());
-                    }
-                }),
-                FluxSink.OverflowStrategy.BUFFER);
-    }
-
-    @Override
-    public String ask(String chatMessage) {
-        chatMemory.add(UserMessage.from(chatMessage));
-        Response<AiMessage> generate = chatLanguageModel.generate(chatMemory.messages());
-        String aiMessage = generate.content().text();
-        chatMemory.add(AiMessage.from(aiMessage));
-        return aiMessage;
-    }
-
-    @Override
-    public void setSystemPrompt(String systemPrompt) {
-        chatMemory.add(SystemMessage.systemMessage(systemPrompt));
+    public OpenAIAssistant(ChatMemory chatMemory, AIAssistant.Service aiServices) {
+        super(chatMemory, aiServices);
     }
 
     @Override
@@ -102,28 +49,44 @@ public class OpenAIAssistant extends AbstractAIAssistant {
 
     public static class Builder extends AbstractAIAssistant.Builder {
 
-        public AIAssistant build() {
+        @Override
+        public ChatLanguageModel getChatLanguageModel() {
             String model = ValidationUtils.ensureNotNull(configProvider.getModel(), "model");
             String apiKey = ValidationUtils.ensureNotNull(
                     configProvider.getCredentials().get("apiKey"), "apiKey");
-            ChatLanguageModel openAiChatModel = OpenAiChatModel.builder()
+            return OpenAiChatModel.builder()
                     .apiKey(apiKey)
                     .baseUrl(BASE_URL)
                     .modelName(model)
                     .build();
-            StreamingChatLanguageModel openaiStreamChatModel = OpenAiStreamingChatModel.builder()
+        }
+
+        @Override
+        public StreamingChatLanguageModel getStreamingChatLanguageModel() {
+            String model = ValidationUtils.ensureNotNull(configProvider.getModel(), "model");
+            String apiKey = ValidationUtils.ensureNotNull(
+                    configProvider.getCredentials().get("apiKey"), "apiKey");
+            return OpenAiStreamingChatModel.builder()
                     .apiKey(apiKey)
                     .baseUrl(BASE_URL)
                     .modelName(model)
                     .build();
-            MessageWindowChatMemory.Builder builder = MessageWindowChatMemory.builder()
-                    .chatMemoryStore(chatMemoryStore)
-                    .maxMessages(MEMORY_LEN);
-            if (id != null) {
-                builder.id(id);
-            }
-            MessageWindowChatMemory chatMemory = builder.build();
-            return new OpenAIAssistant(openAiChatModel, openaiStreamChatModel, chatMemory);
+        }
+
+        public AIAssistant build() {
+            AIAssistant.Service aiService = AiServices.builder(AIAssistant.Service.class)
+                    .chatLanguageModel(getChatLanguageModel())
+                    .streamingChatLanguageModel(getStreamingChatLanguageModel())
+                    .chatMemory(getChatMemory())
+                    .toolProvider(toolProvider)
+                    .systemMessageProvider(threadId -> {
+                        if (threadId != null) {
+                            return systemPrompt;
+                        }
+                        return null;
+                    })
+                    .build();
+            return new OpenAIAssistant(getChatMemory(), aiService);
         }
     }
 }

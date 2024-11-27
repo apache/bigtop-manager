@@ -23,21 +23,10 @@ import org.apache.bigtop.manager.stack.core.param.BaseParams;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.text.MessageFormat;
-
 @Slf4j
 public abstract class InfraParams extends BaseParams {
 
     protected InfraParams(CommandPayload commandPayload) {
         super(commandPayload);
-    }
-
-    /**
-     * service home dir
-     */
-    @Override
-    public String serviceHome() {
-        String service = this.commandPayload.getServiceName();
-        return MessageFormat.format("{0}/{1}", stackHome(), service.toLowerCase());
     }
 }

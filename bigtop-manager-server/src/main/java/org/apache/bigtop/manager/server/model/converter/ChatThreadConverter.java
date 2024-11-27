@@ -37,10 +37,8 @@ public interface ChatThreadConverter {
     @Mapping(source = "id", target = "threadId")
     ChatThreadVO fromPO2VO(ChatThreadPO platformAuthorizedPO);
 
-    @Mapping(source = "threadInfo", target = "threadInfo", qualifiedByName = "map2String")
     ChatThreadPO fromDTO2PO(ChatThreadDTO chatThreadDTO);
 
-    @Mapping(source = "threadInfo", target = "threadInfo", qualifiedByName = "jsonString2Map")
     ChatThreadDTO fromPO2DTO(ChatThreadPO chatThreadPO);
 
     ChatThreadDTO fromReq2DTO(ChatbotThreadReq chatbotThreadReq);

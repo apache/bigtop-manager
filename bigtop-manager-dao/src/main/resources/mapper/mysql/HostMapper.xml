@@ -36,6 +36,44 @@
         ${alias}.cluster_id
     </sql>
 
+    <select id="findByQuery" resultType="org.apache.bigtop.manager.dao.po.HostPO">
+        select
+        <include refid="baseColumnsV2">
+            <property name="alias" value="h"/>
+        </include>, c.name as cluster_name, count(comp.id) as component_num
+        from host h
+        left join cluster c on h.cluster_id = c.id
+        left join component comp on h.id = comp.host_id
+        <where>
+            <if test="query.hostname != null and query.hostname != ''">
+                and h.hostname like concat('%', #{query.hostname}, '%')
+            </if>
+            <if test="query.clusterId != null">
+                and h.cluster_id = #{query.clusterId}
+            </if>
+            <if test="query.ipv4 != null and query.ipv4 != ''">
+                and h.ipv4 like concat('%', #{query.ipv4}, '%')
+            </if>
+            <if test="query.status != null">
+                and h.status = #{query.status}
+            </if>
+        </where>
+        group by h.id, c.name
+    </select>
+
+    <select id="findDetailsById" resultType="org.apache.bigtop.manager.dao.po.HostPO">
+        select
+        <include refid="baseColumnsV2">
+            <property name="alias" value="h"/>
+        </include>, c.name as cluster_name, count(comp.id) as component_num
+        from host h
+        left join cluster c on h.cluster_id = c.id
+        left join component comp on h.id = comp.host_id
+        where h.id = #{id}
+        group by h.id, c.name
+        limit 1
+    </select>
+
     <select id="findByHostname" resultType="org.apache.bigtop.manager.dao.po.HostPO">
         select
         <include refid="baseColumns"/>
@@ -46,26 +84,6 @@
                 hostname = #{hostname}
             </if>
         </where>
-        limit 1
-    </select>
-
-    <select id="findByIdJoin" resultType="org.apache.bigtop.manager.dao.po.HostPO">
-        select
-        <include refid="baseColumnsV2">
-            <property name="alias" value="h"/>
-        </include>
-        ,clus.name as cluster_name
-        from
-        (select * from host
-        <where>
-            <if test="id != 0">
-                id = #{id}
-            </if>
-        </where>
-        ) h
-        inner join
-        cluster clus
-        on h.cluster_id = clus.id
         limit 1
     </select>
 
@@ -89,7 +107,7 @@
         on h.cluster_id = clus.id
     </select>
 
-    <select id="findAllByHostnameIn"
+    <select id="findAllByHostnames"
             resultType="org.apache.bigtop.manager.dao.po.HostPO">
         select
         <include refid="baseColumns"/>
@@ -103,43 +121,5 @@
                 </foreach>
             </if>
         </where>
-    </select>
-
-    <select id="findByQuery" resultType="org.apache.bigtop.manager.dao.po.HostPO">
-        select
-        <include refid="baseColumnsV2">
-            <property name="alias" value="h"/>
-        </include>, c.name as cluster_name, count(hc.id) as component_num
-        from host h
-        left join cluster c on h.cluster_id = c.id
-        left join host_component hc on h.id = hc.host_id
-        <where>
-            <if test="query.hostnameLike != null and query.hostnameLike != ''">
-                and h.hostname like concat('%', #{query.hostnameLike}, '%')
-            </if>
-            <if test="query.clusterId != null">
-                and h.cluster_id = #{query.clusterId}
-            </if>
-            <if test="query.ipv4Like != null and query.ipv4Like != ''">
-                and h.ipv4 like concat('%', #{query.ipv4Like}, '%')
-            </if>
-            <if test="query.status != null">
-                and h.status = #{query.status}
-            </if>
-        </where>
-        group by h.id
-    </select>
-
-    <select id="findDetailsById" resultType="org.apache.bigtop.manager.dao.po.HostPO">
-        select
-        <include refid="baseColumnsV2">
-            <property name="alias" value="h"/>
-        </include>, c.name as cluster_name, count(hc.id) as component_num
-        from host h
-        left join cluster c on h.cluster_id = c.id
-        left join host_component hc on h.id = hc.host_id
-        where h.id = #{id}
-        group by h.id
-        limit 1
     </select>
 </mapper>

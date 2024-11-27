@@ -24,7 +24,7 @@ import org.apache.bigtop.manager.common.message.entity.pojo.PackageInfo;
 import org.apache.bigtop.manager.common.message.entity.pojo.PackageSpecificInfo;
 import org.apache.bigtop.manager.common.message.entity.pojo.ScriptInfo;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.repository.HostComponentDao;
+import org.apache.bigtop.manager.dao.repository.ComponentDao;
 import org.apache.bigtop.manager.grpc.generated.CommandRequest;
 import org.apache.bigtop.manager.grpc.generated.CommandType;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
@@ -32,6 +32,8 @@ import org.apache.bigtop.manager.server.model.dto.CustomCommandDTO;
 import org.apache.bigtop.manager.server.model.dto.PackageDTO;
 import org.apache.bigtop.manager.server.model.dto.PackageSpecificDTO;
 import org.apache.bigtop.manager.server.model.dto.ScriptDTO;
+import org.apache.bigtop.manager.server.model.dto.StackDTO;
+import org.apache.bigtop.manager.server.utils.StackUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +41,7 @@ import java.util.Map;
 
 public abstract class AbstractComponentTask extends AbstractTask {
 
-    protected HostComponentDao hostComponentDao;
+    protected ComponentDao componentDao;
 
     public AbstractComponentTask(TaskContext taskContext) {
         super(taskContext);
@@ -49,21 +51,21 @@ public abstract class AbstractComponentTask extends AbstractTask {
     protected void injectBeans() {
         super.injectBeans();
 
-        this.hostComponentDao = SpringContextHolder.getBean(HostComponentDao.class);
+        this.componentDao = SpringContextHolder.getBean(ComponentDao.class);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     protected CommandRequest getCommandRequest() {
+        StackDTO stackDTO = StackUtils.getServiceStack(taskContext.getServiceName());
         CommandPayload commandPayload = new CommandPayload();
         commandPayload.setServiceName(taskContext.getServiceName());
-        commandPayload.setCommand(getCommand());
-        commandPayload.setServiceUser(taskContext.getServiceUser());
-        commandPayload.setStackName(taskContext.getStackName());
-        commandPayload.setStackVersion(taskContext.getStackVersion());
         commandPayload.setComponentName(taskContext.getComponentName());
-        commandPayload.setRootDir(taskContext.getRootDir());
-        commandPayload.setHostname(taskContext.getHostname());
+        commandPayload.setServiceUser(taskContext.getServiceUser());
+        commandPayload.setStackName(stackDTO.getStackName());
+        commandPayload.setStackVersion(stackDTO.getStackVersion());
+        commandPayload.setCommand(getCommand());
+        commandPayload.setCustomCommand(getCustomCommand());
 
         Map<String, Object> properties = taskContext.getProperties();
 
@@ -75,7 +77,6 @@ public abstract class AbstractComponentTask extends AbstractTask {
 
         CommandRequest.Builder builder = CommandRequest.newBuilder();
         builder.setType(CommandType.COMPONENT);
-        builder.setHostname(taskContext.getHostname());
         builder.setPayload(JsonUtils.writeAsString(commandPayload));
 
         return builder.build();
@@ -101,7 +102,6 @@ public abstract class AbstractComponentTask extends AbstractTask {
         List<PackageSpecificInfo> packageSpecificInfos = new ArrayList<>();
         for (PackageSpecificDTO packageSpecificDTO : packageSpecificDTOList) {
             PackageSpecificInfo packageSpecificInfo = new PackageSpecificInfo();
-            packageSpecificInfo.setOs(packageSpecificDTO.getOs());
             packageSpecificInfo.setArch(packageSpecificDTO.getArch());
             List<PackageInfo> packageInfoList = new ArrayList<>();
             for (PackageDTO packageDTO : packageSpecificDTO.getPackages()) {

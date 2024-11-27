@@ -146,10 +146,10 @@ public abstract class AbstractJob implements Job {
             }
         }
         if (!taskPOList.isEmpty()) {
-            taskDao.updateStateByIds(taskPOList);
+            taskDao.partialUpdateByIds(taskPOList);
         }
         if (!stagePOList.isEmpty()) {
-            stageDao.updateStateByIds(stagePOList);
+            stageDao.partialUpdateByIds(stagePOList);
         }
         jobDao.partialUpdateById(jobPO);
     }

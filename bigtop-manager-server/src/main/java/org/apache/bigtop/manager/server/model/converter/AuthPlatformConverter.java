@@ -44,6 +44,7 @@ public interface AuthPlatformConverter {
     AuthPlatformConverter INSTANCE = Mappers.getMapper(AuthPlatformConverter.class);
 
     @Mapping(target = "platformName", expression = "java(platformPO.getName())")
+    @Mapping(source = "credentials", target = "authCredentials", qualifiedByName = "jsonString2Map")
     AuthPlatformVO fromPO2VO(AuthPlatformPO authPlatformPO, @Context PlatformPO platformPO);
 
     AuthPlatformDTO fromReq2DTO(AuthPlatformReq authPlatformReq);

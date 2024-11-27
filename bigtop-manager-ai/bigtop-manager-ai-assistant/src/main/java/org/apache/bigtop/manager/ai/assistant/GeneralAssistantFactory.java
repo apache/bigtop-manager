@@ -19,35 +19,35 @@
 package org.apache.bigtop.manager.ai.assistant;
 
 import org.apache.bigtop.manager.ai.assistant.provider.LocSystemPromptProvider;
-import org.apache.bigtop.manager.ai.assistant.store.PersistentChatMemoryStore;
+import org.apache.bigtop.manager.ai.assistant.store.ChatMemoryStoreProvider;
 import org.apache.bigtop.manager.ai.core.AbstractAIAssistantFactory;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.enums.SystemPrompt;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
-import org.apache.bigtop.manager.ai.core.factory.ToolBox;
 import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
 import org.apache.bigtop.manager.ai.core.provider.SystemPromptProvider;
 import org.apache.bigtop.manager.ai.dashscope.DashScopeAssistant;
 import org.apache.bigtop.manager.ai.openai.OpenAIAssistant;
 import org.apache.bigtop.manager.ai.qianfan.QianFanAssistant;
 
-import org.apache.commons.lang3.NotImplementedException;
-
-import dev.langchain4j.store.memory.chat.ChatMemoryStore;
+import dev.langchain4j.service.tool.ToolProvider;
 import dev.langchain4j.store.memory.chat.InMemoryChatMemoryStore;
+
+import java.util.List;
 
 public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
 
     private final SystemPromptProvider systemPromptProvider;
-    private final ChatMemoryStore chatMemoryStore;
+    private final ChatMemoryStoreProvider chatMemoryStoreProvider;
 
-    public GeneralAssistantFactory(ChatMemoryStore chatMemoryStore) {
-        this(new LocSystemPromptProvider(), chatMemoryStore);
+    public GeneralAssistantFactory(ChatMemoryStoreProvider chatMemoryStoreProvider) {
+        this(new LocSystemPromptProvider(), chatMemoryStoreProvider);
     }
 
-    public GeneralAssistantFactory(SystemPromptProvider systemPromptProvider, ChatMemoryStore chatMemoryStore) {
+    public GeneralAssistantFactory(
+            SystemPromptProvider systemPromptProvider, ChatMemoryStoreProvider chatMemoryStoreProvider) {
         this.systemPromptProvider = systemPromptProvider;
-        this.chatMemoryStore = chatMemoryStore;
+        this.chatMemoryStoreProvider = chatMemoryStoreProvider;
     }
 
     @Override
@@ -55,37 +55,37 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
             PlatformType platformType,
             AIAssistantConfigProvider assistantConfig,
             Object id,
-            SystemPrompt systemPrompts) {
+            ToolProvider toolProvider,
+            SystemPrompt systemPrompt) {
         AIAssistant.Builder builder =
                 switch (platformType) {
                     case OPENAI -> OpenAIAssistant.builder();
                     case DASH_SCOPE -> DashScopeAssistant.builder();
                     case QIANFAN -> QianFanAssistant.builder();
                 };
-        AIAssistant aiAssistant = builder.id(id)
+        builder = builder.id(id)
                 .memoryStore(
                         (id == null)
                                 ? new InMemoryChatMemoryStore()
-                                : ((PersistentChatMemoryStore) chatMemoryStore).clone())
+                                : chatMemoryStoreProvider.createPersistentChatMemoryStore())
                 .withConfigProvider(assistantConfig)
-                .build();
+                .withToolProvider(toolProvider);
 
-        String systemPrompt = systemPromptProvider.getSystemMessage(systemPrompts);
-        aiAssistant.setSystemPrompt(systemPrompt);
+        List<String> systemPrompts = new java.util.ArrayList<>();
+        systemPrompts.add(systemPromptProvider.getSystemMessage(systemPrompt));
         String locale = assistantConfig.getLanguage();
         if (locale != null) {
-            aiAssistant.setSystemPrompt(systemPromptProvider.getLanguagePrompt(locale));
+            systemPrompts.add(systemPromptProvider.getLanguagePrompt(locale));
         }
-        return aiAssistant;
+
+        builder.withSystemPrompt(systemPromptProvider.getSystemMessages(systemPrompts));
+
+        return builder.build();
     }
 
     @Override
-    public AIAssistant create(PlatformType platformType, AIAssistantConfigProvider assistantConfig, Object id) {
-        return createWithPrompt(platformType, assistantConfig, id, SystemPrompt.DEFAULT_PROMPT);
-    }
-
-    @Override
-    public ToolBox createToolBox(PlatformType platformType) {
-        throw new NotImplementedException("ToolBox is not implemented for GeneralAssistantFactory");
+    public AIAssistant createAiService(
+            PlatformType platformType, AIAssistantConfigProvider assistantConfig, Long id, ToolProvider toolProvider) {
+        return createWithPrompt(platformType, assistantConfig, id, toolProvider, SystemPrompt.DEFAULT_PROMPT);
     }
 }

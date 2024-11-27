@@ -28,6 +28,4 @@ import java.util.List;
 public interface TaskDao extends BaseDao<TaskPO> {
 
     List<TaskPO> findByStageId(@Param("stageId") Long stageId);
-
-    void updateStateByIds(@Param("tasks") List<TaskPO> tasks);
 }

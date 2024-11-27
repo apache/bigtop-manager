@@ -19,15 +19,17 @@
 package org.apache.bigtop.manager.server.utils;
 
 import org.apache.bigtop.manager.common.enums.Command;
+import org.apache.bigtop.manager.common.utils.CaseUtils;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
+import org.apache.bigtop.manager.common.utils.ProjectPathUtils;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.exception.ServerException;
 import org.apache.bigtop.manager.server.model.converter.ServiceConverter;
 import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
 import org.apache.bigtop.manager.server.model.dto.PropertyDTO;
+import org.apache.bigtop.manager.server.model.dto.ServiceConfigDTO;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.model.dto.StackDTO;
-import org.apache.bigtop.manager.server.model.dto.TypeConfigDTO;
 import org.apache.bigtop.manager.server.stack.dag.ComponentCommandWrapper;
 import org.apache.bigtop.manager.server.stack.dag.DAG;
 import org.apache.bigtop.manager.server.stack.dag.DagGraphEdge;
@@ -42,7 +44,6 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,8 +58,6 @@ public class StackUtils {
 
     private static final String META_FILE = "metainfo.xml";
 
-    private static final String STACKS_FOLDER_NAME = "stacks";
-
     private static final String SERVICES_FOLDER_NAME = "services";
 
     private static final String CONFIGURATION_FOLDER = "configuration";
@@ -67,7 +66,7 @@ public class StackUtils {
 
     private static final String DEPENDENCY_FILE_NAME = "order.json";
 
-    public static final Map<String, List<TypeConfigDTO>> SERVICE_CONFIG_MAP = new HashMap<>();
+    public static final Map<String, List<ServiceConfigDTO>> SERVICE_CONFIG_MAP = new HashMap<>();
 
     public static final Map<StackDTO, List<ServiceDTO>> STACK_SERVICE_MAP = new HashMap<>();
 
@@ -77,9 +76,6 @@ public class StackUtils {
         parseStack();
     }
 
-    /**
-     *
-     */
     private static void parseStack() {
         File stacksFolder = loadStacksFolder();
         File[] stackFolders = Optional.ofNullable(stacksFolder.listFiles()).orElse(new File[0]);
@@ -112,7 +108,7 @@ public class StackUtils {
                 ServiceDTO serviceDTO = parseServiceMetaInfo(file);
                 services.add(serviceDTO);
 
-                parseServiceConfigurations(file, serviceDTO.getServiceName());
+                parseServiceConfigurations(file, serviceDTO.getName());
 
                 parseDag(file);
             }
@@ -126,31 +122,32 @@ public class StackUtils {
                 JaxbUtils.readFromPath(file.getAbsolutePath() + "/" + META_FILE, ServiceMetainfoXml.class);
         ServiceModel serviceModel = serviceMetainfoXml.getService();
         ServiceDTO serviceDTO = ServiceConverter.INSTANCE.fromModel2DTO(serviceModel);
-        serviceDTO.setServiceDesc(StringUtils.strip(serviceDTO.getServiceDesc()));
+        serviceDTO.setDesc(StringUtils.strip(serviceDTO.getDesc()));
         return serviceDTO;
     }
 
     private static void parseServiceConfigurations(File file, String serviceName) {
-        List<TypeConfigDTO> typeConfigs = new ArrayList<>();
+        List<ServiceConfigDTO> configs = new ArrayList<>();
         File configFolder = new File(file.getAbsolutePath(), CONFIGURATION_FOLDER);
         if (configFolder.exists()) {
             for (File configFile : Optional.ofNullable(configFolder.listFiles()).orElse(new File[0])) {
                 String configPath = configFile.getAbsolutePath();
                 String fileExtension = configPath.substring(configPath.lastIndexOf(".") + 1);
                 if (fileExtension.equals(CONFIGURATION_FILE_EXTENSION)) {
-                    String typeName = configPath.substring(
+                    String configName = configPath.substring(
                             configPath.lastIndexOf(File.separator) + 1, configPath.lastIndexOf("."));
 
                     List<PropertyDTO> properties = StackConfigUtils.loadConfig(configPath);
-                    TypeConfigDTO typeConfigDTO = new TypeConfigDTO();
-                    typeConfigDTO.setTypeName(typeName);
-                    typeConfigDTO.setProperties(properties);
-                    typeConfigs.add(typeConfigDTO);
+
+                    ServiceConfigDTO serviceConfigDTO = new ServiceConfigDTO();
+                    serviceConfigDTO.setName(configName);
+                    serviceConfigDTO.setProperties(properties);
+                    configs.add(serviceConfigDTO);
                 }
             }
         }
 
-        SERVICE_CONFIG_MAP.put(serviceName, typeConfigs);
+        SERVICE_CONFIG_MAP.put(serviceName, configs);
     }
 
     private static void parseDag(File file) {
@@ -192,12 +189,7 @@ public class StackUtils {
      * Load stack folder as file
      */
     private static File loadStacksFolder() throws ApiException {
-        URL url = StackUtils.class.getClassLoader().getResource(STACKS_FOLDER_NAME);
-        if (url == null) {
-            throw new ServerException("Can't find stack folder");
-        }
-
-        String stackPath = url.getPath();
+        String stackPath = ProjectPathUtils.getServerStackPath();
         File file = new File(stackPath);
         if (!file.exists()) {
             throw new ServerException("Can't find stack folder");
@@ -207,10 +199,18 @@ public class StackUtils {
         return file;
     }
 
+    public static String getFullStackName(StackDTO stackDTO) {
+        return CaseUtils.toCamelCase(stackDTO.getStackName()) + "-" + stackDTO.getStackVersion();
+    }
+
+    public static List<StackDTO> getAllStacks() {
+        return new ArrayList<>(STACK_SERVICE_MAP.keySet());
+    }
+
     public static StackDTO getServiceStack(String serviceName) {
         for (Map.Entry<StackDTO, List<ServiceDTO>> entry : STACK_SERVICE_MAP.entrySet()) {
             for (ServiceDTO serviceDTO : entry.getValue()) {
-                if (serviceDTO.getServiceName().equals(serviceName)) {
+                if (serviceDTO.getName().equals(serviceName)) {
                     return entry.getKey();
                 }
             }
@@ -231,7 +231,7 @@ public class StackUtils {
     public static ServiceDTO getServiceDTO(String serviceName) {
         for (Map.Entry<StackDTO, List<ServiceDTO>> entry : STACK_SERVICE_MAP.entrySet()) {
             for (ServiceDTO serviceDTO : entry.getValue()) {
-                if (serviceDTO.getServiceName().equals(serviceName)) {
+                if (serviceDTO.getName().equals(serviceName)) {
                     return serviceDTO;
                 }
             }
@@ -244,7 +244,7 @@ public class StackUtils {
         for (Map.Entry<StackDTO, List<ServiceDTO>> entry : STACK_SERVICE_MAP.entrySet()) {
             for (ServiceDTO serviceDTO : entry.getValue()) {
                 for (ComponentDTO componentDTO : serviceDTO.getComponents()) {
-                    if (componentDTO.getComponentName().equals(componentName)) {
+                    if (componentDTO.getName().equals(componentName)) {
                         return componentDTO;
                     }
                 }
@@ -252,5 +252,19 @@ public class StackUtils {
         }
 
         throw new ServerException("Component not found: " + componentName);
+    }
+
+    public static ServiceDTO getServiceDTOByComponentName(String componentName) {
+        for (Map.Entry<StackDTO, List<ServiceDTO>> entry : STACK_SERVICE_MAP.entrySet()) {
+            for (ServiceDTO serviceDTO : entry.getValue()) {
+                for (ComponentDTO componentDTO : serviceDTO.getComponents()) {
+                    if (componentDTO.getName().equals(componentName)) {
+                        return serviceDTO;
+                    }
+                }
+            }
+        }
+
+        throw new ServerException("Service not found by component name: " + componentName);
     }
 }

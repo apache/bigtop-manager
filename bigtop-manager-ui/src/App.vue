@@ -21,8 +21,8 @@
   import { storeToRefs } from 'pinia'
   import { onMounted } from 'vue'
   import { useLocaleStore } from '@/store/locale'
-  import { useTheme } from './store/theme'
-  const themeStore = useTheme()
+  import { useThemeStore } from './store/theme'
+  const themeStore = useThemeStore()
   const localeStore = useLocaleStore()
   const { antd } = storeToRefs(localeStore)
   const { themeConfig } = storeToRefs(themeStore)

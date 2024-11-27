@@ -19,8 +19,9 @@
 package org.apache.bigtop.manager.server.command.task;
 
 import org.apache.bigtop.manager.common.enums.Command;
-import org.apache.bigtop.manager.common.enums.MaintainState;
-import org.apache.bigtop.manager.dao.po.HostComponentPO;
+import org.apache.bigtop.manager.dao.po.ComponentPO;
+import org.apache.bigtop.manager.dao.query.ComponentQuery;
+import org.apache.bigtop.manager.server.enums.HealthyStatusEnum;
 
 public class ComponentStartTask extends AbstractComponentTask {
 
@@ -37,17 +38,18 @@ public class ComponentStartTask extends AbstractComponentTask {
     public void onSuccess() {
         super.onSuccess();
 
-        Long clusterId = taskContext.getClusterId();
         String componentName = taskContext.getComponentName();
-        String hostname = taskContext.getHostname();
-        HostComponentPO hostComponentPO =
-                hostComponentDao.findByClusterIdAndComponentNameAndHostname(clusterId, componentName, hostname);
-        hostComponentPO.setState(MaintainState.STARTED.getName());
-        hostComponentDao.partialUpdateById(hostComponentPO);
+        String hostname = taskContext.getHostDTO().getHostname();
+        ComponentQuery componentQuery =
+                ComponentQuery.builder().hostname(hostname).name(componentName).build();
+        ComponentPO componentPO = componentDao.findByQuery(componentQuery).get(0);
+        componentPO.setStatus(HealthyStatusEnum.HEALTHY.getCode());
+        componentDao.partialUpdateById(componentPO);
     }
 
     @Override
     public String getName() {
-        return "Start " + taskContext.getComponentDisplayName() + " on " + taskContext.getHostname();
+        return "Start " + taskContext.getComponentDisplayName() + " on "
+                + taskContext.getHostDTO().getHostname();
     }
 }

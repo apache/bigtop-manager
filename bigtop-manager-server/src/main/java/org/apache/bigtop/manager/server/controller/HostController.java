@@ -55,7 +55,6 @@ public class HostController {
     @Resource
     private HostService hostService;
 
-    @Operation(summary = "list", description = "List hosts")
     @Parameters({
         @Parameter(in = ParameterIn.QUERY, name = "pageNum", schema = @Schema(type = "integer", defaultValue = "1")),
         @Parameter(in = ParameterIn.QUERY, name = "pageSize", schema = @Schema(type = "integer", defaultValue = "10")),
@@ -66,6 +65,7 @@ public class HostController {
                 description = "asc/desc",
                 schema = @Schema(type = "string", defaultValue = "asc"))
     })
+    @Operation(summary = "list", description = "List hosts")
     @GetMapping
     public ResponseEntity<PageVO<HostVO>> list(HostQuery hostQuery) {
         return ResponseEntity.success(hostService.list(hostQuery));

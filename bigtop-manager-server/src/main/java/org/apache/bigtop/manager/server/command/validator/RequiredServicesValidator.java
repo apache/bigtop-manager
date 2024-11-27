@@ -50,7 +50,7 @@ public class RequiredServicesValidator implements CommandValidator {
 
     @Override
     public List<CommandIdentifier> getCommandIdentifiers() {
-        return List.of(new CommandIdentifier(CommandLevel.SERVICE, Command.INSTALL));
+        return List.of(new CommandIdentifier(CommandLevel.SERVICE, Command.ADD));
     }
 
     @Override
@@ -70,9 +70,8 @@ public class RequiredServicesValidator implements CommandValidator {
                 return;
             }
 
-            List<ServicePO> servicePOList = serviceDao.findByClusterIdAndServiceNameIn(clusterId, requiredServices);
-            List<String> list =
-                    servicePOList.stream().map(ServicePO::getServiceName).toList();
+            List<ServicePO> servicePOList = serviceDao.findByClusterIdAndNames(clusterId, requiredServices);
+            List<String> list = servicePOList.stream().map(ServicePO::getName).toList();
 
             requiredServices.removeAll(list);
 

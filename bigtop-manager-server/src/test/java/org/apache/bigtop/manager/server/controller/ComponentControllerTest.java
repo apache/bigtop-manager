@@ -18,7 +18,9 @@
  */
 package org.apache.bigtop.manager.server.controller;
 
+import org.apache.bigtop.manager.dao.query.ComponentQuery;
 import org.apache.bigtop.manager.server.model.vo.ComponentVO;
+import org.apache.bigtop.manager.server.model.vo.PageVO;
 import org.apache.bigtop.manager.server.service.ComponentService;
 import org.apache.bigtop.manager.server.utils.MessageSourceUtils;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
@@ -32,9 +34,6 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.Arrays;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -66,11 +65,10 @@ class ComponentControllerTest {
 
     @Test
     void listReturnsAllComponents() {
-        Long clusterId = 1L;
-        List<ComponentVO> components = Arrays.asList(new ComponentVO(), new ComponentVO());
-        when(componentService.list(clusterId)).thenReturn(components);
+        PageVO<ComponentVO> components = new PageVO<>();
+        when(componentService.list(any())).thenReturn(components);
 
-        ResponseEntity<List<ComponentVO>> response = componentController.list(clusterId);
+        ResponseEntity<PageVO<ComponentVO>> response = componentController.list(new ComponentQuery());
 
         assertTrue(response.isSuccess());
         assertEquals(components, response.getData());
@@ -78,33 +76,24 @@ class ComponentControllerTest {
 
     @Test
     void getReturnsComponentById() {
+        Long clusterId = 1L;
         Long id = 1L;
         ComponentVO component = new ComponentVO();
         when(componentService.get(id)).thenReturn(component);
 
-        ResponseEntity<ComponentVO> response = componentController.get(id);
+        ResponseEntity<ComponentVO> response = componentController.get(clusterId, id);
 
         assertTrue(response.isSuccess());
         assertEquals(component, response.getData());
     }
 
     @Test
-    void listReturnsEmptyForNoComponents() {
-        Long clusterId = 1L;
-        when(componentService.list(clusterId)).thenReturn(List.of());
-
-        ResponseEntity<List<ComponentVO>> response = componentController.list(clusterId);
-
-        assertTrue(response.isSuccess());
-        assertTrue(response.getData().isEmpty());
-    }
-
-    @Test
     void getReturnsNotFoundForInvalidId() {
+        Long clusterId = 1L;
         Long id = 999L;
         when(componentService.get(id)).thenReturn(null);
 
-        ResponseEntity<ComponentVO> response = componentController.get(id);
+        ResponseEntity<ComponentVO> response = componentController.get(clusterId, id);
 
         assertTrue(response.isSuccess());
         assertNull(response.getData());

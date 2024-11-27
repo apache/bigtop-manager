@@ -25,15 +25,9 @@ import java.util.List;
 @Data
 public class ServiceConfigVO {
 
-    private String serviceName;
+    private Long id;
 
-    private String configDesc;
+    private String name;
 
-    private Integer version;
-
-    private List<TypeConfigVO> configs;
-
-    private String createTime;
-
-    private String updateTime;
+    private List<PropertyVO> properties;
 }

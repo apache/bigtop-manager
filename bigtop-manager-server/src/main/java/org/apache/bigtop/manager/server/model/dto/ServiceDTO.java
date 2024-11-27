@@ -25,21 +25,21 @@ import java.util.List;
 @Data
 public class ServiceDTO {
 
-    private String serviceName;
+    private String name;
 
     private String displayName;
 
-    private String serviceDesc;
+    private String desc;
 
-    private String serviceVersion;
+    private String version;
 
-    private String serviceUser;
+    private String user;
 
     private List<PackageSpecificDTO> packageSpecifics;
 
     private List<ComponentDTO> components;
 
-    private List<TypeConfigDTO> configs;
+    private List<ServiceConfigDTO> configs;
 
     private List<String> requiredServices;
 }

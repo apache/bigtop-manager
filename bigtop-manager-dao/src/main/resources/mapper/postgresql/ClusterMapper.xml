@@ -36,10 +36,11 @@
             <property name="alias" value="c"/>
         </include>, u.nickname as create_user,
         count(h.id) as total_host, sum(h.available_processors) as total_processor,
-        sum(h.total_memory_size) as total_memory, sum(h.total_disk) as total_disk
+        sum(h.total_memory_size) as total_memory, sum(h.total_disk) as total_disk, count(s.id) as total_service
         from
         cluster c left join user u on c.create_by = u.id
         left join host h on c.id = h.cluster_id
+        left join service s on c.id = s.cluster_id
         where c.id = #{id}
         limit 1
     </select>
@@ -55,23 +56,5 @@
 
     <select id="count" resultType="java.lang.Integer">
         select count(*) from cluster
-    </select>
-
-    <select id="findByIdJoin"
-            resultType="org.apache.bigtop.manager.dao.po.ClusterPO">
-        select
-        <include refid="baseColumnsV2">
-            <property name="alias" value="r"/>
-        </include>
-        , s.stack_name, s.stack_version
-        from
-        cluster r
-        inner join stack s
-        on r.stack_id = s.id
-        <where>
-            <if test="clusterId!=0">
-                r.id=#{clusterId}
-            </if>
-        </where>
     </select>
 </mapper>
