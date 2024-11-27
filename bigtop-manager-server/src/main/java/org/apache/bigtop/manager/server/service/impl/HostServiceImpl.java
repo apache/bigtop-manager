@@ -208,7 +208,8 @@ public class HostServiceImpl implements HostService {
                 throw new ApiException(ApiExceptionEnum.HOST_UNABLE_TO_EXEC_COMMAND, hostDTO.getHostname());
             }
 
-            // Check process, wait for 10s so we can get the correct exit code
+            // Check the process, the agent may encounter some errors and exit when starting
+            // So we need to wait for a while before the check
             try {
                 Thread.sleep(10 * 1000);
             } catch (InterruptedException e) {
