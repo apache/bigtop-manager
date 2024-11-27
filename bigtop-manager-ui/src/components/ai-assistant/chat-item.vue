@@ -17,12 +17,8 @@
   ~ under the License.
   -->
 <script setup lang="ts">
-  interface Props {
-    sender?: string
-    message?: string
-  }
-
-  defineProps<Props>()
+  import { ChatMessageItem } from '@/api/ai-assistant/types'
+  defineProps<ChatMessageItem>()
 </script>
 
 <template>

@@ -21,7 +21,7 @@
   import EmptyContent from './empty-content.vue'
   import ChatInput from './chat-input.vue'
   import ChatHistory from './chat-history.vue'
-  import ChatItem from './chat-item.vue'
+  // import ChatItem from './chat-item.vue'
 
   enum Action {
     ADD,
@@ -114,7 +114,7 @@
 
 <template>
   <div class="ai-assistant">
-    <chat-history :visible="historyVisible" />
+    <chat-history v-if="historyVisible" />
     <a-drawer
       v-model:open="open"
       :title="title"
@@ -138,7 +138,7 @@
       <div class="chat">
         <empty-content v-if="false" />
         <div class="chat-content">
-          <chat-item />
+          <!-- <chat-item /> -->
         </div>
       </div>
       <template #footer>

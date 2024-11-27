@@ -17,42 +17,38 @@
   ~ under the License.
   -->
 <script setup lang="ts">
-  import { ref } from 'vue'
+  import { onMounted } from 'vue'
+  import { useAiChatStore } from '@/store/ai-assistant'
+  import { storeToRefs } from 'pinia'
 
-  interface Props {
-    visible: boolean
-  }
+  const aiChatStore = useAiChatStore()
+  const { selectKey, threads } = storeToRefs(aiChatStore)
 
-  defineProps<Props>()
-
-  const selectedKey = ref(0)
-  const items = ref(
-    Array.from({ length: 100 }, (_, i) => {
-      return {
-        key: `${i}`,
-        label: `Chat ${i}Chat ${i}Chat ${i}Chat ${i}Chat ${i}Chat ${i}Chat ${i}Chat ${i}Chat ${i}Chat ${i}Chat ${i}Chat ${i}`,
-        title: `Chat ${i}`
-      }
-    })
-  )
-
-  const handleClick = () => {}
+  onMounted(() => {
+    aiChatStore.getThreadsFromAuthPlatform()
+  })
 </script>
 
 <template>
-  <div v-if="$props.visible" class="chat-history">
+  <div class="chat-history">
     <header>
       <a-typography-title :level="5">历史记录</a-typography-title>
     </header>
     <main>
-      <a-menu v-model:selectedKeys="selectedKey" @click="handleClick">
-        <a-menu-item v-for="item in items" :key="item.key" :title="item.title">
-          <span>{{ item.label }}</span>
+      <a-menu v-model:selected-keys="selectKey">
+        <a-menu-item
+          v-for="item in threads"
+          :key="item.threadId"
+          :title="item.name"
+        >
+          <span>{{ item.name }}</span>
         </a-menu-item>
       </a-menu>
     </main>
     <footer>
-      <a-button type="primary">新建会话</a-button>
+      <a-button type="primary" @click="aiChatStore.createChatThread">
+        新建会话
+      </a-button>
     </footer>
   </div>
 </template>
@@ -64,7 +60,7 @@
     top: 64px;
     height: 100%;
     z-index: 10;
-    width: '300px';
+    width: 300px;
     background-color: #f7f9fc;
 
     display: grid;
