@@ -27,4 +27,7 @@ public interface MonitoringService {
     JsonNode queryAgentsInfo();
 
     JsonNode queryAgentsInstStatus();
+
+    JsonNode queryClusterInfo(String clusterName);
+    JsonNode queryHostsInfo();
 }

@@ -18,6 +18,7 @@
  */
 package org.apache.bigtop.manager.server.proxy;
 
+import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -41,6 +42,9 @@ import java.util.Set;
 public class PrometheusProxy {
 
     private final WebClient webClient;
+
+    @Resource
+    private BigtopProxy bigtopProxy;
 
     @Value("${monitoring.agent-host-job-name}")
     private String agentHostJobName;
@@ -171,6 +175,55 @@ public class PrometheusProxy {
         return agentsInfo;
     }
 
+    public JsonNode queryCluster(String clusterId,String timeSlice){
+        JsonNode agentsIpv4 = bigtopProxy.getAgentsIpv4(clusterId).get("hosts");
+        ObjectMapper objectMapper = new ObjectMapper();
+        ArrayNode clusterInfo = objectMapper.createArrayNode();
+        long clusterMemTotal = 0L;
+        long clusterMemIdle= 0L;
+        long clusterDiskTotal = 0L;
+        long clusterDiskIdle = 0L;
+
+        for(JsonNode agentIpv4:agentsIpv4){
+            // 1min 15min 30min 1h 6h 12h
+            JsonNode cpuResult = queryAgentCpu(agentIpv4.asText());
+            JsonNode memResult = queryAgentMemory(agentsIpv4.asText());
+            JsonNode diskResult = queryAgentDisk(agentIpv4.asText());
+            JsonNode diskIOResult = queryAgentDiskIO(agentsIpv4.asText());
+            ObjectNode temp = objectMapper.createObjectNode();
+
+            // hostInfo
+            temp.put("hostname", cpuResult.get("hostname").asText());
+            temp.put("iPv4addr", cpuResult.get("iPv4addr").asText());
+            temp.put("cpuInfo", cpuResult.get("cpuInfo").asText().strip());
+            temp.put("time", cpuResult.get("time").asText());
+            temp.put("cpuLoadAvgMin_1", cpuResult.get("cpuLoadAvgMin_1").asDouble());
+            temp.put("cpuLoadAvgMin_5", cpuResult.get("cpuLoadAvgMin_5").asDouble());
+            temp.put("cpuLoadAvgMin_15", cpuResult.get("cpuLoadAvgMin_15").asDouble());
+            temp.put("cpuLoadAvgMin_30", cpuResult.get("cpuLoadAvgMin_15").asDouble());
+//            temp.put("cpuLoadAvgMin_60", cpuResult.get("cpuLoadAvgMin_15").asDouble());
+//            temp.put("cpuLoadAvgMin_360", cpuResult.get("cpuLoadAvgMin_15").asDouble());
+//            temp.put("cpuLoadAvgMin_720", cpuResult.get("cpuLoadAvgMin_15").asDouble());
+            temp.put("cpuUsage", cpuResult.get("cpuUsage").asDouble());
+            temp.put("fileTotalDescriptor", cpuResult.get("fileTotalDescriptor").asLong());
+            temp.put("fileOpenDescriptor", cpuResult.get("fileOpenDescriptor").asLong());
+            // MEM
+            clusterMemIdle += memResult.get("memIdle").asLong();
+            clusterMemTotal += memResult.get("memTotal").asLong();
+            // DISK
+            for(JsonNode disk:diskResult.get("diskInfo")){
+                if(disk.get("diskUsage").asText().equals("diskTotalSpace")){
+                    clusterDiskTotal += disk.get("diskValue").asLong();
+                }else {  // diskFreeSpace
+                    clusterDiskIdle += disk.get("diskValue").asLong();
+                }
+            }
+            // DISK IO
+            temp.set("diskIO", diskIOResult.get("diskIO"));
+            clusterInfo.add(temp);
+        }
+        return clusterInfo;
+    }
     public JsonNode query(String params) {
         Mono<JsonNode> body = webClient
                 .post()
@@ -278,7 +331,7 @@ public class PrometheusProxy {
                 for (JsonNode agent : agentDisksResult) {
                     JsonNode agentDisk = agent.get("metric");
                     ObjectNode temp = objectMapper.createObjectNode();
-                    temp.put("diskName", agentDisk.get("diskUsage").asText());
+                    temp.put("diskName", agentDisk.get("diskName").asText());
                     temp.put("diskUsage", agentDisk.get("diskUsage").asText());
                     temp.put("diskValue", agent.get("value").get(1).asLong());
                     tempDiskInfo.add(temp);

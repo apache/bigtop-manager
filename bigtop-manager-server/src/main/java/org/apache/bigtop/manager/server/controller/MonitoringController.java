@@ -18,11 +18,16 @@
  */
 package org.apache.bigtop.manager.server.controller;
 
+import org.apache.bigtop.manager.server.model.vo.ClusterVO;
+import org.apache.bigtop.manager.server.service.ClusterService;
+import org.apache.bigtop.manager.server.service.HostService;
 import org.apache.bigtop.manager.server.service.MonitoringService;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -31,6 +36,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.annotation.Resource;
 
+import javax.naming.ldap.PagedResultsControl;
+
 @Tag(name = "Monitoring Controller")
 @RestController
 @RequestMapping("monitoring")
@@ -38,6 +45,11 @@ public class MonitoringController {
 
     @Resource
     private MonitoringService monitoringService;
+    @Resource
+    private ClusterService clusterService;
+
+    @Resource
+    private HostService hostService;
 
     @Operation(summary = "agent healthy", description = "agent healthy check")
     @GetMapping("agenthealthy")
@@ -56,5 +68,15 @@ public class MonitoringController {
     @GetMapping("agentinstinfo")
     public ResponseEntity<JsonNode> queryAgentsInstStatus() {
         return ResponseEntity.success(monitoringService.queryAgentsInstStatus());
+    }
+
+    @Operation(summary = "cluster info", description = "cluster info")
+    @GetMapping("clusterinfo")
+    public ResponseEntity<JsonNode> queryCluster(
+            @RequestParam(value = "clusterId", required = true) String clusterId,
+            @RequestParam(value = "timeDec", required = true, defaultValue = "0") String timeDec) {
+        ClusterVO clusterVO = clusterService.get(Long.getLong(clusterId));
+        String clusterName = clusterVO.getName();
+        return ResponseEntity.success(monitoringService.queryClusterInfo(clusterName));
     }
 }
