@@ -18,7 +18,6 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
-import io.swagger.v3.core.util.Json;
 import org.apache.bigtop.manager.server.proxy.PrometheusProxy;
 import org.apache.bigtop.manager.server.service.MonitoringService;
 
@@ -47,19 +46,7 @@ public class MonitoringServiceImpl implements MonitoringService {
     }
 
     @Override
-    public JsonNode queryAgentsInstStatus() {
-        return prometheusProxy.queryAgentsInstStatus();
-    }
-
-    // query cluster format
-    @Override
-    public JsonNode queryClusterInfo(String clusterName) {
-        return null;
-    }
-
-    // query every agent format
-    @Override
-    public JsonNode queryHostsInfo() {
-        return null;
+    public JsonNode queryClusterInfo(String clusterId, String step) {
+        return prometheusProxy.queryClusterInfo(clusterId, step);
     }
 }

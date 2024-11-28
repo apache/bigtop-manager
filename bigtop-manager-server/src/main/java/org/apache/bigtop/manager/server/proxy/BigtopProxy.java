@@ -43,10 +43,10 @@ public class BigtopProxy {
 
     private MultiValueMap<String, String> createFormData(String clusterId, Integer pageNum) {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add("hostnameLike", ""); // 主机名正则
-        formData.add("clusterId", clusterId); // 集群ID
-        formData.add("ipv4Like", ""); // ipv4 正则
-        formData.add("status", ""); // 主机状态
+        formData.add("hostnameLike", "");
+        formData.add("clusterId", clusterId);
+        formData.add("ipv4Like", "");
+        formData.add("status", "");
         formData.add("pageNum", String.valueOf(pageNum));
         formData.add("pageSize", "20");
         formData.add("orderBy", "id");
