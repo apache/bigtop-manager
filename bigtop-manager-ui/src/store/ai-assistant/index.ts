@@ -24,7 +24,7 @@ import type {
 } from '@/api/ai-assistant/types'
 import * as ai from '@/api/ai-assistant/index'
 import { defineStore } from 'pinia'
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 
 export const useAiChatStore = defineStore(
   'ai-assistant',
@@ -32,11 +32,6 @@ export const useAiChatStore = defineStore(
     const currThread = ref<ChatThread>({})
     const threads = ref<ChatThread[]>([])
     const chatRecords = ref<ChatMessageItem[]>([])
-    const selectKey = ref<ThreadId[]>([currThread.value.threadId || ''])
-
-    watch(selectKey, (newKey) => {
-      console.log('newKey :>> ', newKey)
-    })
 
     const createChatThread = async () => {
       const data = await ai.createChatThread({
@@ -61,7 +56,6 @@ export const useAiChatStore = defineStore(
       currThread,
       threads,
       chatRecords,
-      selectKey,
       createChatThread,
       getThread,
       getThreadsFromAuthPlatform

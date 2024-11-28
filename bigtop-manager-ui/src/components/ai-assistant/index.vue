@@ -21,11 +21,14 @@
   import EmptyContent from './empty-content.vue'
   import ChatInput from './chat-input.vue'
   import ChatHistory from './chat-history.vue'
+  import { DrawerProps } from 'ant-design-vue'
+  import type { GroupItem } from '../common/button-group/types'
+
   // import ChatItem from './chat-item.vue'
 
   enum Action {
     ADD,
-    HSITORY,
+    RECORDS,
     FULLSCREEN,
     EXITSCREEN,
     CLOSE
@@ -33,42 +36,33 @@
 
   type ActionType = keyof typeof Action
 
-  interface ActionItem {
-    icon: string
-    action: ActionType
-    tip?: string
-  }
-
   const open = ref(false)
-  const isFullScreen = ref(false)
+  const show = ref(false)
   const title = ref('AI 助理')
-  const commonConfig = shallowReactive({
+  const fullScreen = ref(false)
+  const actionHandlers = ref<Map<ActionType, (...args: any[]) => void>>(
+    new Map()
+  )
+  const styleConfig = shallowReactive<DrawerProps>({
     headerStyle: {
       height: '56px'
     },
+    bodyStyle: {
+      padding: '16px'
+    },
     contentWrapperStyle: {
       boxShadow: 'none',
-      top: '64px'
+      top: '64px',
+      transform: 'translateX(0)'
     },
     footerStyle: {
       border: 'none'
-    },
-    placement: 'right',
-    closable: false,
-    mask: false
+    }
   })
 
-  const historyStyleConfig = shallowReactive({
-    width: '300px',
-    backgroundColor: '#F7F9FC'
-  })
-
-  const historyVisible = computed(() => isFullScreen.value && open.value)
-  const chatWindowWidth = computed(() =>
-    isFullScreen.value ? `calc(100% - ${historyStyleConfig.width})` : 450
-  )
-
-  const actions = computed((): ActionItem[] => [
+  const historyVisible = computed(() => fullScreen.value && open.value)
+  const width = computed(() => (fullScreen.value ? 'calc(100% - 300px)' : 450))
+  const actionGroup = computed((): GroupItem<ActionType>[] => [
     {
       tip: '创建对话',
       icon: 'plus_gray',
@@ -77,34 +71,72 @@
     {
       tip: '历史记录',
       icon: 'history',
-      action: 'HSITORY'
+      action: 'RECORDS',
+      clickEvent: openRecord
     },
     {
-      tip: isFullScreen.value ? '退出全屏' : '窗口全屏',
-      icon: isFullScreen.value ? 'exit_screen' : 'full_screen',
-      action: isFullScreen.value ? 'EXITSCREEN' : 'FULLSCREEN'
+      tip: '窗口全屏',
+      icon: 'full_screen',
+      action: 'FULLSCREEN',
+      clickEvent: toggleFullScreen
+    },
+    {
+      tip: '退出全屏',
+      icon: 'exit_screen',
+      action: 'EXITSCREEN',
+      clickEvent: toggleFullScreen
     },
     {
       icon: 'close',
-      action: 'CLOSE'
+      action: 'CLOSE',
+      clickEvent: closed
     }
   ])
 
-  const onActions = (item: ActionItem) => {
-    if (['FULLSCREEN', 'EXITSCREEN'].includes(item.action)) {
-      isFullScreen.value = !isFullScreen.value
-    }
-    if (item.action === 'CLOSE') {
-      open.value = false
-    }
-  }
+  const checkActions = computed(() =>
+    fullScreen.value
+      ? filterActions(['EXITSCREEN', 'CLOSE'])
+      : filterActions(['ADD', 'RECORDS', 'FULLSCREEN', 'CLOSE'])
+  )
 
-  const afterOpenChange = (bool: boolean) => {
-    console.log('open', bool)
+  const filterActions = (showActions?: ActionType[]) => {
+    if (!showActions) return actionGroup.value
+    return actionGroup.value.filter(
+      (action) => action.action && showActions.includes(action.action)
+    )
   }
 
   const openDrawer = () => {
     open.value = true
+    initActionHandler()
+  }
+
+  const openRecord = () => {
+    show.value = true
+  }
+
+  const toggleFullScreen = () => {
+    fullScreen.value = !fullScreen.value
+  }
+
+  const closed = () => {
+    open.value = false
+  }
+
+  const onActions = (item: GroupItem<ActionType>) => {
+    const handler = item.action && actionHandlers.value.get(item.action)
+    if (handler) {
+      handler()
+    } else {
+      console.warn(`Unknown action: ${item.action}`)
+    }
+  }
+
+  const initActionHandler = () => {
+    actionGroup.value.forEach((act) => {
+      act.action &&
+        actionHandlers.value.set(act.action, act.clickEvent || (() => {}))
+    })
   }
 
   defineExpose({
@@ -114,27 +146,37 @@
 
 <template>
   <div class="ai-assistant">
-    <chat-history v-if="historyVisible" />
+    <chat-history :visible="historyVisible" history-type="large" />
     <a-drawer
       v-model:open="open"
       :title="title"
-      :width="chatWindowWidth"
-      v-bind="commonConfig"
-      @after-open-change="afterOpenChange"
+      :width="width"
+      :mask="false"
+      :closable="false"
+      placement="right"
+      v-bind="styleConfig"
     >
       <template #extra>
-        <a-space>
-          <a-button
-            v-for="action in actions"
-            :key="action.icon"
-            shape="circle"
-            type="text"
-            @click="onActions(action)"
-          >
-            <svg-icon :name="action.icon" />
-          </a-button>
-        </a-space>
+        <button-group :groups="checkActions" @on-click="onActions">
+          <template #icon="{ item }">
+            <svg-icon :name="item.icon" />
+          </template>
+        </button-group>
       </template>
+
+      <chat-history :visible="show" history-type="small">
+        <template #extra>
+          <button-group
+            :groups="filterActions(['CLOSE'])"
+            @on-click="onActions"
+          >
+            <template #icon="{ item }">
+              <svg-icon :name="item.icon" />
+            </template>
+          </button-group>
+        </template>
+      </chat-history>
+
       <div class="chat">
         <empty-content v-if="false" />
         <div class="chat-content">
@@ -152,6 +194,13 @@
 </template>
 
 <style lang="scss" scoped>
+  .ai-assistant-desc {
+    display: block;
+    text-align: center;
+    font-size: 12px;
+    margin: $space-sm 0;
+  }
+
   .chat {
     height: 100%;
 
@@ -160,12 +209,5 @@
       max-width: 800px;
       margin: 0 auto;
     }
-  }
-
-  .ai-assistant-desc {
-    display: block;
-    text-align: center;
-    font-size: 12px;
-    margin: $space-sm 0;
   }
 </style>

@@ -17,39 +17,87 @@
   ~ under the License.
   -->
 <script setup lang="ts">
-  import { onMounted } from 'vue'
+  import { onMounted, ref, toRefs } from 'vue'
   import { useAiChatStore } from '@/store/ai-assistant'
   import { storeToRefs } from 'pinia'
+  import type { ThreadId } from '@/api/ai-assistant/types'
+
+  interface Props {
+    historyType: 'large' | 'small'
+    visible?: boolean
+  }
+
+  const props = defineProps<Props>()
 
   const aiChatStore = useAiChatStore()
-  const { selectKey, threads } = storeToRefs(aiChatStore)
+  const { threads, currThread } = storeToRefs(aiChatStore)
+  const { visible, historyType } = toRefs(props)
+  const selectKey = ref<ThreadId[]>([])
+  const title = ref('历史记录')
+
+  const handleSelect = ({ key }: { key: ThreadId }) => {
+    aiChatStore.getThread(key)
+  }
 
   onMounted(() => {
+    selectKey.value = [currThread.value.threadId || '']
     aiChatStore.getThreadsFromAuthPlatform()
   })
 </script>
 
 <template>
-  <div class="chat-history">
-    <header>
-      <a-typography-title :level="5">历史记录</a-typography-title>
-    </header>
-    <main>
-      <a-menu v-model:selected-keys="selectKey">
-        <a-menu-item
-          v-for="item in threads"
-          :key="item.threadId"
-          :title="item.name"
-        >
-          <span>{{ item.name }}</span>
-        </a-menu-item>
-      </a-menu>
-    </main>
-    <footer>
-      <a-button type="primary" @click="aiChatStore.createChatThread">
-        新建会话
-      </a-button>
-    </footer>
+  <div>
+    <a-drawer
+      v-if="historyType === 'small'"
+      v-model:open="visible"
+      :title="title"
+      placement="top"
+      :closable="false"
+      :mask="false"
+      :get-container="false"
+      :style="{ position: 'absolute' }"
+      :body-style="{
+        padding: '16px'
+      }"
+    >
+      <template #extra>
+        <slot name="extra"></slot>
+      </template>
+      <main>
+        <a-menu v-model:selected-keys="selectKey" @select="handleSelect">
+          <a-menu-item
+            v-for="item in threads"
+            :key="item.threadId"
+            :title="item.name"
+          >
+            <span>{{ item.name }}</span>
+          </a-menu-item>
+        </a-menu>
+      </main>
+    </a-drawer>
+    <template v-else>
+      <div v-if="visible" class="chat-history">
+        <header>
+          <a-typography-title :level="5">{{ title }}</a-typography-title>
+        </header>
+        <main>
+          <a-menu v-model:selected-keys="selectKey" @select="handleSelect">
+            <a-menu-item
+              v-for="item in threads"
+              :key="item.threadId"
+              :title="item.name"
+            >
+              <span>{{ item.name }}</span>
+            </a-menu-item>
+          </a-menu>
+        </main>
+        <footer>
+          <a-button type="primary" @click="aiChatStore.createChatThread">
+            新建会话
+          </a-button>
+        </footer>
+      </div>
+    </template>
   </div>
 </template>
 
