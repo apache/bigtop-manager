@@ -109,7 +109,7 @@ CREATE TABLE `host`
     `total_memory_size`    BIGINT,
     `desc`                 VARCHAR(255) DEFAULT NULL,
     `status`               INTEGER DEFAULT NULL COMMENT '1-healthy, 2-unhealthy, 3-unknown',
-    `err_info`             VARCHAR(255) DEFAULT NULL,
+    `err_info`             TEXT DEFAULT NULL,
     `create_time`          DATETIME     DEFAULT CURRENT_TIMESTAMP,
     `update_time`          DATETIME     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `create_by`            BIGINT,

@@ -22,10 +22,10 @@
           xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.1.0 http://maven.apache.org/xsd/assembly-2.1.0.xsd">
     <id>server</id>
     <formats>
-        <format>dir</format>
+        <format>tar.gz</format>
     </formats>
-    <includeBaseDirectory>false</includeBaseDirectory>
-    <baseDirectory>server</baseDirectory>
+    <includeBaseDirectory>true</includeBaseDirectory>
+    <baseDirectory>bigtop-manager-server</baseDirectory>
     <fileSets>
         <fileSet>
             <directory>${basedir}/src/main/resources</directory>

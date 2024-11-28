@@ -18,11 +18,14 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
+import org.apache.bigtop.manager.common.constants.MessageConstants;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.dao.po.HostPO;
+import org.apache.bigtop.manager.dao.po.RepoPO;
 import org.apache.bigtop.manager.dao.query.HostQuery;
 import org.apache.bigtop.manager.dao.repository.ComponentDao;
 import org.apache.bigtop.manager.dao.repository.HostDao;
+import org.apache.bigtop.manager.dao.repository.RepoDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.enums.HealthyStatusEnum;
 import org.apache.bigtop.manager.server.enums.HostAuthTypeEnum;
@@ -52,6 +55,9 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class HostServiceImpl implements HostService {
+
+    @Resource
+    private RepoDao repoDao;
 
     @Resource
     private HostDao hostDao;
@@ -140,25 +146,9 @@ public class HostServiceImpl implements HostService {
     @Override
     public Boolean checkConnection(HostDTO hostDTO) {
         String command = "hostname";
-        HostAuthTypeEnum authType = HostAuthTypeEnum.fromCode(hostDTO.getAuthType());
         for (String hostname : hostDTO.getHostnames()) {
             try {
-                ShellResult result = null;
-                switch (authType) {
-                    case PASSWORD -> result = RemoteSSHUtils.executeCommand(
-                            hostname, hostDTO.getSshPort(), hostDTO.getSshUser(), hostDTO.getSshPassword(), command);
-                    case KEY -> result = RemoteSSHUtils.executeCommand(
-                            hostname,
-                            hostDTO.getSshPort(),
-                            hostDTO.getSshUser(),
-                            hostDTO.getSshKeyFilename(),
-                            hostDTO.getSshKeyString(),
-                            hostDTO.getSshKeyPassword(),
-                            command);
-                    case NO_AUTH -> result = RemoteSSHUtils.executeCommand(
-                            hostname, hostDTO.getSshPort(), hostDTO.getSshUser(), command);
-                }
-
+                ShellResult result = execCommandOnRemoteHost(hostDTO, hostname, command);
                 if (result.getExitCode() != 0) {
                     log.error("Unable to connect to host, hostname: {}, msg: {}", hostname, result.getErrMsg());
                     throw new ApiException(ApiExceptionEnum.HOST_UNABLE_TO_CONNECT, hostname);
@@ -172,5 +162,97 @@ public class HostServiceImpl implements HostService {
         }
 
         return true;
+    }
+
+    @Override
+    public Boolean installDependencies(List<Long> hostIds, String path) {
+        List<RepoPO> repoPOList = repoDao.findAll();
+        Map<String, RepoPO> archRepoMap = repoPOList.stream()
+                .filter(repoPO -> repoPO.getType() == 2)
+                .collect(Collectors.toMap(RepoPO::getArch, repo -> repo));
+
+        List<HostPO> hostPOList = hostDao.findByIds(hostIds);
+        for (HostPO hostPO : hostPOList) {
+            HostDTO hostDTO = HostConverter.INSTANCE.fromPO2DTO(hostPO);
+
+            // Get host arch
+            String arch = execCommandOnRemoteHost(hostDTO, hostDTO.getHostname(), "arch")
+                    .getOutput()
+                    .trim();
+            arch = arch.equals("arm64") ? "aarch64" : arch;
+
+            // Download & Extract agent tarball
+            String repoUrl = archRepoMap.get(arch).getBaseUrl();
+            String tarballUrl = repoUrl + "/bigtop-manager-agent.tar.gz";
+            String command = "curl -L " + tarballUrl + " | tar -xz -C " + path;
+            ShellResult result = execCommandOnRemoteHost(hostDTO, hostDTO.getHostname(), command);
+            if (result.getExitCode() != MessageConstants.SUCCESS_CODE) {
+                hostPO.setErrInfo(result.getErrMsg());
+                hostDao.updateById(hostPO);
+
+                log.error(
+                        "Unable to download & extract agent tarball, hostname: {}, msg: {}",
+                        hostDTO.getHostname(),
+                        result.getErrMsg());
+                throw new ApiException(ApiExceptionEnum.HOST_UNABLE_TO_EXEC_COMMAND, hostDTO.getHostname());
+            }
+
+            // Run agent in background
+            command = "nohup " + path + "/bigtop-manager-agent/bin/start.sh > /dev/null 2>&1 &";
+            result = execCommandOnRemoteHost(hostDTO, hostDTO.getHostname(), command);
+            if (result.getExitCode() != MessageConstants.SUCCESS_CODE) {
+                hostPO.setErrInfo(result.getErrMsg());
+                hostDao.updateById(hostPO);
+
+                log.error("Unable to start agent, hostname: {}, msg: {}", hostDTO.getHostname(), result.getErrMsg());
+                throw new ApiException(ApiExceptionEnum.HOST_UNABLE_TO_EXEC_COMMAND, hostDTO.getHostname());
+            }
+
+            // Check the process, the agent may encounter some errors and exit when starting
+            // So we need to wait for a while before the check
+            try {
+                Thread.sleep(10 * 1000);
+            } catch (InterruptedException e) {
+                log.error("Thread sleep interrupted", e);
+            }
+            command = "ps -ef | grep bigtop-manager-agent | grep -v grep";
+            result = execCommandOnRemoteHost(hostDTO, hostDTO.getHostname(), command);
+            if (result.getExitCode() != MessageConstants.SUCCESS_CODE
+                    || !result.getOutput().contains("bigtop-manager-agent")) {
+                hostPO.setErrInfo("Unable to start agent process, please check the log");
+                hostDao.updateById(hostPO);
+
+                log.error("Unable to start agent process, hostname: {}", hostDTO.getHostname());
+                throw new ApiException(ApiExceptionEnum.HOST_UNABLE_TO_EXEC_COMMAND, hostDTO.getHostname());
+            }
+
+            hostPO.setStatus(HealthyStatusEnum.HEALTHY.getCode());
+            hostDao.updateById(hostPO);
+        }
+
+        return true;
+    }
+
+    private ShellResult execCommandOnRemoteHost(HostDTO hostDTO, String hostname, String command) {
+        HostAuthTypeEnum authType = HostAuthTypeEnum.fromCode(hostDTO.getAuthType());
+        try {
+            return switch (authType) {
+                case PASSWORD -> RemoteSSHUtils.executeCommand(
+                        hostname, hostDTO.getSshPort(), hostDTO.getSshUser(), hostDTO.getSshPassword(), command);
+                case KEY -> RemoteSSHUtils.executeCommand(
+                        hostname,
+                        hostDTO.getSshPort(),
+                        hostDTO.getSshUser(),
+                        hostDTO.getSshKeyFilename(),
+                        hostDTO.getSshKeyString(),
+                        hostDTO.getSshKeyPassword(),
+                        command);
+                case NO_AUTH -> RemoteSSHUtils.executeCommand(
+                        hostname, hostDTO.getSshPort(), hostDTO.getSshUser(), command);
+            };
+        } catch (Exception e) {
+            log.error("Unable to exec command on host, hostname: {}, command: {}", hostname, command, e);
+            throw new ApiException(ApiExceptionEnum.HOST_UNABLE_TO_EXEC_COMMAND, hostname);
+        }
     }
 }

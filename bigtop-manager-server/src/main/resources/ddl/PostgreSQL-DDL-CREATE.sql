@@ -97,7 +97,7 @@ CREATE TABLE host
     total_memory_size    BIGINT,
     "desc"               VARCHAR(255)  DEFAULT NULL,
     status               INT  DEFAULT NULL,
-    err_info             VARCHAR(255)  DEFAULT NULL,
+    err_info             TEXT  DEFAULT NULL,
     create_time          TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
     update_time          TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
     create_by            BIGINT,
