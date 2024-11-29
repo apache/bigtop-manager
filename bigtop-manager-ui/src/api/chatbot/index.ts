@@ -62,9 +62,7 @@ export const validateAuthCredentials = (
   })
 }
 
-export const getChatThreads = (
-  params: ChatThreadCondition
-): Promise<ChatThread[]> => {
+export const getChatThreads = (params: ChatThreadCondition): Promise<ChatThread[]> => {
   return request({
     method: 'get',
     url: `/chatbot/auth-platforms/${params.authId}/threads`,
@@ -73,9 +71,7 @@ export const getChatThreads = (
     }
   })
 }
-export const createChatThread = (
-  data: ChatThreadCondition
-): Promise<ChatThread> => {
+export const createChatThread = (data: ChatThreadCondition): Promise<ChatThread> => {
   return request({
     method: 'post',
     url: `/chatbot/auth-platforms/${data.authId}/threads?model=${data.model}`
@@ -90,17 +86,13 @@ export const getThreadChatHistory = (
   })
 }
 
-export const delAuthorizedPlatform = (
-  authId: string | number
-): Promise<boolean> => {
+export const delAuthorizedPlatform = (authId: string | number): Promise<boolean> => {
   return request({
     method: 'delete',
     url: `/chatbot/auth-platforms/${authId}`
   })
 }
-export const delChatThread = (
-  params: ChatThreadDelCondition
-): Promise<boolean> => {
+export const delChatThread = (params: ChatThreadDelCondition): Promise<boolean> => {
   return request({
     method: 'delete',
     url: `/chatbot/auth-platforms/${params.authId}/threads/${params.threadId}`

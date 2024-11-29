@@ -17,15 +17,28 @@
   ~ under the License.
   -->
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+  import { ref } from 'vue'
+  import { useAiChatStore } from '@/store/ai-assistant'
+
+  const aiChatStore = useAiChatStore()
+  const message = ref('')
+
+  const sendMessage = async () => {
+    aiChatStore.setChatRecordForSender('USER', message.value)
+    aiChatStore.collectReciveMessage(message.value)
+    message.value = ''
+  }
+</script>
 <template>
   <div class="chat-input">
     <a-textarea
+      v-model:value="message"
       :bordered="false"
-      :autosize="{ minRows: 1, maxRows: 6 }"
+      :auto-size="{ minRows: 1, maxRows: 6 }"
       placeholder="请输入你的问题"
     />
-    <a-button type="text" shape="circle">
+    <a-button type="text" shape="circle" @click="sendMessage">
       <template #icon>
         <svg-icon name="send" />
       </template>

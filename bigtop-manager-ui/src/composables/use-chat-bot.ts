@@ -48,9 +48,7 @@ const useChatBot = () => {
   const canceler = ref<Canceler>()
   const messageReceiver = ref('')
 
-  function formatAuthCredentials<T extends Object>(
-    authFormData: T
-  ): AuthCredential[] {
+  function formatAuthCredentials<T extends Object>(authFormData: T): AuthCredential[] {
     const authCredentials: AuthCredential[] = []
     for (const [key, value] of Object.entries(authFormData)) {
       authCredentials.push({ key, value } as AuthCredential)
@@ -84,9 +82,7 @@ const useChatBot = () => {
     }
   }
 
-  async function fetchCredentialFormModelOfPlatform(
-    platformId: string | number
-  ) {
+  async function fetchCredentialFormModelOfPlatform(platformId: string | number) {
     try {
       loading.value = true
       const data = await getCredentialFormModelOfPlatform(platformId)
@@ -99,10 +95,7 @@ const useChatBot = () => {
     }
   }
 
-  async function testAuthPlatform<T extends Object>(
-    platformId: string | number,
-    authFormData: T
-  ) {
+  async function testAuthPlatform<T extends Object>(platformId: string | number, authFormData: T) {
     try {
       checkLoading.value = true
       const data = await validateAuthCredentials({
@@ -144,10 +137,7 @@ const useChatBot = () => {
     }
   }
 
-  async function fetchThreadChatHistory(
-    authId: string | number,
-    threadId: string | number
-  ) {
+  async function fetchThreadChatHistory(authId: string | number, threadId: string | number) {
     try {
       loading.value = true
       const data = await getThreadChatHistory({ authId, threadId })

@@ -25,6 +25,7 @@ import type {
   ThreadId,
   UpdateChatThread
 } from './types'
+import axios, { AxiosProgressEvent, AxiosResponse, CancelTokenSource } from 'axios'
 
 export const getThreadsFromAuthPlatform = (): Promise<ChatThread[]> => {
   return request({
@@ -40,17 +41,14 @@ export const getThread = (threadId: ThreadId): Promise<ChatThread> => {
   })
 }
 
-export const getThreadRecords = (threadId: ThreadId): Promise<ChatThread> => {
+export const getThreadRecords = (threadId: ThreadId): Promise<ChatMessageItem[]> => {
   return request({
     method: 'get',
     url: `/llm/chatbot/threads/${threadId}/history`
   })
 }
 
-export const updateThread = (
-  threadId: ThreadId,
-  data: UpdateChatThread
-): Promise<ChatThread> => {
+export const updateThread = (threadId: ThreadId, data: UpdateChatThread): Promise<ChatThread> => {
   return request({
     method: 'put',
     url: `/llm/chatbot/threads/${threadId}`,
@@ -65,9 +63,7 @@ export const deleteThread = (threadId: ThreadId): Promise<boolean> => {
   })
 }
 
-export const createChatThread = (
-  data: CreateChatThread
-): Promise<ChatThread> => {
+export const createChatThread = (data: CreateChatThread): Promise<ChatThread> => {
   return request({
     method: 'post',
     url: '/llm/chatbot/threads',
@@ -75,13 +71,29 @@ export const createChatThread = (
   })
 }
 
+export interface chatMessagesRes<T> {
+  promise: Promise<T>
+  cancel: () => void
+}
+
 export const talkWithChatbot = (
   threadId: ThreadId,
-  data: { message: string }
-): Promise<ChatMessageItem[]> => {
-  return request({
+  data: { message: string },
+  func: Function
+): chatMessagesRes<AxiosResponse<ChatMessageItem[], any>> => {
+  const source: CancelTokenSource = axios.CancelToken.source()
+
+  const promise = request({
     method: 'post',
     url: `/llm/chatbot/threads/${threadId}/talk`,
-    data
+    responseType: 'stream',
+    data: {
+      message: data.message
+    },
+    timeout: 0,
+    cancelToken: source.token,
+    onDownloadProgress: (progressEvent: AxiosProgressEvent) => func(progressEvent)
   })
+
+  return { promise, cancel: source.cancel }
 }

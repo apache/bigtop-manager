@@ -18,26 +18,39 @@
  */
 
 import type { App } from 'vue'
-import router from '@/router'
-import pinia from '@/store'
-import i18n from '@/locales'
-import Antd, { message } from 'ant-design-vue'
-import components from '@/components/common'
-import directives from '@/directives'
-import VueDOMPurifyHTML from 'vue-dompurify-html'
-interface PluginOptions {
-  antdMessageMaxCount: number
+
+interface ObserverElement extends Element {
+  cancelObserver?: MutationObserver
+}
+
+const install = (app: App) => {
+  app.directive('autoScroll', {
+    mounted(el: ObserverElement) {
+      const observerConfig = {
+        childList: true,
+        subtree: true,
+        characterDataOldValue: true,
+        characterData: true
+      }
+
+      const observer = new MutationObserver(() => {
+        const lastChild = el.lastElementChild
+        lastChild && lastChild.scrollIntoView({ behavior: 'smooth', block: 'end' })
+      })
+      observer.observe(el, observerConfig)
+
+      el.cancelObserver = observer
+    },
+
+    beforeUnmount(el: ObserverElement) {
+      if (el.cancelObserver) {
+        el.cancelObserver.disconnect()
+        delete el.cancelObserver
+      }
+    }
+  })
 }
 
 export default {
-  install(app: App, options: PluginOptions) {
-    app.use(Antd)
-    app.use(router)
-    app.use(pinia)
-    app.use(i18n)
-    app.use(directives)
-    app.use(components)
-    app.use(VueDOMPurifyHTML) // xss defense
-    message.config({ maxCount: options.antdMessageMaxCount })
-  }
+  install
 }

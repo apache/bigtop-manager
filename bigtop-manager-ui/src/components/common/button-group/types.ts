@@ -29,7 +29,7 @@ export interface GroupItem<T = string> {
   action?: T
   type?: BtnType
   shape?: ShapeType
-  clickEvent?: (item: GroupItem) => void
+  clickEvent?: (item?: GroupItem, ...args: any[]) => void
 }
 
 export interface Props {

@@ -17,14 +17,17 @@
   ~ under the License.
   -->
 <script setup lang="ts">
-  import { computed, ref, shallowReactive } from 'vue'
+  import { computed, ref, shallowReactive, watch } from 'vue'
+  import { DrawerProps } from 'ant-design-vue'
+  import { useAiChatStore } from '@/store/ai-assistant'
+  import { useLlmConfigStore } from '@/store/llm-config'
+  import { storeToRefs } from 'pinia'
   import EmptyContent from './empty-content.vue'
   import ChatInput from './chat-input.vue'
   import ChatHistory from './chat-history.vue'
-  import { DrawerProps } from 'ant-design-vue'
-  import type { GroupItem } from '../common/button-group/types'
-
-  // import ChatItem from './chat-item.vue'
+  import ChatMessage from './chat-message.vue'
+  import type { ChatMessageItem } from '@/api/ai-assistant/types'
+  import type { GroupItem } from '@/components/common/button-group/types'
 
   enum Action {
     ADD,
@@ -36,61 +39,35 @@
 
   type ActionType = keyof typeof Action
 
+  const aiChatStore = useAiChatStore()
+  const llmConfigStore = useLlmConfigStore()
+  const { currThread, chatRecords, messageReceiver } = storeToRefs(aiChatStore)
+  const { currAuthPlatform: currPlatform } = storeToRefs(llmConfigStore)
+
   const open = ref(false)
-  const show = ref(false)
   const title = ref('AI 助理')
   const fullScreen = ref(false)
-  const actionHandlers = ref<Map<ActionType, (...args: any[]) => void>>(
-    new Map()
-  )
+  const actionHandlers = ref<Map<ActionType, (...args: any[]) => void>>(new Map())
+  const samllChatHistoryRef = ref<InstanceType<typeof ChatHistory> | null>(null)
   const styleConfig = shallowReactive<DrawerProps>({
-    headerStyle: {
-      height: '56px'
-    },
-    bodyStyle: {
-      padding: '16px'
-    },
-    contentWrapperStyle: {
-      boxShadow: 'none',
-      top: '64px',
-      transform: 'translateX(0)'
-    },
-    footerStyle: {
-      border: 'none'
-    }
+    headerStyle: { height: '56px' },
+    bodyStyle: { padding: 0 },
+    contentWrapperStyle: { boxShadow: 'none', top: '64px' },
+    footerStyle: { border: 'none' }
   })
 
-  const historyVisible = computed(() => fullScreen.value && open.value)
   const width = computed(() => (fullScreen.value ? 'calc(100% - 300px)' : 450))
+  const noChat = computed(() => Object.keys(currThread.value).length === 0)
+  const historyVisible = computed(() => fullScreen.value && open.value)
+  const authPlatformCached = computed(
+    () => Object.keys((currPlatform && currPlatform.value) || {}).length > 0
+  )
   const actionGroup = computed((): GroupItem<ActionType>[] => [
-    {
-      tip: '创建对话',
-      icon: 'plus_gray',
-      action: 'ADD'
-    },
-    {
-      tip: '历史记录',
-      icon: 'history',
-      action: 'RECORDS',
-      clickEvent: openRecord
-    },
-    {
-      tip: '窗口全屏',
-      icon: 'full_screen',
-      action: 'FULLSCREEN',
-      clickEvent: toggleFullScreen
-    },
-    {
-      tip: '退出全屏',
-      icon: 'exit_screen',
-      action: 'EXITSCREEN',
-      clickEvent: toggleFullScreen
-    },
-    {
-      icon: 'close',
-      action: 'CLOSE',
-      clickEvent: closed
-    }
+    { tip: '创建对话', icon: 'plus_gray', action: 'ADD' },
+    { tip: '历史记录', icon: 'history', action: 'RECORDS', clickEvent: openRecord },
+    { tip: '窗口全屏', icon: 'full_screen', action: 'FULLSCREEN', clickEvent: toggleFullScreen },
+    { tip: '退出全屏', icon: 'exit_screen', action: 'EXITSCREEN', clickEvent: toggleFullScreen },
+    { icon: 'close', action: 'CLOSE', clickEvent: () => controlVisible(false) }
   ])
 
   const checkActions = computed(() =>
@@ -99,6 +76,34 @@
       : filterActions(['ADD', 'RECORDS', 'FULLSCREEN', 'CLOSE'])
   )
 
+  const recordReceiver = computed(
+    (): ChatMessageItem => ({ sender: 'AI', message: messageReceiver.value })
+  )
+
+  watch(open, (val) => {
+    val && initConfig()
+  })
+
+  const controlVisible = (visible: boolean = true) => {
+    open.value = visible
+  }
+
+  const openRecord = () => {
+    samllChatHistoryRef.value?.controlVisible(true)
+  }
+
+  const toggleFullScreen = () => {
+    fullScreen.value = !fullScreen.value
+  }
+
+  const initConfig = () => {
+    actionGroup.value.forEach(({ action, clickEvent }) => {
+      action && actionHandlers.value.set(action, clickEvent || (() => {}))
+    })
+    !authPlatformCached.value && llmConfigStore.getAuthorizedPlatforms()
+    aiChatStore.getThreadRecords()
+  }
+
   const filterActions = (showActions?: ActionType[]) => {
     if (!showActions) return actionGroup.value
     return actionGroup.value.filter(
@@ -106,41 +111,13 @@
     )
   }
 
-  const openDrawer = () => {
-    open.value = true
-    initActionHandler()
-  }
-
-  const openRecord = () => {
-    show.value = true
-  }
-
-  const toggleFullScreen = () => {
-    fullScreen.value = !fullScreen.value
-  }
-
-  const closed = () => {
-    open.value = false
-  }
-
   const onActions = (item: GroupItem<ActionType>) => {
     const handler = item.action && actionHandlers.value.get(item.action)
-    if (handler) {
-      handler()
-    } else {
-      console.warn(`Unknown action: ${item.action}`)
-    }
-  }
-
-  const initActionHandler = () => {
-    actionGroup.value.forEach((act) => {
-      act.action &&
-        actionHandlers.value.set(act.action, act.clickEvent || (() => {}))
-    })
+    handler ? handler() : console.warn(`Unknown action: ${item.action}`)
   }
 
   defineExpose({
-    openDrawer
+    controlVisible
   })
 </script>
 
@@ -163,30 +140,20 @@
           </template>
         </button-group>
       </template>
-
-      <chat-history :visible="show" history-type="small">
-        <template #extra>
-          <button-group
-            :groups="filterActions(['CLOSE'])"
-            @on-click="onActions"
-          >
-            <template #icon="{ item }">
-              <svg-icon :name="item.icon" />
-            </template>
-          </button-group>
-        </template>
-      </chat-history>
-
+      <chat-history ref="samllChatHistoryRef" history-type="small" />
       <div class="chat">
-        <empty-content v-if="false" />
-        <div class="chat-content">
-          <!-- <chat-item /> -->
-        </div>
+        <empty-content v-if="noChat" />
+        <template v-else>
+          <div v-if="open" v-auto-scroll class="chat-content">
+            <chat-message v-for="(record, idx) in chatRecords" :key="idx" :record="record" />
+            <chat-message v-if="messageReceiver" :record="recordReceiver" />
+          </div>
+        </template>
       </div>
       <template #footer>
         <chat-input />
         <a-typography-text type="secondary" class="ai-assistant-desc">
-          DashScope qwen-1.8b-chat
+          {{ currPlatform?.platformName }} {{ currPlatform?.model }}
         </a-typography-text>
       </template>
     </a-drawer>
@@ -203,6 +170,8 @@
 
   .chat {
     height: 100%;
+    padding-inline: $space-md;
+    overflow: auto;
 
     .chat-content {
       width: 100%;

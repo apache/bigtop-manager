@@ -48,8 +48,7 @@ export const useMenuStore = defineStore(
       return path?.includes(RouteExceptions.DYNAMIC_ROUTE_MATCH)
     })
     const siderMenus = computed((): MenuItem[] => {
-      const siderMenuTemplate =
-        baseRoutesMap.value.get(headerSelectedKey.value) || []
+      const siderMenuTemplate = baseRoutesMap.value.get(headerSelectedKey.value) || []
       const formatSider = cloneDeep(siderMenuTemplate)
       if (hasCluster.value) {
         updateSiderItemByClusters(formatSider as MenuItem[])
@@ -116,10 +115,7 @@ export const useMenuStore = defineStore(
             label: meta.title || '',
             title: meta.title || '',
             name: name || '',
-            children:
-              children && children.length > 0
-                ? formatRouteToMenu(children, fullPath)
-                : []
+            children: children && children.length > 0 ? formatRouteToMenu(children, fullPath) : []
           }
         })
     }
@@ -138,10 +134,7 @@ export const useMenuStore = defineStore(
 
     const onHeaderClick = (key: string) => {
       headerSelectedKey.value = key
-      if (
-        !hasCluster.value &&
-        route.name == RouteExceptions.SPECIAL_ROUTE_NAME
-      ) {
+      if (!hasCluster.value && route.name == RouteExceptions.SPECIAL_ROUTE_NAME) {
         return
       }
       siderMenuSelectedKey.value = findActivePath(siderMenus.value[0])
@@ -154,12 +147,9 @@ export const useMenuStore = defineStore(
     }
 
     const updateSiderMenu = async (isDelete = false) => {
-      isDelete
-        ? await clusterStore.delCluster()
-        : await clusterStore.addCluster()
+      isDelete ? await clusterStore.delCluster() : await clusterStore.addCluster()
       siderMenuSelectedKey.value =
-        siderMenus.value[0].children?.at(-1)?.key ||
-        RouteExceptions.SPECIAL_ROUTE_PATH
+        siderMenus.value[0].children?.at(-1)?.key || RouteExceptions.SPECIAL_ROUTE_PATH
       router.push(siderMenuSelectedKey.value)
     }
 

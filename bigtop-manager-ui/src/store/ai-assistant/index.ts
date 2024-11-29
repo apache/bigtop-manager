@@ -17,14 +17,14 @@
  * under the License.
  */
 
-import type {
-  ChatMessageItem,
-  ChatThread,
-  ThreadId
-} from '@/api/ai-assistant/types'
+import dayjs from 'dayjs'
 import * as ai from '@/api/ai-assistant/index'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { Sender } from '@/api/chatbot/types'
+import { getRandomFromTimestamp } from '@/utils/tools'
+import type { AxiosProgressEvent, Canceler } from 'axios'
+import type { ChatMessageItem, ChatThread, ThreadId } from '@/api/ai-assistant/types'
 
 export const useAiChatStore = defineStore(
   'ai-assistant',
@@ -32,38 +32,115 @@ export const useAiChatStore = defineStore(
     const currThread = ref<ChatThread>({})
     const threads = ref<ChatThread[]>([])
     const chatRecords = ref<ChatMessageItem[]>([])
+    const canceler = ref<Canceler>()
+    const messageReceiver = ref('')
 
     const createChatThread = async () => {
-      const data = await ai.createChatThread({
-        id: null,
-        name: `thread-${Date.now().toString().slice(-6)}`
-      })
-      currThread.value = data
+      const tempName = `thread-${getRandomFromTimestamp()}`
+      const data = await ai.createChatThread({ id: null, name: tempName })
+      getThread(data.threadId as ThreadId)
       getThreadsFromAuthPlatform()
     }
 
     const getThread = async (threadId: ThreadId) => {
-      const data = await ai.getThread(threadId)
-      currThread.value = data
+      try {
+        const data = await ai.getThread(threadId)
+        currThread.value = data
+      } catch (error) {
+        console.log('error :>> ', error)
+      }
     }
 
     const getThreadsFromAuthPlatform = async () => {
-      const data = await ai.getThreadsFromAuthPlatform()
-      threads.value = data
+      try {
+        const data = await ai.getThreadsFromAuthPlatform()
+        threads.value = data
+      } catch (error) {
+        console.log('erro :>> ', error)
+      }
+    }
+
+    const getThreadRecords = async () => {
+      try {
+        const { threadId } = currThread.value
+        const data = await ai.getThreadRecords(threadId as ThreadId)
+        chatRecords.value = data
+      } catch (error) {
+        console.log('error :>> ', error)
+      }
+    }
+
+    const talkWithChatbot = async (message: string) => {
+      try {
+        const { threadId } = currThread.value
+        if (threadId) {
+          const { cancel, promise } = ai.talkWithChatbot(threadId, { message }, onMessageReceive)
+          canceler.value = cancel
+          return promise.then(onMessageComplete)
+        }
+      } catch (error) {
+        console.log('error :>> ', error)
+      }
+    }
+
+    const collectReciveMessage = async (message: string) => {
+      try {
+        const res = await talkWithChatbot(message)
+        setChatRecordForSender('AI', res?.message || '')
+      } catch (error) {
+        console.log('error :>> ', error)
+      }
+    }
+
+    const onMessageReceive = ({ event }: AxiosProgressEvent) => {
+      messageReceiver.value = event.target.responseText
+        .split('data:')
+        .map((s: string) => {
+          return s.trimEnd()
+        })
+        .join('')
+    }
+
+    const onMessageComplete = () => {
+      const formatResultMsg = messageReceiver.value
+      messageReceiver.value = ''
+      cancelSseConnect()
+      return Promise.resolve({ message: formatResultMsg, state: true })
+    }
+
+    const cancelSseConnect = () => {
+      if (!canceler.value) {
+        return
+      }
+      canceler.value()
+    }
+
+    const setChatRecordForSender = async (sender: Sender, message: string) => {
+      chatRecords.value.push({
+        sender,
+        message,
+        createTime: dayjs().format()
+      })
     }
 
     return {
       currThread,
       threads,
       chatRecords,
+      messageReceiver,
+      talkWithChatbot,
       createChatThread,
       getThread,
-      getThreadsFromAuthPlatform
+      getThreadsFromAuthPlatform,
+      cancelSseConnect,
+      getThreadRecords,
+      setChatRecordForSender,
+      collectReciveMessage
     }
   },
   {
     persist: {
-      storage: sessionStorage,
+      storage: localStorage,
       paths: ['currThread']
     }
   }

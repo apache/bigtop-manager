@@ -60,13 +60,8 @@
       langTag!.textContent = (
         code?.classList.value.replace('hljs language-', '') as string
       ).toLowerCase()
-      copyTag &&
-        copyTag.removeEventListener('click', () =>
-          copyCode(code?.textContent || '')
-        )
-      copyTag?.addEventListener('click', () =>
-        copyCode(code?.textContent || '')
-      )
+      copyTag && copyTag.removeEventListener('click', () => copyCode(code?.textContent || ''))
+      copyTag?.addEventListener('click', () => copyCode(code?.textContent || ''))
     })
   }
 
@@ -99,12 +94,7 @@
 </script>
 
 <template>
-  <div
-    v-upgradeCodeBlock
-    v-dompurify-html="markdownContent"
-    class="markdown-body"
-  >
-  </div>
+  <div v-upgradeCodeBlock v-dompurify-html="markdownContent" class="markdown-body"> </div>
 </template>
 
 <style lang="scss" scoped></style>

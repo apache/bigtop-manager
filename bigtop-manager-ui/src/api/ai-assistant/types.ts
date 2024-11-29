@@ -44,5 +44,5 @@ export interface ChatThread {
 export interface ChatMessageItem {
   sender: SenderType
   message: string
-  createTime: string
+  createTime?: string
 }

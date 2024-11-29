@@ -22,11 +22,7 @@ import request from '@/api/request.ts'
 import type { chatMessagesRes, LogsRes } from './types'
 import type { SendChatMessageCondition } from '@/api/chatbot/types'
 
-export const getLogs = (
-  clusterId: number,
-  id: number,
-  func: Function
-): LogsRes => {
+export const getLogs = (clusterId: number, id: number, func: Function): LogsRes => {
   const source: CancelTokenSource = axios.CancelToken.source()
 
   const promise = request({
@@ -35,8 +31,7 @@ export const getLogs = (
     responseType: 'stream',
     timeout: 0,
     cancelToken: source.token,
-    onDownloadProgress: (progressEvent: AxiosProgressEvent) =>
-      func(progressEvent)
+    onDownloadProgress: (progressEvent: AxiosProgressEvent) => func(progressEvent)
   })
 
   return { promise, cancel: source.cancel }
@@ -56,8 +51,7 @@ export const sendChatMessage = (
     },
     timeout: 0,
     cancelToken: source.token,
-    onDownloadProgress: (progressEvent: AxiosProgressEvent) =>
-      func(progressEvent)
+    onDownloadProgress: (progressEvent: AxiosProgressEvent) => func(progressEvent)
   })
 
   return { promise, cancel: source.cancel }

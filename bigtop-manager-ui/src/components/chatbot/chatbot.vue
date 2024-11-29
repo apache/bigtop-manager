@@ -52,9 +52,7 @@
   const getCompName = computed(() => pages[currPage.value.nextPage])
   const showChatOps = computed(() => 'chat-window' === currPage.value?.nextPage)
   const showBack = computed(
-    () =>
-      withoutBack.includes(currPage.value.nextPage) ||
-      afterPages.value.length == 1
+    () => withoutBack.includes(currPage.value.nextPage) || afterPages.value.length == 1
   )
 
   const visibleWindow = (close = false) => {
@@ -116,11 +114,7 @@
           <header>
             <div class="header-left">
               <svg-icon v-if="!showBack" name="left" @click="onBack" />
-              <svg-icon
-                v-if="showChatOps && !isExpand"
-                name="home"
-                @click="resetPageStatus"
-              />
+              <svg-icon v-if="showChatOps && !isExpand" name="home" @click="resetPageStatus" />
             </div>
             <div v-if="showChatOps" class="header-middle">
               {{ chatPayload?.threadName }}

@@ -17,7 +17,7 @@
   ~ under the License.
   -->
 <script setup lang="ts">
-  import { onMounted, ref, toRefs } from 'vue'
+  import { ref, toRefs, watch, watchEffect } from 'vue'
   import { useAiChatStore } from '@/store/ai-assistant'
   import { storeToRefs } from 'pinia'
   import type { ThreadId } from '@/api/ai-assistant/types'
@@ -27,31 +27,45 @@
     visible?: boolean
   }
 
-  const props = defineProps<Props>()
-
   const aiChatStore = useAiChatStore()
   const { threads, currThread } = storeToRefs(aiChatStore)
+  const props = defineProps<Props>()
   const { visible, historyType } = toRefs(props)
-  const selectKey = ref<ThreadId[]>([])
+
+  const open = ref(false)
   const title = ref('历史记录')
+  const selectKey = ref<ThreadId[]>([])
+
+  watch(currThread, (val) => {
+    selectKey.value = [val.threadId || '']
+  })
+
+  watchEffect(() => {
+    if (open.value || visible.value) {
+      selectKey.value = [currThread.value.threadId || '']
+      aiChatStore.getThreadsFromAuthPlatform()
+    }
+  })
+
+  const controlVisible = (visible: boolean) => {
+    open.value = visible
+  }
 
   const handleSelect = ({ key }: { key: ThreadId }) => {
     aiChatStore.getThread(key)
   }
 
-  onMounted(() => {
-    selectKey.value = [currThread.value.threadId || '']
-    aiChatStore.getThreadsFromAuthPlatform()
+  defineExpose({
+    controlVisible
   })
 </script>
 
 <template>
-  <div>
+  <div class="chat-history">
     <a-drawer
       v-if="historyType === 'small'"
-      v-model:open="visible"
+      v-model:open="open"
       :title="title"
-      placement="top"
       :closable="false"
       :mask="false"
       :get-container="false"
@@ -59,42 +73,37 @@
       :body-style="{
         padding: '16px'
       }"
+      placement="top"
     >
       <template #extra>
-        <slot name="extra"></slot>
+        <a-button type="text" shape="circle" @click="controlVisible(false)">
+          <template #icon>
+            <svg-icon name="close" />
+          </template>
+        </a-button>
       </template>
       <main>
         <a-menu v-model:selected-keys="selectKey" @select="handleSelect">
-          <a-menu-item
-            v-for="item in threads"
-            :key="item.threadId"
-            :title="item.name"
-          >
+          <a-menu-item v-for="item in threads" :key="item.threadId" :title="item.name">
             <span>{{ item.name }}</span>
           </a-menu-item>
         </a-menu>
       </main>
     </a-drawer>
     <template v-else>
-      <div v-if="visible" class="chat-history">
+      <div v-if="visible" class="chat-history-large">
         <header>
           <a-typography-title :level="5">{{ title }}</a-typography-title>
         </header>
         <main>
           <a-menu v-model:selected-keys="selectKey" @select="handleSelect">
-            <a-menu-item
-              v-for="item in threads"
-              :key="item.threadId"
-              :title="item.name"
-            >
+            <a-menu-item v-for="item in threads" :key="item.threadId" :title="item.name">
               <span>{{ item.name }}</span>
             </a-menu-item>
           </a-menu>
         </main>
         <footer>
-          <a-button type="primary" @click="aiChatStore.createChatThread">
-            新建会话
-          </a-button>
+          <a-button type="primary" @click="aiChatStore.createChatThread"> 新建会话 </a-button>
         </footer>
       </div>
     </template>
@@ -103,42 +112,44 @@
 
 <style lang="scss" scoped>
   .chat-history {
-    position: fixed;
-    left: 0;
-    top: 64px;
-    height: 100%;
-    z-index: 10;
-    width: 300px;
-    background-color: #f7f9fc;
-
-    display: grid;
-    grid-template-rows: repeat(1, 56px 1fr 158px);
-
-    header {
-      padding: $space-md;
-    }
-
-    main {
-      padding-inline: $space-md;
-      overflow: auto;
-      :deep(.ant-menu) {
-        background: initial !important;
-        border: none;
-        .ant-menu-item {
-          border-radius: 0;
-        }
-        .ant-menu-item-selected {
-          background-color: $color-white;
-        }
+    :deep(.ant-menu) {
+      background: initial !important;
+      border: none;
+      .ant-menu-item {
+        border-radius: 0;
+      }
+      .ant-menu-item-selected {
+        background-color: $color-white;
       }
     }
+    &-large {
+      position: fixed;
+      left: 0;
+      top: 64px;
+      height: 100%;
+      z-index: 10;
+      width: 300px;
+      background-color: #f7f9fc;
 
-    footer {
-      padding-inline: $space-md;
-      text-align: center;
-      button {
-        height: 40px;
-        width: 100%;
+      display: grid;
+      grid-template-rows: repeat(1, 56px 1fr 158px);
+
+      header {
+        padding: $space-md;
+      }
+
+      main {
+        padding-inline: $space-md;
+        overflow: auto;
+      }
+
+      footer {
+        padding-inline: $space-md;
+        text-align: center;
+        button {
+          height: 40px;
+          width: 100%;
+        }
       }
     }
   }

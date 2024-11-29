@@ -51,7 +51,7 @@
   }
 
   const handleCommunication = () => {
-    aiAssistantRef.value?.openDrawer()
+    aiAssistantRef.value?.controlVisible()
   }
 </script>
 

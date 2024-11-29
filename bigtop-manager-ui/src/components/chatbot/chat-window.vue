@@ -38,13 +38,8 @@
     currPage?: Option
   }
 
-  const {
-    loading,
-    receiving,
-    messageReceiver,
-    fetchSendChatMessage,
-    fetchThreadChatHistory
-  } = useChatBot()
+  const { loading, receiving, messageReceiver, fetchSendChatMessage, fetchThreadChatHistory } =
+    useChatBot()
   const { t } = useI18n()
   const inputText = ref('')
   const isMessageReceived = ref(true)
@@ -53,9 +48,7 @@
   const props = defineProps<PlatformChatProps>()
   const { visible, currPage, isExpand, chatPayload } = toRefs(props)
 
-  const sendable = computed(
-    () => inputText.value != '' && isMessageReceived.value
-  )
+  const sendable = computed(() => inputText.value != '' && isMessageReceived.value)
   const tempMsg = computed<ChatThreadHistoryItem>(() => ({
     sender: 'AI',
     message: messageReceiver.value || '...'
@@ -140,16 +133,8 @@
 <template>
   <div class="platform-chat">
     <section class="chat-container">
-      <chat-msg-item
-        v-for="(chatItem, index) of tempHistory"
-        :key="index"
-        :chat-item="chatItem"
-      />
-      <chat-msg-item
-        v-if="receiving"
-        :chat-item="tempMsg"
-        @updated-msg="handleScrollToBottom"
-      />
+      <chat-msg-item v-for="(chatItem, index) of tempHistory" :key="index" :chat-item="chatItem" />
+      <chat-msg-item v-if="receiving" :chat-item="tempMsg" @updated-msg="handleScrollToBottom" />
     </section>
     <footer>
       <div class="msg-wrp">
@@ -167,10 +152,7 @@
             class="msg-input-send"
             @click="sendMessage"
           >
-            <svg-icon
-              :name="sendable ? 'send' : 'send-disabled'"
-              style="margin: 0"
-            />
+            <svg-icon :name="sendable ? 'send' : 'send-disabled'" style="margin: 0" />
           </a-button>
         </div>
       </div>

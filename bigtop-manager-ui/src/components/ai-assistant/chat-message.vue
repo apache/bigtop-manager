@@ -17,20 +17,27 @@
   ~ under the License.
   -->
 <script setup lang="ts">
-  import { ChatMessageItem } from '@/api/ai-assistant/types'
-  defineProps<ChatMessageItem>()
+  import type { ChatMessageItem } from '@/api/ai-assistant/types'
+  import { computed } from 'vue'
+
+  interface Props {
+    record: ChatMessageItem
+  }
+
+  const props = defineProps<Props>()
+  const isUser = computed(() => props.record.sender === 'USER')
 </script>
 
 <template>
   <div class="chat-item">
     <div class="chat-item-avatar">
-      <svg-icon name="chat_avatar" />
+      <svg-icon :name="isUser ? 'chat_avatar' : 'chatbot'" />
     </div>
-    <div class="chat-item-message">
-      <p>
-        {{ $props.message }}
-      </p>
-    </div>
+    <article class="chat-item-message">
+      <div class="msg-wrp">
+        <markdown-view :mark-raw="$props.record.message" />
+      </div>
+    </article>
   </div>
 </template>
 
@@ -38,6 +45,7 @@
   .chat-item {
     gap: $space-md;
     display: flex;
+    margin: $space-md 0;
     &-avatar {
       width: 32px;
       height: 32px;
@@ -53,10 +61,10 @@
       flex: 1;
       border-radius: 4px;
       background-color: #f7f9fc;
-      p {
-        margin: 0;
-        line-height: 22px;
-        padding: 9px $space-md;
+      .msg-wrp {
+        height: auto;
+        width: 100%;
+        padding: $space-sm $space-md;
       }
     }
   }

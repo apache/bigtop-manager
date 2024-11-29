@@ -60,3 +60,7 @@ export const scrollToBottom = (container: HTMLElement | null) => {
     container.scrollTop = container.scrollHeight
   })
 }
+
+export const getRandomFromTimestamp = (len: number = 6) => {
+  return Date.now().toString().slice(-len)
+}
