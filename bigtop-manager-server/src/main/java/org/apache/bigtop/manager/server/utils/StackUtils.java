@@ -21,6 +21,7 @@ package org.apache.bigtop.manager.server.utils;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.utils.CaseUtils;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
+import org.apache.bigtop.manager.common.utils.ProjectPathUtils;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.exception.ServerException;
 import org.apache.bigtop.manager.server.model.converter.ServiceConverter;
@@ -43,7 +44,6 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,8 +57,6 @@ public class StackUtils {
     private static final String ROLE_COMMAND_SPLIT = "-";
 
     private static final String META_FILE = "metainfo.xml";
-
-    private static final String STACKS_FOLDER_NAME = "stacks";
 
     private static final String SERVICES_FOLDER_NAME = "services";
 
@@ -78,9 +76,6 @@ public class StackUtils {
         parseStack();
     }
 
-    /**
-     *
-     */
     private static void parseStack() {
         File stacksFolder = loadStacksFolder();
         File[] stackFolders = Optional.ofNullable(stacksFolder.listFiles()).orElse(new File[0]);
@@ -194,12 +189,7 @@ public class StackUtils {
      * Load stack folder as file
      */
     private static File loadStacksFolder() throws ApiException {
-        URL url = StackUtils.class.getClassLoader().getResource(STACKS_FOLDER_NAME);
-        if (url == null) {
-            throw new ServerException("Can't find stack folder");
-        }
-
-        String stackPath = url.getPath();
+        String stackPath = ProjectPathUtils.getServerStackPath();
         File file = new File(stackPath);
         if (!file.exists()) {
             throw new ServerException("Can't find stack folder");
@@ -211,6 +201,10 @@ public class StackUtils {
 
     public static String getFullStackName(StackDTO stackDTO) {
         return CaseUtils.toCamelCase(stackDTO.getStackName()) + "-" + stackDTO.getStackVersion();
+    }
+
+    public static List<StackDTO> getAllStacks() {
+        return new ArrayList<>(STACK_SERVICE_MAP.keySet());
     }
 
     public static StackDTO getServiceStack(String serviceName) {
