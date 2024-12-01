@@ -39,9 +39,7 @@ export const getAuthorizedPlatforms = (): Promise<AuthorizedPlatform[]> => {
   })
 }
 
-export const getPlatformCredentials = (
-  platformId: number
-): Promise<PlatformCredential[]> => {
+export const getPlatformCredentials = (platformId: number): Promise<PlatformCredential[]> => {
   return request({
     method: 'get',
     url: `/llm/config/platforms/${platformId}/auth-credentials`
@@ -58,9 +56,7 @@ export const addAuthorizedPlatform = (
   })
 }
 
-export const getAuthPlatformDetail = (
-  authId: number
-): Promise<UpdateAuthorizedPlatformConfig> => {
+export const getAuthPlatformDetail = (authId: number): Promise<UpdateAuthorizedPlatformConfig> => {
   return request({
     method: 'get',
     url: `/llm/config/auth-platforms/${authId}`
@@ -84,27 +80,21 @@ export const deleteAuthPlatform = (authId: number): Promise<boolean> => {
   })
 }
 
-export const deactivateAuthorizedPlatform = (
-  authId: number
-): Promise<boolean> => {
+export const deactivateAuthorizedPlatform = (authId: number): Promise<boolean> => {
   return request({
     method: 'post',
     url: `/llm/config/auth-platforms/${authId}/deactivate`
   })
 }
 
-export const activateAuthorizedPlatform = (
-  authId: number
-): Promise<boolean> => {
+export const activateAuthorizedPlatform = (authId: number): Promise<boolean> => {
   return request({
     method: 'post',
     url: `/llm/config/auth-platforms/${authId}/activate`
   })
 }
 
-export const testAuthorizedPlatform = (
-  data: UpdateAuthorizedPlatformConfig
-): Promise<boolean> => {
+export const testAuthorizedPlatform = (data: UpdateAuthorizedPlatformConfig): Promise<boolean> => {
   return request({
     method: 'post',
     url: '/llm/config/auth-platforms/test',

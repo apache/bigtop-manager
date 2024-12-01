@@ -26,6 +26,7 @@ export default {
   status: '状态',
   edit: '编辑',
   delete: '删除',
+  rename: '重命名',
   disable: '停用',
   enable: '使用',
   submit: '提交',

@@ -17,14 +17,22 @@
   ~ under the License.
   -->
 <script setup lang="ts">
-  import { ref, toRefs, watch, watchEffect } from 'vue'
+  import { ref, shallowRef, toRefs, watch } from 'vue'
   import { useAiChatStore } from '@/store/ai-assistant'
   import { storeToRefs } from 'pinia'
-  import type { ThreadId } from '@/api/ai-assistant/types'
+  import { formatTime } from '@/utils/tools'
+  import { EllipsisOutlined } from '@ant-design/icons-vue'
+  import type { ChatThread, ThreadId } from '@/api/ai-assistant/types'
+  import type { MenuInfo } from 'ant-design-vue/es/menu/src/interface'
 
   interface Props {
     historyType: 'large' | 'small'
     visible?: boolean
+  }
+
+  interface ThreadOperation {
+    key: 'delete' | 'rename'
+    danger?: boolean
   }
 
   const aiChatStore = useAiChatStore()
@@ -35,17 +43,31 @@
   const open = ref(false)
   const title = ref('历史记录')
   const selectKey = ref<ThreadId[]>([])
+  const threadOperations = shallowRef<ThreadOperation[]>([
+    { key: 'rename' },
+    { key: 'delete', danger: true }
+  ])
 
   watch(currThread, (val) => {
     selectKey.value = [val.threadId || '']
   })
 
-  watchEffect(() => {
-    if (open.value || visible.value) {
-      selectKey.value = [currThread.value.threadId || '']
-      aiChatStore.getThreadsFromAuthPlatform()
+  watch(
+    () => [open.value, visible.value],
+    async ([open, visible]) => {
+      if (open || visible) {
+        await aiChatStore.getThreadsFromAuthPlatform()
+        if (Object.keys(currThread.value).length > 0) {
+          selectKey.value = [currThread.value.threadId || '']
+        } else {
+          currThread.value = threads.value[0]
+        }
+      }
+    },
+    {
+      immediate: true
     }
-  })
+  )
 
   const controlVisible = (visible: boolean) => {
     open.value = visible
@@ -53,6 +75,11 @@
 
   const handleSelect = ({ key }: { key: ThreadId }) => {
     aiChatStore.getThread(key)
+  }
+
+  const handleThreadActions = (thread: ChatThread, { key }: MenuInfo) => {
+    console.log('thread :>> ', thread)
+    console.log('key :>> ', key)
   }
 
   defineExpose({
@@ -84,8 +111,11 @@
       </template>
       <main>
         <a-menu v-model:selected-keys="selectKey" @select="handleSelect">
-          <a-menu-item v-for="item in threads" :key="item.threadId" :title="item.name">
-            <span>{{ item.name }}</span>
+          <a-menu-item v-for="item in threads" :key="item.threadId">
+            <div class="chat-history-item">
+              <span :title="item.name">{{ item.name }}</span>
+              <span>{{ formatTime(item.createTime) }}</span>
+            </div>
           </a-menu-item>
         </a-menu>
       </main>
@@ -97,8 +127,30 @@
         </header>
         <main>
           <a-menu v-model:selected-keys="selectKey" @select="handleSelect">
-            <a-menu-item v-for="item in threads" :key="item.threadId" :title="item.name">
-              <span>{{ item.name }}</span>
+            <a-menu-item v-for="thread in threads" :key="thread.threadId" :title="thread.name">
+              <div class="chat-history-item">
+                <span>{{ thread.name }}</span>
+                <a-dropdown :trigger="['click']">
+                  <a @click.prevent>
+                    <a-button type="text" shape="circle">
+                      <template #icon>
+                        <EllipsisOutlined />
+                      </template>
+                    </a-button>
+                  </a>
+                  <template #overlay>
+                    <a-menu @click="handleThreadActions(thread, $event)">
+                      <a-menu-item
+                        v-for="action in threadOperations"
+                        :key="action.key"
+                        :danger="action.danger"
+                      >
+                        <span>{{ $t(`common.${action.key}`) }}</span>
+                      </a-menu-item>
+                    </a-menu>
+                  </template>
+                </a-dropdown>
+              </div>
             </a-menu-item>
           </a-menu>
         </main>
@@ -112,17 +164,24 @@
 
 <style lang="scss" scoped>
   .chat-history {
+    &-item {
+      display: flex;
+      justify-content: space-between;
+      span:last-child {
+        color: $color-text;
+      }
+    }
     :deep(.ant-menu) {
       background: initial !important;
       border: none;
       .ant-menu-item {
         border-radius: 0;
       }
-      .ant-menu-item-selected {
-        background-color: $color-white;
-      }
     }
     &-large {
+      :deep(.ant-menu-item-selected) {
+        background-color: $color-white;
+      }
       position: fixed;
       left: 0;
       top: 64px;

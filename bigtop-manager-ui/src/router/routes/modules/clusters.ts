@@ -68,8 +68,7 @@ const routes: RouteRecordRaw[] = [
       {
         name: 'Infrastructures',
         path: 'infrastructures',
-        component: () =>
-          import('@/pages/cluster-mange/infrastructures/index.vue'),
+        component: () => import('@/pages/cluster-mange/infrastructures/index.vue'),
         meta: {
           icon: 'infrastructures',
           title: 'menu.infra'

@@ -16,27 +16,4 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-export type MaintainState = 'Uninstalled' | 'Installed' | 'Maintained' | 'Started' | 'Stopped'
-
-export enum State {
-  Pending = '#1677ff',
-  Processing = '#1677fe',
-  Successful = '#52c41a',
-  Failed = '#ff4d4f',
-  Canceled = '#80868b'
-}
-
-export enum CommonState {
-  normal = '#52c41a',
-  abnormal = '#ff4d4f',
-  maintained = '#d9d9d9'
-}
-
-export enum CurrState {
-  Installed,
-  Started,
-  Maintained,
-  Uninstalled,
-  Stopped
-}
+export default {}

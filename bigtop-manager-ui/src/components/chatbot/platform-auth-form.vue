@@ -33,12 +33,8 @@
   type FormState = { [key: string]: string }
 
   const { t } = useI18n()
-  const {
-    loading,
-    checkLoading,
-    testAuthPlatform,
-    fetchCredentialFormModelOfPlatform
-  } = useChatBot()
+  const { loading, checkLoading, testAuthPlatform, fetchCredentialFormModelOfPlatform } =
+    useChatBot()
   const props = defineProps<PlatformAuthFormProps>()
   const { currPage, visible, chatPayload } = toRefs(props)
   const formRef = ref<FormInstance>()
@@ -63,9 +59,7 @@
   watchEffect(async () => {
     if (currPage.value?.nextPage === 'platform-auth-form' && visible.value) {
       const { authId } = chatPayload.value
-      const data = await fetchCredentialFormModelOfPlatform(
-        authId as string | number
-      )
+      const data = await fetchCredentialFormModelOfPlatform(authId as string | number)
       credentialFormModel.value = data as CredentialFormItem[]
       loading.value = false
     }
@@ -73,10 +67,7 @@
 
   const onSuccess = async () => {
     const { authId } = chatPayload.value
-    const data = await testAuthPlatform(
-      authId as string | number,
-      toRaw(formState.value)
-    )
+    const data = await testAuthPlatform(authId as string | number, toRaw(formState.value))
     if (data) {
       const { id: authId, platformName, supportModels } = data
       emits('update:currPage', {

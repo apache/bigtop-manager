@@ -32,8 +32,7 @@
     currPage?: Option
   }
   const { t } = useI18n()
-  const { loading, fetchAuthorizedPlatforms, fetchDelAuthorizedPlatform } =
-    useChatBot()
+  const { loading, fetchAuthorizedPlatforms, fetchDelAuthorizedPlatform } = useChatBot()
   const props = defineProps<PlatformAuthSelectorProps>()
   const { visible, currPage, chatPayload } = toRefs(props)
   const authorizedPlatforms = ref<AuthorizedPlatform[]>([])

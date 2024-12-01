@@ -42,6 +42,10 @@ export const useAiChatStore = defineStore(
       getThreadsFromAuthPlatform()
     }
 
+    const updateChatThread = async () => {}
+
+    const deleteChatThread = async () => {}
+
     const getThread = async (threadId: ThreadId) => {
       try {
         const data = await ai.getThread(threadId)
@@ -130,6 +134,8 @@ export const useAiChatStore = defineStore(
       messageReceiver,
       talkWithChatbot,
       createChatThread,
+      updateChatThread,
+      deleteChatThread,
       getThread,
       getThreadsFromAuthPlatform,
       cancelSseConnect,

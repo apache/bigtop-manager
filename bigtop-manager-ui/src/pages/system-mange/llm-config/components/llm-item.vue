@@ -153,8 +153,7 @@
       }))
   })
 
-  const getActionDisabled = (key: ActionKeys): boolean =>
-    isDisable(key) || isEnable(key)
+  const getActionDisabled = (key: ActionKeys): boolean => isDisable(key) || isEnable(key)
 
   const isDisable = (key: ActionKeys): boolean =>
     currStatus.value === AuthPlatformStatus.UNAVAILABLE && key === 'ENABLE'
@@ -236,10 +235,7 @@
     <template v-else>
       <div class="llm-card-action" @click="handleCreateLlmConfig">
         <svg-icon name="plus_dark" />
-        <a-typography-text
-          type="secondary"
-          :content="$t('llmConfig.add_authorization')"
-        />
+        <a-typography-text type="secondary" :content="$t('llmConfig.add_authorization')" />
       </div>
     </template>
   </div>

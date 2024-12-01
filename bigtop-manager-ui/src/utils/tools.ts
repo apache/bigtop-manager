@@ -17,6 +17,13 @@
  * under the License.
  */
 
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
+
+dayjs.extend(utc)
+dayjs.extend(timezone)
+
 export const copyText = (text: string): Promise<any> => {
   if (navigator.clipboard) {
     return navigator.clipboard.writeText(text)
@@ -63,4 +70,11 @@ export const scrollToBottom = (container: HTMLElement | null) => {
 
 export const getRandomFromTimestamp = (len: number = 6) => {
   return Date.now().toString().slice(-len)
+}
+
+export const formatTime = (
+  time: string | undefined,
+  formatRule: string = 'YYYY-MM-DD HH:mm:ss'
+) => {
+  return typeof time === 'string' && dayjs(time).tz(dayjs.tz.guess(), true).format(formatRule)
 }

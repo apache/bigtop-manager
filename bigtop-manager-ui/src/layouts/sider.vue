@@ -42,9 +42,7 @@
   const toggleActivatedIcon = (menuItem: MenuItem) => {
     const { key, icon } = menuItem
     if (menuStore.isDynamicRouteMatched) {
-      return key === RouteExceptions.SPECIAL_ROUTE_PATH
-        ? `${icon}_activated`
-        : icon
+      return key === RouteExceptions.SPECIAL_ROUTE_PATH ? `${icon}_activated` : icon
     } else {
       return key === siderMenuSelectedKey.value ? `${icon}_activated` : icon
     }
@@ -61,17 +59,10 @@
 
 <template>
   <a-layout-sider class="sider">
-    <a-menu
-      :selected-keys="[siderMenuSelectedKey]"
-      mode="inline"
-      @select="onSiderClick"
-    >
+    <a-menu :selected-keys="[siderMenuSelectedKey]" mode="inline" @select="onSiderClick">
       <template v-for="menuItem in siderMenus" :key="menuItem.key">
         <a-sub-menu
-          v-if="
-            menuItem.children &&
-            menuItem.name === RouteExceptions.SPECIAL_ROUTE_NAME
-          "
+          v-if="menuItem.children && menuItem.name === RouteExceptions.SPECIAL_ROUTE_NAME"
           :key="menuItem.key"
         >
           <template #icon>

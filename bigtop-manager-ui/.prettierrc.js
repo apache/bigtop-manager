@@ -18,16 +18,16 @@
  */
 
 module.exports = {
-    useTabs: false,
-    printWidth: 100,
-    semi: false,
-    vueIndentScriptAndStyle: true,
-    singleQuote: true,
-    quoteProps: 'as-needed',
-    jsxBracketSameLine: false,
-    jsxSingleQuote: true,
-    arrowParens: 'always',
-    htmlWhitespaceSensitivity: 'strict',
-    endOfLine: 'lf',
-    trailingComma: 'none'
+  useTabs: false,
+  printWidth: 100,
+  semi: false,
+  vueIndentScriptAndStyle: true,
+  singleQuote: true,
+  quoteProps: 'as-needed',
+  jsxBracketSameLine: false,
+  jsxSingleQuote: true,
+  arrowParens: 'always',
+  htmlWhitespaceSensitivity: 'strict',
+  endOfLine: 'lf',
+  trailingComma: 'none'
 }

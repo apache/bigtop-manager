@@ -17,11 +17,7 @@
  * under the License.
  */
 
-import axios, {
-  AxiosError,
-  AxiosResponse,
-  InternalAxiosRequestConfig
-} from 'axios'
+import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import { message } from 'ant-design-vue'
 import { ResponseEntity } from '@/api/types'
 import router from '@/router'
@@ -36,18 +32,13 @@ const request = axios.create({
 })
 
 request.interceptors.request.use(
-  (
-    config: InternalAxiosRequestConfig<any>
-  ): InternalAxiosRequestConfig<any> => {
+  (config: InternalAxiosRequestConfig<any>): InternalAxiosRequestConfig<any> => {
     config.headers = config.headers || {}
 
     const locale = i18n.global.locale.value as Locale
     config.headers['Accept-Language'] = locale.replace('_', '-')
 
-    const token =
-      localStorage.getItem('Token') ??
-      sessionStorage.getItem('Token') ??
-      undefined
+    const token = localStorage.getItem('Token') ?? sessionStorage.getItem('Token') ?? undefined
     if (token) {
       config.headers['Token'] = token
     }

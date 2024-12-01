@@ -19,24 +19,12 @@
 <script setup lang="ts">
   import SelectMenu from './select-menu.vue'
   import useChatBot from '@/composables/use-chat-bot'
-  import {
-    toRefs,
-    computed,
-    h,
-    ref,
-    watchEffect,
-    toRaw,
-    onActivated
-  } from 'vue'
+  import { toRefs, computed, h, ref, watchEffect, toRaw, onActivated } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { Modal } from 'ant-design-vue/es/components'
   import { ExclamationCircleFilled } from '@ant-design/icons-vue/lib/icons'
   import type { SelectData, Option } from './select-menu.vue'
-  import type {
-    ChatbotConfig,
-    ChatThread,
-    ChatThreadDelCondition
-  } from '@/api/chatbot/types'
+  import type { ChatbotConfig, ChatThread, ChatThreadDelCondition } from '@/api/chatbot/types'
 
   interface PreChatProps {
     visible: boolean
@@ -44,12 +32,7 @@
     currPage?: Option
   }
 
-  const {
-    loading,
-    fetchChatThreads,
-    fetchCreateChatThread,
-    fetchDelChatThread
-  } = useChatBot()
+  const { loading, fetchChatThreads, fetchCreateChatThread, fetchDelChatThread } = useChatBot()
   const { t } = useI18n()
   const props = defineProps<PreChatProps>()
   const { currPage, visible, chatPayload } = toRefs(props)
@@ -145,11 +128,7 @@
 <template>
   <div>
     <a-spin :spinning="loading">
-      <select-menu
-        :select-data="chatThreadsSelectData"
-        @remove="onRemove"
-        @select="onSelect"
-      />
+      <select-menu :select-data="chatThreadsSelectData" @remove="onRemove" @select="onSelect" />
     </a-spin>
   </div>
 </template>

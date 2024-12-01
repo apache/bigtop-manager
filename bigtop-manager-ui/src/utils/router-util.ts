@@ -22,9 +22,7 @@ interface RouteModuleType {
   routes: RouteRecordRaw[]
 }
 
-export const mergeRouteModules = (
-  routeModules: Record<string, unknown>
-): RouteRecordRaw[] => {
+export const mergeRouteModules = (routeModules: Record<string, unknown>): RouteRecordRaw[] => {
   const mergedRoutes: RouteRecordRaw[] = []
   for (const routeModule of Object.values(routeModules)) {
     const moduleRoutes = (routeModule as RouteModuleType)?.routes ?? []

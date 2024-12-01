@@ -63,14 +63,8 @@
   )
   const formItems = computed((): FormItemState[] => {
     const newFormItems =
-      formCredentials.value?.map((v) =>
-        createNewFormItem('input', v.name, v.displayName)
-      ) ?? []
-    return [
-      ...formItemConfig.value.slice(0, 2),
-      ...newFormItems,
-      ...formItemConfig.value.slice(2)
-    ]
+      formCredentials.value?.map((v) => createNewFormItem('input', v.name, v.displayName)) ?? []
+    return [...formItemConfig.value.slice(0, 2), ...newFormItems, ...formItemConfig.value.slice(2)]
   })
 
   watchEffect(() => {
@@ -155,12 +149,7 @@
       <template #footer>
         <footer>
           <a-space size="middle">
-            <a-button
-              :disabled="loading"
-              :loading="loadingTest"
-              type="primary"
-              @click="handleTest"
-            >
+            <a-button :disabled="loading" :loading="loadingTest" type="primary" @click="handleTest">
               {{ $t('llmConfig.test') }}
             </a-button>
           </a-space>
@@ -168,12 +157,7 @@
             <a-button :disabled="isDisabled" @click="handleCancel">
               {{ $t('common.cancel') }}
             </a-button>
-            <a-button
-              :disabled="loadingTest"
-              :loading="loading"
-              type="primary"
-              @click="handleOk"
-            >
+            <a-button :disabled="loadingTest" :loading="loading" type="primary" @click="handleOk">
               {{ $t('common.confirm') }}
             </a-button>
           </a-space>

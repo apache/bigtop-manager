@@ -64,9 +64,7 @@ const replacePatternInHosts = (rawHostNames: string[]): string[] => {
 }
 
 // parse hostNames as pattern expression
-export const parseHostNamesAsPatternExpression = (
-  hostNameStr: string
-): string[] => {
+export const parseHostNamesAsPatternExpression = (hostNameStr: string): string[] => {
   let hostNames: string[] = []
   const hostNameArr = hostNameStr.replace(/\n|\r\n|\s/g, ',').split(',')
   hostNameArr.forEach((a) => {

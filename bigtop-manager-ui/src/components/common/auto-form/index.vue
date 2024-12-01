@@ -149,19 +149,14 @@
     >
       <div v-for="item in props.formItems" :key="item.field">
         <slot :="{ item, state: formState }" :name="item.field">
-          <a-form-item
-            v-if="!props.hiddenItems.includes(item.field)"
-            v-bind="item.formItemProps"
-          >
+          <a-form-item v-if="!props.hiddenItems.includes(item.field)" v-bind="item.formItemProps">
             <!-- input -->
             <a-input
               v-if="item.type == 'input'"
               v-model:value="formState[item.field]"
               v-bind="item.controlProps"
               :disabled="
-                disabledItems
-                  ? disabledItems.includes(item.field)
-                  : item.controlProps.disabled
+                disabledItems ? disabledItems.includes(item.field) : item.controlProps.disabled
               "
               v-on="formItemEvents[item.field] || {}"
             />
@@ -172,9 +167,7 @@
               v-model:value="formState[item.field]"
               v-bind="item.controlProps"
               :disabled="
-                disabledItems
-                  ? disabledItems.includes(item.field)
-                  : item.controlProps.disabled
+                disabledItems ? disabledItems.includes(item.field) : item.controlProps.disabled
               "
               v-on="formItemEvents[item.field] || {}"
             />
@@ -185,16 +178,12 @@
               v-model:value="formState[item.field]"
               v-bind="item.controlProps"
               :disabled="
-                disabledItems
-                  ? disabledItems.includes(item.field)
-                  : item.controlProps.disabled
+                disabledItems ? disabledItems.includes(item.field) : item.controlProps.disabled
               "
               v-on="formItemEvents[item.field] || {}"
             >
               <a-select-option
-                v-for="(child, childIndex) in optionMap[item.field] ||
-                item.defaultOptionsMap ||
-                []"
+                v-for="(child, childIndex) in optionMap[item.field] || item.defaultOptionsMap || []"
                 :key="childIndex"
                 :value="
                   typeof child === 'string'
@@ -216,20 +205,14 @@
               v-model:value="formState[item.field]"
               v-bind="item.controlProps"
               :disabled="
-                disabledItems
-                  ? disabledItems.includes(item.field)
-                  : item.controlProps.disabled
+                disabledItems ? disabledItems.includes(item.field) : item.controlProps.disabled
               "
               v-on="formItemEvents[item.field] || {}"
             >
               <a-radio
-                v-for="(child, childIndex) in optionMap[item.field] ||
-                item.defaultOptionsMap ||
-                []"
+                v-for="(child, childIndex) in optionMap[item.field] || item.defaultOptionsMap || []"
                 :key="childIndex"
-                :value="
-                  child[(item.fieldMap && item.fieldMap.value) || 'value']
-                "
+                :value="child[(item.fieldMap && item.fieldMap.value) || 'value']"
               >
                 {{ child[(item.fieldMap && item.fieldMap.label) || 'label'] }}
               </a-radio>
