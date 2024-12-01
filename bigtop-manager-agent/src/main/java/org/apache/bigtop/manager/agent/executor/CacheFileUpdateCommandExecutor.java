@@ -40,7 +40,6 @@ import static org.apache.bigtop.manager.common.constants.CacheFiles.COMPONENTS_I
 import static org.apache.bigtop.manager.common.constants.CacheFiles.CONFIGURATIONS_INFO;
 import static org.apache.bigtop.manager.common.constants.CacheFiles.HOSTS_INFO;
 import static org.apache.bigtop.manager.common.constants.CacheFiles.REPOS_INFO;
-import static org.apache.bigtop.manager.common.constants.CacheFiles.SETTINGS_INFO;
 import static org.apache.bigtop.manager.common.constants.CacheFiles.USERS_INFO;
 
 @Slf4j
@@ -71,7 +70,6 @@ public class CacheFileUpdateCommandExecutor extends AbstractCommandExecutor {
             }
         }
 
-        JsonUtils.writeToFile(cacheDir + SETTINGS_INFO, cacheMessagePayload.getSettings());
         JsonUtils.writeToFile(cacheDir + CONFIGURATIONS_INFO, cacheMessagePayload.getConfigurations());
         JsonUtils.writeToFile(cacheDir + HOSTS_INFO, cacheMessagePayload.getClusterHostInfo());
         JsonUtils.writeToFile(cacheDir + USERS_INFO, cacheMessagePayload.getUserInfo());

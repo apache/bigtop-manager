@@ -18,6 +18,7 @@
  */
 package org.apache.bigtop.manager.server.timer;
 
+import org.apache.bigtop.manager.common.utils.CaseUtils;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.repository.ComponentDao;
@@ -28,32 +29,39 @@ import org.apache.bigtop.manager.grpc.generated.ComponentStatusServiceGrpc;
 import org.apache.bigtop.manager.server.enums.HealthyStatusEnum;
 import org.apache.bigtop.manager.server.grpc.GrpcClient;
 
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
 import lombok.extern.slf4j.Slf4j;
 
+import jakarta.annotation.Resource;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
-// @Component
+@Component
 public class ComponentStatusTimer {
 
-    //    @Resource
+    @Resource
     private ComponentDao componentDao;
 
-    //    @Resource
+    @Resource
     private HostDao hostDao;
 
-    //    @Async
-    //    @Scheduled(fixedDelay = 30, timeUnit = TimeUnit.SECONDS)
+    @Async
+    @Scheduled(fixedDelay = 30, timeUnit = TimeUnit.SECONDS)
     public void execute() {
         List<ComponentPO> componentPOList = componentDao.findAll();
         for (ComponentPO componentPO : componentPOList) {
+            componentPO = componentDao.findDetailsById(componentPO.getId());
             HostPO hostPO = hostDao.findById(componentPO.getHostId());
-            // TODO need to build the correct request
             ComponentStatusRequest request = ComponentStatusRequest.newBuilder()
-                    //                    .setServiceName(hostComponentPO.getServiceName())
-                    //                    .setServiceUser(hostComponentPO.getServiceUser())
-                    //                    .setComponentName(hostComponentPO.getComponentName())
-                    //                    .setCommandScript(hostComponentPO.getCommandScript())
+                    .setStackName(CaseUtils.toLowerCase(componentPO.getStack().split("-")[0]))
+                    .setStackVersion(componentPO.getStack().split("-")[1])
+                    .setServiceName(componentPO.getServiceName())
+                    .setServiceUser(componentPO.getServiceUser())
+                    .setComponentName(componentPO.getName())
                     .build();
             ComponentStatusServiceGrpc.ComponentStatusServiceBlockingStub blockingStub = GrpcClient.getBlockingStub(
                     hostPO.getHostname(),

@@ -25,7 +25,5 @@ public enum OSArchType {
     X86_64,
 
     AARCH64,
-
-    PPC64LE,
     ;
 }

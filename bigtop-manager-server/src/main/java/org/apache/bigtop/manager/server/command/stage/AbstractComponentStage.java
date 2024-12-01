@@ -77,9 +77,7 @@ public abstract class AbstractComponentStage extends AbstractStage {
         taskContext.setRootDir(clusterPO.getRootDir());
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put("customCommands", componentDTO.getCustomCommands());
         properties.put("packageSpecifics", serviceDTO.getPackageSpecifics());
-        properties.put("commandScript", componentDTO.getCommandScript());
         taskContext.setProperties(properties);
         return taskContext;
     }

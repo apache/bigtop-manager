@@ -33,9 +33,7 @@ public class ComponentDTO {
 
     private String cardinality;
 
-    private ScriptDTO commandScript;
-
-    private List<CustomCommandDTO> customCommands;
+    private List<String> customCommands;
 
     private QuickLinkDTO quickLink;
 }

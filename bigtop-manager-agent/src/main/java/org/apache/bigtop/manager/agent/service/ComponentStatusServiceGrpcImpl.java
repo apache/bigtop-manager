@@ -20,9 +20,7 @@ package org.apache.bigtop.manager.agent.service;
 
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
-import org.apache.bigtop.manager.common.message.entity.pojo.ScriptInfo;
 import org.apache.bigtop.manager.common.shell.ShellResult;
-import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.grpc.generated.ComponentStatusReply;
 import org.apache.bigtop.manager.grpc.generated.ComponentStatusRequest;
 import org.apache.bigtop.manager.grpc.generated.ComponentStatusServiceGrpc;
@@ -44,12 +42,13 @@ public class ComponentStatusServiceGrpcImpl extends ComponentStatusServiceGrpc.C
         try {
             CommandPayload commandPayload = new CommandPayload();
             commandPayload.setCommand(Command.STATUS);
+            commandPayload.setStackName(request.getStackName());
+            commandPayload.setStackVersion(request.getStackVersion());
             commandPayload.setServiceName(request.getServiceName());
             commandPayload.setServiceUser(request.getServiceUser());
             commandPayload.setComponentName(request.getComponentName());
-            commandPayload.setCommandScript(JsonUtils.readFromString(request.getCommandScript(), ScriptInfo.class));
-            ShellResult shellResult = StackExecutor.execute(commandPayload);
 
+            ShellResult shellResult = StackExecutor.execute(commandPayload);
             ComponentStatusReply reply = ComponentStatusReply.newBuilder()
                     .setStatus(shellResult.getExitCode())
                     .build();

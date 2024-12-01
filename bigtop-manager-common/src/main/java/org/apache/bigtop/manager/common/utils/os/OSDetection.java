@@ -18,12 +18,9 @@
  */
 package org.apache.bigtop.manager.common.utils.os;
 
-import org.apache.bigtop.manager.common.enums.OSArchType;
-import org.apache.bigtop.manager.common.enums.OSType;
 import org.apache.bigtop.manager.common.shell.ShellExecutor;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 
-import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -55,9 +52,7 @@ public class OSDetection {
 
     public static String getOS() {
         if (SystemUtils.IS_OS_LINUX) {
-            String os = getOSType() + getOSVersion().toLowerCase();
-            ifSupportedOS(os);
-            return os;
+            return getOSType() + getOSVersion().toLowerCase();
         } else {
             return System.getProperty("os.name");
         }
@@ -151,25 +146,9 @@ public class OSDetection {
             ShellResult shellResult = ShellExecutor.execCommand(builderParameters);
             String output = shellResult.getOutput().replace("\n", "");
             log.debug("getArch: {}", output);
-
-            ifSupportedArch(output);
             return output;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private static void ifSupportedOS(String os) {
-        if (!EnumUtils.isValidEnumIgnoreCase(OSType.class, os)) {
-            throw new RuntimeException("Unsupported OS: [" + os + "]");
-        }
-        log.debug("OS [{}] is Supported", os);
-    }
-
-    private static void ifSupportedArch(String arch) {
-        if (!EnumUtils.isValidEnumIgnoreCase(OSArchType.class, arch)) {
-            throw new RuntimeException("Unsupported Arch: [" + arch + "]");
-        }
-        log.debug("Arch [{}] is Supported", arch);
     }
 }

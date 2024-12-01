@@ -34,24 +34,13 @@
             <component>
                 <name>prometheus_server</name>
                 <display-name>Prometheus Server</display-name>
-                <category>master</category>
+                <category>server</category>
                 <cardinality>1+</cardinality>
-                <command-script>
-                    <script-id>org.apache.bigtop.manager.stack.infra.v1_0_0.prometheus.PrometheusServerScript</script-id>
-                    <script-type>java</script-type>
-                    <timeout>1200</timeout>
-                </command-script>
             </component>
         </components>
 
         <package-specifics>
             <package-specific>
-                <operating-systems>
-                    <os>centos7</os>
-                    <os>rocky8</os>
-                    <os>openeuler22</os>
-                    <os>openeuler24</os>
-                </operating-systems>
                 <architectures>
                     <arch>x86_64</arch>
                 </architectures>
@@ -63,10 +52,6 @@
                 </packages>
             </package-specific>
             <package-specific>
-                <operating-systems>
-                    <os>openeuler22</os>
-                    <os>openeuler24</os>
-                </operating-systems>
                 <architectures>
                     <arch>aarch64</arch>
                 </architectures>

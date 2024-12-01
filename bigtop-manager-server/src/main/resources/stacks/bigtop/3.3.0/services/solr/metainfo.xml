@@ -31,13 +31,8 @@
             <component>
                 <name>solr_instance</name>
                 <display-name>Solr Instance</display-name>
-                <category>master</category>
+                <category>server</category>
                 <cardinality>1+</cardinality>
-                <command-script>
-                    <script-id>org.apache.bigtop.manager.stack.bigtop.v3_3_0.solr.SolrServerScript</script-id>
-                    <script-type>java</script-type>
-                    <timeout>1200</timeout>
-                </command-script>
                 <quick-link>
                     <display-name>Solr UI</display-name>
                     <http-port-property>solr_port</http-port-property>
@@ -50,11 +45,6 @@
 
         <package-specifics>
             <package-specific>
-                <operating-systems>
-                    <os>centos7</os>
-                    <os>rocky8</os>
-                    <os>openeuler22</os>
-                </operating-systems>
                 <architectures>
                     <arch>x86_64</arch>
                 </architectures>

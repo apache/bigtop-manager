@@ -21,7 +21,6 @@ package org.apache.bigtop.manager.stack.core.executor;
 import org.apache.bigtop.manager.common.constants.MessageConstants;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
-import org.apache.bigtop.manager.common.message.entity.pojo.CustomCommandInfo;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.common.utils.CaseUtils;
 import org.apache.bigtop.manager.common.utils.Environments;
@@ -34,7 +33,6 @@ import org.apache.bigtop.manager.stack.core.spi.script.Script;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Method;
-import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -44,7 +42,11 @@ public class StackExecutor {
 
     private static final Map<String, Hook> HOOK_MAP = new PrioritySPIFactory<>(Hook.class).getSPIMap();
 
-    private static Script getCommandScript(String scriptId) {
+    private static Script getCommandScript(CommandPayload commandPayload) {
+        String componentName = commandPayload.getComponentName();
+        String packageName = getPackageName(commandPayload);
+        String scriptId = packageName + "."
+                + CaseUtils.toCamelCase(componentName, CaseUtils.SEPARATOR_UNDERSCORE) + "Script";
         Script script = SCRIPT_MAP.get(scriptId);
         if (script == null) {
             throw new StackException("Cannot find Script Class {0}", scriptId);
@@ -53,19 +55,11 @@ public class StackExecutor {
         return script;
     }
 
-    private static Script getCustomScript(String customCommand, List<CustomCommandInfo> customCommands) {
-        Script script = null;
-        for (CustomCommandInfo customCommandInfo : customCommands) {
-            if (customCommandInfo.getName().equals(customCommand)) {
-                script = getCommandScript(customCommandInfo.getCommandScript().getScriptId());
-            }
-        }
-
-        if (script == null) {
-            throw new StackException("Cannot find script class {0}", customCommand);
-        }
-
-        return script;
+    private static String getPackageName(CommandPayload commandPayload) {
+        return "org.apache.bigtop.manager.stack" + "."
+                + CaseUtils.toLowerCase(commandPayload.getStackName()) + ".v"
+                + commandPayload.getStackVersion().replaceAll("\\.", "_") + "."
+                + CaseUtils.toLowerCase(commandPayload.getServiceName());
     }
 
     private static void runBeforeHook(String command, Params params) {
@@ -84,20 +78,15 @@ public class StackExecutor {
 
     public static ShellResult execute(CommandPayload commandPayload) {
         try {
-            String command;
-            Script script;
-            if (commandPayload.getCommand().name().equals(Command.CUSTOM.name())) {
-                command = commandPayload.getCustomCommand();
-                script = getCustomScript(command, commandPayload.getCustomCommands());
-            } else {
-                command = commandPayload.getCommand().name();
-                script = getCommandScript(commandPayload.getCommandScript().getScriptId());
-            }
+            String command = commandPayload.getCommand() == Command.CUSTOM
+                    ? commandPayload.getCustomCommand()
+                    : commandPayload.getCommand().name();
+            Script script = getCommandScript(commandPayload);
 
             String methodName = CaseUtils.toCamelCase(command, CaseUtils.SEPARATOR_UNDERSCORE, false);
             Method method = script.getClass().getMethod(methodName, Params.class);
 
-            String paramsClassName = script.getClass().getPackageName() + "."
+            String paramsClassName = getPackageName(commandPayload) + "."
                     + CaseUtils.toCamelCase(commandPayload.getServiceName()) + "Params";
             Class<?> paramsClass = Class.forName(paramsClassName);
             Params params = (Params)
