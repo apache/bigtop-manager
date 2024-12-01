@@ -353,5 +353,9 @@ SET `desc` = 'Get your API Key in https://platform.openai.com/api-keys'
 WHERE `name` = 'OpenAI';
 
 UPDATE `llm_platform`
-SET `desc` = 'Get your API Key in https://platform.openai.com/api-keys'
+SET `desc` = 'Get your API Key in https://bailian.console.aliyun.com/?apiKey=1#/api-key'
 WHERE `name` = 'DashScope';
+
+UPDATE `llm_platform`
+SET `desc` = 'Get API Key and Secret Key in https://console.bce.baidu.com/qianfan/ais/console/applicationConsole/application/v1'
+WHERE `name` = 'QianFan';

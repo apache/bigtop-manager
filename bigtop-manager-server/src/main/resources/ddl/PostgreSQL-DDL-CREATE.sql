@@ -358,3 +358,15 @@ VALUES
 ('{"apiKey": "API Key"}','OpenAI','gpt-3.5-turbo,gpt-4,gpt-4o,gpt-3.5-turbo-16k,gpt-4-turbo-preview,gpt-4-32k,gpt-4o-mini'),
 ('{"apiKey": "API Key"}','DashScope','qwen-1.8b-chat,qwen-max,qwen-plus,qwen-turbo'),
 ('{"apiKey": "API Key", "secretKey": "Secret Key"}','QianFan','Yi-34B-Chat,ERNIE-4.0-8K,ERNIE-3.5-128K,ERNIE-Speed-8K,Llama-2-7B-Chat,Fuyu-8B');
+
+UPDATE llm_platform
+SET "desc" = 'Get your API Key in https://platform.openai.com/api-keys'
+WHERE "name" = 'OpenAI';
+
+UPDATE llm_platform
+SET "desc" = 'Get your API Key in https://bailian.console.aliyun.com/?apiKey=1#/api-key'
+WHERE "name" = 'DashScope';
+
+UPDATE llm_platform
+SET "desc" = 'Get API Key and Secret Key in https://console.bce.baidu.com/qianfan/ais/console/applicationConsole/application/v1'
+WHERE "name" = 'QianFan';
