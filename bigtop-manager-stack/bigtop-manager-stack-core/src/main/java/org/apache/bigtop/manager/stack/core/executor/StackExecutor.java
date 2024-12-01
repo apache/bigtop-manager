@@ -45,8 +45,8 @@ public class StackExecutor {
     private static Script getCommandScript(CommandPayload commandPayload) {
         String componentName = commandPayload.getComponentName();
         String packageName = getPackageName(commandPayload);
-        String scriptId = packageName + "."
-                + CaseUtils.toCamelCase(componentName, CaseUtils.SEPARATOR_UNDERSCORE) + "Script";
+        String scriptId =
+                packageName + "." + CaseUtils.toCamelCase(componentName, CaseUtils.SEPARATOR_UNDERSCORE) + "Script";
         Script script = SCRIPT_MAP.get(scriptId);
         if (script == null) {
             throw new StackException("Cannot find Script Class {0}", scriptId);

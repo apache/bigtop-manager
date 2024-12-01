@@ -200,13 +200,17 @@ public class HostServiceImpl implements HostService {
             // Update agent conf
             // Current only grpc port needs to be updated if it's not default port
             if (hostDTO.getGrpcPort() != 8835) {
-                command = "sed -i 's/port: 8835/port: " + hostDTO.getGrpcPort() + "/' " + path + "/bigtop-manager-agent/conf/application.yml";
+                command = "sed -i 's/port: 8835/port: " + hostDTO.getGrpcPort() + "/' " + path
+                        + "/bigtop-manager-agent/conf/application.yml";
                 result = execCommandOnRemoteHost(hostDTO, hostDTO.getHostname(), command);
                 if (result.getExitCode() != MessageConstants.SUCCESS_CODE) {
                     hostPO.setErrInfo(result.getErrMsg());
                     hostDao.updateById(hostPO);
 
-                    log.error("Unable to update agent config, hostname: {}, msg: {}", hostDTO.getHostname(), result.getErrMsg());
+                    log.error(
+                            "Unable to update agent config, hostname: {}, msg: {}",
+                            hostDTO.getHostname(),
+                            result.getErrMsg());
                     throw new ApiException(ApiExceptionEnum.HOST_UNABLE_TO_EXEC_COMMAND, hostDTO.getHostname());
                 }
             }
