@@ -43,4 +43,7 @@ public class PlatformPO extends BasePO implements Serializable {
 
     @Column(name = "support_models", length = 255)
     private String supportModels;
+
+    @Column(name = "desc")
+    private String desc;
 }

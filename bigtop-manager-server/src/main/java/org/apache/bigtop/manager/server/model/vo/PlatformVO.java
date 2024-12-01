@@ -28,6 +28,8 @@ public class PlatformVO {
 
     private String supportModels;
 
+    private String desc;
+
     public PlatformVO(Long id, String name, String models) {
         this.id = id;
         this.name = name;

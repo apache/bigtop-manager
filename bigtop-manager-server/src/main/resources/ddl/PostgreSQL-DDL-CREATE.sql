@@ -280,6 +280,7 @@ CREATE TABLE llm_platform
     id             BIGINT CHECK (id > 0) NOT NULL GENERATED ALWAYS AS IDENTITY,
     name           VARCHAR(255)          NOT NULL,
     credential     TEXT         DEFAULT NULL,
+    "desc"         TEXT         DEFAULT NULL,
     support_models VARCHAR(255) DEFAULT NULL,
     create_time    TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
     update_time    TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP /* ON UPDATE CURRENT_TIMESTAMP */,
