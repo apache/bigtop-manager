@@ -57,10 +57,18 @@
   })
 
   const width = computed(() => (fullScreen.value ? 'calc(100% - 300px)' : 450))
-  const noChat = computed(() => Object.keys(currThread.value).length === 0)
+  const noChat = computed(
+    () => Object.keys(currThread.value).length === 0 || chatRecords.value.length === 0
+  )
   const historyVisible = computed(() => fullScreen.value && open.value)
-  const authPlatformCached = computed(
-    () => Object.keys((currPlatform && currPlatform.value) || {}).length > 0
+  const authPlatformCached = computed(() => Object.keys(currPlatform.value || {}).length > 0)
+  const recordReceiver = computed(
+    (): ChatMessageItem => ({ sender: 'AI', message: messageReceiver.value })
+  )
+  const checkActions = computed(() =>
+    fullScreen.value
+      ? filterActions(['EXITSCREEN', 'CLOSE'])
+      : filterActions(['ADD', 'RECORDS', 'FULLSCREEN', 'CLOSE'])
   )
   const actionGroup = computed((): GroupItem<ActionType>[] => [
     { tip: '创建对话', icon: 'plus_gray', action: 'ADD' },
@@ -69,16 +77,6 @@
     { tip: '退出全屏', icon: 'exit_screen', action: 'EXITSCREEN', clickEvent: toggleFullScreen },
     { icon: 'close', action: 'CLOSE', clickEvent: () => controlVisible(false) }
   ])
-
-  const checkActions = computed(() =>
-    fullScreen.value
-      ? filterActions(['EXITSCREEN', 'CLOSE'])
-      : filterActions(['ADD', 'RECORDS', 'FULLSCREEN', 'CLOSE'])
-  )
-
-  const recordReceiver = computed(
-    (): ChatMessageItem => ({ sender: 'AI', message: messageReceiver.value })
-  )
 
   watch(open, (val) => {
     val && initConfig()
@@ -107,7 +105,7 @@
   const filterActions = (showActions?: ActionType[]) => {
     if (!showActions) return actionGroup.value
     return actionGroup.value.filter(
-      (action) => action.action && showActions.includes(action.action)
+      (groupItem) => groupItem.action && showActions.includes(groupItem.action)
     )
   }
 

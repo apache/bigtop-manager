@@ -20,25 +20,37 @@
 <script setup lang="ts">
   import { ref } from 'vue'
   import { useAiChatStore } from '@/store/ai-assistant'
+  import { storeToRefs } from 'pinia'
+  import { message } from 'ant-design-vue'
 
   const aiChatStore = useAiChatStore()
-  const message = ref('')
+  const { isSending } = storeToRefs(aiChatStore)
+  const chatMessage = ref('')
 
   const sendMessage = async () => {
-    aiChatStore.setChatRecordForSender('USER', message.value)
-    aiChatStore.collectReciveMessage(message.value)
-    message.value = ''
+    if (chatMessage.value === '') {
+      message.error('消息不能为空')
+      return
+    }
+    aiChatStore.setChatRecordForSender('USER', chatMessage.value)
+    aiChatStore.collectReciveMessage(chatMessage.value)
+    chatMessage.value = ''
   }
 </script>
 <template>
   <div class="chat-input">
     <a-textarea
-      v-model:value="message"
+      v-model:value="chatMessage"
       :bordered="false"
       :auto-size="{ minRows: 1, maxRows: 6 }"
       placeholder="请输入你的问题"
     />
-    <a-button type="text" shape="circle" @click="sendMessage">
+    <a-button
+      :disabled="isSending"
+      :type="isSending ? 'default' : 'text'"
+      shape="circle"
+      @click="sendMessage"
+    >
       <template #icon>
         <svg-icon name="send" />
       </template>

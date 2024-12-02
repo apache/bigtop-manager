@@ -34,6 +34,7 @@ export const useAiChatStore = defineStore(
     const chatRecords = ref<ChatMessageItem[]>([])
     const canceler = ref<Canceler>()
     const messageReceiver = ref('')
+    const isSending = ref(false)
 
     const createChatThread = async () => {
       const tempName = `thread-${getRandomFromTimestamp()}`
@@ -42,14 +43,31 @@ export const useAiChatStore = defineStore(
       getThreadsFromAuthPlatform()
     }
 
-    const updateChatThread = async () => {}
+    const updateChatThread = async (thread: ChatThread, newName: string) => {
+      try {
+        const threadId = thread.threadId as ThreadId
+        await ai.updateThread(threadId, { name: newName })
+        return true
+      } catch (error) {
+        return false
+      }
+    }
 
-    const deleteChatThread = async () => {}
+    const deleteChatThread = async (thread: ChatThread) => {
+      try {
+        const threadId = thread.threadId as ThreadId
+        await ai.deleteThread(threadId)
+        return true
+      } catch (error) {
+        return false
+      }
+    }
 
     const getThread = async (threadId: ThreadId) => {
       try {
         const data = await ai.getThread(threadId)
         currThread.value = data
+        getThreadRecords()
       } catch (error) {
         console.log('error :>> ', error)
       }
@@ -77,12 +95,14 @@ export const useAiChatStore = defineStore(
     const talkWithChatbot = async (message: string) => {
       try {
         const { threadId } = currThread.value
+        isSending.value = true
         if (threadId) {
           const { cancel, promise } = ai.talkWithChatbot(threadId, { message }, onMessageReceive)
           canceler.value = cancel
           return promise.then(onMessageComplete)
         }
       } catch (error) {
+        isSending.value = false
         console.log('error :>> ', error)
       }
     }
@@ -109,6 +129,7 @@ export const useAiChatStore = defineStore(
       const formatResultMsg = messageReceiver.value
       messageReceiver.value = ''
       cancelSseConnect()
+      isSending.value = false
       return Promise.resolve({ message: formatResultMsg, state: true })
     }
 
@@ -132,6 +153,7 @@ export const useAiChatStore = defineStore(
       threads,
       chatRecords,
       messageReceiver,
+      isSending,
       talkWithChatbot,
       createChatThread,
       updateChatThread,

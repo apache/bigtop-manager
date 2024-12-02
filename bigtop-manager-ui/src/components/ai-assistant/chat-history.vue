@@ -17,13 +17,14 @@
   ~ under the License.
   -->
 <script setup lang="ts">
-  import { ref, shallowRef, toRefs, watch } from 'vue'
+  import { ref, shallowReactive, shallowRef, toRefs, watch } from 'vue'
   import { useAiChatStore } from '@/store/ai-assistant'
   import { storeToRefs } from 'pinia'
   import { formatTime } from '@/utils/tools'
   import { EllipsisOutlined } from '@ant-design/icons-vue'
   import type { ChatThread, ThreadId } from '@/api/ai-assistant/types'
-  import type { MenuInfo } from 'ant-design-vue/es/menu/src/interface'
+  import { message, Modal } from 'ant-design-vue'
+  import { useI18n } from 'vue-i18n'
 
   interface Props {
     historyType: 'large' | 'small'
@@ -35,18 +36,35 @@
     danger?: boolean
   }
 
+  type ThreadOperationHandler = Record<
+    'delete' | 'rename',
+    (thread: ChatThread, idx?: number) => void
+  >
+
+  const { t } = useI18n()
   const aiChatStore = useAiChatStore()
   const { threads, currThread } = storeToRefs(aiChatStore)
   const props = defineProps<Props>()
   const { visible, historyType } = toRefs(props)
 
   const open = ref(false)
+  const isRename = ref(false)
   const title = ref('历史记录')
+  const newName = ref('新聊天')
   const selectKey = ref<ThreadId[]>([])
+  const editThread = ref<ChatThread>({})
   const threadOperations = shallowRef<ThreadOperation[]>([
     { key: 'rename' },
     { key: 'delete', danger: true }
   ])
+  const threadOperationHandlers = shallowReactive<ThreadOperationHandler>({
+    delete: (thread, idx) => handleDeleteConfirm(thread, idx),
+    rename: (thread) => {
+      editThread.value = thread
+      isRename.value = true
+      newName.value = thread.name as string
+    }
+  })
 
   watch(currThread, (val) => {
     selectKey.value = [val.threadId || '']
@@ -57,11 +75,8 @@
     async ([open, visible]) => {
       if (open || visible) {
         await aiChatStore.getThreadsFromAuthPlatform()
-        if (Object.keys(currThread.value).length > 0) {
-          selectKey.value = [currThread.value.threadId || '']
-        } else {
-          currThread.value = threads.value[0]
-        }
+        Object.keys(currThread.value).length <= 0 && (currThread.value = threads.value[0])
+        selectKey.value = [currThread.value.threadId || '']
       }
     },
     {
@@ -77,9 +92,40 @@
     aiChatStore.getThread(key)
   }
 
-  const handleThreadActions = (thread: ChatThread, { key }: MenuInfo) => {
-    console.log('thread :>> ', thread)
-    console.log('key :>> ', key)
+  const handleRenameConfirm = async (thread: ChatThread) => {
+    if (newName.value == '') newName.value = '新聊天'
+    isRename.value = false
+    const checkRes = await aiChatStore.updateChatThread(editThread.value, newName.value)
+    if (checkRes) {
+      thread.name = newName.value
+      editThread.value = {}
+      newName.value = ''
+    }
+  }
+
+  const handleDeleteConfirm = (thread: ChatThread, idx?: number) => {
+    Modal.confirm({
+      title: t('common.delete_confirm_content', [`${thread.name}`]),
+      async onOk() {
+        const success = await aiChatStore.deleteChatThread(thread)
+        if (success) {
+          message.success(t('common.delete_success'))
+          await aiChatStore.getThreadsFromAuthPlatform()
+          if (currThread.value.threadId === thread.threadId) {
+            currThread.value = threads.value[idx || 0] || {}
+            aiChatStore.getThread(currThread.value.threadId as ThreadId)
+          }
+        }
+      }
+    })
+  }
+
+  const handleThreadActions = (
+    thread: ChatThread,
+    idx: number,
+    { key }: { key: 'delete' | 'rename' }
+  ) => {
+    threadOperationHandlers[key](thread, idx)
   }
 
   defineExpose({
@@ -110,11 +156,12 @@
         </a-button>
       </template>
       <main>
-        <a-menu v-model:selected-keys="selectKey" @select="handleSelect">
-          <a-menu-item v-for="item in threads" :key="item.threadId">
+        <a-empty v-if="threads.length == 0" />
+        <a-menu v-else v-model:selected-keys="selectKey" @select="handleSelect">
+          <a-menu-item v-for="thread in threads" :key="thread.threadId">
             <div class="chat-history-item">
-              <span :title="item.name">{{ item.name }}</span>
-              <span>{{ formatTime(item.createTime) }}</span>
+              <span :title="thread.name">{{ thread.name }}</span>
+              <span>{{ formatTime(thread.createTime) }}</span>
             </div>
           </a-menu-item>
         </a-menu>
@@ -126,30 +173,46 @@
           <a-typography-title :level="5">{{ title }}</a-typography-title>
         </header>
         <main>
-          <a-menu v-model:selected-keys="selectKey" @select="handleSelect">
-            <a-menu-item v-for="thread in threads" :key="thread.threadId" :title="thread.name">
+          <a-empty v-if="threads.length == 0" />
+          <a-menu v-else v-model:selected-keys="selectKey" @select="handleSelect">
+            <a-menu-item
+              v-for="(thread, idx) in threads"
+              :key="thread.threadId"
+              :title="thread.name"
+            >
               <div class="chat-history-item">
-                <span>{{ thread.name }}</span>
-                <a-dropdown :trigger="['click']">
-                  <a @click.prevent>
-                    <a-button type="text" shape="circle">
+                <a-input
+                  v-if="isRename && editThread.threadId === thread.threadId"
+                  :key="thread.threadId"
+                  :ref="
+                    (el: HTMLElement) => {
+                      isRename && el.focus()
+                    }
+                  "
+                  v-model:value="newName"
+                  @blur="handleRenameConfirm(thread)"
+                />
+                <template v-else>
+                  <span>{{ thread.name }}</span>
+                  <a-dropdown :trigger="['click']">
+                    <a-button type="text" shape="circle" @click.stop>
                       <template #icon>
                         <EllipsisOutlined />
                       </template>
                     </a-button>
-                  </a>
-                  <template #overlay>
-                    <a-menu @click="handleThreadActions(thread, $event)">
-                      <a-menu-item
-                        v-for="action in threadOperations"
-                        :key="action.key"
-                        :danger="action.danger"
-                      >
-                        <span>{{ $t(`common.${action.key}`) }}</span>
-                      </a-menu-item>
-                    </a-menu>
-                  </template>
-                </a-dropdown>
+                    <template #overlay>
+                      <a-menu @click="handleThreadActions(thread, idx, $event)">
+                        <a-menu-item
+                          v-for="action in threadOperations"
+                          :key="action.key"
+                          :danger="action.danger"
+                        >
+                          <span>{{ $t(`common.${action.key}`) }}</span>
+                        </a-menu-item>
+                      </a-menu>
+                    </template>
+                  </a-dropdown>
+                </template>
               </div>
             </a-menu-item>
           </a-menu>
@@ -166,7 +229,9 @@
   .chat-history {
     &-item {
       display: flex;
+      align-items: center;
       justify-content: space-between;
+      height: 100%;
       span:last-child {
         color: $color-text;
       }

@@ -24,8 +24,8 @@ export enum Sender {
 }
 
 export type CreateChatThread = {
-  id: number | string | null
-  name: string | null
+  id?: number | string | null
+  name?: string | null
 }
 
 export type SenderType = keyof typeof Sender
