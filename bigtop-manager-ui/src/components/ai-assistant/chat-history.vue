@@ -36,11 +36,11 @@
     danger?: boolean
   }
 
-  type ThreadOperationHandler = Record<'delete' | 'rename', (thread: ChatThread, idx?: number) => void>
+  type ThreadOperationHandler = Record<'delete' | 'rename', (thread: ChatThread, idx: number) => void>
 
   const { t } = useI18n()
   const aiChatStore = useAiChatStore()
-  const { threads, currThread } = storeToRefs(aiChatStore)
+  const { threads, currThread, threadLimit } = storeToRefs(aiChatStore)
   const props = defineProps<Props>()
   const { visible, historyType } = toRefs(props)
 
@@ -97,7 +97,7 @@
     }
   }
 
-  const handleDeleteConfirm = (thread: ChatThread, idx?: number) => {
+  const handleDeleteConfirm = (thread: ChatThread, idx: number) => {
     Modal.confirm({
       title: t('common.delete_confirm_content', [`${thread.name}`]),
       async onOk() {
@@ -105,8 +105,15 @@
         if (success) {
           message.success(t('common.delete_success'))
           await aiChatStore.getThreadsFromAuthPlatform()
-          if (currThread.value.threadId === thread.threadId) {
-            currThread.value = threads.value[idx || 0] || {}
+          const threadCounts = threads.value.length
+          if (threadCounts === 0) {
+            currThread.value = {}
+          } else {
+            if (idx >= threadCounts) {
+              currThread.value = threads.value[0]
+            } else {
+              currThread.value = threads.value[idx]
+            }
             aiChatStore.getThread(currThread.value.threadId as ThreadId)
           }
         }
@@ -203,7 +210,9 @@
           </div>
         </main>
         <footer>
-          <a-button type="primary" @click="aiChatStore.createChatThread"> {{ $t('aiAssistant.new_chat') }} </a-button>
+          <a-button type="primary" :disabled="threadLimit" @click="aiChatStore.createChatThread">
+            {{ $t('aiAssistant.new_chat') }}
+          </a-button>
         </footer>
       </div>
     </template>

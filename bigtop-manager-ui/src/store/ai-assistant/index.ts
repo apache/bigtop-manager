@@ -19,16 +19,20 @@
 
 import dayjs from 'dayjs'
 import * as ai from '@/api/ai-assistant/index'
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { defineStore, storeToRefs } from 'pinia'
+import { computed, ref, watch } from 'vue'
 import { Sender } from '@/api/chatbot/types'
 import { getRandomFromTimestamp } from '@/utils/tools'
+import { useLlmConfigStore } from '../llm-config'
 import type { AxiosProgressEvent, Canceler } from 'axios'
 import type { ChatMessageItem, ChatThread, ThreadId } from '@/api/ai-assistant/types'
 
 export const useAiChatStore = defineStore(
   'ai-assistant',
   () => {
+    const llmConfigStore = useLlmConfigStore()
+    const { currAuthPlatform } = storeToRefs(llmConfigStore)
+
     const currThread = ref<ChatThread>({})
     const threads = ref<ChatThread[]>([])
     const chatRecords = ref<ChatMessageItem[]>([])
@@ -36,6 +40,24 @@ export const useAiChatStore = defineStore(
     const messageReceiver = ref('')
     const isSending = ref(false)
     const loadingChatRecords = ref(false)
+
+    const threadLimit = computed(() => threads.value.length >= 10)
+
+    watch(currAuthPlatform, (val, oldVal) => {
+      if (val == undefined) {
+        currThread.value = {}
+      } else if (val.llmConfigId !== oldVal?.llmConfigId) {
+        currThread.value = {}
+      }
+    })
+
+    const resetState = () => {
+      currThread.value = {}
+      threads.value = []
+      messageReceiver.value = ''
+      isSending.value = false
+      loadingChatRecords.value = false
+    }
 
     const createChatThread = async () => {
       const tempName = `thread-${getRandomFromTimestamp()}`
@@ -159,6 +181,7 @@ export const useAiChatStore = defineStore(
       messageReceiver,
       isSending,
       loadingChatRecords,
+      threadLimit,
       talkWithChatbot,
       createChatThread,
       updateChatThread,
@@ -168,7 +191,8 @@ export const useAiChatStore = defineStore(
       cancelSseConnect,
       getThreadRecords,
       setChatRecordForSender,
-      collectReciveMessage
+      collectReciveMessage,
+      resetState
     }
   },
   {

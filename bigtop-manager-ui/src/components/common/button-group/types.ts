@@ -29,6 +29,7 @@ export interface GroupItem<T = string> {
   action?: T
   type?: BtnType
   shape?: ShapeType
+  disabled?: boolean
   clickEvent?: (item?: GroupItem, ...args: any[]) => void
 }
 

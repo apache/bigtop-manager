@@ -35,6 +35,7 @@
     <a-button
       v-for="(item, idx) in groups"
       :key="idx"
+      :disabled="item.disabled"
       :shape="item.shape || groupShape || 'default'"
       :type="item.type || groupType || 'default'"
       :title="(item.tip && $t(`${$props.i18n}.${item.tip}`)) || (item.text && $t(`${$props.i18n}.${item.text}`))"

@@ -41,7 +41,7 @@
 
   const aiChatStore = useAiChatStore()
   const llmConfigStore = useLlmConfigStore()
-  const { currThread, chatRecords, messageReceiver, loadingChatRecords } = storeToRefs(aiChatStore)
+  const { currThread, chatRecords, threads, messageReceiver, loadingChatRecords } = storeToRefs(aiChatStore)
   const { currAuthPlatform: currPlatform } = storeToRefs(llmConfigStore)
 
   const open = ref(false)
@@ -64,9 +64,15 @@
   const checkActions = computed(() =>
     fullScreen.value ? filterActions(['EXITSCREEN', 'CLOSE']) : filterActions(['ADD', 'RECORDS', 'FULLSCREEN', 'CLOSE'])
   )
-  const addIcon = computed(() => (chatRecords.value.length === 0 ? 'plus_gray' : 'plus'))
+  const addIcon = computed(() => (chatRecords.value.length === 0 && threads.value.length < 10 ? 'plus' : 'plus_gray'))
   const actionGroup = computed((): GroupItem<ActionType>[] => [
-    { tip: 'new_chat', icon: addIcon.value, action: 'ADD', clickEvent: aiChatStore.createChatThread },
+    {
+      tip: 'new_chat',
+      icon: addIcon.value,
+      action: 'ADD',
+      clickEvent: aiChatStore.createChatThread,
+      disabled: threads.value.length >= 10
+    },
     { tip: 'history', icon: 'history', action: 'RECORDS', clickEvent: openRecord },
     { tip: 'full_screen', icon: 'full_screen', action: 'FULLSCREEN', clickEvent: toggleFullScreen },
     { tip: 'exit_screen', icon: 'exit_screen', action: 'EXITSCREEN', clickEvent: toggleFullScreen },
@@ -89,12 +95,21 @@
     fullScreen.value = !fullScreen.value
   }
 
-  const initConfig = () => {
+  const initConfig = async () => {
     actionGroup.value.forEach(({ action, clickEvent }) => {
       action && actionHandlers.value.set(action, clickEvent || (() => {}))
     })
-    !authPlatformCached.value && llmConfigStore.getAuthorizedPlatforms()
-    aiChatStore.getThreadRecords()
+    !authPlatformCached.value && (await llmConfigStore.getAuthorizedPlatforms())
+    if (Object.keys(currThread.value).length == 0) {
+      if (threads.value.length === 0) {
+        aiChatStore.createChatThread()
+      } else {
+        currThread.value = threads.value[0]
+        aiChatStore.getThreadRecords()
+      }
+    } else {
+      aiChatStore.getThreadRecords()
+    }
   }
 
   const filterActions = (showActions?: ActionType[]) => {

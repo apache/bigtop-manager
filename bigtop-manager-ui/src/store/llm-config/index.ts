@@ -39,6 +39,7 @@ type Platform = {
   supportModels: string[]
 }
 type ActiveAuthPlatform = {
+  llmConfigId: string | number
   platformName: string
   model: string
 }
@@ -71,8 +72,13 @@ export const useLlmConfigStore = defineStore(
     watch(
       () => authorizedPlatforms.value,
       (val) => {
-        const { platformName, model } = val.find((v) => v.status === 1) as AuthorizedPlatform
-        currAuthPlatform.value = { platformName, model }
+        const active = val.filter((v) => v.status === 1)[0] as AuthorizedPlatform
+        if (!active) {
+          currAuthPlatform.value = undefined
+          return
+        }
+        const { platformName, model, id } = active
+        currAuthPlatform.value = { llmConfigId: id, platformName, model }
       },
       {
         deep: true
