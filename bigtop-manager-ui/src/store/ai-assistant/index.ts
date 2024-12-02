@@ -21,7 +21,7 @@ import dayjs from 'dayjs'
 import * as ai from '@/api/ai-assistant/index'
 import { defineStore, storeToRefs } from 'pinia'
 import { computed, ref, watch } from 'vue'
-import { Sender } from '@/api/chatbot/types'
+import { SenderType } from '@/api/ai-assistant/types'
 import { getRandomFromTimestamp } from '@/utils/tools'
 import { useLlmConfigStore } from '../llm-config'
 import type { AxiosProgressEvent, Canceler } from 'axios'
@@ -166,7 +166,7 @@ export const useAiChatStore = defineStore(
       canceler.value()
     }
 
-    const setChatRecordForSender = async (sender: Sender, message: string) => {
+    const setChatRecordForSender = async (sender: SenderType, message: string) => {
       chatRecords.value.push({
         sender,
         message,
