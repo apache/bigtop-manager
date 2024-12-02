@@ -35,7 +35,7 @@
       return
     }
     aiChatStore.setChatRecordForSender('USER', chatMessage.value)
-    aiChatStore.collectReciveMessage(chatMessage.value)
+    aiChatStore.collectReceiveMessage(chatMessage.value)
     chatMessage.value = ''
   }
 </script>

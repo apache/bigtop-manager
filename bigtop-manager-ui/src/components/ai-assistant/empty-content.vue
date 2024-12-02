@@ -30,7 +30,7 @@
 
   const quickAsk = (message: string) => {
     aiChatStore.setChatRecordForSender('USER', message)
-    aiChatStore.collectReciveMessage(message)
+    aiChatStore.collectReceiveMessage(message)
   }
 </script>
 

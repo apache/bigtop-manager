@@ -101,7 +101,7 @@ export const useAiChatStore = defineStore(
         const data = await ai.getThreadsFromAuthPlatform()
         threads.value = data
       } catch (error) {
-        console.log('erro :>> ', error)
+        console.log('error :>> ', error)
       }
     }
 
@@ -133,7 +133,7 @@ export const useAiChatStore = defineStore(
       }
     }
 
-    const collectReciveMessage = async (message: string) => {
+    const collectReceiveMessage = async (message: string) => {
       try {
         const res = await talkWithChatbot(message)
         setChatRecordForSender('AI', res?.message || '')
@@ -191,7 +191,7 @@ export const useAiChatStore = defineStore(
       cancelSseConnect,
       getThreadRecords,
       setChatRecordForSender,
-      collectReciveMessage,
+      collectReceiveMessage,
       resetState
     }
   },

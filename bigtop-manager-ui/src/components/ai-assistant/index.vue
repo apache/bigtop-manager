@@ -48,7 +48,7 @@
   const title = ref('aiAssistant.ai_assistant')
   const fullScreen = ref(false)
   const actionHandlers = ref<Map<ActionType, (...args: any[]) => void>>(new Map())
-  const samllChatHistoryRef = ref<InstanceType<typeof ChatHistory> | null>(null)
+  const smallChatHistoryRef = ref<InstanceType<typeof ChatHistory> | null>(null)
 
   const width = computed(() => (fullScreen.value ? 'calc(100% - 300px)' : 450))
   const noChat = computed(() => Object.keys(currThread.value).length === 0 || chatRecords.value.length === 0)
@@ -101,7 +101,7 @@
   }
 
   const openRecord = () => {
-    samllChatHistoryRef.value?.controlVisible(true)
+    smallChatHistoryRef.value?.controlVisible(true)
   }
 
   const toggleFullScreen = () => {
@@ -160,7 +160,7 @@
           </template>
         </button-group>
       </template>
-      <chat-history ref="samllChatHistoryRef" :history-type="historyType" />
+      <chat-history ref="smallChatHistoryRef" :history-type="historyType" />
       <div class="chat">
         <a-spin :spinning="loadingChatRecords">
           <empty-content v-if="noChat" />
