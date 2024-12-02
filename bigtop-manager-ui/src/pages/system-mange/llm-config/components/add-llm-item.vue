@@ -45,7 +45,7 @@
   const open = ref(false)
   const mode = ref<keyof typeof Mode>('ADD')
   const autoFormRef = ref<Comp.AutoFormInstance | null>(null)
-  const disableFormKeys = shallowRef(['platformId', 'model'])
+  const disableFormKeys = shallowRef(['platformId'])
   const { loading, loadingTest, currPlatform, formKeys, platforms, isDisabled, formCredentials, supportModels } =
     storeToRefs(llmConfigStore)
 
@@ -73,7 +73,11 @@
     currPlatform.value = payload ?? currPlatform.value
     await llmConfigStore.getPlatforms()
     bindPropToFormItems()
-    isEdit.value && llmConfigStore.getAuthPlatformDetail()
+    if (isEdit.value) {
+      await llmConfigStore.getPlatformCredentials()
+      autoFormRef?.value?.setOptions('model', supportModels.value || [])
+      llmConfigStore.getAuthPlatformDetail()
+    }
   }
 
   const handleOk = async () => {

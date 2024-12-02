@@ -94,8 +94,8 @@ export const useLlmConfigStore = defineStore(
     }
 
     const getAuthorizedPlatforms = async () => {
-      loading.value = true
       try {
+        loading.value = true
         authorizedPlatforms.value = await llmServer.getAuthorizedPlatforms()
       } catch (error) {
         console.log('error :>> ', error)
@@ -126,7 +126,6 @@ export const useLlmConfigStore = defineStore(
     const getAuthPlatformDetail = async () => {
       try {
         const authId = currPlatform.value.id as number
-        await getPlatformCredentials()
         const data = await llmServer.getAuthPlatformDetail(authId)
         Object.assign(currPlatform.value, data.authCredentials)
       } catch (error) {
@@ -135,9 +134,9 @@ export const useLlmConfigStore = defineStore(
     }
 
     const addAuthorizedPlatform = async () => {
-      loading.value = true
-      const authorizedPlatformConfig = getAuthorizedPlatformConfig()
       try {
+        loading.value = true
+        const authorizedPlatformConfig = getAuthorizedPlatformConfig()
         return await llmServer.addAuthorizedPlatform(authorizedPlatformConfig)
       } catch (error) {
         console.log('error :>> ', error)
@@ -148,9 +147,9 @@ export const useLlmConfigStore = defineStore(
     }
 
     const updateAuthPlatform = async () => {
-      loading.value = true
-      const authorizedPlatformConfig = getAuthorizedPlatformConfig()
       try {
+        loading.value = true
+        const authorizedPlatformConfig = getAuthorizedPlatformConfig()
         return await llmServer.updateAuthPlatform(authorizedPlatformConfig)
       } catch (error) {
         console.log('error :>> ', error)
@@ -161,9 +160,9 @@ export const useLlmConfigStore = defineStore(
     }
 
     const testAuthorizedPlatform = async () => {
-      loadingTest.value = true
-      const authorizedPlatformConfig = getAuthorizedPlatformConfig()
       try {
+        loadingTest.value = true
+        const authorizedPlatformConfig = getAuthorizedPlatformConfig()
         const data = await llmServer.testAuthorizedPlatform(authorizedPlatformConfig)
         testPassed.value = data
         return data
