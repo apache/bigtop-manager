@@ -45,7 +45,7 @@
   const { currAuthPlatform: currPlatform } = storeToRefs(llmConfigStore)
 
   const open = ref(false)
-  const title = ref('AI 助理')
+  const title = ref('aiAssistant.ai_assistant')
   const fullScreen = ref(false)
   const actionHandlers = ref<Map<ActionType, (...args: any[]) => void>>(new Map())
   const samllChatHistoryRef = ref<InstanceType<typeof ChatHistory> | null>(null)
@@ -66,10 +66,10 @@
   )
   const addIcon = computed(() => (chatRecords.value.length === 0 ? 'plus_gray' : 'plus'))
   const actionGroup = computed((): GroupItem<ActionType>[] => [
-    { tip: '创建对话', icon: addIcon.value, action: 'ADD', clickEvent: aiChatStore.createChatThread },
-    { tip: '历史记录', icon: 'history', action: 'RECORDS', clickEvent: openRecord },
-    { tip: '窗口全屏', icon: 'full_screen', action: 'FULLSCREEN', clickEvent: toggleFullScreen },
-    { tip: '退出全屏', icon: 'exit_screen', action: 'EXITSCREEN', clickEvent: toggleFullScreen },
+    { tip: 'new_chat', icon: addIcon.value, action: 'ADD', clickEvent: aiChatStore.createChatThread },
+    { tip: 'history', icon: 'history', action: 'RECORDS', clickEvent: openRecord },
+    { tip: 'full_screen', icon: 'full_screen', action: 'FULLSCREEN', clickEvent: toggleFullScreen },
+    { tip: 'exit_screen', icon: 'exit_screen', action: 'EXITSCREEN', clickEvent: toggleFullScreen },
     { icon: 'close', action: 'CLOSE', clickEvent: () => controlVisible(false) }
   ])
 
@@ -117,7 +117,7 @@
     <chat-history :visible="historyVisible" history-type="large" />
     <a-drawer
       v-model:open="open"
-      :title="title"
+      :title="$t(title)"
       :width="width"
       :mask="false"
       :closable="false"
@@ -125,7 +125,7 @@
       v-bind="styleConfig"
     >
       <template #extra>
-        <button-group :groups="checkActions" @on-click="onActions">
+        <button-group i18n="aiAssistant" :groups="checkActions" @on-click="onActions">
           <template #icon="{ item }">
             <svg-icon :name="item.icon" />
           </template>

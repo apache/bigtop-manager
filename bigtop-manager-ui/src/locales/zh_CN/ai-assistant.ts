@@ -16,4 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-export default {}
+export default {
+  history: '历史记录',
+  ai_assistant: 'AI 助理',
+  new_chat: '新聊天',
+  full_screen: '窗口全屏',
+  exit_screen: '退出全屏',
+  show_only10_records: '仅展示 10 条历史记录',
+  message_cannot_be_empty: '消息不能为空',
+  enter_question: '请输入你的问题',
+  greeting: '你好，我是你的 AI 助理',
+  help: '请问有什么可以帮助你的吗？',
+  bigtop_manager: '什么是Bigtop Manager？',
+  can_do_for_you: '你可以为我做什么？',
+  big_data_news: '大数据领域最近有什么有趣的事？'
+}

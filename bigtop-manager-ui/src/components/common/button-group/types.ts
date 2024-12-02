@@ -33,6 +33,7 @@ export interface GroupItem<T = string> {
 }
 
 export interface Props {
+  i18n: string
   groups: GroupItem[]
   groupType?: BtnType
   groupShape?: ShapeType

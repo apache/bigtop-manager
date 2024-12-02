@@ -16,4 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-export default {}
+export default {
+  history: 'History',
+  ai_assistant: 'AI assistant',
+  new_chat: 'New Chat',
+  full_screen: 'Full screen',
+  exit_screen: 'Exit screen',
+  show_only10_records: 'Display only 10 records',
+  message_cannot_be_empty: 'Message cannot be empty',
+  enter_question: 'Please enter your question',
+  greeting: 'Hello, I am your AI assistant',
+  help: 'How can I assist you today?',
+  bigtop_manager: 'What is Bigtop Manager?',
+  can_do_for_you: 'What can you do for me?',
+  big_data_news: 'What interesting things are happening in the field of Big Data?'
+}

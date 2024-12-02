@@ -46,8 +46,8 @@
 
   const open = ref(false)
   const isRename = ref(false)
-  const title = ref('历史记录')
-  const newName = ref('新聊天')
+  const title = ref('aiAssistant.history')
+  const newName = ref('aiAssistant.new_chat')
   const selectKey = ref<ThreadId[]>([])
   const editThread = ref<ChatThread>({})
   const threadOperations = shallowRef<ThreadOperation[]>([{ key: 'rename' }, { key: 'delete', danger: true }])
@@ -87,7 +87,7 @@
   }
 
   const handleRenameConfirm = async (thread: ChatThread) => {
-    if (newName.value == '') newName.value = '新聊天'
+    if (newName.value == '') newName.value = t('aiAssistant.new_chat')
     isRename.value = false
     const checkRes = await aiChatStore.updateChatThread(editThread.value, newName.value)
     if (checkRes) {
@@ -128,7 +128,7 @@
     <a-drawer
       v-if="historyType === 'small'"
       v-model:open="open"
-      :title="title"
+      :title="$t(title)"
       :closable="false"
       :mask="false"
       :get-container="false"
@@ -160,7 +160,7 @@
     <template v-else>
       <div v-if="visible" class="chat-history-large">
         <header>
-          <a-typography-title :level="5">{{ title }}</a-typography-title>
+          <a-typography-title :level="5">{{ $t(title) }}</a-typography-title>
         </header>
         <main>
           <a-empty v-if="threads.length == 0" />
@@ -199,11 +199,11 @@
             </a-menu-item>
           </a-menu>
           <div class="chat-history-limit">
-            <a-typography-text size="small" type="secondary" content="仅展示 10 条历史记录" />
+            <a-typography-text size="small" type="secondary" :content="$t('aiAssistant.show_only10_records')" />
           </div>
         </main>
         <footer>
-          <a-button type="primary" @click="aiChatStore.createChatThread"> 新建会话 </a-button>
+          <a-button type="primary" @click="aiChatStore.createChatThread"> {{ $t('aiAssistant.new_chat') }} </a-button>
         </footer>
       </div>
     </template>

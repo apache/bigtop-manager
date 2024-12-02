@@ -22,14 +22,16 @@
   import { useAiChatStore } from '@/store/ai-assistant'
   import { storeToRefs } from 'pinia'
   import { message } from 'ant-design-vue'
+  import { useI18n } from 'vue-i18n'
 
+  const { t } = useI18n()
   const aiChatStore = useAiChatStore()
   const { isSending } = storeToRefs(aiChatStore)
   const chatMessage = ref('')
 
   const sendMessage = async () => {
     if (chatMessage.value === '') {
-      message.error('消息不能为空')
+      message.error(t('aiAssistant.message_cannot_be_empty'))
       return
     }
     aiChatStore.setChatRecordForSender('USER', chatMessage.value)
@@ -43,7 +45,7 @@
       v-model:value="chatMessage"
       :bordered="false"
       :auto-size="{ minRows: 1, maxRows: 6 }"
-      placeholder="请输入你的问题"
+      :placeholder="$t('aiAssistant.enter_question')"
     />
     <a-button :disabled="isSending" :type="isSending ? 'default' : 'text'" shape="circle" @click="sendMessage">
       <template #icon>

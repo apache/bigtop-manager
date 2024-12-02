@@ -22,6 +22,7 @@
   import type { Props } from './types'
 
   const props = withDefaults(defineProps<Props>(), {
+    i18n: '',
     groupShape: 'circle',
     groupType: 'text'
   })
@@ -36,7 +37,7 @@
       :key="idx"
       :shape="item.shape || groupShape || 'default'"
       :type="item.type || groupType || 'default'"
-      :title="item.tip || item.text"
+      :title="(item.tip && $t(`${$props.i18n}.${item.tip}`)) || (item.text && $t(`${$props.i18n}.${item.text}`))"
       @click="item.clickEvent ? item.clickEvent(item) : () => {}"
     >
       <template #icon>
@@ -47,7 +48,7 @@
         </slot>
       </template>
       <span v-if="item.text">
-        {{ item.text }}
+        {{ item.text && $t(`${$props.i18n}.${item.text}`) }}
       </span>
     </a-button>
   </a-space>

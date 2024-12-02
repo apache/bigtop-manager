@@ -34,15 +34,19 @@
       <template #description>
         <div class="say-hello">
           <a-typography-title :level="5">
-            <div> 你好，我是你的 AI 助理 </div>
-            <div> 请问有什么可以帮助你的吗？ </div>
+            <div> {{ $t('aiAssistant.greeting') }} </div>
+            <div> {{ $t('aiAssistant.help') }} </div>
           </a-typography-title>
         </div>
         <div class="feature-desc">
-          <a-typography-link underline :href="githubUrl" target="_blank"> 什么是Bigtop Manager？ </a-typography-link>
-          <a-typography-link underline :href="githubUrl" target="_blank"> 你可以为我做什么？ </a-typography-link>
           <a-typography-link underline :href="githubUrl" target="_blank">
-            大数据领域最近有什么有趣的事？
+            {{ $t('aiAssistant.bigtop_manager') }}
+          </a-typography-link>
+          <a-typography-link underline :href="githubUrl" target="_blank">
+            {{ $t('aiAssistant.can_do_for_you') }}
+          </a-typography-link>
+          <a-typography-link underline :href="githubUrl" target="_blank">
+            {{ $t('aiAssistant.big_data_news') }}
           </a-typography-link>
         </div>
       </template>
