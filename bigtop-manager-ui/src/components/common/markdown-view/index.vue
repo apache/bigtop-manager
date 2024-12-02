@@ -57,9 +57,7 @@
       const langTag = pre.querySelector('#language')
       const copyTag = pre.querySelector('#copy')
 
-      langTag!.textContent = (
-        code?.classList.value.replace('hljs language-', '') as string
-      ).toLowerCase()
+      langTag!.textContent = (code?.classList.value.replace('hljs language-', '') as string).toLowerCase()
       copyTag && copyTag.removeEventListener('click', () => copyCode(code?.textContent || ''))
       copyTag?.addEventListener('click', () => copyCode(code?.textContent || ''))
     })

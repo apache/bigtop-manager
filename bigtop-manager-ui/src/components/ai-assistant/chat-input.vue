@@ -45,12 +45,7 @@
       :auto-size="{ minRows: 1, maxRows: 6 }"
       placeholder="请输入你的问题"
     />
-    <a-button
-      :disabled="isSending"
-      :type="isSending ? 'default' : 'text'"
-      shape="circle"
-      @click="sendMessage"
-    >
+    <a-button :disabled="isSending" :type="isSending ? 'default' : 'text'" shape="circle" @click="sendMessage">
       <template #icon>
         <svg-icon name="send" />
       </template>

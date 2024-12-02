@@ -18,12 +18,7 @@
  */
 
 import request from '@/api/request.ts'
-import {
-  Platform,
-  PlatformCredential,
-  AuthorizedPlatform,
-  UpdateAuthorizedPlatformConfig
-} from './types'
+import { Platform, PlatformCredential, AuthorizedPlatform, UpdateAuthorizedPlatformConfig } from './types'
 
 export const getPlatforms = (): Promise<Platform[]> => {
   return request({
@@ -46,9 +41,7 @@ export const getPlatformCredentials = (platformId: number): Promise<PlatformCred
   })
 }
 
-export const addAuthorizedPlatform = (
-  data: UpdateAuthorizedPlatformConfig
-): Promise<AuthorizedPlatform> => {
+export const addAuthorizedPlatform = (data: UpdateAuthorizedPlatformConfig): Promise<AuthorizedPlatform> => {
   return request({
     method: 'post',
     url: '/llm/config/auth-platforms',
@@ -63,9 +56,7 @@ export const getAuthPlatformDetail = (authId: number): Promise<UpdateAuthorizedP
   })
 }
 
-export const updateAuthPlatform = (
-  data: UpdateAuthorizedPlatformConfig
-): Promise<UpdateAuthorizedPlatformConfig> => {
+export const updateAuthPlatform = (data: UpdateAuthorizedPlatformConfig): Promise<UpdateAuthorizedPlatformConfig> => {
   return request({
     method: 'put',
     url: `/llm/config/auth-platforms/${data.id}`,

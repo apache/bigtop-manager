@@ -155,9 +155,7 @@
               v-if="item.type == 'input'"
               v-model:value="formState[item.field]"
               v-bind="item.controlProps"
-              :disabled="
-                disabledItems ? disabledItems.includes(item.field) : item.controlProps.disabled
-              "
+              :disabled="disabledItems ? disabledItems.includes(item.field) : item.controlProps.disabled"
               v-on="formItemEvents[item.field] || {}"
             />
 
@@ -166,9 +164,7 @@
               v-if="item.type == 'textarea'"
               v-model:value="formState[item.field]"
               v-bind="item.controlProps"
-              :disabled="
-                disabledItems ? disabledItems.includes(item.field) : item.controlProps.disabled
-              "
+              :disabled="disabledItems ? disabledItems.includes(item.field) : item.controlProps.disabled"
               v-on="formItemEvents[item.field] || {}"
             />
 
@@ -177,25 +173,15 @@
               v-if="item.type == 'select'"
               v-model:value="formState[item.field]"
               v-bind="item.controlProps"
-              :disabled="
-                disabledItems ? disabledItems.includes(item.field) : item.controlProps.disabled
-              "
+              :disabled="disabledItems ? disabledItems.includes(item.field) : item.controlProps.disabled"
               v-on="formItemEvents[item.field] || {}"
             >
               <a-select-option
                 v-for="(child, childIndex) in optionMap[item.field] || item.defaultOptionsMap || []"
                 :key="childIndex"
-                :value="
-                  typeof child === 'string'
-                    ? child
-                    : child[(item.fieldMap && item.fieldMap.value) || 'value']
-                "
+                :value="typeof child === 'string' ? child : child[(item.fieldMap && item.fieldMap.value) || 'value']"
               >
-                {{
-                  typeof child === 'string'
-                    ? child
-                    : child[(item.fieldMap && item.fieldMap.label) || 'label']
-                }}
+                {{ typeof child === 'string' ? child : child[(item.fieldMap && item.fieldMap.label) || 'label'] }}
               </a-select-option>
             </a-select>
 
@@ -204,9 +190,7 @@
               v-if="item.type == 'radio'"
               v-model:value="formState[item.field]"
               v-bind="item.controlProps"
-              :disabled="
-                disabledItems ? disabledItems.includes(item.field) : item.controlProps.disabled
-              "
+              :disabled="disabledItems ? disabledItems.includes(item.field) : item.controlProps.disabled"
               v-on="formItemEvents[item.field] || {}"
             >
               <a-radio

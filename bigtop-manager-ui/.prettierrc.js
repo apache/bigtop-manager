@@ -19,7 +19,7 @@
 
 module.exports = {
   useTabs: false,
-  printWidth: 100,
+  printWidth: 120,
   semi: false,
   vueIndentScriptAndStyle: true,
   singleQuote: true,

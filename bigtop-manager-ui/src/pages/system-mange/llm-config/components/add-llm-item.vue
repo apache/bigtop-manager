@@ -46,24 +46,13 @@
   const mode = ref<keyof typeof Mode>('ADD')
   const autoFormRef = ref<Comp.AutoFormInstance | null>(null)
   const disableFormKeys = shallowRef(['platformId', 'model'])
-  const {
-    loading,
-    loadingTest,
-    currPlatform,
-    formKeys,
-    platforms,
-    isDisabled,
-    formCredentials,
-    supportModels
-  } = storeToRefs(llmConfigStore)
+  const { loading, loadingTest, currPlatform, formKeys, platforms, isDisabled, formCredentials, supportModels } =
+    storeToRefs(llmConfigStore)
 
   const isEdit = computed(() => mode.value === 'EDIT')
-  const disabledItems = computed(() =>
-    isEdit.value ? [...disableFormKeys.value, ...formKeys.value] : []
-  )
+  const disabledItems = computed(() => (isEdit.value ? [...disableFormKeys.value, ...formKeys.value] : []))
   const formItems = computed((): FormItemState[] => {
-    const newFormItems =
-      formCredentials.value?.map((v) => createNewFormItem('input', v.name, v.displayName)) ?? []
+    const newFormItems = formCredentials.value?.map((v) => createNewFormItem('input', v.name, v.displayName)) ?? []
     return [...formItemConfig.value.slice(0, 2), ...newFormItems, ...formItemConfig.value.slice(2)]
   })
 
@@ -90,9 +79,7 @@
   const handleOk = async () => {
     const validate = await autoFormRef.value?.getFormValidation()
     if (!validate) return
-    const api = isEdit.value
-      ? llmConfigStore.updateAuthPlatform
-      : llmConfigStore.addAuthorizedPlatform
+    const api = isEdit.value ? llmConfigStore.updateAuthPlatform : llmConfigStore.addAuthorizedPlatform
     const success = await api()
     if (success) {
       const text = isEdit.value ? 'common.update_success' : 'common.created'

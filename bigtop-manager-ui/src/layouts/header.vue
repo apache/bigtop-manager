@@ -61,12 +61,7 @@
       <svg-icon name="bm_logo" />
     </h1>
     <div class="header-menu">
-      <a-menu
-        :selected-keys="[headerSelectedKey]"
-        theme="dark"
-        mode="horizontal"
-        @select="handleHeaderSelect"
-      >
+      <a-menu :selected-keys="[headerSelectedKey]" theme="dark" mode="horizontal" @select="handleHeaderSelect">
         <a-menu-item v-for="route of headerMenus" :key="route.path">
           {{ $t(route.meta?.title || '') }}
         </a-menu-item>

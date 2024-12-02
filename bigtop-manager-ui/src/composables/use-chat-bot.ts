@@ -164,9 +164,7 @@ const useChatBot = () => {
     try {
       loading.value = true
       const data = await delAuthorizedPlatform(platformId)
-      message[`${data ? 'success' : 'error'}`](
-        data ? t('common.delete_success') : t('common.delete_fail')
-      )
+      message[`${data ? 'success' : 'error'}`](data ? t('common.delete_success') : t('common.delete_fail'))
     } catch (error) {
       console.log('error :>> ', error)
     } finally {
@@ -177,9 +175,7 @@ const useChatBot = () => {
     try {
       loading.value = true
       const data = await delChatThread(payload)
-      message[`${data ? 'success' : 'error'}`](
-        data ? t('common.delete_success') : t('common.delete_fail')
-      )
+      message[`${data ? 'success' : 'error'}`](data ? t('common.delete_success') : t('common.delete_fail'))
     } catch (error) {
       console.log('error :>> ', error)
     } finally {

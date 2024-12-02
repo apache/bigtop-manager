@@ -36,10 +36,7 @@
     danger?: boolean
   }
 
-  type ThreadOperationHandler = Record<
-    'delete' | 'rename',
-    (thread: ChatThread, idx?: number) => void
-  >
+  type ThreadOperationHandler = Record<'delete' | 'rename', (thread: ChatThread, idx?: number) => void>
 
   const { t } = useI18n()
   const aiChatStore = useAiChatStore()
@@ -53,10 +50,7 @@
   const newName = ref('新聊天')
   const selectKey = ref<ThreadId[]>([])
   const editThread = ref<ChatThread>({})
-  const threadOperations = shallowRef<ThreadOperation[]>([
-    { key: 'rename' },
-    { key: 'delete', danger: true }
-  ])
+  const threadOperations = shallowRef<ThreadOperation[]>([{ key: 'rename' }, { key: 'delete', danger: true }])
   const threadOperationHandlers = shallowReactive<ThreadOperationHandler>({
     delete: (thread, idx) => handleDeleteConfirm(thread, idx),
     rename: (thread) => {
@@ -120,11 +114,7 @@
     })
   }
 
-  const handleThreadActions = (
-    thread: ChatThread,
-    idx: number,
-    { key }: { key: 'delete' | 'rename' }
-  ) => {
+  const handleThreadActions = (thread: ChatThread, idx: number, { key }: { key: 'delete' | 'rename' }) => {
     threadOperationHandlers[key](thread, idx)
   }
 
@@ -175,11 +165,7 @@
         <main>
           <a-empty v-if="threads.length == 0" />
           <a-menu v-else v-model:selected-keys="selectKey" @select="handleSelect">
-            <a-menu-item
-              v-for="(thread, idx) in threads"
-              :key="thread.threadId"
-              :title="thread.name"
-            >
+            <a-menu-item v-for="(thread, idx) in threads" :key="thread.threadId" :title="thread.name">
               <div class="chat-history-item">
                 <a-input
                   v-if="isRename && editThread.threadId === thread.threadId"
@@ -202,11 +188,7 @@
                     </a-button>
                     <template #overlay>
                       <a-menu @click="handleThreadActions(thread, idx, $event)">
-                        <a-menu-item
-                          v-for="action in threadOperations"
-                          :key="action.key"
-                          :danger="action.danger"
-                        >
+                        <a-menu-item v-for="action in threadOperations" :key="action.key" :danger="action.danger">
                           <span>{{ $t(`common.${action.key}`) }}</span>
                         </a-menu-item>
                       </a-menu>
@@ -216,6 +198,9 @@
               </div>
             </a-menu-item>
           </a-menu>
+          <div class="chat-history-limit">
+            <a-typography-text size="small" type="secondary" content="仅展示 10 条历史记录" />
+          </div>
         </main>
         <footer>
           <a-button type="primary" @click="aiChatStore.createChatThread"> 新建会话 </a-button>
@@ -227,6 +212,12 @@
 
 <style lang="scss" scoped>
   .chat-history {
+    &-limit {
+      text-align: center;
+      span {
+        font-size: 12px;
+      }
+    }
     &-item {
       display: flex;
       align-items: center;

@@ -72,9 +72,6 @@ export const getRandomFromTimestamp = (len: number = 6) => {
   return Date.now().toString().slice(-len)
 }
 
-export const formatTime = (
-  time: string | undefined,
-  formatRule: string = 'YYYY-MM-DD HH:mm:ss'
-) => {
+export const formatTime = (time: string | undefined, formatRule: string = 'YYYY-MM-DD HH:mm:ss') => {
   return typeof time === 'string' && dayjs(time).tz(dayjs.tz.guess(), true).format(formatRule)
 }

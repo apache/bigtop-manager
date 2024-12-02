@@ -69,21 +69,11 @@
             </slot>
           </div>
           <template v-else>
-            <li
-              v-for="(option, idx) of item.options"
-              :key="idx"
-              class="select-item-option"
-              @click="onSelect(option)"
-            >
+            <li v-for="(option, idx) of item.options" :key="idx" class="select-item-option" @click="onSelect(option)">
               <span>
                 {{ option.name }}
               </span>
-              <div
-                v-show="item.isDeletable"
-                :key="idx"
-                class="select-item-del"
-                @click.stop="onRemove(option)"
-              >
+              <div v-show="item.isDeletable" :key="idx" class="select-item-del" @click.stop="onRemove(option)">
                 <CloseOutlined />
               </div>
             </li>

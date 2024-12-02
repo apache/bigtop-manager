@@ -18,13 +18,7 @@
  */
 
 import request from '@/api/request.ts'
-import type {
-  ChatMessageItem,
-  ChatThread,
-  CreateChatThread,
-  ThreadId,
-  UpdateChatThread
-} from './types'
+import type { ChatMessageItem, ChatThread, CreateChatThread, ThreadId, UpdateChatThread } from './types'
 import axios, { AxiosProgressEvent, AxiosResponse, CancelTokenSource } from 'axios'
 
 export const getThreadsFromAuthPlatform = (): Promise<ChatThread[]> => {

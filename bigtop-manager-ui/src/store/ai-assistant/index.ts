@@ -35,6 +35,7 @@ export const useAiChatStore = defineStore(
     const canceler = ref<Canceler>()
     const messageReceiver = ref('')
     const isSending = ref(false)
+    const loadingChatRecords = ref(false)
 
     const createChatThread = async () => {
       const tempName = `thread-${getRandomFromTimestamp()}`
@@ -84,11 +85,14 @@ export const useAiChatStore = defineStore(
 
     const getThreadRecords = async () => {
       try {
+        loadingChatRecords.value = true
         const { threadId } = currThread.value
         const data = await ai.getThreadRecords(threadId as ThreadId)
         chatRecords.value = data
       } catch (error) {
         console.log('error :>> ', error)
+      } finally {
+        loadingChatRecords.value = false
       }
     }
 
@@ -154,6 +158,7 @@ export const useAiChatStore = defineStore(
       chatRecords,
       messageReceiver,
       isSending,
+      loadingChatRecords,
       talkWithChatbot,
       createChatThread,
       updateChatThread,

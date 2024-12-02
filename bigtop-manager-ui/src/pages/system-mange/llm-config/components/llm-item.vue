@@ -141,9 +141,7 @@
   const currStatus = computed(() => llmConfig.value?.status)
   const actionKeysSet = computed(() => new Set(llmStatus.value?.actionKeys))
   const ellipsis = computed(() => (llmConfig.value ? true : false))
-  const llmStatus = computed(() =>
-    llmStatusConfig.value.find(({ status }) => status === currStatus.value)
-  )
+  const llmStatus = computed(() => llmStatusConfig.value.find(({ status }) => status === currStatus.value))
   const llmActions = computed(() => {
     return extraActions.value
       .filter((item) => actionKeysSet.value.has(item.key))
@@ -158,8 +156,7 @@
   const isDisable = (key: ActionKeys): boolean =>
     currStatus.value === AuthPlatformStatus.UNAVAILABLE && key === 'ENABLE'
 
-  const isEnable = (key: ActionKeys): boolean =>
-    currStatus.value === AuthPlatformStatus.ACTIVE && key === 'DELETE'
+  const isEnable = (key: ActionKeys): boolean => currStatus.value === AuthPlatformStatus.ACTIVE && key === 'DELETE'
 
   const handleCreateLlmConfig = () => {
     emits('createLlmConfig')
@@ -216,11 +213,7 @@
           </a-dropdown>
         </div>
         <div class="llm-card-body">
-          <a-typography-paragraph
-            v-for="{ label, code } in llmDescriptions"
-            :key="code"
-            class="llm-card-desc"
-          >
+          <a-typography-paragraph v-for="{ label, code } in llmDescriptions" :key="code" class="llm-card-desc">
             <a-typography-text>{{ $t(label) }}</a-typography-text>
             <a-typography-paragraph
               type="secondary"

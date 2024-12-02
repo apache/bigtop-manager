@@ -40,9 +40,7 @@ export const useMenuStore = defineStore(
     const headerSelectedKey = ref(headerMenus.value[0].path)
 
     const hasCluster = computed(() => clusters.value.length > 0)
-    const isClusterCreateVisible = computed(() =>
-      RouteExceptions.SPECIAL_ROUTE_PATH.includes(route.matched[0].path)
-    )
+    const isClusterCreateVisible = computed(() => RouteExceptions.SPECIAL_ROUTE_PATH.includes(route.matched[0].path))
     const isDynamicRouteMatched = computed(() => {
       const path = route.matched.at(-1)?.path
       return path?.includes(RouteExceptions.DYNAMIC_ROUTE_MATCH)
@@ -66,10 +64,7 @@ export const useMenuStore = defineStore(
     watchEffect(() => {
       // resolve highlight menu
       const activeMenu = route.meta.activeMenu || route.path
-      const matchedNames = [
-        RouteExceptions.SPECIAL_ROUTE_NAME,
-        RouteExceptions.DEFAULT_ROUTE_NAME
-      ] as string[]
+      const matchedNames = [RouteExceptions.SPECIAL_ROUTE_NAME, RouteExceptions.DEFAULT_ROUTE_NAME] as string[]
       headerSelectedKey.value = route.matched[0].path
 
       if (matchedNames.includes(route.name as string)) {
@@ -124,10 +119,7 @@ export const useMenuStore = defineStore(
       dr.forEach((route) => {
         if (!route.meta?.hidden) {
           const exist = baseRoutesMap.value.get(route.path) || []
-          baseRoutesMap.value.set(route.path, [
-            ...exist,
-            ...formatRouteToMenu(route.children || [], route.path)
-          ])
+          baseRoutesMap.value.set(route.path, [...exist, ...formatRouteToMenu(route.children || [], route.path)])
         }
       })
     }
@@ -148,8 +140,7 @@ export const useMenuStore = defineStore(
 
     const updateSiderMenu = async (isDelete = false) => {
       isDelete ? await clusterStore.delCluster() : await clusterStore.addCluster()
-      siderMenuSelectedKey.value =
-        siderMenus.value[0].children?.at(-1)?.key || RouteExceptions.SPECIAL_ROUTE_PATH
+      siderMenuSelectedKey.value = siderMenus.value[0].children?.at(-1)?.key || RouteExceptions.SPECIAL_ROUTE_PATH
       router.push(siderMenuSelectedKey.value)
     }
 

@@ -36,10 +36,7 @@ export const getLogs = (clusterId: number, id: number, func: Function): LogsRes 
 
   return { promise, cancel: source.cancel }
 }
-export const sendChatMessage = (
-  data: SendChatMessageCondition,
-  func: Function
-): chatMessagesRes => {
+export const sendChatMessage = (data: SendChatMessageCondition, func: Function): chatMessagesRes => {
   const source: CancelTokenSource = axios.CancelToken.source()
 
   const promise = request({

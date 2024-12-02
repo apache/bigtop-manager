@@ -113,11 +113,7 @@
 <template>
   <div>
     <a-spin :spinning="loading">
-      <select-menu
-        :select-data="platformAuthSelectors"
-        @select="onSelect"
-        @remove="onRemove"
-      ></select-menu>
+      <select-menu :select-data="platformAuthSelectors" @select="onSelect" @remove="onRemove"></select-menu>
     </a-spin>
   </div>
 </template>

@@ -71,10 +71,7 @@
 
   const getAllChatThreads = async () => {
     const { authId, model } = chatPayload.value
-    const data = (await fetchChatThreads(
-      authId as string | number,
-      model as string
-    )) as ChatThread[]
+    const data = (await fetchChatThreads(authId as string | number, model as string)) as ChatThread[]
     chatThreads.value = data
   }
 

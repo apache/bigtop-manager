@@ -33,8 +33,7 @@
   type FormState = { [key: string]: string }
 
   const { t } = useI18n()
-  const { loading, checkLoading, testAuthPlatform, fetchCredentialFormModelOfPlatform } =
-    useChatBot()
+  const { loading, checkLoading, testAuthPlatform, fetchCredentialFormModelOfPlatform } = useChatBot()
   const props = defineProps<PlatformAuthFormProps>()
   const { currPage, visible, chatPayload } = toRefs(props)
   const formRef = ref<FormInstance>()
@@ -117,10 +116,7 @@
                 }
               ]"
             >
-              <a-input
-                v-model:value="formState[`${item.name}`]"
-                :placeholder="`please input ${item.displayName}`"
-              />
+              <a-input v-model:value="formState[`${item.name}`]" :placeholder="`please input ${item.displayName}`" />
             </a-form-item>
           </a-form>
         </template>

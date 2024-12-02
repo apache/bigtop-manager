@@ -20,9 +20,7 @@
 import type { App } from 'vue'
 
 const kebabToCamel = (kebab: string): string => {
-  return kebab
-    .replace(/-./g, (match) => match.charAt(1).toUpperCase())
-    .replace(/^./, (match) => match.toUpperCase())
+  return kebab.replace(/-./g, (match) => match.charAt(1).toUpperCase()).replace(/^./, (match) => match.toUpperCase())
 }
 
 const install = (app: App) => {

@@ -30,8 +30,7 @@
   const userStore = useUserStore()
   const menuStore = useMenuStore()
   const clusterStore = useClusterStore()
-  const { headerSelectedKey, headerMenus, siderMenuSelectedKey, siderMenus } =
-    storeToRefs(menuStore)
+  const { headerSelectedKey, headerMenus, siderMenuSelectedKey, siderMenus } = storeToRefs(menuStore)
 
   onMounted(async () => {
     userStore.getUserInfo()

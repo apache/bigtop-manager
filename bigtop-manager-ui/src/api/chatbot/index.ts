@@ -43,18 +43,14 @@ export const getSupportedPlatforms = (): Promise<SupportedPlatform[]> => {
     url: '/chatbot/platforms'
   })
 }
-export const getCredentialFormModelOfPlatform = (
-  platformId: string | number
-): Promise<CredentialFormItem[]> => {
+export const getCredentialFormModelOfPlatform = (platformId: string | number): Promise<CredentialFormItem[]> => {
   return request({
     method: 'get',
     url: `/chatbot/platforms/${platformId}/auth-credentials`
   })
 }
 
-export const validateAuthCredentials = (
-  data: AuthCredentialTestParams
-): Promise<AuthTestResult> => {
+export const validateAuthCredentials = (data: AuthCredentialTestParams): Promise<AuthTestResult> => {
   return request({
     method: 'post',
     url: '/chatbot/auth-platforms',
@@ -77,9 +73,7 @@ export const createChatThread = (data: ChatThreadCondition): Promise<ChatThread>
     url: `/chatbot/auth-platforms/${data.authId}/threads?model=${data.model}`
   })
 }
-export const getThreadChatHistory = (
-  params: ChatThreadHistoryCondition
-): Promise<ChatThreadHistoryItem[]> => {
+export const getThreadChatHistory = (params: ChatThreadHistoryCondition): Promise<ChatThreadHistoryItem[]> => {
   return request({
     method: 'get',
     url: `/chatbot/auth-platforms/${params.authId}/threads/${params.threadId}/history`

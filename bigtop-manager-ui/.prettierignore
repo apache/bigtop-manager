@@ -16,3 +16,8 @@
 node_modules
 dist
 public
+
+package.json
+pnpm-lock.yaml
+
+**/*.md

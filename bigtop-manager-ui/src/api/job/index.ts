@@ -34,10 +34,7 @@ export const retryJob = (id: number, clusterId: number): Promise<JobVO> => {
   })
 }
 
-export const getJobs = (
-  clusterId: number,
-  pagination: Pagination
-): Promise<{ content: JobVO[]; total: number }> => {
+export const getJobs = (clusterId: number, pagination: Pagination): Promise<{ content: JobVO[]; total: number }> => {
   return request({
     method: 'get',
     url: `/clusters/${clusterId}/jobs`,

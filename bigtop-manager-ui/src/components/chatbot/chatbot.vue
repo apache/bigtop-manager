@@ -51,9 +51,7 @@
 
   const getCompName = computed(() => pages[currPage.value.nextPage])
   const showChatOps = computed(() => 'chat-window' === currPage.value?.nextPage)
-  const showBack = computed(
-    () => withoutBack.includes(currPage.value.nextPage) || afterPages.value.length == 1
-  )
+  const showBack = computed(() => withoutBack.includes(currPage.value.nextPage) || afterPages.value.length == 1)
 
   const visibleWindow = (close = false) => {
     close ? (visible.value = false) : (visible.value = !visible.value)
@@ -105,11 +103,7 @@
 
   <teleport to="body">
     <div :class="[isExpand ? 'chatbot-expand' : 'chatbot']">
-      <a-card
-        v-show="visible"
-        class="base-model"
-        :class="[isExpand ? 'chat-model-expand' : 'chat-model']"
-      >
+      <a-card v-show="visible" class="base-model" :class="[isExpand ? 'chat-model-expand' : 'chat-model']">
         <template #title>
           <header>
             <div class="header-left">

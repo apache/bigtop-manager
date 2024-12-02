@@ -22,12 +22,7 @@
   import { ref, computed, toRefs, watchEffect, watch, onActivated } from 'vue'
   import { useI18n } from 'vue-i18n'
   import type { Option } from './select-menu.vue'
-  import {
-    ChatbotConfig,
-    ChatThreadHistoryItem,
-    SendChatMessageCondition,
-    Sender
-  } from '@/api/chatbot/types'
+  import { ChatbotConfig, ChatThreadHistoryItem, SendChatMessageCondition, Sender } from '@/api/chatbot/types'
   import ChatMsgItem from './chat-msg-item.vue'
   import useChatBot from '@/composables/use-chat-bot'
 
@@ -38,8 +33,7 @@
     currPage?: Option
   }
 
-  const { loading, receiving, messageReceiver, fetchSendChatMessage, fetchThreadChatHistory } =
-    useChatBot()
+  const { loading, receiving, messageReceiver, fetchSendChatMessage, fetchThreadChatHistory } = useChatBot()
   const { t } = useI18n()
   const inputText = ref('')
   const isMessageReceived = ref(true)
@@ -59,10 +53,7 @@
   watchEffect(async () => {
     if (currPage.value?.nextPage === 'chat-window' && visible.value) {
       const { authId, threadId } = chatPayload.value
-      const data = await fetchThreadChatHistory(
-        authId as string | number,
-        threadId as string | number
-      )
+      const data = await fetchThreadChatHistory(authId as string | number, threadId as string | number)
       tempHistory.value = data as ChatThreadHistoryItem[]
       loading.value = false
       handleScrollToBottom()
@@ -146,12 +137,7 @@
           @input="onInput"
         ></div>
         <div class="msg-input-suffix">
-          <a-button
-            :disabled="!sendable"
-            type="primary"
-            class="msg-input-send"
-            @click="sendMessage"
-          >
+          <a-button :disabled="!sendable" type="primary" class="msg-input-send" @click="sendMessage">
             <svg-icon :name="sendable ? 'send' : 'send-disabled'" style="margin: 0" />
           </a-button>
         </div>

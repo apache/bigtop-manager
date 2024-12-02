@@ -41,7 +41,7 @@
 
   const aiChatStore = useAiChatStore()
   const llmConfigStore = useLlmConfigStore()
-  const { currThread, chatRecords, messageReceiver } = storeToRefs(aiChatStore)
+  const { currThread, chatRecords, messageReceiver, loadingChatRecords } = storeToRefs(aiChatStore)
   const { currAuthPlatform: currPlatform } = storeToRefs(llmConfigStore)
 
   const open = ref(false)
@@ -57,21 +57,16 @@
   })
 
   const width = computed(() => (fullScreen.value ? 'calc(100% - 300px)' : 450))
-  const noChat = computed(
-    () => Object.keys(currThread.value).length === 0 || chatRecords.value.length === 0
-  )
+  const noChat = computed(() => Object.keys(currThread.value).length === 0 || chatRecords.value.length === 0)
   const historyVisible = computed(() => fullScreen.value && open.value)
   const authPlatformCached = computed(() => Object.keys(currPlatform.value || {}).length > 0)
-  const recordReceiver = computed(
-    (): ChatMessageItem => ({ sender: 'AI', message: messageReceiver.value })
-  )
+  const recordReceiver = computed((): ChatMessageItem => ({ sender: 'AI', message: messageReceiver.value }))
   const checkActions = computed(() =>
-    fullScreen.value
-      ? filterActions(['EXITSCREEN', 'CLOSE'])
-      : filterActions(['ADD', 'RECORDS', 'FULLSCREEN', 'CLOSE'])
+    fullScreen.value ? filterActions(['EXITSCREEN', 'CLOSE']) : filterActions(['ADD', 'RECORDS', 'FULLSCREEN', 'CLOSE'])
   )
+  const addIcon = computed(() => (chatRecords.value.length === 0 ? 'plus_gray' : 'plus'))
   const actionGroup = computed((): GroupItem<ActionType>[] => [
-    { tip: '创建对话', icon: 'plus_gray', action: 'ADD' },
+    { tip: '创建对话', icon: addIcon.value, action: 'ADD', clickEvent: aiChatStore.createChatThread },
     { tip: '历史记录', icon: 'history', action: 'RECORDS', clickEvent: openRecord },
     { tip: '窗口全屏', icon: 'full_screen', action: 'FULLSCREEN', clickEvent: toggleFullScreen },
     { tip: '退出全屏', icon: 'exit_screen', action: 'EXITSCREEN', clickEvent: toggleFullScreen },
@@ -104,9 +99,7 @@
 
   const filterActions = (showActions?: ActionType[]) => {
     if (!showActions) return actionGroup.value
-    return actionGroup.value.filter(
-      (groupItem) => groupItem.action && showActions.includes(groupItem.action)
-    )
+    return actionGroup.value.filter((groupItem) => groupItem.action && showActions.includes(groupItem.action))
   }
 
   const onActions = (item: GroupItem<ActionType>) => {
@@ -140,13 +133,15 @@
       </template>
       <chat-history ref="samllChatHistoryRef" history-type="small" />
       <div class="chat">
-        <empty-content v-if="noChat" />
-        <template v-else>
-          <div v-if="open" v-auto-scroll class="chat-content">
-            <chat-message v-for="(record, idx) in chatRecords" :key="idx" :record="record" />
-            <chat-message v-if="messageReceiver" :record="recordReceiver" />
-          </div>
-        </template>
+        <a-spin :spinning="loadingChatRecords">
+          <empty-content v-if="noChat" />
+          <template v-else>
+            <div v-if="open" v-auto-scroll class="chat-content">
+              <chat-message v-for="(record, idx) in chatRecords" :key="idx" :record="record" />
+              <chat-message v-if="messageReceiver" :record="recordReceiver" />
+            </div>
+          </template>
+        </a-spin>
       </div>
       <template #footer>
         <chat-input />
@@ -170,6 +165,13 @@
     height: 100%;
     padding-inline: $space-md;
     overflow: auto;
+
+    :deep(.ant-spin-nested-loading) {
+      height: 100% !important;
+      .ant-spin-container {
+        height: 100% !important;
+      }
+    }
 
     .chat-content {
       width: 100%;

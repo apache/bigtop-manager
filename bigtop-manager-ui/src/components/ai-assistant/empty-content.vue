@@ -39,12 +39,8 @@
           </a-typography-title>
         </div>
         <div class="feature-desc">
-          <a-typography-link underline :href="githubUrl" target="_blank">
-            什么是Bigtop Manager？
-          </a-typography-link>
-          <a-typography-link underline :href="githubUrl" target="_blank">
-            你可以为我做什么？
-          </a-typography-link>
+          <a-typography-link underline :href="githubUrl" target="_blank"> 什么是Bigtop Manager？ </a-typography-link>
+          <a-typography-link underline :href="githubUrl" target="_blank"> 你可以为我做什么？ </a-typography-link>
           <a-typography-link underline :href="githubUrl" target="_blank">
             大数据领域最近有什么有趣的事？
           </a-typography-link>
