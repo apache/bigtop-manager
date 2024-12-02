@@ -19,8 +19,7 @@
 
 import axios, { type AxiosProgressEvent, type CancelTokenSource } from 'axios'
 import request from '@/api/request.ts'
-import type { chatMessagesRes, LogsRes } from './types'
-import type { SendChatMessageCondition } from '@/api/chatbot/types'
+import type { LogsRes } from './types'
 
 export const getLogs = (clusterId: number, id: number, func: Function): LogsRes => {
   const source: CancelTokenSource = axios.CancelToken.source()
@@ -29,23 +28,6 @@ export const getLogs = (clusterId: number, id: number, func: Function): LogsRes 
     method: 'get',
     url: `/sse/clusters/${clusterId}/tasks/${id}/log`,
     responseType: 'stream',
-    timeout: 0,
-    cancelToken: source.token,
-    onDownloadProgress: (progressEvent: AxiosProgressEvent) => func(progressEvent)
-  })
-
-  return { promise, cancel: source.cancel }
-}
-export const sendChatMessage = (data: SendChatMessageCondition, func: Function): chatMessagesRes => {
-  const source: CancelTokenSource = axios.CancelToken.source()
-
-  const promise = request({
-    method: 'post',
-    url: `/chatbot/auth-platforms/${data.authId}/threads/${data.threadId}/talk`,
-    responseType: 'stream',
-    data: {
-      message: data.message
-    },
     timeout: 0,
     cancelToken: source.token,
     onDownloadProgress: (progressEvent: AxiosProgressEvent) => func(progressEvent)
