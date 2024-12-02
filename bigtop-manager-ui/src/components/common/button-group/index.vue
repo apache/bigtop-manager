@@ -42,14 +42,10 @@
       :shape="item.shape || groupShape || 'default'"
       :type="item.type || groupType || 'default'"
       :title="(item.tip && $t(`${$props.i18n}.${item.tip}`)) || (item.text && $t(`${$props.i18n}.${item.text}`))"
-      @click="item.clickEvent ? item.clickEvent(item) : ({} as any)"
+      @click="item.clickEvent ? item.clickEvent(item) : () => {}"
     >
       <template #icon>
-        <slot name="icon" :item="item">
-          <template v-if="typeof item.icon !== 'string'">
-            <component :is="item.icon"></component>
-          </template>
-        </slot>
+        <slot name="icon" :item="item" />
       </template>
       <span v-if="item.text">
         {{ item.text && $t(`${$props.i18n}.${item.text}`) }}

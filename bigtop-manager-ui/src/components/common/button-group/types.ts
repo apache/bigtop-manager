@@ -17,13 +17,11 @@
  * under the License.
  */
 
-import type { VNode } from 'vue'
-
 type BtnType = 'primary' | 'ghost' | 'dashed' | 'link' | 'text' | 'default'
 type ShapeType = 'default' | 'circle' | 'round'
 
 export interface GroupItem<T = string> {
-  icon?: string | VNode
+  icon?: string
   tip?: string
   text?: string
   action?: T
