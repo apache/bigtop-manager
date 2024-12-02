@@ -60,7 +60,7 @@ export const useAiChatStore = defineStore(
     }
 
     const createChatThread = async () => {
-      const tempName = `thread-${getRandomFromTimestamp()}`
+      const tempName = `chat-${getRandomFromTimestamp()}`
       const data = await ai.createChatThread({ id: null, name: tempName })
       getThread(data.threadId as ThreadId)
       getThreadsFromAuthPlatform()

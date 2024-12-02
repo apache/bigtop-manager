@@ -22,6 +22,7 @@ export default {
   new_chat: 'New Chat',
   full_screen: 'Full screen',
   exit_screen: 'Exit screen',
+  delete_confirm: 'Are you sure you want to delete this chat?',
   show_only10_records: 'Display only 10 records',
   message_cannot_be_empty: 'Message cannot be empty',
   enter_question: 'Please enter your question',

@@ -59,16 +59,21 @@
   const checkActions = computed(() =>
     fullScreen.value ? filterActions(['EXITSCREEN', 'CLOSE']) : filterActions(['ADD', 'RECORDS', 'FULLSCREEN', 'CLOSE'])
   )
-  const addIcon = computed(() => (chatRecords.value.length === 0 && threads.value.length < 10 ? 'plus' : 'plus_gray'))
+  const addIcon = computed(() => (threads.value.length >= 10 ? 'plus_gray' : 'plus'))
   const actionGroup = computed((): GroupItem<ActionType>[] => [
     {
       tip: 'new_chat',
       icon: addIcon.value,
       action: 'ADD',
       clickEvent: aiChatStore.createChatThread,
-      disabled: threads.value.length >= 10
+      disabled: threads.value.length >= 10 || loadingChatRecords.value
     },
-    { tip: 'history', icon: 'history', action: 'RECORDS', clickEvent: openRecord },
+    {
+      tip: 'history',
+      icon: 'history',
+      action: 'RECORDS',
+      clickEvent: openRecord
+    },
     { tip: 'full_screen', icon: 'full_screen', action: 'FULLSCREEN', clickEvent: toggleFullScreen },
     { tip: 'exit_screen', icon: 'exit_screen', action: 'EXITSCREEN', clickEvent: toggleFullScreen },
     { icon: 'close', action: 'CLOSE', clickEvent: () => controlVisible(false) }
@@ -116,6 +121,7 @@
         aiChatStore.getThreadRecords()
       }
     } else {
+      aiChatStore.getThreadsFromAuthPlatform()
       aiChatStore.getThreadRecords()
     }
   }

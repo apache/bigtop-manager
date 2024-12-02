@@ -99,7 +99,7 @@
 
   const handleDeleteConfirm = (thread: ChatThread, idx: number) => {
     Modal.confirm({
-      title: t('common.delete_confirm_content', [`${thread.name}`]),
+      title: t('aiAssistant.delete_confirm', [`${thread.name}`]),
       async onOk() {
         const success = await aiChatStore.deleteChatThread(thread)
         if (success) {
@@ -155,9 +155,9 @@
       <main>
         <a-empty v-if="threads.length == 0" />
         <a-menu v-else v-model:selected-keys="selectKey" @select="handleSelect">
-          <a-menu-item v-for="thread in threads" :key="thread.threadId">
+          <a-menu-item v-for="thread in threads" :key="thread.threadId" :title="thread.name">
             <div class="chat-history-item">
-              <span :title="thread.name">{{ thread.name }}</span>
+              <a-typography-link :ellipsis="true" :content="`${thread.name}`" />
               <span>{{ formatTime(thread.createTime) }}</span>
             </div>
           </a-menu-item>
@@ -186,7 +186,7 @@
                   @blur="handleRenameConfirm(thread)"
                 />
                 <template v-else>
-                  <span>{{ thread.name }}</span>
+                  <a-typography-link :ellipsis="true" :content="`${thread.name}`" />
                   <a-dropdown :trigger="['click']">
                     <a-button type="text" shape="circle" @click.stop>
                       <template #icon>
@@ -231,6 +231,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: $space-sm;
       height: 100%;
       span:last-child {
         color: $color-text;

@@ -19,13 +19,19 @@
 <script setup lang="ts">
   import { shallowRef } from 'vue'
   import { usePngImage } from '@/utils/tools'
+  import { useAiChatStore } from '@/store/ai-assistant'
 
   const imageStyle = shallowRef({
     height: '200px',
     marginBottom: '16px'
   })
+  const aiChatStore = useAiChatStore()
   const emptyState = usePngImage('ai_helper')
-  const githubUrl = import.meta.env.VITE_GITHUB_URL
+
+  const quickAsk = (message: string) => {
+    aiChatStore.setChatRecordForSender('USER', message)
+    aiChatStore.collectReciveMessage(message)
+  }
 </script>
 
 <template>
@@ -39,13 +45,13 @@
           </a-typography-title>
         </div>
         <div class="feature-desc">
-          <a-typography-link underline :href="githubUrl" target="_blank">
+          <a-typography-link underline @click="quickAsk($t('aiAssistant.bigtop_manager'))">
             {{ $t('aiAssistant.bigtop_manager') }}
           </a-typography-link>
-          <a-typography-link underline :href="githubUrl" target="_blank">
+          <a-typography-link underline @click="quickAsk($t('aiAssistant.can_do_for_you'))">
             {{ $t('aiAssistant.can_do_for_you') }}
           </a-typography-link>
-          <a-typography-link underline :href="githubUrl" target="_blank">
+          <a-typography-link underline @click="quickAsk($t('aiAssistant.big_data_news'))">
             {{ $t('aiAssistant.big_data_news') }}
           </a-typography-link>
         </div>

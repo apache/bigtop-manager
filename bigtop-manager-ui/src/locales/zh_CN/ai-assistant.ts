@@ -20,6 +20,7 @@ export default {
   history: '历史记录',
   ai_assistant: 'AI 助理',
   new_chat: '新聊天',
+  delete_confirm: '确认要删除聊天吗？',
   full_screen: '窗口全屏',
   exit_screen: '退出全屏',
   show_only10_records: '仅展示 10 条历史记录',
