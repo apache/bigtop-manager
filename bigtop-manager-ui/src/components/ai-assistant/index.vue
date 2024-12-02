@@ -49,16 +49,11 @@
   const fullScreen = ref(false)
   const actionHandlers = ref<Map<ActionType, (...args: any[]) => void>>(new Map())
   const samllChatHistoryRef = ref<InstanceType<typeof ChatHistory> | null>(null)
-  const styleConfig = shallowReactive<DrawerProps>({
-    headerStyle: { height: '56px' },
-    bodyStyle: { padding: 0 },
-    contentWrapperStyle: { boxShadow: 'none', top: '64px' },
-    footerStyle: { border: 'none' }
-  })
 
   const width = computed(() => (fullScreen.value ? 'calc(100% - 300px)' : 450))
   const noChat = computed(() => Object.keys(currThread.value).length === 0 || chatRecords.value.length === 0)
   const historyVisible = computed(() => fullScreen.value && open.value)
+  const historyType = computed(() => (historyVisible.value ? 'large' : 'small'))
   const authPlatformCached = computed(() => Object.keys(currPlatform.value || {}).length > 0)
   const recordReceiver = computed((): ChatMessageItem => ({ sender: 'AI', message: messageReceiver.value }))
   const checkActions = computed(() =>
@@ -78,6 +73,19 @@
     { tip: 'exit_screen', icon: 'exit_screen', action: 'EXITSCREEN', clickEvent: toggleFullScreen },
     { icon: 'close', action: 'CLOSE', clickEvent: () => controlVisible(false) }
   ])
+
+  const styleConfig = computed((): DrawerProps => {
+    return {
+      headerStyle: { height: '56px' },
+      bodyStyle: { padding: 0 },
+      contentWrapperStyle: {
+        boxShadow: 'none',
+        top: '64px',
+        transform: historyType.value === 'large' ? 'auto' : 'translateX(-180)'
+      },
+      footerStyle: { border: 'none' }
+    }
+  })
 
   watch(open, (val) => {
     val && initConfig()
@@ -129,7 +137,7 @@
 
 <template>
   <div class="ai-assistant">
-    <chat-history :visible="historyVisible" history-type="large" />
+    <chat-history :visible="historyVisible" :history-type="historyType" />
     <a-drawer
       v-model:open="open"
       :title="$t(title)"
@@ -146,7 +154,7 @@
           </template>
         </button-group>
       </template>
-      <chat-history ref="samllChatHistoryRef" history-type="small" />
+      <chat-history ref="samllChatHistoryRef" :history-type="historyType" />
       <div class="chat">
         <a-spin :spinning="loadingChatRecords">
           <empty-content v-if="noChat" />
