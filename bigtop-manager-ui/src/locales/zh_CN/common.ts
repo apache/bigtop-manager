@@ -73,5 +73,6 @@ export default {
   no_options: '暂无选项',
   loading_text_verifying: '校验中',
   enter_error: '请输入{0}',
-  select_error: '请选择{0}'
+  select_error: '请选择{0}',
+  delete_msg: '确认要删除该记录吗？'
 }

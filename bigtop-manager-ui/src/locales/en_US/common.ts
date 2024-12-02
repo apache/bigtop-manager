@@ -73,5 +73,6 @@ export default {
   no_options: 'No options',
   loading_text_verifying: 'Verifying',
   enter_error: 'Please enter {0}',
-  select_error: 'Please select {0}'
+  select_error: 'Please select {0}',
+  delete_msg: 'Are you sure you want to delete this?'
 }

@@ -99,7 +99,7 @@
 
   const handleDeleteConfirm = (thread: ChatThread, idx: number) => {
     Modal.confirm({
-      title: t('aiAssistant.delete_confirm', [`${thread.name}`]),
+      title: t('common.delete_msg'),
       async onOk() {
         const success = await aiChatStore.deleteChatThread(thread)
         if (success) {

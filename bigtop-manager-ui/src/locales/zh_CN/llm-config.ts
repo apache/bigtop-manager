@@ -26,6 +26,5 @@ export default {
   name: '名字',
   platform_name: '平台',
   model: '模型',
-  desc: '备注',
-  delete_authorization: '确认要删除授权吗 ?'
+  desc: '备注'
 }
