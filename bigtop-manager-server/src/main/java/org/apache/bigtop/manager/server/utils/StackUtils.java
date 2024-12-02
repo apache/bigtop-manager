@@ -166,7 +166,7 @@ public class StackUtils {
 
                 DAG.addNodeIfAbsent(blocked, getCommandWrapper(blocked));
                 for (String blocker : blockers) {
-                    DAG.addNodeIfAbsent(blocked, getCommandWrapper(blocked));
+                    DAG.addNodeIfAbsent(blocker, getCommandWrapper(blocker));
                     DAG.addEdge(blocker, blocked, new DagGraphEdge(blocker, blocked), false);
                 }
             }

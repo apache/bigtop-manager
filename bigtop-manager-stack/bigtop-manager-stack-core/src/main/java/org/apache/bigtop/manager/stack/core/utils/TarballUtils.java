@@ -23,10 +23,13 @@ import org.apache.bigtop.manager.stack.core.exception.StackException;
 import org.apache.bigtop.manager.stack.core.tarball.ChecksumValidator;
 import org.apache.bigtop.manager.stack.core.tarball.TarballDownloader;
 import org.apache.bigtop.manager.stack.core.tarball.TarballExtractor;
+import org.apache.bigtop.manager.stack.core.utils.linux.LinuxFileUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 @Slf4j
 public class TarballUtils {
@@ -34,6 +37,11 @@ public class TarballUtils {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void installPackage(
             String repoUrl, String stackHome, String serviceHome, PackageInfo packageInfo, Integer skipLevels) {
+        if (Files.exists(Path.of(serviceHome))) {
+            log.info("Service home [{}] exists, deleting...", serviceHome);
+            LinuxFileUtils.removeDirectories(serviceHome);
+        }
+
         String remoteUrl = repoUrl + File.separator + packageInfo.getName();
         File localFile = new File(stackHome + File.separator + packageInfo.getName());
         String algorithm = packageInfo.getChecksum().split(":")[0];

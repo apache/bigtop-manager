@@ -19,6 +19,9 @@
 package org.apache.bigtop.manager.stack.core.utils.linux;
 
 import org.apache.bigtop.manager.common.constants.Constants;
+import org.apache.bigtop.manager.common.constants.MessageConstants;
+import org.apache.bigtop.manager.common.shell.ShellExecutor;
+import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.common.utils.YamlUtils;
 import org.apache.bigtop.manager.stack.core.enums.ConfigType;
@@ -29,18 +32,12 @@ import org.apache.commons.lang3.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.GroupPrincipal;
-import java.nio.file.attribute.PosixFileAttributeView;
-import java.nio.file.attribute.PosixFilePermission;
-import java.nio.file.attribute.PosixFilePermissions;
-import java.nio.file.attribute.UserPrincipal;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Only support Linux
@@ -131,85 +128,6 @@ public class LinuxFileUtils {
     }
 
     /**
-     * Update file Permissions
-     *
-     * @param dir         file path
-     * @param permissions {@code rwxr--r--}
-     * @param recursive   recursive
-     */
-    public static void updatePermissions(String dir, String permissions, boolean recursive) {
-        if (StringUtils.isBlank(dir)) {
-            log.error("dir must not be null");
-            return;
-        }
-        permissions = StringUtils.isBlank(permissions) ? Constants.PERMISSION_644 : permissions;
-
-        Path path = Paths.get(dir);
-        Set<PosixFilePermission> perms = PosixFilePermissions.fromString(permissions);
-        try {
-            log.info("Changing permissions to [{}] for [{}]", permissions, dir);
-            Files.setPosixFilePermissions(path, perms);
-        } catch (IOException e) {
-            log.error("Error when change permissions", e);
-        }
-
-        // When is a directory, recursive update
-        if (recursive && Files.isDirectory(path)) {
-            try (DirectoryStream<Path> ds = Files.newDirectoryStream(path)) {
-                for (Path subPath : ds) {
-                    updatePermissions(dir + File.separator + subPath.getFileName(), permissions, true);
-                }
-            } catch (IOException e) {
-                log.error("Error when change permissions", e);
-            }
-        }
-    }
-
-    /**
-     * Update file owner
-     *
-     * @param dir       file path
-     * @param owner     owner
-     * @param group     group
-     * @param recursive recursive
-     */
-    public static void updateOwner(String dir, String owner, String group, boolean recursive) {
-        if (StringUtils.isBlank(dir)) {
-            log.error("dir must not be null");
-            return;
-        }
-        owner = StringUtils.isBlank(owner) ? "root" : owner;
-        group = StringUtils.isBlank(group) ? "root" : group;
-
-        Path path = Paths.get(dir);
-        try {
-            log.info("Changing owner to [{}:{}] for [{}]", owner, group, dir);
-            UserPrincipal userPrincipal =
-                    path.getFileSystem().getUserPrincipalLookupService().lookupPrincipalByName(owner);
-
-            GroupPrincipal groupPrincipal =
-                    path.getFileSystem().getUserPrincipalLookupService().lookupPrincipalByGroupName(group);
-
-            PosixFileAttributeView fileAttributeView = Files.getFileAttributeView(path, PosixFileAttributeView.class);
-            fileAttributeView.setOwner(userPrincipal);
-            fileAttributeView.setGroup(groupPrincipal);
-        } catch (IOException e) {
-            log.error("Error when change owner", e);
-        }
-
-        // When it is a directory, recursively set the file owner
-        if (recursive && Files.isDirectory(path)) {
-            try (DirectoryStream<Path> ds = Files.newDirectoryStream(path)) {
-                for (Path subPath : ds) {
-                    updateOwner(dir + File.separator + subPath.getFileName(), owner, group, true);
-                }
-            } catch (IOException e) {
-                log.error("Error when change owner", e);
-            }
-        }
-    }
-
-    /**
      * create directories
      *
      * @param dirPath     directory path
@@ -231,23 +149,43 @@ public class LinuxFileUtils {
             return;
         }
 
+        List<String> builderParameters = new ArrayList<>();
+        builderParameters.add("mkdir");
+        builderParameters.add("-p");
+        builderParameters.add(dirPath);
+
         try {
-            log.info("Creating directory: [{}]", path);
-            if (Files.exists(path)) {
-                if (Files.isDirectory(path)) {
-                    log.info("Directory already exists: [{}], skip creating", path);
-                } else {
-                    throw new IOException("Path exists and is not a directory: " + path);
-                }
-            } else {
-                Files.createDirectories(path);
+            ShellResult shellResult = sudoExecCmd(builderParameters);
+            if (shellResult.getExitCode() != MessageConstants.SUCCESS_CODE) {
+                throw new StackException(shellResult.getErrMsg());
             }
         } catch (IOException e) {
-            log.error("Error when create directory", e);
+            throw new StackException(e);
         }
 
         updateOwner(dirPath, owner, group, recursive);
         updatePermissions(dirPath, permissions, recursive);
+    }
+
+    public static void removeDirectories(String dirPath) {
+        if (StringUtils.isBlank(dirPath)) {
+            log.error("dirPath must not be null");
+            return;
+        }
+
+        List<String> builderParameters = new ArrayList<>();
+        builderParameters.add("rm");
+        builderParameters.add("-rf");
+        builderParameters.add(dirPath);
+
+        try {
+            ShellResult shellResult = sudoExecCmd(builderParameters);
+            if (shellResult.getExitCode() != MessageConstants.SUCCESS_CODE) {
+                throw new StackException(shellResult.getErrMsg());
+            }
+        } catch (IOException e) {
+            throw new StackException(e);
+        }
     }
 
     /**
@@ -283,6 +221,87 @@ public class LinuxFileUtils {
         } catch (IOException e) {
             log.error("Error when create symbolic link", e);
             throw new StackException(e);
+        }
+    }
+
+    /**
+     * Update file Permissions
+     *
+     * @param dir         file path
+     * @param permissions {@code rwxr--r--}
+     * @param recursive   recursive
+     */
+    public static void updatePermissions(String dir, String permissions, boolean recursive) {
+        if (StringUtils.isBlank(dir)) {
+            log.error("dir must not be null");
+            return;
+        }
+
+        permissions = StringUtils.isBlank(permissions) ? Constants.PERMISSION_644 : permissions;
+
+        List<String> builderParameters = new ArrayList<>();
+        builderParameters.add("chmod");
+        if (recursive && Files.isDirectory(Paths.get(dir))) {
+            builderParameters.add("-R");
+        }
+        builderParameters.add(permissions);
+        builderParameters.add(dir);
+
+        try {
+            ShellResult shellResult = sudoExecCmd(builderParameters);
+            if (shellResult.getExitCode() != MessageConstants.SUCCESS_CODE) {
+                throw new StackException(shellResult.getErrMsg());
+            }
+        } catch (IOException e) {
+            throw new StackException(e);
+        }
+    }
+
+    /**
+     * Update file owner
+     *
+     * @param dir       file path
+     * @param owner     owner
+     * @param group     group
+     * @param recursive recursive
+     */
+    public static void updateOwner(String dir, String owner, String group, boolean recursive) {
+        if (StringUtils.isBlank(dir)) {
+            log.error("dir must not be null");
+            return;
+        }
+
+        owner = StringUtils.isBlank(owner) ? "root" : owner;
+        group = StringUtils.isBlank(group) ? "root" : group;
+
+        List<String> builderParameters = new ArrayList<>();
+
+        builderParameters.add("chown");
+        if (recursive && Files.isDirectory(Paths.get(dir))) {
+            builderParameters.add("-R");
+        }
+        builderParameters.add(owner + ":" + group);
+        builderParameters.add(dir);
+
+        try {
+            ShellResult shellResult = sudoExecCmd(builderParameters);
+            if (shellResult.getExitCode() != MessageConstants.SUCCESS_CODE) {
+                throw new StackException(shellResult.getErrMsg());
+            }
+        } catch (IOException e) {
+            throw new StackException(e);
+        }
+    }
+
+    private static ShellResult sudoExecCmd(List<String> params) throws IOException {
+        if ("root".equals(System.getProperty("user.name"))) {
+            return ShellExecutor.execCommand(params);
+        } else {
+            List<String> sudoParams = new ArrayList<>();
+            sudoParams.add("sudo");
+            sudoParams.addAll(params);
+
+            return ShellExecutor.execCommand(sudoParams);
         }
     }
 }

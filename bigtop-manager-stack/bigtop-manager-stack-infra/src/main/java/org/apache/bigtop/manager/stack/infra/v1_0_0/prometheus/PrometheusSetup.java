@@ -37,7 +37,6 @@ public class PrometheusSetup {
         String user = prometheusParams.user();
         String group = prometheusParams.group();
 
-        LinuxFileUtils.createDirectories(prometheusParams.serviceHome(), user, group, PERMISSION_755, true);
         LinuxFileUtils.createDirectories(prometheusParams.dataDir(), user, group, PERMISSION_755, true);
 
         return ShellResult.success("Prometheus Configure success!");

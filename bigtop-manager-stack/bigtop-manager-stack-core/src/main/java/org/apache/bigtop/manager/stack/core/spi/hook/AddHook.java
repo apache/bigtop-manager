@@ -29,9 +29,9 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @AutoService(Hook.class)
-public class InstallHook extends AbstractHook {
+public class AddHook extends AbstractHook {
 
-    public static final String NAME = "install";
+    public static final String NAME = "add";
 
     @Override
     public void doBefore(Params params) {

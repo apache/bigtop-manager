@@ -18,6 +18,7 @@
  */
 package org.apache.bigtop.manager.stack.core.utils.linux;
 
+import org.apache.bigtop.manager.common.constants.MessageConstants;
 import org.apache.bigtop.manager.common.shell.ShellExecutor;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.common.utils.FileUtils;
@@ -67,7 +68,10 @@ public class LinuxAccountUtils {
         builderParameters.add(user);
 
         try {
-            ShellExecutor.execCommand(builderParameters);
+            ShellResult shellResult = sudoExecCmd(builderParameters);
+            if (shellResult.getExitCode() != MessageConstants.SUCCESS_CODE) {
+                throw new StackException(shellResult.getErrMsg());
+            }
         } catch (IOException e) {
             throw new StackException(e);
         }
@@ -154,7 +158,10 @@ public class LinuxAccountUtils {
         builderParameters.add(user);
 
         try {
-            ShellExecutor.execCommand(builderParameters);
+            ShellResult shellResult = sudoExecCmd(builderParameters);
+            if (shellResult.getExitCode() != MessageConstants.SUCCESS_CODE) {
+                throw new StackException(shellResult.getErrMsg());
+            }
         } catch (IOException e) {
             throw new StackException(e);
         }
@@ -179,7 +186,10 @@ public class LinuxAccountUtils {
         builderParameters.add(group);
 
         try {
-            ShellExecutor.execCommand(builderParameters);
+            ShellResult shellResult = sudoExecCmd(builderParameters);
+            if (shellResult.getExitCode() != MessageConstants.SUCCESS_CODE) {
+                throw new StackException(shellResult.getErrMsg());
+            }
         } catch (IOException e) {
             throw new StackException(e);
         }
@@ -227,7 +237,37 @@ public class LinuxAccountUtils {
         builderParameters.add(group);
 
         try {
-            ShellExecutor.execCommand(builderParameters);
+            ShellResult shellResult = sudoExecCmd(builderParameters);
+            if (shellResult.getExitCode() != MessageConstants.SUCCESS_CODE) {
+                throw new StackException(shellResult.getErrMsg());
+            }
+        } catch (IOException e) {
+            throw new StackException(e);
+        }
+    }
+
+    /**
+     * Assign user to supplementary groups
+     *
+     * @param user user
+     * @param groups groups
+     */
+    public static void assignUserToSupGroups(String user, List<String> groups) {
+        Objects.requireNonNull(user);
+        Objects.requireNonNull(groups);
+
+        List<String> builderParameters = new ArrayList<>();
+
+        builderParameters.add("usermod");
+        builderParameters.add("-aG");
+        builderParameters.add(String.join(",", groups));
+        builderParameters.add(user);
+
+        try {
+            ShellResult shellResult = sudoExecCmd(builderParameters);
+            if (shellResult.getExitCode() != MessageConstants.SUCCESS_CODE) {
+                throw new StackException(shellResult.getErrMsg());
+            }
         } catch (IOException e) {
             throw new StackException(e);
         }
@@ -249,7 +289,7 @@ public class LinuxAccountUtils {
         builderParameters.add("awk -F':' '{print $1}' /etc/group | grep  " + group);
 
         try {
-            ShellResult output = ShellExecutor.execCommand(builderParameters);
+            ShellResult output = sudoExecCmd(builderParameters);
             return output.getExitCode() == 0;
         } catch (IOException e) {
             throw new StackException(e);
@@ -271,7 +311,7 @@ public class LinuxAccountUtils {
         builderParameters.add("awk -F':' '{print $1}' /etc/passwd | grep  " + user);
 
         try {
-            ShellResult output = ShellExecutor.execCommand(builderParameters);
+            ShellResult output = sudoExecCmd(builderParameters);
             return output.getExitCode() == 0;
         } catch (IOException e) {
             throw new StackException(e);
@@ -313,5 +353,17 @@ public class LinuxAccountUtils {
         }
 
         return null;
+    }
+
+    private static ShellResult sudoExecCmd(List<String> params) throws IOException {
+        if ("root".equals(System.getProperty("user.name"))) {
+            return ShellExecutor.execCommand(params);
+        } else {
+            List<String> sudoParams = new ArrayList<>();
+            sudoParams.add("sudo");
+            sudoParams.addAll(params);
+
+            return ShellExecutor.execCommand(sudoParams);
+        }
     }
 }
