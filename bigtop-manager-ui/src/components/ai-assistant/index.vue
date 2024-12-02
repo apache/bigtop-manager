@@ -17,7 +17,7 @@
   ~ under the License.
   -->
 <script setup lang="ts">
-  import { computed, ref, shallowReactive, watch } from 'vue'
+  import { computed, ref, watch } from 'vue'
   import { DrawerProps } from 'ant-design-vue'
   import { useAiChatStore } from '@/store/ai-assistant'
   import { useLlmConfigStore } from '@/store/llm-config'
