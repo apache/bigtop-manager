@@ -123,14 +123,9 @@ public abstract class AbstractServiceJob extends AbstractJob {
         return StackUtils.getServiceDTOByComponentName(componentName).getName();
     }
 
-    protected Boolean isMasterComponent(String componentName) {
+    protected Boolean isServerComponent(String componentName) {
         ComponentDTO componentDTO = StackUtils.getComponentDTO(componentName);
-        return componentDTO.getCategory().equalsIgnoreCase(ComponentCategories.MASTER);
-    }
-
-    protected Boolean isSlaveComponent(String componentName) {
-        ComponentDTO componentDTO = StackUtils.getComponentDTO(componentName);
-        return componentDTO.getCategory().equalsIgnoreCase(ComponentCategories.SLAVE);
+        return componentDTO.getCategory().equalsIgnoreCase(ComponentCategories.SERVER);
     }
 
     protected Boolean isClientComponent(String componentName) {

@@ -30,31 +30,8 @@
             <component>
                 <name>resourcemanager</name>
                 <display-name>ResourceManager</display-name>
-                <category>master</category>
+                <category>server</category>
                 <cardinality>1-2</cardinality>
-                <command-script>
-                    <script-id>org.apache.bigtop.manager.stack.bigtop.v3_3_0.yarn.ResourceManagerScript</script-id>
-                    <script-type>java</script-type>
-                    <timeout>1200</timeout>
-                </command-script>
-                <custom-commands>
-                    <custom-command>
-                        <name>decommission</name>
-                        <command-script>
-                            <script-id>org.apache.bigtop.manager.stack.bigtop.v3_3_0.yarn.ResourceManagerScript</script-id>
-                            <script-type>java</script-type>
-                            <timeout>600</timeout>
-                        </command-script>
-                    </custom-command>
-                    <custom-command>
-                        <name>refreshqueues</name>
-                        <command-script>
-                            <script-id>org.apache.bigtop.manager.stack.bigtop.v3_3_0.yarn.ResourceManagerScript</script-id>
-                            <script-type>java</script-type>
-                            <timeout>600</timeout>
-                        </command-script>
-                    </custom-command>
-                </custom-commands>
                 <quick-link>
                     <display-name>ResourceManager UI</display-name>
                     <http-port-property>yarn.resourcemanager.webapp.address</http-port-property>
@@ -66,34 +43,19 @@
             <component>
                 <name>nodemanager</name>
                 <display-name>NodeManager</display-name>
-                <category>slave</category>
+                <category>server</category>
                 <cardinality>1+</cardinality>
-                <command-script>
-                    <script-id>org.apache.bigtop.manager.stack.bigtop.v3_3_0.yarn.NodeManagerScript</script-id>
-                    <script-type>java</script-type>
-                    <timeout>1200</timeout>
-                </command-script>
             </component>
             <component>
                 <name>yarn_client</name>
                 <display-name>YARN Client</display-name>
                 <category>client</category>
                 <cardinality>1+</cardinality>
-                <command-script>
-                    <script-id>org.apache.bigtop.manager.stack.bigtop.v3_3_0.yarn.YarnClientScript</script-id>
-                    <script-type>java</script-type>
-                    <timeout>1200</timeout>
-                </command-script>
             </component>
         </components>
 
         <package-specifics>
             <package-specific>
-                <operating-systems>
-                    <os>centos7</os>
-                    <os>rocky8</os>
-                    <os>openeuler22</os>
-                </operating-systems>
                 <architectures>
                     <arch>x86_64</arch>
                 </architectures>

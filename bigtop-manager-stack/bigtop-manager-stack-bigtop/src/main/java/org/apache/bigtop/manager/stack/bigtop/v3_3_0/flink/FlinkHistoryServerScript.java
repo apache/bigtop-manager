@@ -39,9 +39,9 @@ public class FlinkHistoryServerScript extends AbstractServerScript {
     public ShellResult start(Params params) {
         configure(params);
         FlinkParams flinkParams = (FlinkParams) params;
-        String hadoopClasspath = flinkParams.stackBinDir() + "/hadoop classpath";
-        String cmd = "export HADOOP_CLASSPATH=`" + hadoopClasspath + "`;" + flinkParams.stackLibDir()
-                + "/flink/bin/historyserver.sh start";
+        String hadoopClasspath = flinkParams.hadoopHome() + "/bin/hadoop classpath";
+        String cmd = "export HADOOP_CLASSPATH=`" + hadoopClasspath + "`;" + flinkParams.serviceHome()
+                + "/bin/historyserver.sh start";
         try {
             return LinuxOSUtils.sudoExecCmd(cmd, flinkParams.user());
         } catch (Exception e) {
@@ -52,7 +52,7 @@ public class FlinkHistoryServerScript extends AbstractServerScript {
     @Override
     public ShellResult stop(Params params) {
         FlinkParams flinkParams = (FlinkParams) params;
-        String cmd = flinkParams.stackLibDir() + "/flink/bin/historyserver.sh stop";
+        String cmd = flinkParams.serviceHome() + "/bin/historyserver.sh stop";
         try {
             return LinuxOSUtils.sudoExecCmd(cmd, flinkParams.user());
         } catch (Exception e) {

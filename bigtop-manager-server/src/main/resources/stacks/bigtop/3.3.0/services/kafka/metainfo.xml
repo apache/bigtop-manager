@@ -34,33 +34,13 @@
             <component>
                 <name>kafka_broker</name>
                 <display-name>Kafka Broker</display-name>
-                <category>master</category>
+                <category>server</category>
                 <cardinality>1+</cardinality>
-                <command-script>
-                    <script-id>org.apache.bigtop.manager.stack.bigtop.v3_3_0.kafka.KafkaBrokerScript</script-id>
-                    <script-type>java</script-type>
-                    <timeout>1200</timeout>
-                </command-script>
-                <custom-commands>
-                    <custom-command>
-                        <name>test</name>
-                        <command-script>
-                            <script-id>org.apache.bigtop.manager.stack.bigtop.v3_3_0.kafka.KafkaBrokerScript</script-id>
-                            <script-type>java</script-type>
-                            <timeout>600</timeout>
-                        </command-script>
-                    </custom-command>
-                </custom-commands>
             </component>
         </components>
 
         <package-specifics>
             <package-specific>
-                <operating-systems>
-                    <os>centos7</os>
-                    <os>rocky8</os>
-                    <os>openeuler22</os>
-                </operating-systems>
                 <architectures>
                     <arch>x86_64</arch>
                 </architectures>

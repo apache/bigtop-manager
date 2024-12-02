@@ -19,9 +19,7 @@
 package org.apache.bigtop.manager.common.message.entity.payload;
 
 import org.apache.bigtop.manager.common.enums.Command;
-import org.apache.bigtop.manager.common.message.entity.pojo.CustomCommandInfo;
 import org.apache.bigtop.manager.common.message.entity.pojo.PackageSpecificInfo;
-import org.apache.bigtop.manager.common.message.entity.pojo.ScriptInfo;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -41,10 +39,6 @@ public class CommandPayload extends BasePayload {
     private Command command;
 
     private String customCommand;
-
-    private List<CustomCommandInfo> customCommands;
-
-    private ScriptInfo commandScript;
 
     private String serviceUser;
 

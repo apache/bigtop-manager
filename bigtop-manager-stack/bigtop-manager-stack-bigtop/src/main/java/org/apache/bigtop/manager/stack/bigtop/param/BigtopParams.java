@@ -20,29 +20,10 @@ package org.apache.bigtop.manager.stack.bigtop.param;
 
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
 import org.apache.bigtop.manager.stack.core.param.BaseParams;
-import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
 
 public abstract class BigtopParams extends BaseParams {
 
     protected BigtopParams(CommandPayload commandPayload) {
         super(commandPayload);
-    }
-
-    public String stackBinDir() {
-        return "";
-    }
-
-    public String stackLibDir() {
-        return "";
-    }
-
-    /**
-     * service home dir
-     */
-    @Override
-    public String serviceHome() {
-        String rootDir = LocalSettings.cluster().getRootDir();
-        String service = this.commandPayload.getServiceName();
-        return rootDir + "/" + service.toLowerCase();
     }
 }

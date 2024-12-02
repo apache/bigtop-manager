@@ -107,24 +107,19 @@ public class YarnParams extends BigtopParams {
         return "/etc/hadoop/conf";
     }
 
-    @Override
-    public String serviceHome() {
-        return stackLibDir() + "/hadoop";
-    }
-
     public String hdfsHome() {
-        return stackLibDir() + "/hadoop-hdfs";
+        return stackHome() + "/hadoop-hdfs";
     }
 
     public String yarnExec() {
-        return stackBinDir() + "/yarn";
+        return stackHome() + "/yarn";
     }
 
     public String yarnHome() {
-        return stackLibDir() + "/hadoop-yarn";
+        return stackHome() + "/hadoop-yarn";
     }
 
     public String mapredHome() {
-        return stackLibDir() + "/hadoop-mapreduce";
+        return stackHome() + "/hadoop-mapreduce";
     }
 }

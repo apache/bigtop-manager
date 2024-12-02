@@ -67,7 +67,6 @@ public class CacheFileUpdateTask extends AbstractTask {
     private Map<String, Set<String>> hostMap;
     private List<RepoInfo> repoList;
     private Map<String, String> userMap;
-    private Map<String, Object> settingsMap;
 
     public CacheFileUpdateTask(TaskContext taskContext) {
         super(taskContext);
@@ -208,7 +207,6 @@ public class CacheFileUpdateTask extends AbstractTask {
         messagePayload.setConfigurations(serviceConfigMap);
         messagePayload.setClusterHostInfo(hostMap);
         messagePayload.setRepoInfo(repoList);
-        messagePayload.setSettings(settingsMap);
         messagePayload.setUserInfo(userMap);
         messagePayload.setComponentInfo(componentInfoMap);
 

@@ -25,8 +25,6 @@ import java.util.List;
 @Data
 public class PackageSpecificDTO {
 
-    private List<String> os;
-
     private List<String> arch;
 
     private List<PackageDTO> packages;

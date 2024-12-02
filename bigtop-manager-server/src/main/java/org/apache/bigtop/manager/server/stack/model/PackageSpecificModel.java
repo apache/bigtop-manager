@@ -31,10 +31,6 @@ import java.util.List;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class PackageSpecificModel {
 
-    @XmlElementWrapper(name = "operating-systems")
-    @XmlElements(@XmlElement(name = "os"))
-    private List<String> os;
-
     @XmlElementWrapper(name = "architectures")
     @XmlElements(@XmlElement(name = "arch"))
     private List<String> arch;

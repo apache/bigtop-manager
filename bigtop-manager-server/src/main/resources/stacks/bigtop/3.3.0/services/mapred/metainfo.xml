@@ -30,13 +30,8 @@
             <component>
                 <name>history_server</name>
                 <display-name>History Server</display-name>
-                <category>master</category>
+                <category>server</category>
                 <cardinality>1</cardinality>
-                <command-script>
-                    <script-id>org.apache.bigtop.manager.stack.bigtop.v3_3_0.mapred.HistoryServerScript</script-id>
-                    <script-type>java</script-type>
-                    <timeout>1200</timeout>
-                </command-script>
                 <quick-link>
                     <display-name>JobHistory UI</display-name>
                     <http-port-property>mapreduce.jobhistory.webapp.address</http-port-property>
@@ -50,21 +45,11 @@
                 <display-name>MapReduce2 Client</display-name>
                 <category>client</category>
                 <cardinality>1+</cardinality>
-                <command-script>
-                    <script-id>org.apache.bigtop.manager.stack.bigtop.v3_3_0.mapred.MapredClientScript</script-id>
-                    <script-type>java</script-type>
-                    <timeout>1200</timeout>
-                </command-script>
             </component>
         </components>
 
         <package-specifics>
             <package-specific>
-                <operating-systems>
-                    <os>centos7</os>
-                    <os>rocky8</os>
-                    <os>openeuler22</os>
-                </operating-systems>
                 <architectures>
                     <arch>x86_64</arch>
                 </architectures>
