@@ -24,7 +24,10 @@
   const props = withDefaults(defineProps<Props>(), {
     i18n: '',
     groupShape: 'circle',
-    groupType: 'text'
+    groupType: 'text',
+    groups: () => {
+      return []
+    }
   })
 
   const { groups, groupShape, groupType } = toRefs(props)
