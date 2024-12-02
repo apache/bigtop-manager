@@ -42,7 +42,7 @@
       :shape="item.shape || groupShape || 'default'"
       :type="item.type || groupType || 'default'"
       :title="(item.tip && $t(`${$props.i18n}.${item.tip}`)) || (item.text && $t(`${$props.i18n}.${item.text}`))"
-      @click="item.clickEvent ? item.clickEvent(item) : () => {}"
+      @click="item.clickEvent ? item.clickEvent(item) : ({} as any)"
     >
       <template #icon>
         <slot name="icon" :item="item">
