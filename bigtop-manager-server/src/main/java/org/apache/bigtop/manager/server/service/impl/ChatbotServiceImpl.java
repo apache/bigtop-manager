@@ -44,6 +44,7 @@ import org.apache.bigtop.manager.server.model.dto.AuthPlatformDTO;
 import org.apache.bigtop.manager.server.model.dto.ChatThreadDTO;
 import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
 import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
+import org.apache.bigtop.manager.server.model.vo.TalkVO;
 import org.apache.bigtop.manager.server.service.ChatbotService;
 
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -207,13 +208,38 @@ public class ChatbotServiceImpl implements ChatbotService {
         stringFlux.subscribe(
                 s -> {
                     try {
-                        emitter.send(s);
+                        TalkVO talkVO = new TalkVO();
+                        talkVO.setContent(s);
+                        talkVO.setFinishReason(null);
+                        emitter.send(talkVO);
                     } catch (Exception e) {
                         emitter.completeWithError(e);
                     }
                 },
-                Throwable::printStackTrace,
-                emitter::complete);
+                throwable -> {
+                    // 流处理过程中发生错误，返回错误信息
+                    try {
+                        TalkVO errorVO = new TalkVO();
+                        errorVO.setContent(null);
+                        errorVO.setFinishReason("Error: " + throwable.getMessage());
+                        emitter.send(errorVO);
+                    } catch (Exception sendException) {
+                        sendException.printStackTrace();
+                    }
+                    emitter.completeWithError(throwable);
+                },
+                () -> {
+                    // 流完成时发送最终完成标志
+                    try {
+                        TalkVO finishVO = new TalkVO();
+                        finishVO.setContent(null);
+                        finishVO.setFinishReason("completed");
+                        emitter.send(finishVO);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    emitter.complete();
+                });
 
         emitter.onTimeout(emitter::complete);
         return emitter;
