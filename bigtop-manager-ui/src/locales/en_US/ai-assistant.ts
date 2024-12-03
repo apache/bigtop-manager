@@ -30,5 +30,7 @@ export default {
   help: 'How can I assist you today?',
   bigtop_manager: 'What is Bigtop Manager?',
   can_do_for_you: 'What can you do for me?',
-  big_data_news: 'What interesting things are happening in the field of Big Data?'
+  big_data_news: 'What interesting things are happening in the field of Big Data?',
+  ai_disabled_msg: 'Sorry, the large model is not set up, so the AI assistant is not available.',
+  go_set_up: 'Go to set it up'
 }

@@ -30,5 +30,7 @@ export default {
   help: '请问有什么可以帮助你的吗？',
   bigtop_manager: '什么是Bigtop Manager？',
   can_do_for_you: '你可以为我做什么？',
-  big_data_news: '大数据领域最近有什么有趣的事？'
+  big_data_news: '大数据领域最近有什么有趣的事？',
+  ai_disabled_msg: '抱歉，你还没有配置大模型，无法使用 AI 助理',
+  go_set_up: '前往配置'
 }

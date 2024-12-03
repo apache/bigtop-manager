@@ -36,6 +36,8 @@ export interface ChatThread {
   threadId?: number | string
   authId?: number | string
   platformId?: number | string
+  platformName?: string
+  model?: string
   name?: string
   createTime?: string
   updateTime?: string
@@ -45,4 +47,9 @@ export interface ChatMessageItem {
   sender: SenderType
   message: string
   createTime?: string
+}
+
+export interface ReceivedMessageItem {
+  content?: string
+  finishReason?: 'completed' | null
 }

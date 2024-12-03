@@ -28,6 +28,7 @@
   import ChatMessage from './chat-message.vue'
   import type { ChatMessageItem } from '@/api/ai-assistant/types'
   import type { GroupItem } from '@/components/common/button-group/types'
+  import { useRouter } from 'vue-router'
 
   enum Action {
     ADD,
@@ -39,10 +40,11 @@
 
   type ActionType = keyof typeof Action
 
+  const router = useRouter()
   const aiChatStore = useAiChatStore()
   const llmConfigStore = useLlmConfigStore()
-  const { currThread, chatRecords, threads, messageReceiver, loadingChatRecords } = storeToRefs(aiChatStore)
-  const { currAuthPlatform: currPlatform } = storeToRefs(llmConfigStore)
+  const { currThread, chatRecords, threads, messageReceiver, hasActivePlatform, loadingChatRecords } =
+    storeToRefs(aiChatStore)
 
   const open = ref(false)
   const title = ref('aiAssistant.ai_assistant')
@@ -54,19 +56,24 @@
   const noChat = computed(() => Object.keys(currThread.value).length === 0 || chatRecords.value.length === 0)
   const historyVisible = computed(() => fullScreen.value && open.value)
   const historyType = computed(() => (historyVisible.value ? 'large' : 'small'))
-  const authPlatformCached = computed(() => Object.keys(currPlatform.value || {}).length > 0)
   const recordReceiver = computed((): ChatMessageItem => ({ sender: 'AI', message: messageReceiver.value }))
-  const checkActions = computed(() =>
-    fullScreen.value ? filterActions(['EXITSCREEN', 'CLOSE']) : filterActions(['ADD', 'RECORDS', 'FULLSCREEN', 'CLOSE'])
-  )
+  const checkActions = computed(() => {
+    if (!hasActivePlatform.value) {
+      return filterActions(['CLOSE'])
+    }
+    return fullScreen.value
+      ? filterActions(['EXITSCREEN', 'CLOSE'])
+      : filterActions(['ADD', 'RECORDS', 'FULLSCREEN', 'CLOSE'])
+  })
   const addIcon = computed(() => (threads.value.length >= 10 ? 'plus_gray' : 'plus'))
+  const addState = computed(() => threads.value.length >= 10 || loadingChatRecords.value || !hasActivePlatform.value)
   const actionGroup = computed((): GroupItem<ActionType>[] => [
     {
       tip: 'new_chat',
       icon: addIcon.value,
       action: 'ADD',
       clickEvent: aiChatStore.createChatThread,
-      disabled: threads.value.length >= 10 || loadingChatRecords.value
+      disabled: addState.value
     },
     {
       tip: 'history',
@@ -74,8 +81,18 @@
       action: 'RECORDS',
       clickEvent: openRecord
     },
-    { tip: 'full_screen', icon: 'full_screen', action: 'FULLSCREEN', clickEvent: toggleFullScreen },
-    { tip: 'exit_screen', icon: 'exit_screen', action: 'EXITSCREEN', clickEvent: toggleFullScreen },
+    {
+      tip: 'full_screen',
+      icon: 'full_screen',
+      action: 'FULLSCREEN',
+      clickEvent: toggleFullScreen
+    },
+    {
+      tip: 'exit_screen',
+      icon: 'exit_screen',
+      action: 'EXITSCREEN',
+      clickEvent: toggleFullScreen
+    },
     { icon: 'close', action: 'CLOSE', clickEvent: () => controlVisible(false) }
   ])
 
@@ -112,18 +129,8 @@
     actionGroup.value.forEach(({ action, clickEvent }) => {
       action && actionHandlers.value.set(action, clickEvent || (() => {}))
     })
-    !authPlatformCached.value && (await llmConfigStore.getAuthorizedPlatforms())
-    if (Object.keys(currThread.value).length == 0) {
-      if (threads.value.length === 0) {
-        aiChatStore.createChatThread()
-      } else {
-        currThread.value = threads.value[0]
-        aiChatStore.getThreadRecords()
-      }
-    } else {
-      aiChatStore.getThreadsFromAuthPlatform()
-      aiChatStore.getThreadRecords()
-    }
+    !hasActivePlatform.value && (await llmConfigStore.getAuthorizedPlatforms())
+    aiChatStore.initCurrThread()
   }
 
   const filterActions = (showActions?: ActionType[]) => {
@@ -134,6 +141,11 @@
   const onActions = (item: GroupItem<ActionType>) => {
     const handler = item.action && actionHandlers.value.get(item.action)
     handler ? handler() : console.warn(`Unknown action: ${item.action}`)
+  }
+
+  const goSetUpLlmConfig = () => {
+    controlVisible(false)
+    router.push('/system-mange/llm-config')
   }
 
   defineExpose({
@@ -163,7 +175,7 @@
       <chat-history ref="smallChatHistoryRef" :history-type="historyType" />
       <div class="chat">
         <a-spin :spinning="loadingChatRecords">
-          <empty-content v-if="noChat" />
+          <empty-content v-if="noChat" @go-set-up="goSetUpLlmConfig" />
           <template v-else>
             <div v-if="open" v-auto-scroll class="chat-content">
               <chat-message v-for="(record, idx) in chatRecords" :key="idx" :record="record" />
@@ -172,10 +184,10 @@
           </template>
         </a-spin>
       </div>
-      <template #footer>
+      <template v-if="hasActivePlatform" #footer>
         <chat-input />
         <a-typography-text type="secondary" class="ai-assistant-desc">
-          {{ currPlatform?.platformName }} {{ currPlatform?.model }}
+          {{ currThread?.platformName }} {{ currThread?.model }}
         </a-typography-text>
       </template>
     </a-drawer>

@@ -20,13 +20,26 @@
   import { shallowRef } from 'vue'
   import { usePngImage } from '@/utils/tools'
   import { useAiChatStore } from '@/store/ai-assistant'
+  import { storeToRefs } from 'pinia'
+
+  interface Emits {
+    (event: 'goSetUp'): void
+  }
+
+  const emits = defineEmits<Emits>()
 
   const imageStyle = shallowRef({
     height: '200px',
     marginBottom: '16px'
   })
   const aiChatStore = useAiChatStore()
+  const { hasActivePlatform } = storeToRefs(aiChatStore)
   const emptyState = usePngImage('ai_helper')
+  const disabledState = usePngImage('ai_disabled')
+
+  const goSetUpLlmConfig = () => {
+    emits('goSetUp')
+  }
 
   const quickAsk = (message: string) => {
     aiChatStore.setChatRecordForSender('USER', message)
@@ -36,25 +49,33 @@
 
 <template>
   <div class="empty-content">
-    <a-empty :image="emptyState" :image-style="imageStyle">
+    <a-empty :image="hasActivePlatform ? emptyState : disabledState" :image-style="imageStyle">
       <template #description>
-        <div class="say-hello">
-          <a-typography-title :level="5">
-            <div> {{ $t('aiAssistant.greeting') }} </div>
-            <div> {{ $t('aiAssistant.help') }} </div>
-          </a-typography-title>
-        </div>
-        <div class="feature-desc">
-          <a-typography-link underline @click="quickAsk($t('aiAssistant.bigtop_manager'))">
-            {{ $t('aiAssistant.bigtop_manager') }}
-          </a-typography-link>
-          <a-typography-link underline @click="quickAsk($t('aiAssistant.can_do_for_you'))">
-            {{ $t('aiAssistant.can_do_for_you') }}
-          </a-typography-link>
-          <a-typography-link underline @click="quickAsk($t('aiAssistant.big_data_news'))">
-            {{ $t('aiAssistant.big_data_news') }}
-          </a-typography-link>
-        </div>
+        <template v-if="hasActivePlatform">
+          <div class="say-hello">
+            <a-typography-title :level="5">
+              <div> {{ $t('aiAssistant.greeting') }} </div>
+              <div> {{ $t('aiAssistant.help') }} </div>
+            </a-typography-title>
+          </div>
+          <div class="feature-desc">
+            <a-typography-link underline @click="quickAsk($t('aiAssistant.bigtop_manager'))">
+              {{ $t('aiAssistant.bigtop_manager') }}
+            </a-typography-link>
+            <a-typography-link underline @click="quickAsk($t('aiAssistant.can_do_for_you'))">
+              {{ $t('aiAssistant.can_do_for_you') }}
+            </a-typography-link>
+            <a-typography-link underline @click="quickAsk($t('aiAssistant.big_data_news'))">
+              {{ $t('aiAssistant.big_data_news') }}
+            </a-typography-link>
+          </div>
+        </template>
+        <template v-else>
+          <a-typography-text>
+            <div> {{ $t('aiAssistant.ai_disabled_msg') }} </div>
+          </a-typography-text>
+          <a-typography-link underline @click="goSetUpLlmConfig"> {{ $t('aiAssistant.go_set_up') }} </a-typography-link>
+        </template>
       </template>
     </a-empty>
   </div>

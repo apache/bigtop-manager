@@ -25,7 +25,7 @@ import { SenderType } from '@/api/ai-assistant/types'
 import { getRandomFromTimestamp } from '@/utils/tools'
 import { useLlmConfigStore } from '../llm-config'
 import type { AxiosProgressEvent, Canceler } from 'axios'
-import type { ChatMessageItem, ChatThread, ThreadId } from '@/api/ai-assistant/types'
+import type { ChatMessageItem, ChatThread, ReceivedMessageItem, ThreadId } from '@/api/ai-assistant/types'
 
 export const useAiChatStore = defineStore(
   'ai-assistant',
@@ -41,6 +41,7 @@ export const useAiChatStore = defineStore(
     const isSending = ref(false)
     const loadingChatRecords = ref(false)
 
+    const hasActivePlatform = computed(() => Object.keys(currAuthPlatform.value || {}).length > 0)
     const threadLimit = computed(() => threads.value.length >= 10)
 
     watch(currAuthPlatform, (val, oldVal) => {
@@ -59,11 +60,31 @@ export const useAiChatStore = defineStore(
       loadingChatRecords.value = false
     }
 
+    const initCurrThread = () => {
+      if (Object.keys(currThread.value).length == 0) {
+        if (threads.value.length === 0) {
+          createChatThread()
+        } else {
+          currThread.value = threads.value[0]
+          getThreadRecords()
+        }
+      } else {
+        getThreadsFromAuthPlatform()
+        getThreadRecords()
+      }
+    }
+
     const createChatThread = async () => {
-      const tempName = `thread-${getRandomFromTimestamp()}`
-      const data = await ai.createChatThread({ id: null, name: tempName })
-      getThread(data.threadId as ThreadId)
-      getThreadsFromAuthPlatform()
+      try {
+        const tempName = `thread-${getRandomFromTimestamp()}`
+        const data = await ai.createChatThread({ id: null, name: tempName })
+        if (data) {
+          getThread(data.threadId as ThreadId)
+          getThreadsFromAuthPlatform()
+        }
+      } catch (error) {
+        console.log('error :>> ', error)
+      }
     }
 
     const updateChatThread = async (thread: ChatThread, newName: string) => {
@@ -142,11 +163,22 @@ export const useAiChatStore = defineStore(
       }
     }
 
+    const checkReceiveMessageError = (item: ReceivedMessageItem) => {
+      if (item.content != undefined) {
+        return item.content
+      } else if (item.finishReason && item.finishReason != 'completed') {
+        return item.finishReason
+      }
+    }
+
     const onMessageReceive = ({ event }: AxiosProgressEvent) => {
       messageReceiver.value = event.target.responseText
         .split('data:')
-        .map((s: string) => {
-          return s.trimEnd()
+        .map((stream: string) => {
+          if (stream.length > 0) {
+            const parsedMsgInfo = JSON.parse(stream.trimEnd())
+            return checkReceiveMessageError(parsedMsgInfo)
+          }
         })
         .join('')
     }
@@ -182,6 +214,8 @@ export const useAiChatStore = defineStore(
       isSending,
       loadingChatRecords,
       threadLimit,
+      hasActivePlatform,
+      initCurrThread,
       talkWithChatbot,
       createChatThread,
       updateChatThread,
