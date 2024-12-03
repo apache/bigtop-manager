@@ -45,6 +45,7 @@
   const llmConfigStore = useLlmConfigStore()
   const { currThread, chatRecords, threads, messageReceiver, hasActivePlatform, loadingChatRecords } =
     storeToRefs(aiChatStore)
+  const { currAuthPlatform } = storeToRefs(llmConfigStore)
 
   const open = ref(false)
   const title = ref('aiAssistant.ai_assistant')
@@ -53,7 +54,7 @@
   const smallChatHistoryRef = ref<InstanceType<typeof ChatHistory> | null>(null)
 
   const width = computed(() => (fullScreen.value ? 'calc(100% - 300px)' : 450))
-  const noChat = computed(() => Object.keys(currThread.value).length === 0 || chatRecords.value.length === 0)
+  const noChat = computed(() => Object.keys(currThread.value || {}).length === 0 || chatRecords.value.length === 0)
   const historyVisible = computed(() => fullScreen.value && open.value)
   const historyType = computed(() => (historyVisible.value ? 'large' : 'small'))
   const recordReceiver = computed((): ChatMessageItem => ({ sender: 'AI', message: messageReceiver.value }))
@@ -72,7 +73,7 @@
       tip: 'new_chat',
       icon: addIcon.value,
       action: 'ADD',
-      clickEvent: aiChatStore.createChatThread,
+      clickEvent: () => aiChatStore.createChatThread(),
       disabled: addState.value
     },
     {
@@ -115,6 +116,7 @@
 
   const controlVisible = (visible: boolean = true) => {
     open.value = visible
+    fullScreen.value = false
   }
 
   const openRecord = () => {
@@ -129,7 +131,7 @@
     actionGroup.value.forEach(({ action, clickEvent }) => {
       action && actionHandlers.value.set(action, clickEvent || (() => {}))
     })
-    !hasActivePlatform.value && (await llmConfigStore.getAuthorizedPlatforms())
+    !hasActivePlatform.value && (await llmConfigStore.getAuthorizedPlatforms(false))
     aiChatStore.initCurrThread()
   }
 
@@ -187,7 +189,7 @@
       <template v-if="hasActivePlatform" #footer>
         <chat-input />
         <a-typography-text type="secondary" class="ai-assistant-desc">
-          {{ currThread?.platformName }} {{ currThread?.model }}
+          {{ currAuthPlatform?.platformName }} {{ currAuthPlatform?.model }}
         </a-typography-text>
       </template>
     </a-drawer>

@@ -45,7 +45,7 @@ export const useAiChatStore = defineStore(
     const threadLimit = computed(() => threads.value.length >= 10)
 
     watch(currAuthPlatform, (val, oldVal) => {
-      if (val == undefined) {
+      if (val == undefined || !hasActivePlatform.value) {
         currThread.value = {}
       } else if (val.llmConfigId !== oldVal?.llmConfigId) {
         currThread.value = {}
@@ -61,6 +61,9 @@ export const useAiChatStore = defineStore(
     }
 
     const initCurrThread = () => {
+      if (!hasActivePlatform.value) {
+        return
+      }
       if (Object.keys(currThread.value).length == 0) {
         if (threads.value.length === 0) {
           createChatThread()
@@ -74,12 +77,12 @@ export const useAiChatStore = defineStore(
       }
     }
 
-    const createChatThread = async () => {
+    const createChatThread = async (quickCreate = false) => {
       try {
         const tempName = `thread-${getRandomFromTimestamp()}`
         const data = await ai.createChatThread({ id: null, name: tempName })
         if (data) {
-          getThread(data.threadId as ThreadId)
+          await getThread(data.threadId as ThreadId, quickCreate)
           getThreadsFromAuthPlatform()
         }
       } catch (error) {
@@ -107,11 +110,11 @@ export const useAiChatStore = defineStore(
       }
     }
 
-    const getThread = async (threadId: ThreadId) => {
+    const getThread = async (threadId: ThreadId, quickCreate = false) => {
       try {
         const data = await ai.getThread(threadId)
         currThread.value = data
-        getThreadRecords()
+        !quickCreate && (await getThreadRecords())
       } catch (error) {
         console.log('error :>> ', error)
       }
@@ -156,6 +159,9 @@ export const useAiChatStore = defineStore(
 
     const collectReceiveMessage = async (message: string) => {
       try {
+        if (threads.value.length === 0) {
+          await createChatThread(true)
+        }
         const res = await talkWithChatbot(message)
         setChatRecordForSender('AI', res?.message || '')
       } catch (error) {

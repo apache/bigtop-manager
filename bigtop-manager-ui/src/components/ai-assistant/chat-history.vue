@@ -61,7 +61,7 @@
   })
 
   watch(currThread, (val) => {
-    selectKey.value = [val.threadId || '']
+    selectKey.value = [val?.threadId || '']
   })
 
   watch(
@@ -69,8 +69,8 @@
     async ([open, visible]) => {
       if (open || visible) {
         await aiChatStore.getThreadsFromAuthPlatform()
-        Object.keys(currThread.value).length <= 0 && (currThread.value = threads.value[0])
-        selectKey.value = [currThread.value.threadId || '']
+        Object.keys(currThread.value || {}).length <= 0 && (currThread.value = threads.value[0])
+        selectKey.value = [currThread.value?.threadId || '']
       }
     },
     {
@@ -109,12 +109,12 @@
           if (threadCounts === 0) {
             currThread.value = {}
           } else {
-            if (idx >= threadCounts) {
-              currThread.value = threads.value[0]
-            } else {
+            const isEqual = thread.threadId === currThread.value.threadId
+            idx >= threadCounts && (currThread.value = threads.value[0])
+            if (isEqual) {
               currThread.value = threads.value[idx]
+              aiChatStore.getThread(currThread.value.threadId as ThreadId)
             }
-            aiChatStore.getThread(currThread.value.threadId as ThreadId)
           }
         }
       }
@@ -210,7 +210,7 @@
           </div>
         </main>
         <footer>
-          <a-button type="primary" :disabled="threadLimit" @click="aiChatStore.createChatThread">
+          <a-button type="primary" :disabled="threadLimit" @click="aiChatStore.createChatThread(false)">
             {{ $t('aiAssistant.new_chat') }}
           </a-button>
         </footer>

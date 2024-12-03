@@ -26,13 +26,16 @@
 
   const { t } = useI18n()
   const aiChatStore = useAiChatStore()
-  const { isSending } = storeToRefs(aiChatStore)
+  const { isSending, threads, chatRecords } = storeToRefs(aiChatStore)
   const chatMessage = ref('')
 
   const sendMessage = async () => {
     if (chatMessage.value === '') {
       message.error(t('aiAssistant.message_cannot_be_empty'))
       return
+    }
+    if (threads.value.length === 0) {
+      chatRecords.value = []
     }
     aiChatStore.setChatRecordForSender('USER', chatMessage.value)
     aiChatStore.collectReceiveMessage(chatMessage.value)

@@ -93,9 +93,9 @@ export const useLlmConfigStore = defineStore(
       } as UpdateAuthorizedPlatformConfig
     }
 
-    const getAuthorizedPlatforms = async () => {
+    const getAuthorizedPlatforms = async (hasLoading = true) => {
       try {
-        loading.value = true
+        hasLoading && (loading.value = true)
         authorizedPlatforms.value = await llmServer.getAuthorizedPlatforms()
       } catch (error) {
         console.log('error :>> ', error)

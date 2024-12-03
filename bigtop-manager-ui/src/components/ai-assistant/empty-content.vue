@@ -33,7 +33,7 @@
     marginBottom: '16px'
   })
   const aiChatStore = useAiChatStore()
-  const { hasActivePlatform } = storeToRefs(aiChatStore)
+  const { hasActivePlatform, threads, chatRecords } = storeToRefs(aiChatStore)
   const emptyState = usePngImage('ai_helper')
   const disabledState = usePngImage('ai_disabled')
 
@@ -42,6 +42,9 @@
   }
 
   const quickAsk = (message: string) => {
+    if (threads.value.length === 0) {
+      chatRecords.value = []
+    }
     aiChatStore.setChatRecordForSender('USER', message)
     aiChatStore.collectReceiveMessage(message)
   }
