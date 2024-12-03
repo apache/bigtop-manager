@@ -25,6 +25,4 @@ public class TalkVO {
     private String content;
 
     private String finishReason;
-
-    public TalkVO() {}
 }
