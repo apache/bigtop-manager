@@ -65,7 +65,7 @@ export const createChatThread = (data: CreateChatThread): Promise<ChatThread> =>
   })
 }
 
-export interface chatMessagesRes<T> {
+export interface ChatMessagesRes<T> {
   promise: Promise<T>
   cancel: () => void
 }
@@ -74,7 +74,7 @@ export const talkWithChatbot = (
   threadId: ThreadId,
   data: { message: string },
   func: Function
-): chatMessagesRes<AxiosResponse<ChatMessageItem[], any>> => {
+): ChatMessagesRes<AxiosResponse<ChatMessageItem[], any>> => {
   const source: CancelTokenSource = axios.CancelToken.source()
 
   const promise = request({
