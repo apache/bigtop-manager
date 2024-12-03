@@ -197,7 +197,7 @@ export const useAiChatStore = defineStore(
   },
   {
     persist: {
-      storage: localStorage,
+      storage: sessionStorage,
       paths: ['currThread']
     }
   }

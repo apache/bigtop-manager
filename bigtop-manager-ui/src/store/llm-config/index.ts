@@ -219,7 +219,7 @@ export const useLlmConfigStore = defineStore(
   },
   {
     persist: {
-      storage: localStorage,
+      storage: sessionStorage,
       paths: ['currAuthPlatform']
     }
   }
