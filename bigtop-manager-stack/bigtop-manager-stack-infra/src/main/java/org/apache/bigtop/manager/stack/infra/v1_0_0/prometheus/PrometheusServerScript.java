@@ -54,7 +54,10 @@ public class PrometheusServerScript extends AbstractServerScript {
                 "nohup {0}/prometheus --config.file={0}/prometheus.yml --storage.tsdb.path={0}/data > {0}/nohup.out 2>&1 &",
                 prometheusParams.serviceHome());
         try {
-            LinuxOSUtils.sudoExecCmd(cmd, prometheusParams.user());
+            ShellResult shellResult = LinuxOSUtils.sudoExecCmd(cmd, prometheusParams.user());
+            if (shellResult.getExitCode() != 0) {
+                throw new StackException("Failed to start Prometheus: {0}", shellResult.getErrMsg());
+            }
             long startTime = System.currentTimeMillis();
             long maxWaitTime = 5000;
             long pollInterval = 500;

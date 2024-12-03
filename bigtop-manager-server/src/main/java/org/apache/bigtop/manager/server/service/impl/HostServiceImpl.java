@@ -184,7 +184,9 @@ public class HostServiceImpl implements HostService {
             // Download & Extract agent tarball
             String repoUrl = archRepoMap.get(arch).getBaseUrl();
             String tarballUrl = repoUrl + "/bigtop-manager-agent.tar.gz";
-            String command = "curl -L " + tarballUrl + " | tar -xz -C " + path;
+            String command = "sudo mkdir -p " + path + " &&"
+                    + " sudo chown -R " + hostDTO.getSshUser() + ":" + hostDTO.getSshUser() + " " + path
+                    + " && curl -L " + tarballUrl + " | tar -xz -C " + path;
             ShellResult result = execCommandOnRemoteHost(hostDTO, hostDTO.getHostname(), command);
             if (result.getExitCode() != MessageConstants.SUCCESS_CODE) {
                 hostPO.setErrInfo(result.getErrMsg());
