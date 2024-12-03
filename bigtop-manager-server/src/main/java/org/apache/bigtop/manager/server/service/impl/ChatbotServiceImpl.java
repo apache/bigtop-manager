@@ -217,7 +217,6 @@ public class ChatbotServiceImpl implements ChatbotService {
                     }
                 },
                 throwable -> {
-                    // 流处理过程中发生错误，返回错误信息
                     try {
                         TalkVO errorVO = new TalkVO();
                         errorVO.setContent(null);
@@ -229,7 +228,6 @@ public class ChatbotServiceImpl implements ChatbotService {
                     emitter.completeWithError(throwable);
                 },
                 () -> {
-                    // 流完成时发送最终完成标志
                     try {
                         TalkVO finishVO = new TalkVO();
                         finishVO.setContent(null);
