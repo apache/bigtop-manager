@@ -18,12 +18,15 @@
  */
 package org.apache.bigtop.manager.server.model.converter;
 
+import org.apache.bigtop.manager.dao.po.AuthPlatformPO;
 import org.apache.bigtop.manager.dao.po.ChatThreadPO;
+import org.apache.bigtop.manager.dao.po.PlatformPO;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.dto.ChatThreadDTO;
 import org.apache.bigtop.manager.server.model.req.ChatbotThreadReq;
 import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
 
+import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -35,7 +38,10 @@ public interface ChatThreadConverter {
     ChatThreadConverter INSTANCE = Mappers.getMapper(ChatThreadConverter.class);
 
     @Mapping(source = "id", target = "threadId")
-    ChatThreadVO fromPO2VO(ChatThreadPO platformAuthorizedPO);
+    @Mapping(target = "model", expression = "java(authPlatformPO.getModel())")
+    @Mapping(target = "platformName", expression = "java(platformPO.getName())")
+    ChatThreadVO fromPO2VO(
+            ChatThreadPO platformAuthorizedPO, @Context AuthPlatformPO authPlatformPO, @Context PlatformPO platformPO);
 
     ChatThreadPO fromDTO2PO(ChatThreadDTO chatThreadDTO);
 
