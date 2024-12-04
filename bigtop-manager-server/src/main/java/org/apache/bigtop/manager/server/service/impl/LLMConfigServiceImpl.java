@@ -276,6 +276,21 @@ public class LLMConfigServiceImpl implements LLMConfigService {
             throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED);
         }
 
+        String newModel = authPlatformDTO.getModel();
+        if (newModel != null) {
+            if (AuthPlatformStatus.isActive(authPlatformPO.getStatus())) {
+                throw new ApiException(ApiExceptionEnum.PLATFORM_IS_ACTIVE);
+            }
+
+            authPlatformPO.setModel(newModel);
+
+            if (authPlatformDTO.getTestPassed()) {
+                authPlatformPO.setStatus(AuthPlatformStatus.AVAILABLE.getCode());
+            } else {
+                authPlatformPO.setStatus(AuthPlatformStatus.UNAVAILABLE.getCode());
+            }
+        }
+
         authPlatformPO.setName(authPlatformDTO.getName());
         authPlatformPO.setDesc(authPlatformDTO.getDesc());
 
@@ -327,5 +342,14 @@ public class LLMConfigServiceImpl implements LLMConfigService {
 
         return AuthPlatformConverter.INSTANCE.fromPO2VO(
                 authPlatformPO, platformDao.findById(authPlatformPO.getPlatformId()));
+    }
+
+    @Override
+    public PlatformVO getPlatform(Long id) {
+        PlatformPO platformPO = platformDao.findById(id);
+        if (platformPO == null) {
+            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
+        }
+        return PlatformConverter.INSTANCE.fromPO2VO(platformPO);
     }
 }

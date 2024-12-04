@@ -21,12 +21,8 @@ package org.apache.bigtop.manager.server.model.vo;
 import lombok.Data;
 
 @Data
-public class PlatformVO {
-    private Long id;
+public class TalkVO {
+    private String content;
 
-    private String name;
-
-    private String supportModels;
-
-    private String desc;
+    private String finishReason;
 }
