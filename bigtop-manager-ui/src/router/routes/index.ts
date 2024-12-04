@@ -24,8 +24,7 @@ const dynamicRoutesFiles = import.meta.glob('./modules/**/*.ts', {
   eager: true
 })
 
-export const dynamicRoutes: RouteRecordRaw[] =
-  mergeRouteModules(dynamicRoutesFiles)
+export const dynamicRoutes: RouteRecordRaw[] = mergeRouteModules(dynamicRoutesFiles)
 
 const routes: RouteRecordRaw[] = [
   {
@@ -34,7 +33,7 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/',
-    redirect: '/cluster-mange/'
+    redirect: '/cluster-manage/'
   },
   ...dynamicRoutes,
   {

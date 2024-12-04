@@ -25,9 +25,7 @@
   <a-layout-footer>
     <div class="copyright">
       {{ `Copyright ©2011-${dayjs().year()}` }}
-      <a href="https://www.apache.org" target="_blank">
-        The Apache Software Foundation
-      </a>
+      <a href="https://www.apache.org" target="_blank"> The Apache Software Foundation </a>
       . All rights reserved.
     </div>
   </a-layout-footer>

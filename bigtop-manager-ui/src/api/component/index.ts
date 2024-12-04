@@ -20,9 +20,7 @@
 import { HostComponentVO } from '@/api/component/types.ts'
 import request from '@/api/request.ts'
 
-export const getHostComponents = (
-  clusterId: number
-): Promise<HostComponentVO[]> => {
+export const getHostComponents = (clusterId: number): Promise<HostComponentVO[]> => {
   return request({
     method: 'get',
     url: '/clusters/' + clusterId + '/host-components'

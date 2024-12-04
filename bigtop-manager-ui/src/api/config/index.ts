@@ -20,18 +20,14 @@
 import request from '@/api/request.ts'
 import { ServiceConfigVO } from '@/api/config/types.ts'
 
-export const getLatestConfigs = (
-  clusterId: number
-): Promise<ServiceConfigVO[]> => {
+export const getLatestConfigs = (clusterId: number): Promise<ServiceConfigVO[]> => {
   return request({
     method: 'get',
     url: '/clusters/' + clusterId + '/configurations/latest'
   })
 }
 
-export const getAllConfigs = (
-  clusterId: number
-): Promise<ServiceConfigVO[]> => {
+export const getAllConfigs = (clusterId: number): Promise<ServiceConfigVO[]> => {
   return request({
     method: 'get',
     url: '/clusters/' + clusterId + '/configurations'

@@ -45,32 +45,15 @@
   const open = ref(false)
   const mode = ref<keyof typeof Mode>('ADD')
   const autoFormRef = ref<Comp.AutoFormInstance | null>(null)
-  const disableFormKeys = shallowRef(['platformId', 'model'])
-  const {
-    loading,
-    loadingTest,
-    currPlatform,
-    formKeys,
-    platforms,
-    isDisabled,
-    formCredentials,
-    supportModels
-  } = storeToRefs(llmConfigStore)
+  const disableFormKeys = shallowRef(['platformId'])
+  const { loading, loadingTest, currPlatform, formKeys, platforms, isDisabled, formCredentials, supportModels } =
+    storeToRefs(llmConfigStore)
 
   const isEdit = computed(() => mode.value === 'EDIT')
-  const disabledItems = computed(() =>
-    isEdit.value ? [...disableFormKeys.value, ...formKeys.value] : []
-  )
+  const disabledItems = computed(() => (isEdit.value ? [...disableFormKeys.value, ...formKeys.value] : []))
   const formItems = computed((): FormItemState[] => {
-    const newFormItems =
-      formCredentials.value?.map((v) =>
-        createNewFormItem('input', v.name, v.displayName)
-      ) ?? []
-    return [
-      ...formItemConfig.value.slice(0, 2),
-      ...newFormItems,
-      ...formItemConfig.value.slice(2)
-    ]
+    const newFormItems = formCredentials.value?.map((v) => createNewFormItem('input', v.name, v.displayName)) ?? []
+    return [...formItemConfig.value.slice(0, 2), ...newFormItems, ...formItemConfig.value.slice(2)]
   })
 
   watchEffect(() => {
@@ -90,15 +73,17 @@
     currPlatform.value = payload ?? currPlatform.value
     await llmConfigStore.getPlatforms()
     bindPropToFormItems()
-    isEdit.value && llmConfigStore.getAuthPlatformDetail()
+    if (isEdit.value) {
+      await llmConfigStore.getPlatformCredentials()
+      autoFormRef?.value?.setOptions('model', supportModels.value || [])
+      llmConfigStore.getAuthPlatformDetail()
+    }
   }
 
   const handleOk = async () => {
     const validate = await autoFormRef.value?.getFormValidation()
     if (!validate) return
-    const api = isEdit.value
-      ? llmConfigStore.updateAuthPlatform
-      : llmConfigStore.addAuthorizedPlatform
+    const api = isEdit.value ? llmConfigStore.updateAuthPlatform : llmConfigStore.addAuthorizedPlatform
     const success = await api()
     if (success) {
       const text = isEdit.value ? 'common.update_success' : 'common.created'
@@ -155,12 +140,7 @@
       <template #footer>
         <footer>
           <a-space size="middle">
-            <a-button
-              :disabled="loading"
-              :loading="loadingTest"
-              type="primary"
-              @click="handleTest"
-            >
+            <a-button :disabled="loading" :loading="loadingTest" type="primary" @click="handleTest">
               {{ $t('llmConfig.test') }}
             </a-button>
           </a-space>
@@ -168,12 +148,7 @@
             <a-button :disabled="isDisabled" @click="handleCancel">
               {{ $t('common.cancel') }}
             </a-button>
-            <a-button
-              :disabled="loadingTest"
-              :loading="loading"
-              type="primary"
-              @click="handleOk"
-            >
+            <a-button :disabled="loadingTest" :loading="loading" type="primary" @click="handleOk">
               {{ $t('common.confirm') }}
             </a-button>
           </a-space>

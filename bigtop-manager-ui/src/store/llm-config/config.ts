@@ -33,17 +33,13 @@ export function useFormItemConfig() {
         rules: [
           {
             required: true,
-            message: t('common.enter_error', [
-              `${t('llmConfig.name')}`.toLowerCase()
-            ]),
+            message: t('common.enter_error', [`${t('llmConfig.name')}`.toLowerCase()]),
             trigger: 'blur'
           }
         ]
       },
       controlProps: {
-        placeholder: t('common.enter_error', [
-          `${t('llmConfig.name')}`.toLowerCase()
-        ])
+        placeholder: t('common.enter_error', [`${t('llmConfig.name')}`.toLowerCase()])
       }
     },
     {
@@ -60,17 +56,13 @@ export function useFormItemConfig() {
         rules: [
           {
             required: true,
-            message: t('common.select_error', [
-              t('llmConfig.platform_name').toLowerCase()
-            ]),
+            message: t('common.select_error', [t('llmConfig.platform_name').toLowerCase()]),
             trigger: 'blur'
           }
         ]
       },
       controlProps: {
-        placeholder: t('common.select_error', [
-          t('llmConfig.platform_name').toLowerCase()
-        ])
+        placeholder: t('common.select_error', [t('llmConfig.platform_name').toLowerCase()])
       }
     },
     {
@@ -82,17 +74,13 @@ export function useFormItemConfig() {
         rules: [
           {
             required: true,
-            message: t('common.select_error', [
-              t('llmConfig.model').toLowerCase()
-            ]),
+            message: t('common.select_error', [t('llmConfig.model').toLowerCase()]),
             trigger: 'blur'
           }
         ]
       },
       controlProps: {
-        placeholder: t('common.select_error', [
-          t('llmConfig.model').toLowerCase()
-        ])
+        placeholder: t('common.select_error', [t('llmConfig.model').toLowerCase()])
       }
     },
     {
@@ -114,11 +102,7 @@ export function useFormItemConfig() {
       }
     }
   ])
-  const createNewFormItem = (
-    type: string,
-    field: string,
-    label: string
-  ): FormItemState => {
+  const createNewFormItem = (type: string, field: string, label: string): FormItemState => {
     return {
       type,
       field,

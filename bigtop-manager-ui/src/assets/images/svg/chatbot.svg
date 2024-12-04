@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one
+  ~ or more contributor license agreements.  See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership.  The ASF licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24" height="24"
+  viewBox="0 0 24 24" fill="none">
+  <path fill="rgba(51, 51, 51, 1)"
+    d="M5.5 8L18.5 8C19.6046 8 20.5 8.89543 20.5 10L20.5 20C20.5 21.1046 19.6046 22 18.5 22L5.5 22C4.39543 22 3.5 21.1046 3.5 20L3.5 10C3.5 8.89543 4.39543 8 5.5 8ZM5.5 10C5.5 10 5.5 10 5.5 10L5.5 20C5.5 20 5.5 20 5.5 20L18.5 20C18.5 20 18.5 20 18.5 20L18.5 10C18.5 10 18.5 10 18.5 10L5.5 10Z">
+  </path>
+  <circle cx="8.5" cy="13" r="1" fill="#333333">
+  </circle>
+  <circle cx="15.5" cy="13" r="1" fill="#333333">
+  </circle>
+  <path
+    d="M10 16C9.4477 16 9 16.4477 9 17C9 17.5523 9.4477 18 10 18L10 16ZM14 18C14.5523 18 15 17.5523 15 17C15 16.4477 14.5523 16 14 16L14 18ZM10 18L14 18L14 16L10 16L10 18Z"
+    fill="#333333">
+  </path>
+  <path stroke="rgba(51, 51, 51, 1)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" d="M12 5L12 9">
+  </path>
+  <path stroke="rgba(51, 51, 51, 1)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" d="M2 13L2 17">
+  </path>
+  <path stroke="rgba(51, 51, 51, 1)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" d="M22 13L22 17">
+  </path>
+  <circle cx="12" cy="4" r="1" stroke="rgba(51, 51, 51, 1)" stroke-width="2">
+  </circle>
+</svg>

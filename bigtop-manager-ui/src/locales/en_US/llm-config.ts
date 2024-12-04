@@ -26,6 +26,5 @@ export default {
   name: 'Name',
   platform_name: 'Platform',
   model: 'Model',
-  desc: 'Remark',
-  delete_authorization: 'Are you sure delete this authorization ?'
+  desc: 'Remark'
 }

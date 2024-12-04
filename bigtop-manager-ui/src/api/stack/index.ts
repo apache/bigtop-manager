@@ -29,20 +29,14 @@ export const getStacks = (): Promise<StackVO[]> => {
   })
 }
 
-export const getStackComponents = (
-  stackName: string,
-  stackVersion: string
-): Promise<ServiceComponentVO[]> => {
+export const getStackComponents = (stackName: string, stackVersion: string): Promise<ServiceComponentVO[]> => {
   return request({
     method: 'get',
     url: '/stacks/' + stackName + '/' + stackVersion + '/components'
   })
 }
 
-export const getStackConfigs = (
-  stackName: string,
-  stackVersion: string
-): Promise<ServiceConfigVO[]> => {
+export const getStackConfigs = (stackName: string, stackVersion: string): Promise<ServiceConfigVO[]> => {
   return request({
     method: 'get',
     url: '/stacks/' + stackName + '/' + stackVersion + '/configurations'

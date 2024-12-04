@@ -23,7 +23,7 @@ import pageView from '@/layouts/index.vue'
 
 const routes: RouteRecordRaw[] = [
   {
-    path: '/cluster-mange',
+    path: '/cluster-manage',
     component: pageView,
     redirect: RouteExceptions.SPECIAL_ROUTE_PATH,
     meta: {
@@ -50,7 +50,7 @@ const routes: RouteRecordRaw[] = [
           {
             name: 'ClusterDetail',
             path: RouteExceptions.DYNAMIC_ROUTE_MATCH,
-            component: () => import('@/pages/cluster-mange/cluster/index.vue'),
+            component: () => import('@/pages/cluster-manage/cluster/index.vue'),
             meta: {
               hidden: true
             }
@@ -58,7 +58,7 @@ const routes: RouteRecordRaw[] = [
           {
             name: 'ClusterCreate',
             path: 'create',
-            component: () => import('@/pages/cluster-mange/cluster/create.vue'),
+            component: () => import('@/pages/cluster-manage/cluster/create.vue'),
             meta: {
               hidden: true
             }
@@ -68,8 +68,7 @@ const routes: RouteRecordRaw[] = [
       {
         name: 'Infrastructures',
         path: 'infrastructures',
-        component: () =>
-          import('@/pages/cluster-mange/infrastructures/index.vue'),
+        component: () => import('@/pages/cluster-manage/infrastructures/index.vue'),
         meta: {
           icon: 'infrastructures',
           title: 'menu.infra'
@@ -78,7 +77,7 @@ const routes: RouteRecordRaw[] = [
       {
         name: 'Components',
         path: 'components',
-        component: () => import('@/pages/cluster-mange/components/index.vue'),
+        component: () => import('@/pages/cluster-manage/components/index.vue'),
         meta: {
           icon: 'components',
           title: 'menu.component'
@@ -87,7 +86,7 @@ const routes: RouteRecordRaw[] = [
       {
         name: 'Hosts',
         path: 'hosts',
-        redirect: '/cluster-mange/hosts/list',
+        redirect: '/cluster-manage/hosts/list',
         meta: {
           icon: 'hosts',
           title: 'menu.host'
@@ -96,19 +95,19 @@ const routes: RouteRecordRaw[] = [
           {
             name: 'List',
             path: 'list',
-            component: () => import('@/pages/cluster-mange/hosts/index.vue'),
+            component: () => import('@/pages/cluster-manage/hosts/index.vue'),
             meta: {
               hidden: true,
-              activeMenu: '/cluster-mange/hosts'
+              activeMenu: '/cluster-manage/hosts'
             }
           },
           {
             name: 'HostCreate',
             path: 'addhost',
-            component: () => import('@/pages/cluster-mange/hosts/create.vue'),
+            component: () => import('@/pages/cluster-manage/hosts/create.vue'),
             meta: {
               hidden: true,
-              activeMenu: '/cluster-mange/hosts'
+              activeMenu: '/cluster-manage/hosts'
             }
           }
         ]

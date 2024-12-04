@@ -22,11 +22,13 @@ import menu from '@/locales/en_US/menu.ts'
 import login from '@/locales/en_US/login'
 import user from '@/locales/en_US/user.ts'
 import llmConfig from '@/locales/en_US/llm-config.ts'
+import aiAssistant from '@/locales/en_US/ai-assistant.ts'
 
 export default {
   common,
   menu,
   login,
   user,
-  llmConfig
+  llmConfig,
+  aiAssistant
 }

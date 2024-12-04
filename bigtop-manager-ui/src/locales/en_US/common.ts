@@ -25,6 +25,7 @@ export default {
   action: 'Action',
   status: 'Status',
   edit: 'Edit',
+  rename: 'Rename',
   delete: 'Delete',
   disable: 'Disable',
   enable: 'Enable',
@@ -68,10 +69,10 @@ export default {
   delete_success: 'Delete successfully !',
   delete_fail: 'Delete failed!',
   delete_confirm_title: 'Delete Confirm',
-  delete_confirm_content:
-    'Delete will not be recoverable, are you sure you want to delete {0} ?',
+  delete_confirm_content: 'Delete will not be recoverable, are you sure you want to delete {0} ?',
   no_options: 'No options',
   loading_text_verifying: 'Verifying',
   enter_error: 'Please enter {0}',
-  select_error: 'Please select {0}'
+  select_error: 'Please select {0}',
+  delete_msg: 'Are you sure you want to delete this?'
 }

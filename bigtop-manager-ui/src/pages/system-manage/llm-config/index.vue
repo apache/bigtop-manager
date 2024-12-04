@@ -23,10 +23,7 @@
   import { useLlmConfigStore } from '@/store/llm-config/index'
   import { message, Modal } from 'ant-design-vue'
   import { useI18n } from 'vue-i18n'
-  import LlmItem, {
-    type ActionKeys,
-    type ExtraItem
-  } from './components/llm-item.vue'
+  import LlmItem, { type ActionKeys, type ExtraItem } from './components/llm-item.vue'
   import type { AuthorizedPlatform } from '@/api/llm-config/types'
   import addLlmItem from './components/add-llm-item.vue'
 
@@ -73,7 +70,7 @@
 
   const handleDeleteLlmConfig = (authId: string | number) => {
     Modal.confirm({
-      title: t('llmConfig.delete_authorization'),
+      title: t('common.delete_msg'),
       async onOk() {
         const success = await llmConfigStore.deleteAuthPlatform(authId)
         if (success) {
@@ -104,10 +101,7 @@
         />
         <llm-item :is-config="false" @create-llm-config="createLlmConfig" />
       </div>
-      <add-llm-item
-        ref="addLlmItemRef"
-        @on-ok="llmConfigStore.getAuthorizedPlatforms"
-      />
+      <add-llm-item ref="addLlmItemRef" @on-ok="llmConfigStore.getAuthorizedPlatforms" />
     </div>
   </a-spin>
 </template>

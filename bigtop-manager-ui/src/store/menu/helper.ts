@@ -20,7 +20,5 @@
 import { MenuItem } from './types'
 
 export const findActivePath = (menu: MenuItem): string | undefined => {
-  return menu?.children && menu?.children.length > 0
-    ? findActivePath(menu.children[0])
-    : menu?.key
+  return menu?.children && menu?.children.length > 0 ? findActivePath(menu.children[0]) : menu?.key
 }
