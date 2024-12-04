@@ -22,9 +22,9 @@ import pageView from '@/layouts/index.vue'
 
 const routes: RouteRecordRaw[] = [
   {
-    path: '/system-mange/',
+    path: '/system-manage/',
     component: pageView,
-    redirect: '/system-mange/llm-config',
+    redirect: '/system-manage/llm-config',
     meta: {
       title: 'menu.system'
     },
@@ -32,7 +32,7 @@ const routes: RouteRecordRaw[] = [
       {
         name: 'LlmConfig',
         path: 'llm-config',
-        component: () => import('@/pages/system-mange/llm-config/index.vue'),
+        component: () => import('@/pages/system-manage/llm-config/index.vue'),
         meta: {
           icon: 'llm_config',
           title: 'menu.llm_config'

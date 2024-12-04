@@ -147,7 +147,7 @@
 
   const goSetUpLlmConfig = () => {
     controlVisible(false)
-    router.push('/system-mange/llm-config')
+    router.push('/system-manage/llm-config')
   }
 
   defineExpose({

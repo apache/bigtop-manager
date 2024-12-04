@@ -33,7 +33,7 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/',
-    redirect: '/cluster-mange/'
+    redirect: '/cluster-manage/'
   },
   ...dynamicRoutes,
   {
