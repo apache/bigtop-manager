@@ -26,6 +26,7 @@ export default {
   status: '状态',
   edit: '编辑',
   delete: '删除',
+  rename: '重命名',
   disable: '停用',
   enable: '使用',
   submit: '提交',
@@ -72,5 +73,6 @@ export default {
   no_options: '暂无选项',
   loading_text_verifying: '校验中',
   enter_error: '请输入{0}',
-  select_error: '请选择{0}'
+  select_error: '请选择{0}',
+  delete_msg: '确认要删除该记录吗？'
 }

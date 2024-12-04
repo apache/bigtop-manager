@@ -28,9 +28,5 @@ public class PlatformVO {
 
     private String supportModels;
 
-    public PlatformVO(Long id, String name, String models) {
-        this.id = id;
-        this.name = name;
-        this.supportModels = models;
-    }
+    private String desc;
 }

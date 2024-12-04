@@ -58,6 +58,9 @@ public class ComponentPO extends BasePO implements Serializable {
     private String serviceName;
 
     @Transient
+    private String serviceUser;
+
+    @Transient
     private String serviceDisplayName;
 
     @Transient

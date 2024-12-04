@@ -26,6 +26,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 
 @Slf4j
 public class ProjectPathUtils {
@@ -38,8 +39,26 @@ public class ProjectPathUtils {
         return getProjectStoreDir() + File.separator + "keys";
     }
 
+    public static String getServerStackPath() {
+        return getProjectResourcesDir() + File.separator + "stacks";
+    }
+
     public static String getAgentCachePath() {
         return getProjectStoreDir() + File.separator + "agent-caches";
+    }
+
+    private static String getProjectResourcesDir() {
+        if (Environments.isDevMode()) {
+            return Objects.requireNonNull(ProjectPathUtils.class.getResource("/"))
+                    .getPath();
+        } else {
+            File file = new File(ProjectPathUtils.class
+                    .getProtectionDomain()
+                    .getCodeSource()
+                    .getLocation()
+                    .getPath());
+            return file.getParentFile().getParentFile().getPath();
+        }
     }
 
     private static String getProjectBaseDir() {

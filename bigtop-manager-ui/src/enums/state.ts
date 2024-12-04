@@ -17,12 +17,7 @@
  * under the License.
  */
 
-export type MaintainState =
-  | 'Uninstalled'
-  | 'Installed'
-  | 'Maintained'
-  | 'Started'
-  | 'Stopped'
+export type MaintainState = 'Uninstalled' | 'Installed' | 'Maintained' | 'Started' | 'Stopped'
 
 export enum State {
   Pending = '#1677ff',

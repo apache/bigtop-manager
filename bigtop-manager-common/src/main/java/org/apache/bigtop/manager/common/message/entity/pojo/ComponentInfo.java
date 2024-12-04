@@ -27,10 +27,6 @@ public class ComponentInfo {
 
     private String displayName;
 
-    private String commandScript;
-
-    private String customCommands;
-
     private String category;
 
     private String serviceName;

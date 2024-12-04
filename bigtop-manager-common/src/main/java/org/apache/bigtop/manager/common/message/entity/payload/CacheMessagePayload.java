@@ -37,8 +37,6 @@ import java.util.Set;
 @NoArgsConstructor
 public class CacheMessagePayload extends BasePayload {
 
-    private Map<String, Object> settings;
-
     private ClusterInfo clusterInfo;
 
     private Map<String, String> userInfo;

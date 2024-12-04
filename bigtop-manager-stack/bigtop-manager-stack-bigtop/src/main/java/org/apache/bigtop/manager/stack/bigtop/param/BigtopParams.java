@@ -26,22 +26,4 @@ public abstract class BigtopParams extends BaseParams {
     protected BigtopParams(CommandPayload commandPayload) {
         super(commandPayload);
     }
-
-    public String stackBinDir() {
-        return "";
-    }
-
-    public String stackLibDir() {
-        return "";
-    }
-
-    /**
-     * service home dir
-     */
-    @Override
-    public String serviceHome() {
-        String rootDir = this.commandPayload.getRootDir();
-        String service = this.commandPayload.getServiceName();
-        return rootDir + "/" + service.toLowerCase();
-    }
 }

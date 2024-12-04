@@ -40,12 +40,9 @@ public class ComponentModel {
 
     private String cardinality;
 
-    @XmlElement(name = "command-script")
-    private ScriptModel commandScript;
-
     @XmlElementWrapper(name = "custom-commands")
     @XmlElements(@XmlElement(name = "custom-command"))
-    private List<CustomCommandModel> customCommands;
+    private List<String> customCommands;
 
     @XmlElement(name = "quick-link")
     private QuickLinkModel quickLink;

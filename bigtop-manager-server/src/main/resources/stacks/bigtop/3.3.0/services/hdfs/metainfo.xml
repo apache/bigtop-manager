@@ -30,30 +30,11 @@
             <component>
                 <name>namenode</name>
                 <display-name>NameNode</display-name>
-                <category>master</category>
+                <category>server</category>
                 <cardinality>1-2</cardinality>
-                <command-script>
-                    <script-id>org.apache.bigtop.manager.stack.bigtop.v3_3_0.hdfs.NameNodeScript</script-id>
-                    <script-type>java</script-type>
-                    <timeout>1200</timeout>
-                </command-script>
                 <custom-commands>
-                    <custom-command>
-                        <name>rebalance_hdfs</name>
-                        <command-script>
-                            <script-id>org.apache.bigtop.manager.stack.bigtop.v3_3_0.hdfs.NameNodeScript</script-id>
-                            <script-type>java</script-type>
-                            <timeout>600</timeout>
-                        </command-script>
-                    </custom-command>
-                    <custom-command>
-                        <name>print_topology</name>
-                        <command-script>
-                            <script-id>org.apache.bigtop.manager.stack.bigtop.v3_3_0.hdfs.NameNodeScript</script-id>
-                            <script-type>java</script-type>
-                            <timeout>600</timeout>
-                        </command-script>
-                    </custom-command>
+                    <custom-command>rebalance_hdfs</custom-command>
+                    <custom-command>print_topology</custom-command>
                 </custom-commands>
                 <quick-link>
                     <display-name>NameNode UI</display-name>
@@ -66,45 +47,25 @@
             <component>
                 <name>datanode</name>
                 <display-name>DataNode</display-name>
-                <category>slave</category>
+                <category>server</category>
                 <cardinality>1+</cardinality>
-                <command-script>
-                    <script-id>org.apache.bigtop.manager.stack.bigtop.v3_3_0.hdfs.DataNodeScript</script-id>
-                    <script-type>java</script-type>
-                    <timeout>1200</timeout>
-                </command-script>
             </component>
             <component>
                 <name>secondary_namenode</name>
                 <display-name>SNameNode</display-name>
-                <category>master</category>
+                <category>server</category>
                 <cardinality>1</cardinality>
-                <command-script>
-                    <script-id>org.apache.bigtop.manager.stack.bigtop.v3_3_0.hdfs.SNameNodeScript</script-id>
-                    <script-type>java</script-type>
-                    <timeout>1200</timeout>
-                </command-script>
             </component>
             <component>
                 <name>hdfs_client</name>
                 <display-name>HDFS Client</display-name>
                 <category>client</category>
                 <cardinality>1+</cardinality>
-                <command-script>
-                    <script-id>org.apache.bigtop.manager.stack.bigtop.v3_3_0.hdfs.HdfsClientScript</script-id>
-                    <script-type>java</script-type>
-                    <timeout>1200</timeout>
-                </command-script>
             </component>
         </components>
 
         <package-specifics>
             <package-specific>
-                <operating-systems>
-                    <os>centos7</os>
-                    <os>rocky8</os>
-                    <os>openeuler22</os>
-                </operating-systems>
                 <architectures>
                     <arch>x86_64</arch>
                 </architectures>

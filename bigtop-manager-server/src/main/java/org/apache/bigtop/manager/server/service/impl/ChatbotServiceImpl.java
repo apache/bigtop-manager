@@ -45,6 +45,7 @@ import org.apache.bigtop.manager.server.model.dto.AuthPlatformDTO;
 import org.apache.bigtop.manager.server.model.dto.ChatThreadDTO;
 import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
 import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
+import org.apache.bigtop.manager.server.model.vo.TalkVO;
 import org.apache.bigtop.manager.server.service.ChatbotService;
 import org.apache.bigtop.manager.server.tools.AiServiceToolsProvider;
 
@@ -150,7 +151,7 @@ public class ChatbotServiceImpl implements ChatbotService {
         ChatThreadPO chatThreadPO = ChatThreadConverter.INSTANCE.fromDTO2PO(chatThreadDTO);
         chatThreadPO.setUserId(userId);
         chatThreadDao.save(chatThreadPO);
-        return ChatThreadConverter.INSTANCE.fromPO2VO(chatThreadPO);
+        return ChatThreadConverter.INSTANCE.fromPO2VO(chatThreadPO, authPlatformPO, platformPO);
     }
 
     @Override
@@ -175,6 +176,8 @@ public class ChatbotServiceImpl implements ChatbotService {
         if (authPlatformPO == null) {
             throw new ApiException(ApiExceptionEnum.NO_PLATFORM_IN_USE);
         }
+        PlatformPO platformPO = platformDao.findById(authPlatformPO.getPlatformId());
+
         Long authId = authPlatformPO.getId();
         Long userId = SessionUserHolder.getUserId();
         List<ChatThreadPO> chatThreadPOS = chatThreadDao.findAllByAuthIdAndUserId(authId, userId);
@@ -183,7 +186,8 @@ public class ChatbotServiceImpl implements ChatbotService {
             if (chatThreadPO.getIsDeleted()) {
                 continue;
             }
-            ChatThreadVO chatThreadVO = ChatThreadConverter.INSTANCE.fromPO2VO(chatThreadPO);
+            ChatThreadVO chatThreadVO =
+                    ChatThreadConverter.INSTANCE.fromPO2VO(chatThreadPO, authPlatformPO, platformPO);
             chatThreads.add(chatThreadVO);
         }
         return chatThreads;
@@ -226,13 +230,36 @@ public class ChatbotServiceImpl implements ChatbotService {
         stringFlux.subscribe(
                 s -> {
                     try {
-                        emitter.send(s);
+                        TalkVO talkVO = new TalkVO();
+                        talkVO.setContent(s);
+                        talkVO.setFinishReason(null);
+                        emitter.send(talkVO);
                     } catch (Exception e) {
                         emitter.completeWithError(e);
                     }
                 },
-                Throwable::printStackTrace,
-                emitter::complete);
+                throwable -> {
+                    try {
+                        TalkVO errorVO = new TalkVO();
+                        errorVO.setContent(null);
+                        errorVO.setFinishReason("Error: " + throwable.getMessage());
+                        emitter.send(errorVO);
+                    } catch (Exception sendException) {
+                        sendException.printStackTrace();
+                    }
+                    emitter.completeWithError(throwable);
+                },
+                () -> {
+                    try {
+                        TalkVO finishVO = new TalkVO();
+                        finishVO.setContent(null);
+                        finishVO.setFinishReason("completed");
+                        emitter.send(finishVO);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    emitter.complete();
+                });
 
         emitter.onTimeout(emitter::complete);
         return emitter;
@@ -277,7 +304,9 @@ public class ChatbotServiceImpl implements ChatbotService {
         chatThreadPO.setName(chatThreadDTO.getName());
         chatThreadDao.partialUpdateById(chatThreadPO);
 
-        return ChatThreadConverter.INSTANCE.fromPO2VO(chatThreadPO);
+        AuthPlatformPO authPlatformPO = authPlatformDao.findById(chatThreadPO.getAuthId());
+        return ChatThreadConverter.INSTANCE.fromPO2VO(
+                chatThreadPO, authPlatformPO, platformDao.findById(authPlatformPO.getPlatformId()));
     }
 
     @Override
@@ -295,6 +324,8 @@ public class ChatbotServiceImpl implements ChatbotService {
         if (!chatThreadPO.getUserId().equals(userId)) {
             throw new ApiException(ApiExceptionEnum.PERMISSION_DENIED);
         }
-        return ChatThreadConverter.INSTANCE.fromPO2VO(chatThreadPO);
+        AuthPlatformPO authPlatformPO = authPlatformDao.findById(chatThreadPO.getAuthId());
+        return ChatThreadConverter.INSTANCE.fromPO2VO(
+                chatThreadPO, authPlatformPO, platformDao.findById(authPlatformPO.getPlatformId()));
     }
 }

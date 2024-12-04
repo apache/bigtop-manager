@@ -30,6 +30,10 @@ public class ChatThreadVO {
 
     private String name;
 
+    private String platformName;
+
+    private String model;
+
     private String createTime;
 
     private String updateTime;

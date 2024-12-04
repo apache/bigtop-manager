@@ -109,7 +109,7 @@ CREATE TABLE `host`
     `total_memory_size`    BIGINT,
     `desc`                 VARCHAR(255) DEFAULT NULL,
     `status`               INTEGER DEFAULT NULL COMMENT '1-healthy, 2-unhealthy, 3-unknown',
-    `err_info`             VARCHAR(255) DEFAULT NULL,
+    `err_info`             TEXT DEFAULT NULL,
     `create_time`          DATETIME     DEFAULT CURRENT_TIMESTAMP,
     `update_time`          DATETIME     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `create_by`            BIGINT,
@@ -265,23 +265,12 @@ CREATE TABLE `task`
     KEY               idx_task_stage_id (stage_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE `setting`
-(
-    `id`          BIGINT NOT NULL AUTO_INCREMENT,
-    `config_data` TEXT,
-    `create_by`   BIGINT,
-    `create_time` DATETIME,
-    `type_name`   VARCHAR(255),
-    `update_by`   BIGINT,
-    `update_time` DATETIME,
-    PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
 CREATE TABLE `llm_platform`
 (
     `id`             BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
     `name`           VARCHAR(255)        NOT NULL,
     `credential`     TEXT                DEFAULT NULL,
+    `desc`           TEXT                DEFAULT NULL,
     `support_models` VARCHAR(255)        DEFAULT NULL,
     `create_time`    DATETIME            DEFAULT CURRENT_TIMESTAMP,
     `update_time`    DATETIME            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -358,3 +347,15 @@ VALUES
 ('{"apiKey": "API Key"}', 'OpenAI', 'gpt-3.5-turbo,gpt-4,gpt-4o,gpt-3.5-turbo-16k,gpt-4-turbo-preview,gpt-4-32k,gpt-4o-mini'),
 ('{"apiKey": "API Key"}', 'DashScope', 'qwen-1.8b-chat,qwen-max,qwen-plus,qwen-turbo'),
 ('{"apiKey": "API Key", "secretKey": "Secret Key"}', 'QianFan','Yi-34B-Chat,ERNIE-4.0-8K,ERNIE-3.5-128K,ERNIE-Speed-8K,Llama-2-7B-Chat,Fuyu-8B');
+
+UPDATE `llm_platform`
+SET `desc` = 'Get your API Key in https://platform.openai.com/api-keys'
+WHERE `name` = 'OpenAI';
+
+UPDATE `llm_platform`
+SET `desc` = 'Get your API Key in https://bailian.console.aliyun.com/?apiKey=1#/api-key'
+WHERE `name` = 'DashScope';
+
+UPDATE `llm_platform`
+SET `desc` = 'Get API Key and Secret Key in https://console.bce.baidu.com/qianfan/ais/console/applicationConsole/application/v1'
+WHERE `name` = 'QianFan';

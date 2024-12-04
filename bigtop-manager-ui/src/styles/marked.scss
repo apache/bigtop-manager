@@ -21,6 +21,7 @@
 @import 'highlight.js/styles/github-dark.css';
 
 .markdown-body {
+  display: grid;
   background-color: inherit;
   color: #333333;
   box-sizing: border-box;

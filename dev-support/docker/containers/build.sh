@@ -67,12 +67,14 @@ create_container() {
     log "Create ${container_name}"
     if [ $i -eq 1 ]; then
       docker run -itd -p 15005:5005 -p 15006:5006 -p 18080:8080 --name ${container_name} --hostname ${container_name} --network bigtop-manager --cap-add=SYS_TIME bigtop-manager/develop:${OS}
-      docker cp ../../../bigtop-manager-server/target/bigtop-manager-server ${container_name}:/opt/
+      docker cp ../../../bigtop-manager-server/target/bigtop-manager-server.tar.gz ${container_name}:/opt/
+      docker exec ${container_name} bash -c "cd /opt && tar -zxvf bigtop-manager-server.tar.gz"
       SERVER_PUB_KEY=`docker exec ${container_name} /bin/cat /root/.ssh/id_rsa.pub`
     else
       docker run -itd --name ${container_name} --hostname ${container_name} --network bigtop-manager --cap-add=SYS_TIME bigtop-manager/develop:${OS}
     fi
-      docker cp ../../../bigtop-manager-agent/target/bigtop-manager-agent ${container_name}:/opt/
+      docker cp ../../../bigtop-manager-agent/target/bigtop-manager-agent.tar.gz ${container_name}:/opt/
+      docker exec ${container_name} bash -c "cd /opt && tar -zxvf bigtop-manager-agent.tar.gz"
       docker exec ${container_name} bash -c "echo '$SERVER_PUB_KEY' > /root/.ssh/authorized_keys"
       docker exec ${container_name} ssh-keygen -N '' -t rsa -b 2048 -f /etc/ssh/ssh_host_rsa_key
       docker exec ${container_name} ssh-keygen -N '' -t ecdsa -b 256 -f /etc/ssh/ssh_host_ecdsa_key

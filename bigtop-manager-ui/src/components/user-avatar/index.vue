@@ -18,11 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import {
-    UserOutlined,
-    ProfileOutlined,
-    LogoutOutlined
-  } from '@ant-design/icons-vue'
+  import { UserOutlined, ProfileOutlined, LogoutOutlined } from '@ant-design/icons-vue'
   import { message } from 'ant-design-vue'
   import { useUserStore } from '@/store/user'
   import { storeToRefs } from 'pinia'

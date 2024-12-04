@@ -82,21 +82,13 @@
         <div class="login-body">
           <!-- 登录框主体左侧 -->
           <div class="login-body-left">
-            <img
-              class="login-body-left-img"
-              src="@/assets/images/login.png"
-              alt="login"
-            />
+            <img class="login-body-left-img" src="@/assets/images/login.png" alt="login" />
           </div>
           <a-divider class="login-body-divider m-0" type="vertical" />
           <!-- 登录框主体右侧 -->
           <div class="login-body-right">
             <div class="login-body-right-tips">{{ $t('login.tips') }}</div>
-            <a-form
-              ref="formRef"
-              class="login-body-right-form"
-              :model="loginModel"
-            >
+            <a-form ref="formRef" class="login-body-right-form" :model="loginModel">
               <a-tabs v-model:activeKey="loginModel.type" centered>
                 <a-tab-pane key="account" :tab="$t('login.tab_account')" />
               </a-tabs>
@@ -149,13 +141,7 @@
                   {{ $t('login.remember_me') }}
                 </a-checkbox>
               </div>
-              <a-button
-                type="primary"
-                block
-                :loading="submitLoading"
-                size="large"
-                @click="submit"
-              >
+              <a-button type="primary" block :loading="submitLoading" size="large" @click="submit">
                 {{ $t('login.submit') }}
               </a-button>
             </a-form>
@@ -165,8 +151,7 @@
     </div>
     <div class="copyright">
       Copyright ©2011–2023
-      <a href="https://www.apache.org">The Apache Software Foundation</a>. All
-      rights reserved.
+      <a href="https://www.apache.org">The Apache Software Foundation</a>. All rights reserved.
     </div>
   </div>
 </template>
@@ -268,11 +253,7 @@
           }
 
           .login-body-right {
-            @include flexbox(
-              $direction: column,
-              $justify: center,
-              $align: center
-            );
+            @include flexbox($direction: column, $justify: center, $align: center);
             width: 335px;
             padding: 0 1.25rem;
 

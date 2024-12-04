@@ -73,12 +73,11 @@ public abstract class AbstractComponentStage extends AbstractStage {
         taskContext.setComponentName(componentDTO.getName());
         taskContext.setComponentDisplayName(componentDTO.getDisplayName());
         taskContext.setServiceUser(serviceDTO.getUser());
+        taskContext.setUserGroup(clusterPO.getUserGroup());
         taskContext.setRootDir(clusterPO.getRootDir());
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put("customCommands", componentDTO.getCustomCommands());
         properties.put("packageSpecifics", serviceDTO.getPackageSpecifics());
-        properties.put("commandScript", componentDTO.getCommandScript());
         taskContext.setProperties(properties);
         return taskContext;
     }

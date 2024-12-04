@@ -25,8 +25,6 @@ import java.util.List;
 @Data
 public class PackageSpecificInfo {
 
-    private List<String> os;
-
     private List<String> arch;
 
     private List<PackageInfo> packages;

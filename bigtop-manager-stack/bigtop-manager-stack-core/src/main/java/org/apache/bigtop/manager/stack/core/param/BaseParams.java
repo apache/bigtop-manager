@@ -29,8 +29,6 @@ import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
 import org.apache.bigtop.manager.stack.core.exception.StackException;
 import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
 
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,8 +38,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.apache.bigtop.manager.common.constants.Constants.ROOT_USER;
 
 @Slf4j
 public abstract class BaseParams implements Params {
@@ -90,9 +86,7 @@ public abstract class BaseParams implements Params {
 
     @Override
     public String user() {
-        return StringUtils.isNotBlank(this.commandPayload.getServiceUser())
-                ? this.commandPayload.getServiceUser()
-                : ROOT_USER;
+        return this.commandPayload.getServiceUser();
     }
 
     @Override
@@ -103,7 +97,8 @@ public abstract class BaseParams implements Params {
     @Override
     public RepoInfo repo() {
         return LocalSettings.repos().stream()
-                .filter(r -> OSDetection.getArch().equals(r.getArch()))
+                // Use service tarballs repo(type == 1)
+                .filter(r -> OSDetection.getArch().equals(r.getArch()) && r.getType() == 1)
                 .findFirst()
                 .orElseThrow(() -> new StackException(
                         "Cannot find repo for os: [{0}] and arch: [{1}]", OSDetection.getOS(), OSDetection.getArch()));
@@ -114,7 +109,7 @@ public abstract class BaseParams implements Params {
         RepoInfo repo = this.repo();
         List<PackageInfo> packageInfoList = new ArrayList<>();
         for (PackageSpecificInfo packageSpecificInfo : this.commandPayload.getPackageSpecifics()) {
-            if (packageSpecificInfo.getArch().contains(repo.getArch())) {
+            if (!packageSpecificInfo.getArch().contains(repo.getArch())) {
                 continue;
             }
 
@@ -131,9 +126,13 @@ public abstract class BaseParams implements Params {
 
     @Override
     public String stackHome() {
-        String stackName = this.commandPayload.getStackName();
-        String stackVersion = this.commandPayload.getStackVersion();
-        String root = this.commandPayload.getRootDir();
-        return MessageFormat.format("{0}/{1}/{2}", root, stackName.toLowerCase(), stackVersion);
+        String root = LocalSettings.cluster().getRootDir();
+        return MessageFormat.format("{0}/services", root);
+    }
+
+    @Override
+    public String serviceHome() {
+        String service = this.commandPayload.getServiceName();
+        return MessageFormat.format("{0}/{1}", stackHome(), service.toLowerCase());
     }
 }

@@ -35,6 +35,10 @@ public class StageContext {
 
     private String clusterName;
 
+    private String userGroup;
+
+    private String rootDir;
+
     private List<Long> hostIds;
 
     private ServiceDTO serviceDTO;
@@ -65,6 +69,8 @@ public class StageContext {
 
         context.setClusterName(clusterCommand.getName());
         context.setHostIds(clusterCommand.getHostIds());
+        context.setUserGroup(clusterCommand.getUserGroup());
+        context.setRootDir(clusterCommand.getRootDir());
     }
 
     private static void fromHostCommandPayload(StageContext context, CommandDTO commandDTO) {

@@ -37,5 +37,7 @@ public enum OSType {
     FEDORA36,
 
     OPENEULER22,
+
+    OPENEULER24,
     ;
 }

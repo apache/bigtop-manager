@@ -48,10 +48,7 @@ const replacePatternInHosts = (rawHostNames: string[]): string[] => {
 
       for (let i = parseInt(start, 10); i < parseInt(end, 10) + 1; i++) {
         hostNames.push(
-          rawHostName.replace(
-            /\[\d*\-\d*\]/,
-            extra[0].substring(0, start.length - i.toString().length) + i
-          )
+          rawHostName.replace(/\[\d*\-\d*\]/, extra[0].substring(0, start.length - i.toString().length) + i)
         )
       }
     } else {
@@ -64,9 +61,7 @@ const replacePatternInHosts = (rawHostNames: string[]): string[] => {
 }
 
 // parse hostNames as pattern expression
-export const parseHostNamesAsPatternExpression = (
-  hostNameStr: string
-): string[] => {
+export const parseHostNamesAsPatternExpression = (hostNameStr: string): string[] => {
   let hostNames: string[] = []
   const hostNameArr = hostNameStr.replace(/\n|\r\n|\s/g, ',').split(',')
   hostNameArr.forEach((a) => {

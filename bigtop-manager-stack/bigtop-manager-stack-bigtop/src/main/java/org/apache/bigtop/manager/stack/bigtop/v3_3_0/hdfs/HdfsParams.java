@@ -145,16 +145,11 @@ public class HdfsParams extends BigtopParams {
         return "/etc/hadoop/conf";
     }
 
-    @Override
-    public String serviceHome() {
-        return stackLibDir() + "/hadoop";
-    }
-
     public String hdfsHome() {
-        return stackLibDir() + "/hadoop-hdfs";
+        return stackHome() + "/hadoop-hdfs";
     }
 
     public String hdfsExec() {
-        return stackBinDir() + "/hdfs";
+        return serviceHome() + "/bin/hdfs";
     }
 }

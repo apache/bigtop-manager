@@ -33,13 +33,8 @@
             <component>
                 <name>zookeeper_server</name>
                 <display-name>ZooKeeper Server</display-name>
-                <category>master</category>
+                <category>server</category>
                 <cardinality>1+</cardinality>
-                <command-script>
-                    <script-id>org.apache.bigtop.manager.stack.bigtop.v3_3_0.zookeeper.ZookeeperServerScript</script-id>
-                    <script-type>java</script-type>
-                    <timeout>1200</timeout>
-                </command-script>
             </component>
 
             <component>
@@ -47,26 +42,19 @@
                 <display-name>ZooKeeper Client</display-name>
                 <category>client</category>
                 <cardinality>1+</cardinality>
-                <command-script>
-                    <script-id>org.apache.bigtop.manager.stack.bigtop.v3_3_0.zookeeper.ZookeeperClientScript</script-id>
-                    <script-type>java</script-type>
-                </command-script>
             </component>
         </components>
 
         <package-specifics>
             <package-specific>
-                <operating-systems>
-                    <os>centos7</os>
-                    <os>rocky8</os>
-                    <os>openeuler22</os>
-                </operating-systems>
                 <architectures>
                     <arch>x86_64</arch>
+                    <arch>aarch64</arch>
                 </architectures>
                 <packages>
                     <package>
-                        <name>zookeeper_3_3_0</name>
+                        <name>zookeeper-3.7.2-1.tar.gz</name>
+                        <checksum>380f15d55c0282e33fdc7c2ec551bc5586f0ac126c243cd84347ccb775b846f3</checksum>
                     </package>
                 </packages>
             </package-specific>

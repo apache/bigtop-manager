@@ -71,4 +71,13 @@ public interface HostService {
      * @return true if all hosts are able to connect
      */
     Boolean checkConnection(HostDTO hostDTO);
+
+    /**
+     * Install dependencies
+     *
+     * @param hostIds host ids
+     * @param path remote host path
+     * @return true if all dependencies are installed
+     */
+    Boolean installDependencies(List<Long> hostIds, String path);
 }

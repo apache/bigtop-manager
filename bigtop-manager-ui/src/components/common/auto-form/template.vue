@@ -21,10 +21,7 @@
   import { computed, onMounted, onUnmounted, ref, watchPostEffect } from 'vue'
   import { usePngImage } from '@/utils/tools'
   import { useI18n } from 'vue-i18n'
-  import type {
-    FormItemState,
-    FormState
-  } from '@/components/common/auto-form/types'
+  import type { FormItemState, FormState } from '@/components/common/auto-form/types'
 
   const { t } = useI18n()
   const helper = usePngImage('helper')
