@@ -31,10 +31,10 @@ import java.util.Map;
 @Getter
 public class ZookeeperParams extends BigtopParams {
 
-    private String zookeeperLogDir = "/var/log/zookeeper";
-    private String zookeeperPidDir = "/var/run/zookeeper";
-    private String zookeeperDataDir = "/hadoop/zookeeper";
-    private String zookeeperPidFile = zookeeperPidDir + "/zookeeper_server.pid";
+    private final String zookeeperLogDir = "/var/log/zookeeper";
+    private final String zookeeperPidDir = "/var/run/zookeeper";
+    private final String zookeeperDataDir = serviceHome() + "/data";
+    private final String zookeeperPidFile = zookeeperPidDir + "/zookeeper_server.pid";
 
     public ZookeeperParams(CommandPayload commandPayload) {
         super(commandPayload);
@@ -46,17 +46,13 @@ public class ZookeeperParams extends BigtopParams {
 
     @GlobalParams
     public Map<String, Object> zooCfg() {
-        Map<String, Object> zooCfg = LocalSettings.configurations(serviceName(), "zoo.cfg");
-        zookeeperDataDir = (String) zooCfg.get("dataDir");
-        return zooCfg;
+        Map<String, Object> configurations = LocalSettings.configurations(serviceName(), "zoo.cfg");
+        configurations.put("dataDir", zookeeperDataDir);
+        return configurations;
     }
 
     @GlobalParams
     public Map<String, Object> zookeeperEnv() {
-        Map<String, Object> zookeeperEnv = LocalSettings.configurations(serviceName(), "zookeeper-env");
-        zookeeperLogDir = (String) zookeeperEnv.get("zookeeper_log_dir");
-        zookeeperPidDir = (String) zookeeperEnv.get("zookeeper_pid_dir");
-        zookeeperPidFile = zookeeperPidDir + "/zookeeper_server.pid";
-        return zookeeperEnv;
+        return LocalSettings.configurations(serviceName(), "zookeeper-env");
     }
 }

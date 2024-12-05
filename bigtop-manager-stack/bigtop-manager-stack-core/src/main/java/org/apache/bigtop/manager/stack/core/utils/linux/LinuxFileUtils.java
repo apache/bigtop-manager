@@ -36,8 +36,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Only support Linux
@@ -74,21 +77,23 @@ public class LinuxFileUtils {
             return;
         }
 
+        String tmpPath = "/tmp/" + generateRandomFileName();
         switch (type) {
             case PROPERTIES, XML, ENV, CONTENT:
-                TemplateUtils.map2Template(type, filename, content, paramMap);
+                TemplateUtils.map2Template(type, tmpPath, content, paramMap);
                 break;
             case YAML:
-                YamlUtils.writeYaml(filename, content);
+                YamlUtils.writeYaml(tmpPath, content);
                 break;
             case JSON:
-                JsonUtils.writeToFile(filename, content);
+                JsonUtils.writeToFile(tmpPath, content);
                 break;
             case UNKNOWN:
                 log.info("no need to write");
                 break;
         }
 
+        moveFile(tmpPath, filename);
         updateOwner(filename, owner, group, false);
         updatePermissions(filename, permissions, false);
     }
@@ -121,10 +126,23 @@ public class LinuxFileUtils {
             log.error("type, filename, content, template must not be null");
             return;
         }
-        TemplateUtils.map2CustomTemplate(template, filename, modelMap, paramMap);
 
+        String tmpPath = "/tmp/" + generateRandomFileName();
+        TemplateUtils.map2CustomTemplate(template, tmpPath, modelMap, paramMap);
+
+        moveFile(tmpPath, filename);
         updateOwner(filename, owner, group, false);
         updatePermissions(filename, permissions, false);
+    }
+
+    public static String generateRandomFileName() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+        String timestamp = dateFormat.format(new Date());
+
+        Random random = new Random();
+        int randomNumber = random.nextInt(900) + 100; // Generates a random number between 100 and 999
+
+        return timestamp + randomNumber;
     }
 
     /**
@@ -177,6 +195,27 @@ public class LinuxFileUtils {
         builderParameters.add("rm");
         builderParameters.add("-rf");
         builderParameters.add(dirPath);
+
+        try {
+            ShellResult shellResult = sudoExecCmd(builderParameters);
+            if (shellResult.getExitCode() != MessageConstants.SUCCESS_CODE) {
+                throw new StackException(shellResult.getErrMsg());
+            }
+        } catch (IOException e) {
+            throw new StackException(e);
+        }
+    }
+
+    public static void moveFile(String source, String dest) {
+        if (StringUtils.isBlank(source) || StringUtils.isBlank(dest)) {
+            log.error("source and dest must not be empty");
+            return;
+        }
+
+        List<String> builderParameters = new ArrayList<>();
+        builderParameters.add("mv");
+        builderParameters.add(source);
+        builderParameters.add(dest);
 
         try {
             ShellResult shellResult = sudoExecCmd(builderParameters);

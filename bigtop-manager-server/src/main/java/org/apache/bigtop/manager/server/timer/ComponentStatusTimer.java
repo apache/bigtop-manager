@@ -54,6 +54,10 @@ public class ComponentStatusTimer {
     public void execute() {
         List<ComponentPO> componentPOList = componentDao.findAll();
         for (ComponentPO componentPO : componentPOList) {
+            if (HealthyStatusEnum.fromCode(componentPO.getStatus()) == HealthyStatusEnum.UNKNOWN) {
+                continue;
+            }
+
             componentPO = componentDao.findDetailsById(componentPO.getId());
             HostPO hostPO = hostDao.findById(componentPO.getHostId());
             ComponentStatusRequest request = ComponentStatusRequest.newBuilder()

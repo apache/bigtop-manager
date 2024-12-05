@@ -46,12 +46,6 @@
         <description>Port for running ZK Server.</description>
     </property>
     <property>
-        <name>dataDir</name>
-        <value>/hadoop/zookeeper</value>
-        <display-name>ZooKeeper directory</display-name>
-        <description>Data directory for ZooKeeper.</description>
-    </property>
-    <property>
         <name>autopurge.snapRetainCount</name>
         <value>30</value>
         <description>

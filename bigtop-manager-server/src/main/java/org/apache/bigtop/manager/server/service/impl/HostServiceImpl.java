@@ -218,7 +218,7 @@ public class HostServiceImpl implements HostService {
             }
 
             // Run agent in background
-            command = "nohup " + path + "/bigtop-manager-agent/bin/start.sh > /dev/null 2>&1 &";
+            command = "nohup " + path + "/bigtop-manager-agent/bin/start.sh --debug > /dev/null 2>&1 &";
             result = execCommandOnRemoteHost(hostDTO, hostDTO.getHostname(), command);
             if (result.getExitCode() != MessageConstants.SUCCESS_CODE) {
                 hostPO.setErrInfo(result.getErrMsg());

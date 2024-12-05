@@ -18,6 +18,7 @@
  */
 package org.apache.bigtop.manager.stack.infra.v1_0_0.prometheus;
 
+import org.apache.bigtop.manager.common.constants.Constants;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.stack.core.param.Params;
 import org.apache.bigtop.manager.stack.core.utils.linux.LinuxFileUtils;
@@ -25,8 +26,6 @@ import org.apache.bigtop.manager.stack.core.utils.linux.LinuxFileUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import static org.apache.bigtop.manager.common.constants.Constants.PERMISSION_755;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -37,7 +36,7 @@ public class PrometheusSetup {
         String user = prometheusParams.user();
         String group = prometheusParams.group();
 
-        LinuxFileUtils.createDirectories(prometheusParams.dataDir(), user, group, PERMISSION_755, true);
+        LinuxFileUtils.createDirectories(prometheusParams.dataDir(), user, group, Constants.PERMISSION_755, true);
 
         return ShellResult.success("Prometheus Configure success!");
     }

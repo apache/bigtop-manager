@@ -54,7 +54,7 @@
                 <packages>
                     <package>
                         <name>zookeeper-3.7.2-1.tar.gz</name>
-                        <checksum>380f15d55c0282e33fdc7c2ec551bc5586f0ac126c243cd84347ccb775b846f3</checksum>
+                        <checksum>SHA-256:380f15d55c0282e33fdc7c2ec551bc5586f0ac126c243cd84347ccb775b846f3</checksum>
                     </package>
                 </packages>
             </package-specific>

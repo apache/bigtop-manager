@@ -118,13 +118,17 @@ public class CacheFileUpdateTask extends AbstractTask {
 
         serviceConfigMap = new HashMap<>();
         for (ServiceConfigPO serviceConfigPO : serviceConfigPOList) {
+            List<Map<String, Object>> properties = JsonUtils.readFromString(serviceConfigPO.getPropertiesJson());
+            Map<String, String> kvMap = properties.stream()
+                    .collect(Collectors.toMap(
+                            property -> (String) property.get("name"), property -> (String) property.get("value")));
+            String kvString = JsonUtils.writeAsString(kvMap);
+
             if (serviceConfigMap.containsKey(serviceConfigPO.getServiceName())) {
-                serviceConfigMap
-                        .get(serviceConfigPO.getServiceName())
-                        .put(serviceConfigPO.getName(), serviceConfigPO.getPropertiesJson());
+                serviceConfigMap.get(serviceConfigPO.getServiceName()).put(serviceConfigPO.getName(), kvString);
             } else {
                 Map<String, Object> hashMap = new HashMap<>();
-                hashMap.put(serviceConfigPO.getName(), serviceConfigPO.getPropertiesJson());
+                hashMap.put(serviceConfigPO.getName(), kvString);
                 serviceConfigMap.put(serviceConfigPO.getServiceName(), hashMap);
             }
         }

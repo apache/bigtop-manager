@@ -24,33 +24,13 @@ public final class Constants {
         throw new UnsupportedOperationException("Construct Constants");
     }
 
-    /**
-     * host key for all hosts
-     */
     public static final String ALL_HOST_KEY = "all";
 
-    /**
-     * permission 644
-     */
     public static final String PERMISSION_644 = "644";
 
-    /**
-     * permission 755
-     */
     public static final String PERMISSION_755 = "755";
 
-    /**
-     * permission 775
-     */
-    public static final String PERMISSION_775 = "775";
-
-    /**
-     * permission 777
-     */
     public static final String PERMISSION_777 = "777";
 
-    /**
-     * root user
-     */
     public static final String ROOT_USER = "root";
 }
