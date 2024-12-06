@@ -23,7 +23,6 @@ import org.apache.bigtop.manager.stack.core.exception.StackException;
 import org.apache.bigtop.manager.stack.core.tarball.ChecksumValidator;
 import org.apache.bigtop.manager.stack.core.tarball.TarballDownloader;
 import org.apache.bigtop.manager.stack.core.tarball.TarballExtractor;
-import org.apache.bigtop.manager.stack.core.utils.linux.LinuxFileUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,8 +37,8 @@ public class TarballUtils {
     public static void installPackage(
             String repoUrl, String stackHome, String serviceHome, PackageInfo packageInfo, Integer skipLevels) {
         if (Files.exists(Path.of(serviceHome))) {
-            log.info("Service home [{}] exists, deleting...", serviceHome);
-            LinuxFileUtils.removeDirectories(serviceHome);
+            log.info("Service home [{}] exists, skip downloading...", serviceHome);
+            return;
         }
 
         String remoteUrl = repoUrl + File.separator + packageInfo.getName();

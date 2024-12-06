@@ -81,7 +81,7 @@ public abstract class BaseParams implements Params {
      */
     @Override
     public String confDir() {
-        return "/etc/" + this.commandPayload.getServiceName().toLowerCase() + "/conf";
+        return serviceHome() + "/conf";
     }
 
     @Override

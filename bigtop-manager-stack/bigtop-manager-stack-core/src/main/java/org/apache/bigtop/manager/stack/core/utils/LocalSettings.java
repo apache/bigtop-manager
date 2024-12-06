@@ -51,7 +51,7 @@ public class LocalSettings {
                 Object configData =
                         configJson.getOrDefault(service, new HashMap<>()).get(type);
                 if (configData != null) {
-                    configDataMap = JsonUtils.readFromString((String) configData, new TypeReference<>() {});
+                    configDataMap = JsonUtils.readFromString(configData.toString(), new TypeReference<>() {});
                 }
             }
         } catch (Exception e) {

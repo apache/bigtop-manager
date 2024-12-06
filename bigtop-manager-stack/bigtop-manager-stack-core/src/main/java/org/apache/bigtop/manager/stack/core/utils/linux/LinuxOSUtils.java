@@ -110,7 +110,7 @@ public class LinuxOSUtils {
             return new ShellResult(-1, "", "Component is not running");
         }
         try {
-            return execCmd("kill -0 " + pid);
+            return execCmd("sudo kill -0 " + pid);
         } catch (IOException e) {
             log.warn("Process with pid {} is not running. Stale pid file at {}, error", pid, filepath, e);
             return new ShellResult(-1, "", "Component is not running");

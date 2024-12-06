@@ -247,33 +247,6 @@ public class LinuxAccountUtils {
     }
 
     /**
-     * Assign user to supplementary groups
-     *
-     * @param user user
-     * @param groups groups
-     */
-    public static void assignUserToSupGroups(String user, List<String> groups) {
-        Objects.requireNonNull(user);
-        Objects.requireNonNull(groups);
-
-        List<String> builderParameters = new ArrayList<>();
-
-        builderParameters.add("usermod");
-        builderParameters.add("-aG");
-        builderParameters.add(String.join(",", groups));
-        builderParameters.add(user);
-
-        try {
-            ShellResult shellResult = sudoExecCmd(builderParameters);
-            if (shellResult.getExitCode() != MessageConstants.SUCCESS_CODE) {
-                throw new StackException(shellResult.getErrMsg());
-            }
-        } catch (IOException e) {
-            throw new StackException(e);
-        }
-    }
-
-    /**
      * Check if exists group
      *
      * @param group Group Name

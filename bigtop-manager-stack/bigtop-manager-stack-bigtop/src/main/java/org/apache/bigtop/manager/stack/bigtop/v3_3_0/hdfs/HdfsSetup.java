@@ -83,7 +83,7 @@ public class HdfsSetup {
         LinuxFileUtils.createDirectories(
                 hdfsParams.getDfsDataDir(), hdfsUser, hdfsGroup, Constants.PERMISSION_755, true);
         LinuxFileUtils.createDirectories(
-                hdfsParams.getHadoopLogDir(), hdfsUser, hdfsGroup, Constants.PERMISSION_775, true);
+                hdfsParams.getHadoopLogDir(), hdfsUser, hdfsGroup, Constants.PERMISSION_755, true);
         LinuxFileUtils.createDirectories(
                 hdfsParams.getHadoopPidDir(), hdfsUser, hdfsGroup, Constants.PERMISSION_755, true);
 

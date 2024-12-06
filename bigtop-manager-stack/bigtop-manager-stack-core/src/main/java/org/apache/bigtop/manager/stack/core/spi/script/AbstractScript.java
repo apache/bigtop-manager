@@ -24,7 +24,6 @@ import org.apache.bigtop.manager.common.message.entity.pojo.RepoInfo;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.stack.core.param.Params;
 import org.apache.bigtop.manager.stack.core.utils.TarballUtils;
-import org.apache.bigtop.manager.stack.core.utils.linux.LinuxAccountUtils;
 import org.apache.bigtop.manager.stack.core.utils.linux.LinuxFileUtils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -54,17 +53,14 @@ public abstract class AbstractScript implements Script {
 
         if (!Files.exists(Path.of(stackHome))) {
             String user = System.getProperty("user.name");
-            String group = params.group();
-
-            LinuxAccountUtils.assignUserToSupGroups(user, List.of(group));
-            LinuxFileUtils.createDirectories(stackHome, user, group, Constants.PERMISSION_755, true);
+            LinuxFileUtils.createDirectories(stackHome, user, user, Constants.PERMISSION_755, true);
         }
 
         for (PackageInfo packageInfo : packages) {
             Integer skipLevels = Integer.parseInt(properties.getProperty(PROPERTY_KEY_SKIP_LEVELS, "0"));
             TarballUtils.installPackage(repo.getBaseUrl(), stackHome, serviceHome, packageInfo, skipLevels);
 
-            // Dir already created by TarballUtils, this changes the owner and permission for the service
+            // Dir already created by TarballUtils, this changes the owner and permission for the service home
             LinuxFileUtils.createDirectories(
                     serviceHome, params.user(), params.group(), Constants.PERMISSION_755, true);
         }
