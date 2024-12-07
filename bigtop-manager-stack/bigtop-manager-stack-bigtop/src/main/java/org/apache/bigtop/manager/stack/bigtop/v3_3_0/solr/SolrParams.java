@@ -59,16 +59,16 @@ public class SolrParams extends BigtopParams {
 
     @GlobalParams
     public Map<String, Object> solrXml() {
-        return LocalSettings.configurations(serviceName(), "solr-xml");
+        return LocalSettings.configurations(getServiceName(), "solr-xml");
     }
 
     @GlobalParams
     public Map<String, Object> solrLog4j() {
-        return LocalSettings.configurations(serviceName(), "solr-log4j");
+        return LocalSettings.configurations(getServiceName(), "solr-log4j");
     }
 
     public String getZnode() {
-        Map<String, Object> solrEnv = LocalSettings.configurations(serviceName(), "solr-env");
+        Map<String, Object> solrEnv = LocalSettings.configurations(getServiceName(), "solr-env");
         return (String) solrEnv.get("solr_znode");
     }
 
@@ -87,12 +87,17 @@ public class SolrParams extends BigtopParams {
 
     @GlobalParams
     public Map<String, Object> solrEnv() {
-        Map<String, Object> solrEnv = LocalSettings.configurations(serviceName(), "solr-env");
+        Map<String, Object> solrEnv = LocalSettings.configurations(getServiceName(), "solr-env");
         solrLogDir = (String) solrEnv.get("solr_log_dir");
         solrPidDir = (String) solrEnv.get("solr_pid_dir");
         solrDataDir = (String) solrEnv.get("solr_datadir");
         solrPort = (String) solrEnv.get("SOLR_PORT");
         solrPidFile = solrPidDir + "/solr-" + solrPort + ".pid";
         return solrEnv;
+    }
+
+    @Override
+    public String getServiceName() {
+        return "solr";
     }
 }

@@ -42,4 +42,9 @@ public class PrometheusParams extends InfraParams {
     public String dataDir() {
         return MessageFormat.format("{0}/data", serviceHome());
     }
+
+    @Override
+    public String getServiceName() {
+        return "prometheus";
+    }
 }

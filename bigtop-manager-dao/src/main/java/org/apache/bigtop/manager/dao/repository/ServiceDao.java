@@ -34,5 +34,5 @@ public interface ServiceDao extends BaseDao<ServicePO> {
 
     ServicePO findByClusterIdAndName(@Param("clusterId") Long clusterId, @Param("name") String name);
 
-    List<ServicePO> findByClusterIdAndNames(@Param("clusterId") Long clusterId, @Param("name") List<String> names);
+    List<ServicePO> findByClusterIdAndNames(@Param("clusterId") Long clusterId, @Param("names") List<String> names);
 }

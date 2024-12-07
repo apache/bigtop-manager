@@ -122,11 +122,6 @@ public abstract class BaseParams implements Params {
     }
 
     @Override
-    public String serviceName() {
-        return this.commandPayload.getServiceName();
-    }
-
-    @Override
     public String stackHome() {
         String root = LocalSettings.cluster().getRootDir();
         return MessageFormat.format("{0}/services", root);
@@ -134,7 +129,6 @@ public abstract class BaseParams implements Params {
 
     @Override
     public String serviceHome() {
-        String service = this.commandPayload.getServiceName();
-        return MessageFormat.format("{0}/{1}", stackHome(), service.toLowerCase());
+        return MessageFormat.format("{0}/{1}", stackHome(), getServiceName());
     }
 }

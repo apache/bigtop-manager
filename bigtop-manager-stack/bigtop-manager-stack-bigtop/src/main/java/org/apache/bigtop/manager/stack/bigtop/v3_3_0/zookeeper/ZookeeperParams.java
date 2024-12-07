@@ -52,13 +52,18 @@ public class ZookeeperParams extends BigtopParams {
 
     @GlobalParams
     public Map<String, Object> zooCfg() {
-        Map<String, Object> zooCfg = LocalSettings.configurations(serviceName(), "zoo.cfg");
+        Map<String, Object> zooCfg = LocalSettings.configurations(getServiceName(), "zoo.cfg");
         zookeeperDataDir = (String) zooCfg.get("dataDir");
         return zooCfg;
     }
 
     @GlobalParams
     public Map<String, Object> zookeeperEnv() {
-        return LocalSettings.configurations(serviceName(), "zookeeper-env");
+        return LocalSettings.configurations(getServiceName(), "zookeeper-env");
+    }
+
+    @Override
+    public String getServiceName() {
+        return "zookeeper";
     }
 }

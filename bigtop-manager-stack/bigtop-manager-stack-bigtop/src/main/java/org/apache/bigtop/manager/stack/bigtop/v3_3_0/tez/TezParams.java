@@ -58,12 +58,12 @@ public class TezParams extends BigtopParams {
 
     @GlobalParams
     public Map<String, Object> tezSite() {
-        return LocalSettings.configurations(serviceName(), "tez-site");
+        return LocalSettings.configurations(getServiceName(), "tez-site");
     }
 
     @GlobalParams
     public Map<String, Object> tezEnv() {
-        Map<String, Object> tezEnv = LocalSettings.configurations(serviceName(), "tez-env");
+        Map<String, Object> tezEnv = LocalSettings.configurations(getServiceName(), "tez-env");
 
         String heapDumpEnabled = (String) tezEnv.get("enable_heap_dump");
         if (StringUtils.isNotBlank(heapDumpEnabled) && Boolean.parseBoolean(heapDumpEnabled)) {
@@ -96,5 +96,10 @@ public class TezParams extends BigtopParams {
 
     public String yarnHome() {
         return stackHome() + "/hadoop-yarn";
+    }
+
+    @Override
+    public String getServiceName() {
+        return "tez";
     }
 }

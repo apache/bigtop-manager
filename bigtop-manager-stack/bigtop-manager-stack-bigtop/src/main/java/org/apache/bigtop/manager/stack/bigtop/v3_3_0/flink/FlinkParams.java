@@ -69,7 +69,7 @@ public class FlinkParams extends BigtopParams {
 
     @GlobalParams
     public Map<String, Object> flinkConf() {
-        Map<String, Object> configurations = LocalSettings.configurations(serviceName(), "flink-conf");
+        Map<String, Object> configurations = LocalSettings.configurations(getServiceName(), "flink-conf");
         flinkConfContent = (String) configurations.get("content");
 
         jobManagerArchiveFsDir = (String) configurations.get("jobmanager.archive.fs.dir");
@@ -82,7 +82,7 @@ public class FlinkParams extends BigtopParams {
 
     @GlobalParams
     public Map<String, Object> flinkEnv() {
-        Map<String, Object> configurations = LocalSettings.configurations(serviceName(), "flink-env");
+        Map<String, Object> configurations = LocalSettings.configurations(getServiceName(), "flink-env");
         flinkLogDir = (String) configurations.get("flink_log_dir");
         flinkPidDir = (String) configurations.get("flink_pid_dir");
         historyServerPidFile = MessageFormat.format("{0}/flink-{1}-historyserver.pid", flinkPidDir, user());
@@ -91,14 +91,14 @@ public class FlinkParams extends BigtopParams {
 
     @GlobalParams
     public Map<String, Object> flinkLog4jProperties() {
-        Map<String, Object> configurations = LocalSettings.configurations(serviceName(), "flink-log4j-properties");
+        Map<String, Object> configurations = LocalSettings.configurations(getServiceName(), "flink-log4j-properties");
         flinkLog4jPropertiesContent = (String) configurations.get("content");
         return configurations;
     }
 
     @GlobalParams
     public Map<String, Object> flinkLog4jCLiProperties() {
-        Map<String, Object> configurations = LocalSettings.configurations(serviceName(), "flink-log4j-cli-properties");
+        Map<String, Object> configurations = LocalSettings.configurations(getServiceName(), "flink-log4j-cli-properties");
         flinkLog4jCLiPropertiesContent = (String) configurations.get("content");
         return configurations;
     }
@@ -106,7 +106,7 @@ public class FlinkParams extends BigtopParams {
     @GlobalParams
     public Map<String, Object> flinkLog4jConsoleProperties() {
         Map<String, Object> configurations =
-                LocalSettings.configurations(serviceName(), "flink-log4j-console-properties");
+                LocalSettings.configurations(getServiceName(), "flink-log4j-console-properties");
         flinkLog4jConsolePropertiesContent = (String) configurations.get("content");
         return configurations;
     }
@@ -114,7 +114,7 @@ public class FlinkParams extends BigtopParams {
     @GlobalParams
     public Map<String, Object> flinkLog4jSessionProperties() {
         Map<String, Object> configurations =
-                LocalSettings.configurations(serviceName(), "flink-log4j-session-properties");
+                LocalSettings.configurations(getServiceName(), "flink-log4j-session-properties");
         flinkLog4jSessionPropertiesContent = (String) configurations.get("content");
         return configurations;
     }
@@ -130,5 +130,10 @@ public class FlinkParams extends BigtopParams {
 
     public String hadoopHome() {
         return stackHome() + "/hadoop";
+    }
+
+    @Override
+    public String getServiceName() {
+        return "flink";
     }
 }

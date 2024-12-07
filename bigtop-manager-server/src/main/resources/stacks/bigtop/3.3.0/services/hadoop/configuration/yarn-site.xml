@@ -76,7 +76,7 @@
     </property>
     <property>
         <name>yarn.admin.acl</name>
-        <value />
+        <value>hadoop</value>
         <description>ACL of who can be admin of the YARN cluster.</description>
     </property>
     <!-- NodeManager -->
@@ -323,7 +323,7 @@
     </property>
     <property>
         <name>yarn.timeline-service.leveldb-timeline-store.path</name>
-        <value>/var/log/hadoop-yarn/timeline</value>
+        <value>/var/log/hadoop/timeline</value>
         <description>
             Store file name for leveldb timeline store
         </description>
@@ -351,14 +351,14 @@
         </description>
     </property>
     <property>
-        <description>Enable age off of timeline store data.</description>
         <name>yarn.timeline-service.ttl-enable</name>
         <value>true</value>
+        <description>Enable age off of timeline store data.</description>
     </property>
     <property>
-        <description>Time to live for timeline store data in milliseconds.</description>
         <name>yarn.timeline-service.ttl-ms</name>
         <value>2678400000</value>
+        <description>Time to live for timeline store data in milliseconds.</description>
     </property>
     <property>
         <name>yarn.timeline-service.leveldb-timeline-store.ttl-interval-ms</name>
@@ -373,22 +373,7 @@
             true, then yarn.timeline-service.state-store-class must be specified.
         </description>
     </property>
-    <property>
-        <name>yarn.acl.enable</name>
-        <value>false</value>
-        <description>Are acls enabled.</description>
-    </property>
-    <property>
-        <name>yarn.authorization-provider</name>
-        <description>Yarn authorization provider class.</description>
-    </property>
-    <property>
-        <name>yarn.admin.acl</name>
-        <value>yarn</value>
-        <description>ACL of who can be admin of the YARN cluster.</description>
-    </property>
-    <!--ats
-    v1.5 properties-->
+    <!--ats v1.5 properties-->
     <property>
         <name>yarn.timeline-service.store-class</name>
         <value>org.apache.hadoop.yarn.server.timeline.LeveldbTimelineStore</value>

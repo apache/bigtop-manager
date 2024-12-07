@@ -36,14 +36,14 @@ public interface Params extends PrioritySPI {
 
     List<PackageInfo> packages();
 
-    String serviceName();
-
     String serviceHome();
 
     String stackHome();
 
+    String getServiceName();
+
     @Override
     default String getName() {
-        return serviceName();
+        return getServiceName();
     }
 }

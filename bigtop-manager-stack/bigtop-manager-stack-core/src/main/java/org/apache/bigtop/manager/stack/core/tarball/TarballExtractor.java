@@ -30,6 +30,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.function.Function;
 
 @Slf4j
@@ -75,6 +77,10 @@ public class TarballExtractor {
                     if (!outputFile.exists()) {
                         outputFile.mkdirs();
                     }
+                } else if (entry.isSymbolicLink()) {
+                    Path link = Paths.get(outputFile.getAbsolutePath());
+                    Path target = Paths.get(entry.getLinkName());
+                    Files.createSymbolicLink(link, target);
                 } else {
                     File parent = outputFile.getParentFile();
                     if (!parent.exists()) {

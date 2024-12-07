@@ -80,23 +80,23 @@ public class HadoopParams extends BigtopParams {
     }
 
     public String hadoopLimits() {
-        Map<String, Object> hadoopConf = LocalSettings.configurations(serviceName(), "hadoop.conf");
+        Map<String, Object> hadoopConf = LocalSettings.configurations(getServiceName(), "hadoop.conf");
         return (String) hadoopConf.get("content");
     }
 
     public String workers() {
-        Map<String, Object> hdfsConf = LocalSettings.configurations(serviceName(), "workers");
+        Map<String, Object> hdfsConf = LocalSettings.configurations(getServiceName(), "workers");
         return (String) hdfsConf.get("content");
     }
 
     @GlobalParams
     public Map<String, Object> hdfsLog4j() {
-        return LocalSettings.configurations(serviceName(), "hdfs-log4j");
+        return LocalSettings.configurations(getServiceName(), "hdfs-log4j");
     }
 
     @GlobalParams
     public Map<String, Object> coreSite() {
-        Map<String, Object> coreSite = LocalSettings.configurations(serviceName(), "core-site");
+        Map<String, Object> coreSite = LocalSettings.configurations(getServiceName(), "core-site");
         List<String> namenodeList = LocalSettings.hosts("namenode");
         if (!namenodeList.isEmpty()) {
             coreSite.put(
@@ -107,12 +107,12 @@ public class HadoopParams extends BigtopParams {
 
     @GlobalParams
     public Map<String, Object> hadoopPolicy() {
-        return LocalSettings.configurations(serviceName(), "hadoop-policy");
+        return LocalSettings.configurations(getServiceName(), "hadoop-policy");
     }
 
     @GlobalParams
     public Map<String, Object> hdfsSite() {
-        Map<String, Object> hdfsSite = LocalSettings.configurations(serviceName(), "hdfs-site");
+        Map<String, Object> hdfsSite = LocalSettings.configurations(getServiceName(), "hdfs-site");
         List<String> namenodeList = LocalSettings.hosts("namenode");
         if (!namenodeList.isEmpty()) {
             hdfsSite.put(
@@ -142,12 +142,12 @@ public class HadoopParams extends BigtopParams {
 
     @GlobalParams
     public Map<String, Object> yarnLog4j() {
-        return LocalSettings.configurations(serviceName(), "yarn-log4j");
+        return LocalSettings.configurations(getServiceName(), "yarn-log4j");
     }
 
     @GlobalParams
     public Map<String, Object> yarnSite() {
-        Map<String, Object> yarnSite = LocalSettings.configurations(serviceName(), "yarn-site");
+        Map<String, Object> yarnSite = LocalSettings.configurations(getServiceName(), "yarn-site");
         List<String> resourcemanagerList = LocalSettings.hosts("resourcemanager");
         if (!resourcemanagerList.isEmpty()) {
             yarnSite.put("yarn.resourcemanager.hostname", MessageFormat.format("{0}", resourcemanagerList.get(0)));
@@ -160,22 +160,25 @@ public class HadoopParams extends BigtopParams {
 
     @GlobalParams
     public Map<String, Object> mapredSite() {
-        return LocalSettings.configurations(serviceName(), "mapred-site");
+        return LocalSettings.configurations(getServiceName(), "mapred-site");
     }
 
     @GlobalParams
     public Map<String, Object> hadoopEnv() {
-        return LocalSettings.configurations(serviceName(), "hadoop-env");
+        Map<String, Object> configurations = LocalSettings.configurations(getServiceName(), "hadoop-env");
+        configurations.put("hadoop_log_dir", hadoopLogDir);
+        configurations.put("hadoop_pid_dir", hadoopPidDir);
+        return configurations;
     }
 
     @GlobalParams
     public Map<String, Object> yarnEnv() {
-        return LocalSettings.configurations(serviceName(), "yarn-env");
+        return LocalSettings.configurations(getServiceName(), "yarn-env");
     }
 
     @GlobalParams
     public Map<String, Object> mapredEnv() {
-        return LocalSettings.configurations(serviceName(), "mapred-env");
+        return LocalSettings.configurations(getServiceName(), "mapred-env");
     }
 
     @Override
@@ -185,5 +188,10 @@ public class HadoopParams extends BigtopParams {
 
     public String binDir() {
         return serviceHome() + "/bin";
+    }
+
+    @Override
+    public String getServiceName() {
+        return "hadoop";
     }
 }

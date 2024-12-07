@@ -207,13 +207,13 @@ public class HadoopSetup {
                 hadoopParams.mapredSite(),
                 hadoopParams.getGlobalParamsMap());
 
-        HdfsUtil.createDirectory(hadoopUser, "/apps");
-        HdfsUtil.createDirectory(hadoopUser, "/app-logs");
-        HdfsUtil.createDirectory(hadoopUser, "/apps/mapred");
-        HdfsUtil.createDirectory(hadoopUser, "/apps/mapred/staging");
-        HdfsUtil.createDirectory(hadoopUser, "/apps/mapred/history");
-        HdfsUtil.createDirectory(hadoopUser, "/apps/mapred/history/tmp");
-        HdfsUtil.createDirectory(hadoopUser, "/apps/mapred/history/done");
+//        HdfsUtil.createDirectory(hadoopUser, "/apps");
+//        HdfsUtil.createDirectory(hadoopUser, "/app-logs");
+//        HdfsUtil.createDirectory(hadoopUser, "/apps/mapred");
+//        HdfsUtil.createDirectory(hadoopUser, "/apps/mapred/staging");
+//        HdfsUtil.createDirectory(hadoopUser, "/apps/mapred/history");
+//        HdfsUtil.createDirectory(hadoopUser, "/apps/mapred/history/tmp");
+//        HdfsUtil.createDirectory(hadoopUser, "/apps/mapred/history/done");
 
         log.info("Successfully configured Hadoop");
         return ShellResult.success();

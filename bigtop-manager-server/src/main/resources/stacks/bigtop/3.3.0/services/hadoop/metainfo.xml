@@ -20,11 +20,11 @@
 
 <metainfo>
     <service>
-        <name>hdfs</name>
-        <display-name>HDFS</display-name>
+        <name>hadoop</name>
+        <display-name>Hadoop</display-name>
         <desc>Apache Hadoop Distributed File System.</desc>
         <version>3.3.6-1</version>
-        <user>hdfs</user>
+        <user>hadoop</user>
 
         <components>
             <!-- HDFS Components -->
@@ -40,9 +40,9 @@
                 <quick-link>
                     <display-name>NameNode UI</display-name>
                     <http-port-property>dfs.namenode.http-address</http-port-property>
-                    <http-port-default>50070</http-port-default>
+                    <http-port-default>9870</http-port-default>
                     <https-port-property>dfs.namenode.http-address</https-port-property>
-                    <https-port-default>50470</https-port-default>
+                    <https-port-default>9870</https-port-default>
                 </quick-link>
             </component>
             <component>
