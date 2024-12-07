@@ -43,21 +43,24 @@ public class MonitoringController {
     @Operation(summary = "agent healthy", description = "agent healthy check")
     @GetMapping("agenthealthy")
     public ResponseEntity<JsonNode> agentHostsHealthyStatus() {
-        // json for response
         return ResponseEntity.success(monitoringService.queryAgentsHealthyStatus());
     }
 
-    @Operation(summary = "agent Info", description = "agent info query")
-    @GetMapping("agentInfo")
+    @Operation(summary = "staticAgentInfo", description = "agent info query")
+    @GetMapping("staticAgentInfo")
     public ResponseEntity<JsonNode> queryAgentsInfo() {
         return ResponseEntity.success(monitoringService.queryAgentsInfo());
     }
-
+    @Operation(summary = "dynamicAgentInfo", description = "agent info query")
+    @GetMapping("dynamicAgentInfo")
+    public ResponseEntity<JsonNode> queryAgentsInfo(@RequestParam(value = "pace", defaultValue = "1") String pace){
+        return ResponseEntity.success(monitoringService.queryAgentsInfo(pace));
+    }
     @Operation(summary = "cluster info", description = "cluster info")
     @GetMapping("clusterInfo")
     public ResponseEntity<JsonNode> queryCluster(
             @RequestParam(value = "clusterId") String clusterId,
-            @RequestParam(value = "step", defaultValue = "1m") String step) {
-        return ResponseEntity.success(monitoringService.queryClusterInfo(clusterId, step));
+            @RequestParam(value = "pace", defaultValue = "1") String pace) {
+        return ResponseEntity.success(monitoringService.queryClusterInfo(clusterId, pace));
     }
 }
