@@ -44,9 +44,13 @@ public class MonitoringServiceImpl implements MonitoringService {
     public JsonNode queryAgentsInfo() {
         return prometheusProxy.queryAgentsInfo();
     }
+    @Override
+    public JsonNode queryAgentsInfo(String pace){
+        return prometheusProxy.queryAgentsInfo(pace);
+    }
 
     @Override
-    public JsonNode queryClusterInfo(String clusterId, String step) {
-        return prometheusProxy.queryClusterInfo(clusterId, step);
+    public JsonNode queryClusterInfo(String clusterId, String pace) {
+        return prometheusProxy.queryClusterInfo(clusterId, pace);
     }
 }
