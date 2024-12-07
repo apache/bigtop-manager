@@ -20,7 +20,6 @@ package org.apache.bigtop.manager.stack.bigtop.v3_3_0.hadoop;
 
 import org.apache.bigtop.manager.common.constants.Constants;
 import org.apache.bigtop.manager.common.shell.ShellResult;
-import org.apache.bigtop.manager.stack.bigtop.utils.HdfsUtil;
 import org.apache.bigtop.manager.stack.core.enums.ConfigType;
 import org.apache.bigtop.manager.stack.core.exception.StackException;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
@@ -207,13 +206,13 @@ public class HadoopSetup {
                 hadoopParams.mapredSite(),
                 hadoopParams.getGlobalParamsMap());
 
-//        HdfsUtil.createDirectory(hadoopUser, "/apps");
-//        HdfsUtil.createDirectory(hadoopUser, "/app-logs");
-//        HdfsUtil.createDirectory(hadoopUser, "/apps/mapred");
-//        HdfsUtil.createDirectory(hadoopUser, "/apps/mapred/staging");
-//        HdfsUtil.createDirectory(hadoopUser, "/apps/mapred/history");
-//        HdfsUtil.createDirectory(hadoopUser, "/apps/mapred/history/tmp");
-//        HdfsUtil.createDirectory(hadoopUser, "/apps/mapred/history/done");
+        //        HdfsUtil.createDirectory(hadoopUser, "/apps");
+        //        HdfsUtil.createDirectory(hadoopUser, "/app-logs");
+        //        HdfsUtil.createDirectory(hadoopUser, "/apps/mapred");
+        //        HdfsUtil.createDirectory(hadoopUser, "/apps/mapred/staging");
+        //        HdfsUtil.createDirectory(hadoopUser, "/apps/mapred/history");
+        //        HdfsUtil.createDirectory(hadoopUser, "/apps/mapred/history/tmp");
+        //        HdfsUtil.createDirectory(hadoopUser, "/apps/mapred/history/done");
 
         log.info("Successfully configured Hadoop");
         return ShellResult.success();

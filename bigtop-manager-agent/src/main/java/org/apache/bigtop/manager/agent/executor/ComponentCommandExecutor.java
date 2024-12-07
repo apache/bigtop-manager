@@ -22,7 +22,6 @@ import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.grpc.generated.CommandType;
-import org.apache.bigtop.manager.stack.bigtop.v3_3_0.flink.FlinkParams;
 import org.apache.bigtop.manager.stack.core.executor.StackExecutor;
 
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;

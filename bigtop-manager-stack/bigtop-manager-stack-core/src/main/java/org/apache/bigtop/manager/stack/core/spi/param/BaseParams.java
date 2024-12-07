@@ -18,7 +18,6 @@
  */
 package org.apache.bigtop.manager.stack.core.spi.param;
 
-import lombok.NoArgsConstructor;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
 import org.apache.bigtop.manager.common.message.entity.pojo.PackageInfo;
@@ -31,6 +30,7 @@ import org.apache.bigtop.manager.stack.core.exception.StackException;
 import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Method;

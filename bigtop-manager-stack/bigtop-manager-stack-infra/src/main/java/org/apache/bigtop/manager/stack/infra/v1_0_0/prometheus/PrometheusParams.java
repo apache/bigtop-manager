@@ -18,13 +18,13 @@
  */
 package org.apache.bigtop.manager.stack.infra.v1_0_0.prometheus;
 
-import lombok.NoArgsConstructor;
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.infra.param.InfraParams;
 
 import com.google.auto.service.AutoService;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.text.MessageFormat;
