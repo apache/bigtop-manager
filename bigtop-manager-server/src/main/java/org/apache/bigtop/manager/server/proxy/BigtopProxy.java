@@ -18,7 +18,6 @@
  */
 package org.apache.bigtop.manager.server.proxy;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -29,6 +28,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
@@ -75,7 +75,7 @@ public class BigtopProxy {
             agents.forEach(agent -> hosts.add(agent.get("ipv4").asText()));
         }
         ObjectNode clusterAgents = objectMapper.createObjectNode();
-        clusterAgents.put("agentsNum",hosts.size());
+        clusterAgents.put("agentsNum", hosts.size());
         clusterAgents.set("agents", objectMapper.valueToTree(hosts));
         return clusterAgents;
     }

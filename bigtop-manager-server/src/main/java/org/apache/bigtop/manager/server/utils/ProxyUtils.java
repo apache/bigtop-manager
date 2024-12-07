@@ -19,50 +19,49 @@ public class ProxyUtils {
             return listNode.get(index).asDouble();
         return 0.0;
     }
+
     public static Long getLongSafely(JsonNode parentNode, String key, int index) {
         JsonNode listNode = parentNode.get(key);
         if (listNode != null && listNode.isArray() && index < listNode.size())
             return listNode.get(index).asLong();
         return 0L;
     }
-    public static JsonNode array2node(double[][] array,int num,int cores){
+
+    public static JsonNode array2node(double[][] array, int num, int cores) {
         ObjectMapper mapper = new ObjectMapper();
         double[] cache = new double[6];
-        for(int i = 0; i< num;i++)
-            for(int j = 0;j<6;j++)
-                cache[j] += array[i][j];
+        for (int i = 0; i < num; i++) for (int j = 0; j < 6; j++) cache[j] += array[i][j];
         ArrayNode node = mapper.createArrayNode();
         // 数据排序为日期小在前，日期大在后
-        for(int j = 0;j<6;j++)
-            node.add(cache[j] / cores);
+        for (int j = 0; j < 6; j++) node.add(cache[j] / cores);
         return node;
     }
-    public static JsonNode array2node(double[] array){
+
+    public static JsonNode array2node(double[] array) {
         ArrayNode node = new ObjectMapper().createArrayNode();
-        for(int j = 0;j<6;j++)
-            node.add(array[j]);
+        for (int j = 0; j < 6; j++) node.add(array[j]);
         return node;
     }
-    public static JsonNode array2node(long[] array){
+
+    public static JsonNode array2node(long[] array) {
         ArrayNode node = new ObjectMapper().createArrayNode();
-        for(int j = 0;j<6;j++)
-            node.add(array[j]);
+        for (int j = 0; j < 6; j++) node.add(array[j]);
         return node;
     }
-    public static JsonNode array2node(long[] array1,long[] array2){
+
+    public static JsonNode array2node(long[] array1, long[] array2) {
         ArrayNode node = new ObjectMapper().createArrayNode();
-        for(int j = 0;j<6;j++)
-            if(array2[j] <= 0)
-                node.add(0.0);
-            else
-                node.add((double) ( array2[j] - array1[j]) / array2[j]);
+        for (int j = 0; j < 6; j++)
+            if (array2[j] <= 0) node.add(0.0);
+            else node.add((double) (array2[j] - array1[j]) / array2[j]);
         return node;
     }
-    public static JsonNode array2node(long[][] array1,long[][] array2,int num){
+
+    public static JsonNode array2node(long[][] array1, long[][] array2, int num) {
         ObjectMapper mapper = new ObjectMapper();
         long[] cache1 = new long[6];
         long[] cache2 = new long[6];
-        for(int i = 0; i< num;i++) {
+        for (int i = 0; i < num; i++) {
             for (int j = 0; j < 6; j++) {
                 cache1[j] += array1[i][j];
                 cache2[j] += array2[i][j];
@@ -70,13 +69,12 @@ public class ProxyUtils {
         }
         ArrayNode node = mapper.createArrayNode();
         // The data is sorted with earlier dates coming first and later dates following.
-        for(int j = 0;j < 6;j++)
-            if(cache2[j] <= 0)
-                node.add(0.0);
-            else
-                node.add((double) (cache2[j] - cache1[j]) / cache2[j]);
+        for (int j = 0; j < 6; j++)
+            if (cache2[j] <= 0) node.add(0.0);
+            else node.add((double) (cache2[j] - cache1[j]) / cache2[j]);
         return node;
     }
+
     public static ArrayList<Long> getTimeStampsList(int step) {
         // format
         String currentTimeStr = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
@@ -96,7 +94,8 @@ public class ProxyUtils {
         }
         return timestamps;
     }
-    public static String Number2Param(int step){
-        return String.format("%sm",step);
+
+    public static String Number2Param(int step) {
+        return String.format("%sm", step);
     }
 }

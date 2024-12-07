@@ -51,11 +51,13 @@ public class MonitoringController {
     public ResponseEntity<JsonNode> queryAgentsInfo() {
         return ResponseEntity.success(monitoringService.queryAgentsInfo());
     }
+
     @Operation(summary = "dynamicAgentInfo", description = "agent info query")
     @GetMapping("dynamicAgentInfo")
-    public ResponseEntity<JsonNode> queryAgentsInfo(@RequestParam(value = "pace", defaultValue = "1") String pace){
+    public ResponseEntity<JsonNode> queryAgentsInfo(@RequestParam(value = "pace", defaultValue = "1") String pace) {
         return ResponseEntity.success(monitoringService.queryAgentsInfo(pace));
     }
+
     @Operation(summary = "cluster info", description = "cluster info")
     @GetMapping("clusterInfo")
     public ResponseEntity<JsonNode> queryCluster(
