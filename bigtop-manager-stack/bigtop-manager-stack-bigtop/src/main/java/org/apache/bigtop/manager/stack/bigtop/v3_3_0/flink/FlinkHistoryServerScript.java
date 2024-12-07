@@ -20,7 +20,7 @@ package org.apache.bigtop.manager.stack.bigtop.v3_3_0.flink;
 
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.stack.core.exception.StackException;
-import org.apache.bigtop.manager.stack.core.param.Params;
+import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.spi.script.AbstractServerScript;
 import org.apache.bigtop.manager.stack.core.spi.script.Script;
 import org.apache.bigtop.manager.stack.core.utils.linux.LinuxOSUtils;
@@ -64,5 +64,10 @@ public class FlinkHistoryServerScript extends AbstractServerScript {
     public ShellResult status(Params params) {
         FlinkParams flinkParams = (FlinkParams) params;
         return LinuxOSUtils.checkProcess(flinkParams.getHistoryServerPidFile());
+    }
+
+    @Override
+    public String getComponentName() {
+        return "flink_history_server";
     }
 }

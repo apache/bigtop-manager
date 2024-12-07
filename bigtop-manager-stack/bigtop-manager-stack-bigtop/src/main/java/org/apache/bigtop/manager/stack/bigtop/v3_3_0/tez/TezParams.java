@@ -18,14 +18,17 @@
  */
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.tez;
 
+import lombok.NoArgsConstructor;
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
 import org.apache.bigtop.manager.common.utils.Environments;
 import org.apache.bigtop.manager.stack.bigtop.param.BigtopParams;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
+import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.google.auto.service.AutoService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,6 +37,8 @@ import java.util.Map;
 
 @Getter
 @Slf4j
+@AutoService(Params.class)
+@NoArgsConstructor
 public class TezParams extends BigtopParams {
 
     private String headDumpOpts;
@@ -46,8 +51,6 @@ public class TezParams extends BigtopParams {
         globalParamsMap.put("java_home", Environments.getJavaHome());
         globalParamsMap.put("hadoop_home", hadoopHome());
         globalParamsMap.put("hadoop_conf_dir", hadoopConfDir());
-        globalParamsMap.put("hadoop_hdfs_home", hdfsHome());
-        globalParamsMap.put("hadoop_yarn_home", yarnHome());
         globalParamsMap.put("tez_home", serviceHome());
         globalParamsMap.put("tez_conf_dir", confDir());
         globalParamsMap.put("head_dump_opts", headDumpOpts);

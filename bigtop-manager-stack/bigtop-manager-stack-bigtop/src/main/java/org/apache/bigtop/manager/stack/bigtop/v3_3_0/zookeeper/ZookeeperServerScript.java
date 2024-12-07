@@ -20,7 +20,7 @@ package org.apache.bigtop.manager.stack.bigtop.v3_3_0.zookeeper;
 
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.stack.core.exception.StackException;
-import org.apache.bigtop.manager.stack.core.param.Params;
+import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.spi.script.AbstractServerScript;
 import org.apache.bigtop.manager.stack.core.spi.script.Script;
 import org.apache.bigtop.manager.stack.core.utils.linux.LinuxOSUtils;
@@ -46,7 +46,7 @@ public class ZookeeperServerScript extends AbstractServerScript {
 
     @Override
     public ShellResult configure(Params params) {
-        return ZookeeperSetup.config(params);
+        return ZookeeperSetup.configure(params);
     }
 
     @Override
@@ -77,5 +77,10 @@ public class ZookeeperServerScript extends AbstractServerScript {
     public ShellResult status(Params params) {
         ZookeeperParams zookeeperParams = (ZookeeperParams) params;
         return LinuxOSUtils.checkProcess(zookeeperParams.getZookeeperPidFile());
+    }
+
+    @Override
+    public String getComponentName() {
+        return "zookeeper_server";
     }
 }

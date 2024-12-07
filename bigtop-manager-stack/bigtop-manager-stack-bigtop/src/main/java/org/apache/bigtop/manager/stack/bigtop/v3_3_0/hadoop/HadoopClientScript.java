@@ -16,30 +16,37 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.stack.core.spi.hook;
+package org.apache.bigtop.manager.stack.bigtop.v3_3_0.hadoop;
 
+import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
+import org.apache.bigtop.manager.stack.core.spi.script.AbstractClientScript;
+import org.apache.bigtop.manager.stack.core.spi.script.Script;
 
 import com.google.auto.service.AutoService;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * obtain agent execute command
- */
+import java.util.Properties;
+
 @Slf4j
-@AutoService(Hook.class)
-public class StartHook extends AbstractHook {
-
-    public static final String NAME = "start";
+@AutoService(Script.class)
+public class HadoopClientScript extends AbstractClientScript {
 
     @Override
-    public void doBefore(Params params) {}
+    public ShellResult add(Params params) {
+        Properties properties = new Properties();
+        properties.setProperty(PROPERTY_KEY_SKIP_LEVELS, "1");
+
+        return super.add(params, properties);
+    }
 
     @Override
-    public void doAfter(Params params) {}
+    public ShellResult configure(Params params) {
+        return HadoopSetup.configure(params);
+    }
 
     @Override
-    public String getName() {
-        return NAME;
+    public String getComponentName() {
+        return "hadoop_client";
     }
 }

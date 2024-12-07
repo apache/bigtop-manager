@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.stack.bigtop.v3_3_0.solr;
+package org.apache.bigtop.manager.stack.bigtop.v3_3_0.hadoop;
 
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.stack.core.exception.StackException;
@@ -28,67 +28,80 @@ import org.apache.bigtop.manager.stack.core.utils.linux.LinuxOSUtils;
 import com.google.auto.service.AutoService;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.Properties;
 
 @Slf4j
 @AutoService(Script.class)
-public class SolrServerScript extends AbstractServerScript {
+public class NameNodeScript extends AbstractServerScript {
+
+    @Override
+    public ShellResult add(Params params) {
+        Properties properties = new Properties();
+        properties.setProperty(PROPERTY_KEY_SKIP_LEVELS, "1");
+
+        return super.add(params, properties);
+    }
 
     @Override
     public ShellResult configure(Params params) {
-        return SolrSetup.config(params);
+        return HadoopSetup.configure(params, getComponentName());
     }
 
     @Override
     public ShellResult start(Params params) {
         configure(params);
-        SolrParams solrParams = (SolrParams) params;
-        String confdir = MessageFormat.format("export SOLR_INCLUDE={0}/solr-env.sh", solrParams.confDir());
-        ShellResult shellResult = create_solr_znode(params);
-        String cmd = MessageFormat.format(
-                "{0} && {1}/bin/solr start -cloud -noprompt -s {2} -z {3}",
-                confdir, solrParams.serviceHome(), solrParams.getSolrDataDir(), solrParams.zkHost());
+        HadoopParams hadoopParams = (HadoopParams) params;
+
+        HadoopSetup.formatNameNode(hadoopParams);
+
+        String cmd = MessageFormat.format("{0}/hdfs --daemon start namenode", hadoopParams.binDir());
         try {
-            return LinuxOSUtils.sudoExecCmd(cmd, solrParams.user());
-        } catch (IOException e) {
+            return LinuxOSUtils.sudoExecCmd(cmd, hadoopParams.user());
+        } catch (Exception e) {
             throw new StackException(e);
         }
     }
 
     @Override
     public ShellResult stop(Params params) {
-        SolrParams solrParams = (SolrParams) params;
-        String cmd = MessageFormat.format("{0}/bin/solr stop -all", solrParams.serviceHome());
+        HadoopParams hadoopParams = (HadoopParams) params;
+        String cmd = MessageFormat.format("{0}/hdfs --daemon stop namenode", hadoopParams.binDir());
         try {
-            return LinuxOSUtils.sudoExecCmd(cmd, solrParams.user());
-        } catch (IOException e) {
+            return LinuxOSUtils.sudoExecCmd(cmd, hadoopParams.user());
+        } catch (Exception e) {
             throw new StackException(e);
         }
     }
 
     @Override
     public ShellResult status(Params params) {
-        SolrParams solrParams = (SolrParams) params;
-        return LinuxOSUtils.checkProcess(solrParams.getSolrPidFile());
+        HadoopParams hadoopParams = (HadoopParams) params;
+        return LinuxOSUtils.checkProcess(hadoopParams.getNameNodePidFile());
     }
 
-    public ShellResult create_solr_znode(Params params) {
-        configure(params);
-        SolrParams solrParams = (SolrParams) params;
-        String zNode = solrParams.getZnode();
-        String solrZkString = solrParams.getzkString();
-        String cmd = MessageFormat.format(
-                "{0}/bin/solr zk mkroot {1} -z {2} 2>&1", solrParams.serviceHome(), zNode, solrZkString);
+    public ShellResult rebalanceHdfs(Params params) {
+        HadoopParams hadoopParams = (HadoopParams) params;
+        String cmd = MessageFormat.format("{0}/hdfs balancer", hadoopParams.binDir());
         try {
-            return LinuxOSUtils.sudoExecCmd(cmd, solrParams.user());
-        } catch (IOException e) {
+            return LinuxOSUtils.sudoExecCmd(cmd, hadoopParams.user());
+        } catch (Exception e) {
+            throw new StackException(e);
+        }
+    }
+
+    public ShellResult printTopology(Params params) {
+        HadoopParams hadoopParams = (HadoopParams) params;
+        String cmd = MessageFormat.format("{0}/hdfs dfsadmin -printTopology", hadoopParams.binDir());
+        try {
+            return LinuxOSUtils.sudoExecCmd(cmd, hadoopParams.user());
+        } catch (Exception e) {
             throw new StackException(e);
         }
     }
 
     @Override
     public String getComponentName() {
-        return "solr_server";
+        return "namenode";
     }
 }

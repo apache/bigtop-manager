@@ -16,16 +16,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.stack.bigtop.param;
+package org.apache.bigtop.manager.stack.core.spi.param;
 
-import lombok.NoArgsConstructor;
-import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
-import org.apache.bigtop.manager.stack.core.spi.param.BaseParams;
+import org.apache.bigtop.manager.common.message.entity.pojo.PackageInfo;
+import org.apache.bigtop.manager.common.message.entity.pojo.RepoInfo;
+import org.apache.bigtop.manager.stack.core.spi.PrioritySPI;
 
-@NoArgsConstructor
-public abstract class BigtopParams extends BaseParams {
+import java.util.List;
 
-    protected BigtopParams(CommandPayload commandPayload) {
-        super(commandPayload);
+public interface Params extends PrioritySPI {
+
+    String confDir();
+
+    String user();
+
+    String group();
+
+    RepoInfo repo();
+
+    List<PackageInfo> packages();
+
+    String serviceName();
+
+    String serviceHome();
+
+    String stackHome();
+
+    @Override
+    default String getName() {
+        return serviceName();
     }
 }

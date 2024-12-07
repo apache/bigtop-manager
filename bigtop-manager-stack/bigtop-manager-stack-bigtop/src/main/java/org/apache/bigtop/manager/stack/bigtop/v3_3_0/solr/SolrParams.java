@@ -18,12 +18,15 @@
  */
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.solr;
 
+import lombok.NoArgsConstructor;
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
 import org.apache.bigtop.manager.common.utils.Environments;
 import org.apache.bigtop.manager.stack.bigtop.param.BigtopParams;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
+import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
 
+import com.google.auto.service.AutoService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,6 +36,8 @@ import java.util.Map;
 
 @Getter
 @Slf4j
+@AutoService(Params.class)
+@NoArgsConstructor
 public class SolrParams extends BigtopParams {
 
     private String solrPort = "8983";

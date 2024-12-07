@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.zookeeper;
 
 import org.apache.bigtop.manager.common.shell.ShellResult;
-import org.apache.bigtop.manager.stack.core.param.Params;
+import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.spi.script.AbstractClientScript;
 import org.apache.bigtop.manager.stack.core.spi.script.Script;
 
@@ -42,6 +42,11 @@ public class ZookeeperClientScript extends AbstractClientScript {
 
     @Override
     public ShellResult configure(Params params) {
-        return ZookeeperSetup.config(params);
+        return ZookeeperSetup.configure(params);
+    }
+
+    @Override
+    public String getComponentName() {
+        return "zookeeper_client";
     }
 }

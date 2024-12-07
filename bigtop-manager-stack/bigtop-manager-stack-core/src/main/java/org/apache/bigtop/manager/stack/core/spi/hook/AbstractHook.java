@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.stack.core.spi.hook;
 
-import org.apache.bigtop.manager.stack.core.param.Params;
+import org.apache.bigtop.manager.stack.core.spi.param.Params;
 
 import lombok.extern.slf4j.Slf4j;
 

@@ -18,17 +18,22 @@
  */
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.kafka;
 
+import lombok.NoArgsConstructor;
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
 import org.apache.bigtop.manager.common.utils.Environments;
 import org.apache.bigtop.manager.stack.bigtop.param.BigtopParams;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
+import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
 
+import com.google.auto.service.AutoService;
 import lombok.Getter;
 
 import java.util.Map;
 
 @Getter
+@AutoService(Params.class)
+@NoArgsConstructor
 public class KafkaParams extends BigtopParams {
 
     private String kafkaLogDir = "/var/log/kafka";

@@ -25,9 +25,9 @@ import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.common.utils.CaseUtils;
 import org.apache.bigtop.manager.common.utils.Environments;
 import org.apache.bigtop.manager.stack.core.exception.StackException;
-import org.apache.bigtop.manager.stack.core.param.Params;
 import org.apache.bigtop.manager.stack.core.spi.PrioritySPIFactory;
 import org.apache.bigtop.manager.stack.core.spi.hook.Hook;
+import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.spi.script.Script;
 
 import lombok.extern.slf4j.Slf4j;
@@ -40,26 +40,18 @@ public class StackExecutor {
 
     private static final Map<String, Script> SCRIPT_MAP = new PrioritySPIFactory<>(Script.class).getSPIMap();
 
+    private static final Map<String, Params> PARAMS_MAP = new PrioritySPIFactory<>(Params.class).getSPIMap();
+
     private static final Map<String, Hook> HOOK_MAP = new PrioritySPIFactory<>(Hook.class).getSPIMap();
 
     private static Script getCommandScript(CommandPayload commandPayload) {
         String componentName = commandPayload.getComponentName();
-        String packageName = getPackageName(commandPayload);
-        String scriptId =
-                packageName + "." + CaseUtils.toCamelCase(componentName, CaseUtils.SEPARATOR_UNDERSCORE) + "Script";
-        Script script = SCRIPT_MAP.get(scriptId);
+        Script script = SCRIPT_MAP.get(componentName);
         if (script == null) {
-            throw new StackException("Cannot find Script Class {0}", scriptId);
+            throw new StackException("Cannot find script for component: {0}", componentName);
         }
 
         return script;
-    }
-
-    private static String getPackageName(CommandPayload commandPayload) {
-        return "org.apache.bigtop.manager.stack" + "."
-                + CaseUtils.toLowerCase(commandPayload.getStackName()) + ".v"
-                + commandPayload.getStackVersion().replaceAll("\\.", "_") + "."
-                + CaseUtils.toLowerCase(commandPayload.getServiceName());
     }
 
     private static void runBeforeHook(String command, Params params) {
@@ -86,12 +78,11 @@ public class StackExecutor {
             String methodName = CaseUtils.toCamelCase(command, CaseUtils.SEPARATOR_UNDERSCORE, false);
             Method method = script.getClass().getMethod(methodName, Params.class);
 
-            String paramsClassName = getPackageName(commandPayload) + "."
-                    + CaseUtils.toCamelCase(commandPayload.getServiceName()) + "Params";
-            Class<?> paramsClass = Class.forName(paramsClassName);
-            Params params = (Params)
-                    paramsClass.getDeclaredConstructor(CommandPayload.class).newInstance(commandPayload);
-
+            Params params = PARAMS_MAP
+                    .get(commandPayload.getServiceName())
+                    .getClass()
+                    .getDeclaredConstructor(CommandPayload.class)
+                    .newInstance(commandPayload);
             if (Environments.isDevMode()) {
                 log.info("Executing {}::{} on dev mode", script.getName(), method.getName());
                 return ShellResult.success();

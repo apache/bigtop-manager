@@ -72,6 +72,7 @@ public class LinuxFileUtils {
             String permissions,
             Object content,
             Object paramMap) {
+        log.info("Generating file: [{}]", filename);
         if (type == null || StringUtils.isBlank(filename) || content == null) {
             log.error("type, filename, content must not be null");
             return;
@@ -122,6 +123,7 @@ public class LinuxFileUtils {
             String permissions,
             Object modelMap,
             Object paramMap) {
+        log.info("Generating file: [{}]", filename);
         if (StringUtils.isBlank(filename) || modelMap == null || StringUtils.isEmpty(template)) {
             log.error("type, filename, content, template must not be null");
             return;
