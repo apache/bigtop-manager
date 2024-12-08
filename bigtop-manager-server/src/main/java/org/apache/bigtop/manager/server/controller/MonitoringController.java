@@ -46,23 +46,23 @@ public class MonitoringController {
         return ResponseEntity.success(monitoringService.queryAgentsHealthyStatus());
     }
 
-    @Operation(summary = "staticAgentInfo", description = "agent info query")
+    @Operation(summary = "staticAgentInfo", description = "agent static info query")
     @GetMapping("staticAgentInfo")
     public ResponseEntity<JsonNode> queryAgentsInfo() {
         return ResponseEntity.success(monitoringService.queryAgentsInfo());
     }
 
-    @Operation(summary = "dynamicAgentInfo", description = "agent info query")
+    @Operation(summary = "dynamicAgentInfo", description = "agent dynamic info query")
     @GetMapping("dynamicAgentInfo")
-    public ResponseEntity<JsonNode> queryAgentsInfo(@RequestParam(value = "pace", defaultValue = "1") String pace) {
-        return ResponseEntity.success(monitoringService.queryAgentsInfo(pace));
+    public ResponseEntity<JsonNode> queryAgentsInfo(@RequestParam(value = "step", defaultValue = "1") String step) {
+        return ResponseEntity.success(monitoringService.queryAgentsInfo(step));
     }
 
-    @Operation(summary = "cluster info", description = "cluster info")
+    @Operation(summary = "cluster info", description = "cluster multi info")
     @GetMapping("clusterInfo")
     public ResponseEntity<JsonNode> queryCluster(
             @RequestParam(value = "clusterId") String clusterId,
-            @RequestParam(value = "pace", defaultValue = "1") String pace) {
-        return ResponseEntity.success(monitoringService.queryClusterInfo(clusterId, pace));
+            @RequestParam(value = "step", defaultValue = "1") String step) {
+        return ResponseEntity.success(monitoringService.queryClusterInfo(clusterId, step));
     }
 }
