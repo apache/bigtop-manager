@@ -28,10 +28,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import reactor.core.publisher.Mono;
-
-import java.util.ArrayList;
 
 @Component
 public class BigtopProxy {
@@ -42,12 +41,8 @@ public class BigtopProxy {
         this.webClient = webClientBuilder.baseUrl(bigTopHost).build();
     }
 
-    private MultiValueMap<String, String> createFormData(String clusterId, Integer pageNum) {
+    private MultiValueMap<String, String> createFormData(Integer pageNum) {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add("hostnameLike", "");
-        formData.add("clusterId", clusterId);
-        formData.add("ipv4Like", "");
-        formData.add("status", "");
         formData.add("pageNum", String.valueOf(pageNum));
         formData.add("pageSize", "20");
         formData.add("orderBy", "id");
@@ -55,28 +50,43 @@ public class BigtopProxy {
         return formData;
     }
 
-    public JsonNode queryClusterAgentsList(String clusterId) {
-        ArrayList<String> hosts = new ArrayList<>();
+    public JsonNode queryHosts(int pageNum) {
+        Mono<JsonNode> body = webClient
+                .post()
+                .uri(uriBuilder -> uriBuilder.path("/api/hosts").build())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(BodyInserters.fromFormData(createFormData(pageNum)))
+                .retrieve()
+                .bodyToMono(JsonNode.class);
+        JsonNode result = body.block();
+        if (result == null || result.isEmpty() || !(result.get("failed").asBoolean())) {
+            return null;
+        }
+        return result;
+    }
+
+    public JsonNode queryClusterAgents(String clusterId) {
         ObjectMapper objectMapper = new ObjectMapper();
+        // query cluster name
+        Mono<JsonNode> body =
+                webClient.get().uri("/api/clusters/{id}", clusterId).retrieve().bodyToMono(JsonNode.class);
+        JsonNode result = body.block();
+        if (result == null || result.isEmpty() || !(result.get("failed").asBoolean())) return null;
+        String clusterName = result.get("data").get("name").asText();
+        ObjectNode clusterAgents = objectMapper.createObjectNode();
+        ArrayNode arrayNode = objectMapper.createArrayNode();
         int pageNum = 1;
         while (true) {
-            Mono<JsonNode> body = webClient
-                    .post()
-                    .uri(uriBuilder -> uriBuilder.path("/api/hosts").build())
-                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                    .body(BodyInserters.fromFormData(createFormData(clusterId, pageNum++)))
-                    .retrieve()
-                    .bodyToMono(JsonNode.class);
-            JsonNode result = body.block();
-            if (result == null || result.isEmpty() || !(result.get("failed").asBoolean())) {
-                break;
-            }
-            JsonNode agents = result.get("data").get("content");
-            agents.forEach(agent -> hosts.add(agent.get("ipv4").asText()));
+            JsonNode agentsPage = queryHosts(pageNum++);
+            if (agentsPage == null) break;
+            JsonNode agentsContent = agentsPage.get("data").get("content");
+            agentsContent.forEach(agent -> {
+                if (agent.get("clusterName").asText().equals(clusterName))
+                    arrayNode.add(agent.get("ipv4").asText());
+            });
         }
-        ObjectNode clusterAgents = objectMapper.createObjectNode();
-        clusterAgents.put("agentsNum", hosts.size());
-        clusterAgents.set("agents", objectMapper.valueToTree(hosts));
+        clusterAgents.put("agentsNum", arrayNode.size());
+        clusterAgents.set("agents", arrayNode);
         return clusterAgents;
     }
 }
