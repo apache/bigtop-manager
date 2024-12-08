@@ -18,8 +18,8 @@
  */
 package org.apache.bigtop.manager.stack.core.spi.hook;
 
-import org.apache.bigtop.manager.stack.core.param.Params;
 import org.apache.bigtop.manager.stack.core.spi.PrioritySPI;
+import org.apache.bigtop.manager.stack.core.spi.param.Params;
 
 public interface Hook extends PrioritySPI {
 

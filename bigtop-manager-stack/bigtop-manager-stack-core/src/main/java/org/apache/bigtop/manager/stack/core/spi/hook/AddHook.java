@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.stack.core.spi.hook;
 
-import org.apache.bigtop.manager.stack.core.param.Params;
+import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.utils.linux.LinuxAccountUtils;
 
 import com.google.auto.service.AutoService;

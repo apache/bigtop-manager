@@ -1,0 +1,125 @@
+<?xml version="1.0"?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one
+  ~ or more contributor license agreements.  See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership.  The ASF licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License.  You may obtain a copy of the License at
+  ~
+  ~    https://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+-->
+
+<metainfo>
+    <service>
+        <name>hadoop</name>
+        <display-name>Hadoop</display-name>
+        <desc>Apache Hadoop Distributed File System.</desc>
+        <version>3.3.6-1</version>
+        <user>hadoop</user>
+
+        <components>
+            <!-- HDFS Components -->
+            <component>
+                <name>namenode</name>
+                <display-name>NameNode</display-name>
+                <category>server</category>
+                <cardinality>1-2</cardinality>
+                <custom-commands>
+                    <custom-command>rebalance_hdfs</custom-command>
+                    <custom-command>print_topology</custom-command>
+                </custom-commands>
+                <quick-link>
+                    <display-name>NameNode UI</display-name>
+                    <http-port-property>dfs.namenode.http-address</http-port-property>
+                    <http-port-default>9870</http-port-default>
+                    <https-port-property>dfs.namenode.http-address</https-port-property>
+                    <https-port-default>9870</https-port-default>
+                </quick-link>
+            </component>
+            <component>
+                <name>datanode</name>
+                <display-name>DataNode</display-name>
+                <category>server</category>
+                <cardinality>1+</cardinality>
+            </component>
+            <component>
+                <name>secondarynamenode</name>
+                <display-name>SNameNode</display-name>
+                <category>server</category>
+                <cardinality>1</cardinality>
+            </component>
+
+            <!-- Yarn Components -->
+            <component>
+                <name>resourcemanager</name>
+                <display-name>ResourceManager</display-name>
+                <category>server</category>
+                <cardinality>1-2</cardinality>
+                <quick-link>
+                    <display-name>ResourceManager UI</display-name>
+                    <http-port-property>yarn.resourcemanager.webapp.address</http-port-property>
+                    <http-port-default>8088</http-port-default>
+                    <https-port-property>yarn.resourcemanager.webapp.https.address</https-port-property>
+                    <https-port-default>8090</https-port-default>
+                </quick-link>
+            </component>
+            <component>
+                <name>nodemanager</name>
+                <display-name>NodeManager</display-name>
+                <category>server</category>
+                <cardinality>1+</cardinality>
+            </component>
+
+            <!-- MapReduce2 Components -->
+            <component>
+                <name>history_server</name>
+                <display-name>History Server</display-name>
+                <category>server</category>
+                <cardinality>1</cardinality>
+                <quick-link>
+                    <display-name>JobHistory UI</display-name>
+                    <http-port-property>mapreduce.jobhistory.webapp.address</http-port-property>
+                    <http-port-default>19888</http-port-default>
+                    <https-port-property>mapreduce.jobhistory.webapp.https.address</https-port-property>
+                    <https-port-default>19890</https-port-default>
+                </quick-link>
+            </component>
+
+            <!-- Client -->
+            <component>
+                <name>hadoop_client</name>
+                <display-name>Hadoop Client</display-name>
+                <category>client</category>
+                <cardinality>1+</cardinality>
+            </component>
+        </components>
+
+        <package-specifics>
+            <package-specific>
+                <architectures>
+                    <arch>x86_64</arch>
+                    <arch>aarch64</arch>
+                </architectures>
+                <packages>
+                    <package>
+                        <name>hadoop-3.3.6-1.tar.gz</name>
+                        <checksum>SHA-256:2a9312eac69a542c6266f1689d29ded243dde2d61add333a9762829008f97442</checksum>
+                    </package>
+                </packages>
+            </package-specific>
+        </package-specifics>
+
+        <required-services>
+            <service>zookeeper</service>
+        </required-services>
+    </service>
+</metainfo>

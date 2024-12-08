@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.flink;
 
 import org.apache.bigtop.manager.common.shell.ShellResult;
-import org.apache.bigtop.manager.stack.core.param.Params;
+import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.spi.script.AbstractClientScript;
 import org.apache.bigtop.manager.stack.core.spi.script.Script;
 
@@ -33,5 +33,10 @@ public class FlinkClientScript extends AbstractClientScript {
     @Override
     public ShellResult configure(Params params) {
         return FlinkSetup.config(params);
+    }
+
+    @Override
+    public String getComponentName() {
+        return "flink_client";
     }
 }

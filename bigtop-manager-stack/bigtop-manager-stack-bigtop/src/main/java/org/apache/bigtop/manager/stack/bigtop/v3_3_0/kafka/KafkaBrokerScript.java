@@ -20,7 +20,7 @@ package org.apache.bigtop.manager.stack.bigtop.v3_3_0.kafka;
 
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.stack.core.exception.StackException;
-import org.apache.bigtop.manager.stack.core.param.Params;
+import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.spi.script.AbstractServerScript;
 import org.apache.bigtop.manager.stack.core.spi.script.Script;
 import org.apache.bigtop.manager.stack.core.utils.linux.LinuxOSUtils;
@@ -79,5 +79,10 @@ public class KafkaBrokerScript extends AbstractServerScript {
         } catch (IOException e) {
             throw new StackException(e);
         }
+    }
+
+    @Override
+    public String getComponentName() {
+        return "kafka_broker";
     }
 }

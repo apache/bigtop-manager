@@ -22,7 +22,7 @@ import org.apache.bigtop.manager.common.constants.Constants;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.common.utils.NetUtils;
 import org.apache.bigtop.manager.stack.core.enums.ConfigType;
-import org.apache.bigtop.manager.stack.core.param.Params;
+import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
 import org.apache.bigtop.manager.stack.core.utils.linux.LinuxFileUtils;
 
@@ -39,8 +39,8 @@ import java.util.Map;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ZookeeperSetup {
 
-    public static ShellResult config(Params params) {
-        log.info("Setting zookeeper config");
+    public static ShellResult configure(Params params) {
+        log.info("Configuring ZooKeeper");
         ZookeeperParams zookeeperParams = (ZookeeperParams) params;
 
         String confDir = zookeeperParams.confDir();
@@ -66,7 +66,6 @@ public class ZookeeperSetup {
                     .append("\n");
         }
 
-        // myid
         LinuxFileUtils.toFile(
                 ConfigType.CONTENT,
                 MessageFormat.format("{0}/myid", zookeeperParams.getZookeeperDataDir()),
@@ -75,7 +74,6 @@ public class ZookeeperSetup {
                 Constants.PERMISSION_644,
                 zkHostList.indexOf(NetUtils.getHostname()) + 1 + "");
 
-        // zoo.cfg
         HashMap<String, Object> map = new HashMap<>(zooCfg);
         map.remove("content");
         Map<String, Object> paramMap = Map.of("zk_server_str", zkServerStr.toString(), "security_enabled", false);
@@ -88,7 +86,6 @@ public class ZookeeperSetup {
                 Map.of("model", map),
                 paramMap);
 
-        // zookeeper-env
         LinuxFileUtils.toFileByTemplate(
                 zookeeperEnv.get("content").toString(),
                 MessageFormat.format("{0}/zookeeper-env.sh", confDir),
@@ -97,6 +94,7 @@ public class ZookeeperSetup {
                 Constants.PERMISSION_644,
                 zookeeperParams.getGlobalParamsMap());
 
-        return ShellResult.success("ZooKeeper Server Configure success!");
+        log.info("Successfully configured ZooKeeper");
+        return ShellResult.success();
     }
 }

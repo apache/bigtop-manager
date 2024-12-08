@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -16,23 +16,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.bigtop.manager.stack.core.spi.param;
 
-package org.apache.bigtop.manager.dao.repository;
-
-import org.apache.bigtop.manager.dao.po.ServicePO;
-import org.apache.bigtop.manager.dao.query.ServiceQuery;
-
-import org.apache.ibatis.annotations.Param;
+import org.apache.bigtop.manager.common.message.entity.pojo.PackageInfo;
+import org.apache.bigtop.manager.common.message.entity.pojo.RepoInfo;
+import org.apache.bigtop.manager.stack.core.spi.PrioritySPI;
 
 import java.util.List;
 
-public interface ServiceDao extends BaseDao<ServicePO> {
+public interface Params extends PrioritySPI {
 
-    List<ServicePO> findByQuery(@Param("query") ServiceQuery query);
+    String confDir();
 
-    List<ServicePO> findByClusterId(@Param("clusterId") Long clusterId);
+    String user();
 
-    ServicePO findByClusterIdAndName(@Param("clusterId") Long clusterId, @Param("name") String name);
+    String group();
 
-    List<ServicePO> findByClusterIdAndNames(@Param("clusterId") Long clusterId, @Param("names") List<String> names);
+    RepoInfo repo();
+
+    List<PackageInfo> packages();
+
+    String serviceHome();
+
+    String stackHome();
+
+    String getServiceName();
+
+    @Override
+    default String getName() {
+        return getServiceName();
+    }
 }

@@ -19,11 +19,13 @@
 package org.apache.bigtop.manager.stack.infra.param;
 
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
-import org.apache.bigtop.manager.stack.core.param.BaseParams;
+import org.apache.bigtop.manager.stack.core.spi.param.BaseParams;
 
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@NoArgsConstructor
 public abstract class InfraParams extends BaseParams {
 
     protected InfraParams(CommandPayload commandPayload) {

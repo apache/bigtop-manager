@@ -20,7 +20,7 @@ package org.apache.bigtop.manager.stack.infra.v1_0_0.prometheus;
 
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.stack.core.exception.StackException;
-import org.apache.bigtop.manager.stack.core.param.Params;
+import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.spi.script.AbstractServerScript;
 import org.apache.bigtop.manager.stack.core.spi.script.Script;
 import org.apache.bigtop.manager.stack.core.utils.linux.LinuxOSUtils;
@@ -100,5 +100,10 @@ public class PrometheusServerScript extends AbstractServerScript {
         } catch (Exception e) {
             throw new StackException(e);
         }
+    }
+
+    @Override
+    public String getComponentName() {
+        return "prometheus_server";
     }
 }

@@ -21,7 +21,7 @@ package org.apache.bigtop.manager.stack.bigtop.v3_3_0.flink;
 import org.apache.bigtop.manager.common.constants.Constants;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.stack.bigtop.utils.HdfsUtil;
-import org.apache.bigtop.manager.stack.core.param.Params;
+import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.utils.linux.LinuxFileUtils;
 
 import lombok.AccessLevel;

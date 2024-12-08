@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.solr;
 
 import org.apache.bigtop.manager.common.shell.ShellResult;
-import org.apache.bigtop.manager.stack.core.param.Params;
+import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.spi.script.AbstractClientScript;
 import org.apache.bigtop.manager.stack.core.spi.script.Script;
 
@@ -33,5 +33,10 @@ public class SolrClientScript extends AbstractClientScript {
     @Override
     public ShellResult configure(Params params) {
         return SolrSetup.config(params);
+    }
+
+    @Override
+    public String getComponentName() {
+        return "solr_client";
     }
 }

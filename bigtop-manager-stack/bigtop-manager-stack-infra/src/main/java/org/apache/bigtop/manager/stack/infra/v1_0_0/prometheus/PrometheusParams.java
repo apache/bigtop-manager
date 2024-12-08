@@ -19,15 +19,20 @@
 package org.apache.bigtop.manager.stack.infra.v1_0_0.prometheus;
 
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
+import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.infra.param.InfraParams;
 
+import com.google.auto.service.AutoService;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.text.MessageFormat;
 
 @Getter
 @Slf4j
+@AutoService(Params.class)
+@NoArgsConstructor
 public class PrometheusParams extends InfraParams {
 
     public PrometheusParams(CommandPayload commandPayload) {
@@ -36,5 +41,10 @@ public class PrometheusParams extends InfraParams {
 
     public String dataDir() {
         return MessageFormat.format("{0}/data", serviceHome());
+    }
+
+    @Override
+    public String getServiceName() {
+        return "prometheus";
     }
 }

@@ -19,8 +19,8 @@
 package org.apache.bigtop.manager.stack.core.spi.script;
 
 import org.apache.bigtop.manager.common.shell.ShellResult;
-import org.apache.bigtop.manager.stack.core.param.Params;
 import org.apache.bigtop.manager.stack.core.spi.PrioritySPI;
+import org.apache.bigtop.manager.stack.core.spi.param.Params;
 
 /**
  * Interface representing a script for component support.
@@ -84,4 +84,10 @@ public interface Script extends PrioritySPI {
      * @return a ShellResult object indicating success
      */
     ShellResult check(Params params);
+
+    String getComponentName();
+
+    default String getName() {
+        return getComponentName();
+    }
 }

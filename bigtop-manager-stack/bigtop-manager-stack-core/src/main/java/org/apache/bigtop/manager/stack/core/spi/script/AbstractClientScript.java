@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.stack.core.spi.script;
 
 import org.apache.bigtop.manager.common.shell.ShellResult;
-import org.apache.bigtop.manager.stack.core.param.Params;
+import org.apache.bigtop.manager.stack.core.spi.param.Params;
 
 public abstract class AbstractClientScript extends AbstractScript {
 
