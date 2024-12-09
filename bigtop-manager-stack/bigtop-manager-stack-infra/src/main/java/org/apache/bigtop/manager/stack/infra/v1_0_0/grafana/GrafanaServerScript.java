@@ -93,7 +93,6 @@ public class GrafanaServerScript extends AbstractServerScript {
     public ShellResult status(Params params) {
         GrafanaParams grafanaParams = (GrafanaParams) params;
         String cmd = MessageFormat.format("pgrep -f {0}/bin/grafana", grafanaParams.serviceHome());
-        log.info(cmd);
         try {
             ShellResult result = LinuxOSUtils.execCmd(cmd);
             if (result.getExitCode() == 0) {

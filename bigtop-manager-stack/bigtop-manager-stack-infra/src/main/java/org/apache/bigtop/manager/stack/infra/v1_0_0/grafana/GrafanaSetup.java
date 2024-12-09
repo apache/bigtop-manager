@@ -38,6 +38,6 @@ public class GrafanaSetup {
 
         LinuxFileUtils.createDirectories(prometheusParams.dataDir(), user, group, Constants.PERMISSION_755, true);
 
-        return ShellResult.success("Prometheus Configure success!");
+        return ShellResult.success("Grafana Configure success!");
     }
 }

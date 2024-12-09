@@ -46,8 +46,8 @@
                 </architectures>
                 <packages>
                     <package>
-                        <name>prometheus-2.54.0.linux-amd64.tar.gz</name>
-                        <checksum>SHA-256:465e1393a0cca9705598f6ffaf96ffa78d0347808ab21386b0c6aaec2cf7aa13</checksum>
+                        <name>grafana-enterprise-11.4.0.linux-amd64.tar.gz</name>
+                        <checksum>SHA-256:1334ef2e4232fdf5443542c6fa9b5abe25720edbf03363aa9f2d5147ba231fae</checksum>
                     </package>
                 </packages>
             </package-specific>
