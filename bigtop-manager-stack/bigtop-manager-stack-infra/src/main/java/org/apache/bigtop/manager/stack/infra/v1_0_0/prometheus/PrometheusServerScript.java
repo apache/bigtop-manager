@@ -18,6 +18,7 @@
  */
 package org.apache.bigtop.manager.stack.infra.v1_0_0.prometheus;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.stack.core.exception.StackException;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
@@ -31,6 +32,7 @@ import java.text.MessageFormat;
 import java.util.Properties;
 
 @AutoService(Script.class)
+@Slf4j
 public class PrometheusServerScript extends AbstractServerScript {
 
     @Override
@@ -53,6 +55,7 @@ public class PrometheusServerScript extends AbstractServerScript {
         String cmd = MessageFormat.format(
                 "nohup {0}/prometheus --config.file={0}/prometheus.yml --storage.tsdb.path={0}/data > {0}/nohup.out 2>&1 &",
                 prometheusParams.serviceHome());
+        log.info(cmd);
         try {
             ShellResult shellResult = LinuxOSUtils.sudoExecCmd(cmd, prometheusParams.user());
             if (shellResult.getExitCode() != 0) {

@@ -18,6 +18,7 @@
  */
 package org.apache.bigtop.manager.stack.infra.v1_0_0.grafana;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.stack.core.exception.StackException;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
@@ -31,6 +32,7 @@ import java.text.MessageFormat;
 import java.util.Properties;
 
 @AutoService(Script.class)
+@Slf4j
 public class GrafanaServerScript extends AbstractServerScript {
 
     @Override
@@ -49,14 +51,15 @@ public class GrafanaServerScript extends AbstractServerScript {
     @Override
     public ShellResult start(Params params) {
         configure(params);
-        GrafanaParams prometheusParams = (GrafanaParams) params;
+        GrafanaParams grafanaParams = (GrafanaParams) params;
         String cmd = MessageFormat.format(
-                "nohup {0}/prometheus --config.file={0}/prometheus.yml --storage.tsdb.path={0}/data > {0}/nohup.out 2>&1 &",
-                prometheusParams.serviceHome());
+                "nohup {0}/bin/grafana server --config {0}/conf/defaults.ini --homepath {0} > {0}/nohup.out 2>&1 &",
+                grafanaParams.serviceHome());
+        log.info(cmd);
         try {
-            ShellResult shellResult = LinuxOSUtils.sudoExecCmd(cmd, prometheusParams.user());
+            ShellResult shellResult = LinuxOSUtils.sudoExecCmd(cmd, grafanaParams.user());
             if (shellResult.getExitCode() != 0) {
-                throw new StackException("Failed to start Prometheus: {0}", shellResult.getErrMsg());
+                throw new StackException("Failed to start Grafana: {0}", shellResult.getErrMsg());
             }
             long startTime = System.currentTimeMillis();
             long maxWaitTime = 5000;
@@ -77,10 +80,10 @@ public class GrafanaServerScript extends AbstractServerScript {
 
     @Override
     public ShellResult stop(Params params) {
-        GrafanaParams prometheusParams = (GrafanaParams) params;
-        String cmd = MessageFormat.format("pkill -f {0}/prometheus", prometheusParams.serviceHome());
+        GrafanaParams grafanaParams = (GrafanaParams) params;
+        String cmd = MessageFormat.format("pkill -f {0}/bin/grafana", grafanaParams.serviceHome());
         try {
-            return LinuxOSUtils.sudoExecCmd(cmd, prometheusParams.user());
+            return LinuxOSUtils.sudoExecCmd(cmd, grafanaParams.user());
         } catch (Exception e) {
             throw new StackException(e);
         }
@@ -88,14 +91,15 @@ public class GrafanaServerScript extends AbstractServerScript {
 
     @Override
     public ShellResult status(Params params) {
-        GrafanaParams prometheusParams = (GrafanaParams) params;
-        String cmd = MessageFormat.format("pgrep -f {0}/prometheus", prometheusParams.serviceHome());
+        GrafanaParams grafanaParams = (GrafanaParams) params;
+        String cmd = MessageFormat.format("pgrep -f {0}/bin/grafana", grafanaParams.serviceHome());
+        log.info(cmd);
         try {
             ShellResult result = LinuxOSUtils.execCmd(cmd);
             if (result.getExitCode() == 0) {
                 return ShellResult.success();
             } else {
-                return new ShellResult(-1, "", "Prometheus is not running");
+                return new ShellResult(-1, "", "Grafana is not running");
             }
         } catch (Exception e) {
             throw new StackException(e);
@@ -104,6 +108,6 @@ public class GrafanaServerScript extends AbstractServerScript {
 
     @Override
     public String getComponentName() {
-        return "prometheus_server";
+        return "grafana_server";
     }
 }

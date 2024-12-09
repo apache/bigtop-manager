@@ -45,6 +45,6 @@ public class GrafanaParams extends InfraParams {
 
     @Override
     public String getServiceName() {
-        return "prometheus";
+        return "grafana";
     }
 }

@@ -46,6 +46,9 @@ public class PrioritySPIFactory<T extends PrioritySPI> {
 
     private void resolveConflict(T newSPI) {
         T oldSPI = map.get(newSPI.getName());
+        log.info(String.valueOf(oldSPI.getPriority()));
+        log.info(String.valueOf(oldSPI.getName()));
+        log.info(String.valueOf(newSPI.getName()));
 
         if (newSPI.compareTo(oldSPI.getPriority()) == 0) {
             throw new IllegalArgumentException(String.format(
