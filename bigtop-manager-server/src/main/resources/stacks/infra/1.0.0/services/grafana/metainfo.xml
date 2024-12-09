@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one
+  ~ or more contributor license agreements.  See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership.  The ASF licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License.  You may obtain a copy of the License at
+  ~
+  ~    https://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+-->
+
+<metainfo>
+    <service>
+        <name>grafana</name>
+        <display-name>Grafana</display-name>
+        <desc>
+            Prometheus, a Cloud Native Computing Foundation project, is a systems and service monitoring system. It
+            collects metrics from configured targets at given intervals, evaluates rule expressions, displays the
+            results, and can trigger alerts when specified conditions are observed.
+        </desc>
+        <version>11.3.2</version>
+        <user>lhp</user>
+
+        <components>
+            <component>
+                <name>grafana_server</name>
+                <display-name>Grafana Server</display-name>
+                <category>server</category>
+                <cardinality>1+</cardinality>
+            </component>
+        </components>
+
+        <package-specifics>
+            <package-specific>
+                <architectures>
+                    <arch>x86_64</arch>
+                </architectures>
+                <packages>
+                    <package>
+                        <name>prometheus-2.54.0.linux-amd64.tar.gz</name>
+                        <checksum>SHA-256:465e1393a0cca9705598f6ffaf96ffa78d0347808ab21386b0c6aaec2cf7aa13</checksum>
+                    </package>
+                </packages>
+            </package-specific>
+            <package-specific>
+                <architectures>
+                    <arch>aarch64</arch>
+                </architectures>
+                <packages>
+                    <package>
+                        <name>grafana-enterprise-11.3.2.linux-arm64.tar.gz</name>
+                        <checksum>SHA-256:2392c29712d23d6a3ddaa2607b886a3afaa53dd8925917b8a015aa672691fe24</checksum>
+                    </package>
+                </packages>
+            </package-specific>
+        </package-specifics>
+    </service>
+</metainfo>
