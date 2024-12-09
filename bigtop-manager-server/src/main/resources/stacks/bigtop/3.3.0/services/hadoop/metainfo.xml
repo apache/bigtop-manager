@@ -112,7 +112,7 @@
                 <packages>
                     <package>
                         <name>hadoop-3.3.6-1.tar.gz</name>
-                        <checksum>SHA-256:2a9312eac69a542c6266f1689d29ded243dde2d61add333a9762829008f97442</checksum>
+                        <checksum>SHA-256:0da6364126c6ea6dd0f5b545afec33957ee801d6db6c0874edb0aa5be1e89995</checksum>
                     </package>
                 </packages>
             </package-specific>

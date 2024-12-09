@@ -18,6 +18,9 @@
  */
 package org.apache.bigtop.manager.stack.core.tarball;
 
+import org.apache.bigtop.manager.common.message.entity.pojo.PackageInfo;
+import org.apache.bigtop.manager.stack.core.exception.StackException;
+
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -30,7 +33,55 @@ import java.net.URL;
 public class TarballDownloader {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public static Boolean downloadFile(String fileUrl, String saveDir) {
+    public static void download(String remoteUrl, String saveDir, PackageInfo packageInfo) {
+        File localFile = new File(saveDir + File.separator + packageInfo.getName());
+        String algorithm = packageInfo.getChecksum().split(":")[0];
+        String checksum = packageInfo.getChecksum().split(":")[1];
+
+        if (localFile.exists()) {
+            log.info("File [{}] exists, validating checksum", localFile.getAbsolutePath());
+        } else {
+            log.info("Downloading [{}] to [{}]", remoteUrl, saveDir);
+            download(remoteUrl, saveDir);
+        }
+
+        boolean validateChecksum = ChecksumValidator.validateChecksum(algorithm, checksum, localFile);
+        if (!validateChecksum) {
+            log.warn("Invalid checksum for [{}], re-downloading...", localFile.getAbsolutePath());
+            localFile.delete();
+            download(remoteUrl, saveDir);
+        }
+
+        validateChecksum = ChecksumValidator.validateChecksum(algorithm, checksum, localFile);
+        if (!validateChecksum) {
+            log.error("Invalid checksum for [{}], exiting...", localFile.getAbsolutePath());
+            throw new StackException("Invalid checksum for " + localFile.getAbsolutePath());
+        }
+
+        log.info("Checksum validate successfully for [{}]", localFile.getAbsolutePath());
+    }
+
+    private static void download(String remoteUrl, String saveDir) {
+        int i = 1;
+        while (true) {
+            Boolean downloaded = downloadFile(remoteUrl, saveDir);
+            if (downloaded) {
+                break;
+            } else {
+                if (i == 3) {
+                    log.error("Failed to download [{}], exiting...", remoteUrl);
+                    throw new StackException("Failed to download " + remoteUrl);
+                } else {
+                    log.error("Failed to download [{}], retrying...: {}", remoteUrl, i);
+                }
+            }
+
+            i++;
+        }
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    private static Boolean downloadFile(String fileUrl, String saveDir) {
         HttpURLConnection httpConn = null;
         try {
             URL url = new URL(fileUrl);

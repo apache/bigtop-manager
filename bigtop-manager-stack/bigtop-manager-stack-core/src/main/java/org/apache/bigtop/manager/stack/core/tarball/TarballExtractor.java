@@ -126,7 +126,7 @@ public class TarballExtractor {
     }
 
     private static boolean isTarGz(String filePath) {
-        return filePath.endsWith(".tar.gz");
+        return filePath.endsWith(".tar.gz") || filePath.endsWith(".tgz");
     }
 
     private static boolean isTar(String filePath) {

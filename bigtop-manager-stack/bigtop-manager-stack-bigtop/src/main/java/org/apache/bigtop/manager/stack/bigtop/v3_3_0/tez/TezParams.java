@@ -77,25 +77,12 @@ public class TezParams extends BigtopParams {
         return tezEnv;
     }
 
-    @Override
-    public String confDir() {
-        return "/etc/tez/conf";
-    }
-
     public String hadoopConfDir() {
-        return "/etc/hadoop/conf";
+        return hadoopHome() + "/etc/hadoop";
     }
 
     public String hadoopHome() {
         return stackHome() + "/hadoop";
-    }
-
-    public String hdfsHome() {
-        return stackHome() + "/hadoop-hdfs";
-    }
-
-    public String yarnHome() {
-        return stackHome() + "/hadoop-yarn";
     }
 
     @Override
