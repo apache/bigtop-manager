@@ -23,6 +23,7 @@ import org.apache.bigtop.manager.server.utils.ResponseEntity;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -42,19 +43,26 @@ public class MonitoringController {
     @Operation(summary = "agent healthy", description = "agent healthy check")
     @GetMapping("agenthealthy")
     public ResponseEntity<JsonNode> agentHostsHealthyStatus() {
-        // json for response
         return ResponseEntity.success(monitoringService.queryAgentsHealthyStatus());
     }
 
-    @Operation(summary = "agent Info", description = "agent info query")
-    @GetMapping("agentinfo")
+    @Operation(summary = "staticAgentInfo", description = "agent static info query")
+    @GetMapping("staticAgentInfo")
     public ResponseEntity<JsonNode> queryAgentsInfo() {
         return ResponseEntity.success(monitoringService.queryAgentsInfo());
     }
 
-    @Operation(summary = "agent instant info", description = "agent instant info query")
-    @GetMapping("agentinstinfo")
-    public ResponseEntity<JsonNode> queryAgentsInstStatus() {
-        return ResponseEntity.success(monitoringService.queryAgentsInstStatus());
+    @Operation(summary = "dynamicAgentInfo", description = "agent dynamic info query")
+    @GetMapping("dynamicAgentInfo")
+    public ResponseEntity<JsonNode> queryAgentsInfo(@RequestParam(value = "step", defaultValue = "1") String step) {
+        return ResponseEntity.success(monitoringService.queryAgentsInfo(step));
+    }
+
+    @Operation(summary = "cluster info", description = "cluster multi info")
+    @GetMapping("clusterInfo")
+    public ResponseEntity<JsonNode> queryCluster(
+            @RequestParam(value = "clusterId") String clusterId,
+            @RequestParam(value = "step", defaultValue = "1") String step) {
+        return ResponseEntity.success(monitoringService.queryClusterInfo(clusterId, step));
     }
 }
