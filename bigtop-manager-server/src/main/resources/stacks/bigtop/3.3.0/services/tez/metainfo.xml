@@ -39,17 +39,19 @@
             <package-specific>
                 <architectures>
                     <arch>x86_64</arch>
+                    <arch>aarch64</arch>
                 </architectures>
                 <packages>
                     <package>
-                        <name>tez_3_3_0</name>
+                        <name>tez-0.10.2-1.tar.gz</name>
+                        <checksum>SHA-256:ebc2c195780fc76fb9b12e8987e48c301ca0b1916dca515f5c7a1122d74f397e</checksum>
                     </package>
                 </packages>
             </package-specific>
         </package-specifics>
 
         <required-services>
-            <service>hdfs</service>
+            <service>hadoop</service>
         </required-services>
     </service>
 </metainfo>

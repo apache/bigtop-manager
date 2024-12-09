@@ -52,17 +52,19 @@
             <package-specific>
                 <architectures>
                     <arch>x86_64</arch>
+                    <arch>aarch64</arch>
                 </architectures>
                 <packages>
                     <package>
-                        <name>flink_3_3_0</name>
+                        <name>flink-1.16.2-1.tgz</name>
+                        <checksum>SHA-256:8c6da7cbab14b9cf0ce39c8c873b29f16c83df0b95b7af5cf3061a468efac228</checksum>
                     </package>
                 </packages>
             </package-specific>
         </package-specifics>
 
         <required-services>
-            <service>yarn</service>
+            <service>hadoop</service>
         </required-services>
     </service>
 </metainfo>
