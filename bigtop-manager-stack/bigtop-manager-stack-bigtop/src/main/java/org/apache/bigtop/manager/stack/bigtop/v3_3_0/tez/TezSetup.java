@@ -19,6 +19,7 @@
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.tez;
 
 import org.apache.bigtop.manager.common.constants.Constants;
+import org.apache.bigtop.manager.common.message.entity.pojo.PackageInfo;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.stack.core.enums.ConfigType;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
@@ -30,6 +31,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.text.MessageFormat;
+import java.util.List;
 
 import static org.apache.bigtop.manager.common.constants.Constants.PERMISSION_755;
 
@@ -42,11 +44,23 @@ public class TezSetup {
         TezParams tezParams = (TezParams) params;
 
         String confDir = tezParams.confDir();
+        String serviceHome = tezParams.serviceHome();
+        String libDir = serviceHome + "/lib";
         String hadoopUser = LocalSettings.users().get("hadoop");
         String tezUser = tezParams.user();
         String tezGroup = tezParams.group();
 
+        LinuxFileUtils.createDirectories(serviceHome, tezUser, tezGroup, Constants.PERMISSION_755, true);
         LinuxFileUtils.createDirectories(confDir, tezUser, tezGroup, Constants.PERMISSION_755, true);
+        LinuxFileUtils.createDirectories(libDir, tezUser, tezGroup, Constants.PERMISSION_755, true);
+
+        List<PackageInfo> packages = params.packages();
+        for (PackageInfo packageInfo : packages) {
+            String source = tezParams.stackHome() + "/" + packageInfo.getName();
+            String dest = libDir + "/tez.tar.gz";
+            LinuxFileUtils.copyFile(source, dest);
+            LinuxFileUtils.updateOwner(dest, tezUser, tezGroup, false);
+        }
 
         LinuxFileUtils.toFile(
                 ConfigType.XML,

@@ -208,6 +208,31 @@ public class LinuxFileUtils {
         }
     }
 
+    public static void copyFile(String source, String dest) {
+        if (StringUtils.isBlank(source) || StringUtils.isBlank(dest)) {
+            log.error("source and dest must not be empty");
+            return;
+        }
+
+        List<String> builderParameters = new ArrayList<>();
+        builderParameters.add("cp");
+        if (Files.exists(Path.of(source)) && Files.isDirectory(Paths.get(source))) {
+            builderParameters.add("-r");
+        }
+
+        builderParameters.add(source);
+        builderParameters.add(dest);
+
+        try {
+            ShellResult shellResult = sudoExecCmd(builderParameters);
+            if (shellResult.getExitCode() != MessageConstants.SUCCESS_CODE) {
+                throw new StackException(shellResult.getErrMsg());
+            }
+        } catch (IOException e) {
+            throw new StackException(e);
+        }
+    }
+
     public static void moveFile(String source, String dest) {
         if (StringUtils.isBlank(source) || StringUtils.isBlank(dest)) {
             log.error("source and dest must not be empty");
