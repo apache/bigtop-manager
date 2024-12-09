@@ -28,7 +28,7 @@
             Loki, Elasticsearch, InfluxDB, Postgres and many more.
         </desc>
         <version>11.3.2</version>
-        <user>lhp</user>
+        <user>grafana</user>
 
         <components>
             <component>
@@ -46,8 +46,8 @@
                 </architectures>
                 <packages>
                     <package>
-                        <name>grafana-enterprise-11.4.0.linux-amd64.tar.gz</name>
-                        <checksum>SHA-256:1334ef2e4232fdf5443542c6fa9b5abe25720edbf03363aa9f2d5147ba231fae</checksum>
+                        <name>grafana-enterprise-11.3.2.linux-amd64.tar.gz</name>
+                        <checksum>SHA-256:753733f98cb1e72a26fb723f4634c365e59cdd8e63fbde644f35606023c25b93</checksum>
                     </package>
                 </packages>
             </package-specific>

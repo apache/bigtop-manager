@@ -26,7 +26,6 @@ import org.apache.bigtop.manager.stack.core.spi.script.Script;
 import org.apache.bigtop.manager.stack.core.utils.linux.LinuxOSUtils;
 
 import com.google.auto.service.AutoService;
-import lombok.extern.slf4j.Slf4j;
 
 import java.text.MessageFormat;
 import java.util.Properties;
