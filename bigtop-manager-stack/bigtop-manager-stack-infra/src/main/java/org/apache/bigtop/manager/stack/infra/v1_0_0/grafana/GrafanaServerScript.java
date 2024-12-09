@@ -53,8 +53,7 @@ public class GrafanaServerScript extends AbstractServerScript {
         configure(params);
         GrafanaParams grafanaParams = (GrafanaParams) params;
         String cmd = MessageFormat.format(
-                "nohup {0}/bin/grafana server --homepath {0} > {0}/nohup.out 2>&1 &",
-                grafanaParams.serviceHome());
+                "nohup {0}/bin/grafana server --homepath {0} > {0}/nohup.out 2>&1 &", grafanaParams.serviceHome());
         log.info(cmd);
         try {
             ShellResult shellResult = LinuxOSUtils.sudoExecCmd(cmd, grafanaParams.user());

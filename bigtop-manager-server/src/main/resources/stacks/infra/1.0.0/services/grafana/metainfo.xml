@@ -28,7 +28,7 @@
             Loki, Elasticsearch, InfluxDB, Postgres and many more.
         </desc>
         <version>11.4.0</version>
-        <user>lhp</user>
+        <user>grafana</user>
 
         <components>
             <component>
