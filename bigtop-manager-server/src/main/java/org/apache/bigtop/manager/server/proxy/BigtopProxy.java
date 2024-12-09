@@ -37,7 +37,7 @@ public class BigtopProxy {
 
     private final WebClient webClient;
 
-    public BigtopProxy(WebClient.Builder webClientBuilder, @Value("http://localhost:5173") String bigTopHost) {
+    public BigtopProxy(WebClient.Builder webClientBuilder, @Value("${monitoring.bigtop-host}") String bigTopHost) {
         this.webClient = webClientBuilder.baseUrl(bigTopHost).build();
     }
 
