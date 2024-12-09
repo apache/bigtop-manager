@@ -32,11 +32,11 @@ import lombok.extern.slf4j.Slf4j;
 public class GrafanaSetup {
 
     public static ShellResult config(Params params) {
-        GrafanaParams prometheusParams = (GrafanaParams) params;
-        String user = prometheusParams.user();
-        String group = prometheusParams.group();
+        GrafanaParams grafanaParams = (GrafanaParams) params;
+        String user = grafanaParams.user();
+        String group = grafanaParams.group();
 
-        LinuxFileUtils.createDirectories(prometheusParams.dataDir(), user, group, Constants.PERMISSION_755, true);
+        LinuxFileUtils.createDirectories(grafanaParams.dataDir(), user, group, Constants.PERMISSION_755, true);
 
         return ShellResult.success("Grafana Configure success!");
     }
