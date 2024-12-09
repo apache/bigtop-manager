@@ -35,6 +35,7 @@ import org.apache.bigtop.manager.dao.repository.ChatThreadDao;
 import org.apache.bigtop.manager.dao.repository.PlatformDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.enums.AuthPlatformStatus;
+import org.apache.bigtop.manager.server.enums.ChatbotCommand;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.holder.SessionUserHolder;
 import org.apache.bigtop.manager.server.model.converter.AuthPlatformConverter;
@@ -46,6 +47,7 @@ import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
 import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
 import org.apache.bigtop.manager.server.model.vo.TalkVO;
 import org.apache.bigtop.manager.server.service.ChatbotService;
+import org.apache.bigtop.manager.server.tools.AiServiceToolsProvider;
 
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
@@ -118,10 +120,19 @@ public class ChatbotServiceImpl implements ChatbotService {
     }
 
     private AIAssistant buildAIAssistant(
-            String platformName, String model, Map<String, String> credentials, Long threadId) {
-        return getAIAssistantFactory()
-                .createAiService(
-                        getPlatformType(platformName), getAIAssistantConfig(model, credentials), threadId, null);
+            String platformName, String model, Map<String, String> credentials, Long threadId, ChatbotCommand command) {
+        if (command == null) {
+            return getAIAssistantFactory()
+                    .createAiService(
+                            getPlatformType(platformName), getAIAssistantConfig(model, credentials), threadId, null);
+        } else {
+            return getAIAssistantFactory()
+                    .createAiService(
+                            getPlatformType(platformName),
+                            getAIAssistantConfig(model, credentials),
+                            threadId,
+                            new AiServiceToolsProvider(command));
+        }
     }
 
     @Override
@@ -182,7 +193,7 @@ public class ChatbotServiceImpl implements ChatbotService {
         return chatThreads;
     }
 
-    private AIAssistant prepareTalk(Long threadId) {
+    private AIAssistant prepareTalk(Long threadId, ChatbotCommand command, String message) {
         ChatThreadPO chatThreadPO = chatThreadDao.findById(threadId);
         Long userId = SessionUserHolder.getUserId();
         if (!Objects.equals(userId, chatThreadPO.getUserId()) || chatThreadPO.getIsDeleted()) {
@@ -199,14 +210,22 @@ public class ChatbotServiceImpl implements ChatbotService {
 
         PlatformPO platformPO = platformDao.findById(authPlatformPO.getPlatformId());
         return buildAIAssistant(
-                platformPO.getName(), authPlatformDTO.getModel(), authPlatformDTO.getAuthCredentials(), threadId);
+                platformPO.getName(),
+                authPlatformDTO.getModel(),
+                authPlatformDTO.getAuthCredentials(),
+                threadId,
+                command);
     }
 
     @Override
-    public SseEmitter talk(Long threadId, String message) {
-        AIAssistant aiAssistant = prepareTalk(threadId);
-        Flux<String> stringFlux = aiAssistant.streamAsk(message);
-
+    public SseEmitter talk(Long threadId, ChatbotCommand command, String message) {
+        AIAssistant aiAssistant = prepareTalk(threadId, command, message);
+        Flux<String> stringFlux;
+        if (command == null) {
+            stringFlux = aiAssistant.streamAsk(message);
+        } else {
+            stringFlux = Flux.just(aiAssistant.ask(message));
+        }
         SseEmitter emitter = new SseEmitter();
         stringFlux.subscribe(
                 s -> {
@@ -288,6 +307,11 @@ public class ChatbotServiceImpl implements ChatbotService {
         AuthPlatformPO authPlatformPO = authPlatformDao.findById(chatThreadPO.getAuthId());
         return ChatThreadConverter.INSTANCE.fromPO2VO(
                 chatThreadPO, authPlatformPO, platformDao.findById(authPlatformPO.getPlatformId()));
+    }
+
+    @Override
+    public List<String> getChatbotCommands() {
+        return ChatbotCommand.getAllCommands();
     }
 
     @Override
