@@ -50,7 +50,6 @@ public class ProxyUtils {
         double[] cache = new double[6];
         for (int i = 0; i < num; i++) for (int j = 0; j < 6; j++) cache[j] += array[i][j];
         ArrayNode node = mapper.createArrayNode();
-        // 数据排序为日期小在前，日期大在后
         for (int j = 0; j < 6; j++) node.add(cache[j] / cores);
         return node;
     }
