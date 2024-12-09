@@ -27,8 +27,8 @@
             Visualize metrics, logs, and traces from multiple sources like Prometheus, 
             Loki, Elasticsearch, InfluxDB, Postgres and many more.
         </desc>
-        <version>11.3.2</version>
-        <user>grafana</user>
+        <version>11.4.0</version>
+        <user>lhp</user>
 
         <components>
             <component>
@@ -46,8 +46,8 @@
                 </architectures>
                 <packages>
                     <package>
-                        <name>grafana-enterprise-11.3.2.linux-amd64.tar.gz</name>
-                        <checksum>SHA-256:753733f98cb1e72a26fb723f4634c365e59cdd8e63fbde644f35606023c25b93</checksum>
+                        <name>grafana-11.4.0.linux-amd64.tar.gz</name>
+                        <checksum>SHA-256:3550c73f4455435642976e82cc89aa354f076a75b766a408781107f4f5d4744c</checksum>
                     </package>
                 </packages>
             </package-specific>
@@ -57,8 +57,8 @@
                 </architectures>
                 <packages>
                     <package>
-                        <name>grafana-enterprise-11.3.2.linux-arm64.tar.gz</name>
-                        <checksum>SHA-256:2392c29712d23d6a3ddaa2607b886a3afaa53dd8925917b8a015aa672691fe24</checksum>
+                        <name>grafana-11.4.0.linux-arm64.tar.gz</name>
+                        <checksum>SHA-256:c978b46a61d92883119131641c03b8a1323a284e74ab9a20e7e48207dc1a11e1</checksum>
                     </package>
                 </packages>
             </package-specific>
