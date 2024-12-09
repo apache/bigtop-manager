@@ -53,7 +53,7 @@ public class GrafanaServerScript extends AbstractServerScript {
         configure(params);
         GrafanaParams grafanaParams = (GrafanaParams) params;
         String cmd = MessageFormat.format(
-                "nohup {0}/bin/grafana server --config {0}/conf/defaults.ini --homepath {0} > {0}/nohup.out 2>&1 &",
+                "nohup {0}/bin/grafana server --homepath {0} > {0}/nohup.out 2>&1 &",
                 grafanaParams.serviceHome());
         log.info(cmd);
         try {
