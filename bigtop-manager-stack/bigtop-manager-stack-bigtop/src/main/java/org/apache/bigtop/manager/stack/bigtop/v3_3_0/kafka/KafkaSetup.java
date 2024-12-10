@@ -41,7 +41,8 @@ import static org.apache.bigtop.manager.common.constants.Constants.ROOT_USER;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class KafkaSetup {
 
-    public static ShellResult config(Params params) {
+    public static ShellResult configure(Params params) {
+        log.info("Configuring Kafka");
         KafkaParams kafkaParams = (KafkaParams) params;
 
         String confDir = kafkaParams.confDir();
@@ -52,7 +53,6 @@ public class KafkaSetup {
         LinuxFileUtils.createDirectories(kafkaParams.getKafkaLogDir(), kafkaUser, kafkaGroup, PERMISSION_755, true);
         LinuxFileUtils.createDirectories(kafkaParams.getKafkaPidDir(), kafkaUser, kafkaGroup, PERMISSION_755, true);
 
-        // server.properties
         List<String> zookeeperServerHosts = LocalSettings.hosts("zookeeper_server");
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("zk_server_list", zookeeperServerHosts);
@@ -66,7 +66,6 @@ public class KafkaSetup {
                 kafkaParams.kafkaBroker(),
                 paramMap);
 
-        // kafka-env
         LinuxFileUtils.toFileByTemplate(
                 kafkaParams.getKafkaEnvContent(),
                 MessageFormat.format("{0}/kafka-env.sh", confDir),
@@ -75,7 +74,6 @@ public class KafkaSetup {
                 PERMISSION_644,
                 kafkaParams.getGlobalParamsMap());
 
-        // log4j
         LinuxFileUtils.toFileByTemplate(
                 kafkaParams.getKafkaLog4jContent(),
                 MessageFormat.format("{0}/log4j.properties", confDir),
@@ -84,7 +82,6 @@ public class KafkaSetup {
                 PERMISSION_644,
                 kafkaParams.getGlobalParamsMap());
 
-        // kafka.limits
         LinuxFileUtils.toFileByTemplate(
                 kafkaParams.kafkaLimits(),
                 MessageFormat.format("{0}/kafka.conf", KafkaParams.LIMITS_CONF_DIR),
@@ -93,6 +90,7 @@ public class KafkaSetup {
                 PERMISSION_644,
                 kafkaParams.getGlobalParamsMap());
 
-        return ShellResult.success("Kafka Server Configure success!");
+        log.info("Successfully configured Kafka");
+        return ShellResult.success();
     }
 }
