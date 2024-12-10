@@ -19,74 +19,6 @@
 -->
 <configuration>
     <property>
-        <name>maxBooleanClauses</name>
-        <value>${solr.max.booleanClauses:1024}</value>
-    </property>
-    <property>
-        <name>sharedLib</name>
-        <value>${solr.sharedLib:}</value>
-    </property>
-    <property>
-        <name>allowPaths</name>
-        <value>${solr.allowPaths:}</value>
-    </property>
-    <property>
-        <name>host</name>
-        <value>${host:}</value>
-    </property>
-    <property>
-        <name>hostPort</name>
-        <value>${solr.port.advertise:0}</value>
-    </property>
-    <property>
-        <name>hostContext</name>
-        <value>${hostContext:solr}</value>
-    </property>
-    <property>
-        <name>genericCoreNodeNames</name>
-        <value>${genericCoreNodeNames:true}</value>
-    </property>
-    <property>
-        <name>zkClientTimeout</name>
-        <value>${zkClientTimeout:30000}</value>
-    </property>
-    <property>
-        <name>distribUpdateSoTimeout</name>
-        <value>${distribUpdateSoTimeout:600000}</value>
-    </property>
-    <property>
-        <name>distribUpdateConnTimeout</name>
-        <value>${distribUpdateConnTimeout:60000}</value>
-    </property>
-    <property>
-        <name>zkCredentialsProvider</name>
-        <value>${zkCredentialsProvider:org.apache.solr.common.cloud.DefaultZkCredentialsProvider}</value>
-    </property>
-    <property>
-        <name>zkCredentialsProvider</name>
-        <value>${zkCredentialsProvider:org.apache.solr.common.cloud.DefaultZkCredentialsProvider}</value>
-    </property>
-    <property>
-        <name>zkACLProvider</name>
-        <value>${zkACLProvider:org.apache.solr.common.cloud.DefaultZkACLProvider}</value>
-    </property>
-    <property>
-        <name>socketTimeout</name>
-        <value>${socketTimeout:600000}</value>
-    </property>
-    <property>
-        <name>connTimeout</name>
-        <value>${connTimeout:60000}</value>
-    </property>
-    <property>
-        <name>shardsWhitelist</name>
-        <value>${solr.shardsWhitelist:}</value>
-    </property>
-    <property>
-        <name>metricsenabled</name>
-        <value>{metricsEnabled:true</value>
-    </property>
-    <property>
         <name>content</name>
         <display-name>solr-xml template</display-name>
         <description>This is the freemarker template for solr.xml file</description>
@@ -94,29 +26,31 @@
             <type>longtext</type>
         </attrs>
         <value><![CDATA[
+<#noparse>
 <solr>
-  <int name="maxBooleanClauses">${maxBooleanClauses}</int>
-  <str name="sharedLib">${sharedLib}</str>
-  <str name="allowPaths">${allowPaths}</str>
+  <int name="maxBooleanClauses">${solr.max.booleanClauses:1024}</int>
+  <str name="sharedLib">${solr.sharedLib:}</str>
+  <str name="allowPaths">${solr.allowPaths:}</str>
   <solrcloud>
-    <str name="host">${host}</str>
-    <int name="hostPort">${hostPort}</int>
-    <str name="hostContext">${hostContext}</str>
-    <bool name="genericCoreNodeNames">${genericCoreNodeNames}</bool>
-    <int name="zkClientTimeout">${zkClientTimeout}</int>
-    <int name="distribUpdateSoTimeout">${distribUpdateSoTimeout}</int>
-    <int name="distribUpdateConnTimeout">${distribUpdateConnTimeout}</int>
-    <str name="zkCredentialsProvider">${zkCredentialsProvider}</str>
-    <str name="zkACLProvider">${zkACLProvider}</str>
+    <str name="host">${host:}</str>
+    <int name="hostPort">${solr.port.advertise:0}</int>
+    <str name="hostContext">${hostContext:solr}</str>
+    <bool name="genericCoreNodeNames">${genericCoreNodeNames:true}</bool>
+    <int name="zkClientTimeout">${zkClientTimeout:30000}</int>
+    <int name="distribUpdateSoTimeout">${distribUpdateSoTimeout:600000}</int>
+    <int name="distribUpdateConnTimeout">${distribUpdateConnTimeout:60000}</int>
+    <str name="zkCredentialsProvider">${zkCredentialsProvider:org.apache.solr.common.cloud.DefaultZkCredentialsProvider}</str>
+    <str name="zkACLProvider">${zkACLProvider:org.apache.solr.common.cloud.DefaultZkACLProvider}</str>
   </solrcloud>
   <shardHandlerFactory name="shardHandlerFactory"
     class="HttpShardHandlerFactory">
-    <int name="socketTimeout">${socketTimeout}</int>
-    <int name="connTimeout">${connTimeout}</int>
-    <str name="shardsWhitelist">${shardsWhitelist}</str>
+    <int name="socketTimeout">${socketTimeout:600000}</int>
+    <int name="connTimeout">${connTimeout:60000}</int>
+    <str name="shardsWhitelist">${solr.shardsWhitelist:}</str>
   </shardHandlerFactory>
-  <metrics enabled="${metricsenabled}"/>
+  <metrics enabled="${metricsEnabled:true}"/>
 </solr>
+</#noparse>
       ]]>
         </value>
     </property>
