@@ -21,8 +21,39 @@
 
 <template>
   <div>
-    <a-card>{{ $route.params }}</a-card>
+    <!-- <a-card>{{ $route.params }}</a-card> -->
+
+    <a-row class="option-card">
+      <a-col :span="10">
+        <a-space :size="16">
+          <a-avatar shape="square" :size="54" />
+          <div>
+            <a-typography-title :level="5">{{ $route.params.cluster }}</a-typography-title>
+            <a-typography-text type="secondary">暂无描述</a-typography-text>
+          </div>
+          <div class="option-card-status">
+            <svg-icon name="success" />
+          </div>
+        </a-space>
+      </a-col>
+      <a-col :span="14">
+        <a-space :size="16"> </a-space>
+      </a-col>
+    </a-row>
   </div>
 </template>
 
-<style scoped></style>
+<style lang="scss" scoped>
+  .option-card {
+    @include flexbox($align: center);
+    height: 102px;
+    padding: $space-md;
+    background-color: $color-white;
+    :deep(.ant-avatar) {
+      border-radius: 4px;
+    }
+    &-status {
+      align-items: flex-start;
+    }
+  }
+</style>
