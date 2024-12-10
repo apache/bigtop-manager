@@ -30,14 +30,23 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.Properties;
 
 @Slf4j
 @AutoService(Script.class)
 public class KafkaBrokerScript extends AbstractServerScript {
 
     @Override
+    public ShellResult add(Params params) {
+        Properties properties = new Properties();
+        properties.setProperty(PROPERTY_KEY_SKIP_LEVELS, "1");
+
+        return super.add(params, properties);
+    }
+
+    @Override
     public ShellResult configure(Params params) {
-        return KafkaSetup.config(params);
+        return KafkaSetup.configure(params);
     }
 
     @Override
