@@ -120,13 +120,8 @@ public class FlinkParams extends BigtopParams {
         return configurations;
     }
 
-    @Override
-    public String confDir() {
-        return "/etc/flink/conf";
-    }
-
     public String hadoopConfDir() {
-        return "/etc/hadoop/conf";
+        return hadoopHome() + "/etc/hadoop";
     }
 
     public String hadoopHome() {
