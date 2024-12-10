@@ -43,18 +43,6 @@
     </property>
 
     <property>
-        <name>solr_user</name>
-        <value>solr</value>
-        <description>Solr user</description>
-    </property>
-
-    <property>
-        <name>solr_datadir</name>
-        <value>/var/lib/solr/data</value>
-        <description>Directory for storting Solr index. Make sure you have enough disk space</description>
-    </property>
-
-    <property>
         <name>solr_ssl_enabled</name>
         <value>false</value>
         <description>Enable ssl to Solr</description>
@@ -199,7 +187,7 @@
 
     <property>
         <name>solr_extra_java_opts</name>
-        <value></value>
+        <value />
         <description>Extra Solr java options (e.g.: -Dproperty=value), that will be added to SOLR_OPTS environment
             variable
         </description>
@@ -207,11 +195,11 @@
 
     <property>
         <name>solr_gc_log_opts</name>
-        <value></value>
+        <value />
     </property>
     <property>
         <name>solr_gc_tune</name>
-        <value></value>
+        <value />
     </property>
     <property>
         <name>solr_min_mem</name>
@@ -226,11 +214,11 @@
         <value>false</value>
     </property>
 
-    <!-- solr-env.sh -->
+    <!-- solr.in.sh -->
     <property>
         <name>content</name>
-        <display-name>solr-env template</display-name>
-        <description>This is the freemarker template for solr-env.sh file</description>
+        <display-name>solr.in template</display-name>
+        <description>This is the freemarker template for solr.in.sh file</description>
         <attrs>
             <type>longtext</type>
         </attrs>
@@ -288,12 +276,12 @@ SOLR_PID_DIR=${solr_pid_dir}
 
 # Path to a directory where Solr creates index files, the specified directory
 # must contain a solr.xml; by default, Solr will use server/solr
-SOLR_HOME=${solr_datadir}
+SOLR_HOME=${solr_home}/server/solr
 
 # Solr provides a default Log4J configuration properties file in server/resources
 # however, you may want to customize the log settings and file appender location
 # so you can point the script to use a different log4j.properties file
-LOG4J_PROPS=/etc/solr/conf/log4j2.xml
+LOG4J_PROPS=${solr_home}/server/resources/log4j2.xml
 
 # Location where Solr should write logs to; should agree with the file appender
 # settings in server/resources/log4j.properties

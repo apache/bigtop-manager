@@ -43,14 +43,16 @@ public class SolrParams extends BigtopParams {
     private String solrPort = "8983";
     private String solrLogDir = "/var/log/solr";
     private String solrPidDir = "/var/run/solr";
-    private String solrHomeDir = "/var/lib/solr";
-    private String solrDataDir = "/var/lib/solr/data";
     private String solrPidFile = solrPidDir + "/solr-" + solrPort + ".pid";
+
+    private String zNode;
+    private String zkString;
+    private String zkHost;
 
     public SolrParams(CommandPayload commandPayload) {
         super(commandPayload);
         globalParamsMap.put("java_home", Environments.getJavaHome());
-        globalParamsMap.put("solr_home", solrHomeDir);
+        globalParamsMap.put("solr_home", serviceHome());
         globalParamsMap.put("security_enabled", false);
         globalParamsMap.put("solr_pid_file", solrPidFile);
         globalParamsMap.put("solr_user", user());
@@ -63,37 +65,25 @@ public class SolrParams extends BigtopParams {
     }
 
     @GlobalParams
-    public Map<String, Object> solrLog4j() {
-        return LocalSettings.configurations(getServiceName(), "solr-log4j");
-    }
-
-    public String getZnode() {
-        Map<String, Object> solrEnv = LocalSettings.configurations(getServiceName(), "solr-env");
-        return (String) solrEnv.get("solr_znode");
-    }
-
-    public String getzkString() {
-        List<String> ZookeeperServerHosts = LocalSettings.hosts("zookeeper_server");
-        Map<String, Object> Zkport = LocalSettings.configurations("zookeeper", "zoo.cfg");
-        String clientPort = (String) Zkport.get("clientPort");
-        return MessageFormat.format("{0}:{1}", ZookeeperServerHosts.get(0), clientPort);
-    }
-
-    public String zkHost() {
-        String Znode = getZnode();
-        String SolrZkstring = getzkString();
-        return MessageFormat.format("{0}{1}", SolrZkstring, Znode);
-    }
-
-    @GlobalParams
     public Map<String, Object> solrEnv() {
-        Map<String, Object> solrEnv = LocalSettings.configurations(getServiceName(), "solr-env");
+        Map<String, Object> solrEnv = LocalSettings.configurations(getServiceName(), "solr.in");
         solrLogDir = (String) solrEnv.get("solr_log_dir");
         solrPidDir = (String) solrEnv.get("solr_pid_dir");
-        solrDataDir = (String) solrEnv.get("solr_datadir");
-        solrPort = (String) solrEnv.get("SOLR_PORT");
+        solrPort = (String) solrEnv.get("solr_port");
         solrPidFile = solrPidDir + "/solr-" + solrPort + ".pid";
+
+        List<String> ZookeeperServerHosts = LocalSettings.hosts("zookeeper_server");
+        Map<String, Object> ZKPort = LocalSettings.configurations("zookeeper", "zoo.cfg");
+        String clientPort = (String) ZKPort.get("clientPort");
+        zNode = (String) solrEnv.get("solr_znode");
+        zkString = MessageFormat.format("{0}:{1}", ZookeeperServerHosts.get(0), clientPort);
+        zkHost = MessageFormat.format("{0}{1}", zkString, zNode);
         return solrEnv;
+    }
+
+    @Override
+    public String confDir() {
+        return serviceHome() + "/server/solr";
     }
 
     @Override
