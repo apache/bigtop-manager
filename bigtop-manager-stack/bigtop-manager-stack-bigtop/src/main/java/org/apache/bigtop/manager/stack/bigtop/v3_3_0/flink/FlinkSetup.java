@@ -20,7 +20,6 @@ package org.apache.bigtop.manager.stack.bigtop.v3_3_0.flink;
 
 import org.apache.bigtop.manager.common.constants.Constants;
 import org.apache.bigtop.manager.common.shell.ShellResult;
-import org.apache.bigtop.manager.stack.bigtop.utils.HdfsUtil;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.utils.linux.LinuxFileUtils;
 
@@ -86,7 +85,7 @@ public class FlinkSetup {
                 Constants.PERMISSION_644,
                 flinkParams.getGlobalParamsMap());
 
-//        HdfsUtil.createDirectory(flinkUser, "/completed-jobs");
+        //        HdfsUtil.createDirectory(flinkUser, "/completed-jobs");
 
         log.info("Successfully configured Flink");
         return ShellResult.success();
