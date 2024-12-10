@@ -34,7 +34,8 @@ import java.text.MessageFormat;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FlinkSetup {
 
-    public static ShellResult config(Params params) {
+    public static ShellResult configure(Params params) {
+        log.info("Configuring Flink");
         FlinkParams flinkParams = (FlinkParams) params;
         String flinkUser = params.user();
         String flinkGroup = params.group();
@@ -45,8 +46,6 @@ public class FlinkSetup {
         LinuxFileUtils.createDirectories(
                 flinkParams.getFlinkPidDir(), flinkUser, flinkGroup, Constants.PERMISSION_755, true);
 
-        // log4j.properties
-        log.info("Generating [{}/log4j.properties] file", confDir);
         LinuxFileUtils.toFileByTemplate(
                 flinkParams.getFlinkLog4jPropertiesContent(),
                 MessageFormat.format("{0}/log4j.properties", confDir),
@@ -55,8 +54,6 @@ public class FlinkSetup {
                 Constants.PERMISSION_644,
                 flinkParams.getGlobalParamsMap());
 
-        // log4j-cli.properties
-        log.info("Generating [{}/log4j-cli.properties] file", confDir);
         LinuxFileUtils.toFileByTemplate(
                 flinkParams.getFlinkLog4jCLiPropertiesContent(),
                 MessageFormat.format("{0}/log4j-cli.properties", confDir),
@@ -65,8 +62,6 @@ public class FlinkSetup {
                 Constants.PERMISSION_644,
                 flinkParams.getGlobalParamsMap());
 
-        // log4j-console.properties
-        log.info("Generating [{}/log4j-console.properties] file", confDir);
         LinuxFileUtils.toFileByTemplate(
                 flinkParams.getFlinkLog4jConsolePropertiesContent(),
                 MessageFormat.format("{0}/log4j-console.properties", confDir),
@@ -75,8 +70,6 @@ public class FlinkSetup {
                 Constants.PERMISSION_644,
                 flinkParams.getGlobalParamsMap());
 
-        // log4j-session.properties
-        log.info("Generating [{}/log4j-session.properties] file", confDir);
         LinuxFileUtils.toFileByTemplate(
                 flinkParams.getFlinkLog4jSessionPropertiesContent(),
                 MessageFormat.format("{0}/log4j-session.properties", confDir),
@@ -85,8 +78,6 @@ public class FlinkSetup {
                 Constants.PERMISSION_644,
                 flinkParams.getGlobalParamsMap());
 
-        // flink-conf.yaml
-        log.info("Generating [{}/flink-conf.yaml] file", confDir);
         LinuxFileUtils.toFileByTemplate(
                 flinkParams.getFlinkConfContent(),
                 MessageFormat.format("{0}/flink-conf.yaml", confDir),
@@ -95,8 +86,9 @@ public class FlinkSetup {
                 Constants.PERMISSION_644,
                 flinkParams.getGlobalParamsMap());
 
-        HdfsUtil.createDirectory(flinkUser, "/completed-jobs");
+//        HdfsUtil.createDirectory(flinkUser, "/completed-jobs");
 
-        return ShellResult.success("Flink Configure success!");
+        log.info("Successfully configured Flink");
+        return ShellResult.success();
     }
 }
