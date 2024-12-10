@@ -82,6 +82,11 @@ public class KafkaParams extends BigtopParams {
     }
 
     @Override
+    public String confDir() {
+        return serviceHome() + "/config";
+    }
+
+    @Override
     public String getServiceName() {
         return "kafka";
     }
