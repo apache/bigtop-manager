@@ -18,6 +18,7 @@
  */
 package org.apache.bigtop.manager.server.controller;
 
+import org.apache.bigtop.manager.server.enums.ChatbotCommand;
 import org.apache.bigtop.manager.server.model.converter.ChatThreadConverter;
 import org.apache.bigtop.manager.server.model.dto.ChatThreadDTO;
 import org.apache.bigtop.manager.server.model.req.ChatbotMessageReq;
@@ -88,12 +89,24 @@ public class ChatbotController {
     @Operation(summary = "talk", description = "Talk with Chatbot")
     @PostMapping("/threads/{threadId}/talk")
     public SseEmitter talk(@PathVariable Long threadId, @RequestBody ChatbotMessageReq messageReq) {
-        return chatbotService.talk(threadId, messageReq.getMessage());
+        ChatbotCommand command = ChatbotCommand.getCommandFromMessage(messageReq.getMessage());
+        if (command != null) {
+            messageReq.setMessage(
+                    messageReq.getMessage().substring(command.getCmd().length() + 2));
+            return chatbotService.talk(threadId, command, messageReq.getMessage());
+        }
+        return chatbotService.talk(threadId, null, messageReq.getMessage());
     }
 
     @Operation(summary = "history", description = "Get chat records")
     @GetMapping("/threads/{threadId}/history")
     public ResponseEntity<List<ChatMessageVO>> history(@PathVariable Long threadId) {
         return ResponseEntity.success(chatbotService.history(threadId));
+    }
+
+    @Operation(summary = "get commands", description = "Get all commands")
+    @GetMapping("/commands")
+    public ResponseEntity<List<String>> getCommands() {
+        return ResponseEntity.success(chatbotService.getChatbotCommands());
     }
 }

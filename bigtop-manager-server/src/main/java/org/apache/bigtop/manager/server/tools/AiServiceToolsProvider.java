@@ -16,32 +16,32 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.service;
+package org.apache.bigtop.manager.server.tools;
 
 import org.apache.bigtop.manager.server.enums.ChatbotCommand;
-import org.apache.bigtop.manager.server.model.dto.ChatThreadDTO;
-import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
-import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
 
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import dev.langchain4j.service.tool.ToolProvider;
+import dev.langchain4j.service.tool.ToolProviderRequest;
+import dev.langchain4j.service.tool.ToolProviderResult;
 
-import java.util.List;
+public class AiServiceToolsProvider implements ToolProvider {
 
-public interface ChatbotService {
+    ChatbotCommand chatbotCommand;
 
-    ChatThreadVO createChatThread(ChatThreadDTO chatThreadDTO);
+    public AiServiceToolsProvider(ChatbotCommand chatbotCommand) {
+        this.chatbotCommand = chatbotCommand;
+    }
 
-    boolean deleteChatThread(Long threadId);
+    public AiServiceToolsProvider() {
+        this.chatbotCommand = null;
+    }
 
-    List<ChatThreadVO> getAllChatThreads();
-
-    SseEmitter talk(Long threadId, ChatbotCommand command, String message);
-
-    List<ChatMessageVO> history(Long threadId);
-
-    ChatThreadVO updateChatThread(ChatThreadDTO chatThreadDTO);
-
-    List<String> getChatbotCommands();
-
-    ChatThreadVO getChatThread(Long threadId);
+    @Override
+    public ToolProviderResult provideTools(ToolProviderRequest toolProviderRequest) {
+        if (chatbotCommand.equals(ChatbotCommand.INFO)) {
+            ClusterInfoTools clusterInfoTools = new ClusterInfoTools();
+            return ToolProviderResult.builder().addAll(clusterInfoTools.list()).build();
+        }
+        return null;
+    }
 }
