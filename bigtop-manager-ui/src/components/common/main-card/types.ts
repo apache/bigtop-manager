@@ -17,31 +17,7 @@
  * under the License.
  */
 
-import { MenuItemProps, MenuProps } from 'ant-design-vue'
-
-type BtnType = 'primary' | 'ghost' | 'dashed' | 'link' | 'text' | 'default'
-type ShapeType = 'default' | 'circle' | 'round'
-
-export interface DropdownMenu extends MenuItemProps {
-  action: string
-  text: string
-}
-export interface GroupItem<T = string> {
-  icon?: string
-  tip?: string
-  text?: string
-  action?: T
-  type?: BtnType
-  shape?: ShapeType
-  disabled?: boolean
-  dropdownMenu?: DropdownMenu[]
-  clickEvent?: (item?: GroupItem, ...args: any[]) => void
-  dropdownMenuClickEvent?: MenuProps['onClick']
-}
-
-export interface Props {
-  i18n?: string
-  groups: GroupItem[]
-  groupType?: BtnType
-  groupShape?: ShapeType
+export interface TabItem {
+  key: string
+  title: string
 }

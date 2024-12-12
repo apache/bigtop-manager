@@ -17,43 +17,82 @@
   ~ under the License.
 -->
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+  import { computed, ref } from 'vue'
+  import { useRoute } from 'vue-router'
+  import type { GroupItem } from '@/components/common/button-group/types'
+  import type { TabItem } from '@/components/common/main-card/types'
+  import Dashboard from './dashboard.vue'
+
+  const route = useRoute()
+  const title = computed(() => route.params.cluster as string)
+  const desc = ref('我是描述')
+  const activeKey = ref('1')
+  const tabs = ref<TabItem[]>([
+    {
+      key: '1',
+      title: '概览'
+    },
+    {
+      key: '2',
+      title: '服务'
+    },
+    {
+      key: '3',
+      title: '主机'
+    },
+    {
+      key: '4',
+      title: '用户'
+    },
+    {
+      key: '5',
+      title: '作业'
+    }
+  ])
+  const actionGroup = computed<GroupItem[]>(() => [
+    {
+      shape: 'default',
+      type: 'primary',
+      text: '添加服务',
+      clickEvent: () => addService && addService()
+    },
+    {
+      shape: 'default',
+      type: 'default',
+      text: '其他操作',
+      dropdownMenu: [
+        {
+          action: 'start',
+          text: '启动集群'
+        },
+        {
+          action: 'restart',
+          text: '重启集群'
+        },
+        {
+          action: 'stop',
+          text: '停止集群'
+        }
+      ],
+      dropdownMenuClickEvent: (info) => dropdownMenuClick && dropdownMenuClick(info)
+    }
+  ])
+
+  const dropdownMenuClick: GroupItem['dropdownMenuClickEvent'] = ({ key }) => {
+    console.log('key :>> ', key)
+  }
+
+  const addService: GroupItem['clickEvent'] = () => {
+    console.log('add :>> ')
+  }
+</script>
 
 <template>
-  <div>
-    <!-- <a-card>{{ $route.params }}</a-card> -->
-
-    <a-row class="option-card">
-      <a-col :span="10">
-        <a-space :size="16">
-          <a-avatar shape="square" :size="54" />
-          <div>
-            <a-typography-title :level="5">{{ $route.params.cluster }}</a-typography-title>
-            <a-typography-text type="secondary">暂无描述</a-typography-text>
-          </div>
-          <div class="option-card-status">
-            <svg-icon name="success" />
-          </div>
-        </a-space>
-      </a-col>
-      <a-col :span="14">
-        <a-space :size="16"> </a-space>
-      </a-col>
-    </a-row>
-  </div>
+  <header-card :title="title" :desc="desc" :action-groups="actionGroup" />
+  <main-card :active-key="activeKey" :tabs="tabs">
+    <component :is="Dashboard"></component>
+  </main-card>
 </template>
 
-<style lang="scss" scoped>
-  .option-card {
-    @include flexbox($align: center);
-    height: 102px;
-    padding: $space-md;
-    background-color: $color-white;
-    :deep(.ant-avatar) {
-      border-radius: 4px;
-    }
-    &-status {
-      align-items: flex-start;
-    }
-  }
-</style>
+<style lang="scss" scoped></style>

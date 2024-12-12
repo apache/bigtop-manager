@@ -170,7 +170,7 @@
       <template #extra>
         <button-group i18n="aiAssistant" :groups="checkActions" @on-click="onActions">
           <template #icon="{ item }">
-            <svg-icon :name="item.icon" />
+            <svg-icon v-if="item.icon" :name="item.icon" />
           </template>
         </button-group>
       </template>

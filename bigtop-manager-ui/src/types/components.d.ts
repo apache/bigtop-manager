@@ -16,32 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+export {}
 
-import { MenuItemProps, MenuProps } from 'ant-design-vue'
-
-type BtnType = 'primary' | 'ghost' | 'dashed' | 'link' | 'text' | 'default'
-type ShapeType = 'default' | 'circle' | 'round'
-
-export interface DropdownMenu extends MenuItemProps {
-  action: string
-  text: string
-}
-export interface GroupItem<T = string> {
-  icon?: string
-  tip?: string
-  text?: string
-  action?: T
-  type?: BtnType
-  shape?: ShapeType
-  disabled?: boolean
-  dropdownMenu?: DropdownMenu[]
-  clickEvent?: (item?: GroupItem, ...args: any[]) => void
-  dropdownMenuClickEvent?: MenuProps['onClick']
-}
-
-export interface Props {
-  i18n?: string
-  groups: GroupItem[]
-  groupType?: BtnType
-  groupShape?: ShapeType
+declare module 'vue' {
+  export interface GlobalComponents {
+    HeaderCard: (typeof import('@/components/common/header-card/index.vue'))['default']
+    MainCard: (typeof import('@/components/common/main-card/index.vue'))['default']
+    AutoForm: (typeof import('@/components/common/auto-form/index.vue'))['default']
+    ButtonGroup: (typeof import('@/components/common/button-group/index.vue'))['default']
+    MarkdownView: (typeof import('@/components/common/markdown-view/index.vue'))['default']
+    SvgIcon: (typeof import('@/components/common/svg-icon/index.vue'))['default']
+  }
 }

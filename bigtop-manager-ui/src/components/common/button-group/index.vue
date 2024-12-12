@@ -19,7 +19,8 @@
 
 <script setup lang="ts">
   import { toRefs } from 'vue'
-  import type { Props } from './types'
+  import type { GroupItem, Props } from './types'
+  import { useI18n } from 'vue-i18n'
 
   const props = withDefaults(defineProps<Props>(), {
     i18n: '',
@@ -30,27 +31,64 @@
     }
   })
 
+  const { t } = useI18n()
   const { groups, groupShape, groupType } = toRefs(props)
+
+  const checkTitle = (item: GroupItem) => {
+    if (props.i18n) {
+      if (item.tip) {
+        return t(`${props.i18n}.${item.tip}`)
+      } else if (item.text) {
+        return t(`${props.i18n}.${item.text}`)
+      }
+    } else {
+      return item.tip ? item.tip : item.text ? item.text : undefined
+    }
+  }
 </script>
 
 <template>
   <a-space>
-    <a-button
-      v-for="(item, idx) in groups"
-      :key="idx"
-      :disabled="item.disabled"
-      :shape="item.shape || groupShape || 'default'"
-      :type="item.type || groupType || 'default'"
-      :title="(item.tip && $t(`${$props.i18n}.${item.tip}`)) || (item.text && $t(`${$props.i18n}.${item.text}`))"
-      @click="item.clickEvent ? item.clickEvent(item) : () => {}"
-    >
-      <template #icon>
-        <slot name="icon" :item="item" />
-      </template>
-      <span v-if="item.text">
-        {{ item.text && $t(`${$props.i18n}.${item.text}`) }}
-      </span>
-    </a-button>
+    <template v-for="(item, idx) in groups" :key="idx">
+      <a-dropdown v-if="item.dropdownMenu">
+        <a-button
+          :disabled="item.disabled"
+          :shape="item.shape || groupShape || 'default'"
+          :type="item.type || groupType || 'default'"
+          :title="checkTitle(item)"
+          @click="item.clickEvent ? item.clickEvent(item) : () => {}"
+        >
+          <template #icon>
+            <slot name="icon" :item="item" />
+          </template>
+          <span v-if="item.text">
+            {{ $props.i18n && item.text ? $t(`${$props.i18n}.${item.text}`) : item.text }}
+          </span>
+        </a-button>
+        <template #overlay>
+          <a-menu @click="item.dropdownMenuClickEvent">
+            <a-menu-item v-for="actionItem in item.dropdownMenu" :key="actionItem.action">
+              {{ actionItem.text }}
+            </a-menu-item>
+          </a-menu>
+        </template>
+      </a-dropdown>
+      <a-button
+        v-else
+        :disabled="item.disabled"
+        :shape="item.shape || groupShape || 'default'"
+        :type="item.type || groupType || 'default'"
+        :title="checkTitle(item)"
+        @click="item.clickEvent ? item.clickEvent(item) : () => {}"
+      >
+        <template #icon>
+          <slot name="icon" :item="item" />
+        </template>
+        <span v-if="item.text">
+          {{ $props.i18n && item.text ? $t(`${$props.i18n}.${item.text}`) : item.text }}
+        </span>
+      </a-button>
+    </template>
   </a-space>
 </template>
 
