@@ -123,7 +123,7 @@
         <name>hbase.hregion.memstore.flush.size</name>
         <value>134217728</value>
         <description>
-            The size of an individual memstore. Each column familiy within each region is allocated its own memstore.
+            The size of an individual memstore. Each column family within each region is allocated its own memstore.
         </description>
         <display-name>Memstore Flush Size</display-name>
     </property>
