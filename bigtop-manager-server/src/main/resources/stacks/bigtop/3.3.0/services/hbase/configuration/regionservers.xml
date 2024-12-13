@@ -20,19 +20,9 @@
 
 <configuration>
     <property>
-        <name>hadoop_user_nofile_limit</name>
-        <value>128000</value>
-        <description>Max open files limit setting for Hadoop user.</description>
-    </property>
-    <property>
-        <name>hadoop_user_nproc_limit</name>
-        <value>65536</value>
-        <description>Max number of processes limit setting for Hadoop user.</description>
-    </property>
-    <property>
         <name>content</name>
-        <display-name>hadoop.conf template</display-name>
-        <description>This is the freemarker template for hadoop file</description>
+        <display-name>hbase regionservers template</display-name>
+        <description>This is the freemarker template for hbase file</description>
         <value><![CDATA[
 #
 # Licensed to the Apache Software Foundation (ASF) under one
@@ -52,8 +42,11 @@
 # limitations under the License.
 #
 
-${hadoop_user}    - nofile   ${hadoop_user_nofile_limit}
-${hadoop_group}   - nproc    ${hadoop_user_nproc_limit}
+<#if regionserver_hosts?? >
+<#list regionserver_hosts as host>
+${host}
+</#list>
+</#if>
 
 ]]>
         </value>

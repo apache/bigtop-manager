@@ -1,0 +1,153 @@
+<?xml version="1.0"?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one
+  ~ or more contributor license agreements.  See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership.  The ASF licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License.  You may obtain a copy of the License at
+  ~
+  ~    https://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+-->
+
+<configuration>
+    <property>
+        <name>hbase_log_dir</name>
+        <value>/var/log/hbase</value>
+        <display-name>HBase Log Dir Prefix</display-name>
+        <description>Log Directories for HBase.</description>
+    </property>
+    <property>
+        <name>hbase_pid_dir</name>
+        <value>/var/run/hbase</value>
+        <display-name>HBase PID Dir</display-name>
+        <description>Pid Directory for HBase.</description>
+    </property>
+    <property>
+        <name>regionserver_heapsize</name>
+        <value>4096</value>
+        <description>Maximum amount of memory each HBase RegionServer can use.</description>
+        <display-name>HBase RegionServer Maximum Memory</display-name>
+    </property>
+    <property>
+        <name>regionserver_xmn_max</name>
+        <value>4000</value>
+        <display-name>RegionServers maximum value for -Xmn</display-name>
+        <description>
+            Sets the upper bound on HBase RegionServers' young generation size.
+            This value is used in case the young generation size (-Xmn) calculated based on the max heapsize (regionserver_heapsize)
+            and the -Xmn ratio (regionserver_xmn_ratio) exceeds this value.
+        </description>
+    </property>
+    <property>
+        <name>regionserver_xmn_ratio</name>
+        <value>0.2</value>
+        <display-name>RegionServers -Xmn in -Xmx ratio</display-name>
+        <description>Percentage of max heap size (-Xmx) which used for young generation heap (-Xmn).</description>
+    </property>
+    <property>
+        <name>master_heapsize</name>
+        <value>4096</value>
+        <display-name>HBase Master Maximum Memory</display-name>
+        <description>Maximum amount of memory each HBase Master can use.</description>
+    </property>
+    <property>
+        <name>parallel_gc_threads</name>
+        <value>8</value>
+        <display-name>HBase Parallel GC Threads</display-name>
+        <description>The number of JVM parallel garbage collection threads (e.g. -XX:ParallelGCThreads)</description>
+    </property>
+    <property>
+        <name>java_io_tmpdir</name>
+        <display-name>HBase Java IO Tmpdir</display-name>
+        <value>/tmp</value>
+        <description>Used in hbase-env.sh as HBASE_OPTS=-Djava.io.tmpdir=java_io_tmpdir</description>
+    </property>
+    <property>
+        <name>regionserver_shutdown_timeout</name>
+        <value>30</value>
+        <display-name>HBase RegionServer shutdown timeout</display-name>
+        <description>
+            After this number of seconds waiting for graceful stop of HBase Master it will be forced to exit with SIGKILL.
+            The timeout is introduced because there is a known bug when from time to time HBase RegionServer hangs forever on stop if NN safemode is on.
+        </description>
+    </property>
+    <!-- hbase-env.sh -->
+    <property>
+        <name>content</name>
+        <display-name>hbase-env template</display-name>
+        <description>This is the freemarker template for hbase-env.sh file</description>
+        <value><![CDATA[
+# Set environment variables here.
+
+# The java implementation to use. Java 1.6 required.
+export JAVA_HOME=${java_home!}
+
+# HBase Configuration directory
+export HBASE_CONF_DIR=${hbase_conf_dir}
+
+# The maximum amount of heap to use, in MB. Default is 1000.
+# export HBASE_HEAPSIZE=1000
+
+# Extra Java runtime options.
+# Below are what we set by default. May only work with SUN JVM.
+# For more on why as well as other possible settings,
+# see http://wiki.apache.org/hadoop/PerformanceTuning
+export SERVER_GC_OPTS="-verbose:gc -XX:+PrintGCDetails -Xlog:gc:${hbase_log_dir}/gc.log-`date +'%Y%m%d%H%M'`"
+# Uncomment below to enable java garbage collection logging.
+export HBASE_OPTS="$HBASE_OPTS -verbose:gc -XX:+PrintGCDetails -Xlog:gc:${hbase_log_dir}/gc-hbase.log"
+
+# Uncomment and adjust to enable JMX exporting
+# See jmxremote.password and jmxremote.access in $JRE_HOME/lib/management to configure remote password access.
+# More details at: http://java.sun.com/javase/6/docs/technotes/guides/management/agent.html
+#
+# export HBASE_JMX_BASE="-Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false"
+# If you want to configure BucketCache, specify '-XX: MaxDirectMemorySize=' with proper direct memory size
+# export HBASE_THRIFT_OPTS="$HBASE_JMX_BASE -Dcom.sun.management.jmxremote.port=10103"
+# export HBASE_ZOOKEEPER_OPTS="$HBASE_JMX_BASE -Dcom.sun.management.jmxremote.port=10104"
+
+# File naming hosts on which HRegionServers will run. $HBASE_HOME/conf/regionservers by default.
+export HBASE_REGIONSERVERS=${hbase_conf_dir}/regionservers
+
+# Extra ssh options. Empty by default.
+# export HBASE_SSH_OPTS="-o ConnectTimeout=1 -o SendEnv=HBASE_CONF_DIR"
+
+# Where log files are stored. $HBASE_HOME/logs by default.
+export HBASE_LOG_DIR=${hbase_log_dir}
+
+# A string representing this instance of hbase. $USER by default.
+# export HBASE_IDENT_STRING=$USER
+
+# The scheduling priority for daemon processes. See 'man nice'.
+# export HBASE_NICENESS=10
+
+# The directory where pid files are stored. /tmp by default.
+export HBASE_PID_DIR=${hbase_pid_dir}
+
+# Seconds to sleep between slave commands. Unset by default. This
+# can be useful in large clusters, where, e.g., slave rsyncs can
+# otherwise arrive faster than the master can service them.
+# export HBASE_SLAVE_SLEEP=0.1
+
+# Tell HBase whether it should manage it's own instance of Zookeeper or not.
+export HBASE_MANAGES_ZK=false
+
+# Set common JVM configuration
+export HBASE_OPTS="$HBASE_OPTS -XX:+UseG1GC -XX:MaxGCPauseMillis=100 -XX:-ResizePLAB -XX:ErrorFile=${hbase_log_dir}/hs_err_pid%p.log -Djava.io.tmpdir=${java_io_tmpdir}"
+export HBASE_MASTER_OPTS="$HBASE_MASTER_OPTS -Xmx${master_heapsize}m -XX:ParallelGCThreads=${parallel_gc_threads} $JDK_DEPENDED_OPTS "
+export HBASE_REGIONSERVER_OPTS="$HBASE_REGIONSERVER_OPTS -Xms${regionserver_heapsize}m -Xmx${regionserver_heapsize}m -XX:ParallelGCThreads=${parallel_gc_threads} $JDK_DEPENDED_OPTS"
+]]>
+        </value>
+        <attrs>
+            <type>longtext</type>
+        </attrs>
+    </property>
+</configuration>
