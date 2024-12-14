@@ -110,12 +110,6 @@ public interface BaseDao<Entity> {
     List<Entity> findAll();
 
     /**
-     * Query all entities.
-     */
-    @SelectProvider(type = BaseSqlProvider.class, method = "findByCondition")
-    <Condition> List<Entity> findByCondition(Condition condition);
-
-    /**
      * Delete the entity by primary key.
      */
     @DeleteProvider(type = BaseSqlProvider.class, method = "deleteById")
