@@ -53,8 +53,8 @@ public class PrometheusSetup {
                 Constants.PERMISSION_644,
                 prometheusParams.getGlobalParamsMap());
 
-        for (int i = 0; i < prometheusParams.getPrometheusScrapeJobs().size(); i++) {
-            Map<String, Object> job = prometheusParams.getPrometheusScrapeJobs().get(i);
+        for (int i = 0; i < prometheusParams.getScrapeJobs().size(); i++) {
+            Map<String, Object> job = prometheusParams.getScrapeJobs().get(i);
             Map<String, List<String>> targets = new HashMap<>();
             targets.put("targets", (List<String>) job.get("targets_list"));
             LinuxFileUtils.toFile(

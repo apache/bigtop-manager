@@ -43,16 +43,21 @@ public class PrometheusParams extends InfraParams {
 
     private final String PROMETHEUS_SELF_JOB_NAME = "prometheus";
     private final String BM_AGENT_JOB_NAME = "bm-agent";
-    private final Integer BM_AGENT_PORT = 8081;
+    private final String BM_AGENT_PORT = "8081";
 
-    private final List<Map<String, Object>> prometheusScrapeJobs = new ArrayList<>();
-    private Integer prometheusPort;
+    private Map<String, Object> prometheusScrapeJob;
+    private Map<String, Object> agentScrapeJob;
+    private List<Map<String, Object>> scrapeJobs;
+    private String prometheusPort;
     private String prometheusContent;
     private String prometheusScrapeInterval;
 
     public PrometheusParams(CommandPayload commandPayload) {
         super(commandPayload);
-        globalParamsMap.put("scrape_jobs", prometheusScrapeJobs);
+        scrapeJobs = new ArrayList<>();
+        scrapeJobs.add(prometheusScrapeJob);
+        scrapeJobs.add(agentScrapeJob);
+        globalParamsMap.put("scrape_jobs", scrapeJobs);
         globalParamsMap.put("scrape_interval", prometheusScrapeInterval);
     }
 
@@ -85,12 +90,12 @@ public class PrometheusParams extends InfraParams {
     @GlobalParams
     public Map<String, Object> prometheusJob() {
         Map<String, Object> configuration = LocalSettings.configurations(getServiceName(), "prometheus");
-        prometheusPort = (Integer) configuration.get("port");
+        prometheusPort = (String) configuration.get("port");
         Map<String, Object> job = new HashMap<>();
         job.put("name", PROMETHEUS_SELF_JOB_NAME);
         job.put("targets_file", targetsConfigFile(PROMETHEUS_SELF_JOB_NAME));
         job.put("targets_list", List.of(MessageFormat.format("localhost:{0}", prometheusPort)));
-        prometheusScrapeJobs.add(job);
+        prometheusScrapeJob = job;
         return configuration;
     }
 
@@ -100,7 +105,7 @@ public class PrometheusParams extends InfraParams {
         job.put("name", BM_AGENT_JOB_NAME);
         job.put("targets_file", targetsConfigFile(BM_AGENT_JOB_NAME));
         job.put("targets_list", getAllHost());
-        prometheusScrapeJobs.add(job);
+        agentScrapeJob = job;
         return LocalSettings.configurations(getServiceName(), "prometheus");
     }
 
