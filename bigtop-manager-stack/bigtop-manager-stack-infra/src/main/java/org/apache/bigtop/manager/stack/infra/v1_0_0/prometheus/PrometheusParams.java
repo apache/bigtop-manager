@@ -41,9 +41,9 @@ import java.util.Map;
 @NoArgsConstructor
 public class PrometheusParams extends InfraParams {
 
-    private final String PROMETHEUS_SELF_JOB_NAME = "prometheus";
-    private final String BM_AGENT_JOB_NAME = "bm-agent";
-    private final String BM_AGENT_PORT = "8081";
+    protected final String PROMETHEUS_SELF_JOB_NAME = "prometheus";
+    protected final String BM_AGENT_JOB_NAME = "bm-agent";
+    protected final String BM_AGENT_PORT = "8081";
 
     private Map<String, Object> prometheusScrapeJob;
     private Map<String, Object> agentScrapeJob;
@@ -78,7 +78,7 @@ public class PrometheusParams extends InfraParams {
         return "prometheus";
     }
 
-    private List<String> getAllHost() {
+    protected List<String> getAllHost() {
         List<String> ips = LocalSettings.hosts().get("all");
         List<String> hosts = new ArrayList<>();
         for (String ip : ips) {
