@@ -44,8 +44,7 @@ scrape_configs:
   - job_name: '${job.name}'
 
     file_sd_configs:
-      - files:
-          - '${job.targets_file}'
+      - files: '${job.targets_file}'
 </#list>
 ]]>
         </value>

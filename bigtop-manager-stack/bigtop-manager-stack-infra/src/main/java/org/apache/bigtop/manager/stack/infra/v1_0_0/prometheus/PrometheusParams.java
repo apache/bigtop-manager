@@ -117,4 +117,8 @@ public class PrometheusParams extends InfraParams {
         prometheusScrapeInterval = (String) configuration.get("scrape_interval");
         return configuration;
     }
+
+    public Object listenAddress() {
+        return MessageFormat.format("0.0.0.0:{0}", prometheusPort);
+    }
 }
