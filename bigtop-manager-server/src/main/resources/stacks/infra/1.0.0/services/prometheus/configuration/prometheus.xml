@@ -20,6 +20,11 @@
 
 <configuration>
     <property>
+        <name>port</name>
+        <description>Port on which Prometheus server listens</description>
+        <value>9090</value>
+    </property>
+    <property>
         <name>content</name>
         <description>This is the freemarker template for prometheus.yml file</description>
         <value><![CDATA[
@@ -35,13 +40,13 @@ global:
 # Here it's Prometheus itself.
 scrape_configs:
   # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
-  - job_name: 'prometheus'
+<#list scrape_jobs as job>
+  - job_name: '${job.name}'
 
-    # Override the global default and scrape targets from this job every 5 seconds.
-    scrape_interval: 5s
-
-    static_configs:
-      - targets: ['localhost:9090']
+    file_sd_configs:
+      - files:
+          - '${job.targets_file}'
+</#list>
 ]]>
         </value>
         <attrs>
