@@ -108,10 +108,10 @@ public class TarballDownloader {
                 outputStream.close();
                 inputStream.close();
 
-                log.info("File downloaded: {}", saveFilePath);
+                log.info("File downloaded: [{}]", saveFilePath);
                 return true;
             } else {
-                log.info("No file to download. Server replied HTTP code: {}", responseCode);
+                log.info("No file to download. Server replied HTTP code: [{}]", responseCode);
                 return false;
             }
         } catch (Exception e) {

@@ -254,6 +254,27 @@ public class LinuxFileUtils {
         }
     }
 
+    public static String readFile(String source) {
+        if (StringUtils.isBlank(source)) {
+            throw new StackException("source must not be empty");
+        }
+
+        List<String> builderParameters = new ArrayList<>();
+        builderParameters.add("cat");
+        builderParameters.add(source);
+
+        try {
+            ShellResult shellResult = sudoExecCmd(builderParameters);
+            if (shellResult.getExitCode() != MessageConstants.SUCCESS_CODE) {
+                throw new StackException(shellResult.getErrMsg());
+            }
+
+            return shellResult.getOutput();
+        } catch (IOException e) {
+            throw new StackException(e);
+        }
+    }
+
     /**
      * create symbolic link
      *

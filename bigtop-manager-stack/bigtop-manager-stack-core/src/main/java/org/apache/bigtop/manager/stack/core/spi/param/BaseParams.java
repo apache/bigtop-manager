@@ -55,10 +55,6 @@ public abstract class BaseParams implements Params {
     protected BaseParams(CommandPayload commandPayload) {
         this.commandPayload = commandPayload;
 
-        Command command = commandPayload.getCommand();
-        if (command == Command.ADD) {
-            return;
-        }
         // Global Parameters Injection
         Method[] declaredMethods = this.getClass().getDeclaredMethods();
         for (Method declaredMethod : declaredMethods) {
