@@ -18,14 +18,14 @@
  */
 package org.apache.bigtop.manager.stack.infra.v1_0_0.mysql;
 
+import org.apache.bigtop.manager.common.constants.Constants;
+import org.apache.bigtop.manager.common.shell.ShellResult;
+import org.apache.bigtop.manager.stack.core.spi.param.Params;
+import org.apache.bigtop.manager.stack.core.utils.linux.LinuxFileUtils;
+
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.bigtop.manager.common.constants.Constants;
-import org.apache.bigtop.manager.common.shell.ShellResult;
-import org.apache.bigtop.manager.stack.core.enums.ConfigType;
-import org.apache.bigtop.manager.stack.core.spi.param.Params;
-import org.apache.bigtop.manager.stack.core.utils.linux.LinuxFileUtils;
 
 import java.text.MessageFormat;
 

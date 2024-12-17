@@ -19,7 +19,6 @@
 package org.apache.bigtop.manager.stack.infra.param;
 
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
-import org.apache.bigtop.manager.common.utils.ProjectPathUtils;
 import org.apache.bigtop.manager.stack.core.spi.param.BaseParams;
 
 import lombok.NoArgsConstructor;
@@ -54,10 +53,14 @@ public abstract class InfraParams extends BaseParams {
     public String stackHome() {
         // Parent path of agent dir, which is bigtop-manager-agent/../
         String parentPath = new File(InfraParams.class
-                .getProtectionDomain()
-                .getCodeSource()
-                .getLocation()
-                .getPath()).getParentFile().getParentFile().getParentFile().getPath();
+                        .getProtectionDomain()
+                        .getCodeSource()
+                        .getLocation()
+                        .getPath())
+                .getParentFile()
+                .getParentFile()
+                .getParentFile()
+                .getPath();
 
         return parentPath + "/infras";
     }

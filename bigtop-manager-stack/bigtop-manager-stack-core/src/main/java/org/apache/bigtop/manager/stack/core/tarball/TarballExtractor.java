@@ -23,9 +23,9 @@ import org.apache.bigtop.manager.stack.core.exception.StackException;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
+import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -130,8 +130,8 @@ public class TarballExtractor {
 
     private static void extractTarXz(File tarball, Function<TarArchiveInputStream, Boolean> func) {
         try (InputStream fis = Files.newInputStream(tarball.toPath());
-             XZCompressorInputStream xzis = new XZCompressorInputStream(fis);
-             TarArchiveInputStream tis = new TarArchiveInputStream(xzis)) {
+                XZCompressorInputStream xzis = new XZCompressorInputStream(fis);
+                TarArchiveInputStream tis = new TarArchiveInputStream(xzis)) {
             func.apply(tis);
         } catch (Exception e) {
             log.error("Error extracting tarball", e);

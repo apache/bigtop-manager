@@ -18,7 +18,6 @@
  */
 package org.apache.bigtop.manager.stack.core.spi.param;
 
-import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
 import org.apache.bigtop.manager.common.message.entity.pojo.PackageInfo;
 import org.apache.bigtop.manager.common.message.entity.pojo.PackageSpecificInfo;

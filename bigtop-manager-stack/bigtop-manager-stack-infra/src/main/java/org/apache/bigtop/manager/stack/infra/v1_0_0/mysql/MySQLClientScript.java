@@ -18,12 +18,13 @@
  */
 package org.apache.bigtop.manager.stack.infra.v1_0_0.mysql;
 
-import com.google.auto.service.AutoService;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.spi.script.AbstractClientScript;
 import org.apache.bigtop.manager.stack.core.spi.script.Script;
+
+import com.google.auto.service.AutoService;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Properties;
 

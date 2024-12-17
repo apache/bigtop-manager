@@ -20,7 +20,6 @@ package org.apache.bigtop.manager.stack.core.utils.linux;
 
 import org.apache.bigtop.manager.common.shell.ShellExecutor;
 import org.apache.bigtop.manager.common.shell.ShellResult;
-import org.apache.bigtop.manager.common.utils.FileUtils;
 
 import org.apache.commons.lang3.StringUtils;
 

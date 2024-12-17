@@ -18,8 +18,6 @@
  */
 package org.apache.bigtop.manager.stack.infra.v1_0_0.mysql;
 
-import com.google.auto.service.AutoService;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.common.constants.MessageConstants;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.stack.core.exception.StackException;
@@ -27,6 +25,9 @@ import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.spi.script.AbstractServerScript;
 import org.apache.bigtop.manager.stack.core.spi.script.Script;
 import org.apache.bigtop.manager.stack.core.utils.linux.LinuxOSUtils;
+
+import com.google.auto.service.AutoService;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -52,7 +53,9 @@ public class MySQLServerScript extends AbstractServerScript {
         start(params);
         runCommand(binDir + "/mysql -u root -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY 'root';\"", user);
         runCommand(binDir + "/mysql -u root -p'root' -e\"CREATE USER 'root'@'%' IDENTIFIED BY 'root';\"", user);
-        runCommand(binDir + "/mysql -u root -p'root' -e \"GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;\"", user);
+        runCommand(
+                binDir + "/mysql -u root -p'root' -e \"GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;\"",
+                user);
         stop(params);
 
         return ShellResult.success();
