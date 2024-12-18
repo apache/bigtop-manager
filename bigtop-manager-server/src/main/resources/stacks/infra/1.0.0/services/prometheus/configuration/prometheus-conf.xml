@@ -36,6 +36,13 @@ global:
   external_labels:
     monitor: 'codelab-monitor'
 
+# Rule files specifies a list of globs. Rules and alerts are read from
+# all matching files.
+rule_files:
+<#if rule_files_name??>
+  - ${rule_files_name}
+</#if>
+
 # A scrape configuration containing exactly one endpoint to scrape:
 # Here it's Prometheus itself.
 scrape_configs:

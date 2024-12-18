@@ -51,6 +51,8 @@ public class PrometheusParams extends InfraParams {
     private String prometheusPort;
     private String prometheusContent;
     private String prometheusScrapeInterval;
+    private String prometheusRulesFilename;
+    private String prometheusRulesFileContent;
 
     public PrometheusParams(CommandPayload commandPayload) {
         super(commandPayload);
@@ -59,6 +61,7 @@ public class PrometheusParams extends InfraParams {
         scrapeJobs.add(agentScrapeJob);
         globalParamsMap.put("scrape_jobs", scrapeJobs);
         globalParamsMap.put("scrape_interval", prometheusScrapeInterval);
+        globalParamsMap.put("rules_file_name", prometheusRulesFilename);
     }
 
     public String dataDir() {
@@ -89,7 +92,7 @@ public class PrometheusParams extends InfraParams {
 
     @GlobalParams
     public Map<String, Object> prometheusJob() {
-        Map<String, Object> configuration = LocalSettings.configurations(getServiceName(), "prometheus");
+        Map<String, Object> configuration = LocalSettings.configurations(getServiceName(), "prometheus-conf");
         prometheusPort = (String) configuration.get("port");
         Map<String, Object> job = new HashMap<>();
         job.put("name", PROMETHEUS_SELF_JOB_NAME);
@@ -106,19 +109,28 @@ public class PrometheusParams extends InfraParams {
         job.put("targets_file", targetsConfigFile(BM_AGENT_JOB_NAME));
         job.put("targets_list", getAllHost());
         agentScrapeJob = job;
-        return LocalSettings.configurations(getServiceName(), "prometheus");
+        return LocalSettings.configurations(getServiceName(), "prometheus-conf");
     }
 
     @GlobalParams
     public Map<String, Object> configs() {
-        Map<String, Object> configuration = LocalSettings.configurations(getServiceName(), "prometheus");
+        Map<String, Object> configuration = LocalSettings.configurations(getServiceName(), "prometheus-conf");
 
         prometheusContent = (String) configuration.get("content");
         prometheusScrapeInterval = (String) configuration.get("scrape_interval");
         return configuration;
     }
 
-    public Object listenAddress() {
+    @GlobalParams
+    public Map<String, Object> rules() {
+        Map<String, Object> configuration = LocalSettings.configurations(getServiceName(), "prometheus-rule");
+
+        prometheusRulesFilename = (String) configuration.get("rules_file_name");
+        prometheusRulesFileContent = (String) configuration.get("content");
+        return configuration;
+    }
+
+    public String listenAddress() {
         return MessageFormat.format("0.0.0.0:{0}", prometheusPort);
     }
 }
