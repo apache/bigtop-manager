@@ -74,6 +74,7 @@
 <style lang="scss" scoped>
   .header-card {
     width: 100%;
+    min-width: 389px;
     height: 102px;
     @include flexbox($justify: space-between, $align: center);
     background-color: $color-white;

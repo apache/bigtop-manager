@@ -54,6 +54,7 @@
 
 <style lang="scss" scoped>
   .main-card {
+    min-width: 389px;
     background-color: $color-white;
     padding-inline: $space-md;
     padding-bottom: $space-md;
