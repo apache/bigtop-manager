@@ -94,9 +94,7 @@
             <property name="alias" value="h"/>
         </include>
         ,clus.display_name as cluster_name
-        from
-        host h
-        inner join
+        from host h
         left join cluster clus
         on h.cluster_id = clus.id
         where h.cluster_id = #{clusterId}
