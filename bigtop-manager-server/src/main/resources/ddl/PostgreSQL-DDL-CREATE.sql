@@ -55,6 +55,7 @@ CREATE TABLE cluster
 (
     id            BIGINT CHECK (id > 0) NOT NULL GENERATED ALWAYS AS IDENTITY,
     name          VARCHAR(255)                      DEFAULT NULL,
+    display_name  VARCHAR(255)                      DEFAULT NULL,
     "desc"        VARCHAR(255)                      DEFAULT NULL,
     type          INT CHECK (cluster.type > 0) DEFAULT 1,
     user_group    VARCHAR(255),
@@ -68,7 +69,8 @@ CREATE TABLE cluster
     CONSTRAINT uk_name UNIQUE (name)
 );
 
-COMMENT ON COLUMN cluster.name IS 'Cluster Name';
+COMMENT ON COLUMN cluster.name IS 'Unique Name';
+COMMENT ON COLUMN cluster.display_name IS 'Display Name';
 COMMENT ON COLUMN cluster."desc" IS 'Cluster Description';
 COMMENT ON COLUMN cluster.type IS '1-Physical Machine, 2-Kubernetes';
 COMMENT ON COLUMN cluster.status IS '1-healthy, 2-unhealthy, 3-unknown';

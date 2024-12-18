@@ -71,7 +71,8 @@ CREATE TABLE `user`
 CREATE TABLE `cluster`
 (
     `id`                   BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `name`                 VARCHAR(255) DEFAULT NULL COMMENT 'Cluster Name',
+    `name`                 VARCHAR(255) DEFAULT NULL COMMENT 'Unique Name',
+    `display_name`         VARCHAR(255) DEFAULT NULL COMMENT 'Display Name',
     `desc`                 VARCHAR(255) DEFAULT NULL COMMENT 'Cluster Description',
     `type`                 INTEGER DEFAULT 1 COMMENT '1-Physical Machine, 2-Kubernetes',
     `user_group`           VARCHAR(255),

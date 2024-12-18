@@ -27,6 +27,8 @@ public class ClusterVO {
 
     private String name;
 
+    private String displayName;
+
     private String desc;
 
     private Integer type;

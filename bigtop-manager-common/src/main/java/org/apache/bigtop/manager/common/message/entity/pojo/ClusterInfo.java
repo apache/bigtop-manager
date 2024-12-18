@@ -23,6 +23,8 @@ import lombok.Data;
 @Data
 public class ClusterInfo {
 
+    private String name;
+
     private String userGroup;
 
     private String rootDir;
