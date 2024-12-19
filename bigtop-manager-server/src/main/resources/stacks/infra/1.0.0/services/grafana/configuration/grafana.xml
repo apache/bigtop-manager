@@ -20,10 +20,81 @@
 
 <configuration>
     <property>
+        <name>port</name>
+        <value>3000</value>
+        <display-name>Port</display-name>
+        <description>HTTP port for Grafana to listen on.</description>
+    </property>
+    <property>
+        <name>log_level</name>
+        <value>info</value>
+        <display-name>Log level</display-name>
+        <description>Log level, can be: trace, debug, info, warn, error, critical.</description>
+    </property>
+    <property>
         <name>content</name>
         <description>This is the freemarker template for grafana.ini file</description>
         <value><![CDATA[
-# TODO
+[server]
+# HTTP port for Grafana to listen on
+http_port = ${port}
+# Root URL of Grafana, typically do not change unless running behind a proxy or in a subpath
+root_url = %(protocol)s://%(domain)s:%(http_port)s/
+# Whether to enable TLS/SSL for Grafana, default is disabled
+protocol = http
+
+[security]
+# Admin username and password, it's crucial to change the default username and password
+admin_user = admin
+admin_password = admin
+# Secret key for encrypting sensitive information
+secret_key = some-secret-key
+
+[database]
+# Database type, default is sqlite3
+type = sqlite3
+# Path to the SQLite database file
+path = /var/lib/grafana/grafana.db
+
+[users]
+# Whether to allow user self-signup
+allow_sign_up = true
+# Default organization ID to assign to new users
+auto_assign_org = true
+
+[auth]
+# Enable or disable the authentication system
+enabled = true
+
+[alerting]
+# Enable the alerting system
+enabled = true
+# Default alert evaluation frequency
+default_alert_frequency = 1m
+
+[log]
+# Log level, can be: trace, debug, info, warn, error, critical
+level = ${log_level}
+# Log mode, can be: console, file, or both
+mode = console
+# Log file path (if file mode is enabled)
+file = /var/log/grafana/grafana.log
+
+[smtp]
+# Enable SMTP for email notifications
+enabled = false
+# SMTP server address
+host = smtp.example.com:587
+# SMTP authentication username
+user = example@example.com
+# SMTP authentication password
+password = yourpassword
+
+[plugins]
+# Enable alpha plugins
+enable_alpha = true
+# Allow loading unsigned plugins
+allow_loading_unsigned_plugins = false
 ]]>
         </value>
         <attrs>

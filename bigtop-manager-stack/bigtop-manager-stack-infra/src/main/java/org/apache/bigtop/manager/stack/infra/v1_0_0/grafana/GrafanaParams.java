@@ -19,7 +19,9 @@
 package org.apache.bigtop.manager.stack.infra.v1_0_0.grafana;
 
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
+import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
+import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
 import org.apache.bigtop.manager.stack.infra.param.InfraParams;
 
 import com.google.auto.service.AutoService;
@@ -28,6 +30,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.text.MessageFormat;
+import java.util.Map;
 
 @Getter
 @Slf4j
@@ -35,12 +38,31 @@ import java.text.MessageFormat;
 @NoArgsConstructor
 public class GrafanaParams extends InfraParams {
 
+    private String grafanaContent;
+    private String grafanaPort;
+    private String grafanaLogLevel;
+
     public GrafanaParams(CommandPayload commandPayload) {
         super(commandPayload);
+        globalParamsMap.put("port", grafanaPort);
+        globalParamsMap.put("log_level", grafanaLogLevel);
     }
 
     public String dataDir() {
         return MessageFormat.format("{0}/data", serviceHome());
+    }
+
+    public String confDir() {
+        return MessageFormat.format("{0}/conf", serviceHome());
+    }
+
+    @GlobalParams
+    public Map<String, Object> configs() {
+        Map<String, Object> configuration = LocalSettings.configurations(getServiceName(), "grafana");
+        grafanaContent = (String) configuration.get("content");
+        grafanaPort = (String) configuration.get("port");
+        grafanaLogLevel = (String) configuration.get("logLevel");
+        return configuration;
     }
 
     @Override

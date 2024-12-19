@@ -27,6 +27,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.text.MessageFormat;
+
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class GrafanaSetup {
@@ -37,6 +39,13 @@ public class GrafanaSetup {
         String group = grafanaParams.group();
 
         LinuxFileUtils.createDirectories(grafanaParams.dataDir(), user, group, Constants.PERMISSION_755, true);
+        LinuxFileUtils.toFileByTemplate(
+                grafanaParams.getGrafanaContent(),
+                MessageFormat.format("{0}/grafana.yml", grafanaParams.confDir()),
+                user,
+                group,
+                Constants.PERMISSION_644,
+                grafanaParams.getGlobalParamsMap());
 
         return ShellResult.success("Grafana Configure success!");
     }
