@@ -18,21 +18,23 @@
 -->
 
 <script setup lang="ts">
-  import { onMounted } from 'vue'
+  import { onBeforeUnmount, onMounted, shallowRef } from 'vue'
   import * as echarts from 'echarts/core'
-  import { GridComponent, GridComponentOption } from 'echarts/components'
+  import { GridComponent, GridComponentOption, TooltipComponent, TooltipComponentOption } from 'echarts/components'
   import { LineChart, LineSeriesOption } from 'echarts/charts'
   import { UniversalTransition } from 'echarts/features'
   import { CanvasRenderer } from 'echarts/renderers'
 
-  echarts.use([GridComponent, LineChart, CanvasRenderer, UniversalTransition])
+  echarts.use([GridComponent, LineChart, TooltipComponent, CanvasRenderer, UniversalTransition])
 
-  type EChartsOption = echarts.ComposeOption<GridComponentOption | LineSeriesOption>
+  type EChartsOption = echarts.ComposeOption<GridComponentOption | TooltipComponentOption | LineSeriesOption>
 
   const props = defineProps<{
     chartId: string
     title: string
   }>()
+
+  const myChart = shallowRef<echarts.ECharts | null>(null)
 
   const generateTimeLabels = () => {
     const times = []
@@ -48,62 +50,106 @@
 
   const initCharts = () => {
     const chartDom = document.getElementById(`${props.chartId}`)
-    const myChart = echarts.init(chartDom, null, {
-      devicePixelRatio: window.devicePixelRatio,
-      renderer: 'svg'
+    myChart.value = echarts.init(chartDom, null, {
+      devicePixelRatio: window.devicePixelRatio
     })
     const option: EChartsOption = {
       grid: {
-        top: '12%',
-        bottom: '12%',
-        left: '12%',
-        right: '12%'
+        top: '20px',
+        left: '40px',
+        right: '30px',
+        bottom: '20px'
       },
       tooltip: {
-        trigger: 'axis'
-      },
-      xAxis: {
-        type: 'category',
-        data: generateTimeLabels().slice(7, 14),
-        axisLabel: {
-          fontSize: 12,
-          interval: 0
+        trigger: 'axis',
+        backgroundColor: '#000',
+        borderColor: 'rgba(236,236,236,0.1)',
+        // formatter: (params) => {
+        //   console.log('params :>> ', params)
+        //   return ''
+        // },
+        textStyle: {
+          color: '#fff'
+        },
+        axisPointer: {
+          type: 'cross',
+          crossStyle: {
+            color: '#999'
+          }
         }
       },
-      yAxis: {
-        type: 'value',
-        interval: 20,
-        axisLabel: {
-          fontSize: 12,
-          formatter: '{value} %'
+      xAxis: [
+        {
+          type: 'category',
+          data: generateTimeLabels(),
+          axisPointer: {
+            type: 'line'
+          },
+          axisLabel: {
+            interval: 14,
+            fontSize: 8
+          }
         }
-      },
+      ],
+      yAxis: [
+        {
+          type: 'value',
+          axisPointer: {
+            type: 'shadow',
+            label: {
+              formatter: '{value} %'
+            }
+          },
+          min: 0,
+          max: 100,
+          interval: 20,
+          axisLabel: {
+            fontSize: 8,
+            formatter: '{value} %'
+          }
+        }
+      ],
       series: [
         {
-          name: '数据',
+          name: props.title,
           type: 'line',
-          data: Array.from({ length: 96 }, () => Math.floor(Math.random() * 100))
+          data: Array.from({ length: generateTimeLabels().length }, () => Math.floor(Math.random() * 0)),
+          lineStyle: {
+            color: '#49A4FF',
+            width: 2
+          }
         }
       ]
     }
-    option && myChart.setOption(option)
+    option && myChart.value.setOption(option)
+  }
+
+  const resizeChart = () => {
+    myChart.value?.resize()
   }
 
   onMounted(() => {
     initCharts()
+    window.addEventListener('resize', resizeChart, true)
+  })
+
+  onBeforeUnmount(() => {
+    window.removeEventListener('resize', resizeChart, true)
   })
 </script>
 
 <template>
   <div class="chart">
     <div class="chart-title">{{ $props.title }}</div>
-    <canvas :id="$props.chartId" style="width: 100%; height: 100%; padding: 16px"></canvas>
+    <div :id="$props.chartId" style="height: 260px; width: 100%"></div>
   </div>
 </template>
 
 <style lang="scss" scoped>
   .chart {
-    text-align: center;
+    height: 300px;
+    box-sizing: border-box;
+    padding: 10px;
     &-title {
       text-align: start;
       font-size: 12px;

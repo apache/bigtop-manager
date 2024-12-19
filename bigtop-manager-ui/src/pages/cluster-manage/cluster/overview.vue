@@ -18,7 +18,10 @@
 -->
 
 <script setup lang="ts">
+  import { ref } from 'vue'
   import type { MenuProps } from 'ant-design-vue'
+  import GaugeChart from './components/gauge-chart.vue'
+  import CategoryChart from './components/category-chart.vue'
 
   const baseConfig = {
     clusterStatus: '集群状态',
@@ -92,12 +95,47 @@
     }
   ]
 
+  type TimeRangeText = '1m' | '15m' | '30m' | '1h' | '6h' | '30h'
+  type TimeRangeItem = {
+    text: TimeRangeText
+    time: string
+  }
+  const timeRanges: TimeRangeItem[] = [
+    {
+      text: '1m',
+      time: ''
+    },
+    {
+      text: '15m',
+      time: ''
+    },
+    {
+      text: '30m',
+      time: ''
+    },
+    {
+      text: '1h',
+      time: ''
+    },
+    {
+      text: '6h',
+      time: ''
+    },
+    {
+      text: '30h',
+      time: ''
+    }
+  ]
+
+  const currTimeRange = ref<TimeRangeText>('15m')
+
   const handleServiceOperate: MenuProps['onClick'] = (item) => {
     console.log('item :>> ', item.key)
   }
 
-  import GaugeChart from './components/gauge-chart.vue'
-  import CategoryChart from './components/category-chart.vue'
+  const handleTimeRange = (time: TimeRangeItem) => {
+    currTimeRange.value = time.text
+  }
 </script>
 
 <template>
@@ -162,31 +200,43 @@
         </a-descriptions>
       </a-col>
       <a-col :xs="24" :sm="24" :md="24" :lg="14" :xl="17">
-        <a-descriptions bordered :column="{ xxl: 2, xl: 2, lg: 1, md: 1, sm: 1, xs: 1 }">
-          <template #title>
-            <a-typography-text strong content="图表" />
-          </template>
-          <a-descriptions-item>
+        <div class="chart-title">
+          <a-typography-text strong content="图表" />
+          <a-space :size="12">
+            <div
+              v-for="time in timeRanges"
+              :key="time.text"
+              tabindex="0"
+              class="time-range"
+              :class="{ 'time-range-actived': currTimeRange === time.text }"
+              @click="handleTimeRange(time)"
+            >
+              {{ time.text }}
+            </div>
+          </a-space>
+        </div>
+        <a-row class="chart-wrp">
+          <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
             <div class="chart-item-wrp">
               <gauge-chart chart-id="chart1" title="内存使用率" />
             </div>
-          </a-descriptions-item>
-          <a-descriptions-item>
+          </a-col>
+          <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
             <div class="chart-item-wrp">
               <gauge-chart chart-id="chart2" title="CUP 使用率" />
             </div>
-          </a-descriptions-item>
-          <a-descriptions-item>
+          </a-col>
+          <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
+            <div class="chart-item-wrp">
+              <category-chart chart-id="chart4" title="CPU 使用率" />
+            </div>
+          </a-col>
+          <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
             <div class="chart-item-wrp">
               <category-chart chart-id="chart3" title="内存使用率" />
             </div>
-          </a-descriptions-item>
-          <a-descriptions-item>
-            <div class="chart-item-wrp">
-              <category-chart chart-id="chart4" title="CUP 使用率" />
-            </div>
-          </a-descriptions-item>
-        </a-descriptions>
+          </a-col>
+        </a-row>
       </a-col>
     </a-row>
   </div>
@@ -203,8 +253,54 @@
       border-bottom: 1px solid #e5e5e5;
     }
 
+    .chart-title {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .time-range {
+      padding-inline: 6px;
+      border-radius: 4px;
+      text-align: center;
+      cursor: pointer;
+      user-select: none;
+      outline: none;
+      transition: background-color 0.3s;
+
+      &:hover {
+        color: $color-primary-text-hover;
+      }
+      &-actived {
+        color: $color-primary-text;
+      }
+    }
+
+    .chart-wrp {
+      border-radius: 8px;
+      overflow: hidden;
+      box-sizing: border-box;
+      border: 1px solid $color-border;
+    }
+
     .chart-item-wrp {
-      padding: 10px;
+      border: 1px solid $color-border;
+      margin-right: -1px;
+      margin-bottom: -1px;
+
+      &:first-child {
+        border-left: 0;
+        border-top: 0;
+      }
+
+      &:not(:last-child) {
+        border-right: 0;
+      }
+
+      &:nth-child(n + 3):not(:nth-child(4)) {
+        border-bottom: 0;
+        border-left: 0;
+      }
     }
 
     :deep(.ant-descriptions-view) {

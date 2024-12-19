@@ -22,7 +22,7 @@
   import { useRoute } from 'vue-router'
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { TabItem } from '@/components/common/main-card/types'
-  import Dashboard from './dashboard.vue'
+  import Overview from './overview.vue'
 
   const route = useRoute()
   const title = computed(() => route.params.cluster as string)
@@ -91,7 +91,7 @@
 <template>
   <header-card :title="title" :desc="desc" :action-groups="actionGroup" />
   <main-card :active-key="activeKey" :tabs="tabs">
-    <component :is="Dashboard"></component>
+    <component :is="Overview"></component>
   </main-card>
 </template>
 

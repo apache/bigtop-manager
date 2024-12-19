@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { onMounted } from 'vue'
+  import { onBeforeUnmount, onMounted, shallowRef } from 'vue'
   import * as echarts from 'echarts/core'
   import { GaugeChart, GaugeSeriesOption } from 'echarts/charts'
   import { CanvasRenderer } from 'echarts/renderers'
@@ -32,18 +32,19 @@
     title: string
   }>()
 
+  const myChart = shallowRef<echarts.ECharts | null>(null)
+
   const initCharts = () => {
     const chartDom = document.getElementById(`${props.chartId}`)
-    const myChart = echarts.init(chartDom, null, {
-      devicePixelRatio: window.devicePixelRatio,
-      renderer: 'svg'
+    myChart.value = echarts.init(chartDom, null, {
+      devicePixelRatio: window.devicePixelRatio
     })
     const option: EChartsOption = {
       series: [
         {
           type: 'gauge',
           radius: '90%',
-          center: ['50%', '56%'],
+          center: ['50%', '50%'],
           axisLine: {
             lineStyle: {
               width: 14,
@@ -95,7 +96,7 @@
       ]
     }
 
-    myChart.setOption<echarts.EChartsCoreOption>({
+    myChart.value?.setOption<echarts.EChartsCoreOption>({
       series: [
         {
           data: [
@@ -107,24 +108,37 @@
       ]
     })
 
-    option && myChart.setOption(option)
+    option && myChart.value.setOption(option)
+  }
+
+  const resizeChart = async () => {
+    setTimeout(() => {
+      myChart.value?.resize()
+    })
   }
 
   onMounted(() => {
     initCharts()
+    window.addEventListener('resize', resizeChart, true)
+  })
+
+  onBeforeUnmount(() => {
+    window.removeEventListener('resize', resizeChart, true)
   })
 </script>
 
 <template>
   <div class="chart">
     <div class="chart-title">{{ $props.title }}</div>
-    <canvas :id="$props.chartId" style="width: 100%; height: 100%"></canvas>
+    <div :id="$props.chartId" style="height: 260px; width: 100%"></div>
   </div>
 </template>
 
 <style lang="scss" scoped>
   .chart {
-    text-align: center;
+    height: 300px;
+    box-sizing: border-box;
+    padding: 10px;
     &-title {
       text-align: start;
       font-size: 12px;
