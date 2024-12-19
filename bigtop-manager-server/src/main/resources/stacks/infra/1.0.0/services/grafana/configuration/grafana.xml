@@ -51,10 +51,7 @@ admin_password = admin
 secret_key = some-secret-key
 
 [database]
-# Database type, default is sqlite3
-type = sqlite3
-# Path to the SQLite database file
-path = /var/lib/grafana/grafana.db
+# Database type, can be: sqlite3, mysql, postgres, mssql
 
 [users]
 # Whether to allow user self-signup
