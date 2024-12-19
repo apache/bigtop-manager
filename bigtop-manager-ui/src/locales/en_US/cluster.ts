@@ -16,21 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import common from '@/locales/zh_CN/common.ts'
-import menu from '@/locales/zh_CN/menu.ts'
-import login from '@/locales/zh_CN/login'
-import user from '@/locales/zh_CN/user.ts'
-import llmConfig from '@/locales/zh_CN/llm-config.ts'
-import aiAssistant from '@/locales/zh_CN/ai-assistant.ts'
-import cluster from '@/locales/zh_CN/cluster.ts'
-
 export default {
-  common,
-  menu,
-  login,
-  user,
-  llmConfig,
-  aiAssistant,
-  cluster
+  base_info: 'Basic information',
+  cluster_config: 'Cluster configuration',
+  cluster_management: 'Cluster management',
+  component_info: 'Component information',
+  host_config: 'Host configuration',
+  create_cluster: 'Create Cluster'
 }

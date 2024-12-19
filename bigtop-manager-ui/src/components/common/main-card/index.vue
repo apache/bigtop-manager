@@ -22,11 +22,12 @@
   import { TabItem } from './types'
 
   interface Props {
-    activeKey: string
-    tabs: TabItem[]
+    activeKey?: string
+    tabs?: TabItem[]
   }
 
   withDefaults(defineProps<Props>(), {
+    activeKey: '',
     tabs: () => {
       return []
     }
@@ -41,14 +42,16 @@
 
 <template>
   <div class="main-card">
-    <a-tabs :active-key="activeKey" :tab-bar-gutter="0" @change="handleChange">
-      <a-tab-pane v-for="tab in tabs" :key="tab.key" :tab="tab.title">
-        <slot></slot>
-      </a-tab-pane>
-      <template #renderTabBar="{ DefaultTabBar, ...props }">
-        <component :is="DefaultTabBar" v-bind="props" />
-      </template>
-    </a-tabs>
+    <slot>
+      <a-tabs :active-key="activeKey" :tab-bar-gutter="0" @change="handleChange">
+        <a-tab-pane v-for="tab in tabs" :key="tab.key" :tab="tab.title">
+          <slot name="tab-item"></slot>
+        </a-tab-pane>
+        <template #renderTabBar="{ DefaultTabBar, ...props }">
+          <component :is="DefaultTabBar" v-bind="props" />
+        </template>
+      </a-tabs>
+    </slot>
   </div>
 </template>
 
@@ -56,9 +59,9 @@
   .main-card {
     min-width: 389px;
     background-color: $color-white;
-    padding-inline: $space-md;
-    padding-bottom: $space-md;
+    padding: $space-md;
     :deep(.ant-tabs-tab) {
+      padding-top: 0;
       padding-inline: 16px;
     }
   }

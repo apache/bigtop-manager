@@ -19,8 +19,11 @@
 
 <script setup lang="ts">
   import { useMenuStore } from '@/store/menu'
-  import { shallowRef } from 'vue'
+  import { computed, ref } from 'vue'
+  import ClusterBase from './components/cluster-base.vue'
+  import { useI18n } from 'vue-i18n'
   const menuStore = useMenuStore()
+  const { t } = useI18n()
 
   const onSave = () => {
     menuStore.updateSiderMenu()
@@ -30,27 +33,53 @@
     menuStore.updateSiderMenu(true)
   }
 
-  const stepItems = shallowRef([
+  const current = ref(0)
+  const steps = computed(() => [
     {
-      title: '集群管理'
+      title: t('cluster.cluster_management')
     },
     {
-      title: '组件信息'
+      title: t('cluster.component_info')
     },
     {
-      title: '主机配置'
+      title: t('cluster.host_config')
     },
     {
-      title: '创建集群'
+      title: t('cluster.create_cluster')
     }
   ])
+  const getCompName = computed(() => {
+    if (current.value === 0) {
+      return ClusterBase
+    } else {
+      return ClusterBase
+    }
+  })
 </script>
 
 <template>
   <div class="cluster-create">
     <header-card>
-      <a-steps style="margin-inline: 6%" :current="1" :items="stepItems"></a-steps>
+      <a-steps style="margin-inline: 6%" :current="current" :items="steps"></a-steps>
     </header-card>
+    <main-card>
+      <template v-for="stepItem in steps" :key="stepItem.title">
+        <div v-show="steps[current].title === stepItem.title">
+          <a-typography-text strong :content="stepItem.title" />
+          <section class="step-content">
+            <component :is="getCompName" />
+          </section>
+        </div>
+      </template>
+      <div class="step-action">
+        <a-space>
+          <a-button>退出</a-button>
+          <a-button type="primary">上一步</a-button>
+          <a-button type="primary">下一步</a-button>
+          <a-button type="primary">完成</a-button>
+        </a-space>
+      </div>
+    </main-card>
     <div> create & del</div>
     <a-button @click="onSave">create</a-button>
     <a-button @click="onDel">delete</a-button>
@@ -60,5 +89,15 @@
 <style lang="scss" scoped>
   .cluster-create {
     min-width: 600px;
+    .header-card {
+      min-height: 80px;
+    }
+  }
+  .step-content {
+    padding-block: $space-md;
+  }
+  .step-action {
+    text-align: end;
+    margin-top: $space-md;
   }
 </style>

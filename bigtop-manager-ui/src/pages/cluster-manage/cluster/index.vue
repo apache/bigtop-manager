@@ -100,7 +100,9 @@
 <template>
   <header-card :title="title" :desc="desc" :action-groups="actionGroup" />
   <main-card v-model:active-key="activeKey" :tabs="tabs">
-    <component :is="getCompName"></component>
+    <template #tab-item>
+      <component :is="getCompName"></component>
+    </template>
   </main-card>
 </template>
 
