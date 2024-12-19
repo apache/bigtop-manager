@@ -66,12 +66,6 @@ auto_assign_org = true
 # Enable or disable the authentication system
 enabled = true
 
-[alerting]
-# Enable the alerting system
-enabled = true
-# Default alert evaluation frequency
-default_alert_frequency = 1m
-
 [log]
 # Log level, can be: trace, debug, info, warn, error, critical
 level = ${log_level}

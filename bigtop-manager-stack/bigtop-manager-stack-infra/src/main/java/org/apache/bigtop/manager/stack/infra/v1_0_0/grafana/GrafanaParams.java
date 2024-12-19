@@ -61,7 +61,7 @@ public class GrafanaParams extends InfraParams {
         Map<String, Object> configuration = LocalSettings.configurations(getServiceName(), "grafana");
         grafanaContent = (String) configuration.get("content");
         grafanaPort = (String) configuration.get("port");
-        grafanaLogLevel = (String) configuration.get("logLevel");
+        grafanaLogLevel = (String) configuration.get("log_level");
         return configuration;
     }
 
