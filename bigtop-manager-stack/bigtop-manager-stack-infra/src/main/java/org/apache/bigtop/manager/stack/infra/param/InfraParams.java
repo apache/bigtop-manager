@@ -24,11 +24,44 @@ import org.apache.bigtop.manager.stack.core.spi.param.BaseParams;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.File;
+
 @Slf4j
 @NoArgsConstructor
 public abstract class InfraParams extends BaseParams {
 
     protected InfraParams(CommandPayload commandPayload) {
         super(commandPayload);
+    }
+
+    /**
+     * Infra stack do not belong to any cluster, so we need to override this and provide a group name
+     *
+     * @return group name
+     */
+    @Override
+    public String group() {
+        return "infra";
+    }
+
+    /**
+     * Infra stack do not belong to any cluster, we cannot use stack home of cluster
+     *
+     * @return group name
+     */
+    @Override
+    public String stackHome() {
+        // Parent path of agent dir, which is bigtop-manager-agent/../
+        String parentPath = new File(InfraParams.class
+                        .getProtectionDomain()
+                        .getCodeSource()
+                        .getLocation()
+                        .getPath())
+                .getParentFile()
+                .getParentFile()
+                .getParentFile()
+                .getPath();
+
+        return parentPath + "/infras";
     }
 }

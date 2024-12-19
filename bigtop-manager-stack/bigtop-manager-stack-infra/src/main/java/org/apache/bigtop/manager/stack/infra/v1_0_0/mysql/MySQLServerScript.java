@@ -16,8 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.stack.infra.v1_0_0.grafana;
+package org.apache.bigtop.manager.stack.infra.v1_0_0.mysql;
 
+import org.apache.bigtop.manager.common.constants.MessageConstants;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.stack.core.exception.StackException;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
@@ -28,36 +29,53 @@ import org.apache.bigtop.manager.stack.core.utils.linux.LinuxOSUtils;
 import com.google.auto.service.AutoService;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Properties;
 
-@AutoService(Script.class)
 @Slf4j
-public class GrafanaServerScript extends AbstractServerScript {
+@AutoService(Script.class)
+public class MySQLServerScript extends AbstractServerScript {
 
     @Override
     public ShellResult add(Params params) {
         Properties properties = new Properties();
         properties.setProperty(PROPERTY_KEY_SKIP_LEVELS, "1");
 
-        return super.add(params, properties);
+        super.add(params, properties);
+
+        // Initialize server after added
+        log.info("Initializing MySQL root user");
+        String user = params.user();
+        String binDir = params.serviceHome() + "/bin";
+        configure(params);
+        runCommand(binDir + "/mysqld --initialize-insecure", user);
+        start(params);
+        runCommand(binDir + "/mysql -u root -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY 'root';\"", user);
+        runCommand(binDir + "/mysql -u root -p'root' -e\"CREATE USER 'root'@'%' IDENTIFIED BY 'root';\"", user);
+        runCommand(
+                binDir + "/mysql -u root -p'root' -e \"GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;\"",
+                user);
+        stop(params);
+
+        return ShellResult.success();
     }
 
     @Override
     public ShellResult configure(Params params) {
-        return GrafanaSetup.config(params);
+        return MySQLSetup.configure(params);
     }
 
     @Override
     public ShellResult start(Params params) {
         configure(params);
-        GrafanaParams grafanaParams = (GrafanaParams) params;
-        String cmd = MessageFormat.format(
-                "nohup {0}/bin/grafana server --homepath {0} > {0}/nohup.out 2>&1 &", grafanaParams.serviceHome());
+        MySQLParams mysqlParams = (MySQLParams) params;
+
+        String cmd = getStartCommand(params);
         try {
-            ShellResult shellResult = LinuxOSUtils.sudoExecCmd(cmd, grafanaParams.user());
+            ShellResult shellResult = LinuxOSUtils.sudoExecCmd(cmd, mysqlParams.user());
             if (shellResult.getExitCode() != 0) {
-                throw new StackException("Failed to start Grafana: {0}", shellResult.getErrMsg());
+                throw new StackException("Failed to start MySQL: {0}", shellResult.getErrMsg());
             }
             long startTime = System.currentTimeMillis();
             long maxWaitTime = 5000;
@@ -78,33 +96,46 @@ public class GrafanaServerScript extends AbstractServerScript {
 
     @Override
     public ShellResult stop(Params params) {
-        GrafanaParams grafanaParams = (GrafanaParams) params;
-        String cmd = MessageFormat.format("pkill -f {0}/bin/grafana", grafanaParams.serviceHome());
+        MySQLParams mysqlParams = (MySQLParams) params;
+        String cmd = getStopCommand(params);
         try {
-            return LinuxOSUtils.sudoExecCmd(cmd, grafanaParams.user());
-        } catch (Exception e) {
+            return LinuxOSUtils.sudoExecCmd(cmd, mysqlParams.user());
+        } catch (IOException e) {
             throw new StackException(e);
         }
     }
 
     @Override
     public ShellResult status(Params params) {
-        GrafanaParams grafanaParams = (GrafanaParams) params;
-        String cmd = MessageFormat.format("pgrep -f {0}/bin/grafana", grafanaParams.serviceHome());
+        MySQLParams mysqlParams = (MySQLParams) params;
+        return LinuxOSUtils.checkProcess(mysqlParams.getMysqlPidDir() + "/mysqld.pid");
+    }
+
+    private String getStartCommand(Params params) {
+        MySQLParams mysqlParams = (MySQLParams) params;
+        return MessageFormat.format("nohup {0}/bin/mysqld_safe > /dev/null 2>&1 &", mysqlParams.serviceHome());
+    }
+
+    private String getStopCommand(Params params) {
+        MySQLParams mysqlParams = (MySQLParams) params;
+        return MessageFormat.format(
+                "{0}/bin/mysqladmin -u root -p''{1}'' shutdown",
+                mysqlParams.serviceHome(), mysqlParams.getRootPassword());
+    }
+
+    private void runCommand(String cmd, String user) {
         try {
-            ShellResult result = LinuxOSUtils.execCmd(cmd);
-            if (result.getExitCode() == 0) {
-                return ShellResult.success();
-            } else {
-                return new ShellResult(-1, "", "Grafana is not running");
+            ShellResult shellResult = LinuxOSUtils.sudoExecCmd(cmd, user);
+            if (shellResult.getExitCode() != MessageConstants.SUCCESS_CODE) {
+                throw new StackException(shellResult.getErrMsg());
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new StackException(e);
         }
     }
 
     @Override
     public String getComponentName() {
-        return "grafana_server";
+        return "mysql_server";
     }
 }

@@ -18,7 +18,6 @@
  */
 package org.apache.bigtop.manager.stack.core.spi.param;
 
-import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
 import org.apache.bigtop.manager.common.message.entity.pojo.PackageInfo;
 import org.apache.bigtop.manager.common.message.entity.pojo.PackageSpecificInfo;
@@ -55,10 +54,6 @@ public abstract class BaseParams implements Params {
     protected BaseParams(CommandPayload commandPayload) {
         this.commandPayload = commandPayload;
 
-        Command command = commandPayload.getCommand();
-        if (command == Command.ADD) {
-            return;
-        }
         // Global Parameters Injection
         Method[] declaredMethods = this.getClass().getDeclaredMethods();
         for (Method declaredMethod : declaredMethods) {

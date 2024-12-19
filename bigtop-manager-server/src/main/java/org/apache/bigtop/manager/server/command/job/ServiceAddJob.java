@@ -55,11 +55,11 @@ public class ServiceAddJob extends AbstractServiceJob {
 
     @Override
     protected void createStages() {
+        // Update cache files
+        super.createCacheStage();
+
         // Install components
         super.createAddStages();
-
-        // Update cache files after installed
-        super.createCacheStage();
 
         // Configure services
         super.createConfigureStages();

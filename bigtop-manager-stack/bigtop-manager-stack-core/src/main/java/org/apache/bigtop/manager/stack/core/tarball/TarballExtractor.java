@@ -23,6 +23,7 @@ import org.apache.bigtop.manager.stack.core.exception.StackException;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
+import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,10 +46,12 @@ public class TarballExtractor {
         File tarball = new File(source);
         File destDir = new File(dest);
 
-        if (isTarGz(source)) {
-            extractTarGz(tarball, tis -> extract(tis, destDir, skipLevels));
-        } else if (isTar(source)) {
+        if (isTar(source)) {
             extractTar(tarball, tis -> extract(tis, destDir, skipLevels));
+        } else if (isTarGz(source)) {
+            extractTarGz(tarball, tis -> extract(tis, destDir, skipLevels));
+        } else if (isTarXz(source)) {
+            extractTarXz(tarball, tis -> extract(tis, destDir, skipLevels));
         } else {
             log.info("Unsupported file type: {}", source);
         }
@@ -125,11 +128,26 @@ public class TarballExtractor {
         }
     }
 
-    private static boolean isTarGz(String filePath) {
-        return filePath.endsWith(".tar.gz") || filePath.endsWith(".tgz");
+    private static void extractTarXz(File tarball, Function<TarArchiveInputStream, Boolean> func) {
+        try (InputStream fis = Files.newInputStream(tarball.toPath());
+                XZCompressorInputStream xzis = new XZCompressorInputStream(fis);
+                TarArchiveInputStream tis = new TarArchiveInputStream(xzis)) {
+            func.apply(tis);
+        } catch (Exception e) {
+            log.error("Error extracting tarball", e);
+            throw new StackException(e);
+        }
     }
 
     private static boolean isTar(String filePath) {
         return filePath.endsWith(".tar");
+    }
+
+    private static boolean isTarGz(String filePath) {
+        return filePath.endsWith(".tar.gz") || filePath.endsWith(".tgz");
+    }
+
+    private static boolean isTarXz(String filePath) {
+        return filePath.endsWith(".tar.xz");
     }
 }
