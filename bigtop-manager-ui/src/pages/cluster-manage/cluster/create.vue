@@ -19,6 +19,7 @@
 
 <script setup lang="ts">
   import { useMenuStore } from '@/store/menu'
+  import { shallowRef } from 'vue'
   const menuStore = useMenuStore()
 
   const onSave = () => {
@@ -28,14 +29,36 @@
   const onDel = () => {
     menuStore.updateSiderMenu(true)
   }
+
+  const stepItems = shallowRef([
+    {
+      title: '集群管理'
+    },
+    {
+      title: '组件信息'
+    },
+    {
+      title: '主机配置'
+    },
+    {
+      title: '创建集群'
+    }
+  ])
 </script>
 
 <template>
-  <div>
+  <div class="cluster-create">
+    <header-card>
+      <a-steps style="margin-inline: 6%" :current="1" :items="stepItems"></a-steps>
+    </header-card>
     <div> create & del</div>
     <a-button @click="onSave">create</a-button>
     <a-button @click="onDel">delete</a-button>
   </div>
 </template>
 
-<style scoped></style>
+<style lang="scss" scoped>
+  .cluster-create {
+    min-width: 600px;
+  }
+</style>

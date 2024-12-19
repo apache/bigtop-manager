@@ -23,6 +23,7 @@
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { TabItem } from '@/components/common/main-card/types'
   import Overview from './overview.vue'
+  import Service from './service.vue'
 
   const route = useRoute()
   const title = computed(() => route.params.cluster as string)
@@ -79,6 +80,14 @@
     }
   ])
 
+  const getCompName = computed(() => {
+    if (activeKey.value === '1') {
+      return Overview
+    } else {
+      return Service
+    }
+  })
+
   const dropdownMenuClick: GroupItem['dropdownMenuClickEvent'] = ({ key }) => {
     console.log('key :>> ', key)
   }
@@ -91,7 +100,7 @@
 <template>
   <header-card :title="title" :desc="desc" :action-groups="actionGroup" />
   <main-card v-model:active-key="activeKey" :tabs="tabs">
-    <component :is="Overview"></component>
+    <component :is="getCompName"></component>
   </main-card>
 </template>
 

@@ -53,21 +53,23 @@
 
 <template>
   <div class="header-card">
-    <div class="header-card-info">
-      <a-avatar v-if="showAvatar" shape="square" :size="54" />
-      <div class="card-info-title">
-        <div class="card-info-status">
-          <a-typography-title :level="5">{{ $props.title }}</a-typography-title>
-          <svg-icon v-if="showStatus" :name="status" />
+    <slot>
+      <div class="header-card-info">
+        <a-avatar v-if="showAvatar" shape="square" :size="54" />
+        <div class="card-info-title">
+          <div class="card-info-status">
+            <a-typography-title :level="5">{{ $props.title }}</a-typography-title>
+            <svg-icon v-if="showStatus" :name="status" />
+          </div>
+          <a-typography-text type="secondary">{{ $props.desc }}</a-typography-text>
         </div>
-        <a-typography-text type="secondary">{{ $props.desc }}</a-typography-text>
       </div>
-    </div>
-    <div class="header-card-action">
-      <slot name="actions">
-        <button-group :groups="$props.actionGroups" @on-click="onActions" />
-      </slot>
-    </div>
+      <div class="header-card-action">
+        <slot name="actions">
+          <button-group :groups="$props.actionGroups" @on-click="onActions" />
+        </slot>
+      </div>
+    </slot>
   </div>
 </template>
 
@@ -75,7 +77,7 @@
   .header-card {
     width: 100%;
     min-width: 389px;
-    height: 102px;
+    min-height: 102px;
     @include flexbox($justify: space-between, $align: center);
     background-color: $color-white;
     padding: $space-md;
