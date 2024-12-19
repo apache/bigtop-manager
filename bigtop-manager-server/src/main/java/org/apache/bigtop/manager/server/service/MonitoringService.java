@@ -26,5 +26,7 @@ public interface MonitoringService {
 
     JsonNode queryAgentsInfo();
 
-    JsonNode queryAgentsInstStatus();
+    JsonNode queryAgentsInfo(String step);
+
+    JsonNode queryClusterInfo(String clusterId, String step);
 }
