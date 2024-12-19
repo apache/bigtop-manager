@@ -90,7 +90,7 @@
 
 <template>
   <header-card :title="title" :desc="desc" :action-groups="actionGroup" />
-  <main-card :active-key="activeKey" :tabs="tabs">
+  <main-card v-model:active-key="activeKey" :tabs="tabs">
     <component :is="Overview"></component>
   </main-card>
 </template>

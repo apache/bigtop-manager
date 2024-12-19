@@ -41,7 +41,7 @@
 
 <template>
   <div class="main-card">
-    <a-tabs v-mode:active-key="activeKey" :tab-bar-gutter="0" @change="handleChange">
+    <a-tabs :active-key="activeKey" :tab-bar-gutter="0" @change="handleChange">
       <a-tab-pane v-for="tab in tabs" :key="tab.key" :tab="tab.title">
         <slot></slot>
       </a-tab-pane>
