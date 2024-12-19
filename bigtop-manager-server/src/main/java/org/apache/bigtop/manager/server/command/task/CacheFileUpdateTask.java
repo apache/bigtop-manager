@@ -113,6 +113,7 @@ public class CacheFileUpdateTask extends AbstractTask {
         List<HostPO> hostPOList = hostDao.findByIds(hostIds);
 
         clusterInfo = new ClusterInfo();
+        clusterInfo.setName(clusterPO.getName());
         clusterInfo.setUserGroup(clusterPO.getUserGroup());
         clusterInfo.setRootDir(clusterPO.getRootDir());
 

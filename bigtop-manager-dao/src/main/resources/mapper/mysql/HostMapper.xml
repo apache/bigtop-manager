@@ -40,7 +40,7 @@
         select
         <include refid="baseColumnsV2">
             <property name="alias" value="h"/>
-        </include>, c.name as cluster_name, count(comp.id) as component_num
+        </include>, c.display_name as cluster_name, count(comp.id) as component_num
         from host h
         left join cluster c on h.cluster_id = c.id
         left join component comp on h.id = comp.host_id
@@ -65,7 +65,7 @@
         select
         <include refid="baseColumnsV2">
             <property name="alias" value="h"/>
-        </include>, c.name as cluster_name, count(comp.id) as component_num
+        </include>, c.display_name as cluster_name, count(comp.id) as component_num
         from host h
         left join cluster c on h.cluster_id = c.id
         left join component comp on h.id = comp.host_id
@@ -93,18 +93,11 @@
         <include refid="baseColumnsV2">
             <property name="alias" value="h"/>
         </include>
-        ,clus.name as cluster_name
-        from
-        host h
-        inner join
-        (select * from cluster
-        <where>
-            <if test="clusterId != 0">
-                id = #{clusterId}
-            </if>
-        </where>
-        ) clus
+        ,clus.display_name as cluster_name
+        from host h
+        left join cluster clus
         on h.cluster_id = clus.id
+        where h.cluster_id = #{clusterId}
     </select>
 
     <select id="findAllByHostnames"

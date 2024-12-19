@@ -32,6 +32,10 @@ public class ClusterCommandReq {
     @Schema(example = "c1")
     private String name;
 
+    @NotEmpty
+    @Schema(example = "c1")
+    private String displayName;
+
     @Schema(example = "desc")
     private String desc;
 
