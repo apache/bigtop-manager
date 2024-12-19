@@ -76,20 +76,4 @@ public class PrometheusSetup {
         }
         return ShellResult.success("Prometheus Configure success!");
     }
-
-    public static ShellResult updateTargets(Params params) {
-        PrometheusParams prometheusParams = (PrometheusParams) params;
-        String user = prometheusParams.user();
-        String group = prometheusParams.group();
-        Map<String, List<String>> targets = new HashMap<>();
-        targets.put("targets", prometheusParams.getAllHost());
-        LinuxFileUtils.toFile(
-                ConfigType.JSON,
-                prometheusParams.targetsConfigFile(prometheusParams.BM_AGENT_JOB_NAME),
-                user,
-                group,
-                Constants.PERMISSION_644,
-                List.of(targets));
-        return ShellResult.success("Update hosts success!");
-    }
 }
