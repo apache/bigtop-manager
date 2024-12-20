@@ -19,7 +19,6 @@
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.solr;
 
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
-import org.apache.bigtop.manager.common.utils.Environments;
 import org.apache.bigtop.manager.stack.bigtop.param.BigtopParams;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
@@ -51,7 +50,7 @@ public class SolrParams extends BigtopParams {
 
     public SolrParams(CommandPayload commandPayload) {
         super(commandPayload);
-        globalParamsMap.put("java_home", Environments.getJavaHome());
+        globalParamsMap.put("java_home", javaHome());
         globalParamsMap.put("solr_home", serviceHome());
         globalParamsMap.put("security_enabled", false);
         globalParamsMap.put("solr_pid_file", solrPidFile);

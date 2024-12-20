@@ -117,6 +117,12 @@ public abstract class BaseParams implements Params {
     }
 
     @Override
+    public String javaHome() {
+        String root = LocalSettings.cluster().getRootDir();
+        return MessageFormat.format("{0}/tools/jdk", root);
+    }
+
+    @Override
     public String stackHome() {
         String root = LocalSettings.cluster().getRootDir();
         return MessageFormat.format("{0}/services", root);

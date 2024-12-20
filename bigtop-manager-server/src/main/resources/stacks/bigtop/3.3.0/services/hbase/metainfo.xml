@@ -77,7 +77,6 @@
         </package-specifics>
 
         <required-services>
-            <service>zookeeper</service>
             <service>hadoop</service>
         </required-services>
 

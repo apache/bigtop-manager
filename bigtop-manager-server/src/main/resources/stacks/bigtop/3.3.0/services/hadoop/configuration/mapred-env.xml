@@ -39,7 +39,6 @@ export HADOOP_HOME=${hadoop_home}
 # Could be enabled from deployment option if necessary
 export MAPRED_HISTORYSERVER_OPTS="$MAPRED_HISTORYSERVER_OPTS -Dhadoop.log.dir=$HADOOP_LOG_DIR"
 export HADOOP_LIBEXEC_DIR=${hadoop_libexec_dir}
-export HADOOP_OPTS="$HADOOP_OPTS --add-opens java.base/java.lang=ALL-UNNAMED"
 export JAVA_HOME=${java_home}
 ]]>
         </value>
