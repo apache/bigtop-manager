@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.tools;
+package org.apache.bigtop.manager.server.tools.provider;
 
 import org.apache.bigtop.manager.server.enums.ChatbotCommand;
 
@@ -29,11 +29,11 @@ import jakarta.annotation.Resource;
 @Component
 public class AiServiceToolsProvider {
     @Resource
-    private ClusterInfoToolsProvider clusterInfoToolsProvider;
+    private InfoToolsProvider infoToolsProvider;
 
     public ToolProvider getToolsProvide(ChatbotCommand chatbotCommand) {
         if (chatbotCommand.equals(ChatbotCommand.INFO)) {
-            return clusterInfoToolsProvider;
+            return infoToolsProvider;
         }
         return null;
     }

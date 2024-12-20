@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.tools;
+package org.apache.bigtop.manager.server.tools.functions;
 
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.server.model.vo.ClusterVO;
@@ -28,18 +28,16 @@ import dev.langchain4j.agent.tool.JsonSchemaProperty;
 import dev.langchain4j.agent.tool.Tool;
 import dev.langchain4j.agent.tool.ToolSpecification;
 import dev.langchain4j.service.tool.ToolExecutor;
-import dev.langchain4j.service.tool.ToolProvider;
-import dev.langchain4j.service.tool.ToolProviderRequest;
-import dev.langchain4j.service.tool.ToolProviderResult;
 import lombok.extern.slf4j.Slf4j;
 
 import jakarta.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Component
 @Slf4j
-public class ClusterInfoToolsProvider implements ToolProvider {
+public class ClusterInfoFunctions {
     @Resource
     private ClusterService clusterService;
 
@@ -93,12 +91,11 @@ public class ClusterInfoToolsProvider implements ToolProvider {
         return Map.of(toolSpecification, toolExecutor);
     }
 
-    @Override
-    public ToolProviderResult provideTools(ToolProviderRequest toolProviderRequest) {
-        return ToolProviderResult.builder()
-                .addAll(list())
-                .addAll(get())
-                .addAll(getByName())
-                .build();
+    public Map<ToolSpecification, ToolExecutor> getAllFunctions() {
+        Map<ToolSpecification, ToolExecutor> functions = new HashMap<>();
+        functions.putAll(list());
+        functions.putAll(get());
+        functions.putAll(getByName());
+        return functions;
     }
 }
