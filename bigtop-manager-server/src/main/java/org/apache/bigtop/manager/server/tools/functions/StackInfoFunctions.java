@@ -19,6 +19,8 @@
 package org.apache.bigtop.manager.server.tools.functions;
 
 import org.apache.bigtop.manager.common.utils.JsonUtils;
+import org.apache.bigtop.manager.server.model.vo.PropertyVO;
+import org.apache.bigtop.manager.server.model.vo.ServiceConfigVO;
 import org.apache.bigtop.manager.server.model.vo.ServiceVO;
 import org.apache.bigtop.manager.server.model.vo.StackVO;
 import org.apache.bigtop.manager.server.service.StackService;
@@ -76,6 +78,14 @@ public class StackInfoFunctions {
             for (StackVO stackVO : stackService.list()) {
                 for (ServiceVO serviceVO : stackVO.getServices()) {
                     if (serviceVO.getName().equals(serviceName)) {
+                        for (ServiceConfigVO serviceConfigVO : serviceVO.getConfigs()) {
+                            for (PropertyVO propertyVO : serviceConfigVO.getProperties()) {
+                                if (propertyVO.getName().equals("content")) {
+                                    propertyVO.setValue(null);
+                                }
+                            }
+                        }
+
                         return serviceVO.toString();
                     }
                 }
