@@ -20,16 +20,34 @@
 
 <metainfo>
     <service>
-        <name>tez</name>
-        <display-name>Tez</display-name>
-        <desc>Tez is the next generation Hadoop Query Processing framework written on top of YARN.</desc>
-        <version>0.10.2-1</version>
-        <user>tez</user>
+        <name>hive</name>
+        <display-name>Hive</display-name>
+        <desc>
+            The Apache Hive is a distributed, fault-tolerant data warehouse system
+            that enables analytics at a massive scale and facilitates reading, writing,
+            and managing petabytes of data residing in distributed storage using SQL.
+        </desc>
+        <version>3.1.3-1</version>
+        <user>hive</user>
 
         <components>
             <component>
-                <name>tez_client</name>
-                <display-name>Tez Client</display-name>
+                <name>hiveserver2</name>
+                <display-name>HiveServer2</display-name>
+                <category>server</category>
+                <cardinality>1+</cardinality>
+            </component>
+
+            <component>
+                <name>hive_metastore</name>
+                <display-name>Hive Metastore</display-name>
+                <category>server</category>
+                <cardinality>1+</cardinality>
+            </component>
+
+            <component>
+                <name>hive_client</name>
+                <display-name>Hive Client</display-name>
                 <category>client</category>
                 <cardinality>1+</cardinality>
             </component>
@@ -43,15 +61,16 @@
                 </architectures>
                 <packages>
                     <package>
-                        <name>tez-0.10.2-1.tar.gz</name>
-                        <checksum>SHA-256:ebc2c195780fc76fb9b12e8987e48c301ca0b1916dca515f5c7a1122d74f397e</checksum>
+                        <name>hive-3.1.3-1.tar.gz</name>
+                        <checksum>SHA-256:1118e8c485ccc52dbf06a54604659c2bdbd7b4d4ba366aa40c000585303fcbf9</checksum>
                     </package>
                 </packages>
             </package-specific>
         </package-specifics>
 
         <required-services>
-            <service>hive</service>
+            <service>mysql</service>
+            <service>hadoop</service>
         </required-services>
     </service>
 </metainfo>
