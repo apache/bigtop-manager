@@ -19,6 +19,7 @@
 package org.apache.bigtop.manager.server.tools.provider;
 
 import org.apache.bigtop.manager.server.tools.functions.ClusterInfoFunctions;
+import org.apache.bigtop.manager.server.tools.functions.HostInfoFunctions;
 
 import org.springframework.stereotype.Component;
 
@@ -35,10 +36,14 @@ public class InfoToolsProvider implements ToolProvider {
     @Resource
     private ClusterInfoFunctions clusterInfoFunctions;
 
+    @Resource
+    private HostInfoFunctions hostInfoFunctions;
+
     @Override
     public ToolProviderResult provideTools(ToolProviderRequest toolProviderRequest) {
         return ToolProviderResult.builder()
                 .addAll(clusterInfoFunctions.getAllFunctions())
+                .addAll(hostInfoFunctions.getAllFunctions())
                 .build();
     }
 }
