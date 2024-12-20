@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  // import { useMenuStore } from '@/store/menu'
+  import { useMenuStore } from '@/store/menu'
   import { computed, ref } from 'vue'
   import ClusterBase from './components/cluster-base.vue'
   import ComponentInfo from './components/component-info.vue'
@@ -27,13 +27,7 @@
   import { useI18n } from 'vue-i18n'
 
   const { t } = useI18n()
-  // const menuStore = useMenuStore()
-  // const onSave = () => {
-  //   menuStore.updateSiderMenu()
-  // }
-  // const onDel = () => {
-  //   menuStore.updateSiderMenu(true)
-  // }
+  const menuStore = useMenuStore()
 
   const current = ref(0)
   const steps = computed(() => [
@@ -75,6 +69,9 @@
       current.value = current.value + 1
     }
   }
+  const onSave = () => {
+    menuStore.updateSiderMenu()
+  }
 </script>
 
 <template>
@@ -95,10 +92,14 @@
       </template>
       <div class="step-action">
         <a-space>
-          <a-button>{{ $t('common.exit') }}</a-button>
-          <a-button type="primary" @click="previousStep">{{ $t('common.prev') }}</a-button>
-          <a-button type="primary" @click="nextStep">{{ $t('common.next') }}</a-button>
-          <a-button type="primary">{{ $t('common.done') }}</a-button>
+          <a-button v-show="current != stepsLimit" @click="() => $router.go(-1)">{{ $t('common.exit') }}</a-button>
+          <a-button v-show="current > 0 && current < stepsLimit" type="primary" @click="previousStep">
+            {{ $t('common.prev') }}
+          </a-button>
+          <a-button v-show="current >= 0 && current <= stepsLimit - 1" type="primary" @click="nextStep">
+            {{ $t('common.next') }}
+          </a-button>
+          <a-button v-show="current === stepsLimit" type="primary" @click="onSave">{{ $t('common.done') }}</a-button>
         </a-space>
       </div>
     </main-card>

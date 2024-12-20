@@ -129,7 +129,7 @@
         />
       </a-collapse-panel>
     </a-collapse>
-    <a-button @click="check">校验</a-button>
+    <a-button @click="check">check</a-button>
   </div>
 </template>
 

@@ -22,6 +22,8 @@
   import { ref, shallowRef } from 'vue'
   import type { TableColumnType } from 'ant-design-vue'
   import useBaseTable from '@/composables/use-base-table'
+  import SetSource from './set-source.vue'
+
   const columns: TableColumnType[] = [
     {
       title: '#',
@@ -56,6 +58,7 @@
     }
   ]
   const data = ref<any[]>(generateTestData(50))
+  const setSourceRef = ref<InstanceType<typeof SetSource>>()
   const { columnsProp, dataSource, loading, paginationProps, onChange } = useBaseTable({
     columns,
     rows: data.value
@@ -71,6 +74,10 @@
       name: 'Extra'
     }
   ])
+
+  const handleSetSource = () => {
+    setSourceRef.value?.handleOpen()
+  }
 </script>
 
 <template>
@@ -79,7 +86,7 @@
       <a-radio-group v-model:value="componentSelected" button-style="solid">
         <a-radio-button v-for="comp in components" :key="comp.id" :value="comp.id">{{ comp.name }}</a-radio-button>
       </a-radio-group>
-      <a-button type="primary">{{ $t('cluster.config_source') }}</a-button>
+      <a-button type="primary" @click="handleSetSource">{{ $t('cluster.config_source') }}</a-button>
     </header>
     <a-table
       :loading="loading"
@@ -88,6 +95,7 @@
       :pagination="paginationProps"
       @change="onChange"
     ></a-table>
+    <set-source ref="setSourceRef" />
   </div>
 </template>
 

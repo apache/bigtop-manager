@@ -30,5 +30,6 @@ export default {
   config_source: 'Configuration source',
   install_dependencies: 'Install dependencies',
   add_host: 'Add host',
-  view_log: 'View log'
+  view_log: 'View log',
+  source: 'source'
 }

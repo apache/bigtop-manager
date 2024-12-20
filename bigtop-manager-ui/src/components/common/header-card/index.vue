@@ -23,7 +23,7 @@
   interface Props {
     showAvatar?: boolean
     showStatus?: boolean
-    title: string
+    title?: string
     desc?: string
     status?: string
     actionGroups?: GroupItem[]
