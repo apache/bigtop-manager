@@ -25,7 +25,6 @@ import org.apache.bigtop.manager.server.service.ClusterService;
 import org.springframework.stereotype.Component;
 
 import dev.langchain4j.agent.tool.JsonSchemaProperty;
-import dev.langchain4j.agent.tool.Tool;
 import dev.langchain4j.agent.tool.ToolSpecification;
 import dev.langchain4j.service.tool.ToolExecutor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +40,6 @@ public class ClusterInfoFunctions {
     @Resource
     private ClusterService clusterService;
 
-    @Tool("Get cluster list")
     public Map<ToolSpecification, ToolExecutor> list() {
         ToolSpecification toolSpecification = ToolSpecification.builder()
                 .name("list")
@@ -53,7 +51,6 @@ public class ClusterInfoFunctions {
         return Map.of(toolSpecification, toolExecutor);
     }
 
-    @Tool("Get cluster information based on ID")
     public Map<ToolSpecification, ToolExecutor> get() {
         ToolSpecification toolSpecification = ToolSpecification.builder()
                 .name("get")
@@ -69,7 +66,6 @@ public class ClusterInfoFunctions {
         return Map.of(toolSpecification, toolExecutor);
     }
 
-    @Tool("Get cluster information based on cluster name")
     public Map<ToolSpecification, ToolExecutor> getByName() {
         ToolSpecification toolSpecification = ToolSpecification.builder()
                 .name("getByName")

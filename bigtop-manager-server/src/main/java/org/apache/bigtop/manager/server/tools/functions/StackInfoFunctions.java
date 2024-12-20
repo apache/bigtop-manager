@@ -63,7 +63,7 @@ public class StackInfoFunctions {
 
     public Map<ToolSpecification, ToolExecutor> getServiceByName() {
         ToolSpecification toolSpecification = ToolSpecification.builder()
-                .name("getByName")
+                .name("getServiceByName")
                 .description("Get service information and configs based on service name")
                 .addParameter(
                         "serviceName",
