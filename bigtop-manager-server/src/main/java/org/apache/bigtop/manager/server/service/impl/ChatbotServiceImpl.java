@@ -77,6 +77,9 @@ public class ChatbotServiceImpl implements ChatbotService {
     @Resource
     private ChatMessageDao chatMessageDao;
 
+    @Resource
+    private AiServiceToolsProvider aiServiceToolsProvider;
+
     private AIAssistantFactory aiAssistantFactory;
 
     private static final int CHAT_THREAD_NAME_LENGTH = 100;
@@ -131,7 +134,7 @@ public class ChatbotServiceImpl implements ChatbotService {
                             getPlatformType(platformName),
                             getAIAssistantConfig(model, credentials),
                             threadId,
-                            new AiServiceToolsProvider(command));
+                            aiServiceToolsProvider.getToolsProvide(command));
         }
     }
 

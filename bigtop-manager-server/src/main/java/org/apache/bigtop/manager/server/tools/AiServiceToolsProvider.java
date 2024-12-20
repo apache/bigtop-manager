@@ -20,27 +20,20 @@ package org.apache.bigtop.manager.server.tools;
 
 import org.apache.bigtop.manager.server.enums.ChatbotCommand;
 
+import org.springframework.stereotype.Component;
+
 import dev.langchain4j.service.tool.ToolProvider;
-import dev.langchain4j.service.tool.ToolProviderRequest;
-import dev.langchain4j.service.tool.ToolProviderResult;
 
-public class AiServiceToolsProvider implements ToolProvider {
+import jakarta.annotation.Resource;
 
-    ChatbotCommand chatbotCommand;
+@Component
+public class AiServiceToolsProvider {
+    @Resource
+    private ClusterInfoToolsProvider clusterInfoToolsProvider;
 
-    public AiServiceToolsProvider(ChatbotCommand chatbotCommand) {
-        this.chatbotCommand = chatbotCommand;
-    }
-
-    public AiServiceToolsProvider() {
-        this.chatbotCommand = null;
-    }
-
-    @Override
-    public ToolProviderResult provideTools(ToolProviderRequest toolProviderRequest) {
+    public ToolProvider getToolsProvide(ChatbotCommand chatbotCommand) {
         if (chatbotCommand.equals(ChatbotCommand.INFO)) {
-            ClusterInfoTools clusterInfoTools = new ClusterInfoTools();
-            return ToolProviderResult.builder().addAll(clusterInfoTools.list()).build();
+            return clusterInfoToolsProvider;
         }
         return null;
     }
