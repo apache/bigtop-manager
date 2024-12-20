@@ -40,7 +40,7 @@ import java.util.Map;
 
 @Component
 @Slf4j
-public class StackInfoFunctions {
+public class StackFunctions {
     @Resource
     private StackService stackService;
 

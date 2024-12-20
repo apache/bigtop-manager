@@ -18,9 +18,9 @@
  */
 package org.apache.bigtop.manager.server.tools.provider;
 
-import org.apache.bigtop.manager.server.tools.functions.ClusterInfoFunctions;
-import org.apache.bigtop.manager.server.tools.functions.HostInfoFunctions;
-import org.apache.bigtop.manager.server.tools.functions.StackInfoFunctions;
+import org.apache.bigtop.manager.server.tools.functions.ClusterFunctions;
+import org.apache.bigtop.manager.server.tools.functions.HostFunctions;
+import org.apache.bigtop.manager.server.tools.functions.StackFunctions;
 
 import org.springframework.stereotype.Component;
 
@@ -35,20 +35,20 @@ import jakarta.annotation.Resource;
 @Slf4j
 public class InfoToolsProvider implements ToolProvider {
     @Resource
-    private ClusterInfoFunctions clusterInfoFunctions;
+    private ClusterFunctions clusterFunctions;
 
     @Resource
-    private HostInfoFunctions hostInfoFunctions;
+    private HostFunctions hostFunctions;
 
     @Resource
-    private StackInfoFunctions stackInfoFunctions;
+    private StackFunctions stackFunctions;
 
     @Override
     public ToolProviderResult provideTools(ToolProviderRequest toolProviderRequest) {
         return ToolProviderResult.builder()
-                .addAll(clusterInfoFunctions.getAllFunctions())
-                .addAll(hostInfoFunctions.getAllFunctions())
-                .addAll(stackInfoFunctions.getAllFunctions())
+                .addAll(clusterFunctions.getAllFunctions())
+                .addAll(hostFunctions.getAllFunctions())
+                .addAll(stackFunctions.getAllFunctions())
                 .build();
     }
 }

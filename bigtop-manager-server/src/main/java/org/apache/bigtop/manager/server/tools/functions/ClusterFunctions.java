@@ -36,7 +36,7 @@ import java.util.Map;
 
 @Component
 @Slf4j
-public class ClusterInfoFunctions {
+public class ClusterFunctions {
     @Resource
     private ClusterService clusterService;
 

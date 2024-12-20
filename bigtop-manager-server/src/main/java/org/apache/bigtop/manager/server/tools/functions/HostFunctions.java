@@ -37,7 +37,7 @@ import java.util.Map;
 
 @Component
 @Slf4j
-public class HostInfoFunctions {
+public class HostFunctions {
     @Resource
     private HostService hostService;
 
