@@ -41,24 +41,28 @@ public class HostInfoFunctions {
     @Resource
     private HostService hostService;
 
-    public Map<ToolSpecification, ToolExecutor> get() {
+    public Map<ToolSpecification, ToolExecutor> getHostById() {
         ToolSpecification toolSpecification = ToolSpecification.builder()
-                .name("get")
+                .name("getHostById")
                 .description("Get host information based on ID")
                 .addParameter("hostId", JsonSchemaProperty.NUMBER, JsonSchemaProperty.description("host id"))
                 .build();
         ToolExecutor toolExecutor = (toolExecutionRequest, memoryId) -> {
             Map<String, Object> arguments = JsonUtils.readFromString(toolExecutionRequest.arguments());
             Long hostId = Long.valueOf(arguments.get("hostId").toString());
-            return hostService.get(hostId).toString();
+            HostVO hostVO = hostService.get(hostId);
+            if (hostVO == null) {
+                return "Host not found";
+            }
+            return JsonUtils.indentWriteAsString(hostVO);
         };
 
         return Map.of(toolSpecification, toolExecutor);
     }
 
-    public Map<ToolSpecification, ToolExecutor> getByName() {
+    public Map<ToolSpecification, ToolExecutor> getHostByName() {
         ToolSpecification toolSpecification = ToolSpecification.builder()
-                .name("getByName")
+                .name("getHostByName")
                 .description("Get host information based on cluster name")
                 .addParameter("hostName", JsonSchemaProperty.STRING, JsonSchemaProperty.description("host name"))
                 .build();
@@ -68,8 +72,7 @@ public class HostInfoFunctions {
             HostQuery hostQuery = new HostQuery();
             hostQuery.setHostname(hostName);
             PageVO<HostVO> hostVO = hostService.list(hostQuery);
-            log.info(hostVO.toString());
-            return hostVO.toString();
+            return JsonUtils.indentWriteAsString(hostVO);
         };
 
         return Map.of(toolSpecification, toolExecutor);
@@ -77,8 +80,8 @@ public class HostInfoFunctions {
 
     public Map<ToolSpecification, ToolExecutor> getAllFunctions() {
         Map<ToolSpecification, ToolExecutor> functions = new HashMap<>();
-        functions.putAll(get());
-        functions.putAll(getByName());
+        functions.putAll(getHostById());
+        functions.putAll(getHostByName());
         return functions;
     }
 }

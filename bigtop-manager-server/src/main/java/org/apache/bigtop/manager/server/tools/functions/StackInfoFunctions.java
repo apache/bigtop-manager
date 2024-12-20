@@ -44,9 +44,9 @@ public class StackInfoFunctions {
     @Resource
     private StackService stackService;
 
-    public Map<ToolSpecification, ToolExecutor> list() {
+    public Map<ToolSpecification, ToolExecutor> listStackAndService() {
         ToolSpecification toolSpecification = ToolSpecification.builder()
-                .name("list")
+                .name("listStackAndService")
                 .description("Retrieve the list of services in each stack")
                 .build();
         ToolExecutor toolExecutor = (toolExecutionRequest, memoryId) -> {
@@ -58,7 +58,7 @@ public class StackInfoFunctions {
                 }
                 stackInfo.put(stackVO.getStackName(), services);
             }
-            return stackInfo.toString();
+            return JsonUtils.indentWriteAsString(stackInfo);
         };
         return Map.of(toolSpecification, toolExecutor);
     }
@@ -85,8 +85,7 @@ public class StackInfoFunctions {
                                 }
                             }
                         }
-
-                        return serviceVO.toString();
+                        return JsonUtils.indentWriteAsString(serviceVO);
                     }
                 }
             }
@@ -98,7 +97,7 @@ public class StackInfoFunctions {
 
     public Map<ToolSpecification, ToolExecutor> getAllFunctions() {
         Map<ToolSpecification, ToolExecutor> functions = new HashMap<>();
-        functions.putAll(list());
+        functions.putAll(listStackAndService());
         functions.putAll(getServiceByName());
         return functions;
     }

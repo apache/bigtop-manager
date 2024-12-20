@@ -40,35 +40,39 @@ public class ClusterInfoFunctions {
     @Resource
     private ClusterService clusterService;
 
-    public Map<ToolSpecification, ToolExecutor> list() {
+    public Map<ToolSpecification, ToolExecutor> listCluster() {
         ToolSpecification toolSpecification = ToolSpecification.builder()
-                .name("list")
+                .name("listCluster")
                 .description("Get cluster list")
                 .build();
         ToolExecutor toolExecutor =
-                (toolExecutionRequest, memoryId) -> clusterService.list().toString();
+                (toolExecutionRequest, memoryId) -> JsonUtils.indentWriteAsString(clusterService.list());
 
         return Map.of(toolSpecification, toolExecutor);
     }
 
-    public Map<ToolSpecification, ToolExecutor> get() {
+    public Map<ToolSpecification, ToolExecutor> getClusterById() {
         ToolSpecification toolSpecification = ToolSpecification.builder()
-                .name("get")
+                .name("getClusterById")
                 .description("Get cluster information based on ID")
                 .addParameter("clusterId", JsonSchemaProperty.NUMBER, JsonSchemaProperty.description("cluster id"))
                 .build();
         ToolExecutor toolExecutor = (toolExecutionRequest, memoryId) -> {
             Map<String, Object> arguments = JsonUtils.readFromString(toolExecutionRequest.arguments());
             Long clusterId = Long.valueOf(arguments.get("clusterId").toString());
-            return clusterService.get(clusterId).toString();
+            ClusterVO clusterVO = clusterService.get(clusterId);
+            if (clusterVO == null) {
+                return "Cluster not found";
+            }
+            return JsonUtils.indentWriteAsString(clusterVO);
         };
 
         return Map.of(toolSpecification, toolExecutor);
     }
 
-    public Map<ToolSpecification, ToolExecutor> getByName() {
+    public Map<ToolSpecification, ToolExecutor> getClusterByName() {
         ToolSpecification toolSpecification = ToolSpecification.builder()
-                .name("getByName")
+                .name("getClusterByName")
                 .description("Get cluster information based on cluster name")
                 .addParameter("clusterName", JsonSchemaProperty.STRING, JsonSchemaProperty.description("cluster name"))
                 .build();
@@ -78,7 +82,7 @@ public class ClusterInfoFunctions {
             List<ClusterVO> clusterVOS = clusterService.list();
             for (ClusterVO clusterVO : clusterVOS) {
                 if (clusterVO.getName().equals(clusterName)) {
-                    return clusterVO.toString();
+                    return JsonUtils.indentWriteAsString(clusterVO);
                 }
             }
             return "Cluster not found";
@@ -89,9 +93,9 @@ public class ClusterInfoFunctions {
 
     public Map<ToolSpecification, ToolExecutor> getAllFunctions() {
         Map<ToolSpecification, ToolExecutor> functions = new HashMap<>();
-        functions.putAll(list());
-        functions.putAll(get());
-        functions.putAll(getByName());
+        functions.putAll(listCluster());
+        functions.putAll(getClusterById());
+        functions.putAll(getClusterByName());
         return functions;
     }
 }
