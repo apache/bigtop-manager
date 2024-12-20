@@ -29,5 +29,6 @@ export default {
   user_group: '集群用户组',
   config_source: '配置源',
   install_dependencies: '安装依赖',
-  add_host: '新增主机'
+  add_host: '新增主机',
+  view_log: '查看日志'
 }

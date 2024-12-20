@@ -29,5 +29,6 @@ export default {
   user_group: 'User group',
   config_source: 'Configuration source',
   install_dependencies: 'Install dependencies',
-  add_host: 'Add host'
+  add_host: 'Add host',
+  view_log: 'View log'
 }

@@ -49,3 +49,36 @@ export function generateTableHostData(numRows = 100) {
 
   return tableData
 }
+
+/**
+ * 生成随机数据
+ * @param {*} stageCount - 需要生成的 stage 数量
+ * @param {*} maxTasksPerStage - 每个 stage 中最大任务数量
+ * @param {*} maxStatus - 最大 status 值（从 1 开始）
+ * @returns {Array} - 生成的数据数组
+ */
+export function getCheckWorkflows(stageCount: number, maxTasksPerStage: number, maxStatus: number): Array<any> {
+  const data = []
+
+  for (let i = 0; i < stageCount; i++) {
+    const taskCount = Math.floor(Math.random() * maxTasksPerStage) + 1 // 随机任务数量
+    const tasks = []
+
+    for (let j = 0; j < taskCount; j++) {
+      tasks.push({
+        id: j,
+        name: `task${j + 1}`,
+        status: Math.floor(Math.random() * maxStatus) + 1
+      })
+    }
+
+    data.push({
+      id: i,
+      name: `stage${i + 1}`,
+      status: Math.floor(Math.random() * maxStatus) + 1,
+      tasks
+    })
+  }
+
+  return data
+}

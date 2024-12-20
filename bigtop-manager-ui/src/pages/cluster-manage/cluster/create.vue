@@ -23,6 +23,7 @@
   import ClusterBase from './components/cluster-base.vue'
   import ComponentInfo from './components/component-info.vue'
   import HostConfig from './components/host-config.vue'
+  import CheckWorkflow from './components/check-workflow.vue'
   import { useI18n } from 'vue-i18n'
 
   const { t } = useI18n()
@@ -57,8 +58,10 @@
       return ComponentInfo
     } else if (current.value === 2) {
       return HostConfig
+    } else if (current.value === 3) {
+      return CheckWorkflow
     } else {
-      return HostConfig
+      return CheckWorkflow
     }
   })
 
@@ -77,13 +80,15 @@
 <template>
   <div class="cluster-create">
     <header-card>
-      <a-steps :current="current" :items="steps"></a-steps>
+      <div class="steps-wrp">
+        <a-steps :current="current" :items="steps" />
+      </div>
     </header-card>
     <main-card>
       <template v-for="stepItem in steps" :key="stepItem.title">
         <div v-show="steps[current].title === stepItem.title">
           <a-typography-text strong :content="stepItem.title" />
-          <section class="step-content">
+          <section :class="{ 'step-content': current < stepsLimit }">
             <component :is="getCompName" />
           </section>
         </div>
@@ -105,6 +110,11 @@
     min-width: 600px;
     .header-card {
       min-height: 80px;
+    }
+    .steps-wrp {
+      width: 100%;
+      height: 100%;
+      padding-inline: 6%;
     }
   }
   .step-content {
