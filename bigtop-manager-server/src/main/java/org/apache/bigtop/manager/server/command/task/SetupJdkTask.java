@@ -47,6 +47,6 @@ public class SetupJdkTask extends AbstractTask {
 
     @Override
     public String getName() {
-        return "Check host " + taskContext.getHostDTO().getHostname();
+        return "Setup jdk for " + taskContext.getHostDTO().getHostname();
     }
 }
