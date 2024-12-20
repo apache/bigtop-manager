@@ -25,6 +25,7 @@ import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.dao.repository.HostDao;
 import org.apache.bigtop.manager.server.command.stage.CacheFileUpdateStage;
 import org.apache.bigtop.manager.server.command.stage.HostCheckStage;
+import org.apache.bigtop.manager.server.command.stage.SetupJdkStage;
 import org.apache.bigtop.manager.server.command.stage.Stage;
 import org.apache.bigtop.manager.server.command.stage.StageContext;
 import org.apache.bigtop.manager.server.command.task.Task;
@@ -57,6 +58,7 @@ public class ClusterAddJob extends AbstractJob {
         StageContext stageContext = StageContext.fromCommandDTO(jobContext.getCommandDTO());
         stages.add(new HostCheckStage(stageContext));
         stages.add(new CacheFileUpdateStage(stageContext));
+        stages.add(new SetupJdkStage(stageContext));
     }
 
     @Override

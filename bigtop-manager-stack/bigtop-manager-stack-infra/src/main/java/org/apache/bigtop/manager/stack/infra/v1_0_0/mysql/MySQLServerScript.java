@@ -46,15 +46,27 @@ public class MySQLServerScript extends AbstractServerScript {
 
         // Initialize server after added
         log.info("Initializing MySQL root user");
+        MySQLParams mysqlParams = (MySQLParams) params;
         String user = params.user();
         String binDir = params.serviceHome() + "/bin";
+        String password = mysqlParams.getRootPassword();
         configure(params);
         runCommand(binDir + "/mysqld --initialize-insecure", user);
         start(params);
-        runCommand(binDir + "/mysql -u root -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY 'root';\"", user);
-        runCommand(binDir + "/mysql -u root -p'root' -e\"CREATE USER 'root'@'%' IDENTIFIED BY 'root';\"", user);
         runCommand(
-                binDir + "/mysql -u root -p'root' -e \"GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;\"",
+                MessageFormat.format(
+                        "{0}/mysql -u root -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY ''{1}'';\"",
+                        binDir, password),
+                user);
+        runCommand(
+                MessageFormat.format(
+                        "{0}/mysql -u root -p''{1}'' -e \"CREATE USER ''root''@''%'' IDENTIFIED BY ''{1}'';\"",
+                        binDir, password),
+                user);
+        runCommand(
+                MessageFormat.format(
+                        "{0}/mysql -u root -p''{1}'' -e \"GRANT ALL PRIVILEGES ON *.* TO ''root''@''%'' WITH GRANT OPTION;\"",
+                        binDir, password),
                 user);
         stop(params);
 

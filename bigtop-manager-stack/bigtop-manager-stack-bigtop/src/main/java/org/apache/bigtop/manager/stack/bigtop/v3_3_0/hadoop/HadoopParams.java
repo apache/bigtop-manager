@@ -19,7 +19,6 @@
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.hadoop;
 
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
-import org.apache.bigtop.manager.common.utils.Environments;
 import org.apache.bigtop.manager.stack.bigtop.param.BigtopParams;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
@@ -72,7 +71,7 @@ public class HadoopParams extends BigtopParams {
         globalParamsMap.put("hdfs_user", user());
         globalParamsMap.put("hdfs_group", group());
         globalParamsMap.put("datanode_hosts", LocalSettings.hosts("datanode"));
-        globalParamsMap.put("java_home", Environments.getJavaHome());
+        globalParamsMap.put("java_home", javaHome());
         globalParamsMap.put("hadoop_home", serviceHome());
         globalParamsMap.put("hadoop_conf_dir", confDir());
         globalParamsMap.put("hadoop_libexec_dir", serviceHome() + "/libexec");
