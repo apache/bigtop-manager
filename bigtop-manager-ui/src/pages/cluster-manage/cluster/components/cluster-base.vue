@@ -19,14 +19,15 @@
 
 <script setup lang="ts">
   import type { FormItemState } from '@/components/common/auto-form/types'
-  import { computed, ref } from 'vue'
+  import { computed, ref, shallowRef } from 'vue'
   import { useI18n } from 'vue-i18n'
 
   const { t } = useI18n()
-  const activeKey = ref(['1'])
+  const activeKey = ref(['1', '2'])
+  const autoFormRefMap = shallowRef<Map<string, Comp.AutoFormInstance>>(new Map())
   const formLayout = computed(() => ({
-    labelCol: { span: 4 },
-    wrapperCol: { span: 6 }
+    labelCol: { xs: 5, sm: 5, md: 5, lg: 4, xl: 3 },
+    wrapperCol: { xs: 10, sm: 10, md: 10, lg: 10, xl: { xl: 10, pull: 1 } }
   }))
   const baseInfoFormItems = computed((): FormItemState[] => [
     {
@@ -34,7 +35,7 @@
       field: 'name',
       formItemProps: {
         name: 'name',
-        label: '集群名',
+        label: t('cluster.name'),
         rules: [{ required: true, message: t('common.enter_error'), trigger: 'blur' }]
       },
       controlProps: {
@@ -43,10 +44,10 @@
     },
     {
       type: 'textarea',
-      field: 'remark',
+      field: 'desc',
       formItemProps: {
-        name: 'remark',
-        label: '集群描述',
+        name: 'desc',
+        label: t('cluster.description'),
         rules: [{ required: true, message: t('common.enter_error'), trigger: 'blur' }]
       },
       controlProps: {
@@ -57,10 +58,10 @@
   const clusterConfigFormItems = computed((): FormItemState[] => [
     {
       type: 'input',
-      field: 'name',
+      field: 'rootDirectory',
       formItemProps: {
-        name: 'name',
-        label: '集群根目录',
+        name: 'rootDirectory',
+        label: t('cluster.root_directory'),
         rules: [{ required: true, message: t('common.enter_error'), trigger: 'blur' }]
       },
       controlProps: {
@@ -69,10 +70,10 @@
     },
     {
       type: 'textarea',
-      field: 'remark',
+      field: 'userGroup',
       formItemProps: {
-        name: 'remark',
-        label: '集群用户组',
+        name: 'userGroup',
+        label: t('cluster.user_group'),
         rules: [{ required: true, message: t('common.enter_error'), trigger: 'blur' }]
       },
       controlProps: {
@@ -92,6 +93,22 @@
       formItems: clusterConfigFormItems.value
     }
   ])
+
+  const collectAutoFormRefs = (el: any, title: string) => {
+    if (!autoFormRefMap.value.has(title)) {
+      autoFormRefMap.value.set(title, el)
+    }
+  }
+
+  const check = () => {
+    const autoFormRefs = [...autoFormRefMap.value.values()]
+    autoFormRefs.forEach(async (formRef, idx) => {
+      const res = await formRef.getFormValidation()
+      if (!res) {
+        !activeKey.value.includes(`${idx + 1}`) && activeKey.value.push(`${idx + 1}`)
+      }
+    })
+  }
 </script>
 
 <template>
@@ -99,6 +116,12 @@
     <a-collapse v-model:active-key="activeKey" :bordered="false" :ghost="true">
       <a-collapse-panel v-for="(collapse, idx) in collapses" :key="`${idx + 1}`" :header="collapse.title">
         <auto-form
+          :key="collapse.title"
+          :ref="
+            (el) => {
+              collectAutoFormRefs(el, collapse.title)
+            }
+          "
           v-bind="formLayout"
           v-model:form-value="collapse.formValue"
           :form-items="collapse.formItems"
@@ -106,6 +129,7 @@
         />
       </a-collapse-panel>
     </a-collapse>
+    <a-button @click="check">校验</a-button>
   </div>
 </template>
 

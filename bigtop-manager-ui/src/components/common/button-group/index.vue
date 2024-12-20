@@ -24,15 +24,17 @@
 
   const props = withDefaults(defineProps<Props>(), {
     i18n: '',
+    textCompact: false,
     groupShape: 'circle',
     groupType: 'text',
+    space: 8,
     groups: () => {
       return []
     }
   })
 
   const { t } = useI18n()
-  const { groups, groupShape, groupType } = toRefs(props)
+  const { groups, groupShape, groupType, space, args } = toRefs(props)
 
   const checkTitle = (item: GroupItem) => {
     if (props.i18n) {
@@ -48,7 +50,7 @@
 </script>
 
 <template>
-  <a-space>
+  <a-space :size="space" :wrap="true" :class="{ 'text-compact': $props.textCompact }">
     <template v-for="(item, idx) in groups" :key="idx">
       <a-dropdown v-if="item.dropdownMenu">
         <a-button
@@ -75,11 +77,12 @@
       </a-dropdown>
       <a-button
         v-else
+        :danger="item.danger"
         :disabled="item.disabled"
         :shape="item.shape || groupShape || 'default'"
         :type="item.type || groupType || 'default'"
         :title="checkTitle(item)"
-        @click="item.clickEvent ? item.clickEvent(item) : () => {}"
+        @click="item.clickEvent ? item.clickEvent(item, args) : () => {}"
       >
         <template #icon>
           <slot name="icon" :item="item" />
@@ -92,4 +95,10 @@
   </a-space>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+  .text-compact {
+    button {
+      padding: 0;
+    }
+  }
+</style>

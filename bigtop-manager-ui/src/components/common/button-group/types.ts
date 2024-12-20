@@ -34,6 +34,7 @@ export interface GroupItem<T = string> {
   type?: BtnType
   shape?: ShapeType
   disabled?: boolean
+  danger?: boolean
   dropdownMenu?: DropdownMenu[]
   clickEvent?: (item?: GroupItem, ...args: any[]) => void
   dropdownMenuClickEvent?: MenuProps['onClick']
@@ -41,7 +42,10 @@ export interface GroupItem<T = string> {
 
 export interface Props {
   i18n?: string
+  textCompact?: boolean
   groups: GroupItem[]
   groupType?: BtnType
   groupShape?: ShapeType
+  space?: number
+  args?: any
 }

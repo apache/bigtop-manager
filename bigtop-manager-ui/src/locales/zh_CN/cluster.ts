@@ -22,5 +22,12 @@ export default {
   cluster_management: '集群管理',
   component_info: '组件信息',
   host_config: '主机管理',
-  create_cluster: '创建集群'
+  create: '创建集群',
+  name: '集群名',
+  description: '集群描述',
+  root_directory: '集群根目录',
+  user_group: '集群用户组',
+  config_source: '配置源',
+  install_dependencies: '安装依赖',
+  add_host: '新增主机'
 }

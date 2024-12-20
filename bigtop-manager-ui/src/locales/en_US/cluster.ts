@@ -22,5 +22,12 @@ export default {
   cluster_management: 'Cluster management',
   component_info: 'Component information',
   host_config: 'Host configuration',
-  create_cluster: 'Create Cluster'
+  create: 'Create cluster',
+  name: 'Name',
+  description: 'Description',
+  root_directory: 'Root directory',
+  user_group: 'User group',
+  config_source: 'Configuration source',
+  install_dependencies: 'Install dependencies',
+  add_host: 'Add host'
 }

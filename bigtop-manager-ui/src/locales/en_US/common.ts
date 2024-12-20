@@ -27,6 +27,7 @@ export default {
   edit: 'Edit',
   rename: 'Rename',
   delete: 'Delete',
+  bulk_remove: 'Bulk remove',
   disable: 'Disable',
   enable: 'Enable',
   submit: 'Submit',
@@ -49,6 +50,8 @@ export default {
   service: 'Service',
   stack: 'Stack',
   stage: 'Stage',
+  search: 'Search',
+  reset: 'Reset',
   progress: 'Progress',
   status_change_success: 'Status changed successfully',
   test_success: 'Test successful !',
@@ -74,5 +77,6 @@ export default {
   loading_text_verifying: 'Verifying',
   enter_error: 'Please enter {0}',
   select_error: 'Please select {0}',
-  delete_msg: 'Are you sure you want to delete this?'
+  delete_msg: 'Are you sure you want to delete this?',
+  total: 'Total {0} items'
 }

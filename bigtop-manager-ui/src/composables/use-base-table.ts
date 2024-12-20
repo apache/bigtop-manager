@@ -19,13 +19,15 @@
 
 import { ref, onUnmounted } from 'vue'
 import type { TablePaginationConfig, TableColumnType } from 'ant-design-vue'
-export interface UseBaseTableProps<T> {
+import { useI18n } from 'vue-i18n'
+export interface UseBaseTableProps<T = any> {
   columns: TableColumnType[]
   rows?: T[]
   pagination?: TablePaginationConfig | false | undefined
 }
 const useBaseTable = <T>(props: UseBaseTableProps<T>) => {
   const { columns, rows, pagination } = props
+  const { t } = useI18n()
   const loading = ref(false)
   const dataSource = ref<T[]>(rows || [])
   const columnsProp = ref<TableColumnType[]>(columns)
@@ -35,7 +37,8 @@ const useBaseTable = <T>(props: UseBaseTableProps<T>) => {
     total: dataSource.value.length,
     size: 'small',
     showSizeChanger: true,
-    pageSizeOptions: ['10', '20', '30', '40', '50']
+    pageSizeOptions: ['10', '20', '30', '40', '50'],
+    showTotal: (total) => `${t('common.total', [total])}`
   })
 
   // merge pagination config

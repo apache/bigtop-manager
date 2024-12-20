@@ -26,6 +26,7 @@ export default {
   status: '状态',
   edit: '编辑',
   delete: '删除',
+  bulk_remove: '批量删除',
   rename: '重命名',
   disable: '停用',
   enable: '使用',
@@ -49,6 +50,8 @@ export default {
   service: '服务',
   stack: '组件栈',
   stage: '阶段',
+  search: '搜索',
+  reset: '重置',
   progress: '进度',
   created: '创建成功',
   status_change_success: '状态更新成功',
@@ -74,5 +77,6 @@ export default {
   loading_text_verifying: '校验中',
   enter_error: '请输入{0}',
   select_error: '请选择{0}',
-  delete_msg: '确认要删除该记录吗？'
+  delete_msg: '确认要删除该记录吗？',
+  total: '共{0}数据'
 }

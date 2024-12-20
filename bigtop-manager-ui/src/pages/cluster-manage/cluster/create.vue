@@ -18,20 +18,21 @@
 -->
 
 <script setup lang="ts">
-  import { useMenuStore } from '@/store/menu'
+  // import { useMenuStore } from '@/store/menu'
   import { computed, ref } from 'vue'
   import ClusterBase from './components/cluster-base.vue'
+  import ComponentInfo from './components/component-info.vue'
+  import HostConfig from './components/host-config.vue'
   import { useI18n } from 'vue-i18n'
-  const menuStore = useMenuStore()
+
   const { t } = useI18n()
-
-  const onSave = () => {
-    menuStore.updateSiderMenu()
-  }
-
-  const onDel = () => {
-    menuStore.updateSiderMenu(true)
-  }
+  // const menuStore = useMenuStore()
+  // const onSave = () => {
+  //   menuStore.updateSiderMenu()
+  // }
+  // const onDel = () => {
+  //   menuStore.updateSiderMenu(true)
+  // }
 
   const current = ref(0)
   const steps = computed(() => [
@@ -45,22 +46,38 @@
       title: t('cluster.host_config')
     },
     {
-      title: t('cluster.create_cluster')
+      title: t('cluster.create')
     }
   ])
+  const stepsLimit = computed(() => steps.value.length - 1)
   const getCompName = computed(() => {
     if (current.value === 0) {
       return ClusterBase
+    } else if (current.value === 1) {
+      return ComponentInfo
+    } else if (current.value === 2) {
+      return HostConfig
     } else {
-      return ClusterBase
+      return HostConfig
     }
   })
+
+  const previousStep = () => {
+    if (current.value > 0) {
+      current.value = current.value - 1
+    }
+  }
+  const nextStep = () => {
+    if (current.value < stepsLimit.value) {
+      current.value = current.value + 1
+    }
+  }
 </script>
 
 <template>
   <div class="cluster-create">
     <header-card>
-      <a-steps style="margin-inline: 6%" :current="current" :items="steps"></a-steps>
+      <a-steps :current="current" :items="steps"></a-steps>
     </header-card>
     <main-card>
       <template v-for="stepItem in steps" :key="stepItem.title">
@@ -73,16 +90,13 @@
       </template>
       <div class="step-action">
         <a-space>
-          <a-button>退出</a-button>
-          <a-button type="primary">上一步</a-button>
-          <a-button type="primary">下一步</a-button>
-          <a-button type="primary">完成</a-button>
+          <a-button>{{ $t('common.exit') }}</a-button>
+          <a-button type="primary" @click="previousStep">{{ $t('common.prev') }}</a-button>
+          <a-button type="primary" @click="nextStep">{{ $t('common.next') }}</a-button>
+          <a-button type="primary">{{ $t('common.done') }}</a-button>
         </a-space>
       </div>
     </main-card>
-    <div> create & del</div>
-    <a-button @click="onSave">create</a-button>
-    <a-button @click="onDel">delete</a-button>
   </div>
 </template>
 
