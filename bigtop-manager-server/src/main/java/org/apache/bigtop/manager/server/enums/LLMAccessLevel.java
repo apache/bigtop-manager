@@ -16,27 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.dto;
+package org.apache.bigtop.manager.server.enums;
 
-import lombok.Data;
+import lombok.Getter;
 
-import java.util.Map;
+@Getter
+public enum LLMAccessLevel {
+    CHAT_ONLY(0),
+    READONLY(1),
+    WRITE_GUIDED(2),
+    FULL_ACCESS(3);
 
-@Data
-public class AuthPlatformDTO {
-    private Long id;
+    private final Integer code;
 
-    private Long platformId;
+    LLMAccessLevel(Integer code) {
+        this.code = code;
+    }
 
-    private Map<String, String> authCredentials;
-
-    private String name;
-
-    private String model;
-
-    private String desc;
-
-    private Boolean testPassed;
-
-    private Integer accessLevel;
+    public static Boolean isAccessible(Integer accessLevel) {
+        if (accessLevel == null) {
+            return false;
+        }
+        return !CHAT_ONLY.code.equals(accessLevel);
+    }
 }

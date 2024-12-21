@@ -55,4 +55,7 @@ public class AuthPlatformPO extends BasePO implements Serializable {
 
     @Column(name = "desc")
     private String desc;
+
+    @Column(name = "access_level")
+    private Integer accessLevel;
 }

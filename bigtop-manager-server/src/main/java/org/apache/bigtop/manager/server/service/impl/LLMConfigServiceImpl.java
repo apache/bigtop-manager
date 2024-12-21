@@ -35,6 +35,7 @@ import org.apache.bigtop.manager.dao.repository.ChatThreadDao;
 import org.apache.bigtop.manager.dao.repository.PlatformDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.enums.AuthPlatformStatus;
+import org.apache.bigtop.manager.server.enums.LLMAccessLevel;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.model.converter.AuthPlatformConverter;
 import org.apache.bigtop.manager.server.model.converter.PlatformConverter;
@@ -105,8 +106,6 @@ public class LLMConfigServiceImpl implements LLMConfigService {
     }
 
     private Boolean testAuthorization(String platformName, String model, Map<String, String> credentials) {
-        Boolean result = testFuncCalling(platformName, model, credentials);
-        log.info("Test func calling result: {}", result);
         AIAssistantConfig aiAssistantConfig = getAIAssistantConfig(model, credentials, null);
         AIAssistant aiAssistant = getAIAssistantFactory().create(getPlatformType(platformName), aiAssistantConfig);
         try {
@@ -296,6 +295,10 @@ public class LLMConfigServiceImpl implements LLMConfigService {
                 getStringMap(authPlatformDTO, PlatformConverter.INSTANCE.fromPO2DTO(platformPO));
         if (!testAuthorization(platformPO.getName(), authPlatformDTO.getModel(), credentialSet)) {
             throw new ApiException(ApiExceptionEnum.CREDIT_INCORRECT);
+        }
+
+        if (testFuncCalling(platformPO.getName(), authPlatformDTO.getModel(), credentialSet)) {
+            authPlatformDTO.setAccessLevel(LLMAccessLevel.CHAT_ONLY.getCode());
         }
 
         if (authPlatformDTO.getId() != null) {

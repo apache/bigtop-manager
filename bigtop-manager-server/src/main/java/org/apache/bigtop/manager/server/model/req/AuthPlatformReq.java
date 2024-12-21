@@ -40,4 +40,6 @@ public class AuthPlatformReq {
     private String desc;
 
     private boolean testPassed;
+
+    private Integer accessLevel;
 }

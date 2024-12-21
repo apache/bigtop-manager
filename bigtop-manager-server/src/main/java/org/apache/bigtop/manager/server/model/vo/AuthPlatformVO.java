@@ -38,6 +38,8 @@ public class AuthPlatformVO {
 
     private Integer status;
 
+    private Integer accessLevel;
+
     private Map<String, String> authCredentials;
 
     public AuthPlatformVO() {}
