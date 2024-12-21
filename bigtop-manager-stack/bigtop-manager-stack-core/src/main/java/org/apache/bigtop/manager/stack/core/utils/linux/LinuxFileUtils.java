@@ -275,6 +275,29 @@ public class LinuxFileUtils {
         }
     }
 
+    public static String writeFile(String source, String content) {
+        if (StringUtils.isBlank(source)) {
+            throw new StackException("source must not be empty");
+        }
+
+        List<String> builderParameters = new ArrayList<>();
+        builderParameters.add("echo");
+        builderParameters.add(content);
+        builderParameters.add(">");
+        builderParameters.add(source);
+
+        try {
+            ShellResult shellResult = sudoExecCmd(builderParameters);
+            if (shellResult.getExitCode() != MessageConstants.SUCCESS_CODE) {
+                throw new StackException(shellResult.getErrMsg());
+            }
+
+            return shellResult.getOutput();
+        } catch (IOException e) {
+            throw new StackException(e);
+        }
+    }
+
     /**
      * create symbolic link
      *
