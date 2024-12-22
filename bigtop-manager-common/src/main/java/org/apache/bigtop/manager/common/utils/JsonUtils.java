@@ -32,11 +32,15 @@ import java.io.File;
 public class JsonUtils {
 
     public static final ObjectMapper OBJECTMAPPER;
+    public static final ObjectMapper INDENT_MAPPER;
 
     static {
         OBJECTMAPPER = new ObjectMapper();
         OBJECTMAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         OBJECTMAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
+        INDENT_MAPPER = OBJECTMAPPER.copy();
+        INDENT_MAPPER.enable(SerializationFeature.INDENT_OUTPUT);
     }
 
     public static <T> void writeToFile(String fileName, T obj) {
@@ -135,12 +139,8 @@ public class JsonUtils {
         if (obj == null) {
             return null;
         }
-
         try {
-            OBJECTMAPPER.enable(SerializationFeature.INDENT_OUTPUT);
-            String result = OBJECTMAPPER.writeValueAsString(obj);
-            OBJECTMAPPER.disable(SerializationFeature.INDENT_OUTPUT);
-            return result;
+            return INDENT_MAPPER.writeValueAsString(obj);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
