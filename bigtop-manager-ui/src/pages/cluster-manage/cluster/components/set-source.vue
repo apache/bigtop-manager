@@ -18,21 +18,68 @@
 -->
 
 <script setup lang="ts">
-  import { ref } from 'vue'
+  import type { FormInstance, TableColumnType } from 'ant-design-vue'
+  import { ref, watch } from 'vue'
 
   const open = ref(false)
+  const loading = ref(false)
+  const columns: TableColumnType[] = [
+    {
+      title: '名称',
+      dataIndex: 'name',
+      ellipsis: true
+    },
+    {
+      title: '架构',
+      dataIndex: 'architecture',
+      ellipsis: true
+    },
+    {
+      title: '地址',
+      dataIndex: 'address',
+      ellipsis: true
+    }
+  ]
+  const formRef = ref<FormInstance>()
+  const formRule = ref({
+    list: [] as any[]
+  })
 
   const handleOpen = () => {
     open.value = true
   }
 
   const handleOk = () => {
-    open.value = false
+    formRef.value
+      ?.validateFields()
+      .then((values) => {
+        console.log('Received values of form: ', values)
+        formRef.value?.resetFields()
+        open.value = false
+      })
+      .catch((info) => {
+        console.log('Validate Failed:', info)
+      })
   }
 
   const handleCancel = () => {
     open.value = false
   }
+
+  function generateMockData(rowCount = 10) {
+    return Array.from({ length: rowCount }, (_, i) => ({
+      id: i + 1,
+      name: `名称_${i + 1}`,
+      architecture: `架构_${i + 1}`,
+      address: `https://example.com/${i + 1}`
+    }))
+  }
+
+  watch(open, (val) => {
+    if (val) {
+      formRule.value.list = generateMockData(12)
+    }
+  })
 
   defineExpose({
     handleOpen
@@ -43,7 +90,7 @@
   <div class="set-source">
     <a-modal
       v-model:open="open"
-      :width="700"
+      width="50%"
       :centered="true"
       :mask="false"
       :title="$t('cluster.source')"
@@ -52,8 +99,39 @@
       @ok="handleOk"
       @cancel="handleCancel"
     >
+      <a-form ref="formRef" :model="formRule">
+        <a-table
+          :loading="loading"
+          :scroll="{ y: 340 }"
+          :data-source="formRule.list"
+          :columns="columns"
+          :pagination="false"
+        >
+          <template #bodyCell="{ column, record, index }">
+            <template v-if="column.dataIndex == 'address'">
+              <a-form-item
+                class="custom-form-item"
+                label=" "
+                :colon="false"
+                :name="`list[${index}].address`"
+                :rules="[{ required: true, message: '请输入地址', trigger: 'blur' }]"
+              >
+                <a-input v-model:value="record[column.dataIndex]" style="width: 100%"></a-input>
+              </a-form-item>
+            </template>
+          </template>
+        </a-table>
+      </a-form>
+      <a-typography-text class="set-source-tip" type="danger">*注: 源地址的改动对所有集群生效</a-typography-text>
     </a-modal>
   </div>
 </template>
 
-<style scoped></style>
+<style lang="scss" scoped>
+  .set-source {
+    &-tip {
+      margin-top: $space-sm;
+      font-size: 12px;
+    }
+  }
+</style>
