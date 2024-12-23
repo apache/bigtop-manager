@@ -214,6 +214,7 @@ public class LinuxFileUtils {
             return;
         }
 
+        log.info("Copy file: [{}] to [{}]", source, dest);
         List<String> builderParameters = new ArrayList<>();
         builderParameters.add("cp");
         if (Files.exists(Path.of(source)) && Files.isDirectory(Paths.get(source))) {

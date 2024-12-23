@@ -1,0 +1,91 @@
+<?xml version="1.0"?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one
+  ~ or more contributor license agreements.  See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership.  The ASF licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+-->
+
+<configuration>
+    <property>
+        <name>spark_log_dir</name>
+        <display-name>Spark Log directory</display-name>
+        <value>/var/log/spark</value>
+        <description>Spark Log Dir</description>
+    </property>
+    <property>
+        <name>spark_pid_dir</name>
+        <display-name>Spark PID directory</display-name>
+        <value>/var/run/spark</value>
+    </property>
+    <!-- spark-env.sh -->
+    <property>
+        <name>content</name>
+        <description>This is the freemarker template for spark-env.sh file</description>
+        <value><![CDATA[
+#!/usr/bin/env bash
+
+# This file is sourced when running various Spark programs.
+# Copy it as spark-env.sh and edit that to configure Spark for your site.
+
+# Options read in YARN client mode
+#SPARK_EXECUTOR_INSTANCES="2" #Number of workers to start (Default: 2)
+#SPARK_EXECUTOR_CORES="1" #Number of cores for the workers (Default: 1).
+#SPARK_EXECUTOR_MEMORY="1G" #Memory per Worker (e.g. 1000M, 2G) (Default: 1G)
+#SPARK_DRIVER_MEMORY="512M" #Memory for Master (e.g. 1000M, 2G) (Default: 512 Mb)
+#SPARK_YARN_APP_NAME="spark" #The name of your application (Default: Spark)
+#SPARK_YARN_QUEUE="default" #The hadoop queue to use for allocation requests (Default: default)
+#SPARK_YARN_DIST_FILES="" #Comma separated list of files to be distributed with the job.
+#SPARK_YARN_DIST_ARCHIVES="" #Comma separated list of archives to be distributed with the job.
+
+# Generic options for the daemons used in the standalone deploy mode
+
+# Alternate conf dir. (Default: ${SPARK_HOME}/conf)
+export SPARK_CONF_DIR=${spark_conf_dir}
+
+# Where log files are stored.(Default:${SPARK_HOME}/logs)
+export SPARK_LOG_DIR=${spark_log_dir}
+
+# Where the pid file is stored. (Default: /tmp)
+export SPARK_PID_DIR=${spark_pid_dir}
+
+# A string representing this instance of spark.(Default: $USER)
+SPARK_IDENT_STRING=${spark_user}
+
+# The scheduling priority for daemons. (Default: 0)
+SPARK_NICENESS=0
+
+export HADOOP_HOME=${hadoop_home}
+export HADOOP_CONF_DIR=${hadoop_conf_dir}
+
+export HIVE_HOME=${hive_home}
+export HIVE_CONF_DIR=${hive_conf_dir}
+
+<#noparse>
+export SPARK_DIST_CLASSPATH=$($HADOOP_HOME/bin/hadoop classpath)
+</#noparse>
+
+# The java implementation to use.
+export JAVA_HOME=${java_home}
+
+# Add hadoop native libraries support for better performance
+export LD_LIBRARY_PATH=${hadoop_home}/lib/native/:$LD_LIBRARY_PATH
+]]>
+        </value>
+        <value-attributes>
+            <type>longtext</type>
+        </value-attributes>
+    </property>
+</configuration>
