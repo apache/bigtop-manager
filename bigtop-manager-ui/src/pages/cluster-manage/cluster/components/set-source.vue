@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
   import type { FormInstance, TableColumnType } from 'ant-design-vue'
-  import { ref, watch } from 'vue'
+  import { reactive, ref, toRefs, watch } from 'vue'
 
   const open = ref(false)
   const loading = ref(false)
@@ -27,26 +27,31 @@
     {
       title: '名称',
       dataIndex: 'name',
+      key: 'name',
       ellipsis: true
     },
     {
       title: '架构',
       dataIndex: 'architecture',
+      key: 'architecture',
       ellipsis: true
     },
     {
       title: '地址',
       dataIndex: 'address',
+      key: 'address',
       ellipsis: true
     }
   ]
   const formRef = ref<FormInstance>()
-  const formRule = ref({
+  const form = reactive({
     list: [] as any[]
   })
+  const { list } = toRefs(form)
 
   const handleOpen = () => {
     open.value = true
+    Object.assign(form, { list: [] })
   }
 
   const handleOk = () => {
@@ -75,9 +80,23 @@
     }))
   }
 
-  watch(open, (val) => {
+  const getSourceList = () => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(generateMockData(12))
+      }, 500)
+    })
+  }
+
+  watch(open, async (val) => {
     if (val) {
-      formRule.value.list = generateMockData(12)
+      loading.value = true
+      try {
+        form.list = (await getSourceList()) as any
+        loading.value = false
+      } catch (error) {
+        console.log('error :>> ', error)
+      }
     }
   })
 
@@ -99,24 +118,17 @@
       @ok="handleOk"
       @cancel="handleCancel"
     >
-      <a-form ref="formRef" :model="formRule">
-        <a-table
-          :loading="loading"
-          :scroll="{ y: 340 }"
-          :data-source="formRule.list"
-          :columns="columns"
-          :pagination="false"
-        >
-          <template #bodyCell="{ column, record, index }">
+      <a-form ref="formRef" :model="form">
+        <a-table :loading="loading" :scroll="{ y: 340 }" :data-source="list" :columns="columns" :pagination="false">
+          <template #bodyCell="{ index, column, record }">
             <template v-if="column.dataIndex == 'address'">
               <a-form-item
-                class="custom-form-item"
                 label=" "
                 :colon="false"
-                :name="`list[${index}].address`"
+                :name="['list', index, 'address']"
                 :rules="[{ required: true, message: '请输入地址', trigger: 'blur' }]"
               >
-                <a-input v-model:value="record[column.dataIndex]" style="width: 100%"></a-input>
+                <a-input v-model:value="record[column.key]"></a-input>
               </a-form-item>
             </template>
           </template>
@@ -133,5 +145,8 @@
       margin-top: $space-sm;
       font-size: 12px;
     }
+  }
+  :deep(.ant-form-item) {
+    margin-bottom: 0;
   }
 </style>

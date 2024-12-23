@@ -33,7 +33,7 @@ export function generateTableHostData(numRows = 100) {
   const hostnames = ['Server-A', 'Server-B', 'Server-C', 'Server-D', 'Server-E']
   const ipAddresses = ['192.168.1.1', '192.168.1.2', '192.168.1.3', '192.168.1.4', '192.168.1.5']
   const remarks = ['Main server', 'Backup server', 'Database server', 'Web server', 'Test server']
-  const statuses = ['Online', 'Offline', 'Maintenance', 'Active', 'Inactive']
+  const statuses = ['installing', 'success', 'error', 'unknow']
 
   const tableData = []
 

@@ -19,19 +19,28 @@
 
 <script setup lang="ts">
   import { TableColumnType } from 'ant-design-vue'
-  import { SearchOutlined } from '@ant-design/icons-vue'
   import { computed, reactive, ref } from 'vue'
   import { generateTableHostData } from './mock'
   import useBaseTable from '@/composables/use-base-table'
   import type { FilterConfirmProps, FilterResetProps } from 'ant-design-vue/es/table/interface'
   import type { GroupItem } from '@/components/common/button-group/types'
 
+  type Key = string | number
+  interface TableState {
+    selectedRowKeys: Key[]
+    searchText: string
+    searchedColumn: string
+  }
+
   const searchInputRef = ref()
+  // const checkAllHostIsSuccessfull = ref(false)
   const data = ref<any[]>(generateTableHostData(50))
-  const state = reactive({
+  const state = reactive<TableState>({
     searchText: '',
-    searchedColumn: ''
+    searchedColumn: '',
+    selectedRowKeys: []
   })
+
   const columns = computed((): TableColumnType[] => [
     {
       title: '主机名',
@@ -70,7 +79,8 @@
       fixed: 'right'
     }
   ])
-  const { columnsProp, dataSource, loading, paginationProps, onChange } = useBaseTable({
+
+  const { loading, paginationProps, onChange } = useBaseTable({
     columns: columns.value,
     rows: data.value
   })
@@ -83,7 +93,7 @@
     {
       text: 'delete',
       danger: true,
-      clickEvent: (_item, args) => handleDelet(args)
+      clickEvent: (_item, args) => handleDelete(args)
     }
   ])
 
@@ -99,7 +109,15 @@
     }
   }
 
-  const handleSearch = (selectedKeys: string[], confirm: (param?: FilterConfirmProps) => void, dataIndex: string) => {
+  const onSelectChange = (selectedRowKeys: Key[]) => {
+    state.selectedRowKeys = selectedRowKeys
+  }
+
+  const handleInstallDependencies = () => {
+    console.log('selectedRowKeys :>> ', state.selectedRowKeys)
+  }
+
+  const handleSearch = (selectedKeys: Key[], confirm: (param?: FilterConfirmProps) => void, dataIndex: string) => {
     confirm()
     state.searchText = selectedKeys[0] as string
     state.searchedColumn = dataIndex as string
@@ -114,25 +132,30 @@
     console.log('row :>> ', row)
   }
 
-  const handleDelet = (row: any) => {
-    console.log('row :>> ', row)
+  const handleDelete = (row?: any) => {
+    if (!row) {
+      console.log('selectedRowKeys :>> ', state.selectedRowKeys)
+    } else {
+      console.log('row :>> ', row)
+    }
   }
 </script>
 
 <template>
   <div class="host-config">
     <header>
-      <a-button type="primary">{{ $t('cluster.install_dependencies') }}</a-button>
+      <a-button type="primary" @click="handleInstallDependencies">{{ $t('cluster.install_dependencies') }}</a-button>
       <a-space :size="16">
-        <a-button type="primary" danger>{{ $t('common.bulk_remove') }}</a-button>
+        <a-button type="primary" danger @click="handleDelete">{{ $t('common.bulk_remove') }}</a-button>
         <a-button type="primary">{{ $t('cluster.add_host') }}</a-button>
       </a-space>
     </header>
     <a-table
       :loading="loading"
-      :data-source="dataSource"
-      :columns="columnsProp"
+      :data-source="data"
+      :columns="columns"
       :pagination="paginationProps"
+      :row-selection="{ selectedRowKeys: state.selectedRowKeys, onChange: onSelectChange }"
       @change="onChange"
     >
       <template #customFilterDropdown="{ setSelectedKeys, selectedKeys, confirm, clearFilters, column }">
@@ -146,7 +169,6 @@
           />
           <a-space :size="16">
             <a-button type="primary" size="small" @click="handleSearch(selectedKeys, confirm, column.dataIndex)">
-              <template #icon><SearchOutlined /></template>
               {{ $t('common.search') }}
             </a-button>
             <a-button size="small" @click="handleReset(clearFilters)"> {{ $t('common.reset') }} </a-button>
@@ -154,9 +176,12 @@
         </div>
       </template>
       <template #customFilterIcon="{ filtered }">
-        <search-outlined :style="{ color: filtered ? 'var(--color-primary)' : undefined }" />
+        <svg-icon :name="filtered ? 'search_active' : 'search'" />
       </template>
       <template #bodyCell="{ record, column }">
+        <template v-if="column.key === 'status'">
+          <svg-icon :name="record.status" />
+        </template>
         <template v-if="column.key === 'operation'">
           <button-group
             i18n="common"
