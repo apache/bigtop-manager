@@ -55,7 +55,6 @@
   .check-workflow {
     button {
       padding: 0;
-      margin-top: -4px;
     }
     :deep(.ant-collapse-header) {
       background-color: $color-fill-quaternary;
@@ -65,10 +64,13 @@
     }
     .retry {
       text-align: end;
+      line-height: 14px;
       margin-bottom: $space-sm;
       button {
-        height: auto;
-        line-height: normal;
+        margin: 0;
+        padding: 0;
+        line-height: inherit;
+        height: 0;
       }
     }
   }

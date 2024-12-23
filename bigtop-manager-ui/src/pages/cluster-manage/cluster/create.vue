@@ -83,8 +83,8 @@
     </header-card>
     <main-card>
       <template v-for="stepItem in steps" :key="stepItem.title">
-        <div v-show="steps[current].title === stepItem.title">
-          <a-typography-text strong :content="stepItem.title" />
+        <div v-show="steps[current].title === stepItem.title" class="step-title">
+          <h5>{{ stepItem.title }}</h5>
           <section :class="{ 'step-content': current < stepsLimit }">
             <component :is="getCompName" />
           </section>
@@ -116,6 +116,15 @@
       width: 100%;
       height: 100%;
       padding-inline: 6%;
+    }
+  }
+  .step-title {
+    h5 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 500;
+      letter-spacing: 0px;
+      line-height: 16px;
     }
   }
   .step-content {
