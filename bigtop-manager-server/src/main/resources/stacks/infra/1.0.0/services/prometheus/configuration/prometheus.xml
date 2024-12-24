@@ -49,7 +49,9 @@ scrape_configs:
   # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
 <#list scrape_jobs as job>
   - job_name: '${job.name}'
-
+<#if job.metrics_path??>
+    metrics_path: "${job.metrics_path}"
+</#if>
     file_sd_configs:
       - files: ['${job.targets_file}']
 

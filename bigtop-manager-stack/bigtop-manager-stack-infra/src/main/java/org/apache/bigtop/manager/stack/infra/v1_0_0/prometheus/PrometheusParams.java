@@ -102,6 +102,7 @@ public class PrometheusParams extends InfraParams {
         job.put("name", BM_AGENT_JOB_NAME);
         job.put("targets_file", targetsConfigFile(BM_AGENT_JOB_NAME));
         job.put("targets_list", getAllHost());
+        job.put("metrics_path", "/actuator/prometheus");
         agentScrapeJob = job;
         return LocalSettings.configurations(getServiceName(), "prometheus");
     }
