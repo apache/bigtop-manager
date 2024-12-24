@@ -44,6 +44,7 @@ public class PrometheusSetup {
         String group = prometheusParams.group();
 
         LinuxFileUtils.createDirectories(prometheusParams.dataDir(), user, group, Constants.PERMISSION_755, true);
+        LinuxFileUtils.createDirectories(prometheusParams.confDir(), user, group, Constants.PERMISSION_755, true);
 
         LinuxFileUtils.toFileByTemplate(
                 prometheusParams.getPrometheusContent(),

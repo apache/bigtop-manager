@@ -50,7 +50,6 @@ public class PrometheusParams extends InfraParams {
     private List<Map<String, Object>> scrapeJobs;
     private String prometheusPort;
     private String prometheusContent;
-    private String prometheusScrapeInterval;
     private String prometheusRulesFilename;
     private String prometheusRulesFileContent;
 
@@ -60,16 +59,11 @@ public class PrometheusParams extends InfraParams {
         scrapeJobs.add(prometheusScrapeJob);
         scrapeJobs.add(agentScrapeJob);
         globalParamsMap.put("scrape_jobs", scrapeJobs);
-        globalParamsMap.put("scrape_interval", prometheusScrapeInterval);
         globalParamsMap.put("rules_file_name", prometheusRulesFilename);
     }
 
     public String dataDir() {
         return MessageFormat.format("{0}/data", serviceHome());
-    }
-
-    public String confDir() {
-        return MessageFormat.format("{0}", serviceHome());
     }
 
     public String targetsConfigFile(String jobName) {
@@ -92,7 +86,7 @@ public class PrometheusParams extends InfraParams {
 
     @GlobalParams
     public Map<String, Object> prometheusJob() {
-        Map<String, Object> configuration = LocalSettings.configurations(getServiceName(), "prometheus-conf");
+        Map<String, Object> configuration = LocalSettings.configurations(getServiceName(), "prometheus");
         prometheusPort = (String) configuration.get("port");
         Map<String, Object> job = new HashMap<>();
         job.put("name", PROMETHEUS_SELF_JOB_NAME);
@@ -109,15 +103,14 @@ public class PrometheusParams extends InfraParams {
         job.put("targets_file", targetsConfigFile(BM_AGENT_JOB_NAME));
         job.put("targets_list", getAllHost());
         agentScrapeJob = job;
-        return LocalSettings.configurations(getServiceName(), "prometheus-conf");
+        return LocalSettings.configurations(getServiceName(), "prometheus");
     }
 
     @GlobalParams
     public Map<String, Object> configs() {
-        Map<String, Object> configuration = LocalSettings.configurations(getServiceName(), "prometheus-conf");
+        Map<String, Object> configuration = LocalSettings.configurations(getServiceName(), "prometheus");
 
         prometheusContent = (String) configuration.get("content");
-        prometheusScrapeInterval = (String) configuration.get("scrape_interval");
         return configuration;
     }
 
