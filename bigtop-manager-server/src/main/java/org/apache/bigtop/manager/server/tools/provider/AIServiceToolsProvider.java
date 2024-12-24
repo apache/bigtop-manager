@@ -27,12 +27,12 @@ import dev.langchain4j.service.tool.ToolProvider;
 import jakarta.annotation.Resource;
 
 @Component
-public class AiServiceToolsProvider {
+public class AIServiceToolsProvider {
     @Resource
     private InfoToolsProvider infoToolsProvider;
 
     public ToolProvider getToolsProvide(ChatbotCommand chatbotCommand) {
-        if (chatbotCommand.equals(ChatbotCommand.INFO)) {
+        if (ChatbotCommand.INFO.equals(chatbotCommand)) {
             return infoToolsProvider;
         }
         return null;

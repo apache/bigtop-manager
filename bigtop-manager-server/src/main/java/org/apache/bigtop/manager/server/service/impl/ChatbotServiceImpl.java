@@ -47,7 +47,7 @@ import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
 import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
 import org.apache.bigtop.manager.server.model.vo.TalkVO;
 import org.apache.bigtop.manager.server.service.ChatbotService;
-import org.apache.bigtop.manager.server.tools.provider.AiServiceToolsProvider;
+import org.apache.bigtop.manager.server.tools.provider.AIServiceToolsProvider;
 
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
@@ -78,7 +78,7 @@ public class ChatbotServiceImpl implements ChatbotService {
     private ChatMessageDao chatMessageDao;
 
     @Resource
-    private AiServiceToolsProvider aiServiceToolsProvider;
+    private AIServiceToolsProvider aiServiceToolsProvider;
 
     private AIAssistantFactory aiAssistantFactory;
 
@@ -124,18 +124,12 @@ public class ChatbotServiceImpl implements ChatbotService {
 
     private AIAssistant buildAIAssistant(
             String platformName, String model, Map<String, String> credentials, Long threadId, ChatbotCommand command) {
-        if (command == null) {
-            return getAIAssistantFactory()
-                    .createAiService(
-                            getPlatformType(platformName), getAIAssistantConfig(model, credentials), threadId, null);
-        } else {
-            return getAIAssistantFactory()
-                    .createAiService(
-                            getPlatformType(platformName),
-                            getAIAssistantConfig(model, credentials),
-                            threadId,
-                            aiServiceToolsProvider.getToolsProvide(command));
-        }
+        return getAIAssistantFactory()
+                .createAiService(
+                        getPlatformType(platformName),
+                        getAIAssistantConfig(model, credentials),
+                        threadId,
+                        aiServiceToolsProvider.getToolsProvide(command));
     }
 
     @Override
@@ -196,7 +190,7 @@ public class ChatbotServiceImpl implements ChatbotService {
         return chatThreads;
     }
 
-    private AIAssistant prepareTalk(Long threadId, ChatbotCommand command, String message) {
+    private AIAssistant prepareTalk(Long threadId, ChatbotCommand command) {
         ChatThreadPO chatThreadPO = chatThreadDao.findById(threadId);
         Long userId = SessionUserHolder.getUserId();
         if (!Objects.equals(userId, chatThreadPO.getUserId()) || chatThreadPO.getIsDeleted()) {
@@ -222,7 +216,7 @@ public class ChatbotServiceImpl implements ChatbotService {
 
     @Override
     public SseEmitter talk(Long threadId, ChatbotCommand command, String message) {
-        AIAssistant aiAssistant = prepareTalk(threadId, command, message);
+        AIAssistant aiAssistant = prepareTalk(threadId, command);
         Flux<String> stringFlux;
         if (command == null) {
             stringFlux = aiAssistant.streamAsk(message);
