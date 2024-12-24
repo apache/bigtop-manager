@@ -23,6 +23,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -31,11 +32,15 @@ import java.io.File;
 public class JsonUtils {
 
     public static final ObjectMapper OBJECTMAPPER;
+    public static final ObjectMapper INDENT_MAPPER;
 
     static {
         OBJECTMAPPER = new ObjectMapper();
         OBJECTMAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         OBJECTMAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
+        INDENT_MAPPER = OBJECTMAPPER.copy();
+        INDENT_MAPPER.enable(SerializationFeature.INDENT_OUTPUT);
     }
 
     public static <T> void writeToFile(String fileName, T obj) {
@@ -125,6 +130,17 @@ public class JsonUtils {
 
         try {
             return OBJECTMAPPER.writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static <T> String indentWriteAsString(T obj) {
+        if (obj == null) {
+            return null;
+        }
+        try {
+            return INDENT_MAPPER.writeValueAsString(obj);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
