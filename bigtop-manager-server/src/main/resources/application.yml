@@ -58,7 +58,6 @@ springdoc:
     default-models-expand-depth: -1
 
 monitoring:
-  bigtop-host: "http://localhost:5173"
   prometheus-host: "http://localhost:9090"
   agent-host-job-name: "bm-agent-host"
 

@@ -22,6 +22,7 @@ import org.apache.bigtop.manager.server.service.MonitoringService;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -46,23 +47,17 @@ public class MonitoringController {
         return ResponseEntity.success(monitoringService.queryAgentsHealthyStatus());
     }
 
-    @Operation(summary = "staticAgentInfo", description = "agent static info query")
-    @GetMapping("staticAgentInfo")
-    public ResponseEntity<JsonNode> queryAgentsInfo() {
-        return ResponseEntity.success(monitoringService.queryAgentsInfo());
+    @Operation(summary = "host info", description = "host info query")
+    @GetMapping("host/{id}")
+    public ResponseEntity<JsonNode> queryAgentInfo(
+            @RequestParam(value = "step", defaultValue = "1") String step, @PathVariable String id) {
+        return ResponseEntity.success(monitoringService.queryAgentInfo(Long.valueOf(id), step));
     }
 
-    @Operation(summary = "dynamicAgentInfo", description = "agent dynamic info query")
-    @GetMapping("dynamicAgentInfo")
-    public ResponseEntity<JsonNode> queryAgentsInfo(@RequestParam(value = "step", defaultValue = "1") String step) {
-        return ResponseEntity.success(monitoringService.queryAgentsInfo(step));
-    }
-
-    @Operation(summary = "cluster info", description = "cluster multi info")
-    @GetMapping("clusterInfo")
+    @Operation(summary = "cluster info", description = "cluster info query")
+    @GetMapping("cluster/{id}")
     public ResponseEntity<JsonNode> queryCluster(
-            @RequestParam(value = "clusterId") String clusterId,
-            @RequestParam(value = "step", defaultValue = "1") String step) {
-        return ResponseEntity.success(monitoringService.queryClusterInfo(clusterId, step));
+            @RequestParam(value = "step", defaultValue = "1") String step, @PathVariable String id) {
+        return ResponseEntity.success(monitoringService.queryClusterInfo(Long.valueOf(id), step));
     }
 }
