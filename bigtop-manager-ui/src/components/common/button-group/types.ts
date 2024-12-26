@@ -48,4 +48,5 @@ export interface Props {
   groupShape?: ShapeType
   space?: number
   args?: any
+  auto?: boolean
 }

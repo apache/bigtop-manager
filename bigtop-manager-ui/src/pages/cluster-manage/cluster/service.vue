@@ -18,80 +18,142 @@
 -->
 
 <script setup lang="ts">
-  import { ref } from 'vue'
+  import { onMounted, ref, shallowRef } from 'vue'
+  import { getServices, StatusColors, StatusTexts, type ServiceItem } from './components/mock'
+  import { usePngImage } from '@/utils/tools'
+  import StatusDot from '@/components/common/status-dot/index.vue'
+  import SearchForm from '@/components/common/search-form/index.vue'
+  import type { GroupItem } from '@/components/common/button-group/types'
 
-  const data = ref(
-    Array.from({ length: 20 }, (_, i) => ({
-      key: i,
-      title: `title${i + 1}wwwwwwwwwww`
-    }))
-  )
+  const data = ref<ServiceItem[]>([])
+  const actionGroups = shallowRef<GroupItem[]>([
+    {
+      action: 'start',
+      icon: 'start',
+      clickEvent: (item) => {
+        console.log('item :>> ', item?.action)
+      }
+    },
+    {
+      action: 'stop',
+      icon: 'stop',
+      clickEvent: (item) => {
+        console.log('item :>> ', item?.action)
+      }
+    },
+    {
+      action: 'restart',
+      icon: 'restart',
+      clickEvent: (item) => {
+        console.log('item :>> ', item?.action)
+      }
+    },
+    {
+      action: 'more',
+      icon: 'more_line',
+      clickEvent: (item) => {
+        console.log('item :>> ', item?.action)
+      }
+    }
+  ])
+  onMounted(() => {
+    data.value = getServices()
+  })
 </script>
 
 <template>
   <div class="service">
+    <search-form />
     <div v-for="item in data" :key="item.key" class="item">
       <div class="item-header">
         <div class="item-header-title-wrp">
-          <a-avatar :size="42" class="item-header-icon" />
+          <a-avatar
+            v-if="item.serviceName"
+            :src="usePngImage(item.serviceName.toLowerCase())"
+            :size="42"
+            class="item-header-icon"
+          />
           <div class="item-header-title">
-            <a-typography-text
-              class="item-header-title-tip"
-              :ellipsis="item.title ? { tooltip: item.title } : false"
-              :content="`${item.title}`"
-            />
-            <a-typography-text
-              class="item-header-title-tip"
-              type="secondary"
-              :ellipsis="{ tooltip: 'flink-1.16.2-1' }"
-              content="flink-1.16.2-1"
-            />
+            <a-typography-text :content="`${item.serviceName}`" />
+            <a-typography-text class="small-font" type="secondary" :content="item.version" />
+          </div>
+          <div class="item-header-status">
+            <a-tag :color="StatusColors[item.status]">
+              <status-dot margin="0 4px 0 0" :color="StatusColors[item.status]" />
+              <span class="small-font">{{ $t(`common.${StatusTexts[item.status]}`) }}</span>
+            </a-tag>
           </div>
         </div>
-        <div>
-          <a-typography-text type="secondary" content="需要重启：是" />
+        <div class="small-font">
+          <span>{{ `${$t('common.restart')}:` }}</span>
+          <status-dot :color="StatusColors[item.status]" />
+          <span>{{ `${item.restart ? $t('common.required') : $t('common.not_required')}` }}</span>
         </div>
       </div>
-      <div class="item-content"> content </div>
+      <div class="item-content">
+        <button-group :auto="true" :space="0" :groups="actionGroups">
+          <template #icon="{ item: groupItem }">
+            <svg-icon :name="groupItem.icon || ''" />
+          </template>
+        </button-group>
+      </div>
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
+  .small-font {
+    font-size: 12px;
+    color: $color-text-tertiary;
+  }
+
   .service {
     display: flex;
     flex-wrap: wrap;
     gap: 16px;
   }
+
   .item {
-    flex-shrink: 0;
     width: 280px;
     height: 150px;
     border: 1px solid $color-border-secondary;
-    border-radius: $space-sm;
-    &-header {
+    border-radius: 8px;
+    @include flexbox($direction: column);
+  }
+
+  .item-content {
+    flex: 1;
+    font-size: 12px;
+    padding-inline: 10px;
+    @include flexbox($align: center);
+  }
+
+  .item-header {
+    display: grid;
+    gap: 10px;
+    padding: $space-md;
+    border-bottom: 1px solid $color-border-secondary;
+    &-title-wrp {
+      @include flexbox($gap: $space-sm);
+    }
+    &-title {
       display: grid;
-      gap: 10px;
-      padding: $space-md;
-      border-bottom: 1px solid $color-border-secondary;
-      &-title-wrp {
-        display: flex;
-        gap: $space-sm;
-      }
-      &-title {
-        display: grid;
-        &-tip {
-          width: 200px;
-        }
-      }
-      &-icon {
-        flex-shrink: 0;
-        border-radius: 0;
+    }
+    &-status {
+      flex: 1;
+      text-align: end;
+      span {
+        margin-inline-end: 0;
       }
     }
-
-    &-content {
-      padding: $space-md;
+    &-icon {
+      flex-shrink: 0;
+      border-radius: 0;
+    }
+    :deep(.ant-avatar) {
+      img {
+        object-fit: contain !important;
+      }
     }
   }
 </style>

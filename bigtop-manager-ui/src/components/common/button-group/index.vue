@@ -50,7 +50,7 @@
 </script>
 
 <template>
-  <a-space :size="space" :wrap="true" :class="{ 'text-compact': $props.textCompact }">
+  <a-space :size="space" :wrap="true" :class="{ 'text-compact': $props.textCompact, 'btn-auto': $props.auto }">
     <template v-for="(item, idx) in groups" :key="idx">
       <a-dropdown v-if="item.dropdownMenu">
         <a-button
@@ -100,5 +100,10 @@
     button {
       padding: 0;
     }
+  }
+  .btn-auto {
+    width: 100%;
+    @include flexbox($align: center, $justify: space-between);
+    margin-bottom: 0 !important;
   }
 </style>

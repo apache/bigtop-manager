@@ -82,3 +82,54 @@ export function getCheckWorkflows(stageCount: number, maxTasksPerStage: number, 
 
   return data
 }
+
+// Restart ? Required/Not required
+// 健康/不健康/未知
+
+export enum StatusColors {
+  success = 'success',
+  error = 'error',
+  unknow = 'warning'
+}
+
+export enum StatusTexts {
+  success = 'healthy',
+  error = 'unhealthy',
+  unknow = 'unknown'
+}
+
+export type ServiceStatus = keyof typeof StatusColors
+
+export interface ServiceItem {
+  key: string | number
+  serviceName: string
+  version: string
+  restart: boolean
+  status: ServiceStatus
+}
+
+export function getServices(): ServiceItem[] {
+  const statusList = ['success', 'error', 'unknow']
+  const serviceNames = [
+    'GraFana',
+    'Flink',
+    'Kafka',
+    'ZooKeeper',
+    'Hadoop',
+    'Hbase',
+    'Hive',
+    'MySQL',
+    'Spark',
+    'Solr',
+    'Seatunnel',
+    'Tez',
+    'Prometheus'
+  ]
+  return Array.from({ length: 17 }, (_, i) => ({
+    key: i,
+    serviceName: serviceNames[Math.floor(Math.random() * serviceNames.length)],
+    version: `${serviceNames[Math.floor(Math.random() * serviceNames.length)].toLowerCase()}1.0.${i}`,
+    restart: Math.floor(Math.random() * 2) == 0,
+    status: statusList[Math.floor(Math.random() * statusList.length)] as ServiceStatus
+  }))
+}

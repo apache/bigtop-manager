@@ -41,3 +41,13 @@ $layout-sider-bg-color: $color-bg-base;
   align-items: $align;
   gap: $gap;
 }
+
+@mixin status-dot($background: $color-success, $width: 8px, $height: 8px, $margin: 0 6px 0 0) {
+  content: '';
+  display: inline-block;
+  background-color: $background;
+  width: $width;
+  height: $height;
+  border-radius: 50%;
+  margin: $margin;
+}
