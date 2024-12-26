@@ -18,11 +18,14 @@
 -->
 
 <script setup lang="ts">
+  import { usePngImage } from '@/utils/tools'
   import { GroupItem } from '../button-group/types'
+  import { computed } from 'vue'
 
   interface Props {
     showAvatar?: boolean
     showStatus?: boolean
+    avatar?: string
     title?: string
     desc?: string
     status?: string
@@ -33,9 +36,10 @@
     (event: 'onClick', item: GroupItem): void
   }
 
-  withDefaults(defineProps<Props>(), {
+  const props = withDefaults(defineProps<Props>(), {
     showAvatar: true,
     showStatus: true,
+    avatar: '',
     title: '',
     desc: '暂无描述',
     status: 'success',
@@ -45,6 +49,7 @@
   })
 
   const emits = defineEmits<Emits>()
+  const avatarSrc = computed(() => props.avatar && usePngImage(props.avatar))
 
   const onActions = (item: GroupItem) => {
     emits('onClick', item)
@@ -55,7 +60,7 @@
   <div class="header-card">
     <slot>
       <div class="header-card-info">
-        <a-avatar v-if="showAvatar" shape="square" :size="54" />
+        <a-avatar v-if="showAvatar" :src="avatarSrc" shape="square" :size="54" />
         <div class="card-info-title">
           <div class="card-info-status">
             <a-typography-title :level="5">{{ $props.title }}</a-typography-title>

@@ -98,7 +98,7 @@
 </script>
 
 <template>
-  <header-card :title="title" :desc="desc" :action-groups="actionGroup" />
+  <header-card :title="title" avatar="cluster" :desc="desc" :action-groups="actionGroup" />
   <main-card v-model:active-key="activeKey" :tabs="tabs">
     <template #tab-item>
       <component :is="getCompName"></component>
