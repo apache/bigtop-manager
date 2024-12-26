@@ -16,32 +16,39 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.tools;
+package org.apache.bigtop.manager.server.tools.provider;
 
-import org.apache.bigtop.manager.server.enums.ChatbotCommand;
+import org.apache.bigtop.manager.server.tools.functions.ClusterFunctions;
+import org.apache.bigtop.manager.server.tools.functions.HostFunctions;
+import org.apache.bigtop.manager.server.tools.functions.StackFunctions;
+
+import org.springframework.stereotype.Component;
 
 import dev.langchain4j.service.tool.ToolProvider;
 import dev.langchain4j.service.tool.ToolProviderRequest;
 import dev.langchain4j.service.tool.ToolProviderResult;
+import lombok.extern.slf4j.Slf4j;
 
-public class AiServiceToolsProvider implements ToolProvider {
+import jakarta.annotation.Resource;
 
-    ChatbotCommand chatbotCommand;
+@Component
+@Slf4j
+public class InfoToolsProvider implements ToolProvider {
+    @Resource
+    private ClusterFunctions clusterFunctions;
 
-    public AiServiceToolsProvider(ChatbotCommand chatbotCommand) {
-        this.chatbotCommand = chatbotCommand;
-    }
+    @Resource
+    private HostFunctions hostFunctions;
 
-    public AiServiceToolsProvider() {
-        this.chatbotCommand = null;
-    }
+    @Resource
+    private StackFunctions stackFunctions;
 
     @Override
     public ToolProviderResult provideTools(ToolProviderRequest toolProviderRequest) {
-        if (chatbotCommand.equals(ChatbotCommand.INFO)) {
-            ClusterInfoTools clusterInfoTools = new ClusterInfoTools();
-            return ToolProviderResult.builder().addAll(clusterInfoTools.list()).build();
-        }
-        return null;
+        return ToolProviderResult.builder()
+                .addAll(clusterFunctions.getAllFunctions())
+                .addAll(hostFunctions.getAllFunctions())
+                .addAll(stackFunctions.getAllFunctions())
+                .build();
     }
 }

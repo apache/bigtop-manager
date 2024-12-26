@@ -1,1 +1,5 @@
-{}
+{
+  "MYSQL_SERVER-STOP": [
+    "HIVE_METASTORE-STOP"
+  ]
+}

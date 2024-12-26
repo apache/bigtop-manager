@@ -61,7 +61,7 @@ public class TarballDownloader {
         log.info("Checksum validate successfully for [{}]", localFile.getAbsolutePath());
     }
 
-    private static void download(String remoteUrl, String saveDir) {
+    public static void download(String remoteUrl, String saveDir) {
         int i = 1;
         while (true) {
             Boolean downloaded = downloadFile(remoteUrl, saveDir);

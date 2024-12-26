@@ -20,16 +20,39 @@
 
 <metainfo>
     <service>
-        <name>tez</name>
-        <display-name>Tez</display-name>
-        <desc>Tez is the next generation Hadoop Query Processing framework written on top of YARN.</desc>
-        <version>0.10.2-1</version>
-        <user>tez</user>
+        <name>spark</name>
+        <display-name>Spark</display-name>
+        <desc>
+            Apache Spark is a unified analytics engine for large-scale data processing.
+        </desc>
+        <version>3.3.4-1</version>
+        <user>spark</user>
 
         <components>
             <component>
-                <name>tez_client</name>
-                <display-name>Tez Client</display-name>
+                <name>spark_historyserver</name>
+                <display-name>Spark HistoryServer</display-name>
+                <category>server</category>
+                <cardinality>1+</cardinality>
+                <quick-link>
+                    <display-name>Spark HistoryServer UI</display-name>
+                    <http-port-property>spark.history.ui.port</http-port-property>
+                    <http-port-default>18080</http-port-default>
+                    <https-port-property>spark.history.ui.port</https-port-property>
+                    <https-port-default>18080</https-port-default>
+                </quick-link>
+            </component>
+
+            <component>
+                <name>spark_thriftserver</name>
+                <display-name>Spark ThriftServer</display-name>
+                <category>server</category>
+                <cardinality>1+</cardinality>
+            </component>
+
+            <component>
+                <name>spark_client</name>
+                <display-name>Spark Client</display-name>
                 <category>client</category>
                 <cardinality>1+</cardinality>
             </component>
@@ -43,8 +66,8 @@
                 </architectures>
                 <packages>
                     <package>
-                        <name>tez-0.10.2-1.tar.gz</name>
-                        <checksum>SHA-256:ebc2c195780fc76fb9b12e8987e48c301ca0b1916dca515f5c7a1122d74f397e</checksum>
+                        <name>spark-3.3.4-1.tar.gz</name>
+                        <checksum>SHA-256:91ff4fa884abee1156d7819d16bf3035e98c98833237cfd457b2d0b1b8ad42e5</checksum>
                     </package>
                 </packages>
             </package-specific>
