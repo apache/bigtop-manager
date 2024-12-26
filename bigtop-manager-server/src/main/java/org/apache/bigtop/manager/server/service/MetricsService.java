@@ -20,11 +20,11 @@ package org.apache.bigtop.manager.server.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-public interface MonitoringService {
+public interface MetricsService {
 
     JsonNode queryAgentsHealthyStatus();
 
-    JsonNode queryAgentInfo(Long id, String step);
+    JsonNode queryAgentsInfo(Long id, String interval);
 
-    JsonNode queryClusterInfo(Long clusterId, String step);
+    JsonNode queryClustersInfo(Long clusterId, String interval);
 }

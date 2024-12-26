@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.server.controller;
 
-import org.apache.bigtop.manager.server.service.MonitoringService;
+import org.apache.bigtop.manager.server.service.MetricsService;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,31 +33,31 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.annotation.Resource;
 
-@Tag(name = "Monitoring Controller")
+@Tag(name = "Metrics Controller")
 @RestController
-@RequestMapping("monitoring")
-public class MonitoringController {
+@RequestMapping("metrics")
+public class MetricsController {
 
     @Resource
-    private MonitoringService monitoringService;
+    private MetricsService metricsService;
 
-    @Operation(summary = "agent healthy", description = "agent healthy check")
-    @GetMapping("agenthealthy")
+    @Operation(summary = "hosts healthy", description = "hosts healthy check")
+    @GetMapping("hosts/healthy")
     public ResponseEntity<JsonNode> agentHostsHealthyStatus() {
-        return ResponseEntity.success(monitoringService.queryAgentsHealthyStatus());
+        return ResponseEntity.success(metricsService.queryAgentsHealthyStatus());
     }
 
     @Operation(summary = "host info", description = "host info query")
-    @GetMapping("host/{id}")
+    @GetMapping("hosts/{id}")
     public ResponseEntity<JsonNode> queryAgentInfo(
-            @RequestParam(value = "step", defaultValue = "1") String step, @PathVariable String id) {
-        return ResponseEntity.success(monitoringService.queryAgentInfo(Long.valueOf(id), step));
+            @RequestParam(value = "interval", defaultValue = "1") String interval, @PathVariable String id) {
+        return ResponseEntity.success(metricsService.queryAgentsInfo(Long.valueOf(id), interval));
     }
 
     @Operation(summary = "cluster info", description = "cluster info query")
-    @GetMapping("cluster/{id}")
+    @GetMapping("clusters/{id}")
     public ResponseEntity<JsonNode> queryCluster(
-            @RequestParam(value = "step", defaultValue = "1") String step, @PathVariable String id) {
-        return ResponseEntity.success(monitoringService.queryClusterInfo(Long.valueOf(id), step));
+            @RequestParam(value = "interval", defaultValue = "1") String interval, @PathVariable String id) {
+        return ResponseEntity.success(metricsService.queryClustersInfo(Long.valueOf(id), interval));
     }
 }

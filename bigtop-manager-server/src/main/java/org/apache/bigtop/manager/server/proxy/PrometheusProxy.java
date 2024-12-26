@@ -145,7 +145,7 @@ public class PrometheusProxy {
     /**
      * query agents info
      */
-    public JsonNode queryAgentsInfo(Long id, String step) {
+    public JsonNode queryAgentsInfo(Long id, String interval) {
         ObjectMapper objectMapper = new ObjectMapper();
         String agentIpv4 = hostService.get(id).getIpv4();
         if (!Objects.equals(agentIpv4, "")) {
@@ -159,18 +159,13 @@ public class PrometheusProxy {
             long[] agentDiskRead = new long[6];
             long[] agentDiskWrite = new long[6];
 
-            // real-time cpuUsage
             JsonNode agentCpu = retrieveAgentCpu(agentIpv4);
-            // real-time mem
             JsonNode agentMem = retrieveAgentMemory(agentIpv4);
-            // real-time disk
-            JsonNode agentDisk = queryAgentDisk(agentIpv4);
-            // real-time diskIO
-            JsonNode agentDiskIO = queryAgentDiskIO(agentIpv4);
-            // dynamic
-            JsonNode agentCpuInterval = retrieveAgentCpu(agentIpv4, step);
-            JsonNode agentMemInterval = retrieveAgentMemory(agentIpv4, step);
-            JsonNode agentDiskIOInterval = queryAgentDiskIO(agentIpv4, step);
+            JsonNode agentDisk = retrieveAgentDisk(agentIpv4);
+            JsonNode agentDiskIO = retrieveAgentDiskIO(agentIpv4);
+            JsonNode agentCpuInterval = retrieveAgentCpu(agentIpv4, interval);
+            JsonNode agentMemInterval = retrieveAgentMemory(agentIpv4, interval);
+            JsonNode agentDiskIOInterval = retrieveAgentDiskIO(agentIpv4, interval);
 
             // data process
             for (int i = 0; i < 6; i++) {
@@ -188,55 +183,49 @@ public class PrometheusProxy {
                 agentDiskRead[i] = ProxyUtils.getLongSafely(agentDiskIOInterval, DISK_READ, i);
                 agentDiskWrite[i] = ProxyUtils.getLongSafely(agentDiskIOInterval, DISK_WRITE, i);
             }
-            // HOST
-            ag.put("hostname", agentCpu.get("hostname").asText());
-            ag.put("iPv4addr", agentCpu.get("iPv4addr").asText());
-            ag.put("cpuInfo", agentCpu.get("cpuInfo").asText().strip());
-            // ag.put("iPv6addr", agentCpu.get("iPv6addr").asText());
-            ag.put("os", agentCpu.get("os").asText());
-            ag.put("architecture", agentCpu.get("architecture").asText());
-            ag.put(PHYSICAL_CORES, agentCpu.get(PHYSICAL_CORES).asText());
-            // MEM
-            ag.put(MEM_TOTAL, agentMem.get(MEM_TOTAL).asLong());
-            // DISK
-            ag.set(DISK_TOTAL, agentDisk.get(DISK_TOTAL));
 
             // cur
-            ag.put("cpu_usage_cur", agentCpu.get(CPU_USAGE).asDouble());
+            ag.put("cpuUsageCur", String.format("%.6f", agentCpu.get(CPU_USAGE).asDouble()));
             ag.put(
-                    "memory_usage_cur",
-                    (double) (agentMem.get(MEM_TOTAL).asLong()
-                                    - agentMem.get(MEM_IDLE).asLong())
-                            / agentMem.get(MEM_TOTAL).asLong());
+                    "memoryUsageCur",
+                    String.format(
+                            "%.6f",
+                            (double) (agentMem.get(MEM_TOTAL).asLong()
+                                            - agentMem.get(MEM_IDLE).asLong())
+                                    / agentMem.get(MEM_TOTAL).asLong()));
             ag.put(
-                    "disk_usage_cur",
-                    (double) (agentDisk.get(DISK_TOTAL).asLong()
-                                    - agentDisk.get(DISK_IDLE).asLong())
-                            / agentDisk.get(DISK_TOTAL).asLong());
+                    "diskUsageCur",
+                    String.format(
+                            "%.6f",
+                            (double) (agentDisk.get(DISK_TOTAL).asLong()
+                                            - agentDisk.get(DISK_IDLE).asLong())
+                                    / agentDisk.get(DISK_TOTAL).asLong()));
             ag.put(
-                    "file_descriptor_usage",
-                    (double) agentCpu.get(FILE_OPEN_DESCRIPTOR).asLong()
-                            / agentCpu.get(FILE_TOTAL_DESCRIPTOR).asLong());
-            ag.put("disk_read", agentDiskIO.get(DISK_READ).asLong());
-            ag.put("disk_read", agentDiskIO.get(DISK_WRITE).asLong());
-            // cpu
-            ag.set("cpu_usage", ProxyUtils.array2node(agentsCpuUsage));
-            ag.set("system_load1", ProxyUtils.array2node(agentsCpuLoad1));
-            ag.set("system_load2", ProxyUtils.array2node(agentsCpuLoad2));
-            ag.set("system_load3", ProxyUtils.array2node(agentsCpuLoad3));
-            // mem
-            ag.set("memory_usage", ProxyUtils.array2node(agentMemIdle, agentMemTotal));
-            // disk io
-            ag.set("disk_read", ProxyUtils.array2node(agentDiskRead));
-            ag.set("disk_write", ProxyUtils.array2node(agentDiskWrite));
+                    "fileDescriptorUsage",
+                    String.format(
+                            "%.6f",
+                            (double) agentCpu.get(FILE_OPEN_DESCRIPTOR).asLong()
+                                    / agentCpu.get(FILE_TOTAL_DESCRIPTOR).asLong()));
+            ag.put("diskReadCur", agentDiskIO.get(DISK_READ).asLong());
+            ag.put("diskWriteCur", agentDiskIO.get(DISK_WRITE).asLong());
+
+            // interval
+            ag.set("cpuUsage", ProxyUtils.array2node(agentsCpuUsage));
+            ag.set("systemLoad1", ProxyUtils.array2node(agentsCpuLoad1));
+            ag.set("systemLoad2", ProxyUtils.array2node(agentsCpuLoad2));
+            ag.set("systemLoad3", ProxyUtils.array2node(agentsCpuLoad3));
+            ag.set("memoryUsage", ProxyUtils.array2node(agentMemIdle, agentMemTotal));
+            ag.set("diskRead", ProxyUtils.array2node(agentDiskRead));
+            ag.set("diskWrite", ProxyUtils.array2node(agentDiskWrite));
+
             return ag;
         }
         return objectMapper.createObjectNode();
     }
     /**
-     * query cluster info
+     * query clusters info
      */
-    public JsonNode queryClusterInfo(Long clusterId, String step) {
+    public JsonNode queryClustersInfo(Long clusterId, String interval) {
         HostQuery hostQuery = new HostQuery();
         hostQuery.setClusterId(clusterId);
         PageVO<HostVO> hostPage = hostService.list(hostQuery); // query host list
@@ -245,7 +234,7 @@ public class PrometheusProxy {
         int agentsNum = Math.toIntExact(hostPage.getTotal()); // change to agentsNum
         if (agentsNum > 0) {
             int total_physical_cores = 0;
-            long totalMemSpace = 0L, totalDiskSpace = 0L, totalMemIdle = 0L;
+            long totalMemSpace = 0L, totalMemIdle = 0L;
             double instantCpuUsage = 0.0;
             double[][] agentsCpuUsage = new double[agentsNum][6];
             double[][] agentsCpuLoad1 = new double[agentsNum][6];
@@ -253,28 +242,22 @@ public class PrometheusProxy {
             double[][] agentsCpuLoad3 = new double[agentsNum][6];
             long[][] agentMemIdle = new long[agentsNum][6];
             long[][] agentMemTotal = new long[agentsNum][6];
+
             int agentIndex = 0;
             ObjectNode clusterInfo = objectMapper.createObjectNode();
             for (HostVO hostVO : hostList) {
                 String agentIpv4 = hostVO.getIpv4();
-                // real-time cpuUsage
                 JsonNode agentCpu = retrieveAgentCpu(agentIpv4);
                 instantCpuUsage += agentCpu.get("cpuUsage").asDouble()
                         * agentCpu.get(PHYSICAL_CORES).asInt();
-                // real-time memUsage
                 JsonNode agentMem = retrieveAgentMemory(agentIpv4);
                 totalMemIdle += agentMem.get("memIdle").asLong();
                 totalMemSpace += agentMem.get(("memTotal")).asLong();
-                // real-time diskUsage
-                JsonNode agentDisk = queryAgentDisk(agentIpv4);
-                totalDiskSpace += agentDisk.get(DISK_TOTAL).asLong();
-
-                // freshTime
-                JsonNode agentCpuStep = retrieveAgentCpu(agentIpv4, step);
-                JsonNode agentMemStep = retrieveAgentMemory(agentIpv4, step);
-
+                JsonNode agentCpuStep = retrieveAgentCpu(agentIpv4, interval);
+                JsonNode agentMemStep = retrieveAgentMemory(agentIpv4, interval);
                 int agent_physical_cores = agentCpu.get(PHYSICAL_CORES).asInt();
                 total_physical_cores += agent_physical_cores;
+
                 for (int i = 0; i < 6; i++) {
                     // CPU
                     agentsCpuUsage[agentIndex][i] =
@@ -293,23 +276,18 @@ public class PrometheusProxy {
 
                 agentIndex++; // loop of agents
             }
-            // static
-            clusterInfo.put("total_physical_cores", total_physical_cores);
-            clusterInfo.put("total_memory", totalMemSpace);
-            clusterInfo.put("total_disk", totalDiskSpace);
-
             // cur
-            clusterInfo.put("cpu_usage_cur", instantCpuUsage / total_physical_cores);
-            clusterInfo.put("memory_usage_cur", (double) (totalMemSpace - totalMemIdle) / totalMemSpace);
+            clusterInfo.put("cpuUsageCur", String.format("%.6f", instantCpuUsage / total_physical_cores));
+            clusterInfo.put(
+                    "memoryUsageCur", String.format("%.6f", (double) (totalMemSpace - totalMemIdle) / totalMemSpace));
 
-            // cpu
-            clusterInfo.set("cpu_usage", ProxyUtils.array2node(agentsCpuUsage, total_physical_cores, agentsNum));
-            clusterInfo.set("system_load1", ProxyUtils.array2node(agentsCpuLoad1, total_physical_cores, agentsNum));
-            clusterInfo.set("system_load2", ProxyUtils.array2node(agentsCpuLoad2, total_physical_cores, agentsNum));
-            clusterInfo.set("system_load3", ProxyUtils.array2node(agentsCpuLoad3, total_physical_cores, agentsNum));
+            // interval
+            clusterInfo.set("cpuUsage", ProxyUtils.array2node(agentsCpuUsage, total_physical_cores, agentsNum));
+            clusterInfo.set("systemLoad1", ProxyUtils.array2node(agentsCpuLoad1, total_physical_cores, agentsNum));
+            clusterInfo.set("systemLoad2", ProxyUtils.array2node(agentsCpuLoad2, total_physical_cores, agentsNum));
+            clusterInfo.set("systemLoad3", ProxyUtils.array2node(agentsCpuLoad3, total_physical_cores, agentsNum));
+            clusterInfo.set("memoryUsage", ProxyUtils.array2node(agentMemIdle, agentMemTotal, agentsNum));
 
-            // mem
-            clusterInfo.set("memory_usage", ProxyUtils.array2node(agentMemIdle, agentMemTotal, agentsNum));
             return clusterInfo;
         }
         return objectMapper.createObjectNode();
@@ -355,14 +333,14 @@ public class PrometheusProxy {
     /**
      * retrieve cpu internal
      */
-    public JsonNode retrieveAgentCpu(String iPv4addr, String step) {
+    public JsonNode retrieveAgentCpu(String iPv4addr, String interval) {
         String params = String.format("agent_host_monitoring_cpu{iPv4addr=\"%s\"}", iPv4addr);
-        ArrayList<Long> timeStampsList = ProxyUtils.getTimeStampsList(Integer.parseInt(step));
+        ArrayList<Long> timeStampsList = ProxyUtils.getTimeStampsList(ProxyUtils.processInternal(interval));
         JsonNode result = queryRange(
                 params,
                 timeStampsList.get(timeStampsList.size() - 1),
                 timeStampsList.get(0),
-                ProxyUtils.Number2Param(Integer.parseInt(step))); // end start
+                ProxyUtils.Number2Param(ProxyUtils.processInternal(interval))); // end start
         ObjectMapper objectMapper = new ObjectMapper();
         if (result != null) {
             JsonNode agentCpu = result.get("data").get("result");
@@ -427,14 +405,14 @@ public class PrometheusProxy {
     /**
      * retrieve memory internal
      */
-    public JsonNode retrieveAgentMemory(String iPv4addr, String step) {
+    public JsonNode retrieveAgentMemory(String iPv4addr, String interval) {
         String params = String.format("agent_host_monitoring_mem{iPv4addr=\"%s\"}", iPv4addr);
-        ArrayList<Long> timeStampsList = ProxyUtils.getTimeStampsList(Integer.parseInt(step));
+        ArrayList<Long> timeStampsList = ProxyUtils.getTimeStampsList(ProxyUtils.processInternal(interval));
         JsonNode result = queryRange(
                 params,
                 timeStampsList.get(timeStampsList.size() - 1),
                 timeStampsList.get(0),
-                ProxyUtils.Number2Param(Integer.parseInt(step)));
+                ProxyUtils.Number2Param(ProxyUtils.processInternal(interval)));
         ObjectMapper objectMapper = new ObjectMapper();
         if (result != null) {
             JsonNode agentMem = result.get("data").get("result");
@@ -463,7 +441,7 @@ public class PrometheusProxy {
     /**
      * retrieve diskInfo
      */
-    public JsonNode queryAgentDisk(String iPv4addr) {
+    public JsonNode retrieveAgentDisk(String iPv4addr) {
         String params = String.format("agent_host_monitoring_disk{iPv4addr=\"%s\"}", iPv4addr);
         JsonNode result = query(params);
         ObjectMapper objectMapper = new ObjectMapper();
@@ -478,11 +456,11 @@ public class PrometheusProxy {
 
                 // value
                 Long diskTotalSpace = 0L, diskFreeSpace = 0L;
-                for (JsonNode agent : agentDisksResult) {
-                    if (Objects.equals(agent.get("metric").get("diskUsage").asText(), DISK_IDLE)) {
-                        diskFreeSpace += agent.get("value").get(1).asLong();
+                for (JsonNode disk : agentDisksResult) {
+                    if (Objects.equals(disk.get("metric").get("diskUsage").asText(), DISK_IDLE)) {
+                        diskFreeSpace += disk.get("value").get(1).asLong();
                     } else {
-                        diskTotalSpace += agent.get("value").get(1).asLong();
+                        diskTotalSpace += disk.get("value").get(1).asLong();
                     }
                 }
                 agentDiskInfo.put(DISK_TOTAL, diskTotalSpace);
@@ -496,7 +474,7 @@ public class PrometheusProxy {
     /**
      * retrieve diskIO
      */
-    public JsonNode queryAgentDiskIO(String iPv4addr) {
+    public JsonNode retrieveAgentDiskIO(String iPv4addr) {
         String params = String.format("agent_host_monitoring_diskIO{iPv4addr=\"%s\"}", iPv4addr);
         JsonNode result = query(params);
         ObjectMapper objectMapper = new ObjectMapper();
@@ -527,17 +505,18 @@ public class PrometheusProxy {
         }
         return objectMapper.createObjectNode();
     }
+
     /**
      * retrieve diskIO internal
      */
-    public JsonNode queryAgentDiskIO(String iPv4addr, String step) {
+    public JsonNode retrieveAgentDiskIO(String iPv4addr, String interval) {
         String params = String.format("agent_host_monitoring_diskIO{iPv4addr=\"%s\"}", iPv4addr);
-        ArrayList<Long> timeStampsList = ProxyUtils.getTimeStampsList(Integer.parseInt(step));
+        ArrayList<Long> timeStampsList = ProxyUtils.getTimeStampsList(ProxyUtils.processInternal(interval));
         JsonNode result = queryRange(
                 params,
                 timeStampsList.get(timeStampsList.size() - 1),
                 timeStampsList.get(0),
-                ProxyUtils.Number2Param(Integer.parseInt(step)));
+                ProxyUtils.Number2Param(ProxyUtils.processInternal(interval)));
         ObjectMapper objectMapper = new ObjectMapper();
         if (result != null) {
             JsonNode agentDisksResult = result.get("data").get("result");
@@ -554,11 +533,19 @@ public class PrometheusProxy {
                 long[] diskRead = new long[6];
                 for (JsonNode disk : agentDisksResult) {
                     if (Objects.equals(disk.get("metric").get("diskIO").asText(), DISK_WRITE)) {
-                        for (int i = 0; i < 6; i++)
-                            diskWrite[i] += disk.get("values").get(i).get(1).asLong();
+                        for (int i = 0; i < 6; i++) {
+                            JsonNode listNode = disk.get("values");
+                            if (listNode != null && listNode.isArray() && i < listNode.size())
+                                diskWrite[i] += listNode.get(i).get(1).asLong();
+                            else diskWrite[i] += 0L;
+                        }
                     } else {
-                        for (int i = 0; i < 6; i++)
-                            diskRead[i] += disk.get("values").get(i).get(1).asLong();
+                        for (int i = 0; i < 6; i++) {
+                            JsonNode listNode = disk.get("values");
+                            if (listNode != null && listNode.isArray() && i < listNode.size())
+                                diskRead[i] += listNode.get(i).get(1).asLong();
+                            else diskRead[i] += 0L;
+                        }
                     }
                 }
                 agentDiskIOInfo.set(DISK_WRITE, ProxyUtils.array2node(diskWrite));

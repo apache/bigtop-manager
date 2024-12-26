@@ -50,13 +50,13 @@ public class ProxyUtils {
         double[] cache = new double[6];
         for (int i = 0; i < num; i++) for (int j = 0; j < 6; j++) cache[j] += array[i][j];
         ArrayNode node = mapper.createArrayNode();
-        for (int j = 0; j < 6; j++) node.add(cache[j] / cores);
+        for (int j = 0; j < 6; j++) node.add(String.format("%.6f", cache[j] / cores));
         return node;
     }
 
     public static JsonNode array2node(double[] array) {
         ArrayNode node = new ObjectMapper().createArrayNode();
-        for (int j = 0; j < 6; j++) node.add(array[j]);
+        for (int j = 0; j < 6; j++) node.add(String.format("%.6f", array[j]));
         return node;
     }
 
@@ -69,8 +69,8 @@ public class ProxyUtils {
     public static JsonNode array2node(long[] array1, long[] array2) {
         ArrayNode node = new ObjectMapper().createArrayNode();
         for (int j = 0; j < 6; j++)
-            if (array2[j] <= 0) node.add(0.0);
-            else node.add((double) (array2[j] - array1[j]) / array2[j]);
+            if (array2[j] <= 0) node.add(String.format("%.6f", 0.0));
+            else node.add(String.format("%.6f", (double) (array2[j] - array1[j]) / array2[j]));
         return node;
     }
 
@@ -87,8 +87,8 @@ public class ProxyUtils {
         ArrayNode node = mapper.createArrayNode();
         // The data is sorted with earlier dates coming first and later dates following.
         for (int j = 0; j < 6; j++)
-            if (cache2[j] <= 0) node.add(0.0);
-            else node.add((double) (cache2[j] - cache1[j]) / cache2[j]);
+            if (cache2[j] <= 0) node.add(String.format("%.6f", 0.0));
+            else node.add(String.format("%.6f", (double) (cache2[j] - cache1[j]) / cache2[j]));
         return node;
     }
 
@@ -114,5 +114,14 @@ public class ProxyUtils {
 
     public static String Number2Param(int step) {
         return String.format("%sm", step);
+    }
+
+    public static int processInternal(String internal) {
+        int inter = Integer.parseInt(internal.substring(0, internal.length() - 1));
+        if (internal.endsWith("m")) return inter * 60;
+        else if (internal.endsWith("h")) {
+            return inter * 60 * 60;
+        }
+        return inter;
     }
 }

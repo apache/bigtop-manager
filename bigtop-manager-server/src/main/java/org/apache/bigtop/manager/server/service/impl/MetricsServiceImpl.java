@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.server.proxy.PrometheusProxy;
-import org.apache.bigtop.manager.server.service.MonitoringService;
+import org.apache.bigtop.manager.server.service.MetricsService;
 
 import org.springframework.stereotype.Service;
 
@@ -30,7 +30,7 @@ import jakarta.annotation.Resource;
 
 @Slf4j
 @Service
-public class MonitoringServiceImpl implements MonitoringService {
+public class MetricsServiceImpl implements MetricsService {
 
     @Resource
     private PrometheusProxy prometheusProxy;
@@ -41,12 +41,12 @@ public class MonitoringServiceImpl implements MonitoringService {
     }
 
     @Override
-    public JsonNode queryAgentInfo(Long id, String step) {
-        return prometheusProxy.queryAgentsInfo(id, step);
+    public JsonNode queryAgentsInfo(Long id, String interval) {
+        return prometheusProxy.queryAgentsInfo(id, interval);
     }
 
     @Override
-    public JsonNode queryClusterInfo(Long clusterId, String step) {
-        return prometheusProxy.queryClusterInfo(clusterId, step);
+    public JsonNode queryClustersInfo(Long clusterId, String interval) {
+        return prometheusProxy.queryClustersInfo(clusterId, interval);
     }
 }
