@@ -74,7 +74,7 @@ public class PrometheusProxy {
         this.webClient = webClientBuilder.baseUrl(prometheusHost).build();
     }
     /**
-     * Retrieve current data in real-time
+     * Retrieve current data
      */
     public JsonNode query(String params) {
         Mono<JsonNode> body = webClient
@@ -143,7 +143,7 @@ public class PrometheusProxy {
         return objectMapper.createObjectNode();
     }
     /**
-     * query agents info
+     * query agents info interval
      */
     public JsonNode queryAgentsInfo(Long id, String interval) {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -223,7 +223,7 @@ public class PrometheusProxy {
         return objectMapper.createObjectNode();
     }
     /**
-     * query clusters info
+     * query clusters info interval
      */
     public JsonNode queryClustersInfo(Long clusterId, String interval) {
         HostQuery hostQuery = new HostQuery();
@@ -331,7 +331,7 @@ public class PrometheusProxy {
         return objectMapper.createObjectNode();
     }
     /**
-     * retrieve cpu internal
+     * retrieve cpu interval
      */
     public JsonNode retrieveAgentCpu(String iPv4addr, String interval) {
         String params = String.format("agent_host_monitoring_cpu{iPv4addr=\"%s\"}", iPv4addr);
@@ -403,7 +403,7 @@ public class PrometheusProxy {
         return objectMapper.createObjectNode();
     }
     /**
-     * retrieve memory internal
+     * retrieve memory interval
      */
     public JsonNode retrieveAgentMemory(String iPv4addr, String interval) {
         String params = String.format("agent_host_monitoring_mem{iPv4addr=\"%s\"}", iPv4addr);
@@ -507,7 +507,7 @@ public class PrometheusProxy {
     }
 
     /**
-     * retrieve diskIO internal
+     * retrieve diskIO interval
      */
     public JsonNode retrieveAgentDiskIO(String iPv4addr, String interval) {
         String params = String.format("agent_host_monitoring_diskIO{iPv4addr=\"%s\"}", iPv4addr);
