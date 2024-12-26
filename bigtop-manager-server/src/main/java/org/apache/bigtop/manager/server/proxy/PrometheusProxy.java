@@ -233,7 +233,7 @@ public class PrometheusProxy {
         ObjectMapper objectMapper = new ObjectMapper();
         int agentsNum = Math.toIntExact(hostPage.getTotal()); // change to agentsNum
         if (agentsNum > 0) {
-            int total_physical_cores = 0;
+            int totalPhysicalCores = 0;
             long totalMemSpace = 0L, totalMemIdle = 0L;
             double instantCpuUsage = 0.0;
             double[][] agentsCpuUsage = new double[agentsNum][6];
@@ -255,19 +255,19 @@ public class PrometheusProxy {
                 totalMemSpace += agentMem.get(("memTotal")).asLong();
                 JsonNode agentCpuStep = retrieveAgentCpu(agentIpv4, interval);
                 JsonNode agentMemStep = retrieveAgentMemory(agentIpv4, interval);
-                int agent_physical_cores = agentCpu.get(PHYSICAL_CORES).asInt();
-                total_physical_cores += agent_physical_cores;
+                int agentPhysicalCores = agentCpu.get(PHYSICAL_CORES).asInt();
+                totalPhysicalCores += agentPhysicalCores;
 
                 for (int i = 0; i < 6; i++) {
                     // CPU
                     agentsCpuUsage[agentIndex][i] =
-                            ProxyUtils.getDoubleSafely(agentCpuStep, CPU_USAGE, i) * agent_physical_cores;
+                            ProxyUtils.getDoubleSafely(agentCpuStep, CPU_USAGE, i) * agentPhysicalCores;
                     agentsCpuLoad1[agentIndex][i] =
-                            ProxyUtils.getDoubleSafely(agentCpuStep, CPU_LOAD_AVG_MIN_1, i) * agent_physical_cores;
+                            ProxyUtils.getDoubleSafely(agentCpuStep, CPU_LOAD_AVG_MIN_1, i) * agentPhysicalCores;
                     agentsCpuLoad2[agentIndex][i] =
-                            ProxyUtils.getDoubleSafely(agentCpuStep, CPU_LOAD_AVG_MIN_5, i) * agent_physical_cores;
+                            ProxyUtils.getDoubleSafely(agentCpuStep, CPU_LOAD_AVG_MIN_5, i) * agentPhysicalCores;
                     agentsCpuLoad3[agentIndex][i] =
-                            ProxyUtils.getDoubleSafely(agentCpuStep, CPU_LOAD_AVG_MIN_15, i) * agent_physical_cores;
+                            ProxyUtils.getDoubleSafely(agentCpuStep, CPU_LOAD_AVG_MIN_15, i) * agentPhysicalCores;
 
                     // MEM
                     agentMemIdle[agentIndex][i] = ProxyUtils.getLongSafely(agentMemStep, MEM_IDLE, i);
@@ -277,15 +277,15 @@ public class PrometheusProxy {
                 agentIndex++; // loop of agents
             }
             // cur
-            clusterInfo.put("cpuUsageCur", String.format("%.6f", instantCpuUsage / total_physical_cores));
+            clusterInfo.put("cpuUsageCur", String.format("%.6f", instantCpuUsage / totalPhysicalCores));
             clusterInfo.put(
                     "memoryUsageCur", String.format("%.6f", (double) (totalMemSpace - totalMemIdle) / totalMemSpace));
 
             // interval
-            clusterInfo.set("cpuUsage", ProxyUtils.array2node(agentsCpuUsage, total_physical_cores, agentsNum));
-            clusterInfo.set("systemLoad1", ProxyUtils.array2node(agentsCpuLoad1, total_physical_cores, agentsNum));
-            clusterInfo.set("systemLoad2", ProxyUtils.array2node(agentsCpuLoad2, total_physical_cores, agentsNum));
-            clusterInfo.set("systemLoad3", ProxyUtils.array2node(agentsCpuLoad3, total_physical_cores, agentsNum));
+            clusterInfo.set("cpuUsage", ProxyUtils.array2node(agentsCpuUsage, totalPhysicalCores, agentsNum));
+            clusterInfo.set("systemLoad1", ProxyUtils.array2node(agentsCpuLoad1, totalPhysicalCores, agentsNum));
+            clusterInfo.set("systemLoad2", ProxyUtils.array2node(agentsCpuLoad2, totalPhysicalCores, agentsNum));
+            clusterInfo.set("systemLoad3", ProxyUtils.array2node(agentsCpuLoad3, totalPhysicalCores, agentsNum));
             clusterInfo.set("memoryUsage", ProxyUtils.array2node(agentMemIdle, agentMemTotal, agentsNum));
 
             return clusterInfo;
