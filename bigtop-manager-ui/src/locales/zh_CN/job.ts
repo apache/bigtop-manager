@@ -18,5 +18,5 @@
  */
 
 export default {
-  task_list: '作业列表'
+  job_list: '作业列表'
 }

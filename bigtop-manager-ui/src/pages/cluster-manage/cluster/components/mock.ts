@@ -158,22 +158,22 @@ export function getUserList(count: number = 20): UserListItem[] {
   }))
 }
 
-type TaskStatus = 'success' | 'exception' | 'normal' | 'active'
-export interface TaskListItem {
+type JobStatus = 'success' | 'exception' | 'normal' | 'active'
+export interface JobListItem {
   name: string
-  status: TaskStatus
+  status: JobStatus
   progress: number
   createTime: string
   updateTime: string
 }
 
-export function getTaskList(count: number = 20): TaskListItem[] {
+export function getJobList(count: number = 20): JobListItem[] {
   const status = ['success', 'exception', 'normal', 'active']
   return Array.from({ length: count }, (_, i) => ({
     key: i,
     name: `name-${i}`,
     progress: Math.floor(Math.random() * 100),
-    status: status[Math.floor(Math.random() * status.length)] as TaskStatus,
+    status: status[Math.floor(Math.random() * status.length)] as JobStatus,
     createTime: '2024-09-19 11:11:11',
     updateTime: '2024-09-19 11:11:11'
   }))

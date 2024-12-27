@@ -26,7 +26,7 @@
   import Service from './service.vue'
   import Host from './host.vue'
   import User from './user.vue'
-  import Task from './task.vue'
+  import Job from './job.vue'
 
   const route = useRoute()
   const title = computed(() => route.params.cluster as string)
@@ -84,7 +84,7 @@
   ])
 
   const getCompName = computed(() => {
-    const componnts = [Overview, Service, Host, User, Task]
+    const componnts = [Overview, Service, Host, User, Job]
     return componnts[parseInt(activeKey.value) - 1]
   })
 

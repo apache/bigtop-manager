@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { type TaskListItem, getTaskList } from './components/mock'
+  import { type JobListItem, getJobList } from './components/mock'
   import { ref } from 'vue'
   import type { TableColumnType } from 'ant-design-vue'
   import useBaseTable from '@/composables/use-base-table'
@@ -54,7 +54,7 @@
       ellipsis: true
     }
   ]
-  const data = ref<TaskListItem[]>(getTaskList(50))
+  const data = ref<JobListItem[]>(getJobList(50))
   const { columnsProp, dataSource, loading, paginationProps, onChange } = useBaseTable({
     columns,
     rows: data.value
@@ -62,9 +62,9 @@
 </script>
 
 <template>
-  <div class="task">
+  <div class="job">
     <header>
-      <div class="host-title">{{ $t('task.task_list') }}</div>
+      <div class="host-title">{{ $t('job.job_list') }}</div>
     </header>
     <a-table
       :loading="loading"
@@ -86,7 +86,7 @@
 </template>
 
 <style lang="scss" scoped>
-  .task {
+  .job {
     header {
       margin-bottom: $space-md;
     }

@@ -25,7 +25,7 @@ import llmConfig from '@/locales/zh_CN/llm-config.ts'
 import aiAssistant from '@/locales/zh_CN/ai-assistant.ts'
 import cluster from '@/locales/zh_CN/cluster.ts'
 import host from '@/locales/zh_CN/host.ts'
-import task from '@/locales/zh_CN/task.ts'
+import job from '@/locales/zh_CN/job.ts'
 
 export default {
   common,
@@ -36,5 +36,5 @@ export default {
   aiAssistant,
   cluster,
   host,
-  task
+  job
 }
