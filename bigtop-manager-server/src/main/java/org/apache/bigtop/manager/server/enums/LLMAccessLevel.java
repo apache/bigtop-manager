@@ -33,10 +33,19 @@ public enum LLMAccessLevel {
         this.code = code;
     }
 
-    public static Boolean isAccessible(Integer accessLevel) {
+    public static Boolean isAccessible(LLMAccessLevel accessLevel) {
         if (accessLevel == null) {
             return false;
         }
-        return !CHAT_ONLY.code.equals(accessLevel);
+        return !CHAT_ONLY.equals(accessLevel);
+    }
+
+    public static LLMAccessLevel fromCode(Integer code) {
+        for (LLMAccessLevel level : LLMAccessLevel.values()) {
+            if (level.code.equals(code)) {
+                return level;
+            }
+        }
+        return CHAT_ONLY;
     }
 }

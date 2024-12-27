@@ -36,6 +36,7 @@ import org.apache.bigtop.manager.dao.repository.PlatformDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.enums.AuthPlatformStatus;
 import org.apache.bigtop.manager.server.enums.ChatbotCommand;
+import org.apache.bigtop.manager.server.enums.LLMAccessLevel;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.holder.SessionUserHolder;
 import org.apache.bigtop.manager.server.model.converter.AuthPlatformConverter;
@@ -123,13 +124,18 @@ public class ChatbotServiceImpl implements ChatbotService {
     }
 
     private AIAssistant buildAIAssistant(
-            String platformName, String model, Map<String, String> credentials, Long threadId, ChatbotCommand command) {
+            String platformName,
+            String model,
+            Map<String, String> credentials,
+            Long threadId,
+            ChatbotCommand command,
+            LLMAccessLevel accessLevel) {
         return getAIAssistantFactory()
                 .createAiService(
                         getPlatformType(platformName),
                         getAIAssistantConfig(model, credentials),
                         threadId,
-                        aiServiceToolsProvider.getToolsProvide(command));
+                        aiServiceToolsProvider.getToolsProvide(command, accessLevel));
     }
 
     @Override
@@ -204,14 +210,15 @@ public class ChatbotServiceImpl implements ChatbotService {
         }
 
         AuthPlatformDTO authPlatformDTO = AuthPlatformConverter.INSTANCE.fromPO2DTO(authPlatformPO);
-
+        LLMAccessLevel accessLevel = LLMAccessLevel.fromCode(authPlatformPO.getAccessLevel());
         PlatformPO platformPO = platformDao.findById(authPlatformPO.getPlatformId());
         return buildAIAssistant(
                 platformPO.getName(),
                 authPlatformDTO.getModel(),
                 authPlatformDTO.getAuthCredentials(),
                 threadId,
-                command);
+                command,
+                accessLevel);
     }
 
     @Override

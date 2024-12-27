@@ -282,18 +282,19 @@ CREATE TABLE `llm_platform`
 
 CREATE TABLE `llm_auth_platform`
 (
-    `id`          BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `platform_id` BIGINT(20) UNSIGNED NOT NULL,
-    `credentials` TEXT                NOT NULL,
-    `is_deleted`  TINYINT(1)          DEFAULT 0 NULL,
-    `status`      SMALLINT            DEFAULT 0 COMMENT '1-Active, 2-Available, 3-Unavailable',
-    `model`       VARCHAR(255)        NOT NULL,
-    `name`        VARCHAR(255)        NOT NULL,
-    `desc`        VARCHAR(255)        NOT NULL,
-    `create_time` DATETIME            DEFAULT CURRENT_TIMESTAMP,
-    `update_time` DATETIME            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `create_by`   BIGINT              DEFAULT NULL,
-    `update_by`   BIGINT              DEFAULT NULL,
+    `id`            BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `platform_id`   BIGINT(20) UNSIGNED NOT NULL,
+    `credentials`   TEXT                NOT NULL,
+    `is_deleted`    TINYINT(1)          DEFAULT 0 NULL,
+    `status`        SMALLINT            DEFAULT 0 COMMENT '1-Active, 2-Available, 3-Unavailable',
+    `access_level`  SMALLINT            DEFAULT 1 COMMENT '0-Chat_only, 1-Readonly, 2-Write_guided, 3-Full-access',
+    `model`         VARCHAR(255)        NOT NULL,
+    `name`          VARCHAR(255)        NOT NULL,
+    `desc`          VARCHAR(255)        NOT NULL,
+    `create_time`   DATETIME            DEFAULT CURRENT_TIMESTAMP,
+    `update_time`   DATETIME            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `create_by`     BIGINT              DEFAULT NULL,
+    `update_by`     BIGINT              DEFAULT NULL,
     PRIMARY KEY (`id`),
     KEY `idx_platform_id` (`platform_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
