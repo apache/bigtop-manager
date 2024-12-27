@@ -42,7 +42,7 @@ public class MetricsController {
     private MetricsService metricsService;
 
     @Operation(summary = "hosts healthy", description = "hosts healthy check")
-    @GetMapping("hosts/healthy")
+    @GetMapping("hostshealthy")
     public ResponseEntity<JsonNode> agentHostsHealthyStatus() {
         return ResponseEntity.success(metricsService.queryAgentsHealthyStatus());
     }
@@ -50,14 +50,14 @@ public class MetricsController {
     @Operation(summary = "host info", description = "host info query")
     @GetMapping("hosts/{id}")
     public ResponseEntity<JsonNode> queryAgentInfo(
-            @RequestParam(value = "interval", defaultValue = "1") String interval, @PathVariable String id) {
+            @RequestParam(value = "interval", defaultValue = "1m") String interval, @PathVariable String id) {
         return ResponseEntity.success(metricsService.queryAgentsInfo(Long.valueOf(id), interval));
     }
 
     @Operation(summary = "cluster info", description = "cluster info query")
     @GetMapping("clusters/{id}")
     public ResponseEntity<JsonNode> queryCluster(
-            @RequestParam(value = "interval", defaultValue = "1") String interval, @PathVariable String id) {
+            @RequestParam(value = "interval", defaultValue = "1m") String interval, @PathVariable String id) {
         return ResponseEntity.success(metricsService.queryClustersInfo(Long.valueOf(id), interval));
     }
 }

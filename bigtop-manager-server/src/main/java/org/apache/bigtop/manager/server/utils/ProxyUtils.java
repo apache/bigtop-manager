@@ -45,7 +45,7 @@ public class ProxyUtils {
         return 0L;
     }
 
-    public static JsonNode array2node(double[][] array, int num, int cores) {
+    public static JsonNode array2node(double[][] array, int cores, int num) {
         ObjectMapper mapper = new ObjectMapper();
         double[] cache = new double[6];
         for (int i = 0; i < num; i++) for (int j = 0; j < 6; j++) cache[j] += array[i][j];

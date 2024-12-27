@@ -230,8 +230,8 @@ public class PrometheusProxy {
         hostQuery.setClusterId(clusterId);
         PageVO<HostVO> hostPage = hostService.list(hostQuery); // query host list
         List<HostVO> hostList = hostPage.getContent();
-        ObjectMapper objectMapper = new ObjectMapper();
         int agentsNum = Math.toIntExact(hostPage.getTotal()); // change to agentsNum
+        ObjectMapper objectMapper = new ObjectMapper();
         if (agentsNum > 0) {
             int totalPhysicalCores = 0;
             long totalMemSpace = 0L, totalMemIdle = 0L;
