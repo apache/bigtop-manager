@@ -25,6 +25,6 @@ declare module 'vue' {
     AutoForm: (typeof import('@/components/common/auto-form/index.vue'))['default']
     ButtonGroup: (typeof import('@/components/common/button-group/index.vue'))['default']
     MarkdownView: (typeof import('@/components/common/markdown-view/index.vue'))['default']
-    SvgIcon: (typeof import('@/components/common/svg-icon/index.vue'))['default']
+    StatusDot: (typeof import('@/components/common/status-dot/index.vue'))['default']
   }
 }

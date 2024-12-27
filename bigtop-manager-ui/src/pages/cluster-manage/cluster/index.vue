@@ -24,6 +24,9 @@
   import type { TabItem } from '@/components/common/main-card/types'
   import Overview from './overview.vue'
   import Service from './service.vue'
+  import Host from './host.vue'
+  import User from './user.vue'
+  import Task from './task.vue'
 
   const route = useRoute()
   const title = computed(() => route.params.cluster as string)
@@ -81,11 +84,8 @@
   ])
 
   const getCompName = computed(() => {
-    if (activeKey.value === '1') {
-      return Overview
-    } else {
-      return Service
-    }
+    const componnts = [Overview, Service, Host, User, Task]
+    return componnts[parseInt(activeKey.value) - 1]
   })
 
   const dropdownMenuClick: GroupItem['dropdownMenuClickEvent'] = ({ key }) => {

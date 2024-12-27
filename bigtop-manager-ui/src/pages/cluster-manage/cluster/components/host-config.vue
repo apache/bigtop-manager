@@ -91,7 +91,7 @@
       clickEvent: (_item, args) => handleEdit(args)
     },
     {
-      text: 'delete',
+      text: 'remove',
       danger: true,
       clickEvent: (_item, args) => handleDelete(args)
     }

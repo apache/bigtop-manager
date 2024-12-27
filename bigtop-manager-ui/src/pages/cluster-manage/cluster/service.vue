@@ -21,7 +21,6 @@
   import { onMounted, ref, shallowRef } from 'vue'
   import { getServices, StatusColors, StatusTexts, type ServiceItem } from './components/mock'
   import { usePngImage } from '@/utils/tools'
-  import StatusDot from '@/components/common/status-dot/index.vue'
   import SearchForm from '@/components/common/search-form/index.vue'
   import type { GroupItem } from '@/components/common/button-group/types'
 
@@ -65,29 +64,34 @@
   <div class="service">
     <search-form />
     <div v-for="item in data" :key="item.key" class="item">
-      <div class="item-header">
-        <div class="item-header-title-wrp">
+      <div class="header">
+        <div class="header-base-wrp">
           <a-avatar
             v-if="item.serviceName"
             :src="usePngImage(item.serviceName.toLowerCase())"
             :size="42"
-            class="item-header-icon"
+            class="header-icon"
           />
-          <div class="item-header-title">
+          <div class="header-base-title">
             <a-typography-text :content="`${item.serviceName}`" />
             <a-typography-text class="small-font" type="secondary" :content="item.version" />
           </div>
-          <div class="item-header-status">
+          <div class="header-base-status">
             <a-tag :color="StatusColors[item.status]">
-              <status-dot margin="0 4px 0 0" :color="StatusColors[item.status]" />
-              <span class="small-font">{{ $t(`common.${StatusTexts[item.status]}`) }}</span>
+              <div class="header-base-status-inner">
+                <status-dot :color="StatusColors[item.status]" />
+                <span class="small-font">{{ $t(`common.${StatusTexts[item.status]}`) }}</span>
+              </div>
             </a-tag>
           </div>
         </div>
-        <div class="small-font">
-          <span>{{ `${$t('common.restart')}:` }}</span>
+        <div class="header-required-status">
+          <a-typography-text class="small-font" type="secondary" :content="`${$t('common.restart')}:`" />
           <status-dot :color="StatusColors[item.status]" />
-          <span>{{ `${item.restart ? $t('common.required') : $t('common.not_required')}` }}</span>
+          <a-typography-text
+            class="small-font"
+            :content="`${item.restart ? $t('common.required') : $t('common.not_required')}`"
+          />
         </div>
       </div>
       <div class="item-content">
@@ -104,7 +108,6 @@
 <style lang="scss" scoped>
   .small-font {
     font-size: 12px;
-    color: $color-text-tertiary;
   }
 
   .service {
@@ -128,23 +131,28 @@
     @include flexbox($align: center);
   }
 
-  .item-header {
-    display: grid;
-    gap: 10px;
+  .header {
+    @include flexbox($direction: column, $gap: 10px);
     padding: $space-md;
     border-bottom: 1px solid $color-border-secondary;
-    &-title-wrp {
+    &-base-wrp {
       @include flexbox($gap: $space-sm);
     }
-    &-title {
-      display: grid;
+    &-base-title {
+      @include flexbox($direction: column);
     }
-    &-status {
+    &-base-status {
       flex: 1;
       text-align: end;
-      span {
+      &-inner {
+        @include flexbox($align: center, $gap: 4px);
+      }
+      .ant-tag {
         margin-inline-end: 0;
       }
+    }
+    &-required-status {
+      @include flexbox($align: center, $gap: 4px);
     }
     &-icon {
       flex-shrink: 0;

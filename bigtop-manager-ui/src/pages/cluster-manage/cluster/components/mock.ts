@@ -31,7 +31,10 @@ export function generateTestData(count = 100) {
 
 export function generateTableHostData(numRows = 100) {
   const hostnames = ['Server-A', 'Server-B', 'Server-C', 'Server-D', 'Server-E']
+  const nodeNames = ['host-A', 'host-B', 'host-C', 'host-D']
   const ipAddresses = ['192.168.1.1', '192.168.1.2', '192.168.1.3', '192.168.1.4', '192.168.1.5']
+  const systems = 'Rocky Linux 8.8'
+  const architecture = 'x86_64'
   const remarks = ['Main server', 'Backup server', 'Database server', 'Web server', 'Test server']
   const statuses = ['installing', 'success', 'error', 'unknow']
 
@@ -41,6 +44,10 @@ export function generateTableHostData(numRows = 100) {
     tableData.push({
       key: i + 1,
       name: hostnames[Math.floor(Math.random() * hostnames.length)],
+      system: `${systems}-${i}`,
+      architecture: `${architecture}-${i}`,
+      componentCount: `${i}个组件`,
+      nodeName: nodeNames[Math.floor(Math.random() * nodeNames.length)],
       address: ipAddresses[Math.floor(Math.random() * ipAddresses.length)],
       remark: remarks[Math.floor(Math.random() * remarks.length)],
       status: statuses[Math.floor(Math.random() * statuses.length)]
@@ -131,5 +138,43 @@ export function getServices(): ServiceItem[] {
     version: `${serviceNames[Math.floor(Math.random() * serviceNames.length)].toLowerCase()}1.0.${i}`,
     restart: Math.floor(Math.random() * 2) == 0,
     status: statusList[Math.floor(Math.random() * statusList.length)] as ServiceStatus
+  }))
+}
+
+export interface UserListItem {
+  serviceName: string
+  userName: string
+  userGroup: string
+  descrip: string
+}
+
+export function getUserList(count: number = 20): UserListItem[] {
+  return Array.from({ length: count }, (_, i) => ({
+    key: i,
+    serviceName: `serviceName-${i}`,
+    userName: `user-${i}`,
+    userGroup: `userGroup-${i}`,
+    descrip: 'descrip-descrip-descrip'
+  }))
+}
+
+type TaskStatus = 'success' | 'exception' | 'normal' | 'active'
+export interface TaskListItem {
+  name: string
+  status: TaskStatus
+  progress: number
+  createTime: string
+  updateTime: string
+}
+
+export function getTaskList(count: number = 20): TaskListItem[] {
+  const status = ['success', 'exception', 'normal', 'active']
+  return Array.from({ length: count }, (_, i) => ({
+    key: i,
+    name: `name-${i}`,
+    progress: Math.floor(Math.random() * 100),
+    status: status[Math.floor(Math.random() * status.length)] as TaskStatus,
+    createTime: '2024-09-19 11:11:11',
+    updateTime: '2024-09-19 11:11:11'
   }))
 }

@@ -29,6 +29,7 @@ export default {
   unknown: '未知',
   edit: '编辑',
   delete: '删除',
+  remove: '移除',
   bulk_remove: '批量删除',
   rename: '重命名',
   disable: '停用',

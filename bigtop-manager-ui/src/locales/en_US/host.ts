@@ -16,13 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 export default {
-  profile: '个人中心',
-  settings: '个人设置',
-  logout: '退出登录',
-  username: '用户名',
-  nickname: '昵称',
-  user_list: '用户列表',
-  set_nickname_valid: '昵称不能为空'
+  host_list: 'Host List'
 }

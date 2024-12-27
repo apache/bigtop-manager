@@ -30,6 +30,7 @@ export default {
   edit: 'Edit',
   rename: 'Rename',
   delete: 'Delete',
+  remove: 'Remove',
   bulk_remove: 'Bulk remove',
   disable: 'Disable',
   enable: 'Enable',
