@@ -217,6 +217,10 @@ public class LLMConfigServiceImpl implements LLMConfigService {
             authPlatformPO.setStatus(AuthPlatformStatus.UNAVAILABLE.getCode());
         }
 
+        if (authPlatformDTO.getAccessLevel() == null) {
+            authPlatformDTO.setAccessLevel(LLMAccessLevel.READONLY.getCode());
+        }
+
         authPlatformDao.save(authPlatformPO);
         return AuthPlatformConverter.INSTANCE.fromPO2VO(authPlatformPO, platformPO);
     }
