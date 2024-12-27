@@ -98,4 +98,12 @@ public class ClusterFunctions {
         functions.putAll(getClusterByName());
         return functions;
     }
+
+    public Map<ToolSpecification, ToolExecutor> getReadonlyFunctions() {
+        Map<ToolSpecification, ToolExecutor> functions = new HashMap<>();
+        functions.putAll(listCluster());
+        functions.putAll(getClusterById());
+        functions.putAll(getClusterByName());
+        return functions;
+    }
 }

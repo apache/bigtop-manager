@@ -84,4 +84,11 @@ public class HostFunctions {
         functions.putAll(getHostByName());
         return functions;
     }
+
+    public Map<ToolSpecification, ToolExecutor> getReadonlyFunctions() {
+        Map<ToolSpecification, ToolExecutor> functions = new HashMap<>();
+        functions.putAll(getHostById());
+        functions.putAll(getHostByName());
+        return functions;
+    }
 }
