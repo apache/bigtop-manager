@@ -18,9 +18,7 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
-import org.apache.bigtop.manager.ai.assistant.GeneralAssistantFactory;
-import org.apache.bigtop.manager.ai.assistant.provider.AIAssistantConfig;
-import org.apache.bigtop.manager.ai.assistant.store.ChatMemoryStoreProvider;
+import org.apache.bigtop.manager.ai.assistant.provider.GeneralAssistantConfig;
 import org.apache.bigtop.manager.ai.core.enums.MessageType;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
@@ -80,6 +78,7 @@ public class ChatbotServiceImpl implements ChatbotService {
     @Resource
     private AIServiceToolsProvider aiServiceToolsProvider;
 
+    @Resource
     private AIAssistantFactory aiAssistantFactory;
 
     private static final int CHAT_THREAD_NAME_LENGTH = 100;
@@ -92,14 +91,6 @@ public class ChatbotServiceImpl implements ChatbotService {
         }
     }
 
-    public AIAssistantFactory getAIAssistantFactory() {
-        if (aiAssistantFactory == null) {
-            aiAssistantFactory =
-                    new GeneralAssistantFactory(new ChatMemoryStoreProvider(chatThreadDao, chatMessageDao));
-        }
-        return aiAssistantFactory;
-    }
-
     private AuthPlatformPO getActiveAuthPlatform() {
         List<AuthPlatformPO> authPlatformPOS = authPlatformDao.findAll();
         for (AuthPlatformPO authPlatformPO : authPlatformPOS) {
@@ -110,9 +101,12 @@ public class ChatbotServiceImpl implements ChatbotService {
         return null;
     }
 
-    private AIAssistantConfig getAIAssistantConfig(String model, Map<String, String> credentials) {
-        return AIAssistantConfig.builder()
+    private GeneralAssistantConfig getAIAssistantConfig(
+            String platformName, String model, Map<String, String> credentials, Long id) {
+        return GeneralAssistantConfig.builder()
+                .setPlatformType(getPlatformType(platformName))
                 .setModel(model)
+                .setId(id)
                 .setLanguage(LocaleContextHolder.getLocale().toString())
                 .addCredentials(credentials)
                 .build();
@@ -124,12 +118,9 @@ public class ChatbotServiceImpl implements ChatbotService {
 
     private AIAssistant buildAIAssistant(
             String platformName, String model, Map<String, String> credentials, Long threadId, ChatbotCommand command) {
-        return getAIAssistantFactory()
-                .createAiService(
-                        getPlatformType(platformName),
-                        getAIAssistantConfig(model, credentials),
-                        threadId,
-                        aiServiceToolsProvider.getToolsProvide(command));
+        return aiAssistantFactory.createAIService(
+                getAIAssistantConfig(platformName, model, credentials, threadId),
+                aiServiceToolsProvider.getToolsProvide(command));
     }
 
     @Override

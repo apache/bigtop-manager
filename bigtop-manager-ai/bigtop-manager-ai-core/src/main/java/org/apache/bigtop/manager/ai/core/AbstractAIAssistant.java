@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.ai.core;
 
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
-import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
+import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfig;
 
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
@@ -61,7 +61,7 @@ public abstract class AbstractAIAssistant implements AIAssistant {
         protected Object id;
 
         protected ChatMemoryStore chatMemoryStore;
-        protected AIAssistantConfigProvider configProvider;
+        protected AIAssistantConfig configProvider;
 
         protected ToolProvider toolProvider;
         protected String systemPrompt;
@@ -78,7 +78,7 @@ public abstract class AbstractAIAssistant implements AIAssistant {
             return this;
         }
 
-        public Builder withConfigProvider(AIAssistantConfigProvider configProvider) {
+        public Builder withConfigProvider(AIAssistantConfig configProvider) {
             this.configProvider = configProvider;
             return this;
         }

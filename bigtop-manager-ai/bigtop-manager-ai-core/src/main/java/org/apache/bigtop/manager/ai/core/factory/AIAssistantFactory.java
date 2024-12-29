@@ -18,25 +18,20 @@
  */
 package org.apache.bigtop.manager.ai.core.factory;
 
-import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.enums.SystemPrompt;
-import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
+import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfig;
 
 import dev.langchain4j.service.tool.ToolProvider;
 
 public interface AIAssistantFactory {
 
-    AIAssistant createWithPrompt(
-            PlatformType platformType,
-            AIAssistantConfigProvider assistantConfig,
-            Object id,
-            ToolProvider toolProvider,
-            SystemPrompt systemPrompt);
+    AIAssistant createWithPrompt(AIAssistantConfig config, ToolProvider toolProvider, SystemPrompt systemPrompt);
 
-    default AIAssistant create(PlatformType platformType, AIAssistantConfigProvider assistantConfig) {
-        return createAiService(platformType, assistantConfig, null, null);
+    default AIAssistant create(AIAssistantConfig config) {
+        return createAIService(config, null);
     }
 
-    AIAssistant createAiService(
-            PlatformType platformType, AIAssistantConfigProvider assistantConfig, Long id, ToolProvider toolProvider);
+    default AIAssistant createAIService(AIAssistantConfig config, ToolProvider toolProvider) {
+        return createWithPrompt(config, toolProvider, SystemPrompt.DEFAULT_PROMPT);
+    }
 }

@@ -18,9 +18,7 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
-import org.apache.bigtop.manager.ai.assistant.GeneralAssistantFactory;
-import org.apache.bigtop.manager.ai.assistant.provider.AIAssistantConfig;
-import org.apache.bigtop.manager.ai.assistant.store.ChatMemoryStoreProvider;
+import org.apache.bigtop.manager.ai.assistant.provider.GeneralAssistantConfig;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistantFactory;
@@ -77,26 +75,19 @@ public class LLMConfigServiceImpl implements LLMConfigService {
     @Resource
     private ChatMessageDao chatMessageDao;
 
+    @Resource
     private AIAssistantFactory aiAssistantFactory;
 
     private static final String TEST_FLAG = "ZmxhZw==";
     private static final String TEST_KEY = "bm";
 
-    public AIAssistantFactory getAIAssistantFactory() {
-        if (aiAssistantFactory == null) {
-            aiAssistantFactory =
-                    new GeneralAssistantFactory(new ChatMemoryStoreProvider(chatThreadDao, chatMessageDao));
-        }
-        return aiAssistantFactory;
-    }
-
-    private AIAssistantConfig getAIAssistantConfig(
-            String model, Map<String, String> credentials, Map<String, String> configs) {
-        return AIAssistantConfig.builder()
+    private GeneralAssistantConfig getAIAssistantConfig(
+            String platformName, String model, Map<String, String> credentials) {
+        return GeneralAssistantConfig.builder()
+                .setPlatformType(getPlatformType(platformName))
                 .setModel(model)
                 .setLanguage(LocaleContextHolder.getLocale().toString())
                 .addCredentials(credentials)
-                .addConfigs(configs)
                 .build();
     }
 
@@ -107,8 +98,8 @@ public class LLMConfigServiceImpl implements LLMConfigService {
     private Boolean testAuthorization(String platformName, String model, Map<String, String> credentials) {
         Boolean result = testFuncCalling(platformName, model, credentials);
         log.info("Test func calling result: {}", result);
-        AIAssistantConfig aiAssistantConfig = getAIAssistantConfig(model, credentials, null);
-        AIAssistant aiAssistant = getAIAssistantFactory().create(getPlatformType(platformName), aiAssistantConfig);
+        GeneralAssistantConfig generalAssistantConfig = getAIAssistantConfig(platformName, model, credentials);
+        AIAssistant aiAssistant = aiAssistantFactory.create(generalAssistantConfig);
         try {
             return aiAssistant.test();
         } catch (Exception e) {
@@ -137,9 +128,8 @@ public class LLMConfigServiceImpl implements LLMConfigService {
                     .build();
         };
 
-        AIAssistantConfig aiAssistantConfig = getAIAssistantConfig(model, credentials, null);
-        AIAssistant aiAssistant = getAIAssistantFactory()
-                .createAiService(getPlatformType(platformName), aiAssistantConfig, null, toolProvider);
+        GeneralAssistantConfig generalAssistantConfig = getAIAssistantConfig(platformName, model, credentials);
+        AIAssistant aiAssistant = aiAssistantFactory.createAIService(generalAssistantConfig, toolProvider);
         try {
             return aiAssistant.ask("What is the flag of " + TEST_KEY).contains(TEST_FLAG);
         } catch (Exception e) {

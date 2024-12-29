@@ -18,45 +18,41 @@
  */
 package org.apache.bigtop.manager.ai.assistant;
 
-import org.apache.bigtop.manager.ai.assistant.provider.LocSystemPromptProvider;
+import org.apache.bigtop.manager.ai.assistant.provider.GeneralAssistantConfig;
 import org.apache.bigtop.manager.ai.assistant.store.ChatMemoryStoreProvider;
 import org.apache.bigtop.manager.ai.core.AbstractAIAssistantFactory;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.enums.SystemPrompt;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
-import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
+import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfig;
 import org.apache.bigtop.manager.ai.core.provider.SystemPromptProvider;
 import org.apache.bigtop.manager.ai.dashscope.DashScopeAssistant;
 import org.apache.bigtop.manager.ai.openai.OpenAIAssistant;
 import org.apache.bigtop.manager.ai.qianfan.QianFanAssistant;
 
+import org.springframework.stereotype.Component;
+
 import dev.langchain4j.service.tool.ToolProvider;
 import dev.langchain4j.store.memory.chat.InMemoryChatMemoryStore;
 
+import jakarta.annotation.Resource;
 import java.util.List;
 
+@Component
 public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
 
-    private final SystemPromptProvider systemPromptProvider;
-    private final ChatMemoryStoreProvider chatMemoryStoreProvider;
+    @Resource
+    private SystemPromptProvider systemPromptProvider;
 
-    public GeneralAssistantFactory(ChatMemoryStoreProvider chatMemoryStoreProvider) {
-        this(new LocSystemPromptProvider(), chatMemoryStoreProvider);
-    }
-
-    public GeneralAssistantFactory(
-            SystemPromptProvider systemPromptProvider, ChatMemoryStoreProvider chatMemoryStoreProvider) {
-        this.systemPromptProvider = systemPromptProvider;
-        this.chatMemoryStoreProvider = chatMemoryStoreProvider;
-    }
+    @Resource
+    private ChatMemoryStoreProvider chatMemoryStoreProvider;
 
     @Override
     public AIAssistant createWithPrompt(
-            PlatformType platformType,
-            AIAssistantConfigProvider assistantConfig,
-            Object id,
-            ToolProvider toolProvider,
-            SystemPrompt systemPrompt) {
+            AIAssistantConfig config, ToolProvider toolProvider, SystemPrompt systemPrompt) {
+        GeneralAssistantConfig generalAssistantConfig = (GeneralAssistantConfig) config;
+        PlatformType platformType = generalAssistantConfig.getPlatformType();
+        Object id = generalAssistantConfig.getId();
         AIAssistant.Builder builder =
                 switch (platformType) {
                     case OPENAI -> OpenAIAssistant.builder();
@@ -68,12 +64,12 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
                         (id == null)
                                 ? new InMemoryChatMemoryStore()
                                 : chatMemoryStoreProvider.createPersistentChatMemoryStore())
-                .withConfigProvider(assistantConfig)
+                .withConfigProvider(generalAssistantConfig)
                 .withToolProvider(toolProvider);
 
         List<String> systemPrompts = new java.util.ArrayList<>();
         systemPrompts.add(systemPromptProvider.getSystemMessage(systemPrompt));
-        String locale = assistantConfig.getLanguage();
+        String locale = generalAssistantConfig.getLanguage();
         if (locale != null) {
             systemPrompts.add(systemPromptProvider.getLanguagePrompt(locale));
         }
@@ -81,11 +77,5 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
         builder.withSystemPrompt(systemPromptProvider.getSystemMessages(systemPrompts));
 
         return builder.build();
-    }
-
-    @Override
-    public AIAssistant createAiService(
-            PlatformType platformType, AIAssistantConfigProvider assistantConfig, Long id, ToolProvider toolProvider) {
-        return createWithPrompt(platformType, assistantConfig, id, toolProvider, SystemPrompt.DEFAULT_PROMPT);
     }
 }

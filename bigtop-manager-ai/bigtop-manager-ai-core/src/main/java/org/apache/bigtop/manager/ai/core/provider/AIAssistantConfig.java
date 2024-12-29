@@ -16,17 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.ai.core.factory;
+package org.apache.bigtop.manager.ai.core.provider;
 
-import reactor.core.publisher.Flux;
+import java.util.Map;
 
-import java.util.List;
+public interface AIAssistantConfig {
+    String getModel();
 
-public interface ToolBox {
+    Map<String, String> getCredentials();
 
-    List<String> getTools();
-
-    String invoke(String toolName);
-
-    Flux<String> streamInvoke(String toolName);
+    Map<String, String> getConfigs();
 }

@@ -19,7 +19,7 @@
 package org.apache.bigtop.manager.ai.core.factory;
 
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
-import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
+import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfig;
 
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.model.chat.ChatLanguageModel;
@@ -74,7 +74,7 @@ public interface AIAssistant {
 
         Builder memoryStore(ChatMemoryStore memoryStore);
 
-        Builder withConfigProvider(AIAssistantConfigProvider configProvider);
+        Builder withConfigProvider(AIAssistantConfig configProvider);
 
         Builder withToolProvider(ToolProvider toolProvider);
 
