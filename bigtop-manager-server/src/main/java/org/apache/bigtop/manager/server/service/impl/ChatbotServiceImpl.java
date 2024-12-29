@@ -36,6 +36,8 @@ import org.apache.bigtop.manager.server.enums.AuthPlatformStatus;
 import org.apache.bigtop.manager.server.enums.ChatbotCommand;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.holder.SessionUserHolder;
+import org.apache.bigtop.manager.server.llm.LLMServiceHelper;
+import org.apache.bigtop.manager.server.llm.tools.provider.AIServiceToolsProvider;
 import org.apache.bigtop.manager.server.model.converter.AuthPlatformConverter;
 import org.apache.bigtop.manager.server.model.converter.ChatMessageConverter;
 import org.apache.bigtop.manager.server.model.converter.ChatThreadConverter;
@@ -45,7 +47,6 @@ import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
 import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
 import org.apache.bigtop.manager.server.model.vo.TalkVO;
 import org.apache.bigtop.manager.server.service.ChatbotService;
-import org.apache.bigtop.manager.server.tools.provider.AIServiceToolsProvider;
 
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
@@ -74,6 +75,9 @@ public class ChatbotServiceImpl implements ChatbotService {
 
     @Resource
     private ChatMessageDao chatMessageDao;
+
+    @Resource
+    private LLMServiceHelper llmServiceHelper;
 
     @Resource
     private AIServiceToolsProvider aiServiceToolsProvider;

@@ -18,8 +18,8 @@
  */
 package org.apache.bigtop.manager.ai.assistant;
 
+import org.apache.bigtop.manager.ai.assistant.provider.ChatMemoryStoreProvider;
 import org.apache.bigtop.manager.ai.assistant.provider.GeneralAssistantConfig;
-import org.apache.bigtop.manager.ai.assistant.store.ChatMemoryStoreProvider;
 import org.apache.bigtop.manager.ai.core.AbstractAIAssistantFactory;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.enums.SystemPrompt;

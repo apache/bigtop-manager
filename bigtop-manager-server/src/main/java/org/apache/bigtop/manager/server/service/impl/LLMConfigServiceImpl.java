@@ -34,6 +34,7 @@ import org.apache.bigtop.manager.dao.repository.PlatformDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.enums.AuthPlatformStatus;
 import org.apache.bigtop.manager.server.exception.ApiException;
+import org.apache.bigtop.manager.server.llm.LLMServiceHelper;
 import org.apache.bigtop.manager.server.model.converter.AuthPlatformConverter;
 import org.apache.bigtop.manager.server.model.converter.PlatformConverter;
 import org.apache.bigtop.manager.server.model.dto.AuthPlatformDTO;
@@ -77,6 +78,9 @@ public class LLMConfigServiceImpl implements LLMConfigService {
 
     @Resource
     private AIAssistantFactory aiAssistantFactory;
+
+    @Resource
+    private LLMServiceHelper llmServiceHelper;
 
     private static final String TEST_FLAG = "ZmxhZw==";
     private static final String TEST_KEY = "bm";
@@ -192,10 +196,7 @@ public class LLMConfigServiceImpl implements LLMConfigService {
 
     @Override
     public AuthPlatformVO addAuthorizedPlatform(AuthPlatformDTO authPlatformDTO) {
-        PlatformPO platformPO = platformDao.findById(authPlatformDTO.getPlatformId());
-        if (platformPO == null) {
-            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
-        }
+        PlatformPO platformPO = llmServiceHelper.validateAndGetPlatform(authPlatformDTO.getPlatformId());
 
         Map<String, String> credentialSet =
                 getStringMap(authPlatformDTO, PlatformConverter.INSTANCE.fromPO2DTO(platformPO));
@@ -230,10 +231,7 @@ public class LLMConfigServiceImpl implements LLMConfigService {
 
     @Override
     public boolean deleteAuthorizedPlatform(Long authId) {
-        AuthPlatformPO authPlatformPO = authPlatformDao.findById(authId);
-        if (authPlatformPO == null || authPlatformPO.getIsDeleted()) {
-            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED);
-        }
+        AuthPlatformPO authPlatformPO = llmServiceHelper.validateAndGetAuthPlatform(authId);
 
         if (AuthPlatformStatus.isActive(authPlatformPO.getStatus())) {
             throw new ApiException(ApiExceptionEnum.PLATFORM_IS_ACTIVE);
@@ -263,20 +261,16 @@ public class LLMConfigServiceImpl implements LLMConfigService {
                     AuthPlatformConverter.INSTANCE.fromPO2DTO(authPlatformDao.findById(authPlatformDTO.getId()));
         }
 
-        PlatformPO platformPO = platformDao.findById(authPlatformDTO.getPlatformId());
-        if (platformPO == null) {
-            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
-        }
+        PlatformPO platformPO = llmServiceHelper.validateAndGetPlatform(authPlatformDTO.getPlatformId());
+
         List<String> supportModels = List.of(platformPO.getSupportModels().split(","));
         if (supportModels.isEmpty() || !supportModels.contains(authPlatformDTO.getModel())) {
             throw new ApiException(ApiExceptionEnum.MODEL_NOT_SUPPORTED);
         }
 
         if (authPlatformDTO.getId() != null) {
-            AuthPlatformPO authPlatformPO = authPlatformDao.findById(authPlatformDTO.getId());
-            if (authPlatformPO == null || authPlatformPO.getIsDeleted()) {
-                throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED);
-            }
+            AuthPlatformPO authPlatformPO = llmServiceHelper.validateAndGetAuthPlatform(authPlatformDTO.getId());
+
             AuthPlatformDTO existAuthPlatformDTO = AuthPlatformConverter.INSTANCE.fromPO2DTO(authPlatformPO);
             authPlatformDTO.setAuthCredentials(existAuthPlatformDTO.getAuthCredentials());
             authPlatformDTO.setModel(existAuthPlatformDTO.getModel());
@@ -299,10 +293,7 @@ public class LLMConfigServiceImpl implements LLMConfigService {
 
     @Override
     public AuthPlatformVO updateAuthorizedPlatform(AuthPlatformDTO authPlatformDTO) {
-        AuthPlatformPO authPlatformPO = authPlatformDao.findById(authPlatformDTO.getId());
-        if (authPlatformPO == null || authPlatformPO.getIsDeleted()) {
-            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED);
-        }
+        AuthPlatformPO authPlatformPO = llmServiceHelper.validateAndGetAuthPlatform(authPlatformDTO.getId());
 
         String newModel = authPlatformDTO.getModel();
         if (newModel != null) {
@@ -330,10 +321,7 @@ public class LLMConfigServiceImpl implements LLMConfigService {
 
     @Override
     public boolean activateAuthorizedPlatform(Long authId) {
-        AuthPlatformPO authPlatformPO = authPlatformDao.findById(authId);
-        if (authPlatformPO == null || authPlatformPO.getIsDeleted()) {
-            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED);
-        }
+        AuthPlatformPO authPlatformPO = llmServiceHelper.validateAndGetAuthPlatform(authId);
 
         if (!AuthPlatformStatus.available(authPlatformPO.getStatus())) {
             return false;
@@ -348,10 +336,8 @@ public class LLMConfigServiceImpl implements LLMConfigService {
 
     @Override
     public boolean deactivateAuthorizedPlatform(Long authId) {
-        AuthPlatformPO authPlatformPO = authPlatformDao.findById(authId);
-        if (authPlatformPO == null || authPlatformPO.getIsDeleted()) {
-            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED);
-        }
+        AuthPlatformPO authPlatformPO = llmServiceHelper.validateAndGetAuthPlatform(authId);
+
         AuthPlatformStatus authPlatformStatus = AuthPlatformStatus.fromCode(authPlatformPO.getStatus());
         if (authPlatformStatus.equals(AuthPlatformStatus.ACTIVE)) {
             authPlatformPO.setStatus(AuthPlatformStatus.AVAILABLE.getCode());
@@ -363,10 +349,7 @@ public class LLMConfigServiceImpl implements LLMConfigService {
 
     @Override
     public AuthPlatformVO getAuthorizedPlatform(Long authId) {
-        AuthPlatformPO authPlatformPO = authPlatformDao.findById(authId);
-        if (authPlatformPO == null || authPlatformPO.getIsDeleted()) {
-            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
-        }
+        AuthPlatformPO authPlatformPO = llmServiceHelper.validateAndGetAuthPlatform(authId);
 
         return AuthPlatformConverter.INSTANCE.fromPO2VO(
                 authPlatformPO, platformDao.findById(authPlatformPO.getPlatformId()));
@@ -374,10 +357,8 @@ public class LLMConfigServiceImpl implements LLMConfigService {
 
     @Override
     public PlatformVO getPlatform(Long id) {
-        PlatformPO platformPO = platformDao.findById(id);
-        if (platformPO == null) {
-            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
-        }
+        PlatformPO platformPO = llmServiceHelper.validateAndGetPlatform(id);
+
         return PlatformConverter.INSTANCE.fromPO2VO(platformPO);
     }
 }
