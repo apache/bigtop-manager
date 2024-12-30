@@ -18,8 +18,8 @@
  */
 package org.apache.bigtop.manager.ai.core.factory;
 
+import org.apache.bigtop.manager.ai.core.config.AIAssistantConfig;
 import org.apache.bigtop.manager.ai.core.enums.SystemPrompt;
-import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfig;
 
 import dev.langchain4j.service.tool.ToolProvider;
 

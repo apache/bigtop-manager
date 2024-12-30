@@ -18,9 +18,9 @@
  */
 package org.apache.bigtop.manager.ai.assistant;
 
+import org.apache.bigtop.manager.ai.core.config.AIAssistantConfig;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
-import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfig;
 import org.apache.bigtop.manager.ai.openai.OpenAIAssistant;
 
 import org.junit.jupiter.api.BeforeEach;

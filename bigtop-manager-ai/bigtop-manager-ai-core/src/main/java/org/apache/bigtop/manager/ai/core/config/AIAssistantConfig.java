@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.ai.core.provider;
+package org.apache.bigtop.manager.ai.core.config;
 
 import java.util.Map;
 

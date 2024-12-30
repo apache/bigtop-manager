@@ -18,13 +18,14 @@
  */
 package org.apache.bigtop.manager.ai.assistant.config;
 
+import org.apache.bigtop.manager.ai.core.config.AIAssistantConfig;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
-import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfig;
 
 import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Getter
 public class GeneralAssistantConfig implements AIAssistantConfig {
@@ -40,10 +41,10 @@ public class GeneralAssistantConfig implements AIAssistantConfig {
     private final Map<String, String> configs;
 
     private GeneralAssistantConfig(Builder builder) {
-        this.model = builder.model;
-        this.credentials = builder.credentials;
+        this.model = Objects.requireNonNull(builder.model);
+        this.credentials = Objects.requireNonNull(builder.credentials);
+        this.platformType = Objects.requireNonNull(builder.platformType);
         this.language = builder.language;
-        this.platformType = builder.platformType;
         this.id = builder.id;
         this.configs = builder.configs;
     }
