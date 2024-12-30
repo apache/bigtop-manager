@@ -22,7 +22,6 @@ import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.server.command.task.CacheFileUpdateTask;
 import org.apache.bigtop.manager.server.command.task.Task;
 import org.apache.bigtop.manager.server.command.task.TaskContext;
-import org.apache.bigtop.manager.server.model.dto.HostDTO;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,24 +41,24 @@ public class CacheFileUpdateStage extends AbstractStage {
 
     @Override
     protected void beforeCreateTasks() {
-        List<Long> hostIds = new ArrayList<>();
+        List<String> hostnames = new ArrayList<>();
 
         if (stageContext.getClusterId() == null) {
-            hostIds.addAll(stageContext.getHostIds() == null ? List.of() : stageContext.getHostIds());
+            hostnames.addAll(stageContext.getHostnames() == null ? List.of() : stageContext.getHostnames());
         } else {
-            hostIds.addAll(stageContext.getHostIds() == null ? List.of() : stageContext.getHostIds());
-            hostIds.addAll(hostDao.findAllByClusterId(stageContext.getClusterId()).stream()
-                    .map(HostPO::getId)
+            hostnames.addAll(stageContext.getHostnames() == null ? List.of() : stageContext.getHostnames());
+            hostnames.addAll(hostDao.findAllByClusterId(stageContext.getClusterId()).stream()
+                    .map(HostPO::getHostname)
                     .toList());
         }
 
-        stageContext.setHostIds(hostIds);
+        stageContext.setHostnames(hostnames);
     }
 
     @Override
-    protected Task createTask(HostDTO hostDTO) {
+    protected Task createTask(String hostname) {
         TaskContext taskContext = new TaskContext();
-        taskContext.setHostDTO(hostDTO);
+        taskContext.setHostname(hostname);
         taskContext.setClusterId(stageContext.getClusterId());
         taskContext.setClusterName(stageContext.getClusterName());
         taskContext.setUserGroup(stageContext.getUserGroup());
@@ -70,7 +69,7 @@ public class CacheFileUpdateStage extends AbstractStage {
         taskContext.setComponentDisplayName("Agent");
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put("hostIds", stageContext.getHostIds());
+        properties.put("hostnames", stageContext.getHostnames());
         taskContext.setProperties(properties);
 
         return new CacheFileUpdateTask(taskContext);

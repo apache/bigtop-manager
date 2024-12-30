@@ -42,7 +42,7 @@ public class ComponentAddTask extends AbstractComponentTask {
         super.onSuccess();
 
         String componentName = taskContext.getComponentName();
-        String hostname = taskContext.getHostDTO().getHostname();
+        String hostname = taskContext.getHostname();
         ComponentQuery componentQuery =
                 ComponentQuery.builder().hostname(hostname).name(componentName).build();
         ComponentPO componentPO = componentDao.findByQuery(componentQuery).get(0);
@@ -61,7 +61,6 @@ public class ComponentAddTask extends AbstractComponentTask {
 
     @Override
     public String getName() {
-        return "Add " + taskContext.getComponentDisplayName() + " on "
-                + taskContext.getHostDTO().getHostname();
+        return "Add " + taskContext.getComponentDisplayName() + " on " + taskContext.getHostname();
     }
 }

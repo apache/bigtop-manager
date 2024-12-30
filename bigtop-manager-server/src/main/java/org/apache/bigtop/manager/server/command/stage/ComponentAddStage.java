@@ -20,7 +20,6 @@ package org.apache.bigtop.manager.server.command.stage;
 
 import org.apache.bigtop.manager.server.command.task.ComponentAddTask;
 import org.apache.bigtop.manager.server.command.task.Task;
-import org.apache.bigtop.manager.server.model.dto.HostDTO;
 
 public class ComponentAddStage extends AbstractComponentStage {
 
@@ -29,8 +28,8 @@ public class ComponentAddStage extends AbstractComponentStage {
     }
 
     @Override
-    protected Task createTask(HostDTO hostDTO) {
-        return new ComponentAddTask(createTaskContext(hostDTO));
+    protected Task createTask(String hostname) {
+        return new ComponentAddTask(createTaskContext(hostname));
     }
 
     @Override

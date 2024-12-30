@@ -39,7 +39,7 @@ public class StageContext {
 
     private String rootDir;
 
-    private List<Long> hostIds;
+    private List<String> hostnames;
 
     private ServiceDTO serviceDTO;
 
@@ -68,7 +68,7 @@ public class StageContext {
         ClusterCommandDTO clusterCommand = commandDTO.getClusterCommand();
 
         context.setClusterName(clusterCommand.getName());
-        context.setHostIds(clusterCommand.getHostIds());
+        context.setHostnames(clusterCommand.getHosts().getHostnames());
         context.setUserGroup(clusterCommand.getUserGroup());
         context.setRootDir(clusterCommand.getRootDir());
     }

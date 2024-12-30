@@ -53,8 +53,8 @@ public class ServicePO extends BasePO implements Serializable {
     @Column(name = "stack")
     private String stack;
 
-    @Column(name = "need_restart")
-    private Boolean needRestart;
+    @Column(name = "restart_flag")
+    private Boolean restartFlag;
 
     @Column(name = "cluster_id")
     private Long clusterId;

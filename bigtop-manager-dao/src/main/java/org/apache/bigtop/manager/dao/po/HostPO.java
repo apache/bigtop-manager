@@ -39,6 +39,9 @@ public class HostPO extends BasePO implements Serializable {
     @Column(name = "hostname")
     private String hostname;
 
+    @Column(name = "agent_dir")
+    private String agentDir;
+
     @Column(name = "ssh_user")
     private String sshUser;
 

@@ -33,7 +33,6 @@ public class ComponentConfigureTask extends AbstractComponentTask {
 
     @Override
     public String getName() {
-        return "Configure " + taskContext.getComponentDisplayName() + " on "
-                + taskContext.getHostDTO().getHostname();
+        return "Configure " + taskContext.getComponentDisplayName() + " on " + taskContext.getHostname();
     }
 }

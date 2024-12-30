@@ -16,24 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.command.stage;
+package org.apache.bigtop.manager.server.enums;
 
-import org.apache.bigtop.manager.server.command.task.ComponentStartTask;
-import org.apache.bigtop.manager.server.command.task.Task;
+import lombok.Getter;
 
-public class ComponentStartStage extends AbstractComponentStage {
+@Getter
+public enum InstalledStatusEnum {
+    INSTALLING(1),
+    SUCCESS(2),
+    FAILED(3),
+    ;
 
-    public ComponentStartStage(StageContext stageContext) {
-        super(stageContext);
+    private final Integer code;
+
+    InstalledStatusEnum(Integer code) {
+        this.code = code;
     }
 
-    @Override
-    protected Task createTask(String hostname) {
-        return new ComponentStartTask(createTaskContext(hostname));
-    }
+    public static InstalledStatusEnum fromCode(Integer code) {
+        for (InstalledStatusEnum status : InstalledStatusEnum.values()) {
+            if (status.code.equals(code)) {
+                return status;
+            }
+        }
 
-    @Override
-    public String getName() {
-        return "Start " + stageContext.getComponentDTO().getDisplayName();
+        return FAILED;
     }
 }
