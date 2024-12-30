@@ -27,9 +27,7 @@ public interface AIAssistantFactory {
 
     AIAssistant createWithPrompt(AIAssistantConfig config, ToolProvider toolProvider, SystemPrompt systemPrompt);
 
-    default AIAssistant create(AIAssistantConfig config) {
-        return createAIService(config, null);
-    }
+    AIAssistant createForTest(AIAssistantConfig config, ToolProvider toolProvider);
 
     default AIAssistant createAIService(AIAssistantConfig config, ToolProvider toolProvider) {
         return createWithPrompt(config, toolProvider, SystemPrompt.DEFAULT_PROMPT);

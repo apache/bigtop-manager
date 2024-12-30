@@ -69,21 +69,13 @@ public class LocSystemPromptProvider implements SystemPromptProvider {
     private String loadPromptFromFile(String fileName) {
         final String filePath = fileName + ".st";
         String text = loadTextFromFile(filePath);
-        if (text == null) {
-            return "You are a helpful assistant.";
-        } else {
-            return text;
-        }
+        return Objects.requireNonNullElse(text, "You are a helpful assistant.");
     }
 
     public String getLanguagePrompt(String locale) {
         final String filePath = SystemPrompt.LANGUAGE_PROMPT.getValue() + '-' + locale + ".st";
         String text = loadTextFromFile(filePath);
-        if (text == null) {
-            return "Answer in " + locale;
-        } else {
-            return text;
-        }
+        return Objects.requireNonNullElseGet(text, () -> "Answer in " + locale);
     }
 
     @Override

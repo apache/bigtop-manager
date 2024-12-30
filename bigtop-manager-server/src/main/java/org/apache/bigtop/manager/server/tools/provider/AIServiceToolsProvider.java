@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.llm.tools.provider;
+package org.apache.bigtop.manager.server.tools.provider;
 
 import org.apache.bigtop.manager.server.enums.ChatbotCommand;
 

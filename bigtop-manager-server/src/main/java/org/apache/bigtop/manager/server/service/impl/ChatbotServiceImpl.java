@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
-import org.apache.bigtop.manager.ai.assistant.provider.GeneralAssistantConfig;
+import org.apache.bigtop.manager.ai.assistant.config.GeneralAssistantConfig;
 import org.apache.bigtop.manager.ai.core.enums.MessageType;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
@@ -36,8 +36,6 @@ import org.apache.bigtop.manager.server.enums.AuthPlatformStatus;
 import org.apache.bigtop.manager.server.enums.ChatbotCommand;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.holder.SessionUserHolder;
-import org.apache.bigtop.manager.server.llm.LLMServiceHelper;
-import org.apache.bigtop.manager.server.llm.tools.provider.AIServiceToolsProvider;
 import org.apache.bigtop.manager.server.model.converter.AuthPlatformConverter;
 import org.apache.bigtop.manager.server.model.converter.ChatMessageConverter;
 import org.apache.bigtop.manager.server.model.converter.ChatThreadConverter;
@@ -47,6 +45,7 @@ import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
 import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
 import org.apache.bigtop.manager.server.model.vo.TalkVO;
 import org.apache.bigtop.manager.server.service.ChatbotService;
+import org.apache.bigtop.manager.server.tools.provider.AIServiceToolsProvider;
 
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
@@ -59,7 +58,6 @@ import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @Service
 @Slf4j
@@ -77,9 +75,6 @@ public class ChatbotServiceImpl implements ChatbotService {
     private ChatMessageDao chatMessageDao;
 
     @Resource
-    private LLMServiceHelper llmServiceHelper;
-
-    @Resource
     private AIServiceToolsProvider aiServiceToolsProvider;
 
     @Resource
@@ -95,14 +90,30 @@ public class ChatbotServiceImpl implements ChatbotService {
         }
     }
 
-    private AuthPlatformPO getActiveAuthPlatform() {
+    private AuthPlatformPO validateAndGetActiveAuthPlatform() {
+        AuthPlatformPO authPlatform = null;
         List<AuthPlatformPO> authPlatformPOS = authPlatformDao.findAll();
         for (AuthPlatformPO authPlatformPO : authPlatformPOS) {
             if (AuthPlatformStatus.isActive(authPlatformPO.getStatus())) {
-                return authPlatformPO;
+                authPlatform = authPlatformPO;
             }
         }
-        return null;
+        if (authPlatform == null || authPlatform.getIsDeleted()) {
+            throw new ApiException(ApiExceptionEnum.NO_PLATFORM_IN_USE);
+        }
+        return authPlatform;
+    }
+
+    private ChatThreadPO validateAndGetChatThread(Long threadId) {
+        ChatThreadPO chatThreadPO = chatThreadDao.findById(threadId);
+        if (chatThreadPO == null || chatThreadPO.getIsDeleted()) {
+            throw new ApiException(ApiExceptionEnum.CHAT_THREAD_NOT_FOUND);
+        }
+        Long userId = SessionUserHolder.getUserId();
+        if (!chatThreadPO.getUserId().equals(userId)) {
+            throw new ApiException(ApiExceptionEnum.PERMISSION_DENIED);
+        }
+        return chatThreadPO;
     }
 
     private GeneralAssistantConfig getAIAssistantConfig(
@@ -129,10 +140,7 @@ public class ChatbotServiceImpl implements ChatbotService {
 
     @Override
     public ChatThreadVO createChatThread(ChatThreadDTO chatThreadDTO) {
-        AuthPlatformPO authPlatformPO = getActiveAuthPlatform();
-        if (authPlatformPO == null || authPlatformPO.getIsDeleted()) {
-            throw new ApiException(ApiExceptionEnum.NO_PLATFORM_IN_USE);
-        }
+        AuthPlatformPO authPlatformPO = validateAndGetActiveAuthPlatform();
 
         Long userId = SessionUserHolder.getUserId();
         PlatformPO platformPO = platformDao.findById(authPlatformPO.getPlatformId());
@@ -148,10 +156,7 @@ public class ChatbotServiceImpl implements ChatbotService {
 
     @Override
     public boolean deleteChatThread(Long threadId) {
-        ChatThreadPO chatThreadPO = chatThreadDao.findById(threadId);
-        if (chatThreadPO == null || chatThreadPO.getIsDeleted()) {
-            throw new ApiException(ApiExceptionEnum.CHAT_THREAD_NOT_FOUND);
-        }
+        ChatThreadPO chatThreadPO = validateAndGetChatThread(threadId);
 
         chatThreadPO.setIsDeleted(true);
         chatThreadDao.partialUpdateById(chatThreadPO);
@@ -164,10 +169,8 @@ public class ChatbotServiceImpl implements ChatbotService {
 
     @Override
     public List<ChatThreadVO> getAllChatThreads() {
-        AuthPlatformPO authPlatformPO = getActiveAuthPlatform();
-        if (authPlatformPO == null) {
-            throw new ApiException(ApiExceptionEnum.NO_PLATFORM_IN_USE);
-        }
+        AuthPlatformPO authPlatformPO = validateAndGetActiveAuthPlatform();
+
         PlatformPO platformPO = platformDao.findById(authPlatformPO.getPlatformId());
 
         Long authId = authPlatformPO.getId();
@@ -186,15 +189,10 @@ public class ChatbotServiceImpl implements ChatbotService {
     }
 
     private AIAssistant prepareTalk(Long threadId, ChatbotCommand command) {
-        ChatThreadPO chatThreadPO = chatThreadDao.findById(threadId);
-        Long userId = SessionUserHolder.getUserId();
-        if (!Objects.equals(userId, chatThreadPO.getUserId()) || chatThreadPO.getIsDeleted()) {
-            throw new ApiException(ApiExceptionEnum.CHAT_THREAD_NOT_FOUND);
-        }
-        AuthPlatformPO authPlatformPO = getActiveAuthPlatform();
-        if (authPlatformPO == null
-                || authPlatformPO.getIsDeleted()
-                || !authPlatformPO.getId().equals(chatThreadPO.getAuthId())) {
+        ChatThreadPO chatThreadPO = validateAndGetChatThread(threadId);
+
+        AuthPlatformPO authPlatformPO = validateAndGetActiveAuthPlatform();
+        if (!authPlatformPO.getId().equals(chatThreadPO.getAuthId())) {
             throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_IN_USE);
         }
 
@@ -212,6 +210,7 @@ public class ChatbotServiceImpl implements ChatbotService {
     @Override
     public SseEmitter talk(Long threadId, ChatbotCommand command, String message) {
         AIAssistant aiAssistant = prepareTalk(threadId, command);
+
         Flux<String> stringFlux;
         if (command == null) {
             stringFlux = aiAssistant.streamAsk(message);
@@ -237,7 +236,7 @@ public class ChatbotServiceImpl implements ChatbotService {
                         errorVO.setFinishReason("Error: " + throwable.getMessage());
                         emitter.send(errorVO);
                     } catch (Exception sendException) {
-                        sendException.printStackTrace();
+                        log.error("");
                     }
                     emitter.completeWithError(throwable);
                 },
@@ -260,14 +259,8 @@ public class ChatbotServiceImpl implements ChatbotService {
     @Override
     public List<ChatMessageVO> history(Long threadId) {
         List<ChatMessageVO> chatMessages = new ArrayList<>();
-        ChatThreadPO chatThreadPO = chatThreadDao.findById(threadId);
-        if (chatThreadPO == null || chatThreadPO.getIsDeleted()) {
-            throw new ApiException(ApiExceptionEnum.CHAT_THREAD_NOT_FOUND);
-        }
-        Long userId = SessionUserHolder.getUserId();
-        if (!chatThreadPO.getUserId().equals(userId)) {
-            throw new ApiException(ApiExceptionEnum.PERMISSION_DENIED);
-        }
+        ChatThreadPO chatThreadPO = validateAndGetChatThread(threadId);
+
         List<ChatMessagePO> chatMessagePOs = chatMessageDao.findAllByThreadId(threadId);
         for (ChatMessagePO chatMessagePO : chatMessagePOs) {
             ChatMessageVO chatMessageVO = ChatMessageConverter.INSTANCE.fromPO2VO(chatMessagePO);
@@ -284,14 +277,7 @@ public class ChatbotServiceImpl implements ChatbotService {
 
     @Override
     public ChatThreadVO updateChatThread(ChatThreadDTO chatThreadDTO) {
-        ChatThreadPO chatThreadPO = chatThreadDao.findById(chatThreadDTO.getId());
-        if (chatThreadPO == null || chatThreadPO.getIsDeleted()) {
-            throw new ApiException(ApiExceptionEnum.CHAT_THREAD_NOT_FOUND);
-        }
-        Long userId = SessionUserHolder.getUserId();
-        if (!chatThreadPO.getUserId().equals(userId)) {
-            throw new ApiException(ApiExceptionEnum.PERMISSION_DENIED);
-        }
+        ChatThreadPO chatThreadPO = validateAndGetChatThread(chatThreadDTO.getId());
 
         chatThreadPO.setName(chatThreadDTO.getName());
         chatThreadDao.partialUpdateById(chatThreadPO);
@@ -308,14 +294,8 @@ public class ChatbotServiceImpl implements ChatbotService {
 
     @Override
     public ChatThreadVO getChatThread(Long threadId) {
-        ChatThreadPO chatThreadPO = chatThreadDao.findById(threadId);
-        if (chatThreadPO == null || chatThreadPO.getIsDeleted()) {
-            throw new ApiException(ApiExceptionEnum.CHAT_THREAD_NOT_FOUND);
-        }
-        Long userId = SessionUserHolder.getUserId();
-        if (!chatThreadPO.getUserId().equals(userId)) {
-            throw new ApiException(ApiExceptionEnum.PERMISSION_DENIED);
-        }
+        ChatThreadPO chatThreadPO = validateAndGetChatThread(threadId);
+
         AuthPlatformPO authPlatformPO = authPlatformDao.findById(chatThreadPO.getAuthId());
         return ChatThreadConverter.INSTANCE.fromPO2VO(
                 chatThreadPO, authPlatformPO, platformDao.findById(authPlatformPO.getPlatformId()));

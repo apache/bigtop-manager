@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.ai.assistant.provider;
+package org.apache.bigtop.manager.ai.assistant.config;
 
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfig;

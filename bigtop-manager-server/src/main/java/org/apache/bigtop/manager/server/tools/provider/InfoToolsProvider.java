@@ -16,11 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.llm.tools.provider;
+package org.apache.bigtop.manager.server.tools.provider;
 
-import org.apache.bigtop.manager.server.llm.tools.functions.ClusterFunctions;
-import org.apache.bigtop.manager.server.llm.tools.functions.HostFunctions;
-import org.apache.bigtop.manager.server.llm.tools.functions.StackFunctions;
+import org.apache.bigtop.manager.server.tools.functions.ClusterFunctions;
+import org.apache.bigtop.manager.server.tools.functions.HostFunctions;
+import org.apache.bigtop.manager.server.tools.functions.StackFunctions;
 
 import org.springframework.stereotype.Component;
 

@@ -18,6 +18,8 @@
  */
 package org.apache.bigtop.manager.ai.assistant.provider;
 
+import org.apache.bigtop.manager.ai.assistant.config.GeneralAssistantConfig;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
