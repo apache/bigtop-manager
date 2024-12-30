@@ -16,40 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+import type { ResponseEntity } from './types'
+import request from './request'
+import { AxiosRequestConfig } from 'axios'
 
-export type UpdateClusterParam = { name: string; desc: string }
-
-export interface ClusterVO {
-  createUser?: string
-  desc?: string
-  displayName?: string
-  id?: number
-  name?: string
-  rootDir?: string
-  status?: number
-  totalDisk?: number
-  totalHost?: number
-  totalMemory?: number
-  totalProcessor?: number
-  totalService?: number
-  type?: number
-  userGroup?: string
+const get = <T>(url: string, config?: AxiosRequestConfig): Promise<ResponseEntity<T>> => {
+  return request.get(url, config)
 }
 
-export interface ServiceConfigVO {
-  id?: number
-  name?: string
-  properties?: PropertyVO[]
+const post = <T, U = any>(url: string, data: U, config?: AxiosRequestConfig): Promise<ResponseEntity<T>> => {
+  return request.post(url, data, config)
 }
 
-export interface PropertyVO {
-  attrs?: AttrsVO
-  desc?: string
-  displayName?: string
-  name?: string
-  value?: string
+const put = <T, U = any>(url: string, data: U, config?: AxiosRequestConfig): Promise<ResponseEntity<T>> => {
+  return request.put(url, data, config)
 }
 
-export interface AttrsVO {
-  type?: string
+const del = <T>(url: string, config?: AxiosRequestConfig): Promise<ResponseEntity<T>> => {
+  return request.delete(url, config)
 }
+
+export { get, post, put, del }

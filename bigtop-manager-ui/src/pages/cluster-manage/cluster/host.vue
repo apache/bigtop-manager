@@ -187,12 +187,12 @@
             @change="(e: any) => setSelectedKeys(e.target?.value ? [e.target?.value] : [])"
             @press-enter="handleSearch(selectedKeys, confirm, column.dataIndex)"
           />
-          <a-space :size="16">
+          <div class="search-btn">
+            <a-button size="small" @click="handleReset(clearFilters)"> {{ $t('common.reset') }} </a-button>
             <a-button type="primary" size="small" @click="handleSearch(selectedKeys, confirm, column.dataIndex)">
               {{ $t('common.search') }}
             </a-button>
-            <a-button size="small" @click="handleReset(clearFilters)"> {{ $t('common.reset') }} </a-button>
-          </a-space>
+          </div>
         </div>
       </template>
       <template #customFilterIcon="{ filtered, column }">
@@ -238,5 +238,8 @@
     display: grid;
     gap: $space-sm;
     padding: $space-sm;
+    &-btn {
+      @include flexbox($justify: flex-end, $gap: $space-md);
+    }
   }
 </style>

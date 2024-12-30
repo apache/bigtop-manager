@@ -17,12 +17,21 @@
  * under the License.
  */
 
-import request from '@/api/request.ts'
-import { ClusterVO } from '@/api/cluster/types.ts'
+import { get, put } from '@/api/request-util'
+import type { ClusterVO, ServiceConfigVO, UpdateClusterParam } from './types'
 
-export const getClusters = (): Promise<ClusterVO[]> => {
-  return request({
-    method: 'get',
-    url: '/clusters'
-  })
+export const getCluster = (id: number) => {
+  return get<ClusterVO>(`/clusters/${id}`)
+}
+
+export const updateCluster = (id: number, data: UpdateClusterParam) => {
+  return put<ClusterVO>(`/clusters/${id}`, data)
+}
+
+export const getClusterList = () => {
+  return get<ClusterVO[]>('/clusters')
+}
+
+export const getServicesOfCluster = (param: { clusterId: number; id: number }) => {
+  return get<ServiceConfigVO[]>(`/clusters/${param.clusterId}/services/${param.id}/configs`)
 }
