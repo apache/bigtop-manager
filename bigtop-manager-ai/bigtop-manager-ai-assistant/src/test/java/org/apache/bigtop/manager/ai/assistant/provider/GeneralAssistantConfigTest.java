@@ -19,6 +19,7 @@
 package org.apache.bigtop.manager.ai.assistant.provider;
 
 import org.apache.bigtop.manager.ai.assistant.config.GeneralAssistantConfig;
+import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,7 +56,8 @@ public class GeneralAssistantConfigTest {
 
     @Test
     public void testBuilderSetsValuesCorrectly() {
-        GeneralAssistantConfig config = builder.setModel(model)
+        GeneralAssistantConfig config = builder.setPlatformType(PlatformType.OPENAI)
+                .setModel(model)
                 .setLanguage(language)
                 .addCredentials(credentials)
                 .addConfigs(configs)
@@ -70,7 +72,8 @@ public class GeneralAssistantConfigTest {
 
     @Test
     public void testBuilderAddsSingleCredential() {
-        GeneralAssistantConfig config = builder.setModel(model)
+        GeneralAssistantConfig config = builder.setPlatformType(PlatformType.OPENAI)
+                .setModel(model)
                 .setLanguage(language)
                 .addCredential("client_id", "abcd1234")
                 .build();
@@ -81,7 +84,8 @@ public class GeneralAssistantConfigTest {
 
     @Test
     public void testBuilderAddsSingleConfig() {
-        GeneralAssistantConfig config = builder.setModel(model)
+        GeneralAssistantConfig config = builder.setPlatformType(PlatformType.OPENAI)
+                .setModel(model)
                 .setLanguage(language)
                 .addConfig("threadId", "123")
                 .build();
@@ -92,10 +96,10 @@ public class GeneralAssistantConfigTest {
 
     @Test
     public void testEmptyBuilder() {
-        GeneralAssistantConfig config = builder.build();
+        GeneralAssistantConfig config =
+                builder.setPlatformType(PlatformType.OPENAI).setModel(model).build();
 
         assertNotNull(config);
-        assertNull(config.getModel());
         assertNull(config.getLanguage());
         assertEquals(0, config.getCredentials().size());
         assertEquals(0, config.getConfigs().size());
@@ -110,7 +114,8 @@ public class GeneralAssistantConfigTest {
         Map<String, String> extraConfigs = new HashMap<>();
         extraConfigs.put("retry", "3");
 
-        GeneralAssistantConfig config = builder.setModel(model)
+        GeneralAssistantConfig config = builder.setPlatformType(PlatformType.OPENAI)
+                .setModel(model)
                 .setLanguage(language)
                 .addCredentials(extraCredentials)
                 .addConfigs(extraConfigs)

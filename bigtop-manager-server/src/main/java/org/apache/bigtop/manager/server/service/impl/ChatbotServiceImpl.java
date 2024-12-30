@@ -132,14 +132,13 @@ public class ChatbotServiceImpl implements ChatbotService {
     public ChatThreadVO createChatThread(ChatThreadDTO chatThreadDTO) {
         AuthPlatformPO authPlatformPO = validateAndGetActiveAuthPlatform();
 
-        Long userId = SessionUserHolder.getUserId();
         PlatformPO platformPO = platformDao.findById(authPlatformPO.getPlatformId());
 
         chatThreadDTO.setPlatformId(platformPO.getId());
         chatThreadDTO.setAuthId(authPlatformPO.getId());
 
         ChatThreadPO chatThreadPO = ChatThreadConverter.INSTANCE.fromDTO2PO(chatThreadDTO);
-        chatThreadPO.setUserId(userId);
+        chatThreadPO.setUserId(SessionUserHolder.getUserId());
         chatThreadDao.save(chatThreadPO);
         return ChatThreadConverter.INSTANCE.fromPO2VO(chatThreadPO, authPlatformPO, platformPO);
     }
@@ -147,9 +146,9 @@ public class ChatbotServiceImpl implements ChatbotService {
     @Override
     public boolean deleteChatThread(Long threadId) {
         ChatThreadPO chatThreadPO = validateAndGetChatThread(threadId);
-
         chatThreadPO.setIsDeleted(true);
         chatThreadDao.partialUpdateById(chatThreadPO);
+
         List<ChatMessagePO> chatMessagePOS = chatMessageDao.findAllByThreadId(threadId);
         chatMessagePOS.forEach(chatMessagePO -> chatMessagePO.setIsDeleted(true));
         chatMessageDao.partialUpdateByIds(chatMessagePOS);
@@ -160,12 +159,10 @@ public class ChatbotServiceImpl implements ChatbotService {
     @Override
     public List<ChatThreadVO> getAllChatThreads() {
         AuthPlatformPO authPlatformPO = validateAndGetActiveAuthPlatform();
-
         PlatformPO platformPO = platformDao.findById(authPlatformPO.getPlatformId());
 
-        Long authId = authPlatformPO.getId();
-        Long userId = SessionUserHolder.getUserId();
-        List<ChatThreadPO> chatThreadPOS = chatThreadDao.findAllByAuthIdAndUserId(authId, userId);
+        List<ChatThreadPO> chatThreadPOS =
+                chatThreadDao.findAllByAuthIdAndUserId(authPlatformPO.getId(), SessionUserHolder.getUserId());
         List<ChatThreadVO> chatThreads = new ArrayList<>();
         for (ChatThreadPO chatThreadPO : chatThreadPOS) {
             if (chatThreadPO.getIsDeleted()) {
@@ -180,8 +177,8 @@ public class ChatbotServiceImpl implements ChatbotService {
 
     private AIAssistant prepareTalk(Long threadId, ChatbotCommand command) {
         ChatThreadPO chatThreadPO = validateAndGetChatThread(threadId);
-
         AuthPlatformPO authPlatformPO = validateAndGetActiveAuthPlatform();
+
         if (!authPlatformPO.getId().equals(chatThreadPO.getAuthId())) {
             throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_IN_USE);
         }

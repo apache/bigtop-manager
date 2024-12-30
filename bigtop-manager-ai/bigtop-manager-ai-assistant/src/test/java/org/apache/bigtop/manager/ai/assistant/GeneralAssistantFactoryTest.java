@@ -19,7 +19,6 @@
 package org.apache.bigtop.manager.ai.assistant;
 
 import org.apache.bigtop.manager.ai.core.config.AIAssistantConfig;
-import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 import org.apache.bigtop.manager.ai.openai.OpenAIAssistant;
 
@@ -66,9 +65,8 @@ class GeneralAssistantFactoryTest {
         try (MockedStatic<OpenAIAssistant> openAIAssistantMockedStatic = mockStatic(OpenAIAssistant.class)) {
             openAIAssistantMockedStatic.when(OpenAIAssistant::builder).thenReturn(mockBuilder);
 
-            PlatformType platformType = PlatformType.OPENAI;
-            generalAssistantFactory.create(assistantConfigProvider);
-            generalAssistantFactory.create(assistantConfigProvider);
+            generalAssistantFactory.createAIService(assistantConfigProvider, null);
+            generalAssistantFactory.createForTest(assistantConfigProvider, null);
         }
     }
 }
