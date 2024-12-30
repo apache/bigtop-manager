@@ -80,16 +80,6 @@ public class ChatbotServiceImpl implements ChatbotService {
     @Resource
     private AIAssistantFactory aiAssistantFactory;
 
-    private static final int CHAT_THREAD_NAME_LENGTH = 100;
-
-    public static String getNameFromMessage(String input) {
-        if (input == null || input.length() <= CHAT_THREAD_NAME_LENGTH) {
-            return input;
-        } else {
-            return input.substring(0, CHAT_THREAD_NAME_LENGTH);
-        }
-    }
-
     private AuthPlatformPO validateAndGetActiveAuthPlatform() {
         AuthPlatformPO authPlatform = null;
         List<AuthPlatformPO> authPlatformPOS = authPlatformDao.findAll();
@@ -207,59 +197,52 @@ public class ChatbotServiceImpl implements ChatbotService {
                 command);
     }
 
+    private void sendTalkVO(SseEmitter emitter, String content, String finishReason) {
+        try {
+            TalkVO talkVO = new TalkVO();
+            talkVO.setContent(content);
+            talkVO.setFinishReason(finishReason);
+            emitter.send(talkVO);
+        } catch (Exception e) {
+            log.error("Error sending data to SseEmitter", e);
+            emitter.completeWithError(e);
+        }
+    }
+
+    private void handleError(SseEmitter emitter, Throwable throwable) {
+        log.error("Error during SSE streaming: {}", throwable.getMessage(), throwable);
+        sendTalkVO(emitter, null, "Error: " + throwable.getMessage());
+        emitter.completeWithError(throwable);
+    }
+
+    private void completeEmitter(SseEmitter emitter) {
+        sendTalkVO(emitter, null, "completed");
+        emitter.complete();
+    }
+
     @Override
     public SseEmitter talk(Long threadId, ChatbotCommand command, String message) {
         AIAssistant aiAssistant = prepareTalk(threadId, command);
 
-        Flux<String> stringFlux;
-        if (command == null) {
-            stringFlux = aiAssistant.streamAsk(message);
-        } else {
-            stringFlux = Flux.just(aiAssistant.ask(message));
-        }
+        Flux<String> stringFlux =
+                (command == null) ? aiAssistant.streamAsk(message) : Flux.just(aiAssistant.ask(message));
+
         SseEmitter emitter = new SseEmitter();
+
         stringFlux.subscribe(
-                s -> {
-                    try {
-                        TalkVO talkVO = new TalkVO();
-                        talkVO.setContent(s);
-                        talkVO.setFinishReason(null);
-                        emitter.send(talkVO);
-                    } catch (Exception e) {
-                        emitter.completeWithError(e);
-                    }
-                },
-                throwable -> {
-                    try {
-                        TalkVO errorVO = new TalkVO();
-                        errorVO.setContent(null);
-                        errorVO.setFinishReason("Error: " + throwable.getMessage());
-                        emitter.send(errorVO);
-                    } catch (Exception sendException) {
-                        log.error("");
-                    }
-                    emitter.completeWithError(throwable);
-                },
-                () -> {
-                    try {
-                        TalkVO finishVO = new TalkVO();
-                        finishVO.setContent(null);
-                        finishVO.setFinishReason("completed");
-                        emitter.send(finishVO);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    emitter.complete();
-                });
+                s -> sendTalkVO(emitter, s, null),
+                throwable -> handleError(emitter, throwable),
+                () -> completeEmitter(emitter));
 
         emitter.onTimeout(emitter::complete);
+
         return emitter;
     }
 
     @Override
     public List<ChatMessageVO> history(Long threadId) {
         List<ChatMessageVO> chatMessages = new ArrayList<>();
-        ChatThreadPO chatThreadPO = validateAndGetChatThread(threadId);
+        validateAndGetChatThread(threadId);
 
         List<ChatMessagePO> chatMessagePOs = chatMessageDao.findAllByThreadId(threadId);
         for (ChatMessagePO chatMessagePO : chatMessagePOs) {

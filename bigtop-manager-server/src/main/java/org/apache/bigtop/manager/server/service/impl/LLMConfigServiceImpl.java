@@ -297,6 +297,7 @@ public class LLMConfigServiceImpl implements LLMConfigService {
 
         Map<String, String> credentialSet =
                 getStringMap(authPlatformDTO, PlatformConverter.INSTANCE.fromPO2DTO(platformPO));
+
         if (!testAuthorization(platformPO.getName(), authPlatformDTO.getModel(), credentialSet)) {
             throw new ApiException(ApiExceptionEnum.CREDIT_INCORRECT);
         }

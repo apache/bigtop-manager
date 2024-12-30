@@ -38,9 +38,10 @@ public class ChatMemoryStoreProvider {
     private ChatMessageDao chatMessageDao;
 
     public ChatMemoryStore createPersistentChatMemoryStore() {
-        if (chatThreadDao == null || chatMessageDao == null) {
-            return new InMemoryChatMemoryStore();
-        }
         return new PersistentChatMemoryStore(chatThreadDao, chatMessageDao);
+    }
+
+    public ChatMemoryStore createInMemoryChatMemoryStore() {
+        return new InMemoryChatMemoryStore();
     }
 }

@@ -20,10 +20,12 @@ package org.apache.bigtop.manager.ai.assistant;
 
 import org.apache.bigtop.manager.ai.assistant.config.GeneralAssistantConfig;
 import org.apache.bigtop.manager.ai.assistant.provider.ChatMemoryStoreProvider;
+import org.apache.bigtop.manager.ai.assistant.provider.LocSystemPromptProvider;
 import org.apache.bigtop.manager.ai.core.AbstractAIAssistantFactory;
 import org.apache.bigtop.manager.ai.core.config.AIAssistantConfig;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.enums.SystemPrompt;
+import org.apache.bigtop.manager.ai.core.exception.AssistantConfigNotSetException;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 import org.apache.bigtop.manager.ai.core.provider.SystemPromptProvider;
 import org.apache.bigtop.manager.ai.dashscope.DashScopeAssistant;
@@ -33,7 +35,6 @@ import org.apache.bigtop.manager.ai.qianfan.QianFanAssistant;
 import org.springframework.stereotype.Component;
 
 import dev.langchain4j.service.tool.ToolProvider;
-import dev.langchain4j.store.memory.chat.InMemoryChatMemoryStore;
 
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
@@ -49,15 +50,16 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
     private ChatMemoryStoreProvider chatMemoryStoreProvider;
 
     private void configureSystemPrompt(AIAssistant.Builder builder, SystemPrompt systemPrompt, String locale) {
+        LocSystemPromptProvider locSystemPromptProvider = (LocSystemPromptProvider) systemPromptProvider;
         List<String> systemPrompts = new ArrayList<>();
         if (systemPrompt != null) {
-            systemPrompts.add(systemPromptProvider.getSystemMessage(systemPrompt));
+            systemPrompts.add(locSystemPromptProvider.getSystemMessage(systemPrompt));
         }
 
         if (locale != null) {
-            systemPrompts.add(systemPromptProvider.getLanguagePrompt(locale));
+            systemPrompts.add(locSystemPromptProvider.getLanguagePrompt(locale));
         }
-        builder.withSystemPrompt(systemPromptProvider.getSystemMessages(systemPrompts));
+        builder.withSystemPrompt(locSystemPromptProvider.getSystemMessages(systemPrompts));
     }
 
     private AIAssistant.Builder initializeBuilder(PlatformType platformType) {
@@ -75,7 +77,7 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
         PlatformType platformType = generalAssistantConfig.getPlatformType();
         Object id = generalAssistantConfig.getId();
         if (id == null) {
-            throw new IllegalArgumentException("ID is required");
+            throw new AssistantConfigNotSetException("ID");
         }
 
         AIAssistant.Builder builder = initializeBuilder(platformType);
@@ -96,7 +98,7 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
         AIAssistant.Builder builder = initializeBuilder(platformType);
 
         builder = builder.id(null)
-                .memoryStore(new InMemoryChatMemoryStore())
+                .memoryStore(chatMemoryStoreProvider.createInMemoryChatMemoryStore())
                 .withConfigProvider(generalAssistantConfig)
                 .withToolProvider(toolProvider);
 
