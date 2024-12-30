@@ -35,9 +35,6 @@ public class GeneralAssistantConfig implements AIAssistantConfig {
     private final String language;
     private final PlatformType platformType;
     private final Map<String, String> credentials;
-    /**
-     * Platform extra configs are put here
-     */
     private final Map<String, String> configs;
 
     private GeneralAssistantConfig(Builder builder) {
@@ -75,8 +72,6 @@ public class GeneralAssistantConfig implements AIAssistantConfig {
         private PlatformType platformType;
         private final Map<String, String> credentials = new HashMap<>();
         private final Map<String, String> configs = new HashMap<>();
-
-        public Builder() {}
 
         public Builder setModel(String model) {
             this.model = model;

@@ -55,7 +55,6 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
         if (systemPrompt != null) {
             systemPrompts.add(locSystemPromptProvider.getSystemMessage(systemPrompt));
         }
-
         if (locale != null) {
             systemPrompts.add(locSystemPromptProvider.getLanguagePrompt(locale));
         }
@@ -81,7 +80,7 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
         }
 
         AIAssistant.Builder builder = initializeBuilder(platformType);
-        builder = builder.id(id)
+        builder.id(id)
                 .memoryStore(chatMemoryStoreProvider.createPersistentChatMemoryStore())
                 .withConfigProvider(generalAssistantConfig)
                 .withToolProvider(toolProvider);
@@ -97,7 +96,7 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
         PlatformType platformType = generalAssistantConfig.getPlatformType();
         AIAssistant.Builder builder = initializeBuilder(platformType);
 
-        builder = builder.id(null)
+        builder.id(null)
                 .memoryStore(chatMemoryStoreProvider.createInMemoryChatMemoryStore())
                 .withConfigProvider(generalAssistantConfig)
                 .withToolProvider(toolProvider);

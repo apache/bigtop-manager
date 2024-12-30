@@ -81,100 +81,6 @@ public class LLMConfigServiceImpl implements LLMConfigService {
     private static final String TEST_FLAG = "ZmxhZw==";
     private static final String TEST_KEY = "bm";
 
-    public PlatformPO validateAndGetPlatform(Long platformId) {
-        if (platformId == null) {
-            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
-        }
-
-        PlatformPO platformPO = platformDao.findById(platformId);
-        if (platformPO == null) {
-            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
-        }
-        return platformPO;
-    }
-
-    public AuthPlatformPO validateAndGetAuthPlatform(Long authId) {
-        if (authId == null) {
-            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED);
-        }
-        AuthPlatformPO authPlatformPO = authPlatformDao.findById(authId);
-        if (authPlatformPO == null || authPlatformPO.getIsDeleted()) {
-            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED);
-        }
-        return authPlatformPO;
-    }
-
-    private GeneralAssistantConfig getAIAssistantConfig(
-            String platformName, String model, Map<String, String> credentials) {
-        return GeneralAssistantConfig.builder()
-                .setPlatformType(getPlatformType(platformName))
-                .setModel(model)
-                .setLanguage(LocaleContextHolder.getLocale().toString())
-                .addCredentials(credentials)
-                .build();
-    }
-
-    private PlatformType getPlatformType(String platformName) {
-        return PlatformType.getPlatformType(platformName.toLowerCase());
-    }
-
-    private Boolean testAuthorization(String platformName, String model, Map<String, String> credentials) {
-        Boolean result = testFuncCalling(platformName, model, credentials);
-        log.info("Test func calling result: {}", result);
-        GeneralAssistantConfig generalAssistantConfig = getAIAssistantConfig(platformName, model, credentials);
-        AIAssistant aiAssistant = aiAssistantFactory.createForTest(generalAssistantConfig, null);
-        try {
-            return aiAssistant.test();
-        } catch (Exception e) {
-            throw new ApiException(ApiExceptionEnum.CREDIT_INCORRECT, e.getMessage());
-        }
-    }
-
-    private Boolean testFuncCalling(String platformName, String model, Map<String, String> credentials) {
-        ToolProvider toolProvider = (toolProviderRequest) -> {
-            ToolSpecification toolSpecification = ToolSpecification.builder()
-                    .name("getFlag")
-                    .description("Get flag based on key")
-                    .addParameter("key", JsonSchemaProperty.STRING, JsonSchemaProperty.description("Lowercase key"))
-                    .build();
-            ToolExecutor toolExecutor = (toolExecutionRequest, memoryId) -> {
-                Map<String, Object> arguments = JsonUtils.readFromString(toolExecutionRequest.arguments());
-                String key = arguments.get("key").toString();
-                if (key.equals(TEST_KEY)) {
-                    return TEST_FLAG;
-                }
-                return null;
-            };
-
-            return ToolProviderResult.builder()
-                    .add(toolSpecification, toolExecutor)
-                    .build();
-        };
-
-        GeneralAssistantConfig generalAssistantConfig = getAIAssistantConfig(platformName, model, credentials);
-        AIAssistant aiAssistant = aiAssistantFactory.createForTest(generalAssistantConfig, toolProvider);
-        try {
-            return aiAssistant.ask("What is the flag of " + TEST_KEY).contains(TEST_FLAG);
-        } catch (Exception e) {
-            throw new ApiException(ApiExceptionEnum.CREDIT_INCORRECT, e.getMessage());
-        }
-    }
-
-    private void switchActivePlatform(Long id) {
-        List<AuthPlatformPO> authPlatformPOS = authPlatformDao.findAll();
-        for (AuthPlatformPO authPlatformPO : authPlatformPOS) {
-            if (!AuthPlatformStatus.available(authPlatformPO.getStatus())) {
-                continue;
-            }
-            if (authPlatformPO.getId().equals(id)) {
-                authPlatformPO.setStatus(AuthPlatformStatus.ACTIVE.getCode());
-            } else {
-                authPlatformPO.setStatus(AuthPlatformStatus.AVAILABLE.getCode());
-            }
-        }
-        authPlatformDao.partialUpdateByIds(authPlatformPOS);
-    }
-
     @Override
     public List<PlatformVO> platforms() {
         List<PlatformPO> platformPOs = platformDao.findAll();
@@ -232,22 +138,6 @@ public class LLMConfigServiceImpl implements LLMConfigService {
         return AuthPlatformConverter.INSTANCE.fromPO2VO(authPlatformPO, platformPO);
     }
 
-    private static @NotNull Map<String, String> getStringMap(AuthPlatformDTO authPlatformDTO, PlatformDTO platformDTO) {
-        if (platformDTO == null) {
-            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
-        }
-        Map<String, String> credentialNeed = platformDTO.getAuthCredentials();
-        Map<String, String> credentialGet = authPlatformDTO.getAuthCredentials();
-        Map<String, String> credentialSet = new HashMap<>();
-        for (String key : credentialNeed.keySet()) {
-            if (!credentialGet.containsKey(key)) {
-                throw new ApiException(ApiExceptionEnum.CREDIT_INCORRECT);
-            }
-            credentialSet.put(key, credentialGet.get(key));
-        }
-        return credentialSet;
-    }
-
     @Override
     public boolean deleteAuthorizedPlatform(Long authId) {
         AuthPlatformPO authPlatformPO = validateAndGetAuthPlatform(authId);
@@ -260,15 +150,7 @@ public class LLMConfigServiceImpl implements LLMConfigService {
         authPlatformDao.partialUpdateById(authPlatformPO);
 
         List<ChatThreadPO> chatThreadPOS = chatThreadDao.findAllByAuthId(authPlatformPO.getId());
-        for (ChatThreadPO chatThreadPO : chatThreadPOS) {
-            chatThreadPO.setIsDeleted(true);
-            chatThreadDao.partialUpdateById(chatThreadPO);
-            List<ChatMessagePO> chatMessagePOS = chatMessageDao.findAllByThreadId(chatThreadPO.getId());
-            for (ChatMessagePO chatMessagePO : chatMessagePOS) {
-                chatMessagePO.setIsDeleted(true);
-                chatMessageDao.partialUpdateById(chatMessagePO);
-            }
-        }
+        softDeleteChatThreads(chatThreadPOS);
 
         return true;
     }
@@ -380,5 +262,131 @@ public class LLMConfigServiceImpl implements LLMConfigService {
         PlatformPO platformPO = validateAndGetPlatform(id);
 
         return PlatformConverter.INSTANCE.fromPO2VO(platformPO);
+    }
+
+    public PlatformPO validateAndGetPlatform(Long platformId) {
+        if (platformId == null) {
+            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
+        }
+
+        PlatformPO platformPO = platformDao.findById(platformId);
+        if (platformPO == null) {
+            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
+        }
+        return platformPO;
+    }
+
+    public AuthPlatformPO validateAndGetAuthPlatform(Long authId) {
+        if (authId == null) {
+            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED);
+        }
+        AuthPlatformPO authPlatformPO = authPlatformDao.findById(authId);
+        if (authPlatformPO == null || authPlatformPO.getIsDeleted()) {
+            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_AUTHORIZED);
+        }
+        return authPlatformPO;
+    }
+
+    private GeneralAssistantConfig getAIAssistantConfig(
+            String platformName, String model, Map<String, String> credentials) {
+        return GeneralAssistantConfig.builder()
+                .setPlatformType(getPlatformType(platformName))
+                .setModel(model)
+                .setLanguage(LocaleContextHolder.getLocale().toString())
+                .addCredentials(credentials)
+                .build();
+    }
+
+    private PlatformType getPlatformType(String platformName) {
+        return PlatformType.getPlatformType(platformName.toLowerCase());
+    }
+
+    private Boolean testAuthorization(String platformName, String model, Map<String, String> credentials) {
+        Boolean result = testFuncCalling(platformName, model, credentials);
+        log.info("Test func calling result: {}", result);
+        GeneralAssistantConfig generalAssistantConfig = getAIAssistantConfig(platformName, model, credentials);
+        AIAssistant aiAssistant = aiAssistantFactory.createForTest(generalAssistantConfig, null);
+        try {
+            return aiAssistant.test();
+        } catch (Exception e) {
+            throw new ApiException(ApiExceptionEnum.CREDIT_INCORRECT, e.getMessage());
+        }
+    }
+
+    private Boolean testFuncCalling(String platformName, String model, Map<String, String> credentials) {
+        ToolProvider toolProvider = (toolProviderRequest) -> {
+            ToolSpecification toolSpecification = ToolSpecification.builder()
+                    .name("getFlag")
+                    .description("Get flag based on key")
+                    .addParameter("key", JsonSchemaProperty.STRING, JsonSchemaProperty.description("Lowercase key"))
+                    .build();
+            ToolExecutor toolExecutor = (toolExecutionRequest, memoryId) -> {
+                Map<String, Object> arguments = JsonUtils.readFromString(toolExecutionRequest.arguments());
+                String key = arguments.get("key").toString();
+                if (key.equals(TEST_KEY)) {
+                    return TEST_FLAG;
+                }
+                return null;
+            };
+
+            return ToolProviderResult.builder()
+                    .add(toolSpecification, toolExecutor)
+                    .build();
+        };
+
+        GeneralAssistantConfig generalAssistantConfig = getAIAssistantConfig(platformName, model, credentials);
+        AIAssistant aiAssistant = aiAssistantFactory.createForTest(generalAssistantConfig, toolProvider);
+        try {
+            return aiAssistant.ask("What is the flag of " + TEST_KEY).contains(TEST_FLAG);
+        } catch (Exception e) {
+            throw new ApiException(ApiExceptionEnum.CREDIT_INCORRECT, e.getMessage());
+        }
+    }
+
+    private void switchActivePlatform(Long id) {
+        List<AuthPlatformPO> authPlatformPOS = authPlatformDao.findAll();
+        for (AuthPlatformPO authPlatformPO : authPlatformPOS) {
+            if (!AuthPlatformStatus.available(authPlatformPO.getStatus())) {
+                continue;
+            }
+            if (authPlatformPO.getId().equals(id)) {
+                authPlatformPO.setStatus(AuthPlatformStatus.ACTIVE.getCode());
+            } else {
+                authPlatformPO.setStatus(AuthPlatformStatus.AVAILABLE.getCode());
+            }
+        }
+        authPlatformDao.partialUpdateByIds(authPlatformPOS);
+    }
+
+    private void softDeleteChatMessages(List<ChatMessagePO> chatMessagePOS) {
+        for (ChatMessagePO chatMessagePO : chatMessagePOS) {
+            chatMessagePO.setIsDeleted(true);
+            chatMessageDao.partialUpdateById(chatMessagePO);
+        }
+    }
+
+    private void softDeleteChatThreads(List<ChatThreadPO> chatThreadPOS) {
+        for (ChatThreadPO chatThreadPO : chatThreadPOS) {
+            chatThreadPO.setIsDeleted(true);
+            chatThreadDao.partialUpdateById(chatThreadPO);
+            List<ChatMessagePO> chatMessagePOS = chatMessageDao.findAllByThreadId(chatThreadPO.getId());
+            softDeleteChatMessages(chatMessagePOS);
+        }
+    }
+
+    private static @NotNull Map<String, String> getStringMap(AuthPlatformDTO authPlatformDTO, PlatformDTO platformDTO) {
+        if (platformDTO == null) {
+            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_FOUND);
+        }
+        Map<String, String> credentialNeed = platformDTO.getAuthCredentials();
+        Map<String, String> credentialGet = authPlatformDTO.getAuthCredentials();
+        Map<String, String> credentialSet = new HashMap<>();
+        for (String key : credentialNeed.keySet()) {
+            if (!credentialGet.containsKey(key)) {
+                throw new ApiException(ApiExceptionEnum.CREDIT_INCORRECT);
+            }
+            credentialSet.put(key, credentialGet.get(key));
+        }
+        return credentialSet;
     }
 }

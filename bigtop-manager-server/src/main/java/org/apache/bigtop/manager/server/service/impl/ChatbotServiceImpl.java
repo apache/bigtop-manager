@@ -80,58 +80,9 @@ public class ChatbotServiceImpl implements ChatbotService {
     @Resource
     private AIAssistantFactory aiAssistantFactory;
 
-    private AuthPlatformPO validateAndGetActiveAuthPlatform() {
-        AuthPlatformPO authPlatform = null;
-        List<AuthPlatformPO> authPlatformPOS = authPlatformDao.findAll();
-        for (AuthPlatformPO authPlatformPO : authPlatformPOS) {
-            if (AuthPlatformStatus.isActive(authPlatformPO.getStatus())) {
-                authPlatform = authPlatformPO;
-            }
-        }
-        if (authPlatform == null || authPlatform.getIsDeleted()) {
-            throw new ApiException(ApiExceptionEnum.NO_PLATFORM_IN_USE);
-        }
-        return authPlatform;
-    }
-
-    private ChatThreadPO validateAndGetChatThread(Long threadId) {
-        ChatThreadPO chatThreadPO = chatThreadDao.findById(threadId);
-        if (chatThreadPO == null || chatThreadPO.getIsDeleted()) {
-            throw new ApiException(ApiExceptionEnum.CHAT_THREAD_NOT_FOUND);
-        }
-        Long userId = SessionUserHolder.getUserId();
-        if (!chatThreadPO.getUserId().equals(userId)) {
-            throw new ApiException(ApiExceptionEnum.PERMISSION_DENIED);
-        }
-        return chatThreadPO;
-    }
-
-    private GeneralAssistantConfig getAIAssistantConfig(
-            String platformName, String model, Map<String, String> credentials, Long id) {
-        return GeneralAssistantConfig.builder()
-                .setPlatformType(getPlatformType(platformName))
-                .setModel(model)
-                .setId(id)
-                .setLanguage(LocaleContextHolder.getLocale().toString())
-                .addCredentials(credentials)
-                .build();
-    }
-
-    private PlatformType getPlatformType(String platformName) {
-        return PlatformType.getPlatformType(platformName.toLowerCase());
-    }
-
-    private AIAssistant buildAIAssistant(
-            String platformName, String model, Map<String, String> credentials, Long threadId, ChatbotCommand command) {
-        return aiAssistantFactory.createAIService(
-                getAIAssistantConfig(platformName, model, credentials, threadId),
-                aiServiceToolsProvider.getToolsProvide(command));
-    }
-
     @Override
     public ChatThreadVO createChatThread(ChatThreadDTO chatThreadDTO) {
         AuthPlatformPO authPlatformPO = validateAndGetActiveAuthPlatform();
-
         PlatformPO platformPO = platformDao.findById(authPlatformPO.getPlatformId());
 
         chatThreadDTO.setPlatformId(platformPO.getId());
@@ -140,6 +91,7 @@ public class ChatbotServiceImpl implements ChatbotService {
         ChatThreadPO chatThreadPO = ChatThreadConverter.INSTANCE.fromDTO2PO(chatThreadDTO);
         chatThreadPO.setUserId(SessionUserHolder.getUserId());
         chatThreadDao.save(chatThreadPO);
+
         return ChatThreadConverter.INSTANCE.fromPO2VO(chatThreadPO, authPlatformPO, platformPO);
     }
 
@@ -173,48 +125,6 @@ public class ChatbotServiceImpl implements ChatbotService {
             chatThreads.add(chatThreadVO);
         }
         return chatThreads;
-    }
-
-    private AIAssistant prepareTalk(Long threadId, ChatbotCommand command) {
-        ChatThreadPO chatThreadPO = validateAndGetChatThread(threadId);
-        AuthPlatformPO authPlatformPO = validateAndGetActiveAuthPlatform();
-
-        if (!authPlatformPO.getId().equals(chatThreadPO.getAuthId())) {
-            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_IN_USE);
-        }
-
-        AuthPlatformDTO authPlatformDTO = AuthPlatformConverter.INSTANCE.fromPO2DTO(authPlatformPO);
-
-        PlatformPO platformPO = platformDao.findById(authPlatformPO.getPlatformId());
-        return buildAIAssistant(
-                platformPO.getName(),
-                authPlatformDTO.getModel(),
-                authPlatformDTO.getAuthCredentials(),
-                threadId,
-                command);
-    }
-
-    private void sendTalkVO(SseEmitter emitter, String content, String finishReason) {
-        try {
-            TalkVO talkVO = new TalkVO();
-            talkVO.setContent(content);
-            talkVO.setFinishReason(finishReason);
-            emitter.send(talkVO);
-        } catch (Exception e) {
-            log.error("Error sending data to SseEmitter", e);
-            emitter.completeWithError(e);
-        }
-    }
-
-    private void handleError(SseEmitter emitter, Throwable throwable) {
-        log.error("Error during SSE streaming: {}", throwable.getMessage(), throwable);
-        sendTalkVO(emitter, null, "Error: " + throwable.getMessage());
-        emitter.completeWithError(throwable);
-    }
-
-    private void completeEmitter(SseEmitter emitter) {
-        sendTalkVO(emitter, null, "completed");
-        emitter.complete();
     }
 
     @Override
@@ -279,5 +189,95 @@ public class ChatbotServiceImpl implements ChatbotService {
         AuthPlatformPO authPlatformPO = authPlatformDao.findById(chatThreadPO.getAuthId());
         return ChatThreadConverter.INSTANCE.fromPO2VO(
                 chatThreadPO, authPlatformPO, platformDao.findById(authPlatformPO.getPlatformId()));
+    }
+
+    private AuthPlatformPO validateAndGetActiveAuthPlatform() {
+        AuthPlatformPO authPlatform = null;
+        List<AuthPlatformPO> authPlatformPOS = authPlatformDao.findAll();
+        for (AuthPlatformPO authPlatformPO : authPlatformPOS) {
+            if (AuthPlatformStatus.isActive(authPlatformPO.getStatus())) {
+                authPlatform = authPlatformPO;
+            }
+        }
+        if (authPlatform == null || authPlatform.getIsDeleted()) {
+            throw new ApiException(ApiExceptionEnum.NO_PLATFORM_IN_USE);
+        }
+        return authPlatform;
+    }
+
+    private ChatThreadPO validateAndGetChatThread(Long threadId) {
+        ChatThreadPO chatThreadPO = chatThreadDao.findById(threadId);
+        if (chatThreadPO == null || chatThreadPO.getIsDeleted()) {
+            throw new ApiException(ApiExceptionEnum.CHAT_THREAD_NOT_FOUND);
+        }
+        Long userId = SessionUserHolder.getUserId();
+        if (!chatThreadPO.getUserId().equals(userId)) {
+            throw new ApiException(ApiExceptionEnum.PERMISSION_DENIED);
+        }
+        return chatThreadPO;
+    }
+
+    private GeneralAssistantConfig getAIAssistantConfig(
+            String platformName, String model, Map<String, String> credentials, Long id) {
+        return GeneralAssistantConfig.builder()
+                .setPlatformType(getPlatformType(platformName))
+                .setModel(model)
+                .setId(id)
+                .setLanguage(LocaleContextHolder.getLocale().toString())
+                .addCredentials(credentials)
+                .build();
+    }
+
+    private PlatformType getPlatformType(String platformName) {
+        return PlatformType.getPlatformType(platformName.toLowerCase());
+    }
+
+    private AIAssistant buildAIAssistant(
+            String platformName, String model, Map<String, String> credentials, Long threadId, ChatbotCommand command) {
+        return aiAssistantFactory.createAIService(
+                getAIAssistantConfig(platformName, model, credentials, threadId),
+                aiServiceToolsProvider.getToolsProvide(command));
+    }
+
+    private AIAssistant prepareTalk(Long threadId, ChatbotCommand command) {
+        ChatThreadPO chatThreadPO = validateAndGetChatThread(threadId);
+        AuthPlatformPO authPlatformPO = validateAndGetActiveAuthPlatform();
+
+        if (!authPlatformPO.getId().equals(chatThreadPO.getAuthId())) {
+            throw new ApiException(ApiExceptionEnum.PLATFORM_NOT_IN_USE);
+        }
+
+        AuthPlatformDTO authPlatformDTO = AuthPlatformConverter.INSTANCE.fromPO2DTO(authPlatformPO);
+        PlatformPO platformPO = platformDao.findById(authPlatformPO.getPlatformId());
+
+        return buildAIAssistant(
+                platformPO.getName(),
+                authPlatformDTO.getModel(),
+                authPlatformDTO.getAuthCredentials(),
+                threadId,
+                command);
+    }
+
+    private void sendTalkVO(SseEmitter emitter, String content, String finishReason) {
+        try {
+            TalkVO talkVO = new TalkVO();
+            talkVO.setContent(content);
+            talkVO.setFinishReason(finishReason);
+            emitter.send(talkVO);
+        } catch (Exception e) {
+            log.error("Error sending data to SseEmitter", e);
+            emitter.completeWithError(e);
+        }
+    }
+
+    private void handleError(SseEmitter emitter, Throwable throwable) {
+        log.error("Error during SSE streaming: {}", throwable.getMessage(), throwable);
+        sendTalkVO(emitter, null, "Error: " + throwable.getMessage());
+        emitter.completeWithError(throwable);
+    }
+
+    private void completeEmitter(SseEmitter emitter) {
+        sendTalkVO(emitter, null, "completed");
+        emitter.complete();
     }
 }
