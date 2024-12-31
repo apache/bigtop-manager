@@ -21,9 +21,9 @@ import type { Component } from '@/api/component/types'
 import type { PageVO } from '@/api/types'
 
 export type ServiceList = PageVO<Service>
-export type CommonReq = { clusterId: number; id: number }
+export type ServiceParams = { clusterId: number; id: number }
 export type SnapshotData = { desc?: string; name?: string }
-export type SnapshotRecovery = CommonReq & { snapshotId: string }
+export type SnapshotRecovery = ServiceParams & { snapshotId: string }
 
 export interface Service {
   components?: Component[]

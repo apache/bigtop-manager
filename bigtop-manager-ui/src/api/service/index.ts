@@ -19,7 +19,7 @@
 
 import { del, get, post } from '@/api/request-util'
 import type {
-  CommonReq,
+  ServiceParams,
   Service,
   ServiceConfig,
   ServiceConfigSnapshot,
@@ -32,23 +32,23 @@ export const getServiceList = (clusterId: number) => {
   return get<ServiceList>(`/clusters/${clusterId}/services`)
 }
 
-export const getService = (params: CommonReq) => {
+export const getService = (params: ServiceParams) => {
   return get<Service>(`/clusters/${params.clusterId}/services/${params.id}`)
 }
 
-export const getServiceConfigs = (params: CommonReq) => {
+export const getServiceConfigs = (params: ServiceParams) => {
   return get<ServiceConfig[]>(`/clusters/${params.clusterId}/services/${params.id}/configs`)
 }
 
-export const updateServiceConfigs = (params: CommonReq, data: ServiceConfig) => {
+export const updateServiceConfigs = (params: ServiceParams, data: ServiceConfig) => {
   return post<ServiceConfig[]>(`/clusters/${params.clusterId}/services/${params.id}/configs,`, data)
 }
 
-export const getServiceConfigSnapshotsList = (params: CommonReq) => {
+export const getServiceConfigSnapshotsList = (params: ServiceParams) => {
   return get<ServiceConfigSnapshot[]>(`/clusters/${params.clusterId}/services/${params.id}/config-snapshots`)
 }
 
-export const takeServiceConfigSnapshot = (params: CommonReq, data: SnapshotData) => {
+export const takeServiceConfigSnapshot = (params: ServiceParams, data: SnapshotData) => {
   return post<ServiceConfigSnapshot>(`/clusters/${params.clusterId}/services/${params.id}/config-snapshots,`, data)
 }
 
