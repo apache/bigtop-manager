@@ -18,9 +18,9 @@
  */
 package org.apache.bigtop.manager.server.model.dto.command;
 
-import lombok.Data;
+import org.apache.bigtop.manager.server.model.dto.HostDTO;
 
-import java.util.List;
+import lombok.Data;
 
 @Data
 public class ClusterCommandDTO {
@@ -37,5 +37,5 @@ public class ClusterCommandDTO {
 
     private String rootDir;
 
-    private List<Long> hostIds;
+    private HostDTO hosts;
 }

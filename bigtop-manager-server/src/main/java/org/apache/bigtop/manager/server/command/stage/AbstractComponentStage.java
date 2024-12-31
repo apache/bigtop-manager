@@ -23,7 +23,6 @@ import org.apache.bigtop.manager.dao.repository.ClusterDao;
 import org.apache.bigtop.manager.server.command.task.TaskContext;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
-import org.apache.bigtop.manager.server.model.dto.HostDTO;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 
 import java.util.HashMap;
@@ -61,12 +60,12 @@ public abstract class AbstractComponentStage extends AbstractStage {
         return stageContext.getComponentDTO().getName();
     }
 
-    protected TaskContext createTaskContext(HostDTO hostDTO) {
+    protected TaskContext createTaskContext(String hostname) {
         ServiceDTO serviceDTO = stageContext.getServiceDTO();
         ComponentDTO componentDTO = stageContext.getComponentDTO();
 
         TaskContext taskContext = new TaskContext();
-        taskContext.setHostDTO(hostDTO);
+        taskContext.setHostname(hostname);
         taskContext.setClusterId(clusterPO.getId());
         taskContext.setClusterName(clusterPO.getName());
         taskContext.setServiceName(serviceDTO.getName());

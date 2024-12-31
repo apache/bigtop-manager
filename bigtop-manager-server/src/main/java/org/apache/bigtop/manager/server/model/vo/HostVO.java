@@ -27,6 +27,8 @@ public class HostVO {
 
     private String hostname;
 
+    private String agentDir;
+
     private String sshUser;
 
     private Integer sshPort;

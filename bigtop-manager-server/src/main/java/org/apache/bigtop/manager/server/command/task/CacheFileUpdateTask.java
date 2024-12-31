@@ -101,7 +101,7 @@ public class CacheFileUpdateTask extends AbstractTask {
     @SuppressWarnings("unchecked")
     private void genFullCaches() {
         Long clusterId = taskContext.getClusterId();
-        List<Long> hostIds = (List<Long>) taskContext.getProperties().get("hostIds");
+        List<String> hostnames = (List<String>) taskContext.getProperties().get("hostnames");
         ClusterPO clusterPO = clusterDao.findById(clusterId);
 
         ComponentQuery componentQuery =
@@ -110,7 +110,7 @@ public class CacheFileUpdateTask extends AbstractTask {
         List<ServiceConfigPO> serviceConfigPOList = serviceConfigDao.findByClusterId(clusterPO.getId());
         List<ComponentPO> componentPOList = componentDao.findByQuery(componentQuery);
         List<RepoPO> repoPOList = repoDao.findAll();
-        List<HostPO> hostPOList = hostDao.findByIds(hostIds);
+        List<HostPO> hostPOList = hostDao.findAllByHostnames(hostnames);
 
         clusterInfo = new ClusterInfo();
         clusterInfo.setName(clusterPO.getName());
@@ -165,10 +165,10 @@ public class CacheFileUpdateTask extends AbstractTask {
 
     @SuppressWarnings("unchecked")
     private void genEmptyCaches() {
-        List<Long> hostIds = (List<Long>) taskContext.getProperties().get("hostIds");
+        List<String> hostnames = (List<String>) taskContext.getProperties().get("hostnames");
 
         List<RepoPO> repoPOList = repoDao.findAll();
-        List<HostPO> hostPOList = hostDao.findByIds(hostIds);
+        List<HostPO> hostPOList = hostDao.findAllByHostnames(hostnames);
 
         componentInfoMap = new HashMap<>();
         serviceConfigMap = new HashMap<>();
@@ -224,6 +224,6 @@ public class CacheFileUpdateTask extends AbstractTask {
 
     @Override
     public String getName() {
-        return "Update cache files on " + taskContext.getHostDTO().getHostname();
+        return "Update cache files on " + taskContext.getHostname();
     }
 }
