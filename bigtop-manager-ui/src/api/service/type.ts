@@ -17,21 +17,51 @@
  * under the License.
  */
 
-export interface Component {
-  cardinality?: string
-  category?: string
+import type { Component } from '@/api/component/types'
+import type { PageVO } from '@/api/types'
+
+export type ServiceList = PageVO<Service>
+export type CommonReq = { clusterId: number; id: number }
+export type SnapshotData = { desc?: string; name?: string }
+export type SnapshotRecovery = CommonReq & { snapshotId: string }
+
+export interface Service {
+  components?: Component[]
+  configs?: ServiceConfig[]
+  desc?: string
   displayName?: string
-  hostname?: string
   id?: number
   name?: string
-  quickLink?: QuickLinkVO
-  serviceDisplayName?: string
-  serviceId?: number
-  serviceName?: string
+  requiredServices?: string[]
+  restartFlag?: boolean
   stack?: string
   status?: number
+  user?: string
+  version?: string
 }
-export interface QuickLinkVO {
+
+export interface ServiceConfig {
+  id?: number
+  name?: string
+  properties?: Property[]
+}
+
+export interface Property {
+  attrs?: Attr
+  desc?: string
   displayName?: string
-  url?: string
+  name: string
+  value?: string
+}
+
+export interface Attr {
+  type?: string
+}
+
+export interface ServiceConfigSnapshot {
+  configJson?: string
+  desc?: string
+  id?: number
+  name?: string
+  [property: string]: any
 }

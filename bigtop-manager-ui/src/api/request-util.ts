@@ -24,7 +24,7 @@ const get = <T>(url: string, config?: AxiosRequestConfig): Promise<ResponseEntit
   return request.get(url, config)
 }
 
-const post = <T, U = any>(url: string, data: U, config?: AxiosRequestConfig): Promise<ResponseEntity<T>> => {
+const post = <T, U = any>(url: string, data?: U, config?: AxiosRequestConfig): Promise<ResponseEntity<T>> => {
   return request.post(url, data, config)
 }
 

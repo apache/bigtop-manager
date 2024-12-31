@@ -17,40 +17,36 @@
  * under the License.
  */
 
-import { State } from '@/enums/state'
+import type { PageVO } from '@/api/types'
 
-export type StateType = keyof typeof State
+export type JobList = PageVO<Job>
+export type StageList = PageVO<Stage>
+export type JobParams = { clusterId: number; jobId: number }
+export type TaskParams = JobParams & { stageId: number }
+export type TaskLogParams = TaskParams & { taskId: number }
 
-interface BaseVO {
-  id: number
-  name: string
-  state: StateType
+export interface Job {
   createTime?: string
+  id?: number
+  name?: string
+  state?: string
   updateTime?: string
-  progress?: number
 }
 
-export interface JobVO extends BaseVO {
-  stages: StageVO[]
+export interface Stage {
+  createTime?: string
+  id?: number
+  name?: string
+  order?: number
+  state?: string
+  tasks?: Task[]
+  updateTime?: string
 }
-
-export interface StageVO extends BaseVO {
-  order: number
-  tasks: TaskVO[]
-}
-
-export interface TaskVO extends BaseVO {
-  hostname: string
-}
-
-export interface Pagination {
-  pageNum: number
-  pageSize: number
-  sort?: 'asc' | 'desc'
-  orderBy?: string
-}
-
-export interface OuterData {
-  meta: JobVO[]
-  currItem: StageVO | TaskVO | undefined
+export interface Task {
+  createTime?: string
+  hostname?: string
+  id?: number
+  name?: string
+  state?: string
+  updateTime?: string
 }

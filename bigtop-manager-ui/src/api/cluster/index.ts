@@ -18,7 +18,7 @@
  */
 
 import { get, put } from '@/api/request-util'
-import type { ClusterVO, ServiceConfigVO, UpdateClusterParam } from './types'
+import type { ClusterVO, UpdateClusterParam } from './types'
 
 export const getCluster = (id: number) => {
   return get<ClusterVO>(`/clusters/${id}`)
@@ -30,8 +30,4 @@ export const updateCluster = (id: number, data: UpdateClusterParam) => {
 
 export const getClusterList = () => {
   return get<ClusterVO[]>('/clusters')
-}
-
-export const getServicesOfCluster = (param: { clusterId: number; id: number }) => {
-  return get<ServiceConfigVO[]>(`/clusters/${param.clusterId}/services/${param.id}/configs`)
 }

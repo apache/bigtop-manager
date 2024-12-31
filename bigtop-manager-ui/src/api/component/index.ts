@@ -16,13 +16,3 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import { HostComponentVO } from '@/api/component/types.ts'
-import request from '@/api/request.ts'
-
-export const getHostComponents = (clusterId: number): Promise<HostComponentVO[]> => {
-  return request({
-    method: 'get',
-    url: '/clusters/' + clusterId + '/host-components'
-  })
-}

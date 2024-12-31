@@ -16,28 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+import { get, post } from '@/api/request-util'
+import type { JobParams, Job, JobList, Stage, Task, TaskLogParams, TaskParams } from './types'
 
-import request from '@/api/request.ts'
-import { JobVO, Pagination } from '@/api/job/types.ts'
-
-export const getJob = (id: number, clusterId: number): Promise<JobVO> => {
-  return request({
-    method: 'get',
-    url: '/clusters/' + clusterId + '/jobs/' + id
-  })
+export const getJobList = (clusterId: number) => {
+  return get<JobList>(`/clusters/${clusterId}/jobs`)
 }
 
-export const retryJob = (id: number, clusterId: number): Promise<JobVO> => {
-  return request({
-    method: 'post',
-    url: '/clusters/' + clusterId + '/jobs/' + id + '/retry'
-  })
+export const retryJob = (params: JobParams) => {
+  return post<Job[]>(`/clusters/${params.clusterId}/jobs/${params.jobId}/retry`)
 }
 
-export const getJobs = (clusterId: number, pagination: Pagination): Promise<{ content: JobVO[]; total: number }> => {
-  return request({
-    method: 'get',
-    url: `/clusters/${clusterId}/jobs`,
-    params: pagination
-  })
+export const getStageList = (params: JobParams) => {
+  return get<Stage[]>(`/clusters/${params.clusterId}/jobs/${params.jobId}/stages`)
+}
+
+export const getTaskList = (params: TaskParams) => {
+  return get<Task[]>(`/clusters/${params.clusterId}/jobs/${params.jobId}/stages/${params.stageId}/tasks`)
+}
+
+export const getTaskLog = (params: TaskLogParams) => {
+  return get<string[]>(
+    `/clusters/${params.clusterId}/jobs/${params.jobId}/stages/${params.stageId}/tasks/${params.taskId}/log`
+  )
 }

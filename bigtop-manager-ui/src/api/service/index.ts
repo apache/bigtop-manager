@@ -17,12 +17,46 @@
  * under the License.
  */
 
-import request from '@/api/request.ts'
-import { ServiceVO } from '@/api/service/types.ts'
+import { del, get, post } from '@/api/request-util'
+import type {
+  CommonReq,
+  Service,
+  ServiceConfig,
+  ServiceConfigSnapshot,
+  ServiceList,
+  SnapshotData,
+  SnapshotRecovery
+} from './type'
 
-export const getService = (clusterId: number): Promise<ServiceVO[]> => {
-  return request({
-    method: 'get',
-    url: '/clusters/' + clusterId + '/services'
-  })
+export const getServiceList = (clusterId: number) => {
+  return get<ServiceList>(`/clusters/${clusterId}/services`)
+}
+
+export const getService = (params: CommonReq) => {
+  return get<Service>(`/clusters/${params.clusterId}/services/${params.id}`)
+}
+
+export const getServiceConfigs = (params: CommonReq) => {
+  return get<ServiceConfig[]>(`/clusters/${params.clusterId}/services/${params.id}/configs`)
+}
+
+export const updateServiceConfigs = (params: CommonReq, data: ServiceConfig) => {
+  return post<ServiceConfig[]>(`/clusters/${params.clusterId}/services/${params.id}/configs,`, data)
+}
+
+export const getServiceConfigSnapshotsList = (params: CommonReq) => {
+  return get<ServiceConfigSnapshot[]>(`/clusters/${params.clusterId}/services/${params.id}/config-snapshots`)
+}
+
+export const takeServiceConfigSnapshot = (params: CommonReq, data: SnapshotData) => {
+  return post<ServiceConfigSnapshot>(`/clusters/${params.clusterId}/services/${params.id}/config-snapshots,`, data)
+}
+
+export const recoveryServiceConfigSnapshot = (params: SnapshotRecovery) => {
+  return post<ServiceConfig[]>(
+    `/clusters/${params.clusterId}/services/${params.id}/config-snapshots/${params.snapshotId}`
+  )
+}
+export const deleteServiceConfigSnapshot = (params: SnapshotRecovery) => {
+  return del<boolean>(`/clusters/${params.clusterId}/services/${params.id}/config-snapshots/${params.snapshotId}`)
 }
