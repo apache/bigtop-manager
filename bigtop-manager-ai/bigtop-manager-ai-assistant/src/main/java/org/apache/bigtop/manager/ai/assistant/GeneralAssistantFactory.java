@@ -18,74 +18,89 @@
  */
 package org.apache.bigtop.manager.ai.assistant;
 
+import org.apache.bigtop.manager.ai.assistant.config.GeneralAssistantConfig;
+import org.apache.bigtop.manager.ai.assistant.provider.ChatMemoryStoreProvider;
 import org.apache.bigtop.manager.ai.assistant.provider.LocSystemPromptProvider;
-import org.apache.bigtop.manager.ai.assistant.store.ChatMemoryStoreProvider;
 import org.apache.bigtop.manager.ai.core.AbstractAIAssistantFactory;
+import org.apache.bigtop.manager.ai.core.config.AIAssistantConfig;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.enums.SystemPrompt;
+import org.apache.bigtop.manager.ai.core.exception.AssistantConfigNotSetException;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
-import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
 import org.apache.bigtop.manager.ai.core.provider.SystemPromptProvider;
 import org.apache.bigtop.manager.ai.dashscope.DashScopeAssistant;
 import org.apache.bigtop.manager.ai.openai.OpenAIAssistant;
 import org.apache.bigtop.manager.ai.qianfan.QianFanAssistant;
 
-import dev.langchain4j.service.tool.ToolProvider;
-import dev.langchain4j.store.memory.chat.InMemoryChatMemoryStore;
+import org.springframework.stereotype.Component;
 
+import dev.langchain4j.service.tool.ToolProvider;
+
+import jakarta.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
 
-    private final SystemPromptProvider systemPromptProvider;
-    private final ChatMemoryStoreProvider chatMemoryStoreProvider;
+    @Resource
+    private SystemPromptProvider systemPromptProvider;
 
-    public GeneralAssistantFactory(ChatMemoryStoreProvider chatMemoryStoreProvider) {
-        this(new LocSystemPromptProvider(), chatMemoryStoreProvider);
+    @Resource
+    private ChatMemoryStoreProvider chatMemoryStoreProvider;
+
+    private void configureSystemPrompt(AIAssistant.Builder builder, SystemPrompt systemPrompt, String locale) {
+        LocSystemPromptProvider locSystemPromptProvider = (LocSystemPromptProvider) systemPromptProvider;
+        List<String> systemPrompts = new ArrayList<>();
+        if (systemPrompt != null) {
+            systemPrompts.add(locSystemPromptProvider.getSystemMessage(systemPrompt));
+        }
+        if (locale != null) {
+            systemPrompts.add(locSystemPromptProvider.getLanguagePrompt(locale));
+        }
+        builder.withSystemPrompt(locSystemPromptProvider.getSystemMessages(systemPrompts));
     }
 
-    public GeneralAssistantFactory(
-            SystemPromptProvider systemPromptProvider, ChatMemoryStoreProvider chatMemoryStoreProvider) {
-        this.systemPromptProvider = systemPromptProvider;
-        this.chatMemoryStoreProvider = chatMemoryStoreProvider;
+    private AIAssistant.Builder initializeBuilder(PlatformType platformType) {
+        return switch (platformType) {
+            case OPENAI -> OpenAIAssistant.builder();
+            case DASH_SCOPE -> DashScopeAssistant.builder();
+            case QIANFAN -> QianFanAssistant.builder();
+        };
     }
 
     @Override
     public AIAssistant createWithPrompt(
-            PlatformType platformType,
-            AIAssistantConfigProvider assistantConfig,
-            Object id,
-            ToolProvider toolProvider,
-            SystemPrompt systemPrompt) {
-        AIAssistant.Builder builder =
-                switch (platformType) {
-                    case OPENAI -> OpenAIAssistant.builder();
-                    case DASH_SCOPE -> DashScopeAssistant.builder();
-                    case QIANFAN -> QianFanAssistant.builder();
-                };
-        builder = builder.id(id)
-                .memoryStore(
-                        (id == null)
-                                ? new InMemoryChatMemoryStore()
-                                : chatMemoryStoreProvider.createPersistentChatMemoryStore())
-                .withConfigProvider(assistantConfig)
-                .withToolProvider(toolProvider);
-
-        List<String> systemPrompts = new java.util.ArrayList<>();
-        systemPrompts.add(systemPromptProvider.getSystemMessage(systemPrompt));
-        String locale = assistantConfig.getLanguage();
-        if (locale != null) {
-            systemPrompts.add(systemPromptProvider.getLanguagePrompt(locale));
+            AIAssistantConfig config, ToolProvider toolProvider, SystemPrompt systemPrompt) {
+        GeneralAssistantConfig generalAssistantConfig = (GeneralAssistantConfig) config;
+        PlatformType platformType = generalAssistantConfig.getPlatformType();
+        Object id = generalAssistantConfig.getId();
+        if (id == null) {
+            throw new AssistantConfigNotSetException("ID");
         }
 
-        builder.withSystemPrompt(systemPromptProvider.getSystemMessages(systemPrompts));
+        AIAssistant.Builder builder = initializeBuilder(platformType);
+        builder.id(id)
+                .memoryStore(chatMemoryStoreProvider.createPersistentChatMemoryStore())
+                .withConfigProvider(generalAssistantConfig)
+                .withToolProvider(toolProvider);
+
+        configureSystemPrompt(builder, systemPrompt, generalAssistantConfig.getLanguage());
 
         return builder.build();
     }
 
     @Override
-    public AIAssistant createAiService(
-            PlatformType platformType, AIAssistantConfigProvider assistantConfig, Long id, ToolProvider toolProvider) {
-        return createWithPrompt(platformType, assistantConfig, id, toolProvider, SystemPrompt.DEFAULT_PROMPT);
+    public AIAssistant createForTest(AIAssistantConfig config, ToolProvider toolProvider) {
+        GeneralAssistantConfig generalAssistantConfig = (GeneralAssistantConfig) config;
+        PlatformType platformType = generalAssistantConfig.getPlatformType();
+        AIAssistant.Builder builder = initializeBuilder(platformType);
+
+        builder.id(null)
+                .memoryStore(chatMemoryStoreProvider.createInMemoryChatMemoryStore())
+                .withConfigProvider(generalAssistantConfig)
+                .withToolProvider(toolProvider);
+
+        return builder.build();
     }
 }

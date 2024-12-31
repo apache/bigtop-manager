@@ -29,7 +29,5 @@ public interface SystemPromptProvider {
     // return default system prompt
     String getSystemMessage();
 
-    String getLanguagePrompt(String locale);
-
     String getSystemMessages(List<String> systemPrompts);
 }
