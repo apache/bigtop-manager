@@ -26,6 +26,7 @@ import lombok.Data;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 
 @Data
 public class ClusterCommandReq {
@@ -52,5 +53,5 @@ public class ClusterCommandReq {
 
     @NotEmpty(groups = {CommandGroupSequenceProvider.ClusterCommandGroup.class})
     @Schema(description = "Hosts info for this cluster")
-    private HostReq hosts;
+    private List<HostReq> hosts;
 }
