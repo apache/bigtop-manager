@@ -20,7 +20,6 @@ package org.apache.bigtop.manager.server.command.job;
 
 import org.apache.bigtop.manager.common.constants.ComponentCategories;
 import org.apache.bigtop.manager.common.enums.Command;
-import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.query.ComponentQuery;
 import org.apache.bigtop.manager.dao.repository.ComponentDao;
@@ -147,7 +146,7 @@ public abstract class AbstractServiceJob extends AbstractJob {
     }
 
     protected void createCacheStage() {
-        StageContext stageContext = StageContext.fromPayload(JsonUtils.writeAsString(jobContext.getCommandDTO()));
+        StageContext stageContext = StageContext.fromCommandDTO(jobContext.getCommandDTO());
         stages.add(new CacheFileUpdateStage(stageContext));
     }
 

@@ -20,13 +20,11 @@ package org.apache.bigtop.manager.dao.po;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.io.Serializable;
-import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -60,7 +58,4 @@ public class StagePO extends BasePO implements Serializable {
 
     @Column(name = "job_id", nullable = false)
     private Long jobId;
-
-    @ToString.Exclude
-    private List<TaskPO> tasks;
 }
