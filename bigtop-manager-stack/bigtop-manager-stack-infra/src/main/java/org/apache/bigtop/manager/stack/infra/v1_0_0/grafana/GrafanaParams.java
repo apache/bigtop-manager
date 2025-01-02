@@ -73,7 +73,7 @@ public class GrafanaParams extends InfraParams {
         return MessageFormat.format("{0}/datasources", provisioningDir());
     }
 
-    public String dataSourceFile() {
+    public String prometheusDataSourceFile() {
         return MessageFormat.format("{0}/prometheus.yaml", dataSourceDir());
     }
 
@@ -95,17 +95,18 @@ public class GrafanaParams extends InfraParams {
 
     @GlobalParams
     public Map<String, Object> prometheus() {
+        Map<String, Object> configuration = LocalSettings.configurations(getServiceName(), "grafana-datasources");
         List<String> prometheusServers = LocalSettings.hosts().get("prometheus_server");
         if (prometheusServers == null || prometheusServers.isEmpty()) {
-            return null;
+            return configuration;
         }
         prometheusServer = prometheusServers.get(0);
 
-        Map<String, Object> configuration = LocalSettings.configurations("prometheus", "prometheus");
-        if (configuration == null) {
-            return null;
+        Map<String, Object> prometheus_configuration = LocalSettings.configurations("prometheus", "prometheus");
+        if (prometheus_configuration == null) {
+            return configuration;
         }
-        prometheusPort = (String) configuration.get("port");
+        prometheusPort = (String) prometheus_configuration.get("port");
         return configuration;
     }
 

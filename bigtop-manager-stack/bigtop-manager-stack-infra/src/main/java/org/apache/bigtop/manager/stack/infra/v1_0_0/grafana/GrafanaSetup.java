@@ -49,13 +49,15 @@ public class GrafanaSetup {
                 Constants.PERMISSION_644,
                 grafanaParams.getGlobalParamsMap());
 
-        LinuxFileUtils.toFileByTemplate(
-                grafanaParams.getDataSourceContent(),
-                grafanaParams.dataSourceFile(),
-                user,
-                group,
-                Constants.PERMISSION_644,
-                grafanaParams.getGlobalParamsMap());
+        if (grafanaParams.getPrometheusServer() != null) {
+            LinuxFileUtils.toFileByTemplate(
+                    grafanaParams.getDataSourceContent(),
+                    grafanaParams.prometheusDataSourceFile(),
+                    user,
+                    group,
+                    Constants.PERMISSION_644,
+                    grafanaParams.getGlobalParamsMap());
+        }
 
         return ShellResult.success("Grafana Configure success!");
     }
