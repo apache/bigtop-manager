@@ -72,6 +72,7 @@ public class LocSystemPromptProvider implements SystemPromptProvider {
         return Objects.requireNonNullElse(text, "You are a helpful assistant.");
     }
 
+    @Override
     public String getLanguagePrompt(String locale) {
         final String filePath = SystemPrompt.LANGUAGE_PROMPT.getValue() + '-' + locale + ".st";
         String text = loadTextFromFile(filePath);
