@@ -33,6 +33,7 @@ datasources:
     url: ${prometheus_url}
     isDefault: true
     editable: true
+    uid: uid4prometheus
 </#if>
 ]]>
         </value>

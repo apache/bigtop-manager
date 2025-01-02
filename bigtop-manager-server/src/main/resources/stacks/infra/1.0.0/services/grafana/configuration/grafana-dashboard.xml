@@ -80,7 +80,7 @@ providers:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "de87ha979wzcwf"
+            "uid": "uid4prometheus"
           },
           "fieldConfig": {
             "defaults": {
