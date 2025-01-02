@@ -43,7 +43,7 @@ public class GrafanaSetup {
 
         LinuxFileUtils.toFileByTemplate(
                 grafanaParams.getGrafanaContent(),
-                MessageFormat.format("{0}/grafana.yml", grafanaParams.confDir()),
+                MessageFormat.format("{0}/grafana.ini", grafanaParams.confDir()),
                 user,
                 group,
                 Constants.PERMISSION_644,
