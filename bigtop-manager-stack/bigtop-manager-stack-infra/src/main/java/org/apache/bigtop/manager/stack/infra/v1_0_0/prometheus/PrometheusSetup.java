@@ -20,6 +20,7 @@ package org.apache.bigtop.manager.stack.infra.v1_0_0.prometheus;
 
 import org.apache.bigtop.manager.common.constants.Constants;
 import org.apache.bigtop.manager.common.shell.ShellResult;
+import org.apache.bigtop.manager.stack.core.enums.ConfigType;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.utils.linux.LinuxFileUtils;
 
@@ -27,17 +28,53 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PrometheusSetup {
 
+    @SuppressWarnings("unchecked")
     public static ShellResult config(Params params) {
         PrometheusParams prometheusParams = (PrometheusParams) params;
         String user = prometheusParams.user();
         String group = prometheusParams.group();
 
         LinuxFileUtils.createDirectories(prometheusParams.dataDir(), user, group, Constants.PERMISSION_755, true);
+        LinuxFileUtils.createDirectories(prometheusParams.confDir(), user, group, Constants.PERMISSION_755, true);
 
+        LinuxFileUtils.toFileByTemplate(
+                prometheusParams.getPrometheusContent(),
+                MessageFormat.format("{0}/prometheus.yml", prometheusParams.confDir()),
+                user,
+                group,
+                Constants.PERMISSION_644,
+                prometheusParams.getGlobalParamsMap());
+
+        LinuxFileUtils.toFileByTemplate(
+                prometheusParams.getPrometheusRulesFileContent(),
+                MessageFormat.format(
+                        "{0}/{1}", prometheusParams.confDir(), prometheusParams.getPrometheusRulesFilename()),
+                user,
+                group,
+                Constants.PERMISSION_644,
+                prometheusParams.getGlobalParamsMap());
+
+        for (int i = 0; i < prometheusParams.getScrapeJobs().size(); i++) {
+            Map<String, Object> job = prometheusParams.getScrapeJobs().get(i);
+            Map<String, List<String>> targets = new HashMap<>();
+            targets.put("targets", (List<String>) job.get("targets_list"));
+            LinuxFileUtils.toFile(
+                    ConfigType.JSON,
+                    (String) job.get("targets_file"),
+                    user,
+                    group,
+                    Constants.PERMISSION_644,
+                    List.of(targets));
+        }
         return ShellResult.success("Prometheus Configure success!");
     }
 }

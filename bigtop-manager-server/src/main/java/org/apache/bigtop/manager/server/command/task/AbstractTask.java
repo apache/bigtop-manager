@@ -23,6 +23,7 @@ import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.enums.JobState;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.TaskPO;
+import org.apache.bigtop.manager.dao.repository.HostDao;
 import org.apache.bigtop.manager.dao.repository.TaskDao;
 import org.apache.bigtop.manager.grpc.generated.CommandReply;
 import org.apache.bigtop.manager.grpc.generated.CommandRequest;
@@ -30,12 +31,15 @@ import org.apache.bigtop.manager.grpc.generated.CommandServiceGrpc;
 import org.apache.bigtop.manager.grpc.utils.ProtobufUtil;
 import org.apache.bigtop.manager.server.grpc.GrpcClient;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
+import org.apache.bigtop.manager.server.model.converter.HostConverter;
 import org.apache.bigtop.manager.server.model.dto.HostDTO;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public abstract class AbstractTask implements Task {
+
+    protected HostDao hostDao;
 
     protected TaskDao taskDao;
 
@@ -55,6 +59,7 @@ public abstract class AbstractTask implements Task {
     }
 
     protected void injectBeans() {
+        this.hostDao = SpringContextHolder.getBean(HostDao.class);
         this.taskDao = SpringContextHolder.getBean(TaskDao.class);
     }
 
@@ -83,7 +88,7 @@ public abstract class AbstractTask implements Task {
             builder.setTaskId(getTaskPO().getId());
             commandRequest = builder.build();
 
-            HostDTO hostDTO = taskContext.getHostDTO();
+            HostDTO hostDTO = HostConverter.INSTANCE.fromPO2DTO(hostDao.findByHostname(taskContext.getHostname()));
             CommandServiceGrpc.CommandServiceBlockingStub stub = GrpcClient.getBlockingStub(
                     hostDTO.getHostname(), hostDTO.getGrpcPort(), CommandServiceGrpc.CommandServiceBlockingStub.class);
             CommandReply reply = stub.exec(commandRequest);
@@ -135,7 +140,7 @@ public abstract class AbstractTask implements Task {
             taskPO = new TaskPO();
             taskPO.setName(getName());
             taskPO.setContext(JsonUtils.writeAsString(taskContext));
-            taskPO.setHostname(taskContext.getHostDTO().getHostname());
+            taskPO.setHostname(taskContext.getHostname());
             taskPO.setServiceName(taskContext.getServiceName());
             taskPO.setServiceUser(taskContext.getServiceUser());
             taskPO.setComponentName(taskContext.getComponentName());

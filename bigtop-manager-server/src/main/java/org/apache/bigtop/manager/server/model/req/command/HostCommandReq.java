@@ -21,12 +21,44 @@ package org.apache.bigtop.manager.server.model.req.command;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import jakarta.validation.constraints.NotBlank;
+import java.util.List;
 
 @Data
 public class HostCommandReq {
 
-    @NotBlank
-    @Schema(description = "Host Name", example = "bigtop-manager-server")
-    private String hostname;
+    @Schema(example = "[host1, host2]")
+    private List<String> hostnames;
+
+    @Schema(example = "/opt")
+    private String agentDir;
+
+    @Schema(example = "1")
+    private Long clusterId;
+
+    @Schema(example = "root")
+    private String sshUser;
+
+    @Schema(example = "22")
+    private Integer sshPort;
+
+    @Schema(example = "1")
+    private Integer authType;
+
+    @Schema(example = "password")
+    private String sshPassword;
+
+    @Schema(example = "sshKeyString")
+    private String sshKeyString;
+
+    @Schema(example = "id_rsa123")
+    private String sshKeyFilename;
+
+    @Schema(example = "password")
+    private String sshKeyPassword;
+
+    @Schema(example = "8835")
+    private Integer grpcPort;
+
+    @Schema(example = "description")
+    private String desc;
 }

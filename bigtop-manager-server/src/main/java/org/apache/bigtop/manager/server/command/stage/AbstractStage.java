@@ -25,8 +25,6 @@ import org.apache.bigtop.manager.dao.repository.HostDao;
 import org.apache.bigtop.manager.dao.repository.StageDao;
 import org.apache.bigtop.manager.server.command.task.Task;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
-import org.apache.bigtop.manager.server.model.converter.HostConverter;
-import org.apache.bigtop.manager.server.model.dto.HostDTO;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -56,9 +54,8 @@ public abstract class AbstractStage implements Stage {
 
         beforeCreateTasks();
 
-        List<HostDTO> hostDTOList = HostConverter.INSTANCE.fromPO2DTO(hostDao.findByIds(stageContext.getHostIds()));
-        for (HostDTO hostDTO : hostDTOList) {
-            tasks.add(createTask(hostDTO));
+        for (String hostname : stageContext.getHostnames()) {
+            tasks.add(createTask(hostname));
         }
     }
 
@@ -69,7 +66,7 @@ public abstract class AbstractStage implements Stage {
 
     protected abstract void beforeCreateTasks();
 
-    protected abstract Task createTask(HostDTO hostDTO);
+    protected abstract Task createTask(String hostname);
 
     protected String getServiceName() {
         return "cluster";

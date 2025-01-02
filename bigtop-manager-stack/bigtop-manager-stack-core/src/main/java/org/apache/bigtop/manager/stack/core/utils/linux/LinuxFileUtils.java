@@ -214,6 +214,7 @@ public class LinuxFileUtils {
             return;
         }
 
+        log.info("Copy file: [{}] to [{}]", source, dest);
         List<String> builderParameters = new ArrayList<>();
         builderParameters.add("cp");
         if (Files.exists(Path.of(source)) && Files.isDirectory(Paths.get(source))) {
@@ -261,6 +262,29 @@ public class LinuxFileUtils {
 
         List<String> builderParameters = new ArrayList<>();
         builderParameters.add("cat");
+        builderParameters.add(source);
+
+        try {
+            ShellResult shellResult = sudoExecCmd(builderParameters);
+            if (shellResult.getExitCode() != MessageConstants.SUCCESS_CODE) {
+                throw new StackException(shellResult.getErrMsg());
+            }
+
+            return shellResult.getOutput();
+        } catch (IOException e) {
+            throw new StackException(e);
+        }
+    }
+
+    public static String writeFile(String source, String content) {
+        if (StringUtils.isBlank(source)) {
+            throw new StackException("source must not be empty");
+        }
+
+        List<String> builderParameters = new ArrayList<>();
+        builderParameters.add("echo");
+        builderParameters.add(content);
+        builderParameters.add(">");
         builderParameters.add(source);
 
         try {

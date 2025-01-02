@@ -16,15 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.service;
+package org.apache.bigtop.manager.server.enums;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import lombok.Getter;
 
-public interface MonitoringService {
+@Getter
+public enum InstalledStatusEnum {
+    INSTALLING(1),
+    SUCCESS(2),
+    FAILED(3),
+    ;
 
-    JsonNode queryAgentsHealthyStatus();
+    private final Integer code;
 
-    JsonNode queryAgentsInfo();
+    InstalledStatusEnum(Integer code) {
+        this.code = code;
+    }
 
-    JsonNode queryAgentsInstStatus();
+    public static InstalledStatusEnum fromCode(Integer code) {
+        for (InstalledStatusEnum status : InstalledStatusEnum.values()) {
+            if (status.code.equals(code)) {
+                return status;
+            }
+        }
+
+        return FAILED;
+    }
 }

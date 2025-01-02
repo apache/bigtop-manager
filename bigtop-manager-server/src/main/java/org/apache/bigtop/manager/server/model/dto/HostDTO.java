@@ -33,6 +33,8 @@ public class HostDTO {
     // Used when converted from PO
     private String hostname;
 
+    private String agentDir;
+
     private Long clusterId;
 
     private String sshUser;

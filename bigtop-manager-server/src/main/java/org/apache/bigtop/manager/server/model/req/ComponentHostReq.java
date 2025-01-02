@@ -32,6 +32,6 @@ public class ComponentHostReq {
     private String componentName;
 
     @NotEmpty
-    @Schema(description = "Host IDs for component", example = "[1]")
-    private List<Long> hostIds;
+    @Schema(description = "Hostnames for component", example = "[host1]")
+    private List<String> hostnames;
 }

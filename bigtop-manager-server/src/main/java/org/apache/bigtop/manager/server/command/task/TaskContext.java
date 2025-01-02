@@ -18,8 +18,6 @@
  */
 package org.apache.bigtop.manager.server.command.task;
 
-import org.apache.bigtop.manager.server.model.dto.HostDTO;
-
 import lombok.Data;
 
 import java.util.Map;
@@ -31,7 +29,7 @@ public class TaskContext {
 
     private String clusterName;
 
-    private HostDTO hostDTO;
+    private String hostname;
 
     private String serviceName;
 

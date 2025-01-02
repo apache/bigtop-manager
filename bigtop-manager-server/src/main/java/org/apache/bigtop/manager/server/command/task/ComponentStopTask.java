@@ -39,7 +39,7 @@ public class ComponentStopTask extends AbstractComponentTask {
         super.onSuccess();
 
         String componentName = taskContext.getComponentName();
-        String hostname = taskContext.getHostDTO().getHostname();
+        String hostname = taskContext.getHostname();
         ComponentQuery componentQuery =
                 ComponentQuery.builder().hostname(hostname).name(componentName).build();
         ComponentPO componentPO = componentDao.findByQuery(componentQuery).get(0);
@@ -49,7 +49,6 @@ public class ComponentStopTask extends AbstractComponentTask {
 
     @Override
     public String getName() {
-        return "Stop " + taskContext.getComponentDisplayName() + " on "
-                + taskContext.getHostDTO().getHostname();
+        return "Stop " + taskContext.getComponentDisplayName() + " on " + taskContext.getHostname();
     }
 }

@@ -18,13 +18,12 @@
  */
 package org.apache.bigtop.manager.server.command.job;
 
-import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.po.JobPO;
 import org.apache.bigtop.manager.dao.po.StagePO;
 import org.apache.bigtop.manager.dao.po.TaskPO;
-import org.apache.bigtop.manager.dao.repository.HostDao;
 import org.apache.bigtop.manager.server.command.stage.CacheFileUpdateStage;
 import org.apache.bigtop.manager.server.command.stage.HostCheckStage;
+import org.apache.bigtop.manager.server.command.stage.SetupJdkStage;
 import org.apache.bigtop.manager.server.command.stage.Stage;
 import org.apache.bigtop.manager.server.command.stage.StageContext;
 import org.apache.bigtop.manager.server.command.task.Task;
@@ -33,13 +32,14 @@ import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 import org.apache.bigtop.manager.server.model.converter.ClusterConverter;
 import org.apache.bigtop.manager.server.model.dto.ClusterDTO;
 import org.apache.bigtop.manager.server.model.dto.CommandDTO;
+import org.apache.bigtop.manager.server.model.dto.HostDTO;
+import org.apache.bigtop.manager.server.service.HostService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ClusterAddJob extends AbstractJob {
 
-    private HostDao hostDao;
+    private HostService hostService;
 
     public ClusterAddJob(JobContext jobContext) {
         super(jobContext);
@@ -49,7 +49,7 @@ public class ClusterAddJob extends AbstractJob {
     protected void injectBeans() {
         super.injectBeans();
 
-        hostDao = SpringContextHolder.getBean(HostDao.class);
+        hostService = SpringContextHolder.getBean(HostService.class);
     }
 
     @Override
@@ -57,20 +57,20 @@ public class ClusterAddJob extends AbstractJob {
         StageContext stageContext = StageContext.fromCommandDTO(jobContext.getCommandDTO());
         stages.add(new HostCheckStage(stageContext));
         stages.add(new CacheFileUpdateStage(stageContext));
+        stages.add(new SetupJdkStage(stageContext));
     }
 
     @Override
     public void beforeRun() {
         super.beforeRun();
-    }
 
-    @Override
-    public void onSuccess() {
-        super.onSuccess();
+        if (jobContext.getRetryFlag()) {
+            return;
+        }
 
         saveCluster();
 
-        linkHostToCluster();
+        saveHosts();
 
         linkJobToCluster();
     }
@@ -92,18 +92,13 @@ public class ClusterAddJob extends AbstractJob {
         clusterDao.save(clusterPO);
     }
 
-    private void linkHostToCluster() {
+    private void saveHosts() {
         CommandDTO commandDTO = jobContext.getCommandDTO();
-        List<Long> ids = commandDTO.getClusterCommand().getHostIds();
-        List<HostPO> hostPOList = new ArrayList<>();
-        for (Long id : ids) {
-            HostPO hostPO = new HostPO();
-            hostPO.setId(id);
-            hostPO.setClusterId(clusterPO.getId());
-            hostPOList.add(hostPO);
+        List<HostDTO> hostDTOList = commandDTO.getClusterCommand().getHosts();
+        for (HostDTO hostDTO : hostDTOList) {
+            hostDTO.setClusterId(clusterPO.getId());
+            hostService.add(hostDTO);
         }
-
-        hostDao.partialUpdateByIds(hostPOList);
     }
 
     private void linkJobToCluster() {

@@ -29,6 +29,9 @@ public class HostReq {
     @Schema(example = "[host1, host2]")
     private List<String> hostnames;
 
+    @Schema(example = "/opt")
+    private String agentDir;
+
     @Schema(example = "1")
     private Long clusterId;
 

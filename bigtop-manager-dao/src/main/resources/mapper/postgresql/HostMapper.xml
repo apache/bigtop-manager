@@ -24,11 +24,13 @@
 <mapper namespace="org.apache.bigtop.manager.dao.repository.HostDao">
 
     <sql id="baseColumns">
-        id, hostname, ipv4, ipv6, os, arch, available_processors, free_memory_size, total_memory_size, free_disk, total_disk, state, cluster_id
+        id,  hostname, agent_dir, ssh_user, ssh_port, auth_type, ssh_password, ssh_key_string, ssh_key_filename, ssh_key_password,
+        grpc_port, ipv4, ipv6, os, arch, available_processors, free_memory_size, total_memory_size,
+        free_disk, total_disk, "desc", status, err_info, cluster_id
     </sql>
 
     <sql id="baseColumnsV2">
-        ${alias}.id,  ${alias}.hostname,  ${alias}.ssh_user, ${alias}.ssh_port, ${alias}.auth_type,
+        ${alias}.id,  ${alias}.hostname,  ${alias}.agent_dir, ${alias}.ssh_user, ${alias}.ssh_port, ${alias}.auth_type,
         ${alias}.ssh_password, ${alias}.ssh_key_string, ${alias}.ssh_key_filename, ${alias}.ssh_key_password,
         ${alias}.grpc_port, ${alias}.ipv4, ${alias}.ipv6, ${alias}.os, ${alias}.arch,
         ${alias}.available_processors, ${alias}.free_memory_size, ${alias}.total_memory_size,
@@ -58,7 +60,7 @@
                 and h.status = #{query.status}
             </if>
         </where>
-        group by h.id, c.name
+        group by h.id, c.name, c.display_name
     </select>
 
     <select id="findDetailsById" resultType="org.apache.bigtop.manager.dao.po.HostPO">
@@ -70,7 +72,7 @@
         left join cluster c on h.cluster_id = c.id
         left join component comp on h.id = comp.host_id
         where h.id = #{id}
-        group by h.id, c.name
+        group by h.id, c.name, c.display_name
         limit 1
     </select>
 

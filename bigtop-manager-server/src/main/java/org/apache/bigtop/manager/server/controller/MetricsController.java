@@ -18,11 +18,13 @@
  */
 package org.apache.bigtop.manager.server.controller;
 
-import org.apache.bigtop.manager.server.service.MonitoringService;
+import org.apache.bigtop.manager.server.service.MetricsService;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -31,30 +33,31 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.annotation.Resource;
 
-@Tag(name = "Monitoring Controller")
+@Tag(name = "Metrics Controller")
 @RestController
-@RequestMapping("monitoring")
-public class MonitoringController {
+@RequestMapping("metrics")
+public class MetricsController {
 
     @Resource
-    private MonitoringService monitoringService;
+    private MetricsService metricsService;
 
-    @Operation(summary = "agent healthy", description = "agent healthy check")
-    @GetMapping("agenthealthy")
+    @Operation(summary = "hosts healthy", description = "hosts healthy check")
+    @GetMapping("hostshealthy")
     public ResponseEntity<JsonNode> agentHostsHealthyStatus() {
-        // json for response
-        return ResponseEntity.success(monitoringService.queryAgentsHealthyStatus());
+        return ResponseEntity.success(metricsService.queryAgentsHealthyStatus());
     }
 
-    @Operation(summary = "agent Info", description = "agent info query")
-    @GetMapping("agentinfo")
-    public ResponseEntity<JsonNode> queryAgentsInfo() {
-        return ResponseEntity.success(monitoringService.queryAgentsInfo());
+    @Operation(summary = "host info", description = "host info query")
+    @GetMapping("hosts/{id}")
+    public ResponseEntity<JsonNode> queryAgentInfo(
+            @RequestParam(value = "interval", defaultValue = "1m") String interval, @PathVariable String id) {
+        return ResponseEntity.success(metricsService.queryAgentsInfo(Long.valueOf(id), interval));
     }
 
-    @Operation(summary = "agent instant info", description = "agent instant info query")
-    @GetMapping("agentinstinfo")
-    public ResponseEntity<JsonNode> queryAgentsInstStatus() {
-        return ResponseEntity.success(monitoringService.queryAgentsInstStatus());
+    @Operation(summary = "cluster info", description = "cluster info query")
+    @GetMapping("clusters/{id}")
+    public ResponseEntity<JsonNode> queryCluster(
+            @RequestParam(value = "interval", defaultValue = "1m") String interval, @PathVariable String id) {
+        return ResponseEntity.success(metricsService.queryClustersInfo(Long.valueOf(id), interval));
     }
 }

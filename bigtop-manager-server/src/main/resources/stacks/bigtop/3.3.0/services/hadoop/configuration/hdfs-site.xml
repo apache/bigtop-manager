@@ -93,6 +93,10 @@
         </description>
     </property>
     <property>
+        <name>hadoop.proxyuser.hive.hosts</name>
+        <value>*</value>
+    </property>
+    <property>
         <name>dfs.replication.max</name>
         <value>512</value>
         <description>Maximal block replication.
