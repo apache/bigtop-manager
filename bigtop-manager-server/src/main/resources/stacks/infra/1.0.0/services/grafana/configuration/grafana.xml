@@ -71,15 +71,8 @@ mode = console
 # Log file path (if file mode is enabled)
 file = /var/log/grafana/grafana.log
 
-[smtp]
-# Enable SMTP for email notifications
-enabled = false
-# SMTP server address
-host = smtp.example.com:587
-# SMTP authentication username
-user = example@example.com
-# SMTP authentication password
-password = yourpassword
+[paths]
+provisioning = ${provisioning_path}
 
 [plugins]
 # Enable alpha plugins

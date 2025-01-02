@@ -30,6 +30,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.text.MessageFormat;
+import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -41,11 +42,19 @@ public class GrafanaParams extends InfraParams {
     private String grafanaContent;
     private String grafanaPort;
     private String grafanaLogLevel;
+    private String dataSourceContent;
+    private String prometheusServer;
+    private String prometheusPort;
 
     public GrafanaParams(CommandPayload commandPayload) {
         super(commandPayload);
         globalParamsMap.put("port", grafanaPort);
         globalParamsMap.put("log_level", grafanaLogLevel);
+        globalParamsMap.put("provisioning_path", provisioningDir());
+        if (prometheusServer != null) {
+            globalParamsMap.put(
+                    "prometheus_url", MessageFormat.format("http://{0}:{1}", prometheusServer, prometheusPort));
+        }
     }
 
     public String dataDir() {
@@ -56,12 +65,47 @@ public class GrafanaParams extends InfraParams {
         return MessageFormat.format("{0}/conf", serviceHome());
     }
 
+    public String provisioningDir() {
+        return MessageFormat.format("{0}/provisioning", confDir());
+    }
+
+    public String dataSourceDir() {
+        return MessageFormat.format("{0}/datasources", provisioningDir());
+    }
+
+    public String dataSourceFile() {
+        return MessageFormat.format("{0}/prometheus.yaml", dataSourceDir());
+    }
+
     @GlobalParams
     public Map<String, Object> configs() {
         Map<String, Object> configuration = LocalSettings.configurations(getServiceName(), "grafana");
         grafanaContent = (String) configuration.get("content");
         grafanaPort = (String) configuration.get("port");
         grafanaLogLevel = (String) configuration.get("log_level");
+        return configuration;
+    }
+
+    @GlobalParams
+    public Map<String, Object> dataSources() {
+        Map<String, Object> configuration = LocalSettings.configurations(getServiceName(), "grafana-datasources");
+        dataSourceContent = (String) configuration.get("content");
+        return configuration;
+    }
+
+    @GlobalParams
+    public Map<String, Object> prometheus() {
+        List<String> prometheusServers = LocalSettings.hosts().get("prometheus_server");
+        if (prometheusServers == null || prometheusServers.isEmpty()) {
+            return null;
+        }
+        prometheusServer = prometheusServers.get(0);
+
+        Map<String, Object> configuration = LocalSettings.configurations("prometheus", "prometheus");
+        if (configuration == null) {
+            return null;
+        }
+        prometheusPort = (String) configuration.get("port");
         return configuration;
     }
 

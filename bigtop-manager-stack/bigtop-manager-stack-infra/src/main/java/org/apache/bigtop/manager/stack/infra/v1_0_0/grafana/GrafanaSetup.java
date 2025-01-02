@@ -39,9 +39,19 @@ public class GrafanaSetup {
         String group = grafanaParams.group();
 
         LinuxFileUtils.createDirectories(grafanaParams.dataDir(), user, group, Constants.PERMISSION_755, true);
+        LinuxFileUtils.createDirectories(grafanaParams.dataSourceDir(), user, group, Constants.PERMISSION_755, true);
+
         LinuxFileUtils.toFileByTemplate(
                 grafanaParams.getGrafanaContent(),
                 MessageFormat.format("{0}/grafana.yml", grafanaParams.confDir()),
+                user,
+                group,
+                Constants.PERMISSION_644,
+                grafanaParams.getGlobalParamsMap());
+
+        LinuxFileUtils.toFileByTemplate(
+                grafanaParams.getDataSourceContent(),
+                grafanaParams.dataSourceFile(),
                 user,
                 group,
                 Constants.PERMISSION_644,
