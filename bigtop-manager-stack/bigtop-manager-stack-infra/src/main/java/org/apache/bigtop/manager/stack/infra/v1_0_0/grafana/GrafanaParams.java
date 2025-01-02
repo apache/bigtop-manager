@@ -40,6 +40,9 @@ import java.util.Map;
 public class GrafanaParams extends InfraParams {
 
     private String grafanaContent;
+    private String grafanaDashboardContent;
+    private String prometheusDashboardPath;
+    private String bmAgentDashboardConfig;
     private String grafanaPort;
     private String grafanaLogLevel;
     private String dataSourceContent;
@@ -54,6 +57,7 @@ public class GrafanaParams extends InfraParams {
         if (prometheusServer != null) {
             globalParamsMap.put(
                     "prometheus_url", MessageFormat.format("http://{0}:{1}", prometheusServer, prometheusPort));
+            globalParamsMap.put("prometheus_dashboard_path", prometheusDashboardPath);
         }
     }
 
@@ -73,8 +77,8 @@ public class GrafanaParams extends InfraParams {
         return MessageFormat.format("{0}/datasources", provisioningDir());
     }
 
-    public String prometheusDataSourceFile() {
-        return MessageFormat.format("{0}/prometheus.yaml", dataSourceDir());
+    public String dashboardsDir() {
+        return MessageFormat.format("{0}/dashboards", provisioningDir());
     }
 
     @GlobalParams
@@ -107,6 +111,15 @@ public class GrafanaParams extends InfraParams {
             return configuration;
         }
         prometheusPort = (String) prometheus_configuration.get("port");
+        return configuration;
+    }
+
+    @GlobalParams
+    public Map<String, Object> dashboard() {
+        Map<String, Object> configuration = LocalSettings.configurations(getServiceName(), "grafana-dashboard");
+        grafanaDashboardContent = (String) configuration.get("content");
+        bmAgentDashboardConfig = (String) configuration.get("bm_agent_dashboard");
+        prometheusDashboardPath = MessageFormat.format("{0}/prometheus", dashboardsDir());
         return configuration;
     }
 

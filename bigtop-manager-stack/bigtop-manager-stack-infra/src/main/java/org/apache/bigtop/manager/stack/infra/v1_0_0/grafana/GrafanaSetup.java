@@ -52,7 +52,26 @@ public class GrafanaSetup {
         if (grafanaParams.getPrometheusServer() != null) {
             LinuxFileUtils.toFileByTemplate(
                     grafanaParams.getDataSourceContent(),
-                    grafanaParams.prometheusDataSourceFile(),
+                    MessageFormat.format("{0}/prometheus.yaml", grafanaParams.dataSourceDir()),
+                    user,
+                    group,
+                    Constants.PERMISSION_644,
+                    grafanaParams.getGlobalParamsMap());
+
+            LinuxFileUtils.toFileByTemplate(
+                    grafanaParams.getGrafanaDashboardContent(),
+                    MessageFormat.format("{0}/prometheus.yaml", grafanaParams.dashboardsDir()),
+                    user,
+                    group,
+                    Constants.PERMISSION_644,
+                    grafanaParams.getGlobalParamsMap());
+
+            LinuxFileUtils.createDirectories(
+                    grafanaParams.getPrometheusDashboardPath(), user, group, Constants.PERMISSION_755, true);
+
+            LinuxFileUtils.toFileByTemplate(
+                    grafanaParams.getBmAgentDashboardConfig(),
+                    MessageFormat.format("{0}/bm-agent.json", grafanaParams.getPrometheusDashboardPath()),
                     user,
                     group,
                     Constants.PERMISSION_644,
