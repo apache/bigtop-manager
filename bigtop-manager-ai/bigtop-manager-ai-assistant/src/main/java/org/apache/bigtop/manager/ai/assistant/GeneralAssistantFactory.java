@@ -20,7 +20,6 @@ package org.apache.bigtop.manager.ai.assistant;
 
 import org.apache.bigtop.manager.ai.assistant.config.GeneralAssistantConfig;
 import org.apache.bigtop.manager.ai.assistant.provider.ChatMemoryStoreProvider;
-import org.apache.bigtop.manager.ai.assistant.provider.LocSystemPromptProvider;
 import org.apache.bigtop.manager.ai.core.AbstractAIAssistantFactory;
 import org.apache.bigtop.manager.ai.core.config.AIAssistantConfig;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
@@ -50,15 +49,14 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
     private ChatMemoryStoreProvider chatMemoryStoreProvider;
 
     private void configureSystemPrompt(AIAssistant.Builder builder, SystemPrompt systemPrompt, String locale) {
-        LocSystemPromptProvider locSystemPromptProvider = (LocSystemPromptProvider) systemPromptProvider;
         List<String> systemPrompts = new ArrayList<>();
         if (systemPrompt != null) {
-            systemPrompts.add(locSystemPromptProvider.getSystemMessage(systemPrompt));
+            systemPrompts.add(systemPromptProvider.getSystemMessage(systemPrompt));
         }
         if (locale != null) {
-            systemPrompts.add(locSystemPromptProvider.getLanguagePrompt(locale));
+            systemPrompts.add(systemPromptProvider.getLanguagePrompt(locale));
         }
-        builder.withSystemPrompt(locSystemPromptProvider.getSystemMessages(systemPrompts));
+        builder.withSystemPrompt(systemPromptProvider.getSystemMessages(systemPrompts));
     }
 
     private AIAssistant.Builder initializeBuilder(PlatformType platformType) {
