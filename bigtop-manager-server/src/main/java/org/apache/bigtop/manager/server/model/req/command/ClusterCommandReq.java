@@ -18,6 +18,9 @@
  */
 package org.apache.bigtop.manager.server.model.req.command;
 
+import org.apache.bigtop.manager.server.config.CommandGroupSequenceProvider;
+import org.apache.bigtop.manager.server.model.req.HostReq;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -48,6 +51,7 @@ public class ClusterCommandReq {
     @Schema(example = "/opt")
     private String rootDir;
 
-    @Schema(example = "[1, 2]")
-    private List<Long> hostIds;
+    @NotEmpty(groups = {CommandGroupSequenceProvider.ClusterCommandGroup.class})
+    @Schema(description = "Hosts info for this cluster")
+    private List<HostReq> hosts;
 }

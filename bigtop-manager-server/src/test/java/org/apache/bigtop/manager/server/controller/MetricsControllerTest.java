@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.server.controller;
 
-import org.apache.bigtop.manager.server.service.MonitoringService;
+import org.apache.bigtop.manager.server.service.MetricsService;
 import org.apache.bigtop.manager.server.utils.MessageSourceUtils;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
 
@@ -42,13 +42,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class MonitoringControllerTest {
+class MetricsControllerTest {
 
     @Mock
-    private MonitoringService monitoringService;
+    private MetricsService metricsService;
 
     @InjectMocks
-    private MonitoringController monitoringController;
+    private MetricsController metricsController;
 
     private MockedStatic<MessageSourceUtils> mockedMessageSourceUtils;
 
@@ -66,9 +66,9 @@ class MonitoringControllerTest {
     @Test
     void agentHostsHealthyStatusReturnsSuccess() {
         JsonNode mockResponse = new ObjectMapper().createObjectNode();
-        when(monitoringService.queryAgentsHealthyStatus()).thenReturn(mockResponse);
+        when(metricsService.queryAgentsHealthyStatus()).thenReturn(mockResponse);
 
-        ResponseEntity<JsonNode> response = monitoringController.agentHostsHealthyStatus();
+        ResponseEntity<JsonNode> response = metricsController.agentHostsHealthyStatus();
 
         assertTrue(response.isSuccess());
         assertEquals(mockResponse, response.getData());
@@ -76,9 +76,9 @@ class MonitoringControllerTest {
 
     @Test
     void agentHostsHealthyStatusReturnsEmptyResponse() {
-        when(monitoringService.queryAgentsHealthyStatus()).thenReturn(null);
+        when(metricsService.queryAgentsHealthyStatus()).thenReturn(null);
 
-        ResponseEntity<JsonNode> response = monitoringController.agentHostsHealthyStatus();
+        ResponseEntity<JsonNode> response = metricsController.agentHostsHealthyStatus();
 
         assertTrue(response.isSuccess());
         assertNull(response.getData());

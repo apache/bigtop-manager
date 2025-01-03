@@ -53,6 +53,6 @@ public class HostCheckTask extends AbstractTask {
 
     @Override
     public String getName() {
-        return "Check host " + taskContext.getHostDTO().getHostname();
+        return "Check host " + taskContext.getHostname();
     }
 }

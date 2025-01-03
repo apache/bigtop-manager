@@ -74,7 +74,7 @@ public interface AIAssistant {
 
         Builder memoryStore(ChatMemoryStore memoryStore);
 
-        Builder withConfigProvider(AIAssistantConfig configProvider);
+        Builder withConfig(AIAssistantConfig configProvider);
 
         Builder withToolProvider(ToolProvider toolProvider);
 

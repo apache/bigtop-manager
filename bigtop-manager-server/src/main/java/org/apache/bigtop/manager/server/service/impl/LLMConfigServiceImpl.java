@@ -311,6 +311,8 @@ public class LLMConfigServiceImpl implements LLMConfigService {
     }
 
     private Boolean testAuthorization(String platformName, String model, Map<String, String> credentials) {
+        Boolean result = testFuncCalling(platformName, model, credentials);
+        log.info("Test func calling result: {}", result);
         GeneralAssistantConfig generalAssistantConfig = getAIAssistantConfig(platformName, model, credentials);
         AIAssistant aiAssistant = aiAssistantFactory.createForTest(generalAssistantConfig, null);
         try {

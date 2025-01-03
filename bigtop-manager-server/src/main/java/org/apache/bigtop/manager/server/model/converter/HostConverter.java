@@ -21,6 +21,7 @@ package org.apache.bigtop.manager.server.model.converter;
 import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.dto.HostDTO;
+import org.apache.bigtop.manager.server.model.dto.command.HostCommandDTO;
 import org.apache.bigtop.manager.server.model.req.HostReq;
 import org.apache.bigtop.manager.server.model.vo.HostVO;
 
@@ -36,6 +37,10 @@ public interface HostConverter {
     HostConverter INSTANCE = Mappers.getMapper(HostConverter.class);
 
     HostDTO fromReq2DTO(HostReq hostReq);
+
+    HostDTO fromCommand2DTO(HostCommandDTO hostCommandDTO);
+
+    List<HostDTO> fromCommand2DTO(List<HostCommandDTO> hostCommandDTOList);
 
     HostDTO fromPO2DTO(HostPO hostPO);
 

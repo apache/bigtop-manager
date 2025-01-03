@@ -24,11 +24,11 @@
 <mapper namespace="org.apache.bigtop.manager.dao.repository.ServiceDao">
 
     <sql id="baseColumns">
-        id, name, display_name, "desc", "user", version, stack, need_restart, cluster_id, status
+        id, name, display_name, "desc", "user", version, stack, restart_flag, cluster_id, status
     </sql>
 
     <sql id="baseColumnsV2">
-        ${alias}.id, ${alias}.name, ${alias}.display_name, ${alias}."desc", ${alias}."user", ${alias}.version, ${alias}.stack, ${alias}.need_restart, ${alias}.cluster_id, ${alias}.status
+        ${alias}.id, ${alias}.name, ${alias}.display_name, ${alias}."desc", ${alias}."user", ${alias}.version, ${alias}.stack, ${alias}.restart_flag, ${alias}.cluster_id, ${alias}.status
     </sql>
 
     <select id="findByQuery" resultType="org.apache.bigtop.manager.dao.po.ServicePO">
@@ -43,8 +43,8 @@
             <if test="query.clusterId != null">
                 and s.cluster_id = #{query.clusterId}
             </if>
-            <if test="query.needRestart != null">
-                and s.need_restart = #{query.needRestart}
+            <if test="query.restartFlag != null">
+                and s.restart_flag = #{query.restartFlag}
             </if>
             <if test="query.status != null">
                 and s.status = #{query.status}

@@ -18,9 +18,7 @@
  */
 package org.apache.bigtop.manager.server.command.job;
 
-import org.apache.bigtop.manager.common.constants.ComponentCategories;
 import org.apache.bigtop.manager.common.enums.Command;
-import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.query.ComponentQuery;
 import org.apache.bigtop.manager.dao.repository.ComponentDao;
@@ -35,12 +33,12 @@ import org.apache.bigtop.manager.server.command.stage.ComponentConfigureStage;
 import org.apache.bigtop.manager.server.command.stage.ComponentStartStage;
 import org.apache.bigtop.manager.server.command.stage.ComponentStopStage;
 import org.apache.bigtop.manager.server.command.stage.StageContext;
-import org.apache.bigtop.manager.server.exception.ServerException;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
 import org.apache.bigtop.manager.server.model.dto.ComponentHostDTO;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.model.dto.command.ServiceCommandDTO;
+import org.apache.bigtop.manager.server.utils.StackDAGUtils;
 import org.apache.bigtop.manager.server.utils.StackUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -76,36 +74,17 @@ public abstract class AbstractServiceJob extends AbstractJob {
         super.beforeCreateStages();
     }
 
-    protected StageContext createStageContext(String serviceName, String componentName, List<Long> hostIds) {
+    protected StageContext createStageContext(String serviceName, String componentName, List<String> hostnames) {
         StageContext stageContext = StageContext.fromCommandDTO(jobContext.getCommandDTO());
 
         ServiceDTO serviceDTO = StackUtils.getServiceDTO(serviceName);
         ComponentDTO componentDTO = StackUtils.getComponentDTO(componentName);
 
-        stageContext.setHostIds(hostIds);
+        stageContext.setHostnames(hostnames);
         stageContext.setServiceDTO(serviceDTO);
         stageContext.setComponentDTO(componentDTO);
 
         return stageContext;
-    }
-
-    protected List<String> getTodoListForCommand(Command command) {
-        try {
-            List<String> orderedList =
-                    StackUtils.DAG.getAllNodesList().isEmpty() ? new ArrayList<>() : StackUtils.DAG.topologicalSort();
-            List<String> componentNames = getComponentNames();
-            List<String> componentCommandNames = new ArrayList<>(componentNames.stream()
-                    .map(x -> x + "-" + command.name().toUpperCase())
-                    .toList());
-
-            orderedList.retainAll(componentCommandNames);
-            componentCommandNames.removeAll(orderedList);
-            orderedList.addAll(componentCommandNames);
-
-            return orderedList;
-        } catch (Exception e) {
-            throw new ServerException(e);
-        }
     }
 
     protected List<String> getComponentNames() {
@@ -123,17 +102,7 @@ public abstract class AbstractServiceJob extends AbstractJob {
         return StackUtils.getServiceDTOByComponentName(componentName).getName();
     }
 
-    protected Boolean isServerComponent(String componentName) {
-        ComponentDTO componentDTO = StackUtils.getComponentDTO(componentName);
-        return componentDTO.getCategory().equalsIgnoreCase(ComponentCategories.SERVER);
-    }
-
-    protected Boolean isClientComponent(String componentName) {
-        ComponentDTO componentDTO = StackUtils.getComponentDTO(componentName);
-        return componentDTO.getCategory().equalsIgnoreCase(ComponentCategories.CLIENT);
-    }
-
-    protected List<Long> findHostIdsByComponentName(String componentName) {
+    protected List<String> findHostnamesByComponentName(String componentName) {
         ComponentQuery componentQuery = ComponentQuery.builder()
                 .clusterId(clusterPO.getId())
                 .name(componentName)
@@ -142,28 +111,28 @@ public abstract class AbstractServiceJob extends AbstractJob {
         if (componentPOList == null) {
             return new ArrayList<>();
         } else {
-            return componentPOList.stream().map(ComponentPO::getHostId).toList();
+            return componentPOList.stream().map(ComponentPO::getHostname).toList();
         }
     }
 
     protected void createCacheStage() {
-        StageContext stageContext = StageContext.fromPayload(JsonUtils.writeAsString(jobContext.getCommandDTO()));
+        StageContext stageContext = StageContext.fromCommandDTO(jobContext.getCommandDTO());
         stages.add(new CacheFileUpdateStage(stageContext));
     }
 
     protected void createAddStages() {
-        List<String> todoList = getTodoListForCommand(Command.ADD);
+        List<String> todoList = StackDAGUtils.getTodoList(getComponentNames(), Command.ADD);
 
         for (String componentCommand : todoList) {
             String[] split = componentCommand.split("-");
             String componentName = split[0];
             String serviceName = findServiceNameByComponentName(componentName);
-            List<Long> hostIds = findHostIdsByComponentName(componentName);
-            if (CollectionUtils.isEmpty(hostIds)) {
+            List<String> hostnames = findHostnamesByComponentName(componentName);
+            if (CollectionUtils.isEmpty(hostnames)) {
                 continue;
             }
 
-            StageContext stageContext = createStageContext(serviceName, componentName, hostIds);
+            StageContext stageContext = createStageContext(serviceName, componentName, hostnames);
             stages.add(new ComponentAddStage(stageContext));
         }
     }
@@ -173,76 +142,76 @@ public abstract class AbstractServiceJob extends AbstractJob {
             for (ComponentHostDTO componentHost : serviceCommand.getComponentHosts()) {
                 String serviceName = serviceCommand.getServiceName();
                 String componentName = componentHost.getComponentName();
-                List<Long> hostIds = componentHost.getHostIds();
+                List<String> hostnames = componentHost.getHostnames();
 
-                StageContext stageContext = createStageContext(serviceName, componentName, hostIds);
+                StageContext stageContext = createStageContext(serviceName, componentName, hostnames);
                 stages.add(new ComponentConfigureStage(stageContext));
             }
         }
     }
 
     protected void createStartStages() {
-        List<String> todoList = getTodoListForCommand(Command.START);
+        List<String> todoList = StackDAGUtils.getTodoList(getComponentNames(), Command.START);
 
         for (String componentCommand : todoList) {
             String[] split = componentCommand.split("-");
             String componentName = split[0];
             String serviceName = findServiceNameByComponentName(componentName);
 
-            if (isClientComponent(componentName)) {
+            if (StackUtils.isClientComponent(componentName)) {
                 continue;
             }
 
-            List<Long> hostIds = findHostIdsByComponentName(componentName);
-            if (CollectionUtils.isEmpty(hostIds)) {
+            List<String> hostnames = findHostnamesByComponentName(componentName);
+            if (CollectionUtils.isEmpty(hostnames)) {
                 continue;
             }
 
-            StageContext stageContext = createStageContext(serviceName, componentName, hostIds);
+            StageContext stageContext = createStageContext(serviceName, componentName, hostnames);
             stages.add(new ComponentStartStage(stageContext));
         }
     }
 
     protected void createStopStages() {
-        List<String> todoList = getTodoListForCommand(Command.STOP);
+        List<String> todoList = StackDAGUtils.getTodoList(getComponentNames(), Command.STOP);
 
         for (String componentCommand : todoList) {
             String[] split = componentCommand.split("-");
             String componentName = split[0];
             String serviceName = findServiceNameByComponentName(componentName);
 
-            if (isClientComponent(componentName)) {
+            if (StackUtils.isClientComponent(componentName)) {
                 continue;
             }
 
-            List<Long> hostIds = findHostIdsByComponentName(componentName);
-            if (CollectionUtils.isEmpty(hostIds)) {
+            List<String> hostnames = findHostnamesByComponentName(componentName);
+            if (CollectionUtils.isEmpty(hostnames)) {
                 continue;
             }
 
-            StageContext stageContext = createStageContext(serviceName, componentName, hostIds);
+            StageContext stageContext = createStageContext(serviceName, componentName, hostnames);
             stages.add(new ComponentStopStage(stageContext));
         }
     }
 
     protected void createCheckStages() {
-        List<String> todoList = getTodoListForCommand(Command.CHECK);
+        List<String> todoList = StackDAGUtils.getTodoList(getComponentNames(), Command.CHECK);
 
         for (String componentCommand : todoList) {
             String[] split = componentCommand.split("-");
             String componentName = split[0];
             String serviceName = findServiceNameByComponentName(componentName);
 
-            if (isClientComponent(componentName)) {
+            if (StackUtils.isClientComponent(componentName)) {
                 continue;
             }
 
-            List<Long> hostIds = findHostIdsByComponentName(componentName);
-            if (CollectionUtils.isEmpty(hostIds)) {
+            List<String> hostnames = findHostnamesByComponentName(componentName);
+            if (CollectionUtils.isEmpty(hostnames)) {
                 continue;
             }
 
-            StageContext stageContext = createStageContext(serviceName, componentName, List.of(hostIds.get(0)));
+            StageContext stageContext = createStageContext(serviceName, componentName, List.of(hostnames.get(0)));
             stages.add(new ComponentCheckStage(stageContext));
         }
     }

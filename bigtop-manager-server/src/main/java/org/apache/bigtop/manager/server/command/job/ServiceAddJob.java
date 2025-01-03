@@ -86,12 +86,12 @@ public class ServiceAddJob extends AbstractServiceJob {
     }
 
     @Override
-    protected List<Long> findHostIdsByComponentName(String componentName) {
+    protected List<String> findHostnamesByComponentName(String componentName) {
         for (ServiceCommandDTO serviceCommand : jobContext.getCommandDTO().getServiceCommands()) {
             List<ComponentHostDTO> componentHosts = serviceCommand.getComponentHosts();
             for (ComponentHostDTO componentHost : componentHosts) {
                 if (componentHost.getComponentName().equals(componentName)) {
-                    return componentHost.getHostIds();
+                    return componentHost.getHostnames();
                 }
             }
         }
@@ -156,7 +156,7 @@ public class ServiceAddJob extends AbstractServiceJob {
         List<ComponentPO> componentPOList = new ArrayList<>();
         for (ComponentHostDTO componentHostDTO : serviceCommand.getComponentHosts()) {
             String componentName = componentHostDTO.getComponentName();
-            List<HostPO> hostPOList = hostDao.findByIds(componentHostDTO.getHostIds());
+            List<HostPO> hostPOList = hostDao.findAllByHostnames(componentHostDTO.getHostnames());
 
             for (HostPO hostPO : hostPOList) {
                 ComponentDTO componentDTO = StackUtils.getComponentDTO(componentName);

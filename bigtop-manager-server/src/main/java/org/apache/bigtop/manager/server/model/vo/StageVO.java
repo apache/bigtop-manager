@@ -20,16 +20,12 @@ package org.apache.bigtop.manager.server.model.vo;
 
 import lombok.Data;
 
-import java.util.List;
-
 @Data
 public class StageVO {
 
     private Long id;
 
     private String name;
-
-    private List<TaskVO> tasks;
 
     private String state;
 

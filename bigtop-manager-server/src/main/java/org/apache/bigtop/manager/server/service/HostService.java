@@ -21,6 +21,7 @@ package org.apache.bigtop.manager.server.service;
 import org.apache.bigtop.manager.dao.query.HostQuery;
 import org.apache.bigtop.manager.server.model.dto.HostDTO;
 import org.apache.bigtop.manager.server.model.vo.HostVO;
+import org.apache.bigtop.manager.server.model.vo.InstalledStatusVO;
 import org.apache.bigtop.manager.server.model.vo.PageVO;
 
 import java.util.List;
@@ -75,9 +76,15 @@ public interface HostService {
     /**
      * Install dependencies
      *
-     * @param hostIds host ids
-     * @param path remote host path
+     * @param hostDTO host infos
      * @return true if all dependencies are installed
      */
-    Boolean installDependencies(List<Long> hostIds, String path);
+    Boolean installDependencies(HostDTO hostDTO);
+
+    /**
+     * Get dependency installed status
+     *
+     * @return installed status
+     */
+    List<InstalledStatusVO> installedStatus();
 }

@@ -30,5 +30,5 @@ public class ComponentHostDTO implements Serializable {
     private String componentName;
 
     @NotEmpty
-    private List<Long> hostIds;
+    private List<String> hostnames;
 }

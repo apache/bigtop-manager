@@ -16,37 +16,37 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.command.task;
+package org.apache.bigtop.manager.server.service.impl;
 
-import org.apache.bigtop.manager.common.enums.Command;
-import org.apache.bigtop.manager.grpc.generated.CommandRequest;
-import org.apache.bigtop.manager.grpc.generated.CommandType;
+import org.apache.bigtop.manager.server.proxy.PrometheusProxy;
+import org.apache.bigtop.manager.server.service.MetricsService;
 
-public class SetupJdkTask extends AbstractTask {
+import org.springframework.stereotype.Service;
 
-    public SetupJdkTask(TaskContext taskContext) {
-        super(taskContext);
+import com.fasterxml.jackson.databind.JsonNode;
+import lombok.extern.slf4j.Slf4j;
+
+import jakarta.annotation.Resource;
+
+@Slf4j
+@Service
+public class MetricsServiceImpl implements MetricsService {
+
+    @Resource
+    private PrometheusProxy prometheusProxy;
+
+    @Override
+    public JsonNode queryAgentsHealthyStatus() {
+        return prometheusProxy.queryAgentsHealthyStatus();
     }
 
     @Override
-    protected Command getCommand() {
-        return Command.CUSTOM;
+    public JsonNode queryAgentsInfo(Long id, String interval) {
+        return prometheusProxy.queryAgentsInfo(id, interval);
     }
 
     @Override
-    protected String getCustomCommand() {
-        return "setup_jdk";
-    }
-
-    @Override
-    protected CommandRequest getCommandRequest() {
-        CommandRequest.Builder builder = CommandRequest.newBuilder();
-        builder.setType(CommandType.SETUP_JDK);
-        return builder.build();
-    }
-
-    @Override
-    public String getName() {
-        return "Setup jdk for " + taskContext.getHostname();
+    public JsonNode queryClustersInfo(Long clusterId, String interval) {
+        return prometheusProxy.queryClustersInfo(clusterId, interval);
     }
 }

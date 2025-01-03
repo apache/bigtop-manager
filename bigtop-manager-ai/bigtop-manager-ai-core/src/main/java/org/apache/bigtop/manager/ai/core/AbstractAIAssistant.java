@@ -61,7 +61,7 @@ public abstract class AbstractAIAssistant implements AIAssistant {
         protected Object id;
 
         protected ChatMemoryStore chatMemoryStore;
-        protected AIAssistantConfig configProvider;
+        protected AIAssistantConfig config;
 
         protected ToolProvider toolProvider;
         protected String systemPrompt;
@@ -78,8 +78,8 @@ public abstract class AbstractAIAssistant implements AIAssistant {
             return this;
         }
 
-        public Builder withConfigProvider(AIAssistantConfig configProvider) {
-            this.configProvider = configProvider;
+        public Builder withConfig(AIAssistantConfig config) {
+            this.config = config;
             return this;
         }
 

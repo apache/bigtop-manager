@@ -107,12 +107,22 @@
             <package-specific>
                 <architectures>
                     <arch>x86_64</arch>
+                </architectures>
+                <packages>
+                    <package>
+                        <name>hadoop-3.3.6-1-x86_64.tar.gz</name>
+                        <checksum>SHA-256:4727109fe75e87c9611e7ed3c473510fe6cb6c56d28edeaca1de1aeec305bf2e</checksum>
+                    </package>
+                </packages>
+            </package-specific>
+            <package-specific>
+                <architectures>
                     <arch>aarch64</arch>
                 </architectures>
                 <packages>
                     <package>
-                        <name>hadoop-3.3.6-1.tar.gz</name>
-                        <checksum>SHA-256:0da6364126c6ea6dd0f5b545afec33957ee801d6db6c0874edb0aa5be1e89995</checksum>
+                        <name>hadoop-3.3.6-1-aarch64.tar.gz</name>
+                        <checksum>SHA-256:2a9312eac69a542c6266f1689d29ded243dde2d61add333a9762829008f97442</checksum>
                     </package>
                 </packages>
             </package-specific>

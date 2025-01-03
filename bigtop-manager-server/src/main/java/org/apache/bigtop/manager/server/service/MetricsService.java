@@ -16,37 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.service.impl;
-
-import org.apache.bigtop.manager.server.proxy.PrometheusProxy;
-import org.apache.bigtop.manager.server.service.MonitoringService;
-
-import org.springframework.stereotype.Service;
+package org.apache.bigtop.manager.server.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import lombok.extern.slf4j.Slf4j;
 
-import jakarta.annotation.Resource;
+public interface MetricsService {
 
-@Slf4j
-@Service
-public class MonitoringServiceImpl implements MonitoringService {
+    JsonNode queryAgentsHealthyStatus();
 
-    @Resource
-    private PrometheusProxy prometheusProxy;
+    JsonNode queryAgentsInfo(Long id, String interval);
 
-    @Override
-    public JsonNode queryAgentsHealthyStatus() {
-        return prometheusProxy.queryAgentsHealthyStatus();
-    }
-
-    @Override
-    public JsonNode queryAgentsInfo() {
-        return prometheusProxy.queryAgentsInfo();
-    }
-
-    @Override
-    public JsonNode queryAgentsInstStatus() {
-        return prometheusProxy.queryAgentsInstStatus();
-    }
+    JsonNode queryClustersInfo(Long clusterId, String interval);
 }

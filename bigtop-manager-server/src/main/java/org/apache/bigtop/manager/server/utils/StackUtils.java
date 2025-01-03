@@ -18,6 +18,7 @@
  */
 package org.apache.bigtop.manager.server.utils;
 
+import org.apache.bigtop.manager.common.constants.ComponentCategories;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.utils.CaseUtils;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
@@ -266,5 +267,15 @@ public class StackUtils {
         }
 
         throw new ServerException("Service not found by component name: " + componentName);
+    }
+
+    public static Boolean isServerComponent(String componentName) {
+        ComponentDTO componentDTO = getComponentDTO(componentName);
+        return componentDTO.getCategory().equalsIgnoreCase(ComponentCategories.SERVER);
+    }
+
+    public static Boolean isClientComponent(String componentName) {
+        ComponentDTO componentDTO = getComponentDTO(componentName);
+        return componentDTO.getCategory().equalsIgnoreCase(ComponentCategories.CLIENT);
     }
 }

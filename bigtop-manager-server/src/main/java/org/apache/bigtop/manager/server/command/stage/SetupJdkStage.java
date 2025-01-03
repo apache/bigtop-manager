@@ -21,7 +21,6 @@ package org.apache.bigtop.manager.server.command.stage;
 import org.apache.bigtop.manager.server.command.task.SetupJdkTask;
 import org.apache.bigtop.manager.server.command.task.Task;
 import org.apache.bigtop.manager.server.command.task.TaskContext;
-import org.apache.bigtop.manager.server.model.dto.HostDTO;
 
 public class SetupJdkStage extends AbstractStage {
 
@@ -38,9 +37,9 @@ public class SetupJdkStage extends AbstractStage {
     protected void beforeCreateTasks() {}
 
     @Override
-    protected Task createTask(HostDTO hostDTO) {
+    protected Task createTask(String hostname) {
         TaskContext taskContext = new TaskContext();
-        taskContext.setHostDTO(hostDTO);
+        taskContext.setHostname(hostname);
         taskContext.setClusterId(stageContext.getClusterId());
         taskContext.setClusterName(stageContext.getClusterName());
         taskContext.setServiceName("cluster");

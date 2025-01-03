@@ -39,7 +39,7 @@ public class ServiceVO {
 
     private String stack;
 
-    private Boolean needRestart;
+    private Boolean restartFlag;
 
     private Integer status;
 

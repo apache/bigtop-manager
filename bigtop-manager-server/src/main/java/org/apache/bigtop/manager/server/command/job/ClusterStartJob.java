@@ -16,15 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.service;
+package org.apache.bigtop.manager.server.command.job;
 
-import com.fasterxml.jackson.databind.JsonNode;
+public class ClusterStartJob extends AbstractClusterJob {
 
-public interface MonitoringService {
+    public ClusterStartJob(JobContext jobContext) {
+        super(jobContext);
+    }
 
-    JsonNode queryAgentsHealthyStatus();
+    @Override
+    protected void createStages() {
+        super.createStartStages();
+    }
 
-    JsonNode queryAgentsInfo();
-
-    JsonNode queryAgentsInstStatus();
+    @Override
+    public String getName() {
+        return "Start cluster";
+    }
 }
