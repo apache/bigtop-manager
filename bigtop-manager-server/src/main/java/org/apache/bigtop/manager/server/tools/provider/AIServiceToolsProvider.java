@@ -19,6 +19,7 @@
 package org.apache.bigtop.manager.server.tools.provider;
 
 import org.apache.bigtop.manager.server.enums.ChatbotCommand;
+import org.apache.bigtop.manager.server.enums.LLMAccessLevel;
 
 import org.springframework.stereotype.Component;
 
@@ -31,7 +32,10 @@ public class AIServiceToolsProvider {
     @Resource
     private InfoToolsProvider infoToolsProvider;
 
-    public ToolProvider getToolsProvide(ChatbotCommand chatbotCommand) {
+    public ToolProvider getToolsProvide(ChatbotCommand chatbotCommand, LLMAccessLevel accessLevel) {
+        if (!LLMAccessLevel.isAccessible(accessLevel)) {
+            return null;
+        }
         if (ChatbotCommand.INFO.equals(chatbotCommand)) {
             return infoToolsProvider;
         }
