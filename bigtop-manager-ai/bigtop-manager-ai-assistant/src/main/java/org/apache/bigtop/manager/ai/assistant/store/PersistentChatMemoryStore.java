@@ -41,8 +41,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PersistentChatMemoryStore implements ChatMemoryStore {
 
     private final Map<Object, List<ChatMessage>> messagesByMemoryId = new ConcurrentHashMap<>();
-    protected final ChatThreadDao chatThreadDao;
-    protected final ChatMessageDao chatMessageDao;
+    private final ChatThreadDao chatThreadDao;
+    private final ChatMessageDao chatMessageDao;
 
     public PersistentChatMemoryStore(ChatThreadDao chatThreadDao, ChatMessageDao chatMessageDao) {
         this.chatThreadDao = chatThreadDao;

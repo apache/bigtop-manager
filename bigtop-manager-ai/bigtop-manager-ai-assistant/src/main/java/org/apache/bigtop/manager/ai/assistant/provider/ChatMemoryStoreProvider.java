@@ -16,31 +16,32 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.ai.assistant.store;
+package org.apache.bigtop.manager.ai.assistant.provider;
 
+import org.apache.bigtop.manager.ai.assistant.store.PersistentChatMemoryStore;
 import org.apache.bigtop.manager.dao.repository.ChatMessageDao;
 import org.apache.bigtop.manager.dao.repository.ChatThreadDao;
+
+import org.springframework.stereotype.Component;
 
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 import dev.langchain4j.store.memory.chat.InMemoryChatMemoryStore;
 
+import jakarta.annotation.Resource;
+
+@Component
 public class ChatMemoryStoreProvider {
-    private final ChatThreadDao chatThreadDao;
-    private final ChatMessageDao chatMessageDao;
+    @Resource
+    private ChatThreadDao chatThreadDao;
 
-    public ChatMemoryStoreProvider(ChatThreadDao chatThreadDao, ChatMessageDao chatMessageDao) {
-        this.chatThreadDao = chatThreadDao;
-        this.chatMessageDao = chatMessageDao;
-    }
-
-    public ChatMemoryStoreProvider() {
-        this(null, null);
-    }
+    @Resource
+    private ChatMessageDao chatMessageDao;
 
     public ChatMemoryStore createPersistentChatMemoryStore() {
-        if (chatThreadDao == null || chatMessageDao == null) {
-            return new InMemoryChatMemoryStore();
-        }
         return new PersistentChatMemoryStore(chatThreadDao, chatMessageDao);
+    }
+
+    public ChatMemoryStore createInMemoryChatMemoryStore() {
+        return new InMemoryChatMemoryStore();
     }
 }
