@@ -25,12 +25,9 @@ import org.apache.bigtop.manager.server.model.dto.command.ComponentCommandDTO;
 import org.apache.bigtop.manager.server.model.dto.command.HostCommandDTO;
 import org.apache.bigtop.manager.server.model.dto.command.ServiceCommandDTO;
 
-import org.apache.commons.text.CaseUtils;
-
 import lombok.Data;
 
 import java.io.Serializable;
-import java.text.MessageFormat;
 import java.util.List;
 
 @Data
@@ -51,17 +48,4 @@ public class CommandDTO implements Serializable {
     private List<ServiceCommandDTO> serviceCommands;
 
     private List<ComponentCommandDTO> componentCommands;
-
-    public String getContext() {
-        if (clusterId == null) {
-            return "Create Cluster";
-        }
-
-        if (command == null) {
-            return MessageFormat.format("{0} for {1}", customCommand, commandLevel.toLowerCase());
-        } else {
-            return MessageFormat.format(
-                    "{0} for {1}", CaseUtils.toCamelCase(command.name(), true), commandLevel.toLowerCase());
-        }
-    }
 }

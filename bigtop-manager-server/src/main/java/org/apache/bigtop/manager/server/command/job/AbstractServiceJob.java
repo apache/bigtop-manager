@@ -18,7 +18,6 @@
  */
 package org.apache.bigtop.manager.server.command.job;
 
-import org.apache.bigtop.manager.common.constants.ComponentCategories;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.query.ComponentQuery;
@@ -34,12 +33,12 @@ import org.apache.bigtop.manager.server.command.stage.ComponentConfigureStage;
 import org.apache.bigtop.manager.server.command.stage.ComponentStartStage;
 import org.apache.bigtop.manager.server.command.stage.ComponentStopStage;
 import org.apache.bigtop.manager.server.command.stage.StageContext;
-import org.apache.bigtop.manager.server.exception.ServerException;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
 import org.apache.bigtop.manager.server.model.dto.ComponentHostDTO;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.model.dto.command.ServiceCommandDTO;
+import org.apache.bigtop.manager.server.utils.StackDAGUtils;
 import org.apache.bigtop.manager.server.utils.StackUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -88,25 +87,6 @@ public abstract class AbstractServiceJob extends AbstractJob {
         return stageContext;
     }
 
-    protected List<String> getTodoListForCommand(Command command) {
-        try {
-            List<String> orderedList =
-                    StackUtils.DAG.getAllNodesList().isEmpty() ? new ArrayList<>() : StackUtils.DAG.topologicalSort();
-            List<String> componentNames = getComponentNames();
-            List<String> componentCommandNames = new ArrayList<>(componentNames.stream()
-                    .map(x -> x + "-" + command.name().toUpperCase())
-                    .toList());
-
-            orderedList.retainAll(componentCommandNames);
-            componentCommandNames.removeAll(orderedList);
-            orderedList.addAll(componentCommandNames);
-
-            return orderedList;
-        } catch (Exception e) {
-            throw new ServerException(e);
-        }
-    }
-
     protected List<String> getComponentNames() {
         List<String> serviceNames = getServiceNames();
         ComponentQuery componentQuery = ComponentQuery.builder()
@@ -120,16 +100,6 @@ public abstract class AbstractServiceJob extends AbstractJob {
 
     protected String findServiceNameByComponentName(String componentName) {
         return StackUtils.getServiceDTOByComponentName(componentName).getName();
-    }
-
-    protected Boolean isServerComponent(String componentName) {
-        ComponentDTO componentDTO = StackUtils.getComponentDTO(componentName);
-        return componentDTO.getCategory().equalsIgnoreCase(ComponentCategories.SERVER);
-    }
-
-    protected Boolean isClientComponent(String componentName) {
-        ComponentDTO componentDTO = StackUtils.getComponentDTO(componentName);
-        return componentDTO.getCategory().equalsIgnoreCase(ComponentCategories.CLIENT);
     }
 
     protected List<String> findHostnamesByComponentName(String componentName) {
@@ -151,7 +121,7 @@ public abstract class AbstractServiceJob extends AbstractJob {
     }
 
     protected void createAddStages() {
-        List<String> todoList = getTodoListForCommand(Command.ADD);
+        List<String> todoList = StackDAGUtils.getTodoList(getComponentNames(), Command.ADD);
 
         for (String componentCommand : todoList) {
             String[] split = componentCommand.split("-");
@@ -181,14 +151,14 @@ public abstract class AbstractServiceJob extends AbstractJob {
     }
 
     protected void createStartStages() {
-        List<String> todoList = getTodoListForCommand(Command.START);
+        List<String> todoList = StackDAGUtils.getTodoList(getComponentNames(), Command.START);
 
         for (String componentCommand : todoList) {
             String[] split = componentCommand.split("-");
             String componentName = split[0];
             String serviceName = findServiceNameByComponentName(componentName);
 
-            if (isClientComponent(componentName)) {
+            if (StackUtils.isClientComponent(componentName)) {
                 continue;
             }
 
@@ -203,14 +173,14 @@ public abstract class AbstractServiceJob extends AbstractJob {
     }
 
     protected void createStopStages() {
-        List<String> todoList = getTodoListForCommand(Command.STOP);
+        List<String> todoList = StackDAGUtils.getTodoList(getComponentNames(), Command.STOP);
 
         for (String componentCommand : todoList) {
             String[] split = componentCommand.split("-");
             String componentName = split[0];
             String serviceName = findServiceNameByComponentName(componentName);
 
-            if (isClientComponent(componentName)) {
+            if (StackUtils.isClientComponent(componentName)) {
                 continue;
             }
 
@@ -225,14 +195,14 @@ public abstract class AbstractServiceJob extends AbstractJob {
     }
 
     protected void createCheckStages() {
-        List<String> todoList = getTodoListForCommand(Command.CHECK);
+        List<String> todoList = StackDAGUtils.getTodoList(getComponentNames(), Command.CHECK);
 
         for (String componentCommand : todoList) {
             String[] split = componentCommand.split("-");
             String componentName = split[0];
             String serviceName = findServiceNameByComponentName(componentName);
 
-            if (isClientComponent(componentName)) {
+            if (StackUtils.isClientComponent(componentName)) {
                 continue;
             }
 
