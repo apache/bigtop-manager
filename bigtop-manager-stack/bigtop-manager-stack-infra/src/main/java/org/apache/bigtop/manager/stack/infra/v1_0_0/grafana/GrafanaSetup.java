@@ -20,6 +20,7 @@ package org.apache.bigtop.manager.stack.infra.v1_0_0.grafana;
 
 import org.apache.bigtop.manager.common.constants.Constants;
 import org.apache.bigtop.manager.common.shell.ShellResult;
+import org.apache.bigtop.manager.stack.core.exception.StackException;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.utils.linux.LinuxFileUtils;
 
@@ -28,6 +29,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.text.MessageFormat;
+import java.util.Map;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -60,22 +62,28 @@ public class GrafanaSetup {
 
             LinuxFileUtils.toFileByTemplate(
                     grafanaParams.getGrafanaDashboardContent(),
-                    MessageFormat.format("{0}/prometheus.yaml", grafanaParams.dashboardsDir()),
+                    MessageFormat.format("{0}/bm-dashboards.yaml", grafanaParams.dashboardsDir()),
                     user,
                     group,
                     Constants.PERMISSION_644,
                     grafanaParams.getGlobalParamsMap());
 
-            LinuxFileUtils.createDirectories(
-                    grafanaParams.getPrometheusDashboardPath(), user, group, Constants.PERMISSION_755, true);
+            for (Map<String, Object> dashboard : grafanaParams.getDashboards()) {
+                String confPath = (String) dashboard.get("path");
+                if (confPath == null) {
+                    throw new StackException("Dashboard path is not set");
+                }
 
-            LinuxFileUtils.toFileByTemplate(
-                    grafanaParams.getBmAgentDashboardConfig(),
-                    MessageFormat.format("{0}/bm-agent.json", grafanaParams.getPrometheusDashboardPath()),
-                    user,
-                    group,
-                    Constants.PERMISSION_644,
-                    grafanaParams.getGlobalParamsMap());
+                LinuxFileUtils.createDirectories(confPath, user, group, Constants.PERMISSION_755, true);
+
+                LinuxFileUtils.toFileByTemplate(
+                        grafanaParams.getBmAgentDashboardConfig(),
+                        MessageFormat.format("{0}/{1}.json", confPath, dashboard.get("name")),
+                        user,
+                        group,
+                        Constants.PERMISSION_644,
+                        grafanaParams.getGlobalParamsMap());
+            }
         }
 
         return ShellResult.success("Grafana Configure success!");

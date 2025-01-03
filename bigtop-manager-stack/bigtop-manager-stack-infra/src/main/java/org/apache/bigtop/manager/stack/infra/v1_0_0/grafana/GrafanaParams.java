@@ -30,6 +30,8 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -49,6 +51,8 @@ public class GrafanaParams extends InfraParams {
     private String prometheusServer;
     private String prometheusPort;
 
+    List<Map<String, Object>> dashboards;
+
     public GrafanaParams(CommandPayload commandPayload) {
         super(commandPayload);
         globalParamsMap.put("port", grafanaPort);
@@ -57,7 +61,8 @@ public class GrafanaParams extends InfraParams {
         if (prometheusServer != null) {
             globalParamsMap.put(
                     "prometheus_url", MessageFormat.format("http://{0}:{1}", prometheusServer, prometheusPort));
-            globalParamsMap.put("prometheus_dashboard_path", prometheusDashboardPath);
+
+            globalParamsMap.put("dashboards", dashboards);
         }
     }
 
@@ -79,6 +84,15 @@ public class GrafanaParams extends InfraParams {
 
     public String dashboardsDir() {
         return MessageFormat.format("{0}/dashboards", provisioningDir());
+    }
+
+    public String dashboardConfigDir(String cluster) {
+        return MessageFormat.format("{0}/{1}", dashboardsDir(), cluster);
+    }
+
+    /// TODO
+    public List<String> getClusters() {
+        return List.of("ALL");
     }
 
     @GlobalParams
@@ -115,11 +129,20 @@ public class GrafanaParams extends InfraParams {
     }
 
     @GlobalParams
-    public Map<String, Object> dashboard() {
+    public Map<String, Object> dashboards() {
         Map<String, Object> configuration = LocalSettings.configurations(getServiceName(), "grafana-dashboard");
         grafanaDashboardContent = (String) configuration.get("content");
         bmAgentDashboardConfig = (String) configuration.get("bm_agent_dashboard");
         prometheusDashboardPath = MessageFormat.format("{0}/prometheus", dashboardsDir());
+
+        dashboards = new ArrayList<>();
+        for (String cluster : getClusters()) {
+            Map<String, Object> dashboard = new HashMap<>();
+            dashboard.put("name", cluster);
+            dashboard.put("folder", cluster);
+            dashboard.put("path", dashboardConfigDir(cluster));
+            dashboards.add(dashboard);
+        }
         return configuration;
     }
 
