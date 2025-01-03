@@ -128,15 +128,16 @@ public class LLMConfigServiceImpl implements LLMConfigService {
                 getStringMap(authPlatformDTO, PlatformConverter.INSTANCE.fromPO2DTO(platformPO));
 
         authPlatformDTO.setAuthCredentials(credentialSet);
+
+        if (authPlatformDTO.getAccessLevel() == null) {
+            authPlatformDTO.setAccessLevel(LLMAccessLevel.READONLY.getCode());
+        }
+
         AuthPlatformPO authPlatformPO = AuthPlatformConverter.INSTANCE.fromDTO2PO(authPlatformDTO);
         if (authPlatformDTO.getTestPassed()) {
             authPlatformPO.setStatus(AuthPlatformStatus.AVAILABLE.getCode());
         } else {
             authPlatformPO.setStatus(AuthPlatformStatus.UNAVAILABLE.getCode());
-        }
-
-        if (authPlatformDTO.getAccessLevel() == null) {
-            authPlatformDTO.setAccessLevel(LLMAccessLevel.READONLY.getCode());
         }
 
         authPlatformDao.save(authPlatformPO);
@@ -163,8 +164,8 @@ public class LLMConfigServiceImpl implements LLMConfigService {
     @Override
     public boolean testAuthorizedPlatform(AuthPlatformDTO authPlatformDTO) {
         if (authPlatformDTO.getId() != null) {
-            authPlatformDTO =
-                    AuthPlatformConverter.INSTANCE.fromPO2DTO(authPlatformDao.findById(authPlatformDTO.getId()));
+            AuthPlatformPO authPlatformPO = validateAndGetAuthPlatform(authPlatformDTO.getId());
+            authPlatformDTO = AuthPlatformConverter.INSTANCE.fromPO2DTO(authPlatformPO);
         }
 
         PlatformPO platformPO = validateAndGetPlatform(authPlatformDTO.getPlatformId());
@@ -172,14 +173,6 @@ public class LLMConfigServiceImpl implements LLMConfigService {
         List<String> supportModels = List.of(platformPO.getSupportModels().split(","));
         if (supportModels.isEmpty() || !supportModels.contains(authPlatformDTO.getModel())) {
             throw new ApiException(ApiExceptionEnum.MODEL_NOT_SUPPORTED);
-        }
-
-        if (authPlatformDTO.getId() != null) {
-            AuthPlatformPO authPlatformPO = validateAndGetAuthPlatform(authPlatformDTO.getId());
-
-            AuthPlatformDTO existAuthPlatformDTO = AuthPlatformConverter.INSTANCE.fromPO2DTO(authPlatformPO);
-            authPlatformDTO.setAuthCredentials(existAuthPlatformDTO.getAuthCredentials());
-            authPlatformDTO.setModel(existAuthPlatformDTO.getModel());
         }
 
         Map<String, String> credentialSet =
@@ -311,8 +304,6 @@ public class LLMConfigServiceImpl implements LLMConfigService {
     }
 
     private Boolean testAuthorization(String platformName, String model, Map<String, String> credentials) {
-        Boolean result = testFuncCalling(platformName, model, credentials);
-        log.info("Test func calling result: {}", result);
         GeneralAssistantConfig generalAssistantConfig = getAIAssistantConfig(platformName, model, credentials);
         AIAssistant aiAssistant = aiAssistantFactory.createForTest(generalAssistantConfig, null);
         try {
