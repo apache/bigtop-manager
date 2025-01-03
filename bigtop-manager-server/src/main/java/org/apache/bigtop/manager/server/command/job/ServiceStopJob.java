@@ -52,21 +52,6 @@ public class ServiceStopJob extends AbstractServiceJob {
     }
 
     @Override
-    public void onFailure() {
-        super.onFailure();
-
-        CommandDTO commandDTO = jobContext.getCommandDTO();
-        List<ServiceCommandDTO> serviceCommands = commandDTO.getServiceCommands();
-        for (ServiceCommandDTO serviceCommand : serviceCommands) {
-            Long clusterId = commandDTO.getClusterId();
-            String serviceName = serviceCommand.getServiceName();
-            ServicePO servicePO = serviceDao.findByClusterIdAndName(clusterId, serviceName);
-            servicePO.setStatus(HealthyStatusEnum.UNHEALTHY.getCode());
-            serviceDao.partialUpdateById(servicePO);
-        }
-    }
-
-    @Override
     public String getName() {
         return "Stop services";
     }
