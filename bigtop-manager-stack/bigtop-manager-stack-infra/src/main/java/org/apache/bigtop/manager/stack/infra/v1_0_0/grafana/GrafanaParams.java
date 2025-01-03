@@ -92,7 +92,7 @@ public class GrafanaParams extends InfraParams {
 
     /// TODO
     public List<String> getClusters() {
-        return List.of("ALL");
+        return List.of("cluster_name");
     }
 
     @GlobalParams

@@ -26,15 +26,14 @@
 apiVersion: 1
 
 providers:
-<#if prometheus_url??>
-<#list db as dashboards>
+<#list dashboards as db>
   - name: '${db.name}'
     orgId: 1
     folder: '${db.folder}'
     type: file
     options:
       path: '${db.path}'
-</#if>
+</#list>
 ]]>
         </value>
         <attrs>
