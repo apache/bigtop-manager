@@ -25,17 +25,15 @@ import org.apache.bigtop.manager.server.model.dto.command.ServiceCommandDTO;
 
 import java.util.List;
 
-public class ServiceRestartJob extends AbstractServiceJob {
+public class ServiceCheckJob extends AbstractServiceJob {
 
-    public ServiceRestartJob(JobContext jobContext) {
+    public ServiceCheckJob(JobContext jobContext) {
         super(jobContext);
     }
 
     @Override
     protected void createStages() {
-        super.createStopStages();
-
-        super.createStartStages();
+        super.createCheckStages();
     }
 
     @Override
@@ -70,6 +68,6 @@ public class ServiceRestartJob extends AbstractServiceJob {
 
     @Override
     public String getName() {
-        return "Restart services";
+        return "Check services";
     }
 }

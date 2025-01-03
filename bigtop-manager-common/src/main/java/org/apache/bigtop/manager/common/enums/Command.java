@@ -36,10 +36,14 @@ public enum Command {
     RESTART("restart", "Restart"),
 
     // Available for: Service, Component
-    STATUS("status", "Status"),
     CHECK("check", "Check"),
-    CUSTOM("custom", "Custom"),
+
+    // Available for: Service
     CONFIGURE("configure", "Configure"),
+    CUSTOM("custom", "Custom"),
+
+    // Internal use only, not available for job creation
+    STATUS("status", "Status"),
     ;
 
     private final String code;
