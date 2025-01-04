@@ -28,13 +28,20 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @NoArgsConstructor
 public abstract class InfraParams extends BaseParams {
 
+    protected Map<String, List<String>> clusterHosts;
+
     protected InfraParams(CommandPayload commandPayload) {
         super(commandPayload);
+        clusterHosts = commandPayload.getClusterHosts();
     }
 
     /**
@@ -71,5 +78,10 @@ public abstract class InfraParams extends BaseParams {
         }
 
         return parentPath + "/infras";
+    }
+
+    public Map<String, List<String>> getClusterHosts() {
+        // In Component Status stage, clusterHosts is null
+        return Objects.requireNonNullElseGet(clusterHosts, HashMap::new);
     }
 }

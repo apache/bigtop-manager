@@ -32,7 +32,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
@@ -52,16 +51,15 @@ public class CommandReq {
     @NotNull @Schema(example = "cluster")
     private CommandLevel commandLevel;
 
-    @NotNull(groups = {CommandGroupSequenceProvider.ClusterCommandGroup.class}) @Schema(description = "Command details for cluster level command")
+    @Schema(description = "Command details for cluster level command")
     private ClusterCommandReq clusterCommand;
 
-    @NotNull(groups = {CommandGroupSequenceProvider.HostCommandGroup.class}) @Schema(description = "Command details for host level command")
+    @Schema(description = "Command details for host level command")
     private List<@Valid HostCommandReq> hostCommands;
 
-    @NotEmpty(groups = {CommandGroupSequenceProvider.ServiceCommandGroup.class})
     @Schema(description = "Command details for service level command")
     private List<@Valid ServiceCommandReq> serviceCommands;
 
-    @NotNull(groups = {CommandGroupSequenceProvider.ComponentCommandGroup.class}) @Schema(description = "Command details for component level command")
+    @Schema(description = "Command details for component level command")
     private List<@Valid ComponentCommandReq> componentCommands;
 }

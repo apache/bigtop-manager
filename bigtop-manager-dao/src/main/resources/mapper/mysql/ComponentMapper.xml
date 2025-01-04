@@ -59,6 +59,12 @@
             <if test="query.hostname != null and query.hostname != ''">
                 and h.hostname = #{query.hostname}
             </if>
+            <if test="query.hostnames != null and query.hostnames.size() > 0">
+                and h.hostname in
+                <foreach collection="query.hostnames" item="hostname" index="index" open="(" close=")" separator=",">
+                    #{hostname}
+                </foreach>
+            </if>
             <if test="query.serviceId != null">
                 and comp.service_id = #{query.serviceId}
             </if>

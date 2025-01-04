@@ -18,6 +18,13 @@
  */
 package org.apache.bigtop.manager.server.command.job;
 
+import org.apache.bigtop.manager.dao.po.ServicePO;
+import org.apache.bigtop.manager.server.enums.HealthyStatusEnum;
+import org.apache.bigtop.manager.server.model.dto.CommandDTO;
+import org.apache.bigtop.manager.server.model.dto.command.ServiceCommandDTO;
+
+import java.util.List;
+
 public class ServiceRestartJob extends AbstractServiceJob {
 
     public ServiceRestartJob(JobContext jobContext) {
@@ -29,6 +36,36 @@ public class ServiceRestartJob extends AbstractServiceJob {
         super.createStopStages();
 
         super.createStartStages();
+    }
+
+    @Override
+    public void onSuccess() {
+        super.onSuccess();
+
+        CommandDTO commandDTO = jobContext.getCommandDTO();
+        List<ServiceCommandDTO> serviceCommands = commandDTO.getServiceCommands();
+        for (ServiceCommandDTO serviceCommand : serviceCommands) {
+            Long clusterId = commandDTO.getClusterId();
+            String serviceName = serviceCommand.getServiceName();
+            ServicePO servicePO = serviceDao.findByClusterIdAndName(clusterId, serviceName);
+            servicePO.setStatus(HealthyStatusEnum.HEALTHY.getCode());
+            serviceDao.partialUpdateById(servicePO);
+        }
+    }
+
+    @Override
+    public void onFailure() {
+        super.onFailure();
+
+        CommandDTO commandDTO = jobContext.getCommandDTO();
+        List<ServiceCommandDTO> serviceCommands = commandDTO.getServiceCommands();
+        for (ServiceCommandDTO serviceCommand : serviceCommands) {
+            Long clusterId = commandDTO.getClusterId();
+            String serviceName = serviceCommand.getServiceName();
+            ServicePO servicePO = serviceDao.findByClusterIdAndName(clusterId, serviceName);
+            servicePO.setStatus(HealthyStatusEnum.UNHEALTHY.getCode());
+            serviceDao.partialUpdateById(servicePO);
+        }
     }
 
     @Override

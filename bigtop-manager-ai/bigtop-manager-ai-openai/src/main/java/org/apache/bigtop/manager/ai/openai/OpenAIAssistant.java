@@ -51,9 +51,9 @@ public class OpenAIAssistant extends AbstractAIAssistant {
 
         @Override
         public ChatLanguageModel getChatLanguageModel() {
-            String model = ValidationUtils.ensureNotNull(configProvider.getModel(), "model");
-            String apiKey = ValidationUtils.ensureNotNull(
-                    configProvider.getCredentials().get("apiKey"), "apiKey");
+            String model = ValidationUtils.ensureNotNull(config.getModel(), "model");
+            String apiKey =
+                    ValidationUtils.ensureNotNull(config.getCredentials().get("apiKey"), "apiKey");
             return OpenAiChatModel.builder()
                     .apiKey(apiKey)
                     .baseUrl(BASE_URL)
@@ -63,9 +63,9 @@ public class OpenAIAssistant extends AbstractAIAssistant {
 
         @Override
         public StreamingChatLanguageModel getStreamingChatLanguageModel() {
-            String model = ValidationUtils.ensureNotNull(configProvider.getModel(), "model");
-            String apiKey = ValidationUtils.ensureNotNull(
-                    configProvider.getCredentials().get("apiKey"), "apiKey");
+            String model = ValidationUtils.ensureNotNull(config.getModel(), "model");
+            String apiKey =
+                    ValidationUtils.ensureNotNull(config.getCredentials().get("apiKey"), "apiKey");
             return OpenAiStreamingChatModel.builder()
                     .apiKey(apiKey)
                     .baseUrl(BASE_URL)

@@ -16,17 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.ai.core.factory;
+package org.apache.bigtop.manager.server.command.job;
 
-import reactor.core.publisher.Flux;
+public class ClusterStartJob extends AbstractClusterJob {
 
-import java.util.List;
+    public ClusterStartJob(JobContext jobContext) {
+        super(jobContext);
+    }
 
-public interface ToolBox {
+    @Override
+    protected void createStages() {
+        super.createStartStages();
+    }
 
-    List<String> getTools();
-
-    String invoke(String toolName);
-
-    Flux<String> streamInvoke(String toolName);
+    @Override
+    public String getName() {
+        return "Start cluster";
+    }
 }

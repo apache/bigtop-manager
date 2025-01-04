@@ -19,6 +19,9 @@
 package org.apache.bigtop.manager.server.command.task;
 
 import org.apache.bigtop.manager.common.enums.Command;
+import org.apache.bigtop.manager.dao.po.ComponentPO;
+import org.apache.bigtop.manager.dao.query.ComponentQuery;
+import org.apache.bigtop.manager.server.enums.HealthyStatusEnum;
 
 public class ComponentCheckTask extends AbstractComponentTask {
 
@@ -29,6 +32,32 @@ public class ComponentCheckTask extends AbstractComponentTask {
     @Override
     protected Command getCommand() {
         return Command.CHECK;
+    }
+
+    @Override
+    public void onSuccess() {
+        super.onSuccess();
+
+        String componentName = taskContext.getComponentName();
+        String hostname = taskContext.getHostname();
+        ComponentQuery componentQuery =
+                ComponentQuery.builder().hostname(hostname).name(componentName).build();
+        ComponentPO componentPO = componentDao.findByQuery(componentQuery).get(0);
+        componentPO.setStatus(HealthyStatusEnum.HEALTHY.getCode());
+        componentDao.partialUpdateById(componentPO);
+    }
+
+    @Override
+    public void onFailure() {
+        super.onFailure();
+
+        String componentName = taskContext.getComponentName();
+        String hostname = taskContext.getHostname();
+        ComponentQuery componentQuery =
+                ComponentQuery.builder().hostname(hostname).name(componentName).build();
+        ComponentPO componentPO = componentDao.findByQuery(componentQuery).get(0);
+        componentPO.setStatus(HealthyStatusEnum.UNHEALTHY.getCode());
+        componentDao.partialUpdateById(componentPO);
     }
 
     @Override

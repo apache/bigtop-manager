@@ -16,32 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.dao.query;
+package org.apache.bigtop.manager.server.command.job;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+public class HostStartJob extends AbstractHostJob {
 
-import java.util.List;
+    public HostStartJob(JobContext jobContext) {
+        super(jobContext);
+    }
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class ComponentQuery {
+    @Override
+    protected void createStages() {
+        super.createStartStages();
+    }
 
-    private String name;
-
-    private Long clusterId;
-
-    private Long hostId;
-
-    private String hostname;
-
-    private List<String> hostnames;
-
-    private Long serviceId;
-
-    private List<String> serviceNames;
+    @Override
+    public String getName() {
+        return "Start host";
+    }
 }

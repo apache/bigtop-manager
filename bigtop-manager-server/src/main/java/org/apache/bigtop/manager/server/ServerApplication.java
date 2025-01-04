@@ -25,7 +25,12 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableAsync
 @EnableScheduling
-@SpringBootApplication(scanBasePackages = {"org.apache.bigtop.manager.server", "org.apache.bigtop.manager.common"})
+@SpringBootApplication(
+        scanBasePackages = {
+            "org.apache.bigtop.manager.server",
+            "org.apache.bigtop.manager.common",
+            "org.apache.bigtop.manager.ai"
+        })
 public class ServerApplication {
 
     public static void main(String[] args) {

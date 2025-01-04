@@ -28,23 +28,22 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum Command {
+    // Available for: Cluster, Host, Service, Component
     ADD("add", "Add"),
-
     REMOVE("remove", "Remove"),
-
     START("start", "Start"),
-
     STOP("stop", "Stop"),
-
-    STATUS("status", "Status"),
-
     RESTART("restart", "Restart"),
 
-    CONFIGURE("configure", "Configure"),
-
+    // Available for: Service, Component
     CHECK("check", "Check"),
 
+    // Available for: Service
+    CONFIGURE("configure", "Configure"),
     CUSTOM("custom", "Custom"),
+
+    // Internal use only, not available for job creation
+    STATUS("status", "Status"),
     ;
 
     private final String code;

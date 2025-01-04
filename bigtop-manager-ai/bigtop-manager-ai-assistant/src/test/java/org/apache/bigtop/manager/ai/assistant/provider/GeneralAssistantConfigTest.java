@@ -18,6 +18,9 @@
  */
 package org.apache.bigtop.manager.ai.assistant.provider;
 
+import org.apache.bigtop.manager.ai.assistant.config.GeneralAssistantConfig;
+import org.apache.bigtop.manager.ai.core.enums.PlatformType;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,9 +34,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 @ExtendWith(MockitoExtension.class)
-public class AIAssistantConfigTest {
+public class GeneralAssistantConfigTest {
 
-    private AIAssistantConfig.Builder builder;
+    private GeneralAssistantConfig.Builder builder;
     private String model;
     private String language;
     private Map<String, String> credentials;
@@ -41,7 +44,7 @@ public class AIAssistantConfigTest {
 
     @BeforeEach
     public void setUp() {
-        builder = AIAssistantConfig.builder();
+        builder = GeneralAssistantConfig.builder();
         model = "test-model";
         language = "en-US";
         credentials = new HashMap<>();
@@ -53,7 +56,8 @@ public class AIAssistantConfigTest {
 
     @Test
     public void testBuilderSetsValuesCorrectly() {
-        AIAssistantConfig config = builder.setModel(model)
+        GeneralAssistantConfig config = builder.setPlatformType(PlatformType.OPENAI)
+                .setModel(model)
                 .setLanguage(language)
                 .addCredentials(credentials)
                 .addConfigs(configs)
@@ -68,7 +72,8 @@ public class AIAssistantConfigTest {
 
     @Test
     public void testBuilderAddsSingleCredential() {
-        AIAssistantConfig config = builder.setModel(model)
+        GeneralAssistantConfig config = builder.setPlatformType(PlatformType.OPENAI)
+                .setModel(model)
                 .setLanguage(language)
                 .addCredential("client_id", "abcd1234")
                 .build();
@@ -79,7 +84,8 @@ public class AIAssistantConfigTest {
 
     @Test
     public void testBuilderAddsSingleConfig() {
-        AIAssistantConfig config = builder.setModel(model)
+        GeneralAssistantConfig config = builder.setPlatformType(PlatformType.OPENAI)
+                .setModel(model)
                 .setLanguage(language)
                 .addConfig("threadId", "123")
                 .build();
@@ -90,10 +96,10 @@ public class AIAssistantConfigTest {
 
     @Test
     public void testEmptyBuilder() {
-        AIAssistantConfig config = builder.build();
+        GeneralAssistantConfig config =
+                builder.setPlatformType(PlatformType.OPENAI).setModel(model).build();
 
         assertNotNull(config);
-        assertNull(config.getModel());
         assertNull(config.getLanguage());
         assertEquals(0, config.getCredentials().size());
         assertEquals(0, config.getConfigs().size());
@@ -108,7 +114,8 @@ public class AIAssistantConfigTest {
         Map<String, String> extraConfigs = new HashMap<>();
         extraConfigs.put("retry", "3");
 
-        AIAssistantConfig config = builder.setModel(model)
+        GeneralAssistantConfig config = builder.setPlatformType(PlatformType.OPENAI)
+                .setModel(model)
                 .setLanguage(language)
                 .addCredentials(extraCredentials)
                 .addConfigs(extraConfigs)

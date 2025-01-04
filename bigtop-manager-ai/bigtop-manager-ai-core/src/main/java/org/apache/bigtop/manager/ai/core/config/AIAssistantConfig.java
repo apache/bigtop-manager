@@ -16,16 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.ai.core.provider;
+package org.apache.bigtop.manager.ai.core.config;
 
 import java.util.Map;
 
-public interface AIAssistantConfigProvider {
+public interface AIAssistantConfig {
     String getModel();
 
     Map<String, String> getCredentials();
 
     Map<String, String> getConfigs();
-
-    String getLanguage();
 }

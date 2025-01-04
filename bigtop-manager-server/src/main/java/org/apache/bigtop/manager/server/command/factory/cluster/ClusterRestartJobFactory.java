@@ -16,11 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.command.factory.host;
+package org.apache.bigtop.manager.server.command.factory.cluster;
 
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
-import org.apache.bigtop.manager.server.command.job.HostAddJob;
+import org.apache.bigtop.manager.server.command.job.ClusterRestartJob;
 import org.apache.bigtop.manager.server.command.job.Job;
 import org.apache.bigtop.manager.server.command.job.JobContext;
 import org.apache.bigtop.manager.server.enums.CommandLevel;
@@ -34,15 +34,15 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class HostAddJobFactory extends AbstractHostJobFactory {
+public class ClusterRestartJobFactory extends AbstractClusterJobFactory {
 
     @Override
     public CommandIdentifier getCommandIdentifier() {
-        return new CommandIdentifier(CommandLevel.HOST, Command.ADD);
+        return new CommandIdentifier(CommandLevel.CLUSTER, Command.RESTART);
     }
 
     @Override
     public Job createJob(JobContext jobContext) {
-        return new HostAddJob(jobContext);
+        return new ClusterRestartJob(jobContext);
     }
 }

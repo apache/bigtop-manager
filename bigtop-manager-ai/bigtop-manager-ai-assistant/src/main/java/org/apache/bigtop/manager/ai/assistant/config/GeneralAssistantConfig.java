@@ -16,37 +16,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.ai.assistant.provider;
+package org.apache.bigtop.manager.ai.assistant.config;
 
-import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
+import org.apache.bigtop.manager.ai.core.config.AIAssistantConfig;
+import org.apache.bigtop.manager.ai.core.enums.PlatformType;
+
+import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
-public class AIAssistantConfig implements AIAssistantConfigProvider {
+@Getter
+public class GeneralAssistantConfig implements AIAssistantConfig {
 
-    /**
-     * Model name for platform that we want to use
-     */
+    private final Long id;
     private final String model;
-
-    /**
-     * Credentials for different platforms
-     */
-    private final Map<String, String> credentials;
-
     private final String language;
-    /**
-     * Platform extra configs are put here
-     */
+    private final PlatformType platformType;
+    private final Map<String, String> credentials;
     private final Map<String, String> configs;
 
-    private AIAssistantConfig(
-            String model, Map<String, String> credentials, String language, Map<String, String> configMap) {
-        this.model = model;
-        this.credentials = credentials;
-        this.language = language;
-        this.configs = configMap;
+    private GeneralAssistantConfig(Builder builder) {
+        this.model = Objects.requireNonNull(builder.model);
+        this.credentials = Objects.requireNonNull(builder.credentials);
+        this.platformType = Objects.requireNonNull(builder.platformType);
+        this.language = builder.language;
+        this.id = builder.id;
+        this.configs = builder.configs;
     }
 
     public static Builder builder() {
@@ -68,23 +65,26 @@ public class AIAssistantConfig implements AIAssistantConfigProvider {
         return configs;
     }
 
-    @Override
-    public String getLanguage() {
-        return language;
-    }
-
     public static class Builder {
+        private Long id;
         private String model;
         private String language;
-
+        private PlatformType platformType;
         private final Map<String, String> credentials = new HashMap<>();
-
         private final Map<String, String> configs = new HashMap<>();
-
-        public Builder() {}
 
         public Builder setModel(String model) {
             this.model = model;
+            return this;
+        }
+
+        public Builder setPlatformType(PlatformType platformType) {
+            this.platformType = platformType;
+            return this;
+        }
+
+        public Builder setId(Long id) {
+            this.id = id;
             return this;
         }
 
@@ -115,8 +115,8 @@ public class AIAssistantConfig implements AIAssistantConfigProvider {
             return this;
         }
 
-        public AIAssistantConfig build() {
-            return new AIAssistantConfig(model, credentials, language, configs);
+        public GeneralAssistantConfig build() {
+            return new GeneralAssistantConfig(this);
         }
     }
 }

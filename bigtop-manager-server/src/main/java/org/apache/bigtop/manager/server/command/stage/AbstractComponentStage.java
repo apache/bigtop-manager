@@ -19,6 +19,7 @@
 package org.apache.bigtop.manager.server.command.stage;
 
 import org.apache.bigtop.manager.dao.po.ClusterPO;
+import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.repository.ClusterDao;
 import org.apache.bigtop.manager.server.command.task.TaskContext;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
@@ -26,6 +27,7 @@ import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public abstract class AbstractComponentStage extends AbstractStage {
@@ -77,7 +79,27 @@ public abstract class AbstractComponentStage extends AbstractStage {
 
         Map<String, Object> properties = new HashMap<>();
         properties.put("packageSpecifics", serviceDTO.getPackageSpecifics());
+        properties.put("clusterHosts", getClusterHosts());
         taskContext.setProperties(properties);
         return taskContext;
+    }
+
+    private Map<String, List<String>> getClusterHosts() {
+        Map<String, List<String>> clusterHosts = new HashMap<>();
+        List<HostPO> hostPOs = hostDao.findAll();
+        for (HostPO hostPO : hostPOs) {
+            Long clusterId = hostPO.getClusterId();
+            if (clusterId == null) {
+                continue;
+            }
+            String host = hostPO.getIpv4();
+            String clusterName = clusterDao.findById(clusterId).getName();
+            if (clusterHosts.containsKey(clusterName)) {
+                clusterHosts.get(clusterName).add(host);
+            } else {
+                clusterHosts.put(clusterName, List.of(host));
+            }
+        }
+        return clusterHosts;
     }
 }
