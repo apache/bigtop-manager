@@ -61,7 +61,7 @@ public class GrafanaParams extends InfraParams {
         if (prometheusServer != null) {
             globalParamsMap.put(
                     "prometheus_url", MessageFormat.format("http://{0}:{1}", prometheusServer, prometheusPort));
-
+            setDashboards();
             globalParamsMap.put("dashboards", dashboards);
         }
     }
@@ -88,11 +88,6 @@ public class GrafanaParams extends InfraParams {
 
     public String dashboardConfigDir(String cluster) {
         return MessageFormat.format("{0}/{1}", dashboardsDir(), cluster);
-    }
-
-    /// TODO
-    public List<String> getClusters() {
-        return List.of("cluster_name");
     }
 
     @GlobalParams
@@ -134,7 +129,19 @@ public class GrafanaParams extends InfraParams {
         grafanaDashboardContent = (String) configuration.get("content");
         bmAgentDashboardConfig = (String) configuration.get("bm_agent_dashboard");
         prometheusDashboardPath = MessageFormat.format("{0}/prometheus", dashboardsDir());
+        return configuration;
+    }
 
+    @Override
+    public String getServiceName() {
+        return "grafana";
+    }
+
+    public List<String> getClusters() {
+        return new ArrayList<>(getClusterHosts().keySet());
+    }
+
+    public void setDashboards() {
         dashboards = new ArrayList<>();
         for (String cluster : getClusters()) {
             Map<String, Object> dashboard = new HashMap<>();
@@ -143,11 +150,5 @@ public class GrafanaParams extends InfraParams {
             dashboard.put("path", dashboardConfigDir(cluster));
             dashboards.add(dashboard);
         }
-        return configuration;
-    }
-
-    @Override
-    public String getServiceName() {
-        return "grafana";
     }
 }
