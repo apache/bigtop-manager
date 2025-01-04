@@ -67,6 +67,9 @@ public abstract class AbstractComponentTask extends AbstractTask {
 
         commandPayload.setPackageSpecifics(
                 convertPackageSpecificInfo((List<PackageSpecificDTO>) properties.get("packageSpecifics")));
+        if (stackDTO.getStackName().equals("infra")) {
+            commandPayload.setClusterHosts((Map<String, List<String>>) properties.get("clusterHosts"));
+        }
 
         CommandRequest.Builder builder = CommandRequest.newBuilder();
         builder.setType(CommandType.COMPONENT);

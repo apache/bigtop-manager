@@ -29,15 +29,15 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PrometheusSetup {
 
-    @SuppressWarnings("unchecked")
+    //    private static final String AGENT_TARGET_LABEL = "cluster";
+
+    //    @SuppressWarnings("unchecked")
     public static ShellResult config(Params params) {
         PrometheusParams prometheusParams = (PrometheusParams) params;
         String user = prometheusParams.user();
@@ -63,18 +63,44 @@ public class PrometheusSetup {
                 Constants.PERMISSION_644,
                 prometheusParams.getGlobalParamsMap());
 
+        //        Map<String, List<String>> prometheusTargets = new HashMap<>();
+        //        prometheusTargets.put("targets", (List<String>)
+        // prometheusParams.getPrometheusScrapeJob().get("targets_list"));
+        //        LinuxFileUtils.toFile(
+        //                ConfigType.JSON,
+        //                (String) prometheusParams.getPrometheusScrapeJob().get("targets_file"),
+        //                user,
+        //                group,
+        //                Constants.PERMISSION_644,
+        //                List.of(prometheusTargets));
+        //
+        //        List<Map<String, Object>> agentTargets = new ArrayList<>();
+        //        prometheusParams.getClusterHosts().forEach((cluster, hosts) -> {
+        //            Map<String, Object> agentTarget = new HashMap<>();
+        //            agentTarget.put("targets", hosts);
+        //            agentTarget.put("labels", Map.of(AGENT_TARGET_LABEL, cluster));
+        //            agentTargets.add(agentTarget);
+        //        });
+        //
+        //        LinuxFileUtils.toFile(
+        //                ConfigType.JSON,
+        //                (String) prometheusParams.getAgentScrapeJob().get("targets_file"),
+        //                user,
+        //                group,
+        //                Constants.PERMISSION_644,
+        //                agentTargets);
+
         for (int i = 0; i < prometheusParams.getScrapeJobs().size(); i++) {
             Map<String, Object> job = prometheusParams.getScrapeJobs().get(i);
-            Map<String, List<String>> targets = new HashMap<>();
-            targets.put("targets", (List<String>) job.get("targets_list"));
             LinuxFileUtils.toFile(
                     ConfigType.JSON,
                     (String) job.get("targets_file"),
                     user,
                     group,
                     Constants.PERMISSION_644,
-                    List.of(targets));
+                    job.get("targets_list"));
         }
+
         return ShellResult.success("Prometheus Configure success!");
     }
 }
