@@ -168,7 +168,7 @@ providers:
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "agent_host_monitoring_cpu{cpuUsage=\"cpuUsage\"}",
+          "expr": "agent_host_monitoring_cpu{cpuUsage=\"cpuUsage\", <#noparse>cluster=~\"${cluster}\"</#noparse>}",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "legendFormat": "__auto",
@@ -268,7 +268,7 @@ providers:
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "agent_host_monitoring_cpu{cpuUsage=\"cpuLoadAvgMin_1\"}",
+          "expr": "agent_host_monitoring_cpu{cpuUsage=\"cpuLoadAvgMin_1\", <#noparse>cluster=~\"${cluster}\"</#noparse>}",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "legendFormat": "__auto",
@@ -368,7 +368,7 @@ providers:
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "agent_host_monitoring_cpu{cpuUsage=\"cpuLoadAvgMin_5\"}",
+          "expr": "agent_host_monitoring_cpu{cpuUsage=\"cpuLoadAvgMin_5\", <#noparse>cluster=~\"${cluster}\"</#noparse>}",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "legendFormat": "__auto",
@@ -468,7 +468,7 @@ providers:
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "agent_host_monitoring_cpu{cpuUsage=\"cpuLoadAvgMin_15\"}",
+          "expr": "agent_host_monitoring_cpu{cpuUsage=\"cpuLoadAvgMin_15\", <#noparse>cluster=~\"${cluster}\"</#noparse>}",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "legendFormat": "__auto",
@@ -578,7 +578,7 @@ providers:
           "disableTextWrap": false,
           "editorMode": "builder",
           "exemplar": false,
-          "expr": "agent_host_monitoring_mem{memUsage=\"memTotal\"}",
+          "expr": "agent_host_monitoring_mem{memUsage=\"memTotal\", <#noparse>cluster=~\"${cluster}\"</#noparse>}",
           "format": "time_series",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
@@ -678,7 +678,7 @@ providers:
           "disableTextWrap": false,
           "editorMode": "builder",
           "exemplar": false,
-          "expr": "agent_host_monitoring_mem{memUsage=\"memIdle\"}",
+          "expr": "agent_host_monitoring_mem{memUsage=\"memIdle\", <#noparse>cluster=~\"${cluster}\"</#noparse>}",
           "format": "time_series",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
@@ -791,7 +791,7 @@ providers:
         {
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "agent_host_monitoring_diskIO",
+          "expr": "agent_host_monitoring_diskIO{<#noparse>cluster=~\"${cluster}\"</#noparse>}",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "legendFormat": "__auto",
@@ -887,7 +887,7 @@ providers:
         {
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "agent_host_monitoring_disk{diskUsage=\"diskFreeSpace\"}",
+          "expr": "agent_host_monitoring_disk{diskUsage=\"diskFreeSpace\", <#noparse>cluster=~\"${cluster}\"</#noparse>}",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "legendFormat": "__auto",
@@ -904,7 +904,22 @@ providers:
   "schemaVersion": 40,
   "tags": [],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "type": "custom",
+        "name": "${cluster_label}",
+        "label": "Cluster",
+        "options": [],
+        "query": "${cluster_name}",
+        "refresh": 2,
+        "multi": false,
+        "includeAll": false,
+        "current": {
+          "text": "${cluster_name}",
+          "value": "${cluster_name}"
+        }
+      }
+    ]
   },
   "time": {
     "from": "now-6h",
@@ -913,7 +928,7 @@ providers:
   "timepicker": {},
   "timezone": "browser",
   "title": "bm-agent",
-  "uid": "ee8r44rmotukga",
+  "uid": "uid4agent_dashboard",
   "version": 1,
   "weekStart": ""
 }

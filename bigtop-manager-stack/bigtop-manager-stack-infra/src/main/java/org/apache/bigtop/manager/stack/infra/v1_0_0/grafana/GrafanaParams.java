@@ -23,6 +23,7 @@ import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
 import org.apache.bigtop.manager.stack.infra.param.InfraParams;
+import org.apache.bigtop.manager.stack.infra.v1_0_0.prometheus.PrometheusParams;
 
 import com.google.auto.service.AutoService;
 import lombok.Getter;
@@ -68,10 +69,6 @@ public class GrafanaParams extends InfraParams {
 
     public String dataDir() {
         return MessageFormat.format("{0}/data", serviceHome());
-    }
-
-    public String confDir() {
-        return MessageFormat.format("{0}/conf", serviceHome());
     }
 
     public String provisioningDir() {
@@ -145,9 +142,14 @@ public class GrafanaParams extends InfraParams {
         dashboards = new ArrayList<>();
         for (String cluster : getClusters()) {
             Map<String, Object> dashboard = new HashMap<>();
+            // Used for dashboard yaml configuration
             dashboard.put("name", cluster);
             dashboard.put("folder", cluster);
             dashboard.put("path", dashboardConfigDir(cluster));
+
+            // Used for dashboard json configuration
+            dashboard.put("cluster_label", PrometheusParams.AGENT_TARGET_LABEL);
+            dashboard.put("cluster_name", cluster);
             dashboards.add(dashboard);
         }
     }

@@ -82,7 +82,7 @@ public class GrafanaSetup {
                         user,
                         group,
                         Constants.PERMISSION_644,
-                        grafanaParams.getGlobalParamsMap());
+                        dashboard);
             }
         }
 
