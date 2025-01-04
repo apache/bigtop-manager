@@ -70,7 +70,6 @@ public abstract class AbstractComponentTask extends AbstractTask {
         if (stackDTO.getStackName().equals("infra")) {
             commandPayload.setClusterHosts((Map<String, List<String>>) properties.get("clusterHosts"));
         }
-
         CommandRequest.Builder builder = CommandRequest.newBuilder();
         builder.setType(CommandType.COMPONENT);
         builder.setPayload(JsonUtils.writeAsString(commandPayload));

@@ -28,8 +28,10 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @NoArgsConstructor
@@ -79,9 +81,7 @@ public abstract class InfraParams extends BaseParams {
     }
 
     public Map<String, List<String>> getClusterHosts() {
-        if (clusterHosts == null) {
-            log.error("Cluster hosts is null, please check the command payload");
-        }
-        return clusterHosts;
+        // In Component Status stage, clusterHosts is null
+        return Objects.requireNonNullElseGet(clusterHosts, HashMap::new);
     }
 }

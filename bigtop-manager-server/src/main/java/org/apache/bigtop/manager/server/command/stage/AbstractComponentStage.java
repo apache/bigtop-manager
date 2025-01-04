@@ -88,8 +88,12 @@ public abstract class AbstractComponentStage extends AbstractStage {
         Map<String, List<String>> clusterHosts = new HashMap<>();
         List<HostPO> hostPOs = hostDao.findAll();
         for (HostPO hostPO : hostPOs) {
-            String clusterName = hostPO.getClusterName();
+            Long clusterId = hostPO.getClusterId();
+            if (clusterId == null) {
+                continue;
+            }
             String host = hostPO.getIpv4();
+            String clusterName = clusterDao.findById(clusterId).getName();
             if (clusterHosts.containsKey(clusterName)) {
                 clusterHosts.get(clusterName).add(host);
             } else {
