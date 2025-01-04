@@ -25,15 +25,15 @@ import org.apache.bigtop.manager.server.model.dto.command.ServiceCommandDTO;
 
 import java.util.List;
 
-public class ServiceStartJob extends AbstractServiceJob {
+public class ServiceCheckJob extends AbstractServiceJob {
 
-    public ServiceStartJob(JobContext jobContext) {
+    public ServiceCheckJob(JobContext jobContext) {
         super(jobContext);
     }
 
     @Override
     protected void createStages() {
-        super.createStartStages();
+        super.createCheckStages();
     }
 
     @Override
@@ -52,7 +52,22 @@ public class ServiceStartJob extends AbstractServiceJob {
     }
 
     @Override
+    public void onFailure() {
+        super.onFailure();
+
+        CommandDTO commandDTO = jobContext.getCommandDTO();
+        List<ServiceCommandDTO> serviceCommands = commandDTO.getServiceCommands();
+        for (ServiceCommandDTO serviceCommand : serviceCommands) {
+            Long clusterId = commandDTO.getClusterId();
+            String serviceName = serviceCommand.getServiceName();
+            ServicePO servicePO = serviceDao.findByClusterIdAndName(clusterId, serviceName);
+            servicePO.setStatus(HealthyStatusEnum.UNHEALTHY.getCode());
+            serviceDao.partialUpdateById(servicePO);
+        }
+    }
+
+    @Override
     public String getName() {
-        return "Start services";
+        return "Check services";
     }
 }
