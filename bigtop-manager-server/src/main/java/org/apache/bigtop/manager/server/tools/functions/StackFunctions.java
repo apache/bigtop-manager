@@ -83,6 +83,10 @@ public class StackFunctions {
                                 if (propertyVO.getName().equals("content")) {
                                     propertyVO.setValue(null);
                                 }
+                                if (propertyVO.getAttrs() != null
+                                        && propertyVO.getAttrs().getType().equals("longtext")) {
+                                    propertyVO.setValue(null);
+                                }
                             }
                         }
                         return JsonUtils.indentWriteAsString(serviceVO);
