@@ -97,8 +97,8 @@ public class ComponentServiceImpl implements ComponentService {
         ComponentDTO componentDTO = StackUtils.getComponentDTO(componentPO.getName());
 
         // Only server component should be stopped before remove, client component can be removed directly.
-        if (componentDTO.getCategory().equals(ComponentCategories.SERVER) &&
-                Objects.equals(componentPO.getStatus(), HealthyStatusEnum.HEALTHY.getCode())) {
+        if (componentDTO.getCategory().equals(ComponentCategories.SERVER)
+                && Objects.equals(componentPO.getStatus(), HealthyStatusEnum.HEALTHY.getCode())) {
             throw new ApiException(ApiExceptionEnum.COMPONENT_IS_RUNNING);
         }
 
