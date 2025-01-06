@@ -40,8 +40,11 @@ public class ComponentStartTask extends AbstractComponentTask {
 
         String componentName = taskContext.getComponentName();
         String hostname = taskContext.getHostname();
-        ComponentQuery componentQuery =
-                ComponentQuery.builder().hostname(hostname).name(componentName).build();
+        ComponentQuery componentQuery = ComponentQuery.builder()
+                .clusterId(taskContext.getClusterId())
+                .hostname(hostname)
+                .name(componentName)
+                .build();
         ComponentPO componentPO = componentDao.findByQuery(componentQuery).get(0);
         componentPO.setStatus(HealthyStatusEnum.HEALTHY.getCode());
         componentDao.partialUpdateById(componentPO);

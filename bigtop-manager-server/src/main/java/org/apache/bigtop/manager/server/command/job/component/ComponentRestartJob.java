@@ -16,11 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.command.job;
+package org.apache.bigtop.manager.server.command.job.component;
 
-public class HostRestartJob extends AbstractHostJob {
+import org.apache.bigtop.manager.server.command.job.JobContext;
 
-    public HostRestartJob(JobContext jobContext) {
+public class ComponentRestartJob extends AbstractComponentJob {
+
+    public ComponentRestartJob(JobContext jobContext) {
         super(jobContext);
     }
 
@@ -33,6 +35,6 @@ public class HostRestartJob extends AbstractHostJob {
 
     @Override
     public String getName() {
-        return "Restart host";
+        return "Restart components";
     }
 }

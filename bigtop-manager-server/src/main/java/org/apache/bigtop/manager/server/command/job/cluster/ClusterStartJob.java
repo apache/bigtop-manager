@@ -16,22 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.req;
+package org.apache.bigtop.manager.server.command.job.cluster;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
+import org.apache.bigtop.manager.server.command.job.JobContext;
 
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import java.util.List;
+public class ClusterStartJob extends AbstractClusterJob {
 
-@Data
-public class ComponentHostReq {
+    public ClusterStartJob(JobContext jobContext) {
+        super(jobContext);
+    }
 
-    @NotNull @Schema(description = "Component name", example = "zookeeper_server")
-    private String componentName;
+    @Override
+    protected void createStages() {
+        super.createStartStages();
+    }
 
-    @NotEmpty
-    @Schema(description = "Hostnames for component", example = "[host1, host2]")
-    private List<String> hostnames;
+    @Override
+    public String getName() {
+        return "Start cluster";
+    }
 }

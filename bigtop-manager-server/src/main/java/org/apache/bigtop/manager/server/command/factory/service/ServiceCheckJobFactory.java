@@ -22,7 +22,7 @@ import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
 import org.apache.bigtop.manager.server.command.job.Job;
 import org.apache.bigtop.manager.server.command.job.JobContext;
-import org.apache.bigtop.manager.server.command.job.ServiceCheckJob;
+import org.apache.bigtop.manager.server.command.job.service.ServiceCheckJob;
 import org.apache.bigtop.manager.server.enums.CommandLevel;
 
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
