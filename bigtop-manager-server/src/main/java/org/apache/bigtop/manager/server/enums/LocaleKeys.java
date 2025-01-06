@@ -36,6 +36,8 @@ public enum LocaleKeys {
 
     CLUSTER_NOT_FOUND("cluster.not.found"),
     CLUSTER_EXISTS("cluster.exists"),
+    CLUSTER_HAS_HOSTS("cluster.has.hosts"),
+    CLUSTER_HAS_SERVICES("cluster.has.services"),
 
     HOST_NOT_FOUND("host.not.found"),
     HOST_ASSIGNED("host.assigned"),
@@ -48,8 +50,10 @@ public enum LocaleKeys {
 
     SERVICE_NOT_FOUND("service.not.found"),
     SERVICE_REQUIRED_NOT_FOUND("service.required.not.found"),
+    SERVICE_HAS_COMPONENTS("service.has.components"),
 
     COMPONENT_NOT_FOUND("component.not.found"),
+    COMPONENT_IS_RUNNING("component.is.running"),
 
     JOB_NOT_FOUND("job.not.found"),
     JOB_NOT_RETRYABLE("job.not.retryable"),

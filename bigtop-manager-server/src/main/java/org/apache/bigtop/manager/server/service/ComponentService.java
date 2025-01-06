@@ -37,4 +37,11 @@ public interface ComponentService {
      * @return component
      */
     ComponentVO get(Long id);
+
+    /**
+     * Remove a component.
+     *
+     * @return component
+     */
+    Boolean remove(Long id);
 }

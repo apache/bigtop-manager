@@ -23,6 +23,9 @@ import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
 import org.apache.bigtop.manager.dao.query.ComponentQuery;
 import org.apache.bigtop.manager.dao.repository.ComponentDao;
 import org.apache.bigtop.manager.dao.repository.ServiceConfigDao;
+import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
+import org.apache.bigtop.manager.server.enums.HealthyStatusEnum;
+import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.model.converter.ComponentConverter;
 import org.apache.bigtop.manager.server.model.converter.ServiceConfigConverter;
 import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
@@ -47,6 +50,7 @@ import lombok.extern.slf4j.Slf4j;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -84,6 +88,16 @@ public class ComponentServiceImpl implements ComponentService {
         ComponentVO componentVO = ComponentConverter.INSTANCE.fromPO2VO(componentPO);
         componentVO.setQuickLink(getQuickLink(componentPO));
         return componentVO;
+    }
+
+    @Override
+    public Boolean remove(Long id) {
+        ComponentPO componentPO = componentDao.findById(id);
+        if (Objects.equals(componentPO.getStatus(), HealthyStatusEnum.HEALTHY.getCode())) {
+            throw new ApiException(ApiExceptionEnum.COMPONENT_IS_RUNNING);
+        }
+
+        return componentDao.deleteById(id);
     }
 
     private QuickLinkVO getQuickLink(ComponentPO componentPO) {

@@ -30,7 +30,6 @@ import lombok.Getter;
 public enum Command {
     // Available for: Cluster, Host, Service, Component
     ADD("add", "Add"),
-    REMOVE("remove", "Remove"),
     START("start", "Start"),
     STOP("stop", "Stop"),
     RESTART("restart", "Restart"),
