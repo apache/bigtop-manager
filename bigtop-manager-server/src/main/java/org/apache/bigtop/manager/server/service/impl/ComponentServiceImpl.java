@@ -18,6 +18,7 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
+import org.apache.bigtop.manager.common.constants.ComponentCategories;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
 import org.apache.bigtop.manager.dao.query.ComponentQuery;
@@ -93,7 +94,11 @@ public class ComponentServiceImpl implements ComponentService {
     @Override
     public Boolean remove(Long id) {
         ComponentPO componentPO = componentDao.findById(id);
-        if (Objects.equals(componentPO.getStatus(), HealthyStatusEnum.HEALTHY.getCode())) {
+        ComponentDTO componentDTO = StackUtils.getComponentDTO(componentPO.getName());
+
+        // Only server component should be stopped before remove, client component can be removed directly.
+        if (componentDTO.getCategory().equals(ComponentCategories.SERVER) &&
+                Objects.equals(componentPO.getStatus(), HealthyStatusEnum.HEALTHY.getCode())) {
             throw new ApiException(ApiExceptionEnum.COMPONENT_IS_RUNNING);
         }
 
