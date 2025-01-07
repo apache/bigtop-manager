@@ -53,7 +53,7 @@ public class CommandPayload extends BasePayload {
 
     /**
      * This field is exclusively used for Prometheus and Grafana within the infra services.
-     * Includes cluster and corresponding host IP.
+     * Includes cluster and corresponding hostname.
      */
     private Map<String, List<String>> clusterHosts;
 }
