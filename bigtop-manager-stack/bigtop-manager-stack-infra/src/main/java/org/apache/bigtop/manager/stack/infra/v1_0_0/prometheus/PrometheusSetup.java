@@ -29,15 +29,12 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PrometheusSetup {
 
-    @SuppressWarnings("unchecked")
     public static ShellResult config(Params params) {
         PrometheusParams prometheusParams = (PrometheusParams) params;
         String user = prometheusParams.user();
@@ -65,16 +62,15 @@ public class PrometheusSetup {
 
         for (int i = 0; i < prometheusParams.getScrapeJobs().size(); i++) {
             Map<String, Object> job = prometheusParams.getScrapeJobs().get(i);
-            Map<String, List<String>> targets = new HashMap<>();
-            targets.put("targets", (List<String>) job.get("targets_list"));
             LinuxFileUtils.toFile(
                     ConfigType.JSON,
                     (String) job.get("targets_file"),
                     user,
                     group,
                     Constants.PERMISSION_644,
-                    List.of(targets));
+                    job.get("targets_list"));
         }
+
         return ShellResult.success("Prometheus Configure success!");
     }
 }

@@ -28,6 +28,8 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @NoArgsConstructor
@@ -71,5 +73,10 @@ public abstract class InfraParams extends BaseParams {
         }
 
         return parentPath + "/infras";
+    }
+
+    public Map<String, List<String>> getClusterHosts() {
+        // In Component Status stage, clusterHosts is null
+        return commandPayload.getClusterHosts();
     }
 }

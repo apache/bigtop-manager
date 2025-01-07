@@ -27,6 +27,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.util.List;
+import java.util.Map;
 
 @Data
 @ToString(callSuper = true)
@@ -49,4 +50,10 @@ public class CommandPayload extends BasePayload {
     private String componentName;
 
     private List<PackageSpecificInfo> packageSpecifics;
+
+    /**
+     * This field is exclusively used for Prometheus and Grafana within the infra services.
+     * Includes cluster and corresponding hostname.
+     */
+    private Map<String, List<String>> clusterHosts;
 }
