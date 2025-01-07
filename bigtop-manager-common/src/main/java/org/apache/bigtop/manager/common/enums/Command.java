@@ -29,8 +29,8 @@ import lombok.Getter;
 @Getter
 public enum Command {
     // Available for: Cluster, Host, Service, Component
+    // Remove is not a command because it won't create job, please refer to the related controller for remove action.
     ADD("add", "Add"),
-    REMOVE("remove", "Remove"),
     START("start", "Start"),
     STOP("stop", "Stop"),
     RESTART("restart", "Restart"),

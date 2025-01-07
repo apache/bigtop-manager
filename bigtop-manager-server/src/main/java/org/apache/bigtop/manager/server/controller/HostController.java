@@ -92,10 +92,10 @@ public class HostController {
         return ResponseEntity.success(hostService.update(id, hostDTO));
     }
 
-    @Operation(summary = "delete", description = "Delete a host")
+    @Operation(summary = "remove", description = "Remove a host")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> delete(@PathVariable Long id) {
-        return ResponseEntity.success(hostService.delete(id));
+    public ResponseEntity<Boolean> remove(@PathVariable Long id) {
+        return ResponseEntity.success(hostService.remove(id));
     }
 
     @Operation(summary = "Check connection", description = "Check connection for hosts")

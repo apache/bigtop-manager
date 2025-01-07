@@ -24,6 +24,7 @@ import org.apache.bigtop.manager.server.model.vo.PageVO;
 import org.apache.bigtop.manager.server.service.ComponentService;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -68,5 +69,11 @@ public class ComponentController {
     @GetMapping("/{id}")
     public ResponseEntity<ComponentVO> get(@PathVariable Long clusterId, @PathVariable Long id) {
         return ResponseEntity.success(componentService.get(id));
+    }
+
+    @Operation(summary = "remove", description = "Remove a component")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Boolean> remove(@PathVariable Long clusterId, @PathVariable Long id) {
+        return ResponseEntity.success(componentService.remove(id));
     }
 }

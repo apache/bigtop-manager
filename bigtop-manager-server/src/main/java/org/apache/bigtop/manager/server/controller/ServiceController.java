@@ -78,6 +78,12 @@ public class ServiceController {
         return ResponseEntity.success(serviceService.get(id));
     }
 
+    @Operation(summary = "remove", description = "Remove a service")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Boolean> remove(@PathVariable Long clusterId, @PathVariable Long id) {
+        return ResponseEntity.success(serviceService.remove(id));
+    }
+
     @Operation(summary = "list service configs", description = "List service configs")
     @GetMapping("/{id}/configs")
     public ResponseEntity<List<ServiceConfigVO>> listConf(@PathVariable Long clusterId, @PathVariable Long id) {

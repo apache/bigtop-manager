@@ -63,7 +63,7 @@ public interface HostService {
      *
      * @return Host
      */
-    Boolean delete(Long id);
+    Boolean remove(Long id);
 
     /**
      * Check hosts connection

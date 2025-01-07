@@ -45,4 +45,11 @@ public interface ClusterService {
      * @return Cluster
      */
     ClusterVO update(Long id, ClusterDTO clusterDTO);
+
+    /**
+     * Remove a cluster
+     *
+     * @return Cluster
+     */
+    Boolean remove(Long id);
 }
