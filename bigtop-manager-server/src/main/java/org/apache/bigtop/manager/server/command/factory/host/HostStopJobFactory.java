@@ -20,9 +20,9 @@ package org.apache.bigtop.manager.server.command.factory.host;
 
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
-import org.apache.bigtop.manager.server.command.job.HostStopJob;
 import org.apache.bigtop.manager.server.command.job.Job;
 import org.apache.bigtop.manager.server.command.job.JobContext;
+import org.apache.bigtop.manager.server.command.job.host.HostStopJob;
 import org.apache.bigtop.manager.server.enums.CommandLevel;
 
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;

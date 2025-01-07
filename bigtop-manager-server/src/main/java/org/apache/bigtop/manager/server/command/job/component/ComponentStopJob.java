@@ -16,22 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.req;
+package org.apache.bigtop.manager.server.command.job.component;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
+import org.apache.bigtop.manager.server.command.job.JobContext;
 
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import java.util.List;
+public class ComponentStopJob extends AbstractComponentJob {
 
-@Data
-public class ComponentHostReq {
+    public ComponentStopJob(JobContext jobContext) {
+        super(jobContext);
+    }
 
-    @NotNull @Schema(description = "Component name", example = "zookeeper_server")
-    private String componentName;
+    @Override
+    protected void createStages() {
+        super.createStopStages();
+    }
 
-    @NotEmpty
-    @Schema(description = "Hostnames for component", example = "[host1, host2]")
-    private List<String> hostnames;
+    @Override
+    public String getName() {
+        return "Stop components";
+    }
 }

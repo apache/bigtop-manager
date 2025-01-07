@@ -35,10 +35,8 @@ public enum Command {
     STOP("stop", "Stop"),
     RESTART("restart", "Restart"),
 
-    // Available for: Service, Component
-    CHECK("check", "Check"),
-
     // Available for: Service
+    CHECK("check", "Check"),
     CONFIGURE("configure", "Configure"),
     CUSTOM("custom", "Custom"),
 

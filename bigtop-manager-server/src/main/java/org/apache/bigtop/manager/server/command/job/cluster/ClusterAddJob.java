@@ -16,25 +16,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.command.job;
+package org.apache.bigtop.manager.server.command.job.cluster;
 
+import org.apache.bigtop.manager.dao.po.JobPO;
+import org.apache.bigtop.manager.dao.po.StagePO;
+import org.apache.bigtop.manager.dao.po.TaskPO;
+import org.apache.bigtop.manager.server.command.job.AbstractJob;
+import org.apache.bigtop.manager.server.command.job.JobContext;
 import org.apache.bigtop.manager.server.command.stage.CacheFileUpdateStage;
 import org.apache.bigtop.manager.server.command.stage.HostCheckStage;
 import org.apache.bigtop.manager.server.command.stage.SetupJdkStage;
+import org.apache.bigtop.manager.server.command.stage.Stage;
 import org.apache.bigtop.manager.server.command.stage.StageContext;
+import org.apache.bigtop.manager.server.command.task.Task;
+import org.apache.bigtop.manager.server.enums.HealthyStatusEnum;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
-import org.apache.bigtop.manager.server.model.converter.HostConverter;
+import org.apache.bigtop.manager.server.model.converter.ClusterConverter;
+import org.apache.bigtop.manager.server.model.dto.ClusterDTO;
 import org.apache.bigtop.manager.server.model.dto.CommandDTO;
 import org.apache.bigtop.manager.server.model.dto.HostDTO;
 import org.apache.bigtop.manager.server.service.HostService;
 
 import java.util.List;
 
-public class HostAddJob extends AbstractJob {
+public class ClusterAddJob extends AbstractJob {
 
     private HostService hostService;
 
-    public HostAddJob(JobContext jobContext) {
+    public ClusterAddJob(JobContext jobContext) {
         super(jobContext);
     }
 
@@ -61,20 +70,54 @@ public class HostAddJob extends AbstractJob {
             return;
         }
 
+        saveCluster();
+
         saveHosts();
+
+        linkJobToCluster();
     }
 
     @Override
     public String getName() {
-        return "Add hosts";
+        return "Add cluster";
+    }
+
+    private void saveCluster() {
+        CommandDTO commandDTO = jobContext.getCommandDTO();
+        ClusterDTO clusterDTO = ClusterConverter.INSTANCE.fromCommand2DTO(commandDTO.getClusterCommand());
+        clusterPO = clusterDao.findByName(clusterDTO.getName());
+        if (clusterPO == null) {
+            clusterPO = ClusterConverter.INSTANCE.fromDTO2PO(clusterDTO);
+        }
+
+        clusterPO.setStatus(HealthyStatusEnum.HEALTHY.getCode());
+        clusterDao.save(clusterPO);
     }
 
     private void saveHosts() {
         CommandDTO commandDTO = jobContext.getCommandDTO();
-        List<HostDTO> hostDTOList = HostConverter.INSTANCE.fromCommand2DTO(commandDTO.getHostCommands());
+        List<HostDTO> hostDTOList = commandDTO.getClusterCommand().getHosts();
         for (HostDTO hostDTO : hostDTOList) {
             hostDTO.setClusterId(clusterPO.getId());
             hostService.add(hostDTO);
+        }
+    }
+
+    private void linkJobToCluster() {
+        JobPO jobPO = getJobPO();
+        jobPO.setClusterId(clusterPO.getId());
+        jobDao.partialUpdateById(jobPO);
+
+        for (Stage stage : getStages()) {
+            StagePO stagePO = stage.getStagePO();
+            stagePO.setClusterId(clusterPO.getId());
+            stageDao.partialUpdateById(stagePO);
+
+            for (Task task : stage.getTasks()) {
+                TaskPO taskPO = task.getTaskPO();
+                taskPO.setClusterId(clusterPO.getId());
+                taskDao.partialUpdateById(taskPO);
+            }
         }
     }
 }
