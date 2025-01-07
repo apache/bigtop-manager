@@ -140,6 +140,9 @@ public class GrafanaParams extends InfraParams {
 
     public void setDashboards() {
         dashboards = new ArrayList<>();
+        if (getClusterHosts() == null) {
+            return;
+        }
         for (String cluster : getClusters()) {
             Map<String, Object> dashboard = new HashMap<>();
             // Used for dashboard yaml configuration
