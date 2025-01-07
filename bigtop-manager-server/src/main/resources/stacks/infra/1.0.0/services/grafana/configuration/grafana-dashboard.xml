@@ -29,7 +29,7 @@ providers:
 <#list dashboards as db>
   - name: '${db.name}'
     orgId: 1
-    folder: '${db.folder}'
+    folder: ''
     type: file
     options:
       path: '${db.path}'

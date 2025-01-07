@@ -148,7 +148,6 @@ public class GrafanaParams extends InfraParams {
         Map<String, Object> clusterDashboard = new HashMap<>();
         // Used for dashboard yaml configuration
         clusterDashboard.put("name", "Cluster");
-        clusterDashboard.put("folder", "Cluster");
         clusterDashboard.put("path", dashboardConfigDir("Cluster"));
 
         // Used for dashboard json configuration
