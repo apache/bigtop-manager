@@ -44,7 +44,7 @@ public class PrometheusParams extends InfraParams {
     protected final String PROMETHEUS_SELF_JOB_NAME = "prometheus";
     protected final String BM_AGENT_JOB_NAME = "bm-agent";
     protected final String BM_AGENT_PORT = "8081";
-    public static final String AGENT_TARGET_LABEL = "cluster";
+    protected final String AGENT_TARGET_LABEL = "cluster";
 
     private Map<String, Object> prometheusScrapeJob;
     private Map<String, Object> agentScrapeJob;
@@ -121,16 +121,20 @@ public class PrometheusParams extends InfraParams {
         agentScrapeJob.put("metrics_path", "/actuator/prometheus");
 
         List<Map<String, Object>> agentTargets = new ArrayList<>();
-        getClusterHosts().forEach((cluster, hosts) -> {
-            Map<String, Object> agentTarget = new HashMap<>();
-            List<String> targets = new ArrayList<>();
-            for (String host : hosts) {
-                targets.add(MessageFormat.format("{0}:{1}", host, BM_AGENT_PORT));
-            }
-            agentTarget.put("targets", targets);
-            agentTarget.put("labels", Map.of(AGENT_TARGET_LABEL, cluster));
-            agentTargets.add(agentTarget);
-        });
+        Map<String, List<String>> clusterHosts = getClusterHosts();
+        if (clusterHosts != null) {
+            clusterHosts.forEach((cluster, hosts) -> {
+                Map<String, Object> agentTarget = new HashMap<>();
+                List<String> targets = new ArrayList<>();
+                for (String host : hosts) {
+                    targets.add(MessageFormat.format("{0}:{1}", host, BM_AGENT_PORT));
+                }
+                agentTarget.put("targets", targets);
+                agentTarget.put("labels", Map.of(AGENT_TARGET_LABEL, cluster));
+                agentTargets.add(agentTarget);
+            });
+        }
+
         agentScrapeJob.put("targets_list", agentTargets);
     }
 }

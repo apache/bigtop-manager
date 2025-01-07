@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.command.job;
+package org.apache.bigtop.manager.server.command.job.service;
 
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
@@ -26,6 +26,8 @@ import org.apache.bigtop.manager.dao.repository.HostDao;
 import org.apache.bigtop.manager.dao.repository.ServiceConfigDao;
 import org.apache.bigtop.manager.dao.repository.ServiceConfigSnapshotDao;
 import org.apache.bigtop.manager.dao.repository.ServiceDao;
+import org.apache.bigtop.manager.server.command.job.AbstractJob;
+import org.apache.bigtop.manager.server.command.job.JobContext;
 import org.apache.bigtop.manager.server.command.stage.CacheFileUpdateStage;
 import org.apache.bigtop.manager.server.command.stage.ComponentAddStage;
 import org.apache.bigtop.manager.server.command.stage.ComponentCheckStage;

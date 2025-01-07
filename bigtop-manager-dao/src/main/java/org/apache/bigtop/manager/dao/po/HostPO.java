@@ -109,5 +109,8 @@ public class HostPO extends BasePO implements Serializable {
     private String clusterName;
 
     @Transient
+    private String clusterDisplayName;
+
+    @Transient
     private Integer componentNum;
 }

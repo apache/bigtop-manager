@@ -1,0 +1,108 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *    https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+package org.apache.bigtop.manager.server.command.job.component;
+
+import org.apache.bigtop.manager.dao.po.ComponentPO;
+import org.apache.bigtop.manager.dao.po.HostPO;
+import org.apache.bigtop.manager.dao.po.ServicePO;
+import org.apache.bigtop.manager.server.command.job.JobContext;
+import org.apache.bigtop.manager.server.enums.HealthyStatusEnum;
+import org.apache.bigtop.manager.server.model.converter.ComponentConverter;
+import org.apache.bigtop.manager.server.model.dto.CommandDTO;
+import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
+import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
+import org.apache.bigtop.manager.server.model.dto.command.ComponentCommandDTO;
+import org.apache.bigtop.manager.server.utils.StackUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class ComponentAddJob extends AbstractComponentJob {
+
+    public ComponentAddJob(JobContext jobContext) {
+        super(jobContext);
+    }
+
+    @Override
+    protected void injectBeans() {
+        super.injectBeans();
+    }
+
+    @Override
+    protected void createStages() {
+        // Update cache files
+        super.createCacheStage();
+
+        // Install components
+        super.createAddStages();
+
+        // Configure services
+        super.createConfigureStages();
+
+        // Start all master components
+        super.createStartStages();
+    }
+
+    @Override
+    public void beforeRun() {
+        super.beforeRun();
+
+        // Skip persistent if it's a retry job
+        if (jobContext.getRetryFlag()) {
+            return;
+        }
+
+        CommandDTO commandDTO = jobContext.getCommandDTO();
+        List<ComponentCommandDTO> componentCommands = commandDTO.getComponentCommands();
+        for (ComponentCommandDTO componentCommand : componentCommands) {
+            saveComponents(componentCommand);
+        }
+    }
+
+    @Override
+    public String getName() {
+        return "Add components";
+    }
+
+    private void saveComponents(ComponentCommandDTO componentCommand) {
+        Long clusterId = jobContext.getCommandDTO().getClusterId();
+        String componentName = componentCommand.getComponentName();
+        ServiceDTO serviceDTO = StackUtils.getServiceDTOByComponentName(componentName);
+        ServicePO servicePO = serviceDao.findByClusterIdAndName(clusterId, serviceDTO.getName());
+
+        List<ComponentPO> componentPOList = new ArrayList<>();
+        List<String> hostnames = componentCommand.getHostnames();
+        for (String hostname : hostnames) {
+            HostPO hostPO = hostDao.findByHostname(hostname);
+            ComponentDTO componentDTO = StackUtils.getComponentDTO(componentName);
+            ComponentPO componentPO = ComponentConverter.INSTANCE.fromDTO2PO(componentDTO);
+            componentPO.setClusterId(clusterId);
+            componentPO.setHostId(hostPO.getId());
+            componentPO.setServiceId(servicePO.getId());
+            componentPO.setStatus(HealthyStatusEnum.UNKNOWN.getCode());
+            componentPOList.add(componentPO);
+        }
+
+        componentDao.saveAll(componentPOList);
+
+        // Require restart after adding new components
+        servicePO.setRestartFlag(true);
+        serviceDao.partialUpdateById(servicePO);
+    }
+}

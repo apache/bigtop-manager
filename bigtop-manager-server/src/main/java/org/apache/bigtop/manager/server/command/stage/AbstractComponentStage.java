@@ -26,6 +26,7 @@ import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,19 +87,13 @@ public abstract class AbstractComponentStage extends AbstractStage {
 
     private Map<String, List<String>> getClusterHosts() {
         Map<String, List<String>> clusterHosts = new HashMap<>();
-        List<HostPO> hostPOs = hostDao.findAll();
-        for (HostPO hostPO : hostPOs) {
-            Long clusterId = hostPO.getClusterId();
-            if (clusterId == null) {
-                continue;
+        for (ClusterPO clusterPO : clusterDao.findAll()) {
+            List<String> hosts = new ArrayList<>();
+            for (HostPO hostPO : hostDao.findAllByClusterId(clusterPO.getId())) {
+                String host = hostPO.getHostname();
+                hosts.add(host);
             }
-            String host = hostPO.getIpv4();
-            String clusterName = clusterDao.findById(clusterId).getName();
-            if (clusterHosts.containsKey(clusterName)) {
-                clusterHosts.get(clusterName).add(host);
-            } else {
-                clusterHosts.put(clusterName, List.of(host));
-            }
+            clusterHosts.put(clusterPO.getName(), hosts);
         }
         return clusterHosts;
     }

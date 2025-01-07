@@ -19,13 +19,19 @@
 package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.dao.po.ClusterPO;
+import org.apache.bigtop.manager.dao.po.HostPO;
+import org.apache.bigtop.manager.dao.po.ServicePO;
 import org.apache.bigtop.manager.dao.repository.ClusterDao;
+import org.apache.bigtop.manager.dao.repository.HostDao;
+import org.apache.bigtop.manager.dao.repository.ServiceDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.model.converter.ClusterConverter;
 import org.apache.bigtop.manager.server.model.dto.ClusterDTO;
 import org.apache.bigtop.manager.server.model.vo.ClusterVO;
 import org.apache.bigtop.manager.server.service.ClusterService;
+
+import org.apache.commons.collections4.CollectionUtils;
 
 import org.springframework.stereotype.Service;
 
@@ -40,6 +46,12 @@ public class ClusterServiceImpl implements ClusterService {
 
     @Resource
     private ClusterDao clusterDao;
+
+    @Resource
+    private HostDao hostDao;
+
+    @Resource
+    private ServiceDao serviceDao;
 
     @Override
     public List<ClusterVO> list() {
@@ -65,5 +77,20 @@ public class ClusterServiceImpl implements ClusterService {
         clusterDao.partialUpdateById(clusterPO);
 
         return get(id);
+    }
+
+    @Override
+    public Boolean remove(Long id) {
+        List<HostPO> hostPOList = hostDao.findAllByClusterId(id);
+        if (CollectionUtils.isNotEmpty(hostPOList)) {
+            throw new ApiException(ApiExceptionEnum.CLUSTER_HAS_HOSTS);
+        }
+
+        List<ServicePO> servicePOList = serviceDao.findByClusterId(id);
+        if (CollectionUtils.isNotEmpty(servicePOList)) {
+            throw new ApiException(ApiExceptionEnum.CLUSTER_HAS_SERVICES);
+        }
+
+        return clusterDao.deleteById(id);
     }
 }

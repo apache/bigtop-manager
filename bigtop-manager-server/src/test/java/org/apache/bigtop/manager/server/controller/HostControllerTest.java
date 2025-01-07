@@ -107,9 +107,9 @@ class HostControllerTest {
     @Test
     void deleteReturnsSuccess() {
         Long hostId = 1L;
-        when(hostService.delete(hostId)).thenReturn(true);
+        when(hostService.remove(hostId)).thenReturn(true);
 
-        ResponseEntity<Boolean> response = hostController.delete(hostId);
+        ResponseEntity<Boolean> response = hostController.remove(hostId);
 
         assertTrue(response.isSuccess());
         assertTrue(response.getData());
@@ -163,9 +163,9 @@ class HostControllerTest {
     @Test
     void deleteReturnsFalseForInvalidHostId() {
         Long hostId = 999L;
-        when(hostService.delete(hostId)).thenReturn(false);
+        when(hostService.remove(hostId)).thenReturn(false);
 
-        ResponseEntity<Boolean> response = hostController.delete(hostId);
+        ResponseEntity<Boolean> response = hostController.remove(hostId);
 
         assertTrue(response.isSuccess());
         assertFalse(response.getData());

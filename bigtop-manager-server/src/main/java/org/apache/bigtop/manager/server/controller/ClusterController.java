@@ -26,6 +26,7 @@ import org.apache.bigtop.manager.server.service.ClusterService;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
 
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -64,5 +65,11 @@ public class ClusterController {
     public ResponseEntity<ClusterVO> update(@PathVariable Long id, @RequestBody @Validated ClusterReq clusterReq) {
         ClusterDTO clusterDTO = ClusterConverter.INSTANCE.fromReq2DTO(clusterReq);
         return ResponseEntity.success(clusterService.update(id, clusterDTO));
+    }
+
+    @Operation(summary = "remove", description = "Remove a cluster")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Boolean> remove(@PathVariable Long id) {
+        return ResponseEntity.success(clusterService.remove(id));
     }
 }

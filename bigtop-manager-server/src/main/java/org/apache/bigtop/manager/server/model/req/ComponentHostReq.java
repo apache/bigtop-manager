@@ -28,10 +28,10 @@ import java.util.List;
 @Data
 public class ComponentHostReq {
 
-    @NotNull @Schema(description = "Component name", example = "zookeeper-server")
+    @NotNull @Schema(description = "Component name", example = "zookeeper_server")
     private String componentName;
 
     @NotEmpty
-    @Schema(description = "Hostnames for component", example = "[host1]")
+    @Schema(description = "Hostnames for component", example = "[host1, host2]")
     private List<String> hostnames;
 }

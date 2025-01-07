@@ -71,5 +71,7 @@ public class HostVO {
 
     private String clusterName;
 
+    private String clusterDisplayName;
+
     private Integer componentNum;
 }

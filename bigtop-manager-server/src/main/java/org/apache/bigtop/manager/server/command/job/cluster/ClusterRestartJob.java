@@ -16,29 +16,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.command.job;
+package org.apache.bigtop.manager.server.command.job.cluster;
 
-public class ServiceConfigureJob extends AbstractServiceJob {
+import org.apache.bigtop.manager.server.command.job.JobContext;
 
-    public ServiceConfigureJob(JobContext jobContext) {
+public class ClusterRestartJob extends AbstractClusterJob {
+
+    public ClusterRestartJob(JobContext jobContext) {
         super(jobContext);
     }
 
     @Override
     protected void createStages() {
-        // Update cache files
-        super.createCacheStage();
-
-        // Configure services
-        super.createConfigureStages();
-
-        // Restart services
         super.createStopStages();
+
         super.createStartStages();
     }
 
     @Override
     public String getName() {
-        return "Configure services";
+        return "Restart cluster";
     }
 }

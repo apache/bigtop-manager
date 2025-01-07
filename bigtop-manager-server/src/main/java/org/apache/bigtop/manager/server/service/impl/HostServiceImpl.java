@@ -143,13 +143,12 @@ public class HostServiceImpl implements HostService {
     }
 
     @Override
-    public Boolean delete(Long id) {
+    public Boolean remove(Long id) {
         if (componentDao.countByHostId(id) > 0) {
             throw new ApiException(ApiExceptionEnum.HOST_HAS_COMPONENTS);
         }
 
-        hostDao.deleteById(id);
-        return true;
+        return hostDao.deleteById(id);
     }
 
     @Override

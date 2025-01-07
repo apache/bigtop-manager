@@ -16,21 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.command.job;
+package org.apache.bigtop.manager.server.command.job.component;
 
-public class HostStopJob extends AbstractHostJob {
+import org.apache.bigtop.manager.server.command.job.JobContext;
 
-    public HostStopJob(JobContext jobContext) {
+public class ComponentStartJob extends AbstractComponentJob {
+
+    public ComponentStartJob(JobContext jobContext) {
         super(jobContext);
     }
 
     @Override
     protected void createStages() {
-        super.createStopStages();
+        super.createStartStages();
     }
 
     @Override
     public String getName() {
-        return "Stop host";
+        return "Start components";
     }
 }

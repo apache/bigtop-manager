@@ -16,32 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.service;
+package org.apache.bigtop.manager.server.command.job.cluster;
 
-import org.apache.bigtop.manager.dao.query.ComponentQuery;
-import org.apache.bigtop.manager.server.model.vo.ComponentVO;
-import org.apache.bigtop.manager.server.model.vo.PageVO;
+import org.apache.bigtop.manager.server.command.job.JobContext;
 
-public interface ComponentService {
+public class ClusterStopJob extends AbstractClusterJob {
 
-    /**
-     * List components.
-     *
-     * @return components
-     */
-    PageVO<ComponentVO> list(ComponentQuery query);
+    public ClusterStopJob(JobContext jobContext) {
+        super(jobContext);
+    }
 
-    /**
-     * Get component details.
-     *
-     * @return component
-     */
-    ComponentVO get(Long id);
+    @Override
+    protected void createStages() {
+        super.createStopStages();
+    }
 
-    /**
-     * Remove a component.
-     *
-     * @return component
-     */
-    Boolean remove(Long id);
+    @Override
+    public String getName() {
+        return "Stop cluster";
+    }
 }

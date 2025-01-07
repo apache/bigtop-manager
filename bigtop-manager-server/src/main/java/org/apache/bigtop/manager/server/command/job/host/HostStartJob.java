@@ -16,21 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.command.job;
+package org.apache.bigtop.manager.server.command.job.host;
 
-public class ClusterStopJob extends AbstractClusterJob {
+import org.apache.bigtop.manager.server.command.job.JobContext;
 
-    public ClusterStopJob(JobContext jobContext) {
+public class HostStartJob extends AbstractHostJob {
+
+    public HostStartJob(JobContext jobContext) {
         super(jobContext);
     }
 
     @Override
     protected void createStages() {
-        super.createStopStages();
+        super.createStartStages();
     }
 
     @Override
     public String getName() {
-        return "Stop cluster";
+        return "Start host";
     }
 }
