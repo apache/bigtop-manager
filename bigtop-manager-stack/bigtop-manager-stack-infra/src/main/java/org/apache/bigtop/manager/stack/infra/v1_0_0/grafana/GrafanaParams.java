@@ -52,7 +52,7 @@ public class GrafanaParams extends InfraParams {
     private String prometheusServer;
     private String prometheusPort;
 
-    List<Map<String, Object>> dashboards;
+    private List<Map<String, Object>> dashboards;
 
     public GrafanaParams(CommandPayload commandPayload) {
         super(commandPayload);
@@ -83,8 +83,8 @@ public class GrafanaParams extends InfraParams {
         return MessageFormat.format("{0}/dashboards", provisioningDir());
     }
 
-    public String dashboardConfigDir(String cluster) {
-        return MessageFormat.format("{0}/{1}", dashboardsDir(), cluster);
+    public String dashboardConfigDir(String type) {
+        return MessageFormat.format("{0}/{1}", dashboardsDir(), type);
     }
 
     @GlobalParams
@@ -135,25 +135,27 @@ public class GrafanaParams extends InfraParams {
     }
 
     public List<String> getClusters() {
+        if (getClusterHosts() == null) {
+            return new ArrayList<>();
+        }
         return new ArrayList<>(getClusterHosts().keySet());
     }
 
+    // TODO: add host dashboard
     public void setDashboards() {
         dashboards = new ArrayList<>();
-        if (getClusterHosts() == null) {
-            return;
-        }
-        for (String cluster : getClusters()) {
-            Map<String, Object> dashboard = new HashMap<>();
-            // Used for dashboard yaml configuration
-            dashboard.put("name", cluster);
-            dashboard.put("folder", cluster);
-            dashboard.put("path", dashboardConfigDir(cluster));
 
-            // Used for dashboard json configuration
-            dashboard.put("cluster_label", PrometheusParams.AGENT_TARGET_LABEL);
-            dashboard.put("cluster_name", cluster);
-            dashboards.add(dashboard);
-        }
+        Map<String, Object> clusterDashboard = new HashMap<>();
+        // Used for dashboard yaml configuration
+        clusterDashboard.put("name", "Cluster");
+        clusterDashboard.put("folder", "Cluster");
+        clusterDashboard.put("path", dashboardConfigDir("Cluster"));
+
+        // Used for dashboard json configuration
+        clusterDashboard.put("cluster_label", PrometheusParams.AGENT_TARGET_LABEL);
+        clusterDashboard.put("default_cluster_name", getClusters().get(0));
+        clusterDashboard.put("dashboard_name", "Cluster");
+
+        dashboards.add(clusterDashboard);
     }
 }

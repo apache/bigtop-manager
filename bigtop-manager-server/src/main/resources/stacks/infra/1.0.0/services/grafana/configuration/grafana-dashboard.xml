@@ -832,6 +832,7 @@ providers:
         },
         "includeAll": false,
         "name": "datasource",
+        "label": "Datasource",
         "options": [],
         "query": "prometheus",
         "refresh": 1,
@@ -843,17 +844,17 @@ providers:
           "type": "prometheus",
           "uid": "uid4prometheus"
         },
-        "type": "custom",
+        "type": "query",
         "name": "${cluster_label}",
         "label": "Cluster",
         "options": [],
-        "query": "${cluster_name}",
+        "query": "label_values(${cluster_label})",
         "refresh": 2,
         "multi": false,
         "includeAll": false,
         "current": {
-          "text": "${cluster_name}",
-          "value": "${cluster_name}"
+          "text": "${default_cluster_name}",
+          "value": "${default_cluster_name}"
         }
       },
       {
@@ -863,6 +864,7 @@ providers:
         },
         "includeAll": false,
         "name": "resolution",
+        "label": "Resolution",
         "options": [
           {
             "selected": false,
@@ -901,8 +903,8 @@ providers:
   },
   "timepicker": {},
   "timezone": "",
-  "title": "${cluster_name}",
-  "uid": "dbuid_${cluster_name}",
+  "title": "${dashboard_name}",
+  "uid": "dbuid_${dashboard_name}",
   "version": 4,
   "weekStart": ""
 }
