@@ -158,21 +158,9 @@ providers:
           "exemplar": true,
           "expr": "sum(\n  agent_host_monitoring_cpu{cpuUsage=\"cpuUsage\", cluster=\"$cluster\"}\n) / count(\n  count by (instance) (\n    agent_host_monitoring_cpu{cpuUsage=\"cpuUsage\", cluster=\"$cluster\"}\n  )\n)",
           "interval": "",
-          "legendFormat": "Real-Time",
+          "legendFormat": "CPU Usage",
           "range": true,
           "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "expr": "sum(\n  agent_host_monitoring_cpu{cpuUsage=\"cpuLoadAvgMin_15\", cluster=\"$cluster\"}\n) / count(\n  count by (instance) (\n    agent_host_monitoring_cpu{cpuUsage=\"cpuLoadAvgMin_15\", cluster=\"$cluster\"}\n  )\n)",
-          "hide": false,
-          "legendFormat": "Per 15 Min",
-          "range": true,
-          "refId": "B"
         }
       ],
       "title": "Global CPU  Usage",
@@ -346,14 +334,40 @@ providers:
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "sum(\n  agent_host_monitoring_cpu{cpuUsage=\"cpuUsage\", cluster=\"$cluster\"}\n) / count(\n  count by (instance) (\n    agent_host_monitoring_cpu{cpuUsage=\"cpuUsage\", cluster=\"$cluster\"}\n  )\n)",
+          "expr": "sum(\n  agent_host_monitoring_cpu{cpuUsage=\"cpuLoadAvgMin_1\", cluster=\"$cluster\"}\n) / count(\n  count by (instance) (\n    agent_host_monitoring_cpu{cpuUsage=\"cpuLoadAvgMin_1\", cluster=\"$cluster\"}\n  )\n)",
           "interval": "",
-          "legendFormat": "Average",
+          "legendFormat": "Min_1",
           "range": true,
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "uid4prometheus"
+          },
+          "editorMode": "code",
+          "exemplar": true,
+          "expr": "sum(\n  agent_host_monitoring_cpu{cpuUsage=\"cpuLoadAvgMin_5\", cluster=\"$cluster\"}\n) / count(\n  count by (instance) (\n    agent_host_monitoring_cpu{cpuUsage=\"cpuLoadAvgMin_5\", cluster=\"$cluster\"}\n  )\n)",
+          "interval": "",
+          "legendFormat": "Min_5",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "uid4prometheus"
+          },
+          "editorMode": "code",
+          "exemplar": true,
+          "expr": "sum(\n  agent_host_monitoring_cpu{cpuUsage=\"cpuLoadAvgMin_15\", cluster=\"$cluster\"}\n) / count(\n  count by (instance) (\n    agent_host_monitoring_cpu{cpuUsage=\"cpuLoadAvgMin_15\", cluster=\"$cluster\"}\n  )\n)",
+          "interval": "",
+          "legendFormat": "Min_15",
+          "range": true,
+          "refId": "C"
         }
       ],
-      "title": "CPU Usage",
+      "title": "CPU LoadAvg",
       "type": "stat"
     },
     {
