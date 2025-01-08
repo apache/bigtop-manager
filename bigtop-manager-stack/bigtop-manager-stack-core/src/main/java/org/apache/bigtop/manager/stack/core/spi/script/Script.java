@@ -28,7 +28,7 @@ import org.apache.bigtop.manager.stack.core.spi.param.Params;
 public interface Script extends PrioritySPI {
 
     /**
-     * Install the component.
+     * Install the component, download and extract tarball files.
      *
      * @param params the parameters required for installation
      * @return a ShellResult object containing the result of the installation process
@@ -36,12 +36,24 @@ public interface Script extends PrioritySPI {
     ShellResult add(Params params);
 
     /**
-     * Configure the component.
+     * Configure the component, usually only for config files creation.
      *
      * @param params the parameters required for configuration
      * @return a ShellResult object containing the result of the configuration process
      */
     ShellResult configure(Params params);
+
+    /**
+     * Initialize the component, run necessary tasks which are required by the component <b>before</b> it can be started.
+     * Except for create config files, which is done in {@link #configure(Params)}.
+     * This method is used to run tasks like initializing databases, setting up initial data, etc.
+     * Like Hive Metastore database initialization.
+     * Should only be run in service/component add job.
+     *
+     * @param params the parameters required for initialize
+     * @return a ShellResult object containing the result of the initialize process
+     */
+    ShellResult init(Params params);
 
     /**
      * Start the component.
@@ -50,6 +62,17 @@ public interface Script extends PrioritySPI {
      * @return a ShellResult object containing the result of the start process
      */
     ShellResult start(Params params);
+
+    /**
+     * Prepare the component, Unlike {@link #configure(Params)} and {@link #init(Params)}.
+     * This method is to prepare the environment which are required by cluster <b>after</b> component starts.
+     * Like change default root password for MySQL or upload files to HDFS.
+     * Should only be run in service/component add job.
+     *
+     * @param params the parameters required for prepare
+     * @return a ShellResult object containing the result of the prepare process
+     */
+    ShellResult prepare(Params params);
 
     /**
      * Stop the component.
@@ -69,7 +92,7 @@ public interface Script extends PrioritySPI {
 
     /**
      * Check the healthy status of the component.
-     * A simple status check which will only check if the process is running
+     * A simple status check which will only check if the process is running.
      * use {@link #check(Params)} to check the real healthy status of the component with smoke tests.
      *
      * @param params the parameters required to check the status

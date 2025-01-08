@@ -29,7 +29,7 @@ import lombok.Getter;
 @Getter
 public enum Command {
     // Available for: Cluster, Host, Service, Component
-    // Remove is not a command because it won't create job, please refer to the related controller for remove action.
+    // Remove is not a command because it won't create job, please refer to the related API for remove action.
     ADD("add", "Add"),
     START("start", "Start"),
     STOP("stop", "Stop"),
@@ -40,7 +40,9 @@ public enum Command {
     CONFIGURE("configure", "Configure"),
     CUSTOM("custom", "Custom"),
 
-    // Internal use only, not available for job creation
+    // Internal use only, not available for API call
+    INIT("init", "Init"),
+    PREPARE("prepare", "Prepare"),
     STATUS("status", "Status"),
     ;
 
