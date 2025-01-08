@@ -18,9 +18,11 @@
  */
 package org.apache.bigtop.manager.server.command.job.component;
 
+import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.po.ServicePO;
+import org.apache.bigtop.manager.server.command.helper.ComponentStageHelper;
 import org.apache.bigtop.manager.server.command.job.JobContext;
 import org.apache.bigtop.manager.server.enums.HealthyStatusEnum;
 import org.apache.bigtop.manager.server.model.converter.ComponentConverter;
@@ -32,6 +34,7 @@ import org.apache.bigtop.manager.server.utils.StackUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ComponentAddJob extends AbstractComponentJob {
 
@@ -49,14 +52,18 @@ public class ComponentAddJob extends AbstractComponentJob {
         // Update cache files
         super.createCacheStage();
 
+        CommandDTO commandDTO = jobContext.getCommandDTO();
+        Map<String, List<String>> componentHostsMap = getComponentHostsMap();
+
         // Install components
-        super.createAddStages();
+        stages.addAll(ComponentStageHelper.createComponentStages(componentHostsMap, Command.ADD, commandDTO));
 
-        // Configure services
-        super.createConfigureStages();
+        // Configure components
+        stages.addAll(ComponentStageHelper.createComponentStages(componentHostsMap, Command.CONFIGURE, commandDTO));
 
-        // Start all master components
-        super.createStartStages();
+        // Init/Start/Prepare components
+        List<Command> commands = List.of(Command.INIT, Command.START, Command.PREPARE);
+        stages.addAll(ComponentStageHelper.createComponentStages(componentHostsMap, commands, commandDTO));
     }
 
     @Override

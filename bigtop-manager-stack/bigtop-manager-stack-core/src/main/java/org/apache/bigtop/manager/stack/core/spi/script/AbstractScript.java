@@ -68,6 +68,17 @@ public abstract class AbstractScript implements Script {
         return ShellResult.success();
     }
 
+    @Override
+    public ShellResult init(Params params) {
+        return ShellResult.success();
+    }
+
+    @Override
+    public ShellResult prepare(Params params) {
+        return ShellResult.success();
+    }
+
+    @Override
     public ShellResult restart(Params params) {
         ShellResult shellResult = stop(params);
         if (shellResult.getExitCode() != 0) {

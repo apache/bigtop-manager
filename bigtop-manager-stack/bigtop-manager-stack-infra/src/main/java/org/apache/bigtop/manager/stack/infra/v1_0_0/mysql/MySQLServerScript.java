@@ -42,40 +42,20 @@ public class MySQLServerScript extends AbstractServerScript {
         Properties properties = new Properties();
         properties.setProperty(PROPERTY_KEY_SKIP_LEVELS, "1");
 
-        super.add(params, properties);
-
-        // Initialize server after added
-        log.info("Initializing MySQL root user");
-        MySQLParams mysqlParams = (MySQLParams) params;
-        String user = params.user();
-        String binDir = params.serviceHome() + "/bin";
-        String password = mysqlParams.getRootPassword();
-        configure(params);
-        runCommand(binDir + "/mysqld --initialize-insecure", user);
-        start(params);
-        runCommand(
-                MessageFormat.format(
-                        "{0}/mysql -u root -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY ''{1}'';\"",
-                        binDir, password),
-                user);
-        runCommand(
-                MessageFormat.format(
-                        "{0}/mysql -u root -p''{1}'' -e \"CREATE USER ''root''@''%'' IDENTIFIED BY ''{1}'';\"",
-                        binDir, password),
-                user);
-        runCommand(
-                MessageFormat.format(
-                        "{0}/mysql -u root -p''{1}'' -e \"GRANT ALL PRIVILEGES ON *.* TO ''root''@''%'' WITH GRANT OPTION;\"",
-                        binDir, password),
-                user);
-        stop(params);
-
-        return ShellResult.success();
+        return super.add(params, properties);
     }
 
     @Override
     public ShellResult configure(Params params) {
         return MySQLSetup.configure(params);
+    }
+
+    @Override
+    public ShellResult init(Params params) {
+        String user = params.user();
+        String binDir = params.serviceHome() + "/bin";
+        runCommand(binDir + "/mysqld --initialize-insecure", user);
+        return ShellResult.success();
     }
 
     @Override
@@ -104,6 +84,32 @@ public class MySQLServerScript extends AbstractServerScript {
         } catch (Exception e) {
             throw new StackException(e);
         }
+    }
+
+    @Override
+    public ShellResult prepare(Params params) {
+        MySQLParams mysqlParams = (MySQLParams) params;
+        String user = params.user();
+        String binDir = params.serviceHome() + "/bin";
+        String password = mysqlParams.getRootPassword();
+        runCommand(
+                MessageFormat.format(
+                        "{0}/mysql -u root -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY ''{1}'';\"",
+                        binDir, password),
+                user);
+        runCommand(
+                MessageFormat.format(
+                        "{0}/mysql -u root -p''{1}'' -e \"CREATE USER ''root''@''%'' IDENTIFIED BY ''{1}'';\"",
+                        binDir, password),
+                user);
+        runCommand(
+                MessageFormat.format(
+                        "{0}/mysql -u root -p''{1}'' -e \"GRANT ALL PRIVILEGES ON *.* TO ''root''@''%'' WITH GRANT OPTION;\"",
+                        binDir, password),
+                user);
+        runCommand(
+                MessageFormat.format("{0}/mysql -u root -p''{1}'' -e \"FLUSH PRIVILEGES;\"", binDir, password), user);
+        return ShellResult.success();
     }
 
     @Override

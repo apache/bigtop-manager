@@ -28,7 +28,9 @@ import org.apache.bigtop.manager.dao.repository.ClusterDao;
 import org.apache.bigtop.manager.dao.repository.JobDao;
 import org.apache.bigtop.manager.dao.repository.StageDao;
 import org.apache.bigtop.manager.dao.repository.TaskDao;
+import org.apache.bigtop.manager.server.command.stage.CacheFileUpdateStage;
 import org.apache.bigtop.manager.server.command.stage.Stage;
+import org.apache.bigtop.manager.server.command.stage.StageContext;
 import org.apache.bigtop.manager.server.command.task.Task;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 
@@ -81,6 +83,11 @@ public abstract class AbstractJob implements Job {
     }
 
     protected abstract void createStages();
+
+    protected void createCacheStage() {
+        StageContext stageContext = StageContext.fromCommandDTO(jobContext.getCommandDTO());
+        stages.add(new CacheFileUpdateStage(stageContext));
+    }
 
     @Override
     public void beforeRun() {

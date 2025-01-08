@@ -48,26 +48,19 @@ public class HiveMetastoreScript extends AbstractServerScript {
         Properties properties = new Properties();
         properties.setProperty(PROPERTY_KEY_SKIP_LEVELS, "1");
 
-        ShellResult shellResult = super.add(params, properties);
-
-        // Download mysql jdbc driver
-        RepoInfo repoInfo = LocalSettings.repos().stream()
-                .filter(r -> OSDetection.getArch().equals(r.getArch()) && r.getType() == 2)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Cannot find repo for os: [" + OSDetection.getOS()
-                        + "] and arch: [" + OSDetection.getArch() + "]"));
-        String mysqlDriver = repoInfo.getBaseUrl() + "/mysql-connector-j-8.0.33.jar";
-        TarballDownloader.download(mysqlDriver, params.stackHome());
-        LinuxFileUtils.moveFile(params.stackHome() + "/mysql-connector-j-8.0.33.jar", params.serviceHome() + "/lib/");
-        LinuxFileUtils.updateOwner(params.serviceHome() + "/lib", params.user(), params.group(), true);
-        LinuxFileUtils.updatePermissions(params.serviceHome() + "/lib", Constants.PERMISSION_755, true);
-
-        return shellResult;
+        return super.add(params, properties);
     }
 
     @Override
     public ShellResult configure(Params params) {
         return HiveSetup.configure(params);
+    }
+
+    @Override
+    public ShellResult init(Params params) {
+        downloadMySQLJdbcDriver(params);
+        initSchema(params);
+        return ShellResult.success();
     }
 
     @Override
@@ -119,19 +112,36 @@ public class HiveMetastoreScript extends AbstractServerScript {
         return LinuxOSUtils.checkProcess(hiveParams.getHiveMetastorePidFile());
     }
 
-    private void initSchema(Params params) throws Exception {
-        HiveParams hiveParams = (HiveParams) params;
-        String cmd = hiveParams.serviceHome() + "/bin/schematool -validate -dbType mysql";
-        ShellResult shellResult = LinuxOSUtils.sudoExecCmd(cmd, hiveParams.user());
-        String clusterName = LocalSettings.cluster().getName();
-        if (shellResult.getExitCode() != MessageConstants.SUCCESS_CODE
-                && shellResult.getErrMsg().contains("Table '" + clusterName + "_hive.VERSION' doesn't exist")) {
-            // init schema
-            cmd = hiveParams.serviceHome() + "/bin/schematool -initSchema -dbType mysql";
-            shellResult = LinuxOSUtils.sudoExecCmd(cmd, hiveParams.user());
-            if (shellResult.getExitCode() != MessageConstants.SUCCESS_CODE) {
-                throw new StackException(shellResult.getErrMsg());
+    private void downloadMySQLJdbcDriver(Params params) {
+        RepoInfo repoInfo = LocalSettings.repos().stream()
+                .filter(r -> OSDetection.getArch().equals(r.getArch()) && r.getType() == 2)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Cannot find repo for os: [" + OSDetection.getOS()
+                        + "] and arch: [" + OSDetection.getArch() + "]"));
+        String mysqlDriver = repoInfo.getBaseUrl() + "/mysql-connector-j-8.0.33.jar";
+        TarballDownloader.download(mysqlDriver, params.stackHome());
+        LinuxFileUtils.moveFile(params.stackHome() + "/mysql-connector-j-8.0.33.jar", params.serviceHome() + "/lib/");
+        LinuxFileUtils.updateOwner(params.serviceHome() + "/lib", params.user(), params.group(), true);
+        LinuxFileUtils.updatePermissions(params.serviceHome() + "/lib", Constants.PERMISSION_755, true);
+    }
+
+    private void initSchema(Params params) {
+        try {
+            HiveParams hiveParams = (HiveParams) params;
+            String cmd = hiveParams.serviceHome() + "/bin/schematool -validate -dbType mysql";
+            ShellResult shellResult = LinuxOSUtils.sudoExecCmd(cmd, hiveParams.user());
+            String clusterName = LocalSettings.cluster().getName();
+            if (shellResult.getExitCode() != MessageConstants.SUCCESS_CODE
+                    && shellResult.getErrMsg().contains("Table '" + clusterName + "_hive.VERSION' doesn't exist")) {
+                // init schema
+                cmd = hiveParams.serviceHome() + "/bin/schematool -initSchema -dbType mysql";
+                shellResult = LinuxOSUtils.sudoExecCmd(cmd, hiveParams.user());
+                if (shellResult.getExitCode() != MessageConstants.SUCCESS_CODE) {
+                    throw new StackException(shellResult.getErrMsg());
+                }
             }
+        } catch (IOException e) {
+            throw new StackException(e);
         }
     }
 

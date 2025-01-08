@@ -19,12 +19,14 @@
 package org.apache.bigtop.manager.server.command.job.service;
 
 import org.apache.bigtop.manager.dao.po.ServicePO;
+import org.apache.bigtop.manager.server.command.helper.ComponentStageHelper;
 import org.apache.bigtop.manager.server.command.job.JobContext;
 import org.apache.bigtop.manager.server.enums.HealthyStatusEnum;
 import org.apache.bigtop.manager.server.model.dto.CommandDTO;
 import org.apache.bigtop.manager.server.model.dto.command.ServiceCommandDTO;
 
 import java.util.List;
+import java.util.Map;
 
 public class ServiceStopJob extends AbstractServiceJob {
 
@@ -34,7 +36,10 @@ public class ServiceStopJob extends AbstractServiceJob {
 
     @Override
     protected void createStages() {
-        super.createStopStages();
+        CommandDTO commandDTO = jobContext.getCommandDTO();
+        Map<String, List<String>> componentHostsMap = getComponentHostsMap();
+
+        stages.addAll(ComponentStageHelper.createComponentStages(componentHostsMap, commandDTO));
     }
 
     @Override

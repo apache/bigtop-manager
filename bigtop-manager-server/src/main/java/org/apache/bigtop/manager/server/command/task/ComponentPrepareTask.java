@@ -16,31 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.command.job.component;
+package org.apache.bigtop.manager.server.command.task;
 
-import org.apache.bigtop.manager.server.command.helper.ComponentStageHelper;
-import org.apache.bigtop.manager.server.command.job.JobContext;
-import org.apache.bigtop.manager.server.model.dto.CommandDTO;
+import org.apache.bigtop.manager.common.enums.Command;
 
-import java.util.List;
-import java.util.Map;
+public class ComponentPrepareTask extends AbstractComponentTask {
 
-public class ComponentStartJob extends AbstractComponentJob {
-
-    public ComponentStartJob(JobContext jobContext) {
-        super(jobContext);
+    public ComponentPrepareTask(TaskContext taskContext) {
+        super(taskContext);
     }
 
     @Override
-    protected void createStages() {
-        CommandDTO commandDTO = jobContext.getCommandDTO();
-        Map<String, List<String>> componentHostsMap = getComponentHostsMap();
-
-        stages.addAll(ComponentStageHelper.createComponentStages(componentHostsMap, commandDTO));
+    protected Command getCommand() {
+        return Command.PREPARE;
     }
 
     @Override
     public String getName() {
-        return "Start components";
+        return "Prepare " + taskContext.getComponentDisplayName() + " on " + taskContext.getHostname();
     }
 }
