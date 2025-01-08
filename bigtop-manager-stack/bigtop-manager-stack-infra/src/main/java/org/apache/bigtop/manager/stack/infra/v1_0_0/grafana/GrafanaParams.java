@@ -136,7 +136,7 @@ public class GrafanaParams extends InfraParams {
 
     public List<String> getClusters() {
         if (getClusterHosts() == null) {
-            return new ArrayList<>();
+            return null;
         }
         return new ArrayList<>(getClusterHosts().keySet());
     }
@@ -151,8 +151,13 @@ public class GrafanaParams extends InfraParams {
         clusterDashboard.put("path", dashboardConfigDir("Cluster"));
 
         // Used for dashboard json configuration
+        List<String> clusters = getClusters();
+        if (clusters != null && !clusters.isEmpty()) {
+            clusterDashboard.put("default_cluster_name", getClusters().get(0));
+        } else {
+            clusterDashboard.put("default_cluster_name", "");
+        }
         clusterDashboard.put("cluster_label", PrometheusParams.AGENT_TARGET_LABEL);
-        clusterDashboard.put("default_cluster_name", getClusters().get(0));
         clusterDashboard.put("dashboard_name", "Cluster");
 
         dashboards.add(clusterDashboard);
