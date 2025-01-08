@@ -18,25 +18,17 @@
  */
 package org.apache.bigtop.manager.server.command.job.cluster;
 
-import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.query.ComponentQuery;
 import org.apache.bigtop.manager.dao.repository.ComponentDao;
 import org.apache.bigtop.manager.server.command.job.AbstractJob;
 import org.apache.bigtop.manager.server.command.job.JobContext;
-import org.apache.bigtop.manager.server.command.stage.ComponentStartStage;
-import org.apache.bigtop.manager.server.command.stage.ComponentStopStage;
-import org.apache.bigtop.manager.server.command.stage.StageContext;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
-import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
-import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
-import org.apache.bigtop.manager.server.utils.StackDAGUtils;
-import org.apache.bigtop.manager.server.utils.StackUtils;
-
-import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public abstract class AbstractClusterJob extends AbstractJob {
 
@@ -58,84 +50,16 @@ public abstract class AbstractClusterJob extends AbstractJob {
         super.beforeCreateStages();
     }
 
-    protected StageContext createStageContext(String componentName, List<String> hostnames) {
-        StageContext stageContext = StageContext.fromCommandDTO(jobContext.getCommandDTO());
-
-        ServiceDTO serviceDTO = StackUtils.getServiceDTOByComponentName(componentName);
-        ComponentDTO componentDTO = StackUtils.getComponentDTO(componentName);
-
-        stageContext.setHostnames(hostnames);
-        stageContext.setServiceDTO(serviceDTO);
-        stageContext.setComponentDTO(componentDTO);
-
-        return stageContext;
-    }
-
-    protected void createStartStages() {
-        List<ComponentPO> componentPOList = getComponentPOList();
-        List<String> todoList = StackDAGUtils.getTodoList(getComponentNames(componentPOList), Command.START);
-
-        for (String componentCommand : todoList) {
-            String[] split = componentCommand.split("-");
-            String componentName = split[0];
-
-            if (StackUtils.isClientComponent(componentName)) {
-                continue;
-            }
-
-            List<String> hostnames = findHostnamesByComponentName(componentPOList, componentName);
-            if (CollectionUtils.isEmpty(hostnames)) {
-                continue;
-            }
-
-            StageContext stageContext = createStageContext(componentName, hostnames);
-            stages.add(new ComponentStartStage(stageContext));
+    protected Map<String, List<String>> getComponentHostsMap() {
+        ComponentQuery componentQuery =
+                ComponentQuery.builder().clusterId(clusterPO.getId()).build();
+        List<ComponentPO> componentPOList = componentDao.findByQuery(componentQuery);
+        Map<String, List<String>> componentHostsMap = new HashMap<>();
+        for (ComponentPO componentPO : componentPOList) {
+            List<String> hosts = componentHostsMap.computeIfAbsent(componentPO.getName(), k -> new ArrayList<>());
+            hosts.add(componentPO.getHostname());
         }
-    }
 
-    protected void createStopStages() {
-        List<ComponentPO> componentPOList = getComponentPOList();
-        List<String> todoList = StackDAGUtils.getTodoList(getComponentNames(componentPOList), Command.STOP);
-
-        for (String componentCommand : todoList) {
-            String[] split = componentCommand.split("-");
-            String componentName = split[0];
-
-            if (StackUtils.isClientComponent(componentName)) {
-                continue;
-            }
-
-            List<String> hostnames = findHostnamesByComponentName(componentPOList, componentName);
-            if (CollectionUtils.isEmpty(hostnames)) {
-                continue;
-            }
-
-            StageContext stageContext = createStageContext(componentName, hostnames);
-            stages.add(new ComponentStopStage(stageContext));
-        }
-    }
-
-    private List<ComponentPO> getComponentPOList() {
-        return componentDao.findByQuery(
-                ComponentQuery.builder().clusterId(clusterPO.getId()).build());
-    }
-
-    private List<String> getComponentNames(List<ComponentPO> componentPOList) {
-        if (componentPOList == null) {
-            return new ArrayList<>();
-        } else {
-            return componentPOList.stream().map(ComponentPO::getName).distinct().toList();
-        }
-    }
-
-    private List<String> findHostnamesByComponentName(List<ComponentPO> componentPOList, String componentName) {
-        if (componentPOList == null) {
-            return new ArrayList<>();
-        } else {
-            return componentPOList.stream()
-                    .filter(componentPO -> componentPO.getName().equals(componentName))
-                    .map(ComponentPO::getHostname)
-                    .toList();
-        }
+        return componentHostsMap;
     }
 }

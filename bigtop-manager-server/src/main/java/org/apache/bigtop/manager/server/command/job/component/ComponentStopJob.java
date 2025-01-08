@@ -18,7 +18,12 @@
  */
 package org.apache.bigtop.manager.server.command.job.component;
 
+import org.apache.bigtop.manager.server.command.helper.ComponentStageHelper;
 import org.apache.bigtop.manager.server.command.job.JobContext;
+import org.apache.bigtop.manager.server.model.dto.CommandDTO;
+
+import java.util.List;
+import java.util.Map;
 
 public class ComponentStopJob extends AbstractComponentJob {
 
@@ -28,7 +33,10 @@ public class ComponentStopJob extends AbstractComponentJob {
 
     @Override
     protected void createStages() {
-        super.createStopStages();
+        CommandDTO commandDTO = jobContext.getCommandDTO();
+        Map<String, List<String>> componentHostsMap = getComponentHostsMap();
+
+        stages.addAll(ComponentStageHelper.createComponentStages(componentHostsMap, commandDTO));
     }
 
     @Override

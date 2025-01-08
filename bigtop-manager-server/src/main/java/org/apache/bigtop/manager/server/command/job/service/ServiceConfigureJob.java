@@ -18,7 +18,13 @@
  */
 package org.apache.bigtop.manager.server.command.job.service;
 
+import org.apache.bigtop.manager.common.enums.Command;
+import org.apache.bigtop.manager.server.command.helper.ComponentStageHelper;
 import org.apache.bigtop.manager.server.command.job.JobContext;
+import org.apache.bigtop.manager.server.model.dto.CommandDTO;
+
+import java.util.List;
+import java.util.Map;
 
 public class ServiceConfigureJob extends AbstractServiceJob {
 
@@ -31,12 +37,14 @@ public class ServiceConfigureJob extends AbstractServiceJob {
         // Update cache files
         super.createCacheStage();
 
-        // Configure services
-        super.createConfigureStages();
+        CommandDTO commandDTO = jobContext.getCommandDTO();
+        Map<String, List<String>> componentHostsMap = getComponentHostsMap();
+
+        stages.addAll(ComponentStageHelper.createComponentStages(componentHostsMap, Command.CONFIGURE, commandDTO));
 
         // Restart services
-        super.createStopStages();
-        super.createStartStages();
+        stages.addAll(ComponentStageHelper.createComponentStages(componentHostsMap, Command.STOP, commandDTO));
+        stages.addAll(ComponentStageHelper.createComponentStages(componentHostsMap, Command.START, commandDTO));
     }
 
     @Override

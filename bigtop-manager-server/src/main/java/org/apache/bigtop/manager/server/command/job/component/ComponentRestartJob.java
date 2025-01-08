@@ -18,7 +18,13 @@
  */
 package org.apache.bigtop.manager.server.command.job.component;
 
+import org.apache.bigtop.manager.common.enums.Command;
+import org.apache.bigtop.manager.server.command.helper.ComponentStageHelper;
 import org.apache.bigtop.manager.server.command.job.JobContext;
+import org.apache.bigtop.manager.server.model.dto.CommandDTO;
+
+import java.util.List;
+import java.util.Map;
 
 public class ComponentRestartJob extends AbstractComponentJob {
 
@@ -28,9 +34,12 @@ public class ComponentRestartJob extends AbstractComponentJob {
 
     @Override
     protected void createStages() {
-        super.createStopStages();
+        CommandDTO commandDTO = jobContext.getCommandDTO();
+        Map<String, List<String>> componentHostsMap = getComponentHostsMap();
 
-        super.createStartStages();
+        // Restart services
+        stages.addAll(ComponentStageHelper.createComponentStages(componentHostsMap, Command.STOP, commandDTO));
+        stages.addAll(ComponentStageHelper.createComponentStages(componentHostsMap, Command.START, commandDTO));
     }
 
     @Override
