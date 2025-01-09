@@ -41,8 +41,8 @@ providers:
         </attrs>
     </property>
     <property>
-        <name>bm_agent_dashboard</name>
-        <description>This is the dashboard configuration file for BM agent</description>
+        <name>bm_agent_cluster_dashboard</name>
+        <description>This is the dashboard configuration file for BM agent cluster</description>
         <value><![CDATA[
 {
   "annotations": {
@@ -89,7 +89,7 @@ providers:
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${datasource}"
+        "uid": "uid4prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -156,7 +156,7 @@ providers:
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "sum(\n  agent_host_monitoring_cpu{cpuUsage=\"cpuUsage\", cluster=\"$cluster\"}\n) / count(\n  count by (instance) (\n    agent_host_monitoring_cpu{cpuUsage=\"cpuUsage\", cluster=\"$cluster\"}\n  )\n)",
+          "expr": "sum(\n  agent_host_monitoring_cpu{cpuUsage=\"cpuUsage\", ${cluster_label}<#noparse>=~\"${cluster}\"</#noparse>}\n) / count(\n  count by (instance) (\n    agent_host_monitoring_cpu{cpuUsage=\"cpuUsage\", ${cluster_label}<#noparse>=~\"${cluster}\"</#noparse>}\n  )\n)",
           "interval": "",
           "legendFormat": "CPU Usage",
           "range": true,
@@ -169,7 +169,7 @@ providers:
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${datasource}"
+        "uid": "uid4prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -265,7 +265,7 @@ providers:
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": true,
-          "expr": "sum(\n  agent_host_monitoring_cpu{cpuUsage=\"cpuUsage\", cluster=\"$cluster\"}\n) / count(\n  count by (instance) (\n    agent_host_monitoring_cpu{cpuUsage=\"cpuUsage\", cluster=\"$cluster\"}\n  )\n)",
+          "expr": "sum(\n  agent_host_monitoring_cpu{cpuUsage=\"cpuUsage\", ${cluster_label}<#noparse>=~\"${cluster}\"</#noparse>}\n) / count(\n  count by (instance) (\n    agent_host_monitoring_cpu{cpuUsage=\"cpuUsage\", ${cluster_label}<#noparse>=~\"${cluster}\"</#noparse>}\n  )\n)",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "interval": "$resolution",
@@ -281,7 +281,7 @@ providers:
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${datasource}"
+        "uid": "uid4prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -334,7 +334,7 @@ providers:
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "sum(\n  agent_host_monitoring_cpu{cpuUsage=\"cpuLoadAvgMin_1\", cluster=\"$cluster\"}\n) / count(\n  count by (instance) (\n    agent_host_monitoring_cpu{cpuUsage=\"cpuLoadAvgMin_1\", cluster=\"$cluster\"}\n  )\n)",
+          "expr": "sum(\n  agent_host_monitoring_cpu{cpuUsage=\"cpuLoadAvgMin_1\", ${cluster_label}<#noparse>=~\"${cluster}\"</#noparse>}\n) / count(\n  count by (instance) (\n    agent_host_monitoring_cpu{cpuUsage=\"cpuLoadAvgMin_1\", ${cluster_label}<#noparse>=~\"${cluster}\"</#noparse>}\n  )\n)",
           "interval": "",
           "legendFormat": "Min_1",
           "range": true,
@@ -347,7 +347,7 @@ providers:
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "sum(\n  agent_host_monitoring_cpu{cpuUsage=\"cpuLoadAvgMin_5\", cluster=\"$cluster\"}\n) / count(\n  count by (instance) (\n    agent_host_monitoring_cpu{cpuUsage=\"cpuLoadAvgMin_5\", cluster=\"$cluster\"}\n  )\n)",
+          "expr": "sum(\n  agent_host_monitoring_cpu{cpuUsage=\"cpuLoadAvgMin_5\", ${cluster_label}<#noparse>=~\"${cluster}\"</#noparse>}\n) / count(\n  count by (instance) (\n    agent_host_monitoring_cpu{cpuUsage=\"cpuLoadAvgMin_5\", ${cluster_label}<#noparse>=~\"${cluster}\"</#noparse>}\n  )\n)",
           "interval": "",
           "legendFormat": "Min_5",
           "range": true,
@@ -360,7 +360,7 @@ providers:
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "sum(\n  agent_host_monitoring_cpu{cpuUsage=\"cpuLoadAvgMin_15\", cluster=\"$cluster\"}\n) / count(\n  count by (instance) (\n    agent_host_monitoring_cpu{cpuUsage=\"cpuLoadAvgMin_15\", cluster=\"$cluster\"}\n  )\n)",
+          "expr": "sum(\n  agent_host_monitoring_cpu{cpuUsage=\"cpuLoadAvgMin_15\", ${cluster_label}<#noparse>=~\"${cluster}\"</#noparse>}\n) / count(\n  count by (instance) (\n    agent_host_monitoring_cpu{cpuUsage=\"cpuLoadAvgMin_15\", ${cluster_label}<#noparse>=~\"${cluster}\"</#noparse>}\n  )\n)",
           "interval": "",
           "legendFormat": "Min_15",
           "range": true,
@@ -451,11 +451,11 @@ providers:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "uid4prometheus"
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "(sum(\n  agent_host_monitoring_mem{memUsage=\"memIdle\", <#noparse>cluster=~\"${cluster}\"</#noparse>}\n) / sum(\n  agent_host_monitoring_mem{memUsage=\"memTotal\", <#noparse>cluster=~\"${cluster}\"</#noparse>}\n)) /\ncount(\n  count by (instance) (\n    agent_host_monitoring_mem{memUsage=\"memTotal\", <#noparse>cluster=~\"${cluster}\"</#noparse>}\n  )\n)",
+          "expr": "(sum(\n  agent_host_monitoring_mem{memUsage=\"memIdle\", ${cluster_label}<#noparse>=~\"${cluster}\"</#noparse>}\n) / sum(\n  agent_host_monitoring_mem{memUsage=\"memTotal\", ${cluster_label}<#noparse>=~\"${cluster}\"</#noparse>}\n)) /\ncount(\n  count by (instance) (\n    agent_host_monitoring_mem{memUsage=\"memTotal\", ${cluster_label}<#noparse>=~\"${cluster}\"</#noparse>}\n  )\n)",
           "interval": "",
           "legendFormat": "Real",
           "range": true,
@@ -559,11 +559,11 @@ providers:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "uid4prometheus"
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "(sum(\n  agent_host_monitoring_mem{memUsage=\"memIdle\", <#noparse>cluster=~\"${cluster}\"</#noparse>}\n) / sum(\n  agent_host_monitoring_mem{memUsage=\"memTotal\", <#noparse>cluster=~\"${cluster}\"</#noparse>}\n)) /\ncount(\n  count by (instance) (\n    agent_host_monitoring_mem{memUsage=\"memTotal\", <#noparse>cluster=~\"${cluster}\"</#noparse>}\n  )\n)",
+          "expr": "(sum(\n  agent_host_monitoring_mem{memUsage=\"memIdle\", ${cluster_label}<#noparse>=~\"${cluster}\"</#noparse>}\n) / sum(\n  agent_host_monitoring_mem{memUsage=\"memTotal\", ${cluster_label}<#noparse>=~\"${cluster}\"</#noparse>}\n)) /\ncount(\n  count by (instance) (\n    agent_host_monitoring_mem{memUsage=\"memTotal\", ${cluster_label}<#noparse>=~\"${cluster}\"</#noparse>}\n  )\n)",
           "interval": "$resolution",
           "legendFormat": "Memory usage in %",
           "range": true,
@@ -625,11 +625,11 @@ providers:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "uid4prometheus"
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "(sum(\n  agent_host_monitoring_mem{memUsage=\"memIdle\", <#noparse>cluster=~\"${cluster}\"</#noparse>}\n) / sum(\n  agent_host_monitoring_mem{memUsage=\"memTotal\", <#noparse>cluster=~\"${cluster}\"</#noparse>}\n)) /\ncount(\n  count by (instance) (\n    agent_host_monitoring_mem{memUsage=\"memTotal\", <#noparse>cluster=~\"${cluster}\"</#noparse>}\n  )\n)",
+          "expr": "(sum(\n  agent_host_monitoring_mem{memUsage=\"memIdle\", ${cluster_label}<#noparse>=~\"${cluster}\"</#noparse>}\n) / sum(\n  agent_host_monitoring_mem{memUsage=\"memTotal\", ${cluster_label}<#noparse>=~\"${cluster}\"</#noparse>}\n)) /\ncount(\n  count by (instance) (\n    agent_host_monitoring_mem{memUsage=\"memTotal\", ${cluster_label}<#noparse>=~\"${cluster}\"</#noparse>}\n  )\n)",
           "interval": "",
           "legendFormat": "Real",
           "range": true,
@@ -655,7 +655,7 @@ providers:
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${datasource}"
+        "uid": "uid4prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -713,7 +713,7 @@ providers:
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": false,
-          "expr": "(sum(\n  agent_host_monitoring_disk{diskUsage=\"diskFreeSpace\", <#noparse>cluster=~\"${cluster}\"</#noparse>}\n) / sum(\n  agent_host_monitoring_disk{diskUsage=\"diskTotalSpace\", <#noparse>cluster=~\"${cluster}\"</#noparse>}\n)) /\ncount(\n  count by (instance) (\n    agent_host_monitoring_disk{diskUsage=\"diskFreeSpace\", <#noparse>cluster=~\"${cluster}\"</#noparse>}\n  )\n)",
+          "expr": "(sum(\n  agent_host_monitoring_disk{diskUsage=\"diskFreeSpace\", ${cluster_label}<#noparse>=~\"${cluster}\"</#noparse>}\n) / sum(\n  agent_host_monitoring_disk{diskUsage=\"diskTotalSpace\", ${cluster_label}<#noparse>=~\"${cluster}\"</#noparse>}\n)) /\ncount(\n  count by (instance) (\n    agent_host_monitoring_disk{diskUsage=\"diskFreeSpace\", ${cluster_label}<#noparse>=~\"${cluster}\"</#noparse>}\n  )\n)",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -730,7 +730,7 @@ providers:
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${datasource}"
+        "uid": "uid4prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -818,7 +818,7 @@ providers:
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": false,
-          "expr": "(sum(\n  agent_host_monitoring_disk{diskUsage=\"diskFreeSpace\", <#noparse>cluster=~\"${cluster}\"</#noparse>}\n) / sum(\n  agent_host_monitoring_disk{diskUsage=\"diskTotalSpace\", <#noparse>cluster=~\"${cluster}\"</#noparse>}\n)) /\ncount(\n  count by (instance) (\n    agent_host_monitoring_disk{diskUsage=\"diskFreeSpace\", <#noparse>cluster=~\"${cluster}\"</#noparse>}\n  )\n)",
+          "expr": "(sum(\n  agent_host_monitoring_disk{diskUsage=\"diskFreeSpace\", ${cluster_label}<#noparse>=~\"${cluster}\"</#noparse>}\n) / sum(\n  agent_host_monitoring_disk{diskUsage=\"diskTotalSpace\", ${cluster_label}<#noparse>=~\"${cluster}\"</#noparse>}\n)) /\ncount(\n  count by (instance) (\n    agent_host_monitoring_disk{diskUsage=\"diskFreeSpace\", ${cluster_label}<#noparse>=~\"${cluster}\"</#noparse>}\n  )\n)",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -923,6 +923,999 @@ providers:
   "weekStart": ""
 }
 ]]>
+        </value>
+        <attrs>
+            <type>longtext</type>
+        </attrs>
+    </property>
+    <property>
+        <name>bm_agent_host_dashboard</name>
+        <description>This is the dashboard configuration file for BM agent host</description>
+        <value><![CDATA[
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "datasource",
+          "uid": "grafana"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": 3,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 67,
+      "panels": [],
+      "title": "CPU",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "uid4prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-GrYlRd"
+          },
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 1
+      },
+      "id": 77,
+      "options": {
+        "displayMode": "lcd",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "maxVizHeight": 300,
+        "minVizHeight": 10,
+        "minVizWidth": 0,
+        "namePlacement": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "sizing": "auto",
+        "valueMode": "color"
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "uid4prometheus"
+          },
+          "editorMode": "code",
+          "exemplar": true,
+          "expr": "sum(\n  agent_host_monitoring_cpu{cpuUsage=\"cpuUsage\", ${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>}\n) / count(\n  count by (instance) (\n    agent_host_monitoring_cpu{cpuUsage=\"cpuUsage\", ${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>}\n  )\n)",
+          "interval": "",
+          "legendFormat": "CPU Usage",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "CPU  Usage",
+      "type": "bargauge"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "uid4prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "rgb(255, 255, 255)",
+                "value": null
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 12,
+        "x": 12,
+        "y": 1
+      },
+      "id": 88,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {},
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "uid4prometheus"
+          },
+          "disableTextWrap": false,
+          "editorMode": "code",
+          "exemplar": true,
+          "expr": "4",
+          "fullMetaSearch": false,
+          "hide": false,
+          "includeNullMetadata": true,
+          "interval": "",
+          "legendFormat": "Physical",
+          "range": true,
+          "refId": "B",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "uid4prometheus"
+          },
+          "disableTextWrap": false,
+          "editorMode": "code",
+          "exemplar": true,
+          "expr": "8",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
+          "interval": "",
+          "legendFormat": "Logical",
+          "range": true,
+          "refId": "A",
+          "useBackend": false
+        }
+      ],
+      "title": "CPU Core",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "uid4prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-GrYlRd",
+            "seriesBy": "last"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "CPU %",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "scheme",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 2,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.5
+              },
+              {
+                "color": "red",
+                "value": 0.7
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 12,
+        "y": 4
+      },
+      "id": 72,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "hidden",
+          "placement": "right",
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "uid4prometheus"
+          },
+          "disableTextWrap": false,
+          "editorMode": "code",
+          "exemplar": true,
+          "expr": "sum(\n  agent_host_monitoring_cpu{cpuUsage=\"cpuUsage\", ${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>}\n) / count(\n  count by (instance) (\n    agent_host_monitoring_cpu{cpuUsage=\"cpuUsage\", ${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>}\n  )\n)",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
+          "interval": "$resolution",
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A",
+          "useBackend": false
+        }
+      ],
+      "title": "CPU Utilization",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "uid4prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "rgb(255, 255, 255)",
+                "value": null
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "id": 37,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {},
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "uid4prometheus"
+          },
+          "editorMode": "code",
+          "exemplar": true,
+          "expr": "sum(\n  agent_host_monitoring_cpu{cpuUsage=\"cpuLoadAvgMin_1\", ${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>}\n) / count(\n  count by (instance) (\n    agent_host_monitoring_cpu{cpuUsage=\"cpuLoadAvgMin_1\", ${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>}\n  )\n)",
+          "interval": "",
+          "legendFormat": "Min_1",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "uid4prometheus"
+          },
+          "editorMode": "code",
+          "exemplar": true,
+          "expr": "sum(\n  agent_host_monitoring_cpu{cpuUsage=\"cpuLoadAvgMin_5\", ${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>}\n) / count(\n  count by (instance) (\n    agent_host_monitoring_cpu{cpuUsage=\"cpuLoadAvgMin_5\", ${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>}\n  )\n)",
+          "interval": "",
+          "legendFormat": "Min_5",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "uid4prometheus"
+          },
+          "editorMode": "code",
+          "exemplar": true,
+          "expr": "sum(\n  agent_host_monitoring_cpu{cpuUsage=\"cpuLoadAvgMin_15\", ${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>}\n) / count(\n  count by (instance) (\n    agent_host_monitoring_cpu{cpuUsage=\"cpuLoadAvgMin_15\", ${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>}\n  )\n)",
+          "interval": "",
+          "legendFormat": "Min_15",
+          "range": true,
+          "refId": "C"
+        }
+      ],
+      "title": "CPU LoadAvg",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 11
+      },
+      "id": 79,
+      "panels": [],
+      "title": "Memory",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "uid4prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-GrYlRd"
+          },
+          "decimals": 2,
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 12
+      },
+      "id": 78,
+      "options": {
+        "displayMode": "lcd",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "maxVizHeight": 300,
+        "minVizHeight": 10,
+        "minVizWidth": 0,
+        "namePlacement": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "sizing": "auto",
+        "text": {},
+        "valueMode": "color"
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": ""
+          },
+          "editorMode": "code",
+          "exemplar": true,
+          "expr": "(sum(\n  agent_host_monitoring_mem{memUsage=\"memIdle\", ${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>}\n) / sum(\n  agent_host_monitoring_mem{memUsage=\"memTotal\", ${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>}\n)) /\ncount(\n  count by (instance) (\n    agent_host_monitoring_mem{memUsage=\"memTotal\", ${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>}\n  )\n)",
+          "interval": "",
+          "legendFormat": "Real",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "RAM Usage",
+      "type": "bargauge"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "uid4prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-GrYlRd"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "MEMORY",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "scheme",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "#EAB839",
+                "value": 0.5
+              },
+              {
+                "color": "red",
+                "value": 0.7
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 12
+      },
+      "id": 55,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "lastNotNull",
+            "max",
+            "min"
+          ],
+          "displayMode": "hidden",
+          "placement": "right",
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": ""
+          },
+          "editorMode": "code",
+          "exemplar": true,
+          "expr": "(sum(\n  agent_host_monitoring_mem{memUsage=\"memIdle\", ${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>}\n) / sum(\n  agent_host_monitoring_mem{memUsage=\"memTotal\", ${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>}\n)) /\ncount(\n  count by (instance) (\n    agent_host_monitoring_mem{memUsage=\"memTotal\", ${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>}\n  )\n)",
+          "interval": "$resolution",
+          "legendFormat": "Memory usage in %",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Memory Utilization",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "uid4prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "rgb(255, 255, 255)",
+                "value": null
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 12,
+        "x": 0,
+        "y": 19
+      },
+      "id": 39,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {},
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": ""
+          },
+          "editorMode": "code",
+          "exemplar": true,
+          "expr": "(sum(\n  agent_host_monitoring_mem{memUsage=\"memIdle\", ${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>}\n) / sum(\n  agent_host_monitoring_mem{memUsage=\"memTotal\", ${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>}\n)) /\ncount(\n  count by (instance) (\n    agent_host_monitoring_mem{memUsage=\"memTotal\", ${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>}\n  )\n)",
+          "interval": "",
+          "legendFormat": "Real",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "RAM Usage",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 22
+      },
+      "id": 81,
+      "panels": [],
+      "title": "Storage",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "uid4prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 2,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 23
+      },
+      "id": 87,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "uid4prometheus"
+          },
+          "disableTextWrap": false,
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "(sum(\n  agent_host_monitoring_disk{diskUsage=\"diskFreeSpace\", ${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>}\n) / sum(\n  agent_host_monitoring_disk{diskUsage=\"diskTotalSpace\", ${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>}\n)) /\ncount(\n  count by (instance) (\n    agent_host_monitoring_disk{diskUsage=\"diskFreeSpace\", ${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>}\n  )\n)",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "interval": "$resolution",
+          "legendFormat": "{{label_name}}",
+          "range": true,
+          "refId": "A",
+          "useBackend": false
+        }
+      ],
+      "title": "Persistent Volumes - Usage in %",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "uid4prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 25,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 2,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 23
+      },
+      "id": 82,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "right",
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "uid4prometheus"
+          },
+          "disableTextWrap": false,
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "(sum(\n  agent_host_monitoring_disk{diskUsage=\"diskFreeSpace\", ${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>}\n) / sum(\n  agent_host_monitoring_disk{diskUsage=\"diskTotalSpace\", ${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>}\n)) /\ncount(\n  count by (instance) (\n    agent_host_monitoring_disk{diskUsage=\"diskFreeSpace\", ${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>}\n  )\n)",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "interval": "$resolution",
+          "legendFormat": "{{label_name}}",
+          "range": true,
+          "refId": "A",
+          "useBackend": false
+        }
+      ],
+      "title": "Persistent Volumes - Usage in %",
+      "type": "timeseries"
+    }
+  ],
+  "preload": false,
+  "refresh": "30s",
+  "schemaVersion": 40,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "prometheus",
+          "value": "uid4prometheus"
+        },
+        "includeAll": false,
+        "label": "Datasource",
+        "name": "datasource",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "",
+        "type": "datasource"
+      },
+      {
+        "current": {
+          "text": "${default_cluster_name}",
+          "value": "${default_cluster_name}"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "uid4prometheus"
+        },
+        "includeAll": false,
+        "label": "Cluster",
+        "name": "${cluster_label",
+        "options": [],
+        "query": "label_values(${cluster_label)",
+        "refresh": 2,
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "${default_host_name}",
+          "value": "${default_host_name}r"
+        },
+        "definition": "label_values({${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>},hostname)",
+        "label": "Host",
+        "name": "host",
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values({${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>},hostname)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "1m",
+          "value": "1m"
+        },
+        "includeAll": false,
+        "label": "Resolution",
+        "name": "resolution",
+        "options": [
+          {
+            "selected": false,
+            "text": "1s",
+            "value": "1s"
+          },
+          {
+            "selected": false,
+            "text": "5s",
+            "value": "5s"
+          },
+          {
+            "selected": true,
+            "text": "1m",
+            "value": "1m"
+          },
+          {
+            "selected": false,
+            "text": "3m",
+            "value": "3m"
+          },
+          {
+            "selected": false,
+            "text": "5m",
+            "value": "5m"
+          }
+        ],
+        "query": "1s, 5s, 1m, 3m, 5m",
+        "type": "custom"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "${dashboard_name}",
+  "uid": "dbuid_${dashboard_name}",
+  "version": 19,
+  "weekStart": ""
+}
+        ]]>
         </value>
         <attrs>
             <type>longtext</type>
