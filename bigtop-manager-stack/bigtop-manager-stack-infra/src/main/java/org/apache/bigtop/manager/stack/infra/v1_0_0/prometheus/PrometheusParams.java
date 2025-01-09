@@ -44,7 +44,7 @@ public class PrometheusParams extends InfraParams {
     protected final String PROMETHEUS_SELF_JOB_NAME = "prometheus";
     protected final String BM_AGENT_JOB_NAME = "bm-agent";
     protected final String BM_AGENT_PORT = "8081";
-    protected final String AGENT_TARGET_LABEL = "cluster";
+    public static final String AGENT_TARGET_LABEL = "cluster";
 
     private Map<String, Object> prometheusScrapeJob;
     private Map<String, Object> agentScrapeJob;
