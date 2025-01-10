@@ -1055,14 +1055,18 @@ providers:
       "type": "bargauge"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "uid4prometheus"
+      "id": 88,
+      "type": "stat",
+      "title": "CPU Core",
+      "gridPos": {
+        "x": 12,
+        "y": 1,
+        "h": 3,
+        "w": 12
       },
       "fieldConfig": {
         "defaults": {
           "mappings": [],
-          "noValue": "0",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -1072,34 +1076,10 @@ providers:
               }
             ]
           },
+          "noValue": "0",
           "unit": "none"
         },
         "overrides": []
-      },
-      "gridPos": {
-        "h": 3,
-        "w": 12,
-        "x": 12,
-        "y": 1
-      },
-      "id": 88,
-      "options": {
-        "colorMode": "none",
-        "graphMode": "none",
-        "justifyMode": "center",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "text": {},
-        "textMode": "auto",
-        "wideLayout": true
       },
       "pluginVersion": "11.4.0",
       "targets": [
@@ -1111,15 +1091,16 @@ providers:
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": true,
-          "expr": "4",
+          "expr": "label_replace(agent_host_monitoring_cpu{cpuUsage=\"cpuUsage\", ${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>}\n) / count(\n  count by (instance) (\n    agent_host_monitoring_cpu{cpuUsage=\"cpuUsage\", ${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>}, \"value\", \"$1\", \"physical_cores\", \"(.*)\")",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": true,
           "interval": "",
-          "legendFormat": "Physical",
+          "legendFormat": "Physical: {{value}}",
           "range": true,
           "refId": "B",
-          "useBackend": false
+          "useBackend": false,
+          "format": "time_series"
         },
         {
           "datasource": {
@@ -1127,20 +1108,42 @@ providers:
             "uid": "uid4prometheus"
           },
           "disableTextWrap": false,
-          "editorMode": "code",
+          "editorMode": "builder",
           "exemplar": true,
-          "expr": "8",
+          "expr": "label_replace(agent_host_monitoring_cpu{cpuUsage=\"cpuUsage\", ${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>}\n) / count(\n  count by (instance) (\n    agent_host_monitoring_cpu{cpuUsage=\"cpuUsage\", ${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>}, \"value\", \"$1\", \"logical_cores\", \"(.*)\")",
           "fullMetaSearch": false,
+          "hide": false,
           "includeNullMetadata": true,
           "interval": "",
-          "legendFormat": "Logical",
+          "legendFormat": "Logical: {{value}}",
           "range": true,
-          "refId": "A",
-          "useBackend": false
+          "refId": "C",
+          "useBackend": false,
+          "format": "time_series"
         }
       ],
-      "title": "CPU Core",
-      "type": "stat"
+      "datasource": {
+        "type": "prometheus",
+        "uid": "uid4prometheus"
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "min"
+          ],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "name",
+        "wideLayout": true,
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "showPercentChange": false,
+        "percentChangeColorMode": "standard",
+        "text": {}
+      }
     },
     {
       "datasource": {
