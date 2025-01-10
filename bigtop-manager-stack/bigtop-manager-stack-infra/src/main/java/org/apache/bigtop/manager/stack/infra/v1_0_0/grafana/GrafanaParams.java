@@ -126,7 +126,7 @@ public class GrafanaParams extends InfraParams {
         Map<String, Object> configuration = LocalSettings.configurations(getServiceName(), "grafana-dashboard");
         grafanaDashboardContent = (String) configuration.get("content");
         bmAgentClusterDashboardConfig = (String) configuration.get("bm_agent_cluster_dashboard");
-        bmAgentClusterDashboardConfig = (String) configuration.get("bm_agent_host_dashboard");
+        bmAgentHostDashboardConfig = (String) configuration.get("bm_agent_host_dashboard");
         prometheusDashboardPath = MessageFormat.format("{0}/prometheus", dashboardsDir());
         return configuration;
     }
