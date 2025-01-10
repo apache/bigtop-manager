@@ -1091,7 +1091,7 @@ providers:
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": true,
-          "expr": "label_replace(agent_host_monitoring_cpu{cpuUsage=\"cpuUsage\", ${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>}\n) / count(\n  count by (instance) (\n    agent_host_monitoring_cpu{cpuUsage=\"cpuUsage\", ${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>}, \"value\", \"$1\", \"physical_cores\", \"(.*)\")",
+          "expr": "max by (value) (\n  label_replace(\n    agent_host_monitoring_cpu{cpuUsage=\"cpuUsage\", ${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>},\n    \"value\", \"$1\", \"physical_cores\", \"(.*)\"\n  )\n)",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": true,
@@ -1110,7 +1110,7 @@ providers:
           "disableTextWrap": false,
           "editorMode": "builder",
           "exemplar": true,
-          "expr": "label_replace(agent_host_monitoring_cpu{cpuUsage=\"cpuUsage\", ${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>}\n) / count(\n  count by (instance) (\n    agent_host_monitoring_cpu{cpuUsage=\"cpuUsage\", ${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>}, \"value\", \"$1\", \"logical_cores\", \"(.*)\")",
+          "expr": "max by (value) (\n  label_replace(\n    agent_host_monitoring_cpu{cpuUsage=\"cpuUsage\", ${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>},\n    \"value\", \"$1\", \"logical_cores\", \"(.*)\"\n  )\n)",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": true,
@@ -1843,24 +1843,24 @@ providers:
         },
         "includeAll": false,
         "label": "Cluster",
-        "name": "${cluster_label",
+        "name": "${cluster_label}",
         "options": [],
-        "query": "label_values(${cluster_label)",
+        "query": "label_values(${cluster_label})",
         "refresh": 2,
         "type": "query"
       },
       {
         "current": {
           "text": "${default_host_name}",
-          "value": "${default_host_name}r"
+          "value": "${default_host_name}"
         },
-        "definition": "label_values({${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>},hostname)",
+        "definition": "label_values({${cluster_label}<#noparse>=~\"$cluster\"</#noparse>},hostname)",
         "label": "Host",
         "name": "host",
         "options": [],
         "query": {
           "qryType": 1,
-          "query": "label_values({${cluster_label}<#noparse>=~\"$cluster\", hostname=~\"$host\"</#noparse>},hostname)",
+          "query": "label_values({${cluster_label}<#noparse>=~\"$cluster\"</#noparse>},hostname)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
