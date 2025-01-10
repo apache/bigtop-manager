@@ -16,24 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.agent.executor;
+package org.apache.bigtop.manager.agent.service;
 
 import org.apache.bigtop.manager.common.constants.MessageConstants;
 import org.apache.bigtop.manager.common.message.entity.payload.CacheMessagePayload;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.common.utils.ProjectPathUtils;
-import org.apache.bigtop.manager.grpc.generated.CommandType;
+import org.apache.bigtop.manager.grpc.generated.JobCacheReply;
+import org.apache.bigtop.manager.grpc.generated.JobCacheRequest;
+import org.apache.bigtop.manager.grpc.generated.JobCacheServiceGrpc;
 
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
+import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
+import net.devh.boot.grpc.server.service.GrpcService;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.MessageFormat;
 
 import static org.apache.bigtop.manager.common.constants.CacheFiles.CLUSTER_INFO;
 import static org.apache.bigtop.manager.common.constants.CacheFiles.COMPONENTS_INFO;
@@ -43,41 +42,33 @@ import static org.apache.bigtop.manager.common.constants.CacheFiles.REPOS_INFO;
 import static org.apache.bigtop.manager.common.constants.CacheFiles.USERS_INFO;
 
 @Slf4j
-@Component
-@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class CacheFileUpdateCommandExecutor extends AbstractCommandExecutor {
+@GrpcService
+public class JobCacheServiceGrpcImpl extends JobCacheServiceGrpc.JobCacheServiceImplBase {
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.UPDATE_CACHE_FILES;
-    }
-
-    @Override
-    public void doExecute() {
-        CacheMessagePayload cacheMessagePayload =
-                JsonUtils.readFromString(commandRequest.getPayload(), CacheMessagePayload.class);
+    public void save(JobCacheRequest request, StreamObserver<JobCacheReply> responseObserver) {
+        CacheMessagePayload payload = JsonUtils.readFromString(request.getPayload(), CacheMessagePayload.class);
         String cacheDir = ProjectPathUtils.getAgentCachePath();
         Path p = Paths.get(cacheDir);
         if (!Files.exists(p)) {
             try {
                 Files.createDirectories(p);
             } catch (Exception e) {
-                log.error("Create directory failed: {}", cacheDir, e);
-                commandReplyBuilder.setCode(MessageConstants.FAIL_CODE);
-                commandReplyBuilder.setResult(
-                        MessageFormat.format("Create directory {0}, failed: {1}", cacheDir, e.getMessage()));
-                return;
+                responseObserver.onError(e);
             }
         }
 
-        JsonUtils.writeToFile(cacheDir + CONFIGURATIONS_INFO, cacheMessagePayload.getConfigurations());
-        JsonUtils.writeToFile(cacheDir + HOSTS_INFO, cacheMessagePayload.getClusterHostInfo());
-        JsonUtils.writeToFile(cacheDir + USERS_INFO, cacheMessagePayload.getUserInfo());
-        JsonUtils.writeToFile(cacheDir + COMPONENTS_INFO, cacheMessagePayload.getComponentInfo());
-        JsonUtils.writeToFile(cacheDir + REPOS_INFO, cacheMessagePayload.getRepoInfo());
-        JsonUtils.writeToFile(cacheDir + CLUSTER_INFO, cacheMessagePayload.getClusterInfo());
+        JsonUtils.writeToFile(cacheDir + CONFIGURATIONS_INFO, payload.getConfigurations());
+        JsonUtils.writeToFile(cacheDir + HOSTS_INFO, payload.getClusterHostInfo());
+        JsonUtils.writeToFile(cacheDir + USERS_INFO, payload.getUserInfo());
+        JsonUtils.writeToFile(cacheDir + COMPONENTS_INFO, payload.getComponentInfo());
+        JsonUtils.writeToFile(cacheDir + REPOS_INFO, payload.getRepoInfo());
+        JsonUtils.writeToFile(cacheDir + CLUSTER_INFO, payload.getClusterInfo());
 
-        commandReplyBuilder.setCode(MessageConstants.SUCCESS_CODE);
-        commandReplyBuilder.setResult("Successfully cached files");
+        JobCacheReply reply = JobCacheReply.newBuilder()
+                .setCode(MessageConstants.SUCCESS_CODE)
+                .build();
+        responseObserver.onNext(reply);
+        responseObserver.onCompleted();
     }
 }
