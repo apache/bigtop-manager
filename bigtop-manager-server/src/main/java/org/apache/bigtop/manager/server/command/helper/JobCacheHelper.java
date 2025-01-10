@@ -77,7 +77,7 @@ public class JobCacheHelper {
         INITIALIZED.set(true);
     }
 
-    public static void saveJobCache(Long clusterId, Long jobId, List<String> hostnames) {
+    public static void sendJobCache(Long clusterId, Long jobId, List<String> hostnames) {
         CacheMessagePayload payload = genPayload(clusterId);
         JobCacheRequest request = JobCacheRequest.newBuilder()
                 .setJobId(jobId)
@@ -108,7 +108,7 @@ public class JobCacheHelper {
 
         boolean allSuccess = results.stream().allMatch(Boolean::booleanValue);
         if (!allSuccess) {
-            throw new ServerException("Failed to save job cache");
+            throw new ServerException("Failed to send job cache");
         }
     }
 
