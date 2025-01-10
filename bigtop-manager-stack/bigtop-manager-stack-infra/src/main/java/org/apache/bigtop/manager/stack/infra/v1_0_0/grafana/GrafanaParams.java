@@ -175,7 +175,7 @@ public class GrafanaParams extends InfraParams {
             hostDashboard.put("default_host_name", defaultHost);
         }
 
-        dashboards.add(hostDashboard);
         dashboards.add(clusterDashboard);
+        dashboards.add(hostDashboard);
     }
 }
