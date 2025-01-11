@@ -77,7 +77,7 @@ public class GrafanaSetup {
                 LinuxFileUtils.createDirectories(confPath, user, group, Constants.PERMISSION_755, true);
 
                 LinuxFileUtils.toFileByTemplate(
-                        grafanaParams.getBmAgentDashboardConfig(),
+                        (String) dashboard.get("dashboard_config_content"),
                         MessageFormat.format("{0}/{1}.json", confPath, dashboard.get("name")),
                         user,
                         group,
