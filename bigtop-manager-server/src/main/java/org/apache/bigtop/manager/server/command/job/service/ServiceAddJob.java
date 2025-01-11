@@ -58,9 +58,6 @@ public class ServiceAddJob extends AbstractServiceJob {
 
     @Override
     protected void createStages() {
-        // Update cache files
-        super.createCacheStage();
-
         CommandDTO commandDTO = jobContext.getCommandDTO();
         Map<String, List<String>> componentHostsMap = getComponentHostsMap();
 

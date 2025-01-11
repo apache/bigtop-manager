@@ -16,12 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.command.task;
+package org.apache.bigtop.manager.server.command.helper;
 
-import org.apache.bigtop.manager.common.enums.Command;
+import org.apache.bigtop.manager.common.constants.MessageConstants;
 import org.apache.bigtop.manager.common.message.entity.payload.CacheMessagePayload;
 import org.apache.bigtop.manager.common.message.entity.pojo.ClusterInfo;
-import org.apache.bigtop.manager.common.message.entity.pojo.ComponentInfo;
 import org.apache.bigtop.manager.common.message.entity.pojo.RepoInfo;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
@@ -35,8 +34,11 @@ import org.apache.bigtop.manager.dao.repository.ComponentDao;
 import org.apache.bigtop.manager.dao.repository.HostDao;
 import org.apache.bigtop.manager.dao.repository.RepoDao;
 import org.apache.bigtop.manager.dao.repository.ServiceConfigDao;
-import org.apache.bigtop.manager.grpc.generated.CommandRequest;
-import org.apache.bigtop.manager.grpc.generated.CommandType;
+import org.apache.bigtop.manager.grpc.generated.JobCacheReply;
+import org.apache.bigtop.manager.grpc.generated.JobCacheRequest;
+import org.apache.bigtop.manager.grpc.generated.JobCacheServiceGrpc;
+import org.apache.bigtop.manager.server.exception.ServerException;
+import org.apache.bigtop.manager.server.grpc.GrpcClient;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 import org.apache.bigtop.manager.server.model.converter.RepoConverter;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
@@ -49,59 +51,72 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static org.apache.bigtop.manager.common.constants.Constants.ALL_HOST_KEY;
 
-public class CacheFileUpdateTask extends AbstractTask {
+public class JobCacheHelper {
 
-    private ClusterDao clusterDao;
-    private ServiceConfigDao serviceConfigDao;
-    private RepoDao repoDao;
-    private HostDao hostDao;
-    private ComponentDao componentDao;
+    private static ClusterDao clusterDao;
+    private static ServiceConfigDao serviceConfigDao;
+    private static RepoDao repoDao;
+    private static HostDao hostDao;
+    private static ComponentDao componentDao;
 
-    private ClusterInfo clusterInfo;
-    private Map<String, ComponentInfo> componentInfoMap;
-    private Map<String, Map<String, Object>> serviceConfigMap;
-    private Map<String, Set<String>> hostMap;
-    private List<RepoInfo> repoList;
-    private Map<String, String> userMap;
+    private static final AtomicBoolean INITIALIZED = new AtomicBoolean(false);
 
-    public CacheFileUpdateTask(TaskContext taskContext) {
-        super(taskContext);
+    private static void initialize() {
+        clusterDao = SpringContextHolder.getBean(ClusterDao.class);
+        serviceConfigDao = SpringContextHolder.getBean(ServiceConfigDao.class);
+        repoDao = SpringContextHolder.getBean(RepoDao.class);
+        hostDao = SpringContextHolder.getBean(HostDao.class);
+        componentDao = SpringContextHolder.getBean(ComponentDao.class);
+
+        INITIALIZED.set(true);
     }
 
-    @Override
-    protected void injectBeans() {
-        super.injectBeans();
+    public static void sendJobCache(Long clusterId, Long jobId, List<String> hostnames) {
+        CacheMessagePayload payload = genPayload(clusterId);
+        JobCacheRequest request = JobCacheRequest.newBuilder()
+                .setJobId(jobId)
+                .setPayload(JsonUtils.writeAsString(payload))
+                .build();
+        List<HostPO> hostPOList = hostDao.findAllByHostnames(hostnames);
+        List<CompletableFuture<Boolean>> futures = new ArrayList<>();
+        for (HostPO hostPO : hostPOList) {
+            futures.add(CompletableFuture.supplyAsync(() -> {
+                JobCacheServiceGrpc.JobCacheServiceBlockingStub stub = GrpcClient.getBlockingStub(
+                        hostPO.getHostname(),
+                        hostPO.getGrpcPort(),
+                        JobCacheServiceGrpc.JobCacheServiceBlockingStub.class);
+                JobCacheReply reply = stub.save(request);
+                return reply != null && reply.getCode() == MessageConstants.SUCCESS_CODE;
+            }));
+        }
 
-        this.clusterDao = SpringContextHolder.getBean(ClusterDao.class);
-        this.serviceConfigDao = SpringContextHolder.getBean(ServiceConfigDao.class);
-        this.repoDao = SpringContextHolder.getBean(RepoDao.class);
-        this.hostDao = SpringContextHolder.getBean(HostDao.class);
-        this.componentDao = SpringContextHolder.getBean(ComponentDao.class);
-    }
+        List<Boolean> results = futures.stream()
+                .map((future) -> {
+                    try {
+                        return future.get();
+                    } catch (Exception e) {
+                        return false;
+                    }
+                })
+                .toList();
 
-    @Override
-    public void beforeRun() {
-        super.beforeRun();
-
-        genCaches();
-    }
-
-    private void genCaches() {
-        if (taskContext.getClusterId() == null) {
-            genEmptyCaches();
-        } else {
-            genFullCaches();
+        boolean allSuccess = results.stream().allMatch(Boolean::booleanValue);
+        if (!allSuccess) {
+            throw new ServerException("Failed to send job cache");
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private void genFullCaches() {
-        Long clusterId = taskContext.getClusterId();
-        List<String> hostnames = (List<String>) taskContext.getProperties().get("hostnames");
+    private static CacheMessagePayload genPayload(Long clusterId) {
+        if (!INITIALIZED.get()) {
+            initialize();
+        }
+
         ClusterPO clusterPO = clusterDao.findById(clusterId);
 
         ComponentQuery componentQuery =
@@ -110,14 +125,14 @@ public class CacheFileUpdateTask extends AbstractTask {
         List<ServiceConfigPO> serviceConfigPOList = serviceConfigDao.findByClusterId(clusterPO.getId());
         List<ComponentPO> componentPOList = componentDao.findByQuery(componentQuery);
         List<RepoPO> repoPOList = repoDao.findAll();
-        List<HostPO> hostPOList = hostDao.findAllByHostnames(hostnames);
+        List<HostPO> hostPOList = hostDao.findAll();
 
-        clusterInfo = new ClusterInfo();
+        ClusterInfo clusterInfo = new ClusterInfo();
         clusterInfo.setName(clusterPO.getName());
         clusterInfo.setUserGroup(clusterPO.getUserGroup());
         clusterInfo.setRootDir(clusterPO.getRootDir());
 
-        serviceConfigMap = new HashMap<>();
+        Map<String, Map<String, Object>> serviceConfigMap = new HashMap<>();
         for (ServiceConfigPO serviceConfigPO : serviceConfigPOList) {
             List<Map<String, Object>> properties = JsonUtils.readFromString(serviceConfigPO.getPropertiesJson());
             Map<String, String> kvMap = properties.stream()
@@ -134,7 +149,7 @@ public class CacheFileUpdateTask extends AbstractTask {
             }
         }
 
-        hostMap = new HashMap<>();
+        Map<String, Set<String>> hostMap = new HashMap<>();
         componentPOList.forEach(x -> {
             if (hostMap.containsKey(x.getName())) {
                 hostMap.get(x.getName()).add(x.getHostname());
@@ -149,81 +164,25 @@ public class CacheFileUpdateTask extends AbstractTask {
         Set<String> hostNameSet = hostPOList.stream().map(HostPO::getHostname).collect(Collectors.toSet());
         hostMap.put(ALL_HOST_KEY, hostNameSet);
 
-        repoList = new ArrayList<>();
+        List<RepoInfo> repoList = new ArrayList<>();
         repoPOList.forEach(repoPO -> {
             RepoInfo repoInfo = RepoConverter.INSTANCE.fromPO2Message(repoPO);
             repoList.add(repoInfo);
         });
 
-        userMap = new HashMap<>();
+        Map<String, String> userMap = new HashMap<>();
         for (StackDTO stackDTO : StackUtils.getAllStacks()) {
             for (ServiceDTO serviceDTO : StackUtils.getServiceDTOList(stackDTO)) {
                 userMap.put(serviceDTO.getName(), serviceDTO.getUser());
             }
         }
-    }
 
-    @SuppressWarnings("unchecked")
-    private void genEmptyCaches() {
-        List<String> hostnames = (List<String>) taskContext.getProperties().get("hostnames");
-
-        List<RepoPO> repoPOList = repoDao.findAll();
-        List<HostPO> hostPOList = hostDao.findAllByHostnames(hostnames);
-
-        componentInfoMap = new HashMap<>();
-        serviceConfigMap = new HashMap<>();
-
-        clusterInfo = new ClusterInfo();
-        clusterInfo.setUserGroup(taskContext.getUserGroup());
-        clusterInfo.setRootDir(taskContext.getRootDir());
-
-        hostMap = new HashMap<>();
-        Set<String> hostNameSet = hostPOList.stream().map(HostPO::getHostname).collect(Collectors.toSet());
-        hostMap.put(ALL_HOST_KEY, hostNameSet);
-
-        repoList = new ArrayList<>();
-        repoPOList.forEach(repoPO -> {
-            RepoInfo repoInfo = RepoConverter.INSTANCE.fromPO2Message(repoPO);
-            repoList.add(repoInfo);
-        });
-
-        userMap = new HashMap<>();
-        for (StackDTO stackDTO : StackUtils.getAllStacks()) {
-            for (ServiceDTO serviceDTO : StackUtils.getServiceDTOList(stackDTO)) {
-                userMap.put(serviceDTO.getName(), serviceDTO.getUser());
-            }
-        }
-    }
-
-    @Override
-    protected Command getCommand() {
-        return Command.CUSTOM;
-    }
-
-    @Override
-    protected String getCustomCommand() {
-        return "update_cache_files";
-    }
-
-    @Override
-    protected CommandRequest getCommandRequest() {
-        CacheMessagePayload messagePayload = new CacheMessagePayload();
-        messagePayload.setClusterInfo(clusterInfo);
-        messagePayload.setConfigurations(serviceConfigMap);
-        messagePayload.setClusterHostInfo(hostMap);
-        messagePayload.setRepoInfo(repoList);
-        messagePayload.setUserInfo(userMap);
-        messagePayload.setComponentInfo(componentInfoMap);
-
-        CommandRequest.Builder builder = CommandRequest.newBuilder();
-        builder.setType(CommandType.UPDATE_CACHE_FILES);
-        builder.setPayload(JsonUtils.writeAsString(messagePayload));
-
-        return builder.build();
-    }
-
-    @Override
-    public String getName() {
-        return "Update cache files on " + taskContext.getHostname();
+        CacheMessagePayload payload = new CacheMessagePayload();
+        payload.setClusterInfo(clusterInfo);
+        payload.setConfigurations(serviceConfigMap);
+        payload.setClusterHostInfo(hostMap);
+        payload.setRepoInfo(repoList);
+        payload.setUserInfo(userMap);
+        return payload;
     }
 }
