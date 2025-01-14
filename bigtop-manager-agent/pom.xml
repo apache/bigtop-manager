@@ -69,6 +69,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.bigtop</groupId>
+            <artifactId>bigtop-manager-stack-extra</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
