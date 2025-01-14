@@ -33,7 +33,7 @@ public class ServiceQuery {
 
     private Long clusterId;
 
-    private Boolean needRestart;
+    private Boolean restartFlag;
 
     private Integer status;
 }

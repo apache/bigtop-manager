@@ -39,6 +39,8 @@ public class ComponentQuery {
 
     private String hostname;
 
+    private List<String> hostnames;
+
     private Long serviceId;
 
     private List<String> serviceNames;

@@ -18,6 +18,7 @@
  */
 package org.apache.bigtop.manager.server.service;
 
+import org.apache.bigtop.manager.server.enums.ChatbotCommand;
 import org.apache.bigtop.manager.server.model.dto.ChatThreadDTO;
 import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
 import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
@@ -34,11 +35,13 @@ public interface ChatbotService {
 
     List<ChatThreadVO> getAllChatThreads();
 
-    SseEmitter talk(Long threadId, String message);
+    SseEmitter talk(Long threadId, ChatbotCommand command, String message);
 
     List<ChatMessageVO> history(Long threadId);
 
     ChatThreadVO updateChatThread(ChatThreadDTO chatThreadDTO);
+
+    List<String> getChatbotCommands();
 
     ChatThreadVO getChatThread(Long threadId);
 }

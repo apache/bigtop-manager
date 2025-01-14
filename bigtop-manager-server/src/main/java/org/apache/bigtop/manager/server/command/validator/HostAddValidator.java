@@ -25,7 +25,6 @@ import org.apache.bigtop.manager.server.command.CommandIdentifier;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.enums.CommandLevel;
 import org.apache.bigtop.manager.server.exception.ApiException;
-import org.apache.bigtop.manager.server.model.dto.command.HostCommandDTO;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -48,7 +47,7 @@ public class HostAddValidator implements CommandValidator {
     @Override
     public void validate(ValidatorContext context) {
         List<String> hostnames = context.getCommandDTO().getHostCommands().stream()
-                .map(HostCommandDTO::getHostname)
+                .flatMap(hostCommandDTO -> hostCommandDTO.getHostnames().stream())
                 .toList();
 
         List<HostPO> hostPOList = hostDao.findAllByHostnames(hostnames);

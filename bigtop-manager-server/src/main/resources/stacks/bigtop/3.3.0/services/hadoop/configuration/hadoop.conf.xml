@@ -52,8 +52,8 @@
 # limitations under the License.
 #
 
-${hadoop_user}    - nofile   ${hdfs_user_nofile_limit}
-${hadoop_group}   - nproc    ${hdfs_user_nproc_limit}
+${hadoop_user}    - nofile   ${hadoop_user_nofile_limit}
+${hadoop_group}   - nproc    ${hadoop_user_nproc_limit}
 
 ]]>
         </value>

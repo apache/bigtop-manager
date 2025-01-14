@@ -39,8 +39,8 @@ import static org.apache.bigtop.manager.common.constants.Constants.PERMISSION_75
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SolrSetup {
 
-    public static ShellResult config(Params params) {
-        log.info("solrSetup config");
+    public static ShellResult configure(Params params) {
+        log.info("Configuring Solr");
         SolrParams solrParams = (SolrParams) params;
 
         String confDir = solrParams.confDir();
@@ -48,41 +48,31 @@ public class SolrSetup {
         String solrGroup = solrParams.group();
         Map<String, Object> solrEnv = solrParams.solrEnv();
 
-        LinuxFileUtils.createDirectories(solrParams.getSolrHomeDir(), solrUser, solrGroup, PERMISSION_755, true);
-        LinuxFileUtils.createDirectories(solrParams.getSolrDataDir(), solrUser, solrGroup, PERMISSION_755, true);
         LinuxFileUtils.createDirectories(solrParams.getSolrLogDir(), solrUser, solrGroup, PERMISSION_755, true);
         LinuxFileUtils.createDirectories(solrParams.getSolrPidDir(), solrUser, solrGroup, PERMISSION_755, true);
 
-        // solr-env.xml
         List<String> zookeeperServerHosts = LocalSettings.hosts("zookeeper_server");
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("zookeeper_quorum", zookeeperServerHosts);
         paramMap.put("host", solrParams.hostname());
         LinuxFileUtils.toFileByTemplate(
                 solrEnv.get("content").toString(),
-                MessageFormat.format("{0}/solr-env.sh", confDir),
+                MessageFormat.format("{0}/solr.in.sh", solrParams.serviceHome() + "/bin"),
                 solrUser,
                 solrGroup,
                 Constants.PERMISSION_755,
                 solrParams.getGlobalParamsMap(),
                 paramMap);
-        // solr-log4j.xml
-        LinuxFileUtils.toFileByTemplate(
-                solrParams.solrLog4j().get("content").toString(),
-                MessageFormat.format("{0}/log4j2.xml", confDir),
-                solrUser,
-                solrGroup,
-                Constants.PERMISSION_755,
-                solrParams.getGlobalParamsMap());
-        // solr-xml.xml
+
         LinuxFileUtils.toFileByTemplate(
                 solrParams.solrXml().get("content").toString(),
-                MessageFormat.format("{0}/solr.xml", solrParams.getSolrDataDir()),
+                MessageFormat.format("{0}/solr.xml", confDir),
                 solrUser,
                 solrGroup,
                 Constants.PERMISSION_755,
                 solrParams.getGlobalParamsMap());
 
-        return ShellResult.success("solr Server Configure success!");
+        log.info("Successfully configured Solr");
+        return ShellResult.success();
     }
 }

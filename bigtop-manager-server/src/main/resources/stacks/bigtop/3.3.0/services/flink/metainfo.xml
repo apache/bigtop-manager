@@ -28,8 +28,8 @@
 
         <components>
             <component>
-                <name>flink_history_server</name>
-                <display-name>Flink History Server</display-name>
+                <name>flink_historyserver</name>
+                <display-name>Flink HistoryServer</display-name>
                 <category>server</category>
                 <cardinality>1+</cardinality>
                 <quick-link>

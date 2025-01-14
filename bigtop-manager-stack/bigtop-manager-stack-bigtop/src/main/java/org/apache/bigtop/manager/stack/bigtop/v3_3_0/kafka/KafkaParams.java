@@ -19,7 +19,6 @@
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.kafka;
 
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
-import org.apache.bigtop.manager.common.utils.Environments;
 import org.apache.bigtop.manager.stack.bigtop.param.BigtopParams;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
@@ -47,7 +46,7 @@ public class KafkaParams extends BigtopParams {
         super(commandPayload);
         globalParamsMap.put("kafka_user", user());
         globalParamsMap.put("kafka_group", group());
-        globalParamsMap.put("java_home", Environments.getJavaHome());
+        globalParamsMap.put("java_home", javaHome());
         globalParamsMap.put("kafka_conf_dir", confDir());
         globalParamsMap.put("security_enabled", false);
     }
@@ -79,6 +78,11 @@ public class KafkaParams extends BigtopParams {
     public String kafkaLimits() {
         Map<String, Object> kafkaLimits = LocalSettings.configurations(getServiceName(), "kafka.conf");
         return (String) kafkaLimits.get("content");
+    }
+
+    @Override
+    public String confDir() {
+        return serviceHome() + "/config";
     }
 
     @Override

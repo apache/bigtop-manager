@@ -71,7 +71,8 @@ CREATE TABLE `user`
 CREATE TABLE `cluster`
 (
     `id`                   BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `name`                 VARCHAR(255) DEFAULT NULL COMMENT 'Cluster Name',
+    `name`                 VARCHAR(255) DEFAULT NULL COMMENT 'Unique Name',
+    `display_name`         VARCHAR(255) DEFAULT NULL COMMENT 'Display Name',
     `desc`                 VARCHAR(255) DEFAULT NULL COMMENT 'Cluster Description',
     `type`                 INTEGER DEFAULT 1 COMMENT '1-Physical Machine, 2-Kubernetes',
     `user_group`           VARCHAR(255),
@@ -90,6 +91,7 @@ CREATE TABLE `host`
     `id`                   BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
     `cluster_id`           BIGINT(20) UNSIGNED DEFAULT NULL,
     `hostname`             VARCHAR(255) DEFAULT NULL,
+    `agent_dir`            VARCHAR(255) DEFAULT NULL,
     `ssh_user`             VARCHAR(255) DEFAULT NULL,
     `ssh_port`             INTEGER DEFAULT NULL,
     `auth_type`            INTEGER DEFAULT NULL COMMENT '1-password, 2-key, 3-no_auth',
@@ -142,7 +144,7 @@ CREATE TABLE `service`
     `user`              VARCHAR(255) DEFAULT NULL,
     `version`           VARCHAR(255) DEFAULT NULL,
     `stack`             VARCHAR(255) DEFAULT NULL,
-    `need_restart`      BOOLEAN DEFAULT FALSE,
+    `restart_flag`      BOOLEAN DEFAULT FALSE,
     `cluster_id`        BIGINT,
     `status`            INTEGER DEFAULT NULL COMMENT '1-healthy, 2-unhealthy, 3-unknown',
     `create_time`       DATETIME    DEFAULT CURRENT_TIMESTAMP,

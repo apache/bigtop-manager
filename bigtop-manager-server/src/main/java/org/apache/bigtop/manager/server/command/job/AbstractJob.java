@@ -28,7 +28,9 @@ import org.apache.bigtop.manager.dao.repository.ClusterDao;
 import org.apache.bigtop.manager.dao.repository.JobDao;
 import org.apache.bigtop.manager.dao.repository.StageDao;
 import org.apache.bigtop.manager.dao.repository.TaskDao;
+import org.apache.bigtop.manager.server.command.helper.JobCacheHelper;
 import org.apache.bigtop.manager.server.command.stage.Stage;
+import org.apache.bigtop.manager.server.command.stage.StageContext;
 import org.apache.bigtop.manager.server.command.task.Task;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 
@@ -93,7 +95,17 @@ public abstract class AbstractJob implements Job {
         boolean success = true;
 
         try {
+            // Persist job state and required data.
             beforeRun();
+
+            // Send job cache to agents
+            List<String> hostnames = stages.stream()
+                    .map(Stage::getStageContext)
+                    .map(StageContext::getHostnames)
+                    .flatMap(List::stream)
+                    .distinct()
+                    .toList();
+            JobCacheHelper.sendJobCache(clusterPO.getId(), jobPO.getId(), hostnames);
 
             LinkedBlockingQueue<Stage> queue = new LinkedBlockingQueue<>(stages);
             while (!queue.isEmpty()) {
@@ -145,12 +157,9 @@ public abstract class AbstractJob implements Job {
                 }
             }
         }
-        if (!taskPOList.isEmpty()) {
-            taskDao.partialUpdateByIds(taskPOList);
-        }
-        if (!stagePOList.isEmpty()) {
-            stageDao.partialUpdateByIds(stagePOList);
-        }
+
+        taskDao.partialUpdateByIds(taskPOList);
+        stageDao.partialUpdateByIds(stagePOList);
         jobDao.partialUpdateById(jobPO);
     }
 

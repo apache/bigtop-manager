@@ -51,7 +51,7 @@
         </package-specifics>
 
         <required-services>
-            <service>hadoop</service>
+            <service>hive</service>
         </required-services>
     </service>
 </metainfo>

@@ -21,9 +21,9 @@ package org.apache.bigtop.manager.server.controller;
 import org.apache.bigtop.manager.dao.query.HostQuery;
 import org.apache.bigtop.manager.server.model.converter.HostConverter;
 import org.apache.bigtop.manager.server.model.dto.HostDTO;
-import org.apache.bigtop.manager.server.model.req.HostPathReq;
 import org.apache.bigtop.manager.server.model.req.HostReq;
 import org.apache.bigtop.manager.server.model.vo.HostVO;
+import org.apache.bigtop.manager.server.model.vo.InstalledStatusVO;
 import org.apache.bigtop.manager.server.model.vo.PageVO;
 import org.apache.bigtop.manager.server.service.HostService;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
@@ -92,10 +92,10 @@ public class HostController {
         return ResponseEntity.success(hostService.update(id, hostDTO));
     }
 
-    @Operation(summary = "delete", description = "Delete a host")
+    @Operation(summary = "remove", description = "Remove a host")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> delete(@PathVariable Long id) {
-        return ResponseEntity.success(hostService.delete(id));
+    public ResponseEntity<Boolean> remove(@PathVariable Long id) {
+        return ResponseEntity.success(hostService.remove(id));
     }
 
     @Operation(summary = "Check connection", description = "Check connection for hosts")
@@ -107,7 +107,14 @@ public class HostController {
 
     @Operation(summary = "Install dependencies", description = "Install dependencies on a host")
     @PostMapping("/install-dependencies")
-    public ResponseEntity<Boolean> checkConnection(@RequestBody @Validated HostPathReq hostPathReq) {
-        return ResponseEntity.success(hostService.installDependencies(hostPathReq.getHostIds(), hostPathReq.getPath()));
+    public ResponseEntity<Boolean> installDependencies(@RequestBody @Validated HostReq hostReq) {
+        HostDTO hostDTO = HostConverter.INSTANCE.fromReq2DTO(hostReq);
+        return ResponseEntity.success(hostService.installDependencies(hostDTO));
+    }
+
+    @Operation(summary = "Installed status", description = "Install status for a host")
+    @GetMapping("/installed-status")
+    public ResponseEntity<List<InstalledStatusVO>> installedStatus() {
+        return ResponseEntity.success(hostService.installedStatus());
     }
 }

@@ -39,9 +39,12 @@ public class ComponentStopTask extends AbstractComponentTask {
         super.onSuccess();
 
         String componentName = taskContext.getComponentName();
-        String hostname = taskContext.getHostDTO().getHostname();
-        ComponentQuery componentQuery =
-                ComponentQuery.builder().hostname(hostname).name(componentName).build();
+        String hostname = taskContext.getHostname();
+        ComponentQuery componentQuery = ComponentQuery.builder()
+                .clusterId(taskContext.getClusterId())
+                .hostname(hostname)
+                .name(componentName)
+                .build();
         ComponentPO componentPO = componentDao.findByQuery(componentQuery).get(0);
         componentPO.setStatus(HealthyStatusEnum.UNHEALTHY.getCode());
         componentDao.partialUpdateById(componentPO);
@@ -49,7 +52,6 @@ public class ComponentStopTask extends AbstractComponentTask {
 
     @Override
     public String getName() {
-        return "Stop " + taskContext.getComponentDisplayName() + " on "
-                + taskContext.getHostDTO().getHostname();
+        return "Stop " + taskContext.getComponentDisplayName() + " on " + taskContext.getHostname();
     }
 }

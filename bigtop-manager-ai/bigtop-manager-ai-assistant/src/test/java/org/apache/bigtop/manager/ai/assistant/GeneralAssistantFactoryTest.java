@@ -18,16 +18,12 @@
  */
 package org.apache.bigtop.manager.ai.assistant;
 
-import org.apache.bigtop.manager.ai.assistant.store.ChatMemoryStoreProvider;
-import org.apache.bigtop.manager.ai.core.enums.PlatformType;
+import org.apache.bigtop.manager.ai.core.config.AIAssistantConfig;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
-import org.apache.bigtop.manager.ai.core.provider.AIAssistantConfigProvider;
-import org.apache.bigtop.manager.ai.core.provider.SystemPromptProvider;
 import org.apache.bigtop.manager.ai.openai.OpenAIAssistant;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
@@ -42,23 +38,18 @@ import static org.mockito.Mockito.when;
 class GeneralAssistantFactoryTest {
 
     @Mock
-    private SystemPromptProvider systemPromptProvider;
+    private AIAssistantConfig assistantConfigProvider;
 
     @Mock
-    private AIAssistantConfigProvider assistantConfigProvider;
-
-    @InjectMocks
     private GeneralAssistantFactory generalAssistantFactory;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        generalAssistantFactory = new GeneralAssistantFactory(systemPromptProvider, new ChatMemoryStoreProvider());
         Map<String, String> credentials = Map.of("apiKey", "123456");
         when(assistantConfigProvider.getModel()).thenReturn("model");
         when(assistantConfigProvider.getCredentials()).thenReturn(credentials);
         when(assistantConfigProvider.getConfigs()).thenReturn(null);
-        when(assistantConfigProvider.getLanguage()).thenReturn("en");
     }
 
     @Test
@@ -66,7 +57,7 @@ class GeneralAssistantFactoryTest {
         AIAssistant.Builder mockBuilder = mock(OpenAIAssistant.Builder.class);
         when(mockBuilder.id(any())).thenReturn(mockBuilder);
         when(mockBuilder.memoryStore(any())).thenReturn(mockBuilder);
-        when(mockBuilder.withConfigProvider(any())).thenReturn(mockBuilder);
+        when(mockBuilder.withConfig(any())).thenReturn(mockBuilder);
         when(mockBuilder.withToolProvider(any())).thenReturn(mockBuilder);
         when(mockBuilder.withSystemPrompt(any())).thenReturn(mockBuilder);
         when(mockBuilder.build()).thenReturn(mock(AIAssistant.class));
@@ -74,10 +65,8 @@ class GeneralAssistantFactoryTest {
         try (MockedStatic<OpenAIAssistant> openAIAssistantMockedStatic = mockStatic(OpenAIAssistant.class)) {
             openAIAssistantMockedStatic.when(OpenAIAssistant::builder).thenReturn(mockBuilder);
 
-            PlatformType platformType = PlatformType.OPENAI;
-            generalAssistantFactory.create(platformType, assistantConfigProvider);
-            generalAssistantFactory = new GeneralAssistantFactory(new ChatMemoryStoreProvider());
-            generalAssistantFactory.create(platformType, assistantConfigProvider);
+            generalAssistantFactory.createAIService(assistantConfigProvider, null);
+            generalAssistantFactory.createForTest(assistantConfigProvider, null);
         }
     }
 }

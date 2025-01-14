@@ -27,12 +27,22 @@ import org.apache.bigtop.manager.stack.core.utils.linux.LinuxOSUtils;
 
 import com.google.auto.service.AutoService;
 
+import java.util.Properties;
+
 @AutoService(Script.class)
 public class FlinkHistoryServerScript extends AbstractServerScript {
 
     @Override
+    public ShellResult add(Params params) {
+        Properties properties = new Properties();
+        properties.setProperty(PROPERTY_KEY_SKIP_LEVELS, "1");
+
+        return super.add(params, properties);
+    }
+
+    @Override
     public ShellResult configure(Params params) {
-        return FlinkSetup.config(params);
+        return FlinkSetup.configure(params);
     }
 
     @Override
@@ -68,6 +78,6 @@ public class FlinkHistoryServerScript extends AbstractServerScript {
 
     @Override
     public String getComponentName() {
-        return "flink_history_server";
+        return "flink_historyserver";
     }
 }

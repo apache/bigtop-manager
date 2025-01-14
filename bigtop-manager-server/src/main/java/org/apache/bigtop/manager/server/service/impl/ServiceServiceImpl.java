@@ -19,13 +19,18 @@
 package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.common.utils.JsonUtils;
+import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
 import org.apache.bigtop.manager.dao.po.ServiceConfigSnapshotPO;
 import org.apache.bigtop.manager.dao.po.ServicePO;
+import org.apache.bigtop.manager.dao.query.ComponentQuery;
 import org.apache.bigtop.manager.dao.query.ServiceQuery;
+import org.apache.bigtop.manager.dao.repository.ComponentDao;
 import org.apache.bigtop.manager.dao.repository.ServiceConfigDao;
 import org.apache.bigtop.manager.dao.repository.ServiceConfigSnapshotDao;
 import org.apache.bigtop.manager.dao.repository.ServiceDao;
+import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
+import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.model.converter.ServiceConfigConverter;
 import org.apache.bigtop.manager.server.model.converter.ServiceConfigSnapshotConverter;
 import org.apache.bigtop.manager.server.model.converter.ServiceConverter;
@@ -67,6 +72,9 @@ public class ServiceServiceImpl implements ServiceService {
     @Resource
     private ServiceConfigSnapshotDao serviceConfigSnapshotDao;
 
+    @Resource
+    private ComponentDao componentDao;
+
     @Override
     public PageVO<ServiceVO> list(ServiceQuery query) {
         PageQuery pageQuery = PageUtils.getPageQuery();
@@ -83,6 +91,17 @@ public class ServiceServiceImpl implements ServiceService {
     @Override
     public ServiceVO get(Long id) {
         return ServiceConverter.INSTANCE.fromPO2VO(serviceDao.findById(id));
+    }
+
+    @Override
+    public Boolean remove(Long id) {
+        ComponentQuery query = ComponentQuery.builder().serviceId(id).build();
+        List<ComponentPO> componentPOList = componentDao.findByQuery(query);
+        if (CollectionUtils.isNotEmpty(componentPOList)) {
+            throw new ApiException(ApiExceptionEnum.SERVICE_HAS_COMPONENTS);
+        }
+
+        return serviceDao.deleteById(id);
     }
 
     @Override

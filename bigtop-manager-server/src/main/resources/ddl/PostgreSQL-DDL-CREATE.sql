@@ -55,6 +55,7 @@ CREATE TABLE cluster
 (
     id            BIGINT CHECK (id > 0) NOT NULL GENERATED ALWAYS AS IDENTITY,
     name          VARCHAR(255)                      DEFAULT NULL,
+    display_name  VARCHAR(255)                      DEFAULT NULL,
     "desc"        VARCHAR(255)                      DEFAULT NULL,
     type          INT CHECK (cluster.type > 0) DEFAULT 1,
     user_group    VARCHAR(255),
@@ -68,7 +69,8 @@ CREATE TABLE cluster
     CONSTRAINT uk_name UNIQUE (name)
 );
 
-COMMENT ON COLUMN cluster.name IS 'Cluster Name';
+COMMENT ON COLUMN cluster.name IS 'Unique Name';
+COMMENT ON COLUMN cluster.display_name IS 'Display Name';
 COMMENT ON COLUMN cluster."desc" IS 'Cluster Description';
 COMMENT ON COLUMN cluster.type IS '1-Physical Machine, 2-Kubernetes';
 COMMENT ON COLUMN cluster.status IS '1-healthy, 2-unhealthy, 3-unknown';
@@ -78,6 +80,7 @@ CREATE TABLE host
     id                   BIGINT CHECK (id > 0)         NOT NULL GENERATED ALWAYS AS IDENTITY,
     cluster_id           BIGINT DEFAULT NULL,
     hostname             VARCHAR(255) DEFAULT NULL,
+    agent_dir            VARCHAR(255) DEFAULT NULL,
     ssh_user             VARCHAR(255) DEFAULT NULL,
     ssh_port             INT DEFAULT NULL,
     auth_type            INT DEFAULT NULL,
@@ -137,7 +140,7 @@ CREATE TABLE service
     "user"            VARCHAR(255) DEFAULT NULL,
     version           VARCHAR(255) DEFAULT NULL,
     stack             VARCHAR(255) DEFAULT NULL,
-    need_restart      BOOLEAN DEFAULT FALSE,
+    restart_flag      BOOLEAN DEFAULT FALSE,
     cluster_id        BIGINT,
     status            INTEGER DEFAULT NULL,
     create_time       TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,

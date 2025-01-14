@@ -33,6 +33,6 @@ public class ComponentCommandReq {
     private String componentName;
 
     @NotEmpty
-    @Schema(description = "Host Name List", example = "[bigtop-manager-server, bigtop-manager-agent]")
+    @Schema(description = "Hostnames for component", example = "[host1, host2]")
     private List<String> hostnames;
 }

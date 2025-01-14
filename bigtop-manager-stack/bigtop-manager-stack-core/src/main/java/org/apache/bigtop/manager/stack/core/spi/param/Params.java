@@ -36,9 +36,11 @@ public interface Params extends PrioritySPI {
 
     List<PackageInfo> packages();
 
-    String serviceHome();
+    String javaHome();
 
     String stackHome();
+
+    String serviceHome();
 
     String getServiceName();
 

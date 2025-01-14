@@ -19,7 +19,9 @@
 package org.apache.bigtop.manager.stack.infra.v1_0_0.prometheus;
 
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
+import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
+import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
 import org.apache.bigtop.manager.stack.infra.param.InfraParams;
 
 import com.google.auto.service.AutoService;
@@ -28,6 +30,10 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Getter
 @Slf4j
@@ -35,16 +41,100 @@ import java.text.MessageFormat;
 @NoArgsConstructor
 public class PrometheusParams extends InfraParams {
 
+    protected final String PROMETHEUS_SELF_JOB_NAME = "prometheus";
+    protected final String BM_AGENT_JOB_NAME = "bm-agent";
+    protected final String BM_AGENT_PORT = "8081";
+    public static final String AGENT_TARGET_LABEL = "cluster";
+
+    private Map<String, Object> prometheusScrapeJob;
+    private Map<String, Object> agentScrapeJob;
+    private List<Map<String, Object>> scrapeJobs;
+    private String prometheusPort;
+    private String prometheusContent;
+    private String prometheusRulesFilename;
+    private String prometheusRulesFileContent;
+
     public PrometheusParams(CommandPayload commandPayload) {
         super(commandPayload);
+        setAgentScrapeJob();
+        scrapeJobs = new ArrayList<>();
+        scrapeJobs.add(prometheusScrapeJob);
+        scrapeJobs.add(agentScrapeJob);
+        globalParamsMap.put("scrape_jobs", scrapeJobs);
+        globalParamsMap.put("rules_file_name", prometheusRulesFilename);
     }
 
     public String dataDir() {
         return MessageFormat.format("{0}/data", serviceHome());
     }
 
+    public String targetsConfigFile(String jobName) {
+        return MessageFormat.format("{0}/{1}_targets.json", confDir(), jobName);
+    }
+
     @Override
     public String getServiceName() {
         return "prometheus";
+    }
+
+    @GlobalParams
+    public Map<String, Object> prometheusJob() {
+        Map<String, Object> configuration = LocalSettings.configurations(getServiceName(), "prometheus");
+        prometheusPort = (String) configuration.get("port");
+        Map<String, Object> job = new HashMap<>();
+        job.put("name", PROMETHEUS_SELF_JOB_NAME);
+        job.put("targets_file", targetsConfigFile(PROMETHEUS_SELF_JOB_NAME));
+
+        Map<String, Object> target = new HashMap<>();
+        target.put("targets", List.of(MessageFormat.format("localhost:{0}", prometheusPort)));
+        job.put("targets_list", List.of(target));
+
+        prometheusScrapeJob = job;
+        return configuration;
+    }
+
+    @GlobalParams
+    public Map<String, Object> configs() {
+        Map<String, Object> configuration = LocalSettings.configurations(getServiceName(), "prometheus");
+
+        prometheusContent = (String) configuration.get("content");
+        return configuration;
+    }
+
+    @GlobalParams
+    public Map<String, Object> rules() {
+        Map<String, Object> configuration = LocalSettings.configurations(getServiceName(), "prometheus-rule");
+
+        prometheusRulesFilename = (String) configuration.get("rules_file_name");
+        prometheusRulesFileContent = (String) configuration.get("content");
+        return configuration;
+    }
+
+    public String listenAddress() {
+        return MessageFormat.format("0.0.0.0:{0}", prometheusPort);
+    }
+
+    public void setAgentScrapeJob() {
+        agentScrapeJob = new HashMap<>();
+        agentScrapeJob.put("name", BM_AGENT_JOB_NAME);
+        agentScrapeJob.put("targets_file", targetsConfigFile(BM_AGENT_JOB_NAME));
+        agentScrapeJob.put("metrics_path", "/actuator/prometheus");
+
+        List<Map<String, Object>> agentTargets = new ArrayList<>();
+        Map<String, List<String>> clusterHosts = getClusterHosts();
+        if (clusterHosts != null) {
+            clusterHosts.forEach((cluster, hosts) -> {
+                Map<String, Object> agentTarget = new HashMap<>();
+                List<String> targets = new ArrayList<>();
+                for (String host : hosts) {
+                    targets.add(MessageFormat.format("{0}:{1}", host, BM_AGENT_PORT));
+                }
+                agentTarget.put("targets", targets);
+                agentTarget.put("labels", Map.of(AGENT_TARGET_LABEL, cluster));
+                agentTargets.add(agentTarget);
+            });
+        }
+
+        agentScrapeJob.put("targets_list", agentTargets);
     }
 }

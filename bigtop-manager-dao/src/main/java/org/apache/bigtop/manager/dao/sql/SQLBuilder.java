@@ -19,10 +19,8 @@
 
 package org.apache.bigtop.manager.dao.sql;
 
-import org.apache.bigtop.manager.common.utils.ClassUtils;
 import org.apache.bigtop.manager.dao.annotations.CreateBy;
 import org.apache.bigtop.manager.dao.annotations.CreateTime;
-import org.apache.bigtop.manager.dao.annotations.QueryCondition;
 import org.apache.bigtop.manager.dao.annotations.UpdateBy;
 import org.apache.bigtop.manager.dao.annotations.UpdateTime;
 import org.apache.bigtop.manager.dao.enums.DBType;
@@ -420,26 +418,6 @@ public class SQLBuilder {
         return sql.toString();
     }
 
-    public static <Condition> String findByCondition(
-            TableMetaData tableMetaData, String databaseId, Condition condition) throws IllegalAccessException {
-        String tableName = tableMetaData.getTableName();
-        log.info("databaseId: {}", databaseId);
-        SQL sql = new SQL();
-        switch (DBType.toType(databaseId)) {
-            case POSTGRESQL:
-                tableName = "\"" + tableName + "\"";
-            case MYSQL: {
-                sql = mysqlCondition(condition, tableMetaData);
-                break;
-            }
-            default: {
-                log.error("Unsupported data source");
-            }
-        }
-
-        return sql.toString();
-    }
-
     private static String keywordsFormat(String keyword, DBType dbType) {
         return switch (dbType) {
             case MYSQL -> "`" + keyword + "`";
@@ -461,104 +439,5 @@ public class SQLBuilder {
                 || field.isAnnotationPresent(CreateTime.class)
                 || field.isAnnotationPresent(UpdateBy.class)
                 || field.isAnnotationPresent(UpdateTime.class);
-    }
-
-    private static <Condition> SQL mysqlCondition(Condition condition, TableMetaData tableMetaData)
-            throws IllegalAccessException {
-
-        Class<?> loadClass;
-        try {
-            loadClass = condition.getClass();
-        } catch (Exception e) {
-            throw new RuntimeException("Get class Error!!!");
-        }
-
-        List<Field> fieldList = ClassUtils.getFields(loadClass);
-        /* Prepare SQL */
-        SQL sql = new SQL();
-        sql.SELECT("*");
-        sql.FROM(tableMetaData.getTableName());
-        for (Field field : fieldList) {
-            field.setAccessible(true);
-            String fieldName = field.getName();
-            log.debug("[requestField] {}, [requestValue] {}", fieldName, field.get(condition));
-            if (field.isAnnotationPresent(QueryCondition.class) && Objects.nonNull(field.get(condition))) {
-                QueryCondition annotation = field.getAnnotation(QueryCondition.class);
-
-                String property = fieldName;
-                if (!annotation.queryKey().isEmpty()) {
-                    property = annotation.queryKey();
-                }
-
-                Object value = field.get(condition);
-                Map<String, String> fieldColumnMap = tableMetaData.getFieldColumnMap();
-
-                if (value != null && fieldColumnMap.containsKey(property)) {
-                    String columnName = fieldColumnMap.get(property);
-
-                    log.info(
-                            "[queryKey] {}, [queryType] {}, [queryValue] {}",
-                            property,
-                            annotation.queryType().toString(),
-                            field.get(condition));
-                    switch (annotation.queryType()) {
-                        case EQ:
-                            sql.WHERE(getEquals(columnName, fieldName));
-                            break;
-                        case NOT_EQ:
-                            sql.WHERE(columnName + " != " + getTokenParam(fieldName));
-                            break;
-                        case IN:
-                            sql.WHERE(columnName + " IN ( REPLACE( " + getTokenParam(fieldName) + ", '"
-                                    + annotation.multipleDelimiter() + "', ',') )");
-                            break;
-                        case NOT_IN:
-                            sql.WHERE(columnName + " NOT IN ( REPLACE( " + getTokenParam(fieldName) + ", '"
-                                    + annotation.multipleDelimiter() + "', ',') )");
-                            break;
-                        case GT:
-                            sql.WHERE(columnName + " > " + getTokenParam(fieldName));
-                            break;
-                        case GTE:
-                            sql.WHERE(columnName + " >= " + getTokenParam(fieldName));
-                            break;
-                        case LT:
-                            sql.WHERE(columnName + " < " + getTokenParam(fieldName));
-                            break;
-                        case LTE:
-                            sql.WHERE(columnName + " <= " + getTokenParam(fieldName));
-                            break;
-                        case BETWEEN:
-                            sql.WHERE(columnName + " BETWEEN SUBSTRING_INDEX( " + getTokenParam(fieldName) + ", '"
-                                    + annotation.pairDelimiter() + "', 1) AND SUBSTRING_INDEX( "
-                                    + getTokenParam(fieldName) + ", '"
-                                    + annotation.pairDelimiter() + "', 2)");
-                            break;
-                        case PREFIX_LIKE:
-                            sql.WHERE(columnName + " LIKE CONCAT( " + getTokenParam(fieldName) + ", '%')");
-                            break;
-                        case SUFFIX_LIKE:
-                            sql.WHERE(columnName + " LIKE CONCAT('%', " + getTokenParam(fieldName) + ")");
-                            break;
-                        case LIKE:
-                            sql.WHERE(columnName + " LIKE CONCAT('%', " + getTokenParam(fieldName) + ", '%')");
-                            break;
-                        case NOT_LIKE:
-                            sql.WHERE(columnName + " NOT LIKE CONCAT('%', " + getTokenParam(fieldName) + ", '%')");
-                            break;
-                        case NULL:
-                            sql.WHERE(columnName + " IS NULL");
-                            break;
-                        case NOT_NULL:
-                            sql.WHERE(columnName + " IS NOT NULL");
-                            break;
-                        default:
-                            log.warn("Unknown query type: {}", annotation.queryType());
-                    }
-                }
-            }
-        }
-
-        return sql;
     }
 }

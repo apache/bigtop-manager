@@ -27,6 +27,8 @@ public class HostVO {
 
     private String hostname;
 
+    private String agentDir;
+
     private String sshUser;
 
     private Integer sshPort;
@@ -68,6 +70,8 @@ public class HostVO {
     private String errInfo;
 
     private String clusterName;
+
+    private String clusterDisplayName;
 
     private Integer componentNum;
 }

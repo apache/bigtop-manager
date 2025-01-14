@@ -20,7 +20,6 @@ package org.apache.bigtop.manager.stack.core.utils.linux;
 
 import org.apache.bigtop.manager.common.shell.ShellExecutor;
 import org.apache.bigtop.manager.common.shell.ShellResult;
-import org.apache.bigtop.manager.common.utils.FileUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -104,7 +103,7 @@ public class LinuxOSUtils {
         }
         int pid;
         try {
-            pid = Integer.parseInt(FileUtils.readFile2Str(file).replaceAll("\r|\n", ""));
+            pid = Integer.parseInt(LinuxFileUtils.readFile(filepath).replaceAll("\r|\n", ""));
         } catch (Exception e) {
             log.warn("Pid file {} does not exist or does not contain a process id number, error", filepath, e);
             return new ShellResult(-1, "", "Component is not running");

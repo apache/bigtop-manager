@@ -44,6 +44,13 @@ public interface ServiceService {
      */
     ServiceVO get(Long id);
 
+    /**
+     * Remove a service.
+     *
+     * @return service
+     */
+    Boolean remove(Long id);
+
     List<ServiceConfigVO> listConf(Long clusterId, Long serviceId);
 
     List<ServiceConfigVO> updateConf(Long clusterId, Long serviceId, List<ServiceConfigReq> reqs);

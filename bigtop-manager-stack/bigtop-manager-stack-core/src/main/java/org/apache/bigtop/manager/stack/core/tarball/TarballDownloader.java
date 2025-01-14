@@ -61,7 +61,7 @@ public class TarballDownloader {
         log.info("Checksum validate successfully for [{}]", localFile.getAbsolutePath());
     }
 
-    private static void download(String remoteUrl, String saveDir) {
+    public static void download(String remoteUrl, String saveDir) {
         int i = 1;
         while (true) {
             Boolean downloaded = downloadFile(remoteUrl, saveDir);
@@ -108,10 +108,10 @@ public class TarballDownloader {
                 outputStream.close();
                 inputStream.close();
 
-                log.info("File downloaded: {}", saveFilePath);
+                log.info("File downloaded: [{}]", saveFilePath);
                 return true;
             } else {
-                log.info("No file to download. Server replied HTTP code: {}", responseCode);
+                log.info("No file to download. Server replied HTTP code: [{}]", responseCode);
                 return false;
             }
         } catch (Exception e) {

@@ -24,10 +24,10 @@
 <mapper namespace="org.apache.bigtop.manager.dao.repository.ClusterDao">
 
     <sql id="baseColumns">
-        id, name, "desc", type, user_group, root_dir, status
+        id, name, display_name, "desc", type, user_group, root_dir, status
     </sql>
     <sql id="baseColumnsV2">
-        ${alias}.id, ${alias}.name, ${alias}."desc", ${alias}.type, ${alias}.user_group, ${alias}.root_dir, ${alias}.status
+        ${alias}.id, ${alias}.name, ${alias}.display_name, ${alias}."desc", ${alias}.type, ${alias}.user_group, ${alias}.root_dir, ${alias}.status
     </sql>
 
     <select id="findDetailsById" resultType="org.apache.bigtop.manager.dao.po.ClusterPO">
@@ -38,10 +38,11 @@
         count(h.id) as total_host, sum(h.available_processors) as total_processor,
         sum(h.total_memory_size) as total_memory, sum(h.total_disk) as total_disk, count(s.id) as total_service
         from
-        cluster c left join user u on c.create_by = u.id
+        cluster c left join "user" u on c.create_by = u.id
         left join host h on c.id = h.cluster_id
         left join service s on c.id = s.cluster_id
         where c.id = #{id}
+        group by c.id, u.nickname
         limit 1
     </select>
 

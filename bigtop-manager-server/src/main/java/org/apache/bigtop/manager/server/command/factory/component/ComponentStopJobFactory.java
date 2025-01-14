@@ -22,6 +22,7 @@ import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
 import org.apache.bigtop.manager.server.command.job.Job;
 import org.apache.bigtop.manager.server.command.job.JobContext;
+import org.apache.bigtop.manager.server.command.job.component.ComponentStopJob;
 import org.apache.bigtop.manager.server.enums.CommandLevel;
 
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -42,6 +43,6 @@ public class ComponentStopJobFactory extends AbstractComponentJobFactory {
 
     @Override
     public Job createJob(JobContext jobContext) {
-        return null;
+        return new ComponentStopJob(jobContext);
     }
 }

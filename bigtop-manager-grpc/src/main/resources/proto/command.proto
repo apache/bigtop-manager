@@ -30,6 +30,7 @@ enum CommandType {
   COMPONENT = 0;
   HOST_CHECK = 1;
   UPDATE_CACHE_FILES = 2;
+  SETUP_JDK = 3;
 }
 
 message CommandRequest {

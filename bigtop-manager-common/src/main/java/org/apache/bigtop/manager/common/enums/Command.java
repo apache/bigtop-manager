@@ -28,23 +28,22 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum Command {
+    // Available for: Cluster, Host, Service, Component
+    // Remove is not a command because it won't create job, please refer to the related API for remove action.
     ADD("add", "Add"),
-
-    REMOVE("remove", "Remove"),
-
     START("start", "Start"),
-
     STOP("stop", "Stop"),
-
-    STATUS("status", "Status"),
-
     RESTART("restart", "Restart"),
 
-    CONFIGURE("configure", "Configure"),
-
+    // Available for: Service
     CHECK("check", "Check"),
-
+    CONFIGURE("configure", "Configure"),
     CUSTOM("custom", "Custom"),
+
+    // Internal use only, not available for API call
+    INIT("init", "Init"),
+    PREPARE("prepare", "Prepare"),
+    STATUS("status", "Status"),
     ;
 
     private final String code;
