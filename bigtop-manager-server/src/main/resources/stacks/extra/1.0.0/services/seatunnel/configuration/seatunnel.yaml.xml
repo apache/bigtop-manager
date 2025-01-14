@@ -1,0 +1,131 @@
+<?xml version="1.0"?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one
+  ~ or more contributor license agreements.  See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership.  The ASF licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License.  You may obtain a copy of the License at
+  ~
+  ~    https://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+-->
+
+<configuration>
+    <property>
+        <name>seatunnel_cluster_name</name>
+        <value>seatunnel</value>
+    </property>
+    <property>
+        <name>seatunnel_engine_history_job_expire_minutes</name>
+        <value>1440</value>
+    </property>
+    <property>
+        <name>seatunnel_engine_backup_count</name>
+        <value>1</value>
+    </property>
+    <property>
+        <name>seatunnel_engine_queue_type</name>
+        <value>blockingqueue</value>
+    </property>
+    <property>
+        <name>seatunnel_engine_print_execution_info_interval</name>
+        <value>60</value>
+    </property>
+    <property>
+        <name>seatunnel_engine_print_job_metrics_info_interval</name>
+        <value>60</value>
+    </property>
+    <property>
+        <name>seatunnel_engine_slot_service_dynamic_slot</name>
+        <value>true</value>
+    </property>
+    <property>
+        <name>seatunnel_engine_checkpoint_interval</name>
+        <value>10000</value>
+    </property>
+    <property>
+        <name>seatunnel_engine_checkpoint_timeout</name>
+        <value>60000</value>
+    </property>
+    <property>
+        <name>seatunnel_engine_checkpoint_storage_type</name>
+        <value>hdfs</value>
+    </property>
+    <property>
+        <name>seatunnel_engine_checkpoint_storage_max_retained</name>
+        <value>3</value>
+    </property>
+    <property>
+        <name>seatunnel_engine_checkpoint_storage_plugin_config_namespace</name>
+        <value>/tmp/seatunnel/checkpoint_snapshot</value>
+    </property>
+    <property>
+        <name>seatunnel_engine_checkpoint_storage_plugin_config_storage_type</name>
+        <value>hdfs</value>
+    </property>
+    <property>
+        <name>seatunnel_engine_checkpoint_storage_plugin_config_fs_defaultFS</name>
+        <value>file:///tmp/</value>
+    </property>
+    <property>
+        <name>seatunnel_engine_telemetry_metric_enabled</name>
+        <value>false</value>
+    </property>
+    <property>
+        <name>content</name>
+        <description>This is the freemarker template for seatunnel-env.sh file</description>
+        <value><![CDATA[
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#    https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+seatunnel:
+  engine:
+    history-job-expire-minutes: ${seatunnel_engine_history_job_expire_minutes}
+    backup-count: ${seatunnel_engine_backup_count}
+    queue-type: ${seatunnel_engine_queue_type}
+    print-execution-info-interval: ${seatunnel_engine_print_execution_info_interval}
+    print-job-metrics-info-interval: ${seatunnel_engine_print_job_metrics_info_interval}
+    slot-service:
+      dynamic-slot: ${seatunnel_engine_slot_service_dynamic_slot?string}
+    checkpoint:
+      interval: ${seatunnel_engine_checkpoint_interval}
+      timeout: ${seatunnel_engine_checkpoint_timeout}
+      storage:
+        type: ${seatunnel_engine_checkpoint_storage_type}
+        max-retained: ${seatunnel_engine_checkpoint_storage_max_retained}
+        plugin-config:
+          namespace: ${seatunnel_engine_checkpoint_storage_plugin_config_namespace}
+          storage.type: ${seatunnel_engine_checkpoint_storage_plugin_config_storage_type}
+          fs.defaultFS: ${seatunnel_engine_checkpoint_storage_plugin_config_fs_defaultFS}
+    telemetry:
+      metric:
+        enabled: ${seatunnel_engine_telemetry_metric_enabled?string}
+]]>
+        </value>
+        <attrs>
+            <type>longtext</type>
+        </attrs>
+    </property>
+</configuration>
