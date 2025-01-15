@@ -132,10 +132,10 @@ export function getServices(): ServiceItem[] {
     'Tez',
     'Prometheus'
   ]
-  return Array.from({ length: 17 }, (_, i) => ({
+  return Array.from({ length: serviceNames.length }, (_, i) => ({
     key: i,
-    serviceName: serviceNames[Math.floor(Math.random() * serviceNames.length)],
-    version: `${serviceNames[Math.floor(Math.random() * serviceNames.length)].toLowerCase()}1.0.${i}`,
+    serviceName: serviceNames[i],
+    version: `${serviceNames[i].toLowerCase()}1.0.${i}`,
     restart: Math.floor(Math.random() * 2) == 0,
     status: statusList[Math.floor(Math.random() * statusList.length)] as ServiceStatus
   }))

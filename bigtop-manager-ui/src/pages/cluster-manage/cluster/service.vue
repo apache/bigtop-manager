@@ -18,12 +18,15 @@
 -->
 
 <script setup lang="ts">
-  import { onMounted, ref, shallowRef } from 'vue'
+  import { computed, onMounted, ref, shallowRef } from 'vue'
   import { getServices, StatusColors, StatusTexts, type ServiceItem } from './components/mock'
   import { usePngImage } from '@/utils/tools'
+  import { useI18n } from 'vue-i18n'
   import SearchForm from '@/components/common/search-form/index.vue'
   import type { GroupItem } from '@/components/common/button-group/types'
+  import type { SearchFormItem } from '@/components/common/search-form/types'
 
+  const { t } = useI18n()
   const data = ref<ServiceItem[]>([])
   const actionGroups = shallowRef<GroupItem[]>([
     {
@@ -55,6 +58,49 @@
       }
     }
   ])
+
+  const searchFormItems = computed((): SearchFormItem[] => [
+    {
+      type: 'search',
+      key: 'serviceName',
+      label: '服务名'
+    },
+    {
+      type: 'status',
+      key: 'restart',
+      label: '需要重启',
+      options: [
+        {
+          label: '需重启',
+          value: 1
+        },
+        {
+          label: '无需重启',
+          value: 2
+        }
+      ]
+    },
+    {
+      type: 'status',
+      key: 'status',
+      label: '状态',
+      options: [
+        {
+          label: t(`common.${StatusTexts.success}`),
+          value: StatusTexts.success
+        },
+        {
+          label: t(`common.${StatusTexts.error}`),
+          value: StatusTexts.error
+        },
+        {
+          label: t(`common.${StatusTexts.unknow}`),
+          value: StatusTexts.unknow
+        }
+      ]
+    }
+  ])
+
   onMounted(() => {
     data.value = getServices()
   })
@@ -62,7 +108,7 @@
 
 <template>
   <div class="service">
-    <search-form />
+    <search-form :search-items="searchFormItems" />
     <a-card v-for="item in data" :key="item.key" :hoverable="true" class="service-item">
       <div class="header">
         <div class="header-base-wrp">
