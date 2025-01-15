@@ -21,9 +21,9 @@
   import { computed } from 'vue'
 
   interface StatusDot {
-    width?: string
-    height?: string
+    size?: number
     color?: keyof typeof Colors
+    content?: string
   }
 
   enum Colors {
@@ -35,26 +35,31 @@
 
   const props = withDefaults(defineProps<StatusDot>(), {
     color: 'default',
-    width: '8px',
-    height: '8px'
+    size: 8,
+    content: ''
   })
-
+  const fontSize = computed(() => props.size * 0.6)
   const dotStyle = computed(() => ({
-    width: props.width,
-    height: props.height,
+    width: props.size + 'px',
+    height: props.size + 'px',
+    fontSize: fontSize.value + 'px',
     backgroundColor: Colors[props.color]
   }))
 </script>
 
 <template>
-  <div class="status-dot-item" :style="dotStyle"> </div>
+  <div class="dot" :style="dotStyle">
+    {{ content }}
+  </div>
 </template>
 
-<style lang="scss" scoped>
-  .status-dot-item {
-    display: inline-block;
+<style scoped>
+  .dot {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     border-radius: 50%;
-    line-height: 0;
-    font-size: 0;
+    color: white;
   }
 </style>

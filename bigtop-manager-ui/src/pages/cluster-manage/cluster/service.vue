@@ -63,7 +63,7 @@
 <template>
   <div class="service">
     <search-form />
-    <div v-for="item in data" :key="item.key" class="item">
+    <a-card v-for="item in data" :key="item.key" :hoverable="true" class="service-item">
       <div class="header">
         <div class="header-base-wrp">
           <a-avatar
@@ -73,25 +73,22 @@
             class="header-icon"
           />
           <div class="header-base-title">
-            <a-typography-text :content="`${item.serviceName}`" />
-            <a-typography-text class="small-font" type="secondary" :content="item.version" />
+            <span>{{ `${item.serviceName}` }}</span>
+            <span class="small-gray">{{ item.version }}</span>
           </div>
           <div class="header-base-status">
             <a-tag :color="StatusColors[item.status]">
               <div class="header-base-status-inner">
                 <status-dot :color="StatusColors[item.status]" />
-                <span class="small-font">{{ $t(`common.${StatusTexts[item.status]}`) }}</span>
+                <span class="small">{{ $t(`common.${StatusTexts[item.status]}`) }}</span>
               </div>
             </a-tag>
           </div>
         </div>
-        <div class="header-required-status">
-          <a-typography-text class="small-font" type="secondary" :content="`${$t('common.restart')}:`" />
+        <div class="header-restart-status">
+          <span class="small-gray">{{ `${$t('common.restart')}` }}</span>
           <status-dot :color="StatusColors[item.status]" />
-          <a-typography-text
-            class="small-font"
-            :content="`${item.restart ? $t('common.required') : $t('common.not_required')}`"
-          />
+          <span class="small">{{ `${item.restart ? $t('common.required') : $t('common.not_required')}` }}</span>
         </div>
       </div>
       <div class="item-content">
@@ -101,13 +98,19 @@
           </template>
         </button-group>
       </div>
-    </div>
+    </a-card>
   </div>
 </template>
 
 <style lang="scss" scoped>
-  .small-font {
+  .small {
     font-size: 12px;
+  }
+
+  .small-gray {
+    line-height: 12px;
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.45);
   }
 
   .service {
@@ -116,27 +119,30 @@
     gap: 16px;
   }
 
-  .item {
+  .service-item {
     width: 280px;
     height: 150px;
-    border: 1px solid $color-border-secondary;
     border-radius: 8px;
     @include flexbox($direction: column);
+    :deep(.ant-card-body) {
+      padding: 0;
+      height: 100%;
+      @include flexbox($direction: column);
+    }
   }
 
   .item-content {
     flex: 1;
-    font-size: 12px;
-    padding-inline: 10px;
     @include flexbox($align: center);
+    padding-inline: 8px;
   }
 
   .header {
-    @include flexbox($direction: column, $gap: 10px);
     padding: $space-md;
     border-bottom: 1px solid $color-border-secondary;
     &-base-wrp {
       @include flexbox($gap: $space-sm);
+      margin-bottom: 10px;
     }
     &-base-title {
       @include flexbox($direction: column);
@@ -151,8 +157,8 @@
         margin-inline-end: 0;
       }
     }
-    &-required-status {
-      @include flexbox($align: center, $gap: 4px);
+    &-restart-status {
+      @include flexbox($align: center, $gap: 6px);
     }
     &-icon {
       flex-shrink: 0;
