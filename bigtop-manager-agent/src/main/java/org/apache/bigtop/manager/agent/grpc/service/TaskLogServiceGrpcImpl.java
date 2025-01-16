@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.agent.service;
+package org.apache.bigtop.manager.agent.grpc.service;
 
 import org.apache.bigtop.manager.agent.cache.Caches;
 import org.apache.bigtop.manager.common.utils.ProjectPathUtils;

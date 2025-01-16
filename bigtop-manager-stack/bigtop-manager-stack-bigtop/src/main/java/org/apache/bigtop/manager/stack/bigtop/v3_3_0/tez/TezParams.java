@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.tez;
 
-import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
+import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
 import org.apache.bigtop.manager.stack.bigtop.param.BigtopParams;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
@@ -43,8 +43,8 @@ public class TezParams extends BigtopParams {
     private String headDumpOpts;
     private String tezEnvContent;
 
-    public TezParams(CommandPayload commandPayload) {
-        super(commandPayload);
+    public TezParams(ComponentCommandPayload componentCommandPayload) {
+        super(componentCommandPayload);
         globalParamsMap.put("tez_user", user());
         globalParamsMap.put("tez_group", group());
         globalParamsMap.put("java_home", javaHome());

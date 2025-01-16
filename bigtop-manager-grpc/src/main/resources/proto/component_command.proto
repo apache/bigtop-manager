@@ -16,16 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.common.message.entity.pojo;
+syntax = "proto3";
 
-import lombok.Data;
+import "google/protobuf/struct.proto";
 
-import java.util.List;
+option java_multiple_files = true;
+option java_package = "org.apache.bigtop.manager.grpc.generated";
+option java_outer_classname = "ComponentCommandProto";
 
-@Data
-public class PackageSpecificInfo {
+service ComponentCommandService {
+  rpc Exec (ComponentCommandRequest) returns (ComponentCommandReply) {}
+}
 
-    private List<String> arch;
+message ComponentCommandRequest {
+  int64 task_id = 1;
+  string payload = 2;
+}
 
-    private List<PackageInfo> packages;
+message ComponentCommandReply {
+  int32 code = 1;
 }

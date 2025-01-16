@@ -18,8 +18,6 @@
  */
 package org.apache.bigtop.manager.agent.holder;
 
-import org.apache.bigtop.manager.agent.executor.CommandExecutor;
-
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
@@ -38,9 +36,5 @@ public class SpringContextHolder implements ApplicationContextAware {
     @Override
     public void setApplicationContext(@Nonnull ApplicationContext applicationContext) {
         SpringContextHolder.applicationContext = applicationContext;
-    }
-
-    public static Map<String, CommandExecutor> getCommandExecutors() {
-        return applicationContext.getBeansOfType(CommandExecutor.class);
     }
 }

@@ -16,15 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.common.message.entity.payload;
+package org.apache.bigtop.manager.grpc.pojo;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 @Data
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
 @NoArgsConstructor
-public class HostCheckPayload extends BasePayload {}
+public class RepoInfo {
+
+    private String name;
+
+    private String arch;
+
+    private String baseUrl;
+
+    private Integer type;
+}

@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.zookeeper;
 
-import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
+import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
 import org.apache.bigtop.manager.stack.bigtop.param.BigtopParams;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
@@ -41,8 +41,8 @@ public class ZookeeperParams extends BigtopParams {
 
     private String zookeeperDataDir;
 
-    public ZookeeperParams(CommandPayload commandPayload) {
-        super(commandPayload);
+    public ZookeeperParams(ComponentCommandPayload componentCommandPayload) {
+        super(componentCommandPayload);
         globalParamsMap.put("java_home", javaHome());
         globalParamsMap.put("zookeeper_home", serviceHome());
         globalParamsMap.put("security_enabled", false);

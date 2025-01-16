@@ -16,16 +16,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.common.message.entity.pojo;
+package org.apache.bigtop.manager.grpc.payload;
 
 import lombok.Data;
+import org.apache.bigtop.manager.grpc.pojo.RepoInfo;
+import org.apache.bigtop.manager.grpc.pojo.ClusterInfo;
+
+import java.util.List;
+import java.util.Map;
 
 @Data
-public class ClusterInfo {
+public class JobCachePayload {
 
-    private String name;
+    private ClusterInfo clusterInfo;
 
-    private String userGroup;
+    private Map<String, String> userInfo;
 
-    private String rootDir;
+    private List<RepoInfo> repoInfo;
+
+    private Map<String, Map<String, String>> configurations;
+
+    private Map<String, List<String>> componentHosts;
 }

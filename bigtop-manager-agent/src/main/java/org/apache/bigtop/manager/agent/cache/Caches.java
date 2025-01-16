@@ -20,7 +20,11 @@ package org.apache.bigtop.manager.agent.cache;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class Caches {
+
+    public static Long RUNNING_TASK = null;
+
     public static final List<Long> RUNNING_TASKS = new ArrayList<>();
 }

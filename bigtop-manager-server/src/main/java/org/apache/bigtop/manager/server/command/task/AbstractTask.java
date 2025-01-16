@@ -22,6 +22,7 @@ import org.apache.bigtop.manager.common.constants.MessageConstants;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.enums.JobState;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
+import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.dao.repository.HostDao;
 import org.apache.bigtop.manager.dao.repository.TaskDao;
@@ -45,8 +46,6 @@ public abstract class AbstractTask implements Task {
 
     protected TaskContext taskContext;
 
-    protected CommandRequest commandRequest;
-
     /**
      * Do not use this directly, please use {@link #getTaskPO()} to make sure it's initialized.
      */
@@ -69,8 +68,6 @@ public abstract class AbstractTask implements Task {
         return null;
     }
 
-    protected abstract CommandRequest getCommandRequest();
-
     @Override
     public void beforeRun() {
         taskPO.setState(JobState.PROCESSING.getName());
@@ -84,16 +81,8 @@ public abstract class AbstractTask implements Task {
         try {
             beforeRun();
 
-            CommandRequest.Builder builder = CommandRequest.newBuilder(getCommandRequest());
-            builder.setTaskId(getTaskPO().getId());
-            commandRequest = builder.build();
-
-            HostDTO hostDTO = HostConverter.INSTANCE.fromPO2DTO(hostDao.findByHostname(taskContext.getHostname()));
-            CommandServiceGrpc.CommandServiceBlockingStub stub = GrpcClient.getBlockingStub(
-                    hostDTO.getHostname(), hostDTO.getGrpcPort(), CommandServiceGrpc.CommandServiceBlockingStub.class);
-            CommandReply reply = stub.exec(commandRequest);
-
-            taskSuccess = reply != null && reply.getCode() == MessageConstants.SUCCESS_CODE;
+            HostPO hostPO = hostDao.findByHostname(taskContext.getHostname());
+            taskSuccess = doRun(hostPO.getHostname(), hostPO.getGrpcPort());
         } catch (Exception e) {
             log.error("task failed", e);
             taskSuccess = false;
@@ -108,10 +97,12 @@ public abstract class AbstractTask implements Task {
         return taskSuccess;
     }
 
+    // Send grpc request to agent with specific task implementation
+    protected abstract Boolean doRun(String hostname, Integer grpcPort);
+
     @Override
     public void onSuccess() {
         TaskPO taskPO = getTaskPO();
-        taskPO.setContent(ProtobufUtil.toJson(commandRequest));
         taskPO.setState(JobState.SUCCESSFUL.getName());
         taskDao.partialUpdateById(taskPO);
     }
@@ -119,7 +110,6 @@ public abstract class AbstractTask implements Task {
     @Override
     public void onFailure() {
         TaskPO taskPO = getTaskPO();
-        taskPO.setContent(ProtobufUtil.toJson(commandRequest));
         taskPO.setState(JobState.FAILED.getName());
         taskDao.partialUpdateById(taskPO);
     }

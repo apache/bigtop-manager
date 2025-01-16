@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.hadoop;
 
-import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
+import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
 import org.apache.bigtop.manager.stack.bigtop.param.BigtopParams;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
@@ -66,8 +66,8 @@ public class HadoopParams extends BigtopParams {
 
     private List<String> nameNodeFormattedDirs;
 
-    public HadoopParams(CommandPayload commandPayload) {
-        super(commandPayload);
+    public HadoopParams(ComponentCommandPayload componentCommandPayload) {
+        super(componentCommandPayload);
         globalParamsMap.put("hdfs_user", user());
         globalParamsMap.put("hdfs_group", group());
         globalParamsMap.put("datanode_hosts", LocalSettings.hosts("datanode"));

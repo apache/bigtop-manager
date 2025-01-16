@@ -20,10 +20,12 @@ package org.apache.bigtop.manager.stack.core.executor;
 
 import org.apache.bigtop.manager.common.constants.MessageConstants;
 import org.apache.bigtop.manager.common.enums.Command;
-import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.common.utils.CaseUtils;
 import org.apache.bigtop.manager.common.utils.Environments;
+import org.apache.bigtop.manager.common.utils.JsonUtils;
+import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
+import org.apache.bigtop.manager.grpc.utils.ProtobufUtil;
 import org.apache.bigtop.manager.stack.core.exception.StackException;
 import org.apache.bigtop.manager.stack.core.spi.PrioritySPIFactory;
 import org.apache.bigtop.manager.stack.core.spi.hook.Hook;
@@ -44,8 +46,8 @@ public class StackExecutor {
 
     private static final Map<String, Hook> HOOK_MAP = new PrioritySPIFactory<>(Hook.class).getSPIMap();
 
-    private static Script getCommandScript(CommandPayload commandPayload) {
-        String componentName = commandPayload.getComponentName();
+    private static Script getCommandScript(org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload payload) {
+        String componentName = payload.getComponentName();
         Script script = SCRIPT_MAP.get(componentName);
         if (script == null) {
             throw new StackException("Cannot find script for component: {0}", componentName);
@@ -68,21 +70,21 @@ public class StackExecutor {
         }
     }
 
-    public static ShellResult execute(CommandPayload commandPayload) {
+    public static ShellResult execute(ComponentCommandPayload payload) {
         try {
-            String command = commandPayload.getCommand() == Command.CUSTOM
-                    ? commandPayload.getCustomCommand()
-                    : commandPayload.getCommand().name();
-            Script script = getCommandScript(commandPayload);
+            String command = payload.getCommand().equalsIgnoreCase(Command.CUSTOM.getCode())
+                    ? payload.getCustomCommand()
+                    : payload.getCommand();
+            Script script = getCommandScript(payload);
 
             String methodName = CaseUtils.toCamelCase(command, CaseUtils.SEPARATOR_UNDERSCORE, false);
             Method method = script.getClass().getMethod(methodName, Params.class);
 
             Params params = PARAMS_MAP
-                    .get(commandPayload.getServiceName())
+                    .get(payload.getServiceName())
                     .getClass()
-                    .getDeclaredConstructor(CommandPayload.class)
-                    .newInstance(commandPayload);
+                    .getDeclaredConstructor(ComponentCommandPayload.class)
+                    .newInstance(payload);
             if (Environments.isDevMode()) {
                 log.info("Executing {}::{} on dev mode", script.getName(), method.getName());
                 return ShellResult.success();
@@ -100,7 +102,7 @@ public class StackExecutor {
                 return result;
             }
         } catch (Exception e) {
-            log.error("Error executing command, payload: {}", commandPayload, e);
+            log.error("Error executing command, payload: {}", payload, e);
             return ShellResult.fail();
         }
     }

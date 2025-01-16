@@ -18,8 +18,8 @@
  */
 package org.apache.bigtop.manager.stack.core.spi.param;
 
-import org.apache.bigtop.manager.common.message.entity.pojo.PackageInfo;
-import org.apache.bigtop.manager.common.message.entity.pojo.RepoInfo;
+import org.apache.bigtop.manager.grpc.pojo.PackageInfo;
+import org.apache.bigtop.manager.grpc.pojo.RepoInfo;
 import org.apache.bigtop.manager.stack.core.spi.PrioritySPI;
 
 import java.util.List;

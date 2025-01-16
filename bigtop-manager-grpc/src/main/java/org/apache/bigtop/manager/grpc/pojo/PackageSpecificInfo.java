@@ -16,14 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.common.message.entity.payload;
+package org.apache.bigtop.manager.grpc.pojo;
 
 import lombok.Data;
 
-import java.util.UUID;
+import java.util.List;
 
 @Data
-public class BasePayload {
+public class PackageSpecificInfo {
 
-    private final String requestId = UUID.randomUUID().toString().replaceAll("-", "");
+    private List<String> arch;
+
+    private List<PackageInfo> packages;
 }

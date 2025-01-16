@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.stack.core.tarball;
 
-import org.apache.bigtop.manager.common.message.entity.pojo.PackageInfo;
+import org.apache.bigtop.manager.grpc.pojo.PackageInfo;
 import org.apache.bigtop.manager.stack.core.exception.StackException;
 
 import lombok.extern.slf4j.Slf4j;

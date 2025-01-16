@@ -18,11 +18,12 @@
  */
 package org.apache.bigtop.manager.server.command.task;
 
+import org.apache.bigtop.manager.common.constants.MessageConstants;
 import org.apache.bigtop.manager.common.enums.Command;
-import org.apache.bigtop.manager.common.message.entity.payload.HostCheckPayload;
-import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.grpc.generated.CommandRequest;
-import org.apache.bigtop.manager.grpc.generated.CommandType;
+import org.apache.bigtop.manager.grpc.generated.HostCheckReply;
+import org.apache.bigtop.manager.grpc.generated.HostCheckRequest;
+import org.apache.bigtop.manager.grpc.generated.HostCheckServiceGrpc;
+import org.apache.bigtop.manager.server.grpc.GrpcClient;
 
 public class HostCheckTask extends AbstractTask {
 
@@ -41,14 +42,16 @@ public class HostCheckTask extends AbstractTask {
     }
 
     @Override
-    protected CommandRequest getCommandRequest() {
-        HostCheckPayload messagePayload = new HostCheckPayload();
+    protected Boolean doRun(String hostname, Integer grpcPort) {
+        HostCheckRequest.Builder builder = HostCheckRequest.newBuilder();
+        builder.setTaskId(getTaskPO().getId());
+        HostCheckRequest request = builder.build();
 
-        CommandRequest.Builder builder = CommandRequest.newBuilder();
-        builder.setType(CommandType.HOST_CHECK);
-        builder.setPayload(JsonUtils.writeAsString(messagePayload));
+        HostCheckServiceGrpc.HostCheckServiceBlockingStub stub = GrpcClient.getBlockingStub(
+                hostname, grpcPort, HostCheckServiceGrpc.HostCheckServiceBlockingStub.class);
+        HostCheckReply reply = stub.check(request);
 
-        return builder.build();
+        return reply != null && reply.getCode() == MessageConstants.SUCCESS_CODE;
     }
 
     @Override

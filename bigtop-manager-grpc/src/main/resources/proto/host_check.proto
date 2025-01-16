@@ -16,8 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.common.message.entity.pojo;
+syntax = "proto3";
 
-public enum HostCheckType {
-    TIME_SYNC,
+option java_multiple_files = true;
+option java_package = "org.apache.bigtop.manager.grpc.generated";
+option java_outer_classname = "HostCheckProto";
+
+service HostCheckService {
+  rpc Check (HostCheckRequest) returns (HostCheckReply) {}
+}
+
+message HostCheckRequest {
+  int64 task_id = 1;
+}
+
+message HostCheckReply {
+  int32 code = 1;
 }

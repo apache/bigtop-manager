@@ -16,18 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.common.message.entity.pojo;
+package org.apache.bigtop.manager.grpc.pojo;
 
 import lombok.Data;
 
 @Data
-public class ComponentInfo {
+public class ClusterInfo {
 
-    private String componentName;
+    private String name;
 
-    private String displayName;
+    private String userGroup;
 
-    private String category;
-
-    private String serviceName;
+    private String rootDir;
 }

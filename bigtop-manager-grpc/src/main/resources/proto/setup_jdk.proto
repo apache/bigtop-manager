@@ -16,22 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.common.message.entity.pojo;
+syntax = "proto3";
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+option java_multiple_files = true;
+option java_package = "org.apache.bigtop.manager.grpc.generated";
+option java_outer_classname = "SetupJdkProto";
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class RepoInfo {
+service SetupJdkService {
+  rpc Setup (SetupJdkRequest) returns (SetupJdkReply) {}
+}
 
-    private String name;
+message SetupJdkRequest {
+  int64 task_id = 1;
+}
 
-    private String arch;
-
-    private String baseUrl;
-
-    private Integer type;
+message SetupJdkReply {
+  int32 code = 1;
 }

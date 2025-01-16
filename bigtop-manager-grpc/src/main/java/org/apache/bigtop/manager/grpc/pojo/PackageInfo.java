@@ -16,36 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.common.message.entity.payload;
+package org.apache.bigtop.manager.grpc.pojo;
 
-import org.apache.bigtop.manager.common.message.entity.pojo.ClusterInfo;
-import org.apache.bigtop.manager.common.message.entity.pojo.ComponentInfo;
-import org.apache.bigtop.manager.common.message.entity.pojo.RepoInfo;
-
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 @Data
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
 @NoArgsConstructor
-public class CacheMessagePayload extends BasePayload {
+public class PackageInfo {
 
-    private ClusterInfo clusterInfo;
+    private String name;
 
-    private Map<String, String> userInfo;
-
-    private List<RepoInfo> repoInfo;
-
-    private Map<String, Map<String, Object>> configurations;
-
-    private Map<String, Set<String>> clusterHostInfo;
-
-    private Map<String, ComponentInfo> componentInfo;
+    private String checksum;
 }

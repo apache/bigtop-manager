@@ -16,10 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.agent.service;
+package org.apache.bigtop.manager.agent.grpc.service;
 
 import org.apache.bigtop.manager.common.constants.MessageConstants;
-import org.apache.bigtop.manager.common.message.entity.payload.CacheMessagePayload;
+import org.apache.bigtop.manager.common.utils.FileUtils;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.common.utils.ProjectPathUtils;
 import org.apache.bigtop.manager.grpc.generated.JobCacheReply;
@@ -29,6 +29,8 @@ import org.apache.bigtop.manager.grpc.generated.JobCacheServiceGrpc;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
+import org.apache.bigtop.manager.grpc.payload.JobCachePayload;
+import org.apache.bigtop.manager.grpc.utils.ProtobufUtil;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -47,28 +49,27 @@ public class JobCacheServiceGrpcImpl extends JobCacheServiceGrpc.JobCacheService
 
     @Override
     public void save(JobCacheRequest request, StreamObserver<JobCacheReply> responseObserver) {
-        CacheMessagePayload payload = JsonUtils.readFromString(request.getPayload(), CacheMessagePayload.class);
-        String cacheDir = ProjectPathUtils.getAgentCachePath();
-        Path p = Paths.get(cacheDir);
-        if (!Files.exists(p)) {
-            try {
+        try {
+            JobCachePayload payload = JsonUtils.readFromString(request.getPayload(), JobCachePayload.class);
+            String cacheDir = ProjectPathUtils.getAgentCachePath();
+            Path p = Paths.get(cacheDir);
+            if (!Files.exists(p)) {
                 Files.createDirectories(p);
-            } catch (Exception e) {
-                responseObserver.onError(e);
             }
+
+            JsonUtils.writeToFile(cacheDir + CONFIGURATIONS_INFO, payload.getConfigurations());
+            JsonUtils.writeToFile(cacheDir + HOSTS_INFO, payload.getComponentHosts());
+            JsonUtils.writeToFile(cacheDir + USERS_INFO, payload.getUserInfo());
+            JsonUtils.writeToFile(cacheDir + REPOS_INFO, payload.getRepoInfo());
+            JsonUtils.writeToFile(cacheDir + CLUSTER_INFO, payload.getClusterInfo());
+
+            JobCacheReply reply = JobCacheReply.newBuilder()
+                    .setCode(MessageConstants.SUCCESS_CODE)
+                    .build();
+            responseObserver.onNext(reply);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(e);
         }
-
-        JsonUtils.writeToFile(cacheDir + CONFIGURATIONS_INFO, payload.getConfigurations());
-        JsonUtils.writeToFile(cacheDir + HOSTS_INFO, payload.getClusterHostInfo());
-        JsonUtils.writeToFile(cacheDir + USERS_INFO, payload.getUserInfo());
-        JsonUtils.writeToFile(cacheDir + COMPONENTS_INFO, payload.getComponentInfo());
-        JsonUtils.writeToFile(cacheDir + REPOS_INFO, payload.getRepoInfo());
-        JsonUtils.writeToFile(cacheDir + CLUSTER_INFO, payload.getClusterInfo());
-
-        JobCacheReply reply = JobCacheReply.newBuilder()
-                .setCode(MessageConstants.SUCCESS_CODE)
-                .build();
-        responseObserver.onNext(reply);
-        responseObserver.onCompleted();
     }
 }

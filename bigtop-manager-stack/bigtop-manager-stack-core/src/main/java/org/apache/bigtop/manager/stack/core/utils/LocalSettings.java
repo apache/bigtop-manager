@@ -19,9 +19,8 @@
 package org.apache.bigtop.manager.stack.core.utils;
 
 import org.apache.bigtop.manager.common.constants.CacheFiles;
-import org.apache.bigtop.manager.common.message.entity.pojo.ClusterInfo;
-import org.apache.bigtop.manager.common.message.entity.pojo.ComponentInfo;
-import org.apache.bigtop.manager.common.message.entity.pojo.RepoInfo;
+import org.apache.bigtop.manager.grpc.pojo.ClusterInfo;
+import org.apache.bigtop.manager.grpc.pojo.RepoInfo;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.common.utils.ProjectPathUtils;
 
@@ -117,15 +116,5 @@ public class LocalSettings {
             clusterInfo = JsonUtils.readFromFile(file, new TypeReference<>() {});
         }
         return clusterInfo;
-    }
-
-    public static Map<String, ComponentInfo> components() {
-
-        Map<String, ComponentInfo> componentInfo = new HashMap<>();
-        File file = new File(ProjectPathUtils.getAgentCachePath() + CacheFiles.COMPONENTS_INFO);
-        if (file.exists()) {
-            componentInfo = JsonUtils.readFromFile(file, new TypeReference<>() {});
-        }
-        return componentInfo;
     }
 }
