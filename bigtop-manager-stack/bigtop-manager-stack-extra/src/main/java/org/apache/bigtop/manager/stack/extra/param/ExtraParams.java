@@ -19,57 +19,14 @@
 package org.apache.bigtop.manager.stack.extra.param;
 
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
-import org.apache.bigtop.manager.common.utils.Environments;
 import org.apache.bigtop.manager.stack.core.spi.param.BaseParams;
 
-import org.apache.commons.lang3.SystemUtils;
-
 import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-import java.io.File;
-
-@Slf4j
 @NoArgsConstructor
 public abstract class ExtraParams extends BaseParams {
 
     protected ExtraParams(CommandPayload commandPayload) {
         super(commandPayload);
-    }
-
-    /**
-     * Extra stack do not belong to any cluster, so we need to override this and provide a group name
-     *
-     * @return group name
-     */
-    @Override
-    public String group() {
-        return "extra";
-    }
-
-    /**
-     * Extra stack do not belong to any cluster, we cannot use stack home of cluster
-     *
-     * @return group name
-     */
-    @Override
-    public String stackHome() {
-        // Parent path of agent dir, which is bigtop-manager-agent/../
-        String parentPath;
-        if (Environments.isDevMode()) {
-            return SystemUtils.getUserDir().getParentFile().getPath();
-        } else {
-            parentPath = new File(ExtraParams.class
-                            .getProtectionDomain()
-                            .getCodeSource()
-                            .getLocation()
-                            .getPath())
-                    .getParentFile()
-                    .getParentFile()
-                    .getParentFile()
-                    .getPath();
-        }
-
-        return parentPath + "/extras";
     }
 }
