@@ -29,7 +29,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.text.MessageFormat;
 import java.util.Map;
 
 @Slf4j
@@ -73,16 +72,11 @@ public class SeaTunnelParams extends ExtraParams {
     }
 
     public String sparkHome() {
-        return servicesStackHome() + "/spark";
+        return stackHome() + "/spark";
     }
 
     public String flinkHome() {
-        return servicesStackHome() + "/flink";
-    }
-
-    public String servicesStackHome() {
-        String root = LocalSettings.cluster().getRootDir();
-        return MessageFormat.format("{0}/services", root);
+        return stackHome() + "/flink";
     }
 
     @GlobalParams
