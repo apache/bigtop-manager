@@ -22,9 +22,9 @@
   import { getServices, StatusColors, StatusTexts, type ServiceItem } from './components/mock'
   import { usePngImage } from '@/utils/tools'
   import { useI18n } from 'vue-i18n'
-  import SearchForm from '@/components/common/search-form/index.vue'
+  import FilterForm from '@/components/common/filter-form/index.vue'
   import type { GroupItem } from '@/components/common/button-group/types'
-  import type { SearchFormItem } from '@/components/common/search-form/types'
+  import type { FilterFormItem } from '@/components/common/filter-form/types'
 
   const { t } = useI18n()
   const data = ref<ServiceItem[]>([])
@@ -59,7 +59,7 @@
     }
   ])
 
-  const searchFormItems = computed((): SearchFormItem[] => [
+  const filterFormItems = computed((): FilterFormItem[] => [
     {
       type: 'search',
       key: 'serviceName',
@@ -101,6 +101,10 @@
     }
   ])
 
+  const onFilter = (filters: any) => {
+    console.log('filters :>> ', filters)
+  }
+
   onMounted(() => {
     data.value = getServices()
   })
@@ -108,7 +112,7 @@
 
 <template>
   <div class="service">
-    <search-form :search-items="searchFormItems" />
+    <filter-form :filter-items="filterFormItems" @filter="onFilter" />
     <a-card v-for="item in data" :key="item.key" :hoverable="true" class="service-item">
       <div class="header">
         <div class="header-base-wrp">

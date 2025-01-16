@@ -17,15 +17,15 @@
  * under the License.
  */
 
-export interface SearchFormItemOptionItem {
+export interface FilterFormItemOptionItem {
   value: string | number | boolean
   label: string
   [propkey: string]: any
 }
 
-export interface SearchFormItem {
+export interface FilterFormItem {
   type: string
   key: string
   label: string
-  options?: SearchFormItemOptionItem[]
+  options?: FilterFormItemOptionItem[]
 }
