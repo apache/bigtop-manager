@@ -30,8 +30,15 @@
 
         <components>
             <component>
-                <name>seatunnel_server</name>
-                <display-name>SeaTunnel Server</display-name>
+                <name>seatunnel_master</name>
+                <display-name>SeaTunnel Master</display-name>
+                <category>server</category>
+                <cardinality>1+</cardinality>
+            </component>
+
+            <component>
+                <name>seatunnel_worker</name>
+                <display-name>SeaTunnel Worker</display-name>
                 <category>server</category>
                 <cardinality>1+</cardinality>
             </component>
