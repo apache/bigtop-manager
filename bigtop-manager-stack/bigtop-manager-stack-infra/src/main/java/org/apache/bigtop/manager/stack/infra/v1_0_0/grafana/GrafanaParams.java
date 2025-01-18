@@ -45,7 +45,8 @@ public class GrafanaParams extends InfraParams {
     private String grafanaContent;
     private String grafanaDashboardContent;
     private String prometheusDashboardPath;
-    private String bmAgentDashboardConfig;
+    private String bmAgentClusterDashboardConfig;
+    private String bmAgentHostDashboardConfig;
     private String grafanaPort;
     private String grafanaLogLevel;
     private String dataSourceContent;
@@ -124,7 +125,8 @@ public class GrafanaParams extends InfraParams {
     public Map<String, Object> dashboards() {
         Map<String, Object> configuration = LocalSettings.configurations(getServiceName(), "grafana-dashboard");
         grafanaDashboardContent = (String) configuration.get("content");
-        bmAgentDashboardConfig = (String) configuration.get("bm_agent_dashboard");
+        bmAgentClusterDashboardConfig = (String) configuration.get("bm_agent_cluster_dashboard");
+        bmAgentHostDashboardConfig = (String) configuration.get("bm_agent_host_dashboard");
         prometheusDashboardPath = MessageFormat.format("{0}/prometheus", dashboardsDir());
         return configuration;
     }
@@ -141,7 +143,6 @@ public class GrafanaParams extends InfraParams {
         return new ArrayList<>(getClusterHosts().keySet());
     }
 
-    // TODO: add host dashboard
     public void setDashboards() {
         dashboards = new ArrayList<>();
 
@@ -151,15 +152,30 @@ public class GrafanaParams extends InfraParams {
         clusterDashboard.put("path", dashboardConfigDir("Cluster"));
 
         // Used for dashboard json configuration
-        List<String> clusters = getClusters();
-        if (clusters != null && !clusters.isEmpty()) {
-            clusterDashboard.put("default_cluster_name", getClusters().get(0));
-        } else {
-            clusterDashboard.put("default_cluster_name", "");
-        }
         clusterDashboard.put("cluster_label", PrometheusParams.AGENT_TARGET_LABEL);
         clusterDashboard.put("dashboard_name", "Cluster");
+        clusterDashboard.put("dashboard_config_content", bmAgentClusterDashboardConfig);
+
+        Map<String, Object> hostDashboard = new HashMap<>();
+        hostDashboard.put("name", "Host");
+        hostDashboard.put("path", dashboardConfigDir("Host"));
+
+        hostDashboard.put("cluster_label", PrometheusParams.AGENT_TARGET_LABEL);
+        hostDashboard.put("dashboard_name", "Host");
+        hostDashboard.put("dashboard_config_content", bmAgentHostDashboardConfig);
+
+        Map<String, List<String>> clusterHost = getClusterHosts();
+        if (clusterHost != null && !clusterHost.isEmpty()) {
+            String defaultCluster = clusterHost.keySet().iterator().next();
+            String defaultHost = clusterHost.get(defaultCluster).isEmpty()
+                    ? ""
+                    : clusterHost.get(defaultCluster).get(0);
+            clusterDashboard.put("default_cluster_name", defaultCluster);
+            hostDashboard.put("default_cluster_name", defaultCluster);
+            hostDashboard.put("default_host_name", defaultHost);
+        }
 
         dashboards.add(clusterDashboard);
+        dashboards.add(hostDashboard);
     }
 }
