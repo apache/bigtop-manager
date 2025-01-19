@@ -18,10 +18,10 @@
  */
 package org.apache.bigtop.manager.agent.service;
 
-import io.grpc.stub.StreamObserver;
 import org.apache.bigtop.manager.common.utils.ProjectPathUtils;
 import org.apache.bigtop.manager.grpc.generated.JobCacheReply;
 import org.apache.bigtop.manager.grpc.generated.JobCacheRequest;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,10 +29,14 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import io.grpc.stub.StreamObserver;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 public class JobCacheServiceGrpcImplTest {
@@ -41,7 +45,6 @@ public class JobCacheServiceGrpcImplTest {
 
     @Mock
     private StreamObserver<JobCacheReply> responseObserver;
-
 
     @BeforeEach
     public void setUp() {
@@ -81,7 +84,9 @@ public class JobCacheServiceGrpcImplTest {
 
             // Mock Files.createDirectories to throw an exception
             try (MockedStatic<Files> mockedFiles = mockStatic(Files.class)) {
-                mockedFiles.when(() -> Files.createDirectories(any(Path.class))).thenThrow(new RuntimeException("Directory creation failed"));
+                mockedFiles
+                        .when(() -> Files.createDirectories(any(Path.class)))
+                        .thenThrow(new RuntimeException("Directory creation failed"));
 
                 // Construct JobCacheRequest
                 String payloadJson = "{\"configurations\": {\"configKey\": {\"subKey\": \"subValue\"}}}";

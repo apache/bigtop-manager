@@ -18,14 +18,13 @@
  */
 package org.apache.bigtop.manager.agent.service;
 
-import io.grpc.StatusRuntimeException;
-import io.grpc.stub.StreamObserver;
 import org.apache.bigtop.manager.agent.executor.CommandExecutor;
 import org.apache.bigtop.manager.agent.executor.CommandExecutors;
 import org.apache.bigtop.manager.agent.holder.SpringContextHolder;
 import org.apache.bigtop.manager.grpc.generated.CommandReply;
 import org.apache.bigtop.manager.grpc.generated.CommandRequest;
 import org.apache.bigtop.manager.grpc.generated.CommandType;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,15 +32,24 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationContext;
 
+import io.grpc.StatusRuntimeException;
+import io.grpc.stub.StreamObserver;
+
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
-
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class CommandServiceGrpcImplTest {
-
 
     private CommandServiceGrpcImpl commandServiceGrpc;
 
@@ -51,7 +59,8 @@ public class CommandServiceGrpcImplTest {
         ApplicationContext mockApplicationContext = mock(ApplicationContext.class);
 
         CommandExecutor mockExecutor = mock(CommandExecutor.class);
-        when(mockApplicationContext.getBeansOfType(CommandExecutor.class))
+        lenient()
+                .when(mockApplicationContext.getBeansOfType(CommandExecutor.class))
                 .thenReturn(Map.of("mockExecutor", mockExecutor));
 
         springContextHolder.setApplicationContext(mockApplicationContext);
@@ -154,7 +163,9 @@ public class CommandServiceGrpcImplTest {
                 .build();
 
         CommandExecutor mockExecutor = mock(CommandExecutor.class);
-        lenient().when(CommandExecutors.getCommandExecutor(CommandType.COMPONENT)).thenReturn(mockExecutor);
+        lenient()
+                .when(CommandExecutors.getCommandExecutor(CommandType.COMPONENT))
+                .thenReturn(mockExecutor);
         lenient().when(mockExecutor.execute(request)).thenReturn(expectedReply);
 
         StreamObserver<CommandReply> responseObserver = mock(StreamObserver.class);
@@ -162,7 +173,8 @@ public class CommandServiceGrpcImplTest {
         // Mock truncateLogFile to throw an exception
         CommandServiceGrpcImpl commandServiceGrpcSpy = spy(commandServiceGrpc);
         doThrow(new RuntimeException("File operation failed"))
-                .when(commandServiceGrpcSpy).truncateLogFile(anyLong());
+                .when(commandServiceGrpcSpy)
+                .truncateLogFile(anyLong());
 
         // Act
         commandServiceGrpcSpy.exec(request, responseObserver);
@@ -188,7 +200,9 @@ public class CommandServiceGrpcImplTest {
                 .build();
 
         CommandExecutor mockExecutor = mock(CommandExecutor.class);
-        lenient().when(CommandExecutors.getCommandExecutor(CommandType.COMPONENT)).thenReturn(mockExecutor);
+        lenient()
+                .when(CommandExecutors.getCommandExecutor(CommandType.COMPONENT))
+                .thenReturn(mockExecutor);
         lenient().when(mockExecutor.execute(request)).thenReturn(expectedReply);
 
         StreamObserver<CommandReply> responseObserver = mock(StreamObserver.class);
@@ -201,5 +215,4 @@ public class CommandServiceGrpcImplTest {
         verify(responseObserver, never()).onCompleted(); // Ensure onCompleted is not called
         verify(responseObserver).onError(any(StatusRuntimeException.class));
     }
-
 }

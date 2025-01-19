@@ -18,22 +18,32 @@
  */
 package org.apache.bigtop.manager.agent.service;
 
-import io.grpc.Status;
 import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.grpc.generated.ComponentStatusReply;
 import org.apache.bigtop.manager.grpc.generated.ComponentStatusRequest;
 import org.apache.bigtop.manager.stack.core.executor.StackExecutor;
 
-import io.grpc.StatusRuntimeException;
-import io.grpc.stub.StreamObserver;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
+import io.grpc.stub.StreamObserver;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.clearInvocations;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class ComponentStatusServiceGrpcImplTest {
@@ -42,74 +52,75 @@ public class ComponentStatusServiceGrpcImplTest {
 
     @Test
     public void testGetComponentStatusSuccess() {
-        // Arrange
-        ComponentStatusRequest request = ComponentStatusRequest.newBuilder()
-                .setStackName("TestStack")
-                .setStackVersion("1.0")
-                .setServiceName("TestService")
-                .setServiceUser("TestUser")
-                .setComponentName("TestComponent")
-                .build();
+        try (MockedStatic<StackExecutor> mockedStatic = mockStatic(StackExecutor.class)) {
+            // Arrange
+            ComponentStatusRequest request = ComponentStatusRequest.newBuilder()
+                    .setStackName("TestStack")
+                    .setStackVersion("1.0")
+                    .setServiceName("TestService")
+                    .setServiceUser("TestUser")
+                    .setComponentName("TestComponent")
+                    .build();
 
-        ShellResult shellResult = new ShellResult();
-        shellResult.setExitCode(0);
+            ShellResult shellResult = new ShellResult();
+            shellResult.setExitCode(0);
 
-        // Mock StackExecutor
-        mockStatic(StackExecutor.class);
-        when(StackExecutor.execute(any(CommandPayload.class))).thenReturn(shellResult);
+            // Mock StackExecutor
+            mockedStatic.when(() -> StackExecutor.execute(any(CommandPayload.class))).thenReturn(shellResult);
 
-        StreamObserver<ComponentStatusReply> responseObserver = mock(StreamObserver.class);
-        ArgumentCaptor<ComponentStatusReply> captor = ArgumentCaptor.forClass(ComponentStatusReply.class);
+            StreamObserver<ComponentStatusReply> responseObserver = mock(StreamObserver.class);
+            ArgumentCaptor<ComponentStatusReply> captor = ArgumentCaptor.forClass(ComponentStatusReply.class);
 
-        // Act
-        service.getComponentStatus(request, responseObserver);
+            // Act
+            service.getComponentStatus(request, responseObserver);
 
-        // Assert
-        verify(responseObserver).onNext(captor.capture());
-        verify(responseObserver).onCompleted();
+            // Assert
+            verify(responseObserver).onNext(captor.capture());
+            verify(responseObserver).onCompleted();
 
-        ComponentStatusReply reply = captor.getValue();
-        assertEquals(0, reply.getStatus());
+            ComponentStatusReply reply = captor.getValue();
+            assertEquals(0, reply.getStatus());
+        }
     }
 
     @Test
     public void testGetComponentStatusExecutionFailure() {
-        // Arrange
-        ComponentStatusRequest request = ComponentStatusRequest.newBuilder()
-                .setStackName("TestStack")
-                .setStackVersion("1.0")
-                .setServiceName("TestService")
-                .setServiceUser("TestUser")
-                .setComponentName("TestComponent")
-                .build();
+        try (MockedStatic<StackExecutor> mockedStatic = mockStatic(StackExecutor.class)) {
+            // Arrange
+            ComponentStatusRequest request = ComponentStatusRequest.newBuilder()
+                    .setStackName("TestStack")
+                    .setStackVersion("1.0")
+                    .setServiceName("TestService")
+                    .setServiceUser("TestUser")
+                    .setComponentName("TestComponent")
+                    .build();
 
-        // Mock StackExecutor to throw an exception
-        mockStatic(StackExecutor.class);
-        when(StackExecutor.execute(any(CommandPayload.class)))
-                .thenThrow(new RuntimeException("Execution failed"));
+            // Mock StackExecutor to throw an exception
+            mockedStatic.when(() -> StackExecutor.execute(any(CommandPayload.class))).thenThrow(new RuntimeException("Execution failed"));
 
-        StreamObserver<ComponentStatusReply> responseObserver = mock(StreamObserver.class);
+            StreamObserver<ComponentStatusReply> responseObserver = mock(StreamObserver.class);
 
-        // Act
-        service.getComponentStatus(request, responseObserver);
+            // Act
+            service.getComponentStatus(request, responseObserver);
 
-        // Assert
-        verify(responseObserver).onError(any(StatusRuntimeException.class));
+            // Assert
+            verify(responseObserver).onError(any(StatusRuntimeException.class));
 
-        // Capture the exception and verify its message
-        ArgumentCaptor<Throwable> captor = ArgumentCaptor.forClass(Throwable.class);
-        verify(responseObserver).onError(captor.capture());
+            // Capture the exception and verify its message
+            ArgumentCaptor<Throwable> captor = ArgumentCaptor.forClass(Throwable.class);
+            verify(responseObserver).onError(captor.capture());
 
-        // Get the captured exception
-        Throwable actualException = captor.getValue();
+            // Get the captured exception
+            Throwable actualException = captor.getValue();
 
-        // Check if it is an instance of StatusRuntimeException
-        assertInstanceOf(StatusRuntimeException.class, actualException, "Expected StatusRuntimeException");
+            // Check if it is an instance of StatusRuntimeException
+            assertInstanceOf(StatusRuntimeException.class, actualException, "Expected StatusRuntimeException");
 
-        StatusRuntimeException statusRuntimeException = (StatusRuntimeException) actualException;
+            StatusRuntimeException statusRuntimeException = (StatusRuntimeException) actualException;
 
-        // Check that the status code is UNKNOWN and the message contains the expected error message
-        assertEquals(Status.UNKNOWN.getCode(), statusRuntimeException.getStatus().getCode());
-        assertTrue(statusRuntimeException.getMessage().contains("Execution failed"));
+            // Check that the status code is UNKNOWN and the message contains the expected error message
+            assertEquals(Status.UNKNOWN.getCode(), statusRuntimeException.getStatus().getCode());
+            assertTrue(statusRuntimeException.getMessage().contains("Execution failed"));
+        }
     }
 }

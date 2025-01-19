@@ -18,25 +18,37 @@
  */
 package org.apache.bigtop.manager.agent.monitoring;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.micrometer.core.instrument.MultiGauge;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import oshi.SystemInfo;
 import oshi.hardware.GlobalMemory;
 import oshi.hardware.HardwareAbstractionLayer;
 import oshi.software.os.OperatingSystem;
 
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class AgentHostMonitoringTest {
 
@@ -48,7 +60,6 @@ class AgentHostMonitoringTest {
 
     @Mock
     private GlobalMemory globalMemory;
-
 
     @Mock
     private MultiGauge diskMultiGauge;
@@ -108,7 +119,8 @@ class AgentHostMonitoringTest {
         when(diskJsonNode.get(AgentHostMonitoring.DISK_TOTAL).asDouble()).thenReturn(100.0);
 
         // Call the getDiskGauge method
-        Map<ArrayList<String>, Map<ArrayList<String>, Double>> diskGauge = AgentHostMonitoring.getDiskGauge(agentMonitoring);
+        Map<ArrayList<String>, Map<ArrayList<String>, Double>> diskGauge =
+                AgentHostMonitoring.getDiskGauge(agentMonitoring);
 
         // Assert that the disk gauge data is populated correctly
         assertNotNull(diskGauge);
@@ -133,7 +145,8 @@ class AgentHostMonitoringTest {
                 .put(AgentHostMonitoring.CPU_LOAD_AVG_MIN_15, 15.0)
                 .put(AgentHostMonitoring.CPU_USAGE, 10.0);
 
-        Map<ArrayList<String>, Map<ArrayList<String>, Double>> cpuGauge = AgentHostMonitoring.getCPUGauge(agentMonitoring);
+        Map<ArrayList<String>, Map<ArrayList<String>, Double>> cpuGauge =
+                AgentHostMonitoring.getCPUGauge(agentMonitoring);
 
         // Assert that the CPU gauge data is populated correctly
         assertNotNull(cpuGauge);
@@ -152,17 +165,15 @@ class AgentHostMonitoringTest {
         agentMonitoring.set(AgentHostMonitoring.AGENT_BASE_INFO, agentHostInfo);
 
         // Set MEM related fields
-        agentMonitoring
-                .put(AgentHostMonitoring.MEM_IDLE, 2000.0)
-                .put(AgentHostMonitoring.MEM_TOTAL, 4000.0);
+        agentMonitoring.put(AgentHostMonitoring.MEM_IDLE, 2000.0).put(AgentHostMonitoring.MEM_TOTAL, 4000.0);
 
-        Map<ArrayList<String>, Map<ArrayList<String>, Double>> memGauge = AgentHostMonitoring.getMEMGauge(agentMonitoring);
+        Map<ArrayList<String>, Map<ArrayList<String>, Double>> memGauge =
+                AgentHostMonitoring.getMEMGauge(agentMonitoring);
 
         // Assert that the MEM gauge data is populated correctly
         assertNotNull(memGauge);
         assertFalse(memGauge.isEmpty());
     }
-
 
     @Test
     void testMultiGaugeUpdateData() {

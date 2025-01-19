@@ -18,31 +18,35 @@
  */
 package org.apache.bigtop.manager.agent.service;
 
-import com.sun.management.OperatingSystemMXBean;
-import io.grpc.StatusRuntimeException;
-import io.grpc.stub.StreamObserver;
 import org.apache.bigtop.manager.common.utils.os.OSDetection;
 import org.apache.bigtop.manager.grpc.generated.HostInfoReply;
 import org.apache.bigtop.manager.grpc.generated.HostInfoRequest;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.sun.management.OperatingSystemMXBean;
+import io.grpc.StatusRuntimeException;
+import io.grpc.stub.StreamObserver;
 
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 
-import static org.mockito.Mockito.*;
-
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class HostInfoServiceGrpcImplTest {
 
     @InjectMocks
     private HostInfoServiceGrpcImpl service;
-
 
     @Test
     public void testGetHostInfoSuccess() {
@@ -56,7 +60,7 @@ public class HostInfoServiceGrpcImplTest {
 
         // Mock static methods of OSDetection using MockedStatic
         try (MockedStatic<OSDetection> mockedStatic = mockStatic(OSDetection.class);
-             MockedStatic<ManagementFactory> mockManagementFactory = mockStatic(ManagementFactory.class)) {
+                MockedStatic<ManagementFactory> mockManagementFactory = mockStatic(ManagementFactory.class)) {
             long oneGBInBytes = 1024L * 1024L * 1024L;
             long freeDiskInBytes = 100L * oneGBInBytes;
             long totalDiskInBytes = 500L * oneGBInBytes;
@@ -71,7 +75,9 @@ public class HostInfoServiceGrpcImplTest {
 
             // Mock OperatingSystemMXBean methods
             OperatingSystemMXBean mockOsBean = mock(OperatingSystemMXBean.class);
-            mockManagementFactory.when(ManagementFactory::getOperatingSystemMXBean).thenReturn(mockOsBean);
+            mockManagementFactory
+                    .when(ManagementFactory::getOperatingSystemMXBean)
+                    .thenReturn(mockOsBean);
             when(mockOsBean.getAvailableProcessors()).thenReturn(4);
             when(mockOsBean.getProcessCpuTime()).thenReturn(100L);
             when(mockOsBean.getTotalMemorySize()).thenReturn(1024L * 1024 * 1024);
@@ -111,7 +117,5 @@ public class HostInfoServiceGrpcImplTest {
             // Assert
             verify(mockResponseObserver).onError(any(StatusRuntimeException.class));
         }
-
     }
-
 }
