@@ -24,7 +24,6 @@ import org.apache.bigtop.manager.grpc.generated.ComponentStatusReply;
 import org.apache.bigtop.manager.grpc.generated.ComponentStatusRequest;
 import org.apache.bigtop.manager.stack.core.executor.StackExecutor;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -39,11 +38,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class ComponentStatusServiceGrpcImplTest {
@@ -66,7 +63,9 @@ public class ComponentStatusServiceGrpcImplTest {
             shellResult.setExitCode(0);
 
             // Mock StackExecutor
-            mockedStatic.when(() -> StackExecutor.execute(any(CommandPayload.class))).thenReturn(shellResult);
+            mockedStatic
+                    .when(() -> StackExecutor.execute(any(CommandPayload.class)))
+                    .thenReturn(shellResult);
 
             StreamObserver<ComponentStatusReply> responseObserver = mock(StreamObserver.class);
             ArgumentCaptor<ComponentStatusReply> captor = ArgumentCaptor.forClass(ComponentStatusReply.class);
@@ -96,7 +95,9 @@ public class ComponentStatusServiceGrpcImplTest {
                     .build();
 
             // Mock StackExecutor to throw an exception
-            mockedStatic.when(() -> StackExecutor.execute(any(CommandPayload.class))).thenThrow(new RuntimeException("Execution failed"));
+            mockedStatic
+                    .when(() -> StackExecutor.execute(any(CommandPayload.class)))
+                    .thenThrow(new RuntimeException("Execution failed"));
 
             StreamObserver<ComponentStatusReply> responseObserver = mock(StreamObserver.class);
 
@@ -119,7 +120,8 @@ public class ComponentStatusServiceGrpcImplTest {
             StatusRuntimeException statusRuntimeException = (StatusRuntimeException) actualException;
 
             // Check that the status code is UNKNOWN and the message contains the expected error message
-            assertEquals(Status.UNKNOWN.getCode(), statusRuntimeException.getStatus().getCode());
+            assertEquals(
+                    Status.UNKNOWN.getCode(), statusRuntimeException.getStatus().getCode());
             assertTrue(statusRuntimeException.getMessage().contains("Execution failed"));
         }
     }
