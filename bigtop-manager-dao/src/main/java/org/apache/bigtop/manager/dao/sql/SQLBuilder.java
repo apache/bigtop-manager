@@ -182,6 +182,7 @@ public class SQLBuilder {
                     }
                     idx++;
                 }
+                break;
             }
 
             default: {

@@ -26,7 +26,7 @@
     <sql id="baseColumns">
         id,  hostname, agent_dir, ssh_user, ssh_port, auth_type, ssh_password, ssh_key_string, ssh_key_filename, ssh_key_password,
         grpc_port, ipv4, ipv6, os, arch, available_processors, free_memory_size, total_memory_size,
-        free_disk, total_disk, desc, status, err_info, cluster_id
+        free_disk, total_disk, `desc`, status, err_info, cluster_id
     </sql>
 
     <sql id="baseColumnsV2">
