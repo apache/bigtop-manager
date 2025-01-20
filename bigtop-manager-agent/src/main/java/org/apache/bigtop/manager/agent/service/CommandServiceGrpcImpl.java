@@ -63,7 +63,7 @@ public class CommandServiceGrpcImpl extends CommandServiceGrpc.CommandServiceImp
         }
     }
 
-    private void truncateLogFile(Long taskId) {
+    protected void truncateLogFile(Long taskId) {
         String filePath = ProjectPathUtils.getLogFilePath(taskId);
         File file = new File(filePath);
         if (file.exists()) {
