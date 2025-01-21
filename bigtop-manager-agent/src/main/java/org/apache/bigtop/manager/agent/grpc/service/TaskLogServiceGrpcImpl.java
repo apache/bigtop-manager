@@ -54,7 +54,7 @@ public class TaskLogServiceGrpcImpl extends TaskLogServiceGrpc.TaskLogServiceImp
             // Waiting for new logs
             boolean isTaskRunning = true;
             while (isTaskRunning) {
-                isTaskRunning = Caches.RUNNING_TASKS.contains(request.getTaskId());
+                isTaskRunning = Caches.RUNNING_TASK != null;
                 readNewLogs(file, responseObserver);
                 Thread.sleep(1000);
             }

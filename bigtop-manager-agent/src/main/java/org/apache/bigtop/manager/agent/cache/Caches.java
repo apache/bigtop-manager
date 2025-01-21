@@ -24,6 +24,4 @@ import java.util.List;
 public class Caches {
 
     public static Long RUNNING_TASK = null;
-
-    public static final List<Long> RUNNING_TASKS = new ArrayList<>();
 }
