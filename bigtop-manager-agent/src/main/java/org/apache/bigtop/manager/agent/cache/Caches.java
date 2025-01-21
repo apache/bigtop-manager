@@ -18,9 +18,6 @@
  */
 package org.apache.bigtop.manager.agent.cache;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Caches {
 
     public static Long RUNNING_TASK = null;
