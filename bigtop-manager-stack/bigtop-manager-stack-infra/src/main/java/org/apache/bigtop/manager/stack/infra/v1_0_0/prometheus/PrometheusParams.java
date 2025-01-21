@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.stack.infra.v1_0_0.prometheus;
 
-import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
+import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
@@ -54,8 +54,8 @@ public class PrometheusParams extends InfraParams {
     private String prometheusRulesFilename;
     private String prometheusRulesFileContent;
 
-    public PrometheusParams(CommandPayload commandPayload) {
-        super(commandPayload);
+    public PrometheusParams(ComponentCommandPayload componentCommandPayload) {
+        super(componentCommandPayload);
         setAgentScrapeJob();
         scrapeJobs = new ArrayList<>();
         scrapeJobs.add(prometheusScrapeJob);

@@ -18,12 +18,12 @@
  */
 package org.apache.bigtop.manager.stack.core.spi.param;
 
-import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
-import org.apache.bigtop.manager.common.message.entity.pojo.PackageInfo;
-import org.apache.bigtop.manager.common.message.entity.pojo.PackageSpecificInfo;
-import org.apache.bigtop.manager.common.message.entity.pojo.RepoInfo;
 import org.apache.bigtop.manager.common.utils.NetUtils;
 import org.apache.bigtop.manager.common.utils.os.OSDetection;
+import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
+import org.apache.bigtop.manager.grpc.pojo.PackageInfo;
+import org.apache.bigtop.manager.grpc.pojo.PackageSpecificInfo;
+import org.apache.bigtop.manager.grpc.pojo.RepoInfo;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
 import org.apache.bigtop.manager.stack.core.exception.StackException;
 import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
@@ -48,11 +48,11 @@ public abstract class BaseParams implements Params {
 
     public static final String LIMITS_CONF_DIR = "/etc/security/limits.d";
 
-    protected CommandPayload commandPayload;
+    protected ComponentCommandPayload payload;
 
     @SuppressWarnings("unchecked")
-    protected BaseParams(CommandPayload commandPayload) {
-        this.commandPayload = commandPayload;
+    protected BaseParams(ComponentCommandPayload payload) {
+        this.payload = payload;
 
         // Global Parameters Injection
         Method[] declaredMethods = this.getClass().getDeclaredMethods();
@@ -83,7 +83,7 @@ public abstract class BaseParams implements Params {
 
     @Override
     public String user() {
-        return this.commandPayload.getServiceUser();
+        return this.payload.getServiceUser();
     }
 
     @Override
@@ -105,7 +105,7 @@ public abstract class BaseParams implements Params {
     public List<PackageInfo> packages() {
         RepoInfo repo = this.repo();
         List<PackageInfo> packageInfoList = new ArrayList<>();
-        for (PackageSpecificInfo packageSpecificInfo : this.commandPayload.getPackageSpecifics()) {
+        for (PackageSpecificInfo packageSpecificInfo : this.payload.getPackageSpecifics()) {
             if (!packageSpecificInfo.getArch().contains(repo.getArch())) {
                 continue;
             }

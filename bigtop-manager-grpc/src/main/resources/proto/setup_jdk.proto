@@ -16,26 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.agent.executor;
+syntax = "proto3";
 
-import org.apache.bigtop.manager.grpc.generated.CommandReply;
-import org.apache.bigtop.manager.grpc.generated.CommandRequest;
-import org.apache.bigtop.manager.grpc.generated.CommandType;
+option java_multiple_files = true;
+option java_package = "org.apache.bigtop.manager.grpc.generated";
+option java_outer_classname = "SetupJdkProto";
 
-/**
- * Interface for executing commands on agent.
- */
-public interface CommandExecutor {
+service SetupJdkService {
+  rpc Setup (SetupJdkRequest) returns (SetupJdkReply) {}
+}
 
-    /**
-     * Get the type of the command.
-     * @return CommandType - the type of the command.
-     */
-    CommandType getCommandType();
+message SetupJdkRequest {
+  int64 task_id = 1;
+}
 
-    /**
-     * Execute the command.
-     * @param request - the request for command that needs to be executed.
-     */
-    CommandReply execute(CommandRequest request);
+message SetupJdkReply {
+  int32 code = 1;
 }

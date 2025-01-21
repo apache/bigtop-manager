@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.stack.extra.param;
 
-import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
+import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
 import org.apache.bigtop.manager.stack.core.spi.param.BaseParams;
 
 import lombok.NoArgsConstructor;
@@ -26,7 +26,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public abstract class ExtraParams extends BaseParams {
 
-    protected ExtraParams(CommandPayload commandPayload) {
-        super(commandPayload);
+    protected ExtraParams(ComponentCommandPayload payload) {
+        super(payload);
     }
 }

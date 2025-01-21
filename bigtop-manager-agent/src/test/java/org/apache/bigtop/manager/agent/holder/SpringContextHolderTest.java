@@ -18,33 +18,17 @@
  */
 package org.apache.bigtop.manager.agent.holder;
 
-import org.apache.bigtop.manager.agent.executor.CommandExecutor;
-
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.context.ApplicationContext;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class SpringContextHolderTest {
 
     @Mock
     private ApplicationContext mockApplicationContext;
-
-    @Mock
-    private CommandExecutor mockCommandExecutor;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -54,25 +38,5 @@ public class SpringContextHolderTest {
         Field field = SpringContextHolder.class.getDeclaredField("applicationContext");
         field.setAccessible(true);
         field.set(null, mockApplicationContext);
-    }
-
-    @Test
-    public void testGetCommandExecutors() {
-        // Prepare test data
-        Map<String, CommandExecutor> commandExecutorsMap = new HashMap<>();
-        commandExecutorsMap.put("commandExecutor1", mockCommandExecutor);
-        when(mockApplicationContext.getBeansOfType(CommandExecutor.class)).thenReturn(commandExecutorsMap);
-
-        // Execute the method under test
-        Map<String, CommandExecutor> result = SpringContextHolder.getCommandExecutors();
-
-        // Validate the result
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        assertTrue(result.containsKey("commandExecutor1"));
-        assertSame(mockCommandExecutor, result.get("commandExecutor1"));
-
-        // Verify method calls
-        verify(mockApplicationContext, times(1)).getBeansOfType(CommandExecutor.class);
     }
 }

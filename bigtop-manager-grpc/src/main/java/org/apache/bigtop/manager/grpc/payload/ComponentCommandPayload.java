@@ -16,28 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.common.message.entity.payload;
+package org.apache.bigtop.manager.grpc.payload;
 
-import org.apache.bigtop.manager.common.enums.Command;
-import org.apache.bigtop.manager.common.message.entity.pojo.PackageSpecificInfo;
+import org.apache.bigtop.manager.grpc.pojo.PackageSpecificInfo;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import java.util.List;
 import java.util.Map;
 
 @Data
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
-@NoArgsConstructor
-public class CommandPayload extends BasePayload {
+public class ComponentCommandPayload {
 
     private String serviceName;
 
-    private Command command;
+    private String command;
 
     private String customCommand;
 

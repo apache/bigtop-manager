@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.stack.infra.v1_0_0.grafana;
 
-import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
+import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
@@ -55,8 +55,8 @@ public class GrafanaParams extends InfraParams {
 
     private List<Map<String, Object>> dashboards;
 
-    public GrafanaParams(CommandPayload commandPayload) {
-        super(commandPayload);
+    public GrafanaParams(ComponentCommandPayload componentCommandPayload) {
+        super(componentCommandPayload);
         globalParamsMap.put("port", grafanaPort);
         globalParamsMap.put("log_level", grafanaLogLevel);
         globalParamsMap.put("provisioning_path", provisioningDir());

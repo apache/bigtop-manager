@@ -16,16 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.common.message.entity.pojo;
+package org.apache.bigtop.manager.agent.grpc.config;
 
-import lombok.Data;
+import org.apache.bigtop.manager.agent.grpc.interceptor.TaskInterceptor;
 
-@Data
-public class ClusterInfo {
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-    private String name;
+import net.devh.boot.grpc.server.serverfactory.GrpcServerConfigurer;
 
-    private String userGroup;
+@Configuration
+public class GrpcServerConfig {
 
-    private String rootDir;
+    @Bean
+    public GrpcServerConfigurer configurer() {
+        return serverBuilder -> serverBuilder.intercept(new TaskInterceptor());
+    }
 }

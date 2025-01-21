@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.hive;
 
-import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
+import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
 import org.apache.bigtop.manager.stack.bigtop.param.BigtopParams;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
@@ -55,8 +55,8 @@ public class HiveParams extends BigtopParams {
     private final String hiveShellContent =
             "dir=$(dirname $0)\n$dir/hive --service $1 > /dev/null 2>&1 &\necho $! > $2";
 
-    public HiveParams(CommandPayload commandPayload) {
-        super(commandPayload);
+    public HiveParams(ComponentCommandPayload componentCommandPayload) {
+        super(componentCommandPayload);
         globalParamsMap.put("java_home", javaHome());
         globalParamsMap.put("hadoop_home", hadoopHome());
         globalParamsMap.put("hive_home", serviceHome());

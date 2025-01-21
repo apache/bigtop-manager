@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.stack.extra.v1_0_0.seatunnel;
 
-import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
+import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
@@ -50,8 +50,8 @@ public class SeaTunnelParams extends ExtraParams {
     private String log4j2Content;
     private String log4j2ClientContent;
 
-    public SeaTunnelParams(CommandPayload commandPayload) {
-        super(commandPayload);
+    public SeaTunnelParams(ComponentCommandPayload payload) {
+        super(payload);
         globalParamsMap.put("java_home", javaHome());
         globalParamsMap.put("seatunnel_user", user());
         globalParamsMap.put("seatunnel_group", group());

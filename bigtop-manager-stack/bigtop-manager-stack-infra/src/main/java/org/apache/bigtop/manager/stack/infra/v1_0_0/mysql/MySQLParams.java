@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.stack.infra.v1_0_0.mysql;
 
-import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
+import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
@@ -43,8 +43,8 @@ public class MySQLParams extends InfraParams {
     private String rootPassword;
     private String myCnfContent;
 
-    public MySQLParams(CommandPayload commandPayload) {
-        super(commandPayload);
+    public MySQLParams(ComponentCommandPayload componentCommandPayload) {
+        super(componentCommandPayload);
 
         globalParamsMap.put("mysql_home", serviceHome());
         globalParamsMap.put("mysql_conf_dir", confDir());

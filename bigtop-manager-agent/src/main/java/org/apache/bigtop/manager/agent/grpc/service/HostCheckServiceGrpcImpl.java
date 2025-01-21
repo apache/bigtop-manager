@@ -16,37 +16,49 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.agent.executor;
+package org.apache.bigtop.manager.agent.grpc.service;
 
 import org.apache.bigtop.manager.common.constants.MessageConstants;
 import org.apache.bigtop.manager.common.shell.ShellResult;
+import org.apache.bigtop.manager.common.utils.Environments;
 import org.apache.bigtop.manager.common.utils.os.TimeSyncDetection;
-import org.apache.bigtop.manager.grpc.generated.CommandType;
+import org.apache.bigtop.manager.grpc.generated.HostCheckReply;
+import org.apache.bigtop.manager.grpc.generated.HostCheckRequest;
+import org.apache.bigtop.manager.grpc.generated.HostCheckServiceGrpc;
 
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
+import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
+import net.devh.boot.grpc.server.service.GrpcService;
 
 import java.util.List;
 import java.util.function.Supplier;
 
 @Slf4j
-@Component
-@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class HostCheckCommandExecutor extends AbstractCommandExecutor {
+@GrpcService
+public class HostCheckServiceGrpcImpl extends HostCheckServiceGrpc.HostCheckServiceImplBase {
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.HOST_CHECK;
-    }
+    public void check(HostCheckRequest request, StreamObserver<HostCheckReply> responseObserver) {
+        try {
+            if (Environments.isDevMode()) {
+                HostCheckReply reply = HostCheckReply.newBuilder()
+                        .setCode(MessageConstants.SUCCESS_CODE)
+                        .build();
+                responseObserver.onNext(reply);
+                responseObserver.onCompleted();
+                return;
+            }
 
-    @Override
-    public void doExecute() {
-        ShellResult shellResult = runChecks(List.of(this::checkTimeSync));
-        commandReplyBuilder.setCode(shellResult.getExitCode());
-        commandReplyBuilder.setResult(shellResult.getResult());
+            ShellResult shellResult = runChecks(List.of(this::checkTimeSync));
+            HostCheckReply reply = HostCheckReply.newBuilder()
+                    .setCode(shellResult.getExitCode())
+                    .build();
+            responseObserver.onNext(reply);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            log.error("Error when running host check", e);
+            responseObserver.onError(e);
+        }
     }
 
     private ShellResult runChecks(List<Supplier<ShellResult>> suppliers) {

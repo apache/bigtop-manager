@@ -18,8 +18,8 @@
  */
 package org.apache.bigtop.manager.stack.infra.param;
 
-import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
 import org.apache.bigtop.manager.common.utils.Environments;
+import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
 import org.apache.bigtop.manager.stack.core.spi.param.BaseParams;
 
 import org.apache.commons.lang3.SystemUtils;
@@ -35,8 +35,8 @@ import java.util.Map;
 @NoArgsConstructor
 public abstract class InfraParams extends BaseParams {
 
-    protected InfraParams(CommandPayload commandPayload) {
-        super(commandPayload);
+    protected InfraParams(ComponentCommandPayload componentCommandPayload) {
+        super(componentCommandPayload);
     }
 
     /**
@@ -77,6 +77,6 @@ public abstract class InfraParams extends BaseParams {
 
     public Map<String, List<String>> getClusterHosts() {
         // In Component Status stage, clusterHosts is null
-        return commandPayload.getClusterHosts();
+        return payload.getClusterHosts();
     }
 }

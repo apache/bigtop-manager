@@ -16,12 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.agent.service;
+package org.apache.bigtop.manager.agent.grpc.service;
 
-import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.grpc.generated.ComponentStatusReply;
 import org.apache.bigtop.manager.grpc.generated.ComponentStatusRequest;
+import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
 import org.apache.bigtop.manager.stack.core.executor.StackExecutor;
 
 import org.junit.jupiter.api.Test;
@@ -64,7 +64,7 @@ public class ComponentStatusServiceGrpcImplTest {
 
             // Mock StackExecutor
             mockedStatic
-                    .when(() -> StackExecutor.execute(any(CommandPayload.class)))
+                    .when(() -> StackExecutor.execute(any(ComponentCommandPayload.class)))
                     .thenReturn(shellResult);
 
             StreamObserver<ComponentStatusReply> responseObserver = mock(StreamObserver.class);
@@ -96,7 +96,7 @@ public class ComponentStatusServiceGrpcImplTest {
 
             // Mock StackExecutor to throw an exception
             mockedStatic
-                    .when(() -> StackExecutor.execute(any(CommandPayload.class)))
+                    .when(() -> StackExecutor.execute(any(ComponentCommandPayload.class)))
                     .thenThrow(new RuntimeException("Execution failed"));
 
             StreamObserver<ComponentStatusReply> responseObserver = mock(StreamObserver.class);

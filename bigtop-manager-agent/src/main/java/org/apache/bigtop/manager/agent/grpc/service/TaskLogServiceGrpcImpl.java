@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.agent.service;
+package org.apache.bigtop.manager.agent.grpc.service;
 
 import org.apache.bigtop.manager.agent.cache.Caches;
 import org.apache.bigtop.manager.common.utils.ProjectPathUtils;
@@ -54,7 +54,7 @@ public class TaskLogServiceGrpcImpl extends TaskLogServiceGrpc.TaskLogServiceImp
             // Waiting for new logs
             boolean isTaskRunning = true;
             while (isTaskRunning) {
-                isTaskRunning = Caches.RUNNING_TASKS.contains(request.getTaskId());
+                isTaskRunning = Caches.RUNNING_TASK != null;
                 readNewLogs(file, responseObserver);
                 Thread.sleep(1000);
             }

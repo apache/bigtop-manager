@@ -18,12 +18,14 @@
  */
 syntax = "proto3";
 
+import "google/protobuf/struct.proto";
+
 option java_multiple_files = true;
 option java_package = "org.apache.bigtop.manager.grpc.generated";
 option java_outer_classname = "JobCacheProto";
 
 service JobCacheService {
-  rpc save (JobCacheRequest) returns (JobCacheReply) {}
+  rpc Save (JobCacheRequest) returns (JobCacheReply) {}
 }
 
 message JobCacheRequest {

@@ -16,14 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.agent.service;
+package org.apache.bigtop.manager.agent.grpc.service;
 
 import org.apache.bigtop.manager.common.enums.Command;
-import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.grpc.generated.ComponentStatusReply;
 import org.apache.bigtop.manager.grpc.generated.ComponentStatusRequest;
 import org.apache.bigtop.manager.grpc.generated.ComponentStatusServiceGrpc;
+import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
 import org.apache.bigtop.manager.stack.core.executor.StackExecutor;
 
 import io.grpc.Status;
@@ -40,15 +40,15 @@ public class ComponentStatusServiceGrpcImpl extends ComponentStatusServiceGrpc.C
             ComponentStatusRequest request, StreamObserver<ComponentStatusReply> responseObserver) {
 
         try {
-            CommandPayload commandPayload = new CommandPayload();
-            commandPayload.setCommand(Command.STATUS);
-            commandPayload.setStackName(request.getStackName());
-            commandPayload.setStackVersion(request.getStackVersion());
-            commandPayload.setServiceName(request.getServiceName());
-            commandPayload.setServiceUser(request.getServiceUser());
-            commandPayload.setComponentName(request.getComponentName());
+            ComponentCommandPayload payload = new ComponentCommandPayload();
+            payload.setCommand(Command.STATUS.getCode());
+            payload.setStackName(request.getStackName());
+            payload.setStackVersion(request.getStackVersion());
+            payload.setServiceName(request.getServiceName());
+            payload.setServiceUser(request.getServiceUser());
+            payload.setComponentName(request.getComponentName());
 
-            ShellResult shellResult = StackExecutor.execute(commandPayload);
+            ShellResult shellResult = StackExecutor.execute(payload);
             ComponentStatusReply reply = ComponentStatusReply.newBuilder()
                     .setStatus(shellResult.getExitCode())
                     .build();
