@@ -1,18 +1,17 @@
 package org.apache.bigtop.manager.agent.grpc.interceptor;
 
+import org.apache.bigtop.manager.agent.cache.Caches;
+import org.apache.bigtop.manager.common.utils.ProjectPathUtils;
+import org.apache.bigtop.manager.grpc.generated.TaskLogRequest;
+
+import org.slf4j.MDC;
+
 import io.grpc.ForwardingServerCallListener;
 import io.grpc.Metadata;
 import io.grpc.ServerCall;
 import io.grpc.ServerCallHandler;
 import io.grpc.ServerInterceptor;
-import io.grpc.Status;
-import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.bigtop.manager.agent.cache.Caches;
-import org.apache.bigtop.manager.common.utils.Environments;
-import org.apache.bigtop.manager.common.utils.ProjectPathUtils;
-import org.apache.bigtop.manager.grpc.generated.TaskLogRequest;
-import org.slf4j.MDC;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +22,8 @@ import java.lang.reflect.Method;
 public class TaskInterceptor implements ServerInterceptor {
 
     @Override
-    public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(ServerCall<ReqT, RespT> call, Metadata headers, ServerCallHandler<ReqT, RespT> next) {
+    public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(
+            ServerCall<ReqT, RespT> call, Metadata headers, ServerCallHandler<ReqT, RespT> next) {
         return new ForwardingServerCallListener.SimpleForwardingServerCallListener<>(next.startCall(call, headers)) {
             @Override
             public void onMessage(ReqT message) {

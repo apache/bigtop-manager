@@ -18,7 +18,6 @@
  */
 package org.apache.bigtop.manager.server.command.task;
 
-import org.apache.bigtop.manager.common.constants.MessageConstants;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.enums.JobState;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
@@ -26,14 +25,7 @@ import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.dao.repository.HostDao;
 import org.apache.bigtop.manager.dao.repository.TaskDao;
-import org.apache.bigtop.manager.grpc.generated.CommandReply;
-import org.apache.bigtop.manager.grpc.generated.CommandRequest;
-import org.apache.bigtop.manager.grpc.generated.CommandServiceGrpc;
-import org.apache.bigtop.manager.grpc.utils.ProtobufUtil;
-import org.apache.bigtop.manager.server.grpc.GrpcClient;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
-import org.apache.bigtop.manager.server.model.converter.HostConverter;
-import org.apache.bigtop.manager.server.model.dto.HostDTO;
 
 import lombok.extern.slf4j.Slf4j;
 

@@ -25,7 +25,6 @@ import org.springframework.stereotype.Component;
 import lombok.Getter;
 
 import jakarta.annotation.Nonnull;
-import java.util.Map;
 
 @Component
 public class SpringContextHolder implements ApplicationContextAware {

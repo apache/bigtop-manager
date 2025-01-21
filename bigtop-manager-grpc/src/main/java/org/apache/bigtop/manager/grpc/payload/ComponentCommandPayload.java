@@ -18,8 +18,9 @@
  */
 package org.apache.bigtop.manager.grpc.payload;
 
-import lombok.Data;
 import org.apache.bigtop.manager.grpc.pojo.PackageSpecificInfo;
+
+import lombok.Data;
 
 import java.util.List;
 import java.util.Map;

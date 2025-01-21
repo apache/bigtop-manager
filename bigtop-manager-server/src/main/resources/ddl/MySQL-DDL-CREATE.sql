@@ -177,7 +177,7 @@ CREATE TABLE `service_config_snapshot`
     `id`                BIGINT NOT NULL AUTO_INCREMENT,
     `name`              VARCHAR(255),
     `desc`              VARCHAR(255),
-    `config_json`       TEXT,
+    `config_json`       LONGTEXT,
     `service_id`        BIGINT,
     `create_time`       DATETIME    DEFAULT CURRENT_TIMESTAMP,
     `update_time`       DATETIME    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

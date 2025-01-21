@@ -18,8 +18,6 @@
  */
 package org.apache.bigtop.manager.stack.infra.param;
 
-import com.google.protobuf.ListValue;
-import com.google.protobuf.Value;
 import org.apache.bigtop.manager.common.utils.Environments;
 import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
 import org.apache.bigtop.manager.stack.core.spi.param.BaseParams;
@@ -30,8 +28,6 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 

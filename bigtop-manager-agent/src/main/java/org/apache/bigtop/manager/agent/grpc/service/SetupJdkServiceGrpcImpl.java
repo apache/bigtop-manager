@@ -1,22 +1,22 @@
 package org.apache.bigtop.manager.agent.grpc.service;
 
-import io.grpc.stub.StreamObserver;
-import lombok.extern.slf4j.Slf4j;
-import net.devh.boot.grpc.server.service.GrpcService;
 import org.apache.bigtop.manager.common.constants.Constants;
 import org.apache.bigtop.manager.common.constants.MessageConstants;
-import org.apache.bigtop.manager.grpc.pojo.ClusterInfo;
-import org.apache.bigtop.manager.grpc.pojo.PackageInfo;
-import org.apache.bigtop.manager.grpc.pojo.RepoInfo;
 import org.apache.bigtop.manager.common.utils.Environments;
 import org.apache.bigtop.manager.common.utils.os.OSDetection;
-import org.apache.bigtop.manager.grpc.generated.JobCacheReply;
 import org.apache.bigtop.manager.grpc.generated.SetupJdkReply;
 import org.apache.bigtop.manager.grpc.generated.SetupJdkRequest;
 import org.apache.bigtop.manager.grpc.generated.SetupJdkServiceGrpc;
+import org.apache.bigtop.manager.grpc.pojo.ClusterInfo;
+import org.apache.bigtop.manager.grpc.pojo.PackageInfo;
+import org.apache.bigtop.manager.grpc.pojo.RepoInfo;
 import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
 import org.apache.bigtop.manager.stack.core.utils.TarballUtils;
 import org.apache.bigtop.manager.stack.core.utils.linux.LinuxFileUtils;
+
+import io.grpc.stub.StreamObserver;
+import lombok.extern.slf4j.Slf4j;
+import net.devh.boot.grpc.server.service.GrpcService;
 
 import java.text.MessageFormat;
 

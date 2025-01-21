@@ -47,8 +47,8 @@ public class HostCheckTask extends AbstractTask {
         builder.setTaskId(getTaskPO().getId());
         HostCheckRequest request = builder.build();
 
-        HostCheckServiceGrpc.HostCheckServiceBlockingStub stub = GrpcClient.getBlockingStub(
-                hostname, grpcPort, HostCheckServiceGrpc.HostCheckServiceBlockingStub.class);
+        HostCheckServiceGrpc.HostCheckServiceBlockingStub stub =
+                GrpcClient.getBlockingStub(hostname, grpcPort, HostCheckServiceGrpc.HostCheckServiceBlockingStub.class);
         HostCheckReply reply = stub.check(request);
 
         return reply != null && reply.getCode() == MessageConstants.SUCCESS_CODE;

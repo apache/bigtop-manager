@@ -19,25 +19,22 @@
 package org.apache.bigtop.manager.agent.grpc.service;
 
 import org.apache.bigtop.manager.common.constants.MessageConstants;
-import org.apache.bigtop.manager.common.utils.FileUtils;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.common.utils.ProjectPathUtils;
 import org.apache.bigtop.manager.grpc.generated.JobCacheReply;
 import org.apache.bigtop.manager.grpc.generated.JobCacheRequest;
 import org.apache.bigtop.manager.grpc.generated.JobCacheServiceGrpc;
+import org.apache.bigtop.manager.grpc.payload.JobCachePayload;
 
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
-import org.apache.bigtop.manager.grpc.payload.JobCachePayload;
-import org.apache.bigtop.manager.grpc.utils.ProtobufUtil;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.apache.bigtop.manager.common.constants.CacheFiles.CLUSTER_INFO;
-import static org.apache.bigtop.manager.common.constants.CacheFiles.COMPONENTS_INFO;
 import static org.apache.bigtop.manager.common.constants.CacheFiles.CONFIGURATIONS_INFO;
 import static org.apache.bigtop.manager.common.constants.CacheFiles.HOSTS_INFO;
 import static org.apache.bigtop.manager.common.constants.CacheFiles.REPOS_INFO;

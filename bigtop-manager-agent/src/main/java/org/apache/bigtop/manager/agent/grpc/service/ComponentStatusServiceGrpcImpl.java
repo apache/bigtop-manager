@@ -20,10 +20,10 @@ package org.apache.bigtop.manager.agent.grpc.service;
 
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.shell.ShellResult;
-import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
 import org.apache.bigtop.manager.grpc.generated.ComponentStatusReply;
 import org.apache.bigtop.manager.grpc.generated.ComponentStatusRequest;
 import org.apache.bigtop.manager.grpc.generated.ComponentStatusServiceGrpc;
+import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
 import org.apache.bigtop.manager.stack.core.executor.StackExecutor;
 
 import io.grpc.Status;

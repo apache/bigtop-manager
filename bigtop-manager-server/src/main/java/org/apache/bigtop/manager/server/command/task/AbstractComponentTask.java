@@ -18,17 +18,15 @@
  */
 package org.apache.bigtop.manager.server.command.task;
 
-import com.google.protobuf.ListValue;
-import com.google.protobuf.Value;
 import org.apache.bigtop.manager.common.constants.MessageConstants;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
+import org.apache.bigtop.manager.dao.repository.ComponentDao;
 import org.apache.bigtop.manager.grpc.generated.ComponentCommandReply;
 import org.apache.bigtop.manager.grpc.generated.ComponentCommandRequest;
 import org.apache.bigtop.manager.grpc.generated.ComponentCommandServiceGrpc;
+import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
 import org.apache.bigtop.manager.grpc.pojo.PackageInfo;
 import org.apache.bigtop.manager.grpc.pojo.PackageSpecificInfo;
-import org.apache.bigtop.manager.dao.repository.ComponentDao;
 import org.apache.bigtop.manager.server.grpc.GrpcClient;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 import org.apache.bigtop.manager.server.model.dto.PackageDTO;

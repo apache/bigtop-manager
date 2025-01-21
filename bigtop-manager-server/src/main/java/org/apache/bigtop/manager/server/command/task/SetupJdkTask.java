@@ -20,10 +20,6 @@ package org.apache.bigtop.manager.server.command.task;
 
 import org.apache.bigtop.manager.common.constants.MessageConstants;
 import org.apache.bigtop.manager.common.enums.Command;
-import org.apache.bigtop.manager.grpc.generated.CommandReply;
-import org.apache.bigtop.manager.grpc.generated.CommandRequest;
-import org.apache.bigtop.manager.grpc.generated.CommandServiceGrpc;
-import org.apache.bigtop.manager.grpc.generated.CommandType;
 import org.apache.bigtop.manager.grpc.generated.SetupJdkReply;
 import org.apache.bigtop.manager.grpc.generated.SetupJdkRequest;
 import org.apache.bigtop.manager.grpc.generated.SetupJdkServiceGrpc;
@@ -51,8 +47,8 @@ public class SetupJdkTask extends AbstractTask {
         builder.setTaskId(getTaskPO().getId());
         SetupJdkRequest request = builder.build();
 
-        SetupJdkServiceGrpc.SetupJdkServiceBlockingStub stub = GrpcClient.getBlockingStub(
-                hostname, grpcPort, SetupJdkServiceGrpc.SetupJdkServiceBlockingStub.class);
+        SetupJdkServiceGrpc.SetupJdkServiceBlockingStub stub =
+                GrpcClient.getBlockingStub(hostname, grpcPort, SetupJdkServiceGrpc.SetupJdkServiceBlockingStub.class);
         SetupJdkReply reply = stub.setup(request);
 
         return reply != null && reply.getCode() == MessageConstants.SUCCESS_CODE;

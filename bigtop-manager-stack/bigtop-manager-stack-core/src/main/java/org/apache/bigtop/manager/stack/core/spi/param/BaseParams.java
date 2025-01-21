@@ -18,12 +18,12 @@
  */
 package org.apache.bigtop.manager.stack.core.spi.param;
 
+import org.apache.bigtop.manager.common.utils.NetUtils;
+import org.apache.bigtop.manager.common.utils.os.OSDetection;
 import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
 import org.apache.bigtop.manager.grpc.pojo.PackageInfo;
 import org.apache.bigtop.manager.grpc.pojo.PackageSpecificInfo;
 import org.apache.bigtop.manager.grpc.pojo.RepoInfo;
-import org.apache.bigtop.manager.common.utils.NetUtils;
-import org.apache.bigtop.manager.common.utils.os.OSDetection;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
 import org.apache.bigtop.manager.stack.core.exception.StackException;
 import org.apache.bigtop.manager.stack.core.utils.LocalSettings;

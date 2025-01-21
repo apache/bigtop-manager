@@ -19,10 +19,10 @@
 package org.apache.bigtop.manager.stack.core.utils;
 
 import org.apache.bigtop.manager.common.constants.CacheFiles;
-import org.apache.bigtop.manager.grpc.pojo.ClusterInfo;
-import org.apache.bigtop.manager.grpc.pojo.RepoInfo;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.common.utils.ProjectPathUtils;
+import org.apache.bigtop.manager.grpc.pojo.ClusterInfo;
+import org.apache.bigtop.manager.grpc.pojo.RepoInfo;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.extern.slf4j.Slf4j;
