@@ -28,6 +28,7 @@
         </desc>
         <version>8.0.40</version>
         <user>mysql</user>
+        <license>GPLv2</license>
 
         <components>
             <component>

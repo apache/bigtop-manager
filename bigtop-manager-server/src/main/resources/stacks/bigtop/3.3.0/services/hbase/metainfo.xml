@@ -25,6 +25,7 @@
         <desc>Apache HBase is the Hadoop database, a distributed, scalable, big data store.</desc>
         <version>2.4.17-1</version>
         <user>hbase</user>
+        <license>Apache-2.0</license>
 
         <components>
             <component>

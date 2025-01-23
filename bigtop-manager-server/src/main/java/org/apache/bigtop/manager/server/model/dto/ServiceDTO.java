@@ -35,6 +35,8 @@ public class ServiceDTO {
 
     private String user;
 
+    private String license;
+
     private List<PackageSpecificDTO> packageSpecifics;
 
     private List<ComponentDTO> components;

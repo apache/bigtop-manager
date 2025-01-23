@@ -29,6 +29,7 @@
         </desc>
         <version>11.4.0</version>
         <user>grafana</user>
+        <license>AGPL-3.0</license>
 
         <components>
             <component>

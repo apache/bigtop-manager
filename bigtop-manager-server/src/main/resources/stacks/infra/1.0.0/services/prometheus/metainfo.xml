@@ -29,6 +29,7 @@
         </desc>
         <version>2.54.0</version>
         <user>prometheus</user>
+        <license>Apache-2.0</license>
 
         <components>
             <component>
