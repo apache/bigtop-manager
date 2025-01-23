@@ -42,6 +42,8 @@ public class HadoopClientScript extends AbstractClientScript {
 
     @Override
     public ShellResult configure(Params params) {
+        super.configure(params);
+
         return HadoopSetup.configure(params);
     }
 

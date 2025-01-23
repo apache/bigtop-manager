@@ -20,6 +20,7 @@ package org.apache.bigtop.manager.stack.core.spi.param;
 
 import org.apache.bigtop.manager.grpc.pojo.PackageInfo;
 import org.apache.bigtop.manager.grpc.pojo.RepoInfo;
+import org.apache.bigtop.manager.grpc.pojo.TemplateInfo;
 import org.apache.bigtop.manager.stack.core.spi.PrioritySPI;
 
 import java.util.List;
@@ -35,6 +36,8 @@ public interface Params extends PrioritySPI {
     RepoInfo repo();
 
     List<PackageInfo> packages();
+
+    List<TemplateInfo> templates();
 
     String javaHome();
 

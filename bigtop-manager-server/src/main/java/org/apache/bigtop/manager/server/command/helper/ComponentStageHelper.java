@@ -31,7 +31,6 @@ import org.apache.bigtop.manager.server.command.stage.StageContext;
 import org.apache.bigtop.manager.server.command.task.Task;
 import org.apache.bigtop.manager.server.exception.ServerException;
 import org.apache.bigtop.manager.server.model.dto.CommandDTO;
-import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.utils.StackUtils;
 
@@ -121,11 +120,10 @@ public class ComponentStageHelper {
         StageContext stageContext = StageContext.fromCommandDTO(commandDTO);
 
         ServiceDTO serviceDTO = StackUtils.getServiceDTOByComponentName(componentName);
-        ComponentDTO componentDTO = StackUtils.getComponentDTO(componentName);
 
         stageContext.setHostnames(hostnames);
-        stageContext.setServiceDTO(serviceDTO);
-        stageContext.setComponentDTO(componentDTO);
+        stageContext.setServiceName(serviceDTO.getName());
+        stageContext.setComponentName(componentName);
 
         return stageContext;
     }

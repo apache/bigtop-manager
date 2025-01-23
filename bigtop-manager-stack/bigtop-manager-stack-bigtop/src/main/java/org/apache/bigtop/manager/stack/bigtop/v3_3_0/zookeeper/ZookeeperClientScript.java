@@ -42,6 +42,8 @@ public class ZookeeperClientScript extends AbstractClientScript {
 
     @Override
     public ShellResult configure(Params params) {
+        super.configure(params);
+
         return ZookeeperSetup.configure(params);
     }
 

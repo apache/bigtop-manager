@@ -24,6 +24,7 @@ import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
 import org.apache.bigtop.manager.grpc.pojo.PackageInfo;
 import org.apache.bigtop.manager.grpc.pojo.PackageSpecificInfo;
 import org.apache.bigtop.manager.grpc.pojo.RepoInfo;
+import org.apache.bigtop.manager.grpc.pojo.TemplateInfo;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
 import org.apache.bigtop.manager.stack.core.exception.StackException;
 import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
@@ -114,6 +115,11 @@ public abstract class BaseParams implements Params {
         }
 
         return packageInfoList;
+    }
+
+    @Override
+    public List<TemplateInfo> templates() {
+        return this.payload.getTemplates();
     }
 
     @Override

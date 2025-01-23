@@ -42,6 +42,8 @@ public class FlinkClientScript extends AbstractClientScript {
 
     @Override
     public ShellResult configure(Params params) {
+        super.configure(params);
+
         return FlinkSetup.configure(params);
     }
 

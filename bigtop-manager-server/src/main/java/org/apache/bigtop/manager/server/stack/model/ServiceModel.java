@@ -50,6 +50,10 @@ public class ServiceModel {
     @XmlElements(@XmlElement(name = "component"))
     private List<ComponentModel> components;
 
+    @XmlElementWrapper(name = "templates")
+    @XmlElements(@XmlElement(name = "template"))
+    private List<TemplateModel> templates;
+
     @XmlElementWrapper(name = "required-services")
     @XmlElements(@XmlElement(name = "service"))
     private List<String> requiredServices;

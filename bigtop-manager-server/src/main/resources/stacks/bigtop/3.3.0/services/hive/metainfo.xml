@@ -68,6 +68,13 @@
             </package-specific>
         </package-specifics>
 
+        <templates>
+            <template>
+                <src>hive-service.sh</src>
+                <dest>bin</dest>
+            </template>
+        </templates>
+
         <required-services>
             <service>mysql</service>
             <service>hadoop</service>

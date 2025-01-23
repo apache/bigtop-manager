@@ -42,6 +42,8 @@ public class HiveClientScript extends AbstractClientScript {
 
     @Override
     public ShellResult configure(Params params) {
+        super.configure(params);
+
         return HiveSetup.configure(params);
     }
 

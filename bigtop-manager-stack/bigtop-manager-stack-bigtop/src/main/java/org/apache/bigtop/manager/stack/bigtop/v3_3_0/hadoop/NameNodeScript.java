@@ -45,6 +45,8 @@ public class NameNodeScript extends AbstractServerScript {
 
     @Override
     public ShellResult configure(Params params) {
+        super.configure(params);
+
         return HadoopSetup.configure(params, getComponentName());
     }
 

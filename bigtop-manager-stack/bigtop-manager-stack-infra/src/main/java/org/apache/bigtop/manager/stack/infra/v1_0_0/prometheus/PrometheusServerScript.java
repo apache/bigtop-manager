@@ -43,6 +43,8 @@ public class PrometheusServerScript extends AbstractServerScript {
 
     @Override
     public ShellResult configure(Params params) {
+        super.configure(params);
+
         return PrometheusSetup.config(params);
     }
 

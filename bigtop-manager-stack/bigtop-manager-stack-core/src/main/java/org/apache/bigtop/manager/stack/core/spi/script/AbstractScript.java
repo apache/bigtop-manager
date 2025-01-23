@@ -22,6 +22,9 @@ import org.apache.bigtop.manager.common.constants.Constants;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.grpc.pojo.PackageInfo;
 import org.apache.bigtop.manager.grpc.pojo.RepoInfo;
+import org.apache.bigtop.manager.grpc.pojo.TemplateInfo;
+import org.apache.bigtop.manager.stack.core.enums.ConfigType;
+import org.apache.bigtop.manager.stack.core.spi.param.BaseParams;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.utils.TarballUtils;
 import org.apache.bigtop.manager.stack.core.utils.linux.LinuxFileUtils;
@@ -34,6 +37,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Properties;
+
+import static org.apache.bigtop.manager.common.constants.Constants.PERMISSION_755;
 
 @Slf4j
 public abstract class AbstractScript implements Script {
@@ -63,6 +68,26 @@ public abstract class AbstractScript implements Script {
             // Dir already created by TarballUtils, this changes the owner and permission for the service home
             LinuxFileUtils.createDirectories(
                     serviceHome, params.user(), params.group(), Constants.PERMISSION_755, true);
+        }
+
+        return ShellResult.success();
+    }
+
+    @Override
+    public ShellResult configure(Params params) {
+        List<TemplateInfo> templates = params.templates();
+        for (TemplateInfo template : templates) {
+            String dir = params.serviceHome() + "/" + template.getDest();
+            String filename = dir + "/" + template.getSrc();
+            LinuxFileUtils.createDirectories(dir, params.user(), params.group(), PERMISSION_755, true);
+            LinuxFileUtils.toFile(
+                    ConfigType.CONTENT,
+                    filename,
+                    params.user(),
+                    params.group(),
+                    Constants.PERMISSION_755,
+                    template.getContent(),
+                    ((BaseParams) params).getGlobalParamsMap());
         }
 
         return ShellResult.success();

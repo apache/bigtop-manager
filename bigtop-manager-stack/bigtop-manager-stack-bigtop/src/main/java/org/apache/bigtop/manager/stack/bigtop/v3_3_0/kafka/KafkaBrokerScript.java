@@ -46,6 +46,8 @@ public class KafkaBrokerScript extends AbstractServerScript {
 
     @Override
     public ShellResult configure(Params params) {
+        super.configure(params);
+
         return KafkaSetup.configure(params);
     }
 
