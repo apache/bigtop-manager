@@ -25,6 +25,7 @@
         <desc>Apache Hadoop Distributed File System.</desc>
         <version>3.3.6-1</version>
         <user>hadoop</user>
+        <license>Apache-2.0</license>
 
         <components>
             <!-- HDFS Components -->

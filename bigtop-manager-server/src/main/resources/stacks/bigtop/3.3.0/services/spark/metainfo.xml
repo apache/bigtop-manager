@@ -27,6 +27,7 @@
         </desc>
         <version>3.3.4-1</version>
         <user>spark</user>
+        <license>Apache-2.0</license>
 
         <components>
             <component>

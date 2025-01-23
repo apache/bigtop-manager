@@ -25,6 +25,7 @@
         <desc>Tez is the next generation Hadoop Query Processing framework written on top of YARN.</desc>
         <version>0.10.2-1</version>
         <user>tez</user>
+        <license>Apache-2.0</license>
 
         <components>
             <component>

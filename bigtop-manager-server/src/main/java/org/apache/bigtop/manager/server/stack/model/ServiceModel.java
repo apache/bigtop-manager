@@ -42,6 +42,8 @@ public class ServiceModel {
 
     private String user;
 
+    private String license;
+
     @XmlElementWrapper(name = "package-specifics")
     @XmlElements(@XmlElement(name = "package-specific"))
     private List<PackageSpecificModel> packageSpecifics;
