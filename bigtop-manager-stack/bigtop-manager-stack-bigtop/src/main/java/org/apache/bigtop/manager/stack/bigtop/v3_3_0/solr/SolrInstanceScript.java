@@ -47,6 +47,8 @@ public class SolrInstanceScript extends AbstractServerScript {
 
     @Override
     public ShellResult configure(Params params) {
+        super.configure(params);
+
         return SolrSetup.configure(params);
     }
 

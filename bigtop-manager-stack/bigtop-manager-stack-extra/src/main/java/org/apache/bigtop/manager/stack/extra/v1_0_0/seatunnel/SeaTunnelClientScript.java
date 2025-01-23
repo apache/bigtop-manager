@@ -42,6 +42,8 @@ public class SeaTunnelClientScript extends AbstractClientScript {
 
     @Override
     public ShellResult configure(Params params) {
+        super.configure(params);
+
         return SeaTunnelSetup.config(params);
     }
 

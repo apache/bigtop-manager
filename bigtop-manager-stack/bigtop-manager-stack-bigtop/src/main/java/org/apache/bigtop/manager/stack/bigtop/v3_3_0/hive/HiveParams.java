@@ -52,9 +52,6 @@ public class HiveParams extends BigtopParams {
     private String llapCliLog4j2Content;
     private String llapDaemonLog4j2Content;
 
-    private final String hiveShellContent =
-            "dir=$(dirname $0)\n$dir/hive --service $1 > /dev/null 2>&1 &\necho $! > $2";
-
     public HiveParams(ComponentCommandPayload componentCommandPayload) {
         super(componentCommandPayload);
         globalParamsMap.put("java_home", javaHome());

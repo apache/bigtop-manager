@@ -48,6 +48,8 @@ public class SeaTunnelWorkerScript extends AbstractServerScript {
 
     @Override
     public ShellResult configure(Params params) {
+        super.configure(params);
+
         return SeaTunnelSetup.config(params);
     }
 

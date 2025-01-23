@@ -46,6 +46,8 @@ public class SparkHistoryServerScript extends AbstractServerScript {
 
     @Override
     public ShellResult configure(Params params) {
+        super.configure(params);
+
         return SparkSetup.configure(params);
     }
 

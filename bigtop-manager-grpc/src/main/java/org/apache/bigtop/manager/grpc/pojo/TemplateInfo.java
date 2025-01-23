@@ -16,26 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.command.stage;
+package org.apache.bigtop.manager.grpc.pojo;
 
-import org.apache.bigtop.manager.server.command.task.ComponentInitTask;
-import org.apache.bigtop.manager.server.command.task.Task;
-import org.apache.bigtop.manager.server.utils.StackUtils;
+import lombok.Data;
 
-public class ComponentInitStage extends AbstractComponentStage {
+@Data
+public class TemplateInfo {
 
-    public ComponentInitStage(StageContext stageContext) {
-        super(stageContext);
-    }
+    private String src;
 
-    @Override
-    protected Task createTask(String hostname) {
-        return new ComponentInitTask(createTaskContext(hostname));
-    }
+    private String dest;
 
-    @Override
-    public String getName() {
-        return "Init "
-                + StackUtils.getComponentDTO(stageContext.getComponentName()).getDisplayName();
-    }
+    private String content;
 }

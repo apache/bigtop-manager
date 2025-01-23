@@ -21,6 +21,7 @@ package org.apache.bigtop.manager.server.utils;
 import org.apache.bigtop.manager.common.constants.ComponentCategories;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.utils.CaseUtils;
+import org.apache.bigtop.manager.common.utils.FileUtils;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.common.utils.ProjectPathUtils;
 import org.apache.bigtop.manager.server.exception.ApiException;
@@ -63,11 +64,15 @@ public class StackUtils {
 
     private static final String CONFIGURATION_FOLDER = "configuration";
 
+    private static final String TEMPLATE_FOLDER = "template";
+
     private static final String CONFIGURATION_FILE_EXTENSION = "xml";
 
     private static final String DEPENDENCY_FILE_NAME = "order.json";
 
     public static final Map<String, List<ServiceConfigDTO>> SERVICE_CONFIG_MAP = new HashMap<>();
+
+    public static final Map<String, Map<String, String>> SERVICE_TEMPLATE_MAP = new HashMap<>();
 
     public static final Map<StackDTO, List<ServiceDTO>> STACK_SERVICE_MAP = new HashMap<>();
 
@@ -110,6 +115,7 @@ public class StackUtils {
                 services.add(serviceDTO);
 
                 parseServiceConfigurations(file, serviceDTO.getName());
+                parseServiceTemplates(file, serviceDTO.getName());
 
                 parseDag(file);
             }
@@ -149,6 +155,19 @@ public class StackUtils {
         }
 
         SERVICE_CONFIG_MAP.put(serviceName, configs);
+    }
+
+    private static void parseServiceTemplates(File file, String serviceName) {
+        File templateFolder = new File(file.getAbsolutePath(), TEMPLATE_FOLDER);
+        if (templateFolder.exists()) {
+            for (File templateFile :
+                    Optional.ofNullable(templateFolder.listFiles()).orElse(new File[0])) {
+                String filename = templateFile.getName();
+                String content = FileUtils.readFile2Str(templateFile);
+                Map<String, String> map = SERVICE_TEMPLATE_MAP.computeIfAbsent(serviceName, k -> new HashMap<>());
+                map.put(filename, content);
+            }
+        }
     }
 
     private static void parseDag(File file) {

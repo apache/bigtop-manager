@@ -20,6 +20,7 @@ package org.apache.bigtop.manager.server.command.stage;
 
 import org.apache.bigtop.manager.server.command.task.ComponentStopTask;
 import org.apache.bigtop.manager.server.command.task.Task;
+import org.apache.bigtop.manager.server.utils.StackUtils;
 
 public class ComponentStopStage extends AbstractComponentStage {
 
@@ -34,6 +35,7 @@ public class ComponentStopStage extends AbstractComponentStage {
 
     @Override
     public String getName() {
-        return "Stop " + stageContext.getComponentDTO().getDisplayName();
+        return "Stop "
+                + StackUtils.getComponentDTO(stageContext.getComponentName()).getDisplayName();
     }
 }

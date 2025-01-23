@@ -25,6 +25,7 @@ import org.apache.bigtop.manager.server.command.task.TaskContext;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
+import org.apache.bigtop.manager.server.utils.StackUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,17 +56,17 @@ public abstract class AbstractComponentStage extends AbstractStage {
 
     @Override
     protected String getServiceName() {
-        return stageContext.getServiceDTO().getName();
+        return stageContext.getServiceName();
     }
 
     @Override
     protected String getComponentName() {
-        return stageContext.getComponentDTO().getName();
+        return stageContext.getComponentName();
     }
 
     protected TaskContext createTaskContext(String hostname) {
-        ServiceDTO serviceDTO = stageContext.getServiceDTO();
-        ComponentDTO componentDTO = stageContext.getComponentDTO();
+        ServiceDTO serviceDTO = StackUtils.getServiceDTO(stageContext.getServiceName());
+        ComponentDTO componentDTO = StackUtils.getComponentDTO(stageContext.getComponentName());
 
         TaskContext taskContext = new TaskContext();
         taskContext.setHostname(hostname);
@@ -79,7 +80,6 @@ public abstract class AbstractComponentStage extends AbstractStage {
         taskContext.setRootDir(clusterPO.getRootDir());
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put("packageSpecifics", serviceDTO.getPackageSpecifics());
         properties.put("clusterHosts", getClusterHosts());
         taskContext.setProperties(properties);
         return taskContext;

@@ -45,6 +45,8 @@ public class GrafanaServerScript extends AbstractServerScript {
 
     @Override
     public ShellResult configure(Params params) {
+        super.configure(params);
+
         return GrafanaSetup.config(params);
     }
 

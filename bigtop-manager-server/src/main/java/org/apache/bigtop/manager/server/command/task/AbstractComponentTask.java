@@ -27,11 +27,14 @@ import org.apache.bigtop.manager.grpc.generated.ComponentCommandServiceGrpc;
 import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
 import org.apache.bigtop.manager.grpc.pojo.PackageInfo;
 import org.apache.bigtop.manager.grpc.pojo.PackageSpecificInfo;
+import org.apache.bigtop.manager.grpc.pojo.TemplateInfo;
 import org.apache.bigtop.manager.server.grpc.GrpcClient;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 import org.apache.bigtop.manager.server.model.dto.PackageDTO;
 import org.apache.bigtop.manager.server.model.dto.PackageSpecificDTO;
+import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.model.dto.StackDTO;
+import org.apache.bigtop.manager.server.model.dto.TemplateDTO;
 import org.apache.bigtop.manager.server.utils.StackUtils;
 
 import java.util.ArrayList;
@@ -66,6 +69,8 @@ public abstract class AbstractComponentTask extends AbstractTask {
     @SuppressWarnings("unchecked")
     protected ComponentCommandRequest getComponentCommandRequest() {
         StackDTO stackDTO = StackUtils.getServiceStack(taskContext.getServiceName());
+        ServiceDTO serviceDTO = StackUtils.getServiceDTO(taskContext.getServiceName());
+
         ComponentCommandPayload payload = new ComponentCommandPayload();
         payload.setServiceName(taskContext.getServiceName());
         payload.setComponentName(taskContext.getComponentName());
@@ -75,10 +80,10 @@ public abstract class AbstractComponentTask extends AbstractTask {
         payload.setCommand(getCommand().getCode());
         payload.setCustomCommand(getCustomCommand());
 
-        Map<String, Object> properties = taskContext.getProperties();
+        payload.setTemplates(convertTemplateInfo(serviceDTO.getName(), serviceDTO.getTemplates()));
+        payload.setPackageSpecifics(convertPackageSpecificInfo(serviceDTO.getPackageSpecifics()));
 
-        payload.setPackageSpecifics(
-                convertPackageSpecificInfo((List<PackageSpecificDTO>) properties.get("packageSpecifics")));
+        Map<String, Object> properties = taskContext.getProperties();
         if (stackDTO.getStackName().equals("infra")) {
             Map<String, List<String>> clusterHosts = (Map<String, List<String>>) properties.get("clusterHosts");
             payload.setClusterHosts(clusterHosts);
@@ -89,6 +94,25 @@ public abstract class AbstractComponentTask extends AbstractTask {
         requestBuilder.setTaskId(getTaskPO().getId());
 
         return requestBuilder.build();
+    }
+
+    private List<TemplateInfo> convertTemplateInfo(String serviceName, List<TemplateDTO> templateDTOList) {
+        if (templateDTOList == null) {
+            return new ArrayList<>();
+        }
+
+        List<TemplateInfo> templateInfos = new ArrayList<>();
+        for (TemplateDTO templateDTO : templateDTOList) {
+            String content = StackUtils.SERVICE_TEMPLATE_MAP.get(serviceName).get(templateDTO.getSrc());
+
+            TemplateInfo templateInfo = new TemplateInfo();
+            templateInfo.setSrc(templateDTO.getSrc());
+            templateInfo.setDest(templateDTO.getDest());
+            templateInfo.setContent(content);
+            templateInfos.add(templateInfo);
+        }
+
+        return templateInfos;
     }
 
     private List<PackageSpecificInfo> convertPackageSpecificInfo(List<PackageSpecificDTO> packageSpecificDTOList) {

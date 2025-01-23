@@ -19,6 +19,7 @@
 package org.apache.bigtop.manager.grpc.payload;
 
 import org.apache.bigtop.manager.grpc.pojo.PackageSpecificInfo;
+import org.apache.bigtop.manager.grpc.pojo.TemplateInfo;
 
 import lombok.Data;
 
@@ -43,6 +44,8 @@ public class ComponentCommandPayload {
     private String componentName;
 
     private List<PackageSpecificInfo> packageSpecifics;
+
+    private List<TemplateInfo> templates;
 
     /**
      * This field is exclusively used for Prometheus and Grafana within the infra services.

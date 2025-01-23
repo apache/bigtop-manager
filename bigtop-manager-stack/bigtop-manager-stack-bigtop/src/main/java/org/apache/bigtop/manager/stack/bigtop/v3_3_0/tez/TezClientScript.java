@@ -60,6 +60,8 @@ public class TezClientScript extends AbstractClientScript {
 
     @Override
     public ShellResult configure(Params params) {
+        super.configure(params);
+
         return TezSetup.configure(params);
     }
 

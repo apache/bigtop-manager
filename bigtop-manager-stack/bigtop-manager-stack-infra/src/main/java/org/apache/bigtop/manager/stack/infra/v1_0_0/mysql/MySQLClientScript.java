@@ -42,6 +42,8 @@ public class MySQLClientScript extends AbstractClientScript {
 
     @Override
     public ShellResult configure(Params params) {
+        super.configure(params);
+
         return MySQLSetup.configure(params);
     }
 

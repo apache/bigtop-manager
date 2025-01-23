@@ -37,6 +37,8 @@ public class ServiceDTO {
 
     private List<PackageSpecificDTO> packageSpecifics;
 
+    private List<TemplateDTO> templates;
+
     private List<ComponentDTO> components;
 
     private List<ServiceConfigDTO> configs;

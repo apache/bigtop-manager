@@ -46,6 +46,8 @@ public class HMasterScript extends AbstractServerScript {
 
     @Override
     public ShellResult configure(Params params) {
+        super.configure(params);
+
         return HBaseSetup.configure(params);
     }
 
