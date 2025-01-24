@@ -137,7 +137,10 @@ class JsonUtilsTest {
 
         String jsonString = JsonUtils.indentWriteAsString(testData);
         assertNotNull(jsonString);
-        assertEquals("{\r\n  \"name\" : \"test\",\r\n  \"value\" : 123\r\n}", jsonString);
+        String linedSeparator = System.lineSeparator();
+        String expectedJsonString = "{\n  \"name\" : \"test\",\n  \"value\" : 123\n}".replace("\n", linedSeparator);
+
+        assertEquals(expectedJsonString, jsonString);
     }
 
     // Test edge case: object is null
