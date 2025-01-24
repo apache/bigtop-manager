@@ -26,7 +26,6 @@
 apiVersion: 1
 
 datasources:
-<#if prometheus_url??>
   - name: prometheus
     type: prometheus
     access: proxy
@@ -34,7 +33,6 @@ datasources:
     isDefault: true
     editable: true
     uid: uid4prometheus
-</#if>
 ]]>
         </value>
         <attrs>
