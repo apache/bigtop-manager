@@ -21,7 +21,9 @@ package org.apache.bigtop.manager.common.utils;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -41,13 +43,20 @@ public class DateUtilsTest {
 
     @Test
     public void testFormatDate() {
-        Date date = new Date(1672545600000L); // 2023-01-01 12:00:00
+        Date date = new Date(1672545600000L);
+        TimeZone systemTimeZone = TimeZone.getDefault();
 
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        sdf.setTimeZone(systemTimeZone);
+        String expectedFormatted = sdf.format(date);
         String formatted = DateUtils.format(date);
-        assertEquals("2023-01-01 12:00:00", formatted);
+        assertEquals(expectedFormatted, formatted);
 
+        SimpleDateFormat sdfSystem = new SimpleDateFormat("yyyy-MM-dd");
+        sdfSystem.setTimeZone(systemTimeZone);
+        String expectedCustomFormatted = sdfSystem.format(date);
         String customFormatted = DateUtils.format(date, "yyyy-MM-dd");
-        assertEquals("2023-01-01", customFormatted);
+        assertEquals(expectedCustomFormatted, customFormatted);
     }
 
     @Test
