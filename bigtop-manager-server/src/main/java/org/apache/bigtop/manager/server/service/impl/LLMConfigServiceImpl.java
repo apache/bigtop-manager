@@ -303,7 +303,7 @@ public class LLMConfigServiceImpl implements LLMConfigService {
 
     private Boolean testAuthorization(String platformName, String model, Map<String, String> credentials) {
         Boolean result = testFuncCalling(platformName, model, credentials);
-        log.info("Test func calling result: {}", result);
+        log.info("   result: {}", result);
         GeneralAssistantConfig generalAssistantConfig = getAIAssistantConfig(platformName, model, credentials);
         AIAssistant aiAssistant = aiAssistantFactory.createForTest(generalAssistantConfig, null);
         try {
@@ -339,7 +339,8 @@ public class LLMConfigServiceImpl implements LLMConfigService {
         try {
             return aiAssistant.ask("What is the flag of " + TEST_KEY).contains(TEST_FLAG);
         } catch (Exception e) {
-            throw new ApiException(ApiExceptionEnum.CREDIT_INCORRECT, e.getMessage());
+            log.error("Test function calling failed", e);
+            return false;
         }
     }
 

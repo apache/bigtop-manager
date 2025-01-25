@@ -23,48 +23,22 @@
         <groupId>org.apache.bigtop</groupId>
         <artifactId>bigtop-manager-ai</artifactId>
         <version>${revision}</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>bigtop-manager-ai-assistant</artifactId>
+    <artifactId>bigtop-manager-ai-deepseek</artifactId>
     <name>${project.artifactId}</name>
-    <description>Bigtop Manager AI Assistant</description>
+    <description>Bigtop Manager AI DeepSeek</description>
 
     <dependencies>
         <dependency>
             <groupId>org.apache.bigtop</groupId>
-            <artifactId>bigtop-manager-ai-openai</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.bigtop</groupId>
             <artifactId>bigtop-manager-ai-core</artifactId>
+            <version>${revision}</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.bigtop</groupId>
-            <artifactId>bigtop-manager-ai-dashscope</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-simple</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.bigtop</groupId>
-            <artifactId>bigtop-manager-ai-qianfan</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.bigtop</groupId>
-            <artifactId>bigtop-manager-ai-deepseek</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.bigtop</groupId>
-            <artifactId>bigtop-manager-dao</artifactId>
-        </dependency>
+
         <dependency>
             <groupId>dev.langchain4j</groupId>
-            <artifactId>langchain4j-reactor</artifactId>
+            <artifactId>langchain4j-open-ai</artifactId>
         </dependency>
     </dependencies>
-
 </project>
