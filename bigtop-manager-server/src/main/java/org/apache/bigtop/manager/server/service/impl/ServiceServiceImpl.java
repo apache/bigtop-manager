@@ -44,9 +44,9 @@ import org.apache.bigtop.manager.server.model.vo.ServiceConfigVO;
 import org.apache.bigtop.manager.server.model.vo.ServiceVO;
 import org.apache.bigtop.manager.server.service.ServiceService;
 import org.apache.bigtop.manager.server.utils.PageUtils;
-
 import org.apache.bigtop.manager.server.utils.StackConfigUtils;
 import org.apache.bigtop.manager.server.utils.StackUtils;
+
 import org.apache.commons.collections4.CollectionUtils;
 
 import org.springframework.stereotype.Service;
@@ -57,7 +57,6 @@ import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 
 import jakarta.annotation.Resource;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

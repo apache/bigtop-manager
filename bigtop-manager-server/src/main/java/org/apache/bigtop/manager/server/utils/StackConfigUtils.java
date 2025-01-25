@@ -18,8 +18,6 @@
  */
 package org.apache.bigtop.manager.server.utils;
 
-import dev.langchain4j.agent.tool.P;
-import org.apache.bigtop.manager.dao.repository.ServiceConfigDao;
 import org.apache.bigtop.manager.server.model.dto.AttrsDTO;
 import org.apache.bigtop.manager.server.model.dto.PropertyDTO;
 import org.apache.bigtop.manager.server.model.dto.ServiceConfigDTO;
@@ -30,6 +28,7 @@ import org.apache.bigtop.manager.server.stack.xml.ConfigurationXml;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+
 import org.springframework.beans.BeanUtils;
 
 import java.util.ArrayList;
@@ -74,7 +73,8 @@ public class StackConfigUtils {
         return propertyDTO;
     }
 
-    public static List<ServiceConfigDTO> mergeServiceConfigs(List<ServiceConfigDTO> oriConfigs, List<ServiceConfigDTO> overrideConfigs) {
+    public static List<ServiceConfigDTO> mergeServiceConfigs(
+            List<ServiceConfigDTO> oriConfigs, List<ServiceConfigDTO> overrideConfigs) {
         // To avoid to change the original configs, we use cloned object
         List<ServiceConfigDTO> mergedConfigs = new ArrayList<>();
         for (ServiceConfigDTO oriConfig : oriConfigs) {
@@ -85,6 +85,15 @@ public class StackConfigUtils {
 
         if (CollectionUtils.isEmpty(overrideConfigs)) {
             return mergedConfigs;
+        }
+
+        // Assign id for each service config
+        for (ServiceConfigDTO config : mergedConfigs) {
+            config.setId(overrideConfigs.stream()
+                    .filter(x -> x.getName().equals(config.getName()))
+                    .findFirst()
+                    .map(ServiceConfigDTO::getId)
+                    .orElse(null));
         }
 
         Map<String, Map<String, String>> overrideConfigsMap = serviceConfig2Map(overrideConfigs);
@@ -104,7 +113,7 @@ public class StackConfigUtils {
                 }
             }
 
-            // We still have some properties, maybe added by user manually
+            // We may still have some properties added by user manually
             if (MapUtils.isNotEmpty(overridePropertiesMap)) {
                 for (Map.Entry<String, String> entry : overridePropertiesMap.entrySet()) {
                     PropertyDTO property = new PropertyDTO();
