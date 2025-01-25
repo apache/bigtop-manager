@@ -50,9 +50,7 @@ public class TaskInterceptor implements ServerInterceptor {
                 if (isTaskRequest(message)) {
                     try {
                         Method method = message.getClass().getDeclaredMethod("getTaskId");
-                        method.setAccessible(true);
                         Long taskId = (Long) method.invoke(message);
-                        method.setAccessible(false);
                         truncateLogFile(taskId);
                         MDC.put("taskId", String.valueOf(taskId));
                         Caches.RUNNING_TASK = taskId;

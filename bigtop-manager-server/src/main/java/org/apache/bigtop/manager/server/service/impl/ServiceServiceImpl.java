@@ -34,6 +34,7 @@ import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.model.converter.ServiceConfigConverter;
 import org.apache.bigtop.manager.server.model.converter.ServiceConfigSnapshotConverter;
 import org.apache.bigtop.manager.server.model.converter.ServiceConverter;
+import org.apache.bigtop.manager.server.model.dto.ServiceConfigDTO;
 import org.apache.bigtop.manager.server.model.query.PageQuery;
 import org.apache.bigtop.manager.server.model.req.ServiceConfigReq;
 import org.apache.bigtop.manager.server.model.req.ServiceConfigSnapshotReq;
@@ -44,6 +45,8 @@ import org.apache.bigtop.manager.server.model.vo.ServiceVO;
 import org.apache.bigtop.manager.server.service.ServiceService;
 import org.apache.bigtop.manager.server.utils.PageUtils;
 
+import org.apache.bigtop.manager.server.utils.StackConfigUtils;
+import org.apache.bigtop.manager.server.utils.StackUtils;
 import org.apache.commons.collections4.CollectionUtils;
 
 import org.springframework.stereotype.Service;
@@ -116,15 +119,26 @@ public class ServiceServiceImpl implements ServiceService {
 
     @Override
     public List<ServiceConfigVO> updateConf(Long clusterId, Long serviceId, List<ServiceConfigReq> reqs) {
-        List<ServiceConfigPO> list = new ArrayList<>();
-        for (ServiceConfigReq req : reqs) {
-            ServiceConfigPO serviceConfigPO = new ServiceConfigPO();
-            serviceConfigPO.setId(req.getId());
-            serviceConfigPO.setPropertiesJson(JsonUtils.writeAsString(req.getProperties()));
-            list.add(serviceConfigPO);
-        }
+        ServicePO servicePO = serviceDao.findById(serviceId);
+        List<ServiceConfigPO> configs = serviceConfigDao.findByServiceId(serviceId);
 
-        serviceConfigDao.partialUpdateByIds(list);
+        List<ServiceConfigDTO> oriConfigs;
+        List<ServiceConfigDTO> newConfigs;
+        List<ServiceConfigDTO> mergedConfigs;
+
+        // Merge stack config with existing config first, in case new property has been added to stack config.
+        oriConfigs = StackUtils.SERVICE_CONFIG_MAP.get(servicePO.getName());
+        newConfigs = ServiceConfigConverter.INSTANCE.fromPO2DTO(configs);
+        mergedConfigs = StackConfigUtils.mergeServiceConfigs(oriConfigs, newConfigs);
+
+        // Merge existing config with new config in request object
+        oriConfigs = mergedConfigs;
+        newConfigs = ServiceConfigConverter.INSTANCE.fromReq2DTO(reqs);
+        mergedConfigs = StackConfigUtils.mergeServiceConfigs(oriConfigs, newConfigs);
+
+        // Save merged config
+        List<ServiceConfigPO> serviceConfigPOList = ServiceConfigConverter.INSTANCE.fromDTO2PO(mergedConfigs);
+        serviceConfigDao.partialUpdateByIds(serviceConfigPOList);
         return listConf(clusterId, serviceId);
     }
 
