@@ -31,10 +31,11 @@ public class PlatformTypeTest {
     @Test
     public void testGetPlatforms() {
         List<String> senders = PlatformType.getPlatforms();
-        assertEquals(3, senders.size());
+        assertEquals(4, senders.size());
         assertTrue(senders.contains("openai"));
         assertTrue(senders.contains("dashscope"));
         assertTrue(senders.contains("qianfan"));
+        assertTrue(senders.contains("deepseek"));
     }
 
     @Test
@@ -42,6 +43,7 @@ public class PlatformTypeTest {
         assertEquals(PlatformType.OPENAI, PlatformType.getPlatformType("openai"));
         assertEquals(PlatformType.DASH_SCOPE, PlatformType.getPlatformType("dashscope"));
         assertEquals(PlatformType.QIANFAN, PlatformType.getPlatformType("qianfan"));
+        assertEquals(PlatformType.DEEPSEEK, PlatformType.getPlatformType("deepseek"));
         assertNull(PlatformType.getPlatformType(""));
         assertNull(PlatformType.getPlatformType(null));
         assertNull(PlatformType.getPlatformType("unknown"));
