@@ -38,6 +38,7 @@ import org.apache.bigtop.manager.server.model.dto.ServiceConfigDTO;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.model.dto.StackDTO;
 import org.apache.bigtop.manager.server.model.dto.command.ServiceCommandDTO;
+import org.apache.bigtop.manager.server.utils.StackConfigUtils;
 import org.apache.bigtop.manager.server.utils.StackUtils;
 
 import java.util.ArrayList;
@@ -169,8 +170,10 @@ public class ServiceAddJob extends AbstractServiceJob {
 
         // Persist current configs
         Map<String, String> confMap = new HashMap<>();
-        List<ServiceConfigDTO> configs = serviceCommand.getConfigs();
-        List<ServiceConfigPO> serviceConfigPOList = ServiceConfigConverter.INSTANCE.fromDTO2PO(configs);
+        List<ServiceConfigDTO> oriConfigs = StackUtils.SERVICE_CONFIG_MAP.get(serviceName);
+        List<ServiceConfigDTO> newConfigs = serviceCommand.getConfigs();
+        List<ServiceConfigDTO> mergedConfigs = StackConfigUtils.mergeServiceConfigs(oriConfigs, newConfigs);
+        List<ServiceConfigPO> serviceConfigPOList = ServiceConfigConverter.INSTANCE.fromDTO2PO(mergedConfigs);
         for (ServiceConfigPO serviceConfigPO : serviceConfigPOList) {
             serviceConfigPO.setClusterId(clusterId);
             serviceConfigPO.setServiceId(servicePO.getId());
