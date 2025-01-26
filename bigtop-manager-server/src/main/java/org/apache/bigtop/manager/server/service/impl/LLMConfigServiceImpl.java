@@ -339,7 +339,8 @@ public class LLMConfigServiceImpl implements LLMConfigService {
         try {
             return aiAssistant.ask("What is the flag of " + TEST_KEY).contains(TEST_FLAG);
         } catch (Exception e) {
-            throw new ApiException(ApiExceptionEnum.CREDIT_INCORRECT, e.getMessage());
+            log.error("Test function calling failed", e);
+            return false;
         }
     }
 
