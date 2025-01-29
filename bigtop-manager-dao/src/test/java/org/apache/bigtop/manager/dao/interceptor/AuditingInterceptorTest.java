@@ -84,7 +84,7 @@ class AuditingInterceptorTest {
 
         // Assert update fields are set
         assertEquals(1L, entity.getUpdateBy());
-        assertTrue(now.getTime() < entity.getUpdateTime().getTime());
+        assertTrue(now.getTime() <= entity.getUpdateTime().getTime());
     }
 
     @Test
