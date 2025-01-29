@@ -74,7 +74,7 @@ public class ProjectPathUtils {
         }
     }
 
-    private static String getProjectStoreDir() {
+    protected static String getProjectStoreDir() {
         String path = SystemUtils.getUserHome().getPath() + File.separator + ".bigtop-manager";
         Path p = Paths.get(path);
         if (!Files.exists(p)) {
