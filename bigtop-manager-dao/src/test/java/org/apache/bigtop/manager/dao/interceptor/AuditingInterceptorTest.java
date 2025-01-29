@@ -71,6 +71,7 @@ class AuditingInterceptorTest {
 
     @Test
     void testInterceptWithUpdateCommand() throws Throwable {
+        Timestamp now = new Timestamp(System.currentTimeMillis());
         // Mock MappedStatement and Invocation
         MappedStatement mappedStatement = mock(MappedStatement.class);
         when(mappedStatement.getSqlCommandType()).thenReturn(SqlCommandType.UPDATE);
@@ -83,12 +84,7 @@ class AuditingInterceptorTest {
 
         // Assert update fields are set
         assertEquals(1L, entity.getUpdateBy());
-
-        Timestamp now = new Timestamp(System.currentTimeMillis());
-        long allowedDifference = 100;
-        assertTrue(
-                Math.abs(now.getTime() - entity.getUpdateTime().getTime()) <= allowedDifference,
-                "The timestamp difference is too large.");
+        assertTrue(now.getTime() < entity.getUpdateTime().getTime());
     }
 
     @Test
