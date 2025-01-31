@@ -46,9 +46,9 @@ public class ValidatorConfigTest {
         // Since failFast is enabled, there should be only one error
         assertEquals(1, violations.size());
 
-        // Check the error message
+        // Check the error field
         ConstraintViolation<InvalidObject> violation = violations.iterator().next();
-        assertTrue(violation.getMessage().contains("must not be blank"));
+        assertEquals("field1", violation.getPropertyPath().toString());
     }
 
     // Define a class with multiple validation constraints
