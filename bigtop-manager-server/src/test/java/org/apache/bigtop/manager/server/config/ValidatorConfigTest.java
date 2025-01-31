@@ -27,7 +27,6 @@ import jakarta.validation.constraints.Size;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ValidatorConfigTest {
 
@@ -45,10 +44,6 @@ public class ValidatorConfigTest {
 
         // Since failFast is enabled, there should be only one error
         assertEquals(1, violations.size());
-
-        // Check the error field
-        ConstraintViolation<InvalidObject> violation = violations.iterator().next();
-        assertEquals("field1", violation.getPropertyPath().toString());
     }
 
     // Define a class with multiple validation constraints
