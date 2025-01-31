@@ -143,7 +143,7 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
      * @param node node
      * @return true if contains
      */
-    private boolean containsNode(Node node) {
+    protected boolean containsNode(Node node) {
         lock.readLock().lock();
 
         try {
