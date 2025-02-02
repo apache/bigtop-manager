@@ -57,7 +57,7 @@ class StackFunctionsTest {
 
     @BeforeEach
     void setUp() {
-        // 初始化测试数据
+        // Initialize test data
         testStack = new StackVO();
         testStack.setStackName("test-stack");
 
@@ -86,24 +86,24 @@ class StackFunctionsTest {
 
     @Test
     void testListStackAndService() {
-        // 模拟服务层返回数据
+        // Mock service layer return data
         when(stackService.list()).thenReturn(List.of(testStack));
 
-        // 获取工具
+        // Get tool
         Map<ToolSpecification, ToolExecutor> tools = stackFunctions.listStackAndService();
         assertEquals(1, tools.size());
 
-        // 验证工具规范
+        // Validate tool specification
         ToolSpecification spec = tools.keySet().iterator().next();
         assertEquals("listStackAndService", spec.name());
         assertEquals("Retrieve the list of services in each stack", spec.description());
 
-        // 执行工具
+        // Execute tool
         ToolExecutor executor = tools.values().iterator().next();
         String result =
                 executor.execute(ToolExecutionRequest.builder().arguments("{}").build(), null);
 
-        // 验证结果
+        // Validate result
         String expectedJson =
                 """
                 {
@@ -114,19 +114,19 @@ class StackFunctionsTest {
 
     @Test
     void testGetServiceByNameFound() {
-        // 模拟服务层返回数据
+        // Mock service layer return data
         when(stackService.list()).thenReturn(List.of(testStack));
 
-        // 获取工具
+        // Get tool
         Map<ToolSpecification, ToolExecutor> tools = stackFunctions.getServiceByName();
         ToolExecutor executor = tools.values().iterator().next();
 
-        // 执行查询
+        // Execute query
         String arguments = "{\"serviceName\" : \"test-service\"}";
         String result = executor.execute(
                 ToolExecutionRequest.builder().arguments(arguments).build(), null);
 
-        // 验证结果
+        // Validate result
         assertAll(
                 () -> assertTrue(result.contains("\"name\" : \"test-service\"")),
                 () -> assertTrue(result.contains("\"name\" : \"normal\"")),

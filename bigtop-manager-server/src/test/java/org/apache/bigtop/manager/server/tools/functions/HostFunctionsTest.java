@@ -90,7 +90,7 @@ class HostFunctionsTest {
         String result = executor.execute(
                 ToolExecutionRequest.builder().arguments(arguments).build(), null);
 
-        // 使用系统无关的换行符正则表达式匹配
+        // Use system-independent newline character regex
         String expectedPattern = ".*\"hostname\"\\s*:\\s*\"test-host\".*";
         assertTrue(
                 result.replaceAll("\\R", System.lineSeparator()).matches("(?s)" + expectedPattern),
@@ -138,7 +138,7 @@ class HostFunctionsTest {
         String result = executor.execute(
                 ToolExecutionRequest.builder().arguments(arguments).build(), null);
 
-        // 系统无关的匹配模式
+        // System-independent matching pattern
         String totalPattern = "(?s).*\"total\"\\s*:\\s*1.*";
         String hostPattern = "(?s).*\"hostname\"\\s*:\\s*\"test-host\".*";
         assertTrue(result.matches(totalPattern), "Should contain total=1");
