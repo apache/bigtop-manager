@@ -39,7 +39,7 @@ class DAGTest {
         dag = new DAG<>();
     }
 
-    // 测试节点是否存在
+    // Test if node exists
     @Test
     void testContainsNode() {
         assertFalse(dag.containsNode("A"));
@@ -47,7 +47,7 @@ class DAGTest {
         assertTrue(dag.containsNode("A"));
     }
 
-    // 测试获取节点数量
+    // Test getting the number of nodes
     @Test
     void testGetNodesCount() {
         assertEquals(0, dag.getNodesCount());
@@ -55,7 +55,7 @@ class DAGTest {
         assertEquals(1, dag.getNodesCount());
     }
 
-    // 测试获取边数量
+    // Test getting the number of edges
     @Test
     void testGetEdgesCount() {
         dag.addNodeIfAbsent("A", "Node A");
@@ -65,7 +65,7 @@ class DAGTest {
         assertEquals(1, dag.getEdgesCount());
     }
 
-    // 测试正常添加节点和边
+    // Test adding nodes and edges normally
     @Test
     void testAddEdgeHappyPath() {
         dag.addNodeIfAbsent("A", "Node A");
@@ -78,14 +78,14 @@ class DAGTest {
         assertEquals(3, dag.getEdgesCount());
     }
 
-    // 测试添加自环边
+    // Test adding a self-loop edge
     @Test
     void testAddEdgeSelfLoop() {
         dag.addNodeIfAbsent("A", "Node A");
         assertFalse(dag.addEdge("A", "A"));
     }
 
-    // 测试添加边形成环
+    // Test adding an edge that would form a cycle
     @Test
     void testAddEdgeCycle() {
         dag.addNodeIfAbsent("A", "Node A");
@@ -96,7 +96,7 @@ class DAGTest {
         assertFalse(dag.addEdge("C", "A"));
     }
 
-    // 测试边是否存在
+    // Test if edge exists
     @Test
     void testContainsEdge() {
         dag.addNodeIfAbsent("A", "Node A");
@@ -106,7 +106,7 @@ class DAGTest {
         assertTrue(dag.containsEdge("A", "B"));
     }
 
-    // 测试获取节点信息
+    // Test getting node information
     @Test
     void testGetNode() {
         assertNull(dag.getNode("A"));
@@ -114,7 +114,7 @@ class DAGTest {
         assertEquals("Node A", dag.getNode("A"));
     }
 
-    // 测试获取开始节点
+    // Test getting beginning nodes
     @Test
     void testGetBeginNode() {
         assertTrue(dag.getBeginNode().isEmpty());
@@ -124,7 +124,7 @@ class DAGTest {
         assertEquals(Collections.singletonList("A"), new LinkedList<>(dag.getBeginNode()));
     }
 
-    // 测试获取结束节点
+    // Test getting end nodes
     @Test
     void testGetEndNode() {
         assertTrue(dag.getEndNode().isEmpty());
@@ -134,7 +134,7 @@ class DAGTest {
         assertEquals(Collections.singletonList("B"), new LinkedList<>(dag.getEndNode()));
     }
 
-    // 测试获取前驱节点
+    // Test getting previous nodes
     @Test
     void testGetPreviousNodes() {
         assertTrue(dag.getPreviousNodes("A").isEmpty());
@@ -144,7 +144,7 @@ class DAGTest {
         assertEquals(Collections.singletonList("A"), new LinkedList<>(dag.getPreviousNodes("B")));
     }
 
-    // 测试获取后继节点
+    // Test getting subsequent nodes
     @Test
     void testGetSubsequentNodes() {
         assertTrue(dag.getSubsequentNodes("A").isEmpty());
@@ -154,7 +154,7 @@ class DAGTest {
         assertEquals(Collections.singletonList("B"), new LinkedList<>(dag.getSubsequentNodes("A")));
     }
 
-    // 测试获取节点入度
+    // Test getting the indegree of a node
     @Test
     void testGetIndegree() {
         dag.addNodeIfAbsent("A", "Node A");
@@ -164,7 +164,7 @@ class DAGTest {
         assertEquals(1, dag.getIndegree("B"));
     }
 
-    // 测试拓扑排序
+    // Test topological sorting
     @Test
     void testTopologicalSort() throws Exception {
         dag.addNodeIfAbsent("A", "Node A");
