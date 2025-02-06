@@ -31,5 +31,7 @@ export default {
   install_dependencies: 'Install dependencies',
   add_host: 'Add host',
   view_log: 'View log',
-  source: 'source'
+  source: 'source',
+  cluster_unavailable_message:
+    'Apologies, you do not yet have a cluster, so you cannot use cluster management capabilities.'
 }
