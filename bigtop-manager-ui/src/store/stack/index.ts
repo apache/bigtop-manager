@@ -17,13 +17,28 @@
  * under the License.
  */
 
-import request from '@/api/request.ts'
-import { CommandRequest } from '@/api/command/types.ts'
+import { getStacks } from '@/api/stack'
+import { StackVO } from '@/api/stack/types'
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
 
-export const execCommand = (data: any): Promise<CommandRequest> => {
-  return request({
-    method: 'post',
-    url: '/command',
-    data
-  })
-}
+export const useStackStore = defineStore(
+  'stack',
+  () => {
+    const stacks = ref<StackVO[]>([])
+    const loadStacks = async () => {
+      const data = await getStacks()
+      stacks.value = data
+    }
+
+    return {
+      stacks,
+      loadStacks
+    }
+  },
+  {
+    persist: {
+      storage: sessionStorage
+    }
+  }
+)

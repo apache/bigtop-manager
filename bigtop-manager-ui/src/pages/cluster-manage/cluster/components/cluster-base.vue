@@ -18,13 +18,16 @@
 -->
 
 <script setup lang="ts">
+  import { CommandRequest } from '@/api/command/types'
   import type { FormItemState } from '@/components/common/auto-form/types'
-  import { computed, ref, shallowRef } from 'vue'
+  import { computed, ref, shallowRef, toRefs } from 'vue'
   import { useI18n } from 'vue-i18n'
 
   const { t } = useI18n()
   const activeKey = ref(['1', '2'])
   const autoFormRefMap = shallowRef<Map<string, Comp.AutoFormInstance>>(new Map())
+  const props = defineProps<{ commandRequest: CommandRequest }>()
+  const { commandRequest } = toRefs(props)
   const formLayout = computed(() => ({
     labelCol: { xs: 5, sm: 5, md: 5, lg: 4, xl: 3 },
     wrapperCol: { xs: 10, sm: 10, md: 10, lg: 10, xl: { xl: 10, pull: 1 } }
@@ -58,9 +61,9 @@
   const clusterConfigFormItems = computed((): FormItemState[] => [
     {
       type: 'input',
-      field: 'rootDirectory',
+      field: 'rootDir',
       formItemProps: {
-        name: 'rootDirectory',
+        name: 'rootDir',
         label: t('cluster.root_directory'),
         rules: [{ required: true, message: t('common.enter_error'), trigger: 'blur' }]
       },
@@ -84,15 +87,25 @@
   const collapses = ref([
     {
       title: computed(() => t('cluster.base_info')),
-      formValue: {},
+      formValue: { name: commandRequest.value.clusterCommand?.name, desc: commandRequest.value.clusterCommand?.desc },
       formItems: baseInfoFormItems.value
     },
     {
       title: computed(() => t('cluster.cluster_config')),
-      formValue: {},
+      formValue: {
+        rootDir: commandRequest.value.clusterCommand?.rootDir,
+        userGroup: commandRequest.value.clusterCommand?.rootDir
+      },
       formItems: clusterConfigFormItems.value
     }
   ])
+
+  const getFormValues = () => {
+    return collapses.value.reduce((pre, val) => {
+      Object.assign(pre, val.formValue)
+      return pre
+    }, {})
+  }
 
   const collectAutoFormRefs = (el: any, title: string) => {
     if (!autoFormRefMap.value.has(title)) {
@@ -100,15 +113,33 @@
     }
   }
 
-  const check = () => {
-    const autoFormRefs = [...autoFormRefMap.value.values()]
-    autoFormRefs.forEach(async (formRef, idx) => {
-      const res = await formRef.getFormValidation()
-      if (!res) {
-        !activeKey.value.includes(`${idx + 1}`) && activeKey.value.push(`${idx + 1}`)
+  const check = async () => {
+    try {
+      const autoFormRefs = [...autoFormRefMap.value.values()]
+      const validationResults = await Promise.all(
+        Array.from(autoFormRefs).map((formRef) => formRef.getFormValidation())
+      )
+      const allValid = validationResults.every((res) => res)
+      if (allValid) {
+        const res = getFormValues()
+        return res
+      } else {
+        autoFormRefs.forEach((_formRef, idx) => {
+          if (!validationResults[idx]) {
+            !activeKey.value.includes(`${idx + 1}`) && activeKey.value.push(`${idx + 1}`)
+          }
+        })
+        return -1
       }
-    })
+    } catch (error) {
+      console.error('Error during form validation:', error)
+      return -1
+    }
   }
+
+  defineExpose({
+    check
+  })
 </script>
 
 <template>

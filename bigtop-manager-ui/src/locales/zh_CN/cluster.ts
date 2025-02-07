@@ -30,6 +30,7 @@ export default {
   config_source: '配置源',
   install_dependencies: '安装依赖',
   add_host: '新增主机',
+  edit_host: '编辑主机',
   view_log: '查看日志',
   source: '配置源',
   cluster_unavailable_message: '抱歉，你还没有集群，无法使用集群管理能力。'

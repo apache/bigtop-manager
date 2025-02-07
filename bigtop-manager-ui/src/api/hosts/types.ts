@@ -17,17 +17,55 @@
  * under the License.
  */
 
+import type { PageVO } from '@/api/types'
+
+export type HostVOList = PageVO<HostVO>
+
+/**
+ * HostVO
+ */
 export interface HostVO {
-  id: number
-  clusterName: string
-  hostname: string
-  ipv4: string
-  arch: string
-  os: string
-  availableProcessors: string
-  freeMemorySize: string
-  totalMemorySize: string
-  state: string
-  freeDisk: string
-  totalDisk: string
+  agentDir?: string
+  arch?: string
+  authType?: number
+  availableProcessors?: number
+  clusterDisplayName?: string
+  clusterName?: string
+  componentNum?: number
+  desc?: string
+  errInfo?: string
+  freeDisk?: number
+  freeMemorySize?: number
+  grpcPort?: number
+  hostname?: string
+  id?: number
+  ipv4?: string
+  ipv6?: string
+  os?: string
+  sshKeyFilename?: string
+  sshKeyPassword?: string
+  sshKeyString?: string
+  sshPassword?: string
+  sshPort?: number
+  sshUser?: string
+  status?: number
+  totalDisk?: number
+  totalMemorySize?: number
+  [property: string]: any
+}
+
+export interface HostAdd {
+  agentDir?: string
+  authType?: number | string // '1-password，2-key，3-no_auth',
+  clusterId?: number
+  desc?: string
+  grpcPort?: number
+  hostnames?: string[]
+  sshKeyFilename?: string
+  sshKeyPassword?: string
+  sshKeyString?: string
+  sshPassword?: string
+  sshPort?: number
+  sshUser?: string
+  [property: string]: any
 }

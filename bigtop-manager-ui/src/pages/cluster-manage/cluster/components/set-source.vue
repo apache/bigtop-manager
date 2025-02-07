@@ -18,9 +18,13 @@
 -->
 
 <script setup lang="ts">
-  import type { FormInstance, TableColumnType } from 'ant-design-vue'
-  import { reactive, ref, toRefs, watch } from 'vue'
+  import { reactive, ref, toRefs } from 'vue'
+  import { getRepoList, updateRepo } from '@/api/repo'
+  import type { RepoVO } from '@/api/repo/types'
+  import { message, type FormInstance, type TableColumnType } from 'ant-design-vue'
+  import { useI18n } from 'vue-i18n'
 
+  const { t } = useI18n()
   const open = ref(false)
   const loading = ref(false)
   const columns: TableColumnType[] = [
@@ -32,35 +36,58 @@
     },
     {
       title: '架构',
-      dataIndex: 'architecture',
-      key: 'architecture',
+      dataIndex: 'arch',
+      key: 'arch',
       ellipsis: true
     },
     {
       title: '地址',
-      dataIndex: 'address',
-      key: 'address',
+      dataIndex: 'baseUrl',
+      key: 'baseUrl',
       ellipsis: true
     }
   ]
   const formRef = ref<FormInstance>()
   const form = reactive({
-    list: [] as any[]
+    list: [] as RepoVO[]
   })
   const { list } = toRefs(form)
 
   const handleOpen = () => {
     open.value = true
-    Object.assign(form, { list: [] })
+    getSource()
+  }
+
+  const getSource = async () => {
+    loading.value = true
+    try {
+      const data = await getRepoList()
+      list.value = data
+    } catch (error) {
+      console.log('error :>> ', error)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const updateSourceUrl = async () => {
+    try {
+      const params = list.value.map(({ id, baseUrl }) => ({ id, baseUrl }))
+      await updateRepo(params)
+      formRef.value?.resetFields()
+      message.success(t('common.update_success'))
+      open.value = false
+    } catch (error) {
+      message.error(t('common.update_fail'))
+      console.log('error :>> ', error)
+    }
   }
 
   const handleOk = () => {
     formRef.value
       ?.validateFields()
-      .then((values) => {
-        console.log('Received values of form: ', values)
-        formRef.value?.resetFields()
-        open.value = false
+      .then(() => {
+        updateSourceUrl()
       })
       .catch((info) => {
         console.log('Validate Failed:', info)
@@ -70,35 +97,6 @@
   const handleCancel = () => {
     open.value = false
   }
-
-  function generateMockData(rowCount = 10) {
-    return Array.from({ length: rowCount }, (_, i) => ({
-      id: i + 1,
-      name: `名称_${i + 1}`,
-      architecture: `架构_${i + 1}`,
-      address: `https://example.com/${i + 1}`
-    }))
-  }
-
-  const getSourceList = () => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(generateMockData(12))
-      }, 500)
-    })
-  }
-
-  watch(open, async (val) => {
-    if (val) {
-      loading.value = true
-      try {
-        form.list = (await getSourceList()) as any
-        loading.value = false
-      } catch (error) {
-        console.log('error :>> ', error)
-      }
-    }
-  })
 
   defineExpose({
     handleOpen
@@ -121,14 +119,14 @@
       <a-form ref="formRef" :model="form">
         <a-table :loading="loading" :scroll="{ y: 340 }" :data-source="list" :columns="columns" :pagination="false">
           <template #bodyCell="{ index, column, record }">
-            <template v-if="column.dataIndex == 'address'">
+            <template v-if="column.dataIndex == 'baseUrl'">
               <a-form-item
                 label=" "
                 :colon="false"
-                :name="['list', index, 'address']"
+                :name="['list', index, 'baseUrl']"
                 :rules="[{ required: true, message: '请输入地址', trigger: 'blur' }]"
               >
-                <a-input v-model:value="record[column.key]"></a-input>
+                <a-input v-model:value="record[column.key]" />
               </a-form-item>
             </template>
           </template>

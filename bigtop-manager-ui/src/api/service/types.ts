@@ -17,16 +17,16 @@
  * under the License.
  */
 
-import type { Component } from '@/api/component/types'
+import type { ComponentVO } from '@/api/component/types'
 import type { PageVO } from '@/api/types'
 
-export type ServiceList = PageVO<Service>
+export type ServiceList = PageVO<ServiceVO>
 export type ServiceParams = { clusterId: number; id: number }
 export type SnapshotData = { desc?: string; name?: string }
 export type SnapshotRecovery = ServiceParams & { snapshotId: string }
 
-export interface Service {
-  components?: Component[]
+export interface ServiceVO {
+  components?: ComponentVO[]
   configs?: ServiceConfig[]
   desc?: string
   displayName?: string

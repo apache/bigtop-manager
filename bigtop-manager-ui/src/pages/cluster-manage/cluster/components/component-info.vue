@@ -18,11 +18,16 @@
 -->
 
 <script setup lang="ts">
-  import { generateTestData } from './mock'
-  import { ref, shallowRef } from 'vue'
+  import { ref, shallowRef, watchEffect } from 'vue'
   import type { TableColumnType } from 'ant-design-vue'
   import useBaseTable from '@/composables/use-base-table'
   import SetSource from './set-source.vue'
+  import { useStackStore } from '@/store/stack'
+  import { storeToRefs } from 'pinia'
+  import { ServiceVO } from '@/api/service/types'
+
+  const stackStore = useStackStore()
+  const { stacks } = storeToRefs(stackStore)
 
   const columns: TableColumnType[] = [
     {
@@ -35,7 +40,7 @@
     },
     {
       title: '名称',
-      dataIndex: 'name',
+      dataIndex: 'displayName',
       width: '20%',
       ellipsis: true
     },
@@ -46,34 +51,32 @@
       ellipsis: true
     },
     {
+      key: 'stack',
       title: '组件栈',
-      dataIndex: 'compStack',
+      dataIndex: 'stack',
       width: '20%',
       ellipsis: true
     },
     {
       title: '描述',
-      dataIndex: 'descrip',
+      dataIndex: 'desc',
       ellipsis: true
     }
   ]
-  const data = ref<any[]>(generateTestData(50))
+
+  const data = ref<ServiceVO[]>([])
+  const stackSelected = ref('bigtop')
+  const stackGroup = shallowRef(['bigtop', 'infra', 'extra'])
   const setSourceRef = ref<InstanceType<typeof SetSource>>()
-  const { columnsProp, dataSource, loading, paginationProps, onChange } = useBaseTable({
+  const { columnsProp, loading, paginationProps, onChange, resetState } = useBaseTable({
     columns,
     rows: data.value
   })
-  const componentSelected = ref(0)
-  const components = shallowRef([
-    {
-      id: 0,
-      name: 'Bigtop'
-    },
-    {
-      id: 1,
-      name: 'Extra'
-    }
-  ])
+
+  watchEffect(() => {
+    resetState()
+    data.value = stacks.value.find((v) => v.stackName === stackSelected.value)?.services || []
+  })
 
   const handleSetSource = () => {
     setSourceRef.value?.handleOpen()
@@ -83,18 +86,26 @@
 <template>
   <div class="component-info">
     <header>
-      <a-radio-group v-model:value="componentSelected" button-style="solid">
-        <a-radio-button v-for="comp in components" :key="comp.id" :value="comp.id">{{ comp.name }}</a-radio-button>
+      <a-radio-group v-model:value="stackSelected" button-style="solid">
+        <a-radio-button v-for="(stack, idx) in stackGroup" :key="idx" :value="stack">
+          {{ stackGroup[idx].replace(/^\w/, (c) => c.toUpperCase()) }}
+        </a-radio-button>
       </a-radio-group>
       <a-button type="primary" @click="handleSetSource">{{ $t('cluster.config_source') }}</a-button>
     </header>
     <a-table
       :loading="loading"
-      :data-source="dataSource"
+      :data-source="data"
       :columns="columnsProp"
       :pagination="paginationProps"
       @change="onChange"
-    ></a-table>
+    >
+      <template #bodyCell="{ column, record }">
+        <template v-if="column.key === 'stack'">
+          <span> {{ `${stackSelected}-${record.version}` }} </span>
+        </template>
+      </template>
+    </a-table>
     <set-source ref="setSourceRef" />
   </div>
 </template>

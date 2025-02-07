@@ -30,6 +30,7 @@ export default {
   config_source: 'Configuration source',
   install_dependencies: 'Install dependencies',
   add_host: 'Add host',
+  edit_host: 'Edit host',
   view_log: 'View log',
   source: 'source',
   cluster_unavailable_message:

@@ -150,14 +150,19 @@
     <a-form
       ref="formRef"
       label-align="left"
+      :colon="false"
       :model="formState"
       :label-col="props.labelCol"
       :wrapper-col="props.wrapperCol"
       :disabled="props.formDisabled"
     >
       <div v-for="item in props.formItems" :key="item.field">
-        <slot :="{ item, state: formState }" :name="item.field">
-          <a-form-item v-if="!props.hiddenItems.includes(item.field)" v-bind="item.formItemProps">
+        <slot
+          v-if="!props.hiddenItems.includes(item.field)"
+          :="{ item, state: formState }"
+          :name="item.slot ?? item.field"
+        >
+          <a-form-item v-bind="item.formItemProps">
             <!-- input -->
             <a-input
               v-if="item.type == 'input'"

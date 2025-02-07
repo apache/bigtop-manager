@@ -25,10 +25,16 @@
   import HostConfig from './components/host-config.vue'
   import CheckWorkflow from './components/check-workflow.vue'
   import { useI18n } from 'vue-i18n'
+  import { ClusterCommandReq, Command, CommandLevel, CommandRequest } from '@/api/command/types'
 
   const { t } = useI18n()
   const menuStore = useMenuStore()
+  const compRef = ref<any>()
 
+  const commandRequest = ref<CommandRequest>({
+    command: Command.Add,
+    commandLevel: CommandLevel.Cluster
+  })
   const current = ref(0)
   const steps = computed(() => [
     {
@@ -59,16 +65,33 @@
     }
   })
 
+  const updateCommandRequest = (value: unknown) => {
+    if (current.value === 0) {
+      commandRequest.value.clusterCommand = value as ClusterCommandReq
+    }
+  }
+
   const previousStep = () => {
     if (current.value > 0) {
       current.value = current.value - 1
     }
   }
-  const nextStep = () => {
-    if (current.value < stepsLimit.value) {
-      current.value = current.value + 1
+  const nextStep = async () => {
+    if (!compRef.value?.check) {
+      if (current.value < stepsLimit.value) {
+        current.value = current.value + 1
+      }
+    } else {
+      const res = await compRef.value?.check()
+      if (res !== -1) {
+        updateCommandRequest(res)
+        if (current.value < stepsLimit.value) {
+          current.value = current.value + 1
+        }
+      }
     }
   }
+
   const onSave = () => {
     menuStore.updateSiderMenu()
   }
@@ -76,6 +99,7 @@
 
 <template>
   <div class="cluster-create">
+    {{ commandRequest }}
     <header-card>
       <div class="steps-wrp">
         <a-steps :current="current" :items="steps" />
@@ -85,11 +109,10 @@
       <template v-for="stepItem in steps" :key="stepItem.title">
         <div v-show="steps[current].title === stepItem.title" class="step-title">
           <h5>{{ stepItem.title }}</h5>
-          <section :class="{ 'step-content': current < stepsLimit }">
-            <component :is="getCompName" />
-          </section>
+          <section :class="{ 'step-content': current < stepsLimit }"> </section>
         </div>
       </template>
+      <component :is="getCompName" ref="compRef" :command-request="commandRequest" />
       <div class="step-action">
         <a-space>
           <a-button v-show="current != stepsLimit" @click="() => $router.go(-1)">{{ $t('common.exit') }}</a-button>

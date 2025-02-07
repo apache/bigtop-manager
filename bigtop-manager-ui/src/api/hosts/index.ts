@@ -18,11 +18,19 @@
  */
 
 import request from '@/api/request.ts'
-import { HostVO } from '@/api/hosts/types.ts'
+import { HostAdd, HostVO, HostVOList } from '@/api/hosts/types.ts'
 
-export const getHosts = (clusterId: number): Promise<HostVO[]> => {
+export const getHosts = (): Promise<HostVOList> => {
   return request({
     method: 'get',
-    url: '/clusters/' + clusterId + '/hosts'
+    url: '/hosts'
+  })
+}
+
+export const addHost = (data: HostAdd): Promise<HostVO> => {
+  return request({
+    method: 'post',
+    url: '/hosts',
+    data
   })
 }

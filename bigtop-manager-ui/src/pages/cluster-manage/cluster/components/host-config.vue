@@ -19,11 +19,13 @@
 
 <script setup lang="ts">
   import { TableColumnType } from 'ant-design-vue'
-  import { computed, reactive, ref } from 'vue'
-  import { generateTableHostData } from './mock'
+  import { computed, onMounted, reactive, ref } from 'vue'
   import useBaseTable from '@/composables/use-base-table'
   import type { FilterConfirmProps, FilterResetProps } from 'ant-design-vue/es/table/interface'
   import type { GroupItem } from '@/components/common/button-group/types'
+  import { getHosts } from '@/api/hosts'
+  import { HostVO } from '@/api/hosts/types'
+  import HostCreate from '@/pages/cluster-manage/hosts/create.vue'
 
   type Key = string | number
   interface TableState {
@@ -34,7 +36,8 @@
 
   const searchInputRef = ref()
   // const checkAllHostIsSuccessfull = ref(false)
-  const data = ref<any[]>(generateTableHostData(50))
+  const data = ref<HostVO[]>()
+  const hostCreateRef = ref<InstanceType<typeof HostCreate> | null>(null)
   const state = reactive<TableState>({
     searchText: '',
     searchedColumn: '',
@@ -93,7 +96,7 @@
     {
       text: 'remove',
       danger: true,
-      clickEvent: (_item, args) => handleDelete(args)
+      clickEvent: (_item, args) => deleteHost(args)
     }
   ])
 
@@ -113,9 +116,9 @@
     state.selectedRowKeys = selectedRowKeys
   }
 
-  const handleInstallDependencies = () => {
-    console.log('selectedRowKeys :>> ', state.selectedRowKeys)
-  }
+  // const handleInstallDependencies = () => {
+  //   console.log('selectedRowKeys :>> ', state.selectedRowKeys)
+  // }
 
   const handleSearch = (selectedKeys: Key[], confirm: (param?: FilterConfirmProps) => void, dataIndex: string) => {
     confirm()
@@ -128,26 +131,45 @@
     state.searchText = ''
   }
 
+  const addHost = () => {
+    hostCreateRef.value?.handleOpen()
+  }
+
   const handleEdit = (row: any) => {
     console.log('row :>> ', row)
   }
 
-  const handleDelete = (row?: any) => {
+  const deleteHost = (row?: any) => {
     if (!row) {
       console.log('selectedRowKeys :>> ', state.selectedRowKeys)
     } else {
       console.log('row :>> ', row)
     }
   }
+
+  const getHostList = async () => {
+    try {
+      loading.value = true
+      const { content } = await getHosts()
+      data.value = content
+    } catch (error) {
+      console.log('error :>> ', error)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  onMounted(() => {
+    getHostList()
+  })
 </script>
 
 <template>
   <div class="host-config">
     <header>
-      <a-button type="primary" @click="handleInstallDependencies">{{ $t('cluster.install_dependencies') }}</a-button>
       <a-space :size="16">
-        <a-button type="primary" danger @click="handleDelete">{{ $t('common.bulk_remove') }}</a-button>
-        <a-button type="primary">{{ $t('cluster.add_host') }}</a-button>
+        <a-button type="primary" @click="addHost">{{ $t('cluster.add_host') }}</a-button>
+        <a-button type="primary" danger @click="deleteHost">{{ $t('common.bulk_remove') }}</a-button>
       </a-space>
     </header>
     <a-table
@@ -195,6 +217,7 @@
         </template>
       </template>
     </a-table>
+    <host-create ref="hostCreateRef" />
   </div>
 </template>
 

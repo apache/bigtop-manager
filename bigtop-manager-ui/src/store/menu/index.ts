@@ -89,9 +89,9 @@ export const useMenuStore = defineStore(
           item.children = clusters.value.map((v) => {
             return {
               icon: '',
-              key: `${item.key}/${v.clusterName}/${v.id}`,
-              label: v.clusterName,
-              title: v.clusterName,
+              key: `${item.key}/${v.displayName}/${v.id}`,
+              label: v.displayName || '',
+              title: v.displayName || '',
               activeMenu: item.key
             }
           })

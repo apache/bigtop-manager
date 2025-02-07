@@ -20,20 +20,20 @@
 import { del, get, post } from '@/api/request-util'
 import type {
   ServiceParams,
-  Service,
+  ServiceVO,
   ServiceConfig,
   ServiceConfigSnapshot,
   ServiceList,
   SnapshotData,
   SnapshotRecovery
-} from './type'
+} from './types'
 
 export const getServiceList = (clusterId: number) => {
   return get<ServiceList>(`/clusters/${clusterId}/services`)
 }
 
 export const getService = (params: ServiceParams) => {
-  return get<Service>(`/clusters/${params.clusterId}/services/${params.id}`)
+  return get<ServiceVO>(`/clusters/${params.clusterId}/services/${params.id}`)
 }
 
 export const getServiceConfigs = (params: ServiceParams) => {

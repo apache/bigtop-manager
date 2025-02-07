@@ -17,13 +17,20 @@
  * under the License.
  */
 
+import { RepoUpdate, RepoVO } from './types'
 import request from '@/api/request.ts'
-import { CommandRequest } from '@/api/command/types.ts'
 
-export const execCommand = (data: any): Promise<CommandRequest> => {
+export const getRepoList = (): Promise<RepoVO[]> => {
   return request({
-    method: 'post',
-    url: '/command',
+    method: 'get',
+    url: 'repos'
+  })
+}
+
+export const updateRepo = (data: RepoUpdate[]) => {
+  return request({
+    method: 'put',
+    url: 'repos',
     data
   })
 }

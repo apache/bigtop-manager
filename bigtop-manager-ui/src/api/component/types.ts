@@ -17,7 +17,10 @@
  * under the License.
  */
 
-export interface Component {
+/**
+ * ComponentVO
+ */
+export interface ComponentVO {
   cardinality?: string
   category?: string
   displayName?: string
@@ -30,8 +33,14 @@ export interface Component {
   serviceName?: string
   stack?: string
   status?: number
+  [property: string]: any
 }
+
+/**
+ * QuickLinkVO
+ */
 export interface QuickLinkVO {
   displayName?: string
   url?: string
+  [property: string]: any
 }
