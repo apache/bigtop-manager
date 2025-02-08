@@ -21,9 +21,9 @@ name: "CodeQL"
 
 on:
   push:
+    branches: [ "main" ]
   pull_request:
-    branches:
-      - main
+    branches: [ "main" ]
 
 jobs:
   analyze:
@@ -32,10 +32,21 @@ jobs:
     timeout-minutes: 120
     env:
       JAVA_TOOL_OPTIONS: -Xmx2G -Xms2G -DskipTests -Dmaven.test.skip=true -Dmaven.test.skip=true -Dlicense.skipAddThirdParty=true -Dhttp.keepAlive=false -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.http.retryHandler.count=3 -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
+    permissions:
+      # required for all workflows
+      security-events: write
+      # required to fetch internal or private CodeQL packs
+      packages: read
+      # only required for workflows in private repositories
+      actions: read
+      contents: read
     strategy:
       fail-fast: false
       matrix:
         java: ['17']
+        include:
+          - language: java-kotlin
+          - language: javascript-typescript
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -60,5 +71,10 @@ jobs:
           languages: ${{ matrix.language }}
       - name: CodeQL Autobuild
         uses: github/codeql-action/autobuild@v3
-      - name: CodeQL Analyze
+        with:
+          languages: ${{ matrix.language }}
+      - name: CodeQL Perform Analysis
         uses: github/codeql-action/analyze@v3
+        with:
+          languages: ${{ matrix.language }}
+          category: "/language:${{matrix.language}}"
