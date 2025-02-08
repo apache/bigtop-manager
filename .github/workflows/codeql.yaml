@@ -20,8 +20,10 @@
 name: "CodeQL"
 
 on:
-  schedule:
-    - cron: '0 0 12 * *'
+  push:
+  pull_request:
+    branches:
+      - main
 
 jobs:
   analyze:
