@@ -16,19 +16,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package rg.apache.bigtop.manager.stack.extra.v1_0_0.seatunnel;
+package org.apache.bigtop.manager.stack.extra.v1_0_0.seatunnel;
 
-import org.apache.bigtop.manager.stack.extra.v1_0_0.seatunnel.SeaTunnelWorkerScript;
+import org.apache.bigtop.manager.stack.core.spi.param.Params;
+import org.apache.bigtop.manager.stack.extra.v1_0_0.seatunnel.SeaTunnelClientScript;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class SeaTunnelWorkerScriptTest {
+public class SeaTunnelClientScriptTest {
+
+    private final SeaTunnelClientScript clientScript = new SeaTunnelClientScript();
 
     @Test
     public void testGetComponentName() {
-        SeaTunnelWorkerScript workerScript = new SeaTunnelWorkerScript();
-        assertEquals("seatunnel_worker", workerScript.getComponentName());
+        assertEquals("seatunnel_client", clientScript.getComponentName());
+    }
+
+    @Test
+    public void testAddParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> clientScript.add(params));
+    }
+
+    @Test
+    public void testConfigureParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> clientScript.configure(params));
     }
 }

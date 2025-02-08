@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package rg.apache.bigtop.manager.stack.extra.v1_0_0.seatunnel;
+package org.apache.bigtop.manager.stack.extra.v1_0_0.seatunnel;
 
 import org.apache.bigtop.manager.stack.extra.v1_0_0.seatunnel.SeaTunnelParams;
 
