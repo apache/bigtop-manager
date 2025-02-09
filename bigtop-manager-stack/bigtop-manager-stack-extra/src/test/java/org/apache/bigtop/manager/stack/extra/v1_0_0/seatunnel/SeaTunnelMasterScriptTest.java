@@ -18,8 +18,6 @@
  */
 package org.apache.bigtop.manager.stack.extra.v1_0_0.seatunnel;
 
-import org.apache.bigtop.manager.stack.extra.v1_0_0.seatunnel.SeaTunnelMasterScript;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

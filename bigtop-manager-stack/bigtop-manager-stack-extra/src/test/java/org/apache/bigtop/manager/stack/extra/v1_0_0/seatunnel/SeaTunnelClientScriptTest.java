@@ -19,7 +19,6 @@
 package org.apache.bigtop.manager.stack.extra.v1_0_0.seatunnel;
 
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
-import org.apache.bigtop.manager.stack.extra.v1_0_0.seatunnel.SeaTunnelClientScript;
 
 import org.junit.jupiter.api.Test;
 
