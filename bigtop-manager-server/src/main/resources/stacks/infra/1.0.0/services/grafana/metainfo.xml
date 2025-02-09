@@ -29,6 +29,7 @@
         </desc>
         <version>11.4.0</version>
         <user>grafana</user>
+        <license>AGPL-3.0</license>
 
         <components>
             <component>
@@ -63,5 +64,20 @@
                 </packages>
             </package-specific>
         </package-specifics>
+
+        <templates>
+            <template>
+                <src>cluster-dashboard.json</src>
+                <dest>conf/provisioning/dashboards/cluster</dest>
+            </template>
+            <template>
+                <src>host-dashboard.json</src>
+                <dest>conf/provisioning/dashboards/host</dest>
+            </template>
+        </templates>
+
+        <required-services>
+            <service>prometheus</service>
+        </required-services>
     </service>
 </metainfo>

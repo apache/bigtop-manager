@@ -55,6 +55,10 @@
         </dependency>
         <dependency>
             <groupId>org.apache.bigtop</groupId>
+            <artifactId>bigtop-manager-ai-deepseek</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.bigtop</groupId>
             <artifactId>bigtop-manager-dao</artifactId>
         </dependency>
         <dependency>

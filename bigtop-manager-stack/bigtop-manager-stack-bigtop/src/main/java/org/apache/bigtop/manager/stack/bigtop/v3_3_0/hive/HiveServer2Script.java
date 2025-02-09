@@ -47,6 +47,8 @@ public class HiveServer2Script extends AbstractServerScript {
 
     @Override
     public ShellResult configure(Params params) {
+        super.configure(params);
+
         return HiveSetup.configure(params);
     }
 

@@ -21,6 +21,7 @@ package org.apache.bigtop.manager.server.model.converter;
 import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
 import org.apache.bigtop.manager.server.model.dto.ServiceConfigDTO;
+import org.apache.bigtop.manager.server.model.req.ServiceConfigReq;
 import org.apache.bigtop.manager.server.model.vo.ServiceConfigVO;
 
 import org.mapstruct.Mapper;
@@ -35,6 +36,10 @@ import java.util.List;
 public interface ServiceConfigConverter {
 
     ServiceConfigConverter INSTANCE = Mappers.getMapper(ServiceConfigConverter.class);
+
+    ServiceConfigDTO fromReq2DTO(ServiceConfigReq serviceConfigReq);
+
+    List<ServiceConfigDTO> fromReq2DTO(List<ServiceConfigReq> serviceConfigReqList);
 
     @Mapping(target = "properties", source = "propertiesJson", qualifiedByName = "json2PropertyDTOList")
     ServiceConfigDTO fromPO2DTO(ServiceConfigPO serviceConfigPO);

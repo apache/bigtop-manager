@@ -46,6 +46,8 @@ public class ZookeeperServerScript extends AbstractServerScript {
 
     @Override
     public ShellResult configure(Params params) {
+        super.configure(params);
+
         return ZookeeperSetup.configure(params);
     }
 

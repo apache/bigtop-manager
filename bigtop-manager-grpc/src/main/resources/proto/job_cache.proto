@@ -23,7 +23,7 @@ option java_package = "org.apache.bigtop.manager.grpc.generated";
 option java_outer_classname = "JobCacheProto";
 
 service JobCacheService {
-  rpc save (JobCacheRequest) returns (JobCacheReply) {}
+  rpc Save (JobCacheRequest) returns (JobCacheReply) {}
 }
 
 message JobCacheRequest {

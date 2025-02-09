@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.spark;
 
-import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
+import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
 import org.apache.bigtop.manager.stack.bigtop.param.BigtopParams;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
@@ -47,8 +47,8 @@ public class SparkParams extends BigtopParams {
     private String sparkFairSchedulerContent;
     private String sparkDefaultsContent;
 
-    public SparkParams(CommandPayload commandPayload) {
-        super(commandPayload);
+    public SparkParams(ComponentCommandPayload componentCommandPayload) {
+        super(componentCommandPayload);
         globalParamsMap.put("spark_user", user());
         globalParamsMap.put("spark_group", group());
         globalParamsMap.put("java_home", javaHome());

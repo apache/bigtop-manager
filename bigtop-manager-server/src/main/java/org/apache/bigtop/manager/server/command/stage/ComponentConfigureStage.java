@@ -20,6 +20,7 @@ package org.apache.bigtop.manager.server.command.stage;
 
 import org.apache.bigtop.manager.server.command.task.ComponentConfigureTask;
 import org.apache.bigtop.manager.server.command.task.Task;
+import org.apache.bigtop.manager.server.utils.StackUtils;
 
 public class ComponentConfigureStage extends AbstractComponentStage {
 
@@ -34,6 +35,7 @@ public class ComponentConfigureStage extends AbstractComponentStage {
 
     @Override
     public String getName() {
-        return "Configure " + stageContext.getComponentDTO().getDisplayName();
+        return "Configure "
+                + StackUtils.getComponentDTO(stageContext.getComponentName()).getDisplayName();
     }
 }

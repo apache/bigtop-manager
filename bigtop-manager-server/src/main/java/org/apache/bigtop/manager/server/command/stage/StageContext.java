@@ -22,8 +22,6 @@ import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.repository.ClusterDao;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 import org.apache.bigtop.manager.server.model.dto.CommandDTO;
-import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
-import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.model.dto.command.ClusterCommandDTO;
 
 import lombok.Data;
@@ -43,9 +41,9 @@ public class StageContext {
 
     private List<String> hostnames;
 
-    private ServiceDTO serviceDTO;
+    private String serviceName;
 
-    private ComponentDTO componentDTO;
+    private String componentName;
 
     public static StageContext fromCommandDTO(CommandDTO commandDTO) {
         StageContext context = new StageContext();

@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.stack.infra.v1_0_0.grafana;
 
-import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
+import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
@@ -45,7 +45,8 @@ public class GrafanaParams extends InfraParams {
     private String grafanaContent;
     private String grafanaDashboardContent;
     private String prometheusDashboardPath;
-    private String bmAgentDashboardConfig;
+    private String bmAgentClusterDashboardConfig;
+    private String bmAgentHostDashboardConfig;
     private String grafanaPort;
     private String grafanaLogLevel;
     private String dataSourceContent;
@@ -54,17 +55,14 @@ public class GrafanaParams extends InfraParams {
 
     private List<Map<String, Object>> dashboards;
 
-    public GrafanaParams(CommandPayload commandPayload) {
-        super(commandPayload);
+    public GrafanaParams(ComponentCommandPayload componentCommandPayload) {
+        super(componentCommandPayload);
         globalParamsMap.put("port", grafanaPort);
         globalParamsMap.put("log_level", grafanaLogLevel);
         globalParamsMap.put("provisioning_path", provisioningDir());
-        if (prometheusServer != null) {
-            globalParamsMap.put(
-                    "prometheus_url", MessageFormat.format("http://{0}:{1}", prometheusServer, prometheusPort));
-            setDashboards();
-            globalParamsMap.put("dashboards", dashboards);
-        }
+        globalParamsMap.put("prometheus_url", MessageFormat.format("http://{0}:{1}", prometheusServer, prometheusPort));
+        setDashboards();
+        globalParamsMap.put("dashboards", dashboards);
     }
 
     public String dataDir() {
@@ -124,7 +122,8 @@ public class GrafanaParams extends InfraParams {
     public Map<String, Object> dashboards() {
         Map<String, Object> configuration = LocalSettings.configurations(getServiceName(), "grafana-dashboard");
         grafanaDashboardContent = (String) configuration.get("content");
-        bmAgentDashboardConfig = (String) configuration.get("bm_agent_dashboard");
+        bmAgentClusterDashboardConfig = (String) configuration.get("bm_agent_cluster_dashboard");
+        bmAgentHostDashboardConfig = (String) configuration.get("bm_agent_host_dashboard");
         prometheusDashboardPath = MessageFormat.format("{0}/prometheus", dashboardsDir());
         return configuration;
     }
@@ -141,25 +140,35 @@ public class GrafanaParams extends InfraParams {
         return new ArrayList<>(getClusterHosts().keySet());
     }
 
-    // TODO: add host dashboard
     public void setDashboards() {
         dashboards = new ArrayList<>();
 
-        Map<String, Object> clusterDashboard = new HashMap<>();
         // Used for dashboard yaml configuration
+        Map<String, Object> clusterDashboard = new HashMap<>();
         clusterDashboard.put("name", "Cluster");
-        clusterDashboard.put("path", dashboardConfigDir("Cluster"));
+        clusterDashboard.put("path", dashboardConfigDir("cluster"));
 
-        // Used for dashboard json configuration
-        List<String> clusters = getClusters();
-        if (clusters != null && !clusters.isEmpty()) {
-            clusterDashboard.put("default_cluster_name", getClusters().get(0));
-        } else {
-            clusterDashboard.put("default_cluster_name", "");
-        }
-        clusterDashboard.put("cluster_label", PrometheusParams.AGENT_TARGET_LABEL);
-        clusterDashboard.put("dashboard_name", "Cluster");
+        Map<String, Object> hostDashboard = new HashMap<>();
+        hostDashboard.put("name", "Host");
+        hostDashboard.put("path", dashboardConfigDir("host"));
 
         dashboards.add(clusterDashboard);
+        dashboards.add(hostDashboard);
+
+        // Used for dashboard json configuration
+        globalParamsMap.put("cluster_label", PrometheusParams.AGENT_TARGET_LABEL);
+        globalParamsMap.put("cluster_dashboard_name", "Cluster");
+        globalParamsMap.put("host_dashboard_name", "Host");
+
+        Map<String, List<String>> clusterHost = getClusterHosts();
+        if (clusterHost != null && !clusterHost.isEmpty()) {
+            String defaultCluster = clusterHost.keySet().iterator().next();
+            String defaultHost = clusterHost.get(defaultCluster).isEmpty()
+                    ? ""
+                    : clusterHost.get(defaultCluster).get(0);
+            clusterDashboard.put("default_cluster_name", defaultCluster);
+            globalParamsMap.put("default_cluster_name", defaultCluster);
+            globalParamsMap.put("default_host_name", defaultHost);
+        }
     }
 }

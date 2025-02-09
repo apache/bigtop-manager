@@ -37,6 +37,7 @@ header:
     - 'mvnw'
     - 'mvnw.cmd'
     - 'LICENSE'
+    - 'NOTICE'
     - 'pnpm-lock.yaml'
     - '**/*.txt'
 

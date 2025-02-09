@@ -28,6 +28,7 @@ import org.apache.bigtop.manager.ai.core.exception.AssistantConfigNotSetExceptio
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 import org.apache.bigtop.manager.ai.core.provider.SystemPromptProvider;
 import org.apache.bigtop.manager.ai.dashscope.DashScopeAssistant;
+import org.apache.bigtop.manager.ai.deepseek.DeepSeekAssistant;
 import org.apache.bigtop.manager.ai.openai.OpenAIAssistant;
 import org.apache.bigtop.manager.ai.qianfan.QianFanAssistant;
 
@@ -64,6 +65,7 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
             case OPENAI -> OpenAIAssistant.builder();
             case DASH_SCOPE -> DashScopeAssistant.builder();
             case QIANFAN -> QianFanAssistant.builder();
+            case DEEPSEEK -> DeepSeekAssistant.builder();
         };
     }
 

@@ -20,6 +20,7 @@ package org.apache.bigtop.manager.server.command.stage;
 
 import org.apache.bigtop.manager.server.command.task.ComponentCheckTask;
 import org.apache.bigtop.manager.server.command.task.Task;
+import org.apache.bigtop.manager.server.utils.StackUtils;
 
 public class ComponentCheckStage extends AbstractComponentStage {
 
@@ -34,6 +35,7 @@ public class ComponentCheckStage extends AbstractComponentStage {
 
     @Override
     public String getName() {
-        return "Check " + stageContext.getComponentDTO().getDisplayName();
+        return "Check "
+                + StackUtils.getComponentDTO(stageContext.getComponentName()).getDisplayName();
     }
 }

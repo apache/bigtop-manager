@@ -19,9 +19,6 @@
 package org.apache.bigtop.manager.server.command.helper;
 
 import org.apache.bigtop.manager.common.constants.MessageConstants;
-import org.apache.bigtop.manager.common.message.entity.payload.CacheMessagePayload;
-import org.apache.bigtop.manager.common.message.entity.pojo.ClusterInfo;
-import org.apache.bigtop.manager.common.message.entity.pojo.RepoInfo;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
@@ -37,20 +34,20 @@ import org.apache.bigtop.manager.dao.repository.ServiceConfigDao;
 import org.apache.bigtop.manager.grpc.generated.JobCacheReply;
 import org.apache.bigtop.manager.grpc.generated.JobCacheRequest;
 import org.apache.bigtop.manager.grpc.generated.JobCacheServiceGrpc;
+import org.apache.bigtop.manager.grpc.payload.JobCachePayload;
+import org.apache.bigtop.manager.grpc.pojo.ClusterInfo;
+import org.apache.bigtop.manager.grpc.pojo.RepoInfo;
 import org.apache.bigtop.manager.server.exception.ServerException;
 import org.apache.bigtop.manager.server.grpc.GrpcClient;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
-import org.apache.bigtop.manager.server.model.converter.RepoConverter;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.model.dto.StackDTO;
 import org.apache.bigtop.manager.server.utils.StackUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -78,7 +75,7 @@ public class JobCacheHelper {
     }
 
     public static void sendJobCache(Long clusterId, Long jobId, List<String> hostnames) {
-        CacheMessagePayload payload = genPayload(clusterId);
+        JobCachePayload payload = genPayload(clusterId);
         JobCacheRequest request = JobCacheRequest.newBuilder()
                 .setJobId(jobId)
                 .setPayload(JsonUtils.writeAsString(payload))
@@ -112,7 +109,7 @@ public class JobCacheHelper {
         }
     }
 
-    private static CacheMessagePayload genPayload(Long clusterId) {
+    private static JobCachePayload genPayload(Long clusterId) {
         if (!INITIALIZED.get()) {
             initialize();
         }
@@ -132,7 +129,7 @@ public class JobCacheHelper {
         clusterInfo.setUserGroup(clusterPO.getUserGroup());
         clusterInfo.setRootDir(clusterPO.getRootDir());
 
-        Map<String, Map<String, Object>> serviceConfigMap = new HashMap<>();
+        Map<String, Map<String, String>> serviceConfigMap = new HashMap<>();
         for (ServiceConfigPO serviceConfigPO : serviceConfigPOList) {
             List<Map<String, Object>> properties = JsonUtils.readFromString(serviceConfigPO.getPropertiesJson());
             Map<String, String> kvMap = properties.stream()
@@ -143,30 +140,34 @@ public class JobCacheHelper {
             if (serviceConfigMap.containsKey(serviceConfigPO.getServiceName())) {
                 serviceConfigMap.get(serviceConfigPO.getServiceName()).put(serviceConfigPO.getName(), kvString);
             } else {
-                Map<String, Object> hashMap = new HashMap<>();
+                Map<String, String> hashMap = new HashMap<>();
                 hashMap.put(serviceConfigPO.getName(), kvString);
                 serviceConfigMap.put(serviceConfigPO.getServiceName(), hashMap);
             }
         }
 
-        Map<String, Set<String>> hostMap = new HashMap<>();
+        Map<String, List<String>> hostMap = new HashMap<>();
         componentPOList.forEach(x -> {
             if (hostMap.containsKey(x.getName())) {
                 hostMap.get(x.getName()).add(x.getHostname());
             } else {
-                Set<String> set = new HashSet<>();
-                set.add(x.getHostname());
-                hostMap.put(x.getName(), set);
+                List<String> list = new ArrayList<>();
+                list.add(x.getHostname());
+                hostMap.put(x.getName(), list);
             }
             hostMap.get(x.getName()).add(x.getHostname());
         });
 
-        Set<String> hostNameSet = hostPOList.stream().map(HostPO::getHostname).collect(Collectors.toSet());
-        hostMap.put(ALL_HOST_KEY, hostNameSet);
+        List<String> allHostnames = hostPOList.stream().map(HostPO::getHostname).toList();
+        hostMap.put(ALL_HOST_KEY, allHostnames);
 
         List<RepoInfo> repoList = new ArrayList<>();
         repoPOList.forEach(repoPO -> {
-            RepoInfo repoInfo = RepoConverter.INSTANCE.fromPO2Message(repoPO);
+            RepoInfo repoInfo = new RepoInfo();
+            repoInfo.setName(repoPO.getName());
+            repoInfo.setArch(repoPO.getArch());
+            repoInfo.setBaseUrl(repoPO.getBaseUrl());
+            repoInfo.setType(repoPO.getType());
             repoList.add(repoInfo);
         });
 
@@ -177,10 +178,10 @@ public class JobCacheHelper {
             }
         }
 
-        CacheMessagePayload payload = new CacheMessagePayload();
+        JobCachePayload payload = new JobCachePayload();
         payload.setClusterInfo(clusterInfo);
         payload.setConfigurations(serviceConfigMap);
-        payload.setClusterHostInfo(hostMap);
+        payload.setComponentHosts(hostMap);
         payload.setRepoInfo(repoList);
         payload.setUserInfo(userMap);
         return payload;

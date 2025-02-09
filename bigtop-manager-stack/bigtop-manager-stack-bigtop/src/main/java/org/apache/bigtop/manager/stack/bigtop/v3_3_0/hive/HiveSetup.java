@@ -48,14 +48,6 @@ public class HiveSetup {
         LinuxFileUtils.createDirectories(hiveParams.getHiveLogDir(), hiveUser, hiveGroup, PERMISSION_755, true);
         LinuxFileUtils.createDirectories(hiveParams.getHivePidDir(), hiveUser, hiveGroup, PERMISSION_755, true);
 
-        LinuxFileUtils.toFile(
-                ConfigType.CONTENT,
-                MessageFormat.format("{0}/hive-service.sh", hiveParams.serviceHome() + "/bin"),
-                hiveUser,
-                hiveGroup,
-                Constants.PERMISSION_755,
-                hiveParams.getHiveShellContent());
-
         LinuxFileUtils.toFileByTemplate(
                 hiveParams.hiveLimits(),
                 MessageFormat.format("{0}/hive.conf", HadoopParams.LIMITS_CONF_DIR),

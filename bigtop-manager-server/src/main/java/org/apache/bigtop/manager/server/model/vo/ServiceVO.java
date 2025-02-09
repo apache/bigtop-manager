@@ -37,6 +37,8 @@ public class ServiceVO {
 
     private String user;
 
+    private String license;
+
     private String stack;
 
     private Boolean restartFlag;

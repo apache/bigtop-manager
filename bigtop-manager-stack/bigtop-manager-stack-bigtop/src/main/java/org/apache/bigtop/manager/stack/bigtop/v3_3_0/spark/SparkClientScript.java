@@ -42,6 +42,8 @@ public class SparkClientScript extends AbstractClientScript {
 
     @Override
     public ShellResult configure(Params params) {
+        super.configure(params);
+
         return SparkSetup.configure(params);
     }
 

@@ -28,6 +28,7 @@
         </desc>
         <version>3.7.2-1</version>
         <user>zookeeper</user>
+        <license>Apache-2.0</license>
 
         <components>
             <component>

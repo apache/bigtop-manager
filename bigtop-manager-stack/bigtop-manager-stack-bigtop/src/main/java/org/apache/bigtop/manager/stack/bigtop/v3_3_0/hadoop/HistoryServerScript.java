@@ -43,6 +43,8 @@ public class HistoryServerScript extends AbstractServerScript {
 
     @Override
     public ShellResult configure(Params params) {
+        super.configure(params);
+
         return HadoopSetup.configure(params, getComponentName());
     }
 

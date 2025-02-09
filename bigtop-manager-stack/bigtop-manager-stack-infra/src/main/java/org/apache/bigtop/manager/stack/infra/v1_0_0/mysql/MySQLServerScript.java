@@ -47,6 +47,8 @@ public class MySQLServerScript extends AbstractServerScript {
 
     @Override
     public ShellResult configure(Params params) {
+        super.configure(params);
+
         return MySQLSetup.configure(params);
     }
 

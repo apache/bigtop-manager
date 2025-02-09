@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.kafka;
 
-import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
+import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
 import org.apache.bigtop.manager.stack.bigtop.param.BigtopParams;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
@@ -42,8 +42,8 @@ public class KafkaParams extends BigtopParams {
     private String kafkaEnvContent;
     private String kafkaLog4jContent;
 
-    public KafkaParams(CommandPayload commandPayload) {
-        super(commandPayload);
+    public KafkaParams(ComponentCommandPayload componentCommandPayload) {
+        super(componentCommandPayload);
         globalParamsMap.put("kafka_user", user());
         globalParamsMap.put("kafka_group", group());
         globalParamsMap.put("java_home", javaHome());

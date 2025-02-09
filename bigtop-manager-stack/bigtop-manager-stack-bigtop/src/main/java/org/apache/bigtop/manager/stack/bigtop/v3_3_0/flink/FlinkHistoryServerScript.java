@@ -42,6 +42,8 @@ public class FlinkHistoryServerScript extends AbstractServerScript {
 
     @Override
     public ShellResult configure(Params params) {
+        super.configure(params);
+
         return FlinkSetup.configure(params);
     }
 
