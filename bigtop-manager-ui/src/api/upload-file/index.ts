@@ -16,23 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-export default {
-  base_info: '基本信息',
-  cluster_config: '集群配置',
-  cluster_management: '集群管理',
-  component_info: '组件信息',
-  host_config: '主机管理',
-  create: '创建集群',
-  name: '集群名',
-  description: '集群描述',
-  root_directory: '集群根目录',
-  user_group: '集群用户组',
-  config_source: '配置源',
-  install_dependencies: '安装依赖',
-  add_host: '新增主机',
-  edit_host: '编辑主机',
-  view_log: '查看日志',
-  source: '配置源',
-  show_hosts_resolved: '解析后的主机名列表',
-  cluster_unavailable_message: '抱歉，你还没有集群，无法使用集群管理能力。'
+
+import request from '@/api/request.ts'
+
+export const uploadFile = (data: FormData): Promise<string> => {
+  return request({
+    method: 'post',
+    url: '/files/upload-key',
+    data,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
 }

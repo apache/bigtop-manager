@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { reactive, ref, toRefs } from 'vue'
+  import { computed, reactive, ref, toRefs } from 'vue'
   import { getRepoList, updateRepo } from '@/api/repo'
   import type { RepoVO } from '@/api/repo/types'
   import { message, type FormInstance, type TableColumnType } from 'ant-design-vue'
@@ -27,31 +27,32 @@
   const { t } = useI18n()
   const open = ref(false)
   const loading = ref(false)
-  const columns: TableColumnType[] = [
-    {
-      title: '名称',
-      dataIndex: 'name',
-      key: 'name',
-      ellipsis: true
-    },
-    {
-      title: '架构',
-      dataIndex: 'arch',
-      key: 'arch',
-      ellipsis: true
-    },
-    {
-      title: '地址',
-      dataIndex: 'baseUrl',
-      key: 'baseUrl',
-      ellipsis: true
-    }
-  ]
   const formRef = ref<FormInstance>()
   const form = reactive({
     list: [] as RepoVO[]
   })
   const { list } = toRefs(form)
+
+  const columns = computed((): TableColumnType[] => [
+    {
+      title: t('common.name'),
+      dataIndex: 'name',
+      key: 'name',
+      ellipsis: true
+    },
+    {
+      title: t('common.arch'),
+      dataIndex: 'arch',
+      key: 'arch',
+      ellipsis: true
+    },
+    {
+      title: t('common.base_url'),
+      dataIndex: 'baseUrl',
+      key: 'baseUrl',
+      ellipsis: true
+    }
+  ])
 
   const handleOpen = () => {
     open.value = true
@@ -124,7 +125,7 @@
                 label=" "
                 :colon="false"
                 :name="['list', index, 'baseUrl']"
-                :rules="[{ required: true, message: '请输入地址', trigger: 'blur' }]"
+                :rules="[{ required: true, message: $t('common.enter_error'), trigger: 'blur' }]"
               >
                 <a-input v-model:value="record[column.key]" />
               </a-form-item>
@@ -132,7 +133,7 @@
           </template>
         </a-table>
       </a-form>
-      <a-typography-text class="set-source-tip" type="danger">*注: 源地址的改动对所有集群生效</a-typography-text>
+      <a-typography-text class="set-source-tip" type="danger">{{ `*${$t('common.note')}` }}</a-typography-text>
     </a-modal>
   </div>
 </template>

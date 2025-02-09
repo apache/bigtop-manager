@@ -19,13 +19,14 @@
 
 <script setup lang="ts">
   import { TableColumnType } from 'ant-design-vue'
-  import { computed, onMounted, reactive, ref } from 'vue'
+  import { computed, reactive, ref, watch } from 'vue'
   import useBaseTable from '@/composables/use-base-table'
   import type { FilterConfirmProps, FilterResetProps } from 'ant-design-vue/es/table/interface'
   import type { GroupItem } from '@/components/common/button-group/types'
-  import { getHosts } from '@/api/hosts'
-  import { HostVO } from '@/api/hosts/types'
+  import { HostAdd } from '@/api/hosts/types'
   import HostCreate from '@/pages/cluster-manage/hosts/create.vue'
+  import { generateRandomId } from '@/utils/tools'
+  import { useI18n } from 'vue-i18n'
 
   type Key = string | number
   interface TableState {
@@ -33,10 +34,11 @@
     searchText: string
     searchedColumn: string
   }
-
+  const { t } = useI18n()
+  const props = defineProps<{ stepData: any }>()
+  const emits = defineEmits(['updateData'])
+  const data = ref<HostAdd[]>([])
   const searchInputRef = ref()
-  // const checkAllHostIsSuccessfull = ref(false)
-  const data = ref<HostVO[]>()
   const hostCreateRef = ref<InstanceType<typeof HostCreate> | null>(null)
   const state = reactive<TableState>({
     searchText: '',
@@ -46,44 +48,45 @@
 
   const columns = computed((): TableColumnType[] => [
     {
-      title: '主机名',
-      dataIndex: 'name',
-      key: 'name',
+      title: t('host.hostname'),
+      dataIndex: 'hostname',
+      key: 'hostname',
       ellipsis: true,
       customFilterDropdown: true,
-      onFilter: (value, record) => isContain(record.name, value as string),
+      onFilter: (value, record) => isContain(record.hostname, value as string),
       onFilterDropdownOpenChange: (visible) => onFilterDropdownOpenChange(visible)
     },
     {
-      title: 'IP地址',
-      dataIndex: 'address',
-      key: 'address',
+      title: t('host.ssh_user'),
+      dataIndex: 'ssh_user',
+      width: '260px',
+      key: 'ssh_user',
       ellipsis: true,
       customFilterDropdown: true,
-      onFilter: (value, record) => isContain(record.address, value as string),
+      onFilter: (value, record) => isContain(record.ssh_user, value as string),
       onFilterDropdownOpenChange: (visible) => onFilterDropdownOpenChange(visible)
     },
     {
-      title: '备注',
-      dataIndex: 'remark',
+      title: t('common.desc'),
+      dataIndex: 'desc',
       width: '20%',
       ellipsis: true
     },
     {
-      title: '状态',
+      key: 'status',
+      title: t('common.status'),
       dataIndex: 'status',
-      width: '260px',
       ellipsis: true
     },
     {
-      title: '操作',
+      title: t('common.action'),
       key: 'operation',
       width: '160px',
       fixed: 'right'
     }
   ])
 
-  const { loading, paginationProps, onChange } = useBaseTable({
+  const { loading, dataSource, paginationProps, onChange } = useBaseTable({
     columns: columns.value,
     rows: data.value
   })
@@ -91,7 +94,7 @@
   const operations = computed((): GroupItem[] => [
     {
       text: 'edit',
-      clickEvent: (_item, args) => handleEdit(args)
+      clickEvent: (_item, args) => editHost(args)
     },
     {
       text: 'remove',
@@ -99,6 +102,16 @@
       clickEvent: (_item, args) => deleteHost(args)
     }
   ])
+
+  watch(
+    () => props.stepData,
+    (val) => {
+      dataSource.value = val
+    },
+    {
+      immediate: true
+    }
+  )
 
   const isContain = (source: string, target: string) => {
     return source.toString().toLowerCase().includes(target.toLowerCase())
@@ -116,10 +129,6 @@
     state.selectedRowKeys = selectedRowKeys
   }
 
-  // const handleInstallDependencies = () => {
-  //   console.log('selectedRowKeys :>> ', state.selectedRowKeys)
-  // }
-
   const handleSearch = (selectedKeys: Key[], confirm: (param?: FilterConfirmProps) => void, dataIndex: string) => {
     confirm()
     state.searchText = selectedKeys[0] as string
@@ -132,36 +141,52 @@
   }
 
   const addHost = () => {
-    hostCreateRef.value?.handleOpen()
+    hostCreateRef.value?.handleOpen('ADD')
   }
 
-  const handleEdit = (row: any) => {
-    console.log('row :>> ', row)
+  const editHost = (row: HostAdd) => {
+    hostCreateRef.value?.handleOpen('EDIT', row)
   }
 
-  const deleteHost = (row?: any) => {
-    if (!row) {
-      console.log('selectedRowKeys :>> ', state.selectedRowKeys)
+  const updateStepData = () => {
+    const res = dataSource.value.map((v) => {
+      return {
+        ...v,
+        hostnames: [v.hostname]
+      }
+    })
+    emits('updateData', res)
+  }
+
+  const addHostSuccess = (type: 'ADD' | 'EDIT', item: HostAdd) => {
+    if (type === 'ADD') {
+      const items = item.hostnames?.map((v) => {
+        return {
+          ...item,
+          key: generateRandomId(),
+          hostname: v,
+          status: 'INSTALLING'
+        }
+      }) as HostAdd[]
+      dataSource.value?.unshift(...items)
     } else {
-      console.log('row :>> ', row)
+      const index = dataSource.value.findIndex((data: any) => data.key === item.key)
+      if (index !== -1) {
+        dataSource.value[index] = item
+      }
     }
+    updateStepData()
   }
 
-  const getHostList = async () => {
-    try {
-      loading.value = true
-      const { content } = await getHosts()
-      data.value = content
-    } catch (error) {
-      console.log('error :>> ', error)
-    } finally {
-      loading.value = false
+  const deleteHost = (row?: HostAdd) => {
+    if (!row?.key) {
+      state.selectedRowKeys.length > 0 &&
+        (dataSource.value = dataSource.value?.filter((v: any) => !state.selectedRowKeys.includes(v.key)) || [])
+    } else {
+      dataSource.value = dataSource.value?.filter((v: any) => row.key !== v.key)
     }
+    updateStepData()
   }
-
-  onMounted(() => {
-    getHostList()
-  })
 </script>
 
 <template>
@@ -174,7 +199,7 @@
     </header>
     <a-table
       :loading="loading"
-      :data-source="data"
+      :data-source="dataSource"
       :columns="columns"
       :pagination="paginationProps"
       :row-selection="{ selectedRowKeys: state.selectedRowKeys, onChange: onSelectChange }"
@@ -198,11 +223,15 @@
         </div>
       </template>
       <template #customFilterIcon="{ filtered }">
-        <svg-icon :name="filtered ? 'search_active' : 'search'" />
+        <svg-icon :name="filtered ? 'search_activated' : 'search'" />
       </template>
       <template #bodyCell="{ record, column }">
         <template v-if="column.key === 'status'">
-          <svg-icon :name="record.status" />
+          <svg-icon :name="record.status.toLowerCase()" />
+          <span :title="`${record.message ? record.message : ''}`">
+            {{ `${$t(`common.${record.status.toLowerCase()}`)}` }}
+            {{ record.message ? `:  ${record.message}` : '' }}
+          </span>
         </template>
         <template v-if="column.key === 'operation'">
           <button-group
@@ -217,7 +246,7 @@
         </template>
       </template>
     </a-table>
-    <host-create ref="hostCreateRef" />
+    <host-create ref="hostCreateRef" @on-ok="addHostSuccess" />
   </div>
 </template>
 

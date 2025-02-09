@@ -17,5 +17,26 @@
  * under the License.
  */
 export default {
-  host_list: 'Host List'
+  host_list: 'Host List',
+  uninstallable: 'Please add the host first',
+  hostname: 'Hostname',
+  ssh_user: 'Username',
+  confirm_password: 'Confirm Password',
+  input_method: 'Input Method',
+  file: 'File',
+  text: 'Text',
+  key_file: 'Key File',
+  key_text: 'Key Text',
+  key_password: 'Key Password',
+  confirm_key_password: 'Confirm Key Password',
+  username: 'Username',
+  auth_method: 'Authentication Method',
+  password_auth: 'Password',
+  key_auth: 'Key',
+  no_auth: 'No Authentication',
+  agent_path: 'Agent Path',
+  ssh_port: 'SSH Port',
+  grpc_port: 'gRPC Port',
+  description: 'Description',
+  key_password_not_match: 'Key Passwords do not match.'
 }

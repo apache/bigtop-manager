@@ -18,20 +18,21 @@
 -->
 
 <script setup lang="ts">
-  import { CommandRequest } from '@/api/command/types'
   import type { FormItemState } from '@/components/common/auto-form/types'
-  import { computed, ref, shallowRef, toRefs } from 'vue'
+  import { computed, ref, shallowRef, toRefs, watch } from 'vue'
   import { useI18n } from 'vue-i18n'
 
   const { t } = useI18n()
   const activeKey = ref(['1', '2'])
   const autoFormRefMap = shallowRef<Map<string, Comp.AutoFormInstance>>(new Map())
-  const props = defineProps<{ commandRequest: CommandRequest }>()
-  const { commandRequest } = toRefs(props)
+  const props = defineProps<{ stepData: any }>()
+  const emits = defineEmits(['updateData'])
+  const { stepData } = toRefs(props)
   const formLayout = computed(() => ({
     labelCol: { xs: 5, sm: 5, md: 5, lg: 4, xl: 3 },
     wrapperCol: { xs: 10, sm: 10, md: 10, lg: 10, xl: { xl: 10, pull: 1 } }
   }))
+
   const baseInfoFormItems = computed((): FormItemState[] => [
     {
       type: 'input',
@@ -39,10 +40,12 @@
       formItemProps: {
         name: 'name',
         label: t('cluster.name'),
-        rules: [{ required: true, message: t('common.enter_error'), trigger: 'blur' }]
+        rules: [
+          { required: true, message: t('common.enter_error', [`${t('cluster.name')}`.toLowerCase()]), trigger: 'blur' }
+        ]
       },
       controlProps: {
-        placeholder: t('common.enter_error')
+        placeholder: t('common.enter_error', [`${t('cluster.name')}`.toLowerCase()])
       }
     },
     {
@@ -51,13 +54,20 @@
       formItemProps: {
         name: 'desc',
         label: t('cluster.description'),
-        rules: [{ required: true, message: t('common.enter_error'), trigger: 'blur' }]
+        rules: [
+          {
+            required: true,
+            message: t('common.enter_error', [`${t('cluster.description')}`.toLowerCase()]),
+            trigger: 'blur'
+          }
+        ]
       },
       controlProps: {
-        placeholder: t('common.enter_error')
+        placeholder: t('common.enter_error', [`${t('cluster.description')}`.toLowerCase()])
       }
     }
   ])
+
   const clusterConfigFormItems = computed((): FormItemState[] => [
     {
       type: 'input',
@@ -65,10 +75,16 @@
       formItemProps: {
         name: 'rootDir',
         label: t('cluster.root_directory'),
-        rules: [{ required: true, message: t('common.enter_error'), trigger: 'blur' }]
+        rules: [
+          {
+            required: true,
+            message: t('common.enter_error', [`${t('cluster.root_directory')}`.toLowerCase()]),
+            trigger: 'blur'
+          }
+        ]
       },
       controlProps: {
-        placeholder: t('common.enter_error')
+        placeholder: t('common.enter_error', [`${t('cluster.root_directory')}`.toLowerCase()])
       }
     },
     {
@@ -77,26 +93,33 @@
       formItemProps: {
         name: 'userGroup',
         label: t('cluster.user_group'),
-        rules: [{ required: true, message: t('common.enter_error'), trigger: 'blur' }]
+        rules: [
+          {
+            required: true,
+            message: t('common.enter_error', [`${t('cluster.user_group')}`.toLowerCase()]),
+            trigger: 'blur'
+          }
+        ]
       },
       controlProps: {
-        placeholder: t('common.enter_error')
+        placeholder: t('common.enter_error', [`${t('cluster.user_group')}`.toLowerCase()])
       }
     }
   ])
+
   const collapses = ref([
     {
       title: computed(() => t('cluster.base_info')),
-      formValue: { name: commandRequest.value.clusterCommand?.name, desc: commandRequest.value.clusterCommand?.desc },
-      formItems: baseInfoFormItems.value
+      formValue: { name: stepData.value?.name, desc: stepData.value?.desc },
+      formItems: computed(() => baseInfoFormItems.value)
     },
     {
       title: computed(() => t('cluster.cluster_config')),
       formValue: {
-        rootDir: commandRequest.value.clusterCommand?.rootDir,
-        userGroup: commandRequest.value.clusterCommand?.rootDir
+        rootDir: stepData.value?.rootDir,
+        userGroup: stepData.value?.rootDir
       },
-      formItems: clusterConfigFormItems.value
+      formItems: computed(() => clusterConfigFormItems.value)
     }
   ])
 
@@ -121,21 +144,31 @@
       )
       const allValid = validationResults.every((res) => res)
       if (allValid) {
-        const res = getFormValues()
-        return res
+        return allValid
       } else {
         autoFormRefs.forEach((_formRef, idx) => {
           if (!validationResults[idx]) {
             !activeKey.value.includes(`${idx + 1}`) && activeKey.value.push(`${idx + 1}`)
           }
         })
-        return -1
+        return allValid
       }
     } catch (error) {
       console.error('Error during form validation:', error)
-      return -1
+      return
     }
   }
+
+  watch(
+    () => [collapses.value[0].formValue, collapses.value[1].formValue],
+    () => {
+      const res = getFormValues()
+      emits('updateData', res)
+    },
+    {
+      deep: true
+    }
+  )
 
   defineExpose({
     check
@@ -160,7 +193,6 @@
         />
       </a-collapse-panel>
     </a-collapse>
-    <a-button @click="check">check</a-button>
   </div>
 </template>
 

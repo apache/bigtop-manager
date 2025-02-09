@@ -18,55 +18,93 @@
 -->
 
 <script setup lang="ts">
-  import { computed, ref, watch } from 'vue'
-  import type { AuthorizedPlatform } from '@/api/llm-config/types'
-  // import { message } from 'ant-design-vue'
-  // import { useI18n } from 'vue-i18n'
+  import { computed, h, ref, watch } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import type { HostAdd } from '@/api/hosts/types'
   import { FormItemState } from '@/components/common/auto-form/types'
-  import { UploadOutlined } from '@ant-design/icons-vue'
+  import { CheckCircleOutlined, UploadOutlined } from '@ant-design/icons-vue'
+  import { parseHostNamesAsPatternExpression } from '@/utils/array'
+  import { message, Modal } from 'ant-design-vue'
+  import { useLocaleStore } from '@/store/locale'
+  import { storeToRefs } from 'pinia'
+  import type { UploadProps } from 'ant-design-vue'
+  import { uploadFile } from '@/api/upload-file'
+  import { Rule } from 'ant-design-vue/es/form'
+
   enum Mode {
     EDIT = 'cluster.edit_host',
     ADD = 'cluster.add_host'
   }
 
-  // interface Emits {
-  //   (event: 'onOk'): void
-  // }
+  interface Emits {
+    (event: 'onOk', type: keyof typeof Mode, value: HostAdd): void
+  }
 
-  // const emits = defineEmits<Emits>()
-  // const { t } = useI18n()
+  const emits = defineEmits<Emits>()
+  const { t } = useI18n()
+  const localeStore = useLocaleStore()
+  const { locale } = storeToRefs(localeStore)
   const open = ref(false)
   const mode = ref<keyof typeof Mode>('ADD')
   const hiddenItems = ref<string[]>([])
   const autoFormRef = ref<Comp.AutoFormInstance | null>(null)
-  const formValue = ref<HostAdd>({})
-  const fileList = ref()
-  // const isEdit = computed(() => mode.value === 'EDIT')
+  const formValue = ref<HostAdd & { hostname?: string }>({})
+  const isEdit = computed(() => mode.value === 'EDIT')
+
+  const checkPassword = async (_rule: Rule, value: string) => {
+    if (!value) {
+      return Promise.reject(t('common.enter_error', [`${t('host.confirm_password')}`.toLowerCase()]))
+    }
+    if (value != formValue.value?.sshKeyPassword) {
+      return Promise.reject(t('common.password_not_match'))
+    } else {
+      return Promise.resolve()
+    }
+  }
+
+  const checkSshKeyPassword = async (_rule: Rule, value: string) => {
+    if (value != formValue.value?.sshKeyPassword) {
+      return Promise.reject(t('host.key_password_not_match'))
+    } else {
+      return Promise.resolve()
+    }
+  }
 
   const formItemsForPassword = computed((): FormItemState[] => [
     {
-      type: 'input',
+      type: 'inputPassword',
       field: 'sshKeyPassword',
       formItemProps: {
         name: 'sshKeyPassword',
-        label: '密码',
-        rules: [{ required: true, message: '密码', trigger: 'blur' }]
+        label: t('host.password_auth'),
+        rules: [
+          {
+            required: true,
+            message: t('common.enter_error', [`${t('host.password_auth')}`.toLowerCase()]),
+            trigger: 'blur'
+          }
+        ]
       },
       controlProps: {
-        placeholder: '请输入'
+        placeholder: t('common.enter_error', [`${t('host.password_auth')}`.toLowerCase()])
       }
     },
     {
-      type: 'input',
+      type: 'inputPassword',
       field: 'sshKeyPasswordAgain',
       formItemProps: {
         name: 'sshKeyPasswordAgain',
-        label: '确认密码',
-        rules: [{ required: true, message: '确认密码', trigger: 'blur' }]
+        label: t('host.confirm_password'),
+        rules: [
+          {
+            required: true,
+            validator: checkPassword,
+            trigger: 'blur'
+          }
+        ]
       },
       controlProps: {
-        placeholder: '请输入'
+        placeholder: t('common.enter_error', [`${t('host.confirm_password')}`.toLowerCase()])
       }
     }
   ])
@@ -77,13 +115,19 @@
       field: 'inputType',
       defaultValue: '1',
       defaultOptionsMap: [
-        { value: '1', label: '文件' },
-        { value: '2', label: '文本' }
+        { value: '1', label: t('host.file') },
+        { value: '2', label: t('host.text') }
       ],
       formItemProps: {
         name: 'inputType',
-        label: '输入方式',
-        rules: [{ required: true, message: '输入方式', trigger: 'blur' }]
+        label: t('host.input_method'),
+        rules: [
+          {
+            required: true,
+            message: t('common.select_error', [`${t('host.input_method')}`.toLowerCase()]),
+            trigger: 'blur'
+          }
+        ]
       }
     },
 
@@ -93,7 +137,14 @@
       slot: 'sshKeyFilenameSlot',
       formItemProps: {
         name: 'sshKeyFilename',
-        label: '密钥文件'
+        label: t('host.key_file'),
+        rules: [
+          {
+            required: true,
+            message: t('common.add_error', [`${t('host.key_file')}`.toLowerCase()]),
+            trigger: 'blur'
+          }
+        ]
       }
     },
     {
@@ -101,11 +152,13 @@
       field: 'sshKeyString',
       formItemProps: {
         name: 'sshKeyString',
-        label: '密钥文本',
-        rules: [{ required: true, message: '密钥文本', trigger: 'blur' }]
+        label: t('host.key_text'),
+        rules: [
+          { required: true, message: t('common.enter_error', [`${t('host.key_text')}`.toLowerCase()]), trigger: 'blur' }
+        ]
       },
       controlProps: {
-        placeholder: '请输入'
+        placeholder: t('common.enter_error', [`${t('host.key_text')}`.toLowerCase()])
       }
     },
     {
@@ -113,10 +166,10 @@
       field: 'keyPassword',
       formItemProps: {
         name: 'keyPassword',
-        label: '密钥口令'
+        label: t('host.key_password')
       },
       controlProps: {
-        placeholder: '请输入'
+        placeholder: t('common.enter_error', [`${t('host.key_password')}`.toLowerCase()])
       }
     },
     {
@@ -124,10 +177,17 @@
       field: 'keyPasswordAgain',
       formItemProps: {
         name: 'keyPasswordAgain',
-        label: '确认口令'
+        label: t('host.confirm_key_password'),
+        rules: [
+          {
+            required: false,
+            validator: checkSshKeyPassword,
+            trigger: 'blur'
+          }
+        ]
       },
       controlProps: {
-        placeholder: '请输入'
+        placeholder: t('common.enter_error', [`${t('host.confirm_key_password')}`.toLowerCase()])
       }
     }
   ])
@@ -137,11 +197,14 @@
       field: 'sshUser',
       formItemProps: {
         name: 'sshUser',
-        label: '用户名',
-        rules: [{ required: true, message: '用户名', trigger: 'blur' }]
+        label: t('host.username'),
+        rules: [
+          { required: true, message: t('common.enter_error', [`${t('host.username')}`.toLowerCase()]), trigger: 'blur' }
+        ]
       },
       controlProps: {
-        placeholder: '请输入'
+        disabled: isEdit.value,
+        placeholder: t('common.enter_error', [`${t('host.username')}`.toLowerCase()])
       }
     },
     {
@@ -149,27 +212,36 @@
       field: 'authType',
       defaultValue: '1',
       defaultOptionsMap: [
-        { value: '1', label: '密码' },
-        { value: '2', label: '密钥' },
-        { value: '3', label: '无认证' }
+        { value: '1', label: t('host.password_auth') },
+        { value: '2', label: t('host.key_auth') },
+        { value: '3', label: t('host.no_auth') }
       ],
       formItemProps: {
         name: 'authType',
-        label: '认证方式',
-        rules: [{ required: true, message: '认证方式', trigger: 'blur' }]
+        label: t('host.auth_method'),
+        rules: [
+          {
+            required: true,
+            message: t('common.select_error', [`${t('host.auth_method')}`.toLowerCase()]),
+            trigger: 'blur'
+          }
+        ]
       }
     },
 
     {
-      type: 'textarea',
-      field: 'hostnames',
+      type: mode.value == 'ADD' ? 'textarea' : 'input',
+      field: 'hostname',
       formItemProps: {
-        name: 'hostnames',
-        label: '主机名',
-        rules: [{ required: true, message: '主机名', trigger: 'blur' }]
+        name: 'hostname',
+        label: t('host.hostname'),
+        rules: [
+          { required: true, message: t('common.enter_error', [`${t('host.hostname')}`.toLowerCase()]), trigger: 'blur' }
+        ]
       },
       controlProps: {
-        placeholder: '请输入'
+        disabled: isEdit.value,
+        placeholder: t('common.enter_error', [`${t('host.hostname')}`.toLowerCase()])
       }
     },
 
@@ -179,10 +251,11 @@
       slot: 'agentDirSlot',
       formItemProps: {
         name: 'agentDir',
-        label: 'Agent路径'
+        label: t('host.agent_path')
       },
       controlProps: {
-        placeholder: '请输入'
+        disabled: isEdit.value,
+        placeholder: t('common.enter_error', [`${t('host.agent_path')}`.toLowerCase()])
       }
     },
     {
@@ -190,10 +263,10 @@
       field: 'sshPort',
       formItemProps: {
         name: 'sshPort',
-        label: 'SSH端口'
+        label: t('host.ssh_port')
       },
       controlProps: {
-        placeholder: '请输入'
+        placeholder: t('common.enter_error', [`${t('host.ssh_port')}`.toLowerCase()])
       }
     },
     {
@@ -202,21 +275,21 @@
       slot: 'grpcPortSlot',
       formItemProps: {
         name: 'grpcPort',
-        label: 'gRPC端口'
+        label: t('host.grpc_port')
       },
       controlProps: {
-        placeholder: '请输入'
+        placeholder: t('common.enter_error', [`${t('host.grpc_port')}`.toLowerCase()])
       }
     },
     {
       type: 'textarea',
-      field: 'remark',
+      field: 'desc',
       formItemProps: {
-        name: 'remark',
-        label: '备注'
+        name: 'desc',
+        label: t('host.description')
       },
       controlProps: {
-        placeholder: '请输入'
+        placeholder: t('common.enter_error', [`${t('host.description')}`.toLowerCase()])
       }
     }
   ])
@@ -250,34 +323,145 @@
     }
   )
 
-  const handleOpen = async (payload?: AuthorizedPlatform) => {
+  const handleOpen = async (type: keyof typeof Mode, payload?: HostAdd) => {
     open.value = true
-    mode.value = payload ? 'EDIT' : 'ADD'
-    Object.assign(formValue.value, {
-      authType: '1',
-      inputType: '1'
-    })
+    mode.value = type
+    if (payload) {
+      formValue.value = Object.assign(formValue.value, { ...payload })
+    } else {
+      Object.assign(formValue.value, {
+        authType: '1',
+        inputType: '1'
+      })
+    }
   }
 
   const handleOk = async () => {
     const validate = await autoFormRef.value?.getFormValidation()
     if (!validate) return
-    console.log('object :>> ', formValue.value)
-    // const res = await addHost()
-    // const api = isEdit.value ? llmConfigStore.updateAuthPlatform : llmConfigStore.addAuthorizedPlatform
-    // const success = await api()
-    // if (success) {
-    //   const text = isEdit.value ? 'common.update_success' : 'common.created'
-    //   message.success(t(text))
-    //   handleCancel()
-    //   emits('onOk')
-    // }
+    try {
+      if (!isEdit.value) {
+        const confirmStatus = await showHosts()
+        if (confirmStatus) {
+          emits('onOk', mode.value, formValue.value)
+          handleCancel()
+        }
+      } else {
+        emits('onOk', mode.value, formValue.value)
+        handleCancel()
+      }
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  const createHostNameEls = (list: string[]) => {
+    const elStyles = {
+      contentStyle: {
+        marginInlineStart: '2.125rem',
+        width: '100%',
+        maxHeight: '31.25rem',
+        overflow: 'auto'
+      },
+      itemStyle: { margin: '0.625rem' },
+      iconWrpStyle: {
+        fontSize: '1.375rem',
+        fontWeight: 600,
+        color: 'green',
+        marginInlineEnd: '0.75rem'
+      },
+      titleStyle: {
+        fontSize: '1rem',
+        fontWeight: 600
+      },
+      redfIconStyle: {
+        display: 'flex',
+        alignItems: 'center'
+      }
+    }
+    const items = list.map((item: string, idx: number) => {
+      return h('li', { key: idx, style: elStyles.itemStyle }, item)
+    })
+    const iconWrpStyle = h(
+      'span',
+      {
+        style: elStyles.iconWrpStyle
+      },
+      [h(CheckCircleOutlined)]
+    )
+    const replaceTitle = h('span', { style: elStyles.titleStyle }, `${t('cluster.show_hosts_resolved')}`)
+    const reDefineIcon = h('div', { style: elStyles.redfIconStyle }, [iconWrpStyle, replaceTitle])
+    const box = h(
+      'div',
+      {
+        style: elStyles.contentStyle
+      },
+      items
+    )
+
+    return { box, reDefineIcon }
+  }
+
+  const showHosts = (): Promise<boolean> => {
+    const hostList = parseHostNamesAsPatternExpression(formValue.value.hostname as string)
+    const { box: content, reDefineIcon: icon } = createHostNameEls(hostList)
+    return new Promise((resolve) => {
+      Modal.confirm({
+        title: '',
+        icon,
+        centered: true,
+        width: '31.25rem',
+        content,
+        onOk() {
+          formValue.value.hostnames = hostList
+          resolve(true)
+        },
+        onCancel() {
+          resolve(false)
+          Modal.destroyAll()
+        }
+      })
+    })
   }
 
   const handleCancel = () => {
-    autoFormRef.value?.resetForm()
+    formValue.value = {
+      authType: '1',
+      inputType: '1'
+    }
     open.value = false
   }
+
+  const beforeUpload: UploadProps['beforeUpload'] = (file) => {
+    const isText = file.type === 'text/plain'
+    const checkLimitSize = file.size / 1024 <= 10
+    if (!isText) {
+      message.error(t('common.file_type_error'))
+      return false
+    }
+    if (!checkLimitSize) {
+      message.error(t('common.file_size_error'))
+      return false
+    }
+    return true
+  }
+
+  const customRequest = async (options: { file: any; onSuccess: any; onError: any }) => {
+    const { file, onSuccess, onError } = options
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      const data = await uploadFile(formData)
+      formValue.value!.sshKeyFilename = data
+      onSuccess(data, file)
+      message.success(t('common.upload_success'))
+    } catch (error) {
+      onError(error)
+      message.error(t('common.upload_failed'))
+    }
+  }
+
+  const fileList = ref()
 
   defineExpose({
     handleOpen
@@ -288,7 +472,7 @@
   <div class="add-host">
     <a-modal
       :open="open"
-      :width="500"
+      :width="600"
       :title="Mode[mode] && $t(Mode[mode])"
       :mask-closable="false"
       :centered="true"
@@ -299,16 +483,24 @@
       <auto-form
         ref="autoFormRef"
         v-model:form-value="formValue"
+        :label-col="{
+          span: locale === 'zh_CN' ? 5 : 7
+        }"
         :hidden-items="hiddenItems"
         :show-button="false"
         :form-items="filterFormItems"
       >
         <template #sshKeyFilenameSlot="{ item }">
           <a-form-item v-bind="item.formItemProps">
-            <a-upload v-model:file-list="fileList" action="https://www.mocky.io/v2/5cc8019d300000980a055e76">
+            <a-upload
+              :file-list="fileList"
+              :before-upload="beforeUpload"
+              :custom-request="customRequest"
+              :show-upload-list="false"
+            >
               <a-button>
                 <upload-outlined></upload-outlined>
-                上传文件
+                {{ $t('common.upload_file') }}
               </a-button>
             </a-upload>
           </a-form-item>

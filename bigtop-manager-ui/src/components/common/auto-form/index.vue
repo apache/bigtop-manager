@@ -172,6 +172,14 @@
               v-on="formItemEvents[item.field] || {}"
             />
 
+            <a-input-password
+              v-if="item.type == 'inputPassword'"
+              v-model:value="formState[item.field]"
+              v-bind="item.controlProps"
+              :disabled="disabledItems ? disabledItems.includes(item.field) : item.controlProps?.disabled"
+              v-on="formItemEvents[item.field] || {}"
+            />
+
             <!-- textarea  -->
             <a-textarea
               v-if="item.type == 'textarea'"

@@ -17,5 +17,26 @@
  * under the License.
  */
 export default {
-  host_list: '主机列表'
+  host_list: '主机列表',
+  uninstallable: '请先添加主机',
+  hostname: '主机名',
+  ssh_user: '用户名',
+  confirm_password: '确认密码',
+  input_method: '输入方式',
+  file: '文件',
+  text: '文本',
+  key_file: '密钥文件',
+  key_text: '密钥文本',
+  key_password: '密钥口令',
+  confirm_key_password: '确认口令',
+  username: '用户名',
+  auth_method: '认证方式',
+  password_auth: '密码',
+  key_auth: '密钥',
+  no_auth: '无认证',
+  agent_path: 'Agent路径',
+  ssh_port: 'SSH端口',
+  grpc_port: 'gRPC端口',
+  description: '备注',
+  key_password_not_match: '密钥口令不一致。'
 }

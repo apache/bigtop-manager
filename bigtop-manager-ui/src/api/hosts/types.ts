@@ -69,3 +69,16 @@ export interface HostAdd {
   sshUser?: string
   [property: string]: any
 }
+
+export interface InstalledStatusVO {
+  hostname?: string
+  message?: string
+  status?: Status
+}
+
+export enum Status {
+  Failed = 'FAILED',
+  Installing = 'INSTALLING',
+  Success = 'SUCCESS',
+  Unknown = 'UNKNOW'
+}

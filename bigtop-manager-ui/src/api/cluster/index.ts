@@ -17,17 +17,27 @@
  * under the License.
  */
 
-import { get, put } from '@/api/request-util'
+import request from '@/api/request.ts'
 import type { ClusterVO, UpdateClusterParam } from './types'
 
-export const getCluster = (id: number) => {
-  return get<ClusterVO>(`/clusters/${id}`)
+export const getCluster = (id: number): Promise<ClusterVO[]> => {
+  return request({
+    method: 'get',
+    url: `/clusters/${id}`
+  })
 }
 
 export const updateCluster = (id: number, data: UpdateClusterParam) => {
-  return put<ClusterVO>(`/clusters/${id}`, data)
+  return request({
+    method: 'put',
+    url: `/clusters/${id}`,
+    data
+  })
 }
 
-export const getClusterList = () => {
-  return get<ClusterVO[]>('/clusters')
+export const getClusterList = (): Promise<ClusterVO[]> => {
+  return request({
+    method: 'get',
+    url: '/clusters'
+  })
 }

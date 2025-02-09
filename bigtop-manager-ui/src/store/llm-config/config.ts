@@ -92,13 +92,13 @@ export function useFormItemConfig() {
         rules: [
           {
             required: true,
-            message: t('common.enter_error', [t('llmConfig.desc')]),
+            message: t('common.enter_error', [t('llmConfig.desc').toLowerCase()]),
             trigger: 'blur'
           }
         ]
       },
       controlProps: {
-        placeholder: t('common.enter_error', [t('llmConfig.desc')])
+        placeholder: t('common.enter_error', [t('llmConfig.desc').toLowerCase()])
       }
     }
   ])

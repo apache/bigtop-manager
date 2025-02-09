@@ -18,18 +18,20 @@
 -->
 
 <script setup lang="ts">
-  import { ref, shallowRef, watchEffect } from 'vue'
+  import { computed, ref, shallowRef, watchEffect } from 'vue'
   import type { TableColumnType } from 'ant-design-vue'
   import useBaseTable from '@/composables/use-base-table'
   import SetSource from './set-source.vue'
   import { useStackStore } from '@/store/stack'
   import { storeToRefs } from 'pinia'
   import { ServiceVO } from '@/api/service/types'
+  import { useI18n } from 'vue-i18n'
 
+  const { t } = useI18n()
   const stackStore = useStackStore()
   const { stacks } = storeToRefs(stackStore)
 
-  const columns: TableColumnType[] = [
+  const columns = computed((): TableColumnType[] => [
     {
       title: '#',
       width: '48px',
@@ -39,37 +41,37 @@
       }
     },
     {
-      title: '名称',
+      title: t('common.name'),
       dataIndex: 'displayName',
       width: '20%',
       ellipsis: true
     },
     {
-      title: '版本',
+      title: t('common.version'),
       dataIndex: 'version',
       width: '15%',
       ellipsis: true
     },
     {
       key: 'stack',
-      title: '组件栈',
+      title: t('common.stack'),
       dataIndex: 'stack',
       width: '20%',
       ellipsis: true
     },
     {
-      title: '描述',
+      title: t('common.desc'),
       dataIndex: 'desc',
       ellipsis: true
     }
-  ]
+  ])
 
   const data = ref<ServiceVO[]>([])
   const stackSelected = ref('bigtop')
   const stackGroup = shallowRef(['bigtop', 'infra', 'extra'])
   const setSourceRef = ref<InstanceType<typeof SetSource>>()
-  const { columnsProp, loading, paginationProps, onChange, resetState } = useBaseTable({
-    columns,
+  const { loading, paginationProps, onChange, resetState } = useBaseTable({
+    columns: columns.value,
     rows: data.value
   })
 
@@ -93,13 +95,7 @@
       </a-radio-group>
       <a-button type="primary" @click="handleSetSource">{{ $t('cluster.config_source') }}</a-button>
     </header>
-    <a-table
-      :loading="loading"
-      :data-source="data"
-      :columns="columnsProp"
-      :pagination="paginationProps"
-      @change="onChange"
-    >
+    <a-table :loading="loading" :data-source="data" :columns="columns" :pagination="paginationProps" @change="onChange">
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'stack'">
           <span> {{ `${stackSelected}-${record.version}` }} </span>

@@ -75,3 +75,9 @@ export const getRandomFromTimestamp = (len: number = 6) => {
 export const formatTime = (time: string | undefined, formatRule: string = 'YYYY-MM-DD HH:mm:ss') => {
   return typeof time === 'string' && dayjs(time).tz(dayjs.tz.guess(), true).format(formatRule)
 }
+
+export function generateRandomId(length = 8) {
+  return Math.random()
+    .toString(36)
+    .substring(2, length + 2)
+}
