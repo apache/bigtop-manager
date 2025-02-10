@@ -51,7 +51,7 @@
 
 <template>
   <a-space :size="space" :wrap="true" :class="{ 'text-compact': $props.textCompact, 'btn-auto': $props.auto }">
-    <template v-for="(item, idx) in groups" :key="idx">
+    <template v-for="(item, _index) in groups" :key="_index">
       <a-dropdown v-if="item.dropdownMenu">
         <a-button
           :disabled="item.disabled"
