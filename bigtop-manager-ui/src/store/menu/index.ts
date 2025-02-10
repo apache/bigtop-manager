@@ -146,6 +146,7 @@ export const useMenuStore = defineStore(
 
     const setUpMenu = () => {
       setBaseRoutesMap()
+      updateSiderMenu()
     }
 
     const cleanUpMenu = () => {

@@ -34,9 +34,9 @@
   const stackStore = useStackStore()
   const { headerSelectedKey, headerMenus, siderMenuSelectedKey, siderMenus } = storeToRefs(menuStore)
 
-  onMounted(() => {
+  onMounted(async () => {
     userStore.getUserInfo()
-    clusterStore.loadClusters()
+    await clusterStore.loadClusters()
     menuStore.setUpMenu()
     stackStore.loadStacks()
   })
