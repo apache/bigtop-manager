@@ -29,7 +29,6 @@ export const useClusterStore = defineStore(
     const count = ref(0)
 
     const addCluster = async () => {
-      count.value = count.value + 1
       await loadClusters()
     }
 
@@ -44,7 +43,7 @@ export const useClusterStore = defineStore(
 
     const loadClusters = async () => {
       const data = await getClusterList()
-      clusters.value = data as unknown as ClusterVO[]
+      clusters.value = data
     }
 
     return {

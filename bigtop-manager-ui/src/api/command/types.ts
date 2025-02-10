@@ -29,8 +29,6 @@ export interface CommandRequest {
   [property: string]: any
 }
 
-export type CommandRequestKeys = keyof CommandRequest
-
 export interface ClusterCommandReq {
   desc?: string
   displayName: string
@@ -44,7 +42,7 @@ export interface ClusterCommandReq {
 
 export interface HostReq {
   agentDir?: string
-  authType?: number
+  authType?: number | string
   clusterId?: number
   desc?: string
   grpcPort?: number
@@ -131,5 +129,11 @@ export interface PropertyReq {
 
 export interface AttrsReq {
   type?: string
+  [property: string]: any
+}
+
+export interface CommandVO {
+  id?: number
+  state?: string
   [property: string]: any
 }

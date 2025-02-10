@@ -18,7 +18,7 @@
  */
 
 import request from '@/api/request.ts'
-import { HostAdd, HostVO, HostVOList, InstalledStatusVO } from '@/api/hosts/types.ts'
+import { HostParams, HostVO, HostVOList, InstalledStatusVO } from '@/api/hosts/types.ts'
 
 export const getHosts = (): Promise<HostVOList> => {
   return request({
@@ -27,7 +27,7 @@ export const getHosts = (): Promise<HostVOList> => {
   })
 }
 
-export const addHost = (data: HostAdd): Promise<HostVO> => {
+export const addHost = (data: HostParams): Promise<HostVO> => {
   return request({
     method: 'post',
     url: '/hosts',
@@ -35,7 +35,7 @@ export const addHost = (data: HostAdd): Promise<HostVO> => {
   })
 }
 
-export const installDependencies = (data: HostAdd) => {
+export const installDependencies = (data: HostParams) => {
   return request({
     method: 'post',
     url: '/hosts/install-dependencies',

@@ -20,13 +20,13 @@
 <script setup lang="ts">
   import { TableColumnType } from 'ant-design-vue'
   import { computed, reactive, ref, watch } from 'vue'
-  import useBaseTable from '@/composables/use-base-table'
-  import type { FilterConfirmProps, FilterResetProps } from 'ant-design-vue/es/table/interface'
-  import type { GroupItem } from '@/components/common/button-group/types'
-  import { HostAdd } from '@/api/hosts/types'
-  import HostCreate from '@/pages/cluster-manage/hosts/create.vue'
   import { generateRandomId } from '@/utils/tools'
   import { useI18n } from 'vue-i18n'
+  import useBaseTable from '@/composables/use-base-table'
+  import HostCreate from '@/pages/cluster-manage/hosts/create.vue'
+  import type { FilterConfirmProps, FilterResetProps } from 'ant-design-vue/es/table/interface'
+  import type { GroupItem } from '@/components/common/button-group/types'
+  import type { HostReq } from '@/api/command/types'
 
   type Key = string | number
   interface TableState {
@@ -35,9 +35,9 @@
     searchedColumn: string
   }
   const { t } = useI18n()
-  const props = defineProps<{ stepData: any }>()
+  const props = defineProps<{ stepData: HostReq[] }>()
   const emits = defineEmits(['updateData'])
-  const data = ref<HostAdd[]>([])
+  const data = ref<HostReq[]>([])
   const searchInputRef = ref()
   const hostCreateRef = ref<InstanceType<typeof HostCreate> | null>(null)
   const state = reactive<TableState>({
@@ -144,7 +144,7 @@
     hostCreateRef.value?.handleOpen('ADD')
   }
 
-  const editHost = (row: HostAdd) => {
+  const editHost = (row: HostReq) => {
     hostCreateRef.value?.handleOpen('EDIT', row)
   }
 
@@ -158,7 +158,7 @@
     emits('updateData', res)
   }
 
-  const addHostSuccess = (type: 'ADD' | 'EDIT', item: HostAdd) => {
+  const addHostSuccess = (type: 'ADD' | 'EDIT', item: HostReq) => {
     if (type === 'ADD') {
       const items = item.hostnames?.map((v) => {
         return {
@@ -167,10 +167,10 @@
           hostname: v,
           status: 'INSTALLING'
         }
-      }) as HostAdd[]
+      }) as HostReq[]
       dataSource.value?.unshift(...items)
     } else {
-      const index = dataSource.value.findIndex((data: any) => data.key === item.key)
+      const index = dataSource.value.findIndex((data) => data.key === item.key)
       if (index !== -1) {
         dataSource.value[index] = item
       }
@@ -178,12 +178,12 @@
     updateStepData()
   }
 
-  const deleteHost = (row?: HostAdd) => {
+  const deleteHost = (row?: HostReq) => {
     if (!row?.key) {
       state.selectedRowKeys.length > 0 &&
-        (dataSource.value = dataSource.value?.filter((v: any) => !state.selectedRowKeys.includes(v.key)) || [])
+        (dataSource.value = dataSource.value?.filter((v) => !state.selectedRowKeys.includes(v.key)) || [])
     } else {
-      dataSource.value = dataSource.value?.filter((v: any) => row.key !== v.key)
+      dataSource.value = dataSource.value?.filter((v) => row.key !== v.key)
     }
     updateStepData()
   }

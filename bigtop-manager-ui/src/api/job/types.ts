@@ -25,12 +25,22 @@ export type JobParams = { clusterId: number; jobId: number }
 export type TaskParams = JobParams & { stageId: number }
 export type TaskLogParams = TaskParams & { taskId: number }
 
+export type StateType = keyof typeof State
+
+export enum State {
+  'Pending' = 'pending',
+  'Processing' = 'processing',
+  'Successful' = 'successful',
+  'Failed' = 'failed',
+  'Canceled' = 'canceled'
+}
+
 export interface JobVO {
   createTime?: string
   id?: number
   name?: string
   stages?: StageVO[]
-  state?: string
+  state?: StateType
   updateTime?: string
   [property: string]: any
 }
@@ -40,7 +50,7 @@ export interface StageVO {
   id?: number
   name?: string
   order?: number
-  state?: string
+  state?: StateType
   tasks?: TaskVO[]
   updateTime?: string
   [property: string]: any
@@ -51,7 +61,7 @@ export interface TaskVO {
   hostname?: string
   id?: number
   name?: string
-  state?: string
+  state?: StateType
   updateTime?: string
   [property: string]: any
 }

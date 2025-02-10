@@ -21,11 +21,12 @@
   import type { FormItemState } from '@/components/common/auto-form/types'
   import { computed, ref, shallowRef, toRefs, watch } from 'vue'
   import { useI18n } from 'vue-i18n'
+  import type { ClusterCommandReq } from '@/api/command/types'
 
   const { t } = useI18n()
   const activeKey = ref(['1', '2'])
   const autoFormRefMap = shallowRef<Map<string, Comp.AutoFormInstance>>(new Map())
-  const props = defineProps<{ stepData: any }>()
+  const props = defineProps<{ stepData: ClusterCommandReq }>()
   const emits = defineEmits(['updateData'])
   const { stepData } = toRefs(props)
   const formLayout = computed(() => ({

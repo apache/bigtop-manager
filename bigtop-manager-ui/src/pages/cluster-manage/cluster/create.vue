@@ -20,16 +20,23 @@
 <script setup lang="ts">
   import { useMenuStore } from '@/store/menu'
   import { computed, ref, shallowRef } from 'vue'
-  import ClusterBase from './components/cluster-base.vue'
-  import ComponentInfo from './components/component-info.vue'
-  import HostConfig from './components/host-config.vue'
-  import CheckWorkflow from './components/check-workflow.vue'
   import { useI18n } from 'vue-i18n'
   import { getInstalledStatus, installDependencies } from '@/api/hosts'
   import { message } from 'ant-design-vue'
   import { InstalledStatusVO, Status } from '@/api/hosts/types'
-  import { Command, CommandLevel, CommandRequest } from '@/api/command/types'
   import { execCommand } from '@/api/command'
+  import ClusterBase from './components/cluster-base.vue'
+  import ComponentInfo from './components/component-info.vue'
+  import HostConfig from './components/host-config.vue'
+  import CheckWorkflow from './components/check-workflow.vue'
+  import {
+    ClusterCommandReq,
+    Command,
+    CommandLevel,
+    HostReq,
+    type CommandRequest,
+    type CommandVO
+  } from '@/api/command/types'
 
   const { t } = useI18n()
   const menuStore = useMenuStore()
@@ -41,16 +48,18 @@
   })
   const installing = ref(false)
   const current = ref(0)
-  const stepData = ref([{}, {}, []])
+  const stepData = ref<[Partial<ClusterCommandReq>, any, HostReq[], CommandVO]>([{}, {}, [], {}])
   const installStatus = shallowRef<InstalledStatusVO[]>([])
-  const hasUnknowHost = computed(() => (stepData.value[2] as any[]).every((v) => v.status === Status.Success))
+  const isInstall = computed(() => current.value === 2)
+  const stepsLimit = computed(() => steps.value.length - 1)
+  const hasUnknowHost = computed(() => stepData.value[2].every((v) => v.status === Status.Success))
   const allInstallSuccess = computed(
     () =>
       installStatus.value.length != 0 &&
       installStatus.value.every((v) => v.status === Status.Success) &&
       hasUnknowHost.value
   )
-  const isInstall = computed(() => current.value === 2)
+  const isDone = computed(() => ['Successful', 'Failed'].includes(stepData.value[stepData.value.length - 1].state))
   const steps = computed(() => [
     {
       title: t('cluster.cluster_management')
@@ -65,7 +74,6 @@
       title: t('cluster.create')
     }
   ])
-  const stepsLimit = computed(() => steps.value.length - 1)
   const getCompName = computed(() => {
     if (current.value === 0) {
       return ClusterBase
@@ -80,17 +88,22 @@
     }
   })
 
-  const updateData = (val: unknown) => {
-    stepData.value[current.value] = val as any
+  const updateData = (val: Partial<ClusterCommandReq> | any | HostReq[]) => {
+    stepData.value[current.value] = val
   }
 
-  const addCluster = async () => {
+  const createCluster = async () => {
     try {
-      commandRequest.value.clusterCommand = stepData.value[0] as any
-      commandRequest.value.clusterCommand!.hosts = stepData.value[2] as any[]
-      await execCommand(commandRequest.value)
+      commandRequest.value.clusterCommand = {
+        ...stepData.value[0],
+        displayName: stepData.value[0].name
+      } as ClusterCommandReq
+      commandRequest.value.clusterCommand.hosts = stepData.value[2]
+      stepData.value[stepData.value.length - 1] = await execCommand(commandRequest.value)
+      return true
     } catch (error) {
       console.log('error :>> ', error)
+      return false
     }
   }
 
@@ -100,28 +113,32 @@
     }
   }
 
-  const nextStepPre = async () => {
+  const prepareNextStep = async () => {
     if (current.value === 0) {
       const check = await compRef.value.check()
       if (check) {
         nextStep()
       }
     } else if (current.value === 2) {
-      !allInstallSuccess.value ? await resolveInstallDependencies() : nextStep()
+      if (!allInstallSuccess.value) {
+        await resolveInstallDependencies()
+      } else {
+        const isClusterExisting = await createCluster()
+        isClusterExisting && nextStep()
+      }
     } else {
       nextStep()
     }
   }
 
   const nextStep = async () => {
-    current.value === 2 && addCluster()
     if (current.value < stepsLimit.value) {
       current.value = current.value + 1
     }
   }
 
   const resolveInstallDependencies = async () => {
-    if ((stepData.value[2] as any[]).length == 0) {
+    if (stepData.value[2].length == 0) {
       message.error(t('host.uninstallable'))
       return
     }
@@ -139,7 +156,7 @@
     try {
       const data = await getInstalledStatus()
       installStatus.value = data
-      stepData.value[current.value] = mergeByHostname(stepData.value[current.value] as any[], data)
+      stepData.value[current.value] = mergeByHostname(stepData.value[current.value], data)
       const allResolved = data.every((item) => item.status != Status.Installing)
       if (allResolved) {
         return true
@@ -151,7 +168,7 @@
     }
   }
 
-  const pollUntilSuccess = (interval: number = 2000): void => {
+  const pollUntilSuccess = (interval: number = 1000): void => {
     const intervalId = setInterval(async () => {
       const result = await recordInstalledStatus()
       if (result) {
@@ -183,7 +200,6 @@
 
 <template>
   <div class="cluster-create">
-    {{ stepData }}
     <header-card>
       <div class="steps-wrp">
         <a-steps :current="current" :items="steps" />
@@ -196,9 +212,7 @@
           <section :class="{ 'step-content': current < stepsLimit }"> </section>
         </div>
       </template>
-      <!-- <keep-alive> -->
       <component :is="getCompName" ref="compRef" :step-data="stepData[current]" @update-data="updateData" />
-      <!-- </keep-alive> -->
       <div class="step-action">
         <a-space>
           <a-button v-show="current != stepsLimit" @click="() => $router.go(-1)">{{ $t('common.exit') }}</a-button>
@@ -206,14 +220,21 @@
             {{ $t('common.prev') }}
           </a-button>
           <template v-if="current >= 0 && current <= stepsLimit - 1">
-            <a-button v-if="isInstall && !allInstallSuccess" type="primary" :disabled="installing" @click="nextStepPre">
+            <a-button
+              v-if="isInstall && !allInstallSuccess"
+              type="primary"
+              :disabled="installing"
+              @click="prepareNextStep"
+            >
               {{ $t('cluster.install_dependencies') }}
             </a-button>
-            <a-button v-else type="primary" @click="nextStepPre">
+            <a-button v-else type="primary" @click="prepareNextStep">
               {{ $t('common.next') }}
             </a-button>
           </template>
-          <a-button v-show="current === stepsLimit" type="primary" @click="onSave">{{ $t('common.done') }}</a-button>
+          <a-button v-show="current === stepsLimit && isDone" type="primary" @click="onSave">{{
+            $t('common.done')
+          }}</a-button>
         </a-space>
       </div>
     </main-card>

@@ -31,6 +31,10 @@
   const stackStore = useStackStore()
   const { stacks } = storeToRefs(stackStore)
 
+  const data = ref<ServiceVO[]>([])
+  const stackSelected = ref('bigtop')
+  const setSourceRef = ref<InstanceType<typeof SetSource>>()
+  const stackGroup = shallowRef(['bigtop', 'infra', 'extra'])
   const columns = computed((): TableColumnType[] => [
     {
       title: '#',
@@ -66,10 +70,6 @@
     }
   ])
 
-  const data = ref<ServiceVO[]>([])
-  const stackSelected = ref('bigtop')
-  const stackGroup = shallowRef(['bigtop', 'infra', 'extra'])
-  const setSourceRef = ref<InstanceType<typeof SetSource>>()
   const { loading, paginationProps, onChange, resetState } = useBaseTable({
     columns: columns.value,
     rows: data.value

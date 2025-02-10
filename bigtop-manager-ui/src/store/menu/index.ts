@@ -168,6 +168,9 @@ export const useMenuStore = defineStore(
     }
   },
   {
-    persist: false
+    persist: {
+      storage: localStorage,
+      paths: ['siderMenus']
+    }
   }
 )

@@ -20,16 +20,17 @@
 <script setup lang="ts">
   import { computed, h, ref, watch } from 'vue'
   import { useI18n } from 'vue-i18n'
-  import type { HostAdd } from '@/api/hosts/types'
   import { FormItemState } from '@/components/common/auto-form/types'
   import { CheckCircleOutlined, UploadOutlined } from '@ant-design/icons-vue'
   import { parseHostNamesAsPatternExpression } from '@/utils/array'
   import { message, Modal } from 'ant-design-vue'
   import { useLocaleStore } from '@/store/locale'
   import { storeToRefs } from 'pinia'
-  import type { UploadProps } from 'ant-design-vue'
   import { uploadFile } from '@/api/upload-file'
   import { Rule } from 'ant-design-vue/es/form'
+  import { HostReq } from '@/api/command/types'
+  import type { UploadProps } from 'ant-design-vue'
+  import type { HostParams } from '@/api/hosts/types'
 
   enum Mode {
     EDIT = 'cluster.edit_host',
@@ -37,18 +38,18 @@
   }
 
   interface Emits {
-    (event: 'onOk', type: keyof typeof Mode, value: HostAdd): void
+    (event: 'onOk', type: keyof typeof Mode, value: HostReq): void
   }
 
-  const emits = defineEmits<Emits>()
   const { t } = useI18n()
+  const emits = defineEmits<Emits>()
   const localeStore = useLocaleStore()
-  const { locale } = storeToRefs(localeStore)
   const open = ref(false)
   const mode = ref<keyof typeof Mode>('ADD')
   const hiddenItems = ref<string[]>([])
   const autoFormRef = ref<Comp.AutoFormInstance | null>(null)
-  const formValue = ref<HostAdd & { hostname?: string }>({})
+  const formValue = ref<HostReq & { hostname?: string }>({})
+  const { locale } = storeToRefs(localeStore)
   const isEdit = computed(() => mode.value === 'EDIT')
 
   const checkPassword = async (_rule: Rule, value: string) => {
@@ -323,7 +324,7 @@
     }
   )
 
-  const handleOpen = async (type: keyof typeof Mode, payload?: HostAdd) => {
+  const handleOpen = async (type: keyof typeof Mode, payload?: HostParams) => {
     open.value = true
     mode.value = type
     if (payload) {

@@ -54,7 +54,7 @@ export interface HostVO {
   [property: string]: any
 }
 
-export interface HostAdd {
+export interface HostParams {
   agentDir?: string
   authType?: number | string // '1-password，2-key，3-no_auth',
   clusterId?: number
