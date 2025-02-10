@@ -22,6 +22,7 @@ import org.apache.bigtop.manager.common.utils.ProjectPathUtils;
 import org.apache.bigtop.manager.grpc.generated.JobCacheReply;
 import org.apache.bigtop.manager.grpc.generated.JobCacheRequest;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,18 +47,31 @@ public class JobCacheServiceGrpcImplTest {
     @Mock
     private StreamObserver<JobCacheReply> responseObserver;
 
+    private Path cacheDirPath;
+
     @BeforeEach
-    public void setUp() {
-        // Initialize mock objects
+    public void setUp() throws Exception {
+        // Create a real temporary directory for testing
+        cacheDirPath = Files.createTempDirectory("test-cache-dir");
         jobCacheServiceGrpcImpl = new JobCacheServiceGrpcImpl();
+    }
+
+    @AfterEach
+    public void tearDown() throws Exception {
+        // Delete the test directory after each test
+        if (cacheDirPath != null) {
+            Files.walk(cacheDirPath)
+                    .sorted((p1, p2) -> -p1.compareTo(p2))
+                    .map(Path::toFile)
+                    .forEach(java.io.File::delete);
+        }
     }
 
     @Test
     public void testSaveSuccess() {
         // Mock the static behavior of ProjectPathUtils.getAgentCachePath method
         try (MockedStatic<ProjectPathUtils> mockedStatic = mockStatic(ProjectPathUtils.class)) {
-            String cacheDir = "mock/cache/dir";
-            mockedStatic.when(ProjectPathUtils::getAgentCachePath).thenReturn(cacheDir);
+            mockedStatic.when(ProjectPathUtils::getAgentCachePath).thenReturn(cacheDirPath.toString());
 
             // Construct JobCacheRequest
             String payloadJson = "{\"configurations\": {\"configKey\": {\"subKey\": \"subValue\"}}}";
@@ -79,8 +93,7 @@ public class JobCacheServiceGrpcImplTest {
     public void testSaveDirectoryCreationFailure() {
         // Mock the static behavior of ProjectPathUtils.getAgentCachePath method
         try (MockedStatic<ProjectPathUtils> mockedStatic = mockStatic(ProjectPathUtils.class)) {
-            String cacheDir = "mock/cache/dir";
-            mockedStatic.when(ProjectPathUtils::getAgentCachePath).thenReturn(cacheDir);
+            mockedStatic.when(ProjectPathUtils::getAgentCachePath).thenReturn(cacheDirPath.toString());
 
             // Mock Files.createDirectories to throw an exception
             try (MockedStatic<Files> mockedFiles = mockStatic(Files.class)) {

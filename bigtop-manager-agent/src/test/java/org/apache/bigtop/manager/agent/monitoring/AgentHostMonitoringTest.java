@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.MultiGauge;
 import oshi.SystemInfo;
 import oshi.hardware.GlobalMemory;
@@ -72,6 +73,9 @@ class AgentHostMonitoringTest {
 
     @Mock
     private MultiGauge diskIOMultiGauge;
+
+    @Mock
+    private MeterRegistry registry;
 
     @BeforeEach
     void setUp() {
@@ -173,6 +177,30 @@ class AgentHostMonitoringTest {
         // Assert that the MEM gauge data is populated correctly
         assertNotNull(memGauge);
         assertFalse(memGauge.isEmpty());
+    }
+
+    @Test
+    public void testNewDiskMultiGauge() {
+        MultiGauge result = AgentHostMonitoring.newDiskMultiGauge(registry);
+        assertNotNull(result);
+    }
+
+    @Test
+    public void testNewMemMultiGauge() {
+        MultiGauge result = AgentHostMonitoring.newMemMultiGauge(registry);
+        assertNotNull(result);
+    }
+
+    @Test
+    public void testNewCPUMultiGauge() {
+        MultiGauge result = AgentHostMonitoring.newCPUMultiGauge(registry);
+        assertNotNull(result);
+    }
+
+    @Test
+    public void testNewDiskIOMultiGauge() {
+        MultiGauge result = AgentHostMonitoring.newDiskIOMultiGauge(registry);
+        assertNotNull(result);
     }
 
     @Test

@@ -88,7 +88,7 @@ public class TaskInterceptor implements ServerInterceptor {
         };
     }
 
-    private void truncateLogFile(Long taskId) {
+    protected void truncateLogFile(Long taskId) {
         String filePath = ProjectPathUtils.getLogFilePath(taskId);
         File file = new File(filePath);
         if (file.exists()) {
@@ -100,7 +100,7 @@ public class TaskInterceptor implements ServerInterceptor {
         }
     }
 
-    private Boolean isTaskRequest(Object obj) {
+    protected Boolean isTaskRequest(Object obj) {
         if (obj == null) {
             return false;
         }
