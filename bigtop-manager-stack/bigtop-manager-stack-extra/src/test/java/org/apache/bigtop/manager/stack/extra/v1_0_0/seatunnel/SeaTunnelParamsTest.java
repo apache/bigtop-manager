@@ -18,6 +18,7 @@
  */
 package org.apache.bigtop.manager.stack.extra.v1_0_0.seatunnel;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,33 +27,41 @@ import static org.mockito.Mockito.when;
 
 public class SeaTunnelParamsTest {
 
+    private SeaTunnelParams seaTunnelParams;
+
+    @BeforeEach
+    public void setUp() {
+        seaTunnelParams = mock(SeaTunnelParams.class);
+        when(seaTunnelParams.stackHome()).thenReturn("/stack");
+        when(seaTunnelParams.getServiceName()).thenCallRealMethod();
+        when(seaTunnelParams.serviceHome()).thenCallRealMethod();
+        when(seaTunnelParams.sparkHome()).thenCallRealMethod();
+        when(seaTunnelParams.flinkHome()).thenCallRealMethod();
+        when(seaTunnelParams.confDir()).thenCallRealMethod();
+    }
+
+    @Test
+    public void testServiceHome() {
+        assertEquals("/stack/seatunnel", seaTunnelParams.serviceHome());
+    }
+
     @Test
     public void testConfDir() {
-        SeaTunnelParams seaTunnelParams = mock(SeaTunnelParams.class);
-        when(seaTunnelParams.serviceHome()).thenReturn("/bigtop/seatunnel");
-        when(seaTunnelParams.confDir()).thenCallRealMethod();
-        assertEquals("/bigtop/seatunnel/config", seaTunnelParams.confDir());
+        assertEquals("/stack/seatunnel/config", seaTunnelParams.confDir());
     }
 
     @Test
     public void testSparkHome() {
-        SeaTunnelParams seaTunnelParams = mock(SeaTunnelParams.class);
-        when(seaTunnelParams.stackHome()).thenReturn("/stack");
-        when(seaTunnelParams.sparkHome()).thenCallRealMethod();
         assertEquals("/stack/spark", seaTunnelParams.sparkHome());
     }
 
     @Test
     public void testFlinkHome() {
-        SeaTunnelParams seaTunnelParams = mock(SeaTunnelParams.class);
-        when(seaTunnelParams.stackHome()).thenReturn("/stack");
-        when(seaTunnelParams.flinkHome()).thenCallRealMethod();
         assertEquals("/stack/flink", seaTunnelParams.flinkHome());
     }
 
     @Test
     public void testGetServiceName() {
-        SeaTunnelParams seaTunnelParams = new SeaTunnelParams();
         assertEquals("seatunnel", seaTunnelParams.getServiceName());
     }
 }
