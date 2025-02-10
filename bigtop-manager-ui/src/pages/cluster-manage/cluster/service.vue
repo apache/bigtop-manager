@@ -209,6 +209,9 @@
     }
     &-restart-status {
       @include flexbox($align: center, $gap: 6px);
+      .dot {
+        margin-top: 2px;
+      }
     }
     &-icon {
       flex-shrink: 0;

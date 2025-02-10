@@ -17,7 +17,14 @@
  * under the License.
  */
 import request from '@/api/request.ts'
-import type { JobParams, Job, JobList, Stage, Task, TaskLogParams, TaskParams } from './types'
+import type { JobParams, JobList, TaskLogParams, TaskParams, JobVO, StageVO, TaskVO } from './types'
+
+export const retryJob = (pathParams: JobParams): Promise<JobVO> => {
+  return request({
+    method: 'post',
+    url: `/clusters/${pathParams.clusterId}/jobs/${pathParams.jobId}/retry`
+  })
+}
 
 export const getJobList = (clusterId: number): Promise<JobList> => {
   return request({
@@ -26,30 +33,30 @@ export const getJobList = (clusterId: number): Promise<JobList> => {
   })
 }
 
-export const retryJob = (params: JobParams): Promise<Job[]> => {
+export const getJobDetails = (pathParams: JobParams): Promise<JobVO> => {
   return request({
-    method: 'post',
-    url: `/clusters/${params.clusterId}/jobs/${params.jobId}/retry`
+    method: 'get',
+    url: `/clusters/${pathParams.clusterId}/jobs/${pathParams.jobId}`
   })
 }
 
-export const getStageList = (params: JobParams): Promise<Stage[]> => {
+export const getStageList = (pathParams: JobParams): Promise<StageVO[]> => {
   return request({
     method: 'get',
-    url: `/clusters/${params.clusterId}/jobs/${params.jobId}/stages`
+    url: `/clusters/${pathParams.clusterId}/jobs/${pathParams.jobId}/stages`
   })
 }
 
-export const getTaskList = (params: TaskParams): Promise<Task[]> => {
+export const getTaskList = (pathParams: TaskParams): Promise<TaskVO[]> => {
   return request({
     method: 'get',
-    url: `/clusters/${params.clusterId}/jobs/${params.jobId}/stages/${params.stageId}/tasks`
+    url: `/clusters/${pathParams.clusterId}/jobs/${pathParams.jobId}/stages/${pathParams.stageId}/tasks`
   })
 }
 
-export const getTaskLog = (params: TaskLogParams): Promise<string[]> => {
+export const getTaskLog = (pathParams: TaskLogParams): Promise<string[]> => {
   return request({
     method: 'get',
-    url: `/clusters/${params.clusterId}/jobs/${params.jobId}/stages/${params.stageId}/tasks/${params.taskId}/log`
+    url: `/clusters/${pathParams.clusterId}/jobs/${pathParams.jobId}/stages/${pathParams.stageId}/tasks/${pathParams.taskId}/log`
   })
 }

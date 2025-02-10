@@ -19,34 +19,39 @@
 
 import type { PageVO } from '@/api/types'
 
-export type JobList = PageVO<Job>
-export type StageList = PageVO<Stage>
+export type JobList = PageVO<JobVO>
+export type StageList = PageVO<StageVO>
 export type JobParams = { clusterId: number; jobId: number }
 export type TaskParams = JobParams & { stageId: number }
 export type TaskLogParams = TaskParams & { taskId: number }
 
-export interface Job {
+export interface JobVO {
   createTime?: string
   id?: number
   name?: string
+  stages?: StageVO[]
   state?: string
   updateTime?: string
+  [property: string]: any
 }
 
-export interface Stage {
+export interface StageVO {
   createTime?: string
   id?: number
   name?: string
   order?: number
   state?: string
-  tasks?: Task[]
+  tasks?: TaskVO[]
   updateTime?: string
+  [property: string]: any
 }
-export interface Task {
+
+export interface TaskVO {
   createTime?: string
   hostname?: string
   id?: number
   name?: string
   state?: string
   updateTime?: string
+  [property: string]: any
 }
