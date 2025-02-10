@@ -18,15 +18,39 @@
  */
 package org.apache.bigtop.manager.stack.infra.v1_0_0.mysql;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class MySQLParamsTest {
 
+    private MySQLParams mySQLParams;
+
+    @BeforeEach
+    public void setUp() {
+        mySQLParams = mock(MySQLParams.class);
+        when(mySQLParams.stackHome()).thenReturn("/stack");
+        when(mySQLParams.getServiceName()).thenCallRealMethod();
+        when(mySQLParams.serviceHome()).thenCallRealMethod();
+        when(mySQLParams.confDir()).thenCallRealMethod();
+        when(mySQLParams.user()).thenCallRealMethod();
+    }
+
+    @Test
+    public void testServiceHome() {
+        assertEquals("/stack/mysql", mySQLParams.serviceHome());
+    }
+
+    @Test
+    public void testConfDir() {
+        assertEquals("/stack/mysql/conf", mySQLParams.confDir());
+    }
+
     @Test
     public void testGetServiceName() {
-        MySQLParams mySQLParams = new MySQLParams();
         assertEquals("mysql", mySQLParams.getServiceName());
     }
 }
