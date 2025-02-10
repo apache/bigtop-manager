@@ -1,6 +1,5 @@
 export function generateTestData(count = 100) {
-  // 定义字段
-  const names = ['组件A', '组件B', '组件C', '组件D', '组件E']
+  const names = ['componentA', 'componentB', 'componentC', 'componentD', 'componentE']
   const versions = ['1.0.0', '2.3.1', '3.2.4', '4.0.0', '5.1.2']
   const compStacks = [
     'React, Redux, Webpack',
@@ -17,7 +16,6 @@ export function generateTestData(count = 100) {
     '这是一个前端开发框架'
   ]
 
-  // 生成测试数据
   const testData = Array.from({ length: count }, (_, i) => ({
     key: (i + 1).toString(),
     name: names[Math.floor(Math.random() * names.length)],
@@ -46,7 +44,7 @@ export function generateTableHostData(numRows = 100) {
       name: hostnames[Math.floor(Math.random() * hostnames.length)],
       system: `${systems}-${i}`,
       architecture: `${architecture}-${i}`,
-      componentCount: `${i}个组件`,
+      componentCount: `${i} components`,
       nodeName: nodeNames[Math.floor(Math.random() * nodeNames.length)],
       address: ipAddresses[Math.floor(Math.random() * ipAddresses.length)],
       remark: remarks[Math.floor(Math.random() * remarks.length)],
@@ -82,9 +80,6 @@ export function getCheckWorkflows(stageCount: number, maxTasksPerStage: number, 
 
   return data
 }
-
-// Restart ? Required/Not required
-// 健康/不健康/未知
 
 export enum StatusColors {
   success = 'success',

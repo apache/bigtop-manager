@@ -92,7 +92,8 @@ export const useMenuStore = defineStore(
               key: `${item.key}/${v.displayName}/${v.id}`,
               label: v.displayName || '',
               title: v.displayName || '',
-              activeMenu: item.key
+              activeMenu: item.key,
+              status: v.status || 3
             }
           })
         }
