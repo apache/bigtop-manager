@@ -20,7 +20,7 @@ export default {
   base_info: 'Basic information',
   cluster_config: 'Cluster configuration',
   cluster_management: 'Cluster',
-  component_info: 'Stacks',
+  component_info: 'Stack',
   host_config: 'Hosts',
   create: 'Create',
   name: 'Name',
@@ -32,8 +32,7 @@ export default {
   add_host: 'Add host',
   edit_host: 'Edit host',
   view_log: 'View log',
-  source: 'source',
+  source: 'Source',
   show_hosts_resolved: 'Hostnames after resolved',
-  cluster_unavailable_message:
-    'Apologies, you do not yet have a cluster, so you cannot use cluster management capabilities.'
+  cluster_unavailable_message: 'Sorry, you need to create cluster to use this feature.'
 }

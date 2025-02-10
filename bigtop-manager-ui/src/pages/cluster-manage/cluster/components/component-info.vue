@@ -35,6 +35,7 @@
   const stackSelected = ref('bigtop')
   const setSourceRef = ref<InstanceType<typeof SetSource>>()
   const stackGroup = shallowRef(['bigtop', 'infra', 'extra'])
+  const currentStack = computed(() => stacks.value.find((stack) => stack.stackName === stackSelected.value))
   const columns = computed((): TableColumnType[] => [
     {
       title: '#',
@@ -96,9 +97,9 @@
       <a-button type="primary" @click="handleSetSource">{{ $t('cluster.config_source') }}</a-button>
     </header>
     <a-table :loading="loading" :data-source="data" :columns="columns" :pagination="paginationProps" @change="onChange">
-      <template #bodyCell="{ column, record }">
+      <template #bodyCell="{ column }">
         <template v-if="column.key === 'stack'">
-          <span> {{ `${stackSelected}-${record.version}` }} </span>
+          <span> {{ `${stackSelected}-${currentStack?.stackVersion}` }} </span>
         </template>
       </template>
     </a-table>

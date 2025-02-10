@@ -223,7 +223,7 @@
           </a-col>
           <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
             <div class="chart-item-wrp">
-              <gauge-chart chart-id="chart2" title="CUP 使用率" />
+              <gauge-chart chart-id="chart2" title="CPU 使用率" />
             </div>
           </a-col>
           <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">

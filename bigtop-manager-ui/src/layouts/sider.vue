@@ -105,8 +105,10 @@
       <a-divider />
       <div class="create-option">
         <a-button type="primary" ghost @click="addCluster">
-          <svg-icon name="plus" />
-          <label>{{ $t('menu.create') }}</label>
+          <div>
+            <svg-icon name="plus" />
+            <label>{{ $t('menu.create') }}</label>
+          </div>
         </a-button>
       </div>
     </div>
@@ -144,9 +146,10 @@
       padding-bottom: $space-lg;
       button {
         width: 160px;
-        @include flexbox($align: center);
+        @include flexbox($align: center, $justify: center);
         label {
           margin-left: 10px;
+          cursor: pointer;
         }
       }
     }

@@ -36,7 +36,7 @@ export default {
   no_auth: 'No Authentication',
   agent_path: 'Agent Path',
   ssh_port: 'SSH Port',
-  grpc_port: 'gRPC Port',
+  grpc_port: 'GRPC Port',
   description: 'Description',
   key_password_not_match: 'Key Passwords do not match.'
 }

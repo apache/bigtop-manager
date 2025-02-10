@@ -165,7 +165,7 @@
           ...item,
           key: generateRandomId(),
           hostname: v,
-          status: 'INSTALLING'
+          status: 'UNKNOW'
         }
       }) as HostReq[]
       dataSource.value?.unshift(...items)
