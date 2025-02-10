@@ -71,6 +71,12 @@ public class JobController {
         return ResponseEntity.success(jobService.jobs(clusterId));
     }
 
+    @Operation(summary = "job details", description = "Get job details")
+    @GetMapping("/{jobId}")
+    public ResponseEntity<JobVO> jobDetails(@PathVariable Long clusterId, @PathVariable Long jobId) {
+        return ResponseEntity.success(jobService.jobDetails(clusterId, jobId));
+    }
+
     @Operation(summary = "stages", description = "List stages")
     @Parameters({
         @Parameter(in = ParameterIn.QUERY, name = "pageNum", schema = @Schema(type = "integer", defaultValue = "1")),
