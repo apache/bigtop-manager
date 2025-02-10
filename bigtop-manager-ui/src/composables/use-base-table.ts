@@ -66,7 +66,8 @@ const useBaseTable = <T>(props: UseBaseTableProps<T>) => {
       total: dataSource.value.length || 0,
       size: 'small',
       showSizeChanger: true,
-      pageSizeOptions: ['10', '20', '30', '40', '50']
+      pageSizeOptions: ['10', '20', '30', '40', '50'],
+      showTotal: (total) => `${t('common.total', [total])}`
     }
   }
 

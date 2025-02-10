@@ -32,7 +32,7 @@
     memory: '内存',
     coreCount: '核心数',
     diskSize: '磁盘大小',
-    creater: '创建人'
+    creator: '创建人'
   } as any
 
   const baseInfo = {
@@ -44,7 +44,7 @@
     memory: '内存',
     coreCount: '15个核心',
     diskSize: '磁盘大小',
-    creater: '创建人'
+    creator: '创建人'
   } as any
 
   const serviceStack = [
@@ -208,7 +208,7 @@
               :key="time.text"
               tabindex="0"
               class="time-range"
-              :class="{ 'time-range-actived': currTimeRange === time.text }"
+              :class="{ 'time-range-activated': currTimeRange === time.text }"
               @click="handleTimeRange(time)"
             >
               {{ time.text }}
@@ -271,7 +271,7 @@
       &:hover {
         color: $color-primary-text-hover;
       }
-      &-actived {
+      &-activated {
         color: $color-primary-text;
       }
     }
