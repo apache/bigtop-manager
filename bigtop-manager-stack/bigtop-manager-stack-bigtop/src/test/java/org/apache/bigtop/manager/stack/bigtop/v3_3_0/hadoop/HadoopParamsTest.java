@@ -22,6 +22,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class HadoopParamsTest {
 
@@ -29,22 +31,27 @@ public class HadoopParamsTest {
 
     @BeforeEach
     public void setUp() {
-        hadoopParams = new HadoopParams() {
-            @Override
-            public String serviceHome() {
-                return "/path/to/service";
-            }
-        };
+        hadoopParams = mock(HadoopParams.class);
+        when(hadoopParams.stackHome()).thenReturn("/stack");
+        when(hadoopParams.getServiceName()).thenCallRealMethod();
+        when(hadoopParams.serviceHome()).thenCallRealMethod();
+        when(hadoopParams.confDir()).thenCallRealMethod();
+        when(hadoopParams.binDir()).thenCallRealMethod();
+    }
+
+    @Test
+    public void testServiceHome() {
+        assertEquals("/stack/hadoop", hadoopParams.serviceHome());
     }
 
     @Test
     public void testConfDir() {
-        assertEquals("/path/to/service/etc/hadoop", hadoopParams.confDir());
+        assertEquals("/stack/hadoop/etc/hadoop", hadoopParams.confDir());
     }
 
     @Test
     public void testBinDir() {
-        assertEquals("/path/to/service/bin", hadoopParams.binDir());
+        assertEquals("/stack/hadoop/bin", hadoopParams.binDir());
     }
 
     @Test

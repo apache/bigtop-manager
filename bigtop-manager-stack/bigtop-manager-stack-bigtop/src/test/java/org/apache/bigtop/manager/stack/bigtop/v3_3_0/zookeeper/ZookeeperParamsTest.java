@@ -18,15 +18,38 @@
  */
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.zookeeper;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ZookeeperParamsTest {
 
+    private ZookeeperParams zookeeperParams;
+
+    @BeforeEach
+    public void setUp() {
+        zookeeperParams = mock(ZookeeperParams.class);
+        when(zookeeperParams.stackHome()).thenReturn("/stack");
+        when(zookeeperParams.getServiceName()).thenCallRealMethod();
+        when(zookeeperParams.serviceHome()).thenCallRealMethod();
+        when(zookeeperParams.confDir()).thenCallRealMethod();
+    }
+
+    @Test
+    public void testServiceHome() {
+        assertEquals("/stack/zookeeper", zookeeperParams.serviceHome());
+    }
+
+    @Test
+    public void testConfDir() {
+        assertEquals("/stack/zookeeper/conf", zookeeperParams.confDir());
+    }
+
     @Test
     public void testGetServiceName() {
-        ZookeeperParams zookeeperParams = new ZookeeperParams();
         assertEquals("zookeeper", zookeeperParams.getServiceName());
     }
 }

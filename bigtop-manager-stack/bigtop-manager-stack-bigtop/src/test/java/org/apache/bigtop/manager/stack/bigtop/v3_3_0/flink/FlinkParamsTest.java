@@ -18,6 +18,7 @@
  */
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.flink;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,31 +27,41 @@ import static org.mockito.Mockito.when;
 
 public class FlinkParamsTest {
 
-    @Test
-    public void testHadoopConfDir() {
-        FlinkParams flinkParams = mock(FlinkParams.class);
-        when(flinkParams.stackHome()).thenReturn("/usr/local");
+    private FlinkParams flinkParams;
+
+    @BeforeEach
+    public void setUp() {
+        flinkParams = mock(FlinkParams.class);
+        when(flinkParams.stackHome()).thenReturn("/stack");
+        when(flinkParams.getServiceName()).thenCallRealMethod();
+        when(flinkParams.serviceHome()).thenCallRealMethod();
         when(flinkParams.hadoopHome()).thenCallRealMethod();
         when(flinkParams.hadoopConfDir()).thenCallRealMethod();
+        when(flinkParams.confDir()).thenCallRealMethod();
+    }
 
-        String expected = "/usr/local/hadoop/etc/hadoop";
-        assertEquals(expected, flinkParams.hadoopConfDir());
+    @Test
+    public void testServiceHome() {
+        assertEquals("/stack/flink", flinkParams.serviceHome());
+    }
+
+    @Test
+    public void testConfDir() {
+        assertEquals("/stack/flink/conf", flinkParams.confDir());
+    }
+
+    @Test
+    public void testHadoopConfDir() {
+        assertEquals("/stack/hadoop/etc/hadoop", flinkParams.hadoopConfDir());
     }
 
     @Test
     public void testHadoopHome() {
-        FlinkParams flinkParams = mock(FlinkParams.class);
-        when(flinkParams.stackHome()).thenReturn("/usr/local");
-        when(flinkParams.hadoopHome()).thenCallRealMethod();
-
-        String expected = "/usr/local/hadoop";
-        assertEquals(expected, flinkParams.hadoopHome());
+        assertEquals("/stack/hadoop", flinkParams.hadoopHome());
     }
 
     @Test
     public void testGetServiceName() {
-        FlinkParams flinkParams = new FlinkParams();
-        String expected = "flink";
-        assertEquals(expected, flinkParams.getServiceName());
+        assertEquals("flink", flinkParams.getServiceName());
     }
 }

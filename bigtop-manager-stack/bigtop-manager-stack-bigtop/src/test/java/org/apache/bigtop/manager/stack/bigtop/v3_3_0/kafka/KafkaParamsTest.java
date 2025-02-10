@@ -18,22 +18,34 @@
  */
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.kafka;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class KafkaParamsTest {
 
-    private final KafkaParams kafkaParams = new KafkaParams() {
-        @Override
-        public String serviceHome() {
-            return "/confDir";
-        }
-    };
+    private KafkaParams kafkaParams;
+
+    @BeforeEach
+    public void setUp() {
+        kafkaParams = mock(KafkaParams.class);
+        when(kafkaParams.stackHome()).thenReturn("/stack");
+        when(kafkaParams.getServiceName()).thenCallRealMethod();
+        when(kafkaParams.serviceHome()).thenCallRealMethod();
+        when(kafkaParams.confDir()).thenCallRealMethod();
+    }
+
+    @Test
+    public void testServiceHome() {
+        assertEquals("/stack/kafka", kafkaParams.serviceHome());
+    }
 
     @Test
     public void testConfDir() {
-        assertEquals("/confDir/config", kafkaParams.confDir());
+        assertEquals("/stack/kafka/config", kafkaParams.confDir());
     }
 
     @Test

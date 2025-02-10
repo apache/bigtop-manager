@@ -18,6 +18,7 @@
  */
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.spark;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,27 +27,53 @@ import static org.mockito.Mockito.when;
 
 public class SparkParamsTest {
 
+    private SparkParams sparkParams;
+
+    @BeforeEach
+    public void setUp() {
+        sparkParams = mock(SparkParams.class);
+        when(sparkParams.stackHome()).thenReturn("/stack");
+        when(sparkParams.getServiceName()).thenCallRealMethod();
+        when(sparkParams.serviceHome()).thenCallRealMethod();
+        when(sparkParams.hadoopConfDir()).thenCallRealMethod();
+        when(sparkParams.hadoopHome()).thenCallRealMethod();
+        when(sparkParams.hiveConfDir()).thenCallRealMethod();
+        when(sparkParams.hiveHome()).thenCallRealMethod();
+        when(sparkParams.confDir()).thenCallRealMethod();
+    }
+
+    @Test
+    public void testServiceHome() {
+        assertEquals("/stack/spark", sparkParams.serviceHome());
+    }
+
     @Test
     public void testHadoopConfDir() {
-        SparkParams params = mock(SparkParams.class);
-        when(params.stackHome()).thenReturn("/opt/stack");
-        when(params.hadoopHome()).thenCallRealMethod();
-        when(params.hadoopConfDir()).thenCallRealMethod();
-        assertEquals("/opt/stack/hadoop/etc/hadoop", params.hadoopConfDir());
+        assertEquals("/stack/hadoop/etc/hadoop", sparkParams.hadoopConfDir());
+    }
+
+    @Test
+    public void testHadoopHome() {
+        assertEquals("/stack/hadoop", sparkParams.hadoopHome());
     }
 
     @Test
     public void testHiveConfDir() {
-        SparkParams params = mock(SparkParams.class);
-        when(params.stackHome()).thenReturn("/opt/stack");
-        when(params.hiveHome()).thenCallRealMethod();
-        when(params.hiveConfDir()).thenCallRealMethod();
-        assertEquals("/opt/stack/hive/conf", params.hiveConfDir());
+        assertEquals("/stack/hive/conf", sparkParams.hiveConfDir());
+    }
+
+    @Test
+    public void testHiveHome() {
+        assertEquals("/stack/hive", sparkParams.hiveHome());
+    }
+
+    @Test
+    public void testConfDir() {
+        assertEquals("/stack/spark/conf", sparkParams.confDir());
     }
 
     @Test
     public void testGetServiceName() {
-        SparkParams params = new SparkParams();
-        assertEquals("spark", params.getServiceName());
+        assertEquals("spark", sparkParams.getServiceName());
     }
 }

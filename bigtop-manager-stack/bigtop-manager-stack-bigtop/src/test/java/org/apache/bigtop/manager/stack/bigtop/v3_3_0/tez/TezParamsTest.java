@@ -18,6 +18,7 @@
  */
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.tez;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,27 +27,41 @@ import static org.mockito.Mockito.when;
 
 public class TezParamsTest {
 
-    @Test
-    public void testHadoopHome() {
-        TezParams tezParams = mock(TezParams.class);
+    private TezParams tezParams;
+
+    @BeforeEach
+    public void setUp() {
+        tezParams = mock(TezParams.class);
         when(tezParams.stackHome()).thenReturn("/stack");
-        when(tezParams.hadoopHome()).thenCallRealMethod();
+        when(tezParams.getServiceName()).thenCallRealMethod();
+        when(tezParams.serviceHome()).thenCallRealMethod();
         when(tezParams.hadoopConfDir()).thenCallRealMethod();
-        assertEquals("/stack/hadoop", tezParams.hadoopHome());
+        when(tezParams.hadoopHome()).thenCallRealMethod();
+        when(tezParams.confDir()).thenCallRealMethod();
+    }
+
+    @Test
+    public void testConfDir() {
+        assertEquals("/stack/tez/conf", tezParams.confDir());
+    }
+
+    @Test
+    public void testServiceHome() {
+        assertEquals("/stack/tez", tezParams.serviceHome());
     }
 
     @Test
     public void testHadoopConfDir() {
-        TezParams tezParams = mock(TezParams.class);
-        when(tezParams.stackHome()).thenReturn("/stack");
-        when(tezParams.hadoopHome()).thenCallRealMethod();
-        when(tezParams.hadoopConfDir()).thenCallRealMethod();
         assertEquals("/stack/hadoop/etc/hadoop", tezParams.hadoopConfDir());
     }
 
     @Test
+    public void testHadoopHome() {
+        assertEquals("/stack/hadoop", tezParams.hadoopHome());
+    }
+
+    @Test
     public void testGetServiceName() {
-        TezParams tezParams = new TezParams();
         assertEquals("tez", tezParams.getServiceName());
     }
 }

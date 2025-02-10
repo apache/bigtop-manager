@@ -18,15 +18,38 @@
  */
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.hbase;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class HBaseParamsTest {
 
+    private HBaseParams hBaseParams;
+
+    @BeforeEach
+    public void setUp() {
+        hBaseParams = mock(HBaseParams.class);
+        when(hBaseParams.stackHome()).thenReturn("/stack");
+        when(hBaseParams.getServiceName()).thenCallRealMethod();
+        when(hBaseParams.serviceHome()).thenCallRealMethod();
+        when(hBaseParams.confDir()).thenCallRealMethod();
+    }
+
+    @Test
+    public void testServiceHome() {
+        assertEquals("/stack/hbase", hBaseParams.serviceHome());
+    }
+
+    @Test
+    public void testConfDir() {
+        assertEquals("/stack/hbase/conf", hBaseParams.confDir());
+    }
+
     @Test
     public void testGetServiceName() {
-        HBaseParams hBaseParams = new HBaseParams();
         assertEquals("hbase", hBaseParams.getServiceName());
     }
 }

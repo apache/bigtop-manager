@@ -18,18 +18,36 @@
  */
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.hive;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class HiveParamsTest {
 
-    private final HiveParams hiveParams = new HiveParams() {
-        @Override
-        public String stackHome() {
-            return "/stack";
-        }
-    };
+    private HiveParams hiveParams;
+
+    @BeforeEach
+    public void setUp() {
+        hiveParams = mock(HiveParams.class);
+        when(hiveParams.stackHome()).thenReturn("/stack");
+        when(hiveParams.getServiceName()).thenCallRealMethod();
+        when(hiveParams.serviceHome()).thenCallRealMethod();
+        when(hiveParams.hadoopHome()).thenCallRealMethod();
+        when(hiveParams.confDir()).thenCallRealMethod();
+    }
+
+    @Test
+    public void testServiceHome() {
+        assertEquals("/stack/hive", hiveParams.serviceHome());
+    }
+
+    @Test
+    public void testConfDir() {
+        assertEquals("/stack/hive/conf", hiveParams.confDir());
+    }
 
     @Test
     public void testHadoopHome() {

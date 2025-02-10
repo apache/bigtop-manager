@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class FlinkHistoryServerScriptTest {
 
-    private FlinkHistoryServerScript script = new FlinkHistoryServerScript();
+    private final FlinkHistoryServerScript script = new FlinkHistoryServerScript();
 
     @Test
     void testGetComponentName() {

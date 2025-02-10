@@ -18,26 +18,38 @@
  */
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.solr;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class SolrParamsTest {
 
-    private final SolrParams kafkaParams = new SolrParams() {
-        @Override
-        public String serviceHome() {
-            return "/confDir";
-        }
-    };
+    private SolrParams solrParams;
+
+    @BeforeEach
+    public void setUp() {
+        solrParams = mock(SolrParams.class);
+        when(solrParams.stackHome()).thenReturn("/stack");
+        when(solrParams.getServiceName()).thenCallRealMethod();
+        when(solrParams.serviceHome()).thenCallRealMethod();
+        when(solrParams.confDir()).thenCallRealMethod();
+    }
+
+    @Test
+    public void testServiceHome() {
+        assertEquals("/stack/solr", solrParams.serviceHome());
+    }
 
     @Test
     public void testConfDir() {
-        assertEquals("/confDir/server/solr", kafkaParams.confDir());
+        assertEquals("/stack/solr/server/solr", solrParams.confDir());
     }
 
     @Test
     public void testGetServiceName() {
-        assertEquals("solr", kafkaParams.getServiceName());
+        assertEquals("solr", solrParams.getServiceName());
     }
 }
