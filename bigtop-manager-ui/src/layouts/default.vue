@@ -26,7 +26,7 @@
     <div class="default">
       <img :src="usePngImage('default')" />
       <a-typography-text>{{ $t('cluster.cluster_unavailable_message') }}</a-typography-text>
-      <a-typography-link href="#" underline @click="() => $router.push({ name: 'ClusterCreate' })">
+      <a-typography-link underline @click="() => $router.push({ name: 'ClusterCreate' })">
         {{ $t('cluster.create') }}
       </a-typography-link>
     </div>

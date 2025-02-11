@@ -61,18 +61,10 @@
   )
   const isDone = computed(() => ['Successful', 'Failed'].includes(stepData.value[stepData.value.length - 1].state))
   const steps = computed(() => [
-    {
-      title: t('cluster.cluster_management')
-    },
-    {
-      title: t('cluster.component_info')
-    },
-    {
-      title: t('cluster.host_config')
-    },
-    {
-      title: t('cluster.create')
-    }
+    'cluster.cluster_management',
+    'cluster.component_info',
+    'cluster.host_config',
+    'cluster.create'
   ])
 
   const getCompName = computed(() => {
@@ -189,6 +181,17 @@
     return Array.from(mergedMap.values())
   }
 
+  // const changeStep = (step: number) => {
+  //   if (current.value > step) {
+  //     const previousCount = current.value - step
+  //     Array.from({ length: previousCount }).forEach(() => previousStep())
+  //   }
+  //   if (current.value < step) {
+  //     const nextCount = step - current.value
+  //     Array.from({ length: nextCount }).forEach(() => prepareNextStep())
+  //   }
+  // }
+
   const onSave = () => {
     menuStore.updateSiderMenu()
   }
@@ -198,13 +201,19 @@
   <div class="cluster-create">
     <header-card>
       <div class="steps-wrp">
-        <a-steps :current="current" :items="steps" />
+        <a-steps :current="current">
+          <a-step v-for="step in steps" :key="step" :disabled="true">
+            <template #title>
+              <span>{{ $t(step) }}</span>
+            </template>
+          </a-step>
+        </a-steps>
       </div>
     </header-card>
     <main-card>
       <template v-for="stepItem in steps" :key="stepItem.title">
-        <div v-show="steps[current].title === stepItem.title" class="step-title">
-          <h5>{{ stepItem.title }}</h5>
+        <div v-show="steps[current] === stepItem" class="step-title">
+          <h5>{{ $t(stepItem) }}</h5>
           <section :class="{ 'step-content': current < stepsLimit }"> </section>
         </div>
       </template>
