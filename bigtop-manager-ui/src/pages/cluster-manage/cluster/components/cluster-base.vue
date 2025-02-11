@@ -19,16 +19,30 @@
 
 <script setup lang="ts">
   import type { FormItemState } from '@/components/common/auto-form/types'
-  import { computed, ref, shallowRef, toRefs, watch } from 'vue'
+  import { computed, ref, shallowRef, watch } from 'vue'
   import { useI18n } from 'vue-i18n'
   import type { ClusterCommandReq } from '@/api/command/types'
+  import { pick } from '@/utils/tools'
+
+  type ClusterCommandReqKey = keyof ClusterCommandReq
 
   const { t } = useI18n()
   const activeKey = ref(['1', '2'])
   const autoFormRefMap = shallowRef<Map<string, Comp.AutoFormInstance>>(new Map())
   const props = defineProps<{ stepData: ClusterCommandReq }>()
   const emits = defineEmits(['updateData'])
-  const { stepData } = toRefs(props)
+  const collapses = ref([
+    {
+      title: computed(() => t('cluster.base_info')),
+      formValue: pick<ClusterCommandReq, ClusterCommandReqKey>(props.stepData, ['name', 'displayName', 'desc']),
+      formItems: computed(() => baseInfoFormItems.value)
+    },
+    {
+      title: computed(() => t('cluster.cluster_config')),
+      formValue: pick<ClusterCommandReq, ClusterCommandReqKey>(props.stepData, ['rootDir', 'userGroup']),
+      formItems: computed(() => clusterConfigFormItems.value)
+    }
+  ])
   const formLayout = computed(() => ({
     labelCol: { xs: 5, sm: 5, md: 5, lg: 4, xl: 3 },
     wrapperCol: { xs: 10, sm: 10, md: 10, lg: 10, xl: { xl: 10, pull: 1 } }
@@ -47,6 +61,24 @@
       },
       controlProps: {
         placeholder: t('common.enter_error', [`${t('cluster.name')}`.toLowerCase()])
+      }
+    },
+    {
+      type: 'input',
+      field: 'displayName',
+      formItemProps: {
+        name: 'displayName',
+        label: t('cluster.display_name'),
+        rules: [
+          {
+            required: true,
+            message: t('common.enter_error', [`${t('cluster.display_name')}`.toLowerCase()]),
+            trigger: 'blur'
+          }
+        ]
+      },
+      controlProps: {
+        placeholder: t('common.enter_error', [`${t('cluster.display_name')}`.toLowerCase()])
       }
     },
     {
@@ -89,7 +121,7 @@
       }
     },
     {
-      type: 'textarea',
+      type: 'input',
       field: 'userGroup',
       formItemProps: {
         name: 'userGroup',
@@ -108,22 +140,6 @@
     }
   ])
 
-  const collapses = ref([
-    {
-      title: computed(() => t('cluster.base_info')),
-      formValue: { name: stepData.value?.name, desc: stepData.value?.desc },
-      formItems: computed(() => baseInfoFormItems.value)
-    },
-    {
-      title: computed(() => t('cluster.cluster_config')),
-      formValue: {
-        rootDir: stepData.value?.rootDir,
-        userGroup: stepData.value?.rootDir
-      },
-      formItems: computed(() => clusterConfigFormItems.value)
-    }
-  ])
-
   const getFormValues = () => {
     return collapses.value.reduce((pre, val) => {
       Object.assign(pre, val.formValue)
@@ -132,28 +148,19 @@
   }
 
   const collectAutoFormRefs = (el: any, title: string) => {
-    if (!autoFormRefMap.value.has(title)) {
-      autoFormRefMap.value.set(title, el)
-    }
+    // Synchronous I18n switch
+    el ? autoFormRefMap.value.set(title, el) : autoFormRefMap.value.delete(title)
   }
 
   const check = async () => {
     try {
       const autoFormRefs = [...autoFormRefMap.value.values()]
-      const validationResults = await Promise.all(
-        Array.from(autoFormRefs).map((formRef) => formRef.getFormValidation())
-      )
-      const allValid = validationResults.every((res) => res)
-      if (allValid) {
-        return allValid
-      } else {
-        autoFormRefs.forEach((_formRef, idx) => {
-          if (!validationResults[idx]) {
-            !activeKey.value.includes(`${idx + 1}`) && activeKey.value.push(`${idx + 1}`)
-          }
-        })
-        return allValid
-      }
+      const validation = await Promise.all(autoFormRefs.map((formRef) => formRef?.getFormValidation()))
+      const allValid = validation.every((res) => res)
+      autoFormRefs.forEach((_formRef, index) => {
+        !validation[index] && !activeKey.value.includes(`${index + 1}`) && activeKey.value.push(`${index + 1}`)
+      })
+      return allValid
     } catch (error) {
       console.error('Error during form validation:', error)
       return
@@ -163,8 +170,7 @@
   watch(
     () => [collapses.value[0].formValue, collapses.value[1].formValue],
     () => {
-      const res = getFormValues()
-      emits('updateData', res)
+      emits('updateData', getFormValues())
     },
     {
       deep: true

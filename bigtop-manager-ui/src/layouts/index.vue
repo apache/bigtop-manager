@@ -23,20 +23,19 @@
   import LayoutHeader from '@/layouts/header.vue'
   import LayoutSider from '@/layouts/sider.vue'
   import { useUserStore } from '@/store/user'
-  import { useClusterStore } from '@/store/cluster'
+  // import { useClusterStore } from '@/store/cluster'
   import { useMenuStore } from '@/store/menu/index'
   import { useStackStore } from '@/store/stack'
   import { storeToRefs } from 'pinia'
 
   const userStore = useUserStore()
   const menuStore = useMenuStore()
-  const clusterStore = useClusterStore()
+  // const clusterStore = useClusterStore()
   const stackStore = useStackStore()
   const { headerSelectedKey, headerMenus, siderMenuSelectedKey, siderMenus } = storeToRefs(menuStore)
 
   onMounted(async () => {
     userStore.getUserInfo()
-    await clusterStore.loadClusters()
     menuStore.setUpMenu()
     stackStore.loadStacks()
   })

@@ -40,23 +40,23 @@
 
   const { t } = useI18n()
   const menuStore = useMenuStore()
+  const current = ref(0)
   const compRef = ref<any>()
-
+  const installing = ref(false)
+  const stepData = ref<[Partial<ClusterCommandReq>, any, HostReq[], CommandVO]>([{}, {}, [], {}])
   const commandRequest = ref<CommandRequest>({
     command: Command.Add,
     commandLevel: CommandLevel.Cluster
   })
-  const installing = ref(false)
-  const current = ref(0)
-  const stepData = ref<[Partial<ClusterCommandReq>, any, HostReq[], CommandVO]>([{}, {}, [], {}])
   const installStatus = shallowRef<InstalledStatusVO[]>([])
+  const components = shallowRef<any[]>([ClusterBase, ComponentInfo, HostConfig, CheckWorkflow])
   const isInstall = computed(() => current.value === 2)
   const stepsLimit = computed(() => steps.value.length - 1)
-  const hasUnknowHost = computed(() => stepData.value[2].every((v) => v.status === Status.Success))
+  const hasUnknowHost = computed(() => stepData.value[2].filter((v) => v.status === Status.Unknown).length == 0)
   const allInstallSuccess = computed(
     () =>
-      installStatus.value.length != 0 &&
-      installStatus.value.every((v) => v.status === Status.Success) &&
+      stepData.value[2].length != 0 &&
+      stepData.value[2].every((v) => v.status === Status.Success) &&
       hasUnknowHost.value
   )
   const isDone = computed(() => ['Successful', 'Failed'].includes(stepData.value[stepData.value.length - 1].state))
@@ -74,18 +74,9 @@
       title: t('cluster.create')
     }
   ])
+
   const getCompName = computed(() => {
-    if (current.value === 0) {
-      return ClusterBase
-    } else if (current.value === 1) {
-      return ComponentInfo
-    } else if (current.value === 2) {
-      return HostConfig
-    } else if (current.value === 3) {
-      return CheckWorkflow
-    } else {
-      return CheckWorkflow
-    }
+    return components.value[current.value]
   })
 
   const updateData = (val: Partial<ClusterCommandReq> | any | HostReq[]) => {
@@ -94,10 +85,7 @@
 
   const createCluster = async () => {
     try {
-      commandRequest.value.clusterCommand = {
-        ...stepData.value[0],
-        displayName: stepData.value[0].name
-      } as ClusterCommandReq
+      commandRequest.value.clusterCommand = stepData.value[0] as ClusterCommandReq
       commandRequest.value.clusterCommand.hosts = stepData.value[2]
       stepData.value[stepData.value.length - 1] = await execCommand(commandRequest.value)
       return true
@@ -110,6 +98,12 @@
   const previousStep = () => {
     if (current.value > 0) {
       current.value = current.value - 1
+    }
+  }
+
+  const nextStep = async () => {
+    if (current.value < stepsLimit.value) {
+      current.value = current.value + 1
     }
   }
 
@@ -131,12 +125,6 @@
     }
   }
 
-  const nextStep = async () => {
-    if (current.value < stepsLimit.value) {
-      current.value = current.value + 1
-    }
-  }
-
   const resolveInstallDependencies = async () => {
     if (stepData.value[2].length == 0) {
       message.error(t('host.uninstallable'))
@@ -145,7 +133,7 @@
     try {
       installing.value = true
       const data = await installDependencies(stepData.value[current.value])
-      data && pollUntilSuccess()
+      data && pollUntilInstalled()
     } catch (error) {
       installing.value = false
       console.log('error :>> ', error)
@@ -168,8 +156,16 @@
     }
   }
 
-  const pollUntilSuccess = (interval: number = 1000): void => {
+  const pollUntilInstalled = (interval: number = 1000): void => {
+    let isInitialized = false
     const intervalId = setInterval(async () => {
+      if (!isInitialized) {
+        stepData.value[current.value] = stepData.value[current.value].map((item: HostReq) => ({
+          ...item,
+          status: Status.Installing
+        }))
+        isInitialized = true
+      }
       const result = await recordInstalledStatus()
       if (result) {
         installing.value = false

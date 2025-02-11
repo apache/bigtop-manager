@@ -76,8 +76,20 @@ export const formatTime = (time: string | undefined, formatRule: string = 'YYYY-
   return typeof time === 'string' && dayjs(time).tz(dayjs.tz.guess(), true).format(formatRule)
 }
 
-export function generateRandomId(length = 8) {
+export const generateRandomId = (length = 8) => {
   return Math.random()
     .toString(36)
     .substring(2, length + 2)
+}
+
+export const pick = <T extends object, K extends keyof T>(obj: T, keys: K[]): Pick<T, K> => {
+  return keys.reduce(
+    (acc, key) => {
+      if (obj.hasOwnProperty(key)) {
+        acc[key] = obj[key]
+      }
+      return acc
+    },
+    {} as Pick<T, K>
+  )
 }

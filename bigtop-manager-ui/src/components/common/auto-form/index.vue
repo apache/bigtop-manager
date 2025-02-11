@@ -93,7 +93,7 @@
 
   const getFormValidation = async () => {
     try {
-      await formRef.value.validateFields()
+      await formRef.value?.validateFields()
       return Promise.resolve(true)
     } catch (error) {
       console.log('Failed:', error)

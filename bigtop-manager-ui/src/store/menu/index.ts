@@ -145,8 +145,9 @@ export const useMenuStore = defineStore(
       router.push(siderMenuSelectedKey.value)
     }
 
-    const setUpMenu = () => {
+    const setUpMenu = async () => {
       setBaseRoutesMap()
+      await clusterStore.loadClusters()
       updateSiderMenu()
     }
 

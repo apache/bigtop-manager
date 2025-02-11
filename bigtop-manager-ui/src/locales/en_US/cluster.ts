@@ -24,6 +24,7 @@ export default {
   host_config: 'Hosts',
   create: 'Create',
   name: 'Name',
+  display_name: 'Display name',
   description: 'Description',
   root_directory: 'Root directory',
   user_group: 'User group',

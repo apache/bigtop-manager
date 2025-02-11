@@ -24,6 +24,7 @@ export default {
   host_config: '主机管理',
   create: '创建集群',
   name: '集群名',
+  display_name: '集群显示名',
   description: '集群描述',
   root_directory: '集群根目录',
   user_group: '集群用户组',
