@@ -25,6 +25,8 @@ export type ServiceParams = { clusterId: number; id: number }
 export type SnapshotData = { desc?: string; name?: string }
 export type SnapshotRecovery = ServiceParams & { snapshotId: string }
 
+export type ServiceStatusType = 1 | 2 | 3
+
 export interface ServiceVO {
   components?: ComponentVO[]
   configs?: ServiceConfig[]
@@ -35,7 +37,7 @@ export interface ServiceVO {
   requiredServices?: string[]
   restartFlag?: boolean
   stack?: string
-  status?: number
+  status: ServiceStatusType
   user?: string
   version?: string
 }

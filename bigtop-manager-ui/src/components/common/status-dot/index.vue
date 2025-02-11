@@ -18,19 +18,13 @@
 -->
 
 <script setup lang="ts">
+  import { StatusType, StatusColors } from '@/enums/state'
   import { computed } from 'vue'
 
   interface StatusDot {
     size?: number
-    color?: keyof typeof Colors
+    color?: StatusType
     content?: string
-  }
-
-  enum Colors {
-    success = 'var(--color-success)',
-    error = 'var(--color-error)',
-    warning = 'var(--color-warning)',
-    default = 'var(--color-primary)'
   }
 
   const props = withDefaults(defineProps<StatusDot>(), {
@@ -43,7 +37,7 @@
     width: props.size + 'px',
     height: props.size + 'px',
     fontSize: fontSize.value + 'px',
-    backgroundColor: Colors[props.color]
+    backgroundColor: StatusColors[props.color]
   }))
 </script>
 

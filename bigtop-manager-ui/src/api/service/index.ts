@@ -27,13 +27,18 @@ import type {
   SnapshotRecovery
 } from './types'
 import request from '@/api/request.ts'
+import { get } from '@/api/request-util'
 
-export const getServiceList = (clusterId: number): Promise<ServiceList> => {
-  return request({
-    method: 'get',
-    url: `/clusters/${clusterId}/services`
-  })
+export const getServiceList = (clusterId: number) => {
+  return get<ServiceList>(`/clusters/${clusterId}/services`)
 }
+
+// export const getServiceList = (clusterId: number): Promise<ServiceList> => {
+//   return request({
+//     method: 'get',
+//     url: `/clusters/${clusterId}/services`
+//   })
+// }
 
 export const getService = (params: ServiceParams): Promise<ServiceVO> => {
   return request({

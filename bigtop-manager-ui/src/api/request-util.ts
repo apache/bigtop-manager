@@ -16,23 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import type { ResponseEntity } from './types'
 import request from './request'
 import { AxiosRequestConfig } from 'axios'
 
-const get = <T>(url: string, config?: AxiosRequestConfig): Promise<ResponseEntity<T>> => {
+const get = <T>(url: string, config?: AxiosRequestConfig): Promise<T> => {
   return request.get(url, config)
 }
 
-const post = <T, U = any>(url: string, data?: U, config?: AxiosRequestConfig): Promise<ResponseEntity<T>> => {
+const post = <T, U = any>(url: string, data?: U, config?: AxiosRequestConfig): Promise<T> => {
   return request.post(url, data, config)
 }
 
-const put = <T, U = any>(url: string, data: U, config?: AxiosRequestConfig): Promise<ResponseEntity<T>> => {
+const put = <T, U = any>(url: string, data: U, config?: AxiosRequestConfig): Promise<T> => {
   return request.put(url, data, config)
 }
 
-const del = <T>(url: string, config?: AxiosRequestConfig): Promise<ResponseEntity<T>> => {
+const del = <T>(url: string, config?: AxiosRequestConfig): Promise<T> => {
   return request.delete(url, config)
 }
 

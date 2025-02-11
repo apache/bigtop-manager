@@ -17,26 +17,23 @@
  * under the License.
  */
 
-export type MaintainState = 'Uninstalled' | 'Installed' | 'Maintained' | 'Started' | 'Stopped'
+export type StatusType = keyof typeof StatusColors
 
-export enum State {
-  Pending = '#1677ff',
-  Processing = '#1677fe',
-  Successful = '#52c41a',
-  Failed = '#ff4d4f',
-  Canceled = '#80868b'
+export enum StatusColors {
+  success = 'var(--color-success)',
+  error = 'var(--color-error)',
+  warning = 'var(--color-warning)',
+  default = 'var(--color-primary)'
 }
 
-export enum CommonState {
-  normal = '#52c41a',
-  abnormal = '#ff4d4f',
-  maintained = '#d9d9d9'
+export enum ServiceStatus {
+  healthy = 'success',
+  unhealthy = 'error',
+  unknow = 'warning'
 }
 
-export enum CurrState {
-  Installed,
-  Started,
-  Maintained,
-  Uninstalled,
-  Stopped
+export enum ServiceStatusTexts {
+  'healthy',
+  'unhealthy',
+  'unknow'
 }

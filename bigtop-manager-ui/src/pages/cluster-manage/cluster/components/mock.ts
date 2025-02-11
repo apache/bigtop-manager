@@ -109,7 +109,7 @@ export enum StatusColors {
 export enum StatusTexts {
   success = 'healthy',
   error = 'unhealthy',
-  unknow = 'unknown'
+  unknow = 'unknow'
 }
 
 export type ServiceStatus = keyof typeof StatusColors

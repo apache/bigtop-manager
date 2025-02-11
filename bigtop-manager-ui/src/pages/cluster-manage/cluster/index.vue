@@ -101,7 +101,9 @@
   <header-card :title="title" avatar="cluster" :desc="desc" :action-groups="actionGroup" />
   <main-card v-model:active-key="activeKey" :tabs="tabs">
     <template #tab-item>
-      <component :is="getCompName"></component>
+      <keep-alive>
+        <component :is="getCompName"></component>
+      </keep-alive>
     </template>
   </main-card>
 </template>

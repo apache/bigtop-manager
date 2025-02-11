@@ -18,16 +18,24 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onMounted, ref, shallowRef } from 'vue'
-  import { getServices, StatusColors, StatusTexts, type ServiceItem } from './components/mock'
+  import { computed, onActivated, shallowRef, toRefs } from 'vue'
   import { usePngImage } from '@/utils/tools'
   import { useI18n } from 'vue-i18n'
   import FilterForm from '@/components/common/filter-form/index.vue'
+  import { useServiceStore } from '@/store/service'
+  import { ServiceStatus, ServiceStatusTexts } from '@/enums/state'
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { FilterFormItem } from '@/components/common/filter-form/types'
+  import type { ServiceStatusType } from '@/api/service/types'
 
   const { t } = useI18n()
-  const data = ref<ServiceItem[]>([])
+  const serviceStore = useServiceStore()
+  const { services } = toRefs(serviceStore)
+  const statusColors = shallowRef<Record<ServiceStatusType, keyof typeof ServiceStatusTexts>>({
+    1: 'healthy',
+    2: 'unhealthy',
+    3: 'unknow'
+  })
   const actionGroups = shallowRef<GroupItem[]>([
     {
       action: 'start',
@@ -67,7 +75,7 @@
     },
     {
       type: 'status',
-      key: 'restart',
+      key: 'restartFlag',
       label: '需要重启',
       options: [
         {
@@ -86,16 +94,16 @@
       label: '状态',
       options: [
         {
-          label: t(`common.${StatusTexts.success}`),
-          value: StatusTexts.success
+          label: t(`common.${statusColors.value[1]}`),
+          value: 1
         },
         {
-          label: t(`common.${StatusTexts.error}`),
-          value: StatusTexts.error
+          label: t(`common.${statusColors.value[2]}`),
+          value: 2
         },
         {
-          label: t(`common.${StatusTexts.unknow}`),
-          value: StatusTexts.unknow
+          label: t(`common.${statusColors.value[3]}`),
+          value: 3
         }
       ]
     }
@@ -105,50 +113,48 @@
     console.log('filters :>> ', filters)
   }
 
-  onMounted(() => {
-    data.value = getServices()
+  onActivated(() => {
+    serviceStore.getServices()
   })
 </script>
 
 <template>
   <div class="service">
     <filter-form :filter-items="filterFormItems" @filter="onFilter" />
-    <a-card v-for="item in data" :key="item.key" :hoverable="true" class="service-item">
-      <div class="header">
-        <div class="header-base-wrp">
-          <a-avatar
-            v-if="item.serviceName"
-            :src="usePngImage(item.serviceName.toLowerCase())"
-            :size="42"
-            class="header-icon"
-          />
-          <div class="header-base-title">
-            <span>{{ `${item.serviceName}` }}</span>
-            <span class="small-gray">{{ item.version }}</span>
+    <a-empty v-if="services.length == 0" style="width: 100%" />
+    <template v-else>
+      <a-card v-for="item in services" :key="item.id" :hoverable="true" class="service-item">
+        <div class="header">
+          <div class="header-base-wrp">
+            <a-avatar v-if="item.name" :src="usePngImage(item.name.toLowerCase())" :size="42" class="header-icon" />
+            <div class="header-base-title">
+              <span>{{ `${item.displayName}` }}</span>
+              <span class="small-gray">{{ item.version }}</span>
+            </div>
+            <div class="header-base-status">
+              <a-tag :color="statusColors[item.status]">
+                <div class="header-base-status-inner">
+                  <status-dot :color="ServiceStatus[statusColors[item.status]]" />
+                  <span class="small">{{ $t(`common.${ServiceStatusTexts[item.status]}`) }}</span>
+                </div>
+              </a-tag>
+            </div>
           </div>
-          <div class="header-base-status">
-            <a-tag :color="StatusColors[item.status]">
-              <div class="header-base-status-inner">
-                <status-dot :color="StatusColors[item.status]" />
-                <span class="small">{{ $t(`common.${StatusTexts[item.status]}`) }}</span>
-              </div>
-            </a-tag>
+          <div class="header-restart-status">
+            <span class="small-gray">{{ `${$t('common.restart')}` }}</span>
+            <status-dot :color="ServiceStatus[statusColors[item.status]]" />
+            <span class="small">{{ `${item.restartFlag ? $t('common.required') : $t('common.not_required')}` }}</span>
           </div>
         </div>
-        <div class="header-restart-status">
-          <span class="small-gray">{{ `${$t('common.restart')}` }}</span>
-          <status-dot :color="StatusColors[item.status]" />
-          <span class="small">{{ `${item.restart ? $t('common.required') : $t('common.not_required')}` }}</span>
+        <div class="item-content">
+          <button-group :auto="true" :space="0" :groups="actionGroups">
+            <template #icon="{ item: groupItem }">
+              <svg-icon :name="groupItem.icon || ''" />
+            </template>
+          </button-group>
         </div>
-      </div>
-      <div class="item-content">
-        <button-group :auto="true" :space="0" :groups="actionGroups">
-          <template #icon="{ item: groupItem }">
-            <svg-icon :name="groupItem.icon || ''" />
-          </template>
-        </button-group>
-      </div>
-    </a-card>
+      </a-card>
+    </template>
   </div>
 </template>
 

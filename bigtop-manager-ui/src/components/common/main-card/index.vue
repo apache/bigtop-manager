@@ -44,13 +44,12 @@
   <div class="main-card">
     <slot>
       <a-tabs :active-key="activeKey" :tab-bar-gutter="0" @change="handleChange">
-        <a-tab-pane v-for="tab in tabs" :key="tab.key" :tab="tab.title">
-          <slot name="tab-item"></slot>
-        </a-tab-pane>
+        <a-tab-pane v-for="tab in tabs" :key="tab.key" :tab="tab.title"> </a-tab-pane>
         <template #renderTabBar="{ DefaultTabBar, ...props }">
           <component :is="DefaultTabBar" v-bind="props" />
         </template>
       </a-tabs>
+      <slot name="tab-item"></slot>
     </slot>
   </div>
 </template>
