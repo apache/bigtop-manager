@@ -17,12 +17,73 @@
  * under the License.
  */
 
+import type {
+  ServiceParams,
+  ServiceVO,
+  ServiceConfig,
+  ServiceConfigSnapshot,
+  ServiceList,
+  SnapshotData,
+  SnapshotRecovery
+} from './types'
 import request from '@/api/request.ts'
-import { ServiceVO } from '@/api/service/types.ts'
 
-export const getService = (clusterId: number): Promise<ServiceVO[]> => {
+export const getServiceList = (clusterId: number): Promise<ServiceList> => {
   return request({
     method: 'get',
-    url: '/clusters/' + clusterId + '/services'
+    url: `/clusters/${clusterId}/services`
+  })
+}
+
+export const getService = (params: ServiceParams): Promise<ServiceVO> => {
+  return request({
+    method: 'get',
+    url: `/clusters/${params.clusterId}/services/${params.id}`
+  })
+}
+
+export const getServiceConfigs = (params: ServiceParams): Promise<ServiceConfig[]> => {
+  return request({
+    method: 'get',
+    url: `/clusters/${params.clusterId}/services/${params.id}/configs`
+  })
+}
+
+export const updateServiceConfigs = (params: ServiceParams, data: ServiceConfig): Promise<ServiceConfig[]> => {
+  return request({
+    method: 'post',
+    url: `/clusters/${params.clusterId}/services/${params.id}/configs`,
+    data
+  })
+}
+
+export const getServiceConfigSnapshotsList = (params: ServiceParams): Promise<ServiceConfigSnapshot[]> => {
+  return request({
+    method: 'get',
+    url: `/clusters/${params.clusterId}/services/${params.id}/config-snapshots`
+  })
+}
+
+export const takeServiceConfigSnapshot = (
+  params: ServiceParams,
+  data: SnapshotData
+): Promise<ServiceConfigSnapshot> => {
+  return request({
+    method: 'post',
+    url: `/clusters/${params.clusterId}/services/${params.id}/config-snapshots`,
+    data
+  })
+}
+
+export const recoveryServiceConfigSnapshot = (params: SnapshotRecovery): Promise<ServiceConfig[]> => {
+  return request({
+    method: 'post',
+    url: `/clusters/${params.clusterId}/services/${params.id}/config-snapshots/${params.snapshotId}`
+  })
+}
+export const deleteServiceConfigSnapshot = (params: SnapshotRecovery): Promise<boolean> => {
+  return request({
+    method: 'delete',
+    url: `/clusters/${params.clusterId}/services/${params.id}/config-snapshots/${params.snapshotId}`
   })
 }

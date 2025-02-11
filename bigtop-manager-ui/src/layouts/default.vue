@@ -17,10 +17,33 @@
   ~ under the License.
 -->
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+  import { usePngImage } from '@/utils/tools'
+</script>
 
 <template>
-  <div>default content</div>
+  <a-card>
+    <div class="default">
+      <img :src="usePngImage('default')" />
+      <a-typography-text>{{ $t('cluster.cluster_unavailable_message') }}</a-typography-text>
+      <a-typography-link underline @click="() => $router.push({ name: 'ClusterCreate' })">
+        {{ $t('cluster.create') }}
+      </a-typography-link>
+    </div>
+  </a-card>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+  .default {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    height: 630px;
+    img {
+      width: 400px;
+      height: 200px;
+    }
+  }
+</style>

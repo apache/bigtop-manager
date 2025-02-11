@@ -17,12 +17,93 @@
   ~ under the License.
 -->
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+  import { computed, ref } from 'vue'
+  import { useRoute } from 'vue-router'
+  import type { GroupItem } from '@/components/common/button-group/types'
+  import type { TabItem } from '@/components/common/main-card/types'
+  import Overview from './overview.vue'
+  import Service from './service.vue'
+  import Host from './host.vue'
+  import User from './user.vue'
+  import Job from './job.vue'
+
+  const route = useRoute()
+  const title = computed(() => route.params.cluster as string)
+  const desc = ref('我是描述')
+  const activeKey = ref('1')
+  const tabs = ref<TabItem[]>([
+    {
+      key: '1',
+      title: '概览'
+    },
+    {
+      key: '2',
+      title: '服务'
+    },
+    {
+      key: '3',
+      title: '主机'
+    },
+    {
+      key: '4',
+      title: '用户'
+    },
+    {
+      key: '5',
+      title: '作业'
+    }
+  ])
+  const actionGroup = computed<GroupItem[]>(() => [
+    {
+      shape: 'default',
+      type: 'primary',
+      text: '添加服务',
+      clickEvent: () => addService && addService()
+    },
+    {
+      shape: 'default',
+      type: 'default',
+      text: '其他操作',
+      dropdownMenu: [
+        {
+          action: 'start',
+          text: '启动集群'
+        },
+        {
+          action: 'restart',
+          text: '重启集群'
+        },
+        {
+          action: 'stop',
+          text: '停止集群'
+        }
+      ],
+      dropdownMenuClickEvent: (info) => dropdownMenuClick && dropdownMenuClick(info)
+    }
+  ])
+
+  const getCompName = computed(() => {
+    const componnts = [Overview, Service, Host, User, Job]
+    return componnts[parseInt(activeKey.value) - 1]
+  })
+
+  const dropdownMenuClick: GroupItem['dropdownMenuClickEvent'] = ({ key }) => {
+    console.log('key :>> ', key)
+  }
+
+  const addService: GroupItem['clickEvent'] = () => {
+    console.log('add :>> ')
+  }
+</script>
 
 <template>
-  <div>
-    <a-card>{{ $route.params }}</a-card>
-  </div>
+  <header-card :title="title" avatar="cluster" :desc="desc" :action-groups="actionGroup" />
+  <main-card v-model:active-key="activeKey" :tabs="tabs">
+    <template #tab-item>
+      <component :is="getCompName"></component>
+    </template>
+  </main-card>
 </template>
 
-<style scoped></style>
+<style lang="scss" scoped></style>

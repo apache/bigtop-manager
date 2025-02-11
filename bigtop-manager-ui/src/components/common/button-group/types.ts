@@ -17,9 +17,15 @@
  * under the License.
  */
 
+import { MenuItemProps, MenuProps } from 'ant-design-vue'
+
 type BtnType = 'primary' | 'ghost' | 'dashed' | 'link' | 'text' | 'default'
 type ShapeType = 'default' | 'circle' | 'round'
 
+export interface DropdownMenu extends MenuItemProps {
+  action: string
+  text: string
+}
 export interface GroupItem<T = string> {
   icon?: string
   tip?: string
@@ -28,12 +34,19 @@ export interface GroupItem<T = string> {
   type?: BtnType
   shape?: ShapeType
   disabled?: boolean
+  danger?: boolean
+  dropdownMenu?: DropdownMenu[]
   clickEvent?: (item?: GroupItem, ...args: any[]) => void
+  dropdownMenuClickEvent?: MenuProps['onClick']
 }
 
 export interface Props {
-  i18n: string
+  i18n?: string
+  textCompact?: boolean
   groups: GroupItem[]
   groupType?: BtnType
   groupShape?: ShapeType
+  space?: number
+  args?: any
+  auto?: boolean
 }

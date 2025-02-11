@@ -20,28 +20,13 @@
 import { defineStore } from 'pinia'
 import { ClusterVO } from '@/api/cluster/types.ts'
 import { ref } from 'vue'
-// import { getClusters } from '@/api/cluster'
+import { getClusterList } from '@/api/cluster'
 
 export const useClusterStore = defineStore(
   'cluster',
   () => {
     const clusters = ref<ClusterVO[]>([])
     const count = ref(0)
-
-    const generateRandomDataArray = () => {
-      const dataArray = []
-      for (let i = 0; i < count.value; i++) {
-        dataArray.push({
-          id: i,
-          clusterName: `Cluster-${i}`,
-          clusterType: Math.floor(Math.random() * 10),
-          stackName: `Stack-${i}`,
-          stackVersion: `Version-${i}`,
-          selected: Math.random() < 0.5
-        })
-      }
-      return dataArray
-    }
 
     const addCluster = async () => {
       count.value = count.value + 1
@@ -58,12 +43,8 @@ export const useClusterStore = defineStore(
     }
 
     const loadClusters = async () => {
-      // clusters.value = await getClusters()
-      clusters.value = (await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(generateRandomDataArray())
-        }, 1000)
-      })) as ClusterVO[]
+      const data = await getClusterList()
+      clusters.value = data as ClusterVO[]
     }
 
     return {

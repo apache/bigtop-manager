@@ -23,5 +23,6 @@ export default {
   logout: 'Log Out',
   username: 'Username',
   nickname: 'Nickname',
+  user_list: 'User List',
   set_nickname_valid: 'Nickname should not be empty'
 }

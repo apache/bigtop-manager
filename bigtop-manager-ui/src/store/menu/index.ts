@@ -89,10 +89,11 @@ export const useMenuStore = defineStore(
           item.children = clusters.value.map((v) => {
             return {
               icon: '',
-              key: `${item.key}/${v.clusterName}/${v.id}`,
-              label: v.clusterName,
-              title: v.clusterName,
-              activeMenu: item.key
+              key: `${item.key}/${v.displayName}/${v.id}`,
+              label: v.displayName || '',
+              title: v.displayName || '',
+              activeMenu: item.key,
+              status: v.status || 3
             }
           })
         }
@@ -144,8 +145,10 @@ export const useMenuStore = defineStore(
       router.push(siderMenuSelectedKey.value)
     }
 
-    const setUpMenu = () => {
+    const setUpMenu = async () => {
       setBaseRoutesMap()
+      await clusterStore.loadClusters()
+      updateSiderMenu()
     }
 
     const cleanUpMenu = () => {
@@ -168,6 +171,9 @@ export const useMenuStore = defineStore(
     }
   },
   {
-    persist: false
+    persist: {
+      storage: localStorage,
+      paths: ['siderMenus']
+    }
   }
 )

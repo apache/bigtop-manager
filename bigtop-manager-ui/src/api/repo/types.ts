@@ -16,12 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 export interface RepoVO {
-  repoId: string
-  repoName: string
-  repoType: string
-  baseUrl: string
-  os: string
-  arch: string
+  arch?: string
+  baseUrl?: string
+  id?: number
+  name?: string
+  [property: string]: any
+}
+
+export interface RepoUpdate {
+  baseUrl?: string
+  id?: number
+  [property: string]: any
 }

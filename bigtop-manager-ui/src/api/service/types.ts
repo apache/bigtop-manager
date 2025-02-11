@@ -17,21 +17,51 @@
  * under the License.
  */
 
+import type { ComponentVO } from '@/api/component/types'
+import type { PageVO } from '@/api/types'
+
+export type ServiceList = PageVO<ServiceVO>
+export type ServiceParams = { clusterId: number; id: number }
+export type SnapshotData = { desc?: string; name?: string }
+export type SnapshotRecovery = ServiceParams & { snapshotId: string }
+
 export interface ServiceVO {
+  components?: ComponentVO[]
+  configs?: ServiceConfig[]
+  desc?: string
+  displayName?: string
   id?: number
-  serviceName: string
-  displayName: string
-  serviceDesc: string
-  serviceVersion: string
-  clusterName?: string
-  serviceUser?: string
-  serviceGroup?: string
-  isClient?: boolean
-  isHealthy?: boolean
-  quickLinks?: QuickLinkVO[]
+  name?: string
+  requiredServices?: string[]
+  restartFlag?: boolean
+  stack?: string
+  status?: number
+  user?: string
+  version?: string
 }
 
-export interface QuickLinkVO {
-  displayName: string
-  url: string
+export interface ServiceConfig {
+  id?: number
+  name?: string
+  properties?: Property[]
+}
+
+export interface Property {
+  attrs?: Attr
+  desc?: string
+  displayName?: string
+  name: string
+  value?: string
+}
+
+export interface Attr {
+  type?: string
+}
+
+export interface ServiceConfigSnapshot {
+  configJson?: string
+  desc?: string
+  id?: number
+  name?: string
+  [property: string]: any
 }

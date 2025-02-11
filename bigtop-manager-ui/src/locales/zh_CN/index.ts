@@ -23,6 +23,9 @@ import login from '@/locales/zh_CN/login'
 import user from '@/locales/zh_CN/user.ts'
 import llmConfig from '@/locales/zh_CN/llm-config.ts'
 import aiAssistant from '@/locales/zh_CN/ai-assistant.ts'
+import cluster from '@/locales/zh_CN/cluster.ts'
+import host from '@/locales/zh_CN/host.ts'
+import job from '@/locales/zh_CN/job.ts'
 
 export default {
   common,
@@ -30,5 +33,8 @@ export default {
   login,
   user,
   llmConfig,
-  aiAssistant
+  aiAssistant,
+  cluster,
+  host,
+  job
 }

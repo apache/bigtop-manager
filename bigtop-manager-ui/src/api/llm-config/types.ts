@@ -26,7 +26,8 @@ export enum AuthPlatformStatus {
 export enum LlmLogo {
   'openai' = 1,
   'dashscope' = 2,
-  'qianfan' = 3
+  'qianfan' = 3,
+  'deepseek' = 4
 }
 
 export type LlmLogoFlag = `${LlmLogo}`

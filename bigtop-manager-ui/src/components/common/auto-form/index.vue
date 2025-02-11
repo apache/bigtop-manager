@@ -20,13 +20,15 @@
 <script lang="ts" setup>
   import { computed, onMounted, ref, toRaw, toRefs, watch } from 'vue'
   import { Emits, FormState, Props } from './types'
+  import { useLocaleStore } from '@/store/locale'
+  import { storeToRefs } from 'pinia'
 
   const props = withDefaults(defineProps<Props>(), {
     showButton: true,
     disabledItems: null, // Has higher priority than controlProps of formItems
     hiddenItems: () => [],
     labelCol: () => {
-      return { span: 7 }
+      return { span: 5 }
     },
     wrapperCol: () => {
       return { span: 14 }
@@ -43,6 +45,8 @@
 
   const emits = defineEmits<Emits>()
 
+  const localeStore = useLocaleStore()
+  const { locale } = storeToRefs(localeStore)
   const formRef = ref()
   const formState = ref<FormState>({})
   const tmpCacheFormState = ref<FormState>({})
@@ -71,6 +75,10 @@
     }
   )
 
+  watch(locale, () => {
+    formRef.value.clearValidate()
+  })
+
   const initForm = () => {
     const newForm: FormState = {}
     props.formItems.forEach((item) => {
@@ -85,7 +93,7 @@
 
   const getFormValidation = async () => {
     try {
-      await formRef.value.validateFields()
+      await formRef.value?.validateFields()
       return Promise.resolve(true)
     } catch (error) {
       console.log('Failed:', error)
@@ -142,20 +150,33 @@
     <a-form
       ref="formRef"
       label-align="left"
+      :colon="false"
       :model="formState"
       :label-col="props.labelCol"
       :wrapper-col="props.wrapperCol"
       :disabled="props.formDisabled"
     >
       <div v-for="item in props.formItems" :key="item.field">
-        <slot :="{ item, state: formState }" :name="item.field">
-          <a-form-item v-if="!props.hiddenItems.includes(item.field)" v-bind="item.formItemProps">
+        <slot
+          v-if="!props.hiddenItems.includes(item.field)"
+          :="{ item, state: formState }"
+          :name="item.slot ?? item.field"
+        >
+          <a-form-item v-bind="item.formItemProps">
             <!-- input -->
             <a-input
               v-if="item.type == 'input'"
               v-model:value="formState[item.field]"
               v-bind="item.controlProps"
-              :disabled="disabledItems ? disabledItems.includes(item.field) : item.controlProps.disabled"
+              :disabled="disabledItems ? disabledItems.includes(item.field) : item.controlProps?.disabled"
+              v-on="formItemEvents[item.field] || {}"
+            />
+
+            <a-input-password
+              v-if="item.type == 'inputPassword'"
+              v-model:value="formState[item.field]"
+              v-bind="item.controlProps"
+              :disabled="disabledItems ? disabledItems.includes(item.field) : item.controlProps?.disabled"
               v-on="formItemEvents[item.field] || {}"
             />
 
@@ -164,7 +185,7 @@
               v-if="item.type == 'textarea'"
               v-model:value="formState[item.field]"
               v-bind="item.controlProps"
-              :disabled="disabledItems ? disabledItems.includes(item.field) : item.controlProps.disabled"
+              :disabled="disabledItems ? disabledItems.includes(item.field) : item.controlProps?.disabled"
               v-on="formItemEvents[item.field] || {}"
             />
 
@@ -173,7 +194,7 @@
               v-if="item.type == 'select'"
               v-model:value="formState[item.field]"
               v-bind="item.controlProps"
-              :disabled="disabledItems ? disabledItems.includes(item.field) : item.controlProps.disabled"
+              :disabled="disabledItems ? disabledItems.includes(item.field) : item.controlProps?.disabled"
               v-on="formItemEvents[item.field] || {}"
             >
               <a-select-option
@@ -190,7 +211,7 @@
               v-if="item.type == 'radio'"
               v-model:value="formState[item.field]"
               v-bind="item.controlProps"
-              :disabled="disabledItems ? disabledItems.includes(item.field) : item.controlProps.disabled"
+              :disabled="disabledItems ? disabledItems.includes(item.field) : item.controlProps?.disabled"
               v-on="formItemEvents[item.field] || {}"
             >
               <a-radio

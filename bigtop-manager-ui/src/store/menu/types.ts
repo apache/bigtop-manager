@@ -23,5 +23,6 @@ export interface MenuItem {
   title: string
   name?: string
   activeMenu?: string
+  status?: number
   children?: MenuItem[]
 }

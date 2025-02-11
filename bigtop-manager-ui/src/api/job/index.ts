@@ -16,28 +16,47 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 import request from '@/api/request.ts'
-import { JobVO, Pagination } from '@/api/job/types.ts'
+import type { JobParams, JobList, TaskLogParams, TaskParams, JobVO, StageVO, TaskVO } from './types'
 
-export const getJob = (id: number, clusterId: number): Promise<JobVO> => {
-  return request({
-    method: 'get',
-    url: '/clusters/' + clusterId + '/jobs/' + id
-  })
-}
-
-export const retryJob = (id: number, clusterId: number): Promise<JobVO> => {
+export const retryJob = (pathParams: JobParams): Promise<JobVO> => {
   return request({
     method: 'post',
-    url: '/clusters/' + clusterId + '/jobs/' + id + '/retry'
+    url: `/clusters/${pathParams.clusterId}/jobs/${pathParams.jobId}/retry`
   })
 }
 
-export const getJobs = (clusterId: number, pagination: Pagination): Promise<{ content: JobVO[]; total: number }> => {
+export const getJobList = (clusterId: number): Promise<JobList> => {
   return request({
     method: 'get',
-    url: `/clusters/${clusterId}/jobs`,
-    params: pagination
+    url: `/clusters/${clusterId}/jobs`
+  })
+}
+
+export const getJobDetails = (pathParams: JobParams): Promise<JobVO> => {
+  return request({
+    method: 'get',
+    url: `/clusters/${pathParams.clusterId}/jobs/${pathParams.jobId}`
+  })
+}
+
+export const getStageList = (pathParams: JobParams): Promise<StageVO[]> => {
+  return request({
+    method: 'get',
+    url: `/clusters/${pathParams.clusterId}/jobs/${pathParams.jobId}/stages`
+  })
+}
+
+export const getTaskList = (pathParams: TaskParams): Promise<TaskVO[]> => {
+  return request({
+    method: 'get',
+    url: `/clusters/${pathParams.clusterId}/jobs/${pathParams.jobId}/stages/${pathParams.stageId}/tasks`
+  })
+}
+
+export const getTaskLog = (pathParams: TaskLogParams): Promise<string[]> => {
+  return request({
+    method: 'get',
+    url: `/clusters/${pathParams.clusterId}/jobs/${pathParams.jobId}/stages/${pathParams.stageId}/tasks/${pathParams.taskId}/log`
   })
 }

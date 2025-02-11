@@ -19,31 +19,41 @@
 
 import { ref, onUnmounted } from 'vue'
 import type { TablePaginationConfig, TableColumnType } from 'ant-design-vue'
-export interface UseBaseTableProps<T> {
+import { useI18n } from 'vue-i18n'
+
+type PaginationProps = TablePaginationConfig | false | undefined
+export interface UseBaseTableProps<T = any> {
   columns: TableColumnType[]
   rows?: T[]
-  pagination?: TablePaginationConfig | false | undefined
+  pagination?: PaginationProps
 }
 const useBaseTable = <T>(props: UseBaseTableProps<T>) => {
   const { columns, rows, pagination } = props
+  const { t } = useI18n()
   const loading = ref(false)
   const dataSource = ref<T[]>(rows || [])
   const columnsProp = ref<TableColumnType[]>(columns)
-  const paginationProps = ref<TablePaginationConfig>({
+  const paginationProps = ref<PaginationProps>({
     current: 1,
     pageSize: 10,
     total: dataSource.value.length,
     size: 'small',
     showSizeChanger: true,
-    pageSizeOptions: ['10', '20', '30', '40', '50']
+    pageSizeOptions: ['10', '20', '30', '40', '50'],
+    showTotal: (total) => `${t('common.total', [total])}`
   })
 
   // merge pagination config
-  if (pagination) {
+  if (pagination === undefined && paginationProps.value) {
     paginationProps.value = Object.assign(paginationProps.value, pagination)
+  } else {
+    paginationProps.value = false
   }
 
   const onChange = (pagination: TablePaginationConfig) => {
+    if (!paginationProps.value) {
+      return
+    }
     paginationProps.value = Object.assign(paginationProps.value, pagination)
   }
 
@@ -56,7 +66,8 @@ const useBaseTable = <T>(props: UseBaseTableProps<T>) => {
       total: dataSource.value.length || 0,
       size: 'small',
       showSizeChanger: true,
-      pageSizeOptions: ['10', '20', '30', '40', '50']
+      pageSizeOptions: ['10', '20', '30', '40', '50'],
+      showTotal: (total) => `${t('common.total', [total])}`
     }
   }
 

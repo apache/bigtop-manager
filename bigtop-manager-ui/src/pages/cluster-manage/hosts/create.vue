@@ -17,10 +17,545 @@
   ~ under the License.
 -->
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+  import { computed, h, ref, watch } from 'vue'
+  import { useI18n } from 'vue-i18n'
+  import { FormItemState } from '@/components/common/auto-form/types'
+  import { CheckCircleOutlined, UploadOutlined } from '@ant-design/icons-vue'
+  import { parseHostNamesAsPatternExpression } from '@/utils/array'
+  import { message, Modal } from 'ant-design-vue'
+  import { useLocaleStore } from '@/store/locale'
+  import { storeToRefs } from 'pinia'
+  import { uploadFile } from '@/api/upload-file'
+  import { Rule } from 'ant-design-vue/es/form'
+  import { HostReq } from '@/api/command/types'
+  import type { UploadProps } from 'ant-design-vue'
+  import type { HostParams } from '@/api/hosts/types'
+
+  enum Mode {
+    EDIT = 'cluster.edit_host',
+    ADD = 'cluster.add_host'
+  }
+
+  interface Emits {
+    (event: 'onOk', type: keyof typeof Mode, value: HostReq): void
+  }
+
+  const { t } = useI18n()
+  const emits = defineEmits<Emits>()
+  const localeStore = useLocaleStore()
+  const open = ref(false)
+  const mode = ref<keyof typeof Mode>('ADD')
+  const hiddenItems = ref<string[]>([])
+  const autoFormRef = ref<Comp.AutoFormInstance | null>(null)
+  const formValue = ref<HostReq & { hostname?: string }>({})
+  const { locale } = storeToRefs(localeStore)
+  const isEdit = computed(() => mode.value === 'EDIT')
+
+  const checkPassword = async (_rule: Rule, value: string) => {
+    if (!value) {
+      return Promise.reject(t('common.enter_error', [`${t('host.confirm_password')}`.toLowerCase()]))
+    }
+    if (value != formValue.value?.sshKeyPassword) {
+      return Promise.reject(t('common.password_not_match'))
+    } else {
+      return Promise.resolve()
+    }
+  }
+
+  const checkSshKeyPassword = async (_rule: Rule, value: string) => {
+    if (value != formValue.value?.sshKeyPassword) {
+      return Promise.reject(t('host.key_password_not_match'))
+    } else {
+      return Promise.resolve()
+    }
+  }
+
+  const formItemsForPassword = computed((): FormItemState[] => [
+    {
+      type: 'inputPassword',
+      field: 'sshKeyPassword',
+      formItemProps: {
+        name: 'sshKeyPassword',
+        label: t('host.password_auth'),
+        rules: [
+          {
+            required: true,
+            message: t('common.enter_error', [`${t('host.password_auth')}`.toLowerCase()]),
+            trigger: 'blur'
+          }
+        ]
+      },
+      controlProps: {
+        placeholder: t('common.enter_error', [`${t('host.password_auth')}`.toLowerCase()])
+      }
+    },
+    {
+      type: 'inputPassword',
+      field: 'sshKeyPasswordAgain',
+      formItemProps: {
+        name: 'sshKeyPasswordAgain',
+        label: t('host.confirm_password'),
+        rules: [
+          {
+            required: true,
+            validator: checkPassword,
+            trigger: 'blur'
+          }
+        ]
+      },
+      controlProps: {
+        placeholder: t('common.enter_error', [`${t('host.confirm_password')}`.toLowerCase()])
+      }
+    }
+  ])
+
+  const formItemsForKey = computed((): FormItemState[] => [
+    {
+      type: 'radio',
+      field: 'inputType',
+      defaultValue: '1',
+      defaultOptionsMap: [
+        { value: '1', label: t('host.file') },
+        { value: '2', label: t('host.text') }
+      ],
+      formItemProps: {
+        name: 'inputType',
+        label: t('host.input_method'),
+        rules: [
+          {
+            required: true,
+            message: t('common.select_error', [`${t('host.input_method')}`.toLowerCase()]),
+            trigger: 'blur'
+          }
+        ]
+      }
+    },
+
+    {
+      type: 'input',
+      field: 'sshKeyFilename',
+      slot: 'sshKeyFilenameSlot',
+      formItemProps: {
+        name: 'sshKeyFilename',
+        label: t('host.key_file'),
+        rules: [
+          {
+            required: true,
+            message: t('common.add_error', [`${t('host.key_file')}`.toLowerCase()]),
+            trigger: 'blur'
+          }
+        ]
+      }
+    },
+    {
+      type: 'textarea',
+      field: 'sshKeyString',
+      formItemProps: {
+        name: 'sshKeyString',
+        label: t('host.key_text'),
+        rules: [
+          { required: true, message: t('common.enter_error', [`${t('host.key_text')}`.toLowerCase()]), trigger: 'blur' }
+        ]
+      },
+      controlProps: {
+        placeholder: t('common.enter_error', [`${t('host.key_text')}`.toLowerCase()])
+      }
+    },
+    {
+      type: 'input',
+      field: 'keyPassword',
+      formItemProps: {
+        name: 'keyPassword',
+        label: t('host.key_password')
+      },
+      controlProps: {
+        placeholder: t('common.enter_error', [`${t('host.key_password')}`.toLowerCase()])
+      }
+    },
+    {
+      type: 'textarea',
+      field: 'keyPasswordAgain',
+      formItemProps: {
+        name: 'keyPasswordAgain',
+        label: t('host.confirm_key_password'),
+        rules: [
+          {
+            required: false,
+            validator: checkSshKeyPassword,
+            trigger: 'blur'
+          }
+        ]
+      },
+      controlProps: {
+        placeholder: t('common.enter_error', [`${t('host.confirm_key_password')}`.toLowerCase()])
+      }
+    }
+  ])
+  const formItems = computed((): FormItemState[] => [
+    {
+      type: 'input',
+      field: 'sshUser',
+      formItemProps: {
+        name: 'sshUser',
+        label: t('host.username'),
+        rules: [
+          { required: true, message: t('common.enter_error', [`${t('host.username')}`.toLowerCase()]), trigger: 'blur' }
+        ]
+      },
+      controlProps: {
+        disabled: isEdit.value,
+        placeholder: t('common.enter_error', [`${t('host.username')}`.toLowerCase()])
+      }
+    },
+    {
+      type: 'radio',
+      field: 'authType',
+      defaultValue: '1',
+      defaultOptionsMap: [
+        { value: '1', label: t('host.password_auth') },
+        { value: '2', label: t('host.key_auth') },
+        { value: '3', label: t('host.no_auth') }
+      ],
+      formItemProps: {
+        name: 'authType',
+        label: t('host.auth_method'),
+        rules: [
+          {
+            required: true,
+            message: t('common.select_error', [`${t('host.auth_method')}`.toLowerCase()]),
+            trigger: 'blur'
+          }
+        ]
+      }
+    },
+
+    {
+      type: mode.value == 'ADD' ? 'textarea' : 'input',
+      field: 'hostname',
+      formItemProps: {
+        name: 'hostname',
+        label: t('host.hostname'),
+        rules: [
+          { required: true, message: t('common.enter_error', [`${t('host.hostname')}`.toLowerCase()]), trigger: 'blur' }
+        ]
+      },
+      controlProps: {
+        disabled: isEdit.value,
+        placeholder: t('common.enter_error', [`${t('host.hostname')}`.toLowerCase()])
+      }
+    },
+
+    {
+      type: 'input',
+      field: 'agentDir',
+      slot: 'agentDirSlot',
+      formItemProps: {
+        name: 'agentDir',
+        label: t('host.agent_path')
+      },
+      controlProps: {
+        disabled: isEdit.value,
+        placeholder: t('common.enter_error', [`${t('host.agent_path')}`.toLowerCase()])
+      }
+    },
+    {
+      type: 'input',
+      field: 'sshPort',
+      formItemProps: {
+        name: 'sshPort',
+        label: t('host.ssh_port')
+      },
+      controlProps: {
+        placeholder: t('common.enter_error', [`${t('host.ssh_port')}`.toLowerCase()])
+      }
+    },
+    {
+      type: 'input',
+      field: 'grpcPort',
+      slot: 'grpcPortSlot',
+      formItemProps: {
+        name: 'grpcPort',
+        label: t('host.grpc_port')
+      },
+      controlProps: {
+        placeholder: t('common.enter_error', [`${t('host.grpc_port')}`.toLowerCase()])
+      }
+    },
+    {
+      type: 'textarea',
+      field: 'desc',
+      formItemProps: {
+        name: 'desc',
+        label: t('host.description')
+      },
+      controlProps: {
+        placeholder: t('common.enter_error', [`${t('host.description')}`.toLowerCase()])
+      }
+    }
+  ])
+
+  const filterFormItems = computed((): FormItemState[] => {
+    if (formValue.value.authType === '1') {
+      const data = [...formItems.value]
+      data.splice(2, 0, ...formItemsForPassword.value)
+      return data
+    } else if (formValue.value.authType === '2') {
+      const data = [...formItems.value]
+      data.splice(2, 0, ...formItemsForKey.value)
+      return data
+    }
+    return [...formItems.value]
+  })
+
+  watch(
+    () => formValue.value,
+    (val) => {
+      if (val.inputType && val.inputType === '1') {
+        hiddenItems.value = ['sshKeyString']
+      } else if (val.inputType && val.inputType === '2') {
+        hiddenItems.value = ['sshKeyFilename']
+      } else {
+        hiddenItems.value = []
+      }
+    },
+    {
+      deep: true
+    }
+  )
+
+  const handleOpen = async (type: keyof typeof Mode, payload?: HostParams) => {
+    open.value = true
+    mode.value = type
+    if (payload) {
+      formValue.value = Object.assign(formValue.value, { ...payload })
+    } else {
+      Object.assign(formValue.value, {
+        authType: '1',
+        inputType: '1'
+      })
+    }
+  }
+
+  const handleOk = async () => {
+    const validate = await autoFormRef.value?.getFormValidation()
+    if (!validate) return
+    try {
+      if (!isEdit.value) {
+        const confirmStatus = await showHosts()
+        if (confirmStatus) {
+          emits('onOk', mode.value, formValue.value)
+          handleCancel()
+        }
+      } else {
+        emits('onOk', mode.value, formValue.value)
+        handleCancel()
+      }
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  const createHostNameEls = (list: string[]) => {
+    const elStyles = {
+      contentStyle: {
+        marginInlineStart: '2.125rem',
+        width: '100%',
+        maxHeight: '31.25rem',
+        overflow: 'auto'
+      },
+      itemStyle: { margin: '0.625rem' },
+      iconWrpStyle: {
+        fontSize: '1.375rem',
+        fontWeight: 600,
+        color: 'green',
+        marginInlineEnd: '0.75rem'
+      },
+      titleStyle: {
+        fontSize: '1rem',
+        fontWeight: 600
+      },
+      redfIconStyle: {
+        display: 'flex',
+        alignItems: 'center'
+      }
+    }
+    const items = list.map((item: string, idx: number) => {
+      return h('li', { key: idx, style: elStyles.itemStyle }, item)
+    })
+    const iconWrpStyle = h(
+      'span',
+      {
+        style: elStyles.iconWrpStyle
+      },
+      [h(CheckCircleOutlined)]
+    )
+    const replaceTitle = h('span', { style: elStyles.titleStyle }, `${t('cluster.show_hosts_resolved')}`)
+    const reDefineIcon = h('div', { style: elStyles.redfIconStyle }, [iconWrpStyle, replaceTitle])
+    const box = h(
+      'div',
+      {
+        style: elStyles.contentStyle
+      },
+      items
+    )
+
+    return { box, reDefineIcon }
+  }
+
+  const showHosts = (): Promise<boolean> => {
+    const hostList = parseHostNamesAsPatternExpression(formValue.value.hostname as string)
+    const { box: content, reDefineIcon: icon } = createHostNameEls(hostList)
+    return new Promise((resolve) => {
+      Modal.confirm({
+        title: '',
+        icon,
+        centered: true,
+        width: '31.25rem',
+        content,
+        onOk() {
+          formValue.value.hostnames = hostList
+          resolve(true)
+        },
+        onCancel() {
+          resolve(false)
+          Modal.destroyAll()
+        }
+      })
+    })
+  }
+
+  const handleCancel = () => {
+    formValue.value = {
+      authType: '1',
+      inputType: '1'
+    }
+    open.value = false
+  }
+
+  const beforeUpload: UploadProps['beforeUpload'] = (file) => {
+    const isText = file.type === 'text/plain'
+    const checkLimitSize = file.size / 1024 <= 10
+    if (!isText) {
+      message.error(t('common.file_type_error'))
+      return false
+    }
+    if (!checkLimitSize) {
+      message.error(t('common.file_size_error'))
+      return false
+    }
+    return true
+  }
+
+  const customRequest = async (options: { file: any; onSuccess: any; onError: any }) => {
+    const { file, onSuccess, onError } = options
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      const data = await uploadFile(formData)
+      formValue.value!.sshKeyFilename = data
+      onSuccess(data, file)
+      message.success(t('common.upload_success'))
+    } catch (error) {
+      onError(error)
+      message.error(t('common.upload_failed'))
+    }
+  }
+
+  const fileList = ref()
+
+  defineExpose({
+    handleOpen
+  })
+</script>
 
 <template>
-  <div>host create </div>
+  <div class="add-host">
+    <a-modal
+      :open="open"
+      :width="600"
+      :title="Mode[mode] && $t(Mode[mode])"
+      :mask-closable="false"
+      :centered="true"
+      :destroy-on-close="true"
+      @ok="handleOk"
+      @cancel="handleCancel"
+    >
+      <auto-form
+        ref="autoFormRef"
+        v-model:form-value="formValue"
+        :label-col="{
+          span: locale === 'zh_CN' ? 5 : 7
+        }"
+        :hidden-items="hiddenItems"
+        :show-button="false"
+        :form-items="filterFormItems"
+      >
+        <template #sshKeyFilenameSlot="{ item }">
+          <a-form-item v-bind="item.formItemProps">
+            <a-upload
+              :file-list="fileList"
+              :before-upload="beforeUpload"
+              :custom-request="customRequest"
+              :show-upload-list="false"
+            >
+              <a-button>
+                <upload-outlined></upload-outlined>
+                {{ $t('common.upload_file') }}
+              </a-button>
+            </a-upload>
+          </a-form-item>
+        </template>
+        <template #agentDirSlot="{ item, state }">
+          <a-form-item>
+            <template #label>
+              <div class="question">
+                <span>
+                  {{ item.formItemProps?.label }}
+                </span>
+                <svg-icon style="padding: 1px 0 0 0" name="question" />
+              </div>
+            </template>
+            <a-input v-bind="item.controlProps" v-model:value="state[item.field]" />
+          </a-form-item>
+        </template>
+        <template #grpcPortSlot="{ item, state }">
+          <a-form-item>
+            <template #label>
+              <div class="question">
+                <span>
+                  {{ item.formItemProps?.label }}
+                </span>
+                <svg-icon style="padding: 1px 0 0 0" name="question" />
+              </div>
+            </template>
+            <a-input v-bind="item.controlProps" v-model:value="state[item.field]" />
+          </a-form-item>
+        </template>
+      </auto-form>
+      <template #footer>
+        <footer>
+          <a-space size="middle">
+            <a-button @click="handleCancel">
+              {{ $t('common.cancel') }}
+            </a-button>
+            <a-button type="primary" @click="handleOk">
+              {{ $t('common.confirm') }}
+            </a-button>
+          </a-space>
+        </footer>
+      </template>
+    </a-modal>
+  </div>
 </template>
 
-<style scoped></style>
+<style lang="scss" scoped>
+  .question {
+    cursor: pointer;
+  }
+  footer {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+  }
+</style>

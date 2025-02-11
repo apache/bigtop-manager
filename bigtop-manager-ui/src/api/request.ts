@@ -17,7 +17,8 @@
  * under the License.
  */
 
-import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
+import type { AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
+import axios, { AxiosError } from 'axios'
 import { message } from 'ant-design-vue'
 import { ResponseEntity } from '@/api/types'
 import router from '@/router'
@@ -25,13 +26,17 @@ import i18n from '@/locales'
 import { API_EXPIRE_TIME } from '@/utils/constant.ts'
 import { Locale } from '@/store/locale/types.ts'
 
-const request = axios.create({
+const baseConfig = {
   baseURL: import.meta.env.VITE_APP_BASE_API,
   withCredentials: true,
   timeout: API_EXPIRE_TIME
-})
+}
 
-request.interceptors.request.use((config: InternalAxiosRequestConfig<any>): InternalAxiosRequestConfig<any> => {
+const axiosInstance: AxiosInstance = axios.create(baseConfig)
+const request = axiosInstance.interceptors.request
+const response = axiosInstance.interceptors.response
+
+request.use((config: InternalAxiosRequestConfig<any>): InternalAxiosRequestConfig<any> => {
   config.headers = config.headers || {}
 
   const locale = i18n.global.locale.value as Locale
@@ -45,7 +50,7 @@ request.interceptors.request.use((config: InternalAxiosRequestConfig<any>): Inte
   return config
 })
 
-request.interceptors.response.use(
+response.use(
   async (res: AxiosResponse) => {
     if (res.config.responseType === 'stream') {
       // Skip SSE api check
@@ -80,4 +85,4 @@ request.interceptors.response.use(
   }
 )
 
-export default request
+export default axiosInstance

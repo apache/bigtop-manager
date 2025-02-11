@@ -18,11 +18,34 @@
  */
 
 import request from '@/api/request.ts'
-import { HostVO } from '@/api/hosts/types.ts'
+import { HostParams, HostVO, HostVOList, InstalledStatusVO } from '@/api/hosts/types.ts'
 
-export const getHosts = (clusterId: number): Promise<HostVO[]> => {
+export const getHosts = (): Promise<HostVOList> => {
   return request({
     method: 'get',
-    url: '/clusters/' + clusterId + '/hosts'
+    url: '/hosts'
+  })
+}
+
+export const addHost = (data: HostParams): Promise<HostVO> => {
+  return request({
+    method: 'post',
+    url: '/hosts',
+    data
+  })
+}
+
+export const installDependencies = (data: HostParams) => {
+  return request({
+    method: 'post',
+    url: '/hosts/install-dependencies',
+    data
+  })
+}
+
+export const getInstalledStatus = (): Promise<InstalledStatusVO[]> => {
+  return request({
+    method: 'get',
+    url: '/hosts/installed-status'
   })
 }

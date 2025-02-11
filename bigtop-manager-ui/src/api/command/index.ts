@@ -18,9 +18,9 @@
  */
 
 import request from '@/api/request.ts'
-import { CommandVO } from '@/api/command/types.ts'
+import { CommandRequest, CommandVO } from '@/api/command/types.ts'
 
-export const execCommand = (data: any): Promise<CommandVO> => {
+export const execCommand = (data: CommandRequest): Promise<CommandVO> => {
   return request({
     method: 'post',
     url: '/command',

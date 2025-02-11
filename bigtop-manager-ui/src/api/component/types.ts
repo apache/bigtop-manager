@@ -17,30 +17,30 @@
  * under the License.
  */
 
-import { MaintainState } from '@/enums/state'
-
+/**
+ * ComponentVO
+ */
 export interface ComponentVO {
-  id: number
-  componentName: string
-  displayName: string
-  category: string
-  serviceName: string
-  clusterName: string
-  cardinality: string
+  cardinality?: string
+  category?: string
+  displayName?: string
+  hostname?: string
+  id?: number
+  name?: string
+  quickLink?: QuickLinkVO
+  serviceDisplayName?: string
+  serviceId?: number
+  serviceName?: string
+  stack?: string
+  status?: number
+  [property: string]: any
 }
 
-export interface ServiceComponentVO {
-  serviceName: string
-  components: ComponentVO[]
-}
-
-export interface HostComponentVO {
-  id: number
-  componentName: string
-  displayName: string
-  category: string
-  serviceName: string
-  clusterName: string
-  hostname: string
-  state: MaintainState
+/**
+ * QuickLinkVO
+ */
+export interface QuickLinkVO {
+  displayName?: string
+  url?: string
+  [property: string]: any
 }

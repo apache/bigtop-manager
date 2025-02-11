@@ -18,9 +18,24 @@
  */
 
 import request from '@/api/request.ts'
-import { ClusterVO } from '@/api/cluster/types.ts'
+import type { ClusterVO, UpdateClusterParam } from './types'
 
-export const getClusters = (): Promise<ClusterVO[]> => {
+export const getCluster = (id: number): Promise<ClusterVO[]> => {
+  return request({
+    method: 'get',
+    url: `/clusters/${id}`
+  })
+}
+
+export const updateCluster = (id: number, data: UpdateClusterParam) => {
+  return request({
+    method: 'put',
+    url: `/clusters/${id}`,
+    data
+  })
+}
+
+export const getClusterList = (): Promise<ClusterVO[]> => {
   return request({
     method: 'get',
     url: '/clusters'
