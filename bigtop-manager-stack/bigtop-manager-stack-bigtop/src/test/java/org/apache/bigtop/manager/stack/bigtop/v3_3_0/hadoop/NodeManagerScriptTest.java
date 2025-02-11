@@ -49,18 +49,18 @@ public class NodeManagerScriptTest {
     @Test
     public void testStartParamsNull() {
         Params params = null;
-        assertThrows(NullPointerException.class, () -> nodeManagerScript.add(params));
+        assertThrows(NullPointerException.class, () -> nodeManagerScript.start(params));
     }
 
     @Test
     public void testStopParamsNull() {
         Params params = null;
-        assertThrows(NullPointerException.class, () -> nodeManagerScript.configure(params));
+        assertThrows(NullPointerException.class, () -> nodeManagerScript.stop(params));
     }
 
     @Test
     public void testStatusParamsNull() {
         Params params = null;
-        assertThrows(NullPointerException.class, () -> nodeManagerScript.start(params));
+        assertThrows(NullPointerException.class, () -> nodeManagerScript.status(params));
     }
 }

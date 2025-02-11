@@ -49,18 +49,18 @@ class FlinkHistoryServerScriptTest {
     @Test
     public void testStartParamsNull() {
         Params params = null;
-        assertThrows(NullPointerException.class, () -> flinkHistoryServerScript.add(params));
+        assertThrows(NullPointerException.class, () -> flinkHistoryServerScript.start(params));
     }
 
     @Test
     public void testStopParamsNull() {
         Params params = null;
-        assertThrows(NullPointerException.class, () -> flinkHistoryServerScript.configure(params));
+        assertThrows(NullPointerException.class, () -> flinkHistoryServerScript.stop(params));
     }
 
     @Test
     public void testStatusParamsNull() {
         Params params = null;
-        assertThrows(NullPointerException.class, () -> flinkHistoryServerScript.start(params));
+        assertThrows(NullPointerException.class, () -> flinkHistoryServerScript.status(params));
     }
 }

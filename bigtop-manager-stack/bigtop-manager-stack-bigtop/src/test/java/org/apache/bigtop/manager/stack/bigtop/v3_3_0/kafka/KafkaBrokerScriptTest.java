@@ -49,18 +49,18 @@ public class KafkaBrokerScriptTest {
     @Test
     public void testStartParamsNull() {
         Params params = null;
-        assertThrows(NullPointerException.class, () -> kafkaBrokerScript.add(params));
+        assertThrows(NullPointerException.class, () -> kafkaBrokerScript.start(params));
     }
 
     @Test
     public void testStopParamsNull() {
         Params params = null;
-        assertThrows(NullPointerException.class, () -> kafkaBrokerScript.configure(params));
+        assertThrows(NullPointerException.class, () -> kafkaBrokerScript.stop(params));
     }
 
     @Test
     public void testStatusParamsNull() {
         Params params = null;
-        assertThrows(NullPointerException.class, () -> kafkaBrokerScript.start(params));
+        assertThrows(NullPointerException.class, () -> kafkaBrokerScript.status(params));
     }
 }

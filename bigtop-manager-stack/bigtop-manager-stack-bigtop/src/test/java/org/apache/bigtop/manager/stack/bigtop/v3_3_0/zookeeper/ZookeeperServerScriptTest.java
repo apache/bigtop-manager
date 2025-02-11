@@ -61,6 +61,6 @@ public class ZookeeperServerScriptTest {
     @Test
     public void testStatusParamsNull() {
         Params params = null;
-        assertThrows(NullPointerException.class, () -> zookeeperServerScript.start(params));
+        assertThrows(NullPointerException.class, () -> zookeeperServerScript.status(params));
     }
 }

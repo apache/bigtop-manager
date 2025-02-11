@@ -49,18 +49,18 @@ public class ResourceManagerScriptTest {
     @Test
     public void testStartParamsNull() {
         Params params = null;
-        assertThrows(NullPointerException.class, () -> resourceManagerScript.add(params));
+        assertThrows(NullPointerException.class, () -> resourceManagerScript.start(params));
     }
 
     @Test
     public void testStopParamsNull() {
         Params params = null;
-        assertThrows(NullPointerException.class, () -> resourceManagerScript.configure(params));
+        assertThrows(NullPointerException.class, () -> resourceManagerScript.stop(params));
     }
 
     @Test
     public void testStatusParamsNull() {
         Params params = null;
-        assertThrows(NullPointerException.class, () -> resourceManagerScript.start(params));
+        assertThrows(NullPointerException.class, () -> resourceManagerScript.status(params));
     }
 }

@@ -49,18 +49,18 @@ public class HMasterScriptTest {
     @Test
     public void testStartParamsNull() {
         Params params = null;
-        assertThrows(NullPointerException.class, () -> hMasterScript.add(params));
+        assertThrows(NullPointerException.class, () -> hMasterScript.start(params));
     }
 
     @Test
     public void testStopParamsNull() {
         Params params = null;
-        assertThrows(NullPointerException.class, () -> hMasterScript.configure(params));
+        assertThrows(NullPointerException.class, () -> hMasterScript.stop(params));
     }
 
     @Test
     public void testStatusParamsNull() {
         Params params = null;
-        assertThrows(NullPointerException.class, () -> hMasterScript.start(params));
+        assertThrows(NullPointerException.class, () -> hMasterScript.status(params));
     }
 }

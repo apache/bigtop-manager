@@ -49,18 +49,18 @@ public class SparkThriftServerScriptTest {
     @Test
     public void testStartParamsNull() {
         Params params = null;
-        assertThrows(NullPointerException.class, () -> sparkThriftServerScript.add(params));
+        assertThrows(NullPointerException.class, () -> sparkThriftServerScript.start(params));
     }
 
     @Test
     public void testStopParamsNull() {
         Params params = null;
-        assertThrows(NullPointerException.class, () -> sparkThriftServerScript.configure(params));
+        assertThrows(NullPointerException.class, () -> sparkThriftServerScript.stop(params));
     }
 
     @Test
     public void testStatusParamsNull() {
         Params params = null;
-        assertThrows(NullPointerException.class, () -> sparkThriftServerScript.start(params));
+        assertThrows(NullPointerException.class, () -> sparkThriftServerScript.status(params));
     }
 }

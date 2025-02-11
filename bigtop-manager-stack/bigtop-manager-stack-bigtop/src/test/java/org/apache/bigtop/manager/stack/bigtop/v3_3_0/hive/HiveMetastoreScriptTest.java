@@ -49,18 +49,18 @@ public class HiveMetastoreScriptTest {
     @Test
     public void testStartParamsNull() {
         Params params = null;
-        assertThrows(NullPointerException.class, () -> hiveMetastoreScript.add(params));
+        assertThrows(NullPointerException.class, () -> hiveMetastoreScript.start(params));
     }
 
     @Test
     public void testStopParamsNull() {
         Params params = null;
-        assertThrows(NullPointerException.class, () -> hiveMetastoreScript.configure(params));
+        assertThrows(NullPointerException.class, () -> hiveMetastoreScript.stop(params));
     }
 
     @Test
     public void testStatusParamsNull() {
         Params params = null;
-        assertThrows(NullPointerException.class, () -> hiveMetastoreScript.start(params));
+        assertThrows(NullPointerException.class, () -> hiveMetastoreScript.status(params));
     }
 }

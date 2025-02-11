@@ -49,18 +49,18 @@ public class HiveServer2ScriptTest {
     @Test
     public void testStartParamsNull() {
         Params params = null;
-        assertThrows(NullPointerException.class, () -> hiveServer2Script.add(params));
+        assertThrows(NullPointerException.class, () -> hiveServer2Script.start(params));
     }
 
     @Test
     public void testStopParamsNull() {
         Params params = null;
-        assertThrows(NullPointerException.class, () -> hiveServer2Script.configure(params));
+        assertThrows(NullPointerException.class, () -> hiveServer2Script.stop(params));
     }
 
     @Test
     public void testStatusParamsNull() {
         Params params = null;
-        assertThrows(NullPointerException.class, () -> hiveServer2Script.start(params));
+        assertThrows(NullPointerException.class, () -> hiveServer2Script.status(params));
     }
 }

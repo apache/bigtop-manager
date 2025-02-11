@@ -49,18 +49,18 @@ public class SolrInstanceScriptTest {
     @Test
     public void testStartParamsNull() {
         Params params = null;
-        assertThrows(NullPointerException.class, () -> solrInstanceScript.add(params));
+        assertThrows(NullPointerException.class, () -> solrInstanceScript.start(params));
     }
 
     @Test
     public void testStopParamsNull() {
         Params params = null;
-        assertThrows(NullPointerException.class, () -> solrInstanceScript.configure(params));
+        assertThrows(NullPointerException.class, () -> solrInstanceScript.stop(params));
     }
 
     @Test
     public void testStatusParamsNull() {
         Params params = null;
-        assertThrows(NullPointerException.class, () -> solrInstanceScript.start(params));
+        assertThrows(NullPointerException.class, () -> solrInstanceScript.status(params));
     }
 }
