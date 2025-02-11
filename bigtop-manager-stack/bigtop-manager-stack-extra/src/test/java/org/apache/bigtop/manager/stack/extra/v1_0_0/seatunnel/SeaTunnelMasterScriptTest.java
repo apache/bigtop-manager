@@ -18,15 +18,49 @@
  */
 package org.apache.bigtop.manager.stack.extra.v1_0_0.seatunnel;
 
+import org.apache.bigtop.manager.stack.core.spi.param.Params;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class SeaTunnelMasterScriptTest {
 
+    private final SeaTunnelMasterScript seaTunnelMasterScript = new SeaTunnelMasterScript();
+
     @Test
     public void testGetComponentName() {
-        SeaTunnelMasterScript script = new SeaTunnelMasterScript();
-        assertEquals("seatunnel_master", script.getComponentName());
+        assertEquals("seatunnel_master", seaTunnelMasterScript.getComponentName());
+    }
+
+    @Test
+    public void testAddParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> seaTunnelMasterScript.add(params));
+    }
+
+    @Test
+    public void testConfigureParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> seaTunnelMasterScript.configure(params));
+    }
+
+    @Test
+    public void testStartParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> seaTunnelMasterScript.start(params));
+    }
+
+    @Test
+    public void testStopParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> seaTunnelMasterScript.stop(params));
+    }
+
+    @Test
+    public void testStatusParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> seaTunnelMasterScript.status(params));
     }
 }
