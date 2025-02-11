@@ -18,15 +18,49 @@
  */
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.hbase;
 
+import org.apache.bigtop.manager.stack.core.spi.param.Params;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class HMasterScriptTest {
 
+    private final HMasterScript hMasterScript = new HMasterScript();
+
     @Test
     public void testGetComponentName() {
-        HMasterScript hMasterScript = new HMasterScript();
         assertEquals("hbase_master", hMasterScript.getComponentName());
+    }
+
+    @Test
+    public void testAddParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> hMasterScript.add(params));
+    }
+
+    @Test
+    public void testConfigureParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> hMasterScript.configure(params));
+    }
+
+    @Test
+    public void testStartParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> hMasterScript.add(params));
+    }
+
+    @Test
+    public void testStopParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> hMasterScript.configure(params));
+    }
+
+    @Test
+    public void testStatusParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> hMasterScript.start(params));
     }
 }

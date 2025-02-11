@@ -18,15 +18,49 @@
  */
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.hadoop;
 
+import org.apache.bigtop.manager.stack.core.spi.param.Params;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class DataNodeScriptTest {
 
+    private final DataNodeScript dataNodeScript = new DataNodeScript();
+
     @Test
     public void testGetComponentName() {
-        DataNodeScript dataNodeScript = new DataNodeScript();
         assertEquals("datanode", dataNodeScript.getComponentName());
+    }
+
+    @Test
+    public void testAddParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> dataNodeScript.add(params));
+    }
+
+    @Test
+    public void testConfigureParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> dataNodeScript.configure(params));
+    }
+
+    @Test
+    public void testStartParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> dataNodeScript.add(params));
+    }
+
+    @Test
+    public void testStopParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> dataNodeScript.configure(params));
+    }
+
+    @Test
+    public void testStatusParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> dataNodeScript.start(params));
     }
 }

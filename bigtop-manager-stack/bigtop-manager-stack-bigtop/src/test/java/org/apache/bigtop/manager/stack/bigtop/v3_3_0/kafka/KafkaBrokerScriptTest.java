@@ -18,15 +18,49 @@
  */
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.kafka;
 
+import org.apache.bigtop.manager.stack.core.spi.param.Params;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class KafkaBrokerScriptTest {
 
+    private final KafkaBrokerScript kafkaBrokerScript = new KafkaBrokerScript();
+
     @Test
     public void testGetComponentName() {
-        KafkaBrokerScript kafkaBrokerScript = new KafkaBrokerScript();
         assertEquals("kafka_broker", kafkaBrokerScript.getComponentName());
+    }
+
+    @Test
+    public void testAddParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> kafkaBrokerScript.add(params));
+    }
+
+    @Test
+    public void testConfigureParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> kafkaBrokerScript.configure(params));
+    }
+
+    @Test
+    public void testStartParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> kafkaBrokerScript.add(params));
+    }
+
+    @Test
+    public void testStopParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> kafkaBrokerScript.configure(params));
+    }
+
+    @Test
+    public void testStatusParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> kafkaBrokerScript.start(params));
     }
 }

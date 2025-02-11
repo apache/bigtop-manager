@@ -18,15 +18,49 @@
  */
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.hbase;
 
+import org.apache.bigtop.manager.stack.core.spi.param.Params;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class HRegionServerScriptTest {
 
+    private final HRegionServerScript hRegionServerScript = new HRegionServerScript();
+
     @Test
     public void testGetComponentName() {
-        HRegionServerScript hRegionServerScript = new HRegionServerScript();
         assertEquals("hbase_regionserver", hRegionServerScript.getComponentName());
+    }
+
+    @Test
+    public void testAddParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> hRegionServerScript.add(params));
+    }
+
+    @Test
+    public void testConfigureParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> hRegionServerScript.configure(params));
+    }
+
+    @Test
+    public void testStartParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> hRegionServerScript.add(params));
+    }
+
+    @Test
+    public void testStopParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> hRegionServerScript.configure(params));
+    }
+
+    @Test
+    public void testStatusParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> hRegionServerScript.start(params));
     }
 }

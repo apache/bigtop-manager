@@ -18,15 +18,49 @@
  */
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.hadoop;
 
+import org.apache.bigtop.manager.stack.core.spi.param.Params;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class NodeManagerScriptTest {
 
+    private final NodeManagerScript nodeManagerScript = new NodeManagerScript();
+
     @Test
     public void testGetComponentName() {
-        NodeManagerScript nodeManagerScript = new NodeManagerScript();
         assertEquals("nodemanager", nodeManagerScript.getComponentName());
+    }
+
+    @Test
+    public void testAddParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> nodeManagerScript.add(params));
+    }
+
+    @Test
+    public void testConfigureParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> nodeManagerScript.configure(params));
+    }
+
+    @Test
+    public void testStartParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> nodeManagerScript.add(params));
+    }
+
+    @Test
+    public void testStopParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> nodeManagerScript.configure(params));
+    }
+
+    @Test
+    public void testStatusParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> nodeManagerScript.start(params));
     }
 }

@@ -18,16 +18,49 @@
  */
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.flink;
 
+import org.apache.bigtop.manager.stack.core.spi.param.Params;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class FlinkHistoryServerScriptTest {
 
-    private final FlinkHistoryServerScript script = new FlinkHistoryServerScript();
+    private final FlinkHistoryServerScript flinkHistoryServerScript = new FlinkHistoryServerScript();
 
     @Test
     void testGetComponentName() {
-        assertEquals("flink_historyserver", script.getComponentName());
+        assertEquals("flink_historyserver", flinkHistoryServerScript.getComponentName());
+    }
+
+    @Test
+    public void testAddParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> flinkHistoryServerScript.add(params));
+    }
+
+    @Test
+    public void testConfigureParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> flinkHistoryServerScript.configure(params));
+    }
+
+    @Test
+    public void testStartParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> flinkHistoryServerScript.add(params));
+    }
+
+    @Test
+    public void testStopParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> flinkHistoryServerScript.configure(params));
+    }
+
+    @Test
+    public void testStatusParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> flinkHistoryServerScript.start(params));
     }
 }

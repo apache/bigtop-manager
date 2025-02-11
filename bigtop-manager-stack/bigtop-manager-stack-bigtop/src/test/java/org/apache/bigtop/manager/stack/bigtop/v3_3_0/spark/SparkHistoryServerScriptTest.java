@@ -18,15 +18,49 @@
  */
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.spark;
 
+import org.apache.bigtop.manager.stack.core.spi.param.Params;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class SparkHistoryServerScriptTest {
 
+    private final SparkHistoryServerScript sparkHistoryServerScript = new SparkHistoryServerScript();
+
     @Test
     public void testGetComponentName() {
-        SparkHistoryServerScript script = new SparkHistoryServerScript();
-        assertEquals("spark_historyserver", script.getComponentName());
+        assertEquals("spark_historyserver", sparkHistoryServerScript.getComponentName());
+    }
+
+    @Test
+    public void testAddParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> sparkHistoryServerScript.add(params));
+    }
+
+    @Test
+    public void testConfigureParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> sparkHistoryServerScript.configure(params));
+    }
+
+    @Test
+    public void testStartParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> sparkHistoryServerScript.add(params));
+    }
+
+    @Test
+    public void testStopParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> sparkHistoryServerScript.configure(params));
+    }
+
+    @Test
+    public void testStatusParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> sparkHistoryServerScript.start(params));
     }
 }
