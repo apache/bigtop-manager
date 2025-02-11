@@ -46,6 +46,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 @Tag(name = "Host Controller")
@@ -107,9 +108,10 @@ public class HostController {
 
     @Operation(summary = "Install dependencies", description = "Install dependencies on a host")
     @PostMapping("/install-dependencies")
-    public ResponseEntity<Boolean> installDependencies(@RequestBody @Validated HostReq hostReq) {
-        HostDTO hostDTO = HostConverter.INSTANCE.fromReq2DTO(hostReq);
-        return ResponseEntity.success(hostService.installDependencies(hostDTO));
+    public ResponseEntity<Boolean> installDependencies(@RequestBody @Validated List<HostReq> hostReqs) {
+        List<HostDTO> hostDTOList = new ArrayList<>();
+        hostReqs.forEach(hostReq -> hostDTOList.add(HostConverter.INSTANCE.fromReq2DTO(hostReq)));
+        return ResponseEntity.success(hostService.installDependencies(hostDTOList));
     }
 
     @Operation(summary = "Installed status", description = "Install status for a host")

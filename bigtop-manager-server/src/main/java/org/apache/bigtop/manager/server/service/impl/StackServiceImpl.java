@@ -18,10 +18,17 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
+import org.apache.bigtop.manager.dao.po.ClusterPO;
+import org.apache.bigtop.manager.dao.po.ServicePO;
+import org.apache.bigtop.manager.dao.query.ServiceQuery;
+import org.apache.bigtop.manager.dao.repository.ClusterDao;
+import org.apache.bigtop.manager.dao.repository.ServiceDao;
+import org.apache.bigtop.manager.server.model.converter.ClusterConverter;
 import org.apache.bigtop.manager.server.model.converter.ServiceConverter;
 import org.apache.bigtop.manager.server.model.converter.StackConverter;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.model.dto.StackDTO;
+import org.apache.bigtop.manager.server.model.vo.ClusterVO;
 import org.apache.bigtop.manager.server.model.vo.StackVO;
 import org.apache.bigtop.manager.server.service.StackService;
 import org.apache.bigtop.manager.server.utils.StackUtils;
@@ -30,6 +37,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
 
+import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +45,12 @@ import java.util.Map;
 @Slf4j
 @Service
 public class StackServiceImpl implements StackService {
+
+    @Resource
+    private ClusterDao clusterDao;
+
+    @Resource
+    private ServiceDao serviceDao;
 
     @Override
     public List<StackVO> list() {
@@ -55,5 +69,19 @@ public class StackServiceImpl implements StackService {
         }
 
         return stackVOList;
+    }
+
+    @Override
+    public List<ClusterVO> serviceClusters(String serviceName) {
+        ServiceQuery query = ServiceQuery.builder().name(serviceName).build();
+        List<ServicePO> servicePOList = serviceDao.findByQuery(query);
+        if (servicePOList.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<Long> clusterIds =
+                servicePOList.stream().map(ServicePO::getClusterId).toList();
+        List<ClusterPO> clusterPOList = clusterDao.findByIds(clusterIds);
+        return ClusterConverter.INSTANCE.fromPO2VO(clusterPOList);
     }
 }

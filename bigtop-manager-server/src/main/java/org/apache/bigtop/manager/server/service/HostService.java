@@ -76,10 +76,10 @@ public interface HostService {
     /**
      * Install dependencies
      *
-     * @param hostDTO host infos
+     * @param hostDTOList host infos
      * @return true if all dependencies are installed
      */
-    Boolean installDependencies(HostDTO hostDTO);
+    Boolean installDependencies(List<HostDTO> hostDTOList);
 
     /**
      * Get dependency installed status
