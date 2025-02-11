@@ -19,6 +19,7 @@
 package org.apache.bigtop.manager.stack.infra.v1_0_0.grafana;
 
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

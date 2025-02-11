@@ -19,13 +19,14 @@
 package org.apache.bigtop.manager.stack.infra.v1_0_0.prometheus;
 
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class PrometheusServerScriptTest {
-    
+
     private final PrometheusServerScript prometheusServerScript = new PrometheusServerScript();
 
     @Test
