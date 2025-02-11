@@ -58,12 +58,12 @@
     },
     {
       title: t('host.ssh_user'),
-      dataIndex: 'ssh_user',
+      dataIndex: 'sshUser',
       width: '260px',
-      key: 'ssh_user',
+      key: 'sshUser',
       ellipsis: true,
       customFilterDropdown: true,
-      onFilter: (value, record) => isContain(record.ssh_user, value as string),
+      onFilter: (value, record) => isContain(record.sshUser, value as string),
       onFilterDropdownOpenChange: (visible) => onFilterDropdownOpenChange(visible)
     },
     {
