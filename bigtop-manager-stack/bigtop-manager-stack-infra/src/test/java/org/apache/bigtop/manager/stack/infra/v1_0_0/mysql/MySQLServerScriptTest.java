@@ -18,15 +18,48 @@
  */
 package org.apache.bigtop.manager.stack.infra.v1_0_0.mysql;
 
+import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class MySQLServerScriptTest {
+    
+    private final MySQLServerScript mysqlServerScript = new MySQLServerScript();
 
     @Test
     void testGetComponentName() {
-        MySQLServerScript mysqlServerScript = new MySQLServerScript();
         assertEquals("mysql_server", mysqlServerScript.getComponentName());
+    }
+
+    @Test
+    public void testAddParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> mysqlServerScript.add(params));
+    }
+
+    @Test
+    public void testConfigureParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> mysqlServerScript.configure(params));
+    }
+
+    @Test
+    public void testStartParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> mysqlServerScript.start(params));
+    }
+
+    @Test
+    public void testStopParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> mysqlServerScript.stop(params));
+    }
+
+    @Test
+    public void testStatusParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> mysqlServerScript.status(params));
     }
 }

@@ -18,15 +18,48 @@
  */
 package org.apache.bigtop.manager.stack.infra.v1_0_0.grafana;
 
+import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class GrafanaServerScriptTest {
 
+    private final GrafanaServerScript grafanaServerScript = new GrafanaServerScript();
+
     @Test
     public void testGetComponentName() {
-        GrafanaServerScript grafanaServerScript = new GrafanaServerScript();
         assertEquals("grafana_server", grafanaServerScript.getComponentName());
+    }
+
+    @Test
+    public void testAddParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> grafanaServerScript.add(params));
+    }
+
+    @Test
+    public void testConfigureParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> grafanaServerScript.configure(params));
+    }
+
+    @Test
+    public void testStartParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> grafanaServerScript.start(params));
+    }
+
+    @Test
+    public void testStopParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> grafanaServerScript.stop(params));
+    }
+
+    @Test
+    public void testStatusParamsNull() {
+        Params params = null;
+        assertThrows(NullPointerException.class, () -> grafanaServerScript.status(params));
     }
 }
