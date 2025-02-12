@@ -93,3 +93,20 @@ export const pick = <T extends object, K extends keyof T>(obj: T, keys: K[]): Pi
     {} as Pick<T, K>
   )
 }
+
+type Data = { [key: string]: any }
+type Result = { [key: string]: any | undefined }
+
+export const processData = (data: Data): Result => {
+  const result: Result = {}
+  for (const [key, value] of Object.entries(data)) {
+    if (value === null) {
+      result[key] = undefined
+    } else if (Array.isArray(value)) {
+      result[key] = value[0] || undefined
+    } else {
+      result[key] = value
+    }
+  }
+  return result
+}

@@ -52,7 +52,6 @@ export default {
   desc: 'Description',
   os: 'OS',
   arch: 'Arch',
-  base_url: 'Base URL',
   host: 'Host',
   service: 'Service',
   stack: 'Stack',

@@ -18,14 +18,16 @@
  */
 
 import { ref, onUnmounted } from 'vue'
-import type { TablePaginationConfig, TableColumnType } from 'ant-design-vue'
 import { useI18n } from 'vue-i18n'
+import { processData } from '@/utils/tools'
+import type { PaginationProps, TableColumnType, TableProps } from 'ant-design-vue'
+import type { FilterValue } from 'ant-design-vue/es/table/interface'
 
-type PaginationProps = TablePaginationConfig | false | undefined
+type PaginationType = PaginationProps | false | undefined
 export interface UseBaseTableProps<T = any> {
   columns: TableColumnType[]
   rows?: T[]
-  pagination?: PaginationProps
+  pagination?: PaginationType
 }
 const useBaseTable = <T>(props: UseBaseTableProps<T>) => {
   const { columns, rows, pagination } = props
@@ -33,7 +35,7 @@ const useBaseTable = <T>(props: UseBaseTableProps<T>) => {
   const loading = ref(false)
   const dataSource = ref<T[]>(rows || [])
   const columnsProp = ref<TableColumnType[]>(columns)
-  const paginationProps = ref<PaginationProps>({
+  const paginationProps = ref<PaginationType>({
     current: 1,
     pageSize: 10,
     total: dataSource.value.length,
@@ -42,19 +44,30 @@ const useBaseTable = <T>(props: UseBaseTableProps<T>) => {
     pageSizeOptions: ['10', '20', '30', '40', '50'],
     showTotal: (total) => `${t('common.total', [total])}`
   })
+  const filtersParams = ref<Record<string, FilterValue | null | number | undefined>>({
+    pageNum: paginationProps.value ? paginationProps.value.current : undefined,
+    pageSize: paginationProps.value ? paginationProps.value.pageSize : undefined
+  })
 
-  // merge pagination config
+  // Merge pagination config
   if (pagination === undefined && paginationProps.value) {
-    paginationProps.value = Object.assign(paginationProps.value, pagination)
+    Object.assign(paginationProps.value, pagination)
   } else {
     paginationProps.value = false
   }
 
-  const onChange = (pagination: TablePaginationConfig) => {
+  const onChange: TableProps['onChange'] = (pagination, filters) => {
+    // Collect params of filters
+    Object.assign(filtersParams.value, processData(filters))
     if (!paginationProps.value) {
       return
     }
-    paginationProps.value = Object.assign(paginationProps.value, pagination)
+    Object.assign(paginationProps.value, pagination)
+    // Update value of params about pagination
+    Object.assign(filtersParams.value, {
+      pageNum: pagination.current,
+      pageSize: pagination.pageSize
+    })
   }
 
   const resetState = () => {
@@ -80,6 +93,7 @@ const useBaseTable = <T>(props: UseBaseTableProps<T>) => {
     dataSource,
     loading,
     paginationProps,
+    filtersParams,
     onChange,
     resetState
   }

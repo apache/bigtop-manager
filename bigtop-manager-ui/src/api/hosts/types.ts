@@ -54,6 +54,17 @@ export interface HostVO {
   [property: string]: any
 }
 
+export interface HostListParams {
+  clusterId?: number
+  hostname?: string
+  ipv4?: string
+  orderBy?: string
+  pageNum?: number
+  pageSize?: number
+  sort?: string
+  status?: number
+}
+
 export interface HostParams {
   agentDir?: string
   authType?: number | string // '1-password，2-key，3-no_auth',
@@ -77,8 +88,15 @@ export interface InstalledStatusVO {
 }
 
 export enum Status {
-  Failed = 'FAILED',
   Installing = 'INSTALLING',
   Success = 'SUCCESS',
+  Failed = 'FAILED',
   Unknown = 'UNKNOW'
+}
+
+export enum BaseStatus {
+  'INSTALLING',
+  'SUCCESS',
+  'FAILED',
+  'UNKNOW'
 }

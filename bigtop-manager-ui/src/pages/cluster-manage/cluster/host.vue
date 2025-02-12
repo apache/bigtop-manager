@@ -18,95 +18,99 @@
 -->
 
 <script setup lang="ts">
-  import { TableColumnType } from 'ant-design-vue'
-  import { computed, reactive, ref } from 'vue'
-  import { generateTableHostData } from './components/mock'
+  import { TableColumnType, TableProps } from 'ant-design-vue'
+  import { computed, onActivated, reactive, ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
+  import { useRoute } from 'vue-router'
+
   import useBaseTable from '@/composables/use-base-table'
   import type { FilterConfirmProps, FilterResetProps } from 'ant-design-vue/es/table/interface'
   import type { GroupItem } from '@/components/common/button-group/types'
+  import type { HostVO } from '@/api/hosts/types'
+  import { getHosts } from '@/api/hosts'
 
   type Key = string | number
   interface TableState {
     selectedRowKeys: Key[]
     searchText: string
-    searchedColumn: string
+    searchedColumn: keyof HostVO
   }
 
+  const { t } = useI18n()
+  const route = useRoute()
   const searchInputRef = ref()
-  const data = ref<any[]>(generateTableHostData(50))
+  const hostStatus = ref(['INSTALLING', 'SUCCESS', 'FAILED', 'UNKNOW'])
   const state = reactive<TableState>({
     searchText: '',
     searchedColumn: '',
     selectedRowKeys: []
   })
 
-  const columns = computed((): TableColumnType[] => [
+  const columns = computed((): TableColumnType<HostVO>[] => [
     {
-      title: '节点',
-      dataIndex: 'nodeName',
-      key: 'nodeName',
+      title: t('host.hostname'),
+      dataIndex: 'hostname',
+      key: 'hostname',
       ellipsis: true,
       customFilterDropdown: true,
-      onFilter: (value, record) => isContain(record.nodeName, value as string),
       onFilterDropdownOpenChange: (visible) => onFilterDropdownOpenChange(visible)
     },
     {
-      title: 'IP地址',
-      dataIndex: 'address',
-      key: 'address',
+      title: t('host.ip_address'),
+      dataIndex: 'ipv4',
+      key: 'ipv4',
       ellipsis: true,
       customFilterDropdown: true,
-      onFilter: (value, record) => isContain(record.address, value as string),
       onFilterDropdownOpenChange: (visible) => onFilterDropdownOpenChange(visible)
     },
     {
-      title: '系统',
-      dataIndex: 'system',
+      title: t('common.os'),
+      dataIndex: 'os',
       ellipsis: true
     },
     {
-      title: '架构',
-      dataIndex: 'architecture',
+      title: t('common.arch'),
+      dataIndex: 'arch',
       ellipsis: true
     },
     {
-      title: '组件数',
-      dataIndex: 'componentCount',
+      title: t('host.component_count'),
+      dataIndex: 'componentNum',
       ellipsis: true
     },
     {
-      title: '状态',
+      title: t('common.status'),
       dataIndex: 'status',
       key: 'status',
       width: '160px',
       ellipsis: true,
+      filterMultiple: false,
       filters: [
         {
-          text: '正常',
-          value: 'success'
+          text: t('common.success'),
+          value: 1
         },
         {
-          text: '异常',
-          value: 'error'
+          text: t('common.failed'),
+          value: 2
         },
         {
-          text: '未知',
-          value: 'unknow'
+          text: t('common.unknow'),
+          value: 3
         }
-      ],
-      onFilter: (value, record) => record.status.indexOf(value) === 0
+      ]
     },
     {
-      title: '操作',
+      title: t('common.action'),
       key: 'operation',
       width: '160px',
       fixed: 'right'
     }
   ])
 
-  const { loading, paginationProps, onChange } = useBaseTable({
+  const { loading, dataSource, filtersParams, paginationProps, onChange } = useBaseTable<HostVO>({
     columns: columns.value,
-    rows: data.value
+    rows: []
   })
 
   const operations = computed((): GroupItem[] => [
@@ -120,10 +124,6 @@
       clickEvent: (_item, args) => handleDelete(args)
     }
   ])
-
-  const isContain = (source: string, target: string) => {
-    return source.toString().toLowerCase().includes(target.toLowerCase())
-  }
 
   const onFilterDropdownOpenChange = (visible: boolean) => {
     if (visible) {
@@ -140,7 +140,7 @@
   const handleSearch = (selectedKeys: Key[], confirm: (param?: FilterConfirmProps) => void, dataIndex: string) => {
     confirm()
     state.searchText = selectedKeys[0] as string
-    state.searchedColumn = dataIndex as string
+    state.searchedColumn = dataIndex
   }
 
   const handleReset = (clearFilters: (param?: FilterResetProps) => void) => {
@@ -159,6 +159,37 @@
       console.log('row :>> ', row)
     }
   }
+
+  const getHostList = async (isReset = false) => {
+    loading.value = true
+    const clusterId = parseInt(route.params.id as string)
+    if (isNaN(clusterId) || !paginationProps.value) {
+      loading.value = false
+      return
+    }
+    if (isReset) {
+      paginationProps.value.current = 1
+    }
+    try {
+      const res = await getHosts({ ...filtersParams.value, clusterId })
+      dataSource.value = res.content
+      paginationProps.value.total = res.total
+      loading.value = false
+    } catch (error) {
+      console.log('error :>> ', error)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const tableChange: TableProps['onChange'] = (pagination, filters, ...args) => {
+    onChange(pagination, filters, ...args)
+    getHostList()
+  }
+
+  onActivated(() => {
+    getHostList()
+  })
 </script>
 
 <template>
@@ -172,11 +203,11 @@
     </header>
     <a-table
       :loading="loading"
-      :data-source="data"
+      :data-source="dataSource"
       :columns="columns"
       :pagination="paginationProps"
       :row-selection="{ selectedRowKeys: state.selectedRowKeys, onChange: onSelectChange }"
-      @change="onChange"
+      @change="tableChange"
     >
       <template #customFilterDropdown="{ setSelectedKeys, selectedKeys, confirm, clearFilters, column }">
         <div class="search">
@@ -188,7 +219,9 @@
             @press-enter="handleSearch(selectedKeys, confirm, column.dataIndex)"
           />
           <div class="search-btn">
-            <a-button size="small" @click="handleReset(clearFilters)"> {{ $t('common.reset') }} </a-button>
+            <a-button size="small" @click="handleReset(clearFilters)">
+              {{ $t('common.reset') }}
+            </a-button>
             <a-button type="primary" size="small" @click="handleSearch(selectedKeys, confirm, column.dataIndex)">
               {{ $t('common.search') }}
             </a-button>
@@ -200,11 +233,12 @@
         <svg-icon v-else :name="filtered ? 'filter_activated' : 'filter'" />
       </template>
       <template #bodyCell="{ record, column }">
-        <template v-if="column.key === 'nodeName'">
-          <a-typography-link underline> {{ record.nodeName }} </a-typography-link>
+        <template v-if="column.key === 'hostname'">
+          <a-typography-link underline> {{ record.hostname }} </a-typography-link>
         </template>
         <template v-if="column.key === 'status'">
-          <svg-icon :name="record.status" />
+          <svg-icon style="margin-left: 0" :name="hostStatus[record.status].toLowerCase()" />
+          <span>{{ $t(`common.${hostStatus[record.status].toLowerCase()}`) }}</span>
         </template>
         <template v-if="column.key === 'operation'">
           <button-group
@@ -215,7 +249,7 @@
             :args="record"
             group-shape="default"
             group-type="link"
-          ></button-group>
+          />
         </template>
       </template>
     </a-table>

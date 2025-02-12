@@ -18,12 +18,13 @@
  */
 
 import request from '@/api/request.ts'
-import { HostParams, HostVO, HostVOList, InstalledStatusVO } from '@/api/hosts/types.ts'
+import type { HostListParams, HostParams, HostVO, HostVOList, InstalledStatusVO } from '@/api/hosts/types.ts'
 
-export const getHosts = (): Promise<HostVOList> => {
+export const getHosts = (params?: HostListParams): Promise<HostVOList> => {
   return request({
     method: 'get',
-    url: '/hosts'
+    url: '/hosts',
+    params
   })
 }
 
