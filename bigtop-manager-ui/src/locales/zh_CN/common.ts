@@ -77,6 +77,8 @@ export default {
   update_time: '更新时间',
   notification: '通知',
   copy: '复制',
+  copied: '已复制',
+  download: '下载',
   copy_success: '复制成功',
   copy_fail: '复制失败',
   delete_success: '删除成功',

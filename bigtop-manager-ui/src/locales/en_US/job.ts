@@ -18,5 +18,6 @@
  */
 
 export default {
-  job_list: 'Job List'
+  job_list: 'Job List',
+  task_log: 'Task log'
 }
