@@ -195,7 +195,7 @@
 <template>
   <div class="host">
     <header>
-      <div class="host-title">{{ $t('host.host_list') }}</div>
+      <div class="header-title">{{ $t('host.host_list') }}</div>
       <a-space :size="16">
         <a-button type="primary" danger @click="handleDelete">{{ $t('common.bulk_remove') }}</a-button>
         <a-button type="primary">{{ $t('cluster.add_host') }}</a-button>
@@ -257,17 +257,6 @@
 </template>
 
 <style lang="scss" scoped>
-  .host {
-    header {
-      margin-bottom: $space-md;
-    }
-    &-title {
-      font-size: 14px;
-      font-weight: 500;
-      line-height: 22px;
-      margin-bottom: $space-md;
-    }
-  }
   .search {
     display: grid;
     gap: $space-sm;

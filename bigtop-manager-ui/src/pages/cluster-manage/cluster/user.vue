@@ -66,7 +66,7 @@
 <template>
   <div class="user">
     <header>
-      <div class="host-title">{{ $t('user.user_list') }}</div>
+      <div class="header-title">{{ $t('user.user_list') }}</div>
     </header>
     <a-table
       :loading="loading"
@@ -78,10 +78,4 @@
   </div>
 </template>
 
-<style lang="scss" scoped>
-  .user {
-    header {
-      margin-bottom: $space-md;
-    }
-  }
-</style>
+<style lang="scss" scoped></style>

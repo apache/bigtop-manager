@@ -27,31 +27,33 @@
   import Host from './host.vue'
   import User from './user.vue'
   import Job from '@/components/job/index.vue'
+  import { useI18n } from 'vue-i18n'
 
+  const { t } = useI18n()
   const route = useRoute()
   const title = computed(() => route.params.cluster as string)
   const desc = ref('我是描述')
   const activeKey = ref('1')
-  const tabs = ref<TabItem[]>([
+  const tabs = computed((): TabItem[] => [
     {
       key: '1',
-      title: '概览'
+      title: t('common.overview')
     },
     {
       key: '2',
-      title: '服务'
+      title: t('common.service')
     },
     {
       key: '3',
-      title: '主机'
+      title: t('common.host')
     },
     {
       key: '4',
-      title: '用户'
+      title: t('common.user')
     },
     {
       key: '5',
-      title: '作业'
+      title: t('common.job')
     }
   ])
   const actionGroup = computed<GroupItem[]>(() => [

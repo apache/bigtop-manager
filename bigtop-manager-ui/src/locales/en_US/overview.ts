@@ -16,27 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import common from '@/locales/en_US/common.ts'
-import menu from '@/locales/en_US/menu.ts'
-import login from '@/locales/en_US/login'
-import user from '@/locales/en_US/user.ts'
-import llmConfig from '@/locales/en_US/llm-config.ts'
-import aiAssistant from '@/locales/en_US/ai-assistant.ts'
-import cluster from '@/locales/en_US/cluster.ts'
-import host from '@/locales/en_US/host.ts'
-import job from '@/locales/en_US/job.ts'
-import overview from '@/locales/en_US/overview'
-
 export default {
-  common,
-  menu,
-  login,
-  user,
-  llmConfig,
-  aiAssistant,
-  cluster,
-  host,
-  job,
-  overview
+  basic_info: 'Basic Information',
+  service_info: 'Service Information',
+  detail: 'Details',
+  cluster_status: 'Cluster Status',
+  cluster_name: 'Cluster Name',
+  cluster_desc: 'Cluster Description',
+  host_count: 'Host Count',
+  service_count: 'Service Count',
+  memory: 'Memory',
+  core_count: 'Core Count',
+  disk_size: 'Disk Size',
+  creator: 'Creator'
 }

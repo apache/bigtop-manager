@@ -185,10 +185,15 @@
 </script>
 
 <template>
-  <div>
+  <div class="job">
     <header>
       <a-breadcrumb>
-        <a-breadcrumb-item v-for="breadcrumb in breadcrumbs" :key="breadcrumb.id" @click="clickBreadcrumb(breadcrumb)">
+        <a-breadcrumb-item
+          v-for="breadcrumb in breadcrumbs"
+          :key="breadcrumb.id"
+          class="header-title"
+          @click="clickBreadcrumb(breadcrumb)"
+        >
           <a v-if="currBreadcrumb?.id != breadcrumb.id">{{ breadcrumb.name }}</a>
           <span v-else>{{ breadcrumb.name }}</span>
         </a-breadcrumb-item>
@@ -222,8 +227,4 @@
   </div>
 </template>
 
-<style lang="scss" scoped>
-  header {
-    margin-bottom: $space-md;
-  }
-</style>
+<style lang="scss" scoped></style>

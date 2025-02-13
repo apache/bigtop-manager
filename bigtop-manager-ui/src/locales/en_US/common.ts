@@ -97,5 +97,8 @@ export default {
   file_size_error: 'File size cannot exceed 10KB!',
   upload_success: 'File uploaded successfully!',
   upload_failed: 'File upload failed!',
-  password_not_match: 'Passwords do not match.'
+  password_not_match: 'Passwords do not match.',
+  overview: 'Overview',
+  user: 'User',
+  job: 'Job'
 }

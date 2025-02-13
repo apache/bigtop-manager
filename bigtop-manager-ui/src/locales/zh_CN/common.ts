@@ -97,5 +97,8 @@ export default {
   file_size_error: '文件大小不能超过 10KB！',
   upload_success: '文件上传成功！',
   upload_failed: '文件上传失败！',
-  password_not_match: '密码不一致。'
+  password_not_match: '密码不一致。',
+  overview: '概览',
+  user: '用户',
+  job: '作业'
 }

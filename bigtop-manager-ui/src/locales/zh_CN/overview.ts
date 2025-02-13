@@ -16,27 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import common from '@/locales/en_US/common.ts'
-import menu from '@/locales/en_US/menu.ts'
-import login from '@/locales/en_US/login'
-import user from '@/locales/en_US/user.ts'
-import llmConfig from '@/locales/en_US/llm-config.ts'
-import aiAssistant from '@/locales/en_US/ai-assistant.ts'
-import cluster from '@/locales/en_US/cluster.ts'
-import host from '@/locales/en_US/host.ts'
-import job from '@/locales/en_US/job.ts'
-import overview from '@/locales/en_US/overview'
-
 export default {
-  common,
-  menu,
-  login,
-  user,
-  llmConfig,
-  aiAssistant,
-  cluster,
-  host,
-  job,
-  overview
+  basic_info: '基本信息',
+  service_info: '服务信息',
+  detail: '详情',
+  cluster_status: '集群状态',
+  cluster_name: '集群名',
+  cluster_desc: '集群备注',
+  host_count: '主机数',
+  service_count: '服务数',
+  memory: '内存',
+  core_count: '核心数',
+  disk_size: '磁盘大小',
+  creator: '创建人'
 }
