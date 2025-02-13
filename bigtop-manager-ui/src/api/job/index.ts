@@ -16,47 +16,45 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import request from '@/api/request.ts'
-import type { JobParams, JobList, TaskLogParams, TaskParams, JobVO, StageVO, TaskVO } from './types'
+import type {
+  JobParams,
+  JobList,
+  TaskLogParams,
+  JobVO,
+  JobListParams,
+  TaskListParams,
+  StageListParams,
+  StageList,
+  TaskList,
+  ListParams
+} from './types'
+import { get, post } from '../request-util'
 
-export const retryJob = (pathParams: JobParams): Promise<JobVO> => {
-  return request({
-    method: 'post',
-    url: `/clusters/${pathParams.clusterId}/jobs/${pathParams.jobId}/retry`
-  })
+export const retryJob = (pathParams: JobParams) => {
+  return post<JobVO>(`/clusters/${pathParams.clusterId}/jobs/${pathParams.jobId}/retry`)
 }
 
-export const getJobList = (clusterId: number): Promise<JobList> => {
-  return request({
-    method: 'get',
-    url: `/clusters/${clusterId}/jobs`
-  })
+export const getJobDetails = (pathParams: JobParams) => {
+  return get<JobVO>(`/clusters/${pathParams.clusterId}/jobs/${pathParams.jobId}`)
 }
 
-export const getJobDetails = (pathParams: JobParams): Promise<JobVO> => {
-  return request({
-    method: 'get',
-    url: `/clusters/${pathParams.clusterId}/jobs/${pathParams.jobId}`
-  })
+export const getJobList = (pathParams: JobListParams, params: ListParams) => {
+  return get<JobList>(`/clusters/${pathParams.clusterId}/jobs`, params)
 }
 
-export const getStageList = (pathParams: JobParams): Promise<StageVO[]> => {
-  return request({
-    method: 'get',
-    url: `/clusters/${pathParams.clusterId}/jobs/${pathParams.jobId}/stages`
-  })
+export const getStageList = (pathParams: StageListParams, params: ListParams) => {
+  return get<StageList>(`/clusters/${pathParams.clusterId}/jobs/${pathParams.jobId}/stages`, params)
 }
 
-export const getTaskList = (pathParams: TaskParams): Promise<TaskVO[]> => {
-  return request({
-    method: 'get',
-    url: `/clusters/${pathParams.clusterId}/jobs/${pathParams.jobId}/stages/${pathParams.stageId}/tasks`
-  })
+export const getTaskList = (pathParams: TaskListParams, params: ListParams) => {
+  return get<TaskList>(
+    `/clusters/${pathParams.clusterId}/jobs/${pathParams.jobId}/stages/${pathParams.stageId}/tasks`,
+    params
+  )
 }
 
-export const getTaskLog = (pathParams: TaskLogParams): Promise<string[]> => {
-  return request({
-    method: 'get',
-    url: `/clusters/${pathParams.clusterId}/jobs/${pathParams.jobId}/stages/${pathParams.stageId}/tasks/${pathParams.taskId}/log`
-  })
+export const getTaskLog = (pathParams: TaskLogParams) => {
+  return get<string[]>(
+    `/clusters/${pathParams.clusterId}/jobs/${pathParams.jobId}/stages/${pathParams.stageId}/tasks/${pathParams.taskId}/log`
+  )
 }

@@ -26,7 +26,7 @@
   import Service from './service.vue'
   import Host from './host.vue'
   import User from './user.vue'
-  import Job from './job.vue'
+  import Job from '@/components/job/index.vue'
 
   const route = useRoute()
   const title = computed(() => route.params.cluster as string)

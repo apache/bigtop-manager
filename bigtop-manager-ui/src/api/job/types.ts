@@ -18,22 +18,28 @@
  */
 
 import type { PageVO } from '@/api/types'
+import { JobState } from '@/enums/state'
 
 export type JobList = PageVO<JobVO>
 export type StageList = PageVO<StageVO>
+export type TaskList = PageVO<TaskVO>
+
 export type JobParams = { clusterId: number; jobId: number }
 export type TaskParams = JobParams & { stageId: number }
 export type TaskLogParams = TaskParams & { taskId: number }
 
-export type StateType = keyof typeof State
+export type StateType = keyof typeof JobState
 
-export enum State {
-  'Pending' = 'pending',
-  'Processing' = 'processing',
-  'Successful' = 'successful',
-  'Failed' = 'failed',
-  'Canceled' = 'canceled'
+export interface ListParams {
+  orderBy?: string
+  pageNum?: number
+  pageSize?: number
+  sort?: string
 }
+
+export type JobListParams = { clusterId: number }
+export type StageListParams = JobParams
+export type TaskListParams = TaskParams
 
 export interface JobVO {
   createTime?: string

@@ -40,14 +40,14 @@
     taskId: number
   }
 
-  interface Props {
+  export interface LogsViewProps {
     open: boolean
     loading: boolean
     payLoad?: PayLoad
     subTitle?: string
   }
 
-  const props = defineProps<Props>()
+  const props = defineProps<LogsViewProps>()
   const emits = defineEmits(['update:open'])
 
   const { t } = useI18n()
@@ -144,7 +144,7 @@
 </script>
 
 <template>
-  <a-modal width="800px" :mask="false" :open="open" :title="$t(title)" @ok="handleOk" @cancel="handleOk">
+  <a-modal width="800px" :mask="false" :open="open" :title="$t(`job.${title}`)" @ok="handleOk" @cancel="handleOk">
     <template #closeIcon>
       <svg-icon style="margin: 0" name="close" />
     </template>

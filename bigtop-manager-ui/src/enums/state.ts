@@ -37,3 +37,11 @@ export enum ServiceStatusTexts {
   'unhealthy',
   'unknow'
 }
+
+export enum JobState {
+  'Pending' = 'pending',
+  'Processing' = 'processing',
+  'Successful' = 'successful',
+  'Failed' = 'failed',
+  'Canceled' = 'canceled'
+}

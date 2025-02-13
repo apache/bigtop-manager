@@ -19,8 +19,8 @@
 import request from './request'
 import { AxiosRequestConfig } from 'axios'
 
-const get = <T>(url: string, config?: AxiosRequestConfig): Promise<T> => {
-  return request.get(url, config)
+const get = <T, U = any>(url: string, params?: U, config?: AxiosRequestConfig): Promise<T> => {
+  return request.get(url, { ...config, params })
 }
 
 const post = <T, U = any>(url: string, data?: U, config?: AxiosRequestConfig): Promise<T> => {

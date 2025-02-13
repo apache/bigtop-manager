@@ -154,7 +154,7 @@
   }
   .stage-item {
     @include flexbox($justify: space-between, $align: center);
-    padding-right: 65px;
+    padding-right: 68px;
   }
   .task-item {
     height: 45px;
