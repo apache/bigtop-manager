@@ -34,6 +34,29 @@ jobs:
         with:
           config: .github/typos.toml
 
+  check-chinese-character:
+    name: "Check Chinese Character"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Set JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'maven'
+      - name: Cache local Maven repository
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      - run: ./mvnw clean test -Dskip.pnpm -Dskip.installnodepnpm -Dskip.pnpm.test -DfailIfNoTests=false -Dtest=ChineseCharacterCheckTest
+
   unit-tests-java:
     name: "Run unit test(Java)"
     runs-on: ubuntu-latest
