@@ -99,6 +99,9 @@ type Result = { [key: string]: any | undefined }
 
 export const processData = (data: Data): Result => {
   const result: Result = {}
+  if (!data) {
+    return result
+  }
   for (const [key, value] of Object.entries(data)) {
     if (value === null) {
       result[key] = undefined
