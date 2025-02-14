@@ -19,5 +19,6 @@
 
 export default {
   job_list: 'Job List',
-  task_log: 'Task log'
+  task_log: 'Task log',
+  log_loading: 'Loading logs'
 }
