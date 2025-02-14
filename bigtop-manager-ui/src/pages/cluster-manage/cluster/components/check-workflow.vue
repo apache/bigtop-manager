@@ -22,7 +22,7 @@
   import { getJobDetails, retryJob } from '@/api/job'
   import { CommandVO } from '@/api/command/types'
   import type { JobVO, StageVO, StateType, TaskVO } from '@/api/job/types'
-  import LogsView, { type LogsViewProps } from '@/components/logs-view/index.vue'
+  import LogsView, { type LogViewProps } from '@/components/log-view/index.vue'
 
   const props = defineProps<{ stepData: CommandVO }>()
   const emits = defineEmits(['updateData'])
@@ -30,9 +30,8 @@
   const activeKey = ref<number[]>([])
   const jobDetail = ref<JobVO>({})
   const spinning = ref(false)
-  const logsViewState = reactive<LogsViewProps>({
-    open: false,
-    loading: false
+  const logsViewState = reactive<LogViewProps>({
+    open: false
   })
   const status = shallowRef<Record<StateType, string>>({
     Pending: 'installing',
@@ -153,7 +152,6 @@
       </a-collapse>
       <logs-view
         v-model:open="logsViewState.open"
-        :loading="logsViewState.loading"
         :pay-load="logsViewState.payLoad"
         :sub-title="logsViewState.subTitle"
       />
@@ -186,7 +184,7 @@
   }
   .stage-item {
     @include flexbox($justify: space-between, $align: center);
-    padding-right: 68px;
+    padding-right: 65px;
   }
   .task-item {
     height: 45px;

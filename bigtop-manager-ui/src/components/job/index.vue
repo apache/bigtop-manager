@@ -24,14 +24,14 @@
   import { TableColumnType, TableProps } from 'ant-design-vue'
   import { getJobList, getStageList, getTaskList } from '@/api/job'
   import useBaseTable from '@/composables/use-base-table'
-  import LogsView, { type LogsViewProps } from '@/components/logs-view/index.vue'
+  import LogsView, { type LogViewProps } from '@/components/log-view/index.vue'
   import type { JobVO, StageVO, TaskListParams, TaskVO } from '@/api/job/types'
 
   interface BreadcrumbItem {
     id: string
     name: ComputedRef<string> | string
   }
-  const POLLING_INTERVAL = 5000
+  const POLLING_INTERVAL = 10000
   const { t } = useI18n()
   const route = useRoute()
   const pollingIntervalId = ref<any>(null)
@@ -55,9 +55,8 @@
       api: getTaskList
     }
   ])
-  const logsViewState = reactive<LogsViewProps>({
-    open: false,
-    loading: false
+  const logsViewState = reactive<LogViewProps>({
+    open: false
   })
   const breadcrumbLen = computed(() => breadcrumbs.value.length)
   const currBreadcrumb = computed(() => breadcrumbs.value.at(-1))
@@ -220,7 +219,6 @@
     </a-table>
     <logs-view
       v-model:open="logsViewState.open"
-      :loading="logsViewState.loading"
       :pay-load="logsViewState.payLoad"
       :sub-title="logsViewState.subTitle"
     />
