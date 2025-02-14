@@ -27,6 +27,8 @@ public interface JobService {
 
     PageVO<JobVO> jobs(Long clusterId);
 
+    JobVO jobDetails(Long clusterId, Long jobId);
+
     PageVO<StageVO> stages(Long jobId);
 
     PageVO<TaskVO> tasks(Long stageId);

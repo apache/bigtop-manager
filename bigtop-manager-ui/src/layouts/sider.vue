@@ -106,7 +106,6 @@
       <div class="create-option">
         <a-button type="primary" ghost @click="addCluster">
           <div>
-            <svg-icon style="margin-left: 0" name="plus" />
             <label>{{ $t('menu.create') }}</label>
           </div>
         </a-button>
@@ -148,7 +147,6 @@
         width: 160px;
         @include flexbox($align: center, $justify: center);
         label {
-          margin-left: 10px;
           cursor: pointer;
         }
       }

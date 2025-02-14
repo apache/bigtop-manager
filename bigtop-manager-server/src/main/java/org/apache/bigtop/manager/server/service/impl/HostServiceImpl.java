@@ -173,7 +173,7 @@ public class HostServiceImpl implements HostService {
     }
 
     @Override
-    public Boolean installDependencies(HostDTO hostDTO) {
+    public Boolean installDependencies(List<HostDTO> hostDTOList) {
         List<RepoPO> repoPOList = repoDao.findAll();
         Map<String, RepoPO> archRepoMap = repoPOList.stream()
                 .filter(repoPO -> repoPO.getType() == 2)
@@ -182,14 +182,24 @@ public class HostServiceImpl implements HostService {
         // Clear cache list
         installedStatus.clear();
 
-        for (String hostname : hostDTO.getHostnames()) {
-            InstalledStatusVO installedStatusVO = new InstalledStatusVO();
-            installedStatusVO.setHostname(hostname);
-            installedStatusVO.setStatus(InstalledStatusEnum.INSTALLING);
-            installedStatus.add(installedStatusVO);
+        for (HostDTO hostDTO : hostDTOList) {
+            for (String hostname : hostDTO.getHostnames()) {
+                InstalledStatusVO installedStatusVO = new InstalledStatusVO();
+                installedStatusVO.setHostname(hostname);
+                installedStatusVO.setStatus(InstalledStatusEnum.INSTALLING);
+                installedStatus.add(installedStatusVO);
 
-            // Async install dependencies
-            executorService.submit(() -> installDependencies(archRepoMap, hostDTO, hostname, installedStatusVO));
+                // Async install dependencies
+                executorService.submit(() -> {
+                    try {
+                        installDependencies(archRepoMap, hostDTO, hostname, installedStatusVO);
+                    } catch (Exception e) {
+                        log.error("Unable to install dependencies on host, hostname: {}", hostname, e);
+                        installedStatusVO.setStatus(InstalledStatusEnum.FAILED);
+                        installedStatusVO.setMessage(e.getMessage());
+                    }
+                });
+            }
         }
 
         return true;
@@ -290,7 +300,7 @@ public class HostServiceImpl implements HostService {
             };
         } catch (Exception e) {
             log.error("Unable to exec command on host, hostname: {}, command: {}", hostname, command, e);
-            throw new ApiException(ApiExceptionEnum.HOST_UNABLE_TO_EXEC_COMMAND, hostname);
+            throw new RuntimeException(e);
         }
     }
 }
