@@ -20,13 +20,15 @@ export default {
   basic_info: 'Basic Information',
   service_info: 'Service Information',
   detail: 'Details',
-  cluster_status: 'Cluster Status',
-  cluster_name: 'Cluster Name',
-  cluster_desc: 'Cluster Description',
+  cluster_status: 'Status',
+  cluster_name: 'Name',
+  cluster_desc: 'Description',
   host_count: 'Host Count',
   service_count: 'Service Count',
   memory: 'Memory',
-  core_count: 'Core Count',
+  core_count: 'Processor Count',
   disk_size: 'Disk Size',
-  creator: 'Creator'
+  creator: 'Creator',
+  memory_usage: '内存使用率',
+  cpu_usage: 'CPU使用率'
 }

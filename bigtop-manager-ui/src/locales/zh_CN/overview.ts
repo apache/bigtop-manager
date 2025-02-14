@@ -28,5 +28,7 @@ export default {
   memory: '内存',
   core_count: '核心数',
   disk_size: '磁盘大小',
-  creator: '创建人'
+  creator: '创建人',
+  memory_usage: '内存使用率',
+  cpu_usage: 'CPU使用率'
 }

@@ -18,34 +18,79 @@
 -->
 
 <script setup lang="ts">
-  import { ref } from 'vue'
-  import type { MenuProps } from 'ant-design-vue'
+  import { computed, ref } from 'vue'
   import GaugeChart from './components/gauge-chart.vue'
   import CategoryChart from './components/category-chart.vue'
+  import type { ClusterVO } from '@/api/cluster/types'
+  import type { MenuProps } from 'ant-design-vue'
+  import { useI18n } from 'vue-i18n'
 
-  const baseConfig = {
-    clusterStatus: '集群状态',
-    clusterName: '集群名',
-    clusterDesc: '集群备注',
-    hostCount: '主机数',
-    serviceCount: '服务数',
-    memory: '内存',
-    coreCount: '核心数',
-    diskSize: '磁盘大小',
-    creator: '创建人'
-  } as any
+  type TimeRangeText = '1m' | '15m' | '30m' | '1h' | '6h' | '30h'
+  type TimeRangeItem = {
+    text: TimeRangeText
+    time: string
+  }
 
-  const baseInfo = {
-    clusterStatus: 'succsss',
-    clusterName: '集群名集群名集群名集群名集群名集群名集群名',
-    clusterDesc: '集群备注',
-    hostCount: '15个主机',
-    serviceCount: '15个服务',
-    memory: '内存',
-    coreCount: '15个核心',
-    diskSize: '磁盘大小',
-    creator: '创建人'
-  } as any
+  const { t } = useI18n()
+  const currTimeRange = ref<TimeRangeText>('15m')
+  const clusterDetail = ref<ClusterVO>({
+    id: 0,
+    name: 'string',
+    displayName: 'string',
+    desc: 'string',
+    type: 0,
+    userGroup: 'string',
+    rootDir: 'string',
+    status: 0,
+    createUser: 'string',
+    totalHost: 0,
+    totalService: 0,
+    totalProcessor: 0,
+    totalMemory: 0,
+    totalDisk: 0
+  })
+
+  const timeRanges = computed((): TimeRangeItem[] => [
+    {
+      text: '1m',
+      time: ''
+    },
+    {
+      text: '15m',
+      time: ''
+    },
+    {
+      text: '30m',
+      time: ''
+    },
+    {
+      text: '1h',
+      time: ''
+    },
+    {
+      text: '6h',
+      time: ''
+    },
+    {
+      text: '30h',
+      time: ''
+    }
+  ])
+
+  const baseConfig = computed((): Partial<Record<keyof ClusterVO, string>> => {
+    return {
+      status: t('overview.cluster_status'),
+      displayName: t('overview.cluster_name'),
+      desc: t('overview.cluster_desc'),
+      totalHost: t('overview.host_count'),
+      totalService: t('overview.service_count'),
+      totalMemory: t('overview.memory'),
+      totalProcessor: t('overview.core_count'),
+      totalDisk: t('overview.disk_size'),
+      createUser: t('overview.creator')
+    }
+  })
+  const detailKeys = computed(() => Object.keys(baseConfig.value) as (keyof ClusterVO)[])
 
   const serviceStack = [
     {
@@ -95,40 +140,6 @@
     }
   ]
 
-  type TimeRangeText = '1m' | '15m' | '30m' | '1h' | '6h' | '30h'
-  type TimeRangeItem = {
-    text: TimeRangeText
-    time: string
-  }
-  const timeRanges: TimeRangeItem[] = [
-    {
-      text: '1m',
-      time: ''
-    },
-    {
-      text: '15m',
-      time: ''
-    },
-    {
-      text: '30m',
-      time: ''
-    },
-    {
-      text: '1h',
-      time: ''
-    },
-    {
-      text: '6h',
-      time: ''
-    },
-    {
-      text: '30h',
-      time: ''
-    }
-  ]
-
-  const currTimeRange = ref<TimeRangeText>('15m')
-
   const handleServiceOperate: MenuProps['onClick'] = (item) => {
     console.log('item :>> ', item.key)
   }
@@ -155,10 +166,10 @@
             </template>
             <div class="desc-sub-item-wrp">
               <div class="desc-sub-item">
-                <template v-for="base in Object.keys(baseInfo)" :key="base">
+                <template v-for="base in detailKeys" :key="base">
                   <div class="desc-sub-item-desc">
                     <a-typography-text type="secondary" :content="baseConfig[base]" />
-                    <a-typography-text :content="baseInfo[base]" />
+                    <a-typography-text :content="clusterDetail[base]" />
                   </div>
                 </template>
               </div>
@@ -323,7 +334,7 @@
       @include flexbox($direction: column, $gap: $space-md);
       &-desc {
         display: grid;
-        grid-template-columns: 56px auto;
+        grid-template-columns: 100px auto;
         gap: 30px;
       }
     }
