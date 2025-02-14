@@ -26,9 +26,12 @@ import type {
   StageListParams,
   StageList,
   TaskList,
-  ListParams
+  ListParams,
+  LogsRes
 } from './types'
 import { get, post } from '../request-util'
+import axios, { type AxiosProgressEvent, type CancelTokenSource } from 'axios'
+import request from '../request'
 
 export const retryJob = (pathParams: JobParams) => {
   return post<JobVO>(`/clusters/${pathParams.clusterId}/jobs/${pathParams.jobId}/retry`)
@@ -53,8 +56,17 @@ export const getTaskList = (pathParams: TaskListParams, params: ListParams) => {
   )
 }
 
-export const getTaskLog = (pathParams: TaskLogParams) => {
-  return get<string[]>(
-    `/clusters/${pathParams.clusterId}/jobs/${pathParams.jobId}/stages/${pathParams.stageId}/tasks/${pathParams.taskId}/log`
-  )
+export const getTaskLog = (pathParams: TaskLogParams, func: Function): LogsRes => {
+  const source: CancelTokenSource = axios.CancelToken.source()
+
+  const promise = request({
+    method: 'get',
+    url: `/clusters/${pathParams.clusterId}/jobs/${pathParams.jobId}/stages/${pathParams.stageId}/tasks/${pathParams.taskId}/log`,
+    responseType: 'stream',
+    timeout: 0,
+    cancelToken: source.token,
+    onDownloadProgress: (progressEvent: AxiosProgressEvent) => func(progressEvent)
+  })
+
+  return { promise, cancel: source.cancel }
 }

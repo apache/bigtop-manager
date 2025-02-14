@@ -71,3 +71,8 @@ export interface TaskVO {
   updateTime?: string
   [property: string]: any
 }
+
+export interface LogsRes {
+  promise: Promise<any>
+  cancel: () => void
+}
