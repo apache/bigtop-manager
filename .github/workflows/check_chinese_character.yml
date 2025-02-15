@@ -17,7 +17,7 @@
 # under the License.
 #
 
-name: "Check Chinese Character"
+name: "Check"
 
 on:
   push:
@@ -33,10 +33,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          submodules: true
+          persist-credentials: false
+          submodules: recursive
       - name: Set python
         uses: actions/setup-python@v5
         with:
           python-version: '3.13'
       - name: Check Chinese Character
-        run: python .github/check-chinese-character.py
+        run: python ../.github/check-chinese-character.py
