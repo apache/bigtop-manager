@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import { arrayEquals } from '../../src/utils/array.ts' // 替换成实际的文件路径
+import { arrayEquals } from '../../src/utils/array.ts' // Replace with the actual file path
 import { describe, expect, test } from 'vitest'
 
 describe('arrayEquals', () => {
