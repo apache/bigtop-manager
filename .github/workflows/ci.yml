@@ -46,7 +46,8 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-      - run: python .github/check-chinese-character.py
+      - name: Check Chinese Character
+        run: python ./.github/check-chinese-character.py
 
   unit-tests-java:
     name: "Run unit test(Java)"
