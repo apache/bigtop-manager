@@ -42,8 +42,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: true
-      - name: Set JDK
-        uses: actions/setup-python@v4
+      - name: Set python
+        uses: actions/setup-python@v5
         with:
           python-version: '3.13'
           cache: 'pip' # caching pip dependencies
