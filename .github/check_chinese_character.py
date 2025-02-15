@@ -32,7 +32,16 @@ class ChineseCharacterCheckTest:
         "dist",
     }
     # Supported file extensions
-    SUPPORTED_EXTENSIONS = {".java", ".kt", ".scala", ".js", ".jsx", ".ts", ".tsx", ".vue"}
+    SUPPORTED_EXTENSIONS = {
+        ".java",
+        ".kt",
+        ".scala",
+        ".js",
+        ".jsx",
+        ".ts",
+        ".tsx",
+        ".vue"
+    }
 
     def should_not_contain_chinese_in_comments(self):
         violations = self.scan_for_chinese_characters(ScanTarget.COMMENTS)
