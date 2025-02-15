@@ -47,6 +47,10 @@ jobs:
         with:
           python-version: '3.13'
           cache: 'pip' # caching pip dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
       - run: python .github/check-chinese-character.py
 
   unit-tests-java:
