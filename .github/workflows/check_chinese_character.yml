@@ -40,4 +40,4 @@ jobs:
         with:
           python-version: '3.13'
       - name: Check Chinese Character
-        run: python ../.github/check-chinese-character.py
+        run: python .github/check_chinese_character.py
