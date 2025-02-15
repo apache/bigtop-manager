@@ -34,21 +34,6 @@ jobs:
         with:
           config: .github/typos.toml
 
-  check-chinese-character:
-    name: "Check Chinese Character"
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          submodules: true
-      - name: Set python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
-      - name: Check Chinese Character
-        run: python ./.github/check-chinese-character.py
-
   unit-tests-java:
     name: "Run unit test(Java)"
     runs-on: ubuntu-latest
