@@ -43,19 +43,11 @@ jobs:
         with:
           submodules: true
       - name: Set JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-python@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
-          cache: 'maven'
-      - name: Cache local Maven repository
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-      - run: ./mvnw clean test -Dskip.pnpm -Dskip.installnodepnpm -Dskip.pnpm.test -DfailIfNoTests=false -Dtest=ChineseCharacterCheckTest
+          python-version: '3.13'
+          cache: 'pip' # caching pip dependencies
+      - run: python .github/check-chinese-character.py
 
   unit-tests-java:
     name: "Run unit test(Java)"

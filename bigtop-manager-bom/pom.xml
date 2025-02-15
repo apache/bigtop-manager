@@ -53,7 +53,6 @@
         <langchain4j.version>0.35.0</langchain4j.version>
         <mybatis-spring-boot-starter.version>3.0.3</mybatis-spring-boot-starter.version>
         <pagehelper-spring-boot-starter.version>2.1.0</pagehelper-spring-boot-starter.version>
-        <javaparser.version>3.26.3</javaparser.version>
     </properties>
 
     <dependencyManagement>
@@ -278,11 +277,6 @@
                 <groupId>dev.langchain4j</groupId>
                 <artifactId>langchain4j-reactor</artifactId>
                 <version>${langchain4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.javaparser</groupId>
-                <artifactId>javaparser-core</artifactId>
-                <version>${javaparser.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
