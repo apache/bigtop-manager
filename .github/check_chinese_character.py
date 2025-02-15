@@ -23,7 +23,7 @@ import re
 from pathlib import Path
 from typing import List, Set
 
-class ChineseCharacterCheckTest:
+class chinese_character_check_test:
     CHINESE_CHAR_PATTERN = re.compile(r'[\u4e00-\u9fa5]')
     # Exclude directories or files. If it is a file, just write the file name. The same is true for directories, just write the directory name.
     EXCLUDED_DIRS_AND_FILES = {
@@ -44,10 +44,10 @@ class ChineseCharacterCheckTest:
     }
 
     def should_not_contain_chinese_in_comments(self):
-        violations = self.scan_for_chinese_characters(ScanTarget.COMMENTS)
+        violations = self.scan_for_chinese_characters(scan_target.COMMENTS)
         self.assert_no_chinese_characters(violations)
 
-    def scan_for_chinese_characters(self, target: 'ScanTarget') -> List[str]:
+    def scan_for_chinese_characters(self, target: 'scan_target') -> List[str]:
         violations = []
         for ext in self.SUPPORTED_EXTENSIONS:
             for path in Path("..").rglob(f"*{ext}"):
@@ -63,7 +63,7 @@ class ChineseCharacterCheckTest:
         path_str = str(path)
         return any(path_str.endswith(ext) for ext in self.SUPPORTED_EXTENSIONS)
 
-    def process_file(self, path: Path, target: 'ScanTarget', violations: List[str]):
+    def process_file(self, path: Path, target: 'scan_target', violations: List[str]):
         try:
             with open(path, 'r', encoding='utf-8') as file:
                 content = file.read()
@@ -104,7 +104,7 @@ class ChineseCharacterCheckTest:
     def assert_no_chinese_characters(self, violations: List[str]):
         assert len(violations) == 0, f"Found Chinese characters in files:\n{os.linesep.join(violations)}"
 
-class ScanTarget:
+class scan_target:
     def __init__(self, check_comments: bool, check_code: bool):
         self.check_comments = check_comments
         self.check_code = check_code
@@ -115,10 +115,10 @@ class ScanTarget:
     def include_code(self) -> bool:
         return self.check_code
 
-ScanTarget.COMMENTS = ScanTarget(True, False)
-ScanTarget.CODE = ScanTarget(False, True)
-ScanTarget.ALL = ScanTarget(True, True)
+scan_target.COMMENTS = scan_target(True, False)
+scan_target.CODE = scan_target(False, True)
+scan_target.ALL = scan_target(True, True)
 
 if __name__ == "__main__":
-    test = ChineseCharacterCheckTest()
+    test = chinese_character_check_test()
     test.should_not_contain_chinese_in_comments()
