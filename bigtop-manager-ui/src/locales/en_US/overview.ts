@@ -26,9 +26,10 @@ export default {
   host_count: 'Host Count',
   service_count: 'Service Count',
   memory: 'Memory',
+  chart: 'Chart',
   core_count: 'Processor Count',
   disk_size: 'Disk Size',
   creator: 'Creator',
-  memory_usage: '内存使用率',
-  cpu_usage: 'CPU使用率'
+  memory_usage: 'Memory Usage',
+  cpu_usage: 'Cpu Usage'
 }

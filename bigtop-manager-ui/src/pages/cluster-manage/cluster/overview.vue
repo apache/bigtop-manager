@@ -168,8 +168,8 @@
               <div class="desc-sub-item">
                 <template v-for="base in detailKeys" :key="base">
                   <div class="desc-sub-item-desc">
-                    <a-typography-text type="secondary" :content="baseConfig[base]" />
-                    <a-typography-text :content="clusterDetail[base]" />
+                    <a-typography-text class="desc-sub-item-desc-column" type="secondary" :content="baseConfig[base]" />
+                    <a-typography-text class="desc-sub-item-desc-column" :content="clusterDetail[base]" />
                   </div>
                 </template>
               </div>
@@ -212,7 +212,7 @@
       </a-col>
       <a-col :xs="24" :sm="24" :md="24" :lg="14" :xl="17">
         <div class="chart-title">
-          <a-typography-text strong content="图表" />
+          <a-typography-text strong :content="$t('overview.chart')" />
           <a-space :size="12">
             <div
               v-for="time in timeRanges"
@@ -229,22 +229,22 @@
         <a-row class="chart-wrp">
           <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
             <div class="chart-item-wrp">
-              <gauge-chart chart-id="chart1" title="内存使用率" />
+              <gauge-chart chart-id="chart1" :title="$t('overview.memory_usage')" />
             </div>
           </a-col>
           <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
             <div class="chart-item-wrp">
-              <gauge-chart chart-id="chart2" title="CPU 使用率" />
+              <gauge-chart chart-id="chart2" :title="$t('overview.cpu_usage')" />
             </div>
           </a-col>
           <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
             <div class="chart-item-wrp">
-              <category-chart chart-id="chart4" title="CPU 使用率" />
+              <category-chart chart-id="chart4" :title="$t('overview.cpu_usage')" />
             </div>
           </a-col>
           <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
             <div class="chart-item-wrp">
-              <category-chart chart-id="chart3" title="内存使用率" />
+              <category-chart chart-id="chart3" :title="$t('overview.memory_usage')" />
             </div>
           </a-col>
         </a-row>
@@ -331,11 +331,14 @@
     }
 
     .desc-sub-item {
-      @include flexbox($direction: column, $gap: $space-md);
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      gap: 16px;
       &-desc {
-        display: grid;
-        grid-template-columns: 100px auto;
-        gap: 30px;
+        display: contents;
+        &-column {
+          text-align: left;
+        }
       }
     }
 

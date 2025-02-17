@@ -26,6 +26,7 @@ export default {
   host_count: '主机数',
   service_count: '服务数',
   memory: '内存',
+  chart: '图表',
   core_count: '核心数',
   disk_size: '磁盘大小',
   creator: '创建人',
