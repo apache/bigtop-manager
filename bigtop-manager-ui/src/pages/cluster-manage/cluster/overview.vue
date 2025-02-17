@@ -125,20 +125,20 @@
     }
   ]
 
-  const serviceOperates = [
+  const serviceOperates = computed(() => [
     {
       action: 'start',
-      text: '启动服务'
+      text: t('service.start')
     },
     {
       action: 'restart',
-      text: '重启服务'
+      text: t('service.restart')
     },
     {
       action: 'stop',
-      text: '停止服务'
+      text: t('service.stop')
     }
-  ]
+  ])
 
   const handleServiceOperate: MenuProps['onClick'] = (item) => {
     console.log('item :>> ', item.key)
@@ -156,12 +156,12 @@
         <!-- base info -->
         <a-descriptions layout="vertical" bordered>
           <template #title>
-            <a-typography-text strong content="基本信息" />
+            <a-typography-text strong :content="$t('overview.basic_info')" />
           </template>
           <a-descriptions-item>
             <template #label>
               <div class="desc-sub-label">
-                <a-typography-text strong content="详情" />
+                <a-typography-text strong :content="$t('overview.detail')" />
               </div>
             </template>
             <div class="desc-sub-item-wrp">
@@ -179,7 +179,7 @@
         <!-- service info -->
         <a-descriptions layout="vertical" bordered :column="1">
           <template #title>
-            <a-typography-text strong content="服务信息" />
+            <a-typography-text strong :content="$t('overview.service_info')" />
           </template>
           <template v-for="stack in serviceStack" :key="stack.stackId">
             <a-descriptions-item>

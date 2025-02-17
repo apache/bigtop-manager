@@ -17,23 +17,23 @@
  * under the License.
  */
 export default {
-  base_info: 'Basic information',
-  cluster_config: 'Cluster configuration',
+  base_info: 'Basic Information',
+  cluster_config: 'Cluster Configuration',
   cluster_management: 'Cluster',
   component_info: 'Stack',
   host_config: 'Hosts',
   create: 'Create',
   name: 'Name',
-  display_name: 'Display name',
+  display_name: 'Display Name',
   description: 'Description',
-  root_directory: 'Root directory',
-  user_group: 'User group',
-  config_source: 'Configuration source',
-  install_dependencies: 'Install dependencies',
+  root_directory: 'Root Directory',
+  user_group: 'User Group',
+  config_source: 'Configuration Source',
+  install_dependencies: 'Install Dependencies',
   add_host: 'Add host',
   edit_host: 'Edit host',
   view_log: 'View log',
   source: 'Source',
-  show_hosts_resolved: 'Hostnames after resolved',
+  show_hosts_resolved: 'Resolved Hostnames',
   cluster_unavailable_message: 'Sorry, you need to create cluster to use this feature.'
 }

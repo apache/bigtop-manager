@@ -16,9 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 export default {
-  job_list: 'Job List',
-  task_log: 'Task Log',
-  log_loading: 'Loading logs'
+  start: 'Start Service',
+  restart: 'Restart Service',
+  stop: 'Stop Service'
 }
