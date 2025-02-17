@@ -183,8 +183,8 @@
     }
   }
   .stage-item {
+    margin-right: 68px;
     @include flexbox($justify: space-between, $align: center);
-    padding-right: 65px;
   }
   .task-item {
     height: 45px;

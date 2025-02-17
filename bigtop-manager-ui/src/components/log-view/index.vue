@@ -208,7 +208,7 @@
     overflow: auto;
     pre {
       font-size: 12px;
-      padding: 16px;
+      padding: 8px 16px;
       line-height: 32px;
       min-height: 500px;
       overflow-y: hidden;

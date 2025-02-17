@@ -47,5 +47,6 @@
     margin: 0 6px;
     vertical-align: -0.25em;
     overflow: hidden;
+    flex-shrink: 0;
   }
 </style>
