@@ -52,6 +52,7 @@ export default {
   desc: '描述',
   os: '系统',
   arch: '架构',
+  base_url: '地址',
   host: '主机',
   service: '服务',
   stack: '组件栈',

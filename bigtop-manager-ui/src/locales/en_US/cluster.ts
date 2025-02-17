@@ -30,9 +30,9 @@ export default {
   user_group: 'User Group',
   config_source: 'Configuration Source',
   install_dependencies: 'Install Dependencies',
-  add_host: 'Add host',
-  edit_host: 'Edit host',
-  view_log: 'View log',
+  add_host: 'Add Host',
+  edit_host: 'Edit Host',
+  view_log: 'View Log',
   source: 'Source',
   show_hosts_resolved: 'Resolved Hostnames',
   cluster_unavailable_message: 'Sorry, you need to create cluster to use this feature.'

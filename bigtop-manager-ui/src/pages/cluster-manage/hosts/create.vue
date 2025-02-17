@@ -249,14 +249,13 @@
     {
       type: 'input',
       field: 'agentDir',
-      slot: 'agentDirSlot',
       formItemProps: {
         name: 'agentDir',
         label: t('host.agent_path')
       },
       controlProps: {
         disabled: isEdit.value,
-        placeholder: t('common.enter_error', [`${t('host.agent_path')}`.toLowerCase()])
+        placeholder: t('host.default_agent_path')
       }
     },
     {
@@ -273,13 +272,12 @@
     {
       type: 'input',
       field: 'grpcPort',
-      slot: 'grpcPortSlot',
       formItemProps: {
         name: 'grpcPort',
         label: t('host.grpc_port')
       },
       controlProps: {
-        placeholder: t('common.enter_error', [`${t('host.grpc_port')}`.toLowerCase()])
+        placeholder: t('host.default_grpc_port')
       }
     },
     {
@@ -506,7 +504,7 @@
             </a-upload>
           </a-form-item>
         </template>
-        <template #agentDirSlot="{ item, state }">
+        <!-- <template #agentDirSlot="{ item, state }">
           <a-form-item>
             <template #label>
               <div class="question">
@@ -518,8 +516,8 @@
             </template>
             <a-input v-bind="item.controlProps" v-model:value="state[item.field]" />
           </a-form-item>
-        </template>
-        <template #grpcPortSlot="{ item, state }">
+        </template> -->
+        <!-- <template #grpcPortSlot="{ item, state }">
           <a-form-item>
             <template #label>
               <div class="question">
@@ -531,7 +529,7 @@
             </template>
             <a-input v-bind="item.controlProps" v-model:value="state[item.field]" />
           </a-form-item>
-        </template>
+        </template> -->
       </auto-form>
       <template #footer>
         <footer>
