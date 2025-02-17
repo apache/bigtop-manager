@@ -35,3 +35,11 @@ export interface ClusterVO {
   type?: number
   userGroup?: string
 }
+
+export interface ServiceUserVO {
+  desc?: string
+  displayName?: string
+  user?: string
+  userGroup?: string
+  [property: string]: any
+}

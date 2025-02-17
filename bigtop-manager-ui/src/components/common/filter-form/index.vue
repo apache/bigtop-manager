@@ -31,6 +31,7 @@
   const emits = defineEmits(['filter'])
   const { filterItems } = toRefs(props)
 
+  const tempFilterParams = shallowRef({})
   const filterParams = ref(
     filterItems.value.reduce(
       (pre, value) => {
@@ -39,8 +40,6 @@
       {} as Record<string, any>
     )
   )
-
-  const tempFilterParams = shallowRef({})
 
   const formatFilterFormItems = computed(() =>
     filterItems.value.map((v) => {

@@ -30,13 +30,6 @@ export type TaskLogParams = TaskParams & { taskId: number }
 
 export type StateType = keyof typeof JobState
 
-export interface ListParams {
-  orderBy?: string
-  pageNum?: number
-  pageSize?: number
-  sort?: string
-}
-
 export type JobListParams = { clusterId: number }
 export type StageListParams = JobParams
 export type TaskListParams = TaskParams

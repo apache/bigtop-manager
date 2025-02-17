@@ -18,11 +18,17 @@
 -->
 
 <script setup lang="ts">
-  import { ref } from 'vue'
-  import type { TableColumnType } from 'ant-design-vue'
+  import { computed, onActivated } from 'vue'
+  import { useI18n } from 'vue-i18n'
+  import { useRoute } from 'vue-router'
   import useBaseTable from '@/composables/use-base-table'
+  import { getUserListOfService } from '@/api/cluster'
+  import type { TableColumnType } from 'ant-design-vue'
+  import type { ServiceUserVO } from '@/api/cluster/types'
 
-  const columns: TableColumnType[] = [
+  const { t } = useI18n()
+  const route = useRoute()
+  const columns = computed((): TableColumnType[] => [
     {
       title: '#',
       width: '48px',
@@ -32,33 +38,53 @@
       }
     },
     {
-      title: '服务名',
-      dataIndex: 'serviceName',
+      title: t('service.name'),
+      dataIndex: 'displayName',
       width: '20%',
       ellipsis: true
     },
     {
-      title: '用户名',
-      dataIndex: 'userName',
+      title: t('user.username'),
+      dataIndex: 'user',
       width: '15%',
       ellipsis: true
     },
     {
-      title: '用户组',
+      title: t('user.user_group'),
       dataIndex: 'userGroup',
       width: '20%',
       ellipsis: true
     },
     {
-      title: '描述',
-      dataIndex: 'descrip',
+      title: t('common.desc'),
+      dataIndex: 'desc',
       ellipsis: true
     }
-  ]
-  const data = ref<any[]>([])
-  const { columnsProp, dataSource, loading, paginationProps, onChange } = useBaseTable({
-    columns,
-    rows: data.value
+  ])
+  const { dataSource, loading, filtersParams, paginationProps, onChange } = useBaseTable<ServiceUserVO>({
+    columns: columns.value,
+    rows: []
+  })
+
+  const loadUserListOfService = async () => {
+    const clusterId = parseInt(route.params.id as string)
+    if (isNaN(clusterId) || !paginationProps.value) {
+      loading.value = false
+      return
+    }
+    try {
+      const data = await getUserListOfService(clusterId, filtersParams.value)
+      dataSource.value = data.content
+      paginationProps.value.total = data.total
+    } catch (error) {
+      console.log('error :>> ', error)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  onActivated(() => {
+    loadUserListOfService()
   })
 </script>
 
@@ -70,7 +96,7 @@
     <a-table
       :loading="loading"
       :data-source="dataSource"
-      :columns="columnsProp"
+      :columns="columns"
       :pagination="paginationProps"
       @change="onChange"
     ></a-table>

@@ -26,9 +26,9 @@ import type {
   StageListParams,
   StageList,
   TaskList,
-  ListParams,
   LogsRes
 } from './types'
+import type { ListParams } from '../types'
 import { get, post } from '../request-util'
 import axios, { type AxiosProgressEvent, type CancelTokenSource } from 'axios'
 import request from '../request'
