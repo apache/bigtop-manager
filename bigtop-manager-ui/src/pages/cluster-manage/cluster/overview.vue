@@ -128,15 +128,15 @@
   const serviceOperates = computed(() => [
     {
       action: 'start',
-      text: t('service.start')
+      text: t('common.start', [t('common.service')])
     },
     {
       action: 'restart',
-      text: t('service.restart')
+      text: t('common.restart', [t('common.service')])
     },
     {
       action: 'stop',
-      text: t('service.stop')
+      text: t('common.stop', [t('common.service')])
     }
   ])
 

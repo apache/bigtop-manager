@@ -17,7 +17,6 @@
  * under the License.
  */
 export default {
-  start: 'Start Service',
-  restart: 'Restart Service',
-  stop: 'Stop Service'
+  name: 'Service Name',
+  required_restart: 'Restart'
 }

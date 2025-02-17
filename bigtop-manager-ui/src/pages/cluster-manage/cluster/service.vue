@@ -71,19 +71,19 @@
     {
       type: 'search',
       key: 'serviceName',
-      label: '服务名'
+      label: t('service.name')
     },
     {
       type: 'status',
       key: 'restartFlag',
-      label: '需要重启',
+      label: t('service.required_restart'),
       options: [
         {
-          label: '需重启',
+          label: t('common.required'),
           value: 1
         },
         {
-          label: '无需重启',
+          label: t('common.not_required'),
           value: 2
         }
       ]
@@ -91,7 +91,7 @@
     {
       type: 'status',
       key: 'status',
-      label: '状态',
+      label: t('common.status'),
       options: [
         {
           label: t(`common.${statusColors.value[1]}`),

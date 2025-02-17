@@ -17,7 +17,6 @@
  * under the License.
  */
 export default {
-  start: '启动服务',
-  restart: '重启服务',
-  stop: '停止服务'
+  name: '服务名',
+  required_restart: '需要重启'
 }

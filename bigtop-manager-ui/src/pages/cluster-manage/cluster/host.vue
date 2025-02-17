@@ -218,7 +218,7 @@
             @change="(e: any) => setSelectedKeys(e.target?.value ? [e.target?.value] : [])"
             @press-enter="handleSearch(selectedKeys, confirm, column.dataIndex)"
           />
-          <div class="search-btn">
+          <div class="search-option">
             <a-button size="small" @click="handleReset(clearFilters)">
               {{ $t('common.reset') }}
             </a-button>
@@ -261,8 +261,14 @@
     display: grid;
     gap: $space-sm;
     padding: $space-sm;
-    &-btn {
-      @include flexbox($justify: flex-end, $gap: $space-md);
+    &-option {
+      width: 100%;
+      display: grid;
+      gap: $space-sm;
+      grid-template-columns: 1fr 1fr;
+      button {
+        width: 100%;
+      }
     }
   }
 </style>

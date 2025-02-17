@@ -60,25 +60,25 @@
     {
       shape: 'default',
       type: 'primary',
-      text: '添加服务',
+      text: t('common.add', [t('common.service')]),
       clickEvent: () => addService && addService()
     },
     {
       shape: 'default',
       type: 'default',
-      text: '其他操作',
+      text: t('common.more_operations'),
       dropdownMenu: [
         {
           action: 'start',
-          text: '启动集群'
+          text: t('common.start', [t('common.cluster')])
         },
         {
           action: 'restart',
-          text: '重启集群'
+          text: t('common.restart', [t('common.cluster')])
         },
         {
           action: 'stop',
-          text: '停止集群'
+          text: t('common.stop', [t('common.cluster')])
         }
       ],
       dropdownMenuClickEvent: (info) => dropdownMenuClick && dropdownMenuClick(info)
