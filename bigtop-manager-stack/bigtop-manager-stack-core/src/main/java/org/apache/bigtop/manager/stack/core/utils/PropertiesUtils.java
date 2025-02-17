@@ -85,7 +85,6 @@ public class PropertiesUtils {
      * @throws IOException
      */
     public static void writeProperties(String fileName, List<Map<String, Object>> configList) {
-        // 创建Properties
         Properties properties = new Properties();
 
         for (Map<String, Object> map : configList) {
