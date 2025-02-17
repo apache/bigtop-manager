@@ -53,13 +53,12 @@ export default {
   os: '系统',
   arch: '架构',
   base_url: '地址',
+  cluster: '集群',
   host: '主机',
   service: '服务',
   stack: '组件栈',
   stage: '阶段',
   search: '搜索',
-  reset: '重置',
-  restart: '重启{0}',
   required: '需重启',
   not_required: '无需重启',
   progress: '进度',
@@ -100,5 +99,12 @@ export default {
   password_not_match: '密码不一致。',
   overview: '概览',
   user: '用户',
-  job: '作业'
+  job: '作业',
+  start: '启动{0}',
+  restart: '重启{0}',
+  stop: '停止{0}',
+  add: '添加{0}',
+  reset: '重置',
+  more_operations: '其他操作',
+  ok: '确认'
 }
