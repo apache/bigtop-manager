@@ -18,7 +18,6 @@
 -->
 
 <script setup lang="ts">
-  import { type UserListItem, getUserList } from './components/mock'
   import { ref } from 'vue'
   import type { TableColumnType } from 'ant-design-vue'
   import useBaseTable from '@/composables/use-base-table'
@@ -56,7 +55,7 @@
       ellipsis: true
     }
   ]
-  const data = ref<UserListItem[]>(getUserList(50))
+  const data = ref<any[]>([])
   const { columnsProp, dataSource, loading, paginationProps, onChange } = useBaseTable({
     columns,
     rows: data.value
