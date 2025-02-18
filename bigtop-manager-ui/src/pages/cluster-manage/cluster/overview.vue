@@ -19,11 +19,13 @@
 
 <script setup lang="ts">
   import { computed, ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
+  import { storeToRefs } from 'pinia'
+  import { useServiceStore } from '@/store/service'
   import GaugeChart from './components/gauge-chart.vue'
   import CategoryChart from './components/category-chart.vue'
   import type { ClusterVO } from '@/api/cluster/types'
   import type { MenuProps } from 'ant-design-vue'
-  import { useI18n } from 'vue-i18n'
 
   type TimeRangeText = '1m' | '15m' | '30m' | '1h' | '6h' | '30h'
   type TimeRangeItem = {
@@ -32,7 +34,14 @@
   }
 
   const { t } = useI18n()
+  const serviceStore = useServiceStore()
   const currTimeRange = ref<TimeRangeText>('15m')
+  const chartData = ref({
+    chart1: [],
+    chart2: [],
+    chart3: [],
+    chart4: []
+  })
   const clusterDetail = ref<ClusterVO>({
     id: 0,
     name: 'string',
@@ -50,6 +59,8 @@
     totalDisk: 0
   })
 
+  const { locateStackWithService } = storeToRefs(serviceStore)
+  const noChartData = computed(() => Object.values(chartData.value).every((v) => v.length === 0))
   const timeRanges = computed((): TimeRangeItem[] => [
     {
       text: '1m',
@@ -76,7 +87,6 @@
       time: ''
     }
   ])
-
   const baseConfig = computed((): Partial<Record<keyof ClusterVO, string>> => {
     return {
       status: t('overview.cluster_status'),
@@ -91,40 +101,7 @@
     }
   })
   const detailKeys = computed(() => Object.keys(baseConfig.value) as (keyof ClusterVO)[])
-
-  const serviceStack = [
-    {
-      stackId: 1,
-      stackName: 'Bigtop Stack',
-      stackVersion: 'bigtop-3.3.0',
-      services: [
-        {
-          id: 1,
-          name: 'HDFS'
-        },
-        {
-          id: 2,
-          name: 'Hive'
-        }
-      ]
-    },
-    {
-      stackId: 2,
-      stackName: 'Extra Stack',
-      stackVersion: 'extra-1.0.0',
-      services: [
-        {
-          id: 1,
-          name: 'Doris'
-        },
-        {
-          id: 2,
-          name: 'SeaTunnel'
-        }
-      ]
-    }
-  ]
-
+  const serviceStack = computed(() => locateStackWithService.value)
   const serviceOperates = computed(() => [
     {
       action: 'start',
@@ -153,65 +130,79 @@
   <div class="dashboard">
     <a-row :gutter="[50, 16]" :wrap="true">
       <a-col :xs="24" :sm="24" :md="24" :lg="10" :xl="7" style="display: flex; flex-direction: column; gap: 24px">
-        <!-- base info -->
-        <a-descriptions layout="vertical" bordered>
-          <template #title>
+        <div class="base-info">
+          <div class="box-title">
             <a-typography-text strong :content="$t('overview.basic_info')" />
-          </template>
-          <a-descriptions-item>
-            <template #label>
-              <div class="desc-sub-label">
-                <a-typography-text strong :content="$t('overview.detail')" />
-              </div>
-            </template>
-            <div class="desc-sub-item-wrp">
-              <div class="desc-sub-item">
-                <template v-for="base in detailKeys" :key="base">
-                  <div class="desc-sub-item-desc">
-                    <a-typography-text class="desc-sub-item-desc-column" type="secondary" :content="baseConfig[base]" />
-                    <a-typography-text class="desc-sub-item-desc-column" :content="clusterDetail[base]" />
+          </div>
+          <div>
+            <a-descriptions layout="vertical" bordered>
+              <a-descriptions-item>
+                <template #label>
+                  <div class="desc-sub-label">
+                    <a-typography-text strong :content="$t('overview.detail')" />
                   </div>
                 </template>
-              </div>
-            </div>
-          </a-descriptions-item>
-        </a-descriptions>
+                <div class="desc-sub-item-wrp">
+                  <div class="desc-sub-item">
+                    <template v-for="base in detailKeys" :key="base">
+                      <div class="desc-sub-item-desc">
+                        <a-typography-text
+                          class="desc-sub-item-desc-column"
+                          type="secondary"
+                          :content="baseConfig[base]"
+                        />
+                        <a-typography-text class="desc-sub-item-desc-column" :content="clusterDetail[base]" />
+                      </div>
+                    </template>
+                  </div>
+                </div>
+              </a-descriptions-item>
+            </a-descriptions>
+          </div>
+        </div>
         <!-- service info -->
-        <a-descriptions layout="vertical" bordered :column="1">
+        <template v-if="serviceStack.length == 0">
+          <div class="service-info">
+            <div class="box-title">
+              <a-typography-text strong :content="$t('overview.service_info')" />
+            </div>
+            <div class="box-empty">
+              <a-empty />
+            </div>
+          </div>
+        </template>
+        <a-descriptions v-else layout="vertical" bordered :column="1">
           <template #title>
             <a-typography-text strong :content="$t('overview.service_info')" />
           </template>
-          <template v-for="stack in serviceStack" :key="stack.stackId">
-            <a-descriptions-item>
-              <template #label>
-                <div class="desc-sub-label">
-                  <a-typography-text strong :content="stack.stackName" />
-                  <a-typography-text type="secondary" :content="stack.stackVersion" />
-                </div>
-              </template>
-              <div v-for="service in stack.services" :key="service.id" class="service-item">
-                <a-avatar shape="square" :size="16" />
-                <a-typography-text :content="service.name" />
-
-                <a-dropdown :trigger="['click']">
-                  <a-button type="text" shape="circle" size="small">
-                    <svg-icon name="more" style="margin: 0" />
-                  </a-button>
-                  <template #overlay>
-                    <a-menu @click="handleServiceOperate">
-                      <a-menu-item v-for="operate in serviceOperates" :key="operate.action">
-                        <span>{{ operate.text }}</span>
-                      </a-menu-item>
-                    </a-menu>
-                  </template>
-                </a-dropdown>
+          <a-descriptions-item v-for="stack in serviceStack" :key="stack.stackName">
+            <template #label>
+              <div class="desc-sub-label">
+                <a-typography-text strong :content="stack.stackName" />
+                <a-typography-text type="secondary" :content="stack.stackVersion" />
               </div>
-            </a-descriptions-item>
-          </template>
+            </template>
+            <div v-for="service in stack.services" :key="service.id" class="service-item">
+              <a-avatar shape="square" :size="16" />
+              <a-typography-text :content="service.displayName" />
+              <a-dropdown :trigger="['click']">
+                <a-button type="text" shape="circle" size="small">
+                  <svg-icon name="more" style="margin: 0" />
+                </a-button>
+                <template #overlay>
+                  <a-menu @click="handleServiceOperate">
+                    <a-menu-item v-for="operate in serviceOperates" :key="operate.action">
+                      <span>{{ operate.text }}</span>
+                    </a-menu-item>
+                  </a-menu>
+                </template>
+              </a-dropdown>
+            </div>
+          </a-descriptions-item>
         </a-descriptions>
       </a-col>
       <a-col :xs="24" :sm="24" :md="24" :lg="14" :xl="17">
-        <div class="chart-title">
+        <div class="box-title">
           <a-typography-text strong :content="$t('overview.chart')" />
           <a-space :size="12">
             <div
@@ -226,7 +217,12 @@
             </div>
           </a-space>
         </div>
-        <a-row class="chart-wrp">
+        <template v-if="noChartData">
+          <div class="box-empty">
+            <a-empty />
+          </div>
+        </template>
+        <a-row v-else class="box-content">
           <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
             <div class="chart-item-wrp">
               <gauge-chart chart-id="chart1" :title="$t('overview.memory_usage')" />
@@ -254,68 +250,81 @@
 </template>
 
 <style lang="scss" scoped>
-  .dashboard {
-    .service-item {
-      display: grid;
-      grid-template-columns: auto 1fr auto;
-      gap: $space-md;
-      align-items: center;
-      padding: $space-md;
-      border-bottom: 1px solid #e5e5e5;
-    }
-
-    .chart-title {
+  .box {
+    &-title {
       display: flex;
       justify-content: space-between;
       margin-bottom: 20px;
     }
 
-    .time-range {
-      padding-inline: 6px;
-      border-radius: 4px;
-      text-align: center;
-      cursor: pointer;
-      user-select: none;
-      outline: none;
-      transition: background-color 0.3s;
-
-      &:hover {
-        color: $color-primary-text-hover;
-      }
-      &-activated {
-        color: $color-primary-text;
-      }
-    }
-
-    .chart-wrp {
+    &-content {
       border-radius: 8px;
       overflow: hidden;
       box-sizing: border-box;
       border: 1px solid $color-border;
     }
 
-    .chart-item-wrp {
+    &-empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 200px;
+      border-radius: 8px;
+      box-sizing: border-box;
       border: 1px solid $color-border;
-      margin-right: -1px;
-      margin-bottom: -1px;
+    }
+  }
 
-      &:first-child {
-        border-left: 0;
-        border-top: 0;
-      }
+  .time-range {
+    padding-inline: 6px;
+    border-radius: 4px;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+    outline: none;
+    transition: background-color 0.3s;
 
-      &:not(:last-child) {
-        border-right: 0;
-      }
+    &:hover {
+      color: $color-primary-text-hover;
+    }
+    &-activated {
+      color: $color-primary-text;
+    }
+  }
 
-      &:nth-child(n + 3):not(:nth-child(4)) {
-        border-bottom: 0;
-        border-left: 0;
-      }
+  .service-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: $space-md;
+    align-items: center;
+    padding: $space-md;
+    border-bottom: 1px solid #3b2020;
+  }
+
+  .chart-item-wrp {
+    border: 1px solid $color-border;
+    margin-right: -1px;
+    margin-bottom: -1px;
+
+    &:first-child {
+      border-left: 0;
+      border-top: 0;
     }
 
+    &:not(:last-child) {
+      border-right: 0;
+    }
+
+    &:nth-child(n + 3):not(:nth-child(4)) {
+      border-bottom: 0;
+      border-left: 0;
+    }
+  }
+
+  .dashboard {
     :deep(.ant-descriptions-view) {
       overflow: hidden;
+      border-color: $color-border;
       .ant-descriptions-item-label {
         padding: 0;
       }

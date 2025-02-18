@@ -17,19 +17,29 @@
  * under the License.
  */
 
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { defineStore, storeToRefs } from 'pinia'
+import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { getServiceList } from '@/api/service'
+import { useStackStore } from '@/store/stack/index'
 import type { ServiceVO } from '@/api/service/types'
 
 export const useServiceStore = defineStore(
   'service',
   () => {
     const route = useRoute()
+    const stackStore = useStackStore()
     const services = ref<ServiceVO[]>([])
     const total = ref(0)
     const loading = ref(false)
+    const { stacks } = storeToRefs(stackStore)
+
+    const serviceNames = computed(() => services.value.map((v) => v.name))
+    const locateStackWithService = computed(() =>
+      stacks.value.filter((item) =>
+        item.services.some((service) => service.name && serviceNames.value.includes(service.name))
+      )
+    )
 
     const getServices = async () => {
       try {
@@ -47,7 +57,8 @@ export const useServiceStore = defineStore(
 
     return {
       services,
-      getServices
+      getServices,
+      locateStackWithService
     }
   },
   {
