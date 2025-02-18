@@ -46,9 +46,9 @@ public class InfoToolsProvider implements ToolProvider {
     @Override
     public ToolProviderResult provideTools(ToolProviderRequest toolProviderRequest) {
         return ToolProviderResult.builder()
-                .addAll(clusterFunctions.getAllFunctions())
-                .addAll(hostFunctions.getAllFunctions())
-                .addAll(stackFunctions.getAllFunctions())
+                .addAll(clusterFunctions.getReadonlyFunctions())
+                .addAll(hostFunctions.getReadonlyFunctions())
+                .addAll(stackFunctions.getReadonlyFunctions())
                 .build();
     }
 }
