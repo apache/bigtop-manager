@@ -257,6 +257,9 @@
 </template>
 
 <style lang="scss" scoped>
+  header {
+    margin-bottom: $space-md;
+  }
   .search {
     display: grid;
     gap: $space-sm;
