@@ -23,6 +23,7 @@
   import { RouteExceptions } from '@/enums'
   import { useMenuStore } from '@/store/menu'
   import type { MenuItem } from '@/store/menu/types'
+  import type { ClusterStatusType } from '@/api/cluster/types'
 
   interface Props {
     siderMenuSelectedKey: string
@@ -34,13 +35,11 @@
     siderMenus: () => []
   })
 
-  type ClusterType = 1 | 2 | 3
-
   const { siderMenuSelectedKey, siderMenus } = toRefs(props)
   const router = useRouter()
   const menuStore = useMenuStore()
   const emits = defineEmits(['onSiderClick'])
-  const clusterStatus = ref<Record<ClusterType, string>>({
+  const clusterStatus = ref<Record<ClusterStatusType, string>>({
     1: 'success',
     2: 'error',
     3: 'warning'
@@ -83,7 +82,7 @@
               <div
                 style="height: 10px; margin-inline: 7px; display: flex; justify-content: center; align-items: flex-end"
               >
-                <status-dot :size="8" :color="clusterStatus[child.status as ClusterType] as any" />
+                <status-dot :size="8" :color="clusterStatus[child.status as ClusterStatusType] as any" />
               </div>
             </template>
             <div>

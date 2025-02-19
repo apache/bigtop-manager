@@ -18,65 +18,76 @@
 -->
 
 <script setup lang="ts">
-  import { computed, ref } from 'vue'
-  import { useRoute } from 'vue-router'
-  import type { GroupItem } from '@/components/common/button-group/types'
-  import type { TabItem } from '@/components/common/main-card/types'
+  import { computed, onMounted, ref, shallowRef } from 'vue'
+  import { useI18n } from 'vue-i18n'
+  import { useClusterStore } from '@/store/cluster'
+  import { storeToRefs } from 'pinia'
+  import { execCommand } from '@/api/command'
+  import { Command } from '@/api/command/types'
+  import { CommonStatus, CommonStatusTexts } from '@/enums/state'
   import Overview from './overview.vue'
   import Service from './service.vue'
   import Host from './host.vue'
   import User from './user.vue'
-  import Job from './job.vue'
+  import Job from '@/components/job/index.vue'
+  import type { TabItem } from '@/components/common/main-card/types'
+  import type { GroupItem } from '@/components/common/button-group/types'
+  import type { ClusterStatusType } from '@/api/cluster/types'
 
-  const route = useRoute()
-  const title = computed(() => route.params.cluster as string)
-  const desc = ref('我是描述')
+  const { t } = useI18n()
+  const clusterStore = useClusterStore()
+  const { currCluster, loading } = storeToRefs(clusterStore)
   const activeKey = ref('1')
-  const tabs = ref<TabItem[]>([
+  const statusColors = shallowRef<Record<ClusterStatusType, keyof typeof CommonStatusTexts>>({
+    1: 'healthy',
+    2: 'unhealthy',
+    3: 'unknow'
+  })
+  const tabs = computed((): TabItem[] => [
     {
       key: '1',
-      title: '概览'
+      title: t('common.overview')
     },
     {
       key: '2',
-      title: '服务'
+      title: t('common.service')
     },
     {
       key: '3',
-      title: '主机'
+      title: t('common.host')
     },
     {
       key: '4',
-      title: '用户'
+      title: t('common.user')
     },
     {
       key: '5',
-      title: '作业'
+      title: t('common.job')
     }
   ])
   const actionGroup = computed<GroupItem[]>(() => [
     {
       shape: 'default',
       type: 'primary',
-      text: '添加服务',
+      text: t('common.add', [t('common.service')]),
       clickEvent: () => addService && addService()
     },
     {
       shape: 'default',
       type: 'default',
-      text: '其他操作',
+      text: t('common.more_operations'),
       dropdownMenu: [
         {
-          action: 'start',
-          text: '启动集群'
+          action: 'Start',
+          text: t('common.start', [t('common.cluster')])
         },
         {
-          action: 'restart',
-          text: '重启集群'
+          action: 'Restart',
+          text: t('common.restart', [t('common.cluster')])
         },
         {
-          action: 'stop',
-          text: '停止集群'
+          action: 'Stop',
+          text: t('common.stop', [t('common.cluster')])
         }
       ],
       dropdownMenuClickEvent: (info) => dropdownMenuClick && dropdownMenuClick(info)
@@ -88,22 +99,46 @@
     return componnts[parseInt(activeKey.value) - 1]
   })
 
-  const dropdownMenuClick: GroupItem['dropdownMenuClickEvent'] = ({ key }) => {
-    console.log('key :>> ', key)
+  const dropdownMenuClick: GroupItem['dropdownMenuClickEvent'] = async ({ key }) => {
+    try {
+      await execCommand({
+        command: key as keyof typeof Command,
+        clusterId: currCluster.value.id,
+        commandLevel: 'cluster'
+      })
+      clusterStore.loadClusters()
+      clusterStore.getClusterDetail()
+    } catch (error) {
+      console.log('error :>> ', error)
+    }
   }
 
   const addService: GroupItem['clickEvent'] = () => {
     console.log('add :>> ')
   }
+
+  onMounted(() => {
+    clusterStore.getClusterDetail()
+  })
 </script>
 
 <template>
-  <header-card :title="title" avatar="cluster" :desc="desc" :action-groups="actionGroup" />
-  <main-card v-model:active-key="activeKey" :tabs="tabs">
-    <template #tab-item>
-      <component :is="getCompName"></component>
-    </template>
-  </main-card>
+  <a-spin :spinning="loading">
+    <header-card
+      :title="currCluster.displayName"
+      avatar="cluster"
+      :status="CommonStatus[statusColors[currCluster.status as ClusterStatusType]]"
+      :desc="currCluster.desc"
+      :action-groups="actionGroup"
+    />
+    <main-card v-model:active-key="activeKey" :tabs="tabs">
+      <template #tab-item>
+        <keep-alive>
+          <component :is="getCompName" v-bind="currCluster"></component>
+        </keep-alive>
+      </template>
+    </main-card>
+  </a-spin>
 </template>
 
 <style lang="scss" scoped></style>

@@ -16,12 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-export interface LogsRes {
-  promise: Promise<any>
-  cancel: () => void
-}
-export interface ChatMessagesRes {
-  promise: Promise<any>
-  cancel: () => void
+export default {
+  basic_info: '基本信息',
+  service_info: '服务信息',
+  detail: '详情',
+  cluster_status: '集群状态',
+  cluster_name: '集群名',
+  cluster_desc: '集群备注',
+  host_count: '主机数',
+  service_count: '服务数',
+  memory: '内存',
+  chart: '图表',
+  core_count: '核心数',
+  disk_size: '磁盘大小',
+  creator: '创建人',
+  memory_usage: '内存使用率',
+  cpu_usage: 'CPU使用率',
+  unit_host: '个主机',
+  unit_service: '个服务',
+  unit_processor: '个核心'
 }

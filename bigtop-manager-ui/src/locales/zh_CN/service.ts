@@ -16,37 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import request from '@/api/request.ts'
-import type { HostListParams, HostParams, HostVO, HostVOList, InstalledStatusVO } from '@/api/hosts/types.ts'
-
-export const getHosts = (params?: HostListParams): Promise<HostVOList> => {
-  return request({
-    method: 'get',
-    url: '/hosts',
-    params
-  })
-}
-
-export const addHost = (data: HostParams): Promise<HostVO> => {
-  return request({
-    method: 'post',
-    url: '/hosts',
-    data
-  })
-}
-
-export const installDependencies = (data: HostParams) => {
-  return request({
-    method: 'post',
-    url: '/hosts/install-dependencies',
-    data
-  })
-}
-
-export const getInstalledStatus = (): Promise<InstalledStatusVO[]> => {
-  return request({
-    method: 'get',
-    url: '/hosts/installed-status'
-  })
+export default {
+  name: '服务名',
+  required_restart: '需要重启'
 }

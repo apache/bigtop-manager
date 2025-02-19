@@ -68,7 +68,7 @@
           </span>
         </a-button>
         <template #overlay>
-          <a-menu @click="item.dropdownMenuClickEvent">
+          <a-menu v-if="!item.disabled" @click="item.dropdownMenuClickEvent">
             <a-menu-item v-for="actionItem in item.dropdownMenu" :key="actionItem.action">
               {{ actionItem.text }}
             </a-menu-item>

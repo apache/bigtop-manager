@@ -18,10 +18,11 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onMounted, ref, shallowRef, toRefs } from 'vue'
-  import type { JobVO, StateType } from '@/api/job/types'
+  import { computed, onMounted, reactive, ref, shallowRef, toRefs } from 'vue'
   import { getJobDetails, retryJob } from '@/api/job'
   import { CommandVO } from '@/api/command/types'
+  import LogsView, { type LogViewProps } from '@/components/log-view/index.vue'
+  import type { JobVO, StageVO, StateType, TaskVO } from '@/api/job/types'
 
   const props = defineProps<{ stepData: CommandVO }>()
   const emits = defineEmits(['updateData'])
@@ -29,6 +30,9 @@
   const activeKey = ref<number[]>([])
   const jobDetail = ref<JobVO>({})
   const spinning = ref(false)
+  const logsViewState = reactive<LogViewProps>({
+    open: false
+  })
   const status = shallowRef<Record<StateType, string>>({
     Pending: 'installing',
     Processing: 'processing',
@@ -92,6 +96,23 @@
     }, interval)
   }
 
+  const viewLogs = (stage: StageVO, task: TaskVO) => {
+    const { id: jobId } = stepData.value
+    const { id: stageId } = stage
+    const { id: taskId } = task
+    if (jobId === undefined || stageId === undefined || taskId === undefined) {
+      return
+    }
+    logsViewState.payLoad = {
+      clusterId: 0,
+      jobId,
+      stageId,
+      taskId
+    }
+    logsViewState.open = true
+    logsViewState.subTitle = task.name
+  }
+
   onMounted(() => {
     pollJobDetails(getJobInstanceDetails)
   })
@@ -118,13 +139,22 @@
             <span>{{ task.name }}</span>
             <a-space :size="16">
               <svg-icon :name="task.state && status[task.state]"></svg-icon>
-              <a-button v-if="task.state && !['Canceled', 'Pending'].includes(task.state)" type="link">
+              <a-button
+                v-if="task.state && !['Canceled', 'Pending'].includes(task.state)"
+                type="link"
+                @click="viewLogs(stage, task)"
+              >
                 {{ $t('cluster.view_log') }}
               </a-button>
             </a-space>
           </div>
         </a-collapse-panel>
       </a-collapse>
+      <logs-view
+        v-model:open="logsViewState.open"
+        :pay-load="logsViewState.payLoad"
+        :sub-title="logsViewState.subTitle"
+      />
     </div>
   </a-spin>
 </template>
@@ -153,8 +183,8 @@
     }
   }
   .stage-item {
+    margin-right: 68px;
     @include flexbox($justify: space-between, $align: center);
-    padding-right: 65px;
   }
   .task-item {
     height: 45px;

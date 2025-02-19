@@ -16,37 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import request from '@/api/request.ts'
-import type { HostListParams, HostParams, HostVO, HostVOList, InstalledStatusVO } from '@/api/hosts/types.ts'
-
-export const getHosts = (params?: HostListParams): Promise<HostVOList> => {
-  return request({
-    method: 'get',
-    url: '/hosts',
-    params
-  })
-}
-
-export const addHost = (data: HostParams): Promise<HostVO> => {
-  return request({
-    method: 'post',
-    url: '/hosts',
-    data
-  })
-}
-
-export const installDependencies = (data: HostParams) => {
-  return request({
-    method: 'post',
-    url: '/hosts/install-dependencies',
-    data
-  })
-}
-
-export const getInstalledStatus = (): Promise<InstalledStatusVO[]> => {
-  return request({
-    method: 'get',
-    url: '/hosts/installed-status'
-  })
+export default {
+  basic_info: 'Basic Information',
+  service_info: 'Service Information',
+  detail: 'Details',
+  cluster_status: 'Status',
+  cluster_name: 'Name',
+  cluster_desc: 'Description',
+  host_count: 'Host Count',
+  service_count: 'Service Count',
+  memory: 'Memory',
+  chart: 'Chart',
+  core_count: 'Processor Count',
+  disk_size: 'Disk Size',
+  creator: 'Creator',
+  memory_usage: 'Memory Usage',
+  cpu_usage: 'Cpu Usage',
+  unit_host: 'Hosts',
+  unit_service: 'Services',
+  unit_processor: 'Processors'
 }

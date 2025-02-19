@@ -19,6 +19,8 @@
 
 export type UpdateClusterParam = { name: string; desc: string }
 
+export type ClusterStatusType = 1 | 2 | 3
+
 export interface ClusterVO {
   createUser?: string
   desc?: string
@@ -26,7 +28,7 @@ export interface ClusterVO {
   id?: number
   name?: string
   rootDir?: string
-  status?: number
+  status?: ClusterStatusType
   totalDisk?: number
   totalHost?: number
   totalMemory?: number
@@ -34,4 +36,12 @@ export interface ClusterVO {
   totalService?: number
   type?: number
   userGroup?: string
+}
+
+export interface ServiceUserVO {
+  desc?: string
+  displayName?: string
+  user?: string
+  userGroup?: string
+  [property: string]: any
 }

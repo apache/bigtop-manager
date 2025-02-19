@@ -18,9 +18,10 @@
  */
 
 import request from '@/api/request.ts'
-import type { ClusterVO, UpdateClusterParam } from './types'
+import type { PageVO, ListParams } from '@/api/types'
+import type { ClusterVO, ServiceUserVO, UpdateClusterParam } from './types'
 
-export const getCluster = (id: number): Promise<ClusterVO[]> => {
+export const getCluster = (id: number): Promise<ClusterVO> => {
   return request({
     method: 'get',
     url: `/clusters/${id}`
@@ -39,5 +40,13 @@ export const getClusterList = (): Promise<ClusterVO[]> => {
   return request({
     method: 'get',
     url: '/clusters'
+  })
+}
+
+export const getUserListOfService = (id: number, params: ListParams): Promise<PageVO<ServiceUserVO[]>> => {
+  return request({
+    method: 'get',
+    url: `/clusters/${id}/services/users`,
+    params
   })
 }

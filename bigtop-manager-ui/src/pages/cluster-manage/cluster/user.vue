@@ -18,12 +18,16 @@
 -->
 
 <script setup lang="ts">
-  import { type UserListItem, getUserList } from './components/mock'
-  import { ref } from 'vue'
-  import type { TableColumnType } from 'ant-design-vue'
+  import { computed, onActivated, useAttrs } from 'vue'
+  import { useI18n } from 'vue-i18n'
+  import { getUserListOfService } from '@/api/cluster'
   import useBaseTable from '@/composables/use-base-table'
+  import type { TableColumnType } from 'ant-design-vue'
+  import type { ClusterVO, ServiceUserVO } from '@/api/cluster/types'
 
-  const columns: TableColumnType[] = [
+  const { t } = useI18n()
+  const attrs = useAttrs() as ClusterVO
+  const columns = computed((): TableColumnType[] => [
     {
       title: '#',
       width: '48px',
@@ -33,55 +37,68 @@
       }
     },
     {
-      title: '服务名',
-      dataIndex: 'serviceName',
+      title: t('service.name'),
+      dataIndex: 'displayName',
       width: '20%',
       ellipsis: true
     },
     {
-      title: '用户名',
-      dataIndex: 'userName',
+      title: t('user.username'),
+      dataIndex: 'user',
       width: '15%',
       ellipsis: true
     },
     {
-      title: '用户组',
+      title: t('user.user_group'),
       dataIndex: 'userGroup',
       width: '20%',
       ellipsis: true
     },
     {
-      title: '描述',
-      dataIndex: 'descrip',
+      title: t('common.desc'),
+      dataIndex: 'desc',
       ellipsis: true
     }
-  ]
-  const data = ref<UserListItem[]>(getUserList(50))
-  const { columnsProp, dataSource, loading, paginationProps, onChange } = useBaseTable({
-    columns,
-    rows: data.value
+  ])
+  const { dataSource, loading, filtersParams, paginationProps, onChange } = useBaseTable<ServiceUserVO>({
+    columns: columns.value,
+    rows: []
+  })
+
+  const loadUserListOfService = async () => {
+    if (attrs.id == undefined || !paginationProps.value) {
+      loading.value = false
+      return
+    }
+    try {
+      const data = await getUserListOfService(attrs.id, filtersParams.value)
+      dataSource.value = data.content
+      paginationProps.value.total = data.total
+    } catch (error) {
+      console.log('error :>> ', error)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  onActivated(() => {
+    loadUserListOfService()
   })
 </script>
 
 <template>
   <div class="user">
     <header>
-      <div class="host-title">{{ $t('user.user_list') }}</div>
+      <div class="header-title">{{ $t('user.user_list') }}</div>
     </header>
     <a-table
       :loading="loading"
       :data-source="dataSource"
-      :columns="columnsProp"
+      :columns="columns"
       :pagination="paginationProps"
       @change="onChange"
     ></a-table>
   </div>
 </template>
 
-<style lang="scss" scoped>
-  .user {
-    header {
-      margin-bottom: $space-md;
-    }
-  }
-</style>
+<style lang="scss" scoped></style>

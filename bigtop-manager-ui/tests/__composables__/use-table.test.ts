@@ -71,7 +71,6 @@ describe('useBaseTable', () => {
     }
     expect(result.paginationProps.value).toEqual(expect.objectContaining(expectedPaginationProps))
     // Test showTotal function separately
-    console.log('result.paginationProps.value.showTotal(10) :>> ', result.paginationProps.value.showTotal(10))
     expect(result.paginationProps.value.showTotal(10)).toBe('Total: 10')
   })
 

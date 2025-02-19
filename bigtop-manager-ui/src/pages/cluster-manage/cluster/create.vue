@@ -29,14 +29,7 @@
   import ComponentInfo from './components/component-info.vue'
   import HostConfig from './components/host-config.vue'
   import CheckWorkflow from './components/check-workflow.vue'
-  import {
-    ClusterCommandReq,
-    Command,
-    CommandLevel,
-    HostReq,
-    type CommandRequest,
-    type CommandVO
-  } from '@/api/command/types'
+  import { ClusterCommandReq, HostReq, type CommandRequest, type CommandVO } from '@/api/command/types'
 
   const { t } = useI18n()
   const menuStore = useMenuStore()
@@ -45,8 +38,8 @@
   const installing = ref(false)
   const stepData = ref<[Partial<ClusterCommandReq>, any, HostReq[], CommandVO]>([{}, {}, [], {}])
   const commandRequest = ref<CommandRequest>({
-    command: Command.Add,
-    commandLevel: CommandLevel.Cluster
+    command: 'Add',
+    commandLevel: 'cluster'
   })
   const installStatus = shallowRef<InstalledStatusVO[]>([])
   const components = shallowRef<any[]>([ClusterBase, ComponentInfo, HostConfig, CheckWorkflow])

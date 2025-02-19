@@ -27,3 +27,10 @@ export interface PageVO<T = any> {
   total: number
   content: T[]
 }
+
+export interface ListParams {
+  orderBy?: string
+  pageNum?: number
+  pageSize?: number
+  sort?: string
+}

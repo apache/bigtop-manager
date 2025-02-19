@@ -18,5 +18,7 @@
  */
 
 export default {
-  job_list: '作业列表'
+  job_list: '作业列表',
+  task_log: '任务日志',
+  log_loading: '获取日志中'
 }

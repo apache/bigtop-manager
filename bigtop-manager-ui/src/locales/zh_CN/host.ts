@@ -33,10 +33,14 @@ export default {
   auth_method: '认证方式',
   password_auth: '密码',
   key_auth: '密钥',
+  ip_address: 'IP 地址',
+  component_count: '组件数',
   no_auth: '无认证',
   agent_path: 'Agent路径',
   ssh_port: 'SSH端口',
-  grpc_port: 'gRPC端口',
+  grpc_port: 'GRPC端口',
   description: '备注',
-  key_password_not_match: '密钥口令不一致。'
+  key_password_not_match: '密钥口令不一致。',
+  default_agent_path: '代理应用程序安装路径，默认为/opt',
+  default_grpc_port: '代理应用程序gRPC端口，默认为8835'
 }

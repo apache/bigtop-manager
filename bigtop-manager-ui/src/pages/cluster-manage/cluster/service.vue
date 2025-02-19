@@ -18,16 +18,26 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onMounted, ref, shallowRef } from 'vue'
-  import { getServices, StatusColors, StatusTexts, type ServiceItem } from './components/mock'
+  import { computed, onActivated, shallowRef, toRefs, useAttrs } from 'vue'
   import { usePngImage } from '@/utils/tools'
   import { useI18n } from 'vue-i18n'
+  import { useServiceStore } from '@/store/service'
+  import { CommonStatus, CommonStatusTexts } from '@/enums/state'
   import FilterForm from '@/components/common/filter-form/index.vue'
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { FilterFormItem } from '@/components/common/filter-form/types'
+  import type { ServiceListParams, ServiceStatusType } from '@/api/service/types'
+  import type { ClusterVO } from '@/api/cluster/types'
 
   const { t } = useI18n()
-  const data = ref<ServiceItem[]>([])
+  const attrs = useAttrs() as ClusterVO
+  const serviceStore = useServiceStore()
+  const { services, loading } = toRefs(serviceStore)
+  const statusColors = shallowRef<Record<ServiceStatusType, keyof typeof CommonStatusTexts>>({
+    1: 'healthy',
+    2: 'unhealthy',
+    3: 'unknow'
+  })
   const actionGroups = shallowRef<GroupItem[]>([
     {
       action: 'start',
@@ -63,19 +73,19 @@
     {
       type: 'search',
       key: 'serviceName',
-      label: '服务名'
+      label: t('service.name')
     },
     {
       type: 'status',
-      key: 'restart',
-      label: '需要重启',
+      key: 'restartFlag',
+      label: t('service.required_restart'),
       options: [
         {
-          label: '需重启',
+          label: t('common.required'),
           value: 1
         },
         {
-          label: '无需重启',
+          label: t('common.not_required'),
           value: 2
         }
       ]
@@ -83,73 +93,71 @@
     {
       type: 'status',
       key: 'status',
-      label: '状态',
+      label: t('common.status'),
       options: [
         {
-          label: t(`common.${StatusTexts.success}`),
-          value: StatusTexts.success
+          label: t(`common.${statusColors.value[1]}`),
+          value: 1
         },
         {
-          label: t(`common.${StatusTexts.error}`),
-          value: StatusTexts.error
+          label: t(`common.${statusColors.value[2]}`),
+          value: 2
         },
         {
-          label: t(`common.${StatusTexts.unknow}`),
-          value: StatusTexts.unknow
+          label: t(`common.${statusColors.value[3]}`),
+          value: 3
         }
       ]
     }
   ])
 
-  const onFilter = (filters: any) => {
-    console.log('filters :>> ', filters)
+  const getServices = (filters?: ServiceListParams) => {
+    attrs.id != undefined && serviceStore.getServices(attrs.id, filters)
   }
 
-  onMounted(() => {
-    data.value = getServices()
+  onActivated(() => {
+    getServices()
   })
 </script>
 
 <template>
-  <div class="service">
-    <filter-form :filter-items="filterFormItems" @filter="onFilter" />
-    <a-card v-for="item in data" :key="item.key" :hoverable="true" class="service-item">
-      <div class="header">
-        <div class="header-base-wrp">
-          <a-avatar
-            v-if="item.serviceName"
-            :src="usePngImage(item.serviceName.toLowerCase())"
-            :size="42"
-            class="header-icon"
-          />
-          <div class="header-base-title">
-            <span>{{ `${item.serviceName}` }}</span>
-            <span class="small-gray">{{ item.version }}</span>
+  <a-spin :spinning="loading" class="service">
+    <filter-form :filter-items="filterFormItems" @filter="getServices" />
+    <a-empty v-if="services.length == 0" style="width: 100%" />
+    <template v-else>
+      <a-card v-for="item in services" :key="item.id" :hoverable="true" class="service-item">
+        <div class="header">
+          <div class="header-base-wrp">
+            <a-avatar v-if="item.name" :src="usePngImage(item.name.toLowerCase())" :size="42" class="header-icon" />
+            <div class="header-base-title">
+              <span>{{ `${item.displayName}` }}</span>
+              <span class="small-gray">{{ item.version }}</span>
+            </div>
+            <div class="header-base-status">
+              <a-tag :color="statusColors[item.status]">
+                <div class="header-base-status-inner">
+                  <status-dot :color="CommonStatus[statusColors[item.status]]" />
+                  <span class="small">{{ $t(`common.${CommonStatusTexts[item.status]}`) }}</span>
+                </div>
+              </a-tag>
+            </div>
           </div>
-          <div class="header-base-status">
-            <a-tag :color="StatusColors[item.status]">
-              <div class="header-base-status-inner">
-                <status-dot :color="StatusColors[item.status]" />
-                <span class="small">{{ $t(`common.${StatusTexts[item.status]}`) }}</span>
-              </div>
-            </a-tag>
+          <div class="header-restart-status">
+            <span class="small-gray">{{ `${$t('common.restart')}` }}</span>
+            <status-dot :color="CommonStatus[statusColors[item.status]]" />
+            <span class="small">{{ `${item.restartFlag ? $t('common.required') : $t('common.not_required')}` }}</span>
           </div>
         </div>
-        <div class="header-restart-status">
-          <span class="small-gray">{{ `${$t('common.restart')}` }}</span>
-          <status-dot :color="StatusColors[item.status]" />
-          <span class="small">{{ `${item.restart ? $t('common.required') : $t('common.not_required')}` }}</span>
+        <div class="item-content">
+          <button-group :auto="true" :space="0" :groups="actionGroups">
+            <template #icon="{ item: groupItem }">
+              <svg-icon :name="groupItem.icon || ''" />
+            </template>
+          </button-group>
         </div>
-      </div>
-      <div class="item-content">
-        <button-group :auto="true" :space="0" :groups="actionGroups">
-          <template #icon="{ item: groupItem }">
-            <svg-icon :name="groupItem.icon || ''" />
-          </template>
-        </button-group>
-      </div>
-    </a-card>
-  </div>
+      </a-card>
+    </template>
+  </a-spin>
 </template>
 
 <style lang="scss" scoped>

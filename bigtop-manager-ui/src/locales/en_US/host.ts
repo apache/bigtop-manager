@@ -33,10 +33,14 @@ export default {
   auth_method: 'Authentication Method',
   password_auth: 'Password',
   key_auth: 'Key',
+  ip_address: 'IP Address',
+  component_count: 'Component Count',
   no_auth: 'No Authentication',
   agent_path: 'Agent Path',
   ssh_port: 'SSH Port',
   grpc_port: 'GRPC Port',
   description: 'Description',
-  key_password_not_match: 'Key Passwords do not match.'
+  key_password_not_match: 'Key Passwords do not match.',
+  default_agent_path: 'Agent application installed path, default to /opt',
+  default_grpc_port: 'Agent application grpc port, default to 8835'
 }

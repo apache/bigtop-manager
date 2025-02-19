@@ -20,8 +20,8 @@
 export interface CommandRequest {
   clusterCommand?: ClusterCommandReq
   clusterId?: number
-  command: Command
-  commandLevel: CommandLevel
+  command: keyof typeof Command
+  commandLevel: keyof typeof CommandLevel
   componentCommands?: ComponentCommandReq[]
   customCommand?: string
   hostCommands?: HostCommandReq[]
@@ -70,10 +70,10 @@ export enum Command {
 }
 
 export enum CommandLevel {
-  Cluster = 'cluster',
-  Component = 'component',
-  Host = 'host',
-  Service = 'service'
+  cluster = 'cluster',
+  component = 'component',
+  host = 'host',
+  service = 'service'
 }
 
 export interface ComponentCommandReq {

@@ -17,8 +17,8 @@
  * under the License.
  */
 export default {
-  add_authorization: 'Add authorization',
-  edit_authorization: 'Edit authorization',
+  add_authorization: 'Add Authorization',
+  edit_authorization: 'Edit Authorization',
   test: 'Test',
   unavailable: 'Unavailable',
   active: 'Active',

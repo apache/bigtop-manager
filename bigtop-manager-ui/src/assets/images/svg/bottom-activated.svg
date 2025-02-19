@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~ Licensed to the Apache Software Foundation (ASF) under one
   ~ or more contributor license agreements.  See the NOTICE file
@@ -16,37 +17,9 @@
   ~ specific language governing permissions and limitations
   ~ under the License.
 -->
-
-<script setup lang="ts">
-  import { computed } from 'vue'
-
-  interface SvgIconProps {
-    prefix?: string
-    name: string
-    color?: string
-  }
-
-  const props = withDefaults(defineProps<SvgIconProps>(), {
-    prefix: 'icon',
-    color: '#000'
-  })
-
-  const symbolId = computed(() => `#${props.prefix}-${props.name}`)
-</script>
-
-<template>
-  <svg class="svg-icon" aria-hidden="true">
-    <use :xlink:href="symbolId" :fill="color" />
-  </svg>
-</template>
-
-<style lang="scss" scoped>
-  .svg-icon {
-    height: 1.2em;
-    width: 1.2em;
-    margin: 0 6px;
-    vertical-align: -0.25em;
-    overflow: hidden;
-    flex-shrink: 0;
-  }
-</style>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="9.33349609375"
+  height="5.33331298828125" viewBox="0 0 9.33349609375 5.33331298828125" fill="none">
+  <path stroke="rgba(22, 119, 255, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
+    d="M8.66675 0.666656L4.66675 4.66666L0.666748 0.666656">
+  </path>
+</svg>
