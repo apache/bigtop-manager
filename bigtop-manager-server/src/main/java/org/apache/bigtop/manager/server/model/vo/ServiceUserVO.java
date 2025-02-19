@@ -16,26 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.service;
+package org.apache.bigtop.manager.server.model.vo;
 
-import org.apache.bigtop.manager.server.model.vo.ServiceClusterVO;
-import org.apache.bigtop.manager.server.model.vo.StackVO;
+import lombok.Data;
 
-import java.util.List;
+@Data
+public class ServiceUserVO {
 
-public interface StackService {
+    private String displayName;
 
-    /**
-     * Get all stacks.
-     *
-     * @return Stacks
-     */
-    List<StackVO> list();
+    private String user;
 
-    /**
-     * Get service clusters.
-     *
-     * @return Service clusters
-     */
-    List<ServiceClusterVO> serviceClusters();
+    private String userGroup;
+
+    private String desc;
 }

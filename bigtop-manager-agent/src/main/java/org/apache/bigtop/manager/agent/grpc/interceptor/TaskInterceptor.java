@@ -107,7 +107,7 @@ public class TaskInterceptor implements ServerInterceptor {
 
         // Every task will have taskId, but TaskLogRequest have it also, so we need to exclude it
         Class<?> clazz = obj.getClass();
-        if (clazz.isInstance(TaskLogRequest.class)) {
+        if (TaskLogRequest.class.isAssignableFrom(clazz)) {
             return false;
         }
 

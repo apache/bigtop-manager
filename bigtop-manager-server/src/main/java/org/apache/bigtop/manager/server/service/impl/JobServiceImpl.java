@@ -54,6 +54,8 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
 import jakarta.annotation.Resource;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,8 +80,23 @@ public class JobServiceImpl implements JobService {
         try (Page<?> ignored =
                 PageHelper.startPage(pageQuery.getPageNum(), pageQuery.getPageSize(), pageQuery.getOrderBy())) {
             List<JobPO> jobPOList = jobDao.findByClusterId(clusterId);
+            List<JobVO> jobVOList = new ArrayList<>();
+            for (JobPO jobPO : jobPOList) {
+                List<StagePO> stagePOList = stageDao.findByJobId(jobPO.getId());
+                List<StagePO> runningStagePOList = stagePOList.stream()
+                        .filter(stagePO -> List.of(JobState.PROCESSING, JobState.SUCCESSFUL)
+                                .contains(JobState.fromString(stagePO.getState())))
+                        .toList();
+                JobVO jobVO = JobConverter.INSTANCE.fromPO2VO(jobPO);
+                jobVO.setProgress(new BigDecimal(runningStagePOList.size())
+                        .divide(new BigDecimal(stagePOList.size()), 2, RoundingMode.HALF_UP)
+                        .multiply(new BigDecimal(100))
+                        .intValue());
+                jobVOList.add(jobVO);
+            }
+
             PageInfo<JobPO> pageInfo = new PageInfo<>(jobPOList);
-            return PageVO.of(pageInfo);
+            return PageVO.of(jobVOList, pageInfo.getTotal());
         } finally {
             PageHelper.clearPage();
         }

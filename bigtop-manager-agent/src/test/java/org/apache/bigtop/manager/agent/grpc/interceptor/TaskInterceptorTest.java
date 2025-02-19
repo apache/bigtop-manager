@@ -19,6 +19,7 @@
 package org.apache.bigtop.manager.agent.grpc.interceptor;
 
 import org.apache.bigtop.manager.common.utils.ProjectPathUtils;
+import org.apache.bigtop.manager.grpc.generated.TaskLogRequest;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -91,16 +92,17 @@ public class TaskInterceptorTest {
     }
 
     @Test
-    public void testIsTaskRequestTaskRequest() {
-        TaskLogRequest taskLogRequest = new TaskLogRequest();
+    public void testIsTaskLogRequestTaskRequest() {
+        TaskLogRequest taskLogRequest =
+                TaskLogRequest.newBuilder().setTaskId(1L).build();
 
         Boolean result = taskInterceptor.isTaskRequest(taskLogRequest);
 
-        assertTrue(result);
+        assertFalse(result);
     }
 
     @Test
-    public void testIsTaskRequestTaskWithGetTaskIdMethod() {
+    public void testIsTaskRequestTaskRequest() {
         Task task = new Task();
 
         Boolean result = taskInterceptor.isTaskRequest(task);
@@ -125,12 +127,6 @@ public class TaskInterceptorTest {
     }
 
     private static class Task {
-        public Long getTaskId() {
-            return 1L;
-        }
-    }
-
-    private static class TaskLogRequest {
         public Long getTaskId() {
             return 1L;
         }

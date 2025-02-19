@@ -35,5 +35,7 @@ public class JobVO {
 
     private String updateTime;
 
+    private Integer progress;
+
     private List<StageVO> stages;
 }
