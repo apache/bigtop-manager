@@ -25,7 +25,8 @@
   import { getJobList, getStageList, getTaskList } from '@/api/job'
   import useBaseTable from '@/composables/use-base-table'
   import LogsView, { type LogViewProps } from '@/components/log-view/index.vue'
-  import type { JobVO, StageVO, TaskListParams, TaskVO } from '@/api/job/types'
+  import CustomProgress from './custom-progress.vue'
+  import type { JobVO, StageVO, StateType, TaskListParams, TaskVO } from '@/api/job/types'
 
   interface BreadcrumbItem {
     id: string
@@ -41,6 +42,13 @@
       id: `clusterId-${route.params.id}`
     }
   ])
+  const status = shallowRef<Record<StateType, string>>({
+    Pending: 'installing',
+    Processing: 'processing',
+    Failed: 'failed',
+    Canceled: 'canceled',
+    Successful: 'success'
+  })
   const apiMap = shallowRef([
     {
       key: 'clusterId',
@@ -206,15 +214,15 @@
       :pagination="paginationProps"
       @change="tableChange"
     >
-      <template #bodyCell="{ record, column }">
+      <template #bodyCell="{ record, text, column }">
         <template v-if="column.key === 'name'">
           <a-typography-link underline @click="updateBreadcrumbs(record)">
             <span :title="record.name">{{ record.name }}</span>
           </a-typography-link>
         </template>
         <template v-if="column.key === 'state'">
-          {{ record.state }}
-          <!-- <custom-progress :key="record.id" :state="text" :progress-data="record.stages" /> -->
+          <custom-progress v-if="breadcrumbLen === 1" :key="record.id" :state="text" :progress-data="record.progress" />
+          <svg-icon v-else :name="status[record.state as StateType]"></svg-icon>
         </template>
       </template>
     </a-table>

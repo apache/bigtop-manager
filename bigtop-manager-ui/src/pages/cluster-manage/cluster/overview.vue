@@ -356,6 +356,7 @@
       @include flexbox($gap: $space-md);
       padding: $space-md;
       :deep(.ant-tag) {
+        width: fit-content;
         @include flexbox($align: center, $gap: 4px);
       }
     }

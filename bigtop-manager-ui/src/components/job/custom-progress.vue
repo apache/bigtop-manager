@@ -26,14 +26,9 @@
     CloseCircleFilled as Failed
   } from '@ant-design/icons-vue'
 
-  interface ProgressItem {
-    state: keyof typeof JobState
-    [property: string]: any
-  }
-
   interface ProgressProps {
     state: keyof typeof JobState
-    progressData: ProgressItem[]
+    progressData: number
   }
 
   const props = withDefaults(defineProps<ProgressProps>(), {})
@@ -51,9 +46,8 @@
         icon: Successful
       }
     } else if (props.state === 'Processing') {
-      const proportion = props.progressData.filter((v: ProgressItem) => v.state === 'Successful').length + 1
       return {
-        progress: Math.round((proportion / props.progressData.length) * 100),
+        progress: props.progressData,
         status: 'active'
       }
     } else if (props.state === 'Canceled') {
