@@ -46,7 +46,7 @@ public class AddHook extends AbstractHook {
         return NAME;
     }
 
-    private void addUserAndGroup(Params params) {
+    protected void addUserAndGroup(Params params) {
         String user = params.user();
         String group = params.group();
 

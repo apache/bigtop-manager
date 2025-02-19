@@ -328,7 +328,7 @@ public class LinuxAccountUtils {
         return null;
     }
 
-    private static ShellResult sudoExecCmd(List<String> params) throws IOException {
+    protected static ShellResult sudoExecCmd(List<String> params) throws IOException {
         if ("root".equals(System.getProperty("user.name"))) {
             return ShellExecutor.execCommand(params);
         } else {

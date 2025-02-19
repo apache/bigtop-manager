@@ -68,7 +68,7 @@
   <div class="login-container">
     <div class="login-content">
       <div class="login-main">
-        <!-- 登录框头部 -->
+        <!-- Login box header -->
         <div class="login-header">
           <div class="login-header-left">
             <img class="login-logo" src="@/assets/logo.svg" alt="logo" />
@@ -78,14 +78,14 @@
           <div class="login-header-right"><select-lang /></div>
         </div>
         <a-divider class="m-0" />
-        <!-- 登录框主体 -->
+        <!-- Login box body -->
         <div class="login-body">
-          <!-- 登录框主体左侧 -->
+          <!-- On the left side of the login box -->
           <div class="login-body-left">
             <img class="login-body-left-img" src="@/assets/images/login.png" alt="login" />
           </div>
           <a-divider class="login-body-divider m-0" type="vertical" />
-          <!-- 登录框主体右侧 -->
+          <!-- Right side of the login box -->
           <div class="login-body-right">
             <div class="login-body-right-tips">{{ $t('login.tips') }}</div>
             <a-form ref="formRef" class="login-body-right-form" :model="loginModel">
@@ -150,7 +150,7 @@
       </div>
     </div>
     <div class="copyright">
-      Copyright ©2011–2023
+      Copyright ©2024–2025
       <a href="https://www.apache.org">The Apache Software Foundation</a>. All rights reserved.
     </div>
   </div>
