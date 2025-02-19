@@ -52,7 +52,6 @@ import org.apache.bigtop.manager.server.utils.StackUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.github.pagehelper.Page;
@@ -61,7 +60,6 @@ import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 
 import jakarta.annotation.Resource;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -103,7 +101,7 @@ public class ServiceServiceImpl implements ServiceService {
     public PageVO<ServiceUserVO> serviceUsers(Long clusterId) {
         PageQuery pageQuery = PageUtils.getPageQuery();
         try (Page<?> ignored =
-                     PageHelper.startPage(pageQuery.getPageNum(), pageQuery.getPageSize(), pageQuery.getOrderBy())) {
+                PageHelper.startPage(pageQuery.getPageNum(), pageQuery.getPageSize(), pageQuery.getOrderBy())) {
             ServiceQuery query = ServiceQuery.builder().clusterId(clusterId).build();
             List<ServicePO> servicePOList = serviceDao.findByQuery(query);
 

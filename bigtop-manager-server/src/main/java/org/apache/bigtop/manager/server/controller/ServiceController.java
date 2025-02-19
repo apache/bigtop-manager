@@ -74,14 +74,14 @@ public class ServiceController {
     }
 
     @Parameters({
-            @Parameter(in = ParameterIn.QUERY, name = "pageNum", schema = @Schema(type = "integer", defaultValue = "1")),
-            @Parameter(in = ParameterIn.QUERY, name = "pageSize", schema = @Schema(type = "integer", defaultValue = "10")),
-            @Parameter(in = ParameterIn.QUERY, name = "orderBy", schema = @Schema(type = "string", defaultValue = "id")),
-            @Parameter(
-                    in = ParameterIn.QUERY,
-                    name = "sort",
-                    description = "asc/desc",
-                    schema = @Schema(type = "string", defaultValue = "asc"))
+        @Parameter(in = ParameterIn.QUERY, name = "pageNum", schema = @Schema(type = "integer", defaultValue = "1")),
+        @Parameter(in = ParameterIn.QUERY, name = "pageSize", schema = @Schema(type = "integer", defaultValue = "10")),
+        @Parameter(in = ParameterIn.QUERY, name = "orderBy", schema = @Schema(type = "string", defaultValue = "id")),
+        @Parameter(
+                in = ParameterIn.QUERY,
+                name = "sort",
+                description = "asc/desc",
+                schema = @Schema(type = "string", defaultValue = "asc"))
     })
     @Operation(summary = "service user list", description = "List service users")
     @GetMapping("/users")

@@ -18,9 +18,7 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
-import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.ServicePO;
-import org.apache.bigtop.manager.dao.query.ServiceQuery;
 import org.apache.bigtop.manager.dao.repository.ClusterDao;
 import org.apache.bigtop.manager.dao.repository.ServiceDao;
 import org.apache.bigtop.manager.server.model.converter.ClusterConverter;
@@ -35,6 +33,7 @@ import org.apache.bigtop.manager.server.service.StackService;
 import org.apache.bigtop.manager.server.utils.StackUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
+
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
@@ -82,10 +81,9 @@ public class StackServiceImpl implements StackService {
         Map<Long, ClusterVO> clusterVOMap = ClusterConverter.INSTANCE.fromPO2VO(clusterDao.findAll()).stream()
                 .collect(Collectors.toMap(ClusterVO::getId, Function.identity()));
         // Name - ServicePO map
-        Map<String, List<ServicePO>> servicePONameMap =  serviceDao.findAll().stream()
-                .collect(Collectors.groupingBy(ServicePO::getName));
-        List<ServiceDTO> serviceDTOList = StackUtils.getAllStacks()
-                .stream()
+        Map<String, List<ServicePO>> servicePONameMap =
+                serviceDao.findAll().stream().collect(Collectors.groupingBy(ServicePO::getName));
+        List<ServiceDTO> serviceDTOList = StackUtils.getAllStacks().stream()
                 .map(StackUtils::getServiceDTOList)
                 .flatMap(List::stream)
                 .toList();

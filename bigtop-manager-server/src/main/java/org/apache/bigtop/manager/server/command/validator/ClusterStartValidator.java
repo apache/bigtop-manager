@@ -18,20 +18,19 @@
  */
 package org.apache.bigtop.manager.server.command.validator;
 
-import jakarta.annotation.Resource;
 import org.apache.bigtop.manager.common.enums.Command;
-import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.ServicePO;
-import org.apache.bigtop.manager.dao.repository.ClusterDao;
 import org.apache.bigtop.manager.dao.repository.ServiceDao;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.enums.CommandLevel;
 import org.apache.bigtop.manager.server.exception.ApiException;
-import org.apache.bigtop.manager.server.model.dto.command.ClusterCommandDTO;
+
 import org.apache.commons.collections4.CollectionUtils;
+
 import org.springframework.stereotype.Component;
 
+import jakarta.annotation.Resource;
 import java.util.List;
 
 @Component

@@ -18,7 +18,6 @@
  */
 package org.apache.bigtop.manager.server.service;
 
-import org.apache.bigtop.manager.server.model.vo.ClusterVO;
 import org.apache.bigtop.manager.server.model.vo.ServiceClusterVO;
 import org.apache.bigtop.manager.server.model.vo.StackVO;
 
