@@ -18,11 +18,13 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onMounted, ref } from 'vue'
+  import { computed, onMounted, ref, shallowRef } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { useClusterStore } from '@/store/cluster'
   import { storeToRefs } from 'pinia'
   import { execCommand } from '@/api/command'
+  import { Command } from '@/api/command/types'
+  import { CommonStatus, CommonStatusTexts } from '@/enums/state'
   import Overview from './overview.vue'
   import Service from './service.vue'
   import Host from './host.vue'
@@ -30,12 +32,17 @@
   import Job from '@/components/job/index.vue'
   import type { TabItem } from '@/components/common/main-card/types'
   import type { GroupItem } from '@/components/common/button-group/types'
-  import { Command } from '@/api/command/types'
+  import type { ClusterStatusType } from '@/api/cluster/types'
 
   const { t } = useI18n()
   const clusterStore = useClusterStore()
   const { currCluster, loading } = storeToRefs(clusterStore)
   const activeKey = ref('1')
+  const statusColors = shallowRef<Record<ClusterStatusType, keyof typeof CommonStatusTexts>>({
+    1: 'healthy',
+    2: 'unhealthy',
+    3: 'unknow'
+  })
   const tabs = computed((): TabItem[] => [
     {
       key: '1',
@@ -120,6 +127,7 @@
     <header-card
       :title="currCluster.displayName"
       avatar="cluster"
+      :status="CommonStatus[statusColors[currCluster.status as ClusterStatusType]]"
       :desc="currCluster.desc"
       :action-groups="actionGroup"
     />

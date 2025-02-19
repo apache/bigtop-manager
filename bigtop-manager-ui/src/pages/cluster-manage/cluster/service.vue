@@ -112,7 +112,7 @@
   ])
 
   const getServices = (filters?: ServiceListParams) => {
-    attrs.id && serviceStore.getServices(attrs.id, filters)
+    attrs.id != undefined && serviceStore.getServices(attrs.id, filters)
   }
 
   onActivated(() => {

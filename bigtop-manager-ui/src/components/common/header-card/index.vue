@@ -41,8 +41,8 @@
     showStatus: true,
     avatar: '',
     title: '',
-    desc: '暂无描述',
-    status: 'success',
+    desc: '',
+    status: '',
     actionGroups: () => {
       return []
     }

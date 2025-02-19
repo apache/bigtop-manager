@@ -21,12 +21,14 @@ import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { useRoute } from 'vue-router'
 import { getCluster, getClusterList } from '@/api/cluster'
-import { ClusterVO } from '@/api/cluster/types.ts'
+import { useServiceStore } from '@/store/service'
+import type { ClusterVO } from '@/api/cluster/types.ts'
 
 export const useClusterStore = defineStore(
   'cluster',
   () => {
     const route = useRoute()
+    const serviceStore = useServiceStore()
     const clusters = ref<ClusterVO[]>([])
     const loading = ref(false)
     const currCluster = ref<ClusterVO>({})
@@ -47,6 +49,7 @@ export const useClusterStore = defineStore(
       try {
         loading.value = true
         currCluster.value = await getCluster(parseInt(clusterId.value))
+        currCluster.value.id != undefined && serviceStore.getServices(currCluster.value.id)
       } catch (error) {
         console.log('error :>> ', error)
       } finally {

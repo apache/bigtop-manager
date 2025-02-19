@@ -157,10 +157,13 @@
                         <a-tag
                           v-if="base === 'status'"
                           class="reset-tag"
-                          :color="clusterDetail[base] && CommonStatus[statusColors[clusterDetail[base]]]"
+                          :color="CommonStatus[statusColors[clusterDetail[base] as ClusterStatusType]]"
                         >
-                          <status-dot :color="clusterDetail[base] && CommonStatus[statusColors[clusterDetail[base]]]" />
-                          {{ clusterDetail[base] && $t(`common.${statusColors[clusterDetail[base]]}`) }}
+                          <status-dot :color="CommonStatus[statusColors[clusterDetail[base] as ClusterStatusType]]" />
+                          {{
+                            clusterDetail[base] &&
+                            $t(`common.${statusColors[clusterDetail[base] as ClusterStatusType]}`)
+                          }}
                         </a-tag>
                         <a-typography-text
                           v-else

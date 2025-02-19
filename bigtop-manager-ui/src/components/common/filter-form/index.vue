@@ -185,6 +185,7 @@
     width: 100%;
     display: flex;
     gap: $space-sm;
+    margin-bottom: $space-md;
     &-label {
       display: inline-block;
       cursor: pointer;
