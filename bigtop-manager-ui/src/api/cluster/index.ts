@@ -21,7 +21,7 @@ import request from '@/api/request.ts'
 import type { PageVO, ListParams } from '@/api/types'
 import type { ClusterVO, ServiceUserVO, UpdateClusterParam } from './types'
 
-export const getCluster = (id: number): Promise<ClusterVO[]> => {
+export const getCluster = (id: number): Promise<ClusterVO> => {
   return request({
     method: 'get',
     url: `/clusters/${id}`

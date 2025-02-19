@@ -26,13 +26,13 @@ export enum StatusColors {
   default = 'var(--color-primary)'
 }
 
-export enum ServiceStatus {
+export enum CommonStatus {
   healthy = 'success',
   unhealthy = 'error',
   unknow = 'warning'
 }
 
-export enum ServiceStatusTexts {
+export enum CommonStatusTexts {
   'healthy',
   'unhealthy',
   'unknow'

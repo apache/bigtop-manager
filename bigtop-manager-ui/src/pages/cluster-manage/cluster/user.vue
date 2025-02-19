@@ -18,16 +18,15 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onActivated } from 'vue'
+  import { computed, onActivated, useAttrs } from 'vue'
   import { useI18n } from 'vue-i18n'
-  import { useRoute } from 'vue-router'
-  import useBaseTable from '@/composables/use-base-table'
   import { getUserListOfService } from '@/api/cluster'
+  import useBaseTable from '@/composables/use-base-table'
   import type { TableColumnType } from 'ant-design-vue'
-  import type { ServiceUserVO } from '@/api/cluster/types'
+  import type { ClusterVO, ServiceUserVO } from '@/api/cluster/types'
 
   const { t } = useI18n()
-  const route = useRoute()
+  const attrs = useAttrs() as ClusterVO
   const columns = computed((): TableColumnType[] => [
     {
       title: '#',
@@ -67,13 +66,12 @@
   })
 
   const loadUserListOfService = async () => {
-    const clusterId = parseInt(route.params.id as string)
-    if (isNaN(clusterId) || !paginationProps.value) {
+    if (attrs.id == undefined || !paginationProps.value) {
       loading.value = false
       return
     }
     try {
-      const data = await getUserListOfService(clusterId, filtersParams.value)
+      const data = await getUserListOfService(attrs.id, filtersParams.value)
       dataSource.value = data.content
       paginationProps.value.total = data.total
     } catch (error) {

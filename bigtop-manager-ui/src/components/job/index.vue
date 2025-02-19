@@ -31,7 +31,7 @@
     id: string
     name: ComputedRef<string> | string
   }
-  const POLLING_INTERVAL = 10000
+  const POLLING_INTERVAL = 3000
   const { t } = useI18n()
   const route = useRoute()
   const pollingIntervalId = ref<any>(null)
@@ -41,7 +41,7 @@
       id: `clusterId-${route.params.id}`
     }
   ])
-  const keyOfParams = shallowRef([
+  const apiMap = shallowRef([
     {
       key: 'clusterId',
       api: getJobList
@@ -93,7 +93,7 @@
     (): TaskListParams =>
       breadcrumbs.value.reduce((pre, val, index) => {
         return Object.assign(pre, {
-          [`${keyOfParams.value[index].key}`]: val.id.replace(`${keyOfParams.value[index].key}-`, '')
+          [`${apiMap.value[index].key}`]: val.id.replace(`${apiMap.value[index].key}-`, '')
         })
       }, {} as TaskListParams)
   )
@@ -112,7 +112,7 @@
   }
 
   const updateBreadcrumbs = (data: BreadcrumbItem) => {
-    if (breadcrumbLen.value + 1 > keyOfParams.value.length) {
+    if (breadcrumbLen.value + 1 > apiMap.value.length) {
       // task log open
       logsViewState.open = true
       logsViewState.subTitle = data.name as string
@@ -122,7 +122,7 @@
       }
       return
     }
-    const currId = `${keyOfParams.value[breadcrumbLen.value].key}-${data.id}`
+    const currId = `${apiMap.value[breadcrumbLen.value].key}-${data.id}`
     const index = breadcrumbs.value.findIndex((v) => v.id === currId)
     if (index === -1) {
       breadcrumbs.value.push({
@@ -143,7 +143,7 @@
       if (isFirstCall) {
         loading.value = true
       }
-      const { api } = keyOfParams.value[breadcrumbs.value.length - 1]
+      const { api } = apiMap.value[breadcrumbs.value.length - 1]
       const res = await api(apiParams.value, filtersParams.value)
       dataSource.value = res.content
       paginationProps.value.total = res.total

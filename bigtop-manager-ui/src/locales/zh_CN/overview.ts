@@ -31,5 +31,8 @@ export default {
   disk_size: '磁盘大小',
   creator: '创建人',
   memory_usage: '内存使用率',
-  cpu_usage: 'CPU使用率'
+  cpu_usage: 'CPU使用率',
+  unit_host: '个主机',
+  unit_service: '个服务',
+  unit_processor: '个核心'
 }

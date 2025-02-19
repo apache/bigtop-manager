@@ -18,13 +18,15 @@
 -->
 
 <script setup lang="ts">
-  import { computed, ref } from 'vue'
+  import { computed, ref, shallowRef, useAttrs } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { storeToRefs } from 'pinia'
   import { useServiceStore } from '@/store/service'
+  import { formatFromByte } from '@/utils/storage'
+  import { CommonStatus, CommonStatusTexts } from '@/enums/state'
   import GaugeChart from './components/gauge-chart.vue'
   import CategoryChart from './components/category-chart.vue'
-  import type { ClusterVO } from '@/api/cluster/types'
+  import type { ClusterStatusType, ClusterVO } from '@/api/cluster/types'
   import type { MenuProps } from 'ant-design-vue'
 
   type TimeRangeText = '1m' | '15m' | '30m' | '1h' | '6h' | '30h'
@@ -34,6 +36,7 @@
   }
 
   const { t } = useI18n()
+  const attrs = useAttrs() as ClusterVO
   const serviceStore = useServiceStore()
   const currTimeRange = ref<TimeRangeText>('15m')
   const chartData = ref({
@@ -42,24 +45,17 @@
     chart3: [],
     chart4: []
   })
-  const clusterDetail = ref<ClusterVO>({
-    id: 0,
-    name: 'string',
-    displayName: 'string',
-    desc: 'string',
-    type: 0,
-    userGroup: 'string',
-    rootDir: 'string',
-    status: 0,
-    createUser: 'string',
-    totalHost: 0,
-    totalService: 0,
-    totalProcessor: 0,
-    totalMemory: 0,
-    totalDisk: 0
+  const statusColors = shallowRef<Record<ClusterStatusType, keyof typeof CommonStatusTexts>>({
+    1: 'healthy',
+    2: 'unhealthy',
+    3: 'unknow'
   })
-
   const { locateStackWithService } = storeToRefs(serviceStore)
+  const clusterDetail = computed(() => ({
+    ...attrs,
+    totalMemory: formatFromByte(attrs.totalMemory as number),
+    totalDisk: formatFromByte(attrs.totalDisk as number)
+  }))
   const noChartData = computed(() => Object.values(chartData.value).every((v) => v.length === 0))
   const timeRanges = computed((): TimeRangeItem[] => [
     {
@@ -98,6 +94,13 @@
       totalProcessor: t('overview.core_count'),
       totalDisk: t('overview.disk_size'),
       createUser: t('overview.creator')
+    }
+  })
+  const unitOfBaseConfig = computed((): Partial<Record<keyof ClusterVO, string>> => {
+    return {
+      totalHost: t('overview.unit_host'),
+      totalService: t('overview.unit_service'),
+      totalProcessor: t('overview.unit_processor')
     }
   })
   const detailKeys = computed(() => Object.keys(baseConfig.value) as (keyof ClusterVO)[])
@@ -151,7 +154,23 @@
                           type="secondary"
                           :content="baseConfig[base]"
                         />
-                        <a-typography-text class="desc-sub-item-desc-column" :content="clusterDetail[base]" />
+                        <a-tag
+                          v-if="base === 'status'"
+                          class="reset-tag"
+                          :color="clusterDetail[base] && CommonStatus[statusColors[clusterDetail[base]]]"
+                        >
+                          <status-dot :color="clusterDetail[base] && CommonStatus[statusColors[clusterDetail[base]]]" />
+                          {{ clusterDetail[base] && $t(`common.${statusColors[clusterDetail[base]]}`) }}
+                        </a-tag>
+                        <a-typography-text
+                          v-else
+                          class="desc-sub-item-desc-column"
+                          :content="
+                            Object.keys(unitOfBaseConfig).includes(base)
+                              ? `${clusterDetail[base]} ${unitOfBaseConfig[base]}`
+                              : `${clusterDetail[base]}`
+                          "
+                        />
                       </div>
                     </template>
                   </div>
@@ -252,8 +271,7 @@
 <style lang="scss" scoped>
   .box {
     &-title {
-      display: flex;
-      justify-content: space-between;
+      @include flexbox($justify: space-between);
       margin-bottom: 20px;
     }
 
@@ -265,9 +283,7 @@
     }
 
     &-empty {
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      @include flexbox($justify: center, $align: center);
       min-height: 200px;
       border-radius: 8px;
       box-sizing: border-box;
@@ -334,9 +350,11 @@
     }
 
     .desc-sub-item-wrp {
-      display: flex;
-      gap: $space-md;
+      @include flexbox($gap: $space-md);
       padding: $space-md;
+      :deep(.ant-tag) {
+        @include flexbox($align: center, $gap: 4px);
+      }
     }
 
     .desc-sub-item {

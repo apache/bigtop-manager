@@ -18,21 +18,23 @@
 -->
 
 <script setup lang="ts">
-  import { computed, ref } from 'vue'
-  import { useRoute } from 'vue-router'
-  import type { GroupItem } from '@/components/common/button-group/types'
-  import type { TabItem } from '@/components/common/main-card/types'
+  import { computed, onMounted, ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
+  import { useClusterStore } from '@/store/cluster'
+  import { storeToRefs } from 'pinia'
+  import { execCommand } from '@/api/command'
   import Overview from './overview.vue'
   import Service from './service.vue'
   import Host from './host.vue'
   import User from './user.vue'
   import Job from '@/components/job/index.vue'
-  import { useI18n } from 'vue-i18n'
+  import type { TabItem } from '@/components/common/main-card/types'
+  import type { GroupItem } from '@/components/common/button-group/types'
+  import { Command } from '@/api/command/types'
 
   const { t } = useI18n()
-  const route = useRoute()
-  const title = computed(() => route.params.cluster as string)
-  const desc = ref('我是描述')
+  const clusterStore = useClusterStore()
+  const { currCluster } = storeToRefs(clusterStore)
   const activeKey = ref('1')
   const tabs = computed((): TabItem[] => [
     {
@@ -69,15 +71,15 @@
       text: t('common.more_operations'),
       dropdownMenu: [
         {
-          action: 'start',
+          action: 'Start',
           text: t('common.start', [t('common.cluster')])
         },
         {
-          action: 'restart',
+          action: 'Restart',
           text: t('common.restart', [t('common.cluster')])
         },
         {
-          action: 'stop',
+          action: 'Stop',
           text: t('common.stop', [t('common.cluster')])
         }
       ],
@@ -90,21 +92,40 @@
     return componnts[parseInt(activeKey.value) - 1]
   })
 
-  const dropdownMenuClick: GroupItem['dropdownMenuClickEvent'] = ({ key }) => {
-    console.log('key :>> ', key)
+  const dropdownMenuClick: GroupItem['dropdownMenuClickEvent'] = async ({ key }) => {
+    try {
+      await execCommand({
+        command: key as keyof typeof Command,
+        clusterId: currCluster.value.id,
+        commandLevel: 'cluster'
+      })
+      clusterStore.loadClusters()
+      clusterStore.getClusterDetail()
+    } catch (error) {
+      console.log('error :>> ', error)
+    }
   }
 
   const addService: GroupItem['clickEvent'] = () => {
     console.log('add :>> ')
   }
+
+  onMounted(() => {
+    clusterStore.getClusterDetail()
+  })
 </script>
 
 <template>
-  <header-card :title="title" avatar="cluster" :desc="desc" :action-groups="actionGroup" />
+  <header-card
+    :title="currCluster.displayName"
+    avatar="cluster"
+    :desc="currCluster.desc"
+    :action-groups="actionGroup"
+  />
   <main-card v-model:active-key="activeKey" :tabs="tabs">
     <template #tab-item>
       <keep-alive>
-        <component :is="getCompName"></component>
+        <component :is="getCompName" v-bind="currCluster"></component>
       </keep-alive>
     </template>
   </main-card>

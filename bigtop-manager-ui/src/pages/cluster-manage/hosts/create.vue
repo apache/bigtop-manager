@@ -553,7 +553,6 @@
   }
   footer {
     width: 100%;
-    display: flex;
-    justify-content: flex-end;
+    @include flexbox($justify: flex-end);
   }
 </style>

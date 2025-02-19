@@ -17,49 +17,57 @@
  * under the License.
  */
 
+import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
+import { useRoute } from 'vue-router'
+import { getCluster, getClusterList } from '@/api/cluster'
 import { ClusterVO } from '@/api/cluster/types.ts'
-import { ref } from 'vue'
-import { getClusterList } from '@/api/cluster'
 
 export const useClusterStore = defineStore(
   'cluster',
   () => {
+    const route = useRoute()
     const clusters = ref<ClusterVO[]>([])
-    const count = ref(0)
+    const currCluster = ref<ClusterVO>({})
+    const clusterId = computed(() => (route.params.id as string) || undefined)
 
     const addCluster = async () => {
-      count.value = count.value + 1
       await loadClusters()
     }
 
     const delCluster = async () => {
-      if (count.value < 0) {
-        count.value = 0
-        return
-      }
-      count.value = count.value - 1
       await loadClusters()
     }
 
+    const getClusterDetail = async () => {
+      if (clusterId.value == undefined) {
+        return
+      }
+      try {
+        currCluster.value = await getCluster(parseInt(clusterId.value))
+      } catch (error) {
+        console.log('error :>> ', error)
+      }
+    }
+
     const loadClusters = async () => {
-      const data = await getClusterList()
-      clusters.value = data as ClusterVO[]
+      clusters.value = await getClusterList()
     }
 
     return {
       clusters,
-      count,
+      currCluster,
       addCluster,
       delCluster,
-      loadClusters
+      loadClusters,
+      getClusterDetail
     }
   },
   {
     persist: false
     // persist: {
     //   storage: sessionStorage,
-    //   paths: ['clusters', 'count']
+    //   paths: ['clusters',]
     // }
   }
 )

@@ -19,15 +19,13 @@
 
 import { defineStore, storeToRefs } from 'pinia'
 import { computed, ref } from 'vue'
-import { useRoute } from 'vue-router'
 import { getServiceList } from '@/api/service'
 import { useStackStore } from '@/store/stack/index'
-import type { ServiceVO } from '@/api/service/types'
+import type { ServiceListParams, ServiceVO } from '@/api/service/types'
 
 export const useServiceStore = defineStore(
   'service',
   () => {
-    const route = useRoute()
     const stackStore = useStackStore()
     const services = ref<ServiceVO[]>([])
     const total = ref(0)
@@ -41,11 +39,10 @@ export const useServiceStore = defineStore(
       )
     )
 
-    const getServices = async () => {
+    const getServices = async (clusterId: number, filterParams?: ServiceListParams) => {
       try {
         loading.value = true
-        const params = route.params as unknown as { id: string; clusterName: string }
-        const data = await getServiceList(parseInt(params.id))
+        const data = await getServiceList(clusterId, { ...filterParams, pageNum: 1, pageSize: 50 })
         services.value = data.content
         total.value = data.total
       } catch (error) {
@@ -57,6 +54,7 @@ export const useServiceStore = defineStore(
 
     return {
       services,
+      loading,
       getServices,
       locateStackWithService
     }

@@ -17,6 +17,7 @@
  * under the License.
  */
 
+import type { ListParams } from '../types'
 import type {
   ServiceParams,
   ServiceVO,
@@ -24,12 +25,13 @@ import type {
   ServiceConfigSnapshot,
   ServiceList,
   SnapshotData,
-  SnapshotRecovery
+  SnapshotRecovery,
+  ServiceListParams
 } from './types'
 import { get, post, del } from '@/api/request-util'
 
-export const getServiceList = (clusterId: number) => {
-  return get<ServiceList>(`/clusters/${clusterId}/services`)
+export const getServiceList = (clusterId: number, params?: ListParams & ServiceListParams) => {
+  return get<ServiceList>(`/clusters/${clusterId}/services`, params)
 }
 
 export const getService = (pathParams: ServiceParams) => {

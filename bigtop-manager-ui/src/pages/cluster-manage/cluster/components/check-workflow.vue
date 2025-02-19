@@ -21,8 +21,8 @@
   import { computed, onMounted, reactive, ref, shallowRef, toRefs } from 'vue'
   import { getJobDetails, retryJob } from '@/api/job'
   import { CommandVO } from '@/api/command/types'
-  import type { JobVO, StageVO, StateType, TaskVO } from '@/api/job/types'
   import LogsView, { type LogViewProps } from '@/components/log-view/index.vue'
+  import type { JobVO, StageVO, StateType, TaskVO } from '@/api/job/types'
 
   const props = defineProps<{ stepData: CommandVO }>()
   const emits = defineEmits(['updateData'])

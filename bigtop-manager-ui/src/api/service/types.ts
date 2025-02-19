@@ -24,8 +24,12 @@ export type ServiceList = PageVO<ServiceVO>
 export type ServiceParams = { clusterId: number; id: number }
 export type SnapshotData = { desc?: string; name?: string }
 export type SnapshotRecovery = ServiceParams & { snapshotId: string }
-
 export type ServiceStatusType = 1 | 2 | 3
+export type ServiceListParams = {
+  name?: string
+  restartFlag?: boolean
+  status?: ServiceStatusType
+}
 
 export interface ServiceVO {
   components?: ComponentVO[]

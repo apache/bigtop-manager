@@ -18,11 +18,11 @@
 -->
 
 <script setup lang="ts">
-  import type { FormItemState } from '@/components/common/auto-form/types'
   import { computed, ref, shallowRef, watch } from 'vue'
   import { useI18n } from 'vue-i18n'
-  import type { ClusterCommandReq } from '@/api/command/types'
   import { pick } from '@/utils/tools'
+  import type { ClusterCommandReq } from '@/api/command/types'
+  import type { FormItemState } from '@/components/common/auto-form/types'
 
   type ClusterCommandReqKey = keyof ClusterCommandReq
 

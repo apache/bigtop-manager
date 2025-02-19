@@ -19,15 +19,14 @@
 
 <script setup lang="ts">
   import { TableColumnType, TableProps } from 'ant-design-vue'
-  import { computed, onActivated, reactive, ref } from 'vue'
+  import { computed, onActivated, reactive, ref, useAttrs } from 'vue'
   import { useI18n } from 'vue-i18n'
-  import { useRoute } from 'vue-router'
-
+  import { getHosts } from '@/api/hosts'
   import useBaseTable from '@/composables/use-base-table'
   import type { FilterConfirmProps, FilterResetProps } from 'ant-design-vue/es/table/interface'
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { HostVO } from '@/api/hosts/types'
-  import { getHosts } from '@/api/hosts'
+  import type { ClusterVO } from '@/api/cluster/types'
 
   type Key = string | number
   interface TableState {
@@ -37,7 +36,7 @@
   }
 
   const { t } = useI18n()
-  const route = useRoute()
+  const attrs = useAttrs() as ClusterVO
   const searchInputRef = ref()
   const hostStatus = ref(['INSTALLING', 'SUCCESS', 'FAILED', 'UNKNOW'])
   const state = reactive<TableState>({
@@ -162,8 +161,7 @@
 
   const getHostList = async (isReset = false) => {
     loading.value = true
-    const clusterId = parseInt(route.params.id as string)
-    if (isNaN(clusterId) || !paginationProps.value) {
+    if (attrs.id == undefined || !paginationProps.value) {
       loading.value = false
       return
     }
@@ -171,7 +169,7 @@
       paginationProps.value.current = 1
     }
     try {
-      const res = await getHosts({ ...filtersParams.value, clusterId })
+      const res = await getHosts({ ...filtersParams.value, clusterId: attrs.id })
       dataSource.value = res.content
       paginationProps.value.total = res.total
       loading.value = false

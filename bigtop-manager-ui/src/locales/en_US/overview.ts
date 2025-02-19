@@ -31,5 +31,8 @@ export default {
   disk_size: 'Disk Size',
   creator: 'Creator',
   memory_usage: 'Memory Usage',
-  cpu_usage: 'Cpu Usage'
+  cpu_usage: 'Cpu Usage',
+  unit_host: 'Hosts',
+  unit_service: 'Services',
+  unit_processor: 'Processors'
 }
