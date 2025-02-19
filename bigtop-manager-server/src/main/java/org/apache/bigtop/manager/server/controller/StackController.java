@@ -19,6 +19,7 @@
 package org.apache.bigtop.manager.server.controller;
 
 import org.apache.bigtop.manager.server.model.vo.ClusterVO;
+import org.apache.bigtop.manager.server.model.vo.ServiceClusterVO;
 import org.apache.bigtop.manager.server.model.vo.StackVO;
 import org.apache.bigtop.manager.server.service.StackService;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
@@ -49,8 +50,8 @@ public class StackController {
     }
 
     @Operation(summary = "service clusters", description = "Get service clusters")
-    @GetMapping("/services/{serviceName}/clusters")
-    public ResponseEntity<List<ClusterVO>> serviceClusters(@PathVariable String serviceName) {
-        return ResponseEntity.success(stackService.serviceClusters(serviceName));
+    @GetMapping("/services/clusters")
+    public ResponseEntity<List<ServiceClusterVO>> serviceClusters() {
+        return ResponseEntity.success(stackService.serviceClusters());
     }
 }

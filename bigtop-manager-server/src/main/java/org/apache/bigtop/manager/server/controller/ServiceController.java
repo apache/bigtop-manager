@@ -24,6 +24,7 @@ import org.apache.bigtop.manager.server.model.req.ServiceConfigSnapshotReq;
 import org.apache.bigtop.manager.server.model.vo.PageVO;
 import org.apache.bigtop.manager.server.model.vo.ServiceConfigSnapshotVO;
 import org.apache.bigtop.manager.server.model.vo.ServiceConfigVO;
+import org.apache.bigtop.manager.server.model.vo.ServiceUserVO;
 import org.apache.bigtop.manager.server.model.vo.ServiceVO;
 import org.apache.bigtop.manager.server.service.ServiceService;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
@@ -70,6 +71,22 @@ public class ServiceController {
     @GetMapping
     public ResponseEntity<PageVO<ServiceVO>> list(ServiceQuery query) {
         return ResponseEntity.success(serviceService.list(query));
+    }
+
+    @Parameters({
+            @Parameter(in = ParameterIn.QUERY, name = "pageNum", schema = @Schema(type = "integer", defaultValue = "1")),
+            @Parameter(in = ParameterIn.QUERY, name = "pageSize", schema = @Schema(type = "integer", defaultValue = "10")),
+            @Parameter(in = ParameterIn.QUERY, name = "orderBy", schema = @Schema(type = "string", defaultValue = "id")),
+            @Parameter(
+                    in = ParameterIn.QUERY,
+                    name = "sort",
+                    description = "asc/desc",
+                    schema = @Schema(type = "string", defaultValue = "asc"))
+    })
+    @Operation(summary = "service user list", description = "List service users")
+    @GetMapping("/users")
+    public ResponseEntity<PageVO<ServiceUserVO>> serviceUsers(@PathVariable Long clusterId) {
+        return ResponseEntity.success(serviceService.serviceUsers(clusterId));
     }
 
     @Operation(summary = "get", description = "Get a service")

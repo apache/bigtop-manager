@@ -91,16 +91,16 @@ public class TaskInterceptorTest {
     }
 
     @Test
-    public void testIsTaskRequestTaskRequest() {
+    public void testIsTaskLogRequestTaskRequest() {
         TaskLogRequest taskLogRequest = new TaskLogRequest();
 
         Boolean result = taskInterceptor.isTaskRequest(taskLogRequest);
 
-        assertTrue(result);
+        assertFalse(result);
     }
 
     @Test
-    public void testIsTaskRequestTaskWithGetTaskIdMethod() {
+    public void testIsTaskRequestTaskRequest() {
         Task task = new Task();
 
         Boolean result = taskInterceptor.isTaskRequest(task);

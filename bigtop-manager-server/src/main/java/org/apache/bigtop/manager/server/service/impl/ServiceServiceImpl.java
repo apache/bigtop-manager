@@ -19,12 +19,14 @@
 package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.common.utils.JsonUtils;
+import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
 import org.apache.bigtop.manager.dao.po.ServiceConfigSnapshotPO;
 import org.apache.bigtop.manager.dao.po.ServicePO;
 import org.apache.bigtop.manager.dao.query.ComponentQuery;
 import org.apache.bigtop.manager.dao.query.ServiceQuery;
+import org.apache.bigtop.manager.dao.repository.ClusterDao;
 import org.apache.bigtop.manager.dao.repository.ComponentDao;
 import org.apache.bigtop.manager.dao.repository.ServiceConfigDao;
 import org.apache.bigtop.manager.dao.repository.ServiceConfigSnapshotDao;
@@ -41,6 +43,7 @@ import org.apache.bigtop.manager.server.model.req.ServiceConfigSnapshotReq;
 import org.apache.bigtop.manager.server.model.vo.PageVO;
 import org.apache.bigtop.manager.server.model.vo.ServiceConfigSnapshotVO;
 import org.apache.bigtop.manager.server.model.vo.ServiceConfigVO;
+import org.apache.bigtop.manager.server.model.vo.ServiceUserVO;
 import org.apache.bigtop.manager.server.model.vo.ServiceVO;
 import org.apache.bigtop.manager.server.service.ServiceService;
 import org.apache.bigtop.manager.server.utils.PageUtils;
@@ -49,6 +52,7 @@ import org.apache.bigtop.manager.server.utils.StackUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.github.pagehelper.Page;
@@ -57,6 +61,8 @@ import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 
 import jakarta.annotation.Resource;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,6 +70,9 @@ import java.util.Map;
 @Slf4j
 @Service
 public class ServiceServiceImpl implements ServiceService {
+
+    @Resource
+    private ClusterDao clusterDao;
 
     @Resource
     private ServiceDao serviceDao;
@@ -85,6 +94,32 @@ public class ServiceServiceImpl implements ServiceService {
             List<ServicePO> servicePOList = serviceDao.findByQuery(query);
             PageInfo<ServicePO> pageInfo = new PageInfo<>(servicePOList);
             return PageVO.of(pageInfo);
+        } finally {
+            PageHelper.clearPage();
+        }
+    }
+
+    @Override
+    public PageVO<ServiceUserVO> serviceUsers(Long clusterId) {
+        PageQuery pageQuery = PageUtils.getPageQuery();
+        try (Page<?> ignored =
+                     PageHelper.startPage(pageQuery.getPageNum(), pageQuery.getPageSize(), pageQuery.getOrderBy())) {
+            ServiceQuery query = ServiceQuery.builder().clusterId(clusterId).build();
+            List<ServicePO> servicePOList = serviceDao.findByQuery(query);
+
+            ClusterPO clusterPO = clusterDao.findById(clusterId);
+            List<ServiceUserVO> res = new ArrayList<>();
+            for (ServicePO servicePO : servicePOList) {
+                ServiceUserVO serviceUserVO = new ServiceUserVO();
+                serviceUserVO.setDisplayName(servicePO.getDisplayName());
+                serviceUserVO.setUser(servicePO.getUser());
+                serviceUserVO.setUserGroup(clusterPO.getUserGroup());
+                serviceUserVO.setDesc(servicePO.getDesc());
+                res.add(serviceUserVO);
+            }
+
+            PageInfo<ServicePO> pageInfo = new PageInfo<>(servicePOList);
+            return PageVO.of(res, pageInfo.getTotal());
         } finally {
             PageHelper.clearPage();
         }
