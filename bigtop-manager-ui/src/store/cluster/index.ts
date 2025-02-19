@@ -28,6 +28,7 @@ export const useClusterStore = defineStore(
   () => {
     const route = useRoute()
     const clusters = ref<ClusterVO[]>([])
+    const loading = ref(false)
     const currCluster = ref<ClusterVO>({})
     const clusterId = computed(() => (route.params.id as string) || undefined)
 
@@ -44,9 +45,12 @@ export const useClusterStore = defineStore(
         return
       }
       try {
+        loading.value = true
         currCluster.value = await getCluster(parseInt(clusterId.value))
       } catch (error) {
         console.log('error :>> ', error)
+      } finally {
+        loading.value = false
       }
     }
 
@@ -56,6 +60,7 @@ export const useClusterStore = defineStore(
 
     return {
       clusters,
+      loading,
       currCluster,
       addCluster,
       delCluster,

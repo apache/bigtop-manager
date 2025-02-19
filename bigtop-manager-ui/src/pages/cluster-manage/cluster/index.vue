@@ -34,7 +34,7 @@
 
   const { t } = useI18n()
   const clusterStore = useClusterStore()
-  const { currCluster } = storeToRefs(clusterStore)
+  const { currCluster, loading } = storeToRefs(clusterStore)
   const activeKey = ref('1')
   const tabs = computed((): TabItem[] => [
     {
@@ -116,19 +116,21 @@
 </script>
 
 <template>
-  <header-card
-    :title="currCluster.displayName"
-    avatar="cluster"
-    :desc="currCluster.desc"
-    :action-groups="actionGroup"
-  />
-  <main-card v-model:active-key="activeKey" :tabs="tabs">
-    <template #tab-item>
-      <keep-alive>
-        <component :is="getCompName" v-bind="currCluster"></component>
-      </keep-alive>
-    </template>
-  </main-card>
+  <a-spin :spinning="loading">
+    <header-card
+      :title="currCluster.displayName"
+      avatar="cluster"
+      :desc="currCluster.desc"
+      :action-groups="actionGroup"
+    />
+    <main-card v-model:active-key="activeKey" :tabs="tabs">
+      <template #tab-item>
+        <keep-alive>
+          <component :is="getCompName" v-bind="currCluster"></component>
+        </keep-alive>
+      </template>
+    </main-card>
+  </a-spin>
 </template>
 
 <style lang="scss" scoped></style>
