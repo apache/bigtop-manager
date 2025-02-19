@@ -149,6 +149,7 @@
       paginationProps.value.total = res.total
     } catch (error) {
       console.log('error :>> ', error)
+      stopPolling()
     } finally {
       loading.value = false
     }
