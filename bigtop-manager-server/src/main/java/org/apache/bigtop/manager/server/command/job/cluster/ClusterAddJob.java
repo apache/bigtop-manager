@@ -21,7 +21,6 @@ package org.apache.bigtop.manager.server.command.job.cluster;
 import org.apache.bigtop.manager.dao.po.JobPO;
 import org.apache.bigtop.manager.dao.po.StagePO;
 import org.apache.bigtop.manager.dao.po.TaskPO;
-import org.apache.bigtop.manager.server.command.job.AbstractJob;
 import org.apache.bigtop.manager.server.command.job.JobContext;
 import org.apache.bigtop.manager.server.command.stage.HostCheckStage;
 import org.apache.bigtop.manager.server.command.stage.SetupJdkStage;
@@ -38,7 +37,7 @@ import org.apache.bigtop.manager.server.service.HostService;
 
 import java.util.List;
 
-public class ClusterAddJob extends AbstractJob {
+public class ClusterAddJob extends AbstractClusterJob {
 
     private HostService hostService;
 
@@ -92,7 +91,7 @@ public class ClusterAddJob extends AbstractJob {
         return "Add cluster";
     }
 
-    private void saveCluster() {
+    protected void saveCluster() {
         CommandDTO commandDTO = jobContext.getCommandDTO();
         ClusterDTO clusterDTO = ClusterConverter.INSTANCE.fromCommand2DTO(commandDTO.getClusterCommand());
         clusterPO = clusterDao.findByName(clusterDTO.getName());
@@ -104,7 +103,7 @@ public class ClusterAddJob extends AbstractJob {
         clusterDao.save(clusterPO);
     }
 
-    private void saveHosts() {
+    protected void saveHosts() {
         CommandDTO commandDTO = jobContext.getCommandDTO();
         List<HostDTO> hostDTOList = commandDTO.getClusterCommand().getHosts();
         for (HostDTO hostDTO : hostDTOList) {
@@ -113,7 +112,7 @@ public class ClusterAddJob extends AbstractJob {
         }
     }
 
-    private void linkJobToCluster() {
+    protected void linkJobToCluster() {
         JobPO jobPO = getJobPO();
         jobPO.setClusterId(clusterPO.getId());
         jobDao.partialUpdateById(jobPO);

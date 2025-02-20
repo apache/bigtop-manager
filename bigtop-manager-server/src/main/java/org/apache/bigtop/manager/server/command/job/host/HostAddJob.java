@@ -68,7 +68,7 @@ public class HostAddJob extends AbstractHostJob {
         return "Add hosts";
     }
 
-    private void saveHosts() {
+    protected void saveHosts() {
         CommandDTO commandDTO = jobContext.getCommandDTO();
         List<HostDTO> hostDTOList = HostConverter.INSTANCE.fromCommand2DTO(commandDTO.getHostCommands());
         for (HostDTO hostDTO : hostDTOList) {
