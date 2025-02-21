@@ -52,11 +52,11 @@
   const { locale } = storeToRefs(localeStore)
   const isEdit = computed(() => mode.value === 'EDIT')
 
-  const checkPassword = async (_rule: Rule, value: string) => {
+  const checkSshPassword = async (_rule: Rule, value: string) => {
     if (!value) {
       return Promise.reject(t('common.enter_error', [`${t('host.confirm_password')}`.toLowerCase()]))
     }
-    if (value != formValue.value?.sshKeyPassword) {
+    if (value != formValue.value?.sshPassword) {
       return Promise.reject(t('common.password_not_match'))
     } else {
       return Promise.resolve()
@@ -71,12 +71,12 @@
     }
   }
 
-  const formItemsForPassword = computed((): FormItemState[] => [
+  const formItemsForSshPassword = computed((): FormItemState[] => [
     {
       type: 'inputPassword',
-      field: 'sshKeyPassword',
+      field: 'sshPassword',
       formItemProps: {
-        name: 'sshKeyPassword',
+        name: 'sshPassword',
         label: t('host.password_auth'),
         rules: [
           {
@@ -92,14 +92,14 @@
     },
     {
       type: 'inputPassword',
-      field: 'sshKeyPasswordAgain',
+      field: 'sshPasswordAgain',
       formItemProps: {
-        name: 'sshKeyPasswordAgain',
+        name: 'sshPasswordAgain',
         label: t('host.confirm_password'),
         rules: [
           {
             required: true,
-            validator: checkPassword,
+            validator: checkSshPassword,
             trigger: 'blur'
           }
         ]
@@ -110,7 +110,7 @@
     }
   ])
 
-  const formItemsForKey = computed((): FormItemState[] => [
+  const formItemsForSshKeyPassword = computed((): FormItemState[] => [
     {
       type: 'radio',
       field: 'inputType',
@@ -164,9 +164,9 @@
     },
     {
       type: 'input',
-      field: 'keyPassword',
+      field: 'sshKeyPassword',
       formItemProps: {
-        name: 'keyPassword',
+        name: 'sshKeyPassword',
         label: t('host.key_password')
       },
       controlProps: {
@@ -175,9 +175,9 @@
     },
     {
       type: 'textarea',
-      field: 'keyPasswordAgain',
+      field: 'sshKeyPasswordAgain',
       formItemProps: {
-        name: 'keyPasswordAgain',
+        name: 'sshKeyPasswordAgain',
         label: t('host.confirm_key_password'),
         rules: [
           {
@@ -296,11 +296,11 @@
   const filterFormItems = computed((): FormItemState[] => {
     if (formValue.value.authType === '1') {
       const data = [...formItems.value]
-      data.splice(2, 0, ...formItemsForPassword.value)
+      data.splice(2, 0, ...formItemsForSshPassword.value)
       return data
     } else if (formValue.value.authType === '2') {
       const data = [...formItems.value]
-      data.splice(2, 0, ...formItemsForKey.value)
+      data.splice(2, 0, ...formItemsForSshKeyPassword.value)
       return data
     }
     return [...formItems.value]
