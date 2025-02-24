@@ -161,4 +161,9 @@ public abstract class AbstractStage implements Stage {
 
         return stagePO;
     }
+
+    protected void setStageContextAndTasksForTest(StageContext stageContext, List<Task> tasks) {
+        this.stageContext = stageContext;
+        this.tasks = tasks;
+    }
 }
