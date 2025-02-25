@@ -20,10 +20,7 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div>
-    <span> infra list </span>
-    <a-button type="primary" @click="() => $router.push({ name: 'InfraCreation' })">Create Infra</a-button>
-  </div>
+  <div class="service-configurator"> service-configurator </div>
 </template>
 
-<style scoped></style>
+<style lang="scss" scoped></style>

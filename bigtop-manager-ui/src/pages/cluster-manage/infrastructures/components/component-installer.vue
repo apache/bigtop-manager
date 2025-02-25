@@ -16,14 +16,10 @@
   ~ specific language governing permissions and limitations
   ~ under the License.
 -->
-
 <script setup lang="ts"></script>
 
 <template>
-  <div>
-    <span> infra list </span>
-    <a-button type="primary" @click="() => $router.push({ name: 'InfraCreation' })">Create Infra</a-button>
-  </div>
+  <div class="component-installer"> component-installer </div>
 </template>
 
-<style scoped></style>
+<style lang="scss" scoped></style>
