@@ -17,10 +17,213 @@
   ~ under the License.
 -->
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+  import { computed, onMounted, reactive, ref, toRefs } from 'vue'
+
+  interface DataItem {
+    id: number
+    name: string
+    desc: string
+    order: number
+  }
+
+  interface State {
+    isAddableData: DataItem[]
+    isRmoveableData: DataItem[]
+  }
+
+  const searchStr = ref('')
+  const state = reactive<State>({
+    isAddableData: [],
+    isRmoveableData: []
+  })
+  const { isAddableData } = toRefs(state)
+
+  const normalizedData = computed(() =>
+    isAddableData.value.map((item) => ({
+      ...item,
+      name: item.name.toString().toLowerCase(),
+      desc: item.desc.toString().toLowerCase()
+    }))
+  )
+
+  const filterAddableData = computed(() =>
+    normalizedData.value.filter(
+      (v) => v.name.includes(searchStr.value.toLowerCase()) || v.desc.includes(searchStr.value.toLowerCase())
+    )
+  )
+
+  const moveItem = <T extends { name: string; order: number }>(from: T[], to: T[], item: T, key: keyof T = 'name') => {
+    const index = from.findIndex((v) => v[key] === item[key])
+    if (index !== -1) {
+      const [removedItem] = from.splice(index, 1)
+      insertByOrder(to, removedItem)
+    }
+  }
+
+  //  Binary search
+  const findInsertIndex = <T extends { order: number }>(array: T[], order: number) => {
+    let low = 0
+    let high = array.length
+
+    while (low < high) {
+      const mid = (low + high) >>> 1
+      if (array[mid].order < order) {
+        low = mid + 1
+      } else {
+        high = mid
+      }
+    }
+    return low
+  }
+
+  const insertByOrder = <T extends { order: number }>(array: T[], item: T) => {
+    const index = findInsertIndex(array, item.order)
+    array.splice(index, 0, item)
+  }
+
+  const addInstallItem = (item: DataItem) => {
+    moveItem(state.isAddableData, state.isRmoveableData, item)
+  }
+
+  const removeInstallItem = (item: DataItem) => {
+    moveItem(state.isRmoveableData, state.isAddableData, item)
+  }
+
+  onMounted(() => {
+    state.isAddableData = getAddableData()
+  })
+
+  const getAddableData = () => {
+    return Array.from(
+      { length: 40 },
+      (_v, k) =>
+        ({
+          id: k,
+          name: `ZooKeeper-${k}`,
+          desc: `Apache ZooKeeper is an effort to develop and maintain ${k}`,
+          order: k
+        }) as unknown as DataItem
+    )
+  }
+</script>
 
 <template>
-  <div class="service-selector"> service-selector </div>
+  <div class="service-selector">
+    <div>
+      <div class="list-title">
+        <div>服务列表</div>
+        <a-input v-model:value="searchStr" placeholder="请输入搜索关键字" />
+      </div>
+      <a-list item-layout="horizontal" :data-source="filterAddableData">
+        <template #renderItem="{ item }">
+          <a-list-item>
+            <template #actions>
+              <a-button size="small" type="primary" @click="addInstallItem(item)">Add</a-button>
+            </template>
+            <a-list-item-meta>
+              <template #title>
+                <div class="ellipsis" :title="item.name">
+                  <template
+                    v-for="(fragment, i) in item.name
+                      .toString()
+                      .split(new RegExp(`(?<=${searchStr})|(?=${searchStr})`, 'i'))"
+                  >
+                    <mark v-if="fragment.toLowerCase() === searchStr.toLowerCase()" :key="i" class="highlight">
+                      {{ fragment }}
+                    </mark>
+                    <template v-else>{{ fragment }}</template>
+                  </template>
+                </div>
+              </template>
+              <template #description>
+                <div class="ellipsis" :title="item.desc">
+                  <template
+                    v-for="(fragment, i) in item.desc
+                      .toString()
+                      .split(new RegExp(`(?<=${searchStr})|(?=${searchStr})`, 'i'))"
+                  >
+                    <mark v-if="fragment.toLowerCase() === searchStr.toLowerCase()" :key="i" class="highlight">
+                      {{ fragment }}
+                    </mark>
+                    <template v-else>{{ fragment }}</template>
+                  </template>
+                </div>
+              </template>
+              <template #avatar>
+                <a-avatar shape="square" :size="54" />
+              </template>
+            </a-list-item-meta>
+          </a-list-item>
+        </template>
+      </a-list>
+    </div>
+    <a-divider type="vertical" class="divider" />
+    <div>
+      <div class="list-title">
+        <div>待安装服务</div>
+      </div>
+      <a-list item-layout="horizontal" :data-source="state.isRmoveableData">
+        <template #renderItem="{ item }">
+          <a-list-item>
+            <template #actions>
+              <a-button size="small" danger type="primary" @click="removeInstallItem(item)">Remove</a-button>
+            </template>
+            <a-list-item-meta>
+              <template #title>
+                <div class="ellipsis" :data-tooltip="item.name">
+                  {{ item.name }}
+                </div>
+              </template>
+              <template #description>
+                <div class="ellipsis" :data-tooltip="item.desc">
+                  {{ item.desc }}
+                </div>
+              </template>
+              <template #avatar>
+                <a-avatar shape="square" :size="54" />
+              </template>
+            </a-list-item-meta>
+          </a-list-item>
+        </template>
+      </a-list>
+    </div>
+  </div>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+  .highlight {
+    background-color: rgb(255, 192, 105);
+    padding: 0px;
+  }
+
+  .service-selector {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    grid-template-rows: auto;
+    justify-content: space-between;
+    .list-title {
+      display: flex;
+      height: 32px;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 500;
+      border-bottom: 1px solid $color-border;
+      padding-bottom: 16px;
+      .ant-input {
+        flex: 0 1 160px;
+      }
+    }
+    .ant-list {
+      max-height: 500px;
+      overflow: auto;
+    }
+  }
+  .divider {
+    height: 100%;
+    margin-inline: 16px;
+  }
+  :deep(.ant-avatar) {
+    border-radius: 4px;
+  }
+</style>
