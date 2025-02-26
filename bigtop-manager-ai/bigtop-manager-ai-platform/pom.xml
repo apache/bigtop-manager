@@ -25,9 +25,9 @@
         <version>${revision}</version>
     </parent>
 
-    <artifactId>bigtop-manager-ai-qianfan</artifactId>
+    <artifactId>bigtop-manager-ai-platform</artifactId>
     <name>${project.artifactId}</name>
-    <description>Bigtop Manager AI QianFan</description>
+    <description>Bigtop Manager AI Platform</description>
 
     <dependencies>
         <dependency>
@@ -38,7 +38,17 @@
 
         <dependency>
             <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-open-ai</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
             <artifactId>langchain4j-qianfan</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-dashscope</artifactId>
         </dependency>
     </dependencies>
 </project>

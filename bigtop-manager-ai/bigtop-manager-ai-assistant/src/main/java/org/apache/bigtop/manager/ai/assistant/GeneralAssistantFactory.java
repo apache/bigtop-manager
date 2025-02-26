@@ -27,10 +27,10 @@ import org.apache.bigtop.manager.ai.core.enums.SystemPrompt;
 import org.apache.bigtop.manager.ai.core.exception.AssistantConfigNotSetException;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 import org.apache.bigtop.manager.ai.core.provider.SystemPromptProvider;
-import org.apache.bigtop.manager.ai.dashscope.DashScopeAssistant;
-import org.apache.bigtop.manager.ai.deepseek.DeepSeekAssistant;
-import org.apache.bigtop.manager.ai.openai.OpenAIAssistant;
-import org.apache.bigtop.manager.ai.qianfan.QianFanAssistant;
+import org.apache.bigtop.manager.ai.platform.DashScopeAssistant;
+import org.apache.bigtop.manager.ai.platform.DeepSeekAssistant;
+import org.apache.bigtop.manager.ai.platform.OpenAIAssistant;
+import org.apache.bigtop.manager.ai.platform.QianFanAssistant;
 
 import org.springframework.stereotype.Component;
 
