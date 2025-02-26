@@ -27,20 +27,20 @@ import org.apache.bigtop.manager.dao.repository.ChatThreadDao;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.ChatMessageType;
+import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class PersistentChatMemoryStore implements ChatMemoryStore {
 
-    private final Map<Object, List<ChatMessage>> messagesByMemoryId = new ConcurrentHashMap<>();
+    private final List<ChatMessage> messagesInMemory = new ArrayList<>();
     private final ChatThreadDao chatThreadDao;
     private final ChatMessageDao chatMessageDao;
 
@@ -82,9 +82,20 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
         return chatMessagePO;
     }
 
+    private List<ChatMessage> sortMessages(List<ChatMessage> messages) {
+        List<ChatMessage> systemMessages = messages.stream()
+                .filter(message -> message instanceof SystemMessage)
+                .collect(Collectors.toList());
+        List<ChatMessage> otherMessages = messages.stream()
+                .filter(message -> !(message instanceof SystemMessage))
+                .toList();
+
+        systemMessages.addAll(otherMessages);
+        return systemMessages;
+    }
+
     @Override
     public List<ChatMessage> getMessages(Object threadId) {
-        List<ChatMessage> messages = this.messagesByMemoryId.get(threadId);
         List<ChatMessagePO> chatMessages = chatMessageDao.findAllByThreadId((Long) threadId);
         List<ChatMessage> allChatMessages = new ArrayList<>();
         if (!chatMessages.isEmpty()) {
@@ -93,18 +104,18 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
                     .filter(Objects::nonNull)
                     .toList());
         }
-        if (messages != null) {
-            allChatMessages.addAll(messages);
-        }
-        return allChatMessages;
+
+        allChatMessages.addAll(messagesInMemory);
+
+        return sortMessages(allChatMessages);
     }
 
     @Override
     public void updateMessages(Object threadId, List<ChatMessage> messages) {
-        this.messagesByMemoryId.put(threadId, messages);
         ChatMessage newMessage = messages.get(messages.size() - 1);
         ChatMessagePO chatMessagePO = convertToChatMessagePO(newMessage, (Long) threadId);
         if (chatMessagePO == null) {
+            messagesInMemory.add(newMessage);
             return;
         }
         chatMessageDao.save(chatMessagePO);
