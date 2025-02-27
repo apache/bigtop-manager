@@ -32,24 +32,24 @@
     isRmoveableData: DataItem[]
   }
 
+  interface Props {
+    stepData: any
+  }
+
+  const props = defineProps<Props>()
+  const emits = defineEmits(['update:stepData'])
+
   const searchStr = ref('')
   const state = reactive<State>({
     isAddableData: [],
     isRmoveableData: []
   })
   const { isAddableData } = toRefs(state)
-
-  const normalizedData = computed(() =>
-    isAddableData.value.map((item) => ({
-      ...item,
-      name: item.name.toString().toLowerCase(),
-      desc: item.desc.toString().toLowerCase()
-    }))
-  )
-
   const filterAddableData = computed(() =>
-    normalizedData.value.filter(
-      (v) => v.name.includes(searchStr.value.toLowerCase()) || v.desc.includes(searchStr.value.toLowerCase())
+    isAddableData.value.filter(
+      (v) =>
+        v.name.toString().toLowerCase().includes(searchStr.value) ||
+        v.desc.toString().toLowerCase().includes(searchStr.value)
     )
   )
 
@@ -84,14 +84,20 @@
 
   const addInstallItem = (item: DataItem) => {
     moveItem(state.isAddableData, state.isRmoveableData, item)
+    emits('update:stepData', state)
   }
 
   const removeInstallItem = (item: DataItem) => {
     moveItem(state.isRmoveableData, state.isAddableData, item)
+    emits('update:stepData', state)
   }
 
   onMounted(() => {
-    state.isAddableData = getAddableData()
+    if (!props.stepData) {
+      state.isAddableData = getAddableData()
+    } else {
+      Object.assign(state, props.stepData)
+    }
   })
 
   const getAddableData = () => {
@@ -112,8 +118,8 @@
   <div class="service-selector">
     <div>
       <div class="list-title">
-        <div>服务列表</div>
-        <a-input v-model:value="searchStr" placeholder="请输入搜索关键字" />
+        <div>{{ $t('service.select_service') }}</div>
+        <a-input v-model:value="searchStr" :placeholder="$t('service.please_enter_search_keyword')" />
       </div>
       <a-list item-layout="horizontal" :data-source="filterAddableData">
         <template #renderItem="{ item }">
@@ -161,7 +167,7 @@
     <a-divider type="vertical" class="divider" />
     <div>
       <div class="list-title">
-        <div>待安装服务</div>
+        <div>{{ $t('service.pending_installation_services') }}</div>
       </div>
       <a-list item-layout="horizontal" :data-source="state.isRmoveableData">
         <template #renderItem="{ item }">

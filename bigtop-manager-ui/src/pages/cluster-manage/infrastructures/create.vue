@@ -26,12 +26,6 @@
   import ServiceOverview from './components/service-overview.vue'
   import ComponentInstaller from './components/component-installer.vue'
 
-  interface StepData {
-    selector: any[]
-    assigner: any[]
-    configurator: any
-  }
-
   const components = shallowRef<any[]>([
     ServiceSelector,
     ComponentAssigner,
@@ -40,13 +34,14 @@
     ComponentInstaller
   ])
 
-  const stepData = reactive<StepData>({
-    selector: [],
-    assigner: [],
-    configurator: {}
-  })
-
-  const steps = computed(() => ['选择服务', '分配组件', '配置服务', '服务总览', '安装组件'])
+  const stepData = reactive<any[]>([])
+  const steps = computed(() => [
+    'service.select_service',
+    'service.assign_component',
+    'service.configure_service',
+    'service.service_overview',
+    'service.install_component'
+  ])
   const { current, stepsLimit, previousStep, nextStep } = useSteps(steps.value)
   const currComp = computed(() => components.value[current.value])
 </script>
@@ -71,7 +66,7 @@
           <section :class="{ 'step-content': current < stepsLimit }"> </section>
         </div>
       </template>
-      <component :is="currComp" v-model:stepData="stepData" />
+      <component :is="currComp" v-model:stepData="stepData[current]" />
       <div class="step-action">
         <a-space>
           <a-button v-show="current != stepsLimit" @click="() => $router.go(-1)">{{ $t('common.exit') }}</a-button>

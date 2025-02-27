@@ -18,5 +18,15 @@
  */
 export default {
   name: 'Service Name',
-  required_restart: 'Restart'
+  required_restart: 'Restart',
+  select_service: 'Select Service',
+  assign_component: 'Assign Component',
+  configure_service: 'Configure Service',
+  service_overview: 'Service Overview',
+  install_component: 'Install Component',
+  service_list: 'Service List',
+  pending_installation_services: 'Pending Installation Services',
+  select_host: 'Select  Host',
+  host_preview: 'Host Preview',
+  please_enter_search_keyword: 'Please enter search keyword'
 }
