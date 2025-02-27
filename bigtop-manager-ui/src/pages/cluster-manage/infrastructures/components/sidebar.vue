@@ -18,32 +18,34 @@
 -->
 
 <script setup lang="ts">
-  import { ref } from 'vue'
+  import { ref, watch } from 'vue'
   import type { TreeProps } from 'ant-design-vue'
 
+  interface Props {
+    data: any[]
+    fieldNames?: TreeProps['fieldNames']
+  }
+
+  const props = defineProps<Props>()
+  const emits = defineEmits(['select'])
   const expandedKeys = ref<string[]>([])
   const selectedKeys = ref<string[]>([])
-  const treeData = ref<TreeProps['treeData']>([
-    { title: 'ZooKeeper', key: '0', isLeaf: true },
-    { title: 'ZooKeeper', key: '1', isLeaf: true },
-    { title: 'ZooKeeper', key: '2', isLeaf: true }
-  ])
-  const onLoadData: TreeProps['loadData'] = (treeNode) => {
-    return new Promise<void>((resolve) => {
-      if (treeNode.dataRef?.children) {
-        resolve()
-        return
-      }
-      setTimeout(() => {
-        treeNode.dataRef!.children = [
-          { title: 'Child Node', key: `${treeNode.eventKey}-0` },
-          { title: 'Child Node', key: `${treeNode.eventKey}-1` }
-        ]
-        treeData.value = [...(treeData.value || [])]
-        resolve()
-      }, 1000)
-    })
+  const treeData = ref<TreeProps['treeData']>([])
+
+  const handleSelect: TreeProps['onSelect'] = (selectedKeys, info) => {
+    emits('select', info.node.dataRef)
   }
+
+  watch(
+    () => props.data,
+    (val) => {
+      treeData.value = val
+    },
+    {
+      immediate: true,
+      deep: true
+    }
+  )
 </script>
 
 <template>
@@ -51,9 +53,10 @@
     <a-tree
       v-model:expandedKeys="expandedKeys"
       v-model:selectedKeys="selectedKeys"
-      :selectable="false"
-      :load-data="onLoadData"
+      :selectable="true"
       :tree-data="treeData"
+      :field-names="$props.fieldNames"
+      @select="handleSelect"
     />
   </div>
 </template>

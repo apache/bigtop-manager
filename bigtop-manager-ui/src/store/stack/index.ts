@@ -17,6 +17,7 @@
  * under the License.
  */
 
+import { ServiceVO } from '@/api/service/types'
 import { getStacks } from '@/api/stack'
 import { StackVO } from '@/api/stack/types'
 import { defineStore } from 'pinia'
@@ -26,14 +27,30 @@ export const useStackStore = defineStore(
   'stack',
   () => {
     const stacks = ref<StackVO[]>([])
+
     const loadStacks = async () => {
       const data = await getStacks()
       stacks.value = data
     }
 
+    const getFilterServices = (exclude?: string[], isOrder = true) => {
+      const filterData = stacks.value.reduce((pre, val) => {
+        if (!exclude?.includes(val.stackName)) {
+          pre.push(...val.services)
+        }
+        return pre
+      }, [] as ServiceVO[])
+
+      if (isOrder) {
+        return filterData.map((service, index) => ({ ...service, order: index }))
+      }
+      return filterData
+    }
+
     return {
       stacks,
-      loadStacks
+      loadStacks,
+      getFilterServices
     }
   },
   {

@@ -20,11 +20,13 @@
 <script setup lang="ts">
   import { HostVO } from '@/api/hosts/types'
   import { TableColumnType, TableProps } from 'ant-design-vue'
-  import { FilterConfirmProps, FilterResetProps } from 'ant-design-vue/es/table/interface'
-  import { computed, onMounted, reactive, ref } from 'vue'
+  import { FilterConfirmProps, FilterResetProps, TableRowSelection } from 'ant-design-vue/es/table/interface'
+  import { computed, onActivated, reactive, ref } from 'vue'
   import { useI18n } from 'vue-i18n'
-  import useBaseTable from '@/composables/use-base-table'
+  import { getHosts } from '@/api/hosts'
+  import { useRoute } from 'vue-router'
   import Sidebar from './sidebar.vue'
+  import useBaseTable from '@/composables/use-base-table'
 
   type Key = string | number
 
@@ -34,7 +36,11 @@
     searchedColumn: keyof HostVO
   }
 
+  defineProps<{ stepData: any }>()
+  defineEmits(['update'])
+
   const { t } = useI18n()
+  const route = useRoute()
   const searchInputRef = ref()
   const state = reactive<TableState>({
     searchText: '',
@@ -73,7 +79,8 @@
     }
   }
 
-  const onSelectChange = (selectedRowKeys: Key[]) => {
+  const onSelectChange: TableRowSelection['onChange'] = (selectedRowKeys, selectedRows) => {
+    console.log('selectedRows :>> ', selectedRows)
     state.selectedRowKeys = selectedRowKeys
   }
 
@@ -88,21 +95,37 @@
     state.searchText = ''
   }
 
-  const { loading, dataSource, paginationProps, onChange } = useBaseTable<HostVO>({
+  const { loading, dataSource, filtersParams, paginationProps, onChange } = useBaseTable<HostVO>({
     columns: columns.value,
     rows: []
   })
 
   const tableChange: TableProps['onChange'] = (pagination, filters, ...args) => {
     onChange(pagination, filters, ...args)
+    getHostList()
   }
 
-  onMounted(() => {
-    dataSource.value = Array.from({ length: 40 }, (_v, k) => ({
-      hostname: `test-${k}`,
-      ipv4: '192.168.4.2',
-      desc: `I am a test host-${k}`
-    }))
+  const getHostList = async () => {
+    loading.value = true
+    const clusterId = route.query.id as unknown as number
+    if (clusterId || !paginationProps.value) {
+      loading.value = false
+      return
+    }
+    try {
+      const res = await getHosts({ ...filtersParams.value, clusterId })
+      dataSource.value = res.content
+      paginationProps.value.total = res.total
+      loading.value = false
+    } catch (error) {
+      console.log('error :>> ', error)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  onActivated(() => {
+    getHostList()
   })
 </script>
 
@@ -112,7 +135,14 @@
       <div class="list-title">
         <div>{{ $t('service.service_list') }}</div>
       </div>
-      <sidebar />
+      <sidebar
+        :data="$props.stepData[0].map((v: any) => ({ ...v, selectable: false }))"
+        :field-names="{
+          children: 'components',
+          title: 'name',
+          key: 'name'
+        }"
+      />
     </section>
     <a-divider type="vertical" class="divider" />
     <section>
@@ -120,6 +150,7 @@
         <div>{{ $t('service.select_host') }}</div>
       </div>
       <a-table
+        row-key="id"
         :loading="loading"
         :data-source="dataSource"
         :columns="columns"
@@ -153,7 +184,6 @@
       <div class="list-title">
         <div>{{ $t('service.host_preview') }}</div>
       </div>
-      <sidebar />
     </section>
   </div>
 </template>

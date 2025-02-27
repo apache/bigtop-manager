@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onMounted, ref } from 'vue'
+  import { computed, onActivated, ref } from 'vue'
   import Sidebar from './sidebar.vue'
   import type { ServiceConfigReq } from '@/api/command/types'
 
@@ -59,7 +59,7 @@
     config.properties?.push(createNewConfigItem())
   }
 
-  onMounted(() => {
+  onActivated(() => {
     configs.value = getConfigsData()
     activeKey.value = configs.value.map((v: any) => v.id)
   })
@@ -96,7 +96,7 @@
       <div class="list-title">
         <div>{{ $t('service.service_list') }}</div>
       </div>
-      <sidebar />
+      <sidebar :data="[]" />
     </section>
     <a-divider type="vertical" class="divider" />
     <section>

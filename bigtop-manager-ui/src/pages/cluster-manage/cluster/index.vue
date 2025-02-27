@@ -25,6 +25,7 @@
   import { execCommand } from '@/api/command'
   import { Command } from '@/api/command/types'
   import { CommonStatus, CommonStatusTexts } from '@/enums/state'
+  import { useRouter } from 'vue-router'
   import Overview from './overview.vue'
   import Service from './service.vue'
   import Host from './host.vue'
@@ -35,6 +36,7 @@
   import type { ClusterStatusType } from '@/api/cluster/types'
 
   const { t } = useI18n()
+  const router = useRouter()
   const clusterStore = useClusterStore()
   const { currCluster, loading } = storeToRefs(clusterStore)
   const activeKey = ref('1')
@@ -114,7 +116,7 @@
   }
 
   const addService: GroupItem['clickEvent'] = () => {
-    console.log('add :>> ')
+    router.push({ name: 'InfraCreation', query: { clusterId: currCluster.value.id } })
   }
 
   onMounted(() => {

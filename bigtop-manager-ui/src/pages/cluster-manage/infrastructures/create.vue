@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { computed, reactive, shallowRef } from 'vue'
+  import { computed, ref, shallowRef } from 'vue'
   import useSteps from '@/composables/use-steps'
   import ServiceSelector from './components/service-selector.vue'
   import ComponentAssigner from './components/component-assigner.vue'
@@ -34,7 +34,7 @@
     ComponentInstaller
   ])
 
-  const stepData = reactive<any[]>([])
+  const stepData = ref<any[]>([])
   const steps = computed(() => [
     'service.select_service',
     'service.assign_component',
@@ -44,6 +44,10 @@
   ])
   const { current, stepsLimit, previousStep, nextStep } = useSteps(steps.value)
   const currComp = computed(() => components.value[current.value])
+
+  const handelUpdate = (state: any) => {
+    stepData.value[current.value] = state
+  }
 </script>
 
 <template>
@@ -66,7 +70,9 @@
           <section :class="{ 'step-content': current < stepsLimit }"> </section>
         </div>
       </template>
-      <component :is="currComp" v-model:stepData="stepData[current]" />
+      <keep-alive>
+        <component :is="currComp" :step-data="stepData" @update="handelUpdate" />
+      </keep-alive>
       <div class="step-action">
         <a-space>
           <a-button v-show="current != stepsLimit" @click="() => $router.go(-1)">{{ $t('common.exit') }}</a-button>

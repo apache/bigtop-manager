@@ -18,14 +18,12 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onMounted, reactive, ref, toRefs } from 'vue'
+  import { computed, onActivated, reactive, ref, toRefs } from 'vue'
+  import { useStackStore } from '@/store/stack'
+  import { usePngImage } from '@/utils/tools'
+  import type { ServiceVO } from '@/api/service/types'
 
-  interface DataItem {
-    id: number
-    name: string
-    desc: string
-    order: number
-  }
+  type DataItem = ServiceVO & { order: number }
 
   interface State {
     isAddableData: DataItem[]
@@ -37,8 +35,9 @@
   }
 
   const props = defineProps<Props>()
-  const emits = defineEmits(['update:stepData'])
+  const emits = defineEmits(['update'])
 
+  const stackStore = useStackStore()
   const searchStr = ref('')
   const state = reactive<State>({
     isAddableData: [],
@@ -48,12 +47,12 @@
   const filterAddableData = computed(() =>
     isAddableData.value.filter(
       (v) =>
-        v.name.toString().toLowerCase().includes(searchStr.value) ||
-        v.desc.toString().toLowerCase().includes(searchStr.value)
+        v.name?.toString().toLowerCase().includes(searchStr.value) ||
+        v.desc?.toString().toLowerCase().includes(searchStr.value)
     )
   )
 
-  const moveItem = <T extends { name: string; order: number }>(from: T[], to: T[], item: T, key: keyof T = 'name') => {
+  const moveItem = <T extends { name?: string; order: number }>(from: T[], to: T[], item: T, key: keyof T = 'name') => {
     const index = from.findIndex((v) => v[key] === item[key])
     if (index !== -1) {
       const [removedItem] = from.splice(index, 1)
@@ -84,34 +83,21 @@
 
   const addInstallItem = (item: DataItem) => {
     moveItem(state.isAddableData, state.isRmoveableData, item)
-    emits('update:stepData', state)
+    emits('update', state.isRmoveableData)
   }
 
   const removeInstallItem = (item: DataItem) => {
     moveItem(state.isRmoveableData, state.isAddableData, item)
-    emits('update:stepData', state)
+    emits('update', state.isRmoveableData)
   }
 
-  onMounted(() => {
-    if (!props.stepData) {
-      state.isAddableData = getAddableData()
-    } else {
-      Object.assign(state, props.stepData)
-    }
+  const splitSearchStr = (splitStr: string) => {
+    return splitStr.toString().split(new RegExp(`(?<=${searchStr.value})|(?=${searchStr.value})`, 'i'))
+  }
+
+  onActivated(() => {
+    !props.stepData[0] && (state.isAddableData = stackStore.getFilterServices(['infra']) as DataItem[])
   })
-
-  const getAddableData = () => {
-    return Array.from(
-      { length: 40 },
-      (_v, k) =>
-        ({
-          id: k,
-          name: `ZooKeeper-${k}`,
-          desc: `Apache ZooKeeper is an effort to develop and maintain ${k}`,
-          order: k
-        }) as unknown as DataItem
-    )
-  }
 </script>
 
 <template>
@@ -129,12 +115,8 @@
             </template>
             <a-list-item-meta>
               <template #title>
-                <div class="ellipsis" :title="item.name">
-                  <template
-                    v-for="(fragment, i) in item.name
-                      .toString()
-                      .split(new RegExp(`(?<=${searchStr})|(?=${searchStr})`, 'i'))"
-                  >
+                <div class="ellipsis item-name" :title="item.name">
+                  <template v-for="(fragment, i) in splitSearchStr(item.name)">
                     <mark v-if="fragment.toLowerCase() === searchStr.toLowerCase()" :key="i" class="highlight">
                       {{ fragment }}
                     </mark>
@@ -144,11 +126,7 @@
               </template>
               <template #description>
                 <div class="ellipsis" :title="item.desc">
-                  <template
-                    v-for="(fragment, i) in item.desc
-                      .toString()
-                      .split(new RegExp(`(?<=${searchStr})|(?=${searchStr})`, 'i'))"
-                  >
+                  <template v-for="(fragment, i) in splitSearchStr(item.desc)">
                     <mark v-if="fragment.toLowerCase() === searchStr.toLowerCase()" :key="i" class="highlight">
                       {{ fragment }}
                     </mark>
@@ -157,7 +135,7 @@
                 </div>
               </template>
               <template #avatar>
-                <a-avatar shape="square" :size="54" />
+                <a-avatar v-if="item.name" :src="usePngImage(item.name.toLowerCase())" :size="54" class="header-icon" />
               </template>
             </a-list-item-meta>
           </a-list-item>
@@ -177,7 +155,7 @@
             </template>
             <a-list-item-meta>
               <template #title>
-                <div class="ellipsis" :data-tooltip="item.name">
+                <div class="ellipsis item-name" :data-tooltip="item.name">
                   {{ item.name }}
                 </div>
               </template>
@@ -187,7 +165,7 @@
                 </div>
               </template>
               <template #avatar>
-                <a-avatar shape="square" :size="54" />
+                <a-avatar v-if="item.name" :src="usePngImage(item.name.toLowerCase())" :size="54" class="header-icon" />
               </template>
             </a-list-item-meta>
           </a-list-item>
@@ -201,6 +179,10 @@
   .highlight {
     background-color: rgb(255, 192, 105);
     padding: 0px;
+  }
+
+  .item-name {
+    font-size: 16px;
   }
 
   .service-selector {
@@ -231,5 +213,8 @@
   }
   :deep(.ant-avatar) {
     border-radius: 4px;
+    img {
+      object-fit: contain !important;
+    }
   }
 </style>
