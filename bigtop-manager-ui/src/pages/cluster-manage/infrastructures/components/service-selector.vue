@@ -22,16 +22,19 @@
   import { useStackStore } from '@/store/stack'
   import { usePngImage } from '@/utils/tools'
   import type { ServiceVO } from '@/api/service/types'
+  import type { ComponentVO } from '@/api/component/types'
+
+  type StepData = [ServiceVO[], ComponentVO[], any, any, any]
 
   type DataItem = ServiceVO & { order: number }
 
   interface State {
     isAddableData: DataItem[]
-    isRmoveableData: DataItem[]
+    selectedData: DataItem[]
   }
 
   interface Props {
-    stepData: any
+    stepData: StepData
   }
 
   const props = defineProps<Props>()
@@ -41,7 +44,7 @@
   const searchStr = ref('')
   const state = reactive<State>({
     isAddableData: [],
-    isRmoveableData: []
+    selectedData: []
   })
   const { isAddableData } = toRefs(state)
   const filterAddableData = computed(() =>
@@ -51,6 +54,11 @@
         v.desc?.toString().toLowerCase().includes(searchStr.value)
     )
   )
+
+  const insertByOrder = <T extends { order: number }>(array: T[], item: T) => {
+    const index = findInsertIndex(array, item.order)
+    array.splice(index, 0, item)
+  }
 
   const moveItem = <T extends { name?: string; order: number }>(from: T[], to: T[], item: T, key: keyof T = 'name') => {
     const index = from.findIndex((v) => v[key] === item[key])
@@ -76,19 +84,20 @@
     return low
   }
 
-  const insertByOrder = <T extends { order: number }>(array: T[], item: T) => {
-    const index = findInsertIndex(array, item.order)
-    array.splice(index, 0, item)
+  const handleInstallItem = (item: DataItem, from: DataItem[], to: DataItem[]) => {
+    item.components = item.components?.map((v) => ({ ...v, hosts: [] }))
+    moveItem(from, to, item)
+    emits('update', to)
   }
 
   const addInstallItem = (item: DataItem) => {
-    moveItem(state.isAddableData, state.isRmoveableData, item)
-    emits('update', state.isRmoveableData)
+    handleInstallItem(item, state.isAddableData, state.selectedData)
+    emits('update', state.selectedData)
   }
 
   const removeInstallItem = (item: DataItem) => {
-    moveItem(state.isRmoveableData, state.isAddableData, item)
-    emits('update', state.isRmoveableData)
+    handleInstallItem(item, state.selectedData, state.isAddableData)
+    emits('update', state.selectedData)
   }
 
   const splitSearchStr = (splitStr: string) => {
@@ -96,7 +105,7 @@
   }
 
   onActivated(() => {
-    !props.stepData[0] && (state.isAddableData = stackStore.getFilterServices(['infra']) as DataItem[])
+    !props.stepData[0] && (state.isAddableData = stackStore.getServicesByExclude(['infra']) as DataItem[])
   })
 </script>
 
@@ -147,7 +156,7 @@
       <div class="list-title">
         <div>{{ $t('service.pending_installation_services') }}</div>
       </div>
-      <a-list item-layout="horizontal" :data-source="state.isRmoveableData">
+      <a-list item-layout="horizontal" :data-source="state.selectedData">
         <template #renderItem="{ item }">
           <a-list-item>
             <template #actions>

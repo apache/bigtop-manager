@@ -19,16 +19,20 @@
 
 <script setup lang="ts">
   import { HostVO } from '@/api/hosts/types'
-  import { TableColumnType, TableProps } from 'ant-design-vue'
+  import { TableColumnType } from 'ant-design-vue'
   import { FilterConfirmProps, FilterResetProps, TableRowSelection } from 'ant-design-vue/es/table/interface'
-  import { computed, onActivated, reactive, ref } from 'vue'
+  import { computed, onActivated, reactive, ref, shallowRef, watch } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { getHosts } from '@/api/hosts'
   import { useRoute } from 'vue-router'
   import Sidebar from './sidebar.vue'
   import useBaseTable from '@/composables/use-base-table'
+  import type { Key } from 'ant-design-vue/es/_util/type'
+  import type { ServiceVO } from '@/api/service/types'
+  import type { ComponentVO } from '@/api/component/types'
 
-  type Key = string | number
+  type StepData = [ServiceVO[], ComponentVO[], any, any, any]
+  type AllComps = ComponentVO & { hosts?: HostVO[] }
 
   interface TableState {
     selectedRowKeys: Key[]
@@ -36,33 +40,40 @@
     searchedColumn: keyof HostVO
   }
 
-  defineProps<{ stepData: any }>()
+  const props = defineProps<{ stepData: StepData }>()
   defineEmits(['update'])
 
   const { t } = useI18n()
   const route = useRoute()
   const searchInputRef = ref()
+  const allComps = ref<AllComps>(new Map<string, AllComps>())
+  const currComp = ref<Key>()
+  const fieldNames = shallowRef({
+    children: 'components',
+    title: 'displayName',
+    key: 'name'
+  })
   const state = reactive<TableState>({
     searchText: '',
     searchedColumn: '',
     selectedRowKeys: []
   })
+  const propsData = computed(() => props.stepData[0])
+  const serviceList = computed(() => propsData.value.map((v) => ({ ...v, selectable: false })))
   const columns = computed((): TableColumnType<HostVO>[] => [
     {
       title: t('host.hostname'),
       dataIndex: 'hostname',
       key: 'hostname',
       ellipsis: true,
-      customFilterDropdown: true,
-      onFilterDropdownOpenChange: (visible) => onFilterDropdownOpenChange(visible)
+      customFilterDropdown: true
     },
     {
       title: t('host.ip_address'),
       dataIndex: 'ipv4',
       key: 'ipv4',
       ellipsis: true,
-      customFilterDropdown: true,
-      onFilterDropdownOpenChange: (visible) => onFilterDropdownOpenChange(visible)
+      customFilterDropdown: true
     },
     {
       title: t('common.desc'),
@@ -71,16 +82,36 @@
     }
   ])
 
-  const onFilterDropdownOpenChange = (visible: boolean) => {
-    if (visible) {
-      setTimeout(() => {
-        searchInputRef.value.focus()
-      }, 100)
+  const resetSelectedRowKeys = (key: Key | undefined) => {
+    state.selectedRowKeys =
+      key != undefined && allComps.value.has(key) ? allComps.value.get(key).hosts.map((v: HostVO) => v.id) : []
+  }
+
+  watch(
+    () => currComp.value,
+    (val) => {
+      resetSelectedRowKeys(val)
     }
+  )
+
+  watch(
+    () => props.stepData[0],
+    (val) => {
+      allComps.value = new Map(val.flatMap((s) => s.components!.map((comp) => [comp.name, comp])))
+      resetSelectedRowKeys(currComp.value)
+    },
+    {
+      deep: true,
+      immediate: true
+    }
+  )
+
+  const onSelectComponent = (selectedKeys: Key[]) => {
+    currComp.value = selectedKeys[0]
   }
 
   const onSelectChange: TableRowSelection['onChange'] = (selectedRowKeys, selectedRows) => {
-    console.log('selectedRows :>> ', selectedRows)
+    allComps.value.has(currComp.value) && (allComps.value.get(currComp.value).hosts = selectedRows)
     state.selectedRowKeys = selectedRowKeys
   }
 
@@ -93,16 +124,6 @@
   const handleReset = (clearFilters: (param?: FilterResetProps) => void) => {
     clearFilters({ confirm: true })
     state.searchText = ''
-  }
-
-  const { loading, dataSource, filtersParams, paginationProps, onChange } = useBaseTable<HostVO>({
-    columns: columns.value,
-    rows: []
-  })
-
-  const tableChange: TableProps['onChange'] = (pagination, filters, ...args) => {
-    onChange(pagination, filters, ...args)
-    getHostList()
   }
 
   const getHostList = async () => {
@@ -124,6 +145,12 @@
     }
   }
 
+  const { loading, dataSource, filtersParams, paginationProps, onChange } = useBaseTable<HostVO>({
+    columns: columns.value,
+    rows: [],
+    onChangeCallback: getHostList
+  })
+
   onActivated(() => {
     getHostList()
   })
@@ -135,14 +162,7 @@
       <div class="list-title">
         <div>{{ $t('service.service_list') }}</div>
       </div>
-      <sidebar
-        :data="$props.stepData[0].map((v: any) => ({ ...v, selectable: false }))"
-        :field-names="{
-          children: 'components',
-          title: 'name',
-          key: 'name'
-        }"
-      />
+      <sidebar :data="serviceList" :field-names="fieldNames" @select="onSelectComponent" />
     </section>
     <a-divider type="vertical" class="divider" />
     <section>
@@ -156,7 +176,7 @@
         :columns="columns"
         :pagination="paginationProps"
         :row-selection="{ selectedRowKeys: state.selectedRowKeys, onChange: onSelectChange }"
-        @change="tableChange"
+        @change="onChange"
       >
         <template #customFilterDropdown="{ setSelectedKeys, selectedKeys, confirm, clearFilters, column }">
           <div class="search">

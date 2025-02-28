@@ -25,6 +25,10 @@
   import ServiceConfigurator from './components/service-configurator.vue'
   import ServiceOverview from './components/service-overview.vue'
   import ComponentInstaller from './components/component-installer.vue'
+  import type { ServiceVO } from '@/api/service/types'
+  import type { ComponentVO } from '@/api/component/types'
+
+  type StepData = [ServiceVO[], ComponentVO[], any, any, any]
 
   const components = shallowRef<any[]>([
     ServiceSelector,
@@ -34,7 +38,7 @@
     ComponentInstaller
   ])
 
-  const stepData = ref<any[]>([])
+  const stepData = ref<StepData>([[], [], {}, {}, {}])
   const steps = computed(() => [
     'service.select_service',
     'service.assign_component',

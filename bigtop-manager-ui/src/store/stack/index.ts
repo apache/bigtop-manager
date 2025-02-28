@@ -29,28 +29,23 @@ export const useStackStore = defineStore(
     const stacks = ref<StackVO[]>([])
 
     const loadStacks = async () => {
-      const data = await getStacks()
-      stacks.value = data
+      try {
+        const data = await getStacks()
+        stacks.value = data
+      } catch (error) {
+        console.log('error :>> ', error)
+      }
     }
 
-    const getFilterServices = (exclude?: string[], isOrder = true) => {
-      const filterData = stacks.value.reduce((pre, val) => {
-        if (!exclude?.includes(val.stackName)) {
-          pre.push(...val.services)
-        }
-        return pre
-      }, [] as ServiceVO[])
-
-      if (isOrder) {
-        return filterData.map((service, index) => ({ ...service, order: index }))
-      }
-      return filterData
+    const getServicesByExclude = (exclude?: string[], isOrder = true): ServiceVO[] => {
+      const filterData = stacks.value.flatMap((stack) => (exclude?.includes(stack.stackName) ? [] : stack.services))
+      return isOrder ? filterData.map((service, index) => ({ ...service, order: index })) : filterData
     }
 
     return {
       stacks,
       loadStacks,
-      getFilterServices
+      getServicesByExclude
     }
   },
   {

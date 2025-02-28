@@ -20,20 +20,25 @@
 <script setup lang="ts">
   import { ref, watch } from 'vue'
   import type { TreeProps } from 'ant-design-vue'
+  import type { Key } from 'ant-design-vue/es/_util/type'
 
   interface Props {
     data: any[]
     fieldNames?: TreeProps['fieldNames']
   }
 
+  interface Emits {
+    (event: 'select', selectedKeys: Key[]): void
+  }
+
   const props = defineProps<Props>()
-  const emits = defineEmits(['select'])
+  const emits = defineEmits<Emits>()
   const expandedKeys = ref<string[]>([])
   const selectedKeys = ref<string[]>([])
   const treeData = ref<TreeProps['treeData']>([])
 
-  const handleSelect: TreeProps['onSelect'] = (selectedKeys, info) => {
-    emits('select', info.node.dataRef)
+  const handleSelect: TreeProps['onSelect'] = (selectedKeys) => {
+    emits('select', selectedKeys)
   }
 
   watch(
