@@ -31,8 +31,11 @@
   import type { ServiceVO } from '@/api/service/types'
   import type { ComponentVO } from '@/api/component/types'
 
+  interface CompItem extends ComponentVO {
+    hosts?: HostVO[]
+  }
+
   type StepData = [ServiceVO[], ComponentVO[], any, any, any]
-  type AllComps = ComponentVO & { hosts?: HostVO[] }
 
   interface TableState {
     selectedRowKeys: Key[]
@@ -41,12 +44,12 @@
   }
 
   const props = defineProps<{ stepData: StepData }>()
-  defineEmits(['update'])
+  const emits = defineEmits(['update'])
 
   const { t } = useI18n()
   const route = useRoute()
   const searchInputRef = ref()
-  const allComps = ref<AllComps>(new Map<string, AllComps>())
+  const allComps = ref<CompItem>(new Map<string, CompItem>())
   const currComp = ref<Key>()
   const fieldNames = shallowRef({
     children: 'components',
@@ -60,6 +63,12 @@
   })
   const propsData = computed(() => props.stepData[0])
   const serviceList = computed(() => propsData.value.map((v) => ({ ...v, selectable: false })))
+  const hostsOfCurrComp = computed((): HostVO[] => {
+    if (allComps.value.has(currComp.value)) {
+      return allComps.value.get(currComp.value).hosts
+    }
+    return []
+  })
   const columns = computed((): TableColumnType<HostVO>[] => [
     {
       title: t('host.hostname'),
@@ -97,8 +106,11 @@
   watch(
     () => props.stepData[0],
     (val) => {
-      allComps.value = new Map(val.flatMap((s) => s.components!.map((comp) => [comp.name, comp])))
-      resetSelectedRowKeys(currComp.value)
+      if (val.length > 0) {
+        allComps.value = new Map(val.flatMap((s) => s.components!.map((comp) => [comp.name, comp])))
+        resetSelectedRowKeys(currComp.value)
+        emits('update', allComps.value)
+      }
     },
     {
       deep: true,
@@ -111,7 +123,10 @@
   }
 
   const onSelectChange: TableRowSelection['onChange'] = (selectedRowKeys, selectedRows) => {
-    allComps.value.has(currComp.value) && (allComps.value.get(currComp.value).hosts = selectedRows)
+    if (allComps.value.has(currComp.value)) {
+      allComps.value.get(currComp.value).hosts = selectedRows
+      emits('update', allComps.value)
+    }
     state.selectedRowKeys = selectedRowKeys
   }
 
@@ -204,6 +219,14 @@
       <div class="list-title">
         <div>{{ $t('service.host_preview') }}</div>
       </div>
+      <div class="preview">
+        <a-empty v-if="hostsOfCurrComp.length === 0" />
+        <template v-else>
+          <div v-for="host in hostsOfCurrComp" :key="host.id">
+            {{ host.hostname }}
+          </div>
+        </template>
+      </div>
     </section>
   </div>
 </template>
@@ -225,6 +248,12 @@
       height: 100%;
       margin-inline: 16px;
     }
+  }
+
+  .preview {
+    display: grid;
+    gap: 8px;
+    padding-inline: 24px;
   }
 
   .search {

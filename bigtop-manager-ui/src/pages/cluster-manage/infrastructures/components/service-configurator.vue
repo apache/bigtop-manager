@@ -18,21 +18,32 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onActivated, ref } from 'vue'
+  import { onActivated, ref, shallowRef, watch } from 'vue'
   import Sidebar from './sidebar.vue'
   import type { ServiceConfigReq } from '@/api/command/types'
+  import type { ServiceVO } from '@/api/service/types'
+  import type { ComponentVO } from '@/api/component/types'
+  import type { Key } from 'ant-design-vue/es/_util/type'
 
-  // interface Props {
-  //   stepData: any
-  // }
+  type StepData = [ServiceVO[], ComponentVO[], any, any, any]
 
-  // const props = defineProps<Props>()
-  // const emits = defineEmits(['update:stepData'])
+  interface Props {
+    stepData: StepData
+  }
+
+  const props = defineProps<Props>()
+  const emits = defineEmits(['update'])
 
   const searchStr = ref('')
+  const currService = ref<Key>('')
   const activeKey = ref<number[]>([])
+  const serviceList = ref<ServiceVO[]>([])
   const configs = ref<ServiceConfigReq[]>([])
-  const layout = computed(() => ({
+  const fieldNames = shallowRef({
+    title: 'displayName',
+    key: 'name'
+  })
+  const layout = shallowRef({
     labelCol: {
       xs: { span: 24 },
       sm: { span: 8 },
@@ -44,7 +55,7 @@
       sm: { span: 16 },
       lg: { span: 18 }
     }
-  }))
+  })
 
   const createNewConfigItem = () => {
     return {
@@ -60,34 +71,28 @@
   }
 
   onActivated(() => {
-    configs.value = getConfigsData()
-    activeKey.value = configs.value.map((v: any) => v.id)
+    serviceList.value = props.stepData[0]
   })
 
-  const getConfigsData = () => {
-    return Array.from({ length: 3 }, (_v, k) => ({
-      id: k,
-      name: 'zookeeper-env',
-      properties: [
-        {
-          name: 'zookeeper_log_dir',
-          displayName: 'zookeeper_log_dir',
-          value: ''
-        },
-        {
-          name: 'zookeeper-env template',
-          displayName: 'zookeeper-env template',
-          value: ''
-        },
-        {
-          type: 'textarea',
-          name: 'zookeeper-env template',
-          displayName: 'zookeeper-env template',
-          value: ''
-        }
-      ].map((v) => ({ ...v, isManual: false }))
-    })) as ServiceConfigReq[]
+  const onSelectComponent = (selectedKeys: Key[]) => {
+    currService.value = selectedKeys[0]
+    const index = props.stepData[0].findIndex((v) => v.name === selectedKeys[0])
+    if (index !== -1) {
+      configs.value = props.stepData[0][index].configs as ServiceConfigReq[]
+    } else {
+      configs.value = []
+    }
   }
+
+  watch(
+    () => configs.value,
+    (val) => {
+      emits('update', val)
+    },
+    {
+      deep: true
+    }
+  )
 </script>
 
 <template>
@@ -96,7 +101,7 @@
       <div class="list-title">
         <div>{{ $t('service.service_list') }}</div>
       </div>
-      <sidebar :data="[]" />
+      <sidebar :data="serviceList" :field-names="fieldNames" @select="onSelectComponent" />
     </section>
     <a-divider type="vertical" class="divider" />
     <section>
@@ -104,7 +109,8 @@
         <div>{{ $t('service.host_preview') }}</div>
         <a-input v-model:value="searchStr" :placeholder="$t('service.please_enter_search_keyword')" />
       </div>
-      <a-form>
+      <a-empty v-if="configs.length === 0" />
+      <a-form v-else>
         <a-collapse v-model:active-key="activeKey" :bordered="false" :ghost="true">
           <a-collapse-panel v-for="config in configs" :key="config.id">
             <template #extra>

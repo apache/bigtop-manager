@@ -92,12 +92,10 @@
 
   const addInstallItem = (item: DataItem) => {
     handleInstallItem(item, state.isAddableData, state.selectedData)
-    emits('update', state.selectedData)
   }
 
   const removeInstallItem = (item: DataItem) => {
     handleInstallItem(item, state.selectedData, state.isAddableData)
-    emits('update', state.selectedData)
   }
 
   const splitSearchStr = (splitStr: string) => {
@@ -105,7 +103,7 @@
   }
 
   onActivated(() => {
-    !props.stepData[0] && (state.isAddableData = stackStore.getServicesByExclude(['infra']) as DataItem[])
+    props.stepData[0].length == 0 && (state.isAddableData = stackStore.getServicesByExclude(['infra']) as DataItem[])
   })
 </script>
 
