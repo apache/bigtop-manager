@@ -49,15 +49,14 @@
         <revision>0.0.1-SNAPSHOT</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>17</java.version>
-        <flatten-maven-plugin.version>1.4.0</flatten-maven-plugin.version>
-        <maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
+        <maven-assembly-plugin.version>3.7.1</maven-assembly-plugin.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-dependency-plugin.version>3.8.1</maven-dependency-plugin.version>
         <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
         <maven-javadoc-plugin.version>3.11.2</maven-javadoc-plugin.version>
         <maven.javadoc.skip>false</maven.javadoc.skip>
+        <maven-release-plugin.version>3.1.1</maven-release-plugin.version>
         <maven-scm-provider-jgit.version>2.1.0</maven-scm-provider-jgit.version>
-        <license-maven-plugin.version>2.5.0</license-maven-plugin.version>
         <flatten-maven-plugin.version>1.6.0</flatten-maven-plugin.version>
         <build-helper-maven-plugin.version>3.6.0</build-helper-maven-plugin.version>
         <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
@@ -276,26 +275,27 @@
                 </plugin>
 
                 <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>${build-helper-maven-plugin.version}</version>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>${maven-release-plugin.version}</version>
+                    <configuration>
+                        <autoVersionSubmodules>true</autoVersionSubmodules>
+                        <tagNameFormat>@{project.version}</tagNameFormat>
+                        <tagBase>${project.version}</tagBase>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.apache.maven.scm</groupId>
+                            <artifactId>maven-scm-provider-jgit</artifactId>
+                            <version>${maven-scm-provider-jgit.version}</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
 
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>license-maven-plugin</artifactId>
-                    <version>${license-maven-plugin.version}</version>
-                    <configuration>
-                        <outputDirectory>${project.basedir}/bigtop-manager-dist/target/</outputDirectory>
-                        <thirdPartyFilename>THIRD-PARTY.txt</thirdPartyFilename>
-                        <sortArtifactByName>false</sortArtifactByName>
-                        <useMissingFile>false</useMissingFile>
-                        <addJavaLicenseAfterPackage>true</addJavaLicenseAfterPackage>
-                        <socketTimeout>30000</socketTimeout>
-                        <connectTimeout>30000</connectTimeout>
-                        <connectionRequestTimeout>30000</connectionRequestTimeout>
-                        <excludedScopes>test,provided</excludedScopes>
-                    </configuration>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>${build-helper-maven-plugin.version}</version>
                 </plugin>
 
                 <!-- make sure that flatten runs after shaded -->
@@ -342,23 +342,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <configuration>
-                    <autoVersionSubmodules>true</autoVersionSubmodules>
-                    <tagNameFormat>@{project.version}</tagNameFormat>
-                    <tagBase>${project.version}</tagBase>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.apache.maven.scm</groupId>
-                        <artifactId>maven-scm-provider-jgit</artifactId>
-                        <version>${maven-scm-provider-jgit.version}</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>license-maven-plugin</artifactId>
             </plugin>
 
             <plugin>
