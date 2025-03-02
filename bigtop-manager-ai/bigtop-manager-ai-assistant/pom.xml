@@ -33,29 +33,11 @@
     <dependencies>
         <dependency>
             <groupId>org.apache.bigtop</groupId>
-            <artifactId>bigtop-manager-ai-openai</artifactId>
+            <artifactId>bigtop-manager-ai-platform</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.bigtop</groupId>
             <artifactId>bigtop-manager-ai-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.bigtop</groupId>
-            <artifactId>bigtop-manager-ai-dashscope</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-simple</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.bigtop</groupId>
-            <artifactId>bigtop-manager-ai-qianfan</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.bigtop</groupId>
-            <artifactId>bigtop-manager-ai-deepseek</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.bigtop</groupId>

@@ -20,7 +20,7 @@ package org.apache.bigtop.manager.ai.assistant;
 
 import org.apache.bigtop.manager.ai.core.config.AIAssistantConfig;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
-import org.apache.bigtop.manager.ai.openai.OpenAIAssistant;
+import org.apache.bigtop.manager.ai.platform.OpenAIAssistant;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
