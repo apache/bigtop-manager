@@ -216,20 +216,21 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
+                <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>bigtop-manager-server</id>
+                        <id>copy-dependencies</id>
                         <goals>
-                            <goal>single</goal>
+                            <goal>copy-dependencies</goal>
                         </goals>
                         <phase>package</phase>
                         <configuration>
-                            <finalName>bigtop-manager-server</finalName>
-                            <descriptors>
-                                <descriptor>src/main/resources/assembly/server.xml</descriptor>
-                            </descriptors>
-                            <appendAssemblyId>false</appendAssemblyId>
+                            <outputDirectory>${project.build.directory}/libs/</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                            <includeScope>compile</includeScope>
+                            <includeScope>runtime</includeScope>
                         </configuration>
                     </execution>
                 </executions>
