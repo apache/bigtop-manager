@@ -55,7 +55,7 @@
         @on-sider-click="menuStore.onSiderClick"
       />
       <a-layout class="layout-inner">
-        <router-view />
+        <router-view :key="$route.fullPath" />
         <layout-footer />
       </a-layout>
     </a-layout>
