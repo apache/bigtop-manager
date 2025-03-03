@@ -84,7 +84,7 @@ public class ComponentAddJob extends AbstractComponentJob {
         return "Add components";
     }
 
-    private void saveComponents(ComponentCommandDTO componentCommand) {
+    protected void saveComponents(ComponentCommandDTO componentCommand) {
         Long clusterId = jobContext.getCommandDTO().getClusterId();
         String componentName = componentCommand.getComponentName();
         ServiceDTO serviceDTO = StackUtils.getServiceDTOByComponentName(componentName);
