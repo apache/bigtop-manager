@@ -18,27 +18,32 @@
 -->
 
 <script setup lang="ts">
-  import { computed, ref, shallowRef } from 'vue'
+  import { computed, readonly, ref, shallowRef } from 'vue'
   import useSteps from '@/composables/use-steps'
   import ServiceSelector from './components/service-selector.vue'
   import ComponentAssigner from './components/component-assigner.vue'
   import ServiceConfigurator from './components/service-configurator.vue'
-  import ServiceOverview from './components/service-overview.vue'
   import ComponentInstaller from './components/component-installer.vue'
   import type { ServiceVO } from '@/api/service/types'
   import type { ComponentVO } from '@/api/component/types'
+  import { type CommandRequest, type CommandVO } from '@/api/command/types'
 
-  type StepData = [ServiceVO[], ComponentVO[], any, any, any]
+  type StepData = [ServiceVO[], Map<string, ComponentVO>, any, any, CommandVO]
 
   const components = shallowRef<any[]>([
     ServiceSelector,
     ComponentAssigner,
     ServiceConfigurator,
-    ServiceOverview,
+    ServiceConfigurator,
     ComponentInstaller
   ])
 
-  const stepData = ref<StepData>([[], [], {}, {}, {}])
+  const stepData = shallowRef<StepData>([[], new Map(), {}, {}, {}])
+  const readonlyStepData = readonly(stepData.value) // ✨ 转为只读
+  const commandRequest = ref<CommandRequest>({
+    command: 'Add',
+    commandLevel: 'service'
+  })
   const steps = computed(() => [
     'service.select_service',
     'service.assign_component',
@@ -49,7 +54,12 @@
   const { current, stepsLimit, previousStep, nextStep } = useSteps(steps.value)
   const currComp = computed(() => components.value[current.value])
 
-  const handelUpdate = (state: any) => {
+  const createService = () => {
+    console.log('commandRequest.value :>> ', commandRequest.value)
+    console.log('stepData.value :>> ', stepData.value)
+  }
+
+  const handelUpdate = (state: ServiceVO[] | Map<string, ComponentVO> | any | CommandVO) => {
     stepData.value[current.value] = state
   }
 </script>
@@ -75,7 +85,7 @@
         </div>
       </template>
       <keep-alive>
-        <component :is="currComp" :step-data="stepData" @update="handelUpdate" />
+        <component :is="currComp" :is-view="current === 3" :step-data="readonlyStepData" @update="handelUpdate" />
       </keep-alive>
       <div class="step-action">
         <a-space>
@@ -88,7 +98,9 @@
               {{ $t('common.next') }}
             </a-button>
           </template>
-          <a-button v-show="current === stepsLimit" type="primary">{{ $t('common.done') }}</a-button>
+          <a-button v-show="current === stepsLimit" type="primary" @click="createService">
+            {{ $t('common.done') }}
+          </a-button>
         </a-space>
       </div>
     </main-card>

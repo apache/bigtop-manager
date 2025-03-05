@@ -25,7 +25,7 @@
   import { useI18n } from 'vue-i18n'
   import { getHosts } from '@/api/hosts'
   import { useRoute } from 'vue-router'
-  import Sidebar from './sidebar.vue'
+  import TreeSelector from './tree-selector.vue'
   import useBaseTable from '@/composables/use-base-table'
   import type { Key } from 'ant-design-vue/es/_util/type'
   import type { ServiceVO } from '@/api/service/types'
@@ -35,7 +35,7 @@
     hosts?: HostVO[]
   }
 
-  type StepData = [ServiceVO[], ComponentVO[], any, any, any]
+  type StepData = [ServiceVO[], Map<string, ComponentVO>, any, any, any]
 
   interface TableState {
     selectedRowKeys: Key[]
@@ -150,7 +150,7 @@
     }
     try {
       const res = await getHosts({ ...filtersParams.value, clusterId })
-      dataSource.value = res.content
+      dataSource.value = res.content.map((v) => ({ ...v, name: v.id, displayName: v.hostname }))
       paginationProps.value.total = res.total
       loading.value = false
     } catch (error) {
@@ -177,7 +177,7 @@
       <div class="list-title">
         <div>{{ $t('service.service_list') }}</div>
       </div>
-      <sidebar :data="serviceList" :field-names="fieldNames" @select="onSelectComponent" />
+      <tree-selector :data="serviceList" :field-names="fieldNames" @select="onSelectComponent" />
     </section>
     <a-divider type="vertical" class="divider" />
     <section>

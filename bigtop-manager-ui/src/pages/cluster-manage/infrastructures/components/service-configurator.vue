@@ -20,19 +20,22 @@
 <script setup lang="ts">
   import { onActivated, ref, shallowRef, watch } from 'vue'
   import { Empty } from 'ant-design-vue'
-  import Sidebar from './sidebar.vue'
+  import TreeSelector from './tree-selector.vue'
   import type { ServiceConfigReq } from '@/api/command/types'
   import type { ServiceVO } from '@/api/service/types'
   import type { ComponentVO } from '@/api/component/types'
   import type { Key } from 'ant-design-vue/es/_util/type'
 
-  type StepData = [ServiceVO[], ComponentVO[], any, any, any]
+  type StepData = [ServiceVO[], Map<string, ComponentVO>, any, any, any]
 
   interface Props {
     stepData: StepData
+    isView?: boolean
   }
 
-  const props = defineProps<Props>()
+  const props = withDefaults(defineProps<Props>(), {
+    isView: false
+  })
   const emits = defineEmits(['update'])
 
   const searchStr = ref('')
@@ -40,6 +43,7 @@
   const activeKey = ref<number[]>([])
   const serviceList = ref<ServiceVO[]>([])
   const configs = ref<ServiceConfigReq[]>([])
+  const hostPreviewList = ref<ComponentVO[]>([])
   const fieldNames = shallowRef({
     title: 'displayName',
     key: 'name'
@@ -79,9 +83,12 @@
     currService.value = selectedKeys[0]
     const index = props.stepData[0].findIndex((v) => v.name === selectedKeys[0])
     if (index !== -1) {
-      configs.value = props.stepData[0][index].configs as ServiceConfigReq[]
+      const temp = props.stepData[0][index]
+      configs.value = temp.configs as ServiceConfigReq[]
+      hostPreviewList.value = temp.components as ComponentVO[]
     } else {
       configs.value = []
+      hostPreviewList.value = []
     }
   }
 
@@ -97,12 +104,12 @@
 </script>
 
 <template>
-  <div class="service-configurator">
+  <div class="service-configurator" :class="{ 'service-configurator-view': $props.isView }">
     <section>
       <div class="list-title">
         <div>{{ $t('service.service_list') }}</div>
       </div>
-      <sidebar :data="serviceList" :field-names="fieldNames" @select="onSelectComponent" />
+      <tree-selector :data="serviceList" :field-names="fieldNames" @select="onSelectComponent" />
     </section>
     <a-divider type="vertical" class="divider" />
     <section>
@@ -111,7 +118,7 @@
         <a-input v-model:value="searchStr" :placeholder="$t('service.please_enter_search_keyword')" />
       </div>
       <a-empty v-if="configs.length === 0" :image="Empty.PRESENTED_IMAGE_SIMPLE" />
-      <a-form v-else>
+      <a-form v-else :disabled="$props.isView">
         <a-collapse v-model:active-key="activeKey" :bordered="false" :ghost="true">
           <a-collapse-panel v-for="config in configs" :key="config.id">
             <template #extra>
@@ -141,10 +148,26 @@
         </a-collapse>
       </a-form>
     </section>
+    <template v-if="isView">
+      <a-divider type="vertical" class="divider" />
+      <section>
+        <div class="list-title">
+          <div>{{ $t('service.host_preview') }}</div>
+        </div>
+        <tree-selector
+          :data="hostPreviewList"
+          :selectable="false"
+          :field-names="{ ...fieldNames, children: 'hosts' }"
+        />
+      </section>
+    </template>
   </div>
 </template>
 
 <style lang="scss" scoped>
+  .service-configurator-view {
+    grid-template-columns: 1fr auto 4fr auto 1fr !important;
+  }
   .service-configurator {
     display: grid;
     grid-template-columns: 1fr auto 4fr;

@@ -25,13 +25,17 @@
   interface Props {
     data: any[]
     fieldNames?: TreeProps['fieldNames']
+    selectable?: boolean
   }
 
   interface Emits {
     (event: 'select', selectedKeys: Key[]): void
   }
 
-  const props = defineProps<Props>()
+  const props = withDefaults(defineProps<Props>(), {
+    selectable: true,
+    fieldNames: () => ({ children: 'children', title: 'title', key: 'key' })
+  })
   const emits = defineEmits<Emits>()
   const expandedKeys = ref<string[]>([])
   const selectedKeys = ref<string[]>([])
@@ -59,7 +63,7 @@
       v-if="props.data.length > 0"
       v-model:expandedKeys="expandedKeys"
       v-model:selectedKeys="selectedKeys"
-      :selectable="true"
+      :selectable="props.selectable"
       :tree-data="treeData"
       :field-names="$props.fieldNames"
       @select="handleSelect"
