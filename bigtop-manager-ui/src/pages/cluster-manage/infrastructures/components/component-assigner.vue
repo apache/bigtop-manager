@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
   import { HostVO } from '@/api/hosts/types'
-  import { TableColumnType } from 'ant-design-vue'
+  import { TableColumnType, Empty } from 'ant-design-vue'
   import { FilterConfirmProps, FilterResetProps, TableRowSelection } from 'ant-design-vue/es/table/interface'
   import { computed, onActivated, reactive, ref, shallowRef, watch } from 'vue'
   import { useI18n } from 'vue-i18n'
@@ -220,7 +220,7 @@
         <div>{{ $t('service.host_preview') }}</div>
       </div>
       <div class="preview">
-        <a-empty v-if="hostsOfCurrComp.length === 0" />
+        <a-empty v-if="hostsOfCurrComp.length === 0" :image="Empty.PRESENTED_IMAGE_SIMPLE" />
         <template v-else>
           <div v-for="host in hostsOfCurrComp" :key="host.id">
             {{ host.hostname }}

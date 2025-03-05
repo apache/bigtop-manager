@@ -19,6 +19,7 @@
 
 <script setup lang="ts">
   import { onActivated, ref, shallowRef, watch } from 'vue'
+  import { Empty } from 'ant-design-vue'
   import Sidebar from './sidebar.vue'
   import type { ServiceConfigReq } from '@/api/command/types'
   import type { ServiceVO } from '@/api/service/types'
@@ -109,7 +110,7 @@
         <div>{{ $t('service.host_preview') }}</div>
         <a-input v-model:value="searchStr" :placeholder="$t('service.please_enter_search_keyword')" />
       </div>
-      <a-empty v-if="configs.length === 0" />
+      <a-empty v-if="configs.length === 0" :image="Empty.PRESENTED_IMAGE_SIMPLE" />
       <a-form v-else>
         <a-collapse v-model:active-key="activeKey" :bordered="false" :ghost="true">
           <a-collapse-panel v-for="config in configs" :key="config.id">

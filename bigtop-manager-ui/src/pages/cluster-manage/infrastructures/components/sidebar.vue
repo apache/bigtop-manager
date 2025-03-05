@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
   import { ref, watch } from 'vue'
-  import type { TreeProps } from 'ant-design-vue'
+  import { type TreeProps, Empty } from 'ant-design-vue'
   import type { Key } from 'ant-design-vue/es/_util/type'
 
   interface Props {
@@ -56,6 +56,7 @@
 <template>
   <div class="sidebar">
     <a-tree
+      v-if="props.data.length > 0"
       v-model:expandedKeys="expandedKeys"
       v-model:selectedKeys="selectedKeys"
       :selectable="true"
@@ -63,6 +64,7 @@
       :field-names="$props.fieldNames"
       @select="handleSelect"
     />
+    <a-empty v-else :image="Empty.PRESENTED_IMAGE_SIMPLE" />
   </div>
 </template>
 
