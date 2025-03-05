@@ -106,5 +106,7 @@ export default {
   stop: 'Stop {0}',
   add: 'Add {0}',
   more_operations: 'More Operations',
-  ok: 'Ok'
+  ok: 'Ok',
+  yes: 'yes',
+  no: 'no'
 }

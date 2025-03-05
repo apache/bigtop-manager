@@ -106,5 +106,7 @@ export default {
   add: '添加{0}',
   reset: '重置',
   more_operations: '其他操作',
-  ok: '确认'
+  ok: '确认',
+  yes: '是',
+  no: '否'
 }
