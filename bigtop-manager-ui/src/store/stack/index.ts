@@ -21,12 +21,12 @@ import { ServiceVO } from '@/api/service/types'
 import { getStacks } from '@/api/stack'
 import { StackVO } from '@/api/stack/types'
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { shallowRef } from 'vue'
 
 export const useStackStore = defineStore(
   'stack',
   () => {
-    const stacks = ref<StackVO[]>([])
+    const stacks = shallowRef<StackVO[]>([])
 
     const loadStacks = async () => {
       try {

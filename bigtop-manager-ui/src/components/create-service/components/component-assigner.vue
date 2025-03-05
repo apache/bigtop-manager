@@ -19,23 +19,16 @@
 
 <script setup lang="ts">
   import { HostVO } from '@/api/hosts/types'
-  import { TableColumnType, Empty } from 'ant-design-vue'
+  import { TableColumnType, Empty, TreeProps } from 'ant-design-vue'
   import { FilterConfirmProps, FilterResetProps, TableRowSelection } from 'ant-design-vue/es/table/interface'
-  import { computed, onActivated, reactive, ref, shallowRef, watch } from 'vue'
+  import { computed, onActivated, reactive, ref, shallowRef, toRaw, watch } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { getHosts } from '@/api/hosts'
   import { useRoute } from 'vue-router'
+  import useCreateService from './useCreateService'
   import TreeSelector from './tree-selector.vue'
   import useBaseTable from '@/composables/use-base-table'
   import type { Key } from 'ant-design-vue/es/_util/type'
-  import type { ServiceVO } from '@/api/service/types'
-  import type { ComponentVO } from '@/api/component/types'
-
-  interface CompItem extends ComponentVO {
-    hosts?: HostVO[]
-  }
-
-  type StepData = [ServiceVO[], Map<string, ComponentVO>, any, any, any]
 
   interface TableState {
     selectedRowKeys: Key[]
@@ -43,14 +36,10 @@
     searchedColumn: keyof HostVO
   }
 
-  const props = defineProps<{ stepData: StepData }>()
-  const emits = defineEmits(['update'])
-
   const { t } = useI18n()
   const route = useRoute()
   const searchInputRef = ref()
-  const allComps = ref<CompItem>(new Map<string, CompItem>())
-  const currComp = ref<Key>()
+  const currComp = ref<string>('')
   const fieldNames = shallowRef({
     children: 'components',
     title: 'displayName',
@@ -61,11 +50,11 @@
     searchedColumn: '',
     selectedRowKeys: []
   })
-  const propsData = computed(() => props.stepData[0])
-  const serviceList = computed(() => propsData.value.map((v) => ({ ...v, selectable: false })))
+  const { allComps, serviceCommands, updateComponentHosts } = useCreateService()
+  const serviceList = computed(() => serviceCommands.value.map((v) => ({ ...v, selectable: false })))
   const hostsOfCurrComp = computed((): HostVO[] => {
-    if (allComps.value.has(currComp.value)) {
-      return allComps.value.get(currComp.value).hosts
+    if (allComps.value.has(currComp.value.split('/')[1])) {
+      return allComps.value.get(currComp.value.split('/')[1])?.hosts
     }
     return []
   })
@@ -91,41 +80,25 @@
     }
   ])
 
-  const resetSelectedRowKeys = (key: Key | undefined) => {
-    state.selectedRowKeys =
-      key != undefined && allComps.value.has(key) ? allComps.value.get(key).hosts.map((v: HostVO) => v.id) : []
-  }
-
   watch(
     () => currComp.value,
     (val) => {
-      resetSelectedRowKeys(val)
+      resetSelectedRowKeys(val.split('/')[1])
     }
   )
 
-  watch(
-    () => props.stepData[0],
-    (val) => {
-      if (val.length > 0) {
-        allComps.value = new Map(val.flatMap((s) => s.components!.map((comp) => [comp.name, comp])))
-        resetSelectedRowKeys(currComp.value)
-        emits('update', allComps.value)
-      }
-    },
-    {
-      deep: true,
-      immediate: true
-    }
-  )
+  const resetSelectedRowKeys = (key: string) => {
+    state.selectedRowKeys =
+      key != undefined && allComps.value.has(key) ? allComps.value.get(key)?.hosts.map((v: HostVO) => v.id) : []
+  }
 
-  const onSelectComponent = (selectedKeys: Key[]) => {
-    currComp.value = selectedKeys[0]
+  const onSelectComponent: TreeProps['onSelect'] = (selectedKeys, e) => {
+    currComp.value = `${e.node.parent?.key}/${selectedKeys[0]}`
   }
 
   const onSelectChange: TableRowSelection['onChange'] = (selectedRowKeys, selectedRows) => {
-    if (allComps.value.has(currComp.value)) {
-      allComps.value.get(currComp.value).hosts = selectedRows
-      emits('update', allComps.value)
+    if (allComps.value.has(currComp.value.split('/')[1])) {
+      updateComponentHosts(currComp.value, toRaw(selectedRows))
     }
     state.selectedRowKeys = selectedRowKeys
   }

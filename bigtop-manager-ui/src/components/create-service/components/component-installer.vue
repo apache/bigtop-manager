@@ -114,7 +114,7 @@
   }
 
   onMounted(() => {
-    pollJobDetails(getJobInstanceDetails)
+    // pollJobDetails(getJobInstanceDetails)
   })
 </script>
 

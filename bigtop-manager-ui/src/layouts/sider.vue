@@ -55,7 +55,7 @@
   }
 
   const addCluster = () => {
-    router.push({ name: 'ClusterCreate' })
+    router.push({ name: 'CreateCluster' })
   }
 
   const onSiderClick = ({ key }: any) => {
@@ -100,7 +100,7 @@
         </template>
       </template>
     </a-menu>
-    <div v-show="menuStore.isClusterCreateVisible">
+    <div v-show="menuStore.isCreateClusterVisible">
       <a-divider />
       <div class="create-option">
         <a-button type="primary" ghost @click="addCluster">

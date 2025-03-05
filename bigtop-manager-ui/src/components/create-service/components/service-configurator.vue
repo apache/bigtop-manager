@@ -18,26 +18,24 @@
 -->
 
 <script setup lang="ts">
-  import { onActivated, ref, shallowRef, watch } from 'vue'
+  import { onActivated, ref, shallowRef } from 'vue'
   import { Empty } from 'ant-design-vue'
   import TreeSelector from './tree-selector.vue'
+  import useCreateService from './useCreateService'
   import type { ServiceConfigReq } from '@/api/command/types'
   import type { ServiceVO } from '@/api/service/types'
   import type { ComponentVO } from '@/api/component/types'
   import type { Key } from 'ant-design-vue/es/_util/type'
 
-  type StepData = [ServiceVO[], Map<string, ComponentVO>, any, any, any]
-
   interface Props {
-    stepData: StepData
     isView?: boolean
   }
 
-  const props = withDefaults(defineProps<Props>(), {
+  withDefaults(defineProps<Props>(), {
     isView: false
   })
-  const emits = defineEmits(['update'])
 
+  const { serviceCommands } = useCreateService()
   const searchStr = ref('')
   const currService = ref<Key>('')
   const activeKey = ref<number[]>([])
@@ -76,14 +74,14 @@
   }
 
   onActivated(() => {
-    serviceList.value = props.stepData[0]
+    serviceList.value = serviceCommands.value
   })
 
   const onSelectComponent = (selectedKeys: Key[]) => {
     currService.value = selectedKeys[0]
-    const index = props.stepData[0].findIndex((v) => v.name === selectedKeys[0])
+    const index = serviceCommands.value.findIndex((v) => v.name === selectedKeys[0])
     if (index !== -1) {
-      const temp = props.stepData[0][index]
+      const temp = serviceCommands.value[index]
       configs.value = temp.configs as ServiceConfigReq[]
       hostPreviewList.value = temp.components as ComponentVO[]
     } else {
@@ -91,16 +89,6 @@
       hostPreviewList.value = []
     }
   }
-
-  watch(
-    () => configs.value,
-    (val) => {
-      emits('update', val)
-    },
-    {
-      deep: true
-    }
-  )
 </script>
 
 <template>

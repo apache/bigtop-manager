@@ -18,17 +18,13 @@
 -->
 
 <script setup lang="ts">
-  import { computed, readonly, ref, shallowRef } from 'vue'
-  import useSteps from '@/composables/use-steps'
+  import { computed, ref, shallowRef, watch } from 'vue'
+  import useCreateService from './components/useCreateService'
   import ServiceSelector from './components/service-selector.vue'
   import ComponentAssigner from './components/component-assigner.vue'
   import ServiceConfigurator from './components/service-configurator.vue'
   import ComponentInstaller from './components/component-installer.vue'
-  import type { ServiceVO } from '@/api/service/types'
-  import type { ComponentVO } from '@/api/component/types'
-  import { type CommandRequest, type CommandVO } from '@/api/command/types'
-
-  type StepData = [ServiceVO[], Map<string, ComponentVO>, any, any, CommandVO]
+  import { type CommandRequest } from '@/api/command/types'
 
   const components = shallowRef<any[]>([
     ServiceSelector,
@@ -38,29 +34,26 @@
     ComponentInstaller
   ])
 
-  const stepData = shallowRef<StepData>([[], new Map(), {}, {}, {}])
-  const readonlyStepData = readonly(stepData.value) // ✨ 转为只读
   const commandRequest = ref<CommandRequest>({
     command: 'Add',
     commandLevel: 'service'
   })
-  const steps = computed(() => [
-    'service.select_service',
-    'service.assign_component',
-    'service.configure_service',
-    'service.service_overview',
-    'service.install_component'
-  ])
-  const { current, stepsLimit, previousStep, nextStep } = useSteps(steps.value)
+  const { current, stepsLimit, steps, previousStep, nextStep, serviceCommands } = useCreateService()
   const currComp = computed(() => components.value[current.value])
+
+  watch(
+    () => serviceCommands.value,
+    (val) => {
+      console.log('val :>> ', val)
+    },
+    {
+      deep: true
+    }
+  )
 
   const createService = () => {
     console.log('commandRequest.value :>> ', commandRequest.value)
-    console.log('stepData.value :>> ', stepData.value)
-  }
-
-  const handelUpdate = (state: ServiceVO[] | Map<string, ComponentVO> | any | CommandVO) => {
-    stepData.value[current.value] = state
+    console.log('serviceCommands :>> ', serviceCommands)
   }
 </script>
 
@@ -85,7 +78,7 @@
         </div>
       </template>
       <keep-alive>
-        <component :is="currComp" :is-view="current === 3" :step-data="readonlyStepData" @update="handelUpdate" />
+        <component :is="currComp" :is-view="current === 3" />
       </keep-alive>
       <div class="step-action">
         <a-space>

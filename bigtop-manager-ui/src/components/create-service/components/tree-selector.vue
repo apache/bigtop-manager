@@ -20,7 +20,6 @@
 <script setup lang="ts">
   import { ref, watch } from 'vue'
   import { type TreeProps, Empty } from 'ant-design-vue'
-  import type { Key } from 'ant-design-vue/es/_util/type'
 
   interface Props {
     data: any[]
@@ -29,7 +28,7 @@
   }
 
   interface Emits {
-    (event: 'select', selectedKeys: Key[]): void
+    (event: 'select', ...args: any): void
   }
 
   const props = withDefaults(defineProps<Props>(), {
@@ -41,8 +40,8 @@
   const selectedKeys = ref<string[]>([])
   const treeData = ref<TreeProps['treeData']>([])
 
-  const handleSelect: TreeProps['onSelect'] = (selectedKeys) => {
-    emits('select', selectedKeys)
+  const handleSelect: TreeProps['onSelect'] = (selectedKeys, e) => {
+    emits('select', selectedKeys, e)
   }
 
   watch(

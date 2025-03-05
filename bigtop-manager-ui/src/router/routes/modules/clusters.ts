@@ -56,9 +56,17 @@ const routes: RouteRecordRaw[] = [
             }
           },
           {
-            name: 'ClusterCreate',
-            path: 'create',
+            name: 'CreateCluster',
+            path: 'create-cluster',
             component: () => import('@/pages/cluster-manage/cluster/create.vue'),
+            meta: {
+              hidden: true
+            }
+          },
+          {
+            name: 'CreateService',
+            path: 'create-service',
+            component: () => import('@/components/create-service/create.vue'),
             meta: {
               hidden: true
             }
@@ -78,15 +86,6 @@ const routes: RouteRecordRaw[] = [
             name: 'InfraList',
             path: 'list',
             component: () => import('@/pages/cluster-manage/infrastructures/index.vue'),
-            meta: {
-              hidden: true,
-              activeMenu: '/cluster-manage/infrastructures'
-            }
-          },
-          {
-            name: 'InfraCreation',
-            path: 'create',
-            component: () => import('@/pages/cluster-manage/infrastructures/create.vue'),
             meta: {
               hidden: true,
               activeMenu: '/cluster-manage/infrastructures'

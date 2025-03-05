@@ -19,12 +19,9 @@
 
 <script setup lang="ts">
   import { computed, onActivated, reactive, ref, toRefs } from 'vue'
-  import { useStackStore } from '@/store/stack'
   import { usePngImage } from '@/utils/tools'
+  import useCreateService from './useCreateService'
   import type { ServiceVO } from '@/api/service/types'
-  import type { ComponentVO } from '@/api/component/types'
-
-  type StepData = [ServiceVO[], ComponentVO[], any, any, any]
 
   type DataItem = ServiceVO & { order: number }
 
@@ -33,19 +30,12 @@
     selectedData: DataItem[]
   }
 
-  interface Props {
-    stepData: StepData
-  }
-
-  const props = defineProps<Props>()
-  const emits = defineEmits(['update'])
-
-  const stackStore = useStackStore()
   const searchStr = ref('')
   const state = reactive<State>({
     isAddableData: [],
     selectedData: []
   })
+  const { serviceCommands, filteredServices, setDataByCurrent } = useCreateService()
   const { isAddableData } = toRefs(state)
   const filterAddableData = computed(() =>
     isAddableData.value.filter(
@@ -87,7 +77,7 @@
   const handleInstallItem = (item: DataItem, from: DataItem[], to: DataItem[]) => {
     item.components = item.components?.map((v) => ({ ...v, hosts: [] }))
     moveItem(from, to, item)
-    emits('update', to)
+    setDataByCurrent(state.selectedData)
   }
 
   const addInstallItem = (item: DataItem) => {
@@ -103,7 +93,9 @@
   }
 
   onActivated(() => {
-    props.stepData[0].length == 0 && (state.isAddableData = stackStore.getServicesByExclude(['infra']) as DataItem[])
+    serviceCommands.value.length > 0
+      ? (state.selectedData = serviceCommands.value)
+      : (state.isAddableData = filteredServices.value as DataItem[])
   })
 </script>
 
