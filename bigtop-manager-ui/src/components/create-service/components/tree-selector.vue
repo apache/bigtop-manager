@@ -18,52 +18,52 @@
 -->
 
 <script setup lang="ts">
-  import { ref, watch } from 'vue'
+  import { ref } from 'vue'
   import { type TreeProps, Empty } from 'ant-design-vue'
 
   interface Props {
-    data: any[]
+    tree: any
+    expandSelectedKeys?: string
     fieldNames?: TreeProps['fieldNames']
     selectable?: boolean
   }
 
   interface Emits {
     (event: 'select', ...args: any): void
+    (event: 'update:expandSelectedKeys', expandSelectedKeys: string): void
   }
 
-  const props = withDefaults(defineProps<Props>(), {
+  withDefaults(defineProps<Props>(), {
     selectable: true,
+    expandSelectedKeys: '',
     fieldNames: () => ({ children: 'children', title: 'title', key: 'key' })
   })
+
   const emits = defineEmits<Emits>()
   const expandedKeys = ref<string[]>([])
-  const selectedKeys = ref<string[]>([])
-  const treeData = ref<TreeProps['treeData']>([])
+  const checkSelectedKeys = ref<string[]>([])
 
   const handleSelect: TreeProps['onSelect'] = (selectedKeys, e) => {
-    emits('select', selectedKeys, e)
-  }
-
-  watch(
-    () => props.data,
-    (val) => {
-      treeData.value = val
-    },
-    {
-      immediate: true,
-      deep: true
+    const selectedKey = selectedKeys[0]
+    if (!selectedKey) {
+      return
     }
-  )
+    const checkSelectedKey = checkSelectedKeys.value[0]
+    if (selectedKey !== checkSelectedKey) {
+      checkSelectedKeys.value = selectedKeys as string[]
+      emits('update:expandSelectedKeys', `${e.node.parent?.key}/${selectedKeys[0]}`)
+    }
+  }
 </script>
 
 <template>
   <div class="sidebar">
     <a-tree
-      v-if="props.data.length > 0"
+      v-if="$props.tree.length > 0"
       v-model:expandedKeys="expandedKeys"
-      v-model:selectedKeys="selectedKeys"
-      :selectable="props.selectable"
-      :tree-data="treeData"
+      :selected-keys="checkSelectedKeys"
+      :selectable="$props.selectable"
+      :tree-data="$props.tree"
       :field-names="$props.fieldNames"
       @select="handleSelect"
     />

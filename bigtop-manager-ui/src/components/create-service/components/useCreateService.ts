@@ -22,6 +22,8 @@ import { useStackStore } from '@/store/stack'
 import useSteps from '@/composables/use-steps'
 import type { HostVO } from '@/api/hosts/types'
 import type { ServiceVO } from '@/api/service/types'
+import type { DataNode } from 'ant-design-vue/es/tree'
+import { TreeProps } from 'ant-design-vue'
 
 type DataItem = ServiceVO & { order: number }
 
@@ -54,6 +56,29 @@ const useCreateService = () => {
     component.hosts = hosts
   }
 
+  const findLastChildOfFirstNode = (
+    tree: any,
+    fieldNames: TreeProps['fieldNames']
+  ): { currNode: DataNode; pNode: DataNode | undefined } | undefined => {
+    if (!tree || tree.length === 0) return undefined
+    const childrenKey = fieldNames?.children || 'children'
+    const queue: Array<{ node: DataNode; pNode: DataNode | undefined }> = tree.map((node: any) => ({
+      node,
+      pNode: undefined
+    }))
+    while (queue.length > 0) {
+      const { node: current, pNode } = queue.shift()!
+      const children = (current[childrenKey] as DataNode[]) || []
+      if (children.length === 0) {
+        return { currNode: current, pNode }
+      }
+      children.forEach((child) => {
+        queue.push({ node: child, pNode: current })
+      })
+    }
+    return undefined
+  }
+
   return {
     steps,
     current,
@@ -62,6 +87,7 @@ const useCreateService = () => {
     filteredServices,
     allComps,
     setDataByCurrent,
+    findLastChildOfFirstNode,
     updateComponentHosts,
     previousStep,
     nextStep
