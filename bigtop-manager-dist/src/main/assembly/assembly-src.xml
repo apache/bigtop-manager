@@ -34,9 +34,6 @@
                 <include>**/*</include>
             </includes>
             <excludes>
-                <!-- github ignore -->
-                <exclude>**/.github/**</exclude>
-
                 <!-- maven ignore -->
                 <exclude>**/target/**</exclude>
                 <exclude>**/*.class</exclude>
@@ -52,9 +49,12 @@
                 <exclude>**/pom.xml.releaseBackup</exclude>
                 <exclude>**/.flattened-pom.xml</exclude>
                 <exclude>*.gpg</exclude>
+
                 <!--github ignore-->
+                <exclude>**/.git/**</exclude>
                 <exclude>**/.github/**</exclude>
                 <exclude>**/.dlc.json</exclude>
+
                 <!-- eclipse ignore -->
                 <exclude>**/.settings/**</exclude>
                 <exclude>**/.project</exclude>
@@ -66,8 +66,17 @@
                 <exclude>**/*.iml</exclude>
                 <exclude>**/*.iws</exclude>
 
+                <!-- vscode ignore -->
+                <exclude>**/.vscode/**</exclude>
+
+                <!-- frontend ignore -->
+                <exclude>**/node/**</exclude>
+                <exclude>**/node_modules/**</exclude>
+                <exclude>**/dist/**</exclude>
+
                 <!-- temp ignore -->
                 <exclude>**/logs/**</exclude>
+                <exclude>**/tasklogs/**</exclude>
                 <exclude>**/*.log</exclude>
                 <exclude>**/*.doc</exclude>
                 <exclude>**/*.cache</exclude>
