@@ -20,7 +20,7 @@
 <script setup lang="ts">
   import { computed, onActivated, reactive, ref, toRefs } from 'vue'
   import { usePngImage } from '@/utils/tools'
-  import useCreateService from './useCreateService'
+  import useCreateService from './use-create-service'
   import type { ServiceVO } from '@/api/service/types'
 
   type DataItem = ServiceVO & { order: number }

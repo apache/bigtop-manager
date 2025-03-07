@@ -21,7 +21,7 @@
   import { onActivated, ref, shallowRef } from 'vue'
   import { Empty } from 'ant-design-vue'
   import TreeSelector from './tree-selector.vue'
-  import useCreateService from './useCreateService'
+  import useCreateService from './use-create-service'
   import type { ServiceConfigReq } from '@/api/command/types'
   import type { ServiceVO } from '@/api/service/types'
   import type { ComponentVO } from '@/api/component/types'
@@ -97,7 +97,7 @@
       <div class="list-title">
         <div>{{ $t('service.service_list') }}</div>
       </div>
-      <tree-selector :data="serviceList" :field-names="fieldNames" @select="onSelectComponent" />
+      <tree-selector :tree="serviceList" :field-names="fieldNames" @select="onSelectComponent" />
     </section>
     <a-divider type="vertical" class="divider" />
     <section>
@@ -143,7 +143,7 @@
           <div>{{ $t('service.host_preview') }}</div>
         </div>
         <tree-selector
-          :data="hostPreviewList"
+          :tree="hostPreviewList"
           :selectable="false"
           :field-names="{ ...fieldNames, children: 'hosts' }"
         />

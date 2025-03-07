@@ -25,7 +25,7 @@
   import { useI18n } from 'vue-i18n'
   import { getHosts } from '@/api/hosts'
   import { useRoute } from 'vue-router'
-  import useCreateService from './useCreateService'
+  import useCreateService from './use-create-service'
   import TreeSelector from './tree-selector.vue'
   import useBaseTable from '@/composables/use-base-table'
   import type { Key } from 'ant-design-vue/es/_util/type'

@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
   import { computed, ref, shallowRef, watch } from 'vue'
-  import useCreateService from './components/useCreateService'
+  import useCreateService from './components/use-create-service'
   import ServiceSelector from './components/service-selector.vue'
   import ComponentAssigner from './components/component-assigner.vue'
   import ServiceConfigurator from './components/service-configurator.vue'
