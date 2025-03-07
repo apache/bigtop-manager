@@ -23,6 +23,7 @@ import org.apache.bigtop.manager.dao.po.ChatThreadPO;
 import org.apache.bigtop.manager.dao.repository.ChatMessageDao;
 import org.apache.bigtop.manager.dao.repository.ChatThreadDao;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -122,7 +123,7 @@ class PersistentChatMemoryStoreTest {
 
         persistentChatMemoryStore.deleteMessages(threadId);
 
-        assertTrue(chatMessagePOS.get(0).getIsDeleted());
+        Assertions.assertTrue(chatMessagePOS.get(0).getIsDeleted());
     }
 
     @Test

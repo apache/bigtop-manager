@@ -26,12 +26,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
@@ -54,13 +54,13 @@ class GeneralAssistantFactoryTest {
 
     @Test
     void testCreateAIAssistant() {
-        AIAssistant.Builder mockBuilder = mock(OpenAIAssistant.Builder.class);
+        AIAssistant.Builder mockBuilder = Mockito.mock(OpenAIAssistant.Builder.class);
         when(mockBuilder.id(any())).thenReturn(mockBuilder);
         when(mockBuilder.memoryStore(any())).thenReturn(mockBuilder);
         when(mockBuilder.withConfig(any())).thenReturn(mockBuilder);
         when(mockBuilder.withToolProvider(any())).thenReturn(mockBuilder);
         when(mockBuilder.withSystemPrompt(any())).thenReturn(mockBuilder);
-        when(mockBuilder.build()).thenReturn(mock(AIAssistant.class));
+        when(mockBuilder.build()).thenReturn(Mockito.mock(AIAssistant.class));
 
         try (MockedStatic<OpenAIAssistant> openAIAssistantMockedStatic = mockStatic(OpenAIAssistant.class)) {
             openAIAssistantMockedStatic.when(OpenAIAssistant::builder).thenReturn(mockBuilder);

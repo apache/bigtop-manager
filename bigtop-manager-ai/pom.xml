@@ -17,7 +17,7 @@
   ~ specific language governing permissions and limitations
   ~ under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.apache.bigtop</groupId>
@@ -27,14 +27,8 @@
     </parent>
 
     <artifactId>bigtop-manager-ai</artifactId>
-    <packaging>pom</packaging>
     <name>${project.artifactId}</name>
     <description>Bigtop Manager AI</description>
-    <modules>
-        <module>bigtop-manager-ai-core</module>
-        <module>bigtop-manager-ai-assistant</module>
-        <module>bigtop-manager-ai-platform</module>
-    </modules>
 
     <dependencyManagement>
         <dependencies>
@@ -50,8 +44,34 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.apache.bigtop</groupId>
+            <artifactId>bigtop-manager-dao</artifactId>
+        </dependency>
+        <dependency>
             <groupId>dev.langchain4j</groupId>
             <artifactId>langchain4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-reactor</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-open-ai</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-qianfan</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-dashscope</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-simple</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

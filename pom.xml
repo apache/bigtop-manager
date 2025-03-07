@@ -130,23 +130,6 @@
                 <version>${project.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>org.apache.bigtop</groupId>
-                <artifactId>bigtop-manager-ai-core</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.bigtop</groupId>
-                <artifactId>bigtop-manager-ai-platform</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.bigtop</groupId>
-                <artifactId>bigtop-manager-ai-assistant</artifactId>
-                <version>${project.version}</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
