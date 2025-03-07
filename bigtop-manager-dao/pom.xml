@@ -74,10 +74,6 @@
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.apache.bigtop</groupId>
-            <artifactId>bigtop-manager-ai-core</artifactId>
-        </dependency>
     </dependencies>
 
 </project>
