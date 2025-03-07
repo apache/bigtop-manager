@@ -53,15 +53,15 @@ public class LocSystemPromptProvider implements SystemPromptProvider {
 
     private String loadTextFromFile(String fileName) {
         try {
-            String fullPath = Objects.requireNonNull(
-                            this.getClass().getClassLoader().getResource(fileName))
-                    .toString();
+            String fullPath =
+                    Objects.requireNonNull(ResourceUtils.getFile(fileName)).toString();
             File file = ResourceUtils.getFile(fullPath);
             return Files.readString(file.toPath(), StandardCharsets.UTF_8);
         } catch (IOException | NullPointerException e) {
             log.error(
                     "Exception occurred while loading SystemPrompt from local. Here is some information:{}",
                     e.getMessage());
+
             return null;
         }
     }
