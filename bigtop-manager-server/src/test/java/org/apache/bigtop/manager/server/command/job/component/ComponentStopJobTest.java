@@ -29,6 +29,7 @@ import org.apache.bigtop.manager.dao.repository.StageDao;
 import org.apache.bigtop.manager.dao.repository.TaskDao;
 import org.apache.bigtop.manager.server.command.helper.ComponentStageHelper;
 import org.apache.bigtop.manager.server.command.job.JobContext;
+import org.apache.bigtop.manager.server.command.stage.ComponentStopStage;
 import org.apache.bigtop.manager.server.command.stage.Stage;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 import org.apache.bigtop.manager.server.model.dto.CommandDTO;
@@ -50,6 +51,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.lenient;
@@ -88,7 +90,6 @@ public class ComponentStopJobTest {
     @Spy
     private JobContext jobContext;
 
-    @Mock
     private List<Stage> stages;
 
     @Mock
@@ -143,6 +144,7 @@ public class ComponentStopJobTest {
         jobContext.setRetryFlag(false);
 
         doCallRealMethod().when(componentStopJob).setJobContextAndStagesForTest(any(), any());
+        stages = new ArrayList<>();
         componentStopJob.setJobContextAndStagesForTest(jobContext, stages);
 
         doCallRealMethod().when(componentStopJob).injectBeans();
@@ -177,11 +179,17 @@ public class ComponentStopJobTest {
 
             doCallRealMethod().when(componentStopJob).createStages();
             when(componentStopJob.getComponentHostsMap()).thenReturn(new HashMap<>());
-            when(ComponentStageHelper.createComponentStages(any(), any())).thenReturn(new ArrayList<>());
-            when(stages.addAll(any())).thenReturn(true);
+
+            List<Stage> stageList = new ArrayList<>();
+            stageList.add(mock(ComponentStopStage.class));
+
+            when(ComponentStageHelper.createComponentStages(any(), any())).thenReturn(stageList);
 
             componentStopJob.createStages();
-            verify(stages, times(1)).addAll(any());
+            doCallRealMethod().when(componentStopJob).getStages();
+            assertEquals(componentStopJob.getStages().size(), 1);
+            assertInstanceOf(
+                    ComponentStopStage.class, componentStopJob.getStages().get(0));
         }
     }
 

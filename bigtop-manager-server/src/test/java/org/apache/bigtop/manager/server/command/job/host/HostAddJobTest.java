@@ -26,6 +26,8 @@ import org.apache.bigtop.manager.dao.repository.JobDao;
 import org.apache.bigtop.manager.dao.repository.StageDao;
 import org.apache.bigtop.manager.dao.repository.TaskDao;
 import org.apache.bigtop.manager.server.command.job.JobContext;
+import org.apache.bigtop.manager.server.command.stage.HostCheckStage;
+import org.apache.bigtop.manager.server.command.stage.SetupJdkStage;
 import org.apache.bigtop.manager.server.command.stage.Stage;
 import org.apache.bigtop.manager.server.command.stage.StageContext;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
@@ -47,6 +49,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.lenient;
@@ -83,7 +86,6 @@ public class HostAddJobTest {
     @Spy
     private JobContext jobContext;
 
-    @Mock
     private List<Stage> stages;
 
     @Mock
@@ -135,6 +137,7 @@ public class HostAddJobTest {
         jobContext.setRetryFlag(false);
 
         doCallRealMethod().when(hostAddJob).setJobContextAndStagesForTest(any(), any());
+        stages = new ArrayList<>();
         hostAddJob.setJobContextAndStagesForTest(jobContext, stages);
 
         doCallRealMethod().when(hostAddJob).injectBeans();
@@ -165,12 +168,17 @@ public class HostAddJobTest {
     @Test
     public void testCreateStages() {
         try (MockedStatic<StageContext> stageContextMockedStatic = mockStatic(StageContext.class)) {
+            when(hostAddJob.getHostCheckStage(any())).thenReturn(mock(HostCheckStage.class));
+            when(hostAddJob.getSetupJdkStage(any())).thenReturn(mock(SetupJdkStage.class));
 
             when(StageContext.fromCommandDTO(any())).thenReturn(mock(StageContext.class));
             doCallRealMethod().when(hostAddJob).createStages();
 
             hostAddJob.createStages();
-            verify(stages, times(2)).add(any());
+            doCallRealMethod().when(hostAddJob).getStages();
+            assertEquals(hostAddJob.getStages().size(), 2);
+            assertInstanceOf(HostCheckStage.class, hostAddJob.getStages().get(0));
+            assertInstanceOf(SetupJdkStage.class, hostAddJob.getStages().get(1));
         }
     }
 

@@ -26,6 +26,7 @@ import org.apache.bigtop.manager.dao.repository.StageDao;
 import org.apache.bigtop.manager.dao.repository.TaskDao;
 import org.apache.bigtop.manager.server.command.helper.ComponentStageHelper;
 import org.apache.bigtop.manager.server.command.job.JobContext;
+import org.apache.bigtop.manager.server.command.stage.ComponentStopStage;
 import org.apache.bigtop.manager.server.command.stage.Stage;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 import org.apache.bigtop.manager.server.model.dto.CommandDTO;
@@ -46,6 +47,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.lenient;
@@ -78,13 +80,12 @@ public class ClusterStopJobTest {
     @Spy
     private JobContext jobContext;
 
-    @Mock
     private List<Stage> stages;
 
     @Mock
     private ClusterPO clusterPO;
 
-    private ClusterStopJob ClusterStopJob;
+    private ClusterStopJob clusterStopJob;
 
     @BeforeEach
     public void setUp() {
@@ -95,7 +96,7 @@ public class ClusterStopJobTest {
         when(SpringContextHolder.getBean(TaskDao.class)).thenReturn(taskDao);
         when(SpringContextHolder.getBean(ComponentDao.class)).thenReturn(componentDao);
 
-        ClusterStopJob = mock(ClusterStopJob.class);
+        clusterStopJob = mock(ClusterStopJob.class);
 
         ClusterCommandDTO clusterCommandDTO = new ClusterCommandDTO();
         clusterCommandDTO.setName("testName");
@@ -124,11 +125,12 @@ public class ClusterStopJobTest {
         jobContext.setCommandDTO(commandDTO);
         jobContext.setRetryFlag(false);
 
-        doCallRealMethod().when(ClusterStopJob).setJobContextAndStagesForTest(any(), any());
-        ClusterStopJob.setJobContextAndStagesForTest(jobContext, stages);
+        doCallRealMethod().when(clusterStopJob).setJobContextAndStagesForTest(any(), any());
+        stages = new ArrayList<>();
+        clusterStopJob.setJobContextAndStagesForTest(jobContext, stages);
 
-        doCallRealMethod().when(ClusterStopJob).injectBeans();
-        ClusterStopJob.injectBeans();
+        doCallRealMethod().when(clusterStopJob).injectBeans();
+        clusterStopJob.injectBeans();
     }
 
     @AfterEach
@@ -143,8 +145,8 @@ public class ClusterStopJobTest {
 
     @Test
     public void testBeforeCreateStages() {
-        doCallRealMethod().when(ClusterStopJob).beforeCreateStages();
-        ClusterStopJob.beforeCreateStages();
+        doCallRealMethod().when(clusterStopJob).beforeCreateStages();
+        clusterStopJob.beforeCreateStages();
         verify(clusterDao, times(1)).findById(123L);
     }
 
@@ -153,19 +155,25 @@ public class ClusterStopJobTest {
         try (MockedStatic<ComponentStageHelper> componentStageHelperMockedStatic =
                 mockStatic(ComponentStageHelper.class)) {
 
-            doCallRealMethod().when(ClusterStopJob).createStages();
-            when(ClusterStopJob.getComponentHostsMap()).thenReturn(new HashMap<>());
-            when(ComponentStageHelper.createComponentStages(any(), any())).thenReturn(new ArrayList<>());
-            when(stages.addAll(any())).thenReturn(true);
+            doCallRealMethod().when(clusterStopJob).createStages();
+            when(clusterStopJob.getComponentHostsMap()).thenReturn(new HashMap<>());
 
-            ClusterStopJob.createStages();
-            verify(stages, times(1)).addAll(any());
+            List<Stage> stageList = new ArrayList<>();
+            stageList.add(mock(ComponentStopStage.class));
+
+            when(ComponentStageHelper.createComponentStages(any(), any())).thenReturn(stageList);
+
+            clusterStopJob.createStages();
+            doCallRealMethod().when(clusterStopJob).getStages();
+            assertEquals(clusterStopJob.getStages().size(), 1);
+            assertInstanceOf(
+                    ComponentStopStage.class, clusterStopJob.getStages().get(0));
         }
     }
 
     @Test
     public void testGetName() {
-        doCallRealMethod().when(ClusterStopJob).getName();
-        assertEquals("Stop cluster", ClusterStopJob.getName());
+        doCallRealMethod().when(clusterStopJob).getName();
+        assertEquals("Stop cluster", clusterStopJob.getName());
     }
 }

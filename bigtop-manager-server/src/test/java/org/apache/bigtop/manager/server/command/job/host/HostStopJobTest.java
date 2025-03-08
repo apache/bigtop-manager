@@ -18,7 +18,6 @@
  */
 package org.apache.bigtop.manager.server.command.job.host;
 
-import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.JobPO;
 import org.apache.bigtop.manager.dao.repository.ClusterDao;
@@ -28,6 +27,7 @@ import org.apache.bigtop.manager.dao.repository.StageDao;
 import org.apache.bigtop.manager.dao.repository.TaskDao;
 import org.apache.bigtop.manager.server.command.helper.ComponentStageHelper;
 import org.apache.bigtop.manager.server.command.job.JobContext;
+import org.apache.bigtop.manager.server.command.stage.ComponentStopStage;
 import org.apache.bigtop.manager.server.command.stage.Stage;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 import org.apache.bigtop.manager.server.model.dto.CommandDTO;
@@ -48,6 +48,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.lenient;
@@ -58,7 +59,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class HostStopJobHostStopJobTest {
+public class HostStopJobTest {
 
     private MockedStatic<SpringContextHolder> springContextHolderMockedStatic;
 
@@ -80,7 +81,6 @@ public class HostStopJobHostStopJobTest {
     @Spy
     private JobContext jobContext;
 
-    @Mock
     private List<Stage> stages;
 
     @Mock
@@ -131,6 +131,7 @@ public class HostStopJobHostStopJobTest {
         jobContext.setRetryFlag(false);
 
         doCallRealMethod().when(hostStopJob).setJobContextAndStagesForTest(any(), any());
+        stages = new ArrayList<>();
         hostStopJob.setJobContextAndStagesForTest(jobContext, stages);
 
         doCallRealMethod().when(hostStopJob).injectBeans();
@@ -165,12 +166,16 @@ public class HostStopJobHostStopJobTest {
 
             doCallRealMethod().when(hostStopJob).createStages();
             when(hostStopJob.getComponentHostsMap()).thenReturn(new HashMap<>());
-            when(ComponentStageHelper.createComponentStages(any(), any(Command.class), any()))
-                    .thenReturn(new ArrayList<>());
-            when(stages.addAll(any())).thenReturn(true);
+
+            List<Stage> stageList = new ArrayList<>();
+            stageList.add(mock(ComponentStopStage.class));
+
+            when(ComponentStageHelper.createComponentStages(any(), any())).thenReturn(stageList);
 
             hostStopJob.createStages();
-            verify(stages, times(1)).addAll(any());
+            doCallRealMethod().when(hostStopJob).getStages();
+            assertEquals(hostStopJob.getStages().size(), 1);
+            assertInstanceOf(ComponentStopStage.class, hostStopJob.getStages().get(0));
         }
     }
 

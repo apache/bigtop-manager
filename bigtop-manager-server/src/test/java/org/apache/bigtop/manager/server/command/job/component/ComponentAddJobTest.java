@@ -18,6 +18,7 @@
  */
 package org.apache.bigtop.manager.server.command.job.component;
 
+import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.JobPO;
 import org.apache.bigtop.manager.dao.repository.ClusterDao;
@@ -29,6 +30,11 @@ import org.apache.bigtop.manager.dao.repository.StageDao;
 import org.apache.bigtop.manager.dao.repository.TaskDao;
 import org.apache.bigtop.manager.server.command.helper.ComponentStageHelper;
 import org.apache.bigtop.manager.server.command.job.JobContext;
+import org.apache.bigtop.manager.server.command.stage.ComponentAddStage;
+import org.apache.bigtop.manager.server.command.stage.ComponentConfigureStage;
+import org.apache.bigtop.manager.server.command.stage.ComponentInitStage;
+import org.apache.bigtop.manager.server.command.stage.ComponentPrepareStage;
+import org.apache.bigtop.manager.server.command.stage.ComponentStartStage;
 import org.apache.bigtop.manager.server.command.stage.Stage;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 import org.apache.bigtop.manager.server.model.dto.CommandDTO;
@@ -50,7 +56,9 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
@@ -89,7 +97,6 @@ public class ComponentAddJobTest {
     @Spy
     private JobContext jobContext;
 
-    @Mock
     private List<Stage> stages;
 
     @Mock
@@ -144,6 +151,7 @@ public class ComponentAddJobTest {
         jobContext.setRetryFlag(false);
 
         doCallRealMethod().when(componentAddJob).setJobContextAndStagesForTest(any(), any());
+        stages = new ArrayList<>();
         componentAddJob.setJobContextAndStagesForTest(jobContext, stages);
 
         doCallRealMethod().when(componentAddJob).injectBeans();
@@ -178,11 +186,39 @@ public class ComponentAddJobTest {
 
             doCallRealMethod().when(componentAddJob).createStages();
             when(componentAddJob.getComponentHostsMap()).thenReturn(new HashMap<>());
-            when(ComponentStageHelper.createComponentStages(any(), any())).thenReturn(new ArrayList<>());
-            when(stages.addAll(any())).thenReturn(true);
+
+            List<Stage> stageList1 = new ArrayList<>();
+            stageList1.add(mock(ComponentAddStage.class));
+
+            List<Stage> stageList2 = new ArrayList<>();
+            stageList2.add(mock(ComponentConfigureStage.class));
+
+            List<Command> commands = List.of(Command.INIT, Command.START, Command.PREPARE);
+            List<Stage> stageList3 = new ArrayList<>();
+            stageList3.add(mock(ComponentInitStage.class));
+            stageList3.add(mock(ComponentStartStage.class));
+            stageList3.add(mock(ComponentPrepareStage.class));
+
+            when(ComponentStageHelper.createComponentStages(any(), eq(Command.ADD), any()))
+                    .thenReturn(stageList1);
+            when(ComponentStageHelper.createComponentStages(any(), eq(Command.CONFIGURE), any()))
+                    .thenReturn(stageList2);
+            when(ComponentStageHelper.createComponentStages(any(), eq(commands), any()))
+                    .thenReturn(stageList3);
 
             componentAddJob.createStages();
-            verify(stages, times(3)).addAll(any());
+            doCallRealMethod().when(componentAddJob).getStages();
+            assertEquals(componentAddJob.getStages().size(), 5);
+            assertInstanceOf(
+                    ComponentAddStage.class, componentAddJob.getStages().get(0));
+            assertInstanceOf(
+                    ComponentConfigureStage.class, componentAddJob.getStages().get(1));
+            assertInstanceOf(
+                    ComponentInitStage.class, componentAddJob.getStages().get(2));
+            assertInstanceOf(
+                    ComponentStartStage.class, componentAddJob.getStages().get(3));
+            assertInstanceOf(
+                    ComponentPrepareStage.class, componentAddJob.getStages().get(4));
         }
     }
 

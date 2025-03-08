@@ -18,7 +18,6 @@
  */
 package org.apache.bigtop.manager.server.command.job.service;
 
-import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.JobPO;
 import org.apache.bigtop.manager.dao.po.ServicePO;
@@ -34,6 +33,7 @@ import org.apache.bigtop.manager.dao.repository.StageDao;
 import org.apache.bigtop.manager.dao.repository.TaskDao;
 import org.apache.bigtop.manager.server.command.helper.ComponentStageHelper;
 import org.apache.bigtop.manager.server.command.job.JobContext;
+import org.apache.bigtop.manager.server.command.stage.ComponentStartStage;
 import org.apache.bigtop.manager.server.command.stage.Stage;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 import org.apache.bigtop.manager.server.model.dto.CommandDTO;
@@ -53,6 +53,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.lenient;
@@ -97,7 +98,6 @@ public class ServiceStartJobTest {
     @Spy
     private JobContext jobContext;
 
-    @Mock
     private List<Stage> stages;
 
     @Mock
@@ -143,9 +143,9 @@ public class ServiceStartJobTest {
         Stage stage = mock(Stage.class);
         lenient().when(stage.getStagePO()).thenReturn(new StagePO());
         lenient().when(stage.getTasks()).thenReturn(new ArrayList<>());
-        stages.add(stage);
 
         doCallRealMethod().when(serviceStartJob).setJobContextAndStagesForTest(any(), any());
+        stages = new ArrayList<>();
         serviceStartJob.setJobContextAndStagesForTest(jobContext, stages);
 
         doCallRealMethod().when(serviceStartJob).injectBeans();
@@ -180,12 +180,17 @@ public class ServiceStartJobTest {
 
             doCallRealMethod().when(serviceStartJob).createStages();
             when(serviceStartJob.getComponentHostsMap()).thenReturn(new HashMap<>());
-            when(ComponentStageHelper.createComponentStages(any(), any(Command.class), any()))
-                    .thenReturn(new ArrayList<>());
-            when(stages.addAll(any())).thenReturn(true);
+
+            List<Stage> stageList = new ArrayList<>();
+            stageList.add(mock(ComponentStartStage.class));
+
+            when(ComponentStageHelper.createComponentStages(any(), any())).thenReturn(stageList);
 
             serviceStartJob.createStages();
-            verify(stages, times(1)).addAll(any());
+            doCallRealMethod().when(serviceStartJob).getStages();
+            assertEquals(serviceStartJob.getStages().size(), 1);
+            assertInstanceOf(
+                    ComponentStartStage.class, serviceStartJob.getStages().get(0));
         }
     }
 

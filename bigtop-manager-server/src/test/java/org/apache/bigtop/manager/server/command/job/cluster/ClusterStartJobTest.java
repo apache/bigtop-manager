@@ -26,6 +26,7 @@ import org.apache.bigtop.manager.dao.repository.StageDao;
 import org.apache.bigtop.manager.dao.repository.TaskDao;
 import org.apache.bigtop.manager.server.command.helper.ComponentStageHelper;
 import org.apache.bigtop.manager.server.command.job.JobContext;
+import org.apache.bigtop.manager.server.command.stage.ComponentStartStage;
 import org.apache.bigtop.manager.server.command.stage.Stage;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 import org.apache.bigtop.manager.server.model.dto.CommandDTO;
@@ -46,6 +47,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.lenient;
@@ -78,7 +80,6 @@ public class ClusterStartJobTest {
     @Spy
     private JobContext jobContext;
 
-    @Mock
     private List<Stage> stages;
 
     @Mock
@@ -125,6 +126,7 @@ public class ClusterStartJobTest {
         jobContext.setRetryFlag(false);
 
         doCallRealMethod().when(clusterStartJob).setJobContextAndStagesForTest(any(), any());
+        stages = new ArrayList<>();
         clusterStartJob.setJobContextAndStagesForTest(jobContext, stages);
 
         doCallRealMethod().when(clusterStartJob).injectBeans();
@@ -155,11 +157,17 @@ public class ClusterStartJobTest {
 
             doCallRealMethod().when(clusterStartJob).createStages();
             when(clusterStartJob.getComponentHostsMap()).thenReturn(new HashMap<>());
-            when(ComponentStageHelper.createComponentStages(any(), any())).thenReturn(new ArrayList<>());
-            when(stages.addAll(any())).thenReturn(true);
+
+            List<Stage> stageList = new ArrayList<>();
+            stageList.add(mock(ComponentStartStage.class));
+
+            when(ComponentStageHelper.createComponentStages(any(), any())).thenReturn(stageList);
 
             clusterStartJob.createStages();
-            verify(stages, times(1)).addAll(any());
+            doCallRealMethod().when(clusterStartJob).getStages();
+            assertEquals(clusterStartJob.getStages().size(), 1);
+            assertInstanceOf(
+                    ComponentStartStage.class, clusterStartJob.getStages().get(0));
         }
     }
 
