@@ -18,16 +18,16 @@
 -->
 
 <script setup lang="ts">
-  import { HostVO } from '@/api/hosts/types'
-  import { TableColumnType, Empty } from 'ant-design-vue'
-  import { FilterConfirmProps, FilterResetProps, TableRowSelection } from 'ant-design-vue/es/table/interface'
-  import { computed, onActivated, reactive, ref, shallowRef, toRaw, watch } from 'vue'
   import { useI18n } from 'vue-i18n'
-  import { getHosts } from '@/api/hosts'
   import { useRoute } from 'vue-router'
+  import { computed, onActivated, reactive, ref, shallowRef } from 'vue'
+  import { TableColumnType, Empty } from 'ant-design-vue'
+  import { HostVO } from '@/api/hosts/types'
+  import { getHosts } from '@/api/hosts'
   import useCreateService from './use-create-service'
   import TreeSelector from './tree-selector.vue'
   import useBaseTable from '@/composables/use-base-table'
+  import type { FilterConfirmProps, FilterResetProps, TableRowSelection } from 'ant-design-vue/es/table/interface'
   import type { Key } from 'ant-design-vue/es/_util/type'
 
   interface TableState {
@@ -39,7 +39,6 @@
   const { t } = useI18n()
   const route = useRoute()
   const searchInputRef = ref()
-  const expandTreeSelectedKey = ref<string>('')
   const currComp = ref<string>('')
   const fieldNames = shallowRef({
     children: 'components',
@@ -51,13 +50,11 @@
     searchedColumn: '',
     selectedRowKeys: []
   })
-  const { allComps, serviceCommands, findLastChildOfFirstNode, updateComponentHosts } = useCreateService()
-  const serviceList = computed(() => serviceCommands.value.map((v) => ({ ...v, selectable: false })))
+  const { allComps, selectedServices, updateHostsForComponent } = useCreateService()
+  const serviceList = computed(() => selectedServices.value.map((v) => ({ ...v, selectable: false })))
   const hostsOfCurrComp = computed((): HostVO[] => {
-    if (allComps.value.has(currComp.value.split('/')[1])) {
-      return allComps.value.get(currComp.value.split('/')[1])?.hosts
-    }
-    return []
+    const temp = currComp.value.split('/').at(-1)
+    return allComps.value.has(temp) ? allComps.value.get(temp)?.hosts : []
   })
   const columns = computed((): TableColumnType<HostVO>[] => [
     {
@@ -80,20 +77,6 @@
       ellipsis: true
     }
   ])
-
-  watch(expandTreeSelectedKey, (val) => {
-    currComp.value = val
-    resetSelectedRowKeys(val.split('/')[1])
-  })
-
-  const resetSelectedRowKeys = (key: string) => {
-    state.selectedRowKeys = allComps.value.has(key) ? allComps.value.get(key)?.hosts.map((v: HostVO) => v.id) : []
-  }
-
-  const onSelectChange: TableRowSelection['onChange'] = (selectedRowKeys, selectedRows) => {
-    allComps.value.has(currComp.value.split('/')[1]) && updateComponentHosts(currComp.value, toRaw(selectedRows))
-    state.selectedRowKeys = selectedRowKeys
-  }
 
   const handleSearch = (selectedKeys: Key[], confirm: (param?: FilterConfirmProps) => void, dataIndex: string) => {
     confirm()
@@ -133,21 +116,22 @@
     onChangeCallback: getHostList
   })
 
-  const setupExpandTreeSelectedKey = () => {
-    if (!currComp.value) {
-      const findResult = findLastChildOfFirstNode(serviceList, fieldNames.value)
-      if (findResult) {
-        const { currNode, pNode } = findResult
-        currComp.value = pNode
-          ? `${pNode![fieldNames.value.key]}/${currNode[fieldNames.value.key]}`
-          : `${currNode[fieldNames.value.key]}`
-      }
-    }
+  const onSelectChange: TableRowSelection['onChange'] = (selectedRowKeys, selectedRows) => {
+    allComps.value.has(currComp.value.split('/').at(-1)) && updateHostsForComponent(currComp.value, selectedRows)
+    state.selectedRowKeys = selectedRowKeys
+  }
+
+  const resetSelectedRowKeys = (key: string) => {
+    state.selectedRowKeys = allComps.value.has(key) ? allComps.value.get(key)?.hosts.map((v: HostVO) => v.id) : []
+  }
+
+  const treeSelectedChange = (keyPath: string) => {
+    currComp.value = keyPath ?? ''
+    resetSelectedRowKeys(keyPath.split('/')[1])
   }
 
   onActivated(() => {
     getHostList()
-    setupExpandTreeSelectedKey()
   })
 </script>
 
@@ -157,12 +141,7 @@
       <div class="list-title">
         <div>{{ $t('service.service_list') }}</div>
       </div>
-      <tree-selector
-        ref="treeSelectorRef"
-        v-model:expand-selected-keys="expandTreeSelectedKey"
-        :tree="serviceList"
-        :field-names="fieldNames"
-      />
+      <tree-selector :tree="serviceList" :field-names="fieldNames" @change="treeSelectedChange" />
     </section>
     <a-divider type="vertical" class="divider" />
     <section>

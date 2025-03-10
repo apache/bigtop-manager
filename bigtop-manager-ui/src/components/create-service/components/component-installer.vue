@@ -19,6 +19,7 @@
 
 <script setup lang="ts">
   import { computed, onMounted, reactive, ref, shallowRef, toRefs } from 'vue'
+  import { Empty } from 'ant-design-vue'
   import { getJobDetails, retryJob } from '@/api/job'
   import { CommandVO } from '@/api/command/types'
   import LogsView, { type LogViewProps } from '@/components/log-view/index.vue'
@@ -114,13 +115,13 @@
   }
 
   onMounted(() => {
-    // pollJobDetails(getJobInstanceDetails)
+    pollJobDetails(getJobInstanceDetails)
   })
 </script>
 
 <template>
   <a-spin :spinning="spinning">
-    <a-empty v-if="stages.length == 0" />
+    <a-empty v-if="stages.length == 0" :image="Empty.PRESENTED_IMAGE_SIMPLE" />
     <div v-else class="component-installer">
       <div class="retry">
         <a-button v-if="stepData.state === 'Failed'" type="link" @click="handleRetryJob">{{

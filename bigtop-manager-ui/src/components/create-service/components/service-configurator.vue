@@ -18,12 +18,11 @@
 -->
 
 <script setup lang="ts">
-  import { onActivated, ref, shallowRef } from 'vue'
+  import { ref, shallowRef } from 'vue'
   import { Empty } from 'ant-design-vue'
   import TreeSelector from './tree-selector.vue'
   import useCreateService from './use-create-service'
   import type { ServiceConfigReq } from '@/api/command/types'
-  import type { ServiceVO } from '@/api/service/types'
   import type { ComponentVO } from '@/api/component/types'
   import type { Key } from 'ant-design-vue/es/_util/type'
 
@@ -35,11 +34,10 @@
     isView: false
   })
 
-  const { serviceCommands } = useCreateService()
+  const { selectedServices } = useCreateService()
   const searchStr = ref('')
   const currService = ref<Key>('')
   const activeKey = ref<number[]>([])
-  const serviceList = ref<ServiceVO[]>([])
   const configs = ref<ServiceConfigReq[]>([])
   const hostPreviewList = ref<ComponentVO[]>([])
   const fieldNames = shallowRef({
@@ -73,15 +71,11 @@
     config.properties?.push(createNewConfigItem())
   }
 
-  onActivated(() => {
-    serviceList.value = serviceCommands.value
-  })
-
-  const onSelectComponent = (selectedKeys: Key[]) => {
-    currService.value = selectedKeys[0]
-    const index = serviceCommands.value.findIndex((v) => v.name === selectedKeys[0])
+  const handleChange = (expandSelectedKeyPath: string) => {
+    currService.value = expandSelectedKeyPath
+    const index = selectedServices.value.findIndex((v) => v.name === expandSelectedKeyPath.split('/').at(-1))
     if (index !== -1) {
-      const temp = serviceCommands.value[index]
+      const temp = selectedServices.value[index]
       configs.value = temp.configs as ServiceConfigReq[]
       hostPreviewList.value = temp.components as ComponentVO[]
     } else {
@@ -97,7 +91,7 @@
       <div class="list-title">
         <div>{{ $t('service.service_list') }}</div>
       </div>
-      <tree-selector :tree="serviceList" :field-names="fieldNames" @select="onSelectComponent" />
+      <tree-selector :tree="selectedServices" :field-names="fieldNames" @change="handleChange" />
     </section>
     <a-divider type="vertical" class="divider" />
     <section>

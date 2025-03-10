@@ -18,30 +18,51 @@
 -->
 
 <script setup lang="ts">
-  import { ref } from 'vue'
+  import { ref, watch } from 'vue'
   import { type TreeProps, Empty } from 'ant-design-vue'
+  import type { DataNode, FieldNames, Key } from 'ant-design-vue/es/vc-tree/interface'
 
   interface Props {
     tree: any
-    expandSelectedKeys?: string
-    fieldNames?: TreeProps['fieldNames']
+    fieldNames?: FieldNames
     selectable?: boolean
   }
 
   interface Emits {
-    (event: 'select', ...args: any): void
-    (event: 'update:expandSelectedKeys', expandSelectedKeys: string): void
+    (event: 'change', expandSelectedKeyPath: string): void
   }
 
-  withDefaults(defineProps<Props>(), {
+  const props = withDefaults(defineProps<Props>(), {
     selectable: true,
-    expandSelectedKeys: '',
     fieldNames: () => ({ children: 'children', title: 'title', key: 'key' })
   })
 
   const emits = defineEmits<Emits>()
-  const expandedKeys = ref<string[]>([])
-  const checkSelectedKeys = ref<string[]>([])
+  const checkSelectedKeys = ref<Key[]>([])
+
+  const setupDefaultSelectKey = (treeNode: DataNode, fieldNames: Required<FieldNames>) => {
+    const { children, key } = fieldNames
+    const stack: string[] = []
+    const pathParts: string[] = []
+
+    function traverse(node: DataNode, stack: string[]): boolean {
+      stack.push(node[key])
+      if (!node[children] || node[children].length === 0) {
+        pathParts.push(...stack)
+        return true
+      }
+      for (const child of node[children]) {
+        if (traverse(child, stack)) {
+          return true
+        }
+      }
+      stack.pop()
+      return false
+    }
+
+    traverse(treeNode, stack)
+    return pathParts.join('/')
+  }
 
   const handleSelect: TreeProps['onSelect'] = (selectedKeys, e) => {
     const selectedKey = selectedKeys[0]
@@ -50,17 +71,32 @@
     }
     const checkSelectedKey = checkSelectedKeys.value[0]
     if (selectedKey !== checkSelectedKey) {
-      checkSelectedKeys.value = selectedKeys as string[]
-      emits('update:expandSelectedKeys', `${e.node.parent?.key}/${selectedKeys[0]}`)
+      const keyPath = `${e.node.parent?.key}/${selectedKey}`
+      checkSelectedKeys.value = selectedKeys
+      emits('change', keyPath)
     }
   }
+
+  watch(
+    () => props.tree,
+    (val) => {
+      if (val[0]) {
+        const findPath = setupDefaultSelectKey(val[0], props.fieldNames as Required<FieldNames>)
+        const selectedKey = findPath.split('/').at(-1)
+        checkSelectedKeys.value = selectedKey ? [selectedKey] : []
+        emits('change', findPath)
+      }
+    },
+    {
+      immediate: true
+    }
+  )
 </script>
 
 <template>
   <div class="sidebar">
     <a-tree
       v-if="$props.tree.length > 0"
-      v-model:expandedKeys="expandedKeys"
       :selected-keys="checkSelectedKeys"
       :selectable="$props.selectable"
       :tree-data="$props.tree"

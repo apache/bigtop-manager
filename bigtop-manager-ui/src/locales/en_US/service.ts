@@ -28,5 +28,7 @@ export default {
   pending_installation_services: 'Pending Installation Services',
   select_host: 'Select  Host',
   host_preview: 'Host Preview',
-  please_enter_search_keyword: 'Please enter search keyword'
+  please_enter_search_keyword: 'Please enter search keyword',
+  component_host_assignment: 'Assign at least one host for each component',
+  service_selection: 'Please select services to install'
 }

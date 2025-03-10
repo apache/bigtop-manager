@@ -23,6 +23,7 @@
   import { storeToRefs } from 'pinia'
   import { useServiceStore } from '@/store/service'
   import { formatFromByte } from '@/utils/storage'
+  import { usePngImage } from '@/utils/tools'
   import { CommonStatus, CommonStatusTexts } from '@/enums/state'
   import GaugeChart from './components/gauge-chart.vue'
   import CategoryChart from './components/category-chart.vue'
@@ -200,12 +201,15 @@
           <a-descriptions-item v-for="stack in serviceStack" :key="stack.stackName">
             <template #label>
               <div class="desc-sub-label">
-                <a-typography-text strong :content="stack.stackName" />
+                <a-typography-text
+                  strong
+                  :content="stack.stackName.charAt(0).toUpperCase() + stack.stackName.slice(1) + ' Stack'"
+                />
                 <a-typography-text type="secondary" :content="stack.stackVersion" />
               </div>
             </template>
             <div v-for="service in stack.services" :key="service.id" class="service-item">
-              <a-avatar shape="square" :size="16" />
+              <a-avatar v-if="service.name" :src="usePngImage(service.name.toLowerCase())" :size="16" />
               <a-typography-text :content="service.displayName" />
               <a-dropdown :trigger="['click']">
                 <a-button type="text" shape="circle" size="small">
@@ -272,6 +276,12 @@
 </template>
 
 <style lang="scss" scoped>
+  :deep(.ant-avatar) {
+    border-radius: 4px;
+    img {
+      object-fit: contain !important;
+    }
+  }
   .box {
     &-title {
       @include flexbox($justify: space-between);
@@ -316,8 +326,8 @@
     grid-template-columns: auto 1fr auto;
     gap: $space-md;
     align-items: center;
-    padding: $space-md;
-    border-bottom: 1px solid #3b2020;
+    padding: 12px 16px;
+    border-bottom: 1px solid #f0f0f0;
   }
 
   .chart-item-wrp {

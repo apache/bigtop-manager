@@ -18,42 +18,58 @@
 -->
 
 <script setup lang="ts">
-  import { computed, ref, shallowRef, watch } from 'vue'
+  import { computed, shallowRef } from 'vue'
+  import { message } from 'ant-design-vue'
+  import { useI18n } from 'vue-i18n'
   import useCreateService from './components/use-create-service'
   import ServiceSelector from './components/service-selector.vue'
   import ComponentAssigner from './components/component-assigner.vue'
   import ServiceConfigurator from './components/service-configurator.vue'
   import ComponentInstaller from './components/component-installer.vue'
-  import { type CommandRequest } from '@/api/command/types'
 
-  const components = shallowRef<any[]>([
-    ServiceSelector,
-    ComponentAssigner,
-    ServiceConfigurator,
-    ServiceConfigurator,
-    ComponentInstaller
-  ])
-
-  const commandRequest = ref<CommandRequest>({
-    command: 'Add',
-    commandLevel: 'service'
-  })
-  const { current, stepsLimit, steps, previousStep, nextStep, serviceCommands } = useCreateService()
+  const { t } = useI18n()
+  const components = shallowRef<any[]>([ServiceSelector, ComponentAssigner, ServiceConfigurator, ServiceConfigurator])
+  const {
+    current,
+    stepsLimit,
+    steps,
+    allComps,
+    afterCreateRes,
+    selectedServices,
+    previousStep,
+    nextStep,
+    createService
+  } = useCreateService()
   const currComp = computed(() => components.value[current.value])
 
-  watch(
-    () => serviceCommands.value,
-    (val) => {
-      console.log('val :>> ', val)
-    },
-    {
-      deep: true
+  const validateServiceSelection = () => {
+    if (selectedServices.value.length === 0) {
+      message.error(t('service.service_selection'))
+      return false
     }
-  )
+    return true
+  }
 
-  const createService = () => {
-    console.log('commandRequest.value :>> ', commandRequest.value)
-    console.log('serviceCommands :>> ', serviceCommands)
+  const validateComponentAssignments = () => {
+    const allComponents = Array.from(allComps.value.values())
+    const isValid = allComponents.every((comp) => comp?.hosts?.length > 0)
+    if (!isValid) {
+      message.error(t('service.component_host_assignment'))
+    }
+    return isValid
+  }
+
+  const stepValidators = [validateServiceSelection, validateComponentAssignments, () => true]
+
+  const proceedToNextStep = async () => {
+    if (current.value < 3) {
+      stepValidators[current.value]() && nextStep()
+    } else if (current.value === 3) {
+      const state = await createService()
+      if (state) {
+        nextStep()
+      }
+    }
   }
 </script>
 
@@ -80,6 +96,7 @@
       <keep-alive>
         <component :is="currComp" :is-view="current === 3" />
       </keep-alive>
+      <component-installer v-if="current == stepsLimit" :step-data="afterCreateRes" />
       <div class="step-action">
         <a-space>
           <a-button v-show="current != stepsLimit" @click="() => $router.go(-1)">{{ $t('common.exit') }}</a-button>
@@ -87,11 +104,11 @@
             {{ $t('common.prev') }}
           </a-button>
           <template v-if="current >= 0 && current <= stepsLimit - 1">
-            <a-button type="primary" @click="nextStep">
+            <a-button type="primary" @click="proceedToNextStep">
               {{ $t('common.next') }}
             </a-button>
           </template>
-          <a-button v-show="current === stepsLimit" type="primary" @click="createService">
+          <a-button v-show="current === stepsLimit" type="primary" @click="$router.go(-1)">
             {{ $t('common.done') }}
           </a-button>
         </a-space>

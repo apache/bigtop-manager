@@ -35,7 +35,7 @@
     isAddableData: [],
     selectedData: []
   })
-  const { serviceCommands, filteredServices, setDataByCurrent } = useCreateService()
+  const { selectedServices, filteredServices, setDataByCurrent } = useCreateService()
   const { isAddableData } = toRefs(state)
   const filterAddableData = computed(() =>
     isAddableData.value.filter(
@@ -93,8 +93,8 @@
   }
 
   onActivated(() => {
-    serviceCommands.value.length > 0
-      ? (state.selectedData = serviceCommands.value)
+    selectedServices.value.length > 0
+      ? (state.selectedData = selectedServices.value)
       : (state.isAddableData = filteredServices.value as DataItem[])
   })
 </script>
@@ -110,7 +110,7 @@
         <template #renderItem="{ item }">
           <a-list-item>
             <template #actions>
-              <a-button size="small" type="primary" @click="addInstallItem(item)">Add</a-button>
+              <a-button size="small" type="primary" @click="addInstallItem(item)">{{ $t('common.add') }}</a-button>
             </template>
             <a-list-item-meta>
               <template #title>
@@ -150,7 +150,9 @@
         <template #renderItem="{ item }">
           <a-list-item>
             <template #actions>
-              <a-button size="small" danger type="primary" @click="removeInstallItem(item)">Remove</a-button>
+              <a-button size="small" danger type="primary" @click="removeInstallItem(item)">
+                {{ $t('common.remove') }}
+              </a-button>
             </template>
             <a-list-item-meta>
               <template #title>

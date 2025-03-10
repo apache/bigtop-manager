@@ -18,17 +18,20 @@
  */
 
 import { computed, ref } from 'vue'
+import { useRoute } from 'vue-router'
 import { useStackStore } from '@/store/stack'
+import { execCommand } from '@/api/command'
 import useSteps from '@/composables/use-steps'
 import type { HostVO } from '@/api/hosts/types'
 import type { ServiceVO } from '@/api/service/types'
-import type { DataNode } from 'ant-design-vue/es/tree'
-import { TreeProps } from 'ant-design-vue'
+import type { CommandVO, CommandRequest, ServiceCommandReq } from '@/api/command/types'
 
 type DataItem = ServiceVO & { order: number }
 
 const filteredServices = computed(() => useStackStore().getServicesByExclude(['infra']))
-const serviceCommands = ref<DataItem[]>([])
+const selectedServices = ref<DataItem[]>([])
+const afterCreateRes = ref<CommandVO>({ id: undefined })
+
 const steps = computed(() => [
   'service.select_service',
   'service.assign_component',
@@ -39,56 +42,64 @@ const steps = computed(() => [
 const { current, stepsLimit, previousStep, nextStep } = useSteps(steps.value)
 
 const useCreateService = () => {
+  const route = useRoute()
+  const commandRequest = ref<CommandRequest>({
+    command: 'Add',
+    commandLevel: 'service',
+    clusterId: parseInt(route.query.clusterId as string)
+  })
+
   const allComps = computed(() => {
-    return new Map(serviceCommands.value.flatMap((s) => s.components!.map((comp) => [comp.name, comp])))
+    return new Map(selectedServices.value.flatMap((s) => s.components!.map((comp) => [comp.name, comp])))
   })
 
   const setDataByCurrent = (val: DataItem[]) => {
-    serviceCommands.value = val
+    selectedServices.value = val
   }
 
-  const updateComponentHosts = (compName: string, hosts: HostVO[]) => {
+  const updateHostsForComponent = (compName: string, hosts: HostVO[]) => {
     const [serviceName, componentName] = compName.split('/')
-    const service = serviceCommands.value.find((svc) => svc.name === serviceName)
+    const service = selectedServices.value.find((svc) => svc.name === serviceName)
     if (!service) return false
     const component = service.components?.find((comp) => comp.name === componentName)
     if (!component) return false
     component.hosts = hosts
   }
 
-  const findLastChildOfFirstNode = (
-    tree: any,
-    fieldNames: TreeProps['fieldNames']
-  ): { currNode: DataNode; pNode: DataNode | undefined } | undefined => {
-    if (!tree || tree.length === 0) return undefined
-    const childrenKey = fieldNames?.children || 'children'
-    const queue: Array<{ node: DataNode; pNode: DataNode | undefined }> = tree.map((node: any) => ({
-      node,
-      pNode: undefined
-    }))
-    while (queue.length > 0) {
-      const { node: current, pNode } = queue.shift()!
-      const children = (current[childrenKey] as DataNode[]) || []
-      if (children.length === 0) {
-        return { currNode: current, pNode }
-      }
-      children.forEach((child) => {
-        queue.push({ node: child, pNode: current })
-      })
+  const transformServiceData = (services: DataItem[]) => {
+    return services.map((service) => ({
+      serviceName: service.name,
+      componentHosts: service.components!.map((component) => ({
+        componentName: component.name,
+        hostnames: component.hosts.map((host: HostVO) => host.hostname)
+      })),
+      configs: service.configs
+    })) as ServiceCommandReq[]
+  }
+
+  const createService = async () => {
+    try {
+      const formatData = transformServiceData(selectedServices.value)
+      commandRequest.value.serviceCommands = formatData
+      afterCreateRes.value = await execCommand(commandRequest.value)
+      return true
+    } catch (error) {
+      console.log('error :>> ', error)
+      return false
     }
-    return undefined
   }
 
   return {
     steps,
     current,
     stepsLimit,
-    serviceCommands,
+    selectedServices,
     filteredServices,
     allComps,
+    afterCreateRes,
     setDataByCurrent,
-    findLastChildOfFirstNode,
-    updateComponentHosts,
+    updateHostsForComponent,
+    createService,
     previousStep,
     nextStep
   }

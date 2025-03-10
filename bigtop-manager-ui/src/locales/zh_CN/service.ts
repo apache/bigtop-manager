@@ -28,5 +28,7 @@ export default {
   pending_installation_services: '待安装服务',
   select_host: '选择主机',
   host_preview: '主机预览',
-  please_enter_search_keyword: '请输入搜索关键字'
+  please_enter_search_keyword: '请输入搜索关键字',
+  component_host_assignment: '每个组件至少分配一个主机',
+  service_selection: '请选择需要安装的服务'
 }
