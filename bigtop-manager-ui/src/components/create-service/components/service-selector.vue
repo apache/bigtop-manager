@@ -38,7 +38,7 @@
   const filterAddableData = computed(() =>
     isAddableData.value.filter(
       (v) =>
-        v.name?.toString().toLowerCase().includes(searchStr.value) ||
+        v.displayName?.toString().toLowerCase().includes(searchStr.value) ||
         v.desc?.toString().toLowerCase().includes(searchStr.value)
     )
   )
@@ -78,10 +78,13 @@
     setDataByCurrent(state.selectedData)
   }
 
-  const addInstallItem = (item: ExpandServiceVO) => {
-    const res = resolveRequiredServices(item)
-    console.log('res :>> ', res)
-    // handleInstallItem(item, state.isAddableData, state.selectedData)
+  const addInstallItem = async (item: ExpandServiceVO) => {
+    const items = await resolveRequiredServices(item)
+    if (items.length > 0) {
+      items.forEach((i) => {
+        handleInstallItem(i, state.isAddableData, state.selectedData)
+      })
+    }
   }
 
   const removeInstallItem = (item: ExpandServiceVO) => {
@@ -110,12 +113,12 @@
         <template #renderItem="{ item }">
           <a-list-item>
             <template #actions>
-              <a-button size="small" type="primary" @click="addInstallItem(item)">{{ $t('common.add') }}</a-button>
+              <a-button type="primary" @click="addInstallItem(item)">{{ $t('common.add') }}</a-button>
             </template>
             <a-list-item-meta>
               <template #title>
-                <div class="ellipsis item-name" :title="item.name">
-                  <template v-for="(fragment, i) in splitSearchStr(item.name)">
+                <div class="ellipsis item-name" :title="item.displayName">
+                  <template v-for="(fragment, i) in splitSearchStr(item.displayName)">
                     <mark v-if="fragment.toLowerCase() === searchStr.toLowerCase()" :key="i" class="highlight">
                       {{ fragment }}
                     </mark>
@@ -134,7 +137,7 @@
                 </div>
               </template>
               <template #avatar>
-                <a-avatar v-if="item.name" :src="usePngImage(item.name.toLowerCase())" :size="54" class="header-icon" />
+                <a-avatar v-if="item.displayName" :src="usePngImage(item.displayName.toLowerCase())" :size="54" class="header-icon" />
               </template>
             </a-list-item-meta>
           </a-list-item>
@@ -150,14 +153,14 @@
         <template #renderItem="{ item }">
           <a-list-item>
             <template #actions>
-              <a-button size="small" danger type="primary" @click="removeInstallItem(item)">
+              <a-button danger type="primary" @click="removeInstallItem(item)">
                 {{ $t('common.remove') }}
               </a-button>
             </template>
             <a-list-item-meta>
               <template #title>
-                <div class="ellipsis item-name" :data-tooltip="item.name">
-                  {{ item.name }}
+                <div class="ellipsis item-name" :data-tooltip="item.displayName">
+                  {{ item.displayName }}
                 </div>
               </template>
               <template #description>
@@ -166,7 +169,7 @@
                 </div>
               </template>
               <template #avatar>
-                <a-avatar v-if="item.name" :src="usePngImage(item.name.toLowerCase())" :size="54" class="header-icon" />
+                <a-avatar v-if="item.displayName" :src="usePngImage(item.displayName.toLowerCase())" :size="54" class="header-icon" />
               </template>
             </a-list-item-meta>
           </a-list-item>
