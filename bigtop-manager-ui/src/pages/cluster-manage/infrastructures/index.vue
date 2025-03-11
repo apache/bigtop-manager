@@ -22,7 +22,6 @@
 <template>
   <div>
     <span> infra list </span>
-    <a-button type="primary" @click="() => $router.push({ name: 'CreateService' })">Create Infra</a-button>
   </div>
 </template>
 

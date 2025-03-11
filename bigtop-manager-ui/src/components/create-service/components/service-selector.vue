@@ -21,13 +21,11 @@
   import { computed, onActivated, reactive, ref, toRefs } from 'vue'
   import { usePngImage } from '@/utils/tools'
   import useCreateService from './use-create-service'
-  import type { ServiceVO } from '@/api/service/types'
-
-  type DataItem = ServiceVO & { order: number }
+  import { ExpandServiceVO } from '@/store/stack'
 
   interface State {
-    isAddableData: DataItem[]
-    selectedData: DataItem[]
+    isAddableData: ExpandServiceVO[]
+    selectedData: ExpandServiceVO[]
   }
 
   const searchStr = ref('')
@@ -35,7 +33,7 @@
     isAddableData: [],
     selectedData: []
   })
-  const { selectedServices, filteredServices, setDataByCurrent } = useCreateService()
+  const { selectedServices, filteredServices, resolveRequiredServices, setDataByCurrent } = useCreateService()
   const { isAddableData } = toRefs(state)
   const filterAddableData = computed(() =>
     isAddableData.value.filter(
@@ -74,17 +72,18 @@
     return low
   }
 
-  const handleInstallItem = (item: DataItem, from: DataItem[], to: DataItem[]) => {
+  const handleInstallItem = (item: ExpandServiceVO, from: ExpandServiceVO[], to: ExpandServiceVO[]) => {
     item.components = item.components?.map((v) => ({ ...v, hosts: [] }))
     moveItem(from, to, item)
     setDataByCurrent(state.selectedData)
   }
 
-  const addInstallItem = (item: DataItem) => {
+  const addInstallItem = (item: ExpandServiceVO) => {
+    resolveRequiredServices(item)
     handleInstallItem(item, state.isAddableData, state.selectedData)
   }
 
-  const removeInstallItem = (item: DataItem) => {
+  const removeInstallItem = (item: ExpandServiceVO) => {
     handleInstallItem(item, state.selectedData, state.isAddableData)
   }
 
@@ -95,7 +94,7 @@
   onActivated(() => {
     selectedServices.value.length > 0
       ? (state.selectedData = selectedServices.value)
-      : (state.isAddableData = filteredServices.value as DataItem[])
+      : (state.isAddableData = filteredServices.value as ExpandServiceVO[])
   })
 </script>
 

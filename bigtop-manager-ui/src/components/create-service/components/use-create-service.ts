@@ -17,19 +17,19 @@
  * under the License.
  */
 
-import { computed, ref } from 'vue'
+import { computed, createVNode, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { useStackStore } from '@/store/stack'
+import { ExpandServiceVO, useStackStore } from '@/store/stack'
 import { execCommand } from '@/api/command'
 import useSteps from '@/composables/use-steps'
 import type { HostVO } from '@/api/hosts/types'
-import type { ServiceVO } from '@/api/service/types'
 import type { CommandVO, CommandRequest, ServiceCommandReq } from '@/api/command/types'
-
-type DataItem = ServiceVO & { order: number }
+import { Modal } from 'ant-design-vue'
+import { ExclamationCircleOutlined } from '@ant-design/icons-vue'
 
 const filteredServices = computed(() => useStackStore().getServicesByExclude(['infra']))
-const selectedServices = ref<DataItem[]>([])
+const servicesOfInfra = computed(() => useStackStore().getServicesByExclude(['bigtop', 'extra']))
+const selectedServices = ref<ExpandServiceVO[]>([])
 const afterCreateRes = ref<CommandVO>({ id: undefined })
 
 const steps = computed(() => [
@@ -53,7 +53,7 @@ const useCreateService = () => {
     return new Map(selectedServices.value.flatMap((s) => s.components!.map((comp) => [comp.name, comp])))
   })
 
-  const setDataByCurrent = (val: DataItem[]) => {
+  const setDataByCurrent = (val: ExpandServiceVO[]) => {
     selectedServices.value = val
   }
 
@@ -66,7 +66,7 @@ const useCreateService = () => {
     component.hosts = hosts
   }
 
-  const transformServiceData = (services: DataItem[]) => {
+  const transformServiceData = (services: ExpandServiceVO[]) => {
     return services.map((service) => ({
       serviceName: service.name,
       componentHosts: service.components!.map((component) => ({
@@ -75,6 +75,34 @@ const useCreateService = () => {
       })),
       configs: service.configs
     })) as ServiceCommandReq[]
+  }
+
+  // Validate services from infra
+  const validServiceFromInfra = (requiredServices: string[]) => {
+    return servicesOfInfra.value.some((service) => requiredServices?.includes(service.name!))
+  }
+
+  // Validate services from bigtop / extra
+  const validServiceFromBigtopAndExtra = (selectService: ExpandServiceVO, requiredServices: string[]) => {
+    const isSelected = selectedServices.value.some((service) => service.name === selectService.name)
+    if (isSelected) {
+      return true
+    } else {
+      console.log('requiredServices :>> ', requiredServices)
+      confirmRequiredServicesToInstall()
+    }
+  }
+
+  const resolveRequiredServices = (item: ExpandServiceVO) => {
+    const { requiredServices } = item
+    if (!requiredServices) {
+      return
+    }
+    if (validServiceFromInfra(requiredServices)) {
+      return false
+    } else {
+      validServiceFromBigtopAndExtra(item, requiredServices)
+    }
   }
 
   const createService = async () => {
@@ -89,6 +117,22 @@ const useCreateService = () => {
     }
   }
 
+  const confirmRequiredServicesToInstall = () => {
+    Modal.confirm({
+      content: 'destroy all',
+      icon: createVNode(ExclamationCircleOutlined),
+      onOk() {
+        return new Promise((resolve, reject) => {
+          setTimeout(Math.random() > 0.5 ? resolve : reject, 1000)
+        }).catch(() => console.log('Oops errors!'))
+      },
+      cancelText: 'Click to destroy all',
+      onCancel() {
+        Modal.destroyAll()
+      }
+    })
+  }
+
   return {
     steps,
     current,
@@ -99,6 +143,7 @@ const useCreateService = () => {
     afterCreateRes,
     setDataByCurrent,
     updateHostsForComponent,
+    resolveRequiredServices,
     createService,
     previousStep,
     nextStep

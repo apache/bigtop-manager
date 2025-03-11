@@ -23,6 +23,8 @@ import { StackVO } from '@/api/stack/types'
 import { defineStore } from 'pinia'
 import { shallowRef } from 'vue'
 
+export type ExpandServiceVO = ServiceVO & { order: number }
+
 export const useStackStore = defineStore(
   'stack',
   () => {
@@ -37,7 +39,7 @@ export const useStackStore = defineStore(
       }
     }
 
-    const getServicesByExclude = (exclude?: string[], isOrder = true): ServiceVO[] => {
+    const getServicesByExclude = (exclude?: string[], isOrder = true): ExpandServiceVO[] | ServiceVO[] => {
       const filterData = stacks.value.flatMap((stack) => (exclude?.includes(stack.stackName) ? [] : stack.services))
       return isOrder ? filterData.map((service, index) => ({ ...service, order: index })) : filterData
     }
