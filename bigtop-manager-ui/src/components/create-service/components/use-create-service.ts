@@ -83,27 +83,30 @@ const useCreateService = () => {
   }
 
   // Validate services from bigtop / extra
-  const validServiceFromBigtopAndExtra = (selectService: ExpandServiceVO, requiredServices: string[]) => {
+  const validServiceFromBigtopAndExtra = async (requiredServices: string[], selectService: ExpandServiceVO) => {
     const isSelected = selectedServices.value.some((service) => service.name === selectService.name)
     if (isSelected) {
       return true
     } else {
-      console.log('requiredServices :>> ', requiredServices)
-      confirmRequiredServicesToInstall()
+      const res = await confirmRequiredServicesToInstall(requiredServices)
+      console.log('res :>> ', res)
+      return false
     }
   }
 
   const resolveRequiredServices = (item: ExpandServiceVO) => {
     const { requiredServices } = item
     if (!requiredServices) {
-      return
+      return false
     }
     if (validServiceFromInfra(requiredServices)) {
       return false
     } else {
-      validServiceFromBigtopAndExtra(item, requiredServices)
+      return validServiceFromBigtopAndExtra(requiredServices, item)
     }
   }
+
+  const transformRequiredServicesToTree = () => {}
 
   const createService = async () => {
     try {
@@ -117,19 +120,21 @@ const useCreateService = () => {
     }
   }
 
-  const confirmRequiredServicesToInstall = () => {
-    Modal.confirm({
-      content: 'destroy all',
-      icon: createVNode(ExclamationCircleOutlined),
-      onOk() {
-        return new Promise((resolve, reject) => {
-          setTimeout(Math.random() > 0.5 ? resolve : reject, 1000)
-        }).catch(() => console.log('Oops errors!'))
-      },
-      cancelText: 'Click to destroy all',
-      onCancel() {
-        Modal.destroyAll()
-      }
+  const confirmRequiredServicesToInstall = (requiredServices: string[]) => {
+    return new Promise((resolve, reject) => {
+      Modal.confirm({
+        content: 'A rely on B',
+        icon: createVNode(ExclamationCircleOutlined),
+        cancelText: '否',
+        okText: '是',
+        onOk() {
+          return resolve(requiredServices)
+        },
+        onCancel() {
+          Modal.destroyAll()
+          return reject(requiredServices)
+        }
+      })
     })
   }
 

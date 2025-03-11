@@ -79,8 +79,9 @@
   }
 
   const addInstallItem = (item: ExpandServiceVO) => {
-    resolveRequiredServices(item)
-    handleInstallItem(item, state.isAddableData, state.selectedData)
+    const res = resolveRequiredServices(item)
+    console.log('res :>> ', res)
+    // handleInstallItem(item, state.isAddableData, state.selectedData)
   }
 
   const removeInstallItem = (item: ExpandServiceVO) => {
