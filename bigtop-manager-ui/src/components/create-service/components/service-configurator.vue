@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { ref, shallowRef } from 'vue'
+  import { ref, shallowRef, watch } from 'vue'
   import { Empty } from 'ant-design-vue'
   import TreeSelector from './tree-selector.vue'
   import useCreateService from './use-create-service'
@@ -54,8 +54,14 @@
     wrapperCol: {
       xs: { span: 24 },
       sm: { span: 16 },
+      md: { span: 16 },
       lg: { span: 18 }
     }
+  })
+
+  watch(searchStr, (val) => {
+    console.log('val :>> ', val)
+    console.log('config :>> ', configs.value)
   })
 
   const createNewConfigItem = () => {
@@ -100,7 +106,7 @@
         <a-input v-model:value="searchStr" :placeholder="$t('service.please_enter_search_keyword')" />
       </div>
       <a-empty v-if="configs.length === 0" :image="Empty.PRESENTED_IMAGE_SIMPLE" />
-      <a-form v-else :disabled="$props.isView">
+      <a-form v-else :disabled="$props.isView" :label-wrap="true">
         <a-collapse v-model:active-key="activeKey" :bordered="false" :ghost="true">
           <a-collapse-panel v-for="config in configs" :key="config.id">
             <template #extra>
@@ -113,11 +119,13 @@
             <template #header>
               <span>{{ config.name }}</span>
             </template>
-            <a-row v-for="(item, idx) in config.properties" :key="idx" :gutter="[16, 0]">
+            <a-row v-for="(item, idx) in config.properties" :key="idx" :gutter="[16, 0]" :wrap="true">
               <a-col v-bind="layout.labelCol">
                 <a-form-item>
                   <a-textarea v-if="item.isManual" v-model:value="item.name" :auto-size="{ minRows: 1, maxRows: 5 }" />
-                  <span v-else>{{ item.displayName ?? item.name }}</span>
+                  <span v-else style="overflow-wrap: break-word" :title="item.displayName ?? item.name">
+                    {{ item.displayName ?? item.name }}
+                  </span>
                 </a-form-item>
               </a-col>
               <a-col v-bind="layout.wrapperCol">

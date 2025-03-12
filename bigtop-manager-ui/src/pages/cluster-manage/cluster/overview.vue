@@ -49,7 +49,7 @@
   const statusColors = shallowRef<Record<ClusterStatusType, keyof typeof CommonStatusTexts>>({
     1: 'healthy',
     2: 'unhealthy',
-    3: 'unknow'
+    3: 'unknown'
   })
   const { locateStackWithService } = storeToRefs(serviceStore)
   const clusterDetail = computed(() => ({

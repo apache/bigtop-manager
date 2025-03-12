@@ -30,5 +30,7 @@ export default {
   host_preview: '主机预览',
   please_enter_search_keyword: '请输入搜索关键字',
   component_host_assignment: '每个组件至少分配一个主机',
-  service_selection: '请选择需要安装的服务'
+  service_selection: '请选择需要安装的服务',
+  dependencies_conflict_msg: '{0} 依赖于基础服务 {1}，请先前往安装',
+  dependencies_msg: '{0} 依赖于服务 {1}, 是否一起安装？'
 }

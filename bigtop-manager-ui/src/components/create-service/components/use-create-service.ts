@@ -17,21 +17,27 @@
  * under the License.
  */
 
-import { computed, createVNode, ref } from 'vue'
+import { computed, createVNode, ref, watch } from 'vue'
+import { message, Modal } from 'ant-design-vue'
+import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import { ExpandServiceVO, useStackStore } from '@/store/stack'
 import { execCommand } from '@/api/command'
 import useSteps from '@/composables/use-steps'
+import SvgIcon from '@/components/common/svg-icon/index.vue'
 import type { HostVO } from '@/api/hosts/types'
 import type { CommandVO, CommandRequest, ServiceCommandReq } from '@/api/command/types'
-import { message, Modal } from 'ant-design-vue'
-import { ExclamationCircleOutlined } from '@ant-design/icons-vue'
 
-const filteredServices = computed(() => useStackStore().getServicesByExclude(['infra']))
-const servicesOfInfra = computed(() => useStackStore().getServicesByExclude(['bigtop', 'extra']))
+interface ProcessResult {
+  success: boolean
+  conflictService?: ExpandServiceVO
+}
+
 const selectedServices = ref<ExpandServiceVO[]>([])
 const afterCreateRes = ref<CommandVO>({ id: undefined })
 
+const servicesOfInfra = computed(() => useStackStore().getServicesByExclude(['bigtop', 'extra']) as ExpandServiceVO[])
+const servicesOfExcludeInfra = computed(() => useStackStore().getServicesByExclude(['infra']))
 const steps = computed(() => [
   'service.select_service',
   'service.assign_component',
@@ -43,6 +49,19 @@ const { current, stepsLimit, previousStep, nextStep } = useSteps(steps.value)
 
 const useCreateService = () => {
   const route = useRoute()
+  const { t } = useI18n()
+  const processedServices = ref(new Set())
+
+  watch(
+    () => selectedServices.value,
+    () => {
+      processedServices.value = new Set(selectedServices.value.map((v) => v.name))
+    },
+    {
+      deep: true
+    }
+  )
+
   const commandRequest = ref<CommandRequest>({
     command: 'Add',
     commandLevel: 'service',
@@ -78,92 +97,88 @@ const useCreateService = () => {
   }
 
   // Validate services from infra
-  const validServiceFromInfra = (requiredServices: string[]) => {
-    return servicesOfInfra.value
+  const validServiceFromInfra = (targetService: ExpandServiceVO, requiredServices: string[]) => {
+    const filterServiceNames = servicesOfInfra.value
       .filter((service) => requiredServices?.includes(service.name!))
-      .map((v) => v.displayName)
+      .map((service) => service.displayName)
+
+    if (!filterServiceNames.length) return false
+    message.error(t('service.dependencies_conflict_msg', [targetService.displayName!, filterServiceNames.join(',')]))
+    return true
   }
 
-  interface ProcessResult {
-    success: boolean
-    conflictService?: ExpandServiceVO
-  }
-
-  async function processDependencies(
-    node: ExpandServiceVO,
+  const processDependencies = async (
+    targetService: ExpandServiceVO,
     serviceMap: Map<string, ExpandServiceVO>,
     servicesOfInfra: ExpandServiceVO[],
-    collected: ExpandServiceVO[],
-    processed: Set<string>
-  ): Promise<ProcessResult> {
-    const dependencies = node.requiredServices || []
-    const infraConflict = servicesOfInfra.some((s) => s.name === node.name)
+    collected: ExpandServiceVO[]
+  ): Promise<ProcessResult> => {
+    const dependencies = targetService.requiredServices || []
 
-    if (infraConflict) {
+    if (validServiceFromInfra(targetService, dependencies)) {
       return {
         success: false,
-        conflictService: node
+        conflictService: targetService
       }
     }
 
     for (const serviceName of dependencies) {
       const dependency = serviceMap.get(serviceName)
-      if (!dependency || processed.has(dependency.name!)) continue
+      if (!dependency || processedServices.value.has(dependency.name!)) continue
 
-      const isInInfra = servicesOfInfra.some((s) => s.name === dependency.name)
-      if (isInInfra) {
-        return {
-          success: false,
-          conflictService: dependency
-        }
-      }
-
-      const shouldAdd = await confirmRequiredServicesToInstall(dependency)
+      const shouldAdd = await confirmRequiredServicesToInstall(targetService, dependency)
       if (!shouldAdd) return { success: false }
 
       collected.push(dependency)
-      processed.add(dependency.name!)
-      const result = await processDependencies(dependency, serviceMap, servicesOfInfra, collected, processed)
+      processedServices.value.add(dependency.name!)
+      const result = await processDependencies(dependency, serviceMap, servicesOfInfra, collected)
 
       if (!result.success) {
         collected.splice(collected.indexOf(dependency), 1)
-        processed.delete(dependency.name!)
+        processedServices.value.delete(dependency.name!)
         return result
       }
     }
     return { success: true }
   }
 
-  const handleServiceSelection = async (selectedNode: ExpandServiceVO) => {
-    const serviceMap = new Map(filteredServices.value.map((s) => [s.name as string, s as ExpandServiceVO]))
-    const processed = new Set(selectedServices.value.map((v) => v.name!))
+  const handlePreSelectedServiceDependencies = async (preSelectedService: ExpandServiceVO) => {
+    const serviceMap = new Map(servicesOfExcludeInfra.value.map((s) => [s.name as string, s as ExpandServiceVO]))
     const result: ExpandServiceVO[] = []
-    const dependenciesSuccess = await processDependencies(
-      selectedNode,
-      serviceMap,
-      servicesOfInfra.value as ExpandServiceVO[],
-      result,
-      processed
-    )
-    if (dependenciesSuccess) {
-      result.unshift(selectedNode)
+    const dependenciesSuccess = await processDependencies(preSelectedService, serviceMap, servicesOfInfra.value, result)
+    if (dependenciesSuccess.success) {
+      result.unshift(preSelectedService)
       return result
     }
     return []
   }
 
-  const resolveRequiredServices = async (item: ExpandServiceVO) => {
-    const { requiredServices } = item
+  const confirmServiceDependencies = async (preSelectedService: ExpandServiceVO) => {
+    const { requiredServices } = preSelectedService
     if (!requiredServices) {
-      return [item]
+      return [preSelectedService]
     }
-    const filterServiceNames = validServiceFromInfra(requiredServices)
-    if (filterServiceNames.length > 0) {
-      message.error(`${filterServiceNames.join(',')}属于基础服务，请先前往安装`)
+    if (validServiceFromInfra(preSelectedService, requiredServices)) {
       return []
     } else {
-      return await handleServiceSelection(item)
+      return await handlePreSelectedServiceDependencies(preSelectedService)
     }
+  }
+
+  const confirmRequiredServicesToInstall = (targetService: ExpandServiceVO, requiredService: ExpandServiceVO) => {
+    return new Promise((resolve) => {
+      Modal.confirm({
+        content: t('service.dependencies_msg', [targetService.displayName, requiredService.displayName]),
+        icon: createVNode(SvgIcon, { name: 'unknown' }),
+        cancelText: t('common.no'),
+        okText: t('common.yes'),
+        onOk: () => resolve(true),
+        onCancel: () => {
+          Modal.destroyAll()
+          return resolve(false)
+        }
+      })
+    })
   }
 
   const createService = async () => {
@@ -178,35 +193,17 @@ const useCreateService = () => {
     }
   }
 
-  const confirmRequiredServicesToInstall = (requiredService: ExpandServiceVO) => {
-    return new Promise((resolve) => {
-      Modal.confirm({
-        content: `dependency ${requiredService.displayName}`,
-        icon: createVNode(ExclamationCircleOutlined),
-        cancelText: '否',
-        okText: '是',
-        onOk() {
-          return resolve(true)
-        },
-        onCancel() {
-          Modal.destroyAll()
-          return resolve(false)
-        }
-      })
-    })
-  }
-
   return {
     steps,
     current,
     stepsLimit,
     selectedServices,
-    filteredServices,
+    servicesOfExcludeInfra,
     allComps,
     afterCreateRes,
     setDataByCurrent,
     updateHostsForComponent,
-    resolveRequiredServices,
+    confirmServiceDependencies,
     createService,
     previousStep,
     nextStep

@@ -26,7 +26,7 @@ export default {
   status: 'Status',
   healthy: 'Healthy',
   unhealthy: 'Unhealthy',
-  unknow: 'Unknown',
+  unknown: 'Unknown',
   failed: 'Failed',
   success: 'Normal',
   edit: 'Edit',
@@ -106,5 +106,7 @@ export default {
   stop: 'Stop {0}',
   add: 'Add {0}',
   more_operations: 'More Operations',
-  ok: 'Ok'
+  ok: 'Ok',
+  yes: 'Yes',
+  no: 'No'
 }

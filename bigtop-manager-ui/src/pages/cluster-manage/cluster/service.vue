@@ -37,7 +37,7 @@
   const statusColors = shallowRef<Record<ServiceStatusType, keyof typeof CommonStatusTexts>>({
     1: 'healthy',
     2: 'unhealthy',
-    3: 'unknow'
+    3: 'unknown'
   })
 
   const actionGroups = shallowRef<GroupItem[]>([

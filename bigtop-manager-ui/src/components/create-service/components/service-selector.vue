@@ -33,13 +33,13 @@
     isAddableData: [],
     selectedData: []
   })
-  const { selectedServices, filteredServices, resolveRequiredServices, setDataByCurrent } = useCreateService()
+  const { selectedServices, servicesOfExcludeInfra, confirmServiceDependencies, setDataByCurrent } = useCreateService()
   const { isAddableData } = toRefs(state)
   const filterAddableData = computed(() =>
     isAddableData.value.filter(
       (v) =>
-        v.displayName?.toString().toLowerCase().includes(searchStr.value) ||
-        v.desc?.toString().toLowerCase().includes(searchStr.value)
+        v.displayName?.toString().toLowerCase().includes(searchStr.value.toString().toLowerCase()) ||
+        v.desc?.toString().toLowerCase().includes(searchStr.value.toString().toLowerCase())
     )
   )
 
@@ -79,7 +79,7 @@
   }
 
   const addInstallItem = async (item: ExpandServiceVO) => {
-    const items = await resolveRequiredServices(item)
+    const items = await confirmServiceDependencies(item)
     if (items.length > 0) {
       items.forEach((i) => {
         handleInstallItem(i, state.isAddableData, state.selectedData)
@@ -98,7 +98,11 @@
   onActivated(() => {
     selectedServices.value.length > 0
       ? (state.selectedData = selectedServices.value)
-      : (state.isAddableData = filteredServices.value as ExpandServiceVO[])
+      : (state.isAddableData = servicesOfExcludeInfra.value as ExpandServiceVO[])
+  })
+
+  defineExpose({
+    addInstallItem
   })
 </script>
 
@@ -137,7 +141,12 @@
                 </div>
               </template>
               <template #avatar>
-                <a-avatar v-if="item.displayName" :src="usePngImage(item.displayName.toLowerCase())" :size="54" class="header-icon" />
+                <a-avatar
+                  v-if="item.displayName"
+                  :src="usePngImage(item.displayName.toLowerCase())"
+                  :size="54"
+                  class="header-icon"
+                />
               </template>
             </a-list-item-meta>
           </a-list-item>
@@ -169,7 +178,12 @@
                 </div>
               </template>
               <template #avatar>
-                <a-avatar v-if="item.displayName" :src="usePngImage(item.displayName.toLowerCase())" :size="54" class="header-icon" />
+                <a-avatar
+                  v-if="item.displayName"
+                  :src="usePngImage(item.displayName.toLowerCase())"
+                  :size="54"
+                  class="header-icon"
+                />
               </template>
             </a-list-item-meta>
           </a-list-item>

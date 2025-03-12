@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { computed, shallowRef } from 'vue'
+  import { computed, ref, shallowRef } from 'vue'
   import { message } from 'ant-design-vue'
   import { useI18n } from 'vue-i18n'
   import useCreateService from './components/use-create-service'
@@ -38,14 +38,33 @@
     selectedServices,
     previousStep,
     nextStep,
-    createService
+    createService,
+    confirmServiceDependencies
   } = useCreateService()
+  const compRef = ref<any>()
   const currComp = computed(() => components.value[current.value])
 
-  const validateServiceSelection = () => {
+  const validateServiceSelection = async () => {
     if (selectedServices.value.length === 0) {
       message.error(t('service.service_selection'))
       return false
+    } else {
+      return await validateDependenciesOfServiceSelection()
+    }
+  }
+
+  const validateDependenciesOfServiceSelection = async () => {
+    let selectedServiceNames = new Set(selectedServices.value.map((service) => service.name))
+    for (const service of selectedServices.value) {
+      const res = await confirmServiceDependencies(service)
+      if (res.length === 0) {
+        return false
+      }
+      const filter = res.filter((service) => !selectedServiceNames.has(service.name))
+      filter.forEach((service) => {
+        compRef.value.addInstallItem(service)
+        selectedServiceNames.add(service.name)
+      })
     }
     return true
   }
@@ -63,7 +82,7 @@
 
   const proceedToNextStep = async () => {
     if (current.value < 3) {
-      stepValidators[current.value]() && nextStep()
+      ;(await stepValidators[current.value]()) && nextStep()
     } else if (current.value === 3) {
       const state = await createService()
       if (state) {
@@ -94,7 +113,7 @@
         </div>
       </template>
       <keep-alive>
-        <component :is="currComp" :is-view="current === 3" />
+        <component :is="currComp" ref="compRef" :is-view="current === 3" />
       </keep-alive>
       <component-installer v-if="current == stepsLimit" :step-data="afterCreateRes" />
       <div class="step-action">
