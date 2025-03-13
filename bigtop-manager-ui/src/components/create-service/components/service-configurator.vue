@@ -94,6 +94,7 @@
       configs.value = []
       hostPreviewList.value = []
     }
+    filterConfigurations()
   }
 
   const filterConfigurations = () => {
@@ -118,7 +119,7 @@
 
   onActivated(() => {
     debouncedOnSearch.value = debounce(filterConfigurations, 500)
-    filterConfigs.value = configs.value
+    filterConfigs.value = [...configs.value]
   })
 
   onDeactivated(() => {

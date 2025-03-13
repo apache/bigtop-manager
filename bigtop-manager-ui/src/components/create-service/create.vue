@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { computed, ref, shallowRef } from 'vue'
+  import { computed, onUnmounted, ref, shallowRef } from 'vue'
   import { message } from 'ant-design-vue'
   import { useI18n } from 'vue-i18n'
   import useCreateService from './components/use-create-service'
@@ -30,12 +30,14 @@
   const { t } = useI18n()
   const components = shallowRef<any[]>([ServiceSelector, ComponentAssigner, ServiceConfigurator, ServiceConfigurator])
   const {
+    scope,
     current,
     stepsLimit,
     steps,
     allComps,
     afterCreateRes,
     selectedServices,
+    setDataByCurrent,
     previousStep,
     nextStep,
     createService,
@@ -90,6 +92,11 @@
       }
     }
   }
+
+  onUnmounted(() => {
+    scope.stop()
+    setDataByCurrent([])
+  })
 </script>
 
 <template>

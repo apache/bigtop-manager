@@ -97,8 +97,8 @@
 
   onActivated(() => {
     selectedServices.value.length > 0
-      ? (state.selectedData = selectedServices.value)
-      : (state.isAddableData = servicesOfExcludeInfra.value as ExpandServiceVO[])
+      ? (state.selectedData = [...selectedServices.value])
+      : (state.isAddableData = [...(servicesOfExcludeInfra.value as ExpandServiceVO[])])
   })
 
   defineExpose({

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import { computed, createVNode, ref, watch } from 'vue'
+import { computed, createVNode, ref, watch, effectScope, Ref, ComputedRef } from 'vue'
 import { message, Modal } from 'ant-design-vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
@@ -27,30 +27,46 @@ import useSteps from '@/composables/use-steps'
 import SvgIcon from '@/components/common/svg-icon/index.vue'
 import type { HostVO } from '@/api/hosts/types'
 import type { CommandVO, CommandRequest, ServiceCommandReq } from '@/api/command/types'
+import type { ServiceVO } from '@/api/service/types'
 
 interface ProcessResult {
   success: boolean
   conflictService?: ExpandServiceVO
 }
 
-const selectedServices = ref<ExpandServiceVO[]>([])
-const afterCreateRes = ref<CommandVO>({ id: undefined })
+const scope = effectScope()
+let isChange = false
+let selectedServices: Ref<ExpandServiceVO[]>
+let afterCreateRes: Ref<CommandVO>
+let servicesOfInfra: ComputedRef<ExpandServiceVO[]>
+let servicesOfExcludeInfra: ComputedRef<ExpandServiceVO[] | ServiceVO[]>
+let steps: ComputedRef<string[]>
 
-const servicesOfInfra = computed(() => useStackStore().getServicesByExclude(['bigtop', 'extra']) as ExpandServiceVO[])
-const servicesOfExcludeInfra = computed(() => useStackStore().getServicesByExclude(['infra']))
-const steps = computed(() => [
-  'service.select_service',
-  'service.assign_component',
-  'service.configure_service',
-  'service.service_overview',
-  'service.install_component'
-])
-const { current, stepsLimit, previousStep, nextStep } = useSteps(steps.value)
+const setupStore = () => {
+  scope.run(() => {
+    selectedServices = ref<ExpandServiceVO[]>([])
+    afterCreateRes = ref<CommandVO>({ id: undefined })
+    servicesOfInfra = computed(() => useStackStore().getServicesByExclude(['bigtop', 'extra']) as ExpandServiceVO[])
+    servicesOfExcludeInfra = computed(() => useStackStore().getServicesByExclude(['infra']))
+    steps = computed(() => [
+      'service.select_service',
+      'service.assign_component',
+      'service.configure_service',
+      'service.service_overview',
+      'service.install_component'
+    ])
+  })
+}
 
 const useCreateService = () => {
+  if (!isChange) {
+    setupStore()
+    isChange = true
+  }
   const route = useRoute()
   const { t } = useI18n()
   const processedServices = ref(new Set())
+  const { current, stepsLimit, previousStep, nextStep } = useSteps(steps.value)
 
   watch(
     () => selectedServices.value,
@@ -206,7 +222,8 @@ const useCreateService = () => {
     confirmServiceDependencies,
     createService,
     previousStep,
-    nextStep
+    nextStep,
+    scope
   }
 }
 
