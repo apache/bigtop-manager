@@ -18,7 +18,8 @@
 -->
 
 <script setup lang="ts">
-  import { ref, shallowRef, watch } from 'vue'
+  import { onActivated, onDeactivated, ref, shallowRef, watch } from 'vue'
+  import { debounce } from 'lodash'
   import { Empty } from 'ant-design-vue'
   import TreeSelector from './tree-selector.vue'
   import useCreateService from './use-create-service'
@@ -30,16 +31,18 @@
     isView?: boolean
   }
 
-  withDefaults(defineProps<Props>(), {
+  const props = withDefaults(defineProps<Props>(), {
     isView: false
   })
 
   const { selectedServices } = useCreateService()
   const searchStr = ref('')
   const currService = ref<Key>('')
-  const activeKey = ref<number[]>([])
   const configs = ref<ServiceConfigReq[]>([])
+  const activeKey = ref<number[]>([])
+  const debouncedOnSearch = ref()
   const hostPreviewList = ref<ComponentVO[]>([])
+  const filterConfigs = ref<ServiceConfigReq[]>([])
   const fieldNames = shallowRef({
     title: 'displayName',
     key: 'name'
@@ -59,10 +62,13 @@
     }
   })
 
-  watch(searchStr, (val) => {
-    console.log('val :>> ', val)
-    console.log('config :>> ', configs.value)
-  })
+  watch(
+    () => props.isView,
+    () => {
+      searchStr.value = ''
+      filterConfigs.value = configs.value
+    }
+  )
 
   const createNewConfigItem = () => {
     return {
@@ -89,6 +95,35 @@
       hostPreviewList.value = []
     }
   }
+
+  const filterConfigurations = () => {
+    if (!searchStr.value) {
+      filterConfigs.value = configs.value
+    }
+    const lowerSearchTerm = searchStr.value.toLowerCase()
+    filterConfigs.value = configs.value.filter((config) => {
+      return config.properties.some((property) => {
+        return (
+          (property.displayName || '').toLowerCase().includes(lowerSearchTerm) ||
+          property.name.toLowerCase().includes(lowerSearchTerm) ||
+          (property.value && property.value.toString().toLowerCase().includes(lowerSearchTerm))
+        )
+      })
+    })
+  }
+
+  // const splitSearchStr = (splitStr: string) => {
+  //   return splitStr.toString().split(new RegExp(`(?<=${searchStr.value})|(?=${searchStr.value})`, 'i'))
+  // }
+
+  onActivated(() => {
+    debouncedOnSearch.value = debounce(filterConfigurations, 500)
+    filterConfigs.value = configs.value
+  })
+
+  onDeactivated(() => {
+    debouncedOnSearch.value.cancel()
+  })
 </script>
 
 <template>
@@ -103,12 +138,16 @@
     <section>
       <div class="list-title">
         <div>{{ $t('service.host_preview') }}</div>
-        <a-input v-model:value="searchStr" :placeholder="$t('service.please_enter_search_keyword')" />
+        <a-input
+          v-model:value="searchStr"
+          :placeholder="$t('service.please_enter_search_keyword')"
+          @input="debouncedOnSearch"
+        />
       </div>
-      <a-empty v-if="configs.length === 0" :image="Empty.PRESENTED_IMAGE_SIMPLE" />
+      <a-empty v-if="filterConfigs.length === 0" :image="Empty.PRESENTED_IMAGE_SIMPLE" />
       <a-form v-else :disabled="$props.isView" :label-wrap="true">
         <a-collapse v-model:active-key="activeKey" :bordered="false" :ghost="true">
-          <a-collapse-panel v-for="config in configs" :key="config.id">
+          <a-collapse-panel v-for="config in filterConfigs" :key="config.id">
             <template #extra>
               <a-button type="text" shape="circle" @click.stop="manualAddConfig(config)">
                 <template #icon>
@@ -126,6 +165,19 @@
                   <span v-else style="overflow-wrap: break-word" :title="item.displayName ?? item.name">
                     {{ item.displayName ?? item.name }}
                   </span>
+
+                  <!-- <template v-else>
+                    <template v-for="(fragment, i) in splitSearchStr(item.displayName ?? item.name)">
+                      <mark v-if="fragment.toLowerCase() === searchStr.toLowerCase()" :key="i" class="highlight">
+                        {{ fragment }}
+                      </mark>
+                      <template v-else>
+                        <span :key="i" style="overflow-wrap: break-word" :title="item.displayName ?? item.name">
+                          {{ fragment }}
+                        </span>
+                      </template>
+                    </template>
+                  </template> -->
                 </a-form-item>
               </a-col>
               <a-col v-bind="layout.wrapperCol">
@@ -155,6 +207,10 @@
 </template>
 
 <style lang="scss" scoped>
+  .highlight {
+    background-color: rgb(255, 192, 105);
+    padding: 0px;
+  }
   .service-configurator-view {
     grid-template-columns: 1fr auto 4fr auto 1fr !important;
   }

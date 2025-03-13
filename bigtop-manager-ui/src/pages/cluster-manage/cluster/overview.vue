@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { computed, ref, shallowRef, useAttrs } from 'vue'
+  import { computed, onActivated, ref, shallowRef, useAttrs } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { storeToRefs } from 'pinia'
   import { useServiceStore } from '@/store/service'
@@ -28,7 +28,9 @@
   import GaugeChart from './components/gauge-chart.vue'
   import CategoryChart from './components/category-chart.vue'
   import type { ClusterStatusType, ClusterVO } from '@/api/cluster/types'
-  import type { MenuProps } from 'ant-design-vue'
+  import { type MenuProps, Empty } from 'ant-design-vue'
+  import type { ServiceListParams } from '@/api/service/types'
+  import type { StackVO } from '@/api/stack/types'
 
   type TimeRangeText = '1m' | '15m' | '30m' | '1h' | '6h' | '30h'
   type TimeRangeItem = {
@@ -51,7 +53,7 @@
     2: 'unhealthy',
     3: 'unknown'
   })
-  const { locateStackWithService } = storeToRefs(serviceStore)
+  const { locateStackWithService, serviceNames } = storeToRefs(serviceStore)
   const clusterDetail = computed(() => ({
     ...attrs,
     totalMemory: formatFromByte(attrs.totalMemory as number),
@@ -105,7 +107,6 @@
     }
   })
   const detailKeys = computed(() => Object.keys(baseConfig.value) as (keyof ClusterVO)[])
-  const serviceStack = computed(() => locateStackWithService.value)
   const serviceOperates = computed(() => [
     {
       action: 'start',
@@ -128,6 +129,18 @@
   const handleTimeRange = (time: TimeRangeItem) => {
     currTimeRange.value = time.text
   }
+
+  const getServices = (filters?: ServiceListParams) => {
+    attrs.id != undefined && serviceStore.getServices(attrs.id, filters)
+  }
+
+  const servicesFromCurrentCluster = (stack: StackVO) => {
+    return stack.services.filter((v) => serviceNames.value.includes(v.name))
+  }
+
+  onActivated(() => {
+    getServices()
+  })
 </script>
 
 <template>
@@ -184,13 +197,13 @@
           </div>
         </div>
         <!-- service info -->
-        <template v-if="serviceStack.length == 0">
+        <template v-if="locateStackWithService.length == 0">
           <div class="service-info">
             <div class="box-title">
               <a-typography-text strong :content="$t('overview.service_info')" />
             </div>
             <div class="box-empty">
-              <a-empty />
+              <a-empty :image="Empty.PRESENTED_IMAGE_SIMPLE" />
             </div>
           </div>
         </template>
@@ -198,17 +211,17 @@
           <template #title>
             <a-typography-text strong :content="$t('overview.service_info')" />
           </template>
-          <a-descriptions-item v-for="stack in serviceStack" :key="stack.stackName">
+          <a-descriptions-item v-for="stack in locateStackWithService" :key="stack.stackName">
             <template #label>
               <div class="desc-sub-label">
                 <a-typography-text
                   strong
                   :content="stack.stackName.charAt(0).toUpperCase() + stack.stackName.slice(1) + ' Stack'"
                 />
-                <a-typography-text type="secondary" :content="stack.stackVersion" />
+                <a-typography-text type="secondary" :content="`${stack.stackName}-${stack.stackVersion}`" />
               </div>
             </template>
-            <div v-for="service in stack.services" :key="service.id" class="service-item">
+            <div v-for="service in servicesFromCurrentCluster(stack)" :key="service.id" class="service-item">
               <a-avatar v-if="service.name" :src="usePngImage(service.name.toLowerCase())" :size="16" />
               <a-typography-text :content="service.displayName" />
               <a-dropdown :trigger="['click']">

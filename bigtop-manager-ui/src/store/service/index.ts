@@ -33,11 +33,11 @@ export const useServiceStore = defineStore(
     const { stacks } = storeToRefs(stackStore)
 
     const serviceNames = computed(() => services.value.map((v) => v.name))
-    const locateStackWithService = computed(() =>
-      stacks.value.filter((item) =>
+    const locateStackWithService = computed(() => {
+      return stacks.value.filter((item) =>
         item.services.some((service) => service.name && serviceNames.value.includes(service.name))
       )
-    )
+    })
 
     const getServices = async (clusterId: number, filterParams?: ServiceListParams) => {
       try {
@@ -56,6 +56,7 @@ export const useServiceStore = defineStore(
       services,
       loading,
       getServices,
+      serviceNames,
       locateStackWithService
     }
   },
