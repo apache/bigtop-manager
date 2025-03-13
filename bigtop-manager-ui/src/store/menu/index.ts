@@ -63,7 +63,10 @@ export const useMenuStore = defineStore(
 
     watchEffect(() => {
       // resolve highlight menu
-      const activeMenu = route.meta.activeMenu || route.path
+      let activeMenu = route.meta.activeMenu || route.path
+      if (route.name === 'CreateService') {
+        activeMenu = route.path.split('/').slice(0, -1).join('/')
+      }
       const matchedNames = [RouteExceptions.SPECIAL_ROUTE_NAME, RouteExceptions.DEFAULT_ROUTE_NAME] as string[]
       headerSelectedKey.value = route.matched[0].path
 

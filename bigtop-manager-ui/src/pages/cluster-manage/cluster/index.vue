@@ -116,7 +116,7 @@
   }
 
   const addService: GroupItem['clickEvent'] = () => {
-    router.push({ name: 'CreateService', query: { clusterId: currCluster.value.id } })
+    router.push({ name: 'CreateService' })
   }
 
   onMounted(() => {

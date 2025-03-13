@@ -65,7 +65,7 @@ const routes: RouteRecordRaw[] = [
           },
           {
             name: 'CreateService',
-            path: 'create-service',
+            path: `${RouteExceptions.DYNAMIC_ROUTE_MATCH}/create-service`,
             component: () => import('@/components/create-service/create.vue'),
             meta: {
               hidden: true

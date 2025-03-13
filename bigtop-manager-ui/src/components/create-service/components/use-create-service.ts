@@ -81,7 +81,7 @@ const useCreateService = () => {
   const commandRequest = ref<CommandRequest>({
     command: 'Add',
     commandLevel: 'service',
-    clusterId: parseInt(route.query.clusterId as string)
+    clusterId: parseInt(route.params.id as string)
   })
 
   const allComps = computed(() => {

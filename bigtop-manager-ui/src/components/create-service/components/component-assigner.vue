@@ -93,8 +93,8 @@
 
   const getHostList = async () => {
     loading.value = true
-    const clusterId = route.query.id as unknown as number
-    if (clusterId || !paginationProps.value) {
+    const clusterId = route.params.id as unknown as number
+    if (!paginationProps.value) {
       loading.value = false
       return
     }
