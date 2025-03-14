@@ -84,11 +84,11 @@
       options: [
         {
           label: t('common.required'),
-          value: 1
+          value: true
         },
         {
           label: t('common.not_required'),
-          value: 2
+          value: false
         }
       ]
     },

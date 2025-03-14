@@ -161,7 +161,7 @@
       font-size: 16px;
       font-weight: 500;
       letter-spacing: 0px;
-      line-height: 16px;
+      line-height: 24px;
     }
   }
   .step-content {

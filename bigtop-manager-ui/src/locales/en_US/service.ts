@@ -23,7 +23,7 @@ export default {
   assign_component: 'Assign Component',
   configure_service: 'Configure Service',
   service_overview: 'Service Overview',
-  install_component: 'Install Component',
+  install_component: 'Install',
   service_list: 'Service List',
   pending_installation_services: 'Selected Services',
   select_host: 'Select  Host',
