@@ -103,6 +103,7 @@
     .header-left {
       width: $layout-sider-width;
       margin: 0;
+      flex-shrink: 0;
       :deep(.svg-icon) {
         width: 180px;
         height: 30px;

@@ -126,7 +126,7 @@
   <a-spin :spinning="loading" class="service">
     <filter-form :filter-items="filterFormItems" @filter="getServices" />
     <a-empty v-if="services.length == 0" style="width: 100%" :image="Empty.PRESENTED_IMAGE_SIMPLE" />
-    <template v-else>
+    <div v-else class="service-item-wrp">
       <a-card v-for="item in services" :key="item.id" :hoverable="true" class="service-item">
         <div class="header">
           <div class="header-base-wrp">
@@ -158,7 +158,7 @@
           </button-group>
         </div>
       </a-card>
-    </template>
+    </div>
   </a-spin>
 </template>
 
@@ -173,10 +173,10 @@
     color: rgba(0, 0, 0, 0.45);
   }
 
-  .service {
+  .service-item-wrp {
     display: flex;
     flex-wrap: wrap;
-    gap: 16px;
+    gap: 19px;
   }
 
   .service-item {
