@@ -19,6 +19,7 @@
 
 <script setup lang="ts">
   import { computed, onActivated, shallowRef, toRefs, useAttrs } from 'vue'
+  import { Empty } from 'ant-design-vue'
   import { usePngImage } from '@/utils/tools'
   import { useI18n } from 'vue-i18n'
   import { useServiceStore } from '@/store/service'
@@ -36,8 +37,9 @@
   const statusColors = shallowRef<Record<ServiceStatusType, keyof typeof CommonStatusTexts>>({
     1: 'healthy',
     2: 'unhealthy',
-    3: 'unknow'
+    3: 'unknown'
   })
+
   const actionGroups = shallowRef<GroupItem[]>([
     {
       action: 'start',
@@ -123,7 +125,7 @@
 <template>
   <a-spin :spinning="loading" class="service">
     <filter-form :filter-items="filterFormItems" @filter="getServices" />
-    <a-empty v-if="services.length == 0" style="width: 100%" />
+    <a-empty v-if="services.length == 0" style="width: 100%" :image="Empty.PRESENTED_IMAGE_SIMPLE" />
     <template v-else>
       <a-card v-for="item in services" :key="item.id" :hoverable="true" class="service-item">
         <div class="header">
@@ -134,10 +136,10 @@
               <span class="small-gray">{{ item.version }}</span>
             </div>
             <div class="header-base-status">
-              <a-tag :color="statusColors[item.status]">
+              <a-tag :color="CommonStatus[statusColors[item.status]]">
                 <div class="header-base-status-inner">
                   <status-dot :color="CommonStatus[statusColors[item.status]]" />
-                  <span class="small">{{ $t(`common.${CommonStatusTexts[item.status]}`) }}</span>
+                  <span class="small">{{ $t(`common.${statusColors[item.status]}`) }}</span>
                 </div>
               </a-tag>
             </div>

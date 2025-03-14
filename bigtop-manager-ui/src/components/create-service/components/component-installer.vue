@@ -122,7 +122,7 @@
 <template>
   <a-spin :spinning="spinning">
     <a-empty v-if="stages.length == 0" :image="Empty.PRESENTED_IMAGE_SIMPLE" />
-    <div v-else class="check-workflow">
+    <div v-else class="component-installer">
       <div class="retry">
         <a-button v-if="stepData.state === 'Failed'" type="link" @click="handleRetryJob">{{
           $t('common.retry')
@@ -161,7 +161,7 @@
 </template>
 
 <style lang="scss" scoped>
-  .check-workflow {
+  .component-installer {
     button {
       padding: 0;
     }

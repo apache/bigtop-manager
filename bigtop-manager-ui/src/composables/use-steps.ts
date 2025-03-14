@@ -17,31 +17,30 @@
  * under the License.
  */
 
-export type StatusType = keyof typeof StatusColors
+import { computed, ref } from 'vue'
 
-export enum StatusColors {
-  success = 'var(--color-success)',
-  error = 'var(--color-error)',
-  warning = 'var(--color-warning)',
-  default = 'var(--color-primary)'
+const useSteps = (stepList: string[]) => {
+  const current = ref(0)
+  const stepsLimit = computed(() => stepList.length - 1)
+
+  const previousStep = () => {
+    if (current.value > 0) {
+      current.value = current.value - 1
+    }
+  }
+
+  const nextStep = () => {
+    if (current.value < stepsLimit.value) {
+      current.value = current.value + 1
+    }
+  }
+
+  return {
+    current,
+    stepsLimit,
+    previousStep,
+    nextStep
+  }
 }
 
-export enum CommonStatus {
-  healthy = 'success',
-  unhealthy = 'error',
-  unknown = 'warning'
-}
-
-export enum CommonStatusTexts {
-  'healthy',
-  'unhealthy',
-  'unknown'
-}
-
-export enum JobState {
-  'Pending' = 'pending',
-  'Processing' = 'processing',
-  'Successful' = 'successful',
-  'Failed' = 'failed',
-  'Canceled' = 'canceled'
-}
+export default useSteps

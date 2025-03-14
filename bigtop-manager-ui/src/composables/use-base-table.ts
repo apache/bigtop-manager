@@ -28,6 +28,7 @@ export interface UseBaseTableProps<T = any> {
   columns: TableColumnType[]
   rows?: T[]
   pagination?: PaginationType
+  onChangeCallback?: () => void
 }
 const useBaseTable = <T>(props: UseBaseTableProps<T>) => {
   const { columns, rows, pagination } = props
@@ -68,6 +69,10 @@ const useBaseTable = <T>(props: UseBaseTableProps<T>) => {
       pageNum: pagination.current,
       pageSize: pagination.pageSize
     })
+
+    if (props.onChangeCallback) {
+      props.onChangeCallback()
+    }
   }
 
   const resetState = () => {
@@ -81,6 +86,9 @@ const useBaseTable = <T>(props: UseBaseTableProps<T>) => {
       showSizeChanger: true,
       pageSizeOptions: ['10', '20', '30', '40', '50'],
       showTotal: (total) => `${t('common.total', [total])}`
+    }
+    if (props.onChangeCallback) {
+      props.onChangeCallback()
     }
   }
 

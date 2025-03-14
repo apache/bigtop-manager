@@ -17,23 +17,37 @@
  * under the License.
  */
 
+import { ServiceVO } from '@/api/service/types'
 import { getStacks } from '@/api/stack'
 import { StackVO } from '@/api/stack/types'
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { shallowRef } from 'vue'
+
+export type ExpandServiceVO = ServiceVO & { order: number }
 
 export const useStackStore = defineStore(
   'stack',
   () => {
-    const stacks = ref<StackVO[]>([])
+    const stacks = shallowRef<StackVO[]>([])
+
     const loadStacks = async () => {
-      const data = await getStacks()
-      stacks.value = data
+      try {
+        const data = await getStacks()
+        stacks.value = data
+      } catch (error) {
+        console.log('error :>> ', error)
+      }
+    }
+
+    const getServicesByExclude = (exclude?: string[], isOrder = true): ExpandServiceVO[] | ServiceVO[] => {
+      const filterData = stacks.value.flatMap((stack) => (exclude?.includes(stack.stackName) ? [] : stack.services))
+      return isOrder ? filterData.map((service, index) => ({ ...service, order: index })) : filterData
     }
 
     return {
       stacks,
-      loadStacks
+      loadStacks,
+      getServicesByExclude
     }
   },
   {

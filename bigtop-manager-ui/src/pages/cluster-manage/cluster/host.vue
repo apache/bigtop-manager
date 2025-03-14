@@ -94,7 +94,7 @@
           value: 2
         },
         {
-          text: t('common.unknow'),
+          text: t('common.unknown'),
           value: 3
         }
       ]

@@ -25,6 +25,7 @@
   import { message } from 'ant-design-vue'
   import { InstalledStatusVO, Status } from '@/api/hosts/types'
   import { execCommand } from '@/api/command'
+  import useSteps from '@/composables/use-steps'
   import ClusterBase from './components/cluster-base.vue'
   import ComponentInfo from './components/component-info.vue'
   import HostConfig from './components/host-config.vue'
@@ -33,7 +34,6 @@
 
   const { t } = useI18n()
   const menuStore = useMenuStore()
-  const current = ref(0)
   const compRef = ref<any>()
   const installing = ref(false)
   const stepData = ref<[Partial<ClusterCommandReq>, any, HostReq[], CommandVO]>([{}, {}, [], {}])
@@ -44,7 +44,6 @@
   const installStatus = shallowRef<InstalledStatusVO[]>([])
   const components = shallowRef<any[]>([ClusterBase, ComponentInfo, HostConfig, CheckWorkflow])
   const isInstall = computed(() => current.value === 2)
-  const stepsLimit = computed(() => steps.value.length - 1)
   const hasUnknowHost = computed(() => stepData.value[2].filter((v) => v.status === Status.Unknown).length == 0)
   const allInstallSuccess = computed(
     () =>
@@ -64,6 +63,8 @@
     return components.value[current.value]
   })
 
+  const { current, stepsLimit, previousStep, nextStep } = useSteps(steps.value)
+
   const updateData = (val: Partial<ClusterCommandReq> | any | HostReq[]) => {
     stepData.value[current.value] = val
   }
@@ -77,18 +78,6 @@
     } catch (error) {
       console.log('error :>> ', error)
       return false
-    }
-  }
-
-  const previousStep = () => {
-    if (current.value > 0) {
-      current.value = current.value - 1
-    }
-  }
-
-  const nextStep = async () => {
-    if (current.value < stepsLimit.value) {
-      current.value = current.value + 1
     }
   }
 

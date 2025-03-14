@@ -20,7 +20,9 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div> infra list</div>
+  <div>
+    <span> infra list </span>
+  </div>
 </template>
 
 <style scoped></style>
