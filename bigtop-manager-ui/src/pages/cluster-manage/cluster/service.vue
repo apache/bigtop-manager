@@ -74,7 +74,7 @@
   const filterFormItems = computed((): FilterFormItem[] => [
     {
       type: 'search',
-      key: 'serviceName',
+      key: 'name',
       label: t('service.name')
     },
     {
