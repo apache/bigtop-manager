@@ -47,7 +47,8 @@
   const currComp = computed(() => components.value[current.value])
 
   const validateServiceSelection = async () => {
-    if (selectedServices.value.length === 0) {
+    console.log(selectedServices.value.filter((v) => !v.isInstalled).length)
+    if (selectedServices.value.filter((v) => !v.isInstalled).length === 0) {
       message.error(t('service.service_selection'))
       return false
     } else {
@@ -116,7 +117,7 @@
       <template v-for="stepItem in steps" :key="stepItem.title">
         <div v-show="steps[current] === stepItem" class="step-title">
           <h5>{{ $t(stepItem) }}</h5>
-          <section :class="{ 'step-content': current < stepsLimit }"> </section>
+          <section :class="{ 'step-content': current < stepsLimit }"></section>
         </div>
       </template>
       <keep-alive>
@@ -146,15 +147,18 @@
 <style lang="scss" scoped>
   .infra-creation {
     min-width: 600px;
+
     .header-card {
       min-height: 80px;
     }
+
     .steps-wrp {
       width: 100%;
       height: 100%;
       padding-inline: 6%;
     }
   }
+
   .step-title {
     h5 {
       margin: 0;
@@ -164,9 +168,11 @@
       line-height: 24px;
     }
   }
+
   .step-content {
     padding-block: $space-md;
   }
+
   .step-action {
     text-align: end;
     margin-top: $space-md;

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import { computed, createVNode, ref, watch, effectScope, Ref, ComputedRef } from 'vue'
+import { computed, ComputedRef, createVNode, effectScope, Ref, ref, watch } from 'vue'
 import { message, Modal } from 'ant-design-vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
@@ -26,7 +26,7 @@ import { execCommand } from '@/api/command'
 import useSteps from '@/composables/use-steps'
 import SvgIcon from '@/components/common/svg-icon/index.vue'
 import type { HostVO } from '@/api/hosts/types'
-import type { CommandVO, CommandRequest, ServiceCommandReq } from '@/api/command/types'
+import type { CommandRequest, CommandVO, ServiceCommandReq } from '@/api/command/types'
 import type { ServiceVO } from '@/api/service/types'
 
 interface ProcessResult {
@@ -67,6 +67,7 @@ const useCreateService = () => {
   const { t } = useI18n()
   const processedServices = ref(new Set())
   const { current, stepsLimit, previousStep, nextStep } = useSteps(steps.value)
+  const clusterId = computed(() => parseInt(route.params.id as string))
 
   watch(
     () => selectedServices.value,
@@ -81,11 +82,15 @@ const useCreateService = () => {
   const commandRequest = ref<CommandRequest>({
     command: 'Add',
     commandLevel: 'service',
-    clusterId: parseInt(route.params.id as string)
+    clusterId: clusterId.value
   })
 
   const allComps = computed(() => {
-    return new Map(selectedServices.value.flatMap((s) => s.components!.map((comp) => [comp.name, comp])))
+    return new Map(
+      selectedServices.value
+        .filter((v) => !v.isInstalled)
+        .flatMap((s) => s.components!.map((comp) => [comp.name, comp]))
+    )
   })
 
   const setDataByCurrent = (val: ExpandServiceVO[]) => {
@@ -104,9 +109,10 @@ const useCreateService = () => {
   const transformServiceData = (services: ExpandServiceVO[]) => {
     return services.map((service) => ({
       serviceName: service.name,
-      componentHosts: service.components!.map((component) => ({
+      installed: service.isInstalled === undefined ? false : service.isInstalled,
+      componentHosts: (service.components || []).map((component) => ({
         componentName: component.name,
-        hostnames: component.hosts.map((host: HostVO) => host.hostname)
+        hostnames: (component.hosts || []).map((host: HostVO) => host.hostname)
       })),
       configs: service.configs
     })) as ServiceCommandReq[]
@@ -141,6 +147,8 @@ const useCreateService = () => {
     for (const serviceName of dependencies) {
       const dependency = serviceMap.get(serviceName)
       if (!dependency || processedServices.value.has(dependency.name!)) continue
+
+      if (dependency.isInstalled) continue
 
       const shouldAdd = await confirmRequiredServicesToInstall(targetService, dependency)
       if (!shouldAdd) return { success: false }
@@ -199,8 +207,7 @@ const useCreateService = () => {
 
   const createService = async () => {
     try {
-      const formatData = transformServiceData(selectedServices.value)
-      commandRequest.value.serviceCommands = formatData
+      commandRequest.value.serviceCommands = transformServiceData(selectedServices.value.filter((v) => !v.isInstalled))
       afterCreateRes.value = await execCommand(commandRequest.value)
       return true
     } catch (error) {
@@ -211,6 +218,7 @@ const useCreateService = () => {
 
   return {
     steps,
+    clusterId,
     current,
     stepsLimit,
     selectedServices,

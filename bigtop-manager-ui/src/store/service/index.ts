@@ -20,7 +20,7 @@
 import { defineStore, storeToRefs } from 'pinia'
 import { computed, ref } from 'vue'
 import { getServiceList } from '@/api/service'
-import { useStackStore } from '@/store/stack/index'
+import { useStackStore } from '@/store/stack'
 import type { ServiceListParams, ServiceVO } from '@/api/service/types'
 
 export const useServiceStore = defineStore(

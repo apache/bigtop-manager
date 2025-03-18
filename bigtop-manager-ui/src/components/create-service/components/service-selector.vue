@@ -22,19 +22,26 @@
   import { usePngImage } from '@/utils/tools'
   import useCreateService from './use-create-service'
   import { ExpandServiceVO } from '@/store/stack'
+  import { useServiceStore } from '@/store/service'
 
   interface State {
     isAddableData: ExpandServiceVO[]
     selectedData: ExpandServiceVO[]
   }
 
+  const serviceStore = useServiceStore()
   const searchStr = ref('')
   const state = reactive<State>({
     isAddableData: [],
     selectedData: []
   })
-  const { selectedServices, servicesOfExcludeInfra, confirmServiceDependencies, setDataByCurrent } = useCreateService()
+  const { clusterId, selectedServices, servicesOfExcludeInfra, confirmServiceDependencies, setDataByCurrent } =
+    useCreateService()
   const { isAddableData } = toRefs(state)
+  const checkSelectedServicesOnlyInstalled = computed(
+    () => selectedServices.value.filter((v: ExpandServiceVO) => !v.isInstalled).length === 0
+  )
+  const installedServiceNames = computed(() => serviceStore.services.map((v) => v.name))
   const filterAddableData = computed(() =>
     isAddableData.value.filter(
       (v) =>
@@ -95,10 +102,25 @@
     return splitStr.toString().split(new RegExp(`(?<=${searchStr.value})|(?=${searchStr.value})`, 'i'))
   }
 
-  onActivated(() => {
-    selectedServices.value.length > 0
-      ? (state.selectedData = [...selectedServices.value])
-      : (state.isAddableData = [...(servicesOfExcludeInfra.value as ExpandServiceVO[])])
+  const addInstalledSymbolForSelectedServices = async (onlyInstalled: boolean) => {
+    if (onlyInstalled) {
+      await serviceStore.getServices(clusterId.value)
+      servicesOfExcludeInfra.value.forEach((v) => {
+        if (installedServiceNames.value.includes(v.name)) {
+          v.isInstalled = true
+          state.selectedData.push(v as ExpandServiceVO)
+        } else {
+          state.isAddableData.push(v as ExpandServiceVO)
+        }
+      })
+      setDataByCurrent(state.selectedData)
+    } else {
+      state.selectedData = [...selectedServices.value]
+    }
+  }
+
+  onActivated(async () => {
+    await addInstalledSymbolForSelectedServices(checkSelectedServicesOnlyInstalled.value)
   })
 
   defineExpose({
@@ -162,7 +184,7 @@
         <template #renderItem="{ item }">
           <a-list-item>
             <template #actions>
-              <a-button danger type="primary" @click="removeInstallItem(item)">
+              <a-button danger :disabled="item.isInstalled" type="primary" @click="removeInstallItem(item)">
                 {{ $t('common.remove') }}
               </a-button>
             </template>
@@ -208,6 +230,7 @@
     grid-template-columns: 1fr auto 1fr;
     grid-template-rows: auto;
     justify-content: space-between;
+
     .list-title {
       display: flex;
       height: 32px;
@@ -216,21 +239,26 @@
       font-weight: 500;
       border-bottom: 1px solid $color-border;
       padding-bottom: 16px;
+
       .ant-input {
         flex: 0 1 160px;
       }
     }
+
     .ant-list {
       max-height: 500px;
       overflow: auto;
     }
   }
+
   .divider {
     height: 100%;
     margin-inline: 16px;
   }
+
   :deep(.ant-avatar) {
     border-radius: 4px;
+
     img {
       object-fit: contain !important;
     }
