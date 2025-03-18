@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { onActivated, onDeactivated, ref, shallowRef, watch } from 'vue'
+  import { computed, onActivated, onDeactivated, ref, shallowRef, watch } from 'vue'
   import { debounce } from 'lodash'
   import { Empty } from 'ant-design-vue'
   import TreeSelector from './tree-selector.vue'
@@ -61,6 +61,7 @@
       lg: { span: 18 }
     }
   })
+  const serviceList = computed(() => selectedServices.value.filter((v) => !v.isInstalled))
 
   watch(
     () => props.isView,
@@ -133,7 +134,7 @@
       <div class="list-title">
         <div>{{ $t('service.service_list') }}</div>
       </div>
-      <tree-selector :tree="selectedServices" :field-names="fieldNames" @change="handleChange" />
+      <tree-selector :tree="serviceList" :field-names="fieldNames" @change="handleChange" />
     </section>
     <a-divider type="vertical" class="divider" />
     <section>
@@ -212,9 +213,11 @@
     background-color: rgb(255, 192, 105);
     padding: 0px;
   }
+
   .service-configurator-view {
     grid-template-columns: 1fr auto 4fr auto 1fr !important;
   }
+
   .service-configurator {
     display: grid;
     grid-template-columns: 1fr auto 4fr;
@@ -225,6 +228,7 @@
       background-color: $color-fill-quaternary;
       border-bottom: 1px solid $color-border-secondary;
     }
+
     :deep(.ant-collapse-content-box) {
       padding-inline: 24px !important;
     }
@@ -243,10 +247,12 @@
       border-bottom: 1px solid $color-border;
       padding-bottom: 16px;
       margin-bottom: 16px;
+
       .ant-input {
         flex: 0 1 160px;
       }
     }
+
     .divider {
       height: 100%;
       margin-inline: 16px;

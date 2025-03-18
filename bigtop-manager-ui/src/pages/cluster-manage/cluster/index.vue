@@ -97,8 +97,8 @@
   ])
 
   const getCompName = computed(() => {
-    const componnts = [Overview, Service, Host, User, Job]
-    return componnts[parseInt(activeKey.value) - 1]
+    const components = [Overview, Service, Host, User, Job]
+    return components[parseInt(activeKey.value) - 1]
   })
 
   const dropdownMenuClick: GroupItem['dropdownMenuClickEvent'] = async ({ key }) => {
@@ -108,8 +108,8 @@
         clusterId: currCluster.value.id,
         commandLevel: 'cluster'
       })
-      clusterStore.loadClusters()
-      clusterStore.getClusterDetail()
+      await clusterStore.loadClusters()
+      await clusterStore.getClusterDetail()
     } catch (error) {
       console.log('error :>> ', error)
     }

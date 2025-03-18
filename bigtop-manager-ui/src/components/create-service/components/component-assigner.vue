@@ -51,7 +51,14 @@
     selectedRowKeys: []
   })
   const { allComps, selectedServices, updateHostsForComponent } = useCreateService()
-  const serviceList = computed(() => selectedServices.value.map((v) => ({ ...v, selectable: false })))
+  const serviceList = computed(() =>
+    selectedServices.value
+      .filter((v) => !v.isInstalled)
+      .map((v) => ({
+        ...v,
+        selectable: false
+      }))
+  )
   const hostsOfCurrComp = computed((): HostVO[] => {
     const temp = currComp.value.split('/').at(-1)
     return allComps.value.has(temp) ? allComps.value.get(temp)?.hosts : []
@@ -199,6 +206,7 @@
   .component-assigner {
     display: grid;
     grid-template-columns: 1fr auto 3fr auto 1fr;
+
     .list-title {
       display: flex;
       height: 32px;
@@ -208,6 +216,7 @@
       padding-bottom: 16px;
       margin-bottom: 16px;
     }
+
     .divider {
       height: 100%;
       margin-inline: 16px;
@@ -224,11 +233,13 @@
     display: grid;
     gap: $space-sm;
     padding: $space-sm;
+
     &-option {
       width: 100%;
       display: grid;
       gap: $space-sm;
       grid-template-columns: 1fr 1fr;
+
       button {
         width: 100%;
       }

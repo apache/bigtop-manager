@@ -47,7 +47,6 @@
   const currComp = computed(() => components.value[current.value])
 
   const validateServiceSelection = async () => {
-    console.log(selectedServices.value.filter((v) => !v.isInstalled).length)
     if (selectedServices.value.filter((v) => !v.isInstalled).length === 0) {
       message.error(t('service.service_selection'))
       return false
@@ -81,7 +80,7 @@
     return isValid
   }
 
-  const stepValidators = [validateServiceSelection, validateComponentAssignments, () => true]
+  const stepValidators = [validateServiceSelection, validateComponentAssignments, () => true, () => true]
 
   const proceedToNextStep = async () => {
     if (current.value < 3) {
