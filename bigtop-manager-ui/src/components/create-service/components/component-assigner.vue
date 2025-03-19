@@ -23,10 +23,11 @@
   import { computed, onActivated, reactive, ref, shallowRef } from 'vue'
   import { TableColumnType, Empty } from 'ant-design-vue'
   import { HostVO } from '@/api/hosts/types'
+  import { useInstalledStore } from '@/store/installed'
   import { getHosts } from '@/api/hosts'
   import useCreateService from './use-create-service'
-  import TreeSelector from './tree-selector.vue'
   import useBaseTable from '@/composables/use-base-table'
+  import TreeSelector from './tree-selector.vue'
   import type { FilterConfirmProps, FilterResetProps, TableRowSelection } from 'ant-design-vue/es/table/interface'
   import type { Key } from 'ant-design-vue/es/_util/type'
 
@@ -38,6 +39,7 @@
 
   const { t } = useI18n()
   const route = useRoute()
+  const installedStore = useInstalledStore()
   const searchInputRef = ref()
   const currComp = ref<string>('')
   const fieldNames = shallowRef({
@@ -50,15 +52,14 @@
     searchedColumn: '',
     selectedRowKeys: []
   })
-  const { allComps, selectedServices, updateHostsForComponent } = useCreateService()
+  const { clusterId, allComps, selectedServices, updateHostsForComponent } = useCreateService()
   const serviceList = computed(() =>
-    selectedServices.value
-      .filter((v) => !v.isInstalled)
-      .map((v) => ({
-        ...v,
-        selectable: false
-      }))
+    selectedServices.value.map((v) => ({
+      ...v,
+      selectable: false
+    }))
   )
+
   const hostsOfCurrComp = computed((): HostVO[] => {
     const temp = currComp.value.split('/').at(-1)
     return allComps.value.has(temp) ? allComps.value.get(temp)?.hosts : []
@@ -123,13 +124,20 @@
     onChangeCallback: getHostList
   })
 
+  const getCheckboxProps: TableRowSelection['getCheckboxProps'] = (record) => ({
+    disabled: installedStore
+      .getInstalledNamesOrIdsOfServiceByKey(`${clusterId.value}`)
+      .includes(currComp.value.split('/')[0]),
+    name: record.hostname
+  })
+
   const onSelectChange: TableRowSelection['onChange'] = (selectedRowKeys, selectedRows) => {
     allComps.value.has(currComp.value.split('/').at(-1)) && updateHostsForComponent(currComp.value, selectedRows)
     state.selectedRowKeys = selectedRowKeys
   }
 
   const resetSelectedRowKeys = (key: string) => {
-    state.selectedRowKeys = allComps.value.has(key) ? allComps.value.get(key)?.hosts.map((v: HostVO) => v.id) : []
+    state.selectedRowKeys = allComps.value.has(key) ? allComps.value.get(key)?.hosts.map((v: HostVO) => v.hostname) : []
   }
 
   const treeSelectedChange = (keyPath: string) => {
@@ -155,13 +163,18 @@
       <div class="list-title">
         <div>{{ $t('service.select_host') }}</div>
       </div>
+      {{ currComp }}
       <a-table
-        row-key="id"
+        row-key="hostname"
         :loading="loading"
         :data-source="dataSource"
         :columns="columns"
         :pagination="paginationProps"
-        :row-selection="{ selectedRowKeys: state.selectedRowKeys, onChange: onSelectChange }"
+        :row-selection="{
+          selectedRowKeys: state.selectedRowKeys,
+          getCheckboxProps: getCheckboxProps,
+          onChange: onSelectChange
+        }"
         @change="onChange"
       >
         <template #customFilterDropdown="{ setSelectedKeys, selectedKeys, confirm, clearFilters, column }">

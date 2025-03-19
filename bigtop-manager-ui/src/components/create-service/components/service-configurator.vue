@@ -23,6 +23,7 @@
   import { Empty } from 'ant-design-vue'
   import TreeSelector from './tree-selector.vue'
   import useCreateService from './use-create-service'
+  import { useInstalledStore } from '@/store/installed'
   import type { ServiceConfigReq } from '@/api/command/types'
   import type { ComponentVO } from '@/api/component/types'
   import type { Key } from 'ant-design-vue/es/_util/type'
@@ -35,7 +36,8 @@
     isView: false
   })
 
-  const { selectedServices } = useCreateService()
+  const { clusterId, selectedServices } = useCreateService()
+  const installedStore = useInstalledStore()
   const searchStr = ref('')
   const currService = ref<Key>('')
   const configs = ref<ServiceConfigReq[]>([])
@@ -61,7 +63,13 @@
       lg: { span: 18 }
     }
   })
-  const serviceList = computed(() => selectedServices.value.filter((v) => !v.isInstalled))
+  const serviceList = computed(() => selectedServices.value)
+
+  const disabled = computed(() =>
+    installedStore
+      .getInstalledNamesOrIdsOfServiceByKey(`${clusterId.value}`)
+      .includes(currService.value.toString().split('/').at(-1)!)
+  )
 
   watch(
     () => props.isView,
@@ -147,7 +155,7 @@
         />
       </div>
       <a-empty v-if="filterConfigs.length === 0" :image="Empty.PRESENTED_IMAGE_SIMPLE" />
-      <a-form v-else :disabled="$props.isView" :label-wrap="true">
+      <a-form v-else :disabled="$props.isView || disabled" :label-wrap="true">
         <a-collapse v-model:active-key="activeKey" :bordered="false" :ghost="true">
           <a-collapse-panel v-for="config in filterConfigs" :key="config.id">
             <template #extra>

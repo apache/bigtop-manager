@@ -21,15 +21,16 @@
   import { computed, onActivated, reactive, ref, toRefs } from 'vue'
   import { usePngImage } from '@/utils/tools'
   import useCreateService from './use-create-service'
-  import { ExpandServiceVO } from '@/store/stack'
-  import { useServiceStore } from '@/store/service'
+  import { useInstalledStore } from '@/store/installed'
+  import type { ExpandServiceVO } from '@/store/stack'
+  import { ComponentVO } from '@/api/component/types.ts'
 
   interface State {
     isAddableData: ExpandServiceVO[]
     selectedData: ExpandServiceVO[]
   }
 
-  const serviceStore = useServiceStore()
+  const installedStore = useInstalledStore()
   const searchStr = ref('')
   const state = reactive<State>({
     isAddableData: [],
@@ -41,7 +42,6 @@
   const checkSelectedServicesOnlyInstalled = computed(
     () => selectedServices.value.filter((v: ExpandServiceVO) => !v.isInstalled).length === 0
   )
-  const installedServiceNames = computed(() => serviceStore.services.map((v) => v.name))
   const filterAddableData = computed(() =>
     isAddableData.value.filter(
       (v) =>
@@ -102,11 +102,48 @@
     return splitStr.toString().split(new RegExp(`(?<=${searchStr.value})|(?=${searchStr.value})`, 'i'))
   }
 
+  const mergeComponents = (components: ComponentVO[]) => {
+    return Object.values(
+      components.reduce((acc, item) => {
+        const key = item.name!
+        const hostname = item.hostname
+        if (!acc[key]) {
+          acc[key] = {
+            ...item,
+            hosts: [{ hostname }]
+          }
+        } else {
+          acc[key].hosts.push({ hostname })
+        }
+        return acc
+      }, {})
+    )
+  }
+
+  const initInstalledServicesDetail = async () => {
+    const detailRes = await installedStore.getInstalledServicesDetailByKey(`${clusterId.value}`)
+    const detailMap = new Map<string, ExpandServiceVO>()
+    if (!detailRes) {
+      return detailMap
+    } else {
+      return detailRes.reduce(
+        (pre, val) =>
+          pre.set(val.name!, {
+            ...val,
+            components: mergeComponents(val.components || [])
+          } as ExpandServiceVO),
+        detailMap
+      )
+    }
+  }
+
   const addInstalledSymbolForSelectedServices = async (onlyInstalled: boolean) => {
     if (onlyInstalled) {
-      await serviceStore.getServices(clusterId.value)
+      const installedServiceMap = await initInstalledServicesDetail()
+      const installedServiceNames = installedStore.getInstalledNamesOrIdsOfServiceByKey(`${clusterId.value}`)
       servicesOfExcludeInfra.value.forEach((v) => {
-        if (installedServiceNames.value.includes(v.name)) {
+        if (installedServiceNames.includes(v.name || '')) {
+          Object.assign(v, installedServiceMap.get(v.name!))
           v.isInstalled = true
           state.selectedData.push(v as ExpandServiceVO)
         } else {
@@ -117,6 +154,8 @@
     } else {
       state.selectedData = [...selectedServices.value]
     }
+
+    console.log(selectedServices.value)
   }
 
   onActivated(async () => {

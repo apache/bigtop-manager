@@ -17,23 +17,33 @@
  * under the License.
  */
 
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import { useRoute } from 'vue-router'
 import { getCluster, getClusterList } from '@/api/cluster'
 import { useServiceStore } from '@/store/service'
+import { useInstalledStore } from '@/store/installed'
 import type { ClusterVO } from '@/api/cluster/types.ts'
 
 export const useClusterStore = defineStore(
   'cluster',
   () => {
     const route = useRoute()
+    const installedStore = useInstalledStore()
     const serviceStore = useServiceStore()
-    const installedServiceOfCluster = ref<Record<string, string[]>>({})
     const clusters = ref<ClusterVO[]>([])
     const loading = ref(false)
     const currCluster = ref<ClusterVO>({})
     const clusterId = computed(() => (route.params.id as string) || undefined)
+
+    watch(
+      () => clusters.value,
+      (val) => {
+        val.forEach((cluster) => {
+          installedStore.setInstalledMapKey(`${cluster.id}`)
+        })
+      }
+    )
 
     const addCluster = async () => {
       await loadClusters()
@@ -51,11 +61,6 @@ export const useClusterStore = defineStore(
         loading.value = true
         currCluster.value = await getCluster(parseInt(clusterId.value))
         currCluster.value.id != undefined && (await serviceStore.getServices(currCluster.value.id))
-        const { id, name } = currCluster.value
-        const serviceNamesFromCluster = serviceStore.services.map((v) => v.name as string)
-        if (!installedServiceOfCluster.value[`${id}-${name}`]) {
-          installedServiceOfCluster.value[`${id}-${name}`] = serviceNamesFromCluster
-        }
       } catch (error) {
         console.log('error :>> ', error)
       } finally {
@@ -71,7 +76,6 @@ export const useClusterStore = defineStore(
       clusters,
       loading,
       currCluster,
-      installedServiceOfCluster,
       addCluster,
       delCluster,
       loadClusters,
@@ -79,9 +83,6 @@ export const useClusterStore = defineStore(
     }
   },
   {
-    persist: {
-      storage: sessionStorage,
-      paths: ['installedServiceOfCluster']
-    }
+    persist: false
   }
 )

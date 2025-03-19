@@ -65,6 +65,7 @@
 <style lang="scss" scoped>
   .layout {
     height: 100vh;
+
     &-inner {
       padding: $space-lg $space-md;
       overflow: auto;

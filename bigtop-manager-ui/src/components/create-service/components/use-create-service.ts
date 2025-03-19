@@ -86,11 +86,7 @@ const useCreateService = () => {
   })
 
   const allComps = computed(() => {
-    return new Map(
-      selectedServices.value
-        .filter((v) => !v.isInstalled)
-        .flatMap((s) => s.components!.map((comp) => [comp.name, comp]))
-    )
+    return new Map(selectedServices.value.flatMap((s) => s.components!.map((comp) => [comp.name, comp])))
   })
 
   const setDataByCurrent = (val: ExpandServiceVO[]) => {
@@ -207,7 +203,7 @@ const useCreateService = () => {
 
   const createService = async () => {
     try {
-      commandRequest.value.serviceCommands = transformServiceData(selectedServices.value.filter((v) => !v.isInstalled))
+      commandRequest.value.serviceCommands = transformServiceData(selectedServices.value)
       afterCreateRes.value = await execCommand(commandRequest.value)
       return true
     } catch (error) {
