@@ -18,10 +18,9 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onActivated, reactive, ref, toRefs } from 'vue'
+  import { computed, onActivated, reactive, ref, toRefs, useAttrs } from 'vue'
   import { usePngImage } from '@/utils/tools'
   import useCreateService from './use-create-service'
-  import { useInstalledStore } from '@/store/installed'
   import type { ExpandServiceVO } from '@/store/stack'
   import { ComponentVO } from '@/api/component/types.ts'
 
@@ -30,14 +29,21 @@
     selectedData: ExpandServiceVO[]
   }
 
-  const installedStore = useInstalledStore()
+  const { creationMode } = useAttrs()
   const searchStr = ref('')
   const state = reactive<State>({
     isAddableData: [],
     selectedData: []
   })
-  const { clusterId, selectedServices, servicesOfExcludeInfra, confirmServiceDependencies, setDataByCurrent } =
-    useCreateService()
+  const {
+    clusterId,
+    selectedServices,
+    servicesOfInfra,
+    servicesOfExcludeInfra,
+    installedStore,
+    confirmServiceDependencies,
+    setDataByCurrent
+  } = useCreateService()
   const { isAddableData } = toRefs(state)
   const checkSelectedServicesOnlyInstalled = computed(
     () => selectedServices.value.filter((v: ExpandServiceVO) => !v.isInstalled).length === 0
@@ -105,7 +111,6 @@
   const mergeComponents = (components: ComponentVO[]) => {
     return Object.values(
       components.reduce((acc, item) => {
-        console.log(item)
         const { name, hostname } = item
         if (!acc[name!]) {
           acc[name!] = {
@@ -141,7 +146,8 @@
     if (onlyInstalled) {
       const installedServiceMap = await initInstalledServicesDetail()
       const installedServiceNames = installedStore.getInstalledNamesOrIdsOfServiceByKey(`${clusterId.value}`)
-      servicesOfExcludeInfra.value.forEach((v) => {
+      const data = creationMode === 'internal' ? servicesOfExcludeInfra.value : servicesOfInfra.value
+      data.forEach((v) => {
         if (installedServiceNames.includes(v.name || '')) {
           Object.assign(v, installedServiceMap.get(v.name!))
           v.isInstalled = true
@@ -154,8 +160,6 @@
     } else {
       state.selectedData = [...selectedServices.value]
     }
-
-    console.log(selectedServices.value)
   }
 
   onActivated(async () => {

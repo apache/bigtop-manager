@@ -19,11 +19,9 @@
 
 <script setup lang="ts">
   import { useI18n } from 'vue-i18n'
-  import { useRoute } from 'vue-router'
   import { computed, onActivated, reactive, ref, shallowRef } from 'vue'
   import { TableColumnType, Empty } from 'ant-design-vue'
   import { HostVO } from '@/api/hosts/types'
-  import { useInstalledStore } from '@/store/installed'
   import { getHosts } from '@/api/hosts'
   import useCreateService from './use-create-service'
   import useBaseTable from '@/composables/use-base-table'
@@ -38,8 +36,6 @@
   }
 
   const { t } = useI18n()
-  const route = useRoute()
-  const installedStore = useInstalledStore()
   const searchInputRef = ref()
   const currComp = ref<string>('')
   const fieldNames = shallowRef({
@@ -52,7 +48,7 @@
     searchedColumn: '',
     selectedRowKeys: []
   })
-  const { clusterId, allComps, selectedServices, updateHostsForComponent } = useCreateService()
+  const { clusterId, installedStore, allComps, selectedServices, updateHostsForComponent } = useCreateService()
   const serviceList = computed(() =>
     selectedServices.value.map((v) => ({
       ...v,
@@ -101,13 +97,12 @@
 
   const getHostList = async () => {
     loading.value = true
-    const clusterId = route.params.id as unknown as number
     if (!paginationProps.value) {
       loading.value = false
       return
     }
     try {
-      const res = await getHosts({ ...filtersParams.value, clusterId })
+      const res = await getHosts({ ...filtersParams.value, clusterId: clusterId.value })
       dataSource.value = res.content.map((v) => ({ ...v, name: v.id, displayName: v.hostname }))
       paginationProps.value.total = res.total
       loading.value = false

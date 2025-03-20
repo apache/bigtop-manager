@@ -65,7 +65,7 @@ const routes: RouteRecordRaw[] = [
           },
           {
             name: 'CreateService',
-            path: `${RouteExceptions.DYNAMIC_ROUTE_MATCH}/create-service`,
+            path: `${RouteExceptions.DYNAMIC_ROUTE_MATCH}/create-service/:creationMode`,
             component: () => import('@/components/create-service/create.vue'),
             meta: {
               hidden: true
@@ -86,6 +86,15 @@ const routes: RouteRecordRaw[] = [
             name: 'InfraList',
             path: 'list',
             component: () => import('@/pages/cluster-manage/infrastructures/index.vue'),
+            meta: {
+              hidden: true,
+              activeMenu: '/cluster-manage/infrastructures'
+            }
+          },
+          {
+            name: 'CreateInfraService',
+            path: 'create-infra-service/:id/:creationMode',
+            component: () => import('@/components/create-service/create.vue'),
             meta: {
               hidden: true,
               activeMenu: '/cluster-manage/infrastructures'

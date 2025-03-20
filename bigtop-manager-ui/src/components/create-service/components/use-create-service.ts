@@ -22,6 +22,7 @@ import { message, Modal } from 'ant-design-vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import { ExpandServiceVO, useStackStore } from '@/store/stack'
+import { useInstalledStore } from '@/store/installed'
 import { execCommand } from '@/api/command'
 import useSteps from '@/composables/use-steps'
 import SvgIcon from '@/components/common/svg-icon/index.vue'
@@ -63,11 +64,13 @@ const useCreateService = () => {
     setupStore()
     isChange = true
   }
+  const installedStore = useInstalledStore()
   const route = useRoute()
   const { t } = useI18n()
   const processedServices = ref(new Set())
   const { current, stepsLimit, previousStep, nextStep } = useSteps(steps.value)
-  const clusterId = computed(() => parseInt(route.params.id as string))
+  const clusterId = computed(() => Number(route.params.id))
+  const creationMode = computed(() => route.params.creationMode as 'internal' | 'public')
 
   watch(
     () => selectedServices.value,
@@ -116,12 +119,16 @@ const useCreateService = () => {
 
   // Validate services from infra
   const validServiceFromInfra = (targetService: ExpandServiceVO, requiredServices: string[]) => {
-    const filterServiceNames = servicesOfInfra.value
-      .filter((service) => requiredServices?.includes(service.name!))
-      .map((service) => service.displayName)
+    const servicesOfInfraNames = servicesOfInfra.value.map((v) => v.name)
+    const installedServicesOfInfra = installedStore.getInstalledNamesOrIdsOfServiceByKey('0', 'names')
+    const set = new Set(installedServicesOfInfra)
+    const missServices = requiredServices.reduce((acc, name) => {
+      !set.has(name) && servicesOfInfraNames.includes(name) && acc.push(name)
+      return acc
+    }, [] as string[])
 
-    if (!filterServiceNames.length) return false
-    message.error(t('service.dependencies_conflict_msg', [targetService.displayName!, filterServiceNames.join(',')]))
+    if (missServices.length === 0) return false
+    message.error(t('service.dependencies_conflict_msg', [targetService.displayName!, missServices.join(',')]))
     return true
   }
 
@@ -133,7 +140,7 @@ const useCreateService = () => {
   ): Promise<ProcessResult> => {
     const dependencies = targetService.requiredServices || []
 
-    if (validServiceFromInfra(targetService, dependencies)) {
+    if (creationMode.value === 'internal' && validServiceFromInfra(targetService, dependencies)) {
       return {
         success: false,
         conflictService: targetService
@@ -162,8 +169,16 @@ const useCreateService = () => {
     return { success: true }
   }
 
+  const getServiceMap = (services: ServiceVO[]) => {
+    return new Map(services.map((s) => [s.name as string, s as ExpandServiceVO]))
+  }
+
   const handlePreSelectedServiceDependencies = async (preSelectedService: ExpandServiceVO) => {
-    const serviceMap = new Map(servicesOfExcludeInfra.value.map((s) => [s.name as string, s as ExpandServiceVO]))
+    const serviceMap =
+      creationMode.value == 'public'
+        ? getServiceMap(servicesOfInfra.value)
+        : getServiceMap(servicesOfExcludeInfra.value)
+
     const result: ExpandServiceVO[] = []
     const dependenciesSuccess = await processDependencies(preSelectedService, serviceMap, servicesOfInfra.value, result)
     if (dependenciesSuccess.success) {
@@ -178,7 +193,7 @@ const useCreateService = () => {
     if (!requiredServices) {
       return [preSelectedService]
     }
-    if (validServiceFromInfra(preSelectedService, requiredServices)) {
+    if (creationMode.value === 'internal' && validServiceFromInfra(preSelectedService, requiredServices)) {
       return []
     } else {
       return await handlePreSelectedServiceDependencies(preSelectedService)
@@ -219,6 +234,8 @@ const useCreateService = () => {
     stepsLimit,
     selectedServices,
     servicesOfExcludeInfra,
+    servicesOfInfra,
+    installedStore,
     allComps,
     afterCreateRes,
     setDataByCurrent,
@@ -227,7 +244,8 @@ const useCreateService = () => {
     createService,
     previousStep,
     nextStep,
-    scope
+    scope,
+    creationMode
   }
 }
 

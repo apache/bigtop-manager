@@ -21,6 +21,13 @@
 
 <template>
   <div>
+    <a-button
+      @click="
+        () => $router.push({ name: 'CreateInfraService', params: { id: 0, cluster: '', creationMode: 'public' } })
+      "
+    >
+      add Service
+    </a-button>
     <span> infra list </span>
   </div>
 </template>

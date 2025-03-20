@@ -120,7 +120,12 @@
         </div>
       </template>
       <keep-alive>
-        <component :is="currComp" ref="compRef" :is-view="current === 3" />
+        <component
+          :is="currComp"
+          ref="compRef"
+          :is-view="current === 3"
+          v-bind="{ creationMode: $route.params.creationMode || 'internal' }"
+        />
       </keep-alive>
       <component-installer v-if="current == stepsLimit" :step-data="afterCreateRes" />
       <div class="step-action">

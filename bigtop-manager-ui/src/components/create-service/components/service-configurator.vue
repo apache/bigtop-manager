@@ -23,7 +23,6 @@
   import { Empty } from 'ant-design-vue'
   import TreeSelector from './tree-selector.vue'
   import useCreateService from './use-create-service'
-  import { useInstalledStore } from '@/store/installed'
   import type { ServiceConfigReq } from '@/api/command/types'
   import type { ComponentVO } from '@/api/component/types'
   import type { Key } from 'ant-design-vue/es/_util/type'
@@ -36,8 +35,7 @@
     isView: false
   })
 
-  const { clusterId, selectedServices } = useCreateService()
-  const installedStore = useInstalledStore()
+  const { clusterId, installedStore, selectedServices } = useCreateService()
   const searchStr = ref('')
   const currService = ref<Key>('')
   const configs = ref<ServiceConfigReq[]>([])

@@ -40,6 +40,10 @@ export const useInstalledStore = defineStore(
       installedMap.value[key] = value
     }
 
+    const getServicesOfInfra = async () => {
+      await serviceStore.getServices(0)
+    }
+
     const getInstalledServicesDetailByKey = async (key: string): Promise<ServiceVO[] | undefined> => {
       try {
         const serviceIds = getInstalledNamesOrIdsOfServiceByKey(key, 'ids')
@@ -54,6 +58,7 @@ export const useInstalledStore = defineStore(
 
     return {
       installedMap,
+      getServicesOfInfra,
       setInstalledMapKey,
       setInstalledMapKeyOfValue,
       getInstalledNamesOrIdsOfServiceByKey,
