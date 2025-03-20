@@ -30,7 +30,7 @@
   import ComponentInfo from './components/component-info.vue'
   import HostConfig from './components/host-config.vue'
   import CheckWorkflow from './components/check-workflow.vue'
-  import { ClusterCommandReq, HostReq, type CommandRequest, type CommandVO } from '@/api/command/types'
+  import { ClusterCommandReq, type CommandRequest, type CommandVO, HostReq } from '@/api/command/types'
 
   const { t } = useI18n()
   const menuStore = useMenuStore()
@@ -53,7 +53,7 @@
   )
   const isDone = computed(() => ['Successful', 'Failed'].includes(stepData.value[stepData.value.length - 1].state))
   const steps = computed(() => [
-    'cluster.cluster_management',
+    'cluster.cluster_info',
     'cluster.component_info',
     'cluster.host_config',
     'cluster.create'
@@ -119,12 +119,7 @@
       const data = await getInstalledStatus()
       installStatus.value = data
       stepData.value[current.value] = mergeByHostname(stepData.value[current.value], data)
-      const allResolved = data.every((item) => item.status != Status.Installing)
-      if (allResolved) {
-        return true
-      } else {
-        return false
-      }
+      return data.every((item) => item.status != Status.Installing)
     } catch (error) {
       console.log('error :>> ', error)
     }
@@ -196,7 +191,7 @@
       <template v-for="stepItem in steps" :key="stepItem.title">
         <div v-show="steps[current] === stepItem" class="step-title">
           <h5>{{ $t(stepItem) }}</h5>
-          <section :class="{ 'step-content': current < stepsLimit }"> </section>
+          <section :class="{ 'step-content': current < stepsLimit }"></section>
         </div>
       </template>
       <component :is="getCompName" ref="compRef" :step-data="stepData[current]" @update-data="updateData" />
@@ -219,9 +214,9 @@
               {{ $t('common.next') }}
             </a-button>
           </template>
-          <a-button v-show="current === stepsLimit && isDone" type="primary" @click="onSave">{{
-            $t('common.done')
-          }}</a-button>
+          <a-button v-show="current === stepsLimit && isDone" type="primary" @click="onSave"
+            >{{ $t('common.done') }}
+          </a-button>
         </a-space>
       </div>
     </main-card>
@@ -231,15 +226,18 @@
 <style lang="scss" scoped>
   .cluster-create {
     min-width: 600px;
+
     .header-card {
       min-height: 80px;
     }
+
     .steps-wrp {
       width: 100%;
       height: 100%;
       padding-inline: 6%;
     }
   }
+
   .step-title {
     h5 {
       margin: 0;
@@ -249,9 +247,11 @@
       line-height: 16px;
     }
   }
+
   .step-content {
     padding-block: $space-md;
   }
+
   .step-action {
     text-align: end;
     margin-top: $space-md;

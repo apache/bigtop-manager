@@ -23,7 +23,6 @@
   import LayoutHeader from '@/layouts/header.vue'
   import LayoutSider from '@/layouts/sider.vue'
   import { useUserStore } from '@/store/user'
-  // import { useClusterStore } from '@/store/cluster'
   import { useMenuStore } from '@/store/menu'
   import { useStackStore } from '@/store/stack'
   import { useInstalledStore } from '@/store/installed'
@@ -32,7 +31,6 @@
   const userStore = useUserStore()
   const menuStore = useMenuStore()
   const installedStore = useInstalledStore()
-  // const clusterStore = useClusterStore()
   const stackStore = useStackStore()
   const { headerSelectedKey, headerMenus, siderMenuSelectedKey, siderMenus } = storeToRefs(menuStore)
 
@@ -70,6 +68,9 @@
     height: 100vh;
 
     &-inner {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
       padding: $space-lg $space-md;
       overflow: auto;
     }

@@ -20,7 +20,7 @@
 <script setup lang="ts">
   import { computed, reactive, ref, toRefs } from 'vue'
   import { getRepoList, updateRepo } from '@/api/repo'
-  import { message, type FormInstance, type TableColumnType } from 'ant-design-vue'
+  import { type FormInstance, message, type TableColumnType } from 'ant-design-vue'
   import { useI18n } from 'vue-i18n'
   import type { RepoVO } from '@/api/repo/types'
 
@@ -62,8 +62,7 @@
   const getSource = async () => {
     loading.value = true
     try {
-      const data = await getRepoList()
-      list.value = data
+      list.value = await getRepoList()
     } catch (error) {
       console.log('error :>> ', error)
     } finally {

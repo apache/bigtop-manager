@@ -27,6 +27,7 @@ export default {
   healthy: 'Healthy',
   unhealthy: 'Unhealthy',
   unknown: 'Unknown',
+  unknow: 'Unknown',
   failed: 'Failed',
   success: 'Normal',
   edit: 'Edit',
