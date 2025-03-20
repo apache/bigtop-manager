@@ -43,7 +43,7 @@ export const useInstalledStore = defineStore(
     const getInstalledServicesDetailByKey = async (key: string): Promise<ServiceVO[] | undefined> => {
       try {
         const serviceIds = getInstalledNamesOrIdsOfServiceByKey(key, 'ids')
-        const allDetail = serviceIds.map((id) =>
+        const allDetail = serviceIds?.map((id) =>
           serviceStore.getServiceDetail(Number(key), Number(id))
         ) as Promise<ServiceVO>[]
         return await Promise.all(allDetail)

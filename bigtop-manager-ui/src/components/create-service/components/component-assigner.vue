@@ -163,7 +163,6 @@
       <div class="list-title">
         <div>{{ $t('service.select_host') }}</div>
       </div>
-      {{ currComp }}
       <a-table
         row-key="hostname"
         :loading="loading"

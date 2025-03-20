@@ -105,15 +105,15 @@
   const mergeComponents = (components: ComponentVO[]) => {
     return Object.values(
       components.reduce((acc, item) => {
-        const key = item.name!
-        const hostname = item.hostname
-        if (!acc[key]) {
-          acc[key] = {
+        console.log(item)
+        const { name, hostname } = item
+        if (!acc[name!]) {
+          acc[name!] = {
             ...item,
-            hosts: [{ hostname }]
+            hosts: [{ hostname, name: hostname, displayName: hostname }]
           }
         } else {
-          acc[key].hosts.push({ hostname })
+          acc[name!].hosts.push({ hostname, name: hostname, displayName: hostname })
         }
         return acc
       }, {})

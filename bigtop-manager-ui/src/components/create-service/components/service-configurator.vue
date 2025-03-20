@@ -127,7 +127,7 @@
   // }
 
   onActivated(() => {
-    debouncedOnSearch.value = debounce(filterConfigurations, 500)
+    debouncedOnSearch.value = debounce(filterConfigurations, 300)
     filterConfigs.value = [...configs.value]
   })
 
