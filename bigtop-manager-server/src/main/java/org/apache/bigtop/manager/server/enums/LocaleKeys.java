@@ -43,6 +43,7 @@ public enum LocaleKeys {
     HOST_NOT_FOUND("host.not.found"),
     HOST_ASSIGNED("host.assigned"),
     HOST_NOT_CONNECTED("host.not.connected"),
+    HOST_UNABLE_TO_RESOLVE("host.unable.to.resolve"),
     HOST_UNABLE_TO_CONNECT("host.unable.to.connect"),
     HOST_UNABLE_TO_EXEC_COMMAND("host.unable.to.exec.command"),
     HOST_HAS_COMPONENTS("host.has.components"),

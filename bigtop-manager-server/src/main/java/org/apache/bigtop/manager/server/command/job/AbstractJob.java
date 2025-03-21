@@ -105,7 +105,7 @@ public abstract class AbstractJob implements Job {
                     .flatMap(List::stream)
                     .distinct()
                     .toList();
-            JobCacheHelper.sendJobCache(clusterPO.getId(), jobPO.getId(), hostnames);
+            JobCacheHelper.sendJobCache(jobPO.getId(), hostnames);
 
             LinkedBlockingQueue<Stage> queue = new LinkedBlockingQueue<>(stages);
             while (!queue.isEmpty()) {

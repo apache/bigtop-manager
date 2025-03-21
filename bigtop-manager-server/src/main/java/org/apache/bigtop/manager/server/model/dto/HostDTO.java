@@ -53,5 +53,9 @@ public class HostDTO {
 
     private Integer grpcPort;
 
+    private String ipv4;
+
+    private String ipv6;
+
     private String desc;
 }
