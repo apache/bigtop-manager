@@ -91,12 +91,12 @@ export enum Status {
   Installing = 'INSTALLING',
   Success = 'SUCCESS',
   Failed = 'FAILED',
-  Unknown = 'UNKNOW'
+  Unknown = 'UNKNOWN'
 }
 
 export enum BaseStatus {
   'INSTALLING',
   'SUCCESS',
   'FAILED',
-  'UNKNOW'
+  'UNKNOWN'
 }

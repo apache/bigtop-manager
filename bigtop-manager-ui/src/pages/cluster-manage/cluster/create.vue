@@ -44,12 +44,12 @@
   const installStatus = shallowRef<InstalledStatusVO[]>([])
   const components = shallowRef<any[]>([ClusterBase, ComponentInfo, HostConfig, CheckWorkflow])
   const isInstall = computed(() => current.value === 2)
-  const hasUnknowHost = computed(() => stepData.value[2].filter((v) => v.status === Status.Unknown).length == 0)
+  const hasUnknownHost = computed(() => stepData.value[2].filter((v) => v.status === Status.Unknown).length == 0)
   const allInstallSuccess = computed(
     () =>
       stepData.value[2].length != 0 &&
       stepData.value[2].every((v) => v.status === Status.Success) &&
-      hasUnknowHost.value
+      hasUnknownHost.value
   )
   const isDone = computed(() => ['Successful', 'Failed'].includes(stepData.value[stepData.value.length - 1].state))
   const steps = computed(() => [
