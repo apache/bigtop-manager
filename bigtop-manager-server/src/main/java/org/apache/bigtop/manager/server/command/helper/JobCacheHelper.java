@@ -128,59 +128,38 @@ public class JobCacheHelper {
 
         ClusterPO clusterPO = clusterDao.findById(clusterId);
 
-        ComponentQuery componentQuery =
+        ComponentQuery query =
                 ComponentQuery.builder().clusterId(clusterId).build();
 
-        List<ServiceConfigPO> serviceConfigPOList = serviceConfigDao.findByClusterId(clusterPO.getId());
-        List<ComponentPO> componentPOList = componentDao.findByQuery(componentQuery);
+        List<ComponentPO> componentPOList = componentDao.findByQuery(query);
 
         ClusterInfo clusterInfo = new ClusterInfo();
         clusterInfo.setName(clusterPO.getName());
         clusterInfo.setUserGroup(clusterPO.getUserGroup());
         clusterInfo.setRootDir(clusterPO.getRootDir());
 
-        Map<String, Map<String, String>> serviceConfigMap = new HashMap<>();
-        for (ServiceConfigPO serviceConfigPO : serviceConfigPOList) {
-            List<Map<String, Object>> properties = JsonUtils.readFromString(serviceConfigPO.getPropertiesJson());
-            Map<String, String> kvMap = properties.stream()
-                    .collect(Collectors.toMap(
-                            property -> (String) property.get("name"), property -> (String) property.get("value")));
-            String kvString = JsonUtils.writeAsString(kvMap);
+        Map<String, Map<String, String>> serviceConfigMap = payload.getConfigurations();
+        serviceConfigMap.putAll(getServiceConfigMap(clusterId));
 
-            if (serviceConfigMap.containsKey(serviceConfigPO.getServiceName())) {
-                serviceConfigMap.get(serviceConfigPO.getServiceName()).put(serviceConfigPO.getName(), kvString);
-            } else {
-                Map<String, String> hashMap = new HashMap<>();
-                hashMap.put(serviceConfigPO.getName(), kvString);
-                serviceConfigMap.put(serviceConfigPO.getServiceName(), hashMap);
-            }
-        }
-
-        Map<String, List<String>> hostMap = payload.getComponentHosts();
-        componentPOList.forEach(x -> {
-            if (hostMap.containsKey(x.getName())) {
-                hostMap.get(x.getName()).add(x.getHostname());
-            } else {
-                List<String> list = new ArrayList<>();
-                list.add(x.getHostname());
-                hostMap.put(x.getName(), list);
-            }
-            hostMap.get(x.getName()).add(x.getHostname());
-        });
+        Map<String, List<String>> componentHostMap = payload.getComponentHosts();
+        componentHostMap.putAll(getComponentHostMap(clusterId));
 
         payload.setClusterId(clusterId);
         payload.setClusterInfo(clusterInfo);
         payload.setConfigurations(serviceConfigMap);
-        payload.setComponentHosts(hostMap);
+        payload.setComponentHosts(componentHostMap);
     }
 
     private static void genGlobalPayload(JobCachePayload payload) {
         List<RepoPO> repoPOList = repoDao.findAll();
         List<HostPO> hostPOList = hostDao.findAll();
 
-        Map<String, List<String>> hostMap = new HashMap<>();
+        Map<String, Map<String, String>> serviceConfigMap = getServiceConfigMap(0L);
+
+        Map<String, List<String>> componentHostMap = new HashMap<>();
         List<String> allHostnames = hostPOList.stream().map(HostPO::getHostname).toList();
-        hostMap.put(ALL_HOST_KEY, allHostnames);
+        componentHostMap.put(ALL_HOST_KEY, allHostnames);
+        componentHostMap.putAll(getComponentHostMap(0L));
 
         List<RepoInfo> repoList = new ArrayList<>();
         repoPOList.forEach(repoPO -> {
@@ -199,8 +178,49 @@ public class JobCacheHelper {
             }
         }
 
-        payload.setComponentHosts(hostMap);
+        payload.setConfigurations(serviceConfigMap);
+        payload.setComponentHosts(componentHostMap);
         payload.setRepoInfo(repoList);
         payload.setUserInfo(userMap);
+    }
+
+    private static Map<String, Map<String, String>> getServiceConfigMap(Long clusterId) {
+        List<ServiceConfigPO> serviceConfigPOList = serviceConfigDao.findByClusterId(clusterId);
+        Map<String, Map<String, String>> serviceConfigMap = new HashMap<>();
+        for (ServiceConfigPO serviceConfigPO : serviceConfigPOList) {
+            List<Map<String, Object>> properties = JsonUtils.readFromString(serviceConfigPO.getPropertiesJson());
+            Map<String, String> kvMap = properties.stream()
+                    .collect(Collectors.toMap(
+                            property -> (String) property.get("name"), property -> (String) property.get("value")));
+            String kvString = JsonUtils.writeAsString(kvMap);
+
+            if (serviceConfigMap.containsKey(serviceConfigPO.getServiceName())) {
+                serviceConfigMap.get(serviceConfigPO.getServiceName()).put(serviceConfigPO.getName(), kvString);
+            } else {
+                Map<String, String> hashMap = new HashMap<>();
+                hashMap.put(serviceConfigPO.getName(), kvString);
+                serviceConfigMap.put(serviceConfigPO.getServiceName(), hashMap);
+            }
+        }
+
+        return serviceConfigMap;
+    }
+
+    private static Map<String, List<String>> getComponentHostMap(Long clusterId) {
+        ComponentQuery query =
+                ComponentQuery.builder().clusterId(clusterId).build();
+        List<ComponentPO> componentPOList = componentDao.findByQuery(query);
+        Map<String, List<String>> hostMap = new HashMap<>();
+        componentPOList.forEach(x -> {
+            if (hostMap.containsKey(x.getName())) {
+                hostMap.get(x.getName()).add(x.getHostname());
+            } else {
+                List<String> list = new ArrayList<>();
+                list.add(x.getHostname());
+                hostMap.put(x.getName(), list);
+            }
+        });
+
+        return hostMap;
     }
 }

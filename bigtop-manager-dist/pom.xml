@@ -68,27 +68,27 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>server-bin</id>
+                        <id>server</id>
                         <goals>
                             <goal>single</goal>
                         </goals>
                         <phase>package</phase>
                         <configuration>
                             <descriptors>
-                                <descriptor>src/main/assembly/assembly-server-bin.xml</descriptor>
+                                <descriptor>src/main/assembly/assembly-server.xml</descriptor>
                             </descriptors>
                             <appendAssemblyId>true</appendAssemblyId>
                         </configuration>
                     </execution>
                     <execution>
-                        <id>agent-bin</id>
+                        <id>agent</id>
                         <goals>
                             <goal>single</goal>
                         </goals>
                         <phase>package</phase>
                         <configuration>
                             <descriptors>
-                                <descriptor>src/main/assembly/assembly-agent-bin.xml</descriptor>
+                                <descriptor>src/main/assembly/assembly-agent.xml</descriptor>
                             </descriptors>
                             <appendAssemblyId>true</appendAssemblyId>
                         </configuration>
@@ -135,7 +135,7 @@
                                 <phase>package</phase>
                                 <configuration>
                                     <descriptors>
-                                        <descriptor>src/main/assembly/assembly-server-bin.xml</descriptor>
+                                        <descriptor>src/main/assembly/assembly-server.xml</descriptor>
                                     </descriptors>
                                     <appendAssemblyId>true</appendAssemblyId>
                                 </configuration>
@@ -148,7 +148,7 @@
                                 <phase>package</phase>
                                 <configuration>
                                     <descriptors>
-                                        <descriptor>src/main/assembly/assembly-agent-bin.xml</descriptor>
+                                        <descriptor>src/main/assembly/assembly-agent.xml</descriptor>
                                     </descriptors>
                                     <appendAssemblyId>true</appendAssemblyId>
                                 </configuration>

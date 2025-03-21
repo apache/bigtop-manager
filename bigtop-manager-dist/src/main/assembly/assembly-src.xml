@@ -24,7 +24,7 @@
         <format>tar.gz</format>
     </formats>
     <includeBaseDirectory>true</includeBaseDirectory>
-    <baseDirectory>${project.build.finalName}-src</baseDirectory>
+    <baseDirectory>bigtop-manager-src</baseDirectory>
 
     <fileSets>
         <fileSet>
