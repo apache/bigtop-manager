@@ -33,6 +33,7 @@ import io.grpc.stub.AbstractStub;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Constructor;
+import java.net.InetAddress;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -85,7 +86,16 @@ public class GrpcClient {
     }
 
     private static ManagedChannel createChannel(String host, Integer port) {
-        ManagedChannel channel = ManagedChannelBuilder.forAddress(host, port)
+        String ipv4;
+        try {
+            InetAddress address = InetAddress.getByName(host);
+            ipv4 = address.getHostAddress();
+        } catch (Exception e) {
+            log.error("Unable to resolve host: {}", host);
+            throw new ApiException(ApiExceptionEnum.HOST_UNABLE_TO_RESOLVE, host);
+        }
+
+        ManagedChannel channel = ManagedChannelBuilder.forAddress(ipv4, port)
                 .usePlaintext()
                 .keepAliveTime(60, TimeUnit.SECONDS)
                 .keepAliveWithoutCalls(true)

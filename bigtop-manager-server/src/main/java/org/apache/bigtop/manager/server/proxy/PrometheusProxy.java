@@ -18,15 +18,9 @@
  */
 package org.apache.bigtop.manager.server.proxy;
 
-import org.apache.bigtop.manager.dao.query.HostQuery;
-import org.apache.bigtop.manager.server.model.vo.HostVO;
-import org.apache.bigtop.manager.server.model.vo.PageVO;
-import org.apache.bigtop.manager.server.service.HostService;
 import org.apache.bigtop.manager.server.utils.ProxyUtils;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -36,7 +30,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import reactor.core.publisher.Mono;
 
-import jakarta.annotation.Resource;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -44,13 +37,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-@Component
 public class PrometheusProxy {
 
     private final WebClient webClient;
-
-    @Value("${monitoring.agent-host-job-name}")
-    private String agentHostJobName;
 
     public static final String MEM_IDLE = "memIdle";
     public static final String MEM_TOTAL = "memTotal";
@@ -66,12 +55,8 @@ public class PrometheusProxy {
     public static final String DISK_READ = "diskRead";
     public static final String DISK_WRITE = "diskWrite";
 
-    @Resource
-    private HostService hostService;
-
-    public PrometheusProxy(
-            WebClient.Builder webClientBuilder, @Value("${monitoring.prometheus-host}") String prometheusHost) {
-        this.webClient = webClientBuilder.baseUrl(prometheusHost).build();
+    public PrometheusProxy(String prometheusHost) {
+        this.webClient = WebClient.builder().baseUrl(prometheusHost).build();
     }
     /**
      * Retrieve current data
@@ -120,7 +105,7 @@ public class PrometheusProxy {
      * query agents healthy
      */
     public JsonNode queryAgentsHealthyStatus() {
-        JsonNode result = query("up{job=\"%s\"}".formatted(agentHostJobName));
+        JsonNode result = query("up{job=\"%s\"}".formatted("bm-agent-host"));
         ObjectMapper objectMapper = new ObjectMapper();
         ArrayNode agentsHealthyStatus = objectMapper.createArrayNode();
         if (result != null) {
@@ -145,9 +130,8 @@ public class PrometheusProxy {
     /**
      * query agents info interval
      */
-    public JsonNode queryAgentsInfo(Long id, String interval) {
+    public JsonNode queryAgentsInfo(String agentIpv4, String interval) {
         ObjectMapper objectMapper = new ObjectMapper();
-        String agentIpv4 = hostService.get(id).getIpv4();
         if (!Objects.equals(agentIpv4, "")) {
             ObjectNode ag = objectMapper.createObjectNode();
             double[] agentsCpuUsage = new double[6];
@@ -225,12 +209,8 @@ public class PrometheusProxy {
     /**
      * query clusters info interval
      */
-    public JsonNode queryClustersInfo(Long clusterId, String interval) {
-        HostQuery hostQuery = new HostQuery();
-        hostQuery.setClusterId(clusterId);
-        PageVO<HostVO> hostPage = hostService.list(hostQuery); // query host list
-        List<HostVO> hostList = hostPage.getContent();
-        int agentsNum = Math.toIntExact(hostPage.getTotal()); // change to agentsNum
+    public JsonNode queryClustersInfo(List<String> agentIpv4s, String interval) {
+        int agentsNum = agentIpv4s.size(); // change to agentsNum
         ObjectMapper objectMapper = new ObjectMapper();
         if (agentsNum > 0) {
             int totalPhysicalCores = 0;
@@ -245,8 +225,7 @@ public class PrometheusProxy {
 
             int agentIndex = 0;
             ObjectNode clusterInfo = objectMapper.createObjectNode();
-            for (HostVO hostVO : hostList) {
-                String agentIpv4 = hostVO.getIpv4();
+            for (String agentIpv4 : agentIpv4s) {
                 JsonNode agentCpu = retrieveAgentCpu(agentIpv4);
                 instantCpuUsage += agentCpu.get("cpuUsage").asDouble()
                         * agentCpu.get(PHYSICAL_CORES).asInt();

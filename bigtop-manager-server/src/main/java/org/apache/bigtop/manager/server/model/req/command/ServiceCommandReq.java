@@ -36,6 +36,9 @@ public class ServiceCommandReq {
     @NotNull @Schema(description = "Service name", example = "zookeeper")
     private String serviceName;
 
+    @NotNull @Schema(description = "Whether the service is already installed", example = "false")
+    private Boolean installed;
+
     @NotEmpty(groups = {CommandGroupSequenceProvider.ServiceInstallCommandGroup.class})
     @Schema(description = "Components for service on each hosts")
     private List<@Valid ComponentHostReq> componentHosts;

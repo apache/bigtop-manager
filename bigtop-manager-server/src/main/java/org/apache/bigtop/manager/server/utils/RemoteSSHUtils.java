@@ -66,7 +66,9 @@ public class RemoteSSHUtils {
             String keyPassword,
             String command)
             throws Exception {
-        String keyPath = ProjectPathUtils.getKeyStorePath() + File.separator + keyFilename;
+        String keyPath = StringUtils.isEmpty(keyFilename)
+                ? null
+                : ProjectPathUtils.getKeyStorePath() + File.separator + keyFilename;
         try (SshClient client = getSshClient(keyPath, keyString, keyPassword)) {
             return run(client, host, port, user, command);
         }

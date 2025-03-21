@@ -33,6 +33,7 @@ import org.apache.bigtop.manager.dao.repository.ServiceConfigSnapshotDao;
 import org.apache.bigtop.manager.dao.repository.ServiceDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
+import org.apache.bigtop.manager.server.model.converter.ComponentConverter;
 import org.apache.bigtop.manager.server.model.converter.ServiceConfigConverter;
 import org.apache.bigtop.manager.server.model.converter.ServiceConfigSnapshotConverter;
 import org.apache.bigtop.manager.server.model.converter.ServiceConverter;
@@ -40,6 +41,7 @@ import org.apache.bigtop.manager.server.model.dto.ServiceConfigDTO;
 import org.apache.bigtop.manager.server.model.query.PageQuery;
 import org.apache.bigtop.manager.server.model.req.ServiceConfigReq;
 import org.apache.bigtop.manager.server.model.req.ServiceConfigSnapshotReq;
+import org.apache.bigtop.manager.server.model.vo.ComponentVO;
 import org.apache.bigtop.manager.server.model.vo.PageVO;
 import org.apache.bigtop.manager.server.model.vo.ServiceConfigSnapshotVO;
 import org.apache.bigtop.manager.server.model.vo.ServiceConfigVO;
@@ -125,7 +127,16 @@ public class ServiceServiceImpl implements ServiceService {
 
     @Override
     public ServiceVO get(Long id) {
-        return ServiceConverter.INSTANCE.fromPO2VO(serviceDao.findById(id));
+        ServiceVO serviceVO = ServiceConverter.INSTANCE.fromPO2VO(serviceDao.findById(id));
+
+        ComponentQuery query = ComponentQuery.builder().serviceId(id).build();
+        List<ComponentPO> componentPOList = componentDao.findByQuery(query);
+        List<ComponentVO> componentVOList = ComponentConverter.INSTANCE.fromPO2VO(componentPOList);
+        List<ServiceConfigVO> serviceConfigVOList = listConf(null, id);
+
+        serviceVO.setComponents(componentVOList);
+        serviceVO.setConfigs(serviceConfigVOList);
+        return serviceVO;
     }
 
     @Override

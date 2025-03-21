@@ -45,9 +45,11 @@ import org.apache.bigtop.manager.server.model.dto.StackDTO;
 import org.apache.bigtop.manager.server.utils.StackUtils;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -74,15 +76,25 @@ public class JobCacheHelper {
         INITIALIZED.set(true);
     }
 
-    public static void sendJobCache(Long clusterId, Long jobId, List<String> hostnames) {
-        JobCachePayload payload = genPayload(clusterId);
-        JobCacheRequest request = JobCacheRequest.newBuilder()
-                .setJobId(jobId)
-                .setPayload(JsonUtils.writeAsString(payload))
-                .build();
+    public static void sendJobCache(Long jobId, List<String> hostnames) {
+        if (!INITIALIZED.get()) {
+            initialize();
+        }
+
+        JobCachePayload payload = new JobCachePayload();
+        genGlobalPayload(payload);
+
+        // Sort by cluster id to avoid regenerating the same cluster payload
         List<HostPO> hostPOList = hostDao.findAllByHostnames(hostnames);
+        hostPOList.sort(Comparator.comparing(HostPO::getClusterId));
+
         List<CompletableFuture<Boolean>> futures = new ArrayList<>();
         for (HostPO hostPO : hostPOList) {
+            genClusterPayload(payload, hostPO.getClusterId());
+            JobCacheRequest request = JobCacheRequest.newBuilder()
+                    .setJobId(jobId)
+                    .setPayload(JsonUtils.writeAsString(payload))
+                    .build();
             futures.add(CompletableFuture.supplyAsync(() -> {
                 JobCacheServiceGrpc.JobCacheServiceBlockingStub stub = GrpcClient.getBlockingStub(
                         hostPO.getHostname(),
@@ -109,9 +121,9 @@ public class JobCacheHelper {
         }
     }
 
-    private static JobCachePayload genPayload(Long clusterId) {
-        if (!INITIALIZED.get()) {
-            initialize();
+    private static void genClusterPayload(JobCachePayload payload, Long clusterId) {
+        if (Objects.equals(payload.getClusterId(), clusterId)) {
+            return;
         }
 
         ClusterPO clusterPO = clusterDao.findById(clusterId);
@@ -121,8 +133,6 @@ public class JobCacheHelper {
 
         List<ServiceConfigPO> serviceConfigPOList = serviceConfigDao.findByClusterId(clusterPO.getId());
         List<ComponentPO> componentPOList = componentDao.findByQuery(componentQuery);
-        List<RepoPO> repoPOList = repoDao.findAll();
-        List<HostPO> hostPOList = hostDao.findAll();
 
         ClusterInfo clusterInfo = new ClusterInfo();
         clusterInfo.setName(clusterPO.getName());
@@ -146,7 +156,7 @@ public class JobCacheHelper {
             }
         }
 
-        Map<String, List<String>> hostMap = new HashMap<>();
+        Map<String, List<String>> hostMap = payload.getComponentHosts();
         componentPOList.forEach(x -> {
             if (hostMap.containsKey(x.getName())) {
                 hostMap.get(x.getName()).add(x.getHostname());
@@ -158,6 +168,17 @@ public class JobCacheHelper {
             hostMap.get(x.getName()).add(x.getHostname());
         });
 
+        payload.setClusterId(clusterId);
+        payload.setClusterInfo(clusterInfo);
+        payload.setConfigurations(serviceConfigMap);
+        payload.setComponentHosts(hostMap);
+    }
+
+    private static void genGlobalPayload(JobCachePayload payload) {
+        List<RepoPO> repoPOList = repoDao.findAll();
+        List<HostPO> hostPOList = hostDao.findAll();
+
+        Map<String, List<String>> hostMap = new HashMap<>();
         List<String> allHostnames = hostPOList.stream().map(HostPO::getHostname).toList();
         hostMap.put(ALL_HOST_KEY, allHostnames);
 
@@ -178,12 +199,8 @@ public class JobCacheHelper {
             }
         }
 
-        JobCachePayload payload = new JobCachePayload();
-        payload.setClusterInfo(clusterInfo);
-        payload.setConfigurations(serviceConfigMap);
         payload.setComponentHosts(hostMap);
         payload.setRepoInfo(repoList);
         payload.setUserInfo(userMap);
-        return payload;
     }
 }
