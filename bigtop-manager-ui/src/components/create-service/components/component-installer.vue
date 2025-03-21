@@ -26,7 +26,6 @@
   import type { JobVO, StageVO, StateType, TaskVO } from '@/api/job/types'
 
   const props = defineProps<{ stepData: CommandVO }>()
-  const emits = defineEmits(['updateData'])
   const { stepData } = toRefs(props)
   const activeKey = ref<number[]>([])
   const jobDetail = ref<JobVO>({})
@@ -57,7 +56,6 @@
       const data = await getJobDetails({ jobId, clusterId: 0 })
       jobDetail.value = data
       activeKey.value = data.stages ? data.stages?.map((v) => v.id!) : []
-      emits('updateData', { ...stepData.value, ...data })
       return ['Successful', 'Failed'].includes(data.state as StateType)
     } catch (error) {
       console.log('error :>> ', error)
@@ -124,9 +122,9 @@
     <a-empty v-if="stages.length == 0" :image="Empty.PRESENTED_IMAGE_SIMPLE" />
     <div v-else class="component-installer">
       <div class="retry">
-        <a-button v-if="stepData.state === 'Failed'" type="link" @click="handleRetryJob">{{
-          $t('common.retry')
-        }}</a-button>
+        <a-button v-if="jobDetail.state === 'Failed'" type="link" @click="handleRetryJob">
+          {{ $t('common.retry') }}
+        </a-button>
       </div>
       <a-collapse v-model:active-key="activeKey" :bordered="false" :ghost="true">
         <a-collapse-panel v-for="stage in stages" :key="stage.id">

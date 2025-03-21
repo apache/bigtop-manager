@@ -19,7 +19,7 @@
 export default {
   base_info: 'Basic Information',
   cluster_config: 'Cluster Configuration',
-  cluster_management: 'Cluster',
+  cluster_info: 'Cluster',
   component_info: 'Stack',
   host_config: 'Hosts',
   create: 'Create',

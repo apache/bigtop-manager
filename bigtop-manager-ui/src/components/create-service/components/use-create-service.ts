@@ -17,16 +17,17 @@
  * under the License.
  */
 
-import { computed, createVNode, ref, watch, effectScope, Ref, ComputedRef } from 'vue'
+import { computed, ComputedRef, createVNode, effectScope, Ref, ref, watch } from 'vue'
 import { message, Modal } from 'ant-design-vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import { ExpandServiceVO, useStackStore } from '@/store/stack'
+import { useInstalledStore } from '@/store/installed'
 import { execCommand } from '@/api/command'
 import useSteps from '@/composables/use-steps'
 import SvgIcon from '@/components/common/svg-icon/index.vue'
 import type { HostVO } from '@/api/hosts/types'
-import type { CommandVO, CommandRequest, ServiceCommandReq } from '@/api/command/types'
+import type { CommandRequest, CommandVO, ServiceCommandReq } from '@/api/command/types'
 import type { ServiceVO } from '@/api/service/types'
 
 interface ProcessResult {
@@ -63,10 +64,13 @@ const useCreateService = () => {
     setupStore()
     isChange = true
   }
+  const installedStore = useInstalledStore()
   const route = useRoute()
   const { t } = useI18n()
   const processedServices = ref(new Set())
   const { current, stepsLimit, previousStep, nextStep } = useSteps(steps.value)
+  const clusterId = computed(() => Number(route.params.id))
+  const creationMode = computed(() => route.params.creationMode as 'internal' | 'public')
 
   watch(
     () => selectedServices.value,
@@ -81,7 +85,7 @@ const useCreateService = () => {
   const commandRequest = ref<CommandRequest>({
     command: 'Add',
     commandLevel: 'service',
-    clusterId: parseInt(route.params.id as string)
+    clusterId: clusterId.value
   })
 
   const allComps = computed(() => {
@@ -104,9 +108,10 @@ const useCreateService = () => {
   const transformServiceData = (services: ExpandServiceVO[]) => {
     return services.map((service) => ({
       serviceName: service.name,
-      componentHosts: service.components!.map((component) => ({
+      installed: service.isInstalled === undefined ? false : service.isInstalled,
+      componentHosts: (service.components || []).map((component) => ({
         componentName: component.name,
-        hostnames: component.hosts.map((host: HostVO) => host.hostname)
+        hostnames: (component.hosts || []).map((host: HostVO) => host.hostname)
       })),
       configs: service.configs
     })) as ServiceCommandReq[]
@@ -114,12 +119,16 @@ const useCreateService = () => {
 
   // Validate services from infra
   const validServiceFromInfra = (targetService: ExpandServiceVO, requiredServices: string[]) => {
-    const filterServiceNames = servicesOfInfra.value
-      .filter((service) => requiredServices?.includes(service.name!))
-      .map((service) => service.displayName)
+    const servicesOfInfraNames = servicesOfInfra.value.map((v) => v.name)
+    const installedServicesOfInfra = installedStore.getInstalledNamesOrIdsOfServiceByKey('0', 'names')
+    const set = new Set(installedServicesOfInfra)
+    const missServices = requiredServices.reduce((acc, name) => {
+      !set.has(name) && servicesOfInfraNames.includes(name) && acc.push(name)
+      return acc
+    }, [] as string[])
 
-    if (!filterServiceNames.length) return false
-    message.error(t('service.dependencies_conflict_msg', [targetService.displayName!, filterServiceNames.join(',')]))
+    if (missServices.length === 0) return false
+    message.error(t('service.dependencies_conflict_msg', [targetService.displayName!, missServices.join(',')]))
     return true
   }
 
@@ -131,7 +140,7 @@ const useCreateService = () => {
   ): Promise<ProcessResult> => {
     const dependencies = targetService.requiredServices || []
 
-    if (validServiceFromInfra(targetService, dependencies)) {
+    if (creationMode.value === 'internal' && validServiceFromInfra(targetService, dependencies)) {
       return {
         success: false,
         conflictService: targetService
@@ -141,6 +150,8 @@ const useCreateService = () => {
     for (const serviceName of dependencies) {
       const dependency = serviceMap.get(serviceName)
       if (!dependency || processedServices.value.has(dependency.name!)) continue
+
+      if (dependency.isInstalled) continue
 
       const shouldAdd = await confirmRequiredServicesToInstall(targetService, dependency)
       if (!shouldAdd) return { success: false }
@@ -158,8 +169,16 @@ const useCreateService = () => {
     return { success: true }
   }
 
+  const getServiceMap = (services: ServiceVO[]) => {
+    return new Map(services.map((s) => [s.name as string, s as ExpandServiceVO]))
+  }
+
   const handlePreSelectedServiceDependencies = async (preSelectedService: ExpandServiceVO) => {
-    const serviceMap = new Map(servicesOfExcludeInfra.value.map((s) => [s.name as string, s as ExpandServiceVO]))
+    const serviceMap =
+      creationMode.value == 'public'
+        ? getServiceMap(servicesOfInfra.value)
+        : getServiceMap(servicesOfExcludeInfra.value)
+
     const result: ExpandServiceVO[] = []
     const dependenciesSuccess = await processDependencies(preSelectedService, serviceMap, servicesOfInfra.value, result)
     if (dependenciesSuccess.success) {
@@ -174,7 +193,7 @@ const useCreateService = () => {
     if (!requiredServices) {
       return [preSelectedService]
     }
-    if (validServiceFromInfra(preSelectedService, requiredServices)) {
+    if (creationMode.value === 'internal' && validServiceFromInfra(preSelectedService, requiredServices)) {
       return []
     } else {
       return await handlePreSelectedServiceDependencies(preSelectedService)
@@ -199,8 +218,7 @@ const useCreateService = () => {
 
   const createService = async () => {
     try {
-      const formatData = transformServiceData(selectedServices.value)
-      commandRequest.value.serviceCommands = formatData
+      commandRequest.value.serviceCommands = transformServiceData(selectedServices.value)
       afterCreateRes.value = await execCommand(commandRequest.value)
       return true
     } catch (error) {
@@ -211,10 +229,13 @@ const useCreateService = () => {
 
   return {
     steps,
+    clusterId,
     current,
     stepsLimit,
     selectedServices,
     servicesOfExcludeInfra,
+    servicesOfInfra,
+    installedStore,
     allComps,
     afterCreateRes,
     setDataByCurrent,
@@ -223,7 +244,8 @@ const useCreateService = () => {
     createService,
     previousStep,
     nextStep,
-    scope
+    scope,
+    creationMode
   }
 }
 

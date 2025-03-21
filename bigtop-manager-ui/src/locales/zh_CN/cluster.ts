@@ -19,7 +19,7 @@
 export default {
   base_info: '基本信息',
   cluster_config: '集群配置',
-  cluster_management: '集群管理',
+  cluster_info: '集群信息',
   component_info: '组件信息',
   host_config: '主机管理',
   create: '创建集群',

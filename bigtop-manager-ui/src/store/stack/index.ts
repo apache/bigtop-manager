@@ -32,8 +32,7 @@ export const useStackStore = defineStore(
 
     const loadStacks = async () => {
       try {
-        const data = await getStacks()
-        stacks.value = data
+        stacks.value = await getStacks()
       } catch (error) {
         console.log('error :>> ', error)
       }

@@ -18,23 +18,36 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onActivated, reactive, ref, toRefs } from 'vue'
+  import { computed, onActivated, reactive, ref, toRefs, useAttrs } from 'vue'
   import { usePngImage } from '@/utils/tools'
   import useCreateService from './use-create-service'
-  import { ExpandServiceVO } from '@/store/stack'
+  import type { ExpandServiceVO } from '@/store/stack'
+  import { ComponentVO } from '@/api/component/types.ts'
 
   interface State {
     isAddableData: ExpandServiceVO[]
     selectedData: ExpandServiceVO[]
   }
 
+  const { creationMode } = useAttrs()
   const searchStr = ref('')
   const state = reactive<State>({
     isAddableData: [],
     selectedData: []
   })
-  const { selectedServices, servicesOfExcludeInfra, confirmServiceDependencies, setDataByCurrent } = useCreateService()
+  const {
+    clusterId,
+    selectedServices,
+    servicesOfInfra,
+    servicesOfExcludeInfra,
+    installedStore,
+    confirmServiceDependencies,
+    setDataByCurrent
+  } = useCreateService()
   const { isAddableData } = toRefs(state)
+  const checkSelectedServicesOnlyInstalled = computed(
+    () => selectedServices.value.filter((v: ExpandServiceVO) => !v.isInstalled).length === 0
+  )
   const filterAddableData = computed(() =>
     isAddableData.value.filter(
       (v) =>
@@ -95,10 +108,62 @@
     return splitStr.toString().split(new RegExp(`(?<=${searchStr.value})|(?=${searchStr.value})`, 'i'))
   }
 
-  onActivated(() => {
-    selectedServices.value.length > 0
-      ? (state.selectedData = [...selectedServices.value])
-      : (state.isAddableData = [...(servicesOfExcludeInfra.value as ExpandServiceVO[])])
+  const mergeComponents = (components: ComponentVO[]) => {
+    return Object.values(
+      components.reduce((acc, item) => {
+        const { name, hostname } = item
+        if (!acc[name!]) {
+          acc[name!] = {
+            ...item,
+            hosts: [{ hostname, name: hostname, displayName: hostname }]
+          }
+        } else {
+          acc[name!].hosts.push({ hostname, name: hostname, displayName: hostname })
+        }
+        return acc
+      }, {})
+    )
+  }
+
+  const initInstalledServicesDetail = async () => {
+    const detailRes = await installedStore.getInstalledServicesDetailByKey(`${clusterId.value}`)
+    const detailMap = new Map<string, ExpandServiceVO>()
+    if (!detailRes) {
+      return detailMap
+    } else {
+      return detailRes.reduce(
+        (pre, val) =>
+          pre.set(val.name!, {
+            ...val,
+            components: mergeComponents(val.components || [])
+          } as ExpandServiceVO),
+        detailMap
+      )
+    }
+  }
+
+  const addInstalledSymbolForSelectedServices = async (onlyInstalled: boolean) => {
+    if (onlyInstalled) {
+      const installedServiceMap = await initInstalledServicesDetail()
+      const installedServiceNames = installedStore.getInstalledNamesOrIdsOfServiceByKey(`${clusterId.value}`)
+      const data = creationMode === 'internal' ? servicesOfExcludeInfra.value : servicesOfInfra.value
+      data.forEach((v) => {
+        if (installedServiceNames.includes(v.name || '')) {
+          Object.assign(v, installedServiceMap.get(v.name!))
+          v.isInstalled = true
+          state.selectedData.push(v as ExpandServiceVO)
+        } else {
+          state.isAddableData.push(v as ExpandServiceVO)
+        }
+      })
+      setDataByCurrent(state.selectedData)
+    } else {
+      state.selectedData = [...selectedServices.value]
+    }
+  }
+
+  onActivated(async () => {
+    await addInstalledSymbolForSelectedServices(checkSelectedServicesOnlyInstalled.value)
   })
 
   defineExpose({
@@ -162,7 +227,7 @@
         <template #renderItem="{ item }">
           <a-list-item>
             <template #actions>
-              <a-button danger type="primary" @click="removeInstallItem(item)">
+              <a-button danger :disabled="item.isInstalled" type="primary" @click="removeInstallItem(item)">
                 {{ $t('common.remove') }}
               </a-button>
             </template>
@@ -208,6 +273,7 @@
     grid-template-columns: 1fr auto 1fr;
     grid-template-rows: auto;
     justify-content: space-between;
+
     .list-title {
       display: flex;
       height: 32px;
@@ -216,21 +282,26 @@
       font-weight: 500;
       border-bottom: 1px solid $color-border;
       padding-bottom: 16px;
+
       .ant-input {
         flex: 0 1 160px;
       }
     }
+
     .ant-list {
       max-height: 500px;
       overflow: auto;
     }
   }
+
   .divider {
     height: 100%;
     margin-inline: 16px;
   }
+
   :deep(.ant-avatar) {
     border-radius: 4px;
+
     img {
       object-fit: contain !important;
     }

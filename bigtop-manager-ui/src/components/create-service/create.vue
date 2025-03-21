@@ -47,7 +47,7 @@
   const currComp = computed(() => components.value[current.value])
 
   const validateServiceSelection = async () => {
-    if (selectedServices.value.length === 0) {
+    if (selectedServices.value.filter((v) => !v.isInstalled).length === 0) {
       message.error(t('service.service_selection'))
       return false
     } else {
@@ -80,7 +80,7 @@
     return isValid
   }
 
-  const stepValidators = [validateServiceSelection, validateComponentAssignments, () => true]
+  const stepValidators = [validateServiceSelection, validateComponentAssignments, () => true, () => true]
 
   const proceedToNextStep = async () => {
     if (current.value < 3) {
@@ -116,11 +116,16 @@
       <template v-for="stepItem in steps" :key="stepItem.title">
         <div v-show="steps[current] === stepItem" class="step-title">
           <h5>{{ $t(stepItem) }}</h5>
-          <section :class="{ 'step-content': current < stepsLimit }"> </section>
+          <section :class="{ 'step-content': current < stepsLimit }"></section>
         </div>
       </template>
       <keep-alive>
-        <component :is="currComp" ref="compRef" :is-view="current === 3" />
+        <component
+          :is="currComp"
+          ref="compRef"
+          :is-view="current === 3"
+          v-bind="{ creationMode: $route.params.creationMode || 'internal' }"
+        />
       </keep-alive>
       <component-installer v-if="current == stepsLimit" :step-data="afterCreateRes" />
       <div class="step-action">
@@ -146,27 +151,32 @@
 <style lang="scss" scoped>
   .infra-creation {
     min-width: 600px;
+
     .header-card {
       min-height: 80px;
     }
+
     .steps-wrp {
       width: 100%;
       height: 100%;
       padding-inline: 6%;
     }
   }
+
   .step-title {
     h5 {
       margin: 0;
       font-size: 16px;
       font-weight: 500;
       letter-spacing: 0px;
-      line-height: 16px;
+      line-height: 24px;
     }
   }
+
   .step-content {
     padding-block: $space-md;
   }
+
   .step-action {
     text-align: end;
     margin-top: $space-md;

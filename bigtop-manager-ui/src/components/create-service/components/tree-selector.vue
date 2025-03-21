@@ -97,6 +97,7 @@
   <div class="sidebar">
     <a-tree
       v-if="$props.tree.length > 0"
+      :default-expand-all="true"
       :selected-keys="checkSelectedKeys"
       :selectable="$props.selectable"
       :tree-data="$props.tree"

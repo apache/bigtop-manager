@@ -19,14 +19,13 @@
 
 <script setup lang="ts">
   import { useI18n } from 'vue-i18n'
-  import { useRoute } from 'vue-router'
   import { computed, onActivated, reactive, ref, shallowRef } from 'vue'
   import { TableColumnType, Empty } from 'ant-design-vue'
   import { HostVO } from '@/api/hosts/types'
   import { getHosts } from '@/api/hosts'
   import useCreateService from './use-create-service'
-  import TreeSelector from './tree-selector.vue'
   import useBaseTable from '@/composables/use-base-table'
+  import TreeSelector from './tree-selector.vue'
   import type { FilterConfirmProps, FilterResetProps, TableRowSelection } from 'ant-design-vue/es/table/interface'
   import type { Key } from 'ant-design-vue/es/_util/type'
 
@@ -37,7 +36,6 @@
   }
 
   const { t } = useI18n()
-  const route = useRoute()
   const searchInputRef = ref()
   const currComp = ref<string>('')
   const fieldNames = shallowRef({
@@ -50,8 +48,14 @@
     searchedColumn: '',
     selectedRowKeys: []
   })
-  const { allComps, selectedServices, updateHostsForComponent } = useCreateService()
-  const serviceList = computed(() => selectedServices.value.map((v) => ({ ...v, selectable: false })))
+  const { clusterId, installedStore, allComps, selectedServices, updateHostsForComponent } = useCreateService()
+  const serviceList = computed(() =>
+    selectedServices.value.map((v) => ({
+      ...v,
+      selectable: false
+    }))
+  )
+
   const hostsOfCurrComp = computed((): HostVO[] => {
     const temp = currComp.value.split('/').at(-1)
     return allComps.value.has(temp) ? allComps.value.get(temp)?.hosts : []
@@ -93,13 +97,12 @@
 
   const getHostList = async () => {
     loading.value = true
-    const clusterId = route.params.id as unknown as number
     if (!paginationProps.value) {
       loading.value = false
       return
     }
     try {
-      const res = await getHosts({ ...filtersParams.value, clusterId })
+      const res = await getHosts({ ...filtersParams.value, clusterId: clusterId.value })
       dataSource.value = res.content.map((v) => ({ ...v, name: v.id, displayName: v.hostname }))
       paginationProps.value.total = res.total
       loading.value = false
@@ -116,13 +119,20 @@
     onChangeCallback: getHostList
   })
 
+  const getCheckboxProps: TableRowSelection['getCheckboxProps'] = (record) => ({
+    disabled: installedStore
+      .getInstalledNamesOrIdsOfServiceByKey(`${clusterId.value}`)
+      .includes(currComp.value.split('/')[0]),
+    name: record.hostname
+  })
+
   const onSelectChange: TableRowSelection['onChange'] = (selectedRowKeys, selectedRows) => {
     allComps.value.has(currComp.value.split('/').at(-1)) && updateHostsForComponent(currComp.value, selectedRows)
     state.selectedRowKeys = selectedRowKeys
   }
 
   const resetSelectedRowKeys = (key: string) => {
-    state.selectedRowKeys = allComps.value.has(key) ? allComps.value.get(key)?.hosts.map((v: HostVO) => v.id) : []
+    state.selectedRowKeys = allComps.value.has(key) ? allComps.value.get(key)?.hosts.map((v: HostVO) => v.hostname) : []
   }
 
   const treeSelectedChange = (keyPath: string) => {
@@ -149,12 +159,16 @@
         <div>{{ $t('service.select_host') }}</div>
       </div>
       <a-table
-        row-key="id"
+        row-key="hostname"
         :loading="loading"
         :data-source="dataSource"
         :columns="columns"
         :pagination="paginationProps"
-        :row-selection="{ selectedRowKeys: state.selectedRowKeys, onChange: onSelectChange }"
+        :row-selection="{
+          selectedRowKeys: state.selectedRowKeys,
+          getCheckboxProps: getCheckboxProps,
+          onChange: onSelectChange
+        }"
         @change="onChange"
       >
         <template #customFilterDropdown="{ setSelectedKeys, selectedKeys, confirm, clearFilters, column }">
@@ -199,6 +213,7 @@
   .component-assigner {
     display: grid;
     grid-template-columns: 1fr auto 3fr auto 1fr;
+
     .list-title {
       display: flex;
       height: 32px;
@@ -208,6 +223,7 @@
       padding-bottom: 16px;
       margin-bottom: 16px;
     }
+
     .divider {
       height: 100%;
       margin-inline: 16px;
@@ -224,11 +240,13 @@
     display: grid;
     gap: $space-sm;
     padding: $space-sm;
+
     &-option {
       width: 100%;
       display: grid;
       gap: $space-sm;
       grid-template-columns: 1fr 1fr;
+
       button {
         width: 100%;
       }

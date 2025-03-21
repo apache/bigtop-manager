@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { onActivated, onDeactivated, ref, shallowRef, watch } from 'vue'
+  import { computed, onActivated, onDeactivated, ref, shallowRef, watch } from 'vue'
   import { debounce } from 'lodash'
   import { Empty } from 'ant-design-vue'
   import TreeSelector from './tree-selector.vue'
@@ -35,7 +35,7 @@
     isView: false
   })
 
-  const { selectedServices } = useCreateService()
+  const { clusterId, installedStore, selectedServices } = useCreateService()
   const searchStr = ref('')
   const currService = ref<Key>('')
   const configs = ref<ServiceConfigReq[]>([])
@@ -61,6 +61,13 @@
       lg: { span: 18 }
     }
   })
+  const serviceList = computed(() => selectedServices.value)
+
+  const disabled = computed(() =>
+    installedStore
+      .getInstalledNamesOrIdsOfServiceByKey(`${clusterId.value}`)
+      .includes(currService.value.toString().split('/').at(-1)!)
+  )
 
   watch(
     () => props.isView,
@@ -118,7 +125,7 @@
   // }
 
   onActivated(() => {
-    debouncedOnSearch.value = debounce(filterConfigurations, 500)
+    debouncedOnSearch.value = debounce(filterConfigurations, 300)
     filterConfigs.value = [...configs.value]
   })
 
@@ -133,7 +140,7 @@
       <div class="list-title">
         <div>{{ $t('service.service_list') }}</div>
       </div>
-      <tree-selector :tree="selectedServices" :field-names="fieldNames" @change="handleChange" />
+      <tree-selector :tree="serviceList" :field-names="fieldNames" @change="handleChange" />
     </section>
     <a-divider type="vertical" class="divider" />
     <section>
@@ -146,7 +153,7 @@
         />
       </div>
       <a-empty v-if="filterConfigs.length === 0" :image="Empty.PRESENTED_IMAGE_SIMPLE" />
-      <a-form v-else :disabled="$props.isView" :label-wrap="true">
+      <a-form v-else :disabled="$props.isView || disabled" :label-wrap="true">
         <a-collapse v-model:active-key="activeKey" :bordered="false" :ghost="true">
           <a-collapse-panel v-for="config in filterConfigs" :key="config.id">
             <template #extra>
@@ -212,9 +219,11 @@
     background-color: rgb(255, 192, 105);
     padding: 0px;
   }
+
   .service-configurator-view {
     grid-template-columns: 1fr auto 4fr auto 1fr !important;
   }
+
   .service-configurator {
     display: grid;
     grid-template-columns: 1fr auto 4fr;
@@ -225,6 +234,7 @@
       background-color: $color-fill-quaternary;
       border-bottom: 1px solid $color-border-secondary;
     }
+
     :deep(.ant-collapse-content-box) {
       padding-inline: 24px !important;
     }
@@ -243,10 +253,12 @@
       border-bottom: 1px solid $color-border;
       padding-bottom: 16px;
       margin-bottom: 16px;
+
       .ant-input {
         flex: 0 1 160px;
       }
     }
+
     .divider {
       height: 100%;
       margin-inline: 16px;

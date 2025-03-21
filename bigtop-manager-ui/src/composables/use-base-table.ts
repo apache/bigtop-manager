@@ -24,12 +24,14 @@ import type { PaginationProps, TableColumnType, TableProps } from 'ant-design-vu
 import type { FilterValue } from 'ant-design-vue/es/table/interface'
 
 type PaginationType = PaginationProps | false | undefined
+
 export interface UseBaseTableProps<T = any> {
   columns: TableColumnType[]
   rows?: T[]
   pagination?: PaginationType
   onChangeCallback?: () => void
 }
+
 const useBaseTable = <T>(props: UseBaseTableProps<T>) => {
   const { columns, rows, pagination } = props
   const { t } = useI18n()
@@ -86,9 +88,6 @@ const useBaseTable = <T>(props: UseBaseTableProps<T>) => {
       showSizeChanger: true,
       pageSizeOptions: ['10', '20', '30', '40', '50'],
       showTotal: (total) => `${t('common.total', [total])}`
-    }
-    if (props.onChangeCallback) {
-      props.onChangeCallback()
     }
   }
 
