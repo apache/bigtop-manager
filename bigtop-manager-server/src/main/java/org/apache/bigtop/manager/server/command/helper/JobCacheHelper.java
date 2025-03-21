@@ -128,11 +128,6 @@ public class JobCacheHelper {
 
         ClusterPO clusterPO = clusterDao.findById(clusterId);
 
-        ComponentQuery query =
-                ComponentQuery.builder().clusterId(clusterId).build();
-
-        List<ComponentPO> componentPOList = componentDao.findByQuery(query);
-
         ClusterInfo clusterInfo = new ClusterInfo();
         clusterInfo.setName(clusterPO.getName());
         clusterInfo.setUserGroup(clusterPO.getUserGroup());
@@ -207,8 +202,7 @@ public class JobCacheHelper {
     }
 
     private static Map<String, List<String>> getComponentHostMap(Long clusterId) {
-        ComponentQuery query =
-                ComponentQuery.builder().clusterId(clusterId).build();
+        ComponentQuery query = ComponentQuery.builder().clusterId(clusterId).build();
         List<ComponentPO> componentPOList = componentDao.findByQuery(query);
         Map<String, List<String>> hostMap = new HashMap<>();
         componentPOList.forEach(x -> {
