@@ -132,6 +132,7 @@ public class ServiceAddJobTest {
 
         ServiceCommandDTO serviceCommandDTO = new ServiceCommandDTO();
         serviceCommandDTO.setServiceName("testName");
+        serviceCommandDTO.setInstalled(false);
 
         ArrayList<ServiceCommandDTO> serviceCommands = new ArrayList<>();
         serviceCommands.add(serviceCommandDTO);
