@@ -114,7 +114,7 @@ export interface ComponentHostReq {
 export interface ServiceConfigReq {
   id?: number
   name?: string
-  properties?: PropertyReq[]
+  properties: PropertyReq[]
   [property: string]: any
 }
 

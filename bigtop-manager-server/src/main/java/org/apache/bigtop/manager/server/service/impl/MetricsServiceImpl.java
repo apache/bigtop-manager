@@ -18,35 +18,77 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
+import org.apache.bigtop.manager.dao.po.ComponentPO;
+import org.apache.bigtop.manager.dao.po.HostPO;
+import org.apache.bigtop.manager.dao.query.ComponentQuery;
+import org.apache.bigtop.manager.dao.repository.ComponentDao;
+import org.apache.bigtop.manager.dao.repository.HostDao;
 import org.apache.bigtop.manager.server.proxy.PrometheusProxy;
 import org.apache.bigtop.manager.server.service.MetricsService;
 
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 
 import jakarta.annotation.Resource;
+import java.util.List;
 
 @Slf4j
 @Service
 public class MetricsServiceImpl implements MetricsService {
 
     @Resource
-    private PrometheusProxy prometheusProxy;
+    private HostDao hostDao;
+
+    @Resource
+    private ComponentDao componentDao;
 
     @Override
     public JsonNode queryAgentsHealthyStatus() {
-        return prometheusProxy.queryAgentsHealthyStatus();
+        PrometheusProxy proxy = getProxy();
+        if (proxy == null) {
+            return new ObjectMapper().createObjectNode();
+        }
+
+        return proxy.queryAgentsHealthyStatus();
     }
 
     @Override
     public JsonNode queryAgentsInfo(Long id, String interval) {
-        return prometheusProxy.queryAgentsInfo(id, interval);
+        PrometheusProxy proxy = getProxy();
+        if (proxy == null) {
+            return new ObjectMapper().createObjectNode();
+        }
+
+        String ipv4 = hostDao.findById(id).getIpv4();
+        return proxy.queryAgentsInfo(ipv4, interval);
     }
 
     @Override
     public JsonNode queryClustersInfo(Long clusterId, String interval) {
-        return prometheusProxy.queryClustersInfo(clusterId, interval);
+        PrometheusProxy proxy = getProxy();
+        if (proxy == null) {
+            return new ObjectMapper().createObjectNode();
+        }
+
+        List<String> ipv4s = hostDao.findAllByClusterId(clusterId).stream()
+                .map(HostPO::getIpv4)
+                .toList();
+        return proxy.queryClustersInfo(ipv4s, interval);
+    }
+
+    private PrometheusProxy getProxy() {
+        ComponentQuery query =
+                ComponentQuery.builder().name("prometheus_server").build();
+        List<ComponentPO> componentPOList = componentDao.findByQuery(query);
+        if (componentPOList.isEmpty()) {
+            return null;
+        } else {
+            ComponentPO componentPO = componentPOList.get(0);
+            HostPO hostPO = hostDao.findById(componentPO.getHostId());
+            return new PrometheusProxy(hostPO.getHostname());
+        }
     }
 }

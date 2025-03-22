@@ -29,13 +29,13 @@ export enum StatusColors {
 export enum CommonStatus {
   healthy = 'success',
   unhealthy = 'error',
-  unknow = 'warning'
+  unknown = 'warning'
 }
 
 export enum CommonStatusTexts {
   'healthy',
   'unhealthy',
-  'unknow'
+  'unknown'
 }
 
 export enum JobState {

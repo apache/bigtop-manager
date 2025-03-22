@@ -20,7 +20,16 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div> infra list</div>
+  <div>
+    <a-button
+      @click="
+        () => $router.push({ name: 'CreateInfraService', params: { id: 0, cluster: '', creationMode: 'public' } })
+      "
+    >
+      add Service
+    </a-button>
+    <span> infra list </span>
+  </div>
 </template>
 
 <style scoped></style>

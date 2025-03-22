@@ -26,7 +26,7 @@ export default {
   status: '状态',
   healthy: '健康',
   unhealthy: '不健康',
-  unknow: '未知',
+  unknown: '未知',
   success: '正常',
   failed: '异常',
   edit: '编辑',
@@ -106,5 +106,7 @@ export default {
   add: '添加{0}',
   reset: '重置',
   more_operations: '其他操作',
-  ok: '确认'
+  ok: '确认',
+  yes: '是',
+  no: '否'
 }

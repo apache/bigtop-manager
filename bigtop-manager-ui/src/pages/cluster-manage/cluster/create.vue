@@ -25,15 +25,15 @@
   import { message } from 'ant-design-vue'
   import { InstalledStatusVO, Status } from '@/api/hosts/types'
   import { execCommand } from '@/api/command'
+  import useSteps from '@/composables/use-steps'
   import ClusterBase from './components/cluster-base.vue'
   import ComponentInfo from './components/component-info.vue'
   import HostConfig from './components/host-config.vue'
   import CheckWorkflow from './components/check-workflow.vue'
-  import { ClusterCommandReq, HostReq, type CommandRequest, type CommandVO } from '@/api/command/types'
+  import { ClusterCommandReq, type CommandRequest, type CommandVO, HostReq } from '@/api/command/types'
 
   const { t } = useI18n()
   const menuStore = useMenuStore()
-  const current = ref(0)
   const compRef = ref<any>()
   const installing = ref(false)
   const stepData = ref<[Partial<ClusterCommandReq>, any, HostReq[], CommandVO]>([{}, {}, [], {}])
@@ -44,17 +44,16 @@
   const installStatus = shallowRef<InstalledStatusVO[]>([])
   const components = shallowRef<any[]>([ClusterBase, ComponentInfo, HostConfig, CheckWorkflow])
   const isInstall = computed(() => current.value === 2)
-  const stepsLimit = computed(() => steps.value.length - 1)
-  const hasUnknowHost = computed(() => stepData.value[2].filter((v) => v.status === Status.Unknown).length == 0)
+  const hasUnknownHost = computed(() => stepData.value[2].filter((v) => v.status === Status.Unknown).length == 0)
   const allInstallSuccess = computed(
     () =>
       stepData.value[2].length != 0 &&
       stepData.value[2].every((v) => v.status === Status.Success) &&
-      hasUnknowHost.value
+      hasUnknownHost.value
   )
   const isDone = computed(() => ['Successful', 'Failed'].includes(stepData.value[stepData.value.length - 1].state))
   const steps = computed(() => [
-    'cluster.cluster_management',
+    'cluster.cluster_info',
     'cluster.component_info',
     'cluster.host_config',
     'cluster.create'
@@ -63,6 +62,8 @@
   const getCompName = computed(() => {
     return components.value[current.value]
   })
+
+  const { current, stepsLimit, previousStep, nextStep } = useSteps(steps.value)
 
   const updateData = (val: Partial<ClusterCommandReq> | any | HostReq[]) => {
     stepData.value[current.value] = val
@@ -77,18 +78,6 @@
     } catch (error) {
       console.log('error :>> ', error)
       return false
-    }
-  }
-
-  const previousStep = () => {
-    if (current.value > 0) {
-      current.value = current.value - 1
-    }
-  }
-
-  const nextStep = async () => {
-    if (current.value < stepsLimit.value) {
-      current.value = current.value + 1
     }
   }
 
@@ -130,12 +119,7 @@
       const data = await getInstalledStatus()
       installStatus.value = data
       stepData.value[current.value] = mergeByHostname(stepData.value[current.value], data)
-      const allResolved = data.every((item) => item.status != Status.Installing)
-      if (allResolved) {
-        return true
-      } else {
-        return false
-      }
+      return data.every((item) => item.status != Status.Installing)
     } catch (error) {
       console.log('error :>> ', error)
     }
@@ -207,7 +191,7 @@
       <template v-for="stepItem in steps" :key="stepItem.title">
         <div v-show="steps[current] === stepItem" class="step-title">
           <h5>{{ $t(stepItem) }}</h5>
-          <section :class="{ 'step-content': current < stepsLimit }"> </section>
+          <section :class="{ 'step-content': current < stepsLimit }"></section>
         </div>
       </template>
       <component :is="getCompName" ref="compRef" :step-data="stepData[current]" @update-data="updateData" />
@@ -230,9 +214,9 @@
               {{ $t('common.next') }}
             </a-button>
           </template>
-          <a-button v-show="current === stepsLimit && isDone" type="primary" @click="onSave">{{
-            $t('common.done')
-          }}</a-button>
+          <a-button v-show="current === stepsLimit && isDone" type="primary" @click="onSave"
+            >{{ $t('common.done') }}
+          </a-button>
         </a-space>
       </div>
     </main-card>
@@ -242,15 +226,18 @@
 <style lang="scss" scoped>
   .cluster-create {
     min-width: 600px;
+
     .header-card {
       min-height: 80px;
     }
+
     .steps-wrp {
       width: 100%;
       height: 100%;
       padding-inline: 6%;
     }
   }
+
   .step-title {
     h5 {
       margin: 0;
@@ -260,9 +247,11 @@
       line-height: 16px;
     }
   }
+
   .step-content {
     padding-block: $space-md;
   }
+
   .step-action {
     text-align: end;
     margin-top: $space-md;

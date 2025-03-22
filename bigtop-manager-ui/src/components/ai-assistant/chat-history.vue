@@ -23,7 +23,7 @@
   import { formatTime } from '@/utils/tools'
   import { EllipsisOutlined } from '@ant-design/icons-vue'
   import type { ChatThread, ThreadId } from '@/api/ai-assistant/types'
-  import { message, Modal } from 'ant-design-vue'
+  import { message, Modal, Empty } from 'ant-design-vue'
   import { useI18n } from 'vue-i18n'
 
   interface Props {
@@ -153,7 +153,7 @@
         </a-button>
       </template>
       <main>
-        <a-empty v-if="threads.length == 0" />
+        <a-empty v-if="threads.length == 0" :image="Empty.PRESENTED_IMAGE_SIMPLE" />
         <a-menu v-else v-model:selected-keys="selectKey" @select="handleSelect">
           <a-menu-item v-for="thread in threads" :key="thread.threadId" :title="thread.name">
             <div class="chat-history-item">
@@ -170,7 +170,7 @@
           <a-typography-title :level="5">{{ $t(title) }}</a-typography-title>
         </header>
         <main>
-          <a-empty v-if="threads.length == 0" />
+          <a-empty v-if="threads.length == 0" :image="Empty.PRESENTED_IMAGE_SIMPLE" />
           <a-menu v-else v-model:selected-keys="selectKey" @select="handleSelect">
             <a-menu-item v-for="(thread, idx) in threads" :key="thread.threadId" :title="thread.name">
               <div class="chat-history-item">

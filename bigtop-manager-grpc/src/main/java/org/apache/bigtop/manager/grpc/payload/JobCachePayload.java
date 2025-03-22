@@ -29,6 +29,8 @@ import java.util.Map;
 @Data
 public class JobCachePayload {
 
+    private Long clusterId;
+
     private ClusterInfo clusterInfo;
 
     private Map<String, String> userInfo;

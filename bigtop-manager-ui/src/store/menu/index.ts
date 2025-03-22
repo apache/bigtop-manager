@@ -40,7 +40,7 @@ export const useMenuStore = defineStore(
     const headerSelectedKey = ref(headerMenus.value[0].path)
 
     const hasCluster = computed(() => clusters.value.length > 0)
-    const isClusterCreateVisible = computed(() => RouteExceptions.SPECIAL_ROUTE_PATH.includes(route.matched[0].path))
+    const isCreateClusterVisible = computed(() => RouteExceptions.SPECIAL_ROUTE_PATH.includes(route.matched[0].path))
     const isDynamicRouteMatched = computed(() => {
       const path = route.matched.at(-1)?.path
       return path?.includes(RouteExceptions.DYNAMIC_ROUTE_MATCH)
@@ -63,7 +63,10 @@ export const useMenuStore = defineStore(
 
     watchEffect(() => {
       // resolve highlight menu
-      const activeMenu = route.meta.activeMenu || route.path
+      let activeMenu = route.meta.activeMenu || route.path
+      if (route.name === 'CreateService') {
+        activeMenu = route.path.split('/').slice(0, -2).join('/')
+      }
       const matchedNames = [RouteExceptions.SPECIAL_ROUTE_NAME, RouteExceptions.DEFAULT_ROUTE_NAME] as string[]
       headerSelectedKey.value = route.matched[0].path
 
@@ -160,7 +163,7 @@ export const useMenuStore = defineStore(
       siderMenus,
       headerSelectedKey,
       siderMenuSelectedKey,
-      isClusterCreateVisible,
+      isCreateClusterVisible,
       isDynamicRouteMatched,
       setUpMenu,
       cleanUpMenu,

@@ -57,10 +57,6 @@ springdoc:
   swagger-ui:
     default-models-expand-depth: -1
 
-monitoring:
-  prometheus-host: "http://localhost:9090"
-  agent-host-job-name: "bm-agent-host"
-
 pagehelper:
   reasonable: false
   params: count=countSql
