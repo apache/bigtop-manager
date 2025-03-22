@@ -61,11 +61,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.bigtop</groupId>
-            <artifactId>bigtop-manager-ai-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.bigtop</groupId>
-            <artifactId>bigtop-manager-ai-assistant</artifactId>
+            <artifactId>bigtop-manager-ai</artifactId>
         </dependency>
 
         <dependency>
