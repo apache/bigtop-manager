@@ -29,7 +29,13 @@
       <a-button type="primary" @click="handleSetSource">{{ $t('cluster.config_source') }}</a-button>
     </div>
     <div>
-      <a-table :loading="loading" :data-source="store.data" :columns="columns" :pagination="paginationProps" @change="onChange">
+      <a-table 
+        :loading="loading" 
+        :data-source="stacks.filter((ele) => { return ele.stackName.toUpperCase() === store.stackSelected.toUpperCase() })" 
+        :columns="columns" 
+        :pagination="paginationProps" 
+        @change="onChange"
+      >
         <template #bodyCell="{ column }">
           <template v-if="column.key === 'stack'">
             <span> {{ `${store.stackSelected}-${currentStack?.stackVersion}` }} </span>
@@ -41,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, computed } from 'vue';
+import { reactive, computed, onMounted } from 'vue';
 import useBaseTable from '@/composables/use-base-table';
 import type { TableColumnType } from 'ant-design-vue';
 import { useI18n } from 'vue-i18n'
@@ -56,11 +62,8 @@ const store = reactive({
   loading: false,
   stackSelected: 'Bigtop',
   stackGroup: ['Bigtop', 'Infra', 'Extra'],
-  data: [
-    { id: 1 }
-  ],
 })
- const currentStack = computed(() => stacks.value.find((stack) => stack.stackName === store.stackSelected))
+const currentStack = computed(() => stacks.value.find((stack) => stack.stackName.toUpperCase() === store.stackSelected.toUpperCase() ))
 const columns = computed((): TableColumnType[] => [
     {
       title: '#',
@@ -72,13 +75,13 @@ const columns = computed((): TableColumnType[] => [
     },
     {
       title: t('common.name'),
-      dataIndex: 'displayName',
+      dataIndex: 'stackName',
       width: '20%',
       ellipsis: true
     },
     {
       title: t('common.version'),
-      dataIndex: 'version',
+      dataIndex: 'stackVersion',
       width: '15%',
       ellipsis: true
     },
@@ -96,14 +99,18 @@ const columns = computed((): TableColumnType[] => [
     },
 ])
   
-const { loading, paginationProps, onChange, resetState } = useBaseTable({
+const { loading, paginationProps, onChange } = useBaseTable({
   columns: columns.value,
-  rows: store.data
+  rows: stacks.value
 })
 
 const handleSetSource = () => {
   // setSourceRef.value?.handleOpen()
 }
+
+onMounted(() =>{
+  stackStore.loadStacks();
+})
 </script>
 
 <style lang="scss" scoped>
@@ -116,7 +123,7 @@ const handleSetSource = () => {
   .cluster-conponents-header {
     display: flex;
     justify-content: space-between;
-    margin-bottom: $space-md;
+    margin: $space-md 0;
   }
 }
 </style>
