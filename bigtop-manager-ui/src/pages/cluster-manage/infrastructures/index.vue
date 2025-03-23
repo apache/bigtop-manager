@@ -18,49 +18,56 @@
 -->
 
 <template>
-  <div class="infra-header">
-    <div>
-      <div class="menu-title">{{ $t('menu.infra') }}</div>
-      <div class="menu-info">{{ $t('infra.info') }}</div>
+  <div>
+    <div class="infra-header">
+      <div>
+        <div class="menu-title">{{ $t('menu.infra') }}</div>
+        <div class="menu-info">{{ $t('infra.info') }}</div>
+      </div>
+      <a-button
+        type="primary"
+        @click=" () => $router.push({ name: 'CreateInfraService', params: { id: 0, cluster: '', creationMode: 'public' } })"
+      >
+        {{ $t('infra.action') }}
+      </a-button>
     </div>
-    <a-button type="primary">{{ $t('infra.action') }}</a-button>
-  </div>
-  <div class="infra-body">
-    <filter-form :filter-items="filterFormItems" @filter="getServices" />
-    <a-empty v-if="store.services.length == 0" style="width: 100%" />
-    <template v-else>
-      <a-card v-for="item in store.services" :key="item.name" :hoverable="true" class="service-item">
-        <div class="header">
-          <div class="header-base-wrp">
-            <a-avatar v-if="item.name" :src="usePngImage(item.name.toLowerCase())" :size="42" class="header-icon" />
-            <div class="header-base-title">
-              <span>{{ `${item.displayName}` }}</span>
-              <span class="small-gray">{{ item.version }}</span>
+    <div class="infra-body">
+      <filter-form :filter-items="filterFormItems" @filter="getServices" />
+      <a-empty v-if="store.services.length == 0" style="width: 100%" />
+      <template v-else>
+        <a-card v-for="item in store.services" :key="item.name" :hoverable="true" class="service-item">
+          <div class="header">
+            <div class="header-base-wrp">
+              <a-avatar v-if="item.name" :src="usePngImage(item.name.toLowerCase())" :size="42" class="header-icon" />
+              <div class="header-base-title">
+                <span>{{ `${item.displayName}` }}</span>
+                <span class="small-gray">{{ item.version }}</span>
+              </div>
+              <div class="header-base-status">
+                <a-tag :color="CommonStatus[statusColors[item.status]]">
+                  <div class="header-base-status-inner">
+                    <status-dot :color="CommonStatus[statusColors[item.status]]" />
+                    <span class="small">{{ $t(`common.${CommonStatusTexts[item.status]}`) }}</span>
+                  </div>
+                </a-tag>
+              </div>
             </div>
-            <div class="header-base-status">
-              <a-tag :color="CommonStatus[statusColors[item.status]]">
-                <div class="header-base-status-inner">
-                  <status-dot :color="CommonStatus[statusColors[item.status]]" />
-                  <span class="small">{{ $t(`common.${CommonStatusTexts[item.status]}`) }}</span>
-                </div>
-              </a-tag>
+            <div class="header-restart-status">
+              <span class="small-gray">{{ `${$t('common.restart')}` }}</span>
+              <status-dot :color="CommonStatus[statusColors[item.status]]" />
+              <span class="small">{{ `${item.restartFlag ? $t('common.required') : $t('common.not_required')}` }}</span>
             </div>
           </div>
-          <div class="header-restart-status">
-            <span class="small-gray">{{ `${$t('common.restart')}` }}</span>
-            <status-dot :color="CommonStatus[statusColors[item.status]]" />
-            <span class="small">{{ `${item.restartFlag ? $t('common.required') : $t('common.not_required')}` }}</span>
+          <div class="item-content">
+            <button-group :auto="true" :space="0" :groups="actionGroups">
+              <template #icon="{ item: groupItem }">
+                <svg-icon :name="groupItem.icon || ''" />
+              </template>
+            </button-group>
           </div>
-        </div>
-        <div class="item-content">
-          <button-group :auto="true" :space="0" :groups="actionGroups">
-            <template #icon="{ item: groupItem }">
-              <svg-icon :name="groupItem.icon || ''" />
-            </template>
-          </button-group>
-        </div>
-      </a-card>
-    </template>
+        </a-card>
+      </template>
+    </div>
   </div>
 </template>
 <script setup lang="ts">

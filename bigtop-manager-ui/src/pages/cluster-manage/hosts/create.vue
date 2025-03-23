@@ -49,14 +49,15 @@
   const hiddenItems = ref<string[]>([])
   const autoFormRef = ref<Comp.AutoFormInstance | null>(null)
   const formValue = ref<HostReq & { hostname?: string }>({})
+  const fileName = ref('')
   const { locale } = storeToRefs(localeStore)
   const isEdit = computed(() => mode.value === 'EDIT')
 
-  const checkPassword = async (_rule: Rule, value: string) => {
+  const checkSshPassword = async (_rule: Rule, value: string) => {
     if (!value) {
       return Promise.reject(t('common.enter_error', [`${t('host.confirm_password')}`.toLowerCase()]))
     }
-    if (value != formValue.value?.sshKeyPassword) {
+    if (value != formValue.value?.sshPassword) {
       return Promise.reject(t('common.password_not_match'))
     } else {
       return Promise.resolve()
@@ -71,12 +72,12 @@
     }
   }
 
-  const formItemsForPassword = computed((): FormItemState[] => [
+  const formItemsForSshPassword = computed((): FormItemState[] => [
     {
       type: 'inputPassword',
-      field: 'sshKeyPassword',
+      field: 'sshPassword',
       formItemProps: {
-        name: 'sshKeyPassword',
+        name: 'sshPassword',
         label: t('host.password_auth'),
         rules: [
           {
@@ -92,14 +93,14 @@
     },
     {
       type: 'inputPassword',
-      field: 'sshKeyPasswordAgain',
+      field: 'sshPasswordAgain',
       formItemProps: {
-        name: 'sshKeyPasswordAgain',
+        name: 'sshPasswordAgain',
         label: t('host.confirm_password'),
         rules: [
           {
             required: true,
-            validator: checkPassword,
+            validator: checkSshPassword,
             trigger: 'blur'
           }
         ]
@@ -110,7 +111,7 @@
     }
   ])
 
-  const formItemsForKey = computed((): FormItemState[] => [
+  const formItemsForSshKeyPassword = computed((): FormItemState[] => [
     {
       type: 'radio',
       field: 'inputType',
@@ -163,10 +164,10 @@
       }
     },
     {
-      type: 'input',
-      field: 'keyPassword',
+      type: 'inputPassword',
+      field: 'sshKeyPassword',
       formItemProps: {
-        name: 'keyPassword',
+        name: 'sshKeyPassword',
         label: t('host.key_password')
       },
       controlProps: {
@@ -174,10 +175,10 @@
       }
     },
     {
-      type: 'textarea',
-      field: 'keyPasswordAgain',
+      type: 'inputPassword',
+      field: 'sshKeyPasswordAgain',
       formItemProps: {
-        name: 'keyPasswordAgain',
+        name: 'sshKeyPasswordAgain',
         label: t('host.confirm_key_password'),
         rules: [
           {
@@ -296,11 +297,11 @@
   const filterFormItems = computed((): FormItemState[] => {
     if (formValue.value.authType === '1') {
       const data = [...formItems.value]
-      data.splice(2, 0, ...formItemsForPassword.value)
+      data.splice(2, 0, ...formItemsForSshPassword.value)
       return data
     } else if (formValue.value.authType === '2') {
       const data = [...formItems.value]
-      data.splice(2, 0, ...formItemsForKey.value)
+      data.splice(2, 0, ...formItemsForSshKeyPassword.value)
       return data
     }
     return [...formItems.value]
@@ -428,6 +429,7 @@
       authType: '1',
       inputType: '1'
     }
+    fileName.value = ''
     open.value = false
   }
 
@@ -452,15 +454,15 @@
       formData.append('file', file)
       const data = await uploadFile(formData)
       formValue.value!.sshKeyFilename = data
+      fileName.value = file.name
       onSuccess(data, file)
       message.success(t('common.upload_success'))
     } catch (error) {
       onError(error)
       message.error(t('common.upload_failed'))
+      fileName.value = ''
     }
   }
-
-  const fileList = ref()
 
   defineExpose({
     handleOpen
@@ -492,7 +494,7 @@
         <template #sshKeyFilenameSlot="{ item }">
           <a-form-item v-bind="item.formItemProps">
             <a-upload
-              :file-list="fileList"
+              accept="text/plain"
               :before-upload="beforeUpload"
               :custom-request="customRequest"
               :show-upload-list="false"
@@ -502,34 +504,9 @@
                 {{ $t('common.upload_file') }}
               </a-button>
             </a-upload>
+            <span class="filename">{{ fileName }}</span>
           </a-form-item>
         </template>
-        <!-- <template #agentDirSlot="{ item, state }">
-          <a-form-item>
-            <template #label>
-              <div class="question">
-                <span>
-                  {{ item.formItemProps?.label }}
-                </span>
-                <svg-icon style="padding: 1px 0 0 0" name="question" />
-              </div>
-            </template>
-            <a-input v-bind="item.controlProps" v-model:value="state[item.field]" />
-          </a-form-item>
-        </template> -->
-        <!-- <template #grpcPortSlot="{ item, state }">
-          <a-form-item>
-            <template #label>
-              <div class="question">
-                <span>
-                  {{ item.formItemProps?.label }}
-                </span>
-                <svg-icon style="padding: 1px 0 0 0" name="question" />
-              </div>
-            </template>
-            <a-input v-bind="item.controlProps" v-model:value="state[item.field]" />
-          </a-form-item>
-        </template> -->
       </auto-form>
       <template #footer>
         <footer>
@@ -550,6 +527,10 @@
 <style lang="scss" scoped>
   .question {
     cursor: pointer;
+  }
+  .filename {
+    color: $color-primary;
+    padding-inline: $space-sm;
   }
   footer {
     width: 100%;

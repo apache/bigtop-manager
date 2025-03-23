@@ -23,18 +23,19 @@
   import LayoutHeader from '@/layouts/header.vue'
   import LayoutSider from '@/layouts/sider.vue'
   import { useUserStore } from '@/store/user'
-  // import { useClusterStore } from '@/store/cluster'
-  import { useMenuStore } from '@/store/menu/index'
+  import { useMenuStore } from '@/store/menu'
   import { useStackStore } from '@/store/stack'
+  import { useInstalledStore } from '@/store/installed'
   import { storeToRefs } from 'pinia'
 
   const userStore = useUserStore()
   const menuStore = useMenuStore()
-  // const clusterStore = useClusterStore()
+  const installedStore = useInstalledStore()
   const stackStore = useStackStore()
   const { headerSelectedKey, headerMenus, siderMenuSelectedKey, siderMenus } = storeToRefs(menuStore)
 
-  onMounted(async () => {
+  onMounted(() => {
+    installedStore.getServicesOfInfra()
     userStore.getUserInfo()
     menuStore.setUpMenu()
     stackStore.loadStacks()
@@ -55,7 +56,7 @@
         @on-sider-click="menuStore.onSiderClick"
       />
       <a-layout class="layout-inner">
-        <router-view />
+        <router-view :key="$route.fullPath" />
         <layout-footer />
       </a-layout>
     </a-layout>
@@ -65,7 +66,11 @@
 <style lang="scss" scoped>
   .layout {
     height: 100vh;
+
     &-inner {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
       padding: $space-lg $space-md;
       overflow: auto;
     }

@@ -18,5 +18,19 @@
  */
 export default {
   name: 'Service Name',
-  required_restart: 'Restart'
+  required_restart: 'Restart',
+  select_service: 'Services',
+  assign_component: 'Assign Component',
+  configure_service: 'Configure Service',
+  service_overview: 'Service Overview',
+  install_component: 'Install',
+  service_list: 'Service List',
+  pending_installation_services: 'Selected Services',
+  select_host: 'Select  Host',
+  host_preview: 'Host Preview',
+  please_enter_search_keyword: 'Please enter search keyword',
+  component_host_assignment: 'Assign at least one host for each component',
+  service_selection: 'Please select services to install',
+  dependencies_conflict_msg: '{0} requires infra service {1} to be installed first',
+  dependencies_msg: '{0} requires service {1}, add it also?'
 }

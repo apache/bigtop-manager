@@ -48,7 +48,7 @@ public class StageContext {
     public static StageContext fromCommandDTO(CommandDTO commandDTO) {
         StageContext context = new StageContext();
 
-        if (commandDTO.getClusterId() != null) {
+        if (commandDTO.getClusterId() != null && commandDTO.getClusterId() != 0) {
             ClusterDao clusterDao = SpringContextHolder.getBean(ClusterDao.class);
             ClusterPO clusterPO = clusterDao.findById(commandDTO.getClusterId());
             context.setClusterId(clusterPO.getId());

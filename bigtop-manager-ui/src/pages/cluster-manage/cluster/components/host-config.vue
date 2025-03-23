@@ -165,7 +165,7 @@
           ...item,
           key: generateRandomId(),
           hostname: v,
-          status: 'UNKNOW'
+          status: 'UNKNOWN'
         }
       }) as HostReq[]
       dataSource.value?.unshift(...items)
@@ -230,7 +230,7 @@
           <svg-icon :name="record.status.toLowerCase()" />
           <span :title="`${record.message ? record.message : ''}`">
             {{ `${$t(`common.${record.status.toLowerCase()}`)}` }}
-            {{ record.message ? `:  ${record.message}` : '' }}
+            {{ record.message && record.status.toLowerCase() === 'failed' ? `:  ${record.message}` : '' }}
           </span>
         </template>
         <template v-if="column.key === 'operation'">

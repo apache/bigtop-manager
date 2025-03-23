@@ -19,6 +19,7 @@
 
 <script setup lang="ts">
   import { computed, onActivated, shallowRef, toRefs, useAttrs } from 'vue'
+  import { Empty } from 'ant-design-vue'
   import { usePngImage } from '@/utils/tools'
   import { useI18n } from 'vue-i18n'
   import { useServiceStore } from '@/store/service'
@@ -36,8 +37,9 @@
   const statusColors = shallowRef<Record<ServiceStatusType, keyof typeof CommonStatusTexts>>({
     1: 'healthy',
     2: 'unhealthy',
-    3: 'unknow'
+    3: 'unknown'
   })
+
   const actionGroups = shallowRef<GroupItem[]>([
     {
       action: 'start',
@@ -72,7 +74,7 @@
   const filterFormItems = computed((): FilterFormItem[] => [
     {
       type: 'search',
-      key: 'serviceName',
+      key: 'name',
       label: t('service.name')
     },
     {
@@ -82,11 +84,11 @@
       options: [
         {
           label: t('common.required'),
-          value: 1
+          value: true
         },
         {
           label: t('common.not_required'),
-          value: 2
+          value: false
         }
       ]
     },
@@ -123,8 +125,8 @@
 <template>
   <a-spin :spinning="loading" class="service">
     <filter-form :filter-items="filterFormItems" @filter="getServices" />
-    <a-empty v-if="services.length == 0" style="width: 100%" />
-    <template v-else>
+    <a-empty v-if="services.length == 0" style="width: 100%" :image="Empty.PRESENTED_IMAGE_SIMPLE" />
+    <div v-else class="service-item-wrp">
       <a-card v-for="item in services" :key="item.id" :hoverable="true" class="service-item">
         <div class="header">
           <div class="header-base-wrp">
@@ -134,10 +136,10 @@
               <span class="small-gray">{{ item.version }}</span>
             </div>
             <div class="header-base-status">
-              <a-tag :color="statusColors[item.status]">
+              <a-tag :color="CommonStatus[statusColors[item.status]]">
                 <div class="header-base-status-inner">
                   <status-dot :color="CommonStatus[statusColors[item.status]]" />
-                  <span class="small">{{ $t(`common.${CommonStatusTexts[item.status]}`) }}</span>
+                  <span class="small">{{ $t(`common.${statusColors[item.status]}`) }}</span>
                 </div>
               </a-tag>
             </div>
@@ -156,7 +158,7 @@
           </button-group>
         </div>
       </a-card>
-    </template>
+    </div>
   </a-spin>
 </template>
 
@@ -171,10 +173,10 @@
     color: rgba(0, 0, 0, 0.45);
   }
 
-  .service {
+  .service-item-wrp {
     display: flex;
     flex-wrap: wrap;
-    gap: 16px;
+    gap: 19px;
   }
 
   .service-item {

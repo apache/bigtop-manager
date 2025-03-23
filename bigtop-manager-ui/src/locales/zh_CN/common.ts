@@ -26,7 +26,7 @@ export default {
   status: '状态',
   healthy: '健康',
   unhealthy: '不健康',
-  unknow: '未知',
+  unknown: '未知',
   success: '正常',
   failed: '异常',
   edit: '编辑',

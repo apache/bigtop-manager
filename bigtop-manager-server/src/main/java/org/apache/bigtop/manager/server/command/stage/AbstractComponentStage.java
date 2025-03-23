@@ -70,14 +70,14 @@ public abstract class AbstractComponentStage extends AbstractStage {
 
         TaskContext taskContext = new TaskContext();
         taskContext.setHostname(hostname);
-        taskContext.setClusterId(clusterPO.getId());
-        taskContext.setClusterName(clusterPO.getName());
+        taskContext.setClusterId(clusterPO == null ? null : clusterPO.getId());
+        taskContext.setClusterName(clusterPO == null ? null : clusterPO.getName());
         taskContext.setServiceName(serviceDTO.getName());
         taskContext.setComponentName(componentDTO.getName());
         taskContext.setComponentDisplayName(componentDTO.getDisplayName());
         taskContext.setServiceUser(serviceDTO.getUser());
-        taskContext.setUserGroup(clusterPO.getUserGroup());
-        taskContext.setRootDir(clusterPO.getRootDir());
+        taskContext.setUserGroup(clusterPO == null ? null : clusterPO.getUserGroup());
+        taskContext.setRootDir(clusterPO == null ? null : clusterPO.getRootDir());
 
         Map<String, Object> properties = new HashMap<>();
         properties.put("clusterHosts", getClusterHosts());

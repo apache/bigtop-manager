@@ -25,6 +25,7 @@
   import { execCommand } from '@/api/command'
   import { Command } from '@/api/command/types'
   import { CommonStatus, CommonStatusTexts } from '@/enums/state'
+  import { useRouter } from 'vue-router'
   import Overview from './overview.vue'
   import Service from './service.vue'
   import Host from './host.vue'
@@ -35,13 +36,14 @@
   import type { ClusterStatusType } from '@/api/cluster/types'
 
   const { t } = useI18n()
+  const router = useRouter()
   const clusterStore = useClusterStore()
   const { currCluster, loading } = storeToRefs(clusterStore)
   const activeKey = ref('1')
   const statusColors = shallowRef<Record<ClusterStatusType, keyof typeof CommonStatusTexts>>({
     1: 'healthy',
     2: 'unhealthy',
-    3: 'unknow'
+    3: 'unknown'
   })
   const tabs = computed((): TabItem[] => [
     {
@@ -95,8 +97,8 @@
   ])
 
   const getCompName = computed(() => {
-    const componnts = [Overview, Service, Host, User, Job]
-    return componnts[parseInt(activeKey.value) - 1]
+    const components = [Overview, Service, Host, User, Job]
+    return components[parseInt(activeKey.value) - 1]
   })
 
   const dropdownMenuClick: GroupItem['dropdownMenuClickEvent'] = async ({ key }) => {
@@ -106,15 +108,15 @@
         clusterId: currCluster.value.id,
         commandLevel: 'cluster'
       })
-      clusterStore.loadClusters()
-      clusterStore.getClusterDetail()
+      await clusterStore.loadClusters()
+      await clusterStore.getClusterDetail()
     } catch (error) {
       console.log('error :>> ', error)
     }
   }
 
   const addService: GroupItem['clickEvent'] = () => {
-    console.log('add :>> ')
+    router.push({ name: 'CreateService', params: { creationMode: 'internal' } })
   }
 
   onMounted(() => {
