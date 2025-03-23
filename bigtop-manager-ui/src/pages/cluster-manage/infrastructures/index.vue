@@ -29,7 +29,7 @@
     <filter-form :filter-items="filterFormItems" @filter="getServices" />
     <a-empty v-if="store.services.length == 0" style="width: 100%" />
     <template v-else>
-      <a-card v-for="item in store.services" :key="item.id" :hoverable="true" class="service-item">
+      <a-card v-for="item in store.services" :key="item.name" :hoverable="true" class="service-item">
         <div class="header">
           <div class="header-base-wrp">
             <a-avatar v-if="item.name" :src="usePngImage(item.name.toLowerCase())" :size="42" class="header-icon" />
