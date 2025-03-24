@@ -27,7 +27,6 @@ import org.apache.bigtop.manager.dao.repository.ServiceConfigSnapshotDao;
 import org.apache.bigtop.manager.dao.repository.ServiceDao;
 import org.apache.bigtop.manager.server.command.job.AbstractJob;
 import org.apache.bigtop.manager.server.command.job.JobContext;
-import org.apache.bigtop.manager.server.command.stage.Stage;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 import org.apache.bigtop.manager.server.model.dto.command.ServiceCommandDTO;
 
@@ -84,10 +83,5 @@ public abstract class AbstractServiceJob extends AbstractJob {
         return jobContext.getCommandDTO().getServiceCommands().stream()
                 .map(ServiceCommandDTO::getServiceName)
                 .toList();
-    }
-
-    protected void setJobContextAndStagesForTest(JobContext jobContext, List<Stage> stages) {
-        this.jobContext = jobContext;
-        this.stages = stages;
     }
 }

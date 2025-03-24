@@ -145,7 +145,7 @@ public class ServiceAddJob extends AbstractServiceJob {
         return "Add services";
     }
 
-    protected void saveService(ServiceCommandDTO serviceCommand) {
+    private void saveService(ServiceCommandDTO serviceCommand) {
         if (serviceCommand.getInstalled()) {
             return;
         }

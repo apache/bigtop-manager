@@ -23,7 +23,6 @@ import org.apache.bigtop.manager.dao.repository.HostDao;
 import org.apache.bigtop.manager.dao.repository.ServiceDao;
 import org.apache.bigtop.manager.server.command.job.AbstractJob;
 import org.apache.bigtop.manager.server.command.job.JobContext;
-import org.apache.bigtop.manager.server.command.stage.Stage;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 
 import java.util.HashMap;
@@ -64,10 +63,5 @@ public abstract class AbstractComponentJob extends AbstractJob {
         });
 
         return componentHostsMap;
-    }
-
-    protected void setJobContextAndStagesForTest(JobContext jobContext, List<Stage> stages) {
-        this.jobContext = jobContext;
-        this.stages = stages;
     }
 }

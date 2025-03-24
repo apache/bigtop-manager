@@ -67,8 +67,8 @@ public class ClusterAddJob extends AbstractClusterJob {
     @Override
     protected void createStages() {
         StageContext stageContext = StageContext.fromCommandDTO(jobContext.getCommandDTO());
-        stages.add(getHostCheckStage(stageContext));
-        stages.add(getSetupJdkStage(stageContext));
+        stages.add(new HostCheckStage(stageContext));
+        stages.add(new SetupJdkStage(stageContext));
     }
 
     @Override
@@ -91,7 +91,7 @@ public class ClusterAddJob extends AbstractClusterJob {
         return "Add cluster";
     }
 
-    protected void saveCluster() {
+    private void saveCluster() {
         CommandDTO commandDTO = jobContext.getCommandDTO();
         ClusterDTO clusterDTO = ClusterConverter.INSTANCE.fromCommand2DTO(commandDTO.getClusterCommand());
         clusterPO = clusterDao.findByName(clusterDTO.getName());
@@ -103,7 +103,7 @@ public class ClusterAddJob extends AbstractClusterJob {
         clusterDao.save(clusterPO);
     }
 
-    protected void saveHosts() {
+    private void saveHosts() {
         CommandDTO commandDTO = jobContext.getCommandDTO();
         List<HostDTO> hostDTOList = commandDTO.getClusterCommand().getHosts();
         for (HostDTO hostDTO : hostDTOList) {
@@ -112,7 +112,7 @@ public class ClusterAddJob extends AbstractClusterJob {
         }
     }
 
-    protected void linkJobToCluster() {
+    private void linkJobToCluster() {
         JobPO jobPO = getJobPO();
         jobPO.setClusterId(clusterPO.getId());
         jobDao.partialUpdateById(jobPO);
@@ -128,13 +128,5 @@ public class ClusterAddJob extends AbstractClusterJob {
                 taskDao.partialUpdateById(taskPO);
             }
         }
-    }
-
-    protected SetupJdkStage getSetupJdkStage(StageContext stageContext) {
-        return new SetupJdkStage(stageContext);
-    }
-
-    protected HostCheckStage getHostCheckStage(StageContext stageContext) {
-        return new HostCheckStage(stageContext);
     }
 }

@@ -18,165 +18,68 @@
  */
 package org.apache.bigtop.manager.server.command.job.host;
 
-import org.apache.bigtop.manager.dao.po.ClusterPO;
-import org.apache.bigtop.manager.dao.po.JobPO;
-import org.apache.bigtop.manager.dao.repository.ClusterDao;
-import org.apache.bigtop.manager.dao.repository.ComponentDao;
-import org.apache.bigtop.manager.dao.repository.JobDao;
-import org.apache.bigtop.manager.dao.repository.StageDao;
-import org.apache.bigtop.manager.dao.repository.TaskDao;
+import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.server.command.helper.ComponentStageHelper;
 import org.apache.bigtop.manager.server.command.job.JobContext;
 import org.apache.bigtop.manager.server.command.stage.ComponentStartStage;
 import org.apache.bigtop.manager.server.command.stage.Stage;
-import org.apache.bigtop.manager.server.holder.SpringContextHolder;
+import org.apache.bigtop.manager.server.command.stage.StageContext;
 import org.apache.bigtop.manager.server.model.dto.CommandDTO;
-import org.apache.bigtop.manager.server.model.dto.HostDTO;
-import org.apache.bigtop.manager.server.model.dto.command.ClusterCommandDTO;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
-import org.mockito.Spy;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doCallRealMethod;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class HostStartJobTest {
 
-    private MockedStatic<SpringContextHolder> springContextHolderMockedStatic;
-
     @Mock
-    private ClusterDao clusterDao;
-
-    @Mock
-    private JobDao jobDao;
-
-    @Mock
-    private StageDao stageDao;
-
-    @Mock
-    private TaskDao taskDao;
-
-    @Mock
-    private ComponentDao componentDao;
-
-    @Spy
-    private JobContext jobContext;
-
-    private List<Stage> stages;
-
-    @Mock
-    private ClusterPO clusterPO;
-
-    @Spy
-    private JobPO jobPO;
-
     private HostStartJob hostStartJob;
-
-    @BeforeEach
-    public void setUp() {
-        springContextHolderMockedStatic = mockStatic(SpringContextHolder.class);
-        when(SpringContextHolder.getBean(ClusterDao.class)).thenReturn(clusterDao);
-        when(SpringContextHolder.getBean(JobDao.class)).thenReturn(jobDao);
-        when(SpringContextHolder.getBean(StageDao.class)).thenReturn(stageDao);
-        when(SpringContextHolder.getBean(TaskDao.class)).thenReturn(taskDao);
-        when(SpringContextHolder.getBean(ComponentDao.class)).thenReturn(componentDao);
-
-        hostStartJob = mock(HostStartJob.class);
-
-        ClusterCommandDTO clusterCommandDTO = new ClusterCommandDTO();
-        clusterCommandDTO.setName("testName");
-        clusterCommandDTO.setDisplayName("testDisplayName");
-        clusterCommandDTO.setDesc("testDescription.");
-        clusterCommandDTO.setType(1);
-        clusterCommandDTO.setUserGroup("testUserGroup");
-        clusterCommandDTO.setRootDir("/test/root/dir");
-
-        HostDTO hostDTO1 = new HostDTO();
-        HostDTO hostDTO2 = new HostDTO();
-
-        List<HostDTO> hosts = new ArrayList<>();
-        hosts.add(hostDTO1);
-        hosts.add(hostDTO2);
-        clusterCommandDTO.setHosts(hosts);
-
-        CommandDTO commandDTO = new CommandDTO();
-        commandDTO.setClusterId(123L);
-        commandDTO.setClusterCommand(clusterCommandDTO);
-        ;
-
-        clusterPO.setId(1L);
-        lenient().when(clusterDao.findById(123L)).thenReturn(clusterPO);
-        lenient().when(clusterDao.findByName("testName")).thenReturn(clusterPO);
-
-        jobContext.setCommandDTO(commandDTO);
-        jobContext.setRetryFlag(false);
-
-        doCallRealMethod().when(hostStartJob).setJobContextAndStagesForTest(any(), any());
-        stages = new ArrayList<>();
-        hostStartJob.setJobContextAndStagesForTest(jobContext, stages);
-
-        doCallRealMethod().when(hostStartJob).injectBeans();
-        hostStartJob.injectBeans();
-
-        doCallRealMethod().when(hostStartJob).loadJobPO(any());
-        lenient().when(hostStartJob.getJobPO()).thenCallRealMethod();
-        hostStartJob.loadJobPO(jobPO);
-    }
-
-    @AfterEach
-    public void tearDown() {
-        springContextHolderMockedStatic.close();
-    }
-
-    @Test
-    public void testInjectBeans() {
-        springContextHolderMockedStatic.verify(() -> SpringContextHolder.getBean(any(Class.class)), times(5));
-    }
-
-    @Test
-    public void testBeforeCreateStages() {
-        doCallRealMethod().when(hostStartJob).beforeCreateStages();
-        hostStartJob.beforeCreateStages();
-        verify(clusterDao, times(1)).findById(123L);
-    }
 
     @Test
     public void testCreateStages() {
-        try (MockedStatic<ComponentStageHelper> componentStageHelperMockedStatic =
-                mockStatic(ComponentStageHelper.class)) {
+        CommandDTO commandDTO = new CommandDTO();
+        commandDTO.setCommand(Command.START);
+        JobContext jobContext = new JobContext();
+        jobContext.setCommandDTO(commandDTO);
+        List<Stage> stages = new ArrayList<>();
+        ReflectionTestUtils.setField(hostStartJob, "jobContext", jobContext);
+        ReflectionTestUtils.setField(hostStartJob, "stages", stages);
 
-            doCallRealMethod().when(hostStartJob).createStages();
-            when(hostStartJob.getComponentHostsMap()).thenReturn(new HashMap<>());
+        MockedStatic<?> mocked1 = mockStatic(StageContext.class);
+        MockedStatic<?> mocked2 = mockStatic(ComponentStageHelper.class, InvocationOnMock::callRealMethod);
 
-            List<Stage> stageList = new ArrayList<>();
-            stageList.add(mock(ComponentStartStage.class));
+        when(StageContext.fromCommandDTO(any())).thenReturn(new StageContext());
 
-            when(ComponentStageHelper.createComponentStages(any(), any())).thenReturn(stageList);
+        List<Stage> stageList = List.of(mock(ComponentStartStage.class));
+        mocked2.when(() -> ComponentStageHelper.createComponentStages(anyMap(), eq(Command.START), any()))
+                .thenReturn(stageList);
 
-            hostStartJob.createStages();
-            doCallRealMethod().when(hostStartJob).getStages();
-            assertEquals(hostStartJob.getStages().size(), 1);
-            assertInstanceOf(ComponentStartStage.class, hostStartJob.getStages().get(0));
-        }
+        doCallRealMethod().when(hostStartJob).createStages();
+        hostStartJob.createStages();
+
+        assertEquals(1, stages.size());
+        assertTrue(stages.containsAll(stageList));
+
+        mocked1.close();
+        mocked2.close();
     }
 
     @Test

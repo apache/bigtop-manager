@@ -48,8 +48,8 @@ public class HostAddJob extends AbstractHostJob {
     @Override
     protected void createStages() {
         StageContext stageContext = StageContext.fromCommandDTO(jobContext.getCommandDTO());
-        stages.add(getHostCheckStage(stageContext));
-        stages.add(getSetupJdkStage(stageContext));
+        stages.add(new HostCheckStage(stageContext));
+        stages.add(new SetupJdkStage(stageContext));
     }
 
     @Override
@@ -68,20 +68,12 @@ public class HostAddJob extends AbstractHostJob {
         return "Add hosts";
     }
 
-    protected void saveHosts() {
+    private void saveHosts() {
         CommandDTO commandDTO = jobContext.getCommandDTO();
         List<HostDTO> hostDTOList = HostConverter.INSTANCE.fromCommand2DTO(commandDTO.getHostCommands());
         for (HostDTO hostDTO : hostDTOList) {
             hostDTO.setClusterId(clusterPO.getId());
             hostService.add(hostDTO);
         }
-    }
-
-    protected SetupJdkStage getSetupJdkStage(StageContext stageContext) {
-        return new SetupJdkStage(stageContext);
-    }
-
-    protected HostCheckStage getHostCheckStage(StageContext stageContext) {
-        return new HostCheckStage(stageContext);
     }
 }
