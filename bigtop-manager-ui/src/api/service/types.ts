@@ -44,6 +44,7 @@ export interface ServiceVO {
   status: ServiceStatusType
   user?: string
   version?: string
+  isInstalled?: boolean
 }
 
 export interface ServiceConfig {

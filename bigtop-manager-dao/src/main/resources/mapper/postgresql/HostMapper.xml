@@ -50,7 +50,7 @@
             <if test="query.hostname != null and query.hostname != ''">
                 and h.hostname like concat('%', #{query.hostname}, '%')
             </if>
-            <if test="query.clusterId != null">
+            <if test="query.clusterId != null and query.clusterId != 0">
                 and h.cluster_id = #{query.clusterId}
             </if>
             <if test="query.ipv4 != null and query.ipv4 != ''">

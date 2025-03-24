@@ -38,7 +38,7 @@
   const { t } = useI18n()
   const attrs = useAttrs() as ClusterVO
   const searchInputRef = ref()
-  const hostStatus = ref(['INSTALLING', 'SUCCESS', 'FAILED', 'UNKNOW'])
+  const hostStatus = ref(['INSTALLING', 'SUCCESS', 'FAILED', 'UNKNOWN'])
   const state = reactive<TableState>({
     searchText: '',
     searchedColumn: '',
@@ -94,7 +94,7 @@
           value: 2
         },
         {
-          text: t('common.unknow'),
+          text: t('common.unknown'),
           value: 3
         }
       ]

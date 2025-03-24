@@ -54,19 +54,3 @@ mvn clean package -DskipTests
 
 ### API 测试
 - 访问 `http://localhost:8080/swagger-ui/index.html` 查看swagger API 文档
-
-### 如何测试 bm-monitoring
-1. 安装 [Prometheus LTS Version](https://github.com/prometheus/prometheus/releases/download/v2.45.3/prometheus-2.45.3.linux-amd64.tar.gz)
-2. 配置 prometheus.yml，在`scrape_configs`部分添加以下yaml代码
-```
-- job_name: "bm-agent-host"
-  metrics_path: "/actuator/prometheus"
-  static_configs:
-    - targets: ["agent1 server ip/hostname:8081", "agent2 server ip/hostname:8081", ...]
-```
-3. 配置以下prometheus查询信息，配置文件位于 `bigtop-manager-server/src/main/resources/application.yml`
-```
-monitoring:
-  prometheus-host: "http://localhost:9090"
-  agent-host-job-name: "bm-agent-host"
-```

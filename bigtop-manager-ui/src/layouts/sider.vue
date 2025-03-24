@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { toRefs, ref } from 'vue'
+  import { toRefs, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import { RouteExceptions } from '@/enums'
   import { useMenuStore } from '@/store/menu'
@@ -31,19 +31,30 @@
   }
 
   const props = withDefaults(defineProps<Props>(), {
-    siderMenuSelectedKey: '',
-    siderMenus: () => []
+    siderMenuSelectedKey: ''
   })
 
-  const { siderMenuSelectedKey, siderMenus } = toRefs(props)
+  const { siderMenuSelectedKey } = toRefs(props)
   const router = useRouter()
   const menuStore = useMenuStore()
+  const menus = ref<MenuItem[]>([])
   const emits = defineEmits(['onSiderClick'])
   const clusterStatus = ref<Record<ClusterStatusType, string>>({
     1: 'success',
     2: 'error',
     3: 'warning'
   })
+
+  watch(
+    () => props.siderMenus,
+    (val) => {
+      menus.value = []
+      menus.value = val
+    },
+    {
+      deep: true
+    }
+  )
 
   const toggleActivatedIcon = (menuItem: MenuItem) => {
     const { key, icon } = menuItem
@@ -55,7 +66,7 @@
   }
 
   const addCluster = () => {
-    router.push({ name: 'ClusterCreate' })
+    router.push({ name: 'CreateCluster' })
   }
 
   const onSiderClick = ({ key }: any) => {
@@ -66,7 +77,7 @@
 <template>
   <a-layout-sider class="sider">
     <a-menu :selected-keys="[siderMenuSelectedKey]" mode="inline" @select="onSiderClick">
-      <template v-for="menuItem in siderMenus" :key="menuItem.key">
+      <template v-for="menuItem in menus" :key="menuItem.key">
         <a-sub-menu
           v-if="menuItem.children && menuItem.name === RouteExceptions.SPECIAL_ROUTE_NAME"
           :key="menuItem.key"
@@ -100,7 +111,7 @@
         </template>
       </template>
     </a-menu>
-    <div v-show="menuStore.isClusterCreateVisible">
+    <div v-show="menuStore.isCreateClusterVisible">
       <a-divider />
       <div class="create-option">
         <a-button type="primary" ghost @click="addCluster">

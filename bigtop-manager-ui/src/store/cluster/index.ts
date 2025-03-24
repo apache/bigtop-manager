@@ -17,22 +17,33 @@
  * under the License.
  */
 
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import { useRoute } from 'vue-router'
 import { getCluster, getClusterList } from '@/api/cluster'
 import { useServiceStore } from '@/store/service'
+import { useInstalledStore } from '@/store/installed'
 import type { ClusterVO } from '@/api/cluster/types.ts'
 
 export const useClusterStore = defineStore(
   'cluster',
   () => {
     const route = useRoute()
+    const installedStore = useInstalledStore()
     const serviceStore = useServiceStore()
     const clusters = ref<ClusterVO[]>([])
     const loading = ref(false)
     const currCluster = ref<ClusterVO>({})
     const clusterId = computed(() => (route.params.id as string) || undefined)
+
+    watch(
+      () => clusters.value,
+      (val) => {
+        val.forEach((cluster) => {
+          installedStore.setInstalledMapKey(`${cluster.id}`)
+        })
+      }
+    )
 
     const addCluster = async () => {
       await loadClusters()
@@ -49,7 +60,7 @@ export const useClusterStore = defineStore(
       try {
         loading.value = true
         currCluster.value = await getCluster(parseInt(clusterId.value))
-        currCluster.value.id != undefined && serviceStore.getServices(currCluster.value.id)
+        currCluster.value.id != undefined && (await serviceStore.getServices(currCluster.value.id))
       } catch (error) {
         console.log('error :>> ', error)
       } finally {
@@ -73,9 +84,5 @@ export const useClusterStore = defineStore(
   },
   {
     persist: false
-    // persist: {
-    //   storage: sessionStorage,
-    //   paths: ['clusters',]
-    // }
   }
 )
