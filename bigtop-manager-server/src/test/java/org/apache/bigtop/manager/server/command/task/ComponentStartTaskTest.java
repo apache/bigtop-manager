@@ -129,7 +129,6 @@ public class ComponentStartTaskTest {
         verify(componentDao, times(1)).partialUpdateById(any());
     }
 
-
     @Test
     public void tesGetTaskPO() {
         doCallRealMethod().when(componentStartTask).getName();
