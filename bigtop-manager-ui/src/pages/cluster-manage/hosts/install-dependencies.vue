@@ -66,13 +66,16 @@
       dataIndex: 'hostname',
       key: 'hostname',
       ellipsis: true,
-      customFilterDropdown: true
+      customFilterDropdown: true,
+      onFilter: (value, record) => isContain(record.hostname, value as string)
     },
     {
       title: t('common.cluster'),
       key: 'clusterId',
       dataIndex: 'clusterId',
-      ellipsis: true
+      ellipsis: true,
+      filterMultiple: false,
+      filters: clusterStore.clusters.map((v) => ({ text: v.displayName || v.name, value: v.id! }))
     },
     {
       title: t('common.status'),
@@ -106,6 +109,10 @@
     columns: columns.value,
     rows: []
   })
+
+  const isContain = (source: string, target: string): boolean => {
+    return source.toString().toLowerCase().includes(target.toLowerCase())
+  }
 
   const splitHostFormToHostList = (hostForm: HostReq) => {
     dataSource.value = hostForm.hostnames?.map((v) => ({
@@ -203,7 +210,7 @@
   }
 
   const handleInstall = () => {
-    allInstallSuccess.value ? startAddHost() : startInstallDependencies
+    allInstallSuccess.value ? startAddHost() : startInstallDependencies()
   }
 
   const handleOpen = (payLoad: HostReq) => {
@@ -280,8 +287,9 @@
             </a-space>
           </div>
         </template>
-        <template #customFilterIcon="{ filtered }">
-          <svg-icon :name="filtered ? 'search_activated' : 'search'" />
+        <template #customFilterIcon="{ filtered, column }">
+          <svg-icon v-if="column.key === 'hostname'" :name="filtered ? 'search_activated' : 'search'" />
+          <svg-icon v-else :name="filtered ? 'filter_activated' : 'filter'" />
         </template>
         <template #bodyCell="{ record, column }">
           <template v-if="column.key === 'clusterId'">

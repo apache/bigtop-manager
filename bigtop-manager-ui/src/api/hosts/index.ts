@@ -58,3 +58,11 @@ export const updateHost = (data: HostParams): Promise<HostVO[]> => {
     data
   })
 }
+
+export const removeHost = (data: HostParams): Promise<HostVO[]> => {
+  return request({
+    method: 'put',
+    url: `/api/hosts/${data.id}`,
+    data
+  })
+}

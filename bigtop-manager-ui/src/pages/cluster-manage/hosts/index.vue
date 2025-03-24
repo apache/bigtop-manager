@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { TableColumnType } from 'ant-design-vue'
+  import { message, Modal, TableColumnType } from 'ant-design-vue'
   import { computed, onMounted, reactive, ref } from 'vue'
   import { useI18n } from 'vue-i18n'
   import * as hostApi from '@/api/hosts'
@@ -175,12 +175,13 @@
   }
 
   const deleteHost = (row?: HostVO) => {
-    if (!row?.key) {
-      state.selectedRowKeys.length > 0 &&
-        (dataSource.value = dataSource.value?.filter((v) => !state.selectedRowKeys.includes(v.key)) || [])
-    } else {
-      dataSource.value = dataSource.value?.filter((v) => row.key !== v.key)
-    }
+    console.log('row :>> ', row)
+    Modal.confirm({
+      title: t('common.delete_msg'),
+      async onOk() {
+        message.success(t('common.delete_success'))
+      }
+    })
   }
 
   const updateHost = (item: HostReq) => {
