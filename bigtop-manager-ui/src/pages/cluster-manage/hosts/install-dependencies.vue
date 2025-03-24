@@ -60,7 +60,7 @@
   })
   const allInstallSuccess = computed(() => dataSource.value.every((v) => v.status === Status.Success))
   const clusterNameMap = computed(() => new Map(clusters.value.map((v) => [v.id, v])))
-  const columns = computed((): TableColumnType<HostReq>[] => [
+  const columns = computed((): TableColumnType<HostReq & { status: string }>[] => [
     {
       title: t('host.hostname'),
       dataIndex: 'hostname',
@@ -73,32 +73,29 @@
       title: t('common.cluster'),
       key: 'clusterId',
       dataIndex: 'clusterId',
-      ellipsis: true,
-      filterMultiple: false,
-      filters: [
-        {
-          text: '',
-          value: Status.Unknown
-        },
-        {
-          text: '',
-          value: Status.Installing
-        },
-        {
-          text: '',
-          value: Status.Success
-        },
-        {
-          text: '',
-          value: Status.Failed
-        }
-      ]
+      ellipsis: true
     },
     {
       title: t('common.status'),
       dataIndex: 'status',
       key: 'status',
-      ellipsis: true
+      ellipsis: true,
+      filterMultiple: false,
+      onFilter: (value, record: HostReq & { status: string }) => record.status.includes(value as string),
+      filters: [
+        {
+          text: t('common.unknown'),
+          value: Status.Unknown
+        },
+        {
+          text: t('common.success'),
+          value: Status.Success
+        },
+        {
+          text: t('common.failed'),
+          value: Status.Failed
+        }
+      ]
     },
     {
       title: t('common.action'),
@@ -278,7 +275,7 @@
       :mask-closable="false"
       :centered="true"
       :confirm-loading="installing"
-      :ok-text="allInstallSuccess ? $t('common.confirm') : $t('common.install')"
+      :ok-text="allInstallSuccess ? $t('common.confirm') : installing ? $t('common.installing') : t('common.install')"
       :destroy-on-close="true"
       @ok="handleInstall"
       @cancel="handleCancel"

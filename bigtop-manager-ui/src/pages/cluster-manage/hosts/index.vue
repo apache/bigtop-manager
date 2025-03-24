@@ -169,6 +169,7 @@
     try {
       if (isFirstCall) {
         loading.value = true
+        paginationProps.value.current = 1
       }
       const res = await hostApi.getHosts({ ...filtersParams.value, clusterId: 0 })
       dataSource.value = res.content
@@ -333,7 +334,7 @@
       </template>
     </a-table>
     <host-create ref="hostCreateRef" :api-edit-caller="true" :is-public="true" @on-ok="afterSetupHostConfig" />
-    <install-dependencies ref="installRef" />
+    <install-dependencies ref="installRef" @on-install-success="getHostList(true)" />
   </div>
 </template>
 
