@@ -19,6 +19,7 @@
 package org.apache.bigtop.manager.server.command.task;
 
 import org.apache.bigtop.manager.common.enums.Command;
+import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.dao.repository.HostDao;
 import org.apache.bigtop.manager.dao.repository.TaskDao;
@@ -71,6 +72,8 @@ public class SetupJdkTaskTest {
 
         taskContext.setComponentDisplayName("TestComponentDisplayName");
         taskContext.setHostname("TestHostname");
+        taskContext.setServiceName("TestServiceName");
+        taskContext.setServiceUser("TestServiceUser");
         taskContext.setComponentName("TestComponentName");
         taskContext.setClusterId(123L);
 
@@ -107,6 +110,26 @@ public class SetupJdkTaskTest {
     public void testGetCustomCommand() {
         doCallRealMethod().when(setupJdkTask).getCustomCommand();
         assertEquals("setup_jdk", setupJdkTask.getCustomCommand());
+    }
+
+    @Test
+    public void tesGetTaskPO() {
+        doCallRealMethod().when(setupJdkTask).getCustomCommand();
+        doCallRealMethod().when(setupJdkTask).getName();
+        doCallRealMethod().when(setupJdkTask).getCommand();
+
+        setupJdkTask.loadTaskPO(null);
+        TaskPO result = setupJdkTask.getTaskPO();
+
+        assertEquals("Setup jdk for TestHostname", result.getName());
+        assertEquals("Custom", result.getCommand());
+
+        assertEquals(JsonUtils.writeAsString(taskContext), result.getContext());
+        assertEquals("TestHostname", result.getHostname());
+        assertEquals("TestServiceName", result.getServiceName());
+        assertEquals("TestServiceUser", result.getServiceUser());
+        assertEquals("TestComponentName", result.getComponentName());
+        assertEquals("setup_jdk", result.getCustomCommand());
     }
 
     @Test

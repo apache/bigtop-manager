@@ -19,6 +19,7 @@
 package org.apache.bigtop.manager.server.command.task;
 
 import org.apache.bigtop.manager.common.enums.Command;
+import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.dao.repository.ComponentDao;
 import org.apache.bigtop.manager.dao.repository.HostDao;
@@ -36,6 +37,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.lenient;
@@ -78,6 +80,8 @@ public class ComponentAddTaskTest {
 
         taskContext.setComponentDisplayName("TestComponentDisplayName");
         taskContext.setHostname("TestHostname");
+        taskContext.setServiceName("TestServiceName");
+        taskContext.setServiceUser("TestServiceUser");
         taskContext.setComponentName("TestComponentName");
         taskContext.setClusterId(123L);
 
@@ -127,6 +131,25 @@ public class ComponentAddTaskTest {
     public void tesGetTaskContext() {
         doCallRealMethod().when(componentAddTask).getTaskContext();
         assertEquals(taskContext, componentAddTask.getTaskContext());
+    }
+
+    @Test
+    public void tesGetTaskPO() {
+        doCallRealMethod().when(componentAddTask).getName();
+        doCallRealMethod().when(componentAddTask).getCommand();
+
+        componentAddTask.loadTaskPO(null);
+        TaskPO result = componentAddTask.getTaskPO();
+
+        assertEquals("Add TestComponentDisplayName on TestHostname", result.getName());
+        assertEquals("Add", result.getCommand());
+
+        assertEquals(JsonUtils.writeAsString(taskContext), result.getContext());
+        assertEquals("TestHostname", result.getHostname());
+        assertEquals("TestServiceName", result.getServiceName());
+        assertEquals("TestServiceUser", result.getServiceUser());
+        assertEquals("TestComponentName", result.getComponentName());
+        assertNull(result.getCustomCommand());
     }
 
     @Test

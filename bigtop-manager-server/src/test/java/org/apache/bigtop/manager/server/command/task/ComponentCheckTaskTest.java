@@ -19,6 +19,7 @@
 package org.apache.bigtop.manager.server.command.task;
 
 import org.apache.bigtop.manager.common.enums.Command;
+import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.dao.repository.ComponentDao;
@@ -39,6 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.lenient;
@@ -81,6 +83,8 @@ public class ComponentCheckTaskTest {
 
         taskContext.setComponentDisplayName("TestComponentDisplayName");
         taskContext.setHostname("TestHostname");
+        taskContext.setServiceName("TestServiceName");
+        taskContext.setServiceUser("TestServiceUser");
         taskContext.setComponentName("TestComponentName");
         taskContext.setClusterId(123L);
 
@@ -135,6 +139,25 @@ public class ComponentCheckTaskTest {
         componentCheckTask.onFailure();
         verify(taskDao, times(1)).partialUpdateById(any());
         verify(componentDao, times(1)).partialUpdateById(any());
+    }
+
+    @Test
+    public void tesGetTaskPO() {
+        doCallRealMethod().when(componentCheckTask).getName();
+        doCallRealMethod().when(componentCheckTask).getCommand();
+
+        componentCheckTask.loadTaskPO(null);
+        TaskPO result = componentCheckTask.getTaskPO();
+
+        assertEquals("Check TestComponentDisplayName on TestHostname", result.getName());
+        assertEquals("Check", result.getCommand());
+
+        assertEquals(JsonUtils.writeAsString(taskContext), result.getContext());
+        assertEquals("TestHostname", result.getHostname());
+        assertEquals("TestServiceName", result.getServiceName());
+        assertEquals("TestServiceUser", result.getServiceUser());
+        assertEquals("TestComponentName", result.getComponentName());
+        assertNull(result.getCustomCommand());
     }
 
     @Test

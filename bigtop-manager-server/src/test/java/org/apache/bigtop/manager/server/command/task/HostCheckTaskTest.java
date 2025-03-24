@@ -19,6 +19,7 @@
 package org.apache.bigtop.manager.server.command.task;
 
 import org.apache.bigtop.manager.common.enums.Command;
+import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.dao.repository.HostDao;
 import org.apache.bigtop.manager.dao.repository.TaskDao;
@@ -34,6 +35,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.lenient;
@@ -71,6 +73,8 @@ public class HostCheckTaskTest {
 
         taskContext.setComponentDisplayName("TestComponentDisplayName");
         taskContext.setHostname("TestHostname");
+        taskContext.setServiceName("TestServiceName");
+        taskContext.setServiceUser("TestServiceUser");
         taskContext.setComponentName("TestComponentName");
         taskContext.setClusterId(123L);
 
@@ -107,6 +111,26 @@ public class HostCheckTaskTest {
     public void testGetCustomCommand() {
         doCallRealMethod().when(hostCheckTask).getCustomCommand();
         assertEquals("check_host", hostCheckTask.getCustomCommand());
+    }
+
+    @Test
+    public void tesGetTaskPO() {
+        doCallRealMethod().when(hostCheckTask).getCustomCommand();
+        doCallRealMethod().when(hostCheckTask).getName();
+        doCallRealMethod().when(hostCheckTask).getCommand();
+
+        hostCheckTask.loadTaskPO(null);
+        TaskPO result = hostCheckTask.getTaskPO();
+
+        assertEquals("Check host TestHostname", result.getName());
+        assertEquals("Custom", result.getCommand());
+
+        assertEquals(JsonUtils.writeAsString(taskContext), result.getContext());
+        assertEquals("TestHostname", result.getHostname());
+        assertEquals("TestServiceName", result.getServiceName());
+        assertEquals("TestServiceUser", result.getServiceUser());
+        assertEquals("TestComponentName", result.getComponentName());
+        assertEquals("check_host", result.getCustomCommand());
     }
 
     @Test
