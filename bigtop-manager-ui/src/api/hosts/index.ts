@@ -50,3 +50,11 @@ export const getInstalledStatus = (): Promise<InstalledStatusVO[]> => {
     url: '/hosts/installed-status'
   })
 }
+
+export const updateHost = (data: HostParams): Promise<HostVO[]> => {
+  return request({
+    method: 'put',
+    url: `/api/hosts/${data.id}`,
+    data
+  })
+}

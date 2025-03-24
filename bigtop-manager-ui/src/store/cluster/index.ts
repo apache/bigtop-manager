@@ -83,6 +83,9 @@ export const useClusterStore = defineStore(
     }
   },
   {
-    persist: false
+    persist: {
+      storage: sessionStorage,
+      paths: ['clusters']
+    }
   }
 )

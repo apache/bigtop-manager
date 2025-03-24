@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { computed, h, ref, watch } from 'vue'
+  import { computed, h, nextTick, ref, watch } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { FormItemState } from '@/components/common/auto-form/types'
   import { CheckCircleOutlined, UploadOutlined } from '@ant-design/icons-vue'
@@ -29,8 +29,9 @@
   import { uploadFile } from '@/api/upload-file'
   import { Rule } from 'ant-design-vue/es/form'
   import { HostReq } from '@/api/command/types'
+  import { useClusterStore } from '@/store/cluster'
   import type { UploadProps } from 'ant-design-vue'
-  import type { HostParams } from '@/api/hosts/types'
+  import type { HostParams, HostVO } from '@/api/hosts/types'
 
   enum Mode {
     EDIT = 'cluster.edit_host',
@@ -38,12 +39,17 @@
   }
 
   interface Emits {
-    (event: 'onOk', type: keyof typeof Mode, value: HostReq): void
+    (event: 'onOk', type: keyof typeof Mode, value: HostReq | HostVO): void
   }
+
+  const props = withDefaults(defineProps<{ isPublic?: boolean }>(), {
+    isPublic: false
+  })
 
   const { t } = useI18n()
   const emits = defineEmits<Emits>()
   const localeStore = useLocaleStore()
+  const clusterStore = useClusterStore()
   const open = ref(false)
   const mode = ref<keyof typeof Mode>('ADD')
   const hiddenItems = ref<string[]>([])
@@ -193,6 +199,34 @@
       }
     }
   ])
+
+  const formItemsOfPublicHost = computed((): FormItemState[] => [
+    {
+      type: 'select',
+      field: 'clusterId',
+      defaultValue: '',
+      fieldMap: {
+        label: 'displayName',
+        value: 'clusterId'
+      },
+      formItemProps: {
+        name: 'clusterId',
+        label: t('common.cluster'),
+        rules: [
+          {
+            required: true,
+            message: t('common.select_error', [`${t('common.cluster')}`.toLowerCase()]),
+            trigger: 'blur'
+          }
+        ]
+      },
+      controlProps: {
+        disabled: isEdit.value,
+        placeholder: t('common.select_error', [`${t('common.cluster')}`.toLowerCase()])
+      }
+    }
+  ])
+
   const formItems = computed((): FormItemState[] => [
     {
       type: 'input',
@@ -230,7 +264,6 @@
         ]
       }
     },
-
     {
       type: mode.value == 'ADD' ? 'textarea' : 'input',
       field: 'hostname',
@@ -298,13 +331,13 @@
     if (formValue.value.authType === '1') {
       const data = [...formItems.value]
       data.splice(2, 0, ...formItemsForSshPassword.value)
-      return data
+      return props.isPublic ? [...formItemsOfPublicHost.value, ...data] : data
     } else if (formValue.value.authType === '2') {
       const data = [...formItems.value]
       data.splice(2, 0, ...formItemsForSshKeyPassword.value)
-      return data
+      return props.isPublic ? [...formItemsOfPublicHost.value, ...data] : data
     }
-    return [...formItems.value]
+    return props.isPublic ? [...formItemsOfPublicHost.value, ...formItems.value] : [...formItems.value]
   })
 
   watch(
@@ -327,13 +360,24 @@
     open.value = true
     mode.value = type
     if (payload) {
-      formValue.value = Object.assign(formValue.value, { ...payload })
+      formValue.value = Object.assign(formValue.value, {
+        ...payload,
+        authType: `${payload.authType}`
+      })
     } else {
       Object.assign(formValue.value, {
         authType: '1',
         inputType: '1'
       })
     }
+
+    props.isPublic && (await getClusterSelectOptions())
+  }
+
+  const getClusterSelectOptions = async () => {
+    await nextTick()
+    const formatClusters = clusterStore.clusters.map((v) => ({ ...v, clusterId: v.id }))
+    autoFormRef.value?.setOptions('clusterId', formatClusters)
   }
 
   const handleOk = async () => {

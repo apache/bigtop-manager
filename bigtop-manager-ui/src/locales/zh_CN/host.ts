@@ -35,6 +35,7 @@ export default {
   key_auth: '密钥',
   ip_address: 'IP 地址',
   component_count: '组件数',
+  component_count_quantifier: '个组件',
   no_auth: '无认证',
   agent_path: 'Agent路径',
   ssh_port: 'SSH端口',
