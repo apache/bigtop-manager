@@ -174,12 +174,19 @@
     hostCreateRef.value?.handleOpen('EDIT', formatHost)
   }
 
-  const deleteHost = (row?: HostVO) => {
-    console.log('row :>> ', row)
+  const deleteHost = (row: HostVO) => {
     Modal.confirm({
       title: t('common.delete_msg'),
       async onOk() {
-        message.success(t('common.delete_success'))
+        try {
+          const data = await hostApi.removeHost({ hostId: row.id! })
+          if (data) {
+            message.success(t('common.delete_success'))
+            getHostList()
+          }
+        } catch (error) {
+          console.log('error :>> ', error)
+        }
       }
     })
   }
@@ -202,7 +209,7 @@
     <div class="title">{{ $t('host.host_list') }}</div>
     <a-space :size="16">
       <a-button type="primary" @click="addHost">{{ $t('cluster.add_host') }}</a-button>
-      <a-button type="primary" danger @click="deleteHost">{{ $t('common.bulk_remove') }}</a-button>
+      <a-button type="primary" danger>{{ $t('common.bulk_remove') }}</a-button>
     </a-space>
     <a-table
       :loading="loading"

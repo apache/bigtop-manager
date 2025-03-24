@@ -54,15 +54,14 @@ export const getInstalledStatus = (): Promise<InstalledStatusVO[]> => {
 export const updateHost = (data: HostParams): Promise<HostVO[]> => {
   return request({
     method: 'put',
-    url: `/api/hosts/${data.id}`,
+    url: `/hosts/${data.id}`,
     data
   })
 }
 
-export const removeHost = (data: HostParams): Promise<HostVO[]> => {
+export const removeHost = (pathParams: { hostId: number }): Promise<boolean> => {
   return request({
-    method: 'put',
-    url: `/api/hosts/${data.id}`,
-    data
+    method: 'delete',
+    url: `/hosts/${pathParams.hostId}`
   })
 }
