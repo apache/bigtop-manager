@@ -23,8 +23,11 @@ import org.apache.bigtop.manager.dao.repository.ClusterDao;
 import org.apache.bigtop.manager.dao.repository.HostDao;
 import org.apache.bigtop.manager.dao.repository.StageDao;
 import org.apache.bigtop.manager.server.command.task.Task;
+import org.apache.bigtop.manager.server.command.task.TaskContext;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
-
+import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
+import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
+import org.apache.bigtop.manager.server.utils.StackUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -110,6 +113,29 @@ public class ComponentStageTest {
         doCallRealMethod().when(componentStage).beforeCreateTasks();
         componentStage.beforeCreateTasks();
         verify(clusterDao, times(1)).findById(123L);
+    }
+
+    @Test
+    public void testCreateTaskContext() {
+        try (MockedStatic<StackUtils> stackUtilsMockedStatic = mockStatic(StackUtils.class)) {
+
+            ServiceDTO serviceDTO = new ServiceDTO();
+            serviceDTO.setName("TestServiceName");
+            serviceDTO.setUser("TestUser");
+
+            ComponentDTO componentDTO = new ComponentDTO();
+            componentDTO.setName("TestComponentName");
+            componentDTO.setDisplayName("TestComponentDisplayName");
+
+            when(StackUtils.getServiceDTO(any())).thenReturn(serviceDTO);
+            when(StackUtils.getComponentDTO(any())).thenReturn(componentDTO);
+
+            doCallRealMethod().when(componentStage).createTaskContext("testHostName");
+            TaskContext result = componentStage.createTaskContext("testHostName");
+
+            assertEquals("testHostName", result.getHostname());
+            // .....
+        }
     }
 
     @Test
