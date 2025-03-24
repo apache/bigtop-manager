@@ -18,7 +18,7 @@
 -->
 
 <template>
-  <div>
+  <a-spin :spinning="loading" class="service">
     <div class="infra-header">
       <div>
         <div class="menu-title">{{ $t('menu.infra') }}</div>
@@ -33,9 +33,9 @@
     </div>
     <div class="infra-body">
       <filter-form :filter-items="filterFormItems" @filter="getServices" />
-      <a-empty v-if="store.services.length == 0" style="width: 100%" />
+      <a-empty v-if="services.length == 0" style="width: 100%" />
       <template v-else>
-        <a-card v-for="item in store.services" :key="item.name" :hoverable="true" class="service-item">
+        <a-card v-for="item in services" :key="item.name" :hoverable="true" class="service-item">
           <div class="header">
             <div class="header-base-wrp">
               <a-avatar v-if="item.name" :src="usePngImage(item.name.toLowerCase())" :size="42" class="header-icon" />
@@ -47,7 +47,7 @@
                 <a-tag :color="CommonStatus[statusColors[item.status]]">
                   <div class="header-base-status-inner">
                     <status-dot :color="CommonStatus[statusColors[item.status]]" />
-                    <span class="small">{{ $t(`common.${CommonStatusTexts[item.status]}`) }}</span>
+                    <span class="small">{{ $t(`common.${statusColors[item.status]}`) }}</span>
                   </div>
                 </a-tag>
               </div>
@@ -68,81 +68,71 @@
         </a-card>
       </template>
     </div>
-  </div>
+  </a-spin>
 </template>
 <script setup lang="ts">
-  import { computed, shallowRef, reactive } from 'vue'
-  import { usePngImage } from '@/utils/tools'
-  import { useI18n } from 'vue-i18n'
-  import { CommonStatus, CommonStatusTexts } from '@/enums/state'
-  import type { ServiceStatusType } from '@/api/service/types'
-  import type { GroupItem } from '@/components/common/button-group/types'
-  import type { FilterFormItem } from '@/components/common/filter-form/types'
+import { computed, shallowRef, onMounted, toRefs } from 'vue'
+import { usePngImage } from '@/utils/tools'
+import { useI18n } from 'vue-i18n'
+import { CommonStatus, CommonStatusTexts } from '@/enums/state'
+import { useServiceStore } from '@/store/service'
+import type { ServiceListParams, ServiceStatusType } from '@/api/service/types'
+import type { GroupItem } from '@/components/common/button-group/types'
+import type { FilterFormItem } from '@/components/common/filter-form/types'
+import { execCommand } from '@/api/command'
+import { CommandRequest, ServiceCommandReq, Command } from '@/api/command/types.ts'
 
-  const { t } = useI18n()
-  const statusColors = shallowRef<Record<ServiceStatusType, keyof typeof CommonStatusTexts>>({
-    0: 'healthy',
-    1: 'unhealthy',
-    2: 'unknow'
-  })
-  const filterFormItems = computed((): FilterFormItem[] => [
-    { type: 'search', key: 'serviceName', label: t('service.name') },
-    {
-      type: 'status',
-      key: 'restartFlag',
-      label: t('service.required_restart'),
-      options: [
-        { label: t('common.required'), value: 1 },
-        { label: t('common.not_required'), value: 2 }
-      ]
-    },
-    {
-      type: 'status',
-      key: 'status',
-      label: t('common.status'),
-      options: [
-        { label: t(`common.${statusColors.value[1]}`), value: 1 },
-        { label: t(`common.${statusColors.value[2]}`), value: 2 },
-        { label: t(`common.${statusColors.value[3]}`), value: 3 }
-      ]
-    }
-  ])
-  const actionGroups = shallowRef<GroupItem[]>([
-    {
-      action: 'start',
-      icon: 'start',
-      clickEvent: (item) => {
-        console.log('item :>> ', item?.action)
-      }
-    },
-    {
-      action: 'stop',
-      icon: 'stop',
-      clickEvent: (item) => {
-        console.log('item :>> ', item?.action)
-      }
-    },
-    {
-      action: 'restart',
-      icon: 'restart',
-      clickEvent: (item) => {
-        console.log('item :>> ', item?.action)
-      }
-    },
-    {
-      action: 'more',
-      icon: 'more_line',
-      clickEvent: (item) => {
-        console.log('item :>> ', item?.action)
-      }
-    }
-  ])
+const { t } = useI18n()
+const serviceStore = useServiceStore()
+const { services, loading } = toRefs(serviceStore)
 
-  const store = reactive({
-    services: [{ name: '1', displayName: '2', version: '3', status: 1 }]
-  })
+const statusColors = shallowRef<Record<ServiceStatusType, keyof typeof CommonStatusTexts>>({
+  1: 'healthy',
+  2: 'unhealthy',
+  3: 'unknown'
+})
+const filterFormItems = computed((): FilterFormItem[] => [
+  { type: 'search', key: 'serviceName', label: t('service.name') },
+  { type: 'status', key: 'restartFlag', label: t('service.required_restart'),
+    options: [
+      { label: t('common.required'), value: 1 },
+      { label: t('common.not_required'), value: 2 }
+    ]
+  },
+  { type: 'status', key: 'status', label: t('common.status'),
+    options: [
+      { label: t(`common.${statusColors.value[1]}`), value: 1 },
+      { label: t(`common.${statusColors.value[2]}`), value: 2 },
+      { label: t(`common.${statusColors.value[3]}`), value: 3 }
+    ]
+  }
+])
+const actionGroups = shallowRef<GroupItem[]>([
+  { action: 'start', icon: 'start', clickEvent: (item) => { console.log('item :>> ', item?.action) } },
+  { action: 'stop', icon: 'stop', clickEvent: (item) => { console.log('item :>> ', item?.action) } },
+  { action: 'restart', icon: 'restart', clickEvent: (item) => { console.log('item :>> ', item?.action) } },
+  { action: 'more', icon: 'more_line', clickEvent: (item) => { console.log('item :>> ', item?.action) } }
+])
 
-  const getServices = () => {}
+// const infraAction = async (command, serviceName) => {
+//   await execCommand({
+//     command: 'Add',
+//     clusterId: 1,
+//     commandLevel: "service",
+//     serviceCommands: [{ serviceName: 'Prometheus' }]
+//   })
+// }
+
+
+
+const getServices = async (filters?: ServiceListParams) => {
+  await serviceStore.getServices(0, filters);
+}
+
+onMounted(async () => { 
+  
+  await getServices()
+})
 </script>
 
 <style scoped lang="scss">
