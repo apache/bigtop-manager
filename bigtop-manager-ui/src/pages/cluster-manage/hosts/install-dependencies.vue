@@ -75,7 +75,24 @@
       dataIndex: 'clusterId',
       ellipsis: true,
       filterMultiple: false,
-      filters: clusterStore.clusters.map((v) => ({ text: v.displayName || v.name, value: v.id! }))
+      filters: [
+        {
+          text: '',
+          value: Status.Unknown
+        },
+        {
+          text: '',
+          value: Status.Installing
+        },
+        {
+          text: '',
+          value: Status.Success
+        },
+        {
+          text: '',
+          value: Status.Failed
+        }
+      ]
     },
     {
       title: t('common.status'),
