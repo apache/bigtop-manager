@@ -78,7 +78,7 @@ public class ServiceAddJobTest {
         when(ComponentStageHelper.createComponentStages(any(), eq(Command.CONFIGURE), any()))
                 .thenReturn(stageList2);
         when(ComponentStageHelper.createComponentStages(
-                any(), eq(List.of(Command.INIT, Command.START, Command.PREPARE)), any()))
+                        any(), eq(List.of(Command.INIT, Command.START, Command.PREPARE)), any()))
                 .thenReturn(stageList3);
         when(ComponentStageHelper.createComponentStages(any(), eq(Command.CHECK), any()))
                 .thenReturn(stageList4);
