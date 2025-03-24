@@ -21,6 +21,8 @@ import type { PageVO } from '@/api/types'
 
 export type HostVOList = PageVO<HostVO>
 
+export type HostStatusType = 1 | 2 | 3
+
 /**
  * HostVO
  */

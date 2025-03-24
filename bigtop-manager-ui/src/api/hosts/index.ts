@@ -59,9 +59,10 @@ export const updateHost = (data: HostParams): Promise<HostVO[]> => {
   })
 }
 
-export const removeHost = (pathParams: { hostId: number }): Promise<boolean> => {
+export const removeHost = (data: { ids: number[] }): Promise<boolean> => {
   return request({
     method: 'delete',
-    url: `/hosts/${pathParams.hostId}`
+    url: '/hosts/batch',
+    data
   })
 }

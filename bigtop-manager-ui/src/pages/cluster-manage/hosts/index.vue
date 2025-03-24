@@ -18,8 +18,8 @@
 -->
 
 <script setup lang="ts">
-  import { message, Modal, TableColumnType } from 'ant-design-vue'
-  import { computed, onMounted, reactive, ref } from 'vue'
+  import { message, Modal, TableColumnType, TableProps } from 'ant-design-vue'
+  import { computed, onMounted, onUnmounted, reactive, ref, shallowRef } from 'vue'
   import { useI18n } from 'vue-i18n'
   import * as hostApi from '@/api/hosts'
   import useBaseTable from '@/composables/use-base-table'
@@ -31,6 +31,7 @@
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { HostVO } from '@/api/hosts/types'
 
+  const POLLING_INTERVAL = 30000
   type Key = string | number
   interface TableState {
     selectedRowKeys: Key[]
@@ -39,15 +40,22 @@
   }
   const { t } = useI18n()
   const searchInputRef = ref()
+  const pollingIntervalId = ref<any>(null)
   const clusterStore = useClusterStore()
   const hostCreateRef = ref<InstanceType<typeof HostCreate> | null>(null)
   const installRef = ref<InstanceType<typeof InstallDependencies> | null>(null)
+  const hostStatus = shallowRef(['INSTALLING', 'SUCCESS', 'FAILED', 'UNKNOWN'])
   const state = reactive<TableState>({
     searchText: '',
     searchedColumn: '',
     selectedRowKeys: []
   })
-
+  const filtersOfClusterDisplayName = computed(() =>
+    clusterStore.clusters.map((v) => ({
+      text: v.displayName || v.name,
+      value: v.id!
+    }))
+  )
   const columns = computed((): TableColumnType<HostVO>[] => [
     {
       title: t('host.hostname'),
@@ -59,9 +67,11 @@
     },
     {
       title: t('common.cluster'),
-      key: 'clusterName',
-      dataIndex: 'clusterName',
-      ellipsis: true
+      key: 'clusterDisplayName',
+      dataIndex: 'clusterDisplayName',
+      ellipsis: true,
+      filterMultiple: false,
+      filters: filtersOfClusterDisplayName.value
     },
     {
       title: t('host.ip_address'),
@@ -92,8 +102,24 @@
     {
       title: t('common.status'),
       dataIndex: 'status',
+      key: 'status',
       width: '260px',
-      ellipsis: true
+      ellipsis: true,
+      filterMultiple: false,
+      filters: [
+        {
+          text: t('common.success'),
+          value: 1
+        },
+        {
+          text: t('common.failed'),
+          value: 2
+        },
+        {
+          text: t('common.unknown'),
+          value: 3
+        }
+      ]
     },
     {
       title: t('common.action'),
@@ -111,7 +137,7 @@
     {
       text: 'remove',
       danger: true,
-      clickEvent: (_item, args) => deleteHost(args)
+      clickEvent: (_item, args) => deleteHost([args.id])
     }
   ])
 
@@ -119,34 +145,38 @@
     columns: columns.value,
     rows: []
   })
+
   const handleSearch = (selectedKeys: Key[], confirm: (param?: FilterConfirmProps) => void, dataIndex: string) => {
     confirm()
     Object.assign(state, {
       searchText: selectedKeys[0] as string,
       searchedColumn: dataIndex
     })
-    getHostList()
+    getHostList(true)
   }
 
   const handleReset = (clearFilters: (param?: FilterResetProps) => void) => {
     clearFilters({ confirm: true })
     state.searchText = ''
-    getHostList()
+    getHostList(true)
   }
 
-  const getHostList = async () => {
-    loading.value = true
+  const getHostList = async (isFirstCall = false) => {
     if (!paginationProps.value) {
       loading.value = false
       return
     }
     try {
+      if (isFirstCall) {
+        loading.value = true
+      }
       const res = await hostApi.getHosts({ ...filtersParams.value, clusterId: 0 })
-      dataSource.value = res.content.map((v) => ({ ...v, name: v.id, displayName: v.hostname }))
+      dataSource.value = res.content
       paginationProps.value.total = res.total
       loading.value = false
     } catch (error) {
       console.log('error :>> ', error)
+      stopPolling()
     } finally {
       loading.value = false
     }
@@ -168,21 +198,29 @@
     hostCreateRef.value?.handleOpen('ADD')
   }
 
+  const bulkRmove = () => {
+    if (state.selectedRowKeys.length === 0) {
+      message.error(t('common.delete_empty'))
+      return
+    }
+    deleteHost(state.selectedRowKeys as number[])
+  }
+
   const editHost = (row: HostVO) => {
     const cluster = clusterStore.clusters.find((v) => v.name === row.clusterName)
     const formatHost = { ...row, diplayName: row.clusterDisplayName, clusterId: cluster?.id }
     hostCreateRef.value?.handleOpen('EDIT', formatHost)
   }
 
-  const deleteHost = (row: HostVO) => {
+  const deleteHost = (ids: number[]) => {
     Modal.confirm({
-      title: t('common.delete_msg'),
+      title: ids.length > 1 ? t('common.delete_msgs') : t('common.delete_msg'),
       async onOk() {
         try {
-          const data = await hostApi.removeHost({ hostId: row.id! })
+          const data = await hostApi.removeHost({ ids })
           if (data) {
             message.success(t('common.delete_success'))
-            getHostList()
+            getHostList(true)
           }
         } catch (error) {
           console.log('error :>> ', error)
@@ -191,16 +229,35 @@
     })
   }
 
-  const updateHost = (item: HostReq) => {
-    console.log('item :>> ', item)
-  }
-
   const afterSetupHostConfig = async (type: 'ADD' | 'EDIT', item: HostReq) => {
-    type === 'ADD' ? installRef.value?.handleOpen(item) : updateHost(item)
+    type === 'ADD' ? installRef.value?.handleOpen(item) : getHostList(true)
   }
 
   onMounted(() => {
-    getHostList()
+    startPolling()
+  })
+
+  const startPolling = () => {
+    getHostList(true)
+    pollingIntervalId.value = setInterval(() => {
+      getHostList()
+    }, POLLING_INTERVAL)
+  }
+
+  const stopPolling = () => {
+    if (pollingIntervalId.value) {
+      clearInterval(pollingIntervalId.value)
+      pollingIntervalId.value = null
+    }
+  }
+
+  const tableChange: TableProps['onChange'] = (pagination, filters, ...args) => {
+    onChange(pagination, filters, ...args)
+    getHostList(true)
+  }
+
+  onUnmounted(() => {
+    stopPolling()
   })
 </script>
 
@@ -209,7 +266,7 @@
     <div class="title">{{ $t('host.host_list') }}</div>
     <a-space :size="16">
       <a-button type="primary" @click="addHost">{{ $t('cluster.add_host') }}</a-button>
-      <a-button type="primary" danger>{{ $t('common.bulk_remove') }}</a-button>
+      <a-button type="primary" danger @click="bulkRmove">{{ $t('common.bulk_remove') }}</a-button>
     </a-space>
     <a-table
       :loading="loading"
@@ -219,7 +276,7 @@
       :pagination="paginationProps"
       :scroll="{ x: 1300, y: 1000 }"
       :row-selection="{ selectedRowKeys: state.selectedRowKeys, onChange: onSelectChange }"
-      @change="onChange"
+      @change="tableChange"
     >
       <template #customFilterDropdown="{ setSelectedKeys, selectedKeys, confirm, clearFilters, column }">
         <div class="search">
@@ -230,16 +287,22 @@
             @change="(e: any) => setSelectedKeys(e.target?.value ? [e.target?.value] : [])"
             @press-enter="handleSearch(selectedKeys, confirm, column.dataIndex)"
           />
-          <a-space :size="16">
+          <div class="search-option">
+            <a-button size="small" @click="handleReset(clearFilters)">
+              {{ $t('common.reset') }}
+            </a-button>
             <a-button type="primary" size="small" @click="handleSearch(selectedKeys, confirm, column.dataIndex)">
               {{ $t('common.search') }}
             </a-button>
-            <a-button size="small" @click="handleReset(clearFilters)"> {{ $t('common.reset') }} </a-button>
-          </a-space>
+          </div>
         </div>
       </template>
-      <template #customFilterIcon="{ filtered }">
-        <svg-icon :name="filtered ? 'search_activated' : 'search'" />
+      <template #customFilterIcon="{ filtered, column }">
+        <svg-icon
+          v-if="!['status', 'clusterDisplayName'].includes(column.key)"
+          :name="filtered ? 'search_activated' : 'search'"
+        />
+        <svg-icon v-else :name="filtered ? 'filter_activated' : 'filter'" />
       </template>
       <template #bodyCell="{ record, column }">
         <template v-if="column.key === 'hostname'">
@@ -253,11 +316,8 @@
           </span>
         </template>
         <template v-if="column.key === 'status'">
-          <svg-icon :name="record.status.toLowerCase()" />
-          <span :title="`${record.message ? record.message : ''}`">
-            {{ `${$t(`common.${record.status.toLowerCase()}`)}` }}
-            {{ record.message && record.status.toLowerCase() === 'failed' ? `:  ${record.message}` : '' }}
-          </span>
+          <svg-icon style="margin-left: 0" :name="hostStatus[record.status].toLowerCase()" />
+          <span>{{ $t(`common.${hostStatus[record.status].toLowerCase()}`) }}</span>
         </template>
         <template v-if="column.key === 'operation'">
           <button-group
@@ -272,7 +332,7 @@
         </template>
       </template>
     </a-table>
-    <host-create ref="hostCreateRef" :is-public="true" @on-ok="afterSetupHostConfig" />
+    <host-create ref="hostCreateRef" :api-edit-caller="true" :is-public="true" @on-ok="afterSetupHostConfig" />
     <install-dependencies ref="installRef" />
   </div>
 </template>
@@ -295,10 +355,20 @@
       line-height: 24px;
     }
   }
+
   .search {
     display: grid;
     gap: $space-sm;
     padding: $space-sm;
+    &-option {
+      width: 100%;
+      display: grid;
+      gap: $space-sm;
+      grid-template-columns: 1fr 1fr;
+      button {
+        width: 100%;
+      }
+    }
   }
 
   .highlight {

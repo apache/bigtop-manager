@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { TableColumnType } from 'ant-design-vue'
+  import { message, TableColumnType } from 'ant-design-vue'
   import { storeToRefs } from 'pinia'
   import { computed, reactive, ref, shallowRef } from 'vue'
   import { useI18n } from 'vue-i18n'
@@ -149,6 +149,10 @@
   }
 
   const startInstallDependencies = async () => {
+    if (dataSource.value.length == 0) {
+      message.error(t('host.uninstallable'))
+      return
+    }
     try {
       installing.value = true
       const data = await installDependencies((dataSource.value = setHostStatusToInstalling()))
@@ -208,9 +212,9 @@
     } as CommandRequest
     installing.value = true
     try {
-      const res = await execCommand(data)
-      console.log('res :>> ', res)
+      await execCommand(data)
       emits('onInstallSuccess')
+      handleCancel()
     } catch (error) {
       console.log('error :>> ', error)
     } finally {

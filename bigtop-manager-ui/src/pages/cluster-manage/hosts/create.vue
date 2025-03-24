@@ -32,6 +32,7 @@
   import { useClusterStore } from '@/store/cluster'
   import type { UploadProps } from 'ant-design-vue'
   import type { HostParams, HostVO } from '@/api/hosts/types'
+  import { updateHost } from '@/api/hosts'
 
   enum Mode {
     EDIT = 'cluster.edit_host',
@@ -42,8 +43,9 @@
     (event: 'onOk', type: keyof typeof Mode, value: HostReq | HostVO): void
   }
 
-  const props = withDefaults(defineProps<{ isPublic?: boolean }>(), {
-    isPublic: false
+  const props = withDefaults(defineProps<{ isPublic?: boolean; apiEditCaller?: boolean }>(), {
+    isPublic: false,
+    apiEditCaller: false
   })
 
   const { t } = useI18n()
@@ -51,6 +53,7 @@
   const localeStore = useLocaleStore()
   const clusterStore = useClusterStore()
   const open = ref(false)
+  const loading = ref(false)
   const mode = ref<keyof typeof Mode>('ADD')
   const hiddenItems = ref<string[]>([])
   const autoFormRef = ref<Comp.AutoFormInstance | null>(null)
@@ -380,6 +383,22 @@
     autoFormRef.value?.setOptions('clusterId', formatClusters)
   }
 
+  const editHost = async (hostConfig: HostReq) => {
+    try {
+      const data = await updateHost(hostConfig)
+      if (data) {
+        loading.value = false
+        message.success(t('common.update_success'))
+        emits('onOk', mode.value, formValue.value)
+        handleCancel()
+      }
+    } catch (error) {
+      console.log('error :>> ', error)
+    } finally {
+      loading.value = false
+    }
+  }
+
   const handleOk = async () => {
     const validate = await autoFormRef.value?.getFormValidation()
     if (!validate) return
@@ -391,8 +410,13 @@
           handleCancel()
         }
       } else {
-        emits('onOk', mode.value, formValue.value)
-        handleCancel()
+        if (props.apiEditCaller) {
+          loading.value = true
+          await editHost(formValue.value)
+        } else {
+          emits('onOk', mode.value, formValue.value)
+          handleCancel()
+        }
       }
     } catch (e) {
       console.log(e)
@@ -520,6 +544,7 @@
       :width="600"
       :title="Mode[mode] && $t(Mode[mode])"
       :mask-closable="false"
+      :confirm-loading="loading"
       :centered="true"
       :destroy-on-close="true"
       @ok="handleOk"
