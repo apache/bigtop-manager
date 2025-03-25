@@ -110,5 +110,6 @@ export default {
   more_operations: 'More Operations',
   ok: 'Ok',
   yes: 'Yes',
-  no: 'No'
+  no: 'No',
+  all: 'All'
 }

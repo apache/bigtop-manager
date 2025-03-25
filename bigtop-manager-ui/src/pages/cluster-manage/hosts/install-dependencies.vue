@@ -34,6 +34,7 @@
   import type { CommandRequest, HostReq } from '@/api/command/types'
 
   type Key = string | number
+
   interface TableState {
     selectedRowKeys: Key[]
     searchText: string
@@ -109,13 +110,13 @@
     {
       text: 'edit',
       disabled: installing.value,
-      clickEvent: (_item, args) => editHost(args)
+      clickEvent: (_item, args) => editPreAddedHost(args)
     },
     {
       text: 'remove',
       danger: true,
       disabled: installing.value,
-      clickEvent: (_item, args) => deleteHost(args)
+      clickEvent: (_item, args) => deletePreAddedHost(args)
     }
   ])
 
@@ -201,11 +202,11 @@
     return Array.from(mergedMap.values())
   }
 
-  const startAddHost = async () => {
+  const startAddHosts = async () => {
     const data = {
-      hostCommands: dataSource.value,
+      command: 'Add',
       commandLevel: 'host',
-      command: 'Add'
+      hostCommands: dataSource.value
     } as CommandRequest
     installing.value = true
     try {
@@ -219,16 +220,16 @@
     }
   }
 
-  const editHost = (row: HostReq) => {
+  const editPreAddedHost = (row: HostReq) => {
     hostCreateRef.value?.handleOpen('EDIT', row)
   }
 
-  const deleteHost = (row: HostReq) => {
+  const deletePreAddedHost = (row: HostReq) => {
     dataSource.value = dataSource.value?.filter((v) => row.key !== v.key)
   }
 
-  const handleInstall = () => {
-    allInstallSuccess.value ? startAddHost() : startInstallDependencies()
+  const handleInstalled = () => {
+    allInstallSuccess.value ? startAddHosts() : startInstallDependencies()
   }
 
   const handleOpen = (payLoad: HostReq) => {
@@ -277,7 +278,7 @@
       :confirm-loading="installing"
       :ok-text="allInstallSuccess ? $t('common.confirm') : installing ? $t('common.installing') : t('common.install')"
       :destroy-on-close="true"
-      @ok="handleInstall"
+      @ok="handleInstalled"
       @cancel="handleCancel"
     >
       <a-table
@@ -301,7 +302,7 @@
               <a-button type="primary" size="small" @click="handleSearch(selectedKeys, confirm, column.dataIndex)">
                 {{ $t('common.search') }}
               </a-button>
-              <a-button size="small" @click="handleReset(clearFilters)"> {{ $t('common.reset') }} </a-button>
+              <a-button size="small" @click="handleReset(clearFilters)"> {{ $t('common.reset') }}</a-button>
             </a-space>
           </div>
         </template>
@@ -349,6 +350,6 @@
 
   .highlight {
     background-color: rgb(255, 192, 105);
-    padding: 0px;
+    padding: 0;
   }
 </style>

@@ -30,18 +30,22 @@
   import type { FilterConfirmProps, FilterResetProps, TableRowSelection } from 'ant-design-vue/es/table/interface'
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { HostVO } from '@/api/hosts/types'
+  import { useRouter } from 'vue-router'
 
   const POLLING_INTERVAL = 30000
   type Key = string | number
+
   interface TableState {
     selectedRowKeys: Key[]
     searchText: string
     searchedColumn: string
   }
+
   const { t } = useI18n()
+  const router = useRouter()
+  const clusterStore = useClusterStore()
   const searchInputRef = ref()
   const pollingIntervalId = ref<any>(null)
-  const clusterStore = useClusterStore()
   const hostCreateRef = ref<InstanceType<typeof HostCreate> | null>(null)
   const installRef = ref<InstanceType<typeof InstallDependencies> | null>(null)
   const hostStatus = shallowRef(['INSTALLING', 'SUCCESS', 'FAILED', 'UNKNOWN'])
@@ -199,7 +203,7 @@
     hostCreateRef.value?.handleOpen('ADD')
   }
 
-  const bulkRmove = () => {
+  const bulkRemove = () => {
     if (state.selectedRowKeys.length === 0) {
       message.error(t('common.delete_empty'))
       return
@@ -209,7 +213,7 @@
 
   const editHost = (row: HostVO) => {
     const cluster = clusterStore.clusters.find((v) => v.name === row.clusterName)
-    const formatHost = { ...row, diplayName: row.clusterDisplayName, clusterId: cluster?.id }
+    const formatHost = { ...row, displayName: row.clusterDisplayName, clusterId: cluster?.id }
     hostCreateRef.value?.handleOpen('EDIT', formatHost)
   }
 
@@ -221,7 +225,7 @@
           const data = await hostApi.removeHost({ ids })
           if (data) {
             message.success(t('common.delete_success'))
-            getHostList(true)
+            await getHostList(true)
           }
         } catch (error) {
           console.log('error :>> ', error)
@@ -231,7 +235,7 @@
   }
 
   const afterSetupHostConfig = async (type: 'ADD' | 'EDIT', item: HostReq) => {
-    type === 'ADD' ? installRef.value?.handleOpen(item) : getHostList(true)
+    type === 'ADD' ? installRef.value?.handleOpen(item) : await getHostList(true)
   }
 
   onMounted(() => {
@@ -257,6 +261,10 @@
     getHostList(true)
   }
 
+  const viewHostDetail = (row: HostVO) => {
+    router.push({ name: 'HostDetail', query: { hostId: row.id } })
+  }
+
   onUnmounted(() => {
     stopPolling()
   })
@@ -267,7 +275,7 @@
     <div class="title">{{ $t('host.host_list') }}</div>
     <a-space :size="16">
       <a-button type="primary" @click="addHost">{{ $t('cluster.add_host') }}</a-button>
-      <a-button type="primary" danger @click="bulkRmove">{{ $t('common.bulk_remove') }}</a-button>
+      <a-button type="primary" danger @click="bulkRemove">{{ $t('common.bulk_remove') }}</a-button>
     </a-space>
     <a-table
       :loading="loading"
@@ -307,8 +315,8 @@
       </template>
       <template #bodyCell="{ record, column }">
         <template v-if="column.key === 'hostname'">
-          <a-typography-link underline>
-            <span :title="record.hostname">{{ record.hostname }}</span>
+          <a-typography-link underlin>
+            <span :title="record.hostname" @click="viewHostDetail(record)">{{ record.hostname }}</span>
           </a-typography-link>
         </template>
         <template v-if="column.key === 'componentNum'">
@@ -361,11 +369,13 @@
     display: grid;
     gap: $space-sm;
     padding: $space-sm;
+
     &-option {
       width: 100%;
       display: grid;
       gap: $space-sm;
       grid-template-columns: 1fr 1fr;
+
       button {
         width: 100%;
       }

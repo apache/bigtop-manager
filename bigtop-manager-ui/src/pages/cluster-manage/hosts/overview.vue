@@ -18,19 +18,18 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onActivated, ref, shallowRef, useAttrs } from 'vue'
+  import { computed, ref, shallowRef, toRefs, watch } from 'vue'
   import { useI18n } from 'vue-i18n'
-  import { storeToRefs } from 'pinia'
-  import { useServiceStore } from '@/store/service'
-  import { formatFromByte } from '@/utils/storage'
-  import { usePngImage } from '@/utils/tools'
-  import { CommonStatus, CommonStatusTexts } from '@/enums/state'
-  import GaugeChart from './components/gauge-chart.vue'
-  import CategoryChart from './components/category-chart.vue'
-  import type { ClusterStatusType, ClusterVO } from '@/api/cluster/types'
-  import { type MenuProps, Empty } from 'ant-design-vue'
-  import type { ServiceListParams } from '@/api/service/types'
-  import type { StackVO } from '@/api/stack/types'
+  import { Empty } from 'ant-design-vue'
+  import { formatFromByte } from '@/utils/storage.ts'
+  import { HostStatusType, HostVO } from '@/api/hosts/types.ts'
+  import { CommonStatus, CommonStatusTexts } from '@/enums/state.ts'
+  import { useStackStore } from '@/store/stack'
+  import { useInstalledStore } from '@/store/installed'
+  import { useClusterStore } from '@/store/cluster'
+  import CategoryChart from '@/pages/cluster-manage/cluster/components/category-chart.vue'
+  import GaugeChart from '@/pages/cluster-manage/cluster/components/gauge-chart.vue'
+  import type { ClusterStatusType } from '@/api/cluster/types.ts'
 
   type TimeRangeText = '1m' | '15m' | '30m' | '1h' | '6h' | '30h'
   type TimeRangeItem = {
@@ -38,27 +37,30 @@
     time: string
   }
 
+  interface Props {
+    hostInfo: HostVO
+  }
+
+  const props = defineProps<Props>()
+  const stackStore = useStackStore()
+  const installedStore = useInstalledStore()
+  const clusterStore = useClusterStore()
+  const { hostInfo } = toRefs(props)
   const { t } = useI18n()
-  const attrs = useAttrs() as ClusterVO
-  const serviceStore = useServiceStore()
   const currTimeRange = ref<TimeRangeText>('15m')
+  const statusColors = shallowRef<Record<HostStatusType, keyof typeof CommonStatusTexts>>({
+    1: 'healthy',
+    2: 'unhealthy',
+    3: 'unknown'
+  })
   const chartData = ref({
     chart1: [],
     chart2: [],
     chart3: [],
     chart4: []
   })
-  const statusColors = shallowRef<Record<ClusterStatusType, keyof typeof CommonStatusTexts>>({
-    1: 'healthy',
-    2: 'unhealthy',
-    3: 'unknown'
-  })
-  const { locateStackWithService, serviceNames } = storeToRefs(serviceStore)
-  const clusterDetail = computed(() => ({
-    ...attrs,
-    totalMemory: formatFromByte(attrs.totalMemory as number),
-    totalDisk: formatFromByte(attrs.totalDisk as number)
-  }))
+  const locateStackWithComponent = computed(() => stackStore.stacks)
+  const needFormatFormByte = computed(() => ['totalMemorySize', 'totalDisk'])
   const noChartData = computed(() => Object.values(chartData.value).every((v) => v.length === 0))
   const timeRanges = computed((): TimeRangeItem[] => [
     {
@@ -86,61 +88,63 @@
       time: ''
     }
   ])
-  const baseConfig = computed((): Partial<Record<keyof ClusterVO, string>> => {
+  const baseConfig = computed((): Partial<Record<keyof HostVO, string>> => {
     return {
-      status: t('overview.cluster_status'),
-      displayName: t('overview.cluster_name'),
-      desc: t('overview.cluster_desc'),
-      totalHost: t('overview.host_count'),
-      totalService: t('overview.service_count'),
-      totalMemory: t('overview.memory'),
-      totalProcessor: t('overview.core_count'),
-      totalDisk: t('overview.disk_size'),
-      createUser: t('overview.creator')
+      status: t('overview.host_status'),
+      hostname: t('overview.host_name'),
+      desc: t('overview.host_desc'),
+      clusterDisplayName: t('common.cluster'),
+      componentNum: t('overview.component_count'),
+      os: t('overview.os'),
+      ipv4: t('overview.ip_v4'),
+      ipv6: t('overview.ip_v6'),
+      arch: t('overview.arch'),
+      availableProcessors: t('overview.core_count'),
+      totalMemorySize: t('overview.memory'),
+      totalDisk: t('overview.disk_size')
     }
   })
-  const unitOfBaseConfig = computed((): Partial<Record<keyof ClusterVO, string>> => {
-    return {
-      totalHost: t('overview.unit_host'),
-      totalService: t('overview.unit_service'),
-      totalProcessor: t('overview.unit_core')
-    }
-  })
-  const detailKeys = computed(() => Object.keys(baseConfig.value) as (keyof ClusterVO)[])
-  const serviceOperates = computed(() => [
-    {
-      action: 'start',
-      text: t('common.start', [t('common.service')])
-    },
-    {
-      action: 'restart',
-      text: t('common.restart', [t('common.service')])
-    },
-    {
-      action: 'stop',
-      text: t('common.stop', [t('common.service')])
-    }
-  ])
-
-  const handleServiceOperate: MenuProps['onClick'] = (item) => {
-    console.log('item :>> ', item.key)
-  }
+  const unitOfBaseConfig = computed(
+    (): Partial<Record<keyof HostVO, string>> => ({
+      componentNum: t('overview.unit_component'),
+      availableProcessors: t('overview.unit_core')
+    })
+  )
+  const detailKeys = computed((): (keyof HostVO)[] => Object.keys(baseConfig.value))
+  // const componentOperates = computed(() => [
+  //   {
+  //     action: 'start',
+  //     text: t('common.start', [t('common.host')])
+  //   },
+  //   {
+  //     action: 'restart',
+  //     text: t('common.restart', [t('common.host')])
+  //   },
+  //   {
+  //     action: 'stop',
+  //     text: t('common.stop', [t('common.host')])
+  //   }
+  // ])
+  //
+  // const handleHostOperate: MenuProps['onClick'] = (item) => {
+  //   console.log('item :>> ', item.key)
+  // }
 
   const handleTimeRange = (time: TimeRangeItem) => {
     currTimeRange.value = time.text
   }
 
-  const getServices = (filters?: ServiceListParams) => {
-    attrs.id != undefined && serviceStore.getServices(attrs.id, filters)
-  }
-
-  const servicesFromCurrentCluster = (stack: StackVO) => {
-    return stack.services.filter((v) => serviceNames.value.includes(v.name))
-  }
-
-  onActivated(() => {
-    getServices()
-  })
+  watch(
+    () => hostInfo.value,
+    (val) => {
+      console.log(val)
+      const index = clusterStore.clusters.findIndex((v) => v.name === hostInfo.value.clusterName)
+      if (index > -1) {
+        installedStore.serviceStore.getServices(clusterStore.clusters[index].id!)
+        console.log(installedStore.serviceStore.services)
+      }
+    }
+  )
 </script>
 
 <template>
@@ -171,23 +175,25 @@
                         <a-tag
                           v-if="base === 'status'"
                           class="reset-tag"
-                          :color="CommonStatus[statusColors[clusterDetail[base] as ClusterStatusType]]"
+                          :color="CommonStatus[statusColors[hostInfo[base] as ClusterStatusType]]"
                         >
-                          <status-dot :color="CommonStatus[statusColors[clusterDetail[base] as ClusterStatusType]]" />
-                          {{
-                            clusterDetail[base] &&
-                            $t(`common.${statusColors[clusterDetail[base] as ClusterStatusType]}`)
-                          }}
+                          <status-dot :color="CommonStatus[statusColors[hostInfo[base] as ClusterStatusType]]" />
+                          {{ hostInfo[base] && $t(`common.${statusColors[hostInfo[base] as ClusterStatusType]}`) }}
                         </a-tag>
-                        <a-typography-text
-                          v-else
-                          class="desc-sub-item-desc-column"
-                          :content="
-                            Object.keys(unitOfBaseConfig).includes(base)
-                              ? `${clusterDetail[base]} ${unitOfBaseConfig[base]}`
-                              : `${clusterDetail[base]}`
-                          "
-                        />
+                        <a-typography-text v-else class="desc-sub-item-desc-column">
+                          <span v-if="Object.keys(unitOfBaseConfig).includes(base as string)">
+                            {{ `${hostInfo[base]} ${unitOfBaseConfig[base]}` }}
+                          </span>
+                          <span v-else>
+                            {{
+                              `${
+                                needFormatFormByte.includes(base as string)
+                                  ? formatFromByte(hostInfo[base])
+                                  : hostInfo[base]
+                              }`
+                            }}
+                          </span>
+                        </a-typography-text>
                       </div>
                     </template>
                   </div>
@@ -196,11 +202,11 @@
             </a-descriptions>
           </div>
         </div>
-        <!-- service info -->
-        <template v-if="locateStackWithService.length == 0">
-          <div class="service-info">
+
+        <template v-if="locateStackWithComponent.length == 0">
+          <div class="component-info">
             <div class="box-title">
-              <a-typography-text strong :content="$t('overview.service_info')" />
+              <a-typography-text strong :content="$t('overview.component_info')" />
             </div>
             <div class="box-empty">
               <a-empty :image="Empty.PRESENTED_IMAGE_SIMPLE" />
@@ -209,9 +215,9 @@
         </template>
         <a-descriptions v-else layout="vertical" bordered :column="1">
           <template #title>
-            <a-typography-text strong :content="$t('overview.service_info')" />
+            <a-typography-text strong :content="$t('overview.component_info')" />
           </template>
-          <a-descriptions-item v-for="stack in locateStackWithService" :key="stack.stackName">
+          <a-descriptions-item v-for="stack in locateStackWithComponent" :key="stack.stackName">
             <template #label>
               <div class="desc-sub-label">
                 <a-typography-text
@@ -221,22 +227,22 @@
                 <a-typography-text type="secondary" :content="`${stack.stackName}-${stack.stackVersion}`" />
               </div>
             </template>
-            <div v-for="service in servicesFromCurrentCluster(stack)" :key="service.id" class="service-item">
-              <a-avatar v-if="service.name" :src="usePngImage(service.name.toLowerCase())" :size="16" />
-              <a-typography-text :content="service.displayName" />
-              <a-dropdown :trigger="['click']">
-                <a-button type="text" shape="circle" size="small">
-                  <svg-icon name="more" style="margin: 0" />
-                </a-button>
-                <template #overlay>
-                  <a-menu @click="handleServiceOperate">
-                    <a-menu-item v-for="operate in serviceOperates" :key="operate.action">
-                      <span>{{ operate.text }}</span>
-                    </a-menu-item>
-                  </a-menu>
-                </template>
-              </a-dropdown>
-            </div>
+            <!--            <div v-for="service in getComponentsFromCurrentHost(stack)" :key="service.id" class="component-item">-->
+            <!--              <a-avatar v-if="service.name" :src="usePngImage(service.name.toLowerCase())" :size="16" />-->
+            <!--              <a-typography-text :content="service.displayName" />-->
+            <!--              <a-dropdown :trigger="['click']">-->
+            <!--                <a-button type="text" shape="circle" size="small">-->
+            <!--                  <svg-icon name="more" style="margin: 0" />-->
+            <!--                </a-button>-->
+            <!--                <template #overlay>-->
+            <!--                  <a-menu @click="handleHostOperate">-->
+            <!--                    <a-menu-item v-for="operate in componentOperates" :key="operate.action">-->
+            <!--                      <span>{{ operate.text }}</span>-->
+            <!--                    </a-menu-item>-->
+            <!--                  </a-menu>-->
+            <!--                </template>-->
+            <!--              </a-dropdown>-->
+            <!--            </div>-->
           </a-descriptions-item>
         </a-descriptions>
       </a-col>
@@ -337,7 +343,7 @@
     }
   }
 
-  .service-item {
+  .component-item {
     display: grid;
     grid-template-columns: auto 1fr auto;
     gap: $space-md;

@@ -27,6 +27,12 @@ export const getHosts = (params?: HostListParams): Promise<HostVOList> => {
     params
   })
 }
+export const getHost = (pathParams: { id: number }): Promise<HostVO> => {
+  return request({
+    method: 'get',
+    url: `/hosts/${pathParams.id}`
+  })
+}
 
 export const addHost = (data: HostParams): Promise<HostVO> => {
   return request({

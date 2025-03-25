@@ -110,5 +110,6 @@ export default {
   more_operations: '其他操作',
   ok: '确认',
   yes: '是',
-  no: '否'
+  no: '否',
+  all: '全部'
 }

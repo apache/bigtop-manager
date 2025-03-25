@@ -137,6 +137,15 @@ const routes: RouteRecordRaw[] = [
               hidden: true,
               activeMenu: '/cluster-manage/hosts'
             }
+          },
+          {
+            name: 'HostDetail',
+            path: 'detail',
+            component: () => import('@/pages/cluster-manage/hosts/detail.vue'),
+            meta: {
+              hidden: true,
+              activeMenu: '/cluster-manage/hosts'
+            }
           }
         ]
       }
