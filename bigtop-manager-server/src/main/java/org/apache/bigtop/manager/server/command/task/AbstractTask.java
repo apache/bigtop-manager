@@ -132,8 +132,4 @@ public abstract class AbstractTask implements Task {
 
         return taskPO;
     }
-
-    protected void setTaskContextForTest(TaskContext taskContext) {
-        this.taskContext = taskContext;
-    }
 }

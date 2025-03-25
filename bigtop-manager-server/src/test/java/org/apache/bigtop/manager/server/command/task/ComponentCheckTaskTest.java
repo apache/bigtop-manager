@@ -35,6 +35,7 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,8 +89,7 @@ public class ComponentCheckTaskTest {
         taskContext.setComponentName("TestComponentName");
         taskContext.setClusterId(123L);
 
-        doCallRealMethod().when(componentCheckTask).setTaskContextForTest(any());
-        componentCheckTask.setTaskContextForTest(taskContext);
+        ReflectionTestUtils.setField(componentCheckTask, "taskContext", taskContext);
 
         doCallRealMethod().when(componentCheckTask).injectBeans();
         componentCheckTask.injectBeans();

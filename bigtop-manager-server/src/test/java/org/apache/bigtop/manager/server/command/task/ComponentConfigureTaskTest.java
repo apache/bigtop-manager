@@ -34,6 +34,7 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -83,8 +84,7 @@ public class ComponentConfigureTaskTest {
         taskContext.setComponentName("TestComponentName");
         taskContext.setClusterId(123L);
 
-        doCallRealMethod().when(componentConfigureTask).setTaskContextForTest(any());
-        componentConfigureTask.setTaskContextForTest(taskContext);
+        ReflectionTestUtils.setField(componentConfigureTask, "taskContext", taskContext);
 
         doCallRealMethod().when(componentConfigureTask).injectBeans();
         componentConfigureTask.injectBeans();
