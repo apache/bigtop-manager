@@ -176,7 +176,7 @@ class StageContextTest {
 
     @Test
     void testComponentCommand() {
-        // Build COMPONENT-level command
+        // Build component level command
         CommandDTO commandDTO = new CommandDTO();
         commandDTO.setCommandLevel(CommandLevel.COMPONENT);
 

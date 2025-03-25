@@ -85,7 +85,7 @@ public abstract class AbstractComponentStage extends AbstractStage {
         return taskContext;
     }
 
-    private Map<String, List<String>> getClusterHosts() {
+    protected Map<String, List<String>> getClusterHosts() {
         Map<String, List<String>> clusterHosts = new HashMap<>();
         for (ClusterPO clusterPO : clusterDao.findAll()) {
             List<String> hosts = new ArrayList<>();

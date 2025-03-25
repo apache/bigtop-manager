@@ -1,0 +1,5 @@
+{
+  "ZOOKEEPER_SERVER-STOP": [
+    "KAFKA_BROKER-STOP"
+  ]
+}
