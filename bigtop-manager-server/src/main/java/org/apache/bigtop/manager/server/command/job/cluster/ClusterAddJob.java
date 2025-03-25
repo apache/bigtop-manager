@@ -21,7 +21,6 @@ package org.apache.bigtop.manager.server.command.job.cluster;
 import org.apache.bigtop.manager.dao.po.JobPO;
 import org.apache.bigtop.manager.dao.po.StagePO;
 import org.apache.bigtop.manager.dao.po.TaskPO;
-import org.apache.bigtop.manager.server.command.job.AbstractJob;
 import org.apache.bigtop.manager.server.command.job.JobContext;
 import org.apache.bigtop.manager.server.command.stage.HostCheckStage;
 import org.apache.bigtop.manager.server.command.stage.SetupJdkStage;
@@ -38,7 +37,7 @@ import org.apache.bigtop.manager.server.service.HostService;
 
 import java.util.List;
 
-public class ClusterAddJob extends AbstractJob {
+public class ClusterAddJob extends AbstractClusterJob {
 
     private HostService hostService;
 
