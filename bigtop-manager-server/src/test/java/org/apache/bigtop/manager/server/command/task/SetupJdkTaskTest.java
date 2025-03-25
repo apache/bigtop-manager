@@ -113,7 +113,7 @@ public class SetupJdkTaskTest {
     }
 
     @Test
-    public void tesGetTaskPO() {
+    public void testGetTaskPO() {
         doCallRealMethod().when(setupJdkTask).getCustomCommand();
         doCallRealMethod().when(setupJdkTask).getName();
         doCallRealMethod().when(setupJdkTask).getCommand();

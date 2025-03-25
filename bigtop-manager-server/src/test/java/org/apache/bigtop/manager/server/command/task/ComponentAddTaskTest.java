@@ -128,13 +128,13 @@ public class ComponentAddTaskTest {
     }
 
     @Test
-    public void tesGetTaskContext() {
+    public void testGetTaskContext() {
         doCallRealMethod().when(componentAddTask).getTaskContext();
         assertEquals(taskContext, componentAddTask.getTaskContext());
     }
 
     @Test
-    public void tesGetTaskPO() {
+    public void testGetTaskPO() {
         doCallRealMethod().when(componentAddTask).getName();
         doCallRealMethod().when(componentAddTask).getCommand();
 

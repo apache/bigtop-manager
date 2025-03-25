@@ -142,7 +142,7 @@ public class ComponentCheckTaskTest {
     }
 
     @Test
-    public void tesGetTaskPO() {
+    public void testGetTaskPO() {
         doCallRealMethod().when(componentCheckTask).getName();
         doCallRealMethod().when(componentCheckTask).getCommand();
 

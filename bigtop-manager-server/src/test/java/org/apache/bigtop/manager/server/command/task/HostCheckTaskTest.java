@@ -113,7 +113,7 @@ public class HostCheckTaskTest {
     }
 
     @Test
-    public void tesGetTaskPO() {
+    public void testGetTaskPO() {
         doCallRealMethod().when(hostCheckTask).getCustomCommand();
         doCallRealMethod().when(hostCheckTask).getName();
         doCallRealMethod().when(hostCheckTask).getCommand();
