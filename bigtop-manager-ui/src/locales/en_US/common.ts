@@ -107,6 +107,7 @@ export default {
   restart: 'Restart {0}',
   stop: 'Stop {0}',
   add: 'Add {0}',
+  configs: 'Configs',
   more_operations: 'More Operations',
   ok: 'Ok',
   yes: 'Yes',

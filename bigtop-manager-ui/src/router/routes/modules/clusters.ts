@@ -70,6 +70,14 @@ const routes: RouteRecordRaw[] = [
             meta: {
               hidden: true
             }
+          },
+          {
+            name: 'ServiceDetail',
+            path: `${RouteExceptions.DYNAMIC_ROUTE_MATCH}/service-detail/:service/:serviceId`,
+            component: () => import('@/pages/cluster-manage/cluster/service-manage/index.vue'),
+            meta: {
+              hidden: true
+            }
           }
         ]
       },

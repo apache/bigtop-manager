@@ -107,6 +107,7 @@ export default {
   stop: '停止{0}',
   add: '添加{0}',
   reset: '重置',
+  configs: '配置',
   more_operations: '其他操作',
   ok: '确认',
   yes: '是',

@@ -127,7 +127,19 @@
     <filter-form :filter-items="filterFormItems" @filter="getServices" />
     <a-empty v-if="services.length == 0" style="width: 100%" :image="Empty.PRESENTED_IMAGE_SIMPLE" />
     <div v-else class="service-item-wrp">
-      <a-card v-for="item in services" :key="item.id" :hoverable="true" class="service-item">
+      <a-card
+        v-for="item in services"
+        :key="item.id"
+        :hoverable="true"
+        class="service-item"
+        @click="
+          () =>
+            $router.push({
+              name: 'ServiceDetail',
+              params: { service: item.displayName || item.name, serviceId: item.id }
+            })
+        "
+      >
         <div class="header">
           <div class="header-base-wrp">
             <a-avatar v-if="item.name" :src="usePngImage(item.name.toLowerCase())" :size="42" class="header-icon" />

@@ -60,7 +60,9 @@
   <div class="header-card">
     <slot>
       <div class="header-card-info">
-        <a-avatar v-if="showAvatar" :src="avatarSrc" shape="square" :size="54" />
+        <slot name="avatar">
+          <a-avatar v-if="showAvatar" :src="avatarSrc" shape="square" :size="54" />
+        </slot>
         <div class="card-info-title">
           <div class="card-info-status">
             <a-typography-title :level="5">{{ $props.title }}</a-typography-title>
@@ -104,6 +106,14 @@
       .ant-typography {
         margin: 0;
       }
+    }
+  }
+
+  :deep(.ant-avatar) {
+    border-radius: 4px;
+
+    img {
+      object-fit: contain !important;
     }
   }
 </style>
