@@ -20,16 +20,15 @@
 <script setup lang="ts">
   import { computed, ref, shallowRef, toRefs, watch } from 'vue'
   import { useI18n } from 'vue-i18n'
-  import { Empty } from 'ant-design-vue'
+  import { Empty, MenuProps } from 'ant-design-vue'
   import { formatFromByte } from '@/utils/storage.ts'
   import { HostStatusType, HostVO } from '@/api/hosts/types.ts'
   import { CommonStatus, CommonStatusTexts } from '@/enums/state.ts'
-  import { useStackStore } from '@/store/stack'
-  import { useInstalledStore } from '@/store/installed'
-  import { useClusterStore } from '@/store/cluster'
   import CategoryChart from '@/pages/cluster-manage/cluster/components/category-chart.vue'
   import GaugeChart from '@/pages/cluster-manage/cluster/components/gauge-chart.vue'
   import type { ClusterStatusType } from '@/api/cluster/types.ts'
+  import { getComponentsByHost } from '@/api/hosts'
+  import { ComponentVO } from '@/api/component/types.ts'
 
   type TimeRangeText = '1m' | '15m' | '30m' | '1h' | '6h' | '30h'
   type TimeRangeItem = {
@@ -42,11 +41,9 @@
   }
 
   const props = defineProps<Props>()
-  const stackStore = useStackStore()
-  const installedStore = useInstalledStore()
-  const clusterStore = useClusterStore()
   const { hostInfo } = toRefs(props)
   const { t } = useI18n()
+  const currExecuteComponent = shallowRef<ComponentVO>({})
   const currTimeRange = ref<TimeRangeText>('15m')
   const statusColors = shallowRef<Record<HostStatusType, keyof typeof CommonStatusTexts>>({
     1: 'healthy',
@@ -59,7 +56,7 @@
     chart3: [],
     chart4: []
   })
-  const locateStackWithComponent = computed(() => stackStore.stacks)
+  const componentsFromCurrentHost = shallowRef<Map<string, ComponentVO[]>>(new Map())
   const needFormatFormByte = computed(() => ['totalMemorySize', 'totalDisk'])
   const noChartData = computed(() => Object.values(chartData.value).every((v) => v.length === 0))
   const timeRanges = computed((): TimeRangeItem[] => [
@@ -111,37 +108,51 @@
     })
   )
   const detailKeys = computed((): (keyof HostVO)[] => Object.keys(baseConfig.value))
-  // const componentOperates = computed(() => [
-  //   {
-  //     action: 'start',
-  //     text: t('common.start', [t('common.host')])
-  //   },
-  //   {
-  //     action: 'restart',
-  //     text: t('common.restart', [t('common.host')])
-  //   },
-  //   {
-  //     action: 'stop',
-  //     text: t('common.stop', [t('common.host')])
-  //   }
-  // ])
-  //
-  // const handleHostOperate: MenuProps['onClick'] = (item) => {
-  //   console.log('item :>> ', item.key)
-  // }
+  const componentOperates = computed(() => [
+    {
+      action: 'start',
+      text: t('common.start', [t('common.host')])
+    },
+    {
+      action: 'restart',
+      text: t('common.restart', [t('common.host')])
+    },
+    {
+      action: 'stop',
+      text: t('common.stop', [t('common.host')])
+    }
+  ])
+
+  const handleHostOperate: MenuProps['onClick'] = (item) => {
+    console.log('item :>> ', item.key)
+    console.log(currExecuteComponent.value)
+  }
 
   const handleTimeRange = (time: TimeRangeItem) => {
     currTimeRange.value = time.text
   }
 
+  const recordClickComp = (comp: ComponentVO) => {
+    currExecuteComponent.value = comp
+  }
+
   watch(
     () => hostInfo.value,
-    (val) => {
-      console.log(val)
-      const index = clusterStore.clusters.findIndex((v) => v.name === hostInfo.value.clusterName)
-      if (index > -1) {
-        installedStore.serviceStore.getServices(clusterStore.clusters[index].id!)
-        console.log(installedStore.serviceStore.services)
+    async (val) => {
+      if (val.id) {
+        try {
+          const data = await getComponentsByHost({ id: val.id })
+          componentsFromCurrentHost.value = data.reduce((pre, val) => {
+            if (!pre.has(val.stack!)) {
+              pre.set(val.stack!, [val])
+            } else {
+              ;(pre.get(val.stack!) as ComponentVO[]).push(val)
+            }
+            return pre
+          }, new Map<string, ComponentVO[]>())
+        } catch (error) {
+          console.log(error)
+        }
       }
     }
   )
@@ -203,7 +214,7 @@
           </div>
         </div>
 
-        <template v-if="locateStackWithComponent.length == 0">
+        <template v-if="componentsFromCurrentHost.size === 0">
           <div class="component-info">
             <div class="box-title">
               <a-typography-text strong :content="$t('overview.component_info')" />
@@ -217,32 +228,28 @@
           <template #title>
             <a-typography-text strong :content="$t('overview.component_info')" />
           </template>
-          <a-descriptions-item v-for="stack in locateStackWithComponent" :key="stack.stackName">
+          <a-descriptions-item v-for="stack in componentsFromCurrentHost.keys()" :key="stack">
             <template #label>
               <div class="desc-sub-label">
-                <a-typography-text
-                  strong
-                  :content="stack.stackName.charAt(0).toUpperCase() + stack.stackName.slice(1) + ' Stack'"
-                />
-                <a-typography-text type="secondary" :content="`${stack.stackName}-${stack.stackVersion}`" />
+                <a-typography-text strong :content="stack.split('-')[0] + ' Stack'" />
+                <a-typography-text type="secondary" :content="`${stack.toLowerCase()}`" />
               </div>
             </template>
-            <!--            <div v-for="service in getComponentsFromCurrentHost(stack)" :key="service.id" class="component-item">-->
-            <!--              <a-avatar v-if="service.name" :src="usePngImage(service.name.toLowerCase())" :size="16" />-->
-            <!--              <a-typography-text :content="service.displayName" />-->
-            <!--              <a-dropdown :trigger="['click']">-->
-            <!--                <a-button type="text" shape="circle" size="small">-->
-            <!--                  <svg-icon name="more" style="margin: 0" />-->
-            <!--                </a-button>-->
-            <!--                <template #overlay>-->
-            <!--                  <a-menu @click="handleHostOperate">-->
-            <!--                    <a-menu-item v-for="operate in componentOperates" :key="operate.action">-->
-            <!--                      <span>{{ operate.text }}</span>-->
-            <!--                    </a-menu-item>-->
-            <!--                  </a-menu>-->
-            <!--                </template>-->
-            <!--              </a-dropdown>-->
-            <!--            </div>-->
+            <div v-for="comp in componentsFromCurrentHost.get(stack)" :key="comp.id" class="component-item">
+              <a-typography-text :content="`${comp.serviceDisplayName}/${comp.displayName}`" />
+              <a-dropdown :trigger="['click']">
+                <a-button type="text" shape="circle" size="small" @click="recordClickComp(comp)">
+                  <svg-icon name="more" style="margin: 0" />
+                </a-button>
+                <template #overlay>
+                  <a-menu @click="handleHostOperate">
+                    <a-menu-item v-for="operate in componentOperates" :key="operate.action">
+                      <span>{{ operate.text }}</span>
+                    </a-menu-item>
+                  </a-menu>
+                </template>
+              </a-dropdown>
+            </div>
           </a-descriptions-item>
         </a-descriptions>
       </a-col>
@@ -345,7 +352,7 @@
 
   .component-item {
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: 1fr auto;
     gap: $space-md;
     align-items: center;
     padding: 12px 16px;

@@ -28,7 +28,7 @@
   import { execCommand } from '@/api/command'
   import HostCreate from '@/pages/cluster-manage/hosts/create.vue'
   import useBaseTable from '@/composables/use-base-table'
-  import { InstalledStatusVO, Status } from '@/api/hosts/types'
+  import { type InstalledStatusVO, Status } from '@/api/hosts/types'
   import type { FilterConfirmProps, FilterResetProps } from 'ant-design-vue/es/table/interface'
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { CommandRequest, HostReq } from '@/api/command/types'

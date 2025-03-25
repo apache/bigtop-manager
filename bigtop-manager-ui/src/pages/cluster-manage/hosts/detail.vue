@@ -20,15 +20,12 @@
 <script setup lang="ts">
   import { computed, onMounted, ref, shallowRef } from 'vue'
   import { useI18n } from 'vue-i18n'
-  // import { storeToRefs } from 'pinia'
-  // import { execCommand } from '@/api/command'
-  // import { Command } from '@/api/command/types'
   import { useRoute } from 'vue-router'
-  import Overview from './overview.vue'
-  import type { GroupItem } from '@/components/common/button-group/types'
-  import { HostStatusType, HostVO } from '@/api/hosts/types.ts'
   import { getHost } from '@/api/hosts'
   import { CommonStatus, CommonStatusTexts } from '@/enums/state'
+  import Overview from './overview.vue'
+  import type { GroupItem } from '@/components/common/button-group/types'
+  import type { HostStatusType, HostVO } from '@/api/hosts/types.ts'
 
   const { t } = useI18n()
   const route = useRoute()

@@ -28,11 +28,11 @@
   import { storeToRefs } from 'pinia'
   import { uploadFile } from '@/api/upload-file'
   import { Rule } from 'ant-design-vue/es/form'
-  import { HostReq } from '@/api/command/types'
+  import { updateHost } from '@/api/hosts'
   import { useClusterStore } from '@/store/cluster'
   import type { UploadProps } from 'ant-design-vue'
+  import type { HostReq } from '@/api/command/types'
   import type { HostParams, HostVO } from '@/api/hosts/types'
-  import { updateHost } from '@/api/hosts'
 
   enum Mode {
     EDIT = 'cluster.edit_host',

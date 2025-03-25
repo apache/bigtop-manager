@@ -19,6 +19,7 @@
 
 import request from '@/api/request.ts'
 import type { HostListParams, HostParams, HostVO, HostVOList, InstalledStatusVO } from '@/api/hosts/types.ts'
+import type { ComponentVO } from '@/api/component/types.ts'
 
 export const getHosts = (params?: HostListParams): Promise<HostVOList> => {
   return request({
@@ -70,5 +71,12 @@ export const removeHost = (data: { ids: number[] }): Promise<boolean> => {
     method: 'delete',
     url: '/hosts/batch',
     data
+  })
+}
+
+export const getComponentsByHost = (pathParams: { id: number }): Promise<ComponentVO[]> => {
+  return request({
+    method: 'get',
+    url: `/hosts/${pathParams.id}/components`
   })
 }
