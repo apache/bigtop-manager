@@ -502,12 +502,12 @@
   }
 
   const beforeUpload: UploadProps['beforeUpload'] = (file) => {
-    const isText = file.type === 'text/plain'
+    // const isText = file.type === 'text/plain'
     const checkLimitSize = file.size / 1024 <= 10
-    if (!isText) {
-      message.error(t('common.file_type_error'))
-      return false
-    }
+    // if (!isText) {
+    //   message.error(t('common.file_type_error'))
+    //   return false
+    // }
     if (!checkLimitSize) {
       message.error(t('common.file_size_error'))
       return false
