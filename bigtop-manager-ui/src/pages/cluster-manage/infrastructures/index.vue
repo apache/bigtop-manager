@@ -123,14 +123,11 @@ const infraAction = async (command: keyof typeof Command, serviceName: string) =
   // })
 }
 
-
-
 const getServices = async (filters?: ServiceListParams) => {
   await serviceStore.getServices(0, filters);
 }
 
 onMounted(async () => { 
-  
   await getServices()
 })
 </script>
