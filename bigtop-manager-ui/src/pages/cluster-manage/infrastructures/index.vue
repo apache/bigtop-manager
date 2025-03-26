@@ -79,7 +79,7 @@ import { useServiceStore } from '@/store/service'
 import type { ServiceListParams, ServiceStatusType } from '@/api/service/types'
 import type { GroupItem } from '@/components/common/button-group/types'
 import type { FilterFormItem } from '@/components/common/filter-form/types'
-import { execCommand } from '@/api/command'
+// import { execCommand } from '@/api/command'
 import type { Command } from '@/api/command/types'
 
 const { t } = useI18n()
@@ -108,10 +108,10 @@ const filterFormItems = computed((): FilterFormItem[] => [
   }
 ])
 const actionGroups = shallowRef<GroupItem[]>([
-  { action: 'start', icon: 'start', clickEvent: (item, args) => { infraAction('Start', args.name) } },
-  { action: 'stop', icon: 'stop', clickEvent: (item, args) => { infraAction('Stop', args.name) } },
-  { action: 'restart', icon: 'restart', clickEvent: (item, args) => { infraAction('Restart', args.name) } },
-  { action: 'more', icon: 'more_line', clickEvent: (item, args) => { infraAction('More', args.name) } }
+  { action: 'start', icon: 'start', clickEvent: (item, args) => { console.log('item :>> ', item?.action); infraAction('Start', args.name) } },
+  { action: 'stop', icon: 'stop', clickEvent: (item, args) => { console.log('item :>> ', item?.action); infraAction('Stop', args.name) } },
+  { action: 'restart', icon: 'restart', clickEvent: (item, args) => { console.log('item :>> ', item?.action); infraAction('Restart', args.name) } },
+  { action: 'more', icon: 'more_line', clickEvent: (item, args) => { console.log('item :>> ', item?.action); infraAction('More', args.name) } }
 ])
 
 const infraAction = async (command: keyof typeof Command, serviceName: string) => {
