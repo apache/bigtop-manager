@@ -237,7 +237,7 @@
               </div>
             </template>
             <div v-for="comp in componentsFromCurrentHost.get(stack)" :key="comp.id" class="component-item">
-              <a-avatar v-if="comp.serviceName" :src="usePngImage(comp.serviceName.toLowerCase())" :size="18" />
+              <a-avatar v-if="comp.serviceName" :src="usePngImage(comp.serviceName.toLowerCase())" :size="22" />
               <a-typography-text :content="`${comp.serviceDisplayName}/${comp.displayName}`" />
               <a-dropdown :trigger="['click']">
                 <a-button type="text" shape="circle" size="small" @click="recordClickComp(comp)">

@@ -222,7 +222,7 @@
               </div>
             </template>
             <div v-for="service in servicesFromCurrentCluster(stack)" :key="service.id" class="service-item">
-              <a-avatar v-if="service.name" :src="usePngImage(service.name.toLowerCase())" :size="18" />
+              <a-avatar v-if="service.name" :src="usePngImage(service.name.toLowerCase())" :size="22" />
               <a-typography-text :content="service.displayName" />
               <a-dropdown :trigger="['click']">
                 <a-button type="text" shape="circle" size="small">
