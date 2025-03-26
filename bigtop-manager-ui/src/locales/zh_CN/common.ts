@@ -57,6 +57,9 @@ export default {
   host: '主机',
   service: '服务',
   stack: '组件栈',
+  component: '组件',
+  componentname: '组件名',
+  quick_link: '快速链接',
   stage: '阶段',
   search: '搜索',
   required: '需重启',
@@ -112,5 +115,6 @@ export default {
   ok: '确认',
   yes: '是',
   no: '否',
-  all: '全部'
+  all: '全部',
+  disabled: '关闭'
 }

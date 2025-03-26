@@ -38,11 +38,16 @@ export default {
   unit_component: 'Components',
   component_info: 'Component Information',
   host_status: 'Status',
-  host_name: 'Name',
+  hostname: 'Name',
   host_desc: 'Description',
   component_count: 'Component Count',
   os: 'OS',
   ip_v4: 'IPv4',
   ip_v6: 'IPv6',
-  arch: 'Architecture'
+  arch: 'Architecture',
+  service_status: 'Status',
+  service_name: 'Name',
+  service_version: 'Version',
+  metrics: 'Metrics',
+  kerberos: 'Kerberos'
 }

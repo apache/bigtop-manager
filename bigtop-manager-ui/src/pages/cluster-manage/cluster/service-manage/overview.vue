@@ -20,11 +20,10 @@
 <script setup lang="ts">
   import { computed, ref, shallowRef, useAttrs } from 'vue'
   import { useI18n } from 'vue-i18n'
-  import { formatFromByte } from '@/utils/storage'
   import { CommonStatus, CommonStatusTexts } from '@/enums/state'
   import GaugeChart from '../components/gauge-chart.vue'
   import CategoryChart from '../components/category-chart.vue'
-  import type { ClusterStatusType, ClusterVO } from '@/api/cluster/types'
+  import type { ServiceVO, ServiceStatusType } from '@/api/service/types'
 
   type TimeRangeText = '1m' | '15m' | '30m' | '1h' | '6h' | '30h'
   type TimeRangeItem = {
@@ -33,7 +32,7 @@
   }
 
   const { t } = useI18n()
-  const attrs = useAttrs() as ClusterVO
+  const attrs = useAttrs()
   const currTimeRange = ref<TimeRangeText>('15m')
   const chartData = ref({
     chart1: [],
@@ -41,16 +40,13 @@
     chart3: [],
     chart4: []
   })
-  const statusColors = shallowRef<Record<ClusterStatusType, keyof typeof CommonStatusTexts>>({
+  const statusColors = shallowRef<Record<ServiceStatusType, keyof typeof CommonStatusTexts>>({
     1: 'healthy',
     2: 'unhealthy',
     3: 'unknown'
   })
-  const clusterDetail = computed(() => ({
-    ...attrs,
-    totalMemory: formatFromByte(attrs.totalMemory as number),
-    totalDisk: formatFromByte(attrs.totalDisk as number)
-  }))
+  const serviceDetail = computed(() => attrs as unknown as ServiceVO)
+  const serviceKeys = computed(() => Object.keys(baseConfig.value) as (keyof ServiceVO)[])
   const noChartData = computed(() => Object.values(chartData.value).every((v) => v.length === 0))
   const timeRanges = computed((): TimeRangeItem[] => [
     {
@@ -78,27 +74,18 @@
       time: ''
     }
   ])
-  const baseConfig = computed((): Partial<Record<keyof ClusterVO, string>> => {
+  const baseConfig = computed((): Partial<Record<keyof ServiceVO, string>> => {
     return {
-      status: t('overview.cluster_status'),
-      displayName: t('overview.cluster_name'),
-      desc: t('overview.cluster_desc'),
-      totalHost: t('overview.host_count'),
-      totalService: t('overview.service_count'),
-      totalMemory: t('overview.memory'),
-      totalProcessor: t('overview.core_count'),
-      totalDisk: t('overview.disk_size'),
-      createUser: t('overview.creator')
+      status: t('overview.service_status'),
+      displayName: t('overview.service_name'),
+      version: t('overview.service_version'),
+      stack: t('common.stack'),
+      restartFlag: t('service.required_restart'),
+      metrics: t('overview.metrics'),
+      kerberos: t('overview.kerberos')
     }
   })
-  const unitOfBaseConfig = computed((): Partial<Record<keyof ClusterVO, string>> => {
-    return {
-      totalHost: t('overview.unit_host'),
-      totalService: t('overview.unit_service'),
-      totalProcessor: t('overview.unit_core')
-    }
-  })
-  const detailKeys = computed(() => Object.keys(baseConfig.value) as (keyof ClusterVO)[])
+
   const handleTimeRange = (time: TimeRangeItem) => {
     currTimeRange.value = time.text
   }
@@ -122,33 +109,37 @@
                 </template>
                 <div class="desc-sub-item-wrp">
                   <div class="desc-sub-item">
-                    <template v-for="base in detailKeys" :key="base">
+                    <template v-for="key in serviceKeys" :key="key">
                       <div class="desc-sub-item-desc">
                         <a-typography-text
                           class="desc-sub-item-desc-column"
                           type="secondary"
-                          :content="baseConfig[base]"
+                          :content="baseConfig[`${key}`]"
                         />
                         <a-tag
-                          v-if="base === 'status'"
+                          v-if="key === 'status'"
                           class="reset-tag"
-                          :color="CommonStatus[statusColors[clusterDetail[base] as ClusterStatusType]]"
+                          :color="CommonStatus[statusColors[serviceDetail[key]]]"
                         >
-                          <status-dot :color="CommonStatus[statusColors[clusterDetail[base] as ClusterStatusType]]" />
-                          {{
-                            clusterDetail[base] &&
-                            $t(`common.${statusColors[clusterDetail[base] as ClusterStatusType]}`)
-                          }}
+                          <status-dot :color="CommonStatus[statusColors[serviceDetail[key]]]" />
+                          {{ serviceDetail[key] && $t(`common.${statusColors[serviceDetail[key]]}`) }}
                         </a-tag>
                         <a-typography-text
-                          v-else
+                          v-else-if="key === 'stack'"
                           class="desc-sub-item-desc-column"
-                          :content="
-                            Object.keys(unitOfBaseConfig).includes(base)
-                              ? `${clusterDetail[base]} ${unitOfBaseConfig[base]}`
-                              : `${clusterDetail[base]}`
-                          "
+                          :content="serviceDetail[key]?.toLowerCase()"
                         />
+                        <a-typography-text
+                          v-else-if="key === 'restartFlag'"
+                          class="desc-sub-item-desc-column"
+                          :content="serviceDetail[key] ? $t('common.yes') : $t('common.no')"
+                        />
+                        <a-typography-text
+                          v-else-if="['kerberos', 'metrics'].includes(key)"
+                          class="desc-sub-item-desc-column"
+                          :content="$t('common.disabled')"
+                        />
+                        <a-typography-text v-else class="desc-sub-item-desc-column" :content="serviceDetail[key]" />
                       </div>
                     </template>
                   </div>

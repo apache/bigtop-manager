@@ -88,7 +88,7 @@
   const baseConfig = computed((): Partial<Record<keyof HostVO, string>> => {
     return {
       status: t('overview.host_status'),
-      hostname: t('overview.host_name'),
+      hostname: t('overview.hostname'),
       desc: t('overview.host_desc'),
       clusterDisplayName: t('common.cluster'),
       componentNum: t('overview.component_count'),

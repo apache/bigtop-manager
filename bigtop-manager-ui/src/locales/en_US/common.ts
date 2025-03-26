@@ -57,6 +57,9 @@ export default {
   host: 'Host',
   service: 'Service',
   stack: 'Stack',
+  component: 'Component',
+  componentname: 'Name',
+  quick_link: 'Quick Link',
   stage: 'Stage',
   search: 'Search',
   reset: 'Reset',
@@ -112,5 +115,6 @@ export default {
   ok: 'Ok',
   yes: 'Yes',
   no: 'No',
-  all: 'All'
+  all: 'All',
+  disabled: 'Disabled'
 }

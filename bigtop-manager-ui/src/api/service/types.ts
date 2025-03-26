@@ -45,6 +45,8 @@ export interface ServiceVO {
   user?: string
   version?: string
   isInstalled?: boolean
+  metrics?: boolean
+  kerberos?: boolean
 }
 
 export interface ServiceConfig {

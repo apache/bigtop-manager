@@ -18,17 +18,20 @@
 -->
 
 <script setup lang="ts">
-  import { computed, ref } from 'vue'
+  import { computed, onMounted, ref, shallowRef } from 'vue'
   import { useI18n } from 'vue-i18n'
   // import { execCommand } from '@/api/command'
   // import { Command } from '@/api/command/types'
   // import { CommonStatus, CommonStatusTexts } from '@/enums/state'
+  import { useServiceStore } from '@/store/service'
   import { useRoute } from 'vue-router'
   import Overview from './overview.vue'
   import Components from './components.vue'
   import Configs from './configs.vue'
   import type { TabItem } from '@/components/common/main-card/types'
   import type { GroupItem } from '@/components/common/button-group/types'
+  import { ServiceVO } from '@/api/service/types'
+  import { storeToRefs } from 'pinia'
 
   interface ServieceInfo {
     cluster: string
@@ -39,8 +42,10 @@
 
   const { t } = useI18n()
   const route = useRoute()
-  const loading = ref(false)
+  const serviceStore = useServiceStore()
+  const { loading } = storeToRefs(serviceStore)
   const activeKey = ref('1')
+  const serviceDetail = shallowRef<ServiceVO>()
   const currServiceInfo = computed(() => route.params as unknown as ServieceInfo)
   const tabs = computed((): TabItem[] => [
     {
@@ -49,7 +54,7 @@
     },
     {
       key: '2',
-      title: t('common.host')
+      title: t('common.component')
     },
     {
       key: '3',
@@ -74,8 +79,7 @@
           action: 'Stop',
           text: t('common.stop', [t('common.cluster')])
         }
-      ],
-      dropdownMenuClickEvent: (info) => dropdownMenuClick && dropdownMenuClick(info)
+      ]
     }
   ])
 
@@ -84,32 +88,28 @@
     return components[parseInt(activeKey.value) - 1]
   })
 
-  const dropdownMenuClick: GroupItem['dropdownMenuClickEvent'] = async ({ key }) => {
-    console.log('key :>> ', key)
-    // try {
-    //   await execCommand({
-    //     command: key as keyof typeof Command,
-    //     clusterId: currServiceInfo.value.id,
-    //     commandLevel: 'cluster'
-    //   })
-    // } catch (error) {
-    //   console.log('error :>> ', error)
-    // }
+  const getServiceDetail = async () => {
+    const { id: clusterId, serviceId } = currServiceInfo.value
+    serviceDetail.value = await serviceStore.getServiceDetail(clusterId, serviceId)
   }
+
+  onMounted(() => {
+    getServiceDetail()
+  })
 </script>
 
 <template>
   <a-spin :spinning="loading">
     <header-card
-      :title="`${$route.params.service}`"
-      :avatar="`${$route.params.service}`.toLowerCase()"
-      desc="test"
+      :title="serviceDetail?.displayName || serviceDetail?.name"
+      :avatar="serviceDetail?.name"
+      :desc="serviceDetail?.desc"
       :action-groups="actionGroup"
     />
     <main-card v-model:active-key="activeKey" :tabs="tabs">
       <template #tab-item>
         <keep-alive>
-          <component :is="getCompName" v-bind="currServiceInfo"></component>
+          <component :is="getCompName" v-bind="serviceDetail"></component>
         </keep-alive>
       </template>
     </main-card>
