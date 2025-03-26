@@ -57,7 +57,7 @@
                 and comp.host_id = #{query.hostId}
             </if>
             <if test="query.hostname != null and query.hostname != ''">
-                and h.hostname = #{query.hostname}
+                and h.hostname like concat('%', #{query.hostname}, '%')
             </if>
             <if test="query.hostnames != null and query.hostnames.size() > 0">
                 and h.hostname in
