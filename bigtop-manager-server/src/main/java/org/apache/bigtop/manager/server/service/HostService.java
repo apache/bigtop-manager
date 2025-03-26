@@ -20,6 +20,7 @@ package org.apache.bigtop.manager.server.service;
 
 import org.apache.bigtop.manager.dao.query.HostQuery;
 import org.apache.bigtop.manager.server.model.dto.HostDTO;
+import org.apache.bigtop.manager.server.model.vo.ComponentVO;
 import org.apache.bigtop.manager.server.model.vo.HostVO;
 import org.apache.bigtop.manager.server.model.vo.InstalledStatusVO;
 import org.apache.bigtop.manager.server.model.vo.PageVO;
@@ -64,6 +65,20 @@ public interface HostService {
      * @return Host
      */
     Boolean remove(Long id);
+
+    /**
+     * Get host components
+     *
+     * @return Components
+     */
+    List<ComponentVO> components(Long id);
+
+    /**
+     * Batch delete hosts
+     *
+     * @return Host
+     */
+    Boolean batchRemove(List<Long> ids);
 
     /**
      * Check hosts connection
