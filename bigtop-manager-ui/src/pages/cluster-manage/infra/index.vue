@@ -115,6 +115,7 @@ const actionGroups = shallowRef<GroupItem[]>([
 ])
 
 const infraAction = async (command: keyof typeof Command, serviceName: string) => {
+  console.log(command, serviceName)
   // await execCommand({
   //   command: command,
   //   clusterId: 0,

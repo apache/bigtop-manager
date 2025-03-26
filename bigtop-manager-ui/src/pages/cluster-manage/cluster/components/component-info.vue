@@ -90,9 +90,9 @@
   <div class="component-info">
     <header>
       <a-radio-group v-model:value="stackSelected" button-style="solid">
-        <a-radio-blutton v-for="(stack, idx) in stackGroup" :key="idx" :value="stack">
+        <a-radio-button v-for="(stack, idx) in stackGroup" :key="idx" :value="stack">
           {{ stackGroup[idx].replace(/^\w/, (c) => c.toUpperCase()) }}
-        </a-radio-blutton>
+        </a-radio-button>
       </a-radio-group>
       <a-button type="primary" @click="handleSetSource">{{ $t('cluster.config_source') }}</a-button>
     </header>
