@@ -573,7 +573,7 @@
                 {{ $t('common.upload_file') }}
               </a-button>
             </a-upload>
-            <span class="filename">{{ fileName }}</span>
+            <span class="filename">{{ fileName ? fileName : mode === 'EDIT' ? formValue[item.field] : '' }}</span>
           </a-form-item>
         </template>
       </auto-form>
