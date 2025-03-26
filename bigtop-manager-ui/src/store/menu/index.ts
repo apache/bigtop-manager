@@ -45,6 +45,24 @@ export const useMenuStore = defineStore(
       const path = route.matched.at(-1)?.path
       return path?.includes(RouteExceptions.DYNAMIC_ROUTE_MATCH)
     })
+
+    const updateSiderItemByClusters = (formatSider: MenuItem[]) => {
+      formatSider.forEach((item) => {
+        if (item.name == RouteExceptions.SPECIAL_ROUTE_NAME) {
+          item.children = clusters.value.map((v) => {
+            return {
+              icon: '',
+              key: `${item.key}/${v.displayName}/${v.id}`,
+              label: v.displayName || '',
+              title: v.displayName || '',
+              activeMenu: item.key,
+              status: v.status || 3
+            }
+          })
+        }
+      })
+    }
+
     const siderMenus = computed((): MenuItem[] => {
       const siderMenuTemplate = baseRoutesMap.value.get(headerSelectedKey.value) || []
       const formatSider = cloneDeep(siderMenuTemplate)
@@ -85,23 +103,6 @@ export const useMenuStore = defineStore(
         siderMenuSelectedKey.value = activeMenu
       }
     })
-
-    const updateSiderItemByClusters = (formatSider: MenuItem[]) => {
-      formatSider.forEach((item) => {
-        if (item.name == RouteExceptions.SPECIAL_ROUTE_NAME) {
-          item.children = clusters.value.map((v) => {
-            return {
-              icon: '',
-              key: `${item.key}/${v.displayName}/${v.id}`,
-              label: v.displayName || '',
-              title: v.displayName || '',
-              activeMenu: item.key,
-              status: v.status || 3
-            }
-          })
-        }
-      })
-    }
 
     const formatRouteToMenu = (tree: any[], upPath = ''): MenuItem[] => {
       return tree

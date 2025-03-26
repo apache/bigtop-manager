@@ -113,7 +113,7 @@
     }
   )
 
-  const isContain = (source: string, target: string) => {
+  const isContain = (source: string, target: string): boolean => {
     return source.toString().toLowerCase().includes(target.toLowerCase())
   }
 

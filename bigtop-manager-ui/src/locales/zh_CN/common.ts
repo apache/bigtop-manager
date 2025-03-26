@@ -57,6 +57,7 @@ export default {
   host: '主机',
   service: '服务',
   stack: '组件栈',
+  component: '组件',
   stage: '阶段',
   search: '搜索',
   required: '需重启',
@@ -89,6 +90,8 @@ export default {
   select_error: '请选择{0}',
   add_error: '请添加{0}',
   delete_msg: '确认要删除该记录吗？',
+  delete_msgs: '确认要删除这些记录吗？',
+  delete_empty: '请选择需要删除的记录',
   total: '共{0}条数据',
   note: '注: 源地址的改动对所有集群生效。',
   upload_file: '上传文件',
@@ -108,5 +111,6 @@ export default {
   more_operations: '其他操作',
   ok: '确认',
   yes: '是',
-  no: '否'
+  no: '否',
+  all: '全部'
 }
