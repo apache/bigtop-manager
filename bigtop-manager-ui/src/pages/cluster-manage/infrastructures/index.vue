@@ -59,7 +59,7 @@
             </div>
           </div>
           <div class="item-content">
-            <button-group :auto="true" :space="0" :groups="actionGroups">
+            <button-group :auto="true" :space="0" :args="item" :groups="actionGroups">
               <template #icon="{ item: groupItem }">
                 <svg-icon :name="groupItem.icon || ''" />
               </template>
@@ -80,7 +80,7 @@ import type { ServiceListParams, ServiceStatusType } from '@/api/service/types'
 import type { GroupItem } from '@/components/common/button-group/types'
 import type { FilterFormItem } from '@/components/common/filter-form/types'
 import { execCommand } from '@/api/command'
-import { CommandRequest, ServiceCommandReq, Command } from '@/api/command/types.ts'
+import type { Command } from '@/api/command/types'
 
 const { t } = useI18n()
 const serviceStore = useServiceStore()
@@ -108,20 +108,20 @@ const filterFormItems = computed((): FilterFormItem[] => [
   }
 ])
 const actionGroups = shallowRef<GroupItem[]>([
-  { action: 'start', icon: 'start', clickEvent: (item) => { console.log('item :>> ', item?.action) } },
-  { action: 'stop', icon: 'stop', clickEvent: (item) => { console.log('item :>> ', item?.action) } },
-  { action: 'restart', icon: 'restart', clickEvent: (item) => { console.log('item :>> ', item?.action) } },
-  { action: 'more', icon: 'more_line', clickEvent: (item) => { console.log('item :>> ', item?.action) } }
+  { action: 'start', icon: 'start', clickEvent: (item, args) => { infraAction('Start', args.name) } },
+  { action: 'stop', icon: 'stop', clickEvent: (item, args) => { infraAction('Stop', args.name) } },
+  { action: 'restart', icon: 'restart', clickEvent: (item, args) => { infraAction('Restart', args.name) } },
+  { action: 'more', icon: 'more_line', clickEvent: (item, args) => { infraAction('More', args.name) } }
 ])
 
-// const infraAction = async (command, serviceName) => {
-//   await execCommand({
-//     command: 'Add',
-//     clusterId: 1,
-//     commandLevel: "service",
-//     serviceCommands: [{ serviceName: 'Prometheus' }]
-//   })
-// }
+const infraAction = async (command: keyof typeof Command, serviceName: string) => {
+  // await execCommand({
+  //   command: command,
+  //   clusterId: 0,
+  //   commandLevel: "service",
+  //   serviceCommands: [{ serviceName: serviceName }]
+  // })
+}
 
 
 
