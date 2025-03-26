@@ -18,13 +18,15 @@
  */
 package org.apache.bigtop.manager.server.command.stage;
 
-import org.apache.bigtop.manager.server.command.task.HostCheckTask;
+import org.apache.bigtop.manager.common.utils.Environments;
+import org.apache.bigtop.manager.server.command.task.ComponentInitTask;
 import org.apache.bigtop.manager.server.command.task.Task;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockedConstruction;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -33,32 +35,42 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mockConstruction;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class HostCheckStageTest {
+public class ComponentInitStageTest {
 
     @Mock
-    private HostCheckStage stage;
+    private ComponentInitStage stage;
 
     @Test
     public void testCreateTask() {
-        StageContext stageContext = new StageContext();
-        ReflectionTestUtils.setField(stage, "stageContext", stageContext);
-
-        MockedConstruction<?> mocked = mockConstruction(HostCheckTask.class);
+        MockedConstruction<?> mocked = mockConstruction(ComponentInitTask.class);
 
         doCallRealMethod().when(stage).createTask(any());
         Task task = stage.createTask("host1");
 
         assertEquals(1, mocked.constructed().size());
-        assertInstanceOf(HostCheckTask.class, task);
+        assertInstanceOf(ComponentInitTask.class, task);
 
         mocked.close();
     }
 
     @Test
-    public void tesGetName() {
+    public void testGetName() {
+        StageContext stageContext = new StageContext();
+        stageContext.setServiceName("zookeeper");
+        stageContext.setComponentName("zookeeper_server");
+
+        ReflectionTestUtils.setField(stage, "stageContext", stageContext);
+
+        MockedStatic<Environments> mocked = mockStatic(Environments.class);
+        when(Environments.isDevMode()).thenReturn(true);
+
         doCallRealMethod().when(stage).getName();
-        assertEquals("Check hosts", stage.getName());
+        assertEquals("Init ZooKeeper Server", stage.getName());
+
+        mocked.close();
     }
 }

@@ -18,93 +18,47 @@
  */
 package org.apache.bigtop.manager.server.command.stage;
 
-import org.apache.bigtop.manager.dao.po.StagePO;
-import org.apache.bigtop.manager.dao.repository.HostDao;
-import org.apache.bigtop.manager.dao.repository.StageDao;
+import org.apache.bigtop.manager.server.command.task.SetupJdkTask;
 import org.apache.bigtop.manager.server.command.task.Task;
-import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
-import org.mockito.Spy;
+import org.mockito.MockedConstruction;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doCallRealMethod;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mockConstruction;
 
 @ExtendWith(MockitoExtension.class)
 public class SetupJdkStageTest {
 
-    private MockedStatic<SpringContextHolder> springContextHolderMockedStatic;
-
     @Mock
-    private StageDao stageDao;
-
-    @Mock
-    private HostDao hostDao;
-
-    @Spy
-    private StageContext stageContext;
-
-    @Mock
-    private List<Task> tasks;
-
-    @Spy
-    private StagePO stagePO;
-
-    private SetupJdkStage setupJdkStage;
-
-    @BeforeEach
-    public void setUp() {
-        springContextHolderMockedStatic = mockStatic(SpringContextHolder.class);
-        when(SpringContextHolder.getBean(StageDao.class)).thenReturn(stageDao);
-        when(SpringContextHolder.getBean(HostDao.class)).thenReturn(hostDao);
-
-        setupJdkStage = mock(SetupJdkStage.class);
-
-        doCallRealMethod().when(setupJdkStage).setStageContextAndTasksForTest(any(), any());
-        setupJdkStage.setStageContextAndTasksForTest(stageContext, tasks);
-
-        doCallRealMethod().when(setupJdkStage).injectBeans();
-        setupJdkStage.injectBeans();
-
-        doCallRealMethod().when(setupJdkStage).loadStagePO(any());
-        lenient().when(setupJdkStage.getStagePO()).thenCallRealMethod();
-        setupJdkStage.loadStagePO(stagePO);
-    }
-
-    @AfterEach
-    public void tearDown() {
-        springContextHolderMockedStatic.close();
-    }
+    private SetupJdkStage stage;
 
     @Test
-    public void testInjectBeans() {
-        springContextHolderMockedStatic.verify(() -> SpringContextHolder.getBean(any(Class.class)), times(2));
-    }
+    public void testCreateTask() {
+        StageContext stageContext = new StageContext();
+        ReflectionTestUtils.setField(stage, "stageContext", stageContext);
 
-    @Test
-    public void testBeforeCreateTasks() {
-        doCallRealMethod().when(setupJdkStage).beforeCreateTasks();
-        assertDoesNotThrow(() -> setupJdkStage.beforeCreateTasks());
+        MockedConstruction<?> mocked = mockConstruction(SetupJdkTask.class);
+
+        doCallRealMethod().when(stage).createTask(any());
+        Task task = stage.createTask("host1");
+
+        assertEquals(1, mocked.constructed().size());
+        assertInstanceOf(SetupJdkTask.class, task);
+
+        mocked.close();
     }
 
     @Test
     public void tesGetName() {
-        doCallRealMethod().when(setupJdkStage).getName();
-        assertEquals("Setup JDK", setupJdkStage.getName());
+        doCallRealMethod().when(stage).getName();
+        assertEquals("Setup JDK", stage.getName());
     }
 }
