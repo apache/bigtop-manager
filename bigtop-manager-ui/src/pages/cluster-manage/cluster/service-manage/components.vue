@@ -75,11 +75,6 @@
       onFilterDropdownOpenChange: (visible) => onFilterDropdownOpenChange(visible)
     },
     {
-      title: t('common.quick_link'),
-      dataIndex: 'quickLink',
-      ellipsis: true
-    },
-    {
       title: t('common.status'),
       dataIndex: 'status',
       key: 'status',
@@ -100,6 +95,11 @@
           value: 3
         }
       ]
+    },
+    {
+      title: t('common.quick_link'),
+      dataIndex: 'quickLink',
+      ellipsis: true
     },
     {
       title: t('common.action'),
@@ -126,6 +126,32 @@
       clickEvent: (_item, args) => handleDelete(args)
     }
   ])
+
+  const batchOperations = computed((): GroupItem[] => [
+    {
+      text: t('common.batch_operation'),
+      type: 'primary',
+      dropdownMenu: [
+        {
+          action: 'Start',
+          text: t('common.start', [t('common.cluster')])
+        },
+        {
+          action: 'Restart',
+          text: t('common.restart', [t('common.cluster')])
+        },
+        {
+          action: 'Stop',
+          text: t('common.stop', [t('common.cluster')])
+        }
+      ],
+      dropdownMenuClickEvent: (info) => dropdownMenuClick && dropdownMenuClick(info)
+    }
+  ])
+
+  const dropdownMenuClick: GroupItem['dropdownMenuClickEvent'] = async ({ key }) => {
+    console.log('key :>> ', key)
+  }
 
   const onFilterDropdownOpenChange = (visible: boolean) => {
     if (visible) {
@@ -199,9 +225,10 @@
   <div class="component">
     <header>
       <div class="header-title">{{ $t('common.component') }}</div>
-      <a-space :size="16">
+      <div class="list-operation">
         <a-button type="primary">{{ $t('common.add', [`${$t('common.component')}`]) }}</a-button>
-      </a-space>
+        <button-group :space="24" :groups="batchOperations" group-shape="default" />
+      </div>
     </header>
     <a-table
       :loading="loading"
@@ -256,6 +283,12 @@
 </template>
 
 <style lang="scss" scoped>
+  .component {
+    .list-operation {
+      display: flex;
+      justify-content: space-between;
+    }
+  }
   header {
     margin-bottom: $space-md;
   }

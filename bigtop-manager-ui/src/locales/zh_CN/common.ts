@@ -33,6 +33,7 @@ export default {
   delete: '删除',
   remove: '移除',
   bulk_remove: '批量删除',
+  batch_operation: '批量操作',
   rename: '重命名',
   disable: '停用',
   enable: '使用',

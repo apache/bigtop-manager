@@ -65,7 +65,7 @@
     {
       shape: 'default',
       type: 'primary',
-      text: t('common.more_operations'),
+      text: t('common.action'),
       dropdownMenu: [
         {
           action: 'Start',

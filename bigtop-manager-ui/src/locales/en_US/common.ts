@@ -34,6 +34,7 @@ export default {
   delete: 'Delete',
   remove: 'Remove',
   bulk_remove: 'Bulk Remove',
+  batch_operation: 'Batch Operation',
   disable: 'Disable',
   enable: 'Enable',
   submit: 'Submit',

@@ -110,6 +110,7 @@
   }
 
   :deep(.ant-avatar) {
+    flex-shrink: 0;
     border-radius: 4px;
 
     img {
