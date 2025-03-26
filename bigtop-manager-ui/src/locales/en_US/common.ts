@@ -57,6 +57,7 @@ export default {
   host: 'Host',
   service: 'Service',
   stack: 'Stack',
+  component: 'Component',
   stage: 'Stage',
   search: 'Search',
   reset: 'Reset',

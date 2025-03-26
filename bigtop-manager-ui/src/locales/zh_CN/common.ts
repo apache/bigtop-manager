@@ -57,6 +57,7 @@ export default {
   host: '主机',
   service: '服务',
   stack: '组件栈',
+  component: '组件',
   stage: '阶段',
   search: '搜索',
   required: '需重启',

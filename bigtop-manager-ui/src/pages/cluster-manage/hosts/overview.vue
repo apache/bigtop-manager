@@ -22,13 +22,14 @@
   import { useI18n } from 'vue-i18n'
   import { Empty, MenuProps } from 'ant-design-vue'
   import { formatFromByte } from '@/utils/storage.ts'
-  import { HostStatusType, HostVO } from '@/api/hosts/types.ts'
+  import { usePngImage } from '@/utils/tools'
   import { CommonStatus, CommonStatusTexts } from '@/enums/state.ts'
   import CategoryChart from '@/pages/cluster-manage/cluster/components/category-chart.vue'
   import GaugeChart from '@/pages/cluster-manage/cluster/components/gauge-chart.vue'
-  import type { ClusterStatusType } from '@/api/cluster/types.ts'
   import { getComponentsByHost } from '@/api/hosts'
-  import { ComponentVO } from '@/api/component/types.ts'
+  import type { HostStatusType, HostVO } from '@/api/hosts/types.ts'
+  import type { ClusterStatusType } from '@/api/cluster/types.ts'
+  import type { ComponentVO } from '@/api/component/types.ts'
 
   type TimeRangeText = '1m' | '15m' | '30m' | '1h' | '6h' | '30h'
   type TimeRangeItem = {
@@ -111,15 +112,15 @@
   const componentOperates = computed(() => [
     {
       action: 'start',
-      text: t('common.start', [t('common.host')])
+      text: t('common.start', [t('common.component')])
     },
     {
       action: 'restart',
-      text: t('common.restart', [t('common.host')])
+      text: t('common.restart', [t('common.component')])
     },
     {
       action: 'stop',
-      text: t('common.stop', [t('common.host')])
+      text: t('common.stop', [t('common.component')])
     }
   ])
 
@@ -200,7 +201,7 @@
                               `${
                                 needFormatFormByte.includes(base as string)
                                   ? formatFromByte(hostInfo[base])
-                                  : hostInfo[base]
+                                  : hostInfo[base] || '--'
                               }`
                             }}
                           </span>
@@ -236,6 +237,7 @@
               </div>
             </template>
             <div v-for="comp in componentsFromCurrentHost.get(stack)" :key="comp.id" class="component-item">
+              <a-avatar v-if="comp.serviceName" :src="usePngImage(comp.serviceName.toLowerCase())" :size="18" />
               <a-typography-text :content="`${comp.serviceDisplayName}/${comp.displayName}`" />
               <a-dropdown :trigger="['click']">
                 <a-button type="text" shape="circle" size="small" @click="recordClickComp(comp)">
@@ -352,11 +354,11 @@
 
   .component-item {
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: auto 1fr auto;
     gap: $space-md;
     align-items: center;
     padding: 12px 16px;
-    border-bottom: 1px solid #f0f0f0;
+    border-top: 1px solid #f0f0f0;
   }
 
   .chart-item-wrp {
