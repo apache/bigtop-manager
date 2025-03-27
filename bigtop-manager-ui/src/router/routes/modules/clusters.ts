@@ -85,7 +85,7 @@ const routes: RouteRecordRaw[] = [
           {
             name: 'InfraList',
             path: 'list',
-            component: () => import('@/pages/cluster-manage/infra/index.vue'),
+            component: () => import('@/pages/cluster-manage/infrastructures/index.vue'),
             meta: {
               hidden: true,
               activeMenu: '/cluster-manage/infrastructures'
