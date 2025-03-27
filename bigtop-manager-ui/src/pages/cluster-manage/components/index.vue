@@ -17,24 +17,28 @@
   ~ under the License.
 -->
 <script setup lang="ts">
-import { reactive, computed, onMounted } from 'vue';
-import useBaseTable from '@/composables/use-base-table';
-import type { TableColumnType } from 'ant-design-vue';
-import { useI18n } from 'vue-i18n'
-import { useStackStore } from '@/store/stack'
-import { storeToRefs } from 'pinia'
-  
-const { t } = useI18n()
-const stackStore = useStackStore()
-const { stacks } = storeToRefs(stackStore)
-  
-const store = reactive({
-  loading: false,
-  stackSelected: 'Bigtop',
-  stackGroup: ['Bigtop', 'Infra', 'Extra'],
-})
-const currentStack = computed(() => stacks.value.find((stack) => stack.stackName.toUpperCase() === store.stackSelected.toUpperCase() ))
-const columns = computed((): TableColumnType[] => [
+  import { ref, reactive, computed, onMounted, watchEffect } from 'vue'
+  import useBaseTable from '@/composables/use-base-table'
+  import type { TableColumnType } from 'ant-design-vue'
+  import { useI18n } from 'vue-i18n'
+  import { useStackStore } from '@/store/stack'
+  import { storeToRefs } from 'pinia'
+  import { ServiceVO } from '@/api/service/types'
+
+  const { t } = useI18n()
+  const stackStore = useStackStore()
+  const { stacks } = storeToRefs(stackStore)
+
+  const store = reactive({
+    loading: false,
+    stackSelected: 'Bigtop',
+    stackGroup: ['Bigtop', 'Infra', 'Extra']
+  })
+  const currentStack = computed(() =>
+    stacks.value.find((stack) => stack.stackName.toUpperCase() === store.stackSelected.toUpperCase())
+  )
+  const data = ref<ServiceVO[]>([])
+  const columns = computed((): TableColumnType[] => [
     {
       title: '#',
       width: '48px',
@@ -45,13 +49,13 @@ const columns = computed((): TableColumnType[] => [
     },
     {
       title: t('common.name'),
-      dataIndex: 'stackName',
+      dataIndex: 'displayName',
       width: '20%',
       ellipsis: true
     },
     {
       title: t('common.version'),
-      dataIndex: 'stackVersion',
+      dataIndex: 'version',
       width: '15%',
       ellipsis: true
     },
@@ -66,21 +70,26 @@ const columns = computed((): TableColumnType[] => [
       title: t('common.desc'),
       dataIndex: 'desc',
       ellipsis: true
-    },
-])
-  
-const { loading, paginationProps, onChange } = useBaseTable({
-  columns: columns.value,
-  rows: stacks.value
-})
+    }
+  ])
 
-const handleSetSource = () => {
-  // setSourceRef.value?.handleOpen()
-}
+  const { loading, paginationProps, onChange, resetState } = useBaseTable({
+    columns: columns.value,
+    rows: data.value
+  })
 
-onMounted(() =>{
-  stackStore.loadStacks();
-})
+  watchEffect(() => {
+    resetState()
+    data.value = currentStack.value?.services || []
+  })
+
+  const handleSetSource = () => {
+    // setSourceRef.value?.handleOpen()
+  }
+
+  onMounted(() => {
+    stackStore.loadStacks()
+  })
 </script>
 
 <template>
@@ -95,11 +104,11 @@ onMounted(() =>{
       <a-button type="primary" @click="handleSetSource">{{ $t('cluster.config_source') }}</a-button>
     </div>
     <div>
-      <a-table 
-        :loading="loading" 
-        :data-source="stacks.filter((ele) => { return ele.stackName.toUpperCase() === store.stackSelected.toUpperCase() })" 
-        :columns="columns" 
-        :pagination="paginationProps" 
+      <a-table
+        :loading="loading"
+        :data-source="data"
+        :columns="columns"
+        :pagination="paginationProps"
         @change="onChange"
       >
         <template #bodyCell="{ column }">
@@ -113,16 +122,16 @@ onMounted(() =>{
 </template>
 
 <style lang="scss" scoped>
-.cluster-components {
-  padding: 24px 16px;
-  background-color: #fff;
-  .menu-title {
-    font-weight: bolder;
+  .cluster-components {
+    padding: 24px 16px;
+    background-color: #fff;
+    .menu-title {
+      font-weight: bolder;
+    }
+    .cluster-components-header {
+      display: flex;
+      justify-content: space-between;
+      margin: $space-md 0;
+    }
   }
-  .cluster-components-header {
-    display: flex;
-    justify-content: space-between;
-    margin: $space-md 0;
-  }
-}
 </style>

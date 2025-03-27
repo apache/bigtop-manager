@@ -18,66 +18,100 @@
 -->
 
 <script setup lang="ts">
-import { computed, shallowRef, onMounted, toRefs } from 'vue'
-import { usePngImage } from '@/utils/tools'
-import { useI18n } from 'vue-i18n'
-import { CommonStatus, CommonStatusTexts } from '@/enums/state'
-import { useServiceStore } from '@/store/service'
-import type { ServiceListParams, ServiceStatusType } from '@/api/service/types'
-import type { GroupItem } from '@/components/common/button-group/types'
-import type { FilterFormItem } from '@/components/common/filter-form/types'
-// import { execCommand } from '@/api/command'
-import type { Command } from '@/api/command/types'
+  import { computed, shallowRef, onMounted, toRefs } from 'vue'
+  import { usePngImage } from '@/utils/tools'
+  import { useI18n } from 'vue-i18n'
+  import { CommonStatus, CommonStatusTexts } from '@/enums/state'
+  import { useServiceStore } from '@/store/service'
+  import type { ServiceListParams, ServiceStatusType } from '@/api/service/types'
+  import type { GroupItem } from '@/components/common/button-group/types'
+  import type { FilterFormItem } from '@/components/common/filter-form/types'
+  // import { execCommand } from '@/api/command';
+  import type { Command } from '@/api/command/types'
 
-const { t } = useI18n()
-const serviceStore = useServiceStore()
-const { services, loading } = toRefs(serviceStore)
+  const { t } = useI18n()
+  const serviceStore = useServiceStore()
+  const { services, loading } = toRefs(serviceStore)
 
-const statusColors = shallowRef<Record<ServiceStatusType, keyof typeof CommonStatusTexts>>({
-  1: 'healthy',
-  2: 'unhealthy',
-  3: 'unknown'
-})
-const filterFormItems = computed((): FilterFormItem[] => [
-  { type: 'search', key: 'serviceName', label: t('service.name') },
-  { type: 'status', key: 'restartFlag', label: t('service.required_restart'),
-    options: [
-      { label: t('common.required'), value: 1 },
-      { label: t('common.not_required'), value: 2 }
-    ]
-  },
-  { type: 'status', key: 'status', label: t('common.status'),
-    options: [
-      { label: t(`common.${statusColors.value[1]}`), value: 1 },
-      { label: t(`common.${statusColors.value[2]}`), value: 2 },
-      { label: t(`common.${statusColors.value[3]}`), value: 3 }
-    ]
+  const statusColors = shallowRef<Record<ServiceStatusType, keyof typeof CommonStatusTexts>>({
+    1: 'healthy',
+    2: 'unhealthy',
+    3: 'unknown'
+  })
+  const filterFormItems = computed((): FilterFormItem[] => [
+    { type: 'search', key: 'serviceName', label: t('service.name') },
+    {
+      type: 'status',
+      key: 'restartFlag',
+      label: t('service.required_restart'),
+      options: [
+        { label: t('common.required'), value: 1 },
+        { label: t('common.not_required'), value: 2 }
+      ]
+    },
+    {
+      type: 'status',
+      key: 'status',
+      label: t('common.status'),
+      options: [
+        { label: t(`common.${statusColors.value[1]}`), value: 1 },
+        { label: t(`common.${statusColors.value[2]}`), value: 2 },
+        { label: t(`common.${statusColors.value[3]}`), value: 3 }
+      ]
+    }
+  ])
+  const actionGroups = shallowRef<GroupItem[]>([
+    {
+      action: 'start',
+      icon: 'start',
+      clickEvent: (item, args) => {
+        console.log('item :>> ', item?.action)
+        infraAction('Start', args.name)
+      }
+    },
+    {
+      action: 'stop',
+      icon: 'stop',
+      clickEvent: (item, args) => {
+        console.log('item :>> ', item?.action)
+        infraAction('Stop', args.name)
+      }
+    },
+    {
+      action: 'restart',
+      icon: 'restart',
+      clickEvent: (item, args) => {
+        console.log('item :>> ', item?.action)
+        infraAction('Restart', args.name)
+      }
+    },
+    {
+      action: 'more',
+      icon: 'more_line',
+      clickEvent: (item, args) => {
+        console.log('item :>> ', item?.action)
+        infraAction('More', args.name)
+      }
+    }
+  ])
+
+  const infraAction = async (command: keyof typeof Command, serviceName: string) => {
+    console.log(command, serviceName)
+    // await execCommand({
+    //   command: command,
+    //   clusterId: 0,
+    //   commandLevel: "service",
+    //   serviceCommands: [{ serviceName: serviceName }]
+    // })
   }
-])
-const actionGroups = shallowRef<GroupItem[]>([
-  { action: 'start', icon: 'start', clickEvent: (item, args) => { console.log('item :>> ', item?.action); infraAction('Start', args.name) } },
-  { action: 'stop', icon: 'stop', clickEvent: (item, args) => { console.log('item :>> ', item?.action); infraAction('Stop', args.name) } },
-  { action: 'restart', icon: 'restart', clickEvent: (item, args) => { console.log('item :>> ', item?.action); infraAction('Restart', args.name) } },
-  { action: 'more', icon: 'more_line', clickEvent: (item, args) => { console.log('item :>> ', item?.action); infraAction('More', args.name) } }
-])
 
-const infraAction = async (command: keyof typeof Command, serviceName: string) => {
-  console.log(command, serviceName)
-  // await execCommand({
-  //   command: command,
-  //   clusterId: 0,
-  //   commandLevel: "service",
-  //   serviceCommands: [{ serviceName: serviceName }]
-  // })
-}
+  const getServices = async (filters?: ServiceListParams) => {
+    await serviceStore.getServices(0, filters)
+  }
 
-const getServices = async (filters?: ServiceListParams) => {
-  await serviceStore.getServices(0, filters);
-}
-
-onMounted(async () => { 
-  await getServices()
-})
+  onMounted(async () => {
+    await getServices()
+  })
 </script>
 
 <template>
@@ -89,7 +123,9 @@ onMounted(async () => {
       </div>
       <a-button
         type="primary"
-        @click=" () => $router.push({ name: 'CreateInfraService', params: { id: 0, cluster: '', creationMode: 'public' } })"
+        @click="
+          () => $router.push({ name: 'CreateInfraService', params: { id: 0, cluster: '', creationMode: 'public' } })
+        "
       >
         {{ $t('infra.action') }}
       </a-button>
