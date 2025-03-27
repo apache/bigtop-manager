@@ -16,36 +16,6 @@
   ~ specific language governing permissions and limitations
   ~ under the License.
 -->
-
-<template>
-  <div class="cluster-components">
-    <div>
-      <div class="menu-title">{{ $t('menu.component') }}</div>
-    </div>
-    <div class="cluster-components-header">
-      <a-radio-group v-model:value="store.stackSelected" button-style="solid">
-        <a-radio-button v-for="(stack, idx) in store.stackGroup" :key="idx" :value="stack">{{ stack }}</a-radio-button>
-      </a-radio-group>
-      <a-button type="primary" @click="handleSetSource">{{ $t('cluster.config_source') }}</a-button>
-    </div>
-    <div>
-      <a-table 
-        :loading="loading" 
-        :data-source="stacks.filter((ele) => { return ele.stackName.toUpperCase() === store.stackSelected.toUpperCase() })" 
-        :columns="columns" 
-        :pagination="paginationProps" 
-        @change="onChange"
-      >
-        <template #bodyCell="{ column }">
-          <template v-if="column.key === 'stack'">
-            <span> {{ `${store.stackSelected}-${currentStack?.stackVersion}` }} </span>
-          </template>
-        </template>
-      </a-table>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { reactive, computed, onMounted } from 'vue';
 import useBaseTable from '@/composables/use-base-table';
@@ -112,6 +82,35 @@ onMounted(() =>{
   stackStore.loadStacks();
 })
 </script>
+
+<template>
+  <div class="cluster-components">
+    <div>
+      <div class="menu-title">{{ $t('menu.component') }}</div>
+    </div>
+    <div class="cluster-components-header">
+      <a-radio-group v-model:value="store.stackSelected" button-style="solid">
+        <a-radio-button v-for="(stack, idx) in store.stackGroup" :key="idx" :value="stack">{{ stack }}</a-radio-button>
+      </a-radio-group>
+      <a-button type="primary" @click="handleSetSource">{{ $t('cluster.config_source') }}</a-button>
+    </div>
+    <div>
+      <a-table 
+        :loading="loading" 
+        :data-source="stacks.filter((ele) => { return ele.stackName.toUpperCase() === store.stackSelected.toUpperCase() })" 
+        :columns="columns" 
+        :pagination="paginationProps" 
+        @change="onChange"
+      >
+        <template #bodyCell="{ column }">
+          <template v-if="column.key === 'stack'">
+            <span> {{ `${store.stackSelected}-${currentStack?.stackVersion}` }} </span>
+          </template>
+        </template>
+      </a-table>
+    </div>
+  </div>
+</template>
 
 <style lang="scss" scoped>
 .cluster-components {
