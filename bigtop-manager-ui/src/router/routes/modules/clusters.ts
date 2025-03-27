@@ -76,7 +76,7 @@ const routes: RouteRecordRaw[] = [
       {
         name: 'Infrastructures',
         path: 'infrastructures',
-        redirect: '/cluster-manage/Infrastructures/list',
+        redirect: '/cluster-manage/infrastructures/list',
         meta: {
           icon: 'infrastructures',
           title: 'menu.infra'
