@@ -19,9 +19,12 @@
 
 <script setup lang="ts">
   import { computed, onActivated, reactive, ref, useAttrs } from 'vue'
+  import { storeToRefs } from 'pinia'
   import { useI18n } from 'vue-i18n'
+  import { useRoute } from 'vue-router'
+  import { getComponents } from '@/api/component'
+  import { useStackStore } from '@/store/stack'
   import useBaseTable from '@/composables/use-base-table'
-  import type { ServiceVO } from '@/api/service/types'
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { TableColumnType, TableProps } from 'ant-design-vue'
   import type { ComponentVO } from '@/api/component/types'
@@ -34,45 +37,57 @@
     searchedColumn: keyof ComponentVO
   }
 
+  interface ServieceInfo {
+    cluster: string
+    id: number
+    service: string
+    serviceId: number
+  }
+
   const { t } = useI18n()
+  const stackStore = useStackStore()
+  const route = useRoute()
   const attrs = useAttrs()
+  const { stacks } = storeToRefs(stackStore)
   const searchInputRef = ref()
-  const hostStatus = ref(['INSTALLING', 'SUCCESS', 'FAILED', 'UNKNOWN'])
+  const componentStatus = ref(['INSTALLING', 'SUCCESS', 'FAILED', 'UNKNOWN'])
   const state = reactive<TableState>({
     searchText: '',
     searchedColumn: '',
     selectedRowKeys: []
   })
 
+  const currServiceInfo = computed(() => route.params as unknown as ServieceInfo)
+  const componentsFromStack = computed(
+    () =>
+      new Map(
+        stacks.value.flatMap(
+          (stack) =>
+            stack.services?.flatMap((service) =>
+              service.name && service.components ? [[service.name, service.components]] : []
+            ) ?? []
+        )
+      )
+  )
+
   const columns = computed((): TableColumnType<ComponentVO>[] => [
     {
       title: t('common.componentname'),
-      dataIndex: 'name',
+      dataIndex: 'displayName',
       key: 'name',
       ellipsis: true,
       filterMultiple: false,
-      filters: [
-        {
-          text: t('common.success'),
-          value: 1
-        },
-        {
-          text: t('common.failed'),
-          value: 2
-        },
-        {
-          text: t('common.unknown'),
-          value: 3
-        }
-      ]
+      filters: [...(componentsFromStack.value.get(currServiceInfo.value.service)?.values() || [])]?.map((v) => ({
+        text: v?.displayName || '',
+        value: v?.name || ''
+      }))
     },
     {
       title: t('host.hostname'),
       dataIndex: 'hostname',
       key: 'hostname',
       ellipsis: true,
-      customFilterDropdown: true,
-      onFilterDropdownOpenChange: (visible) => onFilterDropdownOpenChange(visible)
+      customFilterDropdown: true
     },
     {
       title: t('common.status'),
@@ -98,27 +113,35 @@
     },
     {
       title: t('common.quick_link'),
+      key: 'quickLink',
       dataIndex: 'quickLink',
       ellipsis: true
     },
     {
       title: t('common.action'),
+      width: 180,
       key: 'operation',
-      width: '160px',
       fixed: 'right'
     }
   ])
 
-  const serviceDetail = computed(() => attrs as unknown as ServiceVO)
-  const { loading, dataSource, paginationProps, filtersParams, onChange } = useBaseTable({
+  const { loading, dataSource, paginationProps, filtersParams, onChange, resetState } = useBaseTable<ComponentVO>({
     columns: columns.value,
     rows: []
   })
 
   const operations = computed((): GroupItem[] => [
     {
-      text: 'edit',
-      clickEvent: (_item, args) => handleEdit(args)
+      text: 'start',
+      clickEvent: (_item, args) => handleStart(args)
+    },
+    {
+      text: 'stop',
+      clickEvent: (_item, args) => handleStop(args)
+    },
+    {
+      text: 'restart',
+      clickEvent: (_item, args) => handleRestart(args)
     },
     {
       text: 'remove',
@@ -134,31 +157,33 @@
       dropdownMenu: [
         {
           action: 'Start',
-          text: t('common.start', [t('common.cluster')])
+          text: t('common.start', [t('common.all')])
         },
         {
           action: 'Restart',
-          text: t('common.restart', [t('common.cluster')])
+          text: t('common.restart', [t('common.all')])
         },
         {
           action: 'Stop',
-          text: t('common.stop', [t('common.cluster')])
+          text: t('common.stop', [t('common.all')])
         }
       ],
       dropdownMenuClickEvent: (info) => dropdownMenuClick && dropdownMenuClick(info)
     }
   ])
 
-  const dropdownMenuClick: GroupItem['dropdownMenuClickEvent'] = async ({ key }) => {
-    console.log('key :>> ', key)
+  const getTableOperations = (status: number): GroupItem[] => {
+    if (status === 1) {
+      return operations.value.filter((v) => ['stop', 'restart', 'remove'].includes(v.text!))
+    } else if (status === 2) {
+      return operations.value.filter((v) => ['start', 'remove'].includes(v.text!))
+    } else {
+      return operations.value.filter((v) => v.text === 'remove')
+    }
   }
 
-  const onFilterDropdownOpenChange = (visible: boolean) => {
-    if (visible) {
-      setTimeout(() => {
-        searchInputRef.value.focus()
-      }, 100)
-    }
+  const dropdownMenuClick: GroupItem['dropdownMenuClickEvent'] = async ({ key }) => {
+    console.log('key :>> ', key)
   }
 
   const onSelectChange = (selectedRowKeys: Key[]) => {
@@ -169,15 +194,37 @@
     confirm()
     state.searchText = selectedKeys[0] as string
     state.searchedColumn = dataIndex
+    resetState()
   }
 
   const handleReset = (clearFilters: (param?: FilterResetProps) => void) => {
     clearFilters({ confirm: true })
     state.searchText = ''
+    resetState()
   }
 
-  const handleEdit = (row: any) => {
-    console.log('row :>> ', row)
+  const handleStart = (row?: any) => {
+    if (!row) {
+      console.log('selectedRowKeys :>> ', state.selectedRowKeys)
+    } else {
+      console.log('row :>> ', row)
+    }
+  }
+
+  const handleStop = (row?: any) => {
+    if (!row) {
+      console.log('selectedRowKeys :>> ', state.selectedRowKeys)
+    } else {
+      console.log('row :>> ', row)
+    }
+  }
+
+  const handleRestart = (row?: any) => {
+    if (!row) {
+      console.log('selectedRowKeys :>> ', state.selectedRowKeys)
+    } else {
+      console.log('row :>> ', row)
+    }
   }
 
   const handleDelete = (row?: any) => {
@@ -188,36 +235,35 @@
     }
   }
 
-  const getHostList = async (isReset = false) => {
-    console.log('isReset :>> ', isReset)
-    console.log('filtersParams.value :>> ', filtersParams.value)
-    // loading.value = true
-    // if (attrs.id == undefined || !paginationProps.value) {
-    //   loading.value = false
-    //   return
-    // }
-    // if (isReset) {
-    //   paginationProps.value.current = 1
-    // }
-    // try {
-    //   const res = await getHosts({ ...filtersParams.value, clusterId: attrs.id })
-    //   dataSource.value = res.content
-    //   paginationProps.value.total = res.total
-    //   loading.value = false
-    // } catch (error) {
-    //   console.log('error :>> ', error)
-    // } finally {
-    //   loading.value = false
-    // }
+  const getComponentList = async (isReset = false) => {
+    const { id: clusterId, serviceId } = currServiceInfo.value
+    loading.value = true
+    if (attrs.id == undefined || !paginationProps.value) {
+      loading.value = false
+      return
+    }
+    if (isReset) {
+      paginationProps.value.current = 1
+    }
+    try {
+      const res = await getComponents({ ...filtersParams.value, clusterId, serviceId })
+      dataSource.value = res.content
+      paginationProps.value.total = res.total
+      loading.value = false
+    } catch (error) {
+      console.log('error :>> ', error)
+    } finally {
+      loading.value = false
+    }
   }
 
   const tableChange: TableProps['onChange'] = (pagination, filters, ...args) => {
     onChange(pagination, filters, ...args)
-    getHostList()
+    getComponentList()
   }
 
   onActivated(() => {
-    console.log('serviceDetail.value :>> ', serviceDetail.value)
+    getComponentList(true)
   })
 </script>
 
@@ -258,20 +304,26 @@
         </div>
       </template>
       <template #customFilterIcon="{ filtered, column }">
-        <svg-icon v-if="column.key != 'status'" :name="filtered ? 'search_activated' : 'search'" />
+        <svg-icon v-if="!['name', 'status'].includes(column.key)" :name="filtered ? 'search_activated' : 'search'" />
         <svg-icon v-else :name="filtered ? 'filter_activated' : 'filter'" />
       </template>
       <template #bodyCell="{ record, column }">
-        <template v-if="['name', 'status'].includes(column.key)">
-          <svg-icon style="margin-left: 0" :name="hostStatus[record.status].toLowerCase()" />
-          <span>{{ $t(`common.${hostStatus[record.status].toLowerCase()}`) }}</span>
+        <template v-if="['status'].includes(column.key)">
+          <svg-icon style="margin-left: 0" :name="componentStatus[record.status].toLowerCase()" />
+          <span>{{ $t(`common.${componentStatus[record.status].toLowerCase()}`) }}</span>
+        </template>
+        <template v-if="column.key === 'quickLink'">
+          <span v-if="!record.quickLink">{{ $t('common.no_link') }}</span>
+          <a-typography-link v-else :href="record.quickLink.url" target="_blank">
+            {{ record.quickLink.displayName }}
+          </a-typography-link>
         </template>
         <template v-if="column.key === 'operation'">
           <button-group
             i18n="common"
             :text-compact="true"
             :space="24"
-            :groups="operations"
+            :groups="getTableOperations(record.status)"
             :args="record"
             group-shape="default"
             group-type="link"

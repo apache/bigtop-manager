@@ -18,8 +18,9 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onMounted, ref, shallowRef } from 'vue'
+  import { computed, onMounted, provide, ref, shallowRef } from 'vue'
   import { useI18n } from 'vue-i18n'
+  import { storeToRefs } from 'pinia'
   // import { execCommand } from '@/api/command'
   // import { Command } from '@/api/command/types'
   // import { CommonStatus, CommonStatusTexts } from '@/enums/state'
@@ -30,8 +31,7 @@
   import Configs from './configs.vue'
   import type { TabItem } from '@/components/common/main-card/types'
   import type { GroupItem } from '@/components/common/button-group/types'
-  import { ServiceVO } from '@/api/service/types'
-  import { storeToRefs } from 'pinia'
+  import type { ServiceVO } from '@/api/service/types'
 
   interface ServieceInfo {
     cluster: string
@@ -46,7 +46,7 @@
   const { loading } = storeToRefs(serviceStore)
   const activeKey = ref('1')
   const serviceDetail = shallowRef<ServiceVO>()
-  const currServiceInfo = computed(() => route.params as unknown as ServieceInfo)
+  const routeParams = computed(() => route.params as unknown as ServieceInfo)
   const tabs = computed((): TabItem[] => [
     {
       key: '1',
@@ -69,15 +69,15 @@
       dropdownMenu: [
         {
           action: 'Start',
-          text: t('common.start', [t('common.cluster')])
+          text: t('common.start', [t('common.service')])
         },
         {
           action: 'Restart',
-          text: t('common.restart', [t('common.cluster')])
+          text: t('common.restart', [t('common.service')])
         },
         {
           action: 'Stop',
-          text: t('common.stop', [t('common.cluster')])
+          text: t('common.stop', [t('common.service')])
         }
       ]
     }
@@ -89,9 +89,12 @@
   })
 
   const getServiceDetail = async () => {
-    const { id: clusterId, serviceId } = currServiceInfo.value
+    const { id: clusterId, serviceId } = routeParams.value
     serviceDetail.value = await serviceStore.getServiceDetail(clusterId, serviceId)
   }
+
+  provide('getServiceDetail', getServiceDetail)
+  provide('service', { routeParams })
 
   onMounted(() => {
     getServiceDetail()

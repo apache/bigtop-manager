@@ -17,6 +17,25 @@
  * under the License.
  */
 
+import type { PageVO } from '../types'
+
+export type ComponentList = PageVO<ComponentVO>
+
+export interface ComponentParams {
+  clusterId?: number
+  hostId?: number
+  hostname?: string
+  hostnames?: string[]
+  name?: string
+  orderBy?: string
+  pageNum?: number
+  pageSize?: number
+  serviceId?: number
+  serviceNames?: string[]
+  sort?: string
+  [property: string]: any
+}
+
 /**
  * ComponentVO
  */

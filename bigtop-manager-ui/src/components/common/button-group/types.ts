@@ -31,6 +31,7 @@ export interface GroupItem<T = string> {
   tip?: string
   text?: string
   action?: T
+  hidden?: boolean
   type?: BtnType
   shape?: ShapeType
   disabled?: boolean

@@ -32,5 +32,10 @@ export default {
   component_host_assignment: 'Assign at least one host for each component',
   service_selection: 'Please select services to install',
   dependencies_conflict_msg: '{0} requires infra service {1} to be installed first',
-  dependencies_msg: '{0} requires service {1}, add it also?'
+  dependencies_msg: '{0} requires service {1}, add it also?',
+  capture_snapshot: 'Capture Snapshot',
+  snapshot_management: 'Snapshot Management',
+  snapshot_name: 'Snapshot Name',
+  snapshot_description: 'Snapshot Description',
+  snapshot_notes: 'Snapshot Notes'
 }

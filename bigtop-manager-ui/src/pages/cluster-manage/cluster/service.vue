@@ -24,14 +24,16 @@
   import { useI18n } from 'vue-i18n'
   import { useServiceStore } from '@/store/service'
   import { CommonStatus, CommonStatusTexts } from '@/enums/state'
+  import { useRouter } from 'vue-router'
   import FilterForm from '@/components/common/filter-form/index.vue'
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { FilterFormItem } from '@/components/common/filter-form/types'
-  import type { ServiceListParams, ServiceStatusType } from '@/api/service/types'
+  import type { ServiceListParams, ServiceStatusType, ServiceVO } from '@/api/service/types'
   import type { ClusterVO } from '@/api/cluster/types'
 
   const { t } = useI18n()
   const attrs = useAttrs() as ClusterVO
+  const router = useRouter()
   const serviceStore = useServiceStore()
   const { services, loading } = toRefs(serviceStore)
   const statusColors = shallowRef<Record<ServiceStatusType, keyof typeof CommonStatusTexts>>({
@@ -117,6 +119,13 @@
     attrs.id != undefined && serviceStore.getServices(attrs.id, filters)
   }
 
+  const viewServiceDetail = (payload: ServiceVO) => {
+    router.push({
+      name: 'ServiceDetail',
+      params: { service: payload.name, serviceId: payload.id }
+    })
+  }
+
   onActivated(() => {
     getServices()
   })
@@ -132,13 +141,7 @@
         :key="item.id"
         :hoverable="true"
         class="service-item"
-        @click="
-          () =>
-            $router.push({
-              name: 'ServiceDetail',
-              params: { service: item.displayName || item.name, serviceId: item.id }
-            })
-        "
+        @click="viewServiceDetail(item)"
       >
         <div class="header">
           <div class="header-base-wrp">

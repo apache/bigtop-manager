@@ -21,6 +21,7 @@ export default {
   prev: '上一步',
   next: '下一步',
   done: '完成',
+  save: '保存',
   exit: '退出',
   action: '操作',
   status: '状态',
@@ -31,7 +32,7 @@ export default {
   failed: '异常',
   edit: '编辑',
   delete: '删除',
-  remove: '移除',
+  remove: '移除{0}',
   bulk_remove: '批量删除',
   batch_operation: '批量操作',
   rename: '重命名',
@@ -61,6 +62,7 @@ export default {
   component: '组件',
   componentname: '组件名',
   quick_link: '快速链接',
+  no_link: '无链接',
   stage: '阶段',
   search: '搜索',
   required: '需重启',
@@ -93,6 +95,7 @@ export default {
   select_error: '请选择{0}',
   add_error: '请添加{0}',
   delete_msg: '确认要删除该记录吗？',
+  restore_msg: '确认要恢复该记录吗？',
   delete_msgs: '确认要删除这些记录吗？',
   delete_empty: '请选择需要删除的记录',
   total: '共{0}条数据',
@@ -110,6 +113,7 @@ export default {
   restart: '重启{0}',
   stop: '停止{0}',
   add: '添加{0}',
+  success_msg: '添加成功',
   reset: '重置',
   configs: '配置',
   more_operations: '其他操作',
@@ -117,5 +121,6 @@ export default {
   yes: '是',
   no: '否',
   all: '全部',
-  disabled: '关闭'
+  disabled: '关闭',
+  restore: '恢复'
 }
