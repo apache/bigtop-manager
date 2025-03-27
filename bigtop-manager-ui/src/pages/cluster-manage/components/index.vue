@@ -123,7 +123,7 @@
 
 <style lang="scss" scoped>
   .cluster-components {
-    padding: 24px 16px;
+    padding: 16px;
     background-color: #fff;
     .menu-title {
       font-size: 16px;
