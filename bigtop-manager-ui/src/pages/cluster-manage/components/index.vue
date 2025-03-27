@@ -126,7 +126,9 @@
     padding: 24px 16px;
     background-color: #fff;
     .menu-title {
-      font-weight: bolder;
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 24px;
     }
     .cluster-components-header {
       display: flex;

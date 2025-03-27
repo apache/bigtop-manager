@@ -178,12 +178,25 @@
     align-items: center;
     background-color: #fff;
     .menu-title {
-      font-weight: bolder;
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 24px;
     }
     .menu-info {
       margin-top: 5px;
       color: #00000072;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 22px;
     }
+  }
+  .small {
+    font-size: 12px;
+  }
+  .small-gray {
+    line-height: 12px;
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.45);
   }
   .infra-body {
     margin-top: 16px;
