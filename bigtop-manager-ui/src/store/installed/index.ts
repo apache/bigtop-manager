@@ -57,6 +57,7 @@ export const useInstalledStore = defineStore(
     }
 
     return {
+      serviceStore,
       installedMap,
       getServicesOfInfra,
       setInstalledMapKey,

@@ -34,5 +34,15 @@ export default {
   cpu_usage: 'CPU使用率',
   unit_host: '个主机',
   unit_service: '个服务',
-  unit_processor: '个核心'
+  unit_core: '个核心',
+  unit_component: '个组件',
+  component_info: '组件信息',
+  host_status: '主机状态',
+  host_name: '主机名',
+  host_desc: '主机备注',
+  component_count: '组件数',
+  os: '操作系统',
+  ip_v4: 'IPv4',
+  ip_v6: 'IPv6',
+  arch: '架构'
 }

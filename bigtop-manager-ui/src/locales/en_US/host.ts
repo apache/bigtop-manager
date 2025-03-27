@@ -35,6 +35,7 @@ export default {
   key_auth: 'Key',
   ip_address: 'IP Address',
   component_count: 'Component Count',
+  component_count_quantifier: 'Components',
   no_auth: 'No Authentication',
   agent_path: 'Agent Path',
   ssh_port: 'SSH Port',

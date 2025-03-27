@@ -57,6 +57,7 @@ export default {
   host: 'Host',
   service: 'Service',
   stack: 'Stack',
+  component: 'Component',
   stage: 'Stage',
   search: 'Search',
   reset: 'Reset',
@@ -90,6 +91,8 @@ export default {
   select_error: 'Please select {0}',
   add_error: 'Please add {0}',
   delete_msg: 'Are you sure you want to delete this?',
+  delete_msgs: 'Are you sure you want to delete these?',
+  delete_empty: 'Please select the records you want to delete.',
   total: 'Total {0} items',
   note: 'Note: Changes to the source address will take effect for all clusters.',
   upload_file: 'Upload file',
@@ -108,5 +111,6 @@ export default {
   more_operations: 'More Operations',
   ok: 'Ok',
   yes: 'Yes',
-  no: 'No'
+  no: 'No',
+  all: 'All'
 }
