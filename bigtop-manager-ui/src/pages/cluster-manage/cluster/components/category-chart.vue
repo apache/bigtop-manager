@@ -37,7 +37,7 @@
   const myChart = shallowRef<echarts.ECharts | null>(null)
 
   const generateTimeLabels = () => {
-    const times = []
+    const times = [] as Array<string>
     for (let h = 0; h < 24; h++) {
       for (let m = 0; m < 60; m += 15) {
         const hour = h.toString().padStart(2, '0')

@@ -16,31 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import common from '@/locales/zh_CN/common.ts'
-import menu from '@/locales/zh_CN/menu.ts'
-import login from '@/locales/zh_CN/login'
-import user from '@/locales/zh_CN/user.ts'
-import llmConfig from '@/locales/zh_CN/llm-config.ts'
-import aiAssistant from '@/locales/zh_CN/ai-assistant.ts'
-import cluster from '@/locales/zh_CN/cluster.ts'
-import host from '@/locales/zh_CN/host.ts'
-import job from '@/locales/zh_CN/job.ts'
-import overview from '@/locales/zh_CN/overview.ts'
-import service from '@/locales/zh_CN/service.ts'
-import infra from '@/locales/zh_CN/infra.ts'
-
 export default {
-  common,
-  menu,
-  login,
-  user,
-  llmConfig,
-  aiAssistant,
-  cluster,
-  host,
-  job,
-  overview,
-  service,
-  infra
+  info: 'Only one instance of a basic service shared across clusters can exist',
+  action: 'Add service',
+  restart: 'Need to restart'
 }
