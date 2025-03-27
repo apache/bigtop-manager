@@ -172,7 +172,7 @@
 
 <style scoped lang="scss">
   .infra-header {
-    padding: 24px 16px;
+    padding: 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
