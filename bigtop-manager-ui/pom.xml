@@ -68,13 +68,13 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>pnpm build</id>
+                        <id>pnpm lint</id>
                         <goals>
                             <goal>pnpm</goal>
                         </goals>
                         <phase>generate-resources</phase>
                         <configuration>
-                            <arguments>build</arguments>
+                            <arguments>lint</arguments>
                         </configuration>
                     </execution>
                     <execution>
@@ -86,6 +86,16 @@
                         <configuration>
                             <arguments>test:run</arguments>
                             <skip>${skip.pnpm.test}</skip>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>pnpm build</id>
+                        <goals>
+                            <goal>pnpm</goal>
+                        </goals>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <arguments>build</arguments>
                         </configuration>
                     </execution>
                 </executions>
