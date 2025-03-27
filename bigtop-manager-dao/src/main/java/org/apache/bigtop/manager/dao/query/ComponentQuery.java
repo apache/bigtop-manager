@@ -44,4 +44,6 @@ public class ComponentQuery {
     private Long serviceId;
 
     private List<String> serviceNames;
+
+    private Integer status;
 }

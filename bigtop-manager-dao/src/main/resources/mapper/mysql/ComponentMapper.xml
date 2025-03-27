@@ -48,7 +48,7 @@
         left join host h on comp.host_id = h.id
         <where>
             <if test="query.name != null and query.name != ''">
-                and comp.name = #{query.name}
+                and comp.name like concat('%', #{query.name}, '%')
             </if>
             <if test="query.clusterId != null">
                 and comp.cluster_id = #{query.clusterId}
@@ -73,6 +73,9 @@
                 <foreach collection="query.serviceNames" item="serviceName" index="index" open="(" close=")" separator=",">
                     #{serviceName}
                 </foreach>
+            </if>
+            <if test="query.status != null">
+                and comp.status = #{query.status}
             </if>
         </where>
     </select>
