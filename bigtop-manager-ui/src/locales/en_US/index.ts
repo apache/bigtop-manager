@@ -28,6 +28,7 @@ import host from '@/locales/en_US/host.ts'
 import job from '@/locales/en_US/job.ts'
 import overview from '@/locales/en_US/overview'
 import service from '@/locales/en_US/service'
+import infra from '@/locales/en_US/infra.ts'
 
 export default {
   common,
@@ -40,5 +41,6 @@ export default {
   host,
   job,
   overview,
-  service
+  service,
+  infra
 }
