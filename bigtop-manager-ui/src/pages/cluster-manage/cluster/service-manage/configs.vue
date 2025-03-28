@@ -111,7 +111,7 @@
     captureRef.value?.handleOpen({ id: serviceId, clusterId })
   }
 
-  const openSnapshotMangement = () => {
+  const openSnapshotManagement = () => {
     const { serviceId, id: clusterId } = routeParams.value
     snapshotRef.value?.handleOpen({ id: serviceId, clusterId })
   }
@@ -135,7 +135,7 @@
       <div class="list-operation">
         <a-space>
           <a-button type="primary" @click="onCaptureSnapshot">{{ $t('service.capture_snapshot') }}</a-button>
-          <a-button @click="openSnapshotMangement">{{ $t('service.snapshot_management') }}</a-button>
+          <a-button @click="openSnapshotManagement">{{ $t('service.snapshot_management') }}</a-button>
         </a-space>
         <a-input
           v-model:value="searchStr"

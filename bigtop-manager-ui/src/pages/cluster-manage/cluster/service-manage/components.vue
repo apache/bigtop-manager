@@ -320,7 +320,7 @@
     <header>
       <div class="header-title">{{ $t('common.component') }}</div>
       <div class="list-operation">
-        <a-button type="primary">{{ $t('common.add', [`${$t('common.component')}`]) }}</a-button>
+        <a-button type="primary" :disabled="true">{{ $t('common.add', [`${$t('common.component')}`]) }}</a-button>
         <button-group :groups="batchOperations" group-shape="default" />
       </div>
     </header>
