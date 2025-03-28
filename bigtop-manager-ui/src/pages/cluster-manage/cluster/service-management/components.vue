@@ -159,6 +159,7 @@
     },
     {
       text: 'remove',
+      disabled: true,
       danger: true,
       clickEvent: (_, args) => handleDelete(args)
     }
@@ -247,12 +248,12 @@
 
   const handleDelete = async (row: ComponentVO) => {
     Modal.confirm({
-      title: t('common.restore_msg'),
+      title: t('common.delete_msg'),
       async onOk() {
         try {
           const data = await deleteComponent({ clusterId: currServiceInfo.value.id, id: row.id! })
           if (data) {
-            message.success('common.delete_success')
+            message.success(t('common.delete_success'))
             getComponentList(true, true)
           }
         } catch (error) {
