@@ -165,7 +165,7 @@
             <span class="small">{{ `${item.restartFlag ? $t('common.required') : $t('common.not_required')}` }}</span>
           </div>
         </div>
-        <div class="item-content">
+        <div class="item-content" @click.stop>
           <button-group :auto="true" :space="0" :groups="actionGroups">
             <template #icon="{ item: groupItem }">
               <svg-icon :name="groupItem.icon || ''" />

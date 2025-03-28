@@ -99,7 +99,7 @@
       ]
     },
     {
-      title: t('common.action'),
+      title: t('common.operation'),
       width: '180px',
       key: 'operation',
       fixed: 'right'

@@ -56,7 +56,7 @@
       ellipsis: true
     },
     {
-      title: t('common.action'),
+      title: t('common.operation'),
       dataIndex: 'operation',
       width: '160px',
       key: 'operation',
