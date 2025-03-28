@@ -61,6 +61,7 @@ export interface Property {
   displayName?: string
   name: string
   value?: string
+  [property: string]: any
 }
 
 export interface Attr {

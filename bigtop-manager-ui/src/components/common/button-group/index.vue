@@ -29,7 +29,7 @@
     groupType: 'text',
     space: 8,
     groups: () => {
-      return []
+      return [] as any[]
     }
   })
 

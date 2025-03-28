@@ -21,19 +21,20 @@
   import { computed, ref, shallowRef } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { message, Modal, TableColumnType } from 'ant-design-vue'
+  import useBaseTable from '@/composables/use-base-table'
   import {
     deleteServiceConfigSnapshot,
     getServiceConfigSnapshotsList,
     recoveryServiceConfigSnapshot
   } from '@/api/service'
-  import useBaseTable from '@/composables/use-base-table'
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { ServiceConfigSnapshot, ServiceParams, SnapshotRecovery } from '@/api/service/types'
+
+  type OperationType = 'Restore' | 'Remove'
 
   const { t } = useI18n()
   const open = ref(false)
   const serviceInfo = shallowRef<ServiceParams>()
-  // const emits = defineEmits(['success'])
 
   const columns = computed((): TableColumnType[] => [
     {
@@ -69,52 +70,42 @@
     pagination: false
   })
 
-  const operations = computed((): GroupItem[] => [
+  const operations = computed((): GroupItem<OperationType>[] => [
     {
       text: 'restore',
-      clickEvent: (_item, args) => handleRestore(args)
+      action: 'Restore',
+      clickEvent: (item, args) => handleTableOperation(item!, args)
     },
     {
       text: 'remove',
+      action: 'Remove',
       danger: true,
-      clickEvent: (_item, args) => handleDelete(args)
+      clickEvent: (item, args) => handleTableOperation(item!, args)
     }
   ])
 
-  const handleRestore = async (payLoad: ServiceConfigSnapshot) => {
-    const params = {
-      ...serviceInfo.value,
-      snapshotId: payLoad.id
-    } as SnapshotRecovery
-    Modal.confirm({
-      title: t('common.restore_msg'),
-      async onOk() {
-        try {
-          const data = await recoveryServiceConfigSnapshot(params)
-          if (data) {
-            message.success(t('common.update_success'))
-            resetState()
-            await getSnapshotList()
-          }
-        } catch (error) {
-          console.log('error :>> ', error)
-        }
-      }
-    })
-  }
+  const operationMap = computed(() => ({
+    Restore: {
+      modalTitle: t('common.restore_msg'),
+      api: recoveryServiceConfigSnapshot,
+      successMsg: t('common.update_success')
+    },
+    Remove: {
+      modalTitle: t('common.delete_msg'),
+      api: deleteServiceConfigSnapshot,
+      successMsg: t('common.delete_success')
+    }
+  }))
 
-  const handleDelete = (payLoad: ServiceConfigSnapshot) => {
-    const params = {
-      ...serviceInfo.value,
-      snapshotId: payLoad.id
-    } as SnapshotRecovery
+  const handleTableOperation = (item: GroupItem<OperationType>, payLoad: ServiceConfigSnapshot) => {
+    const currOperation = operationMap.value[item.action!]
     Modal.confirm({
-      title: t('common.delete_msg'),
+      title: currOperation.modalTitle,
       async onOk() {
         try {
-          const data = await deleteServiceConfigSnapshot(params)
+          const data = await currOperation.api({ ...serviceInfo.value, snapshotId: payLoad.id } as SnapshotRecovery)
           if (data) {
-            message.success(t('common.delete_success'))
+            message.success(currOperation.successMsg)
             resetState()
             await getSnapshotList()
           }

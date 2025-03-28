@@ -26,7 +26,7 @@ export interface DropdownMenu extends MenuItemProps {
   action: string
   text: string
 }
-export interface GroupItem<T = string> {
+export interface GroupItem<T = any> {
   icon?: string
   tip?: string
   text?: string
@@ -37,7 +37,7 @@ export interface GroupItem<T = string> {
   disabled?: boolean
   danger?: boolean
   dropdownMenu?: DropdownMenu[]
-  clickEvent?: (item?: GroupItem, ...args: any[]) => void
+  clickEvent?: (item?: GroupItem<T>, ...args: any[]) => void
   dropdownMenuClickEvent?: MenuProps['onClick']
 }
 

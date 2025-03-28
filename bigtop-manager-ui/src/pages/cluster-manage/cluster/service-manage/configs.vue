@@ -20,11 +20,12 @@
 <script setup lang="ts">
   import { onActivated, inject, useAttrs, shallowRef, ref, onDeactivated, ComputedRef } from 'vue'
   import { debounce } from 'lodash'
-  import { Empty } from 'ant-design-vue'
+  import { useI18n } from 'vue-i18n'
+  import { Empty, message } from 'ant-design-vue'
+  import { updateServiceConfigs } from '@/api/service'
   import CaptureSnapshot from './components/capture-snapshot.vue'
   import SnapshotManagement from './components/snapshot-management.vue'
-  import type { ServiceConfigReq } from '@/api/command/types'
-  import type { ServiceVO } from '@/api/service/types'
+  import type { ServiceConfig, ServiceVO } from '@/api/service/types'
 
   interface ServieceInfo {
     cluster: string
@@ -35,11 +36,13 @@
 
   const { routeParams }: { routeParams: ComputedRef<ServieceInfo> } = inject('service') as any
   const attrs = useAttrs() as unknown as ServiceVO
+  const { t } = useI18n()
   const getServiceDetail = inject('getServiceDetail') as () => any
   const searchStr = ref('')
+  const loading = ref(false)
   const activeKey = ref<number[]>([])
-  const configs = ref<ServiceConfigReq[]>([])
-  const filterConfigs = ref<ServiceConfigReq[]>([])
+  const configs = ref<ServiceConfig[]>([])
+  const filterConfigs = ref<ServiceConfig[]>([])
   const captureRef = ref<InstanceType<typeof CaptureSnapshot>>()
   const snapshotRef = ref<InstanceType<typeof SnapshotManagement>>()
   const debouncedOnSearch = ref()
@@ -67,7 +70,7 @@
     }
   }
 
-  const manualAddConfig = (config: ServiceConfigReq) => {
+  const manualAddConfig = (config: ServiceConfig) => {
     config.properties?.push(createNewConfigItem())
   }
 
@@ -77,7 +80,7 @@
     }
     const lowerSearchTerm = searchStr.value.toLowerCase()
     filterConfigs.value = configs.value.filter((config) => {
-      return config.properties.some((property) => {
+      return config.properties?.some((property) => {
         return (
           (property.displayName || '').toLowerCase().includes(lowerSearchTerm) ||
           property.name.toLowerCase().includes(lowerSearchTerm) ||
@@ -87,8 +90,20 @@
     })
   }
 
-  const saveConfigs = () => {
-    getServiceDetail()
+  const saveConfigs = async () => {
+    try {
+      const { serviceId, id: clusterId } = routeParams.value
+      loading.value = true
+      const data = await updateServiceConfigs({ id: serviceId, clusterId }, [...configs.value])
+      if (data) {
+        message.success(t('common.update_success'))
+        getServiceDetail()
+      }
+    } catch (error) {
+      console.log('error :>> ', error)
+    } finally {
+      loading.value = false
+    }
   }
 
   const onCaptureSnapshot = () => {
@@ -102,7 +117,7 @@
   }
 
   onActivated(() => {
-    configs.value = attrs.configs as ServiceConfigReq[]
+    configs.value = attrs.configs as ServiceConfig[]
     filterConfigs.value = [...configs.value]
     debouncedOnSearch.value = debounce(filterConfigurations, 300)
   })
@@ -117,13 +132,20 @@
     <header>
       <div class="header-title">{{ $t('common.configs') }}</div>
       <div class="list-operation">
-        <a-button type="primary" @click="onCaptureSnapshot">{{ $t('service.capture_snapshot') }}</a-button>
-        <a-button @click="openSnapshotMangement">{{ $t('service.snapshot_management') }}</a-button>
+        <a-space>
+          <a-button type="primary" @click="onCaptureSnapshot">{{ $t('service.capture_snapshot') }}</a-button>
+          <a-button @click="openSnapshotMangement">{{ $t('service.snapshot_management') }}</a-button>
+        </a-space>
+        <a-input
+          v-model:value="searchStr"
+          :placeholder="$t('service.please_enter_search_keyword')"
+          @input="debouncedOnSearch"
+        />
       </div>
     </header>
     <section>
       <a-empty v-if="filterConfigs.length === 0" :image="Empty.PRESENTED_IMAGE_SIMPLE" />
-      <a-form v-else :label-wrap="true">
+      <a-form v-else :label-wrap="true" :disabled="loading">
         <a-collapse v-model:active-key="activeKey" :bordered="false" :ghost="true">
           <a-collapse-panel v-for="config in filterConfigs" :key="config.id">
             <template #extra>
@@ -155,8 +177,8 @@
         </a-collapse>
       </a-form>
     </section>
-    <div style="text-align: end" @click="saveConfigs">
-      <a-button type="primary">
+    <div style="text-align: end">
+      <a-button type="primary" :loading="loading" @click="saveConfigs">
         {{ $t('common.save') }}
       </a-button>
     </div>
@@ -176,7 +198,11 @@
     gap: 16px;
     .list-operation {
       display: flex;
+      justify-content: space-between;
       gap: 16px;
+      .ant-input {
+        flex: 0 1 160px;
+      }
     }
     :deep(.ant-collapse-header) {
       display: flex;

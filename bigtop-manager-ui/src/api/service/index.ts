@@ -42,7 +42,7 @@ export const getServiceConfigs = (pathParams: ServiceParams) => {
   return get<ServiceConfig[]>(`/clusters/${pathParams.clusterId}/services/${pathParams.id}/configs`)
 }
 
-export const updateServiceConfigs = (pathParams: ServiceParams, data: ServiceConfig) => {
+export const updateServiceConfigs = (pathParams: ServiceParams, data: ServiceConfig[]) => {
   return post<ServiceConfig[]>(`/clusters/${pathParams.clusterId}/services/${pathParams.id}/configs`, data)
 }
 
