@@ -33,7 +33,7 @@ const replacePatternInHosts = (rawHostNames: string[]): string[] => {
     extra: any,
     allHostNames: any = []
   rawHostNames.forEach(function (rawHostName) {
-    const hostNames = []
+    const hostNames = [] as Array<string>
     start = rawHostName.match(/\[\d*/)
     end = rawHostName.match(/\-\d*]/)
     extra = { 0: '' }

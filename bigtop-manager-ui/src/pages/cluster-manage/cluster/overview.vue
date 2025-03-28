@@ -222,7 +222,7 @@
               </div>
             </template>
             <div v-for="service in servicesFromCurrentCluster(stack)" :key="service.id" class="service-item">
-              <a-avatar v-if="service.name" :src="usePngImage(service.name.toLowerCase())" :size="16" />
+              <a-avatar v-if="service.name" :src="usePngImage(service.name.toLowerCase())" :size="22" />
               <a-typography-text :content="service.displayName" />
               <a-dropdown :trigger="['click']">
                 <a-button type="text" shape="circle" size="small">
@@ -343,7 +343,7 @@
     gap: $space-md;
     align-items: center;
     padding: 12px 16px;
-    border-bottom: 1px solid #f0f0f0;
+    border-top: 1px solid #f0f0f0;
   }
 
   .chart-item-wrp {

@@ -66,7 +66,8 @@ export enum Command {
   Restart = 'Restart',
   Start = 'Start',
   Status = 'Status',
-  Stop = 'Stop'
+  Stop = 'Stop',
+  More = 'More'
 }
 
 export enum CommandLevel {
@@ -99,8 +100,8 @@ export interface HostCommandReq {
 }
 
 export interface ServiceCommandReq {
-  componentHosts: ComponentHostReq[]
-  configs: ServiceConfigReq[]
+  componentHosts?: ComponentHostReq[]
+  configs?: ServiceConfigReq[]
   serviceName: string
   [property: string]: any
 }
