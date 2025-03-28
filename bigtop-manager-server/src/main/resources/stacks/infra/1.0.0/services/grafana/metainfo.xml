@@ -37,6 +37,13 @@
                 <display-name>Grafana Server</display-name>
                 <category>server</category>
                 <cardinality>1+</cardinality>
+                <quick-link>
+                    <display-name>Grafana UI</display-name>
+                    <http-port-property>port</http-port-property>
+                    <http-port-default>3000</http-port-default>
+                    <https-port-property>port</https-port-property>
+                    <https-port-default>3000</https-port-default>
+                </quick-link>
             </component>
         </components>
 
