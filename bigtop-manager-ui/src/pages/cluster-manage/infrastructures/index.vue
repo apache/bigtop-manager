@@ -23,13 +23,15 @@
   import { useI18n } from 'vue-i18n'
   import { CommonStatus, CommonStatusTexts } from '@/enums/state'
   import { useServiceStore } from '@/store/service'
-  import type { ServiceListParams, ServiceStatusType } from '@/api/service/types'
+  import { useRouter } from 'vue-router'
+  import type { ServiceListParams, ServiceStatusType, ServiceVO } from '@/api/service/types'
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { FilterFormItem } from '@/components/common/filter-form/types'
   // import { execCommand } from '@/api/command';
   import type { Command } from '@/api/command/types'
 
   const { t } = useI18n()
+  const router = useRouter()
   const serviceStore = useServiceStore()
   const { services, loading } = toRefs(serviceStore)
 
@@ -109,6 +111,13 @@
     await serviceStore.getServices(0, filters)
   }
 
+  const viewServiceDetail = (payload: ServiceVO) => {
+    router.push({
+      name: 'InfraServiceDetail',
+      params: { id: 0, service: payload.name, serviceId: payload.id }
+    })
+  }
+
   onMounted(async () => {
     await getServices()
   })
@@ -134,7 +143,13 @@
       <filter-form :filter-items="filterFormItems" @filter="getServices" />
       <a-empty v-if="services.length == 0" style="width: 100%" />
       <template v-else>
-        <a-card v-for="item in services" :key="item.name" :hoverable="true" class="service-item">
+        <a-card
+          v-for="item in services"
+          :key="item.name"
+          :hoverable="true"
+          class="service-item"
+          @click="viewServiceDetail(item)"
+        >
           <div class="header">
             <div class="header-base-wrp">
               <a-avatar v-if="item.name" :src="usePngImage(item.name.toLowerCase())" :size="42" class="header-icon" />
@@ -157,7 +172,7 @@
               <span class="small">{{ `${item.restartFlag ? $t('common.required') : $t('common.not_required')}` }}</span>
             </div>
           </div>
-          <div class="item-content">
+          <div class="item-content" @click.stop>
             <button-group :auto="true" :space="0" :args="item" :groups="actionGroups">
               <template #icon="{ item: groupItem }">
                 <svg-icon :name="groupItem.icon || ''" />

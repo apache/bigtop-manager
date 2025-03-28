@@ -79,7 +79,7 @@
       ellipsis: true
     },
     {
-      title: t('common.action'),
+      title: t('common.operation'),
       key: 'operation',
       width: '160px',
       fixed: 'right'

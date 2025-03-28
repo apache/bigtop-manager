@@ -16,3 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+import { get, del } from '../request-util'
+import type { ComponentParams, ComponentVO, ComponentList } from './types'
+
+export const getComponents = (params: ComponentParams) => {
+  return get<ComponentList>(`/clusters/${params.clusterId}/components`, params)
+}
+
+export const getComponent = (pathParams: { clusterId: number; id: number }) => {
+  return get<ComponentVO>(`/clusters/${pathParams.clusterId}/components/${pathParams.id}`)
+}
+
+export const deleteComponent = (pathParams: { clusterId: number; id: number }) => {
+  return del<boolean>(`/clusters/${pathParams.clusterId}/components/${pathParams.id}`)
+}

@@ -21,6 +21,7 @@ export default {
   cluster_config: 'Cluster Configuration',
   cluster_info: 'Cluster',
   component_info: 'Stack',
+  component: 'Component',
   host_config: 'Hosts',
   create: 'Create',
   name: 'Name',

@@ -24,14 +24,16 @@
   import { useI18n } from 'vue-i18n'
   import { useServiceStore } from '@/store/service'
   import { CommonStatus, CommonStatusTexts } from '@/enums/state'
+  import { useRouter } from 'vue-router'
   import FilterForm from '@/components/common/filter-form/index.vue'
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { FilterFormItem } from '@/components/common/filter-form/types'
-  import type { ServiceListParams, ServiceStatusType } from '@/api/service/types'
+  import type { ServiceListParams, ServiceStatusType, ServiceVO } from '@/api/service/types'
   import type { ClusterVO } from '@/api/cluster/types'
 
   const { t } = useI18n()
   const attrs = useAttrs() as ClusterVO
+  const router = useRouter()
   const serviceStore = useServiceStore()
   const { services, loading } = toRefs(serviceStore)
   const statusColors = shallowRef<Record<ServiceStatusType, keyof typeof CommonStatusTexts>>({
@@ -117,6 +119,13 @@
     attrs.id != undefined && serviceStore.getServices(attrs.id, filters)
   }
 
+  const viewServiceDetail = (payload: ServiceVO) => {
+    router.push({
+      name: 'ServiceDetail',
+      params: { service: payload.name, serviceId: payload.id }
+    })
+  }
+
   onActivated(() => {
     getServices()
   })
@@ -127,7 +136,13 @@
     <filter-form :filter-items="filterFormItems" @filter="getServices" />
     <a-empty v-if="services.length == 0" style="width: 100%" :image="Empty.PRESENTED_IMAGE_SIMPLE" />
     <div v-else class="service-item-wrp">
-      <a-card v-for="item in services" :key="item.id" :hoverable="true" class="service-item">
+      <a-card
+        v-for="item in services"
+        :key="item.id"
+        :hoverable="true"
+        class="service-item"
+        @click="viewServiceDetail(item)"
+      >
         <div class="header">
           <div class="header-base-wrp">
             <a-avatar v-if="item.name" :src="usePngImage(item.name.toLowerCase())" :size="42" class="header-icon" />
@@ -150,7 +165,7 @@
             <span class="small">{{ `${item.restartFlag ? $t('common.required') : $t('common.not_required')}` }}</span>
           </div>
         </div>
-        <div class="item-content">
+        <div class="item-content" @click.stop>
           <button-group :auto="true" :space="0" :groups="actionGroups">
             <template #icon="{ item: groupItem }">
               <svg-icon :name="groupItem.icon || ''" />

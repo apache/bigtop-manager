@@ -29,7 +29,7 @@
     groupType: 'text',
     space: 8,
     groups: () => {
-      return []
+      return [] as any[]
     }
   })
 
@@ -52,13 +52,38 @@
 <template>
   <a-space :size="space" :wrap="true" :class="{ 'text-compact': $props.textCompact, 'btn-auto': $props.auto }">
     <template v-for="(item, _index) in groups" :key="_index">
-      <a-dropdown v-if="item.dropdownMenu">
+      <template v-if="!item.hidden">
+        <a-dropdown v-if="item.dropdownMenu">
+          <a-button
+            :disabled="item.disabled"
+            :shape="item.shape || groupShape || 'default'"
+            :type="item.type || groupType || 'default'"
+            :title="checkTitle(item)"
+            @click="item.clickEvent ? item.clickEvent(item) : () => {}"
+          >
+            <template #icon>
+              <slot name="icon" :item="item" />
+            </template>
+            <span v-if="item.text">
+              {{ $props.i18n && item.text ? $t(`${$props.i18n}.${item.text}`) : item.text }}
+            </span>
+          </a-button>
+          <template #overlay>
+            <a-menu v-if="!item.disabled" @click="item.dropdownMenuClickEvent">
+              <a-menu-item v-for="actionItem in item.dropdownMenu" v-bind="actionItem" :key="actionItem.action">
+                {{ actionItem.text }}
+              </a-menu-item>
+            </a-menu>
+          </template>
+        </a-dropdown>
         <a-button
+          v-else
+          :danger="item.danger"
           :disabled="item.disabled"
           :shape="item.shape || groupShape || 'default'"
           :type="item.type || groupType || 'default'"
           :title="checkTitle(item)"
-          @click="item.clickEvent ? item.clickEvent(item) : () => {}"
+          @click="item.clickEvent ? item.clickEvent(item, args) : () => {}"
         >
           <template #icon>
             <slot name="icon" :item="item" />
@@ -67,30 +92,7 @@
             {{ $props.i18n && item.text ? $t(`${$props.i18n}.${item.text}`) : item.text }}
           </span>
         </a-button>
-        <template #overlay>
-          <a-menu v-if="!item.disabled" @click="item.dropdownMenuClickEvent">
-            <a-menu-item v-for="actionItem in item.dropdownMenu" :key="actionItem.action">
-              {{ actionItem.text }}
-            </a-menu-item>
-          </a-menu>
-        </template>
-      </a-dropdown>
-      <a-button
-        v-else
-        :danger="item.danger"
-        :disabled="item.disabled"
-        :shape="item.shape || groupShape || 'default'"
-        :type="item.type || groupType || 'default'"
-        :title="checkTitle(item)"
-        @click="item.clickEvent ? item.clickEvent(item, args) : () => {}"
-      >
-        <template #icon>
-          <slot name="icon" :item="item" />
-        </template>
-        <span v-if="item.text">
-          {{ $props.i18n && item.text ? $t(`${$props.i18n}.${item.text}`) : item.text }}
-        </span>
-      </a-button>
+      </template>
     </template>
   </a-space>
 </template>

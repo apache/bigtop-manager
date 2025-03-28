@@ -18,18 +18,12 @@
 -->
 
 <script setup lang="ts">
-  import { computed, ref, shallowRef, toRefs, watch } from 'vue'
+  import { computed, ref, shallowRef, useAttrs } from 'vue'
   import { useI18n } from 'vue-i18n'
-  import { Empty, MenuProps } from 'ant-design-vue'
-  import { formatFromByte } from '@/utils/storage.ts'
-  import { usePngImage } from '@/utils/tools'
-  import { CommonStatus, CommonStatusTexts } from '@/enums/state.ts'
-  import CategoryChart from '@/pages/cluster-manage/cluster/components/category-chart.vue'
-  import GaugeChart from '@/pages/cluster-manage/cluster/components/gauge-chart.vue'
-  import { getComponentsByHost } from '@/api/hosts'
-  import type { HostStatusType, HostVO } from '@/api/hosts/types.ts'
-  import type { ClusterStatusType } from '@/api/cluster/types.ts'
-  import type { ComponentVO } from '@/api/component/types.ts'
+  import { CommonStatus, CommonStatusTexts } from '@/enums/state'
+  import GaugeChart from '../components/gauge-chart.vue'
+  import CategoryChart from '../components/category-chart.vue'
+  import type { ServiceVO, ServiceStatusType } from '@/api/service/types'
 
   type TimeRangeText = '1m' | '15m' | '30m' | '1h' | '6h' | '30h'
   type TimeRangeItem = {
@@ -37,28 +31,22 @@
     time: string
   }
 
-  interface Props {
-    hostInfo: HostVO
-  }
-
-  const props = defineProps<Props>()
-  const { hostInfo } = toRefs(props)
   const { t } = useI18n()
-  const currExecuteComponent = shallowRef<ComponentVO>({})
+  const attrs = useAttrs()
   const currTimeRange = ref<TimeRangeText>('15m')
-  const statusColors = shallowRef<Record<HostStatusType, keyof typeof CommonStatusTexts>>({
-    1: 'healthy',
-    2: 'unhealthy',
-    3: 'unknown'
-  })
   const chartData = ref({
     chart1: [],
     chart2: [],
     chart3: [],
     chart4: []
   })
-  const componentsFromCurrentHost = shallowRef<Map<string, ComponentVO[]>>(new Map())
-  const needFormatFormByte = computed(() => ['totalMemorySize', 'totalDisk'])
+  const statusColors = shallowRef<Record<ServiceStatusType, keyof typeof CommonStatusTexts>>({
+    1: 'healthy',
+    2: 'unhealthy',
+    3: 'unknown'
+  })
+  const serviceDetail = computed(() => attrs as unknown as ServiceVO)
+  const serviceKeys = computed(() => Object.keys(baseConfig.value) as (keyof ServiceVO)[])
   const noChartData = computed(() => Object.values(chartData.value).every((v) => v.length === 0))
   const timeRanges = computed((): TimeRangeItem[] => [
     {
@@ -86,77 +74,21 @@
       time: ''
     }
   ])
-  const baseConfig = computed((): Partial<Record<keyof HostVO, string>> => {
+  const baseConfig = computed((): Partial<Record<keyof ServiceVO, string>> => {
     return {
-      status: t('overview.host_status'),
-      hostname: t('overview.hostname'),
-      desc: t('overview.host_desc'),
-      clusterDisplayName: t('common.cluster'),
-      componentNum: t('overview.component_count'),
-      os: t('overview.os'),
-      ipv4: t('overview.ip_v4'),
-      ipv6: t('overview.ip_v6'),
-      arch: t('overview.arch'),
-      availableProcessors: t('overview.core_count'),
-      totalMemorySize: t('overview.memory'),
-      totalDisk: t('overview.disk_size')
+      status: t('overview.service_status'),
+      displayName: t('overview.service_name'),
+      version: t('overview.service_version'),
+      stack: t('common.stack'),
+      restartFlag: t('service.required_restart'),
+      metrics: t('overview.metrics'),
+      kerberos: t('overview.kerberos')
     }
   })
-  const unitOfBaseConfig = computed(
-    (): Partial<Record<keyof HostVO, string>> => ({
-      componentNum: t('overview.unit_component'),
-      availableProcessors: t('overview.unit_core')
-    })
-  )
-  const detailKeys = computed((): (keyof HostVO)[] => Object.keys(baseConfig.value))
-  const componentOperates = computed(() => [
-    {
-      action: 'start',
-      text: t('common.start', [t('common.component')])
-    },
-    {
-      action: 'restart',
-      text: t('common.restart', [t('common.component')])
-    },
-    {
-      action: 'stop',
-      text: t('common.stop', [t('common.component')])
-    }
-  ])
-
-  const handleHostOperate: MenuProps['onClick'] = (item) => {
-    console.log('item :>> ', item.key)
-    console.log(currExecuteComponent.value)
-  }
 
   const handleTimeRange = (time: TimeRangeItem) => {
     currTimeRange.value = time.text
   }
-
-  const recordClickComp = (comp: ComponentVO) => {
-    currExecuteComponent.value = comp
-  }
-
-  watch(
-    () => hostInfo.value,
-    async (val) => {
-      if (val.id) {
-        try {
-          const data = await getComponentsByHost({ id: val.id })
-          componentsFromCurrentHost.value = data.reduce((pre, val) => {
-            if (!pre.has(val.stack!)) {
-              pre.set(val.stack!, [val])
-            } else {
-              ;(pre.get(val.stack!) as ComponentVO[]).push(val)
-            }
-            return pre
-          }, new Map<string, ComponentVO[]>())
-        } catch (error) {
-          console.log(error)
-        }
-      }
-    }
-  )
 </script>
 
 <template>
@@ -177,35 +109,37 @@
                 </template>
                 <div class="desc-sub-item-wrp">
                   <div class="desc-sub-item">
-                    <template v-for="base in detailKeys" :key="base">
+                    <template v-for="key in serviceKeys" :key="key">
                       <div class="desc-sub-item-desc">
                         <a-typography-text
                           class="desc-sub-item-desc-column"
                           type="secondary"
-                          :content="baseConfig[base]"
+                          :content="baseConfig[`${key}`]"
                         />
                         <a-tag
-                          v-if="base === 'status'"
+                          v-if="key === 'status'"
                           class="reset-tag"
-                          :color="CommonStatus[statusColors[hostInfo[base] as ClusterStatusType]]"
+                          :color="CommonStatus[statusColors[serviceDetail[key]]]"
                         >
-                          <status-dot :color="CommonStatus[statusColors[hostInfo[base] as ClusterStatusType]]" />
-                          {{ hostInfo[base] && $t(`common.${statusColors[hostInfo[base] as ClusterStatusType]}`) }}
+                          <status-dot :color="CommonStatus[statusColors[serviceDetail[key]]]" />
+                          {{ serviceDetail[key] && $t(`common.${statusColors[serviceDetail[key]]}`) }}
                         </a-tag>
-                        <a-typography-text v-else class="desc-sub-item-desc-column">
-                          <span v-if="Object.keys(unitOfBaseConfig).includes(base as string)">
-                            {{ `${hostInfo[base]} ${unitOfBaseConfig[base]}` }}
-                          </span>
-                          <span v-else>
-                            {{
-                              `${
-                                needFormatFormByte.includes(base as string)
-                                  ? formatFromByte(hostInfo[base])
-                                  : hostInfo[base] || '--'
-                              }`
-                            }}
-                          </span>
-                        </a-typography-text>
+                        <a-typography-text
+                          v-else-if="key === 'stack'"
+                          class="desc-sub-item-desc-column"
+                          :content="serviceDetail[key]?.toLowerCase()"
+                        />
+                        <a-typography-text
+                          v-else-if="key === 'restartFlag'"
+                          class="desc-sub-item-desc-column"
+                          :content="serviceDetail[key] ? $t('common.yes') : $t('common.no')"
+                        />
+                        <a-typography-text
+                          v-else-if="['kerberos', 'metrics'].includes(key)"
+                          class="desc-sub-item-desc-column"
+                          :content="$t('common.disabled')"
+                        />
+                        <a-typography-text v-else class="desc-sub-item-desc-column" :content="serviceDetail[key]" />
                       </div>
                     </template>
                   </div>
@@ -214,46 +148,6 @@
             </a-descriptions>
           </div>
         </div>
-
-        <template v-if="componentsFromCurrentHost.size === 0">
-          <div class="component-info">
-            <div class="box-title">
-              <a-typography-text strong :content="$t('overview.component_info')" />
-            </div>
-            <div class="box-empty">
-              <a-empty :image="Empty.PRESENTED_IMAGE_SIMPLE" />
-            </div>
-          </div>
-        </template>
-        <a-descriptions v-else layout="vertical" bordered :column="1">
-          <template #title>
-            <a-typography-text strong :content="$t('overview.component_info')" />
-          </template>
-          <a-descriptions-item v-for="stack in componentsFromCurrentHost.keys()" :key="stack">
-            <template #label>
-              <div class="desc-sub-label">
-                <a-typography-text strong :content="stack.split('-')[0] + ' Stack'" />
-                <a-typography-text type="secondary" :content="`${stack.toLowerCase()}`" />
-              </div>
-            </template>
-            <div v-for="comp in componentsFromCurrentHost.get(stack)" :key="comp.id" class="component-item">
-              <a-avatar v-if="comp.serviceName" :src="usePngImage(comp.serviceName.toLowerCase())" :size="22" />
-              <a-typography-text :content="`${comp.serviceDisplayName}/${comp.displayName}`" />
-              <a-dropdown :trigger="['click']">
-                <a-button type="text" shape="circle" size="small" @click="recordClickComp(comp)">
-                  <svg-icon name="more" style="margin: 0" />
-                </a-button>
-                <template #overlay>
-                  <a-menu @click="handleHostOperate">
-                    <a-menu-item v-for="operate in componentOperates" :key="operate.action">
-                      <span>{{ operate.text }}</span>
-                    </a-menu-item>
-                  </a-menu>
-                </template>
-              </a-dropdown>
-            </div>
-          </a-descriptions-item>
-        </a-descriptions>
       </a-col>
       <a-col :xs="24" :sm="24" :md="24" :lg="14" :xl="17">
         <div class="box-title">
@@ -350,15 +244,6 @@
     &-activated {
       color: $color-primary-text;
     }
-  }
-
-  .component-item {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    gap: $space-md;
-    align-items: center;
-    padding: 12px 16px;
-    border-top: 1px solid #f0f0f0;
   }
 
   .chart-item-wrp {

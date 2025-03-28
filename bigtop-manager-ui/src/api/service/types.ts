@@ -23,7 +23,7 @@ import type { PageVO } from '@/api/types'
 export type ServiceList = PageVO<ServiceVO>
 export type ServiceParams = { clusterId: number; id: number }
 export type SnapshotData = { desc?: string; name?: string }
-export type SnapshotRecovery = ServiceParams & { snapshotId: string }
+export type SnapshotRecovery = ServiceParams & { snapshotId: number }
 export type ServiceStatusType = 1 | 2 | 3
 export type ServiceListParams = {
   name?: string
@@ -45,6 +45,8 @@ export interface ServiceVO {
   user?: string
   version?: string
   isInstalled?: boolean
+  metrics?: boolean
+  kerberos?: boolean
 }
 
 export interface ServiceConfig {
@@ -59,6 +61,7 @@ export interface Property {
   displayName?: string
   name: string
   value?: string
+  [property: string]: any
 }
 
 export interface Attr {
