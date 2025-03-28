@@ -32,4 +32,8 @@ public class ServiceConfigSnapshotVO implements Serializable {
     private String desc;
 
     private String configJson;
+
+    private String createTime;
+
+    private String updateTime;
 }

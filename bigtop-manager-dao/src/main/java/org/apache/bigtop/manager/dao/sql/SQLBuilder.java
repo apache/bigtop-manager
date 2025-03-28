@@ -369,12 +369,12 @@ public class SQLBuilder {
         SQL sql = new SQL();
         switch (DBType.toType(databaseId)) {
             case MYSQL: {
-                sql.DELETE_FROM(tableMetaData.getTableName());
+                sql.DELETE_FROM(keywordsFormat(tableMetaData.getTableName(), DBType.MYSQL));
                 sql.WHERE(getEquals(tableMetaData.getPkColumn(), tableMetaData.getPkProperty()));
                 break;
             }
             case POSTGRESQL: {
-                sql.FROM(keywordsFormat(tableMetaData.getTableName(), DBType.POSTGRESQL));
+                sql.DELETE_FROM(keywordsFormat(tableMetaData.getTableName(), DBType.POSTGRESQL));
                 sql.WHERE(tableMetaData.getPkColumn() + " = " + id);
                 break;
             }
