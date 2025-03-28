@@ -24,6 +24,7 @@ export default {
   save: 'Save',
   exit: 'Exit',
   action: 'Action',
+  operation: 'Operation',
   status: 'Status',
   healthy: 'Healthy',
   unhealthy: 'Unhealthy',
@@ -122,5 +123,6 @@ export default {
   no: 'No',
   all: 'All',
   disabled: 'Disabled',
-  restore: 'Restore'
+  restore: 'Restore',
+  selected: 'Selected'
 }

@@ -18,23 +18,26 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onActivated, reactive, ref, useAttrs } from 'vue'
+  import { computed, onActivated, onDeactivated, reactive, ref, shallowRef, useAttrs } from 'vue'
   import { storeToRefs } from 'pinia'
   import { useI18n } from 'vue-i18n'
   import { useRoute } from 'vue-router'
-  import { getComponents } from '@/api/component'
+  import { deleteComponent, getComponents } from '@/api/component'
+  import { execCommand } from '@/api/command'
   import { useStackStore } from '@/store/stack'
   import useBaseTable from '@/composables/use-base-table'
   import type { GroupItem } from '@/components/common/button-group/types'
-  import type { TableColumnType, TableProps } from 'ant-design-vue'
+  import { message, Modal, type TableColumnType, type TableProps } from 'ant-design-vue'
   import type { ComponentVO } from '@/api/component/types'
   import type { FilterConfirmProps, FilterResetProps } from 'ant-design-vue/es/table/interface'
+  import type { Command, CommandRequest } from '@/api/command/types'
 
   type Key = string | number
   interface TableState {
     selectedRowKeys: Key[]
     searchText: string
     searchedColumn: keyof ComponentVO
+    selectedRows: ComponentVO[]
   }
 
   interface ServieceInfo {
@@ -44,17 +47,25 @@
     serviceId: number
   }
 
+  const POLLING_INTERVAL = 3000
   const { t } = useI18n()
   const stackStore = useStackStore()
   const route = useRoute()
   const attrs = useAttrs()
   const { stacks } = storeToRefs(stackStore)
   const searchInputRef = ref()
+  const pollingIntervalId = ref<any>(null)
   const componentStatus = ref(['INSTALLING', 'SUCCESS', 'FAILED', 'UNKNOWN'])
+  const commandRequest = shallowRef<CommandRequest>({
+    command: 'Add',
+    commandLevel: 'cluster',
+    componentCommands: []
+  })
   const state = reactive<TableState>({
     searchText: '',
     searchedColumn: '',
-    selectedRowKeys: []
+    selectedRowKeys: [],
+    selectedRows: []
   })
 
   const currServiceInfo = computed(() => route.params as unknown as ServieceInfo)
@@ -93,7 +104,7 @@
       title: t('common.status'),
       dataIndex: 'status',
       key: 'status',
-      width: '160px',
+      width: 160,
       ellipsis: true,
       filterMultiple: false,
       filters: [
@@ -119,34 +130,37 @@
     },
     {
       title: t('common.action'),
-      width: 180,
+      width: 280,
       key: 'operation',
       fixed: 'right'
     }
   ])
 
-  const { loading, dataSource, paginationProps, filtersParams, onChange, resetState } = useBaseTable<ComponentVO>({
+  const { loading, dataSource, paginationProps, filtersParams, onChange } = useBaseTable<ComponentVO>({
     columns: columns.value,
     rows: []
   })
 
-  const operations = computed((): GroupItem[] => [
+  const operations = shallowRef<GroupItem<keyof typeof Command>[]>([
     {
       text: 'start',
-      clickEvent: (_item, args) => handleStart(args)
+      action: 'Start',
+      clickEvent: (item, args) => handleTableOperation(item!, args)
     },
     {
       text: 'stop',
-      clickEvent: (_item, args) => handleStop(args)
+      action: 'Stop',
+      clickEvent: (item, args) => handleTableOperation(item!, args)
     },
     {
       text: 'restart',
-      clickEvent: (_item, args) => handleRestart(args)
+      action: 'Restart',
+      clickEvent: (item, args) => handleTableOperation(item!, args)
     },
     {
       text: 'remove',
       danger: true,
-      clickEvent: (_item, args) => handleDelete(args)
+      clickEvent: (_, args) => handleDelete(args)
     }
   ])
 
@@ -157,87 +171,99 @@
       dropdownMenu: [
         {
           action: 'Start',
-          text: t('common.start', [t('common.all')])
+          text: t('common.start', [t('common.selected')])
         },
         {
           action: 'Restart',
-          text: t('common.restart', [t('common.all')])
+          text: t('common.restart', [t('common.selected')])
         },
         {
           action: 'Stop',
-          text: t('common.stop', [t('common.all')])
+          text: t('common.stop', [t('common.selected')])
         }
       ],
       dropdownMenuClickEvent: (info) => dropdownMenuClick && dropdownMenuClick(info)
     }
   ])
 
-  const getTableOperations = (status: number): GroupItem[] => {
-    if (status === 1) {
-      return operations.value.filter((v) => ['stop', 'restart', 'remove'].includes(v.text!))
-    } else if (status === 2) {
-      return operations.value.filter((v) => ['start', 'remove'].includes(v.text!))
-    } else {
-      return operations.value.filter((v) => v.text === 'remove')
-    }
-  }
-
-  const dropdownMenuClick: GroupItem['dropdownMenuClickEvent'] = async ({ key }) => {
-    console.log('key :>> ', key)
-  }
-
-  const onSelectChange = (selectedRowKeys: Key[]) => {
+  const onSelectChange = (selectedRowKeys: Key[], selectedRows: ComponentVO[]) => {
     state.selectedRowKeys = selectedRowKeys
+    state.selectedRows = selectedRows
   }
 
   const handleSearch = (selectedKeys: Key[], confirm: (param?: FilterConfirmProps) => void, dataIndex: string) => {
     confirm()
     state.searchText = selectedKeys[0] as string
     state.searchedColumn = dataIndex
-    resetState()
+    stopPolling()
+    startPolling()
   }
 
   const handleReset = (clearFilters: (param?: FilterResetProps) => void) => {
     clearFilters({ confirm: true })
     state.searchText = ''
-    resetState()
+    stopPolling()
+    startPolling()
   }
 
-  const handleStart = (row?: any) => {
-    if (!row) {
-      console.log('selectedRowKeys :>> ', state.selectedRowKeys)
-    } else {
-      console.log('row :>> ', row)
+  const dropdownMenuClick: GroupItem['dropdownMenuClickEvent'] = async ({ key }) => {
+    if (state.selectedRows.length === 0) {
+      message.error(t('common.select_error', [`${t('common.component')}`.toLowerCase()]))
+      return
+    }
+    commandRequest.value.command = key as keyof typeof Command
+    const map = state.selectedRows.reduce((map, v) => {
+      if (!map.has(v.name)) {
+        map.set(v.name, { componentName: v.name, hostnames: [v.hostname] })
+      } else {
+        map.get(v.name).hostnames.push(v.hostname)
+      }
+      return map
+    }, new Map())
+    commandRequest.value.componentCommands = [...map.values()]
+    await execOperation()
+    getComponentList(true, true)
+  }
+
+  const handleTableOperation = async (item: GroupItem<keyof typeof Command>, row: ComponentVO) => {
+    commandRequest.value.command = item.action!
+    commandRequest.value.componentCommands?.push({
+      componentName: row.name!,
+      hostnames: [row.hostname!]
+    })
+    await execOperation()
+    getComponentList(true, true)
+  }
+
+  const execOperation = async () => {
+    try {
+      await execCommand({ ...commandRequest.value, clusterId: currServiceInfo.value.id })
+      state.selectedRowKeys = []
+      state.selectedRows = []
+    } catch (error) {
+      console.log('error :>> ', error)
     }
   }
 
-  const handleStop = (row?: any) => {
-    if (!row) {
-      console.log('selectedRowKeys :>> ', state.selectedRowKeys)
-    } else {
-      console.log('row :>> ', row)
-    }
+  const handleDelete = async (row: ComponentVO) => {
+    Modal.confirm({
+      title: t('common.restore_msg'),
+      async onOk() {
+        try {
+          const data = await deleteComponent({ clusterId: currServiceInfo.value.id, id: row.id! })
+          if (data) {
+            message.success('common.delete_success')
+            getComponentList(true, true)
+          }
+        } catch (error) {
+          console.log('error :>> ', error)
+        }
+      }
+    })
   }
 
-  const handleRestart = (row?: any) => {
-    if (!row) {
-      console.log('selectedRowKeys :>> ', state.selectedRowKeys)
-    } else {
-      console.log('row :>> ', row)
-    }
-  }
-
-  const handleDelete = (row?: any) => {
-    if (!row) {
-      console.log('selectedRowKeys :>> ', state.selectedRowKeys)
-    } else {
-      console.log('row :>> ', row)
-    }
-  }
-
-  const getComponentList = async (isReset = false) => {
+  const getComponentList = async (isReset = false, isFirstCall = false) => {
     const { id: clusterId, serviceId } = currServiceInfo.value
-    loading.value = true
     if (attrs.id == undefined || !paginationProps.value) {
       loading.value = false
       return
@@ -246,6 +272,9 @@
       paginationProps.value.current = 1
     }
     try {
+      if (isFirstCall) {
+        loading.value = true
+      }
       const res = await getComponents({ ...filtersParams.value, clusterId, serviceId })
       dataSource.value = res.content
       paginationProps.value.total = res.total
@@ -257,13 +286,32 @@
     }
   }
 
-  const tableChange: TableProps['onChange'] = (pagination, filters, ...args) => {
-    onChange(pagination, filters, ...args)
-    getComponentList()
+  const tableChange: TableProps['onChange'] = (...args) => {
+    onChange(...args)
+    stopPolling()
+    startPolling()
+  }
+
+  const startPolling = () => {
+    getComponentList(true, true)
+    pollingIntervalId.value = setInterval(() => {
+      getComponentList()
+    }, POLLING_INTERVAL)
+  }
+
+  const stopPolling = () => {
+    if (pollingIntervalId.value) {
+      clearInterval(pollingIntervalId.value)
+      pollingIntervalId.value = null
+    }
   }
 
   onActivated(() => {
-    getComponentList(true)
+    startPolling()
+  })
+
+  onDeactivated(() => {
+    stopPolling()
   })
 </script>
 
@@ -273,14 +321,16 @@
       <div class="header-title">{{ $t('common.component') }}</div>
       <div class="list-operation">
         <a-button type="primary">{{ $t('common.add', [`${$t('common.component')}`]) }}</a-button>
-        <button-group :space="24" :groups="batchOperations" group-shape="default" />
+        <button-group :groups="batchOperations" group-shape="default" />
       </div>
     </header>
     <a-table
+      row-key="id"
       :loading="loading"
       :data-source="dataSource"
       :columns="columns"
       :pagination="paginationProps"
+      :scroll="{ x: 900, y: 1000 }"
       :row-selection="{ selectedRowKeys: state.selectedRowKeys, onChange: onSelectChange }"
       @change="tableChange"
     >
@@ -323,7 +373,7 @@
             i18n="common"
             :text-compact="true"
             :space="24"
-            :groups="getTableOperations(record.status)"
+            :groups="operations"
             :args="record"
             group-shape="default"
             group-type="link"

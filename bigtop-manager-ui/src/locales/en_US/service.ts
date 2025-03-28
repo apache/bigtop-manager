@@ -35,7 +35,7 @@ export default {
   dependencies_msg: '{0} requires service {1}, add it also?',
   capture_snapshot: 'Capture Snapshot',
   snapshot_management: 'Snapshot Management',
-  snapshot_name: 'Snapshot Name',
-  snapshot_description: 'Snapshot Description',
+  snapshot_name: 'Name',
+  snapshot_description: 'Description',
   snapshot_notes: 'Snapshot Notes'
 }

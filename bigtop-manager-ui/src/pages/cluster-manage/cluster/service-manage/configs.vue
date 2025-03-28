@@ -119,6 +119,7 @@
   onActivated(() => {
     configs.value = attrs.configs as ServiceConfig[]
     filterConfigs.value = [...configs.value]
+    activeKey.value = filterConfigs.value.map((v) => v.id!)
     debouncedOnSearch.value = debounce(filterConfigurations, 300)
   })
 

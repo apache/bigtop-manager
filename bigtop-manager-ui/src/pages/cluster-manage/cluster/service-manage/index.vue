@@ -65,7 +65,7 @@
     {
       shape: 'default',
       type: 'primary',
-      text: t('common.action'),
+      text: t('common.operation'),
       dropdownMenu: [
         {
           action: 'Start',
@@ -89,8 +89,15 @@
   })
 
   const getServiceDetail = async () => {
-    const { id: clusterId, serviceId } = routeParams.value
-    serviceDetail.value = await serviceStore.getServiceDetail(clusterId, serviceId)
+    try {
+      loading.value = true
+      const { id: clusterId, serviceId } = routeParams.value
+      serviceDetail.value = await serviceStore.getServiceDetail(clusterId, serviceId)
+    } catch (error) {
+      console.log('error :>> ', error)
+    } finally {
+      loading.value = false
+    }
   }
 
   provide('getServiceDetail', getServiceDetail)

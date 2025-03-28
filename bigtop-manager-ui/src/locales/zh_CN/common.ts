@@ -24,6 +24,7 @@ export default {
   save: '保存',
   exit: '退出',
   action: '操作',
+  operation: '操作',
   status: '状态',
   healthy: '健康',
   unhealthy: '不健康',
@@ -122,5 +123,6 @@ export default {
   no: '否',
   all: '全部',
   disabled: '关闭',
-  restore: '恢复'
+  restore: '恢复',
+  selected: '选中'
 }
