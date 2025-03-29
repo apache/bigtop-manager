@@ -53,8 +53,8 @@ public class LocSystemPromptProvider implements SystemPromptProvider {
 
     private String loadTextFromFile(String fileName) {
         try {
-            String fullPath =
-                    Objects.requireNonNull(ResourceUtils.getFile(fileName)).toString();
+            String fullPath = Objects.requireNonNull(getClass().getClassLoader().getResource(fileName))
+                    .getPath();
             File file = ResourceUtils.getFile(fullPath);
             return Files.readString(file.toPath(), StandardCharsets.UTF_8);
         } catch (IOException | NullPointerException e) {
