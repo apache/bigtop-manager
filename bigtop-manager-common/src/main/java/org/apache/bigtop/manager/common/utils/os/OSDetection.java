@@ -111,27 +111,21 @@ public class OSDetection {
         if (isRunningInContainer()) {
             log.debug("Running in containerized environment, using fallback architecture detection");
             String arch = System.getProperty("os.arch");
-            // Standardize architecture names for consistency
             return standardizeArch(arch);
         }
 
         if (SystemUtils.IS_OS_LINUX) {
             try {
                 String arch = getOSArch();
-                // Standardize architecture names for consistency
-                // Standardize architecture names for consistency
                 return standardizeArch(arch);
             } catch (Exception e) {
                 log.warn("Failed to get OS architecture using 'arch' command, falling back to os.arch", e);
                 String arch = System.getProperty("os.arch");
-                // Standardize architecture names for consistency
                 return standardizeArch(arch);
             }
         } else {
             String arch = System.getProperty("os.arch").toLowerCase();
             log.debug("Detected non-Linux architecture: {}", arch);
-            // Standardize architecture names for consistency
-            // Standardize architecture names for consistency
             return standardizeArch(arch);
         }
     }
