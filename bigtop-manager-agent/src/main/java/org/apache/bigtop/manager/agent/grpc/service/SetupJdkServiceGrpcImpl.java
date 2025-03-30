@@ -89,16 +89,28 @@ public class SetupJdkServiceGrpcImpl extends SetupJdkServiceGrpc.SetupJdkService
     }
 
     private String getPkgName(String arch) {
-        String replacedArch = arch.equals("x86_64") ? "x64" : arch;
-        replacedArch = replacedArch.equals("arm64") ? "aarch64" : arch;
-        return MessageFormat.format("jdk-8u431-linux-{0}.tar.gz", replacedArch);
+        String replacedArch =
+                switch (arch) {
+                    case "x86_64" -> "x64";
+                    case "arm64" -> "aarch64";
+                    default -> {
+                        log.error("Unsupported architecture: {}", arch);
+                        throw new IllegalArgumentException("Unsupported architecture: " + arch);
+                    }
+                };
+        String pkgName = MessageFormat.format("jdk-8u431-linux-{0}.tar.gz", replacedArch);
+        log.debug("Generated package name: {}", pkgName);
+        return pkgName;
     }
 
     private String getChecksum(String arch) {
         return switch (arch) {
             case "x64", "x86_64" -> "SHA-256:b396978a716b7d23ccccabfe5c47c3b75d2434d7f8f7af690bc648172382720d";
             case "arm64", "aarch64" -> "SHA-256:e68d3e31ffcf7f05a4de65d04974843073bdff238bb6524adb272de9e616be7c";
-            default -> throw new RuntimeException("Unknown arch for jdk: " + arch);
+            default -> {
+                log.error("Unknown arch for jdk: {}", arch);
+                throw new IllegalArgumentException("Unknown arch for jdk: " + arch);
+            }
         };
     }
 }

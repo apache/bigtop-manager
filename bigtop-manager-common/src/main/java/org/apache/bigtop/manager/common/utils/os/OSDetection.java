@@ -66,11 +66,69 @@ public class OSDetection {
         }
     }
 
+    private static boolean isRunningInContainer() {
+        try {
+            File cgroupFile = new File("/proc/self/cgroup");
+            if (cgroupFile.exists()) {
+                String content = new String(java.nio.file.Files.readAllBytes(cgroupFile.toPath()));
+                if (content.contains("docker") || content.contains("kubepods")) {
+                    return true;
+                }
+            }
+
+            // Check for cgroup v2
+            File cgroup2File = new File("/proc/1/cgroup");
+            if (cgroup2File.exists()) {
+                String content = new String(java.nio.file.Files.readAllBytes(cgroup2File.toPath()));
+                if (content.contains("docker") || content.contains("kubepods")) {
+                    return true;
+                }
+            }
+
+            // Additional check for cgroup v2 controllers
+            File cgroupControllersFile = new File("/sys/fs/cgroup/cgroup.controllers");
+            if (cgroupControllersFile.exists()) {
+                String content = new String(java.nio.file.Files.readAllBytes(cgroupControllersFile.toPath()));
+                // These are common controllers used in containers
+                return content.contains("cpuset") && content.contains("memory");
+            }
+
+            // Check for container environment variable
+            File environFile = new File("/proc/1/environ");
+            if (environFile.exists()) {
+                String content = new String(java.nio.file.Files.readAllBytes(environFile.toPath()));
+                return content.contains("container=docker");
+            }
+
+            return false;
+        } catch (IOException e) {
+            log.warn("Failed to detect container environment: {}", e.getMessage(), e);
+            return false;
+        }
+    }
+
     public static String getArch() {
-        if (SystemUtils.IS_OS_LINUX) {
-            return getOSArch();
-        } else {
+        if (isRunningInContainer()) {
+            log.debug("Running in containerized environment, using fallback architecture detection");
             return System.getProperty("os.arch");
+        }
+
+        if (SystemUtils.IS_OS_LINUX) {
+            try {
+                String arch = getOSArch();
+                log.debug("Detected Linux architecture: {}", arch);
+                return arch;
+            } catch (Exception e) {
+                log.warn("Failed to get OS architecture using 'arch' command, falling back to os.arch", e);
+                return System.getProperty("os.arch");
+            }
+        } else {
+            String arch = System.getProperty("os.arch").toLowerCase();
+            log.debug("Detected non-Linux architecture: {}", arch);
+            // Standardize architecture names for consistency
+            String standardizedArch = standardizeArch(arch);
+            log.debug("Standardized architecture: {}", standardizedArch);
+            return standardizedArch;
         }
     }
 
@@ -139,16 +197,52 @@ public class OSDetection {
     }
 
     private static String getOSArch() {
-        List<String> builderParameters = new ArrayList<>();
-        builderParameters.add("arch");
-
         try {
+            List<String> builderParameters = new ArrayList<>();
+            builderParameters.add("arch");
             ShellResult shellResult = ShellExecutor.execCommand(builderParameters);
             String output = shellResult.getOutput().replace("\n", "");
             log.debug("getArch: {}", output);
             return output;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            log.warn("Failed to execute 'arch' command, falling back to /proc/cpuinfo");
+            try {
+                String cpuInfo = new String(java.nio.file.Files.readAllBytes(new File("/proc/cpuinfo").toPath()));
+                Pattern pattern = Pattern.compile("model name\\s*:.*?(\\w+)$", Pattern.MULTILINE);
+                Matcher matcher = pattern.matcher(cpuInfo);
+                if (matcher.find()) {
+                    String output = matcher.group(1).toLowerCase();
+                    log.debug("getArch: {}", output);
+                    return output;
+                }
+            } catch (IOException ex) {
+                log.error("Failed to read /proc/cpuinfo: {}", ex.getMessage(), ex);
+            }
+            throw new RuntimeException("Unable to detect OS architecture");
         }
+    }
+
+    private static String standardizeArch(String arch) {
+        if ("amd64".equals(arch)) {
+            return "x86_64";
+        } else if ("aarch64".equals(arch)) {
+            return "arm64";
+        } else if ("x86".equals(arch)) {
+            return "i386";
+        } else if ("arm".equals(arch)) {
+            return "armv7l";
+        } else if ("ppc64le".equals(arch)) {
+            return "ppc64le";
+        } else if ("s390x".equals(arch)) {
+            return "s390x";
+        } else if ("riscv64".equals(arch)) {
+            return "riscv64";
+        } else if ("mips".equals(arch)) {
+            return "mips";
+        } else if ("mips64".equals(arch)) {
+            return "mips64";
+        }
+        log.warn("Detected unknown architecture: {}", arch);
+        throw new UnsupportedOperationException("Unsupported architecture: " + arch);
     }
 }
