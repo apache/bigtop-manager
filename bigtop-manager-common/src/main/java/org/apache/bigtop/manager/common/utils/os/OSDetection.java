@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -70,7 +71,7 @@ public class OSDetection {
         try {
             File cgroupFile = new File("/proc/self/cgroup");
             if (cgroupFile.exists()) {
-                String content = new String(java.nio.file.Files.readAllBytes(cgroupFile.toPath()));
+                String content = new String(Files.readAllBytes(cgroupFile.toPath()));
                 if (content.contains("docker") || content.contains("kubepods")) {
                     return true;
                 }
@@ -79,7 +80,7 @@ public class OSDetection {
             // Check for cgroup v2
             File cgroup2File = new File("/proc/1/cgroup");
             if (cgroup2File.exists()) {
-                String content = new String(java.nio.file.Files.readAllBytes(cgroup2File.toPath()));
+                String content = new String(Files.readAllBytes(cgroup2File.toPath()));
                 if (content.contains("docker") || content.contains("kubepods")) {
                     return true;
                 }
@@ -88,7 +89,7 @@ public class OSDetection {
             // Additional check for cgroup v2 controllers
             File cgroupControllersFile = new File("/sys/fs/cgroup/cgroup.controllers");
             if (cgroupControllersFile.exists()) {
-                String content = new String(java.nio.file.Files.readAllBytes(cgroupControllersFile.toPath()));
+                String content = new String(Files.readAllBytes(cgroupControllersFile.toPath()));
                 // These are common controllers used in containers
                 return content.contains("cpuset") && content.contains("memory");
             }
@@ -96,7 +97,7 @@ public class OSDetection {
             // Check for container environment variable
             File environFile = new File("/proc/1/environ");
             if (environFile.exists()) {
-                String content = new String(java.nio.file.Files.readAllBytes(environFile.toPath()));
+                String content = new String(Files.readAllBytes(environFile.toPath()));
                 return content.contains("container=docker");
             }
 
@@ -205,7 +206,7 @@ public class OSDetection {
         } catch (Exception e) {
             log.warn("Failed to execute 'arch' command, falling back to /proc/cpuinfo");
             try {
-                String cpuInfo = new String(java.nio.file.Files.readAllBytes(new File("/proc/cpuinfo").toPath()));
+                String cpuInfo = new String(Files.readAllBytes(new File("/proc/cpuinfo").toPath()));
                 Pattern pattern = Pattern.compile("model name\\s*:.*?(\\w+)$", Pattern.MULTILINE);
                 Matcher matcher = pattern.matcher(cpuInfo);
                 if (matcher.find()) {
