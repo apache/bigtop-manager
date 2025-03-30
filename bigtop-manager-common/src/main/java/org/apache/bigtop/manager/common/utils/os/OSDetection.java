@@ -227,28 +227,20 @@ public class OSDetection {
     }
 
     private static String standardizeArch(String arch) {
-        if ("amd64".equals(arch)) {
-            return "x86_64";
-        } else if ("arm64".equals(arch)) {
-            return "arm64";
-        } else if ("aarch64".equals(arch)) {
-            return "arm64";
-        } else if ("x86".equals(arch)) {
-            return "i386";
-        } else if ("arm".equals(arch)) {
-            return "armv7l";
-        } else if ("ppc64le".equals(arch)) {
-            return "ppc64le";
-        } else if ("s390x".equals(arch)) {
-            return "s390x";
-        } else if ("riscv64".equals(arch)) {
-            return "riscv64";
-        } else if ("mips".equals(arch)) {
-            return "mips";
-        } else if ("mips64".equals(arch)) {
-            return "mips64";
-        }
-        log.warn("Detected unknown architecture: {}", arch);
-        throw new UnsupportedOperationException("Unsupported architecture: " + arch);
+        return switch (arch) {
+            case "amd64" -> "x86_64";
+            case "arm64", "aarch64" -> "aarch64";
+            case "x86" -> "i386";
+            case "arm" -> "armv7l";
+            case "ppc64le" -> "ppc64le";
+            case "s390x" -> "s390x";
+            case "riscv64" -> "riscv64";
+            case "mips" -> "mips";
+            case "mips64" -> "mips64";
+            default -> {
+                log.warn("Detected unknown architecture: {}", arch);
+                throw new UnsupportedOperationException("Unsupported architecture: " + arch);
+            }
+        };
     }
 }

@@ -92,7 +92,7 @@ public class SetupJdkServiceGrpcImpl extends SetupJdkServiceGrpc.SetupJdkService
         String replacedArch =
                 switch (arch) {
                     case "x86_64" -> "x64";
-                    case "arm64" -> "aarch64";
+                    case "arm64", "aarch64" -> "aarch64";
                     default -> {
                         log.error("Unsupported architecture: {}", arch);
                         throw new IllegalArgumentException("Unsupported architecture: " + arch);
