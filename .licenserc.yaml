@@ -84,10 +84,6 @@ dependency:
       license: BSD-3-Clause
     - name: com.github.victools:jsonschema-generator
       license: Apache-2.0
-    - name: ch.qos.logback:logback-classic
-      license: EPL-1.0
-    - name: ch.qos.logback:logback-core
-      license: EPL-1.0
     - name: org.eclipse.jetty.toolchain:jetty-jakarta-servlet-api
       license: Apache-2.0
     - name: com.github.jsqlparser:jsqlparser
@@ -129,6 +125,10 @@ dependency:
       license: CDDL-1.1
     - name: javax.servlet:javax.servlet-api
       license: CDDL-1.1
+    - name: ch.qos.logback:logback-classic
+      license: EPL-1.0
+    - name: ch.qos.logback:logback-core
+      license: EPL-1.0
     - name: org.aspectj:aspectjweaver
       license: EPL-2.0
     - name: jakarta.annotation:jakarta.annotation-api
