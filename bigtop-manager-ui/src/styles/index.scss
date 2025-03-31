@@ -70,3 +70,28 @@
   display: inline-block;
   position: relative;
 }
+
+
+:where(.ant-notification-notice-content){
+ 
+  .ant-notification-notice-message,
+  .ant-notification-notice-description {
+    margin-left: 50px !important;
+    margin-bottom: 0 !important; 
+    padding-inline-end: calc(24px / 2);
+    .ant-progress-line{
+      margin-bottom: 6px !important;
+    }
+  }
+
+  .ant-notification-notice-message{
+    font-size: 14px !important;
+    font-weight: 500 !important;
+  }
+
+  .ant-notification-notice-icon{
+    top: 50%;
+    transform: translateY(-50%);
+    margin: auto;
+  }
+}

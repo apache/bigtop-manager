@@ -27,6 +27,7 @@
   import HostCreate from '@/pages/cluster-manage/hosts/create.vue'
   import InstallDependencies from './install-dependencies.vue'
   import { useClusterStore } from '@/store/cluster'
+  import { useJobProgress } from '@/store/job-progress'
   import type { FilterConfirmProps, FilterResetProps, TableRowSelection } from 'ant-design-vue/es/table/interface'
   import type { HostReq } from '@/api/command/types'
   import type { GroupItem } from '@/components/common/button-group/types'
@@ -44,6 +45,7 @@
   const { t } = useI18n()
   const router = useRouter()
   const clusterStore = useClusterStore()
+  const jobProgressStore = useJobProgress()
   const searchInputRef = ref()
   const pollingIntervalId = ref<any>(null)
   const hostCreateRef = ref<InstanceType<typeof HostCreate> | null>(null)
@@ -200,7 +202,88 @@
   }
 
   const addHost = () => {
-    hostCreateRef.value?.handleOpen('ADD')
+    jobProgressStore.processCommand({
+      command: 'Add',
+      customCommand: 'custom_command',
+      clusterId: 1,
+      commandLevel: 'cluster',
+      clusterCommand: {
+        name: 'c1',
+        displayName: 'c1',
+        desc: 'desc',
+        type: 1,
+        userGroup: 'hadoop',
+        rootDir: '/opt',
+        hosts: [
+          {
+            hostnames: '[host1, host2]',
+            agentDir: '/opt',
+            clusterId: 1,
+            sshUser: 'root',
+            sshPort: 22,
+            authType: 1,
+            sshPassword: 'password',
+            sshKeyString: 'sshKeyString',
+            sshKeyFilename: 'id_rsa123',
+            sshKeyPassword: 'password',
+            grpcPort: 8835,
+            desc: 'description'
+          }
+        ]
+      },
+      hostCommands: [
+        {
+          hostnames: '[host1, host2]',
+          agentDir: '/opt',
+          clusterId: 1,
+          sshUser: 'root',
+          sshPort: 22,
+          authType: 1,
+          sshPassword: 'password',
+          sshKeyString: 'sshKeyString',
+          sshKeyFilename: 'id_rsa123',
+          sshKeyPassword: 'password',
+          grpcPort: 8835,
+          desc: 'description'
+        }
+      ],
+      serviceCommands: [
+        {
+          serviceName: 'zookeeper',
+          installed: false,
+          componentHosts: [
+            {
+              componentName: 'zookeeper_server',
+              hostnames: '[host1, host2]'
+            }
+          ],
+          configs: [
+            {
+              id: 0,
+              name: 'string',
+              properties: [
+                {
+                  name: 'string',
+                  value: 'string',
+                  displayName: 'string',
+                  desc: 'string',
+                  attrs: {
+                    type: 'string'
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      componentCommands: [
+        {
+          componentName: 'zookeeper_server',
+          hostnames: '[host1, host2]'
+        }
+      ]
+    })
+    // hostCreateRef.value?.handleOpen('ADD')
   }
 
   const bulkRemove = () => {
