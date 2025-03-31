@@ -10,7 +10,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Check license header
         uses: apache/skywalking-eyes/header@main
-      - name: Check Dependencies' License
+      - name: Check dependencies' license
         uses: apache/skywalking-eyes/dependency@main
         with:
           flags: '--weak-compatible=true'
