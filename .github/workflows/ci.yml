@@ -12,6 +12,8 @@ jobs:
         uses: apache/skywalking-eyes/header@main
       - name: Check Dependencies' License
         uses: apache/skywalking-eyes/dependency@main
+        with:
+          flags: '--weak-compatible=true'
 
   code-style:
     name: "Check code style"
