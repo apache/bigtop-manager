@@ -42,3 +42,58 @@ header:
     - '**/*.txt'
 
   comment: on-failure
+
+dependency:
+  files:
+    - pom.xml
+    - bigtop-manager-bom/pom.xml
+  licenses:
+    - name: org.apache.hadoop.thirdparty:hadoop-shaded-protobuf_3_7
+      license: Apache-2.0
+    - name: org.apache.hadoop.thirdparty:hadoop-shaded-guava
+      license: Apache-2.0
+    - name: com.fasterxml.jackson.datatype:jackson-datatype-jdk8
+      license: Apache-2.0
+    - name: com.fasterxml.jackson.datatype:jackson-datatype-jsr310
+      license: Apache-2.0
+    - name: com.fasterxml.jackson.module:jackson-module-parameter-names
+      license: Apache-2.0
+    - name: com.fasterxml.jackson.dataformat:jackson-dataformat-yaml
+      license: Apache-2.0
+    - name: com.github.pagehelper:pagehelper
+      license: MIT
+    - name: com.github.pagehelper:pagehelper-spring-boot-starter
+      license: MIT
+    - name: com.github.pagehelper:pagehelper-spring-boot-autoconfigure
+      license: MIT
+    - name: io.swagger.core.v3:swagger-core-jakarta
+      license: Apache-2.0
+    - name: io.swagger.core.v3:swagger-annotations-jakarta
+      license: Apache-2.0
+    - name: io.swagger.core.v3:swagger-models-jakarta
+      license: Apache-2.0
+    - name: org.codehaus.janino:janino
+      license: BSD-3-Clause
+    - name: org.codehaus.janino:commons-compiler
+      license: BSD-3-Clause
+    # Multi licenses
+    - name: jakarta.annotation:jakarta.annotation-api
+      license: EPL-2.0
+    - name: ch.qos.logback:logback-classic
+      license: EPL-1.0
+    - name: ch.qos.logback:logback-core
+      license: EPL-1.0
+    - name: com.sun.jersey:jersey-core
+      license: CDDL-1.1
+    - name: com.sun.jersey:jersey-server
+      license: CDDL-1.1
+    - name: com.sun.jersey:jersey-servlet
+      license: CDDL-1.1
+    - name: javax.servlet:javax.servlet-api
+      license: CDDL-1.1
+    - name: org.eclipse.jetty.toolchain:jetty-jakarta-servlet-api
+      license: Apache-2.0
+    - name: com.github.jsqlparser:jsqlparser
+      license: Apache-2.0
+    - name: jakarta.annotation:jakarta.annotation-api
+      license: EPL-2.0
