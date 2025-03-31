@@ -9,7 +9,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Check license header
-        uses: apache/skywalking-eyes@v0.6.0
+        uses: apache/skywalking-eyes/header@main
+      - name: Check Dependencies' License
+        uses: apache/skywalking-eyes/dependency@main
 
   code-style:
     name: "Check code style"

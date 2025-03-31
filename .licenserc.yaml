@@ -72,17 +72,55 @@ dependency:
       license: Apache-2.0
     - name: io.swagger.core.v3:swagger-models-jakarta
       license: Apache-2.0
+    - name: org.webjars:swagger-ui
+      license: Apache-2.0
     - name: org.codehaus.janino:janino
       license: BSD-3-Clause
     - name: org.codehaus.janino:commons-compiler
       license: BSD-3-Clause
-    # Multi licenses
-    - name: jakarta.annotation:jakarta.annotation-api
-      license: EPL-2.0
+    - name: com.google.guava:listenablefuture
+      license: Apache-2.0
+    - name: com.thoughtworks.paranamer:paranamer
+      license: BSD-3-Clause
+    - name: com.github.victools:jsonschema-generator
+      license: Apache-2.0
     - name: ch.qos.logback:logback-classic
       license: EPL-1.0
     - name: ch.qos.logback:logback-core
       license: EPL-1.0
+    - name: org.eclipse.jetty.toolchain:jetty-jakarta-servlet-api
+      license: Apache-2.0
+    - name: com.github.jsqlparser:jsqlparser
+      license: Apache-2.0
+    - name: org.latencyutils:LatencyUtils
+      license: BSD-2-Clause
+    - name: org.tukaani:xz
+      license: 0BSD
+    - name: com.jcraft:jsch
+      license: BSD-3-Clause
+    - name: io.dropwizard.metrics:metrics-core
+      license: Apache-2.0
+    - name: org.codehaus.woodstox:stax2-api
+      license: BSD-2-Clause
+    - name: org.reactivestreams:reactive-streams
+      license: MIT-0
+    - name: org.jboss.logging:jboss-logging
+      license: Apache-2.0
+    - name: com.auth0:java-jwt
+      license: MIT
+    - name: com.sun.istack:istack-commons-runtime
+      license: EDL-1.0
+    - name: org.jline:jline
+      license: BSD-3-Clause
+    # Weak compatible licenses
+    - name: javax.servlet.jsp:jsp-api
+      license: CDDL-1.1
+    - name: javax.ws.rs:jsr311-api
+      license: CDDL-1.1
+    - name: javax.xml.bind:jaxb-api
+      license: CDDL-1.1
+    - name: com.sun.jersey:jersey-client
+      license: CDDL-1.1
     - name: com.sun.jersey:jersey-core
       license: CDDL-1.1
     - name: com.sun.jersey:jersey-server
@@ -91,9 +129,10 @@ dependency:
       license: CDDL-1.1
     - name: javax.servlet:javax.servlet-api
       license: CDDL-1.1
-    - name: org.eclipse.jetty.toolchain:jetty-jakarta-servlet-api
-      license: Apache-2.0
-    - name: com.github.jsqlparser:jsqlparser
-      license: Apache-2.0
+    - name: org.aspectj:aspectjweaver
+      license: EPL-2.0
     - name: jakarta.annotation:jakarta.annotation-api
       license: EPL-2.0
+  excludes:
+    # Go license
+    - name: com.google.re2j:re2j

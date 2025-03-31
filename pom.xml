@@ -56,6 +56,7 @@
         <maven-javadoc-plugin.version>3.11.2</maven-javadoc-plugin.version>
         <maven.javadoc.skip>false</maven.javadoc.skip>
         <maven-release-plugin.version>3.1.1</maven-release-plugin.version>
+        <license-maven-plugin.version>2.5.0</license-maven-plugin.version>
         <maven-scm-provider-jgit.version>2.1.0</maven-scm-provider-jgit.version>
         <flatten-maven-plugin.version>1.6.0</flatten-maven-plugin.version>
         <build-helper-maven-plugin.version>3.6.0</build-helper-maven-plugin.version>
@@ -291,6 +292,12 @@
                 </plugin>
 
                 <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>license-maven-plugin</artifactId>
+                    <version>${license-maven-plugin.version}</version>
+                </plugin>
+
+                <plugin>
                     <groupId>org.xolstice.maven.plugins</groupId>
                     <artifactId>protobuf-maven-plugin</artifactId>
                     <version>${protobuf-maven-plugin.version}</version>
@@ -317,16 +324,6 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>license-maven-plugin</artifactId>
-                <version>2.0.0</version>
-                <executions>
-                    <execution>
-                        <id>check-licenses</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>add-third-party</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
 
             <plugin>
