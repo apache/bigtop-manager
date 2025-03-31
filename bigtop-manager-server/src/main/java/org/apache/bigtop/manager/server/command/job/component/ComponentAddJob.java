@@ -134,7 +134,8 @@ public class ComponentAddJob extends AbstractComponentJob {
     }
 
     private Boolean checkComponentInstalled(String componentName, String hostname) {
-        ComponentQuery query = ComponentQuery.builder().name(componentName).hostname(hostname).build();
+        ComponentQuery query =
+                ComponentQuery.builder().name(componentName).hostname(hostname).build();
         List<ComponentPO> componentPOList = componentDao.findByQuery(query);
         return componentPOList.size() == 1;
     }
