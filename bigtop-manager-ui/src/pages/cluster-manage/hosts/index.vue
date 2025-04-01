@@ -205,7 +205,7 @@
     jobProgressStore.processCommand({
       command: 'Add',
       customCommand: 'custom_command',
-      clusterId: 1,
+      clusterId: 0,
       commandLevel: 'cluster',
       clusterCommand: {
         name: 'c1',
@@ -216,7 +216,7 @@
         rootDir: '/opt',
         hosts: [
           {
-            hostnames: '[host1, host2]',
+            hostnames: ['host1', 'host2'],
             agentDir: '/opt',
             clusterId: 1,
             sshUser: 'root',
@@ -233,7 +233,7 @@
       },
       hostCommands: [
         {
-          hostnames: '[host1, host2]',
+          hostnames: ['host1', 'host2'],
           agentDir: '/opt',
           clusterId: 1,
           sshUser: 'root',
@@ -254,7 +254,7 @@
           componentHosts: [
             {
               componentName: 'zookeeper_server',
-              hostnames: '[host1, host2]'
+              hostnames: ['host1', 'host2']
             }
           ],
           configs: [
@@ -274,12 +274,6 @@
               ]
             }
           ]
-        }
-      ],
-      componentCommands: [
-        {
-          componentName: 'zookeeper_server',
-          hostnames: '[host1, host2]'
         }
       ]
     })
