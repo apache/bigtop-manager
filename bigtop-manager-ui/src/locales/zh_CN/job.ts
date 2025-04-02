@@ -20,5 +20,9 @@
 export default {
   job_list: '作业列表',
   task_log: '任务日志',
-  log_loading: '获取日志中'
+  log_loading: '获取日志中',
+  pending: '等待中',
+  processing: '运行中',
+  success: '运行成功！',
+  failed: '运行失败！'
 }

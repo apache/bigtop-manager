@@ -18,32 +18,40 @@
  */
 
 import { notification, Progress, Avatar, Button, Modal } from 'ant-design-vue'
-import { computed, h, reactive, shallowRef } from 'vue'
+import { computed, getCurrentInstance, h, reactive, shallowRef } from 'vue'
 import { defineStore } from 'pinia'
 import { useClusterStore } from '@/store/cluster'
-import JobModal from '@/components/job-modal/index.vue'
+import { getJobDetails } from '@/api/job'
 import SvgIcon from '@/components/common/svg-icon/index.vue'
-import { CommandRequest } from '@/api/command/types'
-// import { getJobDetails } from '@/api/job'
-import { JobParams, JobVO } from '@/api/job/types'
+import JobModal from '@/components/job-modal/index.vue'
+import type { JobParams, JobVO } from '@/api/job/types'
+import type { CommandRequest } from '@/api/command/types'
+import { execCommand } from '@/api/command'
 
-type StatusType = 'processing' | 'success' | 'failed'
+type StatusType = 'processing' | 'success' | 'failed' | 'pending'
 type ExecFunc = (params: JobParams) => Promise<JobVO | undefined>
-
-interface JobStageProgressItem extends Partial<CommandRequest> {
+export type CommandRes = { name: string } & JobParams
+export interface JobStageProgressItem extends Partial<CommandRequest> {
   percent: number
   status: 'success' | 'normal' | 'active' | 'exception'
   icon: string
   desc: string
-  payLoad?: any
+  payLoad?: JobVO
 }
 
 type JobStageProgress = Record<StatusType, () => JobStageProgressItem>
 
 export const useJobProgress = defineStore('job-progress', () => {
+  const instance = getCurrentInstance()
   const clusterStore = useClusterStore()
   const progressMap = reactive<Map<number, JobStageProgressItem>>(new Map())
   const jobStageProgress = shallowRef<JobStageProgress>({
+    pending: () => ({
+      percent: 0,
+      status: 'normal',
+      icon: 'processing',
+      desc: '等待中......'
+    }),
     processing: () => ({
       percent: 1,
       status: 'active',
@@ -64,29 +72,29 @@ export const useJobProgress = defineStore('job-progress', () => {
     })
   })
 
-  // // test
-  function getRandomJobStage(): string {
-    const keys = [
-      'Processing',
-      'Successful',
-      'Failed',
-      'Processing',
-      'Processing',
-      'Processing',
-      'Processing',
-      'Processing'
-    ]
-    const randomKey = keys[Math.floor(Math.random() * keys.length)]
-    return randomKey
-  }
+  // // // test
+  // function getRandomJobStage(): string {
+  //   const keys = [
+  //     'Processing',
+  //     'Successful',
+  //     'Failed',
+  //     'Processing',
+  //     'Processing',
+  //     'Processing',
+  //     'Processing',
+  //     'Processing'
+  //   ]
+  //   const randomKey = keys[Math.floor(Math.random() * keys.length)]
+  //   return randomKey
+  // }
 
-  function generateRandomNumber(length) {
-    let randomNumber = ''
-    for (let i = 0; i < length; i++) {
-      randomNumber += Math.floor(Math.random() * 10) // 生成0-9之间的随机数字
-    }
-    return Number(randomNumber)
-  }
+  // function generateRandomNumber(length) {
+  //   let randomNumber = ''
+  //   for (let i = 0; i < length; i++) {
+  //     randomNumber += Math.floor(Math.random() * 10) // 生成0-9之间的随机数字
+  //   }
+  //   return Number(randomNumber)
+  // }
 
   const jobProgressStyle = computed(() => ({
     desc: { display: 'flex', fontSize: '12px', 'justify-content': 'space-between' },
@@ -113,7 +121,7 @@ export const useJobProgress = defineStore('job-progress', () => {
     }
   }
 
-  const createStateIcon = (execRes: JobParams) => {
+  const createStateIcon = (execRes: CommandRes) => {
     return h(
       Avatar,
       { size: 27, shape: 'circle', style: jobProgressStyle.value.avatar },
@@ -127,7 +135,7 @@ export const useJobProgress = defineStore('job-progress', () => {
     )
   }
 
-  const createStateProgress = (execRes: JobParams) => {
+  const createStateProgress = (execRes: CommandRes) => {
     const progressData = progressMap.get(execRes.jobId)
     return h('div', [
       h(Progress, {
@@ -140,7 +148,7 @@ export const useJobProgress = defineStore('job-progress', () => {
     ])
   }
 
-  const createStateDesc = (execRes: JobParams) => {
+  const createStateDesc = (execRes: CommandRes) => {
     const progressData = progressMap.get(execRes.jobId)
     let retryJobOperation = h('span', `${progressData?.percent}%`)
     if (progressData?.status === 'exception') {
@@ -166,7 +174,7 @@ export const useJobProgress = defineStore('job-progress', () => {
     return h('div', { style: jobProgressStyle.value.desc }, [h('span', `${progressData?.desc}`), retryJobOperation])
   }
 
-  const retryJob = (e: Event, execRes: JobParams) => {
+  const retryJob = (e: Event, execRes: CommandRes) => {
     e.stopPropagation()
     Object.assign(progressMap.get(execRes.jobId)!, jobStageProgress.value.processing())
     pollJobDetails(execRes, getJobInstanceDetails)
@@ -174,10 +182,8 @@ export const useJobProgress = defineStore('job-progress', () => {
 
   const getJobInstanceDetails = async (params: JobParams) => {
     try {
-      console.log('params :>> ', params)
-      // const data = await getJobDetails(params)
-      const state = getRandomJobStage()
-      return await Promise.resolve({ state } as any)
+      const data = await getJobDetails(params)
+      return data
     } catch (error) {
       console.log('error :>> ', error)
     }
@@ -228,12 +234,11 @@ export const useJobProgress = defineStore('job-progress', () => {
     intervalId = setInterval(checkStatus, interval)
   }
 
-  const openNotification = (execRes: JobParams, execParams: CommandRequest) => {
-    console.log('execParams :>> ', execParams)
+  const openNotification = (execRes: CommandRes) => {
     pollJobDetails(execRes, getJobInstanceDetails)
     notification.open({
       key: `${execRes.jobId}`,
-      message: `${getClusterDisplayName(execRes.clusterId)}`,
+      message: `${getClusterDisplayName(execRes.clusterId)}-${execRes.name}`,
       duration: null,
       placement: 'bottomRight',
       style: {
@@ -254,26 +259,26 @@ export const useJobProgress = defineStore('job-progress', () => {
 
   const processCommand = async (params: CommandRequest) => {
     try {
-      const { id: jobId } = await Promise.resolve({ id: generateRandomNumber(8), state: getRandomJobStage() })
-      progressMap.set(jobId, Object.assign(params, jobStageProgress.value.processing()))
-      openNotification({ jobId, clusterId: params.clusterId! }, params)
+      const { id: jobId, name } = await execCommand(params)
+      if (jobId && name) {
+        progressMap.set(jobId, Object.assign(params, jobStageProgress.value.processing()))
+        openNotification({ jobId, clusterId: params.clusterId!, name })
+      }
     } catch (error) {
       console.log('error :>> ', error)
     }
   }
 
-  const onClick = (execRes: JobParams) => {
-    console.log('execRes :>> ', execRes)
-
+  const onClick = (execRes: CommandRes) => {
+    Modal.destroyAll()
     Modal.confirm({
-      title: 'Do you want to delete these items?',
       icon: null,
-      content: () => h(JobModal, { jobInfo: { clusterId: execRes.clusterId } }),
-      onOk() {
-        return new Promise((resolve, reject) => {
-          setTimeout(Math.random() > 0.5 ? resolve : reject, 1000)
-        }).catch(() => console.log('Oops errors!'))
-      }
+      width: '60%',
+      zIndex: 9999,
+      closable: true,
+      centered: true,
+      appContext: instance?.appContext,
+      content: () => h(JobModal, { execRes, jobInfo: progressMap })
     })
   }
 

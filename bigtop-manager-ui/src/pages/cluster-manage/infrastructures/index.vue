@@ -24,14 +24,17 @@
   import { CommonStatus, CommonStatusTexts } from '@/enums/state'
   import { useServiceStore } from '@/store/service'
   import { useRouter } from 'vue-router'
+  import { useJobProgress } from '@/store/job-progress'
   import type { ServiceListParams, ServiceStatusType, ServiceVO } from '@/api/service/types'
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { FilterFormItem } from '@/components/common/filter-form/types'
-  // import { execCommand } from '@/api/command';
-  import type { Command } from '@/api/command/types'
+  import { Command, CommandRequest } from '@/api/command/types'
+
+  type GroupItemActionType = keyof typeof Command | 'More'
 
   const { t } = useI18n()
   const router = useRouter()
+  const jobProgressStore = useJobProgress()
   const serviceStore = useServiceStore()
   const { services, loading } = toRefs(serviceStore)
 
@@ -62,49 +65,45 @@
       ]
     }
   ])
-  const actionGroups = shallowRef<GroupItem[]>([
+  const actionGroups = shallowRef<GroupItem<GroupItemActionType>[]>([
     {
-      action: 'start',
+      action: 'Start',
       icon: 'start',
       clickEvent: (item, args) => {
-        console.log('item :>> ', item?.action)
-        infraAction('Start', args.name)
+        infraAction(item!.action!, args)
       }
     },
     {
-      action: 'stop',
+      action: 'Stop',
       icon: 'stop',
       clickEvent: (item, args) => {
-        console.log('item :>> ', item?.action)
-        infraAction('Stop', args.name)
+        infraAction(item!.action!, args)
       }
     },
     {
-      action: 'restart',
+      action: 'Restart',
       icon: 'restart',
       clickEvent: (item, args) => {
-        console.log('item :>> ', item?.action)
-        infraAction('Restart', args.name)
+        infraAction(item!.action!, args)
       }
     },
     {
-      action: 'more',
+      action: 'More',
       icon: 'more_line',
       clickEvent: (item, args) => {
-        console.log('item :>> ', item?.action)
-        infraAction('More', args.name)
+        infraAction(item!.action!, args)
       }
     }
   ])
 
-  const infraAction = async (command: keyof typeof Command, serviceName: string) => {
-    console.log(command, serviceName)
-    // await execCommand({
-    //   command: command,
-    //   clusterId: 0,
-    //   commandLevel: "service",
-    //   serviceCommands: [{ serviceName: serviceName }]
-    // })
+  const infraAction = async (command: GroupItemActionType, service: ServiceVO) => {
+    const execCommandParams = {
+      command: command,
+      clusterId: 0,
+      commandLevel: 'service',
+      serviceCommands: [{ serviceName: service.name, installed: true }]
+    } as CommandRequest
+    jobProgressStore.processCommand(execCommandParams)
   }
 
   const getServices = async (filters?: ServiceListParams) => {

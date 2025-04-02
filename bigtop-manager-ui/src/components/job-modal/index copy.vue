@@ -141,8 +141,7 @@
       logsViewState.subTitle = data.name as string
       logsViewState.payLoad = {
         ...apiParams.value,
-        taskId: Number(data.id),
-        clusterId: currJobInfo.value?.clusterId ?? 0
+        taskId: Number(data.id)
       }
       return
     }
@@ -208,7 +207,6 @@
     </a-table>
     <logs-view
       v-model:open="logsViewState.open"
-      width="46%"
       :pay-load="logsViewState.payLoad"
       :sub-title="logsViewState.subTitle"
     />

@@ -42,6 +42,7 @@
 
   export interface LogViewProps {
     open: boolean
+    width?: string | number
     payLoad?: PayLoad
     subTitle?: string
   }
@@ -154,10 +155,11 @@
 
 <template>
   <a-modal
-    width="60%"
+    :width="$props.width || '60%'"
     style="min-width: 400px"
     :mask="false"
     :open="open"
+    :z-index="99999"
     :title="$t(`job.${title}`)"
     @ok="handleOk"
     @cancel="handleOk"
