@@ -19,14 +19,15 @@
 
 import { notification, Progress, Avatar, Button, Modal } from 'ant-design-vue'
 import { computed, getCurrentInstance, h, reactive, shallowRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { defineStore } from 'pinia'
 import { useClusterStore } from '@/store/cluster'
+import { execCommand } from '@/api/command'
 import { getJobDetails } from '@/api/job'
 import SvgIcon from '@/components/common/svg-icon/index.vue'
 import JobModal from '@/components/job-modal/index.vue'
-import type { JobParams, JobVO } from '@/api/job/types'
 import type { CommandRequest } from '@/api/command/types'
-import { execCommand } from '@/api/command'
+import type { JobParams, JobVO } from '@/api/job/types'
 
 type StatusType = 'processing' | 'success' | 'failed' | 'pending'
 type ExecFunc = (params: JobParams) => Promise<JobVO | undefined>
@@ -42,6 +43,7 @@ export interface JobStageProgressItem extends Partial<CommandRequest> {
 type JobStageProgress = Record<StatusType, () => JobStageProgressItem>
 
 export const useJobProgress = defineStore('job-progress', () => {
+  const { t } = useI18n()
   const instance = getCurrentInstance()
   const clusterStore = useClusterStore()
   const progressMap = reactive<Map<number, JobStageProgressItem>>(new Map())
@@ -50,51 +52,27 @@ export const useJobProgress = defineStore('job-progress', () => {
       percent: 0,
       status: 'normal',
       icon: 'processing',
-      desc: '等待中......'
+      desc: 'job.pending'
     }),
     processing: () => ({
       percent: 1,
       status: 'active',
       icon: 'processing',
-      desc: '运行中......'
+      desc: 'job.processing'
     }),
     success: () => ({
       percent: 100,
       status: 'success',
       icon: 'success',
-      desc: '运行成功！'
+      desc: 'job.success'
     }),
     failed: () => ({
       percent: 100,
       status: 'exception',
       icon: 'failed',
-      desc: '运行失败！'
+      desc: 'job.failed'
     })
   })
-
-  // // // test
-  // function getRandomJobStage(): string {
-  //   const keys = [
-  //     'Processing',
-  //     'Successful',
-  //     'Failed',
-  //     'Processing',
-  //     'Processing',
-  //     'Processing',
-  //     'Processing',
-  //     'Processing'
-  //   ]
-  //   const randomKey = keys[Math.floor(Math.random() * keys.length)]
-  //   return randomKey
-  // }
-
-  // function generateRandomNumber(length) {
-  //   let randomNumber = ''
-  //   for (let i = 0; i < length; i++) {
-  //     randomNumber += Math.floor(Math.random() * 10) // 生成0-9之间的随机数字
-  //   }
-  //   return Number(randomNumber)
-  // }
 
   const jobProgressStyle = computed(() => ({
     desc: { display: 'flex', fontSize: '12px', 'justify-content': 'space-between' },
@@ -116,9 +94,8 @@ export const useJobProgress = defineStore('job-progress', () => {
     const index = clusters.findIndex((v) => v.id === clusterId)
     if (index != -1) {
       return clusters[index].displayName
-    } else {
-      return 'Global'
     }
+    return 'Global'
   }
 
   const createStateIcon = (execRes: CommandRes) => {
@@ -162,7 +139,7 @@ export const useJobProgress = defineStore('job-progress', () => {
         },
         {
           default: () => [
-            h('span', {}, '重试'),
+            h('span', {}, t('common.retry')),
             h(SvgIcon, {
               name: 'retry',
               style: { margin: 0 }
@@ -171,7 +148,10 @@ export const useJobProgress = defineStore('job-progress', () => {
         }
       )
     }
-    return h('div', { style: jobProgressStyle.value.desc }, [h('span', `${progressData?.desc}`), retryJobOperation])
+    return h('div', { style: jobProgressStyle.value.desc }, [
+      h('span', { class: { 'text-loading': progressData?.status === 'active' } }, `${t(`${progressData?.desc}`)}`),
+      retryJobOperation
+    ])
   }
 
   const retryJob = (e: Event, execRes: CommandRes) => {
@@ -241,9 +221,7 @@ export const useJobProgress = defineStore('job-progress', () => {
       message: `${getClusterDisplayName(execRes.clusterId)}-${execRes.name}`,
       duration: null,
       placement: 'bottomRight',
-      style: {
-        padding: '16px'
-      },
+      style: { padding: '16px' },
       class: 'job-progress-notification',
       icon: () => createStateIcon(execRes),
       description: () => createStateProgress(execRes),
@@ -273,8 +251,9 @@ export const useJobProgress = defineStore('job-progress', () => {
     Modal.destroyAll()
     Modal.confirm({
       icon: null,
-      width: '60%',
+      width: '800px',
       zIndex: 9999,
+      mask: false,
       closable: true,
       centered: true,
       appContext: instance?.appContext,

@@ -117,7 +117,7 @@
           id: `jobId-${val.id}`,
           tableData: val.stages || []
         }
-        dataSource.value = (val.stages || []).map((v) => ({ ...v }))
+        dataSource.value = val.stages || []
       }
     },
     {
@@ -149,20 +149,13 @@
     const breadcrumbKey = apiMap.value[breadcrumbLen.value].key
     const currId = `${breadcrumbKey}-${data.id}`
     const index = breadcrumbs.value.findIndex((v) => v.id === currId)
+    const newBreadcrumbItem = { id: currId, name: data.name! }
     if (index === -1) {
       if (breadcrumbKey === 'jobId') {
-        breadcrumbs.value.push({
-          id: currId,
-          name: data.name!,
-          tableData: data.stages
-        })
+        breadcrumbs.value.push(Object.assign(newBreadcrumbItem, { tableData: data.stages }))
         dataSource.value = data.stages
       } else if (breadcrumbKey === 'stageId') {
-        breadcrumbs.value.push({
-          id: currId,
-          name: data.name!,
-          tableData: data.tasks
-        })
+        breadcrumbs.value.push(Object.assign(newBreadcrumbItem, { tableData: data.tasks }))
         dataSource.value = data.tasks
       }
     } else {

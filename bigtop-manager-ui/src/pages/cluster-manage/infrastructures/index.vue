@@ -97,13 +97,15 @@
   ])
 
   const infraAction = async (command: GroupItemActionType, service: ServiceVO) => {
-    const execCommandParams = {
-      command: command,
-      clusterId: 0,
-      commandLevel: 'service',
-      serviceCommands: [{ serviceName: service.name, installed: true }]
-    } as CommandRequest
-    jobProgressStore.processCommand(execCommandParams)
+    if (command !== 'More') {
+      const execCommandParams = {
+        command: command,
+        clusterId: 0,
+        commandLevel: 'service',
+        serviceCommands: [{ serviceName: service.name, installed: true }]
+      } as CommandRequest
+      jobProgressStore.processCommand(execCommandParams)
+    }
   }
 
   const getServices = async (filters?: ServiceListParams) => {

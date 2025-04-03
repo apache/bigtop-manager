@@ -170,7 +170,7 @@
     <template #footer>
       <div class="log-load">
         <div>
-          <span v-show="loading" id="log-loading">{{ $t('job.log_loading') }}</span>
+          <span v-show="loading" class="text-loading">{{ $t('job.log_loading') }}</span>
         </div>
         <a-button key="submit" type="primary" @click="handleOk">
           {{ $t('common.confirm') }}
@@ -219,35 +219,5 @@
       color: #fff;
       margin: 0;
     }
-  }
-
-  @keyframes loading-dots {
-    0% {
-      content: '';
-    }
-    16% {
-      content: '.';
-    }
-    32% {
-      content: '..';
-    }
-    48% {
-      content: '...';
-    }
-    80% {
-      content: '....';
-    }
-    96% {
-      content: '.....';
-    }
-    100% {
-      content: '......';
-    }
-  }
-
-  #log-loading::after {
-    content: '';
-    display: inline-block;
-    animation: loading-dots 1.5s infinite;
   }
 </style>
