@@ -78,9 +78,11 @@
     try {
       loading.value = true
       const hostId = route.query.hostId
+      const clusterId = route.query.clusterId
       const data = await getHost({ id: Number(hostId) })
       hostInfo.value = {
-        ...data
+        ...data,
+        clusterId
       }
     } catch (error) {
       console.log(error)

@@ -22,21 +22,22 @@
   import { useI18n } from 'vue-i18n'
   import { useClusterStore } from '@/store/cluster'
   import { storeToRefs } from 'pinia'
-  import { execCommand } from '@/api/command'
-  import { Command } from '@/api/command/types'
   import { CommonStatus, CommonStatusTexts } from '@/enums/state'
   import { useRouter } from 'vue-router'
+  import { useJobProgress } from '@/store/job-progress'
   import Overview from './overview.vue'
   import Service from './service.vue'
   import Host from './host.vue'
   import User from './user.vue'
   import Job from '@/components/job/index.vue'
+  import type { Command } from '@/api/command/types'
   import type { TabItem } from '@/components/common/main-card/types'
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { ClusterStatusType } from '@/api/cluster/types'
 
   const { t } = useI18n()
   const router = useRouter()
+  const jobProgressStore = useJobProgress()
   const clusterStore = useClusterStore()
   const { currCluster, loading } = storeToRefs(clusterStore)
   const activeKey = ref('1')
@@ -103,13 +104,17 @@
 
   const dropdownMenuClick: GroupItem['dropdownMenuClickEvent'] = async ({ key }) => {
     try {
-      await execCommand({
-        command: key as keyof typeof Command,
-        clusterId: currCluster.value.id,
-        commandLevel: 'cluster'
-      })
-      await clusterStore.loadClusters()
-      await clusterStore.getClusterDetail()
+      await jobProgressStore.processCommand(
+        {
+          command: key as keyof typeof Command,
+          clusterId: currCluster.value.id,
+          commandLevel: 'cluster'
+        },
+        async () => {
+          await clusterStore.loadClusters()
+          await clusterStore.getClusterDetail()
+        }
+      )
     } catch (error) {
       console.log('error :>> ', error)
     }

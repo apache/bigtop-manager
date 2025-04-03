@@ -20,16 +20,19 @@
 <script setup lang="ts">
   import { computed, ref, shallowRef, toRefs, watch } from 'vue'
   import { useI18n } from 'vue-i18n'
-  import { Empty, MenuProps } from 'ant-design-vue'
+  import { Empty } from 'ant-design-vue'
   import { formatFromByte } from '@/utils/storage.ts'
   import { usePngImage } from '@/utils/tools'
   import { CommonStatus, CommonStatusTexts } from '@/enums/state.ts'
+  import { useJobProgress } from '@/store/job-progress'
+  import { getComponentsByHost } from '@/api/hosts'
   import CategoryChart from '@/pages/cluster-manage/cluster/components/category-chart.vue'
   import GaugeChart from '@/pages/cluster-manage/cluster/components/gauge-chart.vue'
-  import { getComponentsByHost } from '@/api/hosts'
   import type { HostStatusType, HostVO } from '@/api/hosts/types.ts'
   import type { ClusterStatusType } from '@/api/cluster/types.ts'
   import type { ComponentVO } from '@/api/component/types.ts'
+  import type { MenuItem } from '@/store/menu/types'
+  import type { Command } from '@/api/command/types'
 
   type TimeRangeText = '1m' | '15m' | '30m' | '1h' | '6h' | '30h'
   type TimeRangeItem = {
@@ -44,7 +47,7 @@
   const props = defineProps<Props>()
   const { hostInfo } = toRefs(props)
   const { t } = useI18n()
-  const currExecuteComponent = shallowRef<ComponentVO>({})
+  const jobProgressStore = useJobProgress()
   const currTimeRange = ref<TimeRangeText>('15m')
   const statusColors = shallowRef<Record<HostStatusType, keyof typeof CommonStatusTexts>>({
     1: 'healthy',
@@ -111,30 +114,34 @@
   const detailKeys = computed((): (keyof HostVO)[] => Object.keys(baseConfig.value))
   const componentOperates = computed(() => [
     {
-      action: 'start',
+      action: 'Start',
       text: t('common.start', [t('common.component')])
     },
     {
-      action: 'restart',
+      action: 'Restart',
       text: t('common.restart', [t('common.component')])
     },
     {
-      action: 'stop',
+      action: 'Stop',
       text: t('common.stop', [t('common.component')])
     }
   ])
 
-  const handleHostOperate: MenuProps['onClick'] = (item) => {
-    console.log('item :>> ', item.key)
-    console.log(currExecuteComponent.value)
+  const handleHostOperate = async (item: MenuItem, component: ComponentVO) => {
+    try {
+      await jobProgressStore.processCommand({
+        command: item.key as keyof typeof Command,
+        clusterId: hostInfo.value.clusterId,
+        commandLevel: 'component',
+        componentCommands: [{ componentName: component.name!, hostnames: [component.hostname!] }]
+      })
+    } catch (error) {
+      console.log('error :>> ', error)
+    }
   }
 
   const handleTimeRange = (time: TimeRangeItem) => {
     currTimeRange.value = time.text
-  }
-
-  const recordClickComp = (comp: ComponentVO) => {
-    currExecuteComponent.value = comp
   }
 
   watch(
@@ -240,11 +247,11 @@
               <a-avatar v-if="comp.serviceName" :src="usePngImage(comp.serviceName.toLowerCase())" :size="22" />
               <a-typography-text :content="`${comp.serviceDisplayName}/${comp.displayName}`" />
               <a-dropdown :trigger="['click']">
-                <a-button type="text" shape="circle" size="small" @click="recordClickComp(comp)">
+                <a-button type="text" shape="circle" size="small">
                   <svg-icon name="more" style="margin: 0" />
                 </a-button>
                 <template #overlay>
-                  <a-menu @click="handleHostOperate">
+                  <a-menu @click="handleHostOperate($event, comp)">
                     <a-menu-item v-for="operate in componentOperates" :key="operate.action">
                       <span>{{ operate.text }}</span>
                     </a-menu-item>

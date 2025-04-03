@@ -29,8 +29,8 @@ import JobModal from '@/components/job-modal/index.vue'
 import type { CommandRequest } from '@/api/command/types'
 import type { JobParams, JobVO } from '@/api/job/types'
 
-type StatusType = 'processing' | 'success' | 'failed' | 'pending'
-type ExecFunc = (params: JobParams) => Promise<JobVO | undefined>
+export type StatusType = 'processing' | 'success' | 'failed' | 'pending'
+export type ExecFunc = (params: JobParams) => Promise<JobVO | undefined>
 export type CommandRes = { name: string } & JobParams
 export interface JobStageProgressItem extends Partial<CommandRequest> {
   percent: number
@@ -112,7 +112,7 @@ export const useJobProgress = defineStore('job-progress', () => {
     )
   }
 
-  const createStateProgress = (execRes: CommandRes) => {
+  const createStateProgress = (execRes: CommandRes, nextAction?: (...args: any) => void) => {
     const progressData = progressMap.get(execRes.jobId)
     return h('div', [
       h(Progress, {
@@ -121,11 +121,11 @@ export const useJobProgress = defineStore('job-progress', () => {
         showInfo: false,
         size: [300, 8]
       }),
-      createStateDesc(execRes)
+      createStateDesc(execRes, nextAction)
     ])
   }
 
-  const createStateDesc = (execRes: CommandRes) => {
+  const createStateDesc = (execRes: CommandRes, nextAction?: (...args: any) => void) => {
     const progressData = progressMap.get(execRes.jobId)
     let retryJobOperation = h('span', `${progressData?.percent}%`)
     if (progressData?.status === 'exception') {
@@ -135,7 +135,7 @@ export const useJobProgress = defineStore('job-progress', () => {
           size: 'small',
           type: 'link',
           style: jobProgressStyle.value.retryBtn,
-          onClick: (e: Event) => retryJob(e, execRes)
+          onClick: (e: Event) => retryJob(e, execRes, nextAction)
         },
         {
           default: () => [
@@ -154,10 +154,10 @@ export const useJobProgress = defineStore('job-progress', () => {
     ])
   }
 
-  const retryJob = (e: Event, execRes: CommandRes) => {
+  const retryJob = (e: Event, execRes: CommandRes, nextAction?: (...args: any) => void) => {
     e.stopPropagation()
     Object.assign(progressMap.get(execRes.jobId)!, jobStageProgress.value.processing())
-    pollJobDetails(execRes, getJobInstanceDetails)
+    pollJobDetails(execRes, getJobInstanceDetails, 1000, nextAction)
   }
 
   const getJobInstanceDetails = async (params: JobParams) => {
@@ -169,7 +169,12 @@ export const useJobProgress = defineStore('job-progress', () => {
     }
   }
 
-  const pollJobDetails = (params: JobParams, execFunc: ExecFunc, interval: number = 1000) => {
+  const pollJobDetails = (
+    params: JobParams,
+    execFunc: ExecFunc,
+    interval: number = 1000,
+    nextAction?: (...args: any) => void
+  ) => {
     let intervalId: NodeJS.Timeout | null = null
     const cleanup = () => {
       if (intervalId) {
@@ -182,6 +187,7 @@ export const useJobProgress = defineStore('job-progress', () => {
       try {
         const result = await execFunc(params)
         if (!result) {
+          progressMap.set(params.jobId, Object.assign(params, jobStageProgress.value.failed()))
           cleanup()
           return
         }
@@ -202,7 +208,10 @@ export const useJobProgress = defineStore('job-progress', () => {
 
         if (state === 'Successful' || state === 'Failed') {
           Object.assign(progressEntry!, targetProgress)
-          state === 'Successful' && closeNotification(params.jobId)
+          if (state === 'Successful') {
+            nextAction && nextAction()
+            closeNotification(params.jobId)
+          }
           cleanup()
         } else if (state === 'Processing') {
           oldPercent < 90 && Object.assign(progressEntry, mergeProgressPercent)
@@ -214,8 +223,8 @@ export const useJobProgress = defineStore('job-progress', () => {
     intervalId = setInterval(checkStatus, interval)
   }
 
-  const openNotification = (execRes: CommandRes) => {
-    pollJobDetails(execRes, getJobInstanceDetails)
+  const openNotification = (execRes: CommandRes, nextAction?: (...args: any) => void) => {
+    pollJobDetails(execRes, getJobInstanceDetails, 1000, nextAction)
     notification.open({
       key: `${execRes.jobId}`,
       message: `${getClusterDisplayName(execRes.clusterId)}-${execRes.name}`,
@@ -224,7 +233,7 @@ export const useJobProgress = defineStore('job-progress', () => {
       style: { padding: '16px' },
       class: 'job-progress-notification',
       icon: () => createStateIcon(execRes),
-      description: () => createStateProgress(execRes),
+      description: () => createStateProgress(execRes, nextAction),
       onClick: () => onClick(execRes)
     })
   }
@@ -235,12 +244,12 @@ export const useJobProgress = defineStore('job-progress', () => {
     }, delay)
   }
 
-  const processCommand = async (params: CommandRequest) => {
+  const processCommand = async (params: CommandRequest, nextAction?: (...args: any) => void) => {
     try {
       const { id: jobId, name } = await execCommand(params)
       if (jobId && name) {
         progressMap.set(jobId, Object.assign(params, jobStageProgress.value.processing()))
-        openNotification({ jobId, clusterId: params.clusterId!, name })
+        openNotification({ jobId, clusterId: params.clusterId!, name }, nextAction)
       }
     } catch (error) {
       console.log('error :>> ', error)

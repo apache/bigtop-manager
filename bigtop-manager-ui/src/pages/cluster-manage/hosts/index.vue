@@ -262,7 +262,12 @@
   }
 
   const viewHostDetail = (row: HostVO) => {
-    router.push({ name: 'HostDetail', query: { hostId: row.id } })
+    const { clusterDisplayName, id: hostId } = row
+    const index = filtersOfClusterDisplayName.value.findIndex((v) => v.text === clusterDisplayName)
+    if (index != -1) {
+      const clusterId = filtersOfClusterDisplayName.value[index].value
+      router.push({ name: 'HostDetail', query: { hostId, clusterId } })
+    }
   }
 
   onUnmounted(() => {

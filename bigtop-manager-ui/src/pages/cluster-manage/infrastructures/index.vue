@@ -28,7 +28,7 @@
   import type { ServiceListParams, ServiceStatusType, ServiceVO } from '@/api/service/types'
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { FilterFormItem } from '@/components/common/filter-form/types'
-  import { Command, CommandRequest } from '@/api/command/types'
+  import type { Command, CommandRequest } from '@/api/command/types'
 
   type GroupItemActionType = keyof typeof Command | 'More'
 
@@ -104,7 +104,7 @@
         commandLevel: 'service',
         serviceCommands: [{ serviceName: service.name, installed: true }]
       } as CommandRequest
-      jobProgressStore.processCommand(execCommandParams)
+      jobProgressStore.processCommand(execCommandParams, getServices)
     }
   }
 
