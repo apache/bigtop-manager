@@ -34,6 +34,7 @@ import org.apache.bigtop.manager.dao.repository.PlatformDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.enums.AuthPlatformStatus;
 import org.apache.bigtop.manager.server.enums.ChatbotCommand;
+import org.apache.bigtop.manager.server.enums.LLMAccessLevel;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.holder.SessionUserHolder;
 import org.apache.bigtop.manager.server.model.converter.AuthPlatformConverter;
@@ -233,10 +234,15 @@ public class ChatbotServiceImpl implements ChatbotService {
     }
 
     private AIAssistant buildAIAssistant(
-            String platformName, String model, Map<String, String> credentials, Long threadId, ChatbotCommand command) {
+            String platformName,
+            String model,
+            Map<String, String> credentials,
+            Long threadId,
+            ChatbotCommand command,
+            LLMAccessLevel accessLevel) {
         return aiAssistantFactory.createAIService(
                 getAIAssistantConfig(platformName, model, credentials, threadId),
-                aiServiceToolsProvider.getToolsProvide(command));
+                aiServiceToolsProvider.getToolsProvide(command, accessLevel));
     }
 
     private AIAssistant prepareTalk(Long threadId, ChatbotCommand command) {
@@ -255,7 +261,8 @@ public class ChatbotServiceImpl implements ChatbotService {
                 authPlatformDTO.getModel(),
                 authPlatformDTO.getAuthCredentials(),
                 threadId,
-                command);
+                command,
+                LLMAccessLevel.fromCode(authPlatformDTO.getAccessLevel()));
     }
 
     private void sendTalkVO(SseEmitter emitter, String content, String finishReason) {
