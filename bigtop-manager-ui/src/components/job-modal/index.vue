@@ -18,30 +18,31 @@
 -->
 
 <script setup lang="ts">
-  import { computed, ComputedRef, onActivated, onDeactivated, reactive, ref, shallowRef } from 'vue'
+  import { computed, Reactive, reactive, ref, shallowRef, toRefs, watch } from 'vue'
   import { useI18n } from 'vue-i18n'
-  import { useRoute } from 'vue-router'
-  import { TableColumnType, TableProps } from 'ant-design-vue'
-  import { getJobList, getStageList, getTaskList } from '@/api/job'
+  import { TableColumnType } from 'ant-design-vue'
   import useBaseTable from '@/composables/use-base-table'
   import LogsView, { type LogViewProps } from '@/components/log-view/index.vue'
-  import CustomProgress from './custom-progress.vue'
+  import CustomProgress from '@/components/job/custom-progress.vue'
   import type { JobVO, StageVO, StateType, TaskListParams, TaskVO } from '@/api/job/types'
+  import type { CommandRes, JobStageProgressItem } from '@/store/job-progress'
 
   interface BreadcrumbItem {
     id: string
-    name: ComputedRef<string> | string
+    name: string
+    tableData: (JobVO | StageVO | TaskVO)[]
   }
-  const POLLING_INTERVAL = 3000
+
+  interface Props {
+    execRes: CommandRes
+    jobInfo: Reactive<Map<number, JobStageProgressItem>>
+  }
+
+  const props = defineProps<Props>()
+  const { execRes, jobInfo } = toRefs(props)
+
   const { t } = useI18n()
-  const route = useRoute()
-  const pollingIntervalId = ref<any>(null)
-  const breadcrumbs = ref<BreadcrumbItem[]>([
-    {
-      name: computed(() => t('job.job_list')),
-      id: `clusterId-${route.params.id}`
-    }
-  ])
+  const breadcrumbs = ref<BreadcrumbItem[]>([])
   const status = shallowRef<Record<StateType, string>>({
     Pending: 'installing',
     Processing: 'processing',
@@ -51,16 +52,10 @@
   })
   const apiMap = shallowRef([
     {
-      key: 'clusterId',
-      api: getJobList
+      key: 'jobId'
     },
     {
-      key: 'jobId',
-      api: getStageList
-    },
-    {
-      key: 'stageId',
-      api: getTaskList
+      key: 'stageId'
     }
   ])
   const logsViewState = reactive<LogViewProps>({
@@ -97,99 +92,76 @@
       ellipsis: true
     }
   ])
-  const apiParams = computed(
-    (): TaskListParams =>
-      breadcrumbs.value.reduce((pre, val, index) => {
-        return Object.assign(pre, {
-          [`${apiMap.value[index].key}`]: val.id.replace(`${apiMap.value[index].key}-`, '')
-        })
-      }, {} as TaskListParams)
+  const apiParams = computed(() =>
+    breadcrumbs.value.reduce((pre, val, index) => {
+      const apiMapKey = apiMap.value[index].key
+      return Object.assign(pre, {
+        [`${apiMapKey}`]: val.id.replace(`${apiMapKey}-`, '')
+      })
+    }, {} as TaskListParams)
   )
 
-  const { dataSource, loading, filtersParams, paginationProps, onChange } = useBaseTable<JobVO | StageVO | TaskVO>({
-    columns: columns.value
+  const { dataSource, loading, paginationProps, onChange } = useBaseTable<JobVO | StageVO | TaskVO>({
+    columns: columns.value,
+    rows: []
   })
+
+  const currJobInfo = computed(() => jobInfo.value.get(execRes.value.jobId))
+
+  watch(
+    () => currJobInfo.value?.payLoad,
+    (val) => {
+      if (val) {
+        breadcrumbs.value[0] = {
+          name: val.name!,
+          id: `jobId-${val.id}`,
+          tableData: val.stages || []
+        }
+        dataSource.value = val.stages || []
+      }
+    },
+    {
+      immediate: true,
+      deep: true
+    }
+  )
 
   const clickBreadcrumb = (breadcrumb: BreadcrumbItem) => {
     if (breadcrumb.id !== currBreadcrumb.value?.id) {
       const index = breadcrumbs.value.findIndex((v) => v.id === breadcrumb.id)
       breadcrumbs.value.splice(index + 1, breadcrumbLen.value - index - 1)
-      stopPolling()
-      startPolling()
     }
+    dataSource.value = breadcrumb.tableData
   }
 
-  const updateBreadcrumbs = (data: BreadcrumbItem) => {
+  const updateBreadcrumbs = (data: JobVO | StageVO | TaskVO) => {
     if (breadcrumbLen.value + 1 > apiMap.value.length) {
       // task log open
       logsViewState.open = true
       logsViewState.subTitle = data.name as string
       logsViewState.payLoad = {
         ...apiParams.value,
-        taskId: parseInt(data.id)
+        taskId: Number(data.id),
+        clusterId: currJobInfo.value?.clusterId ?? 0
       }
       return
     }
-    const currId = `${apiMap.value[breadcrumbLen.value].key}-${data.id}`
+    const breadcrumbKey = apiMap.value[breadcrumbLen.value].key
+    const currId = `${breadcrumbKey}-${data.id}`
     const index = breadcrumbs.value.findIndex((v) => v.id === currId)
+    const newBreadcrumbItem = { id: currId, name: data.name! }
     if (index === -1) {
-      breadcrumbs.value.push({
-        id: currId,
-        name: data.name as string
-      })
-      stopPolling()
-      startPolling()
-    }
-  }
-
-  const getListData = async (isFirstCall = false) => {
-    if (!paginationProps.value) {
-      loading.value = false
-      return
-    }
-    try {
-      if (isFirstCall) {
-        loading.value = true
+      if (breadcrumbKey === 'jobId') {
+        breadcrumbs.value.push(Object.assign(newBreadcrumbItem, { tableData: data.stages }))
+        dataSource.value = data.stages
+      } else if (breadcrumbKey === 'stageId') {
+        breadcrumbs.value.push(Object.assign(newBreadcrumbItem, { tableData: data.tasks }))
+        dataSource.value = data.tasks
       }
-      const { api } = apiMap.value[breadcrumbs.value.length - 1]
-      const res = await api(apiParams.value, { ...filtersParams.value, order: 'desc' })
-      dataSource.value = res.content
-      paginationProps.value.total = res.total
-    } catch (error) {
-      console.log('error :>> ', error)
-      stopPolling()
-    } finally {
-      loading.value = false
+    } else {
+      dataSource.value = breadcrumbs.value[index].tableData
     }
   }
-
-  const tableChange: TableProps['onChange'] = (...args) => {
-    onChange(...args)
-    stopPolling()
-    startPolling()
-  }
-
-  const startPolling = () => {
-    getListData(true)
-    pollingIntervalId.value = setInterval(() => {
-      getListData()
-    }, POLLING_INTERVAL)
-  }
-
-  const stopPolling = () => {
-    if (pollingIntervalId.value) {
-      clearInterval(pollingIntervalId.value)
-      pollingIntervalId.value = null
-    }
-  }
-
-  onActivated(() => {
-    startPolling()
-  })
-
-  onDeactivated(() => {
-    stopPolling()
-  })
 </script>
 
 <template>
@@ -200,6 +172,7 @@
           v-for="breadcrumb in breadcrumbs"
           :key="breadcrumb.id"
           class="header-title"
+          style="font-size: 16px"
           @click="clickBreadcrumb(breadcrumb)"
         >
           <a v-if="currBreadcrumb?.id != breadcrumb.id">{{ breadcrumb.name }}</a>
@@ -212,7 +185,7 @@
       :data-source="dataSource"
       :columns="columns"
       :pagination="paginationProps"
-      @change="tableChange"
+      @change="onChange"
     >
       <template #bodyCell="{ record, text, column }">
         <template v-if="column.key === 'name'">
@@ -228,6 +201,7 @@
     </a-table>
     <logs-view
       v-model:open="logsViewState.open"
+      width="46%"
       :pay-load="logsViewState.payLoad"
       :sub-title="logsViewState.subTitle"
     />

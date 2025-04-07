@@ -20,24 +20,37 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { useServiceStore } from '@/store/service'
-import { ServiceVO } from '@/api/service/types.ts'
+import type { ServiceVO } from '@/api/service/types.ts'
+
+export interface InstalledMapItem {
+  serviceId: number
+  serviceName: string
+  serviceDisplayName: string
+  clusterId: number
+}
 
 export const useInstalledStore = defineStore(
   'installed',
   () => {
     const serviceStore = useServiceStore()
-    const installedMap = ref<Record<string, string[]>>({})
+    const installedServiceMap = ref<Record<string, InstalledMapItem[]>>({})
 
     const getInstalledNamesOrIdsOfServiceByKey = (key: string, flag: 'names' | 'ids' = 'names') => {
-      return installedMap.value[key].map((value) => value.split('-')[flag === 'names' ? 1 : 0])
+      return installedServiceMap.value[key].map((value) => {
+        if (flag === 'ids') {
+          return value.serviceId
+        } else {
+          return value.serviceName
+        }
+      })
     }
 
     const setInstalledMapKey = (key: string) => {
-      installedMap.value[key] = []
+      installedServiceMap.value[key] = []
     }
 
-    const setInstalledMapKeyOfValue = (key: string, value: string[]) => {
-      installedMap.value[key] = value
+    const setInstalledMapKeyOfValue = (key: string, value: InstalledMapItem[]) => {
+      installedServiceMap.value[key] = value
     }
 
     const getServicesOfInfra = async () => {
@@ -58,7 +71,7 @@ export const useInstalledStore = defineStore(
 
     return {
       serviceStore,
-      installedMap,
+      installedServiceMap,
       getServicesOfInfra,
       setInstalledMapKey,
       setInstalledMapKeyOfValue,
@@ -70,7 +83,7 @@ export const useInstalledStore = defineStore(
     persist: {
       storage: sessionStorage,
       key: 'installed',
-      paths: ['installedMap']
+      paths: ['installedServiceMap']
     }
   }
 )

@@ -22,11 +22,11 @@
   import { computed, onMounted, onUnmounted, reactive, ref, shallowRef } from 'vue'
   import { useRouter } from 'vue-router'
   import { useI18n } from 'vue-i18n'
+  import { useClusterStore } from '@/store/cluster'
   import * as hostApi from '@/api/hosts'
   import useBaseTable from '@/composables/use-base-table'
   import HostCreate from '@/pages/cluster-manage/hosts/create.vue'
   import InstallDependencies from './install-dependencies.vue'
-  import { useClusterStore } from '@/store/cluster'
   import type { FilterConfirmProps, FilterResetProps, TableRowSelection } from 'ant-design-vue/es/table/interface'
   import type { HostReq } from '@/api/command/types'
   import type { GroupItem } from '@/components/common/button-group/types'
@@ -262,7 +262,12 @@
   }
 
   const viewHostDetail = (row: HostVO) => {
-    router.push({ name: 'HostDetail', query: { hostId: row.id } })
+    const { clusterDisplayName, id: hostId } = row
+    const index = filtersOfClusterDisplayName.value.findIndex((v) => v.text === clusterDisplayName)
+    if (index != -1) {
+      const clusterId = filtersOfClusterDisplayName.value[index].value
+      router.push({ name: 'HostDetail', query: { hostId, clusterId } })
+    }
   }
 
   onUnmounted(() => {

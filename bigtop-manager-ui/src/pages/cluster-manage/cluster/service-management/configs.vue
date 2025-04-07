@@ -25,7 +25,7 @@
   import { updateServiceConfigs } from '@/api/service'
   import CaptureSnapshot from './components/capture-snapshot.vue'
   import SnapshotManagement from './components/snapshot-management.vue'
-  import type { ServiceConfig, ServiceVO } from '@/api/service/types'
+  import type { Property, ServiceConfig, ServiceVO } from '@/api/service/types'
 
   interface ServieceInfo {
     cluster: string
@@ -48,20 +48,20 @@
   const debouncedOnSearch = ref()
   const layout = shallowRef({
     labelCol: {
-      xs: { span: 24 },
-      sm: { span: 8 },
-      md: { span: 8 },
-      lg: { span: 6 }
+      xs: { span: 23 },
+      sm: { span: 7 },
+      md: { span: 7 },
+      lg: { span: 5 }
     },
     wrapperCol: {
-      xs: { span: 24 },
-      sm: { span: 16 },
-      md: { span: 16 },
-      lg: { span: 18 }
+      xs: { span: 23 },
+      sm: { span: 15 },
+      md: { span: 15 },
+      lg: { span: 17 }
     }
   })
 
-  const createNewConfigItem = () => {
+  const createNewProperty = () => {
     return {
       name: '',
       displayName: '',
@@ -70,8 +70,15 @@
     }
   }
 
-  const manualAddConfig = (config: ServiceConfig) => {
-    config.properties?.push(createNewConfigItem())
+  const manualAddPropertyForConfig = (config: ServiceConfig) => {
+    config.properties?.push(createNewProperty())
+  }
+
+  const removeProperty = (property: Property, config: ServiceConfig) => {
+    const index = (config.properties || []).findIndex((v) => v.name === property.name)
+    if (index != -1) {
+      config.properties?.splice(index, 1)
+    }
   }
 
   const filterConfigurations = () => {
@@ -116,7 +123,8 @@
     snapshotRef.value?.handleOpen({ id: serviceId, clusterId })
   }
 
-  onActivated(() => {
+  onActivated(async () => {
+    await getServiceDetail()
     configs.value = attrs.configs as ServiceConfig[]
     filterConfigs.value = [...configs.value]
     activeKey.value = filterConfigs.value.map((v) => v.id!)
@@ -150,7 +158,7 @@
         <a-collapse v-model:active-key="activeKey" :bordered="false" :ghost="true">
           <a-collapse-panel v-for="config in filterConfigs" :key="config.id">
             <template #extra>
-              <a-button type="text" shape="circle" @click.stop="manualAddConfig(config)">
+              <a-button type="text" shape="circle" @click.stop="manualAddPropertyForConfig(config)">
                 <template #icon>
                   <svg-icon name="plus_dark" />
                 </template>
@@ -159,20 +167,35 @@
             <template #header>
               <span>{{ config.name }}</span>
             </template>
-            <a-row v-for="(item, idx) in config.properties" :key="idx" :gutter="[16, 0]" :wrap="true">
+            <a-row
+              v-for="(property, idx) in config.properties"
+              :key="idx"
+              justify="space-between"
+              :gutter="[16, 0]"
+              :wrap="true"
+            >
               <a-col v-bind="layout.labelCol">
                 <a-form-item>
-                  <a-textarea v-if="item.isManual" v-model:value="item.name" :auto-size="{ minRows: 1, maxRows: 5 }" />
-                  <span v-else style="overflow-wrap: break-word" :title="item.displayName ?? item.name">
-                    {{ item.displayName ?? item.name }}
+                  <a-textarea
+                    v-if="property.isManual"
+                    v-model:value="property.name"
+                    :auto-size="{ minRows: 1, maxRows: 5 }"
+                  />
+                  <span v-else style="overflow-wrap: break-word" :title="property.displayName ?? property.name">
+                    {{ property.displayName ?? property.name }}
                   </span>
                 </a-form-item>
               </a-col>
               <a-col v-bind="layout.wrapperCol">
                 <a-form-item>
-                  <a-textarea v-model:value="item.value" :auto-size="{ minRows: 1, maxRows: 5 }" />
+                  <a-textarea v-model:value="property.value" :auto-size="{ minRows: 1, maxRows: 5 }" />
                 </a-form-item>
               </a-col>
+              <a-button type="text" shape="circle" @click="removeProperty(property, config)">
+                <template #icon>
+                  <svg-icon name="remove" />
+                </template>
+              </a-button>
             </a-row>
           </a-collapse-panel>
         </a-collapse>

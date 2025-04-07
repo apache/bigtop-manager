@@ -135,6 +135,7 @@ export interface AttrsReq {
 
 export interface CommandVO {
   id?: number
+  name?: string
   state?: string
   [property: string]: any
 }

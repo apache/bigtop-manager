@@ -29,7 +29,7 @@ export interface PageVO<T = any> {
 }
 
 export interface ListParams {
-  orderBy?: string
+  order?: string
   pageNum?: number
   pageSize?: number
   sort?: string

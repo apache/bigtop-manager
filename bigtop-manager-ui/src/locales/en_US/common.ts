@@ -124,5 +124,6 @@ export default {
   all: 'All',
   disabled: 'Disabled',
   restore: 'Restore',
-  selected: 'Selected'
+  selected: 'Selected',
+  feature_not_supported: 'Feature not supported yet'
 }

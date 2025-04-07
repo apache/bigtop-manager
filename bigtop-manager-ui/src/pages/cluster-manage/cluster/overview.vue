@@ -21,16 +21,19 @@
   import { computed, onActivated, ref, shallowRef, useAttrs } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { storeToRefs } from 'pinia'
-  import { useServiceStore } from '@/store/service'
   import { formatFromByte } from '@/utils/storage'
   import { usePngImage } from '@/utils/tools'
   import { CommonStatus, CommonStatusTexts } from '@/enums/state'
+  import { useServiceStore } from '@/store/service'
+  import { useJobProgress } from '@/store/job-progress'
+  import { Empty } from 'ant-design-vue'
   import GaugeChart from './components/gauge-chart.vue'
   import CategoryChart from './components/category-chart.vue'
   import type { ClusterStatusType, ClusterVO } from '@/api/cluster/types'
-  import { type MenuProps, Empty } from 'ant-design-vue'
-  import type { ServiceListParams } from '@/api/service/types'
+  import type { ServiceListParams, ServiceVO } from '@/api/service/types'
+  import type { MenuItem } from '@/store/menu/types'
   import type { StackVO } from '@/api/stack/types'
+  import type { Command } from '@/api/command/types'
 
   type TimeRangeText = '1m' | '15m' | '30m' | '1h' | '6h' | '30h'
   type TimeRangeItem = {
@@ -40,6 +43,7 @@
 
   const { t } = useI18n()
   const attrs = useAttrs() as ClusterVO
+  const jobProgressStore = useJobProgress()
   const serviceStore = useServiceStore()
   const currTimeRange = ref<TimeRangeText>('15m')
   const chartData = ref({
@@ -54,6 +58,7 @@
     3: 'unknown'
   })
   const { locateStackWithService, serviceNames } = storeToRefs(serviceStore)
+
   const clusterDetail = computed(() => ({
     ...attrs,
     totalMemory: formatFromByte(attrs.totalMemory as number),
@@ -109,21 +114,30 @@
   const detailKeys = computed(() => Object.keys(baseConfig.value) as (keyof ClusterVO)[])
   const serviceOperates = computed(() => [
     {
-      action: 'start',
+      action: 'Start',
       text: t('common.start', [t('common.service')])
     },
     {
-      action: 'restart',
+      action: 'Restart',
       text: t('common.restart', [t('common.service')])
     },
     {
-      action: 'stop',
+      action: 'Stop',
       text: t('common.stop', [t('common.service')])
     }
   ])
 
-  const handleServiceOperate: MenuProps['onClick'] = (item) => {
-    console.log('item :>> ', item.key)
+  const handleServiceOperate = async (item: MenuItem, service: ServiceVO) => {
+    try {
+      await jobProgressStore.processCommand({
+        command: item.key as keyof typeof Command,
+        clusterId: attrs.id,
+        commandLevel: 'service',
+        serviceCommands: [{ serviceName: service.name!, installed: true }]
+      })
+    } catch (error) {
+      console.log('error :>> ', error)
+    }
   }
 
   const handleTimeRange = (time: TimeRangeItem) => {
@@ -229,7 +243,7 @@
                   <svg-icon name="more" style="margin: 0" />
                 </a-button>
                 <template #overlay>
-                  <a-menu @click="handleServiceOperate">
+                  <a-menu @click="handleServiceOperate($event, service)">
                     <a-menu-item v-for="operate in serviceOperates" :key="operate.action">
                       <span>{{ operate.text }}</span>
                     </a-menu-item>

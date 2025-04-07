@@ -62,6 +62,8 @@ export const useClusterStore = defineStore(
         currCluster.value = await getCluster(parseInt(clusterId.value))
         currCluster.value.id != undefined && (await serviceStore.getServices(currCluster.value.id))
       } catch (error) {
+        currCluster.value = {}
+        clusters.value = []
         console.log('error :>> ', error)
       } finally {
         loading.value = false
