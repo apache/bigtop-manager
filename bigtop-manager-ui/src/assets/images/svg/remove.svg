@@ -19,14 +19,7 @@
 -->
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
   viewBox="0 0 16 16" fill="none">
-  <path stroke="rgba(22, 119, 255, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
-    d="M1.3335 7.99992C1.3335 11.6818 4.31826 14.6666 8.00016 14.6666C11.6821 14.6666 14.6668 11.6818 14.6668 7.99992C14.6668 4.31802 11.6821 1.33325 8.00016 1.33325">
-    <animateTransform values="0 8 8;360 8 8" keyTimes="0;1" dur="1" repeatCount="indefinite" type="rotate"
-      attributeName="transform"></animateTransform>
-  </path>
-  <path stroke="rgba(22, 119, 255, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
-    d="M12 8C12 5.79087 10.2091 4 8 4C5.79087 4 4 5.79087 4 8C4 10.2091 5.79087 12 8 12">
-    <animateTransform values="360 8 8;0 8 8" keyTimes="0;1" dur="1.2" repeatCount="indefinite" type="rotate"
-      attributeName="transform"></animateTransform>
+  <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
+    d="M3.5 8L12.8333 8">
   </path>
 </svg>

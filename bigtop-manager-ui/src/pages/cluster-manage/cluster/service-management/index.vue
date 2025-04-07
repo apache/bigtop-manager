@@ -21,14 +21,13 @@
   import { computed, onMounted, provide, ref, shallowRef } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { storeToRefs } from 'pinia'
-  // import { execCommand } from '@/api/command'
-  // import { Command } from '@/api/command/types'
-  // import { CommonStatus, CommonStatusTexts } from '@/enums/state'
   import { useServiceStore } from '@/store/service'
+  import { useJobProgress } from '@/store/job-progress'
   import { useRoute } from 'vue-router'
   import Overview from './overview.vue'
   import Components from './components.vue'
   import Configs from './configs.vue'
+  import { Command } from '@/api/command/types'
   import type { TabItem } from '@/components/common/main-card/types'
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { ServiceVO } from '@/api/service/types'
@@ -43,6 +42,7 @@
   const { t } = useI18n()
   const route = useRoute()
   const serviceStore = useServiceStore()
+  const jobProgressStore = useJobProgress()
   const { loading } = storeToRefs(serviceStore)
   const activeKey = ref('1')
   const serviceDetail = shallowRef<ServiceVO>()
@@ -79,7 +79,8 @@
           action: 'Stop',
           text: t('common.stop', [t('common.service')])
         }
-      ]
+      ],
+      dropdownMenuClickEvent: (info) => dropdownMenuClick && dropdownMenuClick(info)
     }
   ])
 
@@ -87,6 +88,22 @@
     const components = [Overview, Components, Configs]
     return components[parseInt(activeKey.value) - 1]
   })
+
+  const dropdownMenuClick: GroupItem['dropdownMenuClickEvent'] = async ({ key }) => {
+    try {
+      await jobProgressStore.processCommand(
+        {
+          command: key as keyof typeof Command,
+          clusterId: routeParams.value.id,
+          commandLevel: 'service',
+          serviceCommands: [{ serviceName: routeParams.value.service, installed: true }]
+        },
+        getServiceDetail
+      )
+    } catch (error) {
+      console.log('error :>> ', error)
+    }
+  }
 
   const getServiceDetail = async () => {
     try {

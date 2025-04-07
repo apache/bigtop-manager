@@ -19,10 +19,10 @@
 
 <script setup lang="ts">
   import { useMenuStore } from '@/store/menu'
+  import { message } from 'ant-design-vue'
   import { computed, ref, shallowRef } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { getInstalledStatus, installDependencies } from '@/api/hosts'
-  import { message } from 'ant-design-vue'
   import { InstalledStatusVO, Status } from '@/api/hosts/types'
   import { execCommand } from '@/api/command'
   import useSteps from '@/composables/use-steps'
@@ -30,7 +30,7 @@
   import ComponentInfo from './components/component-info.vue'
   import HostConfig from './components/host-config.vue'
   import CheckWorkflow from './components/check-workflow.vue'
-  import { ClusterCommandReq, type CommandRequest, type CommandVO, HostReq } from '@/api/command/types'
+  import type { ClusterCommandReq, CommandRequest, CommandVO, HostReq } from '@/api/command/types'
 
   const { t } = useI18n()
   const menuStore = useMenuStore()
@@ -51,6 +51,7 @@
       stepData.value[2].every((v) => v.status === Status.Success) &&
       hasUnknownHost.value
   )
+  const getCompName = computed(() => components.value[current.value])
   const isDone = computed(() => ['Successful', 'Failed'].includes(stepData.value[stepData.value.length - 1].state))
   const steps = computed(() => [
     'cluster.cluster_info',
@@ -58,10 +59,6 @@
     'cluster.host_config',
     'cluster.create'
   ])
-
-  const getCompName = computed(() => {
-    return components.value[current.value]
-  })
 
   const { current, stepsLimit, previousStep, nextStep } = useSteps(steps.value)
 

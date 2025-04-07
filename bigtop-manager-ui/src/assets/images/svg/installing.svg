@@ -19,40 +19,45 @@
 -->
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
   viewBox="0 0 16 16" fill="none">
-  <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
-    d="M8 1.33337L8 2.66671">
-  </path>
-  <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
-    d="M11.3332 2.22656L10.6665 3.38126">
-  </path>
-  <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
-    d="M13.7734 4.66663L12.6187 5.33329">
-  </path>
-  <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
-    d="M14.6668 8L13.3335 8">
-  </path>
-  <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
-    d="M13.7734 11.3333L12.6187 10.6666">
-  </path>
-  <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
-    d="M11.3332 13.7735L10.6665 12.6188">
-  </path>
-  <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
-    d="M8 14.6667L8 13.3334">
-  </path>
-  <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
-    d="M4.6665 13.7735L5.33317 12.6188">
-  </path>
-  <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
-    d="M2.22656 11.3333L3.38127 10.6666">
-  </path>
-  <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
-    d="M1.3335 8L2.66683 8">
-  </path>
-  <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
-    d="M2.22656 4.66663L3.38127 5.33329">
-  </path>
-  <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
-    d="M4.6665 2.22656L5.33317 3.38126">
-  </path>
+  <g>
+    <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
+      d="M8 1.33337L8 2.66671">
+    </path>
+    <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
+      d="M11.3332 2.22656L10.6665 3.38126">
+    </path>
+    <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
+      d="M13.7734 4.66663L12.6187 5.33329">
+    </path>
+    <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
+      d="M14.6668 8L13.3335 8">
+    </path>
+    <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
+      d="M13.7734 11.3333L12.6187 10.6666">
+    </path>
+    <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
+      d="M11.3332 13.7735L10.6665 12.6188">
+    </path>
+    <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
+      d="M8 14.6667L8 13.3334">
+    </path>
+    <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
+      d="M4.6665 13.7735L5.33317 12.6188">
+    </path>
+    <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
+      d="M2.22656 11.3333L3.38127 10.6666">
+    </path>
+    <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
+      d="M1.3335 8L2.66683 8">
+    </path>
+    <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
+      d="M2.22656 4.66663L3.38127 5.33329">
+    </path>
+    <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
+      d="M4.6665 2.22656L5.33317 3.38126">
+    </path>
+    <animateTransform values="360 8 8;0 8 8" keyTimes="0;1" dur="1.2" repeatCount="indefinite" type="rotate"
+      attributeName="transform"></animateTransform>
+  </g>
+
 </svg>

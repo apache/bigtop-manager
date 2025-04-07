@@ -25,15 +25,20 @@
   import { useServiceStore } from '@/store/service'
   import { CommonStatus, CommonStatusTexts } from '@/enums/state'
   import { useRouter } from 'vue-router'
+  import { useJobProgress } from '@/store/job-progress'
   import FilterForm from '@/components/common/filter-form/index.vue'
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { FilterFormItem } from '@/components/common/filter-form/types'
   import type { ServiceListParams, ServiceStatusType, ServiceVO } from '@/api/service/types'
   import type { ClusterVO } from '@/api/cluster/types'
+  import type { Command, CommandRequest } from '@/api/command/types'
+
+  type GroupItemActionType = keyof typeof Command | 'More'
 
   const { t } = useI18n()
   const attrs = useAttrs() as ClusterVO
   const router = useRouter()
+  const jobProgressStore = useJobProgress()
   const serviceStore = useServiceStore()
   const { services, loading } = toRefs(serviceStore)
   const statusColors = shallowRef<Record<ServiceStatusType, keyof typeof CommonStatusTexts>>({
@@ -42,33 +47,33 @@
     3: 'unknown'
   })
 
-  const actionGroups = shallowRef<GroupItem[]>([
+  const actionGroups = shallowRef<GroupItem<GroupItemActionType>[]>([
     {
-      action: 'start',
+      action: 'Start',
       icon: 'start',
-      clickEvent: (item) => {
-        console.log('item :>> ', item?.action)
+      clickEvent: (item, args) => {
+        handleServiceOperate(item!.action!, args)
       }
     },
     {
-      action: 'stop',
+      action: 'Stop',
       icon: 'stop',
-      clickEvent: (item) => {
-        console.log('item :>> ', item?.action)
+      clickEvent: (item, args) => {
+        handleServiceOperate(item!.action!, args)
       }
     },
     {
-      action: 'restart',
+      action: 'Restart',
       icon: 'restart',
-      clickEvent: (item) => {
-        console.log('item :>> ', item?.action)
+      clickEvent: (item, args) => {
+        handleServiceOperate(item!.action!, args)
       }
     },
     {
-      action: 'more',
+      action: 'More',
       icon: 'more_line',
-      clickEvent: (item) => {
-        console.log('item :>> ', item?.action)
+      clickEvent: (item, args) => {
+        handleServiceOperate(item!.action!, args)
       }
     }
   ])
@@ -114,6 +119,18 @@
       ]
     }
   ])
+
+  const handleServiceOperate = (command: GroupItemActionType, service: ServiceVO) => {
+    if (command !== 'More') {
+      const execCommandParams = {
+        command: command,
+        clusterId: attrs.id,
+        commandLevel: 'service',
+        serviceCommands: [{ serviceName: service.name, installed: true }]
+      } as CommandRequest
+      jobProgressStore.processCommand(execCommandParams, getServices)
+    }
+  }
 
   const getServices = (filters?: ServiceListParams) => {
     attrs.id != undefined && serviceStore.getServices(attrs.id, filters)
@@ -166,7 +183,7 @@
           </div>
         </div>
         <div class="item-content" @click.stop>
-          <button-group :auto="true" :space="0" :groups="actionGroups">
+          <button-group :auto="true" :space="0" :args="item" :groups="actionGroups">
             <template #icon="{ item: groupItem }">
               <svg-icon :name="groupItem.icon || ''" />
             </template>

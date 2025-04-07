@@ -20,18 +20,15 @@
 <script lang="ts" setup>
   import { computed } from 'vue'
   import { JobState } from '@/enums/state'
-  import {
-    MinusCircleFilled as Canceled,
-    CheckCircleFilled as Successful,
-    CloseCircleFilled as Failed
-  } from '@ant-design/icons-vue'
 
   interface ProgressProps {
     state: keyof typeof JobState
     progressData: number
   }
 
-  const props = withDefaults(defineProps<ProgressProps>(), {})
+  const props = withDefaults(defineProps<ProgressProps>(), {
+    progressData: 1
+  })
 
   const progressConfig = computed(() => {
     if (props.state === 'Pending') {
@@ -43,24 +40,25 @@
       return {
         progress: 100,
         status: 'success',
-        icon: Successful
+        icon: 'success'
       }
     } else if (props.state === 'Processing') {
       return {
-        progress: props.progressData,
+        progress: props.progressData ?? 1,
         status: 'active'
       }
     } else if (props.state === 'Canceled') {
       return {
         progress: 100,
         status: 'normal',
-        icon: Canceled
+        icon: 'canceled',
+        strokeColor: '#faad14'
       }
     } else if (props.state === 'Failed') {
       return {
         progress: 100,
         status: 'exception',
-        icon: Failed
+        icon: 'failed'
       }
     } else {
       return {
@@ -76,18 +74,25 @@
     <a-progress
       :percent="progressConfig.progress"
       :status="progressConfig.status"
-      :stroke-color="JobState[props.state]"
+      :stroke-color="progressConfig.strokeColor || ''"
     >
       <template #format="percent">
         <span v-if="['Processing', 'Pending'].includes(props.state)"> {{ percent }} % </span>
-        <component
-          :is="progressConfig.icon"
+        <svg-icon
           v-else-if="progressConfig.icon"
-          :style="{ color: JobState[props.state] }"
+          :style="{ margin: 0, 'vertical-align': '-0.5em' }"
+          :name="progressConfig.icon"
         />
       </template>
     </a-progress>
   </div>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+  :deep(.ant-progress-line) {
+    margin-bottom: 0px !important;
+    .ant-progress-text {
+      line-height: 0;
+    }
+  }
+</style>

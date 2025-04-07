@@ -23,6 +23,7 @@
   import { useRoute } from 'vue-router'
   import { getHost } from '@/api/hosts'
   import { CommonStatus, CommonStatusTexts } from '@/enums/state'
+  import { message } from 'ant-design-vue'
   import Overview from './overview.vue'
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { HostStatusType, HostVO } from '@/api/hosts/types.ts'
@@ -59,28 +60,19 @@
     }
   ])
 
-  const dropdownMenuClick: GroupItem['dropdownMenuClickEvent'] = async ({ key }) => {
-    console.log(key)
-    // try {
-    //   await execCommand({
-    //     command: key as keyof typeof Command,
-    //     clusterId: currCluster.value.id,
-    //     commandLevel: 'cluster'
-    //   })
-    //   await clusterStore.loadClusters()
-    //   await clusterStore.getClusterDetail()
-    // } catch (error) {
-    //   console.log('error :>> ', error)
-    // }
+  const dropdownMenuClick: GroupItem['dropdownMenuClickEvent'] = async () => {
+    message.error(t('common.feature_not_supported'))
   }
 
   const setupHostInfo = async () => {
     try {
       loading.value = true
       const hostId = route.query.hostId
+      const clusterId = route.query.clusterId
       const data = await getHost({ id: Number(hostId) })
       hostInfo.value = {
-        ...data
+        ...data,
+        clusterId
       }
     } catch (error) {
       console.log(error)

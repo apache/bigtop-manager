@@ -20,5 +20,9 @@
 export default {
   job_list: 'Job List',
   task_log: 'Task Log',
-  log_loading: 'Loading logs'
+  log_loading: 'Loading logs',
+  pending: 'Waiting to run',
+  processing: 'Running',
+  success: 'Run succeeded!',
+  failed: 'Run failed!'
 }
