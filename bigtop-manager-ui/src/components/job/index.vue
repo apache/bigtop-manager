@@ -152,7 +152,7 @@
         loading.value = true
       }
       const { api } = apiMap.value[breadcrumbs.value.length - 1]
-      const res = await api(apiParams.value, filtersParams.value)
+      const res = await api(apiParams.value, { ...filtersParams.value, order: 'desc' })
       dataSource.value = res.content
       paginationProps.value.total = res.total
     } catch (error) {

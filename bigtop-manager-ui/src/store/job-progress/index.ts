@@ -91,7 +91,7 @@ export const useJobProgress = defineStore('job-progress', () => {
 
   const getClusterDisplayName = (clusterId: number) => {
     const clusters = clusterStore.clusters
-    const index = clusters.findIndex((v) => v.id === clusterId)
+    const index = clusters.findIndex((v) => v.id == clusterId)
     if (index != -1) {
       return clusters[index].displayName
     }
@@ -227,7 +227,7 @@ export const useJobProgress = defineStore('job-progress', () => {
     pollJobDetails(execRes, getJobInstanceDetails, 1000, nextAction)
     notification.open({
       key: `${execRes.jobId}`,
-      message: `${getClusterDisplayName(execRes.clusterId)}-${execRes.name}`,
+      message: `${getClusterDisplayName(execRes.clusterId)} - ${execRes.name}`,
       duration: null,
       placement: 'bottomRight',
       style: { padding: '16px' },

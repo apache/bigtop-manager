@@ -131,12 +131,15 @@
 
   const handleHostOperate = async (item: MenuItem, component: ComponentVO) => {
     try {
-      await jobProgressStore.processCommand({
-        command: item.key as keyof typeof Command,
-        clusterId: hostInfo.value.clusterId,
-        commandLevel: 'component',
-        componentCommands: [{ componentName: component.name!, hostnames: [component.hostname!] }]
-      })
+      await jobProgressStore.processCommand(
+        {
+          command: item.key as keyof typeof Command,
+          clusterId: hostInfo.value.clusterId,
+          commandLevel: 'component',
+          componentCommands: [{ componentName: component.name!, hostnames: [component.hostname!] }]
+        },
+        getComponentInfo
+      )
     } catch (error) {
       console.log('error :>> ', error)
     }
@@ -146,9 +149,9 @@
     currTimeRange.value = time.text
   }
 
-  const getComponentInfo = async (hostId: number) => {
+  const getComponentInfo = async () => {
     try {
-      const data = await getComponentsByHost({ id: hostId })
+      const data = await getComponentsByHost({ id: hostInfo.value.id! })
       componentsFromCurrentHost.value = data.reduce((pre, val) => {
         if (!pre.has(val.stack!)) {
           pre.set(val.stack!, [val])
@@ -166,7 +169,7 @@
     () => hostInfo.value,
     (val) => {
       if (val.id) {
-        getComponentInfo(val.id)
+        getComponentInfo()
       }
     }
   )

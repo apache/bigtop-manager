@@ -23,11 +23,11 @@
   import { useI18n } from 'vue-i18n'
   import { useRoute } from 'vue-router'
   import { deleteComponent, getComponents } from '@/api/component'
-  import { execCommand } from '@/api/command'
   import { useStackStore } from '@/store/stack'
+  import { useJobProgress } from '@/store/job-progress'
   import useBaseTable from '@/composables/use-base-table'
-  import type { GroupItem } from '@/components/common/button-group/types'
   import { message, Modal, type TableColumnType, type TableProps } from 'ant-design-vue'
+  import type { GroupItem } from '@/components/common/button-group/types'
   import type { ComponentVO } from '@/api/component/types'
   import type { FilterConfirmProps, FilterResetProps } from 'ant-design-vue/es/table/interface'
   import type { Command, CommandRequest } from '@/api/command/types'
@@ -49,6 +49,7 @@
 
   const POLLING_INTERVAL = 3000
   const { t } = useI18n()
+  const jobProgressStore = useJobProgress()
   const stackStore = useStackStore()
   const route = useRoute()
   const attrs = useAttrs()
@@ -58,7 +59,7 @@
   const componentStatus = ref(['INSTALLING', 'SUCCESS', 'FAILED', 'UNKNOWN'])
   const commandRequest = shallowRef<CommandRequest>({
     command: 'Add',
-    commandLevel: 'cluster',
+    commandLevel: 'component',
     componentCommands: []
   })
   const state = reactive<TableState>({
@@ -233,14 +234,18 @@
       hostnames: [row.hostname!]
     })
     await execOperation()
-    getComponentList(true, true)
   }
 
   const execOperation = async () => {
     try {
-      await execCommand({ ...commandRequest.value, clusterId: currServiceInfo.value.id })
-      state.selectedRowKeys = []
-      state.selectedRows = []
+      await jobProgressStore.processCommand(
+        { ...commandRequest.value, clusterId: currServiceInfo.value.id },
+        async () => {
+          getComponentList(true, true)
+          state.selectedRowKeys = []
+          state.selectedRows = []
+        }
+      )
     } catch (error) {
       console.log('error :>> ', error)
     }
