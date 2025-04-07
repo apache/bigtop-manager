@@ -25,6 +25,7 @@
   import { usePngImage } from '@/utils/tools'
   import { CommonStatus, CommonStatusTexts } from '@/enums/state.ts'
   import { useJobProgress } from '@/store/job-progress'
+  import { useStackStore } from '@/store/stack'
   import { getComponentsByHost } from '@/api/hosts'
   import CategoryChart from '@/pages/cluster-manage/cluster/components/category-chart.vue'
   import GaugeChart from '@/pages/cluster-manage/cluster/components/gauge-chart.vue'
@@ -47,6 +48,7 @@
   const props = defineProps<Props>()
   const { hostInfo } = toRefs(props)
   const { t } = useI18n()
+  const stackStore = useStackStore()
   const jobProgressStore = useJobProgress()
   const currTimeRange = ref<TimeRangeText>('15m')
   const statusColors = shallowRef<Record<HostStatusType, keyof typeof CommonStatusTexts>>({
@@ -144,23 +146,27 @@
     currTimeRange.value = time.text
   }
 
+  const getComponentInfo = async (hostId: number) => {
+    try {
+      const data = await getComponentsByHost({ id: hostId })
+      componentsFromCurrentHost.value = data.reduce((pre, val) => {
+        if (!pre.has(val.stack!)) {
+          pre.set(val.stack!, [val])
+        } else {
+          ;(pre.get(val.stack!) as ComponentVO[]).push(val)
+        }
+        return pre
+      }, new Map<string, ComponentVO[]>())
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   watch(
     () => hostInfo.value,
-    async (val) => {
+    (val) => {
       if (val.id) {
-        try {
-          const data = await getComponentsByHost({ id: val.id })
-          componentsFromCurrentHost.value = data.reduce((pre, val) => {
-            if (!pre.has(val.stack!)) {
-              pre.set(val.stack!, [val])
-            } else {
-              ;(pre.get(val.stack!) as ComponentVO[]).push(val)
-            }
-            return pre
-          }, new Map<string, ComponentVO[]>())
-        } catch (error) {
-          console.log(error)
-        }
+        getComponentInfo(val.id)
       }
     }
   )
@@ -246,7 +252,10 @@
             <div v-for="comp in componentsFromCurrentHost.get(stack)" :key="comp.id" class="component-item">
               <a-avatar v-if="comp.serviceName" :src="usePngImage(comp.serviceName.toLowerCase())" :size="22" />
               <a-typography-text :content="`${comp.serviceDisplayName}/${comp.displayName}`" />
-              <a-dropdown :trigger="['click']">
+              <a-dropdown
+                v-if="stackStore.stackrelationMap?.components[comp.name!].category != 'client'"
+                :trigger="['click']"
+              >
                 <a-button type="text" shape="circle" size="small">
                   <svg-icon name="more" style="margin: 0" />
                 </a-button>

@@ -17,25 +17,63 @@
  * under the License.
  */
 
-import { ServiceVO } from '@/api/service/types'
 import { getStacks } from '@/api/stack'
-import { StackVO } from '@/api/stack/types'
 import { defineStore } from 'pinia'
 import { shallowRef } from 'vue'
+import type { ComponentVO } from '@/api/component/types'
+import type { ServiceConfig, ServiceVO } from '@/api/service/types'
+import type { StackVO } from '@/api/stack/types'
 
 export type ExpandServiceVO = ServiceVO & { order: number }
+interface StackrelationMap {
+  services: {
+    displayName: string
+    stack: string
+    components: string[]
+    configs: ServiceConfig
+  }
+  components: {
+    service: string
+    stack: string
+  } & ComponentVO
+}
 
 export const useStackStore = defineStore(
   'stack',
   () => {
     const stacks = shallowRef<StackVO[]>([])
+    const stackrelationMap = shallowRef<StackrelationMap>()
 
     const loadStacks = async () => {
       try {
         stacks.value = await getStacks()
+        stackrelationMap.value = setupStackRelationMap(stacks.value)
       } catch (error) {
         console.log('error :>> ', error)
       }
+    }
+
+    const setupStackRelationMap = (stacks: StackVO[]) => {
+      const relationMap = { services: {}, components: {} } as StackrelationMap
+      for (const { stackName, services } of stacks) {
+        for (const service of services) {
+          const { name, displayName, components, configs } = service
+          relationMap.services[name!] = {
+            displayName,
+            stack: stackName,
+            components: components!.map(({ name }) => name),
+            configs
+          }
+          for (const component of components!) {
+            relationMap.components[component.name!] = {
+              ...component,
+              service: name,
+              stack: stackName
+            }
+          }
+        }
+      }
+      return relationMap
     }
 
     const getServicesByExclude = (exclude?: string[], isOrder = true): ExpandServiceVO[] | ServiceVO[] => {
@@ -45,6 +83,7 @@ export const useStackStore = defineStore(
 
     return {
       stacks,
+      stackrelationMap,
       loadStacks,
       getServicesByExclude
     }

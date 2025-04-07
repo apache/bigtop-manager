@@ -124,5 +124,6 @@ export default {
   all: '全部',
   disabled: '关闭',
   restore: '恢复',
-  selected: '选中'
+  selected: '选中',
+  feature_not_supported: '功能暂不支持'
 }

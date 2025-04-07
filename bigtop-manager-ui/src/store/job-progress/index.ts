@@ -203,7 +203,7 @@ export const useJobProgress = defineStore('job-progress', () => {
         const currentState = state === 'Successful' ? 'success' : state!.toLowerCase()
         const targetProgress = jobStageProgress.value[`${currentState}`]() ?? progressEntry.percent
         const oldPercent = progressEntry?.percent ?? 0
-        const mergeProgressPercent = { ...targetProgress, percent: oldPercent + 10 }
+        const mergeProgressPercent = { ...targetProgress, percent: oldPercent + 2 }
         progressEntry!.payLoad = result
 
         if (state === 'Successful' || state === 'Failed') {
