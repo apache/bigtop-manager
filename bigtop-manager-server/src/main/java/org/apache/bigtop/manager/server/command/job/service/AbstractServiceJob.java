@@ -66,7 +66,7 @@ public abstract class AbstractServiceJob extends AbstractJob {
     protected Map<String, List<String>> getComponentHostsMap() {
         List<String> serviceNames = getServiceNames();
         ComponentQuery componentQuery = ComponentQuery.builder()
-                .clusterId(clusterPO.getId())
+                .clusterId(clusterPO == null ? 0L : clusterPO.getId())
                 .serviceNames(serviceNames)
                 .build();
         List<ComponentPO> componentPOList = componentDao.findByQuery(componentQuery);

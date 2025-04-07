@@ -39,6 +39,8 @@ public enum LocaleKeys {
     CLUSTER_HAS_HOSTS("cluster.has.hosts"),
     CLUSTER_HAS_SERVICES("cluster.has.services"),
     CLUSTER_HAS_NO_SERVICES("cluster.has.no.services"),
+    CLUSTER_HAS_COMPONENTS("cluster.has.components"),
+    CLUSTER_HAS_NO_COMPONENTS("cluster.has.no.components"),
 
     HOST_NOT_FOUND("host.not.found"),
     HOST_ASSIGNED("host.assigned"),

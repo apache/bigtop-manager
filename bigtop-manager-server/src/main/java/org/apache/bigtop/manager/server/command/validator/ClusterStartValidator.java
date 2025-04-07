@@ -19,7 +19,10 @@
 package org.apache.bigtop.manager.server.command.validator;
 
 import org.apache.bigtop.manager.common.enums.Command;
+import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.po.ServicePO;
+import org.apache.bigtop.manager.dao.query.ComponentQuery;
+import org.apache.bigtop.manager.dao.repository.ComponentDao;
 import org.apache.bigtop.manager.dao.repository.ServiceDao;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
@@ -39,6 +42,9 @@ public class ClusterStartValidator implements CommandValidator {
     @Resource
     private ServiceDao serviceDao;
 
+    @Resource
+    private ComponentDao componentDao;
+
     @Override
     public List<CommandIdentifier> getCommandIdentifiers() {
         return List.of(new CommandIdentifier(CommandLevel.CLUSTER, Command.START));
@@ -51,6 +57,13 @@ public class ClusterStartValidator implements CommandValidator {
 
         if (CollectionUtils.isEmpty(servicePOList)) {
             throw new ApiException(ApiExceptionEnum.CLUSTER_HAS_NO_SERVICES);
+        }
+
+        ComponentQuery componentQuery =
+                ComponentQuery.builder().clusterId(clusterId).build();
+        List<ComponentPO> componentPOList = componentDao.findByQuery(componentQuery);
+        if (CollectionUtils.isEmpty(componentPOList)) {
+            throw new ApiException(ApiExceptionEnum.CLUSTER_HAS_NO_COMPONENTS);
         }
     }
 }
