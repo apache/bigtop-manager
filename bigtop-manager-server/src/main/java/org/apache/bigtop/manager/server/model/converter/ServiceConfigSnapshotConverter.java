@@ -24,6 +24,7 @@ import org.apache.bigtop.manager.server.model.dto.ServiceConfigSnapshotDTO;
 import org.apache.bigtop.manager.server.model.vo.ServiceConfigSnapshotVO;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -37,6 +38,8 @@ public interface ServiceConfigSnapshotConverter {
 
     List<ServiceConfigSnapshotDTO> fromPO2DTO(List<ServiceConfigSnapshotPO> serviceConfigSnapshotPOList);
 
+    @Mapping(target = "createTime", source = "createTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
+    @Mapping(target = "updateTime", source = "updateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
     ServiceConfigSnapshotVO fromPO2VO(ServiceConfigSnapshotPO serviceConfigSnapshotPO);
 
     List<ServiceConfigSnapshotVO> fromPO2VO(List<ServiceConfigSnapshotPO> serviceConfigSnapshotPOList);

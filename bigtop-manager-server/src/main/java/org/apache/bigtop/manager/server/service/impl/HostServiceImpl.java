@@ -20,8 +20,11 @@ package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.common.constants.MessageConstants;
 import org.apache.bigtop.manager.common.shell.ShellResult;
+import org.apache.bigtop.manager.common.utils.InstanceUtils;
+import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.po.RepoPO;
+import org.apache.bigtop.manager.dao.query.ComponentQuery;
 import org.apache.bigtop.manager.dao.query.HostQuery;
 import org.apache.bigtop.manager.dao.repository.ComponentDao;
 import org.apache.bigtop.manager.dao.repository.HostDao;
@@ -31,9 +34,11 @@ import org.apache.bigtop.manager.server.enums.HealthyStatusEnum;
 import org.apache.bigtop.manager.server.enums.HostAuthTypeEnum;
 import org.apache.bigtop.manager.server.enums.InstalledStatusEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
+import org.apache.bigtop.manager.server.model.converter.ComponentConverter;
 import org.apache.bigtop.manager.server.model.converter.HostConverter;
 import org.apache.bigtop.manager.server.model.dto.HostDTO;
 import org.apache.bigtop.manager.server.model.query.PageQuery;
+import org.apache.bigtop.manager.server.model.vo.ComponentVO;
 import org.apache.bigtop.manager.server.model.vo.HostVO;
 import org.apache.bigtop.manager.server.model.vo.InstalledStatusVO;
 import org.apache.bigtop.manager.server.model.vo.PageVO;
@@ -41,6 +46,7 @@ import org.apache.bigtop.manager.server.service.HostService;
 import org.apache.bigtop.manager.server.utils.PageUtils;
 import org.apache.bigtop.manager.server.utils.RemoteSSHUtils;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import com.github.pagehelper.Page;
@@ -136,19 +142,56 @@ public class HostServiceImpl implements HostService {
 
     @Override
     public HostVO update(Long id, HostDTO hostDTO) {
-        HostPO hostPO = HostConverter.INSTANCE.fromDTO2PO(hostDTO);
-        hostPO.setId(id);
-        hostDao.partialUpdateById(hostPO);
+        HostPO hostPO = hostDao.findById(id);
+        HostPO convertedHostPO = HostConverter.INSTANCE.fromDTO2PO(hostDTO);
+        BeanUtils.copyProperties(convertedHostPO, hostPO, InstanceUtils.getNullProperties(convertedHostPO));
+        switch (HostAuthTypeEnum.fromCode(hostPO.getAuthType())) {
+            case PASSWORD -> {
+                hostPO.setSshPassword(hostDTO.getSshPassword());
+                hostPO.setSshKeyString(null);
+                hostPO.setSshKeyFilename(null);
+                hostPO.setSshKeyPassword(null);
+            }
+            case KEY -> {
+                hostPO.setSshPassword(null);
+                hostPO.setSshKeyString(hostDTO.getSshKeyString());
+                hostPO.setSshKeyFilename(hostDTO.getSshKeyFilename());
+                hostPO.setSshKeyPassword(hostDTO.getSshKeyPassword());
+            }
+            case NO_AUTH -> {
+                hostPO.setSshPassword(null);
+                hostPO.setSshKeyString(null);
+                hostPO.setSshKeyFilename(null);
+                hostPO.setSshKeyPassword(null);
+            }
+        }
+
+        hostDao.updateById(hostPO);
         return get(id);
     }
 
     @Override
     public Boolean remove(Long id) {
-        if (componentDao.countByHostId(id) > 0) {
-            throw new ApiException(ApiExceptionEnum.HOST_HAS_COMPONENTS);
+        return batchRemove(List.of(id));
+    }
+
+    @Override
+    public List<ComponentVO> components(Long id) {
+        ComponentQuery query = ComponentQuery.builder().hostId(id).build();
+        List<ComponentPO> componentPOList = componentDao.findByQuery(query);
+        return ComponentConverter.INSTANCE.fromPO2VO(componentPOList);
+    }
+
+    @Override
+    public Boolean batchRemove(List<Long> ids) {
+        for (Long id : ids) {
+            if (componentDao.countByHostId(id) > 0) {
+                HostPO hostPO = hostDao.findById(id);
+                throw new ApiException(ApiExceptionEnum.HOST_HAS_COMPONENTS, hostPO.getHostname());
+            }
         }
 
-        return hostDao.deleteById(id);
+        return hostDao.deleteByIds(ids);
     }
 
     @Override

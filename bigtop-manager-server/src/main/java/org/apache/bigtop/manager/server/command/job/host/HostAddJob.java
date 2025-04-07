@@ -72,7 +72,10 @@ public class HostAddJob extends AbstractHostJob {
         CommandDTO commandDTO = jobContext.getCommandDTO();
         List<HostDTO> hostDTOList = HostConverter.INSTANCE.fromCommand2DTO(commandDTO.getHostCommands());
         for (HostDTO hostDTO : hostDTOList) {
-            hostDTO.setClusterId(clusterPO.getId());
+            if (hostDTO.getClusterId() == null) {
+                hostDTO.setClusterId(clusterPO.getId());
+            }
+
             hostService.add(hostDTO);
         }
     }

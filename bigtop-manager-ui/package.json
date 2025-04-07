@@ -5,7 +5,7 @@
     "dev": "vite --open --mode development",
     "build": "vue-tsc && vite build --mode production",
     "preview": "vite preview",
-    "lint": "eslint src --fix --ext .ts,.tsx,.vue",
+    "lint": "eslint src --ext .ts,.tsx,.vue",
     "prettier": "prettier --write \"src/**/*.{vue,ts,tsx}\"",
     "test": "vitest",
     "test:run": "vitest run"

@@ -16,34 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.dao.query;
+package org.apache.bigtop.manager.server.model.req;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class ComponentQuery {
+public class IdsReq {
 
-    private String name;
-
-    private Long clusterId;
-
-    private Long hostId;
-
-    private String hostname;
-
-    private List<String> hostnames;
-
-    private Long serviceId;
-
-    private List<String> serviceNames;
-
-    private Integer status;
+    private List<Long> ids;
 }
