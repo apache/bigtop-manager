@@ -25,7 +25,7 @@ import type { ServiceConfig, ServiceVO } from '@/api/service/types'
 import type { StackVO } from '@/api/stack/types'
 
 export type ExpandServiceVO = ServiceVO & { order: number }
-interface StackrelationMap {
+interface StackRelationMap {
   services: {
     displayName: string
     stack: string
@@ -42,19 +42,19 @@ export const useStackStore = defineStore(
   'stack',
   () => {
     const stacks = shallowRef<StackVO[]>([])
-    const stackrelationMap = shallowRef<StackrelationMap>()
+    const stackRelationMap = shallowRef<StackRelationMap>()
 
     const loadStacks = async () => {
       try {
         stacks.value = await getStacks()
-        stackrelationMap.value = setupStackRelationMap(stacks.value)
+        stackRelationMap.value = setupStackRelationMap(stacks.value)
       } catch (error) {
         console.log('error :>> ', error)
       }
     }
 
     const setupStackRelationMap = (stacks: StackVO[]) => {
-      const relationMap = { services: {}, components: {} } as StackrelationMap
+      const relationMap = { services: {}, components: {} } as StackRelationMap
       for (const { stackName, services } of stacks) {
         for (const service of services) {
           const { name, displayName, components, configs } = service
@@ -83,7 +83,7 @@ export const useStackStore = defineStore(
 
     return {
       stacks,
-      stackrelationMap,
+      stackRelationMap,
       loadStacks,
       getServicesByExclude
     }

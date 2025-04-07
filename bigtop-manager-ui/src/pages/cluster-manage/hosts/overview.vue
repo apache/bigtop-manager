@@ -264,7 +264,7 @@
               <a-avatar v-if="comp.serviceName" :src="usePngImage(comp.serviceName.toLowerCase())" :size="22" />
               <a-typography-text :content="`${comp.serviceDisplayName}/${comp.displayName}`" />
               <a-dropdown
-                v-if="stackStore.stackrelationMap?.components[comp.name!].category != 'client'"
+                v-if="stackStore.stackRelationMap?.components[comp.name!].category != 'client'"
                 :trigger="['click']"
               >
                 <a-button type="text" shape="circle" size="small">
