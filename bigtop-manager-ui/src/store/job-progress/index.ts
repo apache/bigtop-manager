@@ -260,7 +260,7 @@ export const useJobProgress = defineStore('job-progress', () => {
     Modal.destroyAll()
     Modal.confirm({
       icon: null,
-      width: '800px',
+      width: '980px',
       zIndex: 9999,
       mask: false,
       closable: true,

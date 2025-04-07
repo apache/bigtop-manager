@@ -21,7 +21,7 @@ import { defineStore, storeToRefs } from 'pinia'
 import { computed, ref } from 'vue'
 import { getService, getServiceList } from '@/api/service'
 import { useStackStore } from '@/store/stack'
-import { useInstalledStore } from '@/store/installed'
+import { InstalledMapItem, useInstalledStore } from '@/store/installed'
 import type { ServiceListParams, ServiceVO } from '@/api/service/types'
 
 export const useServiceStore = defineStore(
@@ -33,9 +33,7 @@ export const useServiceStore = defineStore(
     const total = ref(0)
     const loading = ref(false)
     const { stacks } = storeToRefs(stackStore)
-
     const serviceNames = computed(() => services.value.map((v) => v.name))
-    const serviceMap = computed(() => services.value.map((v) => `${v.id}-${v.name}`))
     const locateStackWithService = computed(() => {
       return stacks.value.filter((item) =>
         item.services.some((service) => service.name && serviceNames.value.includes(service.name))
@@ -48,7 +46,13 @@ export const useServiceStore = defineStore(
         const data = await getServiceList(clusterId, { ...filterParams, pageNum: 1, pageSize: 100 })
         services.value = data.content
         total.value = data.total
-        installedStore.setInstalledMapKeyOfValue(`${clusterId}`, serviceMap.value)
+        const serviceMap = services.value.map((v) => ({
+          serviceId: v.id,
+          serviceName: v.name,
+          serviceDisplayName: v.displayName,
+          clusterId: clusterId
+        })) as InstalledMapItem[]
+        installedStore.setInstalledMapKeyOfValue(`${clusterId}`, serviceMap)
       } catch (error) {
         console.log('error :>> ', error)
       } finally {

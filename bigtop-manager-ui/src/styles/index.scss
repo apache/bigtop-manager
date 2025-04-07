@@ -73,6 +73,13 @@
 
 
 .job-progress-notification{
+  &:hover{
+    background-color: $color-bg-text-hover;
+    cursor: pointer;
+  }
+  .ant-notification-notice-close{
+    top: 16px !important;
+  }
   :where(.ant-notification-notice-content){
  
     .ant-notification-notice-message,

@@ -26,14 +26,15 @@
   import { CommonStatus, CommonStatusTexts } from '@/enums/state.ts'
   import { useJobProgress } from '@/store/job-progress'
   import { useStackStore } from '@/store/stack'
+  import { useInstalledStore } from '@/store/installed'
   import { getComponentsByHost } from '@/api/hosts'
+  import { Command } from '@/api/command/types'
   import CategoryChart from '@/pages/cluster-manage/cluster/components/category-chart.vue'
   import GaugeChart from '@/pages/cluster-manage/cluster/components/gauge-chart.vue'
   import type { HostStatusType, HostVO } from '@/api/hosts/types.ts'
   import type { ClusterStatusType } from '@/api/cluster/types.ts'
   import type { ComponentVO } from '@/api/component/types.ts'
   import type { MenuItem } from '@/store/menu/types'
-  import type { Command } from '@/api/command/types'
 
   type TimeRangeText = '1m' | '15m' | '30m' | '1h' | '6h' | '30h'
   type TimeRangeItem = {
@@ -50,6 +51,7 @@
   const { t } = useI18n()
   const stackStore = useStackStore()
   const jobProgressStore = useJobProgress()
+  const installedStore = useInstalledStore()
   const currTimeRange = ref<TimeRangeText>('15m')
   const statusColors = shallowRef<Record<HostStatusType, keyof typeof CommonStatusTexts>>({
     1: 'healthy',
@@ -130,18 +132,24 @@
   ])
 
   const handleHostOperate = async (item: MenuItem, component: ComponentVO) => {
-    try {
-      await jobProgressStore.processCommand(
-        {
-          command: item.key as keyof typeof Command,
-          clusterId: hostInfo.value.clusterId,
-          commandLevel: 'component',
-          componentCommands: [{ componentName: component.name!, hostnames: [component.hostname!] }]
-        },
-        getComponentInfo
-      )
-    } catch (error) {
-      console.log('error :>> ', error)
+    const { serviceName } = component
+    const installedServiceMap = Object.values(installedStore.installedServiceMap)
+      .flat()
+      .filter((v) => v.serviceName === serviceName)
+    if (installedServiceMap.length > 0) {
+      try {
+        await jobProgressStore.processCommand(
+          {
+            command: item.key as keyof typeof Command,
+            clusterId: installedServiceMap[0].clusterId,
+            commandLevel: 'component',
+            componentCommands: [{ componentName: component.name!, hostnames: [component.hostname!] }]
+          },
+          getComponentInfo
+        )
+      } catch (error) {
+        console.log('error :>> ', error)
+      }
     }
   }
 
