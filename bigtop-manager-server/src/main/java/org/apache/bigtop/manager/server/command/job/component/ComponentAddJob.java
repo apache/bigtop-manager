@@ -22,7 +22,6 @@ import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.po.ServicePO;
-import org.apache.bigtop.manager.dao.query.ComponentQuery;
 import org.apache.bigtop.manager.server.command.helper.ComponentStageHelper;
 import org.apache.bigtop.manager.server.command.job.JobContext;
 import org.apache.bigtop.manager.server.enums.HealthyStatusEnum;
@@ -34,7 +33,6 @@ import org.apache.bigtop.manager.server.model.dto.command.ComponentCommandDTO;
 import org.apache.bigtop.manager.server.utils.StackUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -95,10 +93,6 @@ public class ComponentAddJob extends AbstractComponentJob {
         List<ComponentPO> componentPOList = new ArrayList<>();
         List<String> hostnames = componentCommand.getHostnames();
         for (String hostname : hostnames) {
-            if (checkComponentInstalled(componentName, hostname)) {
-                continue;
-            }
-
             HostPO hostPO = hostDao.findByHostname(hostname);
             ComponentDTO componentDTO = StackUtils.getComponentDTO(componentName);
             ComponentPO componentPO = ComponentConverter.INSTANCE.fromDTO2PO(componentDTO);
@@ -114,29 +108,5 @@ public class ComponentAddJob extends AbstractComponentJob {
         // Require restart after adding new components
         servicePO.setRestartFlag(true);
         serviceDao.partialUpdateById(servicePO);
-    }
-
-    protected Map<String, List<String>> getComponentHostsMap() {
-        Map<String, List<String>> componentHostsMap = new HashMap<>();
-
-        jobContext.getCommandDTO().getComponentCommands().forEach(componentCommand -> {
-            String componentName = componentCommand.getComponentName();
-            List<String> hostnames = componentCommand.getHostnames();
-            for (String hostname : hostnames) {
-                if (!checkComponentInstalled(componentName, hostname)) {
-                    List<String> list = componentHostsMap.computeIfAbsent(componentName, k -> new ArrayList<>());
-                    list.add(hostname);
-                }
-            }
-        });
-
-        return componentHostsMap;
-    }
-
-    private Boolean checkComponentInstalled(String componentName, String hostname) {
-        ComponentQuery query =
-                ComponentQuery.builder().name(componentName).hostname(hostname).build();
-        List<ComponentPO> componentPOList = componentDao.findByQuery(query);
-        return componentPOList.size() == 1;
     }
 }
