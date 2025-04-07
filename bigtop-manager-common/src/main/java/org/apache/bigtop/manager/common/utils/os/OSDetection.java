@@ -67,54 +67,7 @@ public class OSDetection {
         }
     }
 
-    private static boolean isRunningInContainer() {
-        try {
-            File cgroupFile = new File("/proc/self/cgroup");
-            if (cgroupFile.exists()) {
-                String content = new String(Files.readAllBytes(cgroupFile.toPath()));
-                if (content.contains("docker") || content.contains("kubepods")) {
-                    return true;
-                }
-            }
-
-            // Check for cgroup v2
-            File cgroup2File = new File("/proc/1/cgroup");
-            if (cgroup2File.exists()) {
-                String content = new String(Files.readAllBytes(cgroup2File.toPath()));
-                if (content.contains("docker") || content.contains("kubepods")) {
-                    return true;
-                }
-            }
-
-            // Additional check for cgroup v2 controllers
-            File cgroupControllersFile = new File("/sys/fs/cgroup/cgroup.controllers");
-            if (cgroupControllersFile.exists()) {
-                String content = new String(Files.readAllBytes(cgroupControllersFile.toPath()));
-                // These are common controllers used in containers
-                return content.contains("cpuset") && content.contains("memory");
-            }
-
-            // Check for container environment variable
-            File environFile = new File("/proc/1/environ");
-            if (environFile.exists()) {
-                String content = new String(Files.readAllBytes(environFile.toPath()));
-                return content.contains("container=docker");
-            }
-
-            return false;
-        } catch (IOException e) {
-            log.warn("Failed to detect container environment: {}", e.getMessage(), e);
-            return false;
-        }
-    }
-
     public static String getArch() {
-        if (isRunningInContainer()) {
-            log.debug("Running in containerized environment, using fallback architecture detection");
-            String arch = System.getProperty("os.arch");
-            return standardizeArch(arch);
-        }
-
         if (SystemUtils.IS_OS_LINUX) {
             try {
                 String arch = getOSArch();
