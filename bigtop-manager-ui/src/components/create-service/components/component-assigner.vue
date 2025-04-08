@@ -48,12 +48,17 @@
     searchedColumn: '',
     selectedRowKeys: []
   })
-  const { clusterId, installedStore, allComps, selectedServices, updateHostsForComponent } = useCreateService()
+  const { clusterId, installedStore, allComps, creationModeType, selectedServices, updateHostsForComponent } =
+    useCreateService()
+
   const serviceList = computed(() =>
     selectedServices.value.map((v) => ({
       ...v,
       selectable: false
     }))
+  )
+  const disabledSelectHost = computed(() =>
+    installedStore.getInstalledNamesOrIdsOfServiceByKey(`${clusterId.value}`).includes(currComp.value.split('/')[0])
   )
 
   const hostsOfCurrComp = computed((): HostVO[] => {
@@ -119,12 +124,22 @@
     onChangeCallback: getHostList
   })
 
-  const getCheckboxProps: TableRowSelection['getCheckboxProps'] = (record) => ({
-    disabled: installedStore
-      .getInstalledNamesOrIdsOfServiceByKey(`${clusterId.value}`)
-      .includes(currComp.value.split('/')[0]),
-    name: record.hostname
-  })
+  const uninstallCompFromSelectedServiceNames = computed(() =>
+    selectedServices.value
+      .flatMap((v) => v.components)
+      .filter((v) => v!.uninstall)
+      .map((v) => v?.name)
+  )
+
+  const getCheckboxProps: TableRowSelection['getCheckboxProps'] = (record) => {
+    return {
+      disabled:
+        creationModeType.value === 'component'
+          ? !uninstallCompFromSelectedServiceNames.value.includes(currComp.value.split('/')[1])
+          : disabledSelectHost.value,
+      name: record.hostname
+    }
+  }
 
   const onSelectChange: TableRowSelection['onChange'] = (selectedRowKeys, selectedRows) => {
     allComps.value.has(currComp.value.split('/').at(-1)) && updateHostsForComponent(currComp.value, selectedRows)

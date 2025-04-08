@@ -34,7 +34,7 @@
   })
 
   const { t } = useI18n()
-  const { groups, groupShape, groupType, space, args } = toRefs(props)
+  const { groups, groupShape, groupType, space, payload } = toRefs(props)
 
   const checkTitle = (item: GroupItem) => {
     if (props.i18n) {
@@ -52,7 +52,7 @@
 <template>
   <a-space :size="space" :wrap="true" :class="{ 'text-compact': $props.textCompact, 'btn-auto': $props.auto }">
     <template v-for="(item, _index) in groups" :key="_index">
-      <template v-if="!item.hidden">
+      <template v-if="!(typeof item.hidden === 'function' ? item.hidden(item, payload) : item.hidden ?? false)">
         <a-dropdown v-if="item.dropdownMenu">
           <a-button
             :disabled="item.disabled"
@@ -83,7 +83,7 @@
           :shape="item.shape || groupShape || 'default'"
           :type="item.type || groupType || 'default'"
           :title="checkTitle(item)"
-          @click="item.clickEvent ? item.clickEvent(item, args) : () => {}"
+          @click="item.clickEvent ? item.clickEvent(item, payload) : () => {}"
         >
           <template #icon>
             <slot name="icon" :item="item" />

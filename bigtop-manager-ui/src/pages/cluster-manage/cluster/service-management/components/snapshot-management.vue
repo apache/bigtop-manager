@@ -170,7 +170,7 @@
               :text-compact="true"
               :space="24"
               :groups="operations"
-              :args="record"
+              :payload="record"
               group-shape="default"
               group-type="link"
             />

@@ -65,7 +65,7 @@ const routes: RouteRecordRaw[] = [
           },
           {
             name: 'CreateService',
-            path: `${RouteExceptions.DYNAMIC_ROUTE_MATCH}/create-service/:creationMode`,
+            path: `${RouteExceptions.DYNAMIC_ROUTE_MATCH}/create-service/:creationMode?`,
             component: () => import('@/components/create-service/create.vue'),
             meta: {
               hidden: true
@@ -75,6 +75,14 @@ const routes: RouteRecordRaw[] = [
             name: 'ServiceDetail',
             path: `${RouteExceptions.DYNAMIC_ROUTE_MATCH}/service-detail/:service/:serviceId`,
             component: () => import('@/pages/cluster-manage/cluster/service-management/index.vue'),
+            meta: {
+              hidden: true
+            }
+          },
+          {
+            name: 'CreateComponent',
+            path: `${RouteExceptions.DYNAMIC_ROUTE_MATCH}/create-component/:service/:serviceId/:creationMode?/:type`,
+            component: () => import('@/components/create-service/create.vue'),
             meta: {
               hidden: true
             }
@@ -112,6 +120,15 @@ const routes: RouteRecordRaw[] = [
             name: 'InfraServiceDetail',
             path: 'create-infra-service/service-detail/:id/:service/:serviceId',
             component: () => import('@/pages/cluster-manage/cluster/service-management/index.vue'),
+            meta: {
+              hidden: true,
+              activeMenu: '/cluster-manage/infrastructures'
+            }
+          },
+          {
+            name: 'CreateInfraComponent',
+            path: '/create-infra-service/create-infra-component/:id/:service/:serviceId/:creationMode?/:type',
+            component: () => import('@/components/create-service/create.vue'),
             meta: {
               hidden: true,
               activeMenu: '/cluster-manage/infrastructures'

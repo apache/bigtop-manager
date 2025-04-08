@@ -62,13 +62,21 @@
       lg: { span: 17 }
     }
   })
-  const serviceList = computed(() => selectedServices.value)
 
-  const disabled = computed(() =>
-    installedStore
+  const serviceList = computed(() => selectedServices.value)
+  const disabled = computed(() => {
+    return installedStore
       .getInstalledNamesOrIdsOfServiceByKey(`${clusterId.value}`)
       .includes(currService.value.toString().split('/').at(-1)!)
-  )
+  })
+
+  // const disabled = computed(() => {
+  //   return creationModeType.value === 'component'
+  //     ? false
+  //     : installedStore
+  //         .getInstalledNamesOrIdsOfServiceByKey(`${clusterId.value}`)
+  //         .includes(currService.value.toString().split('/').at(-1)!)
+  // })
 
   watch(
     () => props.isView,

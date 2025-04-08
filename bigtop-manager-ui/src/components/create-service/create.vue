@@ -35,18 +35,24 @@
     stepsLimit,
     steps,
     allComps,
+    creationModeType,
     afterCreateRes,
     selectedServices,
     setDataByCurrent,
     previousStep,
     nextStep,
     createService,
-    confirmServiceDependencies
+    confirmServiceDependencies,
+    addComponentForService
   } = useCreateService()
   const compRef = ref<any>()
   const currComp = computed(() => components.value[current.value])
 
   const validateServiceSelection = async () => {
+    if (creationModeType.value === 'component') {
+      return true
+    }
+
     if (selectedServices.value.filter((v) => !v.isInstalled).length === 0) {
       message.error(t('service.service_selection'))
       return false
@@ -57,16 +63,17 @@
 
   const validateDependenciesOfServiceSelection = async () => {
     let selectedServiceNames = new Set(selectedServices.value.map((service) => service.name))
-    for (const service of selectedServices.value) {
-      const res = await confirmServiceDependencies(service)
-      if (res.length === 0) {
+    for (const selectedService of selectedServices.value) {
+      const serviceDependencies = await confirmServiceDependencies(selectedService)
+      if (serviceDependencies.length === 0) {
         return false
       }
-      const filter = res.filter((service) => !selectedServiceNames.has(service.name))
-      filter.forEach((service) => {
-        compRef.value.addInstallItem(service)
-        selectedServiceNames.add(service.name)
-      })
+      for (const service of serviceDependencies) {
+        if (!selectedServiceNames.has(service.name)) {
+          compRef.value.addInstallItem(service)
+          selectedServiceNames.add(service.name)
+        }
+      }
     }
     return true
   }
@@ -86,12 +93,17 @@
     if (current.value < 3) {
       ;(await stepValidators[current.value]()) && nextStep()
     } else if (current.value === 3) {
-      const state = await createService()
+      const state = creationModeType.value === 'component' ? await addComponentForService() : await createService()
       if (state) {
         nextStep()
       }
     }
   }
+
+  const noUninstallComponent = computed(() => {
+    const res = selectedServices.value.flatMap((v) => v.components).filter((v) => v!.uninstall)
+    return current.value === 1 && res.length === 0
+  })
 
   onUnmounted(() => {
     scope.stop()
@@ -124,7 +136,7 @@
           :is="currComp"
           ref="compRef"
           :is-view="current === 3"
-          v-bind="{ creationMode: $route.params.creationMode || 'internal' }"
+          v-bind="{ ...$route.params, creationMode: $route.params.creationMode || 'internal' }"
         />
       </keep-alive>
       <component-installer v-if="current == stepsLimit" :step-data="afterCreateRes" />
@@ -135,7 +147,7 @@
             {{ $t('common.prev') }}
           </a-button>
           <template v-if="current >= 0 && current <= stepsLimit - 1">
-            <a-button type="primary" @click="proceedToNextStep">
+            <a-button :disabled="noUninstallComponent" type="primary" @click="proceedToNextStep">
               {{ $t('common.next') }}
             </a-button>
           </template>

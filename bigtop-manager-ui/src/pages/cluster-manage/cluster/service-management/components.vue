@@ -21,7 +21,7 @@
   import { computed, onActivated, onDeactivated, reactive, ref, shallowRef, useAttrs } from 'vue'
   import { storeToRefs } from 'pinia'
   import { useI18n } from 'vue-i18n'
-  import { useRoute } from 'vue-router'
+  import { useRoute, useRouter } from 'vue-router'
   import { deleteComponent, getComponents } from '@/api/component'
   import { useStackStore } from '@/store/stack'
   import { useJobProgress } from '@/store/job-progress'
@@ -52,8 +52,9 @@
   const jobProgressStore = useJobProgress()
   const stackStore = useStackStore()
   const route = useRoute()
+  const router = useRouter()
   const attrs = useAttrs()
-  const { stacks } = storeToRefs(stackStore)
+  const { stacks, stackRelationMap } = storeToRefs(stackStore)
   const searchInputRef = ref()
   const pollingIntervalId = ref<any>(null)
   const componentStatus = ref(['INSTALLING', 'SUCCESS', 'FAILED', 'UNKNOWN'])
@@ -146,21 +147,23 @@
     {
       text: 'start',
       action: 'Start',
+      hidden: (_, args) => stackRelationMap.value?.components[`${args.name}`].category === 'client',
       clickEvent: (item, args) => handleTableOperation(item!, args)
     },
     {
       text: 'stop',
       action: 'Stop',
+      hidden: (_, args) => stackRelationMap.value?.components[`${args.name}`].category === 'client',
       clickEvent: (item, args) => handleTableOperation(item!, args)
     },
     {
       text: 'restart',
       action: 'Restart',
+      hidden: (_, args) => stackRelationMap.value?.components[`${args.name}`].category === 'client',
       clickEvent: (item, args) => handleTableOperation(item!, args)
     },
     {
       text: 'remove',
-      disabled: true,
       danger: true,
       clickEvent: (_, args) => handleDelete(args)
     }
@@ -312,6 +315,10 @@
     }
   }
 
+  const addComponent = () => {
+    router.push({ name: 'CreateComponent', params: { ...route.params, creationMode: 'internal', type: 'component' } })
+  }
+
   onActivated(() => {
     startPolling()
   })
@@ -326,7 +333,7 @@
     <header>
       <div class="header-title">{{ $t('common.component') }}</div>
       <div class="list-operation">
-        <a-button type="primary" :disabled="true">{{ $t('common.add', [`${$t('common.component')}`]) }}</a-button>
+        <a-button type="primary" @click="addComponent">{{ $t('common.add', [`${$t('common.component')}`]) }}</a-button>
         <button-group :groups="batchOperations" group-shape="default" />
       </div>
     </header>
@@ -375,15 +382,17 @@
           </a-typography-link>
         </template>
         <template v-if="column.key === 'operation'">
-          <button-group
-            i18n="common"
-            :text-compact="true"
-            :space="24"
-            :groups="operations"
-            :args="record"
-            group-shape="default"
-            group-type="link"
-          />
+          <div style="display: flex; justify-content: flex-end">
+            <button-group
+              i18n="common"
+              :text-compact="true"
+              :space="24"
+              :groups="operations"
+              :payload="record"
+              group-shape="default"
+              group-type="link"
+            />
+          </div>
         </template>
       </template>
     </a-table>

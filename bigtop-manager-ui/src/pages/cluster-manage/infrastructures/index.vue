@@ -144,7 +144,7 @@
     <div class="infra-body">
       <filter-form :filter-items="filterFormItems" @filter="getServices" />
       <a-empty v-if="services.length == 0" style="width: 100%" :image="Empty.PRESENTED_IMAGE_SIMPLE" />
-      <template v-else>
+      <div v-else class="service-item-wrp">
         <a-card
           v-for="item in services"
           :key="item.name"
@@ -175,14 +175,14 @@
             </div>
           </div>
           <div class="item-content" @click.stop>
-            <button-group :auto="true" :space="0" :args="item" :groups="actionGroups">
+            <button-group :auto="true" :space="0" :payload="item" :groups="actionGroups">
               <template #icon="{ item: groupItem }">
                 <svg-icon :name="groupItem.icon || ''" />
               </template>
             </button-group>
           </div>
         </a-card>
-      </template>
+      </div>
     </div>
   </a-spin>
 </template>
@@ -279,5 +279,11 @@
   }
   :deep(.ant-dropdown-link) {
     margin-right: 10px;
+  }
+
+  .service-item-wrp {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 19px;
   }
 </style>

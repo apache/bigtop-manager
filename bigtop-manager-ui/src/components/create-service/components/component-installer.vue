@@ -48,14 +48,13 @@
   })
 
   const getJobInstanceDetails = async () => {
-    const { id: jobId } = stepData.value
+    const { id: jobId, clusterId } = stepData.value
     if (jobId === undefined) {
       return true
     }
     try {
-      const data = await getJobDetails({ jobId, clusterId: 0 })
+      const data = await getJobDetails({ jobId, clusterId })
       jobDetail.value = data
-      activeKey.value = data.stages ? data.stages?.map((v) => v.id!) : []
       return ['Successful', 'Failed'].includes(data.state as StateType)
     } catch (error) {
       console.log('error :>> ', error)
@@ -64,12 +63,12 @@
   }
 
   const handleRetryJob = async () => {
-    const { id: jobId } = stepData.value
+    const { id: jobId, clusterId } = stepData.value
     if (jobId === undefined) {
       return true
     }
     try {
-      await retryJob({ jobId, clusterId: 0 })
+      await retryJob({ jobId, clusterId })
       pollJobDetails(getJobInstanceDetails)
     } catch (error) {
       console.log('error :>> ', error)
@@ -96,14 +95,14 @@
   }
 
   const viewLogs = (stage: StageVO, task: TaskVO) => {
-    const { id: jobId } = stepData.value
+    const { id: jobId, clusterId } = stepData.value
     const { id: stageId } = stage
     const { id: taskId } = task
     if (jobId === undefined || stageId === undefined || taskId === undefined) {
       return
     }
     logsViewState.payLoad = {
-      clusterId: 0,
+      clusterId,
       jobId,
       stageId,
       taskId

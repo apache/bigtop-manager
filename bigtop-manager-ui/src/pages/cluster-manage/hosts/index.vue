@@ -26,7 +26,7 @@
   import * as hostApi from '@/api/hosts'
   import useBaseTable from '@/composables/use-base-table'
   import HostCreate from '@/pages/cluster-manage/hosts/create.vue'
-  import InstallDependencies from './install-dependencies.vue'
+  import InstallDependencies from '@/pages/cluster-manage/hosts/install-dependencies.vue'
   import type { FilterConfirmProps, FilterResetProps, TableRowSelection } from 'ant-design-vue/es/table/interface'
   import type { HostReq } from '@/api/command/types'
   import type { GroupItem } from '@/components/common/button-group/types'
@@ -339,7 +339,7 @@
             :text-compact="true"
             :space="24"
             :groups="operations"
-            :args="record"
+            :payload="record"
             group-shape="default"
             group-type="link"
           ></button-group>

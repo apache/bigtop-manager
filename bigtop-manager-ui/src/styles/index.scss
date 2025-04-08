@@ -74,7 +74,7 @@
 
 .job-progress-notification{
   &:hover{
-    background-color: $color-bg-text-hover;
+    background-color: $color-bg-layout;
     cursor: pointer;
   }
   .ant-notification-notice-close{
