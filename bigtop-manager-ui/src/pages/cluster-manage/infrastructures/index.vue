@@ -116,7 +116,7 @@
   const viewServiceDetail = (payload: ServiceVO) => {
     router.push({
       name: 'InfraServiceDetail',
-      params: { id: 0, service: payload.name, serviceId: payload.id }
+      params: { id: 0, service: payload.name, cluster: 0, serviceId: payload.id }
     })
   }
 

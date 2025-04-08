@@ -316,7 +316,13 @@
   }
 
   const addComponent = () => {
-    router.push({ name: 'CreateComponent', params: { ...route.params, creationMode: 'internal', type: 'component' } })
+    const { cluster: clusterId } = route.params
+    const creationMode = clusterId == '0' ? 'public' : 'internal'
+    const routerName = clusterId == '0' ? 'CreateInfraComponent' : 'CreateComponent'
+    router.push({
+      name: routerName,
+      params: { ...route.params, creationMode, type: 'component' }
+    })
   }
 
   onActivated(() => {

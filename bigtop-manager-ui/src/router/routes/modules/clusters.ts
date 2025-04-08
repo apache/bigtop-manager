@@ -118,7 +118,7 @@ const routes: RouteRecordRaw[] = [
           },
           {
             name: 'InfraServiceDetail',
-            path: 'create-infra-service/service-detail/:id/:service/:serviceId',
+            path: 'create-infra-service/service-detail/:id/:cluster/:service/:serviceId',
             component: () => import('@/pages/cluster-manage/cluster/service-management/index.vue'),
             meta: {
               hidden: true,
@@ -127,7 +127,7 @@ const routes: RouteRecordRaw[] = [
           },
           {
             name: 'CreateInfraComponent',
-            path: '/create-infra-service/create-infra-component/:id/:service/:serviceId/:creationMode?/:type',
+            path: '/create-infra-service/create-infra-component/:id/:cluster/:service/:serviceId/:creationMode/:type',
             component: () => import('@/components/create-service/create.vue'),
             meta: {
               hidden: true,

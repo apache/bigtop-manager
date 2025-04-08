@@ -28,7 +28,6 @@
   import Overview from './overview.vue'
   import Components from './components.vue'
   import Configs from './configs.vue'
-  import { Command } from '@/api/command/types'
   import type { TabItem } from '@/components/common/main-card/types'
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { ServiceVO } from '@/api/service/types'
