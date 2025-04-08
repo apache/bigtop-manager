@@ -58,9 +58,12 @@ public enum LocaleKeys {
 
     COMPONENT_NOT_FOUND("component.not.found"),
     COMPONENT_IS_RUNNING("component.is.running"),
+    COMPONENT_HAS_NO_SUCH_OP("component.has.no.such.op"),
 
     JOB_NOT_FOUND("job.not.found"),
     JOB_NOT_RETRYABLE("job.not.retryable"),
+    JOB_HAS_NO_STAGES("job.has.no.stages"),
+    STAGE_HAS_NO_TASKS("stage.has.no.tasks"),
 
     CONFIG_NOT_FOUND("config.not.found"),
 

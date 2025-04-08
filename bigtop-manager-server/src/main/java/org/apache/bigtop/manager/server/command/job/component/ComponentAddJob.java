@@ -32,6 +32,7 @@ import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.model.dto.command.ComponentCommandDTO;
 import org.apache.bigtop.manager.server.utils.StackUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -109,11 +110,13 @@ public class ComponentAddJob extends AbstractComponentJob {
             componentPOList.add(componentPO);
         }
 
-        componentDao.saveAll(componentPOList);
+        if (CollectionUtils.isNotEmpty(componentPOList)) {
+            componentDao.saveAll(componentPOList);
 
-        // Require restart after adding new components
-        servicePO.setRestartFlag(true);
-        serviceDao.partialUpdateById(servicePO);
+            // Require restart after adding new components
+            servicePO.setRestartFlag(true);
+            serviceDao.partialUpdateById(servicePO);
+        }
     }
 
     protected Map<String, List<String>> getComponentHostsMap() {

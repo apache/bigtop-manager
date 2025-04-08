@@ -88,10 +88,14 @@ public class JobServiceImpl implements JobService {
                                 .contains(JobState.fromString(stagePO.getState())))
                         .toList();
                 JobVO jobVO = JobConverter.INSTANCE.fromPO2VO(jobPO);
-                jobVO.setProgress(new BigDecimal(runningStagePOList.size())
-                        .divide(new BigDecimal(stagePOList.size()), 2, RoundingMode.HALF_UP)
-                        .multiply(new BigDecimal(100))
-                        .intValue());
+                if (stagePOList.isEmpty()) {
+                    jobVO.setProgress(1);
+                } else {
+                    jobVO.setProgress(new BigDecimal(runningStagePOList.size())
+                            .divide(new BigDecimal(stagePOList.size()), 2, RoundingMode.HALF_UP)
+                            .multiply(new BigDecimal(100))
+                            .intValue());
+                }
                 jobVOList.add(jobVO);
             }
 
@@ -127,10 +131,14 @@ public class JobServiceImpl implements JobService {
         }
 
         JobVO jobVO = JobConverter.INSTANCE.fromPO2VO(jobPO);
-        jobVO.setProgress(new BigDecimal(runningStagePOList.size())
-                .divide(new BigDecimal(stagePOList.size()), 2, RoundingMode.HALF_UP)
-                .multiply(new BigDecimal(100))
-                .intValue());
+        if (stagePOList.isEmpty()) {
+            jobVO.setProgress(1);
+        } else {
+            jobVO.setProgress(new BigDecimal(runningStagePOList.size())
+                    .divide(new BigDecimal(stagePOList.size()), 2, RoundingMode.HALF_UP)
+                    .multiply(new BigDecimal(100))
+                    .intValue());
+        }
         jobVO.setStages(stages);
         return jobVO;
     }
