@@ -215,7 +215,7 @@
             </template>
             <a-list-item-meta>
               <template #title>
-                <div style="display: flex; gap: 8px; justify-content: space-between; flex-wrap: wrap">
+                <div class="item-name-wrp">
                   <div class="ellipsis item-name" :title="item.displayName">
                     <template v-for="(fragment, i) in splitSearchStr(item.displayName)">
                       <mark v-if="fragment.toLowerCase() === searchStr.toLowerCase()" :key="i" class="highlight">
@@ -225,7 +225,7 @@
                     </template>
                   </div>
                   <a-tag :color="licenseTags[item.license]">
-                    <span style="font-weight: normal; line-height: 22px">{{ item.license }}</span>
+                    <span class="item-tag">{{ item.license }}</span>
                   </a-tag>
                 </div>
               </template>
@@ -267,12 +267,12 @@
             </template>
             <a-list-item-meta>
               <template #title>
-                <div style="display: flex; gap: 8px; justify-content: space-between; flex-wrap: wrap">
+                <div class="item-name-wrp">
                   <div class="ellipsis item-name" :data-tooltip="item.displayName">
                     {{ item.displayName }}
                   </div>
                   <a-tag :color="licenseTags[item.license]">
-                    <span style="font-weight: normal; line-height: 22px">{{ item.license }}</span>
+                    <span class="item-tag">{{ item.license }}</span>
                   </a-tag>
                 </div>
               </template>
@@ -303,9 +303,19 @@
     padding: 0px;
   }
 
-  .item-name {
-    flex: 1;
-    font-size: 16px;
+  .item-name-wrp {
+    display: flex;
+    gap: 8px;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    .item-name {
+      flex: 1;
+      font-size: 16px;
+    }
+    .item-tag {
+      font-weight: normal;
+      line-height: 22px;
+    }
   }
 
   .service-selector {
