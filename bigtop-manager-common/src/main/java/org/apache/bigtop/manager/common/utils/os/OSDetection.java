@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -68,9 +69,18 @@ public class OSDetection {
 
     public static String getArch() {
         if (SystemUtils.IS_OS_LINUX) {
-            return getOSArch();
+            try {
+                String arch = getOSArch();
+                return standardizeArch(arch);
+            } catch (Exception e) {
+                log.warn("Failed to get OS architecture using 'arch' command, falling back to os.arch", e);
+                String arch = System.getProperty("os.arch");
+                return standardizeArch(arch);
+            }
         } else {
-            return System.getProperty("os.arch");
+            String arch = System.getProperty("os.arch").toLowerCase();
+            log.debug("Detected non-Linux architecture: {}", arch);
+            return standardizeArch(arch);
         }
     }
 
@@ -139,16 +149,46 @@ public class OSDetection {
     }
 
     private static String getOSArch() {
-        List<String> builderParameters = new ArrayList<>();
-        builderParameters.add("arch");
-
         try {
+            List<String> builderParameters = new ArrayList<>();
+            builderParameters.add("arch");
             ShellResult shellResult = ShellExecutor.execCommand(builderParameters);
             String output = shellResult.getOutput().replace("\n", "");
             log.debug("getArch: {}", output);
             return output;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            log.warn("Failed to execute 'arch' command, falling back to /proc/cpuinfo");
+            try {
+                String cpuInfo = new String(Files.readAllBytes(new File("/proc/cpuinfo").toPath()));
+                Pattern pattern = Pattern.compile("model name\\s*:.*?(\\w+)$", Pattern.MULTILINE);
+                Matcher matcher = pattern.matcher(cpuInfo);
+                if (matcher.find()) {
+                    String output = matcher.group(1).toLowerCase();
+                    log.debug("getArch: {}", output);
+                    return output;
+                }
+            } catch (IOException ex) {
+                log.error("Failed to read /proc/cpuinfo: {}", ex.getMessage(), ex);
+            }
+            throw new RuntimeException("Unable to detect OS architecture");
         }
+    }
+
+    private static String standardizeArch(String arch) {
+        return switch (arch) {
+            case "amd64" -> "x86_64";
+            case "arm64", "aarch64" -> "aarch64";
+            case "x86" -> "i386";
+            case "arm" -> "armv7l";
+            case "ppc64le" -> "ppc64le";
+            case "s390x" -> "s390x";
+            case "riscv64" -> "riscv64";
+            case "mips" -> "mips";
+            case "mips64" -> "mips64";
+            default -> {
+                log.warn("Detected unknown architecture: {}", arch);
+                throw new UnsupportedOperationException("Unsupported architecture: " + arch);
+            }
+        };
     }
 }
