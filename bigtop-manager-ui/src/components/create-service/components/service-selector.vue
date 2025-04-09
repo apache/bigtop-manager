@@ -31,6 +31,11 @@
   }
 
   const searchStr = ref('')
+  const licenseTags = {
+    'Apache-2.0': 'success',
+    'AGPL-3.0': 'error',
+    GPLv2: 'error'
+  }
   const state = reactive<State>({
     isAddableData: [],
     selectedData: []
@@ -210,13 +215,18 @@
             </template>
             <a-list-item-meta>
               <template #title>
-                <div class="ellipsis item-name" :title="item.displayName">
-                  <template v-for="(fragment, i) in splitSearchStr(item.displayName)">
-                    <mark v-if="fragment.toLowerCase() === searchStr.toLowerCase()" :key="i" class="highlight">
-                      {{ fragment }}
-                    </mark>
-                    <template v-else>{{ fragment }}</template>
-                  </template>
+                <div style="display: flex; gap: 8px; justify-content: space-between; flex-wrap: wrap">
+                  <div class="ellipsis item-name" :title="item.displayName">
+                    <template v-for="(fragment, i) in splitSearchStr(item.displayName)">
+                      <mark v-if="fragment.toLowerCase() === searchStr.toLowerCase()" :key="i" class="highlight">
+                        {{ fragment }}
+                      </mark>
+                      <template v-else>{{ fragment }}</template>
+                    </template>
+                  </div>
+                  <a-tag :color="licenseTags[item.license]">
+                    <span style="font-weight: normal; line-height: 22px">{{ item.license }}</span>
+                  </a-tag>
                 </div>
               </template>
               <template #description>
@@ -257,8 +267,13 @@
             </template>
             <a-list-item-meta>
               <template #title>
-                <div class="ellipsis item-name" :data-tooltip="item.displayName">
-                  {{ item.displayName }}
+                <div style="display: flex; gap: 8px; justify-content: space-between; flex-wrap: wrap">
+                  <div class="ellipsis item-name" :data-tooltip="item.displayName">
+                    {{ item.displayName }}
+                  </div>
+                  <a-tag :color="licenseTags[item.license]">
+                    <span style="font-weight: normal; line-height: 22px">{{ item.license }}</span>
+                  </a-tag>
                 </div>
               </template>
               <template #description>
@@ -289,6 +304,7 @@
   }
 
   .item-name {
+    flex: 1;
     font-size: 16px;
   }
 
