@@ -118,8 +118,7 @@ public class JobServiceImpl implements JobService {
                 throw new ApiException(ApiExceptionEnum.JOB_NOT_FOUND);
             }
 
-            if (List.of(JobState.PROCESSING, JobState.SUCCESSFUL)
-                    .contains(JobState.fromString(stagePO.getState()))) {
+            if (List.of(JobState.PROCESSING, JobState.SUCCESSFUL).contains(JobState.fromString(stagePO.getState()))) {
                 runningStagePOList.add(stagePO);
             }
 

@@ -32,6 +32,7 @@ import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.model.dto.command.ComponentCommandDTO;
 import org.apache.bigtop.manager.server.utils.StackUtils;
+
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
