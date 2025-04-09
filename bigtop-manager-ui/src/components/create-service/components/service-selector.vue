@@ -18,18 +18,18 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onActivated, reactive, ref, toRefs, useAttrs } from 'vue'
+  import { computed, onActivated, reactive, ref, toRefs } from 'vue'
   import { usePngImage } from '@/utils/tools'
   import useCreateService from './use-create-service'
   import type { ExpandServiceVO } from '@/store/stack'
-  import { ComponentVO } from '@/api/component/types.ts'
+  import type { ComponentVO } from '@/api/component/types.ts'
+  import type { ServiceVO } from '@/api/service/types'
 
   interface State {
     isAddableData: ExpandServiceVO[]
     selectedData: ExpandServiceVO[]
   }
 
-  const { creationMode } = useAttrs()
   const searchStr = ref('')
   const state = reactive<State>({
     isAddableData: [],
@@ -37,10 +37,13 @@
   })
   const {
     clusterId,
+    routeParams,
     selectedServices,
     servicesOfInfra,
     servicesOfExcludeInfra,
     installedStore,
+    creationMode,
+    creationModeType,
     confirmServiceDependencies,
     setDataByCurrent
   } = useCreateService()
@@ -142,20 +145,41 @@
     }
   }
 
+  const mergeInherentServiceAndInstalledService = (
+    installedServiceMap: Map<string, ExpandServiceVO>,
+    inherentServices: ServiceVO[]
+  ) => {
+    const inherentService = inherentServices.filter((v) => v.name === routeParams.value.service)[0]
+    const installedService = { ...installedServiceMap.get(routeParams.value.service)! }
+    const map = new Map(installedService.components!.map((item) => [item.name, item]))
+    inherentService.components!.forEach((item) => {
+      !map.has(item.name) && map.set(item.name, { ...item, hosts: [], uninstall: true })
+    })
+    installedService.components = [...map.values()]
+    return installedService
+  }
+
   const addInstalledSymbolForSelectedServices = async (onlyInstalled: boolean) => {
     if (onlyInstalled) {
       const installedServiceMap = await initInstalledServicesDetail()
       const installedServiceNames = installedStore.getInstalledNamesOrIdsOfServiceByKey(`${clusterId.value}`)
-      const data = creationMode === 'internal' ? servicesOfExcludeInfra.value : servicesOfInfra.value
-      data.forEach((v) => {
-        if (installedServiceNames.includes(v.name || '')) {
-          Object.assign(v, installedServiceMap.get(v.name!))
-          v.isInstalled = true
-          state.selectedData.push(v as ExpandServiceVO)
-        } else {
-          state.isAddableData.push(v as ExpandServiceVO)
+      const inherentServices = creationMode.value === 'internal' ? servicesOfExcludeInfra.value : servicesOfInfra.value
+
+      if (creationModeType.value === 'component' && installedServiceMap.has(routeParams.value.service)) {
+        state.selectedData[0] = mergeInherentServiceAndInstalledService(installedServiceMap, inherentServices)
+        state.selectedData[0].isInstalled = true
+        state.isAddableData = []
+      } else {
+        for (const service of inherentServices) {
+          if (installedServiceNames.includes(service.name || '')) {
+            Object.assign(service, installedServiceMap.get(service.name!))
+            service.isInstalled = true
+            state.selectedData.push(service as ExpandServiceVO)
+          } else {
+            state.isAddableData.push(service as ExpandServiceVO)
+          }
         }
-      })
+      }
       setDataByCurrent(state.selectedData)
     } else {
       state.selectedData = [...selectedServices.value]

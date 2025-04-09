@@ -25,7 +25,7 @@ import type { ServiceConfig, ServiceVO } from '@/api/service/types'
 import type { StackVO } from '@/api/stack/types'
 
 export type ExpandServiceVO = ServiceVO & { order: number }
-interface StackRelationMap {
+export interface StackRelationMap {
   services: {
     displayName: string
     stack: string

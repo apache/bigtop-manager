@@ -88,6 +88,9 @@ export const useMenuStore = defineStore(
       if (route.name === 'ServiceDetail') {
         activeMenu = route.path.split('/').slice(0, -3).join('/')
       }
+      if (route.name === 'CreateComponent') {
+        activeMenu = route.path.split('/').slice(0, -5).join('/')
+      }
       const matchedNames = [RouteExceptions.SPECIAL_ROUTE_NAME, RouteExceptions.DEFAULT_ROUTE_NAME] as string[]
       headerSelectedKey.value = route.matched[0].path
 

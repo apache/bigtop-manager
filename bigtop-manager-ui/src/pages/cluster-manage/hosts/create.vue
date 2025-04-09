@@ -365,7 +365,8 @@
     if (payload) {
       formValue.value = Object.assign(formValue.value, {
         ...payload,
-        authType: `${payload.authType}`
+        authType: `${payload?.authType ?? 1}`,
+        inputType: `${payload?.inputType ?? 1}`
       })
     } else {
       Object.assign(formValue.value, {
