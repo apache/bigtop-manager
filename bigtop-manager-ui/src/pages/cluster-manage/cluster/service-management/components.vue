@@ -388,17 +388,15 @@
           </a-typography-link>
         </template>
         <template v-if="column.key === 'operation'">
-          <div style="display: flex; justify-content: flex-end">
-            <button-group
-              i18n="common"
-              :text-compact="true"
-              :space="24"
-              :groups="operations"
-              :payload="record"
-              group-shape="default"
-              group-type="link"
-            />
-          </div>
+          <button-group
+            i18n="common"
+            :text-compact="true"
+            :space="24"
+            :groups="operations"
+            :payload="record"
+            group-shape="default"
+            group-type="link"
+          />
         </template>
       </template>
     </a-table>

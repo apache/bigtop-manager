@@ -35,6 +35,7 @@
     stepsLimit,
     steps,
     allComps,
+    allCompsMeta,
     creationModeType,
     afterCreateRes,
     selectedServices,
@@ -47,6 +48,15 @@
   } = useCreateService()
   const compRef = ref<any>()
   const currComp = computed(() => components.value[current.value])
+  const noUninstallComponent = computed(() => {
+    return (
+      current.value === 1 &&
+      creationModeType.value === 'component' &&
+      Array.from(allComps.value).every(
+        ([compName, { hosts }]) => hosts.length === allCompsMeta.value.get(compName)?.hosts?.length
+      )
+    )
+  })
 
   const validateServiceSelection = async () => {
     if (creationModeType.value === 'component') {
@@ -99,11 +109,6 @@
       }
     }
   }
-
-  const noUninstallComponent = computed(() => {
-    const res = selectedServices.value.flatMap((v) => v.components).filter((v) => v!.uninstall)
-    return current.value === 1 && res.length === 0
-  })
 
   onUnmounted(() => {
     scope.stop()
