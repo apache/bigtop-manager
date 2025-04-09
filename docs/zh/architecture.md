@@ -9,14 +9,14 @@
 * **交互协议**：所有接口请求均通过 HTTP 传输
 
 ### 核心层（Core Layer）
-| 模块 | 职责描述 |
-|-|-|
-| Server | 集群元数据管理、Job调度、全局状态维护 |
-| Agent | 主机级服务生命周期管理（部署/启停/配置）|
-| LLM | 基于自然语言处理的智能运维建议生成 |
-| Stack | 组件栈定义 |
-| gRPC | 实现 Server 与 Agent 间的双向通信协议 |
-| Job | 任务执行单元，记录操作状态与日志 |
+| 模块     | 职责描述                       |
+|--------|----------------------------|
+| Server | 集群元数据管理、Job调度、全局状态维护       |
+| Agent  | 主机级服务生命周期管理（部署/启停/配置）      |
+| LLM    | 基于自然语言处理的智能运维建议生成          |
+| Stack  | 组件栈定义                      |
+| gRPC   | 实现 Server 与 Agent 间的双向通信协议 |
+| Job    | 任务执行单元，记录操作状态与日志           |
 
 ### 组件层（Component Layer）
 * **支持组件**：包括但不限于: ZooKeeper/Hadoop/Kafka 等
@@ -36,9 +36,9 @@
 graph TD
     Server-->|Management|Cluster-A
     Server-->|Management|Cluster-B
-    Cluster-A-->|Agent|Host1[Host: Solr]
-    Cluster-A-->|Agent|Host2[Host: Hadoop]
-    Cluster-B-->|Agent|Host3[Host: Kafka]
+    Cluster-A-->|Agent|Host1[Host: ZooKeeper Server]
+    Cluster-A-->|Agent|Host2[Host: ZooKeeper Server]
+    Cluster-B-->|Agent|Host3[Host: ZooKeeper Server]
 ```
 
 ## 任务处理流程
@@ -50,19 +50,19 @@ graph TD
 * **任务调度**：
 ```mermaid
 graph LR
-    A[Job入队] --> B(Job Queue)
-    B --> C{调度策略}
-    C -->|FIFO| D[拆分Task]
-    D --> E[gRPC下发至Agent]
+    A[Job Enqueue] --> B(Job Queue)
+    B --> C{Scheduling Strategy}
+    C -->|FIFO| D[Split Task]
+    D --> E[Distribute to Agent via gRPC]
 ```
 * **脚本执行**：
     * Agent 加载 Stack 中对应的脚本
     * 执行日志实时写入本地 Log 文件
 
 ### 状态管理机制
-| 状态类型 | 触发条件 | 处理策略 |
-|-|-|-|
-| PENDING | Job 创建未调度 | 等待调用 |
-| RUNNING | Task 已下发 Agent | 监听超时阈值 |
-| SUCCESSFUL/FAILED | Agent 返回执行结果 | 更新组件状态 |
-| CANCELED | 前置任务失败 | 取消后续任务 |
+| 状态类型              | 触发条件           | 处理策略   |
+|-------------------|----------------|--------|
+| PENDING           | Job 创建未调度      | 等待调用   |
+| RUNNING           | Task 已下发 Agent | 监听超时阈值 |
+| SUCCESSFUL/FAILED | Agent 返回执行结果   | 更新组件状态 |
+| CANCELED          | 前置任务失败         | 取消后续任务 |

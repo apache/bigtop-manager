@@ -45,18 +45,18 @@ pnpm dev
 然后使用浏览器访问 `localhost:5173` 即可，接下来就请尽情享受您的开发之旅吧！
 
 # 模块及功能
-| 模块 | 介绍 | 
-|-|-|
-| **bigtop-manager-agent** | 会被安装到每台主机上，对每台主机上的服务进行管理 |
-| **bigtop-manager-ai** | 包含一些 AI 助手相关的代码 |
-| **bigtop-manager-bom** | 定义了项目中所有依赖及其版本 |
-| **bigtop-manager-common** | 一些公共工具类 |
-| **bigtop-manager-dao** | 与数据库进行交互 |
-| **bigtop-manager-dist** | 打包后的内容会放在该模块下，包括 `Server` 和 `Agent` 的 tar 包 |
-| **bigtop-manager-grpc** | Server 应用与 Agent 应用通过 gRPC 交互，该模块包含所有 gRCP 服务定义 |
-| **bigtop-manager-server** | 管理端的主要代码 |
-| **bigtop-manager-stack** | 包含各个组件栈中的组件及其操作脚本 |
-| **bigtop-manager-ui** | 前端代码 |
+| 模块                        | 介绍                                              | 
+|---------------------------|-------------------------------------------------|
+| **bigtop-manager-agent**  | 会被安装到每台主机上，对每台主机上的服务进行管理                        |
+| **bigtop-manager-ai**     | 包含一些 AI 助手相关的代码                                 |
+| **bigtop-manager-bom**    | 定义了项目中所有依赖及其版本                                  |
+| **bigtop-manager-common** | 一些公共工具类                                         |
+| **bigtop-manager-dao**    | 与数据库进行交互                                        |
+| **bigtop-manager-dist**   | 打包后的内容会放在该模块下，包括 `Server` 和 `Agent` 的 tar 包     |
+| **bigtop-manager-grpc**   | Server 应用与 Agent 应用通过 gRPC 交互，该模块包含所有 gRCP 服务定义 |
+| **bigtop-manager-server** | 管理端的主要代码                                        |
+| **bigtop-manager-stack**  | 包含各个组件栈中的组件及其操作脚本                               |
+| **bigtop-manager-ui**     | 前端代码                                            |
 
 # ​贡献流程
 ## 代码规范
