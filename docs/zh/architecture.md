@@ -1,7 +1,7 @@
 # 架构与设计
 
 ## 分层架构体系
-![Architecture](arch.png)
+![Architecture](https://github.com/user-attachments/assets/1425d981-f6a2-4bb6-b0a6-a76f0969b99a)
 ### 接口层（Interface Layer）
 * **功能模块**：
     * **REST API**：提供符合 OpenAPI 3.0 规范的HTTP接口
@@ -23,7 +23,7 @@
 * **扩展机制**：通过 Stack 模块定义新组件的安装脚本与配置模板
 
 ## 集群拓扑规则
-![Cluster](cluster.png)
+![Cluster](https://github.com/user-attachments/assets/fc0f3050-d66c-4c04-a258-11290f556a28)
 ### 部署约束
 * **服务实例**：
     * Server 以单实例模式运行于 Host
@@ -36,13 +36,13 @@
 graph TD
     Server-->|Management|Cluster-A
     Server-->|Management|Cluster-B
-    Cluster-A-->|Agent|Host1[Host: ZooKeeper Server]
-    Cluster-A-->|Agent|Host2[Host: ZooKeeper Server]
-    Cluster-B-->|Agent|Host3[Host: ZooKeeper Server]
+    Cluster-A-->|Agent|Host-1
+    Cluster-A-->|Agent|Host-2
+    Cluster-B-->|Agent|Host-3
 ```
 
 ## 任务处理流程
-![Command](command.png)
+![Command](https://github.com/user-attachments/assets/7262b8a8-e8a2-420c-b642-c0838bcf6591)
 ### 指令执行阶段
 * **请求接收**：
     * 用户通过 REST API 或 Web UI 发起操作请求（如启动 Kafka）
