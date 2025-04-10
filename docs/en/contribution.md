@@ -56,7 +56,7 @@ Then access `localhost:5173` in your browser. Next, enjoy your development journ
 | **bigtop-manager-common** | It contains some common utility classes.                                                                                   |
 | **bigtop-manager-dao**    | It interacts with the database.                                                                                            |
 | **bigtop-manager-dist**   | The packaged content will be placed in this module, including the tar packages of `Server` and `Agent`.                    |
-| **bigtop-manager-grpc**   | The Server application and the Agent application interact through gRPC. This module contains all gRCP service definitions. |
+| **bigtop-manager-grpc**   | The Server application and the Agent application interact through gRPC. This module contains all gRPC service definitions. |
 | **bigtop-manager-server** | It is the main code of the management end.                                                                                 |
 | **bigtop-manager-stack**  | It contains the components and their operation scripts in each component stack.                                            |
 | **bigtop-manager-ui**     | It is the front - end code.                                                                                                |

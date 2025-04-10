@@ -62,7 +62,7 @@ graph LR
 ### State Management Mechanism
 | State Type        | Trigger Condition                      | Handling Strategy             |
 |-------------------|----------------------------------------|-------------------------------|
-| PENDING           | Job created but not scheduled          | Wait for invocation           |
+| PENDING           | Task created but not scheduled         | Wait for invocation           |
 | RUNNING           | Task has been issued to the Agent      | Monitor the timeout threshold |
 | SUCCESSFUL/FAILED | The Agent returns the execution result | Update component status       |
 | CANCELED          | The preceding task fails               | Cancel subsequent tasks       | 

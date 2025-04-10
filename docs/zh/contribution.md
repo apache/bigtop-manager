@@ -53,7 +53,7 @@ pnpm dev
 | **bigtop-manager-common** | 一些公共工具类                                         |
 | **bigtop-manager-dao**    | 与数据库进行交互                                        |
 | **bigtop-manager-dist**   | 打包后的内容会放在该模块下，包括 `Server` 和 `Agent` 的 tar 包     |
-| **bigtop-manager-grpc**   | Server 应用与 Agent 应用通过 gRPC 交互，该模块包含所有 gRCP 服务定义 |
+| **bigtop-manager-grpc**   | Server 应用与 Agent 应用通过 gRPC 交互，该模块包含所有 gRPC 服务定义 |
 | **bigtop-manager-server** | 管理端的主要代码                                        |
 | **bigtop-manager-stack**  | 包含各个组件栈中的组件及其操作脚本                               |
 | **bigtop-manager-ui**     | 前端代码                                            |

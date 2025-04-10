@@ -62,7 +62,7 @@ graph LR
 ### 状态管理机制
 | 状态类型              | 触发条件           | 处理策略   |
 |-------------------|----------------|--------|
-| PENDING           | Job 创建未调度      | 等待调用   |
+| PENDING           | Task 创建未调度     | 等待调用   |
 | RUNNING           | Task 已下发 Agent | 监听超时阈值 |
 | SUCCESSFUL/FAILED | Agent 返回执行结果   | 更新组件状态 |
 | CANCELED          | 前置任务失败         | 取消后续任务 |
