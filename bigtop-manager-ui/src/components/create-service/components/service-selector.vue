@@ -152,6 +152,7 @@
   ) => {
     const inherentService = inherentServices.filter((v) => v.name === routeParams.value.service)[0]
     const installedService = { ...installedServiceMap.get(routeParams.value.service)! }
+    installedService.license = inherentService.license
     const map = new Map(installedService.components!.map((item) => [item.name, item]))
     inherentService.components!.forEach((item) => {
       !map.has(item.name) && map.set(item.name, { ...item, hosts: [], uninstall: true })
