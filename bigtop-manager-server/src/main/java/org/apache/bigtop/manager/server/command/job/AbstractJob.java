@@ -32,7 +32,11 @@ import org.apache.bigtop.manager.server.command.helper.JobCacheHelper;
 import org.apache.bigtop.manager.server.command.stage.Stage;
 import org.apache.bigtop.manager.server.command.stage.StageContext;
 import org.apache.bigtop.manager.server.command.task.Task;
+import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
+import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
+
+import org.apache.commons.collections4.CollectionUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -67,6 +71,10 @@ public abstract class AbstractJob implements Job {
         beforeCreateStages();
 
         createStages();
+
+        if (CollectionUtils.isEmpty(stages)) {
+            throw new ApiException(ApiExceptionEnum.JOB_HAS_NO_STAGES);
+        }
     }
 
     protected void injectBeans() {

@@ -24,7 +24,11 @@ import org.apache.bigtop.manager.dao.po.StagePO;
 import org.apache.bigtop.manager.dao.repository.HostDao;
 import org.apache.bigtop.manager.dao.repository.StageDao;
 import org.apache.bigtop.manager.server.command.task.Task;
+import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
+import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
+
+import org.apache.commons.collections4.CollectionUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -56,6 +60,10 @@ public abstract class AbstractStage implements Stage {
 
         for (String hostname : stageContext.getHostnames()) {
             tasks.add(createTask(hostname));
+        }
+
+        if (CollectionUtils.isEmpty(tasks)) {
+            throw new ApiException(ApiExceptionEnum.STAGE_HAS_NO_TASKS, getName());
         }
     }
 
