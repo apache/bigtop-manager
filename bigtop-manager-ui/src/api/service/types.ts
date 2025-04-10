@@ -44,6 +44,7 @@ export interface ServiceVO {
   status: ServiceStatusType
   user?: string
   version?: string
+  license?: string
   isInstalled?: boolean
   metrics?: boolean
   kerberos?: boolean

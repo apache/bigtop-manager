@@ -41,6 +41,7 @@
 
   const { headerSelectedKey, headerMenus } = toRefs(props)
   const githubUrl = import.meta.env.VITE_GITHUB_URL
+  const bigtopMangerDocURL = import.meta.env.VITE_BIGTOP_MANAGER_DOC_URL
   const spaceSize = ref(16)
   const aiAssistantRef = ref<InstanceType<typeof AiAssistant> | null>(null)
 
@@ -80,7 +81,9 @@
           </a>
         </div>
         <div class="header-item">
-          <svg-icon name="book" />
+          <a :href="bigtopMangerDocURL" target="_blank">
+            <svg-icon name="book" />
+          </a>
         </div>
       </a-space>
     </div>

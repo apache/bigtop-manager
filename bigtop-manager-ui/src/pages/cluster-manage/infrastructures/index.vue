@@ -18,272 +18,65 @@
 -->
 
 <script setup lang="ts">
-  import { computed, shallowRef, onMounted, toRefs } from 'vue'
-  import { usePngImage } from '@/utils/tools'
+  import { computed, ref, shallowRef } from 'vue'
   import { useI18n } from 'vue-i18n'
-  import { CommonStatus, CommonStatusTexts } from '@/enums/state'
-  import { useServiceStore } from '@/store/service'
   import { useRouter } from 'vue-router'
-  import { useJobProgress } from '@/store/job-progress'
-  import { Empty } from 'ant-design-vue'
-  import type { ServiceListParams, ServiceStatusType, ServiceVO } from '@/api/service/types'
-  import type { GroupItem } from '@/components/common/button-group/types'
-  import type { FilterFormItem } from '@/components/common/filter-form/types'
-  import type { Command, CommandRequest } from '@/api/command/types'
+  import Service from './service.vue'
+  import Job from '@/components/job/index.vue'
 
-  type GroupItemActionType = keyof typeof Command | 'More'
+  import type { TabItem } from '@/components/common/main-card/types'
+  import type { GroupItem } from '@/components/common/button-group/types'
+  import type { ClusterVO } from '@/api/cluster/types'
 
   const { t } = useI18n()
   const router = useRouter()
-  const jobProgressStore = useJobProgress()
-  const serviceStore = useServiceStore()
-  const { services, loading } = toRefs(serviceStore)
-
-  const statusColors = shallowRef<Record<ServiceStatusType, keyof typeof CommonStatusTexts>>({
-    1: 'healthy',
-    2: 'unhealthy',
-    3: 'unknown'
+  const activeKey = ref('1')
+  const currCluster = shallowRef<ClusterVO>({
+    id: 0,
+    name: '0'
   })
-  const filterFormItems = computed((): FilterFormItem[] => [
-    { type: 'search', key: 'serviceName', label: t('service.name') },
+
+  const tabs = computed((): TabItem[] => [
     {
-      type: 'status',
-      key: 'restartFlag',
-      label: t('service.required_restart'),
-      options: [
-        { label: t('common.required'), value: 1 },
-        { label: t('common.not_required'), value: 2 }
-      ]
+      key: '1',
+      title: t('common.service')
     },
     {
-      type: 'status',
-      key: 'status',
-      label: t('common.status'),
-      options: [
-        { label: t(`common.${statusColors.value[1]}`), value: 1 },
-        { label: t(`common.${statusColors.value[2]}`), value: 2 },
-        { label: t(`common.${statusColors.value[3]}`), value: 3 }
-      ]
-    }
-  ])
-  const actionGroups = shallowRef<GroupItem<GroupItemActionType>[]>([
-    {
-      action: 'Start',
-      icon: 'start',
-      clickEvent: (item, args) => {
-        infraAction(item!.action!, args)
-      }
-    },
-    {
-      action: 'Stop',
-      icon: 'stop',
-      clickEvent: (item, args) => {
-        infraAction(item!.action!, args)
-      }
-    },
-    {
-      action: 'Restart',
-      icon: 'restart',
-      clickEvent: (item, args) => {
-        infraAction(item!.action!, args)
-      }
-    },
-    {
-      action: 'More',
-      icon: 'more_line',
-      clickEvent: (item, args) => {
-        infraAction(item!.action!, args)
-      }
+      key: '2',
+      title: t('common.job')
     }
   ])
 
-  const infraAction = async (command: GroupItemActionType, service: ServiceVO) => {
-    if (command !== 'More') {
-      const execCommandParams = {
-        command: command,
-        clusterId: 0,
-        commandLevel: 'service',
-        serviceCommands: [{ serviceName: service.name, installed: true }]
-      } as CommandRequest
-      jobProgressStore.processCommand(execCommandParams, getServices)
+  const actionGroup = computed<GroupItem[]>(() => [
+    {
+      shape: 'default',
+      type: 'primary',
+      text: t('common.add', [t('common.service')]),
+      clickEvent: () => addService && addService()
     }
-  }
+  ])
 
-  const getServices = async (filters?: ServiceListParams) => {
-    await serviceStore.getServices(0, filters)
-  }
-
-  const viewServiceDetail = (payload: ServiceVO) => {
-    router.push({
-      name: 'InfraServiceDetail',
-      params: { id: 0, service: payload.name, cluster: 0, serviceId: payload.id }
-    })
-  }
-
-  onMounted(async () => {
-    await getServices()
+  const getCompName = computed(() => {
+    const components = [Service, Job]
+    return components[parseInt(activeKey.value) - 1]
   })
+
+  const addService: GroupItem['clickEvent'] = () => {
+    router.push({ name: 'CreateInfraService', params: { id: 0, cluster: 0, creationMode: 'public' } })
+  }
 </script>
 
 <template>
-  <a-spin :spinning="loading" class="service">
-    <div class="infra-header">
-      <div>
-        <div class="menu-title">{{ $t('menu.infra') }}</div>
-        <div class="menu-info">{{ $t('infra.info') }}</div>
-      </div>
-      <a-button
-        type="primary"
-        @click="
-          () => $router.push({ name: 'CreateInfraService', params: { id: 0, cluster: '', creationMode: 'public' } })
-        "
-      >
-        {{ $t('infra.action') }}
-      </a-button>
-    </div>
-    <div class="infra-body">
-      <filter-form :filter-items="filterFormItems" @filter="getServices" />
-      <a-empty v-if="services.length == 0" style="width: 100%" :image="Empty.PRESENTED_IMAGE_SIMPLE" />
-      <div v-else class="service-item-wrp">
-        <a-card
-          v-for="item in services"
-          :key="item.name"
-          :hoverable="true"
-          class="service-item"
-          @click="viewServiceDetail(item)"
-        >
-          <div class="header">
-            <div class="header-base-wrp">
-              <a-avatar v-if="item.name" :src="usePngImage(item.name.toLowerCase())" :size="42" class="header-icon" />
-              <div class="header-base-title">
-                <span>{{ `${item.displayName}` }}</span>
-                <span class="small-gray">{{ item.version }}</span>
-              </div>
-              <div class="header-base-status">
-                <a-tag :color="CommonStatus[statusColors[item.status]]">
-                  <div class="header-base-status-inner">
-                    <status-dot :color="CommonStatus[statusColors[item.status]]" />
-                    <span class="small">{{ $t(`common.${statusColors[item.status]}`) }}</span>
-                  </div>
-                </a-tag>
-              </div>
-            </div>
-            <div class="header-restart-status">
-              <span class="small-gray">{{ `${$t('common.restart')}` }}</span>
-              <status-dot :color="CommonStatus[statusColors[item.status]]" />
-              <span class="small">{{ `${item.restartFlag ? $t('common.required') : $t('common.not_required')}` }}</span>
-            </div>
-          </div>
-          <div class="item-content" @click.stop>
-            <button-group :auto="true" :space="0" :payload="item" :groups="actionGroups">
-              <template #icon="{ item: groupItem }">
-                <svg-icon :name="groupItem.icon || ''" />
-              </template>
-            </button-group>
-          </div>
-        </a-card>
-      </div>
-    </div>
-  </a-spin>
+  <div>
+    <header-card :title="$t('menu.infra')" :show-avatar="false" :desc="$t('infra.info')" :action-groups="actionGroup" />
+    <main-card v-model:active-key="activeKey" :tabs="tabs">
+      <template #tab-item>
+        <keep-alive>
+          <component :is="getCompName" v-bind="currCluster"></component>
+        </keep-alive>
+      </template>
+    </main-card>
+  </div>
 </template>
 
-<style scoped lang="scss">
-  .infra-header {
-    padding: 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #fff;
-    .menu-title {
-      font-size: 16px;
-      font-weight: 500;
-      line-height: 24px;
-    }
-    .menu-info {
-      margin-top: 5px;
-      color: #00000072;
-      font-size: 14px;
-      font-weight: 400;
-      line-height: 22px;
-    }
-  }
-  .small {
-    font-size: 12px;
-  }
-  .small-gray {
-    line-height: 12px;
-    font-size: 12px;
-    color: rgba(0, 0, 0, 0.45);
-  }
-  .infra-body {
-    margin-top: 16px;
-    padding: 16px;
-    background-color: #fff;
-    .service {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-    }
-    .service-item {
-      width: 280px;
-      height: 150px;
-      border-radius: 8px;
-      @include flexbox($direction: column);
-      :deep(.ant-card-body) {
-        padding: 0;
-        height: 100%;
-        @include flexbox($direction: column);
-      }
-      .header {
-        padding: $space-md;
-        border-bottom: 1px solid $color-border-secondary;
-        &-base-wrp {
-          @include flexbox($gap: $space-sm);
-          margin-bottom: 10px;
-        }
-        &-base-title {
-          @include flexbox($direction: column);
-        }
-        &-base-status {
-          flex: 1;
-          text-align: end;
-          &-inner {
-            @include flexbox($align: center, $gap: 4px);
-          }
-          .ant-tag {
-            margin-inline-end: 0;
-          }
-        }
-        &-restart-status {
-          @include flexbox($align: center, $gap: 6px);
-          .dot {
-            margin-top: 2px;
-          }
-        }
-        &-icon {
-          flex-shrink: 0;
-          border-radius: 0;
-        }
-        :deep(.ant-avatar) {
-          img {
-            object-fit: contain !important;
-          }
-        }
-      }
-      .item-content {
-        flex: 1;
-        @include flexbox($align: center);
-        padding-inline: 8px;
-      }
-    }
-  }
-  :deep(.ant-dropdown-link) {
-    margin-right: 10px;
-  }
-
-  .service-item-wrp {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 19px;
-  }
-</style>
+<style lang="scss" scoped></style>
