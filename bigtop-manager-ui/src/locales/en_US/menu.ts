@@ -20,7 +20,7 @@
 export default {
   cluster: 'Cluster',
   infra: 'Infrastructure',
-  component: 'Component',
+  stacks: 'Stacks',
   host: 'Host',
   create: 'Create Cluster',
   system: 'System',

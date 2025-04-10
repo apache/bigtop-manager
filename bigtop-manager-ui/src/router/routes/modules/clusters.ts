@@ -159,7 +159,7 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/pages/cluster-manage/components/index.vue'),
         meta: {
           icon: 'components',
-          title: 'menu.component'
+          title: 'menu.stacks'
         }
       },
       {

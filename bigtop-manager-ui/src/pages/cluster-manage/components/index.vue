@@ -95,7 +95,7 @@
 <template>
   <div class="cluster-components">
     <div>
-      <div class="menu-title">{{ $t('menu.component') }}</div>
+      <div class="menu-title">{{ $t('menu.stacks') }}</div>
     </div>
     <div class="cluster-components-header">
       <a-radio-group v-model:value="store.stackSelected" button-style="solid">
