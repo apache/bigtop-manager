@@ -18,15 +18,20 @@
 -->
 
 <script setup lang="ts">
-  import { TableColumnType, TableProps } from 'ant-design-vue'
+  import { message, Modal, TableColumnType, TableProps } from 'ant-design-vue'
   import { computed, onActivated, reactive, ref, useAttrs } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { getHosts } from '@/api/hosts'
+  import * as hostApi from '@/api/hosts'
+  import { useRouter } from 'vue-router'
   import useBaseTable from '@/composables/use-base-table'
+  import HostCreate from '@/pages/cluster-manage/hosts/create.vue'
+  import InstallDependencies from '@/pages/cluster-manage/hosts/install-dependencies.vue'
   import type { FilterConfirmProps, FilterResetProps } from 'ant-design-vue/es/table/interface'
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { HostVO } from '@/api/hosts/types'
   import type { ClusterVO } from '@/api/cluster/types'
+  import type { HostReq } from '@/api/command/types'
 
   type Key = string | number
   interface TableState {
@@ -36,8 +41,11 @@
   }
 
   const { t } = useI18n()
+  const router = useRouter()
   const attrs = useAttrs() as ClusterVO
   const searchInputRef = ref()
+  const hostCreateRef = ref<InstanceType<typeof HostCreate> | null>(null)
+  const installRef = ref<InstanceType<typeof InstallDependencies> | null>(null)
   const hostStatus = ref(['INSTALLING', 'SUCCESS', 'FAILED', 'UNKNOWN'])
   const state = reactive<TableState>({
     searchText: '',
@@ -120,7 +128,7 @@
     {
       text: 'remove',
       danger: true,
-      clickEvent: (_item, args) => handleDelete(args)
+      clickEvent: (_item, args) => deleteHost([args.id])
     }
   ])
 
@@ -147,16 +155,47 @@
     state.searchText = ''
   }
 
-  const handleEdit = (row: any) => {
-    console.log('row :>> ', row)
+  const handleEdit = (row: HostVO) => {
+    const formatHost = { ...row, displayName: row.clusterDisplayName, clusterId: attrs?.id }
+    hostCreateRef.value?.handleOpen('EDIT', formatHost)
   }
 
-  const handleDelete = (row?: any) => {
-    if (!row) {
-      console.log('selectedRowKeys :>> ', state.selectedRowKeys)
-    } else {
-      console.log('row :>> ', row)
+  const bulkRemove = () => {
+    if (state.selectedRowKeys.length === 0) {
+      message.error(t('common.delete_empty'))
+      return
     }
+    deleteHost(state.selectedRowKeys as number[])
+  }
+
+  const deleteHost = (ids: number[]) => {
+    Modal.confirm({
+      title: ids.length > 1 ? t('common.delete_msgs') : t('common.delete_msg'),
+      async onOk() {
+        try {
+          const data = await hostApi.removeHost({ ids })
+          if (data) {
+            message.success(t('common.delete_success'))
+            await getHostList(true)
+          }
+        } catch (error) {
+          console.log('error :>> ', error)
+        }
+      }
+    })
+  }
+
+  const viewHostDetail = (row: HostVO) => {
+    const { id: hostId } = row
+    router.push({ name: 'HostDetail', query: { hostId, clusterId: attrs.id } })
+  }
+
+  const addHost = () => {
+    hostCreateRef.value?.handleOpen('ADD', { clusterId: attrs.id })
+  }
+
+  const afterSetupHostConfig = async (type: 'ADD' | 'EDIT', item: HostReq) => {
+    type === 'ADD' ? installRef.value?.handleOpen(item) : await getHostList(true)
   }
 
   const getHostList = async (isReset = false) => {
@@ -195,8 +234,8 @@
     <header>
       <div class="header-title">{{ $t('host.host_list') }}</div>
       <a-space :size="16">
-        <a-button type="primary" danger @click="handleDelete">{{ $t('common.bulk_remove') }}</a-button>
-        <a-button type="primary">{{ $t('cluster.add_host') }}</a-button>
+        <a-button type="primary" danger @click="bulkRemove">{{ $t('common.bulk_remove') }}</a-button>
+        <a-button type="primary" @click="addHost">{{ $t('cluster.add_host') }}</a-button>
       </a-space>
     </header>
     <a-table
@@ -232,7 +271,7 @@
       </template>
       <template #bodyCell="{ record, column }">
         <template v-if="column.key === 'hostname'">
-          <a-typography-link underline> {{ record.hostname }} </a-typography-link>
+          <a-typography-link underline @click="viewHostDetail(record)"> {{ record.hostname }} </a-typography-link>
         </template>
         <template v-if="column.key === 'status'">
           <svg-icon style="margin-left: 0" :name="hostStatus[record.status].toLowerCase()" />
@@ -244,13 +283,15 @@
             :text-compact="true"
             :space="24"
             :groups="operations"
-            :args="record"
+            :payload="record"
             group-shape="default"
             group-type="link"
           />
         </template>
       </template>
     </a-table>
+    <host-create ref="hostCreateRef" :api-edit-caller="true" @on-ok="afterSetupHostConfig" />
+    <install-dependencies ref="installRef" @on-install-success="getHostList(true)" />
   </div>
 </template>
 

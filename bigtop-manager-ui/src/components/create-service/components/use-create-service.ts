@@ -29,15 +29,28 @@ import SvgIcon from '@/components/common/svg-icon/index.vue'
 import type { HostVO } from '@/api/hosts/types'
 import type { CommandRequest, CommandVO, ServiceCommandReq } from '@/api/command/types'
 import type { ServiceVO } from '@/api/service/types'
+import type { ComponentVO } from '@/api/component/types'
 
 interface ProcessResult {
   success: boolean
   conflictService?: ExpandServiceVO
 }
 
+interface RouteParams {
+  service: string
+  serviceId: number
+  id: number
+  cluster: string
+}
+
+interface CompItem extends ComponentVO {
+  hosts: HostVO[]
+}
+
 const scope = effectScope()
 let isChange = false
 let selectedServices: Ref<ExpandServiceVO[]>
+let selectedServicesMeta: Ref<ExpandServiceVO[]>
 let afterCreateRes: Ref<CommandVO>
 let servicesOfInfra: ComputedRef<ExpandServiceVO[]>
 let servicesOfExcludeInfra: ComputedRef<ExpandServiceVO[] | ServiceVO[]>
@@ -46,7 +59,8 @@ let steps: ComputedRef<string[]>
 const setupStore = () => {
   scope.run(() => {
     selectedServices = ref<ExpandServiceVO[]>([])
-    afterCreateRes = ref<CommandVO>({ id: undefined })
+    selectedServicesMeta = ref<ExpandServiceVO[]>([])
+    afterCreateRes = ref<{ clusterId: number } & CommandVO>({ id: undefined, clusterId: 0 })
     servicesOfInfra = computed(() => useStackStore().getServicesByExclude(['bigtop', 'extra']) as ExpandServiceVO[])
     servicesOfExcludeInfra = computed(() => useStackStore().getServicesByExclude(['infra']))
     steps = computed(() => [
@@ -71,6 +85,36 @@ const useCreateService = () => {
   const { current, stepsLimit, previousStep, nextStep } = useSteps(steps.value)
   const clusterId = computed(() => Number(route.params.id))
   const creationMode = computed(() => route.params.creationMode as 'internal' | 'public')
+  const creationModeType = computed(() => route.params.type)
+  const routeParams = computed(() => route.params as unknown as RouteParams)
+
+  const commandRequest = ref<CommandRequest>({
+    command: 'Add',
+    commandLevel: 'service',
+    clusterId: clusterId.value
+  })
+
+  const allComps = computed(() => {
+    return new Map(
+      selectedServices.value.flatMap((s) =>
+        s.components!.map((comp) => [
+          comp.name,
+          { serviceName: s.name, serviceDisplayName: s.displayName, serviceId: s.id, ...comp }
+        ])
+      )
+    ) as Map<string, CompItem>
+  })
+
+  const allCompsMeta = computed(() => {
+    return new Map(
+      selectedServicesMeta.value.flatMap((s) =>
+        s.components!.map((comp) => [
+          comp.name,
+          { serviceName: s.name, serviceDisplayName: s.displayName, serviceId: s.id, ...comp }
+        ])
+      )
+    ) as Map<string, CompItem>
+  })
 
   watch(
     () => selectedServices.value,
@@ -82,18 +126,9 @@ const useCreateService = () => {
     }
   )
 
-  const commandRequest = ref<CommandRequest>({
-    command: 'Add',
-    commandLevel: 'service',
-    clusterId: clusterId.value
-  })
-
-  const allComps = computed(() => {
-    return new Map(selectedServices.value.flatMap((s) => s.components!.map((comp) => [comp.name, comp])))
-  })
-
   const setDataByCurrent = (val: ExpandServiceVO[]) => {
     selectedServices.value = val
+    selectedServicesMeta.value = JSON.parse(JSON.stringify(val))
   }
 
   const updateHostsForComponent = (compName: string, hosts: HostVO[]) => {
@@ -220,6 +255,26 @@ const useCreateService = () => {
     try {
       commandRequest.value.serviceCommands = transformServiceData(selectedServices.value)
       afterCreateRes.value = await execCommand(commandRequest.value)
+      Object.assign(afterCreateRes.value, { clusterId })
+      return true
+    } catch (error) {
+      console.log('error :>> ', error)
+      return false
+    }
+  }
+
+  const addComponentForService = async () => {
+    try {
+      commandRequest.value.commandLevel = 'component'
+      commandRequest.value.componentCommands = []
+      for (const [compName, comp] of allComps.value) {
+        commandRequest.value.componentCommands?.push({
+          componentName: compName!,
+          hostnames: comp.hosts.map((v) => v.hostname!)
+        })
+      }
+      afterCreateRes.value = await execCommand(commandRequest.value)
+      Object.assign(afterCreateRes.value, { clusterId })
       return true
     } catch (error) {
       console.log('error :>> ', error)
@@ -233,19 +288,24 @@ const useCreateService = () => {
     current,
     stepsLimit,
     selectedServices,
+    selectedServicesMeta,
     servicesOfExcludeInfra,
     servicesOfInfra,
     installedStore,
     allComps,
     afterCreateRes,
+    scope,
+    creationMode,
+    creationModeType,
+    routeParams,
+    allCompsMeta,
     setDataByCurrent,
+    addComponentForService,
     updateHostsForComponent,
     confirmServiceDependencies,
     createService,
     previousStep,
-    nextStep,
-    scope,
-    creationMode
+    nextStep
   }
 }
 

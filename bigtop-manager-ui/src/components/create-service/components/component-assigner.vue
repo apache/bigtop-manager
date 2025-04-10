@@ -48,7 +48,16 @@
     searchedColumn: '',
     selectedRowKeys: []
   })
-  const { clusterId, installedStore, allComps, selectedServices, updateHostsForComponent } = useCreateService()
+  const {
+    clusterId,
+    installedStore,
+    allComps,
+    allCompsMeta,
+    creationModeType,
+    selectedServices,
+    updateHostsForComponent
+  } = useCreateService()
+
   const serviceList = computed(() =>
     selectedServices.value.map((v) => ({
       ...v,
@@ -56,10 +65,14 @@
     }))
   )
 
+  const currCompInfo = computed(() => allComps.value.get(currComp.value.split('/')[1]))
+  const currCompInfoMeta = computed(() => allCompsMeta.value.get(currComp.value.split('/')[1]))
+  const installedServices = computed(() => installedStore.getInstalledNamesOrIdsOfServiceByKey(`${clusterId.value}`))
   const hostsOfCurrComp = computed((): HostVO[] => {
     const temp = currComp.value.split('/').at(-1)
-    return allComps.value.has(temp) ? allComps.value.get(temp)?.hosts : []
+    return allComps.value.has(temp!) ? allComps.value.get(temp!)?.hosts ?? [] : []
   })
+
   const columns = computed((): TableColumnType<HostVO>[] => [
     {
       title: t('host.hostname'),
@@ -119,20 +132,31 @@
     onChangeCallback: getHostList
   })
 
-  const getCheckboxProps: TableRowSelection['getCheckboxProps'] = (record) => ({
-    disabled: installedStore
-      .getInstalledNamesOrIdsOfServiceByKey(`${clusterId.value}`)
-      .includes(currComp.value.split('/')[0]),
-    name: record.hostname
-  })
+  const validateHostIsCheck = (host: HostVO) => {
+    const notAdd = currCompInfoMeta.value?.hosts.findIndex((v) => v.hostname === host.hostname) == -1
+    if (creationModeType.value === 'component') {
+      return !currCompInfo.value?.uninstall && !notAdd
+    } else {
+      return installedServices.value.includes(currComp.value.split('/')[0]) && !notAdd
+    }
+  }
+
+  const getCheckboxProps: TableRowSelection['getCheckboxProps'] = (record) => {
+    return {
+      disabled: validateHostIsCheck(record),
+      name: record.hostname
+    }
+  }
 
   const onSelectChange: TableRowSelection['onChange'] = (selectedRowKeys, selectedRows) => {
-    allComps.value.has(currComp.value.split('/').at(-1)) && updateHostsForComponent(currComp.value, selectedRows)
+    allComps.value.has(currComp.value.split('/').at(-1)!) && updateHostsForComponent(currComp.value, selectedRows)
     state.selectedRowKeys = selectedRowKeys
   }
 
   const resetSelectedRowKeys = (key: string) => {
-    state.selectedRowKeys = allComps.value.has(key) ? allComps.value.get(key)?.hosts.map((v: HostVO) => v.hostname) : []
+    state.selectedRowKeys = allComps.value.has(key)
+      ? (allComps.value.get(key)?.hosts.map((v: HostVO) => v.hostname) as Key[]) ?? ([] as Key[])
+      : []
   }
 
   const treeSelectedChange = (keyPath: string) => {

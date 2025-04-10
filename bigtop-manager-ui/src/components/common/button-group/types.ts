@@ -31,7 +31,7 @@ export interface GroupItem<T = any> {
   tip?: string
   text?: string
   action?: T
-  hidden?: boolean
+  hidden?: boolean | ((item?: GroupItem<T>, ...args: any[]) => boolean)
   type?: BtnType
   shape?: ShapeType
   disabled?: boolean
@@ -48,6 +48,6 @@ export interface Props {
   groupType?: BtnType
   groupShape?: ShapeType
   space?: number
-  args?: any
+  payload?: any
   auto?: boolean
 }

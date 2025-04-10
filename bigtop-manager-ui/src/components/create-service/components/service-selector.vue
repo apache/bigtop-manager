@@ -18,29 +18,33 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onActivated, reactive, ref, toRefs, useAttrs } from 'vue'
+  import { computed, onActivated, reactive, ref, shallowRef, toRefs } from 'vue'
   import { usePngImage } from '@/utils/tools'
   import useCreateService from './use-create-service'
   import type { ExpandServiceVO } from '@/store/stack'
-  import { ComponentVO } from '@/api/component/types.ts'
+  import type { ComponentVO } from '@/api/component/types.ts'
+  import type { ServiceVO } from '@/api/service/types'
 
   interface State {
     isAddableData: ExpandServiceVO[]
     selectedData: ExpandServiceVO[]
   }
 
-  const { creationMode } = useAttrs()
   const searchStr = ref('')
+  const licenseOfConflictService = shallowRef(['AGPL-3.0', 'GPLv2'])
   const state = reactive<State>({
     isAddableData: [],
     selectedData: []
   })
   const {
     clusterId,
+    routeParams,
     selectedServices,
     servicesOfInfra,
     servicesOfExcludeInfra,
     installedStore,
+    creationMode,
+    creationModeType,
     confirmServiceDependencies,
     setDataByCurrent
   } = useCreateService()
@@ -142,20 +146,42 @@
     }
   }
 
+  const mergeInherentServiceAndInstalledService = (
+    installedServiceMap: Map<string, ExpandServiceVO>,
+    inherentServices: ServiceVO[]
+  ) => {
+    const inherentService = inherentServices.filter((v) => v.name === routeParams.value.service)[0]
+    const installedService = { ...installedServiceMap.get(routeParams.value.service)! }
+    installedService.license = inherentService.license
+    const map = new Map(installedService.components!.map((item) => [item.name, item]))
+    inherentService.components!.forEach((item) => {
+      !map.has(item.name) && map.set(item.name, { ...item, hosts: [], uninstall: true })
+    })
+    installedService.components = [...map.values()]
+    return installedService
+  }
+
   const addInstalledSymbolForSelectedServices = async (onlyInstalled: boolean) => {
     if (onlyInstalled) {
       const installedServiceMap = await initInstalledServicesDetail()
       const installedServiceNames = installedStore.getInstalledNamesOrIdsOfServiceByKey(`${clusterId.value}`)
-      const data = creationMode === 'internal' ? servicesOfExcludeInfra.value : servicesOfInfra.value
-      data.forEach((v) => {
-        if (installedServiceNames.includes(v.name || '')) {
-          Object.assign(v, installedServiceMap.get(v.name!))
-          v.isInstalled = true
-          state.selectedData.push(v as ExpandServiceVO)
-        } else {
-          state.isAddableData.push(v as ExpandServiceVO)
+      const inherentServices = creationMode.value === 'internal' ? servicesOfExcludeInfra.value : servicesOfInfra.value
+
+      if (creationModeType.value === 'component' && installedServiceMap.has(routeParams.value.service)) {
+        state.selectedData[0] = mergeInherentServiceAndInstalledService(installedServiceMap, inherentServices)
+        state.selectedData[0].isInstalled = true
+        state.isAddableData = []
+      } else {
+        for (const service of inherentServices) {
+          if (installedServiceNames.includes(service.name || '')) {
+            Object.assign(service, installedServiceMap.get(service.name!))
+            service.isInstalled = true
+            state.selectedData.push(service as ExpandServiceVO)
+          } else {
+            state.isAddableData.push(service as ExpandServiceVO)
+          }
         }
-      })
+      }
       setDataByCurrent(state.selectedData)
     } else {
       state.selectedData = [...selectedServices.value]
@@ -186,13 +212,18 @@
             </template>
             <a-list-item-meta>
               <template #title>
-                <div class="ellipsis item-name" :title="item.displayName">
-                  <template v-for="(fragment, i) in splitSearchStr(item.displayName)">
-                    <mark v-if="fragment.toLowerCase() === searchStr.toLowerCase()" :key="i" class="highlight">
-                      {{ fragment }}
-                    </mark>
-                    <template v-else>{{ fragment }}</template>
-                  </template>
+                <div class="item-name-wrp">
+                  <div class="ellipsis item-name" :title="item.displayName">
+                    <template v-for="(fragment, i) in splitSearchStr(item.displayName)">
+                      <mark v-if="fragment.toLowerCase() === searchStr.toLowerCase()" :key="i" class="highlight">
+                        {{ fragment }}
+                      </mark>
+                      <template v-else>{{ fragment }}</template>
+                    </template>
+                  </div>
+                  <a-tag :color="licenseOfConflictService.includes(item.license) ? 'error' : 'success'">
+                    <span class="item-tag">{{ item.license }}</span>
+                  </a-tag>
                 </div>
               </template>
               <template #description>
@@ -233,8 +264,13 @@
             </template>
             <a-list-item-meta>
               <template #title>
-                <div class="ellipsis item-name" :data-tooltip="item.displayName">
-                  {{ item.displayName }}
+                <div class="item-name-wrp">
+                  <div class="ellipsis item-name" :data-tooltip="item.displayName">
+                    {{ item.displayName }}
+                  </div>
+                  <a-tag :color="licenseOfConflictService.includes(item.license) ? 'error' : 'success'">
+                    <span class="item-tag">{{ item.license }}</span>
+                  </a-tag>
                 </div>
               </template>
               <template #description>
@@ -264,8 +300,19 @@
     padding: 0px;
   }
 
-  .item-name {
-    font-size: 16px;
+  .item-name-wrp {
+    display: flex;
+    gap: 8px;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    .item-name {
+      flex: 1;
+      font-size: 16px;
+    }
+    .item-tag {
+      font-weight: normal;
+      line-height: 22px;
+    }
   }
 
   .service-selector {

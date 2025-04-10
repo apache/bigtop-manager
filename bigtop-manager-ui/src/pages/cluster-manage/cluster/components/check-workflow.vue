@@ -56,7 +56,6 @@
     try {
       const data = await getJobDetails({ jobId, clusterId: 0 })
       jobDetail.value = data
-      activeKey.value = data.stages ? data.stages?.map((v) => v.id!) : []
       emits('updateData', { ...stepData.value, ...data })
       return ['Successful', 'Failed'].includes(data.state as StateType)
     } catch (error) {

@@ -18,15 +18,15 @@
 -->
 
 <script setup lang="ts">
-  import { computed, ComputedRef, onActivated, onDeactivated, reactive, ref, shallowRef } from 'vue'
+  import { computed, ComputedRef, onActivated, onDeactivated, reactive, ref, shallowRef, useAttrs } from 'vue'
   import { useI18n } from 'vue-i18n'
-  import { useRoute } from 'vue-router'
   import { TableColumnType, TableProps } from 'ant-design-vue'
   import { getJobList, getStageList, getTaskList } from '@/api/job'
   import useBaseTable from '@/composables/use-base-table'
   import LogsView, { type LogViewProps } from '@/components/log-view/index.vue'
   import CustomProgress from './custom-progress.vue'
   import type { JobVO, StageVO, StateType, TaskListParams, TaskVO } from '@/api/job/types'
+  import type { ClusterVO } from '@/api/cluster/types'
 
   interface BreadcrumbItem {
     id: string
@@ -34,12 +34,12 @@
   }
   const POLLING_INTERVAL = 3000
   const { t } = useI18n()
-  const route = useRoute()
+  const clusterInfo = useAttrs() as ClusterVO
   const pollingIntervalId = ref<any>(null)
   const breadcrumbs = ref<BreadcrumbItem[]>([
     {
       name: computed(() => t('job.job_list')),
-      id: `clusterId-${route.params.id}`
+      id: `clusterId-${clusterInfo.id}`
     }
   ])
   const status = shallowRef<Record<StateType, string>>({
@@ -152,7 +152,7 @@
         loading.value = true
       }
       const { api } = apiMap.value[breadcrumbs.value.length - 1]
-      const res = await api(apiParams.value, { ...filtersParams.value, order: 'desc' })
+      const res = await api(apiParams.value, { ...filtersParams.value, sort: 'desc' })
       dataSource.value = res.content
       paginationProps.value.total = res.total
     } catch (error) {

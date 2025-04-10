@@ -18,52 +18,46 @@
  */
 package org.apache.bigtop.manager.server.command.validator;
 
+import org.apache.bigtop.manager.common.constants.ComponentCategories;
 import org.apache.bigtop.manager.common.enums.Command;
-import org.apache.bigtop.manager.dao.po.ComponentPO;
-import org.apache.bigtop.manager.dao.po.ServicePO;
-import org.apache.bigtop.manager.dao.query.ComponentQuery;
-import org.apache.bigtop.manager.dao.repository.ComponentDao;
-import org.apache.bigtop.manager.dao.repository.ServiceDao;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.enums.CommandLevel;
 import org.apache.bigtop.manager.server.exception.ApiException;
-
-import org.apache.commons.collections4.CollectionUtils;
+import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
+import org.apache.bigtop.manager.server.model.dto.command.ComponentCommandDTO;
+import org.apache.bigtop.manager.server.utils.StackUtils;
 
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 
 @Component
-public class ClusterStartValidator implements CommandValidator {
-
-    @Resource
-    private ServiceDao serviceDao;
-
-    @Resource
-    private ComponentDao componentDao;
+public class ComponentOpValidator implements CommandValidator {
 
     @Override
     public List<CommandIdentifier> getCommandIdentifiers() {
-        return List.of(new CommandIdentifier(CommandLevel.CLUSTER, Command.START));
+        return List.of(
+                new CommandIdentifier(CommandLevel.COMPONENT, Command.START),
+                new CommandIdentifier(CommandLevel.COMPONENT, Command.STOP),
+                new CommandIdentifier(CommandLevel.COMPONENT, Command.RESTART));
     }
 
     @Override
     public void validate(ValidatorContext context) {
-        Long clusterId = context.getCommandDTO().getClusterId();
-        List<ServicePO> servicePOList = serviceDao.findByClusterId(clusterId);
-
-        if (CollectionUtils.isEmpty(servicePOList)) {
-            throw new ApiException(ApiExceptionEnum.CLUSTER_HAS_NO_SERVICES);
+        boolean allClient = true;
+        List<ComponentCommandDTO> componentCommands = context.getCommandDTO().getComponentCommands();
+        for (ComponentCommandDTO componentCommandDTO : componentCommands) {
+            String componentName = componentCommandDTO.getComponentName();
+            ComponentDTO componentDTO = StackUtils.getComponentDTO(componentName);
+            if (!Objects.equals(componentDTO.getCategory(), ComponentCategories.CLIENT)) {
+                allClient = false;
+            }
         }
 
-        ComponentQuery componentQuery =
-                ComponentQuery.builder().clusterId(clusterId).build();
-        List<ComponentPO> componentPOList = componentDao.findByQuery(componentQuery);
-        if (CollectionUtils.isEmpty(componentPOList)) {
-            throw new ApiException(ApiExceptionEnum.CLUSTER_HAS_NO_COMPONENTS);
+        if (allClient) {
+            throw new ApiException(ApiExceptionEnum.COMPONENT_HAS_NO_SUCH_OP);
         }
     }
 }

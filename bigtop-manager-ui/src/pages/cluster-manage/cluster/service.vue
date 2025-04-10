@@ -183,7 +183,7 @@
           </div>
         </div>
         <div class="item-content" @click.stop>
-          <button-group :auto="true" :space="0" :args="item" :groups="actionGroups">
+          <button-group :auto="true" :space="0" :payload="item" :groups="actionGroups">
             <template #icon="{ item: groupItem }">
               <svg-icon :name="groupItem.icon || ''" />
             </template>
