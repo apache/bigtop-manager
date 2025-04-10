@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onActivated, reactive, ref, toRefs } from 'vue'
+  import { computed, onActivated, reactive, ref, shallowRef, toRefs } from 'vue'
   import { usePngImage } from '@/utils/tools'
   import useCreateService from './use-create-service'
   import type { ExpandServiceVO } from '@/store/stack'
@@ -31,11 +31,7 @@
   }
 
   const searchStr = ref('')
-  const licenseTags = {
-    'Apache-2.0': 'success',
-    'AGPL-3.0': 'error',
-    GPLv2: 'error'
-  }
+  const licenseOfConflictService = shallowRef(['AGPL-3.0', 'GPLv2'])
   const state = reactive<State>({
     isAddableData: [],
     selectedData: []
@@ -224,7 +220,7 @@
                       <template v-else>{{ fragment }}</template>
                     </template>
                   </div>
-                  <a-tag :color="licenseTags[item.license]">
+                  <a-tag :color="licenseOfConflictService.includes(item.license) ? 'error' : 'success'">
                     <span class="item-tag">{{ item.license }}</span>
                   </a-tag>
                 </div>
@@ -271,7 +267,7 @@
                   <div class="ellipsis item-name" :data-tooltip="item.displayName">
                     {{ item.displayName }}
                   </div>
-                  <a-tag :color="licenseTags[item.license]">
+                  <a-tag :color="licenseOfConflictService.includes(item.license) ? 'error' : 'success'">
                     <span class="item-tag">{{ item.license }}</span>
                   </a-tag>
                 </div>
