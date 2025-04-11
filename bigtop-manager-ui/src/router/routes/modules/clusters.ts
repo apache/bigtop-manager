@@ -24,22 +24,15 @@ import pageView from '@/layouts/index.vue'
 const routes: RouteRecordRaw[] = [
   {
     path: '/cluster-manage',
+    name: 'ClusterManage',
     component: pageView,
-    redirect: RouteExceptions.SPECIAL_ROUTE_PATH,
+    redirect: '/cluster-manage/clusters',
     meta: {
       title: 'menu.cluster'
     },
     children: [
       {
-        name: RouteExceptions.DEFAULT_ROUTE_NAME,
-        path: 'default',
-        component: () => import('@/layouts/default.vue'),
-        meta: {
-          hidden: true
-        }
-      },
-      {
-        name: RouteExceptions.SPECIAL_ROUTE_NAME,
+        name: 'Clusters',
         path: 'clusters',
         redirect: '',
         meta: {
@@ -48,8 +41,16 @@ const routes: RouteRecordRaw[] = [
         },
         children: [
           {
+            name: 'Default',
+            path: 'default',
+            component: () => import('@/layouts/default.vue'),
+            meta: {
+              hidden: true
+            }
+          },
+          {
             name: 'ClusterDetail',
-            path: RouteExceptions.DYNAMIC_ROUTE_MATCH,
+            path: ':cluster/:id',
             component: () => import('@/pages/cluster-manage/cluster/index.vue'),
             meta: {
               hidden: true
@@ -65,7 +66,7 @@ const routes: RouteRecordRaw[] = [
           },
           {
             name: 'CreateService',
-            path: `${RouteExceptions.DYNAMIC_ROUTE_MATCH}/create-service/:creationMode?`,
+            path: ':cluster/:id/create-service/:creationMode?',
             component: () => import('@/components/create-service/create.vue'),
             meta: {
               hidden: true
@@ -73,7 +74,7 @@ const routes: RouteRecordRaw[] = [
           },
           {
             name: 'ServiceDetail',
-            path: `${RouteExceptions.DYNAMIC_ROUTE_MATCH}/service-detail/:service/:serviceId`,
+            path: ':cluster/:id/service-detail/:service/:serviceId',
             component: () => import('@/components/service-management/index.vue'),
             meta: {
               hidden: true
@@ -81,15 +82,7 @@ const routes: RouteRecordRaw[] = [
           },
           {
             name: 'CreateComponent',
-            path: `${RouteExceptions.DYNAMIC_ROUTE_MATCH}/create-component/:service/:serviceId/:creationMode?/:type`,
-            component: () => import('@/components/create-service/create.vue'),
-            meta: {
-              hidden: true
-            }
-          },
-          {
-            name: 'CreateComponent',
-            path: `${RouteExceptions.DYNAMIC_ROUTE_MATCH}/create-component/:service/:serviceId/:creationMode?/:type`,
+            path: ':cluster/:id/create-component/:service/:serviceId/:creationMode?/:type',
             component: () => import('@/components/create-service/create.vue'),
             meta: {
               hidden: true
@@ -112,7 +105,7 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@/pages/cluster-manage/infrastructures/index.vue'),
             meta: {
               hidden: true,
-              activeMenu: '/cluster-manage/infrastructures'
+              activeMenu: '/cluster-manage/infrastructures/list'
             }
           },
           {
@@ -121,7 +114,7 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@/components/create-service/create.vue'),
             meta: {
               hidden: true,
-              activeMenu: '/cluster-manage/infrastructures'
+              activeMenu: '/cluster-manage/infrastructures/list'
             }
           },
           {
@@ -130,7 +123,7 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@/components/service-management/index.vue'),
             meta: {
               hidden: true,
-              activeMenu: '/cluster-manage/infrastructures'
+              activeMenu: '/cluster-manage/infrastructures/list'
             }
           },
           {
@@ -139,16 +132,7 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@/components/create-service/create.vue'),
             meta: {
               hidden: true,
-              activeMenu: '/cluster-manage/infrastructures'
-            }
-          },
-          {
-            name: 'CreateInfraComponent',
-            path: '/create-infra-service/create-infra-component/:id/:cluster/:service/:serviceId/:creationMode/:type',
-            component: () => import('@/components/create-service/create.vue'),
-            meta: {
-              hidden: true,
-              activeMenu: '/cluster-manage/infrastructures'
+              activeMenu: '/cluster-manage/infrastructures/list'
             }
           }
         ]
@@ -156,11 +140,22 @@ const routes: RouteRecordRaw[] = [
       {
         name: 'Components',
         path: 'components',
-        component: () => import('@/pages/cluster-manage/components/index.vue'),
+        redirect: '/cluster-manage/components/list',
         meta: {
           icon: 'components',
           title: 'menu.stacks'
-        }
+        },
+        children: [
+          {
+            name: 'ComponentList',
+            path: 'list',
+            component: () => import('@/pages/cluster-manage/components/index.vue'),
+            meta: {
+              hidden: true,
+              activeMenu: '/cluster-manage/components/list'
+            }
+          }
+        ]
       },
       {
         name: 'Hosts',
@@ -177,7 +172,7 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@/pages/cluster-manage/hosts/index.vue'),
             meta: {
               hidden: true,
-              activeMenu: '/cluster-manage/hosts'
+              activeMenu: '/cluster-manage/hosts/list'
             }
           },
           {
@@ -186,7 +181,7 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@/pages/cluster-manage/hosts/create.vue'),
             meta: {
               hidden: true,
-              activeMenu: '/cluster-manage/hosts'
+              activeMenu: '/cluster-manage/hosts/list'
             }
           },
           {
@@ -195,7 +190,7 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@/pages/cluster-manage/hosts/detail.vue'),
             meta: {
               hidden: true,
-              activeMenu: '/cluster-manage/hosts'
+              activeMenu: '/cluster-manage/hosts/list'
             }
           }
         ]

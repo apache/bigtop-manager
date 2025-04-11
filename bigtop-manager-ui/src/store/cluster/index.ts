@@ -35,6 +35,7 @@ export const useClusterStore = defineStore(
     const loading = ref(false)
     const currCluster = ref<ClusterVO>({})
     const clusterId = computed(() => (route.params.id as string) || undefined)
+    const hasCluster = computed(() => clusters.value.length > 0)
 
     watch(
       () => clusters.value,
@@ -63,7 +64,7 @@ export const useClusterStore = defineStore(
         currCluster.value.id != undefined && (await serviceStore.getServices(currCluster.value.id))
       } catch (error) {
         currCluster.value = {}
-        clusters.value = []
+        clusters.value = [{ id: 1, name: '222' }]
         console.log('error :>> ', error)
       } finally {
         loading.value = false
@@ -78,6 +79,7 @@ export const useClusterStore = defineStore(
       clusters,
       loading,
       currCluster,
+      hasCluster,
       addCluster,
       delCluster,
       loadClusters,

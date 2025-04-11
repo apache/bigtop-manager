@@ -20,8 +20,12 @@
 import type { Router } from 'vue-router'
 
 function setCommonGuard(router: Router) {
-  router.beforeEach(async (_to, _from, next) => {
-    next()
+  router.beforeEach(async (to, _from, next) => {
+    if (to.name === 'Clusters') {
+      next({ name: 'Default' })
+    } else {
+      next()
+    }
   })
 }
 
