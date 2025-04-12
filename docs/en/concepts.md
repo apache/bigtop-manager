@@ -8,32 +8,46 @@ A cluster is a logical unit composed of a group of physical or virtual hosts, us
 * **Multi Cluster**: A single Server instance can manage multiple clusters simultaneously (e.g., production clusters, test clusters, etc.).
 * **Host Binding**: Each Host can only belong to one cluster.
 
-## Stack
-### Definition
+### Stack
+### Stack
+#### Definition
 A predefined standardized service collection that includes installation scripts, configuration templates, and dependency relationship descriptions.
 
-### Stack List
-
+#### Stack List
 | Stack      | Description                                                               |  
 |------------|---------------------------------------------------------------------------|  
 | **Infra**  | Services shared by all clusters, such as the monitoring system Prometheus |  
 | **Bigtop** | Services provided by Apache Bigtop, such as Hadoop/Hive/Spark, etc.       |  
 | **Extra**  | Community-provided or custom services, such as SeaTunnel                  |  
 
-### Extensions
-* Users can extend services by writing configuration files and inheriting `BaseParams`/`AbstractScript`, etc.
-* Declare dependency relationships through the Stack directory structure (e.g., Hive depends on Hadoop).
-
-## Service
-### Definition
+### Service
+#### Definition
 A service unit running on a cluster, representing specific big data services (such as Hadoop/Hive/Spark, etc.).
 
-### Management
-#### Configuration Management
+#### Management
+##### Configuration Management
 * **Snapshots**: Supports configuration snapshot creation and management.
 * **Templates**: Uses Freemarker syntax to dynamically render configuration files.
-#### Status Monitoring
+
+##### Status Monitoring
 * **Heartbeat**: The Agent reports service health status every 30 seconds.
+
+### Component
+#### Definition
+A runtime instance within a service, corresponding to specific processes or functional modules. Component-level operations (start/stop, etc.) are executed by the Agent.
+
+#### Component Examples
+```mermaid
+graph TB
+Hadoop-->NameNode
+Hadoop-->DataNode
+Hadoop-->ResourceManager
+Kafka-->KB[Kafka Broker]
+Solr-->SI[Solr Instance]
+SeaTunnel-->SM[SeaTunnel Master]
+SeaTunnel-->SW[SeaTunnel Worker]
+SeaTunnel-->SL[SeaTunnel Client]
+```
 
 ## Job
 ### Job
@@ -81,13 +95,12 @@ Processing flow after the Agent receives a Task:
 * **Script Execution**: Invokes the predefined component operation script in the Stack.
 * **Status Feedback**: Writes task logs in real time and updates the Task status to the Server.
 
-**Execution Guarantee Mechanisms**
+Execution Guarantee Mechanisms:
 * **Timeout**: A single Task execution timeout (default 30 minutes) is automatically marked as failed.
 * **Retry**: Network exception failures can be automatically retried (up to 3 times).
 * **Idempotent**: Re-executing a successful Task will not cause side effects.
 
 #### State Management Mechanism
-
 | State Type        | Trigger Condition                          | Handling Strategy         |  
 |-------------------|--------------------------------------------|---------------------------|  
 | PENDING           | Task created but not scheduled             | Wait for invocation       |  
