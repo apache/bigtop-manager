@@ -17,33 +17,77 @@
  * under the License.
  */
 
+import { computed, ref, watch } from 'vue'
 import { defineStore } from 'pinia'
-import { ClusterVO } from '@/api/cluster/types.ts'
-import { ref } from 'vue'
-import { getClusters } from '@/api/cluster'
+import { useRoute } from 'vue-router'
+import { getCluster, getClusterList } from '@/api/cluster'
+import { useServiceStore } from '@/store/service'
+import { useInstalledStore } from '@/store/installed'
+import type { ClusterVO } from '@/api/cluster/types.ts'
 
 export const useClusterStore = defineStore(
   'cluster',
   () => {
+    const route = useRoute()
+    const installedStore = useInstalledStore()
+    const serviceStore = useServiceStore()
     const clusters = ref<ClusterVO[]>([])
-    const selectedCluster = ref<ClusterVO | undefined>()
-    const clusterId = ref<number>(0)
+    const loading = ref(false)
+    const currCluster = ref<ClusterVO>({})
+    const clusterId = computed(() => (route.params.id as string) || undefined)
 
-    const loadClusters = async () => {
-      clusters.value = await getClusters()
-      if (clusters.value.length > 0) {
-        selectedCluster.value = clusters.value.filter(
-          (cluster) => cluster.selected
-        )[0]
-        clusterId.value = selectedCluster.value?.id
+    watch(
+      () => clusters.value,
+      (val) => {
+        val.forEach((cluster) => {
+          installedStore.setInstalledMapKey(`${cluster.id}`)
+        })
       }
+    )
 
-      console.log('clusters.value: ', clusters.value)
-      console.log('selectedCluster.value: ', selectedCluster.value)
-      console.log('clusterId.value: ', clusterId.value)
+    const addCluster = async () => {
+      await loadClusters()
     }
 
-    return { loadClusters, clusters, selectedCluster, clusterId }
+    const delCluster = async () => {
+      await loadClusters()
+    }
+
+    const getClusterDetail = async () => {
+      if (clusterId.value == undefined) {
+        return
+      }
+      try {
+        loading.value = true
+        currCluster.value = await getCluster(parseInt(clusterId.value))
+        currCluster.value.id != undefined && (await serviceStore.getServices(currCluster.value.id))
+      } catch (error) {
+        currCluster.value = {}
+        clusters.value = []
+        console.log('error :>> ', error)
+      } finally {
+        loading.value = false
+      }
+    }
+
+    const loadClusters = async () => {
+      clusters.value = await getClusterList()
+    }
+
+    return {
+      clusters,
+      loading,
+      currCluster,
+      addCluster,
+      delCluster,
+      loadClusters,
+      getClusterDetail
+    }
   },
-  { persist: false }
+  {
+    persist: {
+      storage: sessionStorage,
+      paths: ['clusters']
+    }
+  }
 )

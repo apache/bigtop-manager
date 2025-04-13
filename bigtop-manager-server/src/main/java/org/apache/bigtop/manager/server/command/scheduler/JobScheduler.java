@@ -18,7 +18,7 @@
  */
 package org.apache.bigtop.manager.server.command.scheduler;
 
-import org.apache.bigtop.manager.dao.entity.Job;
+import org.apache.bigtop.manager.server.command.job.Job;
 
 /**
  * JobScheduler interface for job management.

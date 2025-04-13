@@ -18,6 +18,11 @@
  */
 
 export default {
-  log_await_message: 'Waiting for more logs',
-  log_complete_message: 'Done!'
+  job_list: 'Job List',
+  task_log: 'Task Log',
+  log_loading: 'Loading logs',
+  pending: 'Waiting to run',
+  processing: 'Running',
+  success: 'Run succeeded!',
+  failed: 'Run failed!'
 }

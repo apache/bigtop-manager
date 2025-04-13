@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one
+  ~ or more contributor license agreements.  See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership.  The ASF licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License.  You may obtain a copy of the License at
+  ~
+  ~    https://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+-->
+
+<configuration>
+    <property>
+        <name>port</name>
+        <value>3000</value>
+        <display-name>Port</display-name>
+        <description>HTTP port for Grafana to listen on.</description>
+    </property>
+    <property>
+        <name>log_level</name>
+        <value>info</value>
+        <display-name>Log level</display-name>
+        <description>Log level, can be: trace, debug, info, warn, error, critical.</description>
+    </property>
+    <property>
+        <name>content</name>
+        <description>This is the freemarker template for grafana.ini file</description>
+        <value><![CDATA[
+[server]
+# HTTP port for Grafana to listen on
+http_port = ${port}
+# Root URL of Grafana, typically do not change unless running behind a proxy or in a subpath
+root_url = %(protocol)s://%(domain)s:%(http_port)s/
+# Whether to enable TLS/SSL for Grafana, default is disabled
+protocol = http
+
+[security]
+# Admin username and password, it's crucial to change the default username and password
+admin_user = admin
+admin_password = admin
+# Secret key for encrypting sensitive information
+secret_key = some-secret-key
+
+[database]
+# Database type, can be: sqlite3, mysql, postgres, mssql
+
+[users]
+# Whether to allow user self-signup
+allow_sign_up = true
+# Default organization ID to assign to new users
+auto_assign_org = true
+
+[auth]
+# Enable or disable the authentication system
+enabled = true
+
+[log]
+# Log level, can be: trace, debug, info, warn, error, critical
+level = ${log_level}
+# Log mode, can be: console, file, or both
+mode = console
+# Log file path (if file mode is enabled)
+file = /var/log/grafana/grafana.log
+
+[paths]
+provisioning = ${provisioning_path}
+
+[plugins]
+# Enable alpha plugins
+enable_alpha = true
+# Allow loading unsigned plugins
+allow_loading_unsigned_plugins = false
+]]>
+        </value>
+        <attrs>
+            <type>longtext</type>
+        </attrs>
+    </property>
+</configuration>

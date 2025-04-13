@@ -18,20 +18,18 @@
 -->
 
 <script setup lang="ts">
-  import {
-    UserOutlined,
-    ProfileOutlined,
-    LogoutOutlined
-  } from '@ant-design/icons-vue'
+  import { UserOutlined, ProfileOutlined, LogoutOutlined } from '@ant-design/icons-vue'
   import { message } from 'ant-design-vue'
   import { useUserStore } from '@/store/user'
   import { storeToRefs } from 'pinia'
   import router from '@/router'
   import { useI18n } from 'vue-i18n'
+  import { useMenuStore } from '@/store/menu'
 
   const i18n = useI18n()
 
   const userStore = useUserStore()
+  const menuStore = useMenuStore()
   const { userVO } = storeToRefs(userStore)
 
   const logout = async () => {
@@ -39,6 +37,7 @@
     try {
       await userStore.logout()
       message.success(i18n.t('login.logout_success'))
+      menuStore.cleanUpMenu()
       await router.push({ path: '/login' })
     } catch (e) {
       console.warn(e)
@@ -50,9 +49,9 @@
 
 <template>
   <a-dropdown placement="bottom">
-    <div class="icon">
-      <user-outlined />
-      <div class="name">{{ userVO?.nickname }}</div>
+    <div class="header-item">
+      <svg-icon name="avatar" />
+      <span class="name">{{ userVO?.nickname }}</span>
     </div>
     <template #overlay>
       <a-menu>
@@ -85,24 +84,7 @@
 </template>
 
 <style lang="scss" scoped>
-  .icon {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 16px;
-    padding: 0 0.5rem;
-    border-radius: 6px;
-    cursor: pointer;
-    height: 36px;
-
-    &:hover {
-      background-color: var(--hover-color);
-    }
-
-    .name {
-      font-size: 14px;
-      margin-left: 0.5rem;
-      line-height: 36px;
-    }
+  .name {
+    color: $color-white;
   }
 </style>

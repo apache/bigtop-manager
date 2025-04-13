@@ -19,32 +19,10 @@
 
 import request from '@/api/request.ts'
 import { StackVO } from '@/api/stack/types.ts'
-import { ServiceComponentVO } from '@/api/component/types.ts'
-import { ServiceConfigVO } from '@/api/config/types.ts'
 
 export const getStacks = (): Promise<StackVO[]> => {
   return request({
     method: 'get',
     url: '/stacks'
-  })
-}
-
-export const getStackComponents = (
-  stackName: string,
-  stackVersion: string
-): Promise<ServiceComponentVO[]> => {
-  return request({
-    method: 'get',
-    url: '/stacks/' + stackName + '/' + stackVersion + '/components'
-  })
-}
-
-export const getStackConfigs = (
-  stackName: string,
-  stackVersion: string
-): Promise<ServiceConfigVO[]> => {
-  return request({
-    method: 'get',
-    url: '/stacks/' + stackName + '/' + stackVersion + '/configurations'
   })
 }

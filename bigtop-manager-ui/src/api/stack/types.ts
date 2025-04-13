@@ -17,8 +17,8 @@
  * under the License.
  */
 
-import { ServiceVO } from '@/api/service/types.ts'
 import { RepoVO } from '@/api/repo/types.ts'
+import { ServiceVO } from '../service/types'
 
 export interface StackVO {
   stackName: string

@@ -17,14 +17,16 @@
   ~ under the License.
 -->
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+  import dayjs from 'dayjs'
+</script>
 
 <template>
   <a-layout-footer>
     <div class="copyright">
-      Copyright ©2011–2023
-      <a href="https://www.apache.org">The Apache Software Foundation</a>. All
-      rights reserved.
+      {{ `Copyright ©2011-${dayjs().year()}` }}
+      <a href="https://www.apache.org" target="_blank"> The Apache Software Foundation </a>
+      . All rights reserved.
     </div>
   </a-layout-footer>
 </template>

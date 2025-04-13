@@ -17,12 +17,51 @@
  * under the License.
  */
 
-import request from '@/api/request.ts'
-import { ServiceVO } from '@/api/service/types.ts'
+import type { ListParams } from '../types'
+import type {
+  ServiceParams,
+  ServiceVO,
+  ServiceConfig,
+  ServiceConfigSnapshot,
+  ServiceList,
+  SnapshotData,
+  SnapshotRecovery,
+  ServiceListParams
+} from './types'
+import { get, post, del } from '@/api/request-util'
 
-export const getService = (clusterId: number): Promise<ServiceVO[]> => {
-  return request({
-    method: 'get',
-    url: '/clusters/' + clusterId + '/services'
-  })
+export const getServiceList = (clusterId: number, params?: ListParams & ServiceListParams) => {
+  return get<ServiceList>(`/clusters/${clusterId}/services`, params)
+}
+
+export const getService = (pathParams: ServiceParams) => {
+  return get<ServiceVO>(`/clusters/${pathParams.clusterId}/services/${pathParams.id}`)
+}
+
+export const getServiceConfigs = (pathParams: ServiceParams) => {
+  return get<ServiceConfig[]>(`/clusters/${pathParams.clusterId}/services/${pathParams.id}/configs`)
+}
+
+export const updateServiceConfigs = (pathParams: ServiceParams, data: ServiceConfig[]) => {
+  return post<ServiceConfig[]>(`/clusters/${pathParams.clusterId}/services/${pathParams.id}/configs`, data)
+}
+
+export const getServiceConfigSnapshotsList = (pathParams: ServiceParams) => {
+  return get<ServiceConfigSnapshot[]>(`/clusters/${pathParams.clusterId}/services/${pathParams.id}/config-snapshots`)
+}
+
+export const takeServiceConfigSnapshot = (pathParams: ServiceParams, data: SnapshotData) => {
+  return post<ServiceConfigSnapshot>(
+    `/clusters/${pathParams.clusterId}/services/${pathParams.id}/config-snapshots`,
+    data
+  )
+}
+
+export const recoveryServiceConfigSnapshot = (pathParams: SnapshotRecovery): Promise<ServiceConfig[]> => {
+  return post<ServiceConfig[]>(
+    `/clusters/${pathParams.clusterId}/services/${pathParams.id}/config-snapshots/${pathParams.snapshotId}`
+  )
+}
+export const deleteServiceConfigSnapshot = (pathParams: SnapshotRecovery): Promise<boolean> => {
+  return del(`/clusters/${pathParams.clusterId}/services/${pathParams.id}/config-snapshots/${pathParams.snapshotId}`)
 }

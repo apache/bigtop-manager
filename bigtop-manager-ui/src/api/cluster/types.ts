@@ -17,28 +17,31 @@
  * under the License.
  */
 
-export interface ClusterReq {
-  clusterName: string
-  clusterType: number
-  stackName: string
-  stackVersion: string
-  repoInfoList: RepoReq[]
-  hostnames: string[]
-}
+export type UpdateClusterParam = { name: string; desc: string }
+
+export type ClusterStatusType = 1 | 2 | 3
 
 export interface ClusterVO {
-  id: number
-  clusterName: string
-  clusterType: number
-  stackName: string
-  stackVersion: string
-  selected: boolean
+  createUser?: string
+  desc?: string
+  displayName?: string
+  id?: number
+  name?: string
+  rootDir?: string
+  status?: ClusterStatusType
+  totalDisk?: number
+  totalHost?: number
+  totalMemory?: number
+  totalProcessor?: number
+  totalService?: number
+  type?: number
+  userGroup?: string
 }
 
-export interface RepoReq {
-  repoId: string
-  repoName: string
-  baseUrl: string
-  os: string
-  arch: string
+export interface ServiceUserVO {
+  desc?: string
+  displayName?: string
+  user?: string
+  userGroup?: string
+  [property: string]: any
 }

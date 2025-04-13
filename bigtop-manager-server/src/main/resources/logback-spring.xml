@@ -44,8 +44,6 @@
         </encoder>
     </appender>
 
-    <logger name="eclipselink.logging" level="DEBUG" additivity="true" />
-
     <root level="INFO">
         <appender-ref ref="STDOUT" />
         <appender-ref ref="SERVER_LOG_FILE" />

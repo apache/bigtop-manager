@@ -25,5 +25,7 @@ public class CommandVO {
 
     private Long id;
 
+    private String name;
+
     private String state;
 }

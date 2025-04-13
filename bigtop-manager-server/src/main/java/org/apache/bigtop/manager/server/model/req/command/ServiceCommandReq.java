@@ -20,7 +20,7 @@ package org.apache.bigtop.manager.server.model.req.command;
 
 import org.apache.bigtop.manager.server.config.CommandGroupSequenceProvider;
 import org.apache.bigtop.manager.server.model.req.ComponentHostReq;
-import org.apache.bigtop.manager.server.model.req.TypeConfigReq;
+import org.apache.bigtop.manager.server.model.req.ServiceConfigReq;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -36,11 +36,8 @@ public class ServiceCommandReq {
     @NotNull @Schema(description = "Service name", example = "zookeeper")
     private String serviceName;
 
-    @Schema(description = "Config Description", example = "Initial config for zookeeper")
-    private String configDesc;
-
-    @Schema(description = "Config version", example = "1")
-    private Integer version;
+    @NotNull @Schema(description = "Whether the service is already installed", example = "false")
+    private Boolean installed;
 
     @NotEmpty(groups = {CommandGroupSequenceProvider.ServiceInstallCommandGroup.class})
     @Schema(description = "Components for service on each hosts")
@@ -48,5 +45,5 @@ public class ServiceCommandReq {
 
     @NotEmpty(groups = {CommandGroupSequenceProvider.ServiceInstallCommandGroup.class})
     @Schema(description = "Configs for service")
-    private List<@Valid TypeConfigReq> configs;
+    private List<@Valid ServiceConfigReq> configs;
 }

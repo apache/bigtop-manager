@@ -18,13 +18,13 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
-import org.apache.bigtop.manager.dao.entity.User;
-import org.apache.bigtop.manager.dao.repository.UserRepository;
+import org.apache.bigtop.manager.dao.po.UserPO;
+import org.apache.bigtop.manager.dao.repository.UserDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.holder.SessionUserHolder;
+import org.apache.bigtop.manager.server.model.converter.UserConverter;
 import org.apache.bigtop.manager.server.model.dto.UserDTO;
-import org.apache.bigtop.manager.server.model.mapper.UserMapper;
 import org.apache.bigtop.manager.server.model.vo.UserVO;
 import org.apache.bigtop.manager.server.service.UserService;
 
@@ -36,21 +36,21 @@ import jakarta.annotation.Resource;
 public class UserServiceImpl implements UserService {
 
     @Resource
-    private UserRepository userRepository;
+    private UserDao userDao;
 
     @Override
     public UserVO current() {
         Long id = SessionUserHolder.getUserId();
-        User user = userRepository.findById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.NEED_LOGIN));
-        return UserMapper.INSTANCE.fromEntity2VO(user);
+        UserPO userPO = userDao.findOptionalById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.NEED_LOGIN));
+        return UserConverter.INSTANCE.fromPO2VO(userPO);
     }
 
     @Override
     public UserVO update(UserDTO userDTO) {
         Long id = SessionUserHolder.getUserId();
-        User user = userRepository.findById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.NEED_LOGIN));
-        user.setNickname(userDTO.getNickname());
-        userRepository.save(user);
-        return UserMapper.INSTANCE.fromEntity2VO(user);
+        UserPO userPO = userDao.findOptionalById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.NEED_LOGIN));
+        userPO.setNickname(userDTO.getNickname());
+        userDao.partialUpdateById(userPO);
+        return UserConverter.INSTANCE.fromPO2VO(userPO);
     }
 }

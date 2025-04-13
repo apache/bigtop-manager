@@ -16,25 +16,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 export default {
-  switch: 'Switch Cluster',
-  create: 'Create Cluster',
-  set_cluster_name: 'Set Cluster Name',
-  set_cluster_name_title: "Let's get started!",
-  set_cluster_name_sub_title: 'Please follow the steps to create your cluster.',
-  set_cluster_name_input: 'Input your cluster name',
-  set_cluster_name_valid: 'Cluster name is required',
-  choose_stack: 'Choose Stack',
-  set_repository: 'Set Repository',
-  set_hosts: 'Set Hosts',
-  set_hosts_placeholder: 'Enter a list of hosts, one per line.',
-  set_hosts_valid: 'Input at least one host name.',
-  show_hosts_resolved: 'Hostnames after resolved',
-  not_exist_title: 'Cluster not exist',
-  not_exist_sub_title: 'Cluster not exist, please create one first.',
-  create_success_title: 'Congratulations!',
-  create_success_sub_title: 'Cluster created successfully, please enjoy it.',
-  create_fail_title: 'Oh no!',
-  create_fail_sub_title: 'Cluster created failed, please retry it.'
+  base_info: 'Basic Information',
+  cluster_config: 'Cluster Configuration',
+  cluster_info: 'Cluster',
+  component_info: 'Stack',
+  component: 'Component',
+  host_config: 'Hosts',
+  create: 'Create',
+  name: 'Name',
+  display_name: 'Display Name',
+  description: 'Description',
+  root_directory: 'Root Directory',
+  user_group: 'User Group',
+  config_source: 'Configuration Source',
+  install_dependencies: 'Install Dependencies',
+  add_host: 'Add Host',
+  edit_host: 'Edit Host',
+  view_log: 'View Log',
+  source: 'Source',
+  show_hosts_resolved: 'Resolved Hostnames',
+  cluster_unavailable_message: 'Sorry, you need to create cluster to use this feature.'
 }

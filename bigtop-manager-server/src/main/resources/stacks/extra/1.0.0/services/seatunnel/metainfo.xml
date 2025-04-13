@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one
+  ~ or more contributor license agreements.  See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership.  The ASF licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License.  You may obtain a copy of the License at
+  ~
+  ~    https://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+-->
+
+<metainfo>
+    <service>
+        <name>seatunnel</name>
+        <display-name>SeaTunnel</display-name>
+        <desc>
+            SeaTunnel is a next-generation, high-performance, distributed data integration tool, capable of synchronizing vast amounts of data daily. It's trusted by numerous companies for its efficiency and stability.
+        </desc>
+        <version>2.3.8</version>
+        <user>seatunnel</user>
+        <license>Apache-2.0</license>
+
+        <components>
+            <component>
+                <name>seatunnel_master</name>
+                <display-name>SeaTunnel Master</display-name>
+                <category>server</category>
+                <cardinality>1+</cardinality>
+            </component>
+
+            <component>
+                <name>seatunnel_worker</name>
+                <display-name>SeaTunnel Worker</display-name>
+                <category>server</category>
+                <cardinality>1+</cardinality>
+            </component>
+            
+            <component>
+                <name>seatunnel_client</name>
+                <display-name>SeaTunnel Client</display-name>
+                <category>client</category>
+                <cardinality>1+</cardinality>
+            </component>
+        </components>
+
+        <package-specifics>
+            <package-specific>
+                <architectures>
+                    <arch>x86_64</arch>
+                    <arch>aarch64</arch>
+                </architectures>
+                <packages>
+                    <package>
+                        <name>apache-seatunnel-2.3.8-bin.tar.gz</name>
+                        <checksum>SHA-256:68a27d7370bd1098754948a482c054b97115676ca104f44c7bdf3aa6fdf88a3b</checksum>
+                    </package>
+                </packages>
+            </package-specific>
+        </package-specifics>
+    </service>
+</metainfo>

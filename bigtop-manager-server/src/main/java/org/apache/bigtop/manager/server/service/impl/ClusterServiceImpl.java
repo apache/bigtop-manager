@@ -18,108 +18,79 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
-import org.apache.bigtop.manager.common.enums.MaintainState;
-import org.apache.bigtop.manager.dao.entity.Cluster;
-import org.apache.bigtop.manager.dao.entity.Repo;
-import org.apache.bigtop.manager.dao.entity.Stack;
-import org.apache.bigtop.manager.dao.repository.ClusterRepository;
-import org.apache.bigtop.manager.dao.repository.RepoRepository;
-import org.apache.bigtop.manager.dao.repository.StackRepository;
+import org.apache.bigtop.manager.dao.po.ClusterPO;
+import org.apache.bigtop.manager.dao.po.HostPO;
+import org.apache.bigtop.manager.dao.po.ServicePO;
+import org.apache.bigtop.manager.dao.repository.ClusterDao;
+import org.apache.bigtop.manager.dao.repository.HostDao;
+import org.apache.bigtop.manager.dao.repository.ServiceDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
+import org.apache.bigtop.manager.server.model.converter.ClusterConverter;
 import org.apache.bigtop.manager.server.model.dto.ClusterDTO;
-import org.apache.bigtop.manager.server.model.dto.StackDTO;
-import org.apache.bigtop.manager.server.model.mapper.ClusterMapper;
-import org.apache.bigtop.manager.server.model.mapper.RepoMapper;
 import org.apache.bigtop.manager.server.model.vo.ClusterVO;
 import org.apache.bigtop.manager.server.service.ClusterService;
-import org.apache.bigtop.manager.server.service.HostService;
-import org.apache.bigtop.manager.server.utils.StackUtils;
+
+import org.apache.commons.collections4.CollectionUtils;
+
+import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
 
 import jakarta.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-@org.springframework.stereotype.Service
+@Service
 public class ClusterServiceImpl implements ClusterService {
 
     @Resource
-    private ClusterRepository clusterRepository;
+    private ClusterDao clusterDao;
 
     @Resource
-    private RepoRepository repoRepository;
+    private HostDao hostDao;
 
     @Resource
-    private StackRepository stackRepository;
-
-    @Resource
-    private HostService hostService;
+    private ServiceDao serviceDao;
 
     @Override
     public List<ClusterVO> list() {
-        List<ClusterVO> clusterVOList = new ArrayList<>();
-        clusterRepository.findAll().forEach(cluster -> {
-            ClusterVO clusterVO = ClusterMapper.INSTANCE.fromEntity2VO(cluster);
-            clusterVOList.add(clusterVO);
-        });
-
-        return clusterVOList;
-    }
-
-    @Override
-    public ClusterVO save(ClusterDTO clusterDTO) {
-        // Save cluster
-        Stack stack =
-                stackRepository.findByStackNameAndStackVersion(clusterDTO.getStackName(), clusterDTO.getStackVersion());
-        StackDTO stackDTO = StackUtils.getStackKeyMap()
-                .get(StackUtils.fullStackName(clusterDTO.getStackName(), clusterDTO.getStackVersion()))
-                .getLeft();
-        Cluster cluster = ClusterMapper.INSTANCE.fromDTO2Entity(clusterDTO, stackDTO, stack);
-        cluster.setSelected(clusterRepository.count() == 0);
-        cluster.setState(MaintainState.UNINSTALLED);
-
-        Cluster oldCluster =
-                clusterRepository.findByClusterName(clusterDTO.getClusterName()).orElse(new Cluster());
-        if (oldCluster.getId() != null) {
-            cluster.setId(oldCluster.getId());
-        }
-        clusterRepository.save(cluster);
-
-        hostService.batchSave(cluster.getId(), clusterDTO.getHostnames());
-
-        // Save repo
-        List<Repo> repos = RepoMapper.INSTANCE.fromDTO2Entity(clusterDTO.getRepoInfoList(), cluster);
-        List<Repo> oldRepos = repoRepository.findAllByCluster(cluster);
-
-        for (Repo repo : repos) {
-            for (Repo oldRepo : oldRepos) {
-                if (oldRepo.getArch().equals(repo.getArch()) && oldRepo.getOs().equals(repo.getOs())) {
-                    repo.setId(oldRepo.getId());
-                }
-            }
-        }
-
-        repoRepository.saveAll(repos);
-        return ClusterMapper.INSTANCE.fromEntity2VO(cluster);
+        List<ClusterPO> clusterPOList = clusterDao.findAll();
+        return ClusterConverter.INSTANCE.fromPO2VO(clusterPOList);
     }
 
     @Override
     public ClusterVO get(Long id) {
-        Cluster cluster =
-                clusterRepository.findById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.CLUSTER_NOT_FOUND));
+        ClusterPO clusterPO = clusterDao.findDetailsById(id);
 
-        return ClusterMapper.INSTANCE.fromEntity2VO(cluster);
+        if (clusterPO == null) {
+            throw new ApiException(ApiExceptionEnum.CLUSTER_NOT_FOUND);
+        }
+
+        return ClusterConverter.INSTANCE.fromPO2VO(clusterPO);
     }
 
     @Override
     public ClusterVO update(Long id, ClusterDTO clusterDTO) {
-        Cluster cluster = ClusterMapper.INSTANCE.fromDTO2Entity(clusterDTO);
-        cluster.setId(id);
-        clusterRepository.save(cluster);
+        ClusterPO clusterPO = ClusterConverter.INSTANCE.fromDTO2PO(clusterDTO);
+        clusterPO.setId(id);
+        clusterDao.partialUpdateById(clusterPO);
 
-        return ClusterMapper.INSTANCE.fromEntity2VO(cluster);
+        return get(id);
+    }
+
+    @Override
+    public Boolean remove(Long id) {
+        List<HostPO> hostPOList = hostDao.findAllByClusterId(id);
+        if (CollectionUtils.isNotEmpty(hostPOList)) {
+            throw new ApiException(ApiExceptionEnum.CLUSTER_HAS_HOSTS);
+        }
+
+        List<ServicePO> servicePOList = serviceDao.findByClusterId(id);
+        if (CollectionUtils.isNotEmpty(servicePOList)) {
+            throw new ApiException(ApiExceptionEnum.CLUSTER_HAS_SERVICES);
+        }
+
+        return clusterDao.deleteById(id);
     }
 }

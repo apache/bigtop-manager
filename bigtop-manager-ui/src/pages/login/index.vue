@@ -54,7 +54,7 @@
       }
 
       message.success(i18n.t('login.login_success'))
-      await router.push('/dashboard')
+      await router.push('/')
     } catch (e) {
       console.warn(e)
     } finally {
@@ -68,7 +68,7 @@
   <div class="login-container">
     <div class="login-content">
       <div class="login-main">
-        <!-- 登录框头部 -->
+        <!-- Login box header -->
         <div class="login-header">
           <div class="login-header-left">
             <img class="login-logo" src="@/assets/logo.svg" alt="logo" />
@@ -78,25 +78,17 @@
           <div class="login-header-right"><select-lang /></div>
         </div>
         <a-divider class="m-0" />
-        <!-- 登录框主体 -->
+        <!-- Login box body -->
         <div class="login-body">
-          <!-- 登录框主体左侧 -->
+          <!-- On the left side of the login box -->
           <div class="login-body-left">
-            <img
-              class="login-body-left-img"
-              src="@/assets/images/login.png"
-              alt="login"
-            />
+            <img class="login-body-left-img" src="@/assets/images/login.png" alt="login" />
           </div>
           <a-divider class="login-body-divider m-0" type="vertical" />
-          <!-- 登录框主体右侧 -->
+          <!-- Right side of the login box -->
           <div class="login-body-right">
             <div class="login-body-right-tips">{{ $t('login.tips') }}</div>
-            <a-form
-              ref="formRef"
-              class="login-body-right-form"
-              :model="loginModel"
-            >
+            <a-form ref="formRef" class="login-body-right-form" :model="loginModel">
               <a-tabs v-model:activeKey="loginModel.type" centered>
                 <a-tab-pane key="account" :tab="$t('login.tab_account')" />
               </a-tabs>
@@ -149,13 +141,7 @@
                   {{ $t('login.remember_me') }}
                 </a-checkbox>
               </div>
-              <a-button
-                type="primary"
-                block
-                :loading="submitLoading"
-                size="large"
-                @click="submit"
-              >
+              <a-button type="primary" block :loading="submitLoading" size="large" @click="submit">
                 {{ $t('login.submit') }}
               </a-button>
             </a-form>
@@ -164,17 +150,15 @@
       </div>
     </div>
     <div class="copyright">
-      Copyright ©2011–2023
-      <a href="https://www.apache.org">The Apache Software Foundation</a>. All
-      rights reserved.
+      Copyright ©2024–2025
+      <a href="https://www.apache.org">The Apache Software Foundation</a>. All rights reserved.
     </div>
   </div>
 </template>
 
 <style scoped lang="scss">
   .login-container {
-    display: flex;
-    flex-direction: column;
+    @include flexbox($direction: column);
     height: 100vh;
     overflow: auto;
     background-color: var(--bg-color-container);
@@ -185,9 +169,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      @include flexbox($justify: center, $align: center);
 
       .login-main {
         border-radius: 0.25rem;
@@ -202,15 +184,11 @@
         }
 
         .login-header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
+          @include flexbox($justify: space-between, $align: center);
           padding: 0.5rem 1rem;
 
           .login-header-left {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            @include flexbox($justify: space-between, $align: center);
 
             .login-title {
               font-weight: 600;
@@ -251,11 +229,9 @@
           }
 
           .login-body-left {
-            display: flex;
+            @include flexbox($justify: center, $align: center);
             min-height: 520px;
             width: 700px;
-            justify-content: center;
-            align-items: center;
             background-color: var(--bg-color-container);
 
             @media (max-width: 991px) {
@@ -277,10 +253,7 @@
           }
 
           .login-body-right {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
+            @include flexbox($direction: column, $justify: center, $align: center);
             width: 335px;
             padding: 0 1.25rem;
 
@@ -298,9 +271,7 @@
             .login-body-right-form {
               .login-body-right-form-bottom {
                 margin-bottom: 24px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
+                @include flexbox($justify: space-between, $align: center);
               }
             }
           }

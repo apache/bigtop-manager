@@ -21,17 +21,15 @@ package org.apache.bigtop.manager.server.model.req;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
 public class ComponentHostReq {
 
-    @NotNull @Schema(description = "Component name", example = "zookeeper-server")
+    @NotNull @Schema(description = "Component name", example = "zookeeper_server")
     private String componentName;
 
-    @NotEmpty
-    @Schema(description = "Hostnames for component", example = "[\"node1\"]")
+    @Schema(description = "Hostnames for component", example = "[host1, host2]")
     private List<String> hostnames;
 }

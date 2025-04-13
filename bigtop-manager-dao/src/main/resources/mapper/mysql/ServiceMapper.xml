@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one
+  ~ or more contributor license agreements.  See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership.  The ASF licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+-->
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.apache.bigtop.manager.dao.repository.ServiceDao">
+
+    <sql id="baseColumns">
+        id, name, display_name, `desc`, user, version, stack, restart_flag, cluster_id, status
+    </sql>
+
+    <sql id="baseColumnsV2">
+        ${alias}.id, ${alias}.name, ${alias}.display_name, ${alias}.`desc`, ${alias}.user, ${alias}.version, ${alias}.stack, ${alias}.restart_flag, ${alias}.cluster_id, ${alias}.status
+    </sql>
+
+    <select id="findByQuery" resultType="org.apache.bigtop.manager.dao.po.ServicePO">
+        select
+        <include refid="baseColumns"/>
+        from
+        service s
+        <where>
+            <if test="query.name != null and query.name != ''">
+                and s.name like concat('%', #{query.name}, '%')
+            </if>
+            <if test="query.clusterId != null">
+                and s.cluster_id = #{query.clusterId}
+            </if>
+            <if test="query.restartFlag != null">
+                and s.restart_flag = #{query.restartFlag}
+            </if>
+            <if test="query.status != null">
+                and s.status = #{query.status}
+            </if>
+        </where>
+    </select>
+
+    <select id="findByClusterId" parameterType="java.lang.Long" resultType="org.apache.bigtop.manager.dao.po.ServicePO">
+        select
+        <include refid="baseColumns" />
+        from service
+        where
+        cluster_id = #{clusterId}
+    </select>
+
+    <select id="findByClusterIdAndName"
+            resultType="org.apache.bigtop.manager.dao.po.ServicePO">
+        select
+        <include refid="baseColumns"/>
+        from
+        service
+        <where>
+            <if test="clusterId != null">
+                cluster_id = #{clusterId}
+            </if>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+        </where>
+    </select>
+
+    <select id="findByClusterIdAndNames"
+            resultType="org.apache.bigtop.manager.dao.po.ServicePO">
+        select
+        <include refid="baseColumns"/>
+        from
+        service
+        <where>
+            <if test="clusterId != null">
+                cluster_id = #{clusterId}
+            </if>
+            <if test="names != null and names.size() > 0">
+                and name in
+                <foreach collection="names" item="name" index="index" open="(" close=")" separator=", ">
+                    #{name}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+</mapper>

@@ -33,13 +33,6 @@ public interface ClusterService {
     List<ClusterVO> list();
 
     /**
-     * Save a cluster
-     *
-     * @return Cluster
-     */
-    ClusterVO save(ClusterDTO clusterDTO);
-
-    /**
      * Get a cluster
      *
      * @return Cluster
@@ -52,4 +45,11 @@ public interface ClusterService {
      * @return Cluster
      */
     ClusterVO update(Long id, ClusterDTO clusterDTO);
+
+    /**
+     * Remove a cluster
+     *
+     * @return Cluster
+     */
+    Boolean remove(Long id);
 }

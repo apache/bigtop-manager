@@ -18,9 +18,7 @@
  */
 package org.apache.bigtop.manager.server.command.scheduler;
 
-import org.apache.bigtop.manager.dao.entity.Job;
-import org.apache.bigtop.manager.server.command.job.runner.JobRunner;
-import org.apache.bigtop.manager.server.command.job.runner.JobRunners;
+import org.apache.bigtop.manager.server.command.job.Job;
 import org.apache.bigtop.manager.server.holder.SessionUserHolder;
 
 import org.springframework.stereotype.Component;
@@ -48,8 +46,7 @@ public class DefaultJobScheduler implements JobScheduler {
         queue.offer(() -> {
             try {
                 SessionUserHolder.setUserId(userId);
-                JobRunner runner = JobRunners.getJobRunner(job);
-                runner.run();
+                job.run();
             } finally {
                 SessionUserHolder.clear();
             }

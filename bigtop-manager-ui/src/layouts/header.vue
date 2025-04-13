@@ -18,62 +18,103 @@
 -->
 
 <script setup lang="ts">
-  import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons-vue'
-  import ClusterInfo from '@/components/cluster-info/index.vue'
-  import JobInfo from '@/components/job-info/index.vue'
-  import AlertInfo from '@/components/alert-info/index.vue'
+  import { ref, toRefs } from 'vue'
   import SelectLang from '@/components/select-lang/index.vue'
   import UserAvatar from '@/components/user-avatar/index.vue'
-  import { useUIStore } from '@/store/ui'
-  import { storeToRefs } from 'pinia'
-  import { useClusterStore } from '@/store/cluster'
+  import AiAssistant from '@/components/ai-assistant/index.vue'
 
-  const uiStore = useUIStore()
-  const clusterStore = useClusterStore()
-  const { siderCollapsed } = storeToRefs(uiStore)
-  const { clusters } = storeToRefs(clusterStore)
+  import { RouteRecordRaw } from 'vue-router'
+
+  interface Props {
+    headerSelectedKey: string
+    headerMenus: RouteRecordRaw[]
+  }
+
+  interface Emits {
+    (event: 'onHeaderClick', key: string): void
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    headerSelectedKey: '',
+    headerMenus: () => []
+  })
+
+  const { headerSelectedKey, headerMenus } = toRefs(props)
+  const githubUrl = import.meta.env.VITE_GITHUB_URL
+  const bigtopMangerDocURL = import.meta.env.VITE_BIGTOP_MANAGER_DOC_URL
+  const spaceSize = ref(16)
+  const aiAssistantRef = ref<InstanceType<typeof AiAssistant> | null>(null)
+
+  const emits = defineEmits<Emits>()
+
+  const handleHeaderSelect = ({ key }: any) => {
+    emits('onHeaderClick', key)
+  }
+
+  const handleCommunication = () => {
+    aiAssistantRef.value?.controlVisible()
+  }
 </script>
 
 <template>
   <a-layout-header class="header">
-    <div class="header-left">
-      <menu-unfold-outlined
-        v-if="siderCollapsed"
-        @click="uiStore.changeCollapsed"
-      />
-      <menu-fold-outlined v-else @click="uiStore.changeCollapsed" />
+    <h1 class="header-left common-layout">
+      <svg-icon name="bm_logo" />
+    </h1>
+    <div class="header-menu">
+      <a-menu :selected-keys="[headerSelectedKey]" theme="dark" mode="horizontal" @select="handleHeaderSelect">
+        <a-menu-item v-for="route of headerMenus" :key="route.path">
+          {{ $t(route.meta?.title || '') }}
+        </a-menu-item>
+      </a-menu>
     </div>
-    <div class="header-right">
-      <template v-if="clusters.length > 0">
-        <cluster-info />
-        <job-info />
-        <alert-info />
-      </template>
-      <select-lang />
-      <user-avatar />
+    <div class="header-right common-layout">
+      <a-space :size="spaceSize">
+        <user-avatar />
+        <div class="header-item" @click="handleCommunication">
+          <svg-icon name="communication" />
+        </div>
+        <select-lang />
+        <div class="header-item">
+          <a :href="githubUrl" target="_blank">
+            <svg-icon name="github" />
+          </a>
+        </div>
+        <div class="header-item">
+          <a :href="bigtopMangerDocURL" target="_blank">
+            <svg-icon name="book" />
+          </a>
+        </div>
+      </a-space>
     </div>
+    <ai-assistant ref="aiAssistantRef" />
   </a-layout-header>
 </template>
 
 <style scoped lang="scss">
+  .common-layout {
+    @include flexbox($justify: center, $align: center);
+    height: 100%;
+  }
   .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #fff;
-    padding: 0 1rem;
-    height: 48px;
-
+    @include flexbox($justify: space-between, $align: center);
+    padding-inline: 0 $space-md;
+    height: $layout-header-height;
+    .header-menu {
+      flex: 1;
+    }
     .header-left {
-      font-size: 16px;
-      cursor: pointer;
-      transition: color 0.3s;
+      width: $layout-sider-width;
+      margin: 0;
+      flex-shrink: 0;
+      :deep(.svg-icon) {
+        width: 180px;
+        height: 30px;
+      }
     }
 
-    .header-right {
-      display: flex;
-      justify-content: end;
-      align-items: center;
+    nav {
+      color: $color-white;
     }
   }
 </style>

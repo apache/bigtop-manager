@@ -29,24 +29,18 @@ service CommandService {
 enum CommandType {
   COMPONENT = 0;
   HOST_CHECK = 1;
-  CACHE_DISTRIBUTE = 2;
+  UPDATE_CACHE_FILES = 2;
+  SETUP_JDK = 3;
 }
 
 message CommandRequest {
   string payload = 1;
-  string hostname = 2;
-  int64 job_id = 3;
-  int64 stage_id = 4;
-  int64 task_id = 5;
-  CommandType type = 6;
+  int64 task_id = 2;
+  CommandType type = 3;
 }
 
 message CommandReply {
   int32 code = 1;
   string result = 2;
-  string hostname = 3;
-  int64 job_id = 4;
-  int64 stage_id = 5;
-  int64 task_id = 6;
-  CommandType type = 7;
+  int64 task_id = 3;
 }

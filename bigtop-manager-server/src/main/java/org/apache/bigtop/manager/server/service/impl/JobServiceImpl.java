@@ -19,86 +19,237 @@
 package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.common.enums.JobState;
-import org.apache.bigtop.manager.dao.entity.Job;
-import org.apache.bigtop.manager.dao.entity.Stage;
-import org.apache.bigtop.manager.dao.entity.Task;
-import org.apache.bigtop.manager.dao.repository.JobRepository;
-import org.apache.bigtop.manager.dao.repository.StageRepository;
-import org.apache.bigtop.manager.dao.repository.TaskRepository;
+import org.apache.bigtop.manager.common.utils.JsonUtils;
+import org.apache.bigtop.manager.dao.po.JobPO;
+import org.apache.bigtop.manager.dao.po.StagePO;
+import org.apache.bigtop.manager.dao.po.TaskPO;
+import org.apache.bigtop.manager.dao.repository.JobDao;
+import org.apache.bigtop.manager.dao.repository.StageDao;
+import org.apache.bigtop.manager.dao.repository.TaskDao;
+import org.apache.bigtop.manager.server.command.CommandIdentifier;
+import org.apache.bigtop.manager.server.command.factory.JobFactories;
+import org.apache.bigtop.manager.server.command.factory.JobFactory;
+import org.apache.bigtop.manager.server.command.job.Job;
+import org.apache.bigtop.manager.server.command.job.JobContext;
 import org.apache.bigtop.manager.server.command.scheduler.JobScheduler;
+import org.apache.bigtop.manager.server.command.stage.Stage;
+import org.apache.bigtop.manager.server.command.task.Task;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
-import org.apache.bigtop.manager.server.model.mapper.JobMapper;
+import org.apache.bigtop.manager.server.model.converter.JobConverter;
+import org.apache.bigtop.manager.server.model.converter.StageConverter;
+import org.apache.bigtop.manager.server.model.converter.TaskConverter;
 import org.apache.bigtop.manager.server.model.query.PageQuery;
 import org.apache.bigtop.manager.server.model.vo.JobVO;
 import org.apache.bigtop.manager.server.model.vo.PageVO;
+import org.apache.bigtop.manager.server.model.vo.StageVO;
+import org.apache.bigtop.manager.server.model.vo.TaskVO;
 import org.apache.bigtop.manager.server.service.JobService;
-import org.apache.bigtop.manager.server.utils.ClusterUtils;
 import org.apache.bigtop.manager.server.utils.PageUtils;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+
 import jakarta.annotation.Resource;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class JobServiceImpl implements JobService {
 
     @Resource
-    private JobRepository jobRepository;
+    private JobDao jobDao;
 
     @Resource
-    private StageRepository stageRepository;
+    private StageDao stageDao;
 
     @Resource
-    private TaskRepository taskRepository;
+    private TaskDao taskDao;
 
     @Resource
     private JobScheduler jobScheduler;
 
     @Override
-    public PageVO<JobVO> list(Long clusterId) {
+    public PageVO<JobVO> jobs(Long clusterId) {
         PageQuery pageQuery = PageUtils.getPageQuery();
-        Pageable pageable = PageRequest.of(pageQuery.getPageNum(), pageQuery.getPageSize(), pageQuery.getSort());
-        Page<Job> page;
-        if (ClusterUtils.isNoneCluster(clusterId)) {
-            page = jobRepository.findAllByClusterIsNull(pageable);
-        } else {
-            page = jobRepository.findAllByClusterId(clusterId, pageable);
-        }
+        try (Page<?> ignored =
+                PageHelper.startPage(pageQuery.getPageNum(), pageQuery.getPageSize(), pageQuery.getOrderBy())) {
+            List<JobPO> jobPOList = jobDao.findByClusterId(clusterId);
+            List<JobVO> jobVOList = new ArrayList<>();
+            for (JobPO jobPO : jobPOList) {
+                List<StagePO> stagePOList = stageDao.findByJobId(jobPO.getId());
+                List<StagePO> runningStagePOList = stagePOList.stream()
+                        .filter(stagePO -> List.of(JobState.PROCESSING, JobState.SUCCESSFUL)
+                                .contains(JobState.fromString(stagePO.getState())))
+                        .toList();
+                JobVO jobVO = JobConverter.INSTANCE.fromPO2VO(jobPO);
+                if (stagePOList.isEmpty()) {
+                    jobVO.setProgress(1);
+                } else {
+                    jobVO.setProgress(new BigDecimal(runningStagePOList.size())
+                            .divide(new BigDecimal(stagePOList.size()), 2, RoundingMode.HALF_UP)
+                            .multiply(new BigDecimal(100))
+                            .intValue());
+                }
+                jobVOList.add(jobVO);
+            }
 
-        return PageVO.of(page);
+            PageInfo<JobPO> pageInfo = new PageInfo<>(jobPOList);
+            return PageVO.of(jobVOList, pageInfo.getTotal());
+        } finally {
+            PageHelper.clearPage();
+        }
     }
 
     @Override
-    public JobVO get(Long id) {
-        Job job = jobRepository.getReferenceById(id);
-        return JobMapper.INSTANCE.fromEntity2VO(job);
+    public JobVO jobDetails(Long clusterId, Long jobId) {
+        JobPO jobPO = jobDao.findById(jobId);
+        List<StageVO> stages = new ArrayList<>();
+        List<StagePO> stagePOList = stageDao.findByJobId(jobId);
+        List<StagePO> runningStagePOList = new ArrayList<>();
+        for (int i = 0; i < stagePOList.size(); i++) {
+            StagePO stagePO = findCorrectStagePO(stagePOList, i + 1);
+            if (stagePO == null) {
+                throw new ApiException(ApiExceptionEnum.JOB_NOT_FOUND);
+            }
+
+            if (List.of(JobState.PROCESSING, JobState.SUCCESSFUL).contains(JobState.fromString(stagePO.getState()))) {
+                runningStagePOList.add(stagePO);
+            }
+
+            StageVO stageVO = StageConverter.INSTANCE.fromPO2VO(stagePO);
+            List<TaskPO> taskPOList = taskDao.findByStageId(stagePO.getId());
+            List<TaskVO> taskVOList = TaskConverter.INSTANCE.fromPO2VO(taskPOList);
+            stageVO.setTasks(taskVOList);
+            stages.add(stageVO);
+        }
+
+        JobVO jobVO = JobConverter.INSTANCE.fromPO2VO(jobPO);
+        if (stagePOList.isEmpty()) {
+            jobVO.setProgress(1);
+        } else {
+            jobVO.setProgress(new BigDecimal(runningStagePOList.size())
+                    .divide(new BigDecimal(stagePOList.size()), 2, RoundingMode.HALF_UP)
+                    .multiply(new BigDecimal(100))
+                    .intValue());
+        }
+        jobVO.setStages(stages);
+        return jobVO;
+    }
+
+    @Override
+    public PageVO<StageVO> stages(Long jobId) {
+        PageQuery pageQuery = PageUtils.getPageQuery();
+        try (Page<?> ignored =
+                PageHelper.startPage(pageQuery.getPageNum(), pageQuery.getPageSize(), pageQuery.getOrderBy())) {
+            List<StagePO> stagePOList = stageDao.findByJobId(jobId);
+            PageInfo<StagePO> pageInfo = new PageInfo<>(stagePOList);
+            return PageVO.of(pageInfo);
+        } finally {
+            PageHelper.clearPage();
+        }
+    }
+
+    @Override
+    public PageVO<TaskVO> tasks(Long stageId) {
+        PageQuery pageQuery = PageUtils.getPageQuery();
+        try (Page<?> ignored =
+                PageHelper.startPage(pageQuery.getPageNum(), pageQuery.getPageSize(), pageQuery.getOrderBy())) {
+            List<TaskPO> taskPOList = taskDao.findByStageId(stageId);
+            PageInfo<TaskPO> pageInfo = new PageInfo<>(taskPOList);
+            return PageVO.of(pageInfo);
+        } finally {
+            PageHelper.clearPage();
+        }
     }
 
     @Override
     public JobVO retry(Long id) {
-        Job job = jobRepository.getReferenceById(id);
-        if (job.getState() != JobState.FAILED) {
+        JobPO jobPO = jobDao.findOptionalById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.JOB_NOT_FOUND));
+        if (JobState.fromString(jobPO.getState()) != JobState.FAILED) {
             throw new ApiException(ApiExceptionEnum.JOB_NOT_RETRYABLE);
         }
 
-        for (Stage stage : job.getStages()) {
-            for (Task task : stage.getTasks()) {
-                task.setState(JobState.PENDING);
-                taskRepository.save(task);
-            }
-
-            stage.setState(JobState.PENDING);
-            stageRepository.save(stage);
-        }
-
-        job.setState(JobState.PENDING);
-        jobRepository.save(job);
+        resetJobStatusInDB(jobPO);
+        Job job = recreateJob(jobPO);
         jobScheduler.submit(job);
 
-        return JobMapper.INSTANCE.fromEntity2VO(job);
+        return JobConverter.INSTANCE.fromPO2VO(jobPO);
+    }
+
+    private void resetJobStatusInDB(JobPO jobPO) {
+        for (StagePO stagePO : stageDao.findByJobId(jobPO.getId())) {
+            for (TaskPO taskPO : taskDao.findByStageId(stagePO.getId())) {
+                taskPO.setState(JobState.PENDING.getName());
+                taskDao.partialUpdateById(taskPO);
+            }
+
+            stagePO.setState(JobState.PENDING.getName());
+            stageDao.partialUpdateById(stagePO);
+        }
+
+        jobPO.setState(JobState.PENDING.getName());
+        jobDao.partialUpdateById(jobPO);
+    }
+
+    private Job recreateJob(JobPO jobPO) {
+        JobContext jobContext = JsonUtils.readFromString(jobPO.getContext(), JobContext.class);
+        jobContext.setRetryFlag(true);
+        CommandIdentifier commandIdentifier = new CommandIdentifier(
+                jobContext.getCommandDTO().getCommandLevel(),
+                jobContext.getCommandDTO().getCommand());
+        JobFactory jobFactory = JobFactories.getJobFactory(commandIdentifier);
+        Job job = jobFactory.createJob(jobContext);
+
+        job.loadJobPO(jobPO);
+        List<StagePO> stagePOList = stageDao.findByJobId(jobPO.getId());
+        for (int i = 0; i < job.getStages().size(); i++) {
+            Stage stage = job.getStages().get(i);
+            StagePO stagePO = findCorrectStagePO(stagePOList, i + 1);
+            if (stagePO == null) {
+                throw new ApiException(ApiExceptionEnum.JOB_NOT_RETRYABLE);
+            }
+
+            stage.loadStagePO(stagePO);
+            List<TaskPO> taskPOList = taskDao.findByStageId(stagePO.getId());
+
+            for (int j = 0; j < stage.getTasks().size(); j++) {
+                Task task = stage.getTasks().get(j);
+                TaskPO taskPO =
+                        findCorrectTaskPO(taskPOList, task.getTaskContext().getHostname());
+                if (taskPO == null) {
+                    throw new ApiException(ApiExceptionEnum.JOB_NOT_RETRYABLE);
+                }
+
+                task.loadTaskPO(taskPO);
+            }
+        }
+
+        return job;
+    }
+
+    private StagePO findCorrectStagePO(List<StagePO> stagePOList, Integer order) {
+        for (StagePO stagePO : stagePOList) {
+            if (stagePO.getOrder().equals(order)) {
+                return stagePO;
+            }
+        }
+
+        return null;
+    }
+
+    private TaskPO findCorrectTaskPO(List<TaskPO> taskPOList, String hostname) {
+        for (TaskPO taskPO : taskPOList) {
+            if (taskPO.getHostname().equals(hostname)) {
+                return taskPO;
+            }
+        }
+
+        return null;
     }
 }

@@ -42,15 +42,19 @@ public class ServiceModel {
 
     private String user;
 
-    private String group;
+    private String license;
 
-    @XmlElementWrapper(name = "os-specifics")
-    @XmlElements(@XmlElement(name = "os-specific"))
-    private List<OSSpecificModel> osSpecifics;
+    @XmlElementWrapper(name = "package-specifics")
+    @XmlElements(@XmlElement(name = "package-specific"))
+    private List<PackageSpecificModel> packageSpecifics;
 
     @XmlElementWrapper(name = "components")
     @XmlElements(@XmlElement(name = "component"))
     private List<ComponentModel> components;
+
+    @XmlElementWrapper(name = "templates")
+    @XmlElements(@XmlElement(name = "template"))
+    private List<TemplateModel> templates;
 
     @XmlElementWrapper(name = "required-services")
     @XmlElements(@XmlElement(name = "service"))

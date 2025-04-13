@@ -27,13 +27,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class RepoDTO {
 
-    private String repoId;
+    private Integer id;
 
-    private String repoName;
+    private String name;
+
+    private String arch;
 
     private String baseUrl;
 
-    private String os;
-
-    private String arch;
+    private Integer type;
 }

@@ -32,14 +32,14 @@ public class CommandGroupSequenceProvider implements DefaultGroupSequenceProvide
     @Override
     public List<Class<?>> getValidationGroups(CommandReq bean) {
         List<Class<?>> defaultGroupSequence = new ArrayList<>();
-        defaultGroupSequence.add(CommandReq.class); // 这一步不能省,否则Default分组都不会执行了，会抛错的
+        defaultGroupSequence.add(CommandReq.class);
 
-        if (bean != null) { // 这块判空请务必要做
+        if (bean != null) {
             CommandLevel commandLevel = bean.getCommandLevel();
 
             switch (commandLevel) {
                 case SERVICE:
-                    if (bean.getCommand() == Command.INSTALL) {
+                    if (bean.getCommand() == Command.ADD) {
                         defaultGroupSequence.add(ServiceInstallCommandGroup.class);
                     } else {
                         defaultGroupSequence.add(ServiceCommandGroup.class);

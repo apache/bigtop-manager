@@ -18,29 +18,49 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
-import org.apache.bigtop.manager.common.enums.MaintainState;
-import org.apache.bigtop.manager.dao.entity.Cluster;
-import org.apache.bigtop.manager.dao.entity.Host;
-import org.apache.bigtop.manager.dao.repository.ClusterRepository;
-import org.apache.bigtop.manager.dao.repository.HostRepository;
+import org.apache.bigtop.manager.common.constants.MessageConstants;
+import org.apache.bigtop.manager.common.shell.ShellResult;
+import org.apache.bigtop.manager.common.utils.InstanceUtils;
+import org.apache.bigtop.manager.dao.po.ComponentPO;
+import org.apache.bigtop.manager.dao.po.HostPO;
+import org.apache.bigtop.manager.dao.po.RepoPO;
+import org.apache.bigtop.manager.dao.query.ComponentQuery;
+import org.apache.bigtop.manager.dao.query.HostQuery;
+import org.apache.bigtop.manager.dao.repository.ComponentDao;
+import org.apache.bigtop.manager.dao.repository.HostDao;
+import org.apache.bigtop.manager.dao.repository.RepoDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
+import org.apache.bigtop.manager.server.enums.HealthyStatusEnum;
+import org.apache.bigtop.manager.server.enums.HostAuthTypeEnum;
+import org.apache.bigtop.manager.server.enums.InstalledStatusEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
-import org.apache.bigtop.manager.server.grpc.GrpcClient;
+import org.apache.bigtop.manager.server.model.converter.ComponentConverter;
+import org.apache.bigtop.manager.server.model.converter.HostConverter;
 import org.apache.bigtop.manager.server.model.dto.HostDTO;
-import org.apache.bigtop.manager.server.model.mapper.HostMapper;
+import org.apache.bigtop.manager.server.model.query.PageQuery;
+import org.apache.bigtop.manager.server.model.vo.ComponentVO;
 import org.apache.bigtop.manager.server.model.vo.HostVO;
+import org.apache.bigtop.manager.server.model.vo.InstalledStatusVO;
+import org.apache.bigtop.manager.server.model.vo.PageVO;
 import org.apache.bigtop.manager.server.service.HostService;
+import org.apache.bigtop.manager.server.utils.PageUtils;
+import org.apache.bigtop.manager.server.utils.RemoteSSHUtils;
 
-import org.apache.commons.collections4.CollectionUtils;
-
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -48,80 +68,282 @@ import java.util.stream.Collectors;
 public class HostServiceImpl implements HostService {
 
     @Resource
-    private ClusterRepository clusterRepository;
+    private RepoDao repoDao;
 
     @Resource
-    private HostRepository hostRepository;
+    private HostDao hostDao;
+
+    @Resource
+    private ComponentDao componentDao;
+
+    private final List<InstalledStatusVO> installedStatus = new CopyOnWriteArrayList<>();
+
+    private final ExecutorService executorService = Executors.newFixedThreadPool(5);
 
     @Override
-    public List<HostVO> list(Long clusterId) {
-        List<Host> hosts = hostRepository.findAllByClusterId(clusterId);
-        if (CollectionUtils.isEmpty(hosts)) {
-            throw new ApiException(ApiExceptionEnum.HOST_NOT_FOUND);
+    public PageVO<HostVO> list(HostQuery hostQuery) {
+        PageQuery pageQuery = PageUtils.getPageQuery();
+        try (Page<?> ignored =
+                PageHelper.startPage(pageQuery.getPageNum(), pageQuery.getPageSize(), pageQuery.getOrderBy())) {
+            List<HostPO> hostPOList = hostDao.findByQuery(hostQuery);
+            PageInfo<HostPO> pageInfo = new PageInfo<>(hostPOList);
+            return PageVO.of(pageInfo);
+        } finally {
+            PageHelper.clearPage();
+        }
+    }
+
+    @Override
+    public List<HostVO> add(HostDTO hostDTO) {
+        List<HostPO> hostPOList = HostConverter.INSTANCE.fromDTO2POListUsingHostnames(hostDTO);
+        for (HostPO hostPO : hostPOList) {
+            hostPO.setStatus(HealthyStatusEnum.HEALTHY.getCode());
         }
 
-        return HostMapper.INSTANCE.fromEntity2VO(hosts);
+        hostDao.saveAll(hostPOList);
+        return HostConverter.INSTANCE.fromPO2VO(hostPOList);
     }
 
     @Override
     public List<HostVO> batchSave(Long clusterId, List<String> hostnames) {
-        Cluster cluster = clusterRepository.getReferenceById(clusterId);
+        List<HostPO> hostnameIn = hostDao.findAllByHostnames(hostnames);
+        List<HostPO> hostPOList = new ArrayList<>();
 
-        List<Host> hostnameIn = hostRepository.findAllByHostnameIn(hostnames);
-        List<Host> hosts = new ArrayList<>();
-
-        Map<String, Host> hostInMap = hostnameIn.stream().collect(Collectors.toMap(Host::getHostname, host -> host));
+        Map<String, HostPO> hostInMap =
+                hostnameIn.stream().collect(Collectors.toMap(HostPO::getHostname, host -> host));
 
         for (String hostname : hostnames) {
-            Host host = new Host();
-            host.setHostname(hostname);
-            host.setCluster(cluster);
-            host.setState(MaintainState.INSTALLED);
+            HostPO hostPO = new HostPO();
+            hostPO.setHostname(hostname);
+            hostPO.setClusterId(clusterId);
+            hostPO.setStatus(HealthyStatusEnum.UNKNOWN.getCode());
 
             if (hostInMap.containsKey(hostname)) {
-                host.setId(hostInMap.get(hostname).getId());
+                hostPO.setId(hostInMap.get(hostname).getId());
             }
 
-            hosts.add(host);
+            hostPOList.add(hostPO);
         }
 
-        hostRepository.saveAll(hosts);
+        hostDao.saveAll(hostPOList);
 
-        return HostMapper.INSTANCE.fromEntity2VO(hosts);
+        return HostConverter.INSTANCE.fromPO2VO(hostPOList);
     }
 
     @Override
     public HostVO get(Long id) {
-        Host host = hostRepository.findById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.HOST_NOT_FOUND));
+        HostPO hostPO = hostDao.findDetailsById(id);
+        if (hostPO == null) {
+            throw new ApiException(ApiExceptionEnum.HOST_NOT_FOUND);
+        }
 
-        return HostMapper.INSTANCE.fromEntity2VO(host);
+        return HostConverter.INSTANCE.fromPO2VO(hostPO);
     }
 
     @Override
     public HostVO update(Long id, HostDTO hostDTO) {
-        Host host = HostMapper.INSTANCE.fromDTO2Entity(hostDTO);
-        host.setId(id);
-        hostRepository.save(host);
+        HostPO hostPO = hostDao.findById(id);
+        HostPO convertedHostPO = HostConverter.INSTANCE.fromDTO2PO(hostDTO);
+        BeanUtils.copyProperties(convertedHostPO, hostPO, InstanceUtils.getNullProperties(convertedHostPO));
+        switch (HostAuthTypeEnum.fromCode(hostPO.getAuthType())) {
+            case PASSWORD -> {
+                hostPO.setSshPassword(hostDTO.getSshPassword());
+                hostPO.setSshKeyString(null);
+                hostPO.setSshKeyFilename(null);
+                hostPO.setSshKeyPassword(null);
+            }
+            case KEY -> {
+                hostPO.setSshPassword(null);
+                hostPO.setSshKeyString(hostDTO.getSshKeyString());
+                hostPO.setSshKeyFilename(hostDTO.getSshKeyFilename());
+                hostPO.setSshKeyPassword(hostDTO.getSshKeyPassword());
+            }
+            case NO_AUTH -> {
+                hostPO.setSshPassword(null);
+                hostPO.setSshKeyString(null);
+                hostPO.setSshKeyFilename(null);
+                hostPO.setSshKeyPassword(null);
+            }
+        }
 
-        return HostMapper.INSTANCE.fromEntity2VO(host);
+        hostDao.updateById(hostPO);
+        return get(id);
     }
 
     @Override
-    public Boolean delete(Long id) {
-        hostRepository.deleteById(id);
-        return true;
+    public Boolean remove(Long id) {
+        return batchRemove(List.of(id));
     }
 
     @Override
-    public Boolean checkConnection(List<String> hostnames) {
-        for (String hostname : hostnames) {
-            if (!GrpcClient.isChannelAlive(hostname)) {
-                // An api exception will throw if connection fails to establish, we don't need to handle the return
-                // value.
-                GrpcClient.createChannel(hostname);
+    public List<ComponentVO> components(Long id) {
+        ComponentQuery query = ComponentQuery.builder().hostId(id).build();
+        List<ComponentPO> componentPOList = componentDao.findByQuery(query);
+        return ComponentConverter.INSTANCE.fromPO2VO(componentPOList);
+    }
+
+    @Override
+    public Boolean batchRemove(List<Long> ids) {
+        for (Long id : ids) {
+            if (componentDao.countByHostId(id) > 0) {
+                HostPO hostPO = hostDao.findById(id);
+                throw new ApiException(ApiExceptionEnum.HOST_HAS_COMPONENTS, hostPO.getHostname());
+            }
+        }
+
+        return hostDao.deleteByIds(ids);
+    }
+
+    @Override
+    public Boolean checkConnection(HostDTO hostDTO) {
+        String command = "hostname";
+        for (String hostname : hostDTO.getHostnames()) {
+            try {
+                ShellResult result = execCommandOnRemoteHost(hostDTO, hostname, command);
+                if (result.getExitCode() != 0) {
+                    log.error("Unable to connect to host, hostname: {}, msg: {}", hostname, result.getErrMsg());
+                    throw new ApiException(ApiExceptionEnum.HOST_UNABLE_TO_CONNECT, hostname);
+                } else {
+                    log.info("Successfully connected to host, hostname: {}, res: {}", hostname, result.getOutput());
+                }
+            } catch (Exception e) {
+                log.error("Unable to connect to host, hostname: {}", hostname, e);
+                throw new ApiException(ApiExceptionEnum.HOST_UNABLE_TO_CONNECT, hostname);
             }
         }
 
         return true;
+    }
+
+    @Override
+    public Boolean installDependencies(List<HostDTO> hostDTOList) {
+        List<RepoPO> repoPOList = repoDao.findAll();
+        Map<String, RepoPO> archRepoMap = repoPOList.stream()
+                .filter(repoPO -> repoPO.getType() == 2)
+                .collect(Collectors.toMap(RepoPO::getArch, repo -> repo));
+
+        // Clear cache list
+        installedStatus.clear();
+
+        for (HostDTO hostDTO : hostDTOList) {
+            for (String hostname : hostDTO.getHostnames()) {
+                InstalledStatusVO installedStatusVO = new InstalledStatusVO();
+                installedStatusVO.setHostname(hostname);
+                installedStatusVO.setStatus(InstalledStatusEnum.INSTALLING);
+                installedStatus.add(installedStatusVO);
+
+                // Async install dependencies
+                executorService.submit(() -> {
+                    try {
+                        installDependencies(archRepoMap, hostDTO, hostname, installedStatusVO);
+                    } catch (Exception e) {
+                        log.error("Unable to install dependencies on host, hostname: {}", hostname, e);
+                        installedStatusVO.setStatus(InstalledStatusEnum.FAILED);
+                        installedStatusVO.setMessage(e.getMessage());
+                    }
+                });
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public List<InstalledStatusVO> installedStatus() {
+        return installedStatus;
+    }
+
+    public void installDependencies(
+            Map<String, RepoPO> archRepoMap, HostDTO hostDTO, String hostname, InstalledStatusVO installedStatusVO) {
+        String path = hostDTO.getAgentDir();
+        // Get host arch
+        String arch =
+                execCommandOnRemoteHost(hostDTO, hostname, "arch").getOutput().trim();
+        arch = arch.equals("arm64") ? "aarch64" : arch;
+
+        // Download & Extract agent tarball
+        String repoUrl = archRepoMap.get(arch).getBaseUrl();
+        String tarballUrl = repoUrl + "/bigtop-manager-agent.tar.gz";
+        String command = "sudo mkdir -p " + path + " &&"
+                + " sudo chown -R " + hostDTO.getSshUser() + ":" + hostDTO.getSshUser() + " " + path
+                + " && curl -L " + tarballUrl + " | tar -xz -C " + path;
+        ShellResult result = execCommandOnRemoteHost(hostDTO, hostname, command);
+        if (result.getExitCode() != MessageConstants.SUCCESS_CODE) {
+            log.error(
+                    "Unable to download & extract agent tarball, hostname: {}, msg: {}", hostname, result.getErrMsg());
+
+            installedStatusVO.setStatus(InstalledStatusEnum.FAILED);
+            installedStatusVO.setMessage(result.getErrMsg());
+            return;
+        }
+
+        // Update agent conf
+        // Current only grpc port needs to be updated if it's not default port
+        if (hostDTO.getGrpcPort() != 8835) {
+            command = "sed -i 's/port: 8835/port: " + hostDTO.getGrpcPort() + "/' " + path
+                    + "/bigtop-manager-agent/conf/application.yml";
+            result = execCommandOnRemoteHost(hostDTO, hostname, command);
+            if (result.getExitCode() != MessageConstants.SUCCESS_CODE) {
+                log.error("Unable to update agent config, hostname: {}, msg: {}", hostname, result.getErrMsg());
+
+                installedStatusVO.setStatus(InstalledStatusEnum.FAILED);
+                installedStatusVO.setMessage(result.getErrMsg());
+                return;
+            }
+        }
+
+        // Run agent in background
+        command = "nohup " + path + "/bigtop-manager-agent/bin/start.sh --debug > /dev/null 2>&1 &";
+        result = execCommandOnRemoteHost(hostDTO, hostname, command);
+        if (result.getExitCode() != MessageConstants.SUCCESS_CODE) {
+            log.error("Unable to start agent, hostname: {}, msg: {}", hostname, result.getErrMsg());
+
+            installedStatusVO.setStatus(InstalledStatusEnum.FAILED);
+            installedStatusVO.setMessage(result.getErrMsg());
+            return;
+        }
+
+        // Check the process, the agent may encounter some errors and exit when starting
+        // So we need to wait for a while before the check
+        try {
+            Thread.sleep(10 * 1000);
+        } catch (InterruptedException e) {
+            log.error("Thread sleep interrupted", e);
+        }
+        command = "ps -ef | grep bigtop-manager-agent | grep -v grep";
+        result = execCommandOnRemoteHost(hostDTO, hostname, command);
+        if (result.getExitCode() != MessageConstants.SUCCESS_CODE
+                || !result.getOutput().contains("bigtop-manager-agent")) {
+            log.error("Unable to start agent process, hostname: {}", hostname);
+
+            installedStatusVO.setStatus(InstalledStatusEnum.FAILED);
+            installedStatusVO.setMessage("Unable to start agent, please check the log.");
+            return;
+        }
+
+        installedStatusVO.setStatus(InstalledStatusEnum.SUCCESS);
+    }
+
+    private ShellResult execCommandOnRemoteHost(HostDTO hostDTO, String hostname, String command) {
+        HostAuthTypeEnum authType = HostAuthTypeEnum.fromCode(hostDTO.getAuthType());
+        try {
+            return switch (authType) {
+                case PASSWORD -> RemoteSSHUtils.executeCommand(
+                        hostname, hostDTO.getSshPort(), hostDTO.getSshUser(), hostDTO.getSshPassword(), command);
+                case KEY -> RemoteSSHUtils.executeCommand(
+                        hostname,
+                        hostDTO.getSshPort(),
+                        hostDTO.getSshUser(),
+                        hostDTO.getSshKeyFilename(),
+                        hostDTO.getSshKeyString(),
+                        hostDTO.getSshKeyPassword(),
+                        command);
+                case NO_AUTH -> RemoteSSHUtils.executeCommand(
+                        hostname, hostDTO.getSshPort(), hostDTO.getSshUser(), command);
+            };
+        } catch (Exception e) {
+            log.error("Unable to exec command on host, hostname: {}, command: {}", hostname, command, e);
+            throw new RuntimeException(e);
+        }
     }
 }

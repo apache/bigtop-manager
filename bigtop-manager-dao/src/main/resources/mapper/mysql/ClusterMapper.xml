@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one
+  ~ or more contributor license agreements.  See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership.  The ASF licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+-->
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.apache.bigtop.manager.dao.repository.ClusterDao">
+
+    <sql id="baseColumns">
+        id, name, display_name, `desc`, type, user_group, root_dir, status
+    </sql>
+    <sql id="baseColumnsV2">
+        ${alias}.id, ${alias}.name, ${alias}.display_name, ${alias}.`desc`, ${alias}.type, ${alias}.user_group, ${alias}.root_dir, ${alias}.status
+    </sql>
+
+    <select id="findDetailsById" resultType="org.apache.bigtop.manager.dao.po.ClusterPO">
+        select
+        <include refid="baseColumnsV2">
+            <property name="alias" value="c"/>
+        </include>, u.nickname as create_user,
+        count(h.id) as total_host, sum(h.available_processors) as total_processor,
+        sum(h.total_memory_size) as total_memory, sum(h.total_disk) as total_disk, count(s.id) as total_service
+        from
+        cluster c left join user u on c.create_by = u.id
+        left join host h on c.id = h.cluster_id
+        left join service s on c.id = s.cluster_id
+        where c.id = #{id}
+        limit 1
+    </select>
+
+    <select id="findByName" resultType="org.apache.bigtop.manager.dao.po.ClusterPO">
+        select
+        <include refid="baseColumns"/>
+        from
+        cluster
+        where name = #{name}
+        limit 1
+    </select>
+
+    <select id="count" resultType="java.lang.Integer">
+        select count(*) from cluster
+    </select>
+</mapper>

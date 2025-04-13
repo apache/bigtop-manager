@@ -18,8 +18,6 @@
  */
 package org.apache.bigtop.manager.server.model.vo;
 
-import org.apache.bigtop.manager.common.enums.JobState;
-
 import lombok.Data;
 
 import java.util.List;
@@ -31,13 +29,13 @@ public class StageVO {
 
     private String name;
 
-    private List<TaskVO> tasks;
-
-    private JobState state;
+    private String state;
 
     private Integer order;
 
     private String createTime;
 
     private String updateTime;
+
+    private List<TaskVO> tasks;
 }

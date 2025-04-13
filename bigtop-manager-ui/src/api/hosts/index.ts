@@ -18,11 +18,65 @@
  */
 
 import request from '@/api/request.ts'
-import { HostVO } from '@/api/hosts/types.ts'
+import type { HostListParams, HostParams, HostVO, HostVOList, InstalledStatusVO } from '@/api/hosts/types.ts'
+import type { ComponentVO } from '@/api/component/types.ts'
 
-export const getHosts = (clusterId: number): Promise<HostVO[]> => {
+export const getHosts = (params?: HostListParams): Promise<HostVOList> => {
   return request({
     method: 'get',
-    url: '/clusters/' + clusterId + '/hosts'
+    url: '/hosts',
+    params
+  })
+}
+export const getHost = (pathParams: { id: number }): Promise<HostVO> => {
+  return request({
+    method: 'get',
+    url: `/hosts/${pathParams.id}`
+  })
+}
+
+export const addHost = (data: HostParams): Promise<HostVO> => {
+  return request({
+    method: 'post',
+    url: '/hosts',
+    data
+  })
+}
+
+export const installDependencies = (data: HostParams) => {
+  return request({
+    method: 'post',
+    url: '/hosts/install-dependencies',
+    data
+  })
+}
+
+export const getInstalledStatus = (): Promise<InstalledStatusVO[]> => {
+  return request({
+    method: 'get',
+    url: '/hosts/installed-status'
+  })
+}
+
+export const updateHost = (data: HostParams): Promise<HostVO[]> => {
+  return request({
+    method: 'put',
+    url: `/hosts/${data.id}`,
+    data
+  })
+}
+
+export const removeHost = (data: { ids: number[] }): Promise<boolean> => {
+  return request({
+    method: 'delete',
+    url: '/hosts/batch',
+    data
+  })
+}
+
+export const getComponentsByHost = (pathParams: { id: number }): Promise<ComponentVO[]> => {
+  return request({
+    method: 'get',
+    url: `/hosts/${pathParams.id}/components`
   })
 }

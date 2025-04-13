@@ -32,21 +32,26 @@ Editor: VsCode
 ## Project Structure
 
 ```
-—————————————————— public           static resources
-—————————————————— src              project source code
-——————————— API                     calls the backend interface
-——————————— assets                  static assets
-——————————— components              customize components
-——————————— layouts                 vue pages
-——————————— locales                 internationalization
-——————————— pages                   components
-——————————— router                  router
-———————————store                    global persistence
-———————————types                    data type
-——————————— utils                   utility function
-——————————— App.vue                 project root component
-———————————main.ts                  Project packaging portal
-——————————————————index.html        Project page
-——————————————————package.json      Package management profile for your project
-——————————————————vite.config.ts    Project configuration file
+—————————————————— public               static resources
+—————————————————— src                  project source code
+——————————— api                         calls the backend interface
+——————————— assets                      static assets
+——————————— components                  customize components
+——————————— composables                 composable
+——————————— directives                  customize directive
+——————————— layouts                     overall page layout
+——————————— locales                     internationalization
+——————————— pages                       components
+——————————— plugins                     global registration configuration
+——————————— router                      router
+——————————— store                       global persistence
+——————————— styles                      style file
+——————————— types                       data type
+——————————— utils                       utility function
+——————————— App.vue                     project root component
+——————————— main.ts                     Project packaging portal
+—————————————————— index.html           Project page
+—————————————————— package.json         Package management profile for your project
+—————————————————— vite.config.ts       Project configuration file
+—————————————————— postcss.config.ts    postcss configuration file
 ```

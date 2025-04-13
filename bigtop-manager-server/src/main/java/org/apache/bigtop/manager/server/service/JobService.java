@@ -20,12 +20,18 @@ package org.apache.bigtop.manager.server.service;
 
 import org.apache.bigtop.manager.server.model.vo.JobVO;
 import org.apache.bigtop.manager.server.model.vo.PageVO;
+import org.apache.bigtop.manager.server.model.vo.StageVO;
+import org.apache.bigtop.manager.server.model.vo.TaskVO;
 
 public interface JobService {
 
-    PageVO<JobVO> list(Long clusterId);
+    PageVO<JobVO> jobs(Long clusterId);
 
-    JobVO get(Long id);
+    JobVO jobDetails(Long clusterId, Long jobId);
+
+    PageVO<StageVO> stages(Long jobId);
+
+    PageVO<TaskVO> tasks(Long stageId);
 
     JobVO retry(Long id);
 }

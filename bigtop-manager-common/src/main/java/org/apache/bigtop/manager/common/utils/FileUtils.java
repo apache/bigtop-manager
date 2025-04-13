@@ -25,6 +25,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
 @Slf4j
@@ -46,6 +48,21 @@ public class FileUtils {
                 output.write(buffer, 0, length);
             }
             return output.toString(StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void writeStr2File(String filename, String content) {
+        File file = new File(filename);
+        writeStr2File(file, content);
+    }
+
+    public static void writeStr2File(File file, String content) {
+        try (OutputStream outputStream = new FileOutputStream(file)) {
+            byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
+            outputStream.write(bytes);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException(e);

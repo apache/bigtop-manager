@@ -43,8 +43,11 @@ public class MetricsCollector {
     @Resource
     @Qualifier("cpuMultiGauge") private MultiGauge cpuMultiGauge;
 
+    @Resource
+    @Qualifier("diskIOMultiGauge") private MultiGauge diskIOMultiGauge;
+
     @Async
-    @Scheduled(cron = "*/10 * *  * * ?")
+    @Scheduled(cron = "0,30 * *  * * ?")
     public void collect() {
         // refresh agent host monitoring data
         scrape();
@@ -54,5 +57,6 @@ public class MetricsCollector {
         AgentHostMonitoring.diskMultiGaugeUpdateData(diskMultiGauge);
         AgentHostMonitoring.memMultiGaugeUpdateData(memMultiGauge);
         AgentHostMonitoring.cpuMultiGaugeUpdateData(cpuMultiGauge);
+        AgentHostMonitoring.diskIOMultiGaugeUpdateData(diskIOMultiGauge);
     }
 }

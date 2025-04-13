@@ -22,6 +22,8 @@ export default {
   settings: '个人设置',
   logout: '退出登录',
   username: '用户名',
+  user_group: '用户组',
   nickname: '昵称',
+  user_list: '用户列表',
   set_nickname_valid: '昵称不能为空'
 }

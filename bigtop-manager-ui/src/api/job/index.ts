@@ -16,31 +16,57 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+import type {
+  JobParams,
+  JobList,
+  TaskLogParams,
+  JobVO,
+  JobListParams,
+  TaskListParams,
+  StageListParams,
+  StageList,
+  TaskList,
+  LogsRes
+} from './types'
+import type { ListParams } from '../types'
+import { get, post } from '../request-util'
+import axios, { type AxiosProgressEvent, type CancelTokenSource } from 'axios'
+import request from '../request'
 
-import request from '@/api/request.ts'
-import { JobVO, Pagination } from '@/api/job/types.ts'
-
-export const getJob = (id: number, clusterId: number): Promise<JobVO> => {
-  return request({
-    method: 'get',
-    url: '/clusters/' + clusterId + '/jobs/' + id
-  })
+export const retryJob = (pathParams: JobParams) => {
+  return post<JobVO>(`/clusters/${pathParams.clusterId}/jobs/${pathParams.jobId}/retry`)
 }
 
-export const retryJob = (id: number, clusterId: number): Promise<JobVO> => {
-  return request({
-    method: 'post',
-    url: '/clusters/' + clusterId + '/jobs/' + id + '/retry'
-  })
+export const getJobDetails = (pathParams: JobParams) => {
+  return get<JobVO>(`/clusters/${pathParams.clusterId}/jobs/${pathParams.jobId}`)
 }
 
-export const getJobs = (
-  clusterId: number,
-  pagination: Pagination
-): Promise<{ content: JobVO[]; total: number }> => {
-  return request({
+export const getJobList = (pathParams: JobListParams, params: ListParams) => {
+  return get<JobList>(`/clusters/${pathParams.clusterId}/jobs`, params)
+}
+
+export const getStageList = (pathParams: StageListParams, params: ListParams) => {
+  return get<StageList>(`/clusters/${pathParams.clusterId}/jobs/${pathParams.jobId}/stages`, params)
+}
+
+export const getTaskList = (pathParams: TaskListParams, params: ListParams) => {
+  return get<TaskList>(
+    `/clusters/${pathParams.clusterId}/jobs/${pathParams.jobId}/stages/${pathParams.stageId}/tasks`,
+    params
+  )
+}
+
+export const getTaskLog = (pathParams: TaskLogParams, func: Function): LogsRes => {
+  const source: CancelTokenSource = axios.CancelToken.source()
+
+  const promise = request({
     method: 'get',
-    url: `/clusters/${clusterId}/jobs`,
-    params: pagination
+    url: `/clusters/${pathParams.clusterId}/jobs/${pathParams.jobId}/stages/${pathParams.stageId}/tasks/${pathParams.taskId}/log`,
+    responseType: 'stream',
+    timeout: 0,
+    cancelToken: source.token,
+    onDownloadProgress: (progressEvent: AxiosProgressEvent) => func(progressEvent)
   })
+
+  return { promise, cancel: source.cancel }
 }

@@ -17,76 +17,15 @@
  * under the License.
  */
 
-import { defineStore, storeToRefs } from 'pinia'
+import { defineStore } from 'pinia'
 import { getCurrentUser, updateUser } from '@/api/user'
-import { computed, h, shallowRef } from 'vue'
+import { shallowRef } from 'vue'
 import { UserReq, UserVO } from '@/api/user/types.ts'
-import { MenuItem } from '@/store/user/types.ts'
-import { initialRoutes, layoutRoutes } from '@/router/routes.ts'
-import { useClusterStore } from '@/store/cluster'
-import { RouteRecordRaw } from 'vue-router'
-import { useServiceStore } from '@/store/service'
-import CircleFilled from '@/components/icons/circle-filled.vue'
 
 export const useUserStore = defineStore(
   'user',
   () => {
     const userVO = shallowRef<UserVO>()
-
-    const clusterStore = useClusterStore()
-    const serviceStore = useServiceStore()
-    const { selectedCluster } = storeToRefs(clusterStore)
-    const { installedServices } = storeToRefs(serviceStore)
-
-    const initMenu = (routes: RouteRecordRaw[]) => {
-      const items: MenuItem[] = []
-      routes.forEach((route) => {
-        const menuItem: MenuItem = {
-          key: route.meta?.title?.toLowerCase(),
-          to: route.path,
-          title: route.meta?.title,
-          icon: route.meta?.icon
-        }
-
-        if (route.meta?.title === 'Services') {
-          menuItem.children = []
-          installedServices.value.forEach((service) => {
-            const color = service.isHealthy ? '#52c41a' : '#f5222d'
-            menuItem.children?.push({
-              key: service.serviceName,
-              to: '/services/' + service.serviceName,
-              title: service.displayName,
-              icon: h(CircleFilled, {
-                style: `font-size: 8px; color: ${color}; margin-right: 0.5rem;`
-              })
-            })
-          })
-        } else if (route.children !== undefined) {
-          menuItem.children = []
-          route.children.forEach((child) => {
-            menuItem.children?.push({
-              key: child.meta?.title?.toLowerCase(),
-              to: route.path + child.path,
-              title: child.meta?.title,
-              icon: child.meta?.icon
-            })
-          })
-        } else {
-        }
-
-        items.push(menuItem)
-      })
-
-      return items
-    }
-
-    const menuItems = computed(() => {
-      if (selectedCluster.value) {
-        return initMenu(layoutRoutes)
-      } else {
-        return initMenu(initialRoutes)
-      }
-    })
 
     const getUserInfo = async () => {
       userVO.value = await getCurrentUser()
@@ -105,7 +44,6 @@ export const useUserStore = defineStore(
 
     return {
       userVO,
-      menuItems,
       getUserInfo,
       updateUserInfo,
       logout

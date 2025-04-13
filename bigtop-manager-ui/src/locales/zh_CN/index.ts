@@ -18,19 +18,29 @@
  */
 
 import common from '@/locales/zh_CN/common.ts'
+import menu from '@/locales/zh_CN/menu.ts'
 import login from '@/locales/zh_CN/login'
 import user from '@/locales/zh_CN/user.ts'
+import llmConfig from '@/locales/zh_CN/llm-config.ts'
+import aiAssistant from '@/locales/zh_CN/ai-assistant.ts'
 import cluster from '@/locales/zh_CN/cluster.ts'
-import hosts from '@/locales/zh_CN/hosts.ts'
-import service from '@/locales/zh_CN/service.ts'
+import host from '@/locales/zh_CN/host.ts'
 import job from '@/locales/zh_CN/job.ts'
+import overview from '@/locales/zh_CN/overview.ts'
+import service from '@/locales/zh_CN/service.ts'
+import infra from '@/locales/zh_CN/infra.ts'
 
 export default {
   common,
+  menu,
   login,
   user,
+  llmConfig,
+  aiAssistant,
   cluster,
-  hosts,
+  host,
+  job,
+  overview,
   service,
-  job
+  infra
 }

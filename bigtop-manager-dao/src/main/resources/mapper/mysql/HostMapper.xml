@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one
+  ~ or more contributor license agreements.  See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership.  The ASF licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+-->
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.apache.bigtop.manager.dao.repository.HostDao">
+
+    <sql id="baseColumns">
+        id,  hostname, agent_dir, ssh_user, ssh_port, auth_type, ssh_password, ssh_key_string, ssh_key_filename, ssh_key_password,
+        grpc_port, ipv4, ipv6, os, arch, available_processors, free_memory_size, total_memory_size,
+        free_disk, total_disk, `desc`, status, err_info, cluster_id
+    </sql>
+
+    <sql id="baseColumnsV2">
+        ${alias}.id,  ${alias}.hostname, ${alias}.agent_dir, ${alias}.ssh_user, ${alias}.ssh_port, ${alias}.auth_type,
+        ${alias}.ssh_password, ${alias}.ssh_key_string, ${alias}.ssh_key_filename, ${alias}.ssh_key_password,
+        ${alias}.grpc_port, ${alias}.ipv4, ${alias}.ipv6, ${alias}.os, ${alias}.arch,
+        ${alias}.available_processors, ${alias}.free_memory_size, ${alias}.total_memory_size,
+        ${alias}.free_disk, ${alias}.total_disk, ${alias}.desc, ${alias}.status, ${alias}.err_info,
+        ${alias}.cluster_id
+    </sql>
+
+    <select id="findByQuery" resultType="org.apache.bigtop.manager.dao.po.HostPO">
+        select
+        <include refid="baseColumnsV2">
+            <property name="alias" value="h"/>
+        </include>, c.name as cluster_name, c.display_name as cluster_display_name, count(comp.id) as component_num
+        from host h
+        left join cluster c on h.cluster_id = c.id
+        left join component comp on h.id = comp.host_id
+        <where>
+            <if test="query.hostname != null and query.hostname != ''">
+                and h.hostname like concat('%', #{query.hostname}, '%')
+            </if>
+            <if test="query.clusterId != null and query.clusterId != 0">
+                and h.cluster_id = #{query.clusterId}
+            </if>
+            <if test="query.ipv4 != null and query.ipv4 != ''">
+                and h.ipv4 like concat('%', #{query.ipv4}, '%')
+            </if>
+            <if test="query.status != null">
+                and h.status = #{query.status}
+            </if>
+        </where>
+        group by h.id, c.name
+    </select>
+
+    <select id="findDetailsById" resultType="org.apache.bigtop.manager.dao.po.HostPO">
+        select
+        <include refid="baseColumnsV2">
+            <property name="alias" value="h"/>
+        </include>, c.name as cluster_name, c.display_name as cluster_display_name, count(comp.id) as component_num
+        from host h
+        left join cluster c on h.cluster_id = c.id
+        left join component comp on h.id = comp.host_id
+        where h.id = #{id}
+        group by h.id, c.name
+        limit 1
+    </select>
+
+    <select id="findByHostname" resultType="org.apache.bigtop.manager.dao.po.HostPO">
+        select
+        <include refid="baseColumns"/>
+        from
+        host
+        <where>
+            <if test="hostname != null">
+                hostname = #{hostname}
+            </if>
+        </where>
+        limit 1
+    </select>
+
+    <select id="findAllByClusterId" parameterType="java.lang.Long"
+            resultType="org.apache.bigtop.manager.dao.po.HostPO">
+        select
+        <include refid="baseColumnsV2">
+            <property name="alias" value="h"/>
+        </include>
+        , clus.name as cluster_name, clus.display_name as cluster_display_name
+        from host h
+        left join cluster clus
+        on h.cluster_id = clus.id
+        where h.cluster_id = #{clusterId}
+    </select>
+
+    <select id="findAllByHostnames"
+            resultType="org.apache.bigtop.manager.dao.po.HostPO">
+        select
+        <include refid="baseColumns"/>
+        from
+        host
+        <where>
+            <if test="hostnames != null and hostnames.size() > 0">
+                hostname in
+                <foreach collection="hostnames" item="hostname" index="index" open="(" close=")" separator=", ">
+                    #{hostname}
+                </foreach>
+            </if>
+        </where>
+    </select>
+</mapper>

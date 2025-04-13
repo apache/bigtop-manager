@@ -47,13 +47,30 @@
             <groupId>org.apache.bigtop</groupId>
             <artifactId>bigtop-manager-common</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.apache.bigtop</groupId>
             <artifactId>bigtop-manager-grpc</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.apache.bigtop</groupId>
             <artifactId>bigtop-manager-stack-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.bigtop</groupId>
+            <artifactId>bigtop-manager-stack-bigtop</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.bigtop</groupId>
+            <artifactId>bigtop-manager-stack-infra</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.bigtop</groupId>
+            <artifactId>bigtop-manager-stack-extra</artifactId>
         </dependency>
 
         <dependency>
@@ -124,6 +141,18 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <testSource>${java.version}</testSource>
+                    <testTarget>${java.version}</testTarget>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
                     <excludes>
@@ -137,20 +166,21 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
+                <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>bigtop-manager-agent</id>
+                        <id>copy-dependencies</id>
                         <goals>
-                            <goal>single</goal>
+                            <goal>copy-dependencies</goal>
                         </goals>
                         <phase>package</phase>
                         <configuration>
-                            <finalName>bigtop-manager-agent</finalName>
-                            <descriptors>
-                                <descriptor>src/main/resources/assembly/agent.xml</descriptor>
-                            </descriptors>
-                            <appendAssemblyId>false</appendAssemblyId>
+                            <outputDirectory>${project.build.directory}/libs/</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                            <includeScope>compile</includeScope>
+                            <includeScope>runtime</includeScope>
                         </configuration>
                     </execution>
                 </executions>

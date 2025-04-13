@@ -18,67 +18,66 @@
  */
 
 import { defineStore, storeToRefs } from 'pinia'
-import { computed, ref, watch } from 'vue'
-import { ServiceVO } from '@/api/service/types.ts'
-import { useClusterStore } from '@/store/cluster'
-import { getService } from '@/api/service'
-import { MergedServiceVO } from '@/store/service/types.ts'
+import { computed, ref } from 'vue'
+import { getService, getServiceList } from '@/api/service'
 import { useStackStore } from '@/store/stack'
+import { InstalledMapItem, useInstalledStore } from '@/store/installed'
+import type { ServiceListParams, ServiceVO } from '@/api/service/types'
 
 export const useServiceStore = defineStore(
   'service',
   () => {
-    const clusterStore = useClusterStore()
     const stackStore = useStackStore()
-    const { clusterId } = storeToRefs(clusterStore)
-    const { currentStack } = storeToRefs(stackStore)
-
-    const installedServices = ref<ServiceVO[]>([])
-    const loadingServices = ref<boolean>(true)
-    const mergedServices = computed(() => {
-      const mergedServices: MergedServiceVO[] = []
-      const installedServiceNames: string[] = []
-      installedServices.value.forEach((service) => {
-        mergedServices.push({
-          installed: true,
-          ...service
-        })
-
-        installedServiceNames.push(service.serviceName)
-      })
-
-      currentStack.value?.services.forEach((service) => {
-        if (!installedServiceNames.includes(service.serviceName)) {
-          mergedServices.push({
-            installed: false,
-            ...service
-          })
-        }
-      })
-
-      return mergedServices
+    const installedStore = useInstalledStore()
+    const services = ref<ServiceVO[]>([])
+    const total = ref(0)
+    const loading = ref(false)
+    const { stacks } = storeToRefs(stackStore)
+    const serviceNames = computed(() => services.value.map((v) => v.name))
+    const locateStackWithService = computed(() => {
+      return stacks.value.filter((item) =>
+        item.services.some((service) => service.name && serviceNames.value.includes(service.name))
+      )
     })
 
-    const loadServices = async () => {
-      if (clusterId.value != 0) {
-        installedServices.value = await getService(clusterId.value)
-        loadingServices.value = false
+    const getServices = async (clusterId: number, filterParams?: ServiceListParams) => {
+      try {
+        loading.value = true
+        const data = await getServiceList(clusterId, { ...filterParams, pageNum: 1, pageSize: 100 })
+        services.value = data.content
+        total.value = data.total
+        const serviceMap = services.value.map((v) => ({
+          serviceId: v.id,
+          serviceName: v.name,
+          serviceDisplayName: v.displayName,
+          clusterId: clusterId
+        })) as InstalledMapItem[]
+        installedStore.setInstalledMapKeyOfValue(`${clusterId}`, serviceMap)
+      } catch (error) {
+        console.log('error :>> ', error)
+      } finally {
+        loading.value = false
       }
     }
 
-    watch(clusterId, async () => {
-      if (clusterId.value != 0) {
-        loadingServices.value = true
-        await loadServices()
+    const getServiceDetail = async (clusterId: number, serviceId: number) => {
+      try {
+        return await getService({ clusterId, id: serviceId })
+      } catch (error) {
+        console.log(error)
       }
-    })
+    }
 
     return {
-      installedServices,
-      loadingServices,
-      mergedServices,
-      loadServices
+      services,
+      loading,
+      getServices,
+      getServiceDetail,
+      serviceNames,
+      locateStackWithService
     }
   },
-  { persist: false }
+  {
+    persist: false
+  }
 )

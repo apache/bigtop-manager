@@ -19,8 +19,10 @@
 package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.common.enums.JobState;
-import org.apache.bigtop.manager.dao.entity.Task;
-import org.apache.bigtop.manager.dao.repository.TaskRepository;
+import org.apache.bigtop.manager.dao.po.HostPO;
+import org.apache.bigtop.manager.dao.po.TaskPO;
+import org.apache.bigtop.manager.dao.repository.HostDao;
+import org.apache.bigtop.manager.dao.repository.TaskDao;
 import org.apache.bigtop.manager.grpc.generated.TaskLogReply;
 import org.apache.bigtop.manager.grpc.generated.TaskLogRequest;
 import org.apache.bigtop.manager.grpc.generated.TaskLogServiceGrpc;
@@ -38,23 +40,29 @@ import jakarta.annotation.Resource;
 public class TaskLogServiceImpl implements TaskLogService {
 
     @Resource
-    private TaskRepository taskRepository;
+    private TaskDao taskDao;
+
+    @Resource
+    private HostDao hostDao;
 
     public void registerSink(Long taskId, FluxSink<String> sink) {
-        Task task = taskRepository.getReferenceById(taskId);
-        String hostname = task.getHostname();
+        TaskPO taskPO = taskDao.findById(taskId);
+        HostPO hostPO = hostDao.findByHostname(taskPO.getHostname());
+        String hostname = hostPO.getHostname();
+        Integer grpcPort = hostPO.getGrpcPort();
 
-        if (task.getState() == JobState.PENDING || task.getState() == JobState.CANCELED) {
+        if (JobState.fromString(taskPO.getState()) == JobState.PENDING
+                || JobState.fromString(taskPO.getState()) == JobState.CANCELED) {
             new Thread(() -> {
                         sink.next("There is no log when task is in status: "
-                                + task.getState().name().toLowerCase()
+                                + taskPO.getState().toLowerCase()
                                 + ", please reopen the window when status changed");
                         sink.complete();
                     })
                     .start();
         } else {
             TaskLogServiceGrpc.TaskLogServiceStub asyncStub =
-                    GrpcClient.getAsyncStub(hostname, TaskLogServiceGrpc.TaskLogServiceStub.class);
+                    GrpcClient.getAsyncStub(hostname, grpcPort, TaskLogServiceGrpc.TaskLogServiceStub.class);
             TaskLogRequest request =
                     TaskLogRequest.newBuilder().setTaskId(taskId).build();
             asyncStub.getLog(request, new LogReader(sink));

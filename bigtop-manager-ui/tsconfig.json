@@ -3,19 +3,15 @@
     "target": "ES2020",
     "useDefineForClassFields": true,
     "module": "ESNext",
-    "lib": [
-      "ES2020",
-      "DOM",
-      "DOM.Iterable"
-    ],
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "baseUrl": "./",
     "paths": {
       "@/*": ["src/*"]
     },
     "skipLibCheck": true,
-    "types": ["vite/client"],
+    "types": ["vitest", "vitest/globals", "vite/client", "vite-plugin-svg-icons/client"],
     /* Bundler mode */
-//     "moduleResolution": "Bundler",
+    //     "moduleResolution": "Bundler",
     "moduleResolution": "Node",
     "allowImportingTsExtensions": true,
     "allowSyntheticDefaultImports": true,
@@ -27,14 +23,10 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": false,
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.d.ts",
-    "src/**/*.tsx",
-    "src/**/*.vue"
-  ],
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "src/types/**/*.d.ts"],
   "references": [
     {
       "path": "./tsconfig.node.json"

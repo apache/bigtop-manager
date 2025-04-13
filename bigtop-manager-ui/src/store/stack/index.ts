@@ -17,93 +17,80 @@
  * under the License.
  */
 
-import { defineStore, storeToRefs } from 'pinia'
-import { getStackComponents, getStackConfigs, getStacks } from '@/api/stack'
-import { computed, shallowReactive, shallowRef, watch } from 'vue'
-import { StackInfo, StackOptionProps } from '@/store/stack/types.ts'
-import { useClusterStore } from '@/store/cluster'
-import { StackVO } from '@/api/stack/types.ts'
-import { ServiceConfigVO } from '@/api/config/types.ts'
-import { ServiceComponentVO } from '@/api/component/types.ts'
-import { RepoVO } from '@/api/repo/types.ts'
-import { ServiceVO } from '@/api/service/types.ts'
+import { getStacks } from '@/api/stack'
+import { defineStore } from 'pinia'
+import { shallowRef } from 'vue'
+import type { ComponentVO } from '@/api/component/types'
+import type { ServiceConfig, ServiceVO } from '@/api/service/types'
+import type { StackVO } from '@/api/stack/types'
+
+export type ExpandServiceVO = ServiceVO & { order: number }
+export interface StackRelationMap {
+  services: {
+    displayName: string
+    stack: string
+    components: string[]
+    configs: ServiceConfig
+  }
+  components: {
+    service: string
+    stack: string
+  } & ComponentVO
+}
 
 export const useStackStore = defineStore(
   'stack',
   () => {
-    const clusterStore = useClusterStore()
-    const { clusterId, selectedCluster } = storeToRefs(clusterStore)
-    const stackOptions = shallowRef<StackOptionProps[]>([])
-    const stackServices = shallowReactive<Record<string, ServiceVO[]>>({})
-    const stackRepos = shallowReactive<Record<string, RepoVO[]>>({})
-    const stackComponents = shallowRef<ServiceComponentVO[]>([])
-    const stackConfigs = shallowRef<ServiceConfigVO[]>([])
-    const initialized = shallowRef(false)
+    const stacks = shallowRef<StackVO[]>([])
+    const stackRelationMap = shallowRef<StackRelationMap>()
 
-    const currentStack = computed<StackInfo>(() => {
-      const cluster = selectedCluster.value
-      const name = [cluster?.stackName, cluster?.stackVersion].join('-')
-      const services = stackServices[name]
-
-      return {
-        name: name,
-        services: services ? services : []
+    const loadStacks = async () => {
+      try {
+        stacks.value = await getStacks()
+        stackRelationMap.value = setupStackRelationMap(stacks.value)
+      } catch (error) {
+        console.log('error :>> ', error)
       }
-    })
+    }
 
-    watch(clusterId, async () => {
-      const stackName = selectedCluster.value?.stackName as string
-      const stackVersion = selectedCluster.value?.stackVersion as string
-
-      stackComponents.value = await getStackComponents(stackName, stackVersion)
-      stackConfigs.value = await getStackConfigs(stackName, stackVersion)
-    })
-
-    const initStacks = async () => {
-      if (!initialized.value) {
-        const stackVOList: StackVO[] = await getStacks()
-        const stacks: StackOptionProps[] = []
-        stackVOList.forEach((stackVO) => {
-          const fullStackName = stackVO.stackName + '-' + stackVO.stackVersion
-          stackServices[fullStackName] = stackVO.services
-          stackRepos[fullStackName] = stackVO.repos
-
-          const props: StackOptionProps = {
-            label: stackVO.stackVersion,
-            value: stackVO.stackVersion
+    const setupStackRelationMap = (stacks: StackVO[]) => {
+      const relationMap = { services: {}, components: {} } as StackRelationMap
+      for (const { stackName, services } of stacks) {
+        for (const service of services) {
+          const { name, displayName, components, configs } = service
+          relationMap.services[name!] = {
+            displayName,
+            stack: stackName,
+            components: components!.map(({ name }) => name),
+            configs
           }
-
-          const existStackVO = stacks.find(
-            (stack) => stack.label === stackVO.stackName
-          )
-
-          if (!existStackVO) {
-            stacks.unshift({
-              label: stackVO.stackName,
-              value: stackVO.stackName,
-              children: [props]
-            })
-          } else {
-            existStackVO.children?.unshift(props)
+          for (const component of components!) {
+            relationMap.components[component.name!] = {
+              ...component,
+              service: name,
+              stack: stackName
+            }
           }
-        })
-
-        stackOptions.value = stacks
-        initialized.value = true
+        }
       }
+      return relationMap
+    }
 
-      return Promise.resolve()
+    const getServicesByExclude = (exclude?: string[], isOrder = true): ExpandServiceVO[] | ServiceVO[] => {
+      const filterData = stacks.value.flatMap((stack) => (exclude?.includes(stack.stackName) ? [] : stack.services))
+      return isOrder ? filterData.map((service, index) => ({ ...service, order: index })) : filterData
     }
 
     return {
-      stackOptions,
-      stackServices,
-      stackRepos,
-      stackComponents,
-      stackConfigs,
-      currentStack,
-      initStacks
+      stacks,
+      stackRelationMap,
+      loadStacks,
+      getServicesByExclude
     }
   },
-  { persist: false }
+  {
+    persist: {
+      storage: sessionStorage
+    }
+  }
 )

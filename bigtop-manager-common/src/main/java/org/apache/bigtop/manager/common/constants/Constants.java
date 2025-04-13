@@ -18,45 +18,19 @@
  */
 package org.apache.bigtop.manager.common.constants;
 
-import java.io.File;
-
 public final class Constants {
 
     private Constants() {
         throw new UnsupportedOperationException("Construct Constants");
     }
 
-    /**
-     * stack cache dir
-     */
-    public static final String STACK_CACHE_DIR =
-            new File(Constants.class
-                                    .getProtectionDomain()
-                                    .getCodeSource()
-                                    .getLocation()
-                                    .getPath())
-                            .getParent() + "/../cache";
-
-    /**
-     * host key for all hosts
-     */
     public static final String ALL_HOST_KEY = "all";
 
-    /**
-     * permission 755
-     */
-    public static final String PERMISSION_755 = "rwxr-xr-x";
-    /**
-     * permission 644
-     */
-    public static final String PERMISSION_644 = "rw-r--r--";
-    /**
-     * permission 777
-     */
-    public static final String PERMISSION_777 = "rwwrwxrwx";
+    public static final String PERMISSION_644 = "644";
 
-    /**
-     * root user
-     */
+    public static final String PERMISSION_755 = "755";
+
+    public static final String PERMISSION_777 = "777";
+
     public static final String ROOT_USER = "root";
 }

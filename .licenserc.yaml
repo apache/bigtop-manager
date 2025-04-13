@@ -21,11 +21,14 @@ header:
     copyright-owner: Apache Software Foundation
 
   paths-ignore:
+    - '.gitmodules'
+    - '.github/actions'
     - '**/.idea/'
     - '**/*.iml'
     - '**/target/**'
     - '**/*.ftl'
     - '**/*.log'
+    - '**/*.st'
     - '.git/'
     - '.github/**'
     - '**/.gitignore'
@@ -34,7 +37,102 @@ header:
     - 'mvnw'
     - 'mvnw.cmd'
     - 'LICENSE'
+    - 'NOTICE'
     - 'pnpm-lock.yaml'
     - '**/*.txt'
 
   comment: on-failure
+
+dependency:
+  files:
+    - pom.xml
+    - bigtop-manager-bom/pom.xml
+  licenses:
+    - name: org.apache.hadoop.thirdparty:hadoop-shaded-protobuf_3_7
+      license: Apache-2.0
+    - name: org.apache.hadoop.thirdparty:hadoop-shaded-guava
+      license: Apache-2.0
+    - name: com.fasterxml.jackson.datatype:jackson-datatype-jdk8
+      license: Apache-2.0
+    - name: com.fasterxml.jackson.datatype:jackson-datatype-jsr310
+      license: Apache-2.0
+    - name: com.fasterxml.jackson.module:jackson-module-parameter-names
+      license: Apache-2.0
+    - name: com.fasterxml.jackson.dataformat:jackson-dataformat-yaml
+      license: Apache-2.0
+    - name: com.github.pagehelper:pagehelper
+      license: MIT
+    - name: com.github.pagehelper:pagehelper-spring-boot-starter
+      license: MIT
+    - name: com.github.pagehelper:pagehelper-spring-boot-autoconfigure
+      license: MIT
+    - name: io.swagger.core.v3:swagger-core-jakarta
+      license: Apache-2.0
+    - name: io.swagger.core.v3:swagger-annotations-jakarta
+      license: Apache-2.0
+    - name: io.swagger.core.v3:swagger-models-jakarta
+      license: Apache-2.0
+    - name: org.webjars:swagger-ui
+      license: Apache-2.0
+    - name: org.codehaus.janino:janino
+      license: BSD-3-Clause
+    - name: org.codehaus.janino:commons-compiler
+      license: BSD-3-Clause
+    - name: com.google.guava:listenablefuture
+      license: Apache-2.0
+    - name: com.thoughtworks.paranamer:paranamer
+      license: BSD-3-Clause
+    - name: com.github.victools:jsonschema-generator
+      license: Apache-2.0
+    - name: org.eclipse.jetty.toolchain:jetty-jakarta-servlet-api
+      license: Apache-2.0
+    - name: com.github.jsqlparser:jsqlparser
+      license: Apache-2.0
+    - name: org.latencyutils:LatencyUtils
+      license: BSD-2-Clause
+    - name: org.tukaani:xz
+      license: 0BSD
+    - name: com.jcraft:jsch
+      license: BSD-3-Clause
+    - name: io.dropwizard.metrics:metrics-core
+      license: Apache-2.0
+    - name: org.codehaus.woodstox:stax2-api
+      license: BSD-2-Clause
+    - name: org.reactivestreams:reactive-streams
+      license: MIT-0
+    - name: org.jboss.logging:jboss-logging
+      license: Apache-2.0
+    - name: com.auth0:java-jwt
+      license: MIT
+    - name: com.sun.istack:istack-commons-runtime
+      license: EDL-1.0
+    - name: org.jline:jline
+      license: BSD-3-Clause
+    # Weak compatible licenses
+    - name: javax.servlet.jsp:jsp-api
+      license: CDDL-1.1
+    - name: javax.ws.rs:jsr311-api
+      license: CDDL-1.1
+    - name: javax.xml.bind:jaxb-api
+      license: CDDL-1.1
+    - name: com.sun.jersey:jersey-client
+      license: CDDL-1.1
+    - name: com.sun.jersey:jersey-core
+      license: CDDL-1.1
+    - name: com.sun.jersey:jersey-server
+      license: CDDL-1.1
+    - name: com.sun.jersey:jersey-servlet
+      license: CDDL-1.1
+    - name: javax.servlet:javax.servlet-api
+      license: CDDL-1.1
+    - name: ch.qos.logback:logback-classic
+      license: EPL-1.0
+    - name: ch.qos.logback:logback-core
+      license: EPL-1.0
+    - name: org.aspectj:aspectjweaver
+      license: EPL-2.0
+    - name: jakarta.annotation:jakarta.annotation-api
+      license: EPL-2.0
+  excludes:
+    # Go license
+    - name: com.google.re2j:re2j

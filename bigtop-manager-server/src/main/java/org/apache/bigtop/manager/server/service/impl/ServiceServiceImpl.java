@@ -18,134 +18,219 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
-import org.apache.bigtop.manager.common.constants.ComponentCategories;
-import org.apache.bigtop.manager.common.enums.MaintainState;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.entity.Cluster;
-import org.apache.bigtop.manager.dao.entity.Component;
-import org.apache.bigtop.manager.dao.entity.Host;
-import org.apache.bigtop.manager.dao.entity.HostComponent;
-import org.apache.bigtop.manager.dao.entity.Service;
-import org.apache.bigtop.manager.dao.entity.ServiceConfig;
-import org.apache.bigtop.manager.dao.entity.TypeConfig;
-import org.apache.bigtop.manager.dao.repository.HostComponentRepository;
-import org.apache.bigtop.manager.dao.repository.ServiceConfigRepository;
-import org.apache.bigtop.manager.dao.repository.ServiceRepository;
-import org.apache.bigtop.manager.server.model.dto.PropertyDTO;
-import org.apache.bigtop.manager.server.model.dto.QuickLinkDTO;
-import org.apache.bigtop.manager.server.model.dto.TypeConfigDTO;
-import org.apache.bigtop.manager.server.model.mapper.ServiceMapper;
-import org.apache.bigtop.manager.server.model.mapper.TypeConfigMapper;
-import org.apache.bigtop.manager.server.model.vo.QuickLinkVO;
+import org.apache.bigtop.manager.dao.po.ClusterPO;
+import org.apache.bigtop.manager.dao.po.ComponentPO;
+import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
+import org.apache.bigtop.manager.dao.po.ServiceConfigSnapshotPO;
+import org.apache.bigtop.manager.dao.po.ServicePO;
+import org.apache.bigtop.manager.dao.query.ComponentQuery;
+import org.apache.bigtop.manager.dao.query.ServiceQuery;
+import org.apache.bigtop.manager.dao.repository.ClusterDao;
+import org.apache.bigtop.manager.dao.repository.ComponentDao;
+import org.apache.bigtop.manager.dao.repository.ServiceConfigDao;
+import org.apache.bigtop.manager.dao.repository.ServiceConfigSnapshotDao;
+import org.apache.bigtop.manager.dao.repository.ServiceDao;
+import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
+import org.apache.bigtop.manager.server.exception.ApiException;
+import org.apache.bigtop.manager.server.model.converter.ComponentConverter;
+import org.apache.bigtop.manager.server.model.converter.ServiceConfigConverter;
+import org.apache.bigtop.manager.server.model.converter.ServiceConfigSnapshotConverter;
+import org.apache.bigtop.manager.server.model.converter.ServiceConverter;
+import org.apache.bigtop.manager.server.model.dto.ServiceConfigDTO;
+import org.apache.bigtop.manager.server.model.query.PageQuery;
+import org.apache.bigtop.manager.server.model.req.ServiceConfigReq;
+import org.apache.bigtop.manager.server.model.req.ServiceConfigSnapshotReq;
+import org.apache.bigtop.manager.server.model.vo.ComponentVO;
+import org.apache.bigtop.manager.server.model.vo.PageVO;
+import org.apache.bigtop.manager.server.model.vo.ServiceConfigSnapshotVO;
+import org.apache.bigtop.manager.server.model.vo.ServiceConfigVO;
+import org.apache.bigtop.manager.server.model.vo.ServiceUserVO;
 import org.apache.bigtop.manager.server.model.vo.ServiceVO;
 import org.apache.bigtop.manager.server.service.ServiceService;
+import org.apache.bigtop.manager.server.utils.PageUtils;
+import org.apache.bigtop.manager.server.utils.StackConfigUtils;
+import org.apache.bigtop.manager.server.utils.StackUtils;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
+import org.springframework.stereotype.Service;
+
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
-@org.springframework.stereotype.Service
+@Service
 public class ServiceServiceImpl implements ServiceService {
 
     @Resource
-    private ServiceRepository serviceRepository;
+    private ClusterDao clusterDao;
 
     @Resource
-    private HostComponentRepository hostComponentRepository;
+    private ServiceDao serviceDao;
 
     @Resource
-    private ServiceConfigRepository serviceConfigRepository;
+    private ServiceConfigDao serviceConfigDao;
+
+    @Resource
+    private ServiceConfigSnapshotDao serviceConfigSnapshotDao;
+
+    @Resource
+    private ComponentDao componentDao;
 
     @Override
-    public List<ServiceVO> list(Long clusterId) {
-        List<ServiceVO> res = new ArrayList<>();
-        List<HostComponent> hostComponentList = hostComponentRepository.findAllByComponentClusterId(clusterId);
-        Map<Long, List<HostComponent>> serviceIdToHostComponent = hostComponentList.stream()
-                .collect(Collectors.groupingBy(hostComponent ->
-                        hostComponent.getComponent().getService().getId()));
+    public PageVO<ServiceVO> list(ServiceQuery query) {
+        PageQuery pageQuery = PageUtils.getPageQuery();
+        try (Page<?> ignored =
+                PageHelper.startPage(pageQuery.getPageNum(), pageQuery.getPageSize(), pageQuery.getOrderBy())) {
+            List<ServicePO> servicePOList = serviceDao.findByQuery(query);
+            PageInfo<ServicePO> pageInfo = new PageInfo<>(servicePOList);
+            return PageVO.of(pageInfo);
+        } finally {
+            PageHelper.clearPage();
+        }
+    }
 
-        for (Map.Entry<Long, List<HostComponent>> entry : serviceIdToHostComponent.entrySet()) {
-            List<HostComponent> hostComponents = entry.getValue();
-            Service service = hostComponents.get(0).getComponent().getService();
-            ServiceVO serviceVO = ServiceMapper.INSTANCE.fromEntity2VO(service);
-            serviceVO.setQuickLinks(new ArrayList<>());
+    @Override
+    public PageVO<ServiceUserVO> serviceUsers(Long clusterId) {
+        PageQuery pageQuery = PageUtils.getPageQuery();
+        try (Page<?> ignored =
+                PageHelper.startPage(pageQuery.getPageNum(), pageQuery.getPageSize(), pageQuery.getOrderBy())) {
+            ServiceQuery query = ServiceQuery.builder().clusterId(clusterId).build();
+            List<ServicePO> servicePOList = serviceDao.findByQuery(query);
 
-            boolean isHealthy = true;
-            boolean isClient = true;
-            for (HostComponent hostComponent : hostComponents) {
-                Component component = hostComponent.getComponent();
-
-                String quickLink = component.getQuickLink();
-                if (StringUtils.isNotBlank(quickLink)) {
-                    QuickLinkVO quickLinkVO = resolveQuickLink(hostComponent, quickLink);
-                    serviceVO.getQuickLinks().add(quickLinkVO);
-                }
-
-                String category = component.getCategory();
-                if (!category.equalsIgnoreCase(ComponentCategories.CLIENT)) {
-                    isClient = false;
-                }
-
-                MaintainState expectedState = category.equalsIgnoreCase(ComponentCategories.CLIENT)
-                        ? MaintainState.INSTALLED
-                        : MaintainState.STARTED;
-                if (!hostComponent.getState().equals(expectedState)) {
-                    isHealthy = false;
-                }
+            ClusterPO clusterPO = clusterDao.findById(clusterId);
+            List<ServiceUserVO> res = new ArrayList<>();
+            for (ServicePO servicePO : servicePOList) {
+                ServiceUserVO serviceUserVO = new ServiceUserVO();
+                serviceUserVO.setDisplayName(servicePO.getDisplayName());
+                serviceUserVO.setUser(servicePO.getUser());
+                serviceUserVO.setUserGroup(clusterPO.getUserGroup());
+                serviceUserVO.setDesc(servicePO.getDesc());
+                res.add(serviceUserVO);
             }
 
-            serviceVO.setIsClient(isClient);
-            serviceVO.setIsHealthy(isHealthy);
-            res.add(serviceVO);
+            PageInfo<ServicePO> pageInfo = new PageInfo<>(servicePOList);
+            return PageVO.of(res, pageInfo.getTotal());
+        } finally {
+            PageHelper.clearPage();
         }
-
-        return res;
     }
 
     @Override
     public ServiceVO get(Long id) {
-        Service service = serviceRepository.findById(id).orElse(new Service());
-        return ServiceMapper.INSTANCE.fromEntity2VO(service);
+        ServiceVO serviceVO = ServiceConverter.INSTANCE.fromPO2VO(serviceDao.findById(id));
+
+        ComponentQuery query = ComponentQuery.builder().serviceId(id).build();
+        List<ComponentPO> componentPOList = componentDao.findByQuery(query);
+        List<ComponentVO> componentVOList = ComponentConverter.INSTANCE.fromPO2VO(componentPOList);
+        List<ServiceConfigVO> serviceConfigVOList = listConf(null, id);
+
+        serviceVO.setComponents(componentVOList);
+        serviceVO.setConfigs(serviceConfigVOList);
+        return serviceVO;
     }
 
-    private QuickLinkVO resolveQuickLink(HostComponent hostComponent, String quickLinkJson) {
-        QuickLinkVO quickLinkVO = new QuickLinkVO();
+    @Override
+    public Boolean remove(Long id) {
+        ComponentQuery query = ComponentQuery.builder().serviceId(id).build();
+        List<ComponentPO> componentPOList = componentDao.findByQuery(query);
+        if (CollectionUtils.isNotEmpty(componentPOList)) {
+            throw new ApiException(ApiExceptionEnum.SERVICE_HAS_COMPONENTS);
+        }
 
-        QuickLinkDTO quickLinkDTO = JsonUtils.readFromString(quickLinkJson, QuickLinkDTO.class);
-        quickLinkVO.setDisplayName(quickLinkDTO.getDisplayName());
+        return serviceDao.deleteById(id);
+    }
 
-        Component component = hostComponent.getComponent();
-        Cluster cluster = component.getCluster();
-        Host host = hostComponent.getHost();
-        Service service = component.getService();
-        ServiceConfig serviceConfig =
-                serviceConfigRepository.findByClusterAndServiceAndSelectedIsTrue(cluster, service);
-        List<TypeConfig> typeConfigs = serviceConfig.getConfigs();
+    @Override
+    public List<ServiceConfigVO> listConf(Long clusterId, Long serviceId) {
+        List<ServiceConfigPO> list = serviceConfigDao.findByServiceId(serviceId);
+        if (CollectionUtils.isEmpty(list)) {
+            return List.of();
+        } else {
+            return ServiceConfigConverter.INSTANCE.fromPO2VO(list);
+        }
+    }
 
-        // Use HTTP for now, need to handle https in the future
-        for (TypeConfig typeConfig : typeConfigs) {
-            TypeConfigDTO typeConfigDTO = TypeConfigMapper.INSTANCE.fromEntity2DTO(typeConfig);
-            for (PropertyDTO propertyDTO : typeConfigDTO.getProperties()) {
-                if (propertyDTO.getName().equals(quickLinkDTO.getHttpPortProperty())) {
-                    String port = propertyDTO.getValue().contains(":")
-                            ? propertyDTO.getValue().split(":")[1]
-                            : propertyDTO.getValue();
-                    String url = "http://" + host.getHostname() + ":" + port;
-                    quickLinkVO.setUrl(url);
-                    return quickLinkVO;
-                }
+    @Override
+    public List<ServiceConfigVO> updateConf(Long clusterId, Long serviceId, List<ServiceConfigReq> reqs) {
+        ServicePO servicePO = serviceDao.findById(serviceId);
+        List<ServiceConfigPO> configs = serviceConfigDao.findByServiceId(serviceId);
+
+        List<ServiceConfigDTO> oriConfigs;
+        List<ServiceConfigDTO> newConfigs;
+        List<ServiceConfigDTO> mergedConfigs;
+
+        // Merge stack config with existing config first, in case new property has been added to stack config.
+        oriConfigs = StackUtils.SERVICE_CONFIG_MAP.get(servicePO.getName());
+        newConfigs = ServiceConfigConverter.INSTANCE.fromPO2DTO(configs);
+        mergedConfigs = StackConfigUtils.mergeServiceConfigs(oriConfigs, newConfigs);
+
+        // Merge existing config with new config in request object
+        oriConfigs = mergedConfigs;
+        newConfigs = ServiceConfigConverter.INSTANCE.fromReq2DTO(reqs);
+        mergedConfigs = StackConfigUtils.mergeServiceConfigs(oriConfigs, newConfigs);
+
+        // Save merged config
+        List<ServiceConfigPO> serviceConfigPOList = ServiceConfigConverter.INSTANCE.fromDTO2PO(mergedConfigs);
+        serviceConfigDao.partialUpdateByIds(serviceConfigPOList);
+        return listConf(clusterId, serviceId);
+    }
+
+    @Override
+    public List<ServiceConfigSnapshotVO> listConfSnapshots(Long clusterId, Long serviceId) {
+        List<ServiceConfigSnapshotPO> list = serviceConfigSnapshotDao.findByServiceId(serviceId);
+        if (CollectionUtils.isEmpty(list)) {
+            return List.of();
+        } else {
+            return ServiceConfigSnapshotConverter.INSTANCE.fromPO2VO(list);
+        }
+    }
+
+    @Override
+    public ServiceConfigSnapshotVO takeConfSnapshot(Long clusterId, Long serviceId, ServiceConfigSnapshotReq req) {
+        List<ServiceConfigPO> list = serviceConfigDao.findByServiceId(serviceId);
+        Map<String, String> confMap = new HashMap<>();
+        for (ServiceConfigPO serviceConfigPO : list) {
+            confMap.put(serviceConfigPO.getName(), serviceConfigPO.getPropertiesJson());
+        }
+
+        String confJson = JsonUtils.writeAsString(confMap);
+        ServiceConfigSnapshotPO serviceConfigSnapshotPO = new ServiceConfigSnapshotPO();
+        serviceConfigSnapshotPO.setName(req.getName());
+        serviceConfigSnapshotPO.setDesc(req.getDesc());
+        serviceConfigSnapshotPO.setConfigJson(confJson);
+        serviceConfigSnapshotPO.setServiceId(serviceId);
+        serviceConfigSnapshotDao.save(serviceConfigSnapshotPO);
+        return ServiceConfigSnapshotConverter.INSTANCE.fromPO2VO(serviceConfigSnapshotPO);
+    }
+
+    @Override
+    public List<ServiceConfigVO> recoveryConfSnapshot(Long clusterId, Long serviceId, Long snapshotId) {
+        ServiceConfigSnapshotPO serviceConfigSnapshotPO = serviceConfigSnapshotDao.findById(snapshotId);
+        Map<String, String> confMap = JsonUtils.readFromString(serviceConfigSnapshotPO.getConfigJson());
+        List<ServiceConfigPO> list = serviceConfigDao.findByServiceId(serviceId);
+        for (ServiceConfigPO serviceConfigPO : list) {
+            String value = confMap.get(serviceConfigPO.getName());
+            if (value != null) {
+                serviceConfigPO.setPropertiesJson(value);
             }
         }
 
-        String url = "http://" + host.getHostname() + ":" + quickLinkDTO.getHttpPortDefault();
-        quickLinkVO.setUrl(url);
-        return quickLinkVO;
+        serviceConfigDao.updateByIds(list);
+        return ServiceConfigConverter.INSTANCE.fromPO2VO(list);
+    }
+
+    @Override
+    public Boolean deleteConfSnapshot(Long clusterId, Long serviceId, Long snapshotId) {
+        return serviceConfigSnapshotDao.deleteById(snapshotId);
     }
 }

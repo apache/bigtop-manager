@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one
+  ~ or more contributor license agreements.  See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership.  The ASF licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+-->
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.apache.bigtop.manager.dao.repository.ComponentDao">
+
+    <sql id="baseColumns">
+        id, name, display_name, service_id, host_id, status
+    </sql>
+
+    <sql id="baseColumnsV2">
+        ${alias}.id, ${alias}.name, ${alias}.display_name, ${alias}.service_id, ${alias}.host_id, ${alias}.status
+    </sql>
+
+    <select id="countByHostId" resultType="long">
+        select count(*)
+        from component
+        where host_id = #{hostId}
+    </select>
+
+    <select id="findByQuery" resultType="org.apache.bigtop.manager.dao.po.ComponentPO">
+        select
+        <include refid="baseColumnsV2">
+            <property name="alias" value="comp"/>
+        </include>, s.name as service_name, s.user as service_user, s.display_name as service_display_name, s.stack, h.hostname
+        from
+        component comp
+        left join service s on comp.service_id = s.id
+        left join host h on comp.host_id = h.id
+        <where>
+            <if test="query.name != null and query.name != ''">
+                and comp.name like concat('%', #{query.name}, '%')
+            </if>
+            <if test="query.clusterId != null">
+                and comp.cluster_id = #{query.clusterId}
+            </if>
+            <if test="query.hostId != null">
+                and comp.host_id = #{query.hostId}
+            </if>
+            <if test="query.hostname != null and query.hostname != ''">
+                and h.hostname like concat('%', #{query.hostname}, '%')
+            </if>
+            <if test="query.hostnames != null and query.hostnames.size() > 0">
+                and h.hostname in
+                <foreach collection="query.hostnames" item="hostname" index="index" open="(" close=")" separator=",">
+                    #{hostname}
+                </foreach>
+            </if>
+            <if test="query.serviceId != null">
+                and comp.service_id = #{query.serviceId}
+            </if>
+            <if test="query.serviceNames != null and query.serviceNames.size() > 0">
+                and s.name in
+                <foreach collection="query.serviceNames" item="serviceName" index="index" open="(" close=")" separator=",">
+                    #{serviceName}
+                </foreach>
+            </if>
+            <if test="query.status != null">
+                and comp.status = #{query.status}
+            </if>
+        </where>
+    </select>
+
+    <select id="findDetailsById" resultType="org.apache.bigtop.manager.dao.po.ComponentPO">
+        select
+        <include refid="baseColumnsV2">
+            <property name="alias" value="comp"/>
+        </include>, s.name as service_name, s.user as service_user, s.display_name as service_display_name, s.stack, h.hostname
+        from
+        component comp
+        left join service s on comp.service_id = s.id
+        left join host h on comp.host_id = h.id
+        where comp.id = #{id}
+    </select>
+</mapper>

@@ -34,21 +34,25 @@
         <spring-boot.version>3.1.1</spring-boot.version>
         <springdoc.version>2.2.0</springdoc.version>
         <freemarker.version>2.3.32</freemarker.version>
-        <common-lang3.version>3.12.0</common-lang3.version>
+        <common-lang3.version>3.14.0</common-lang3.version>
         <snakeyaml.version>2.0</snakeyaml.version>
-        <commons-io.version>2.13.0</commons-io.version>
+        <commons-io.version>2.16.1</commons-io.version>
         <guava.version>32.1.1-jre</guava.version>
         <commons-collections4.version>4.4</commons-collections4.version>
+        <commons-compress.version>1.26.2</commons-compress.version>
+        <xz.version>1.10</xz.version>
         <jwt.version>4.4.0</jwt.version>
         <janino.version>3.0.16</janino.version>
-        <eclipse-link.version>4.0.2</eclipse-link.version>
         <jaxb-runtime.version>4.0.4</jaxb-runtime.version>
-        <hibernate-core.version>6.2.5.Final</hibernate-core.version>
         <commons-text.version>1.11.0</commons-text.version>
         <prometheus-java-client.version>1.0.0</prometheus-java-client.version>
         <oshi-core.version>6.4.11</oshi-core.version>
         <micrometer.version>1.12.4</micrometer.version>
         <jdbc.dm.version>8.1.2.192</jdbc.dm.version>
+        <sshd.version>2.14.0</sshd.version>
+        <langchain4j.version>0.35.0</langchain4j.version>
+        <mybatis-spring-boot-starter.version>3.0.3</mybatis-spring-boot-starter.version>
+        <pagehelper-spring-boot-starter.version>2.1.0</pagehelper-spring-boot-starter.version>
     </properties>
 
     <dependencyManagement>
@@ -62,27 +66,9 @@
             </dependency>
 
             <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-test</artifactId>
-                <scope>test</scope>
-            </dependency>
-
-            <dependency>
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
                 <version>${springdoc.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.eclipse.persistence</groupId>
-                <artifactId>org.eclipse.persistence.jpa</artifactId>
-                <version>${eclipse-link.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.eclipse.persistence</groupId>
-                <artifactId>org.eclipse.persistence.extension</artifactId>
-                <version>${eclipse-link.version}</version>
             </dependency>
 
             <dependency>
@@ -134,6 +120,18 @@
             </dependency>
 
             <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>${commons-compress.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.tukaani</groupId>
+                <artifactId>xz</artifactId>
+                <version>${xz.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>${guava.version}</version>
@@ -155,13 +153,6 @@
                 <groupId>org.glassfish.jaxb</groupId>
                 <artifactId>jaxb-runtime</artifactId>
                 <version>${jaxb-runtime.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.hibernate.orm</groupId>
-                <artifactId>hibernate-core</artifactId>
-                <version>${hibernate-core.version}</version>
-                <scope>provided</scope>
             </dependency>
 
             <dependency>
@@ -195,10 +186,30 @@
                 <version>${micrometer.version}</version>
             </dependency>
 
+            <!-- sshd -->
+            <dependency>
+                <groupId>org.apache.sshd</groupId>
+                <artifactId>sshd-core</artifactId>
+                <version>${sshd.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>com.github.oshi</groupId>
                 <artifactId>oshi-core</artifactId>
                 <version>${oshi-core.version}</version>
+            </dependency>
+
+            <!-- mybatis -->
+            <dependency>
+                <groupId>org.mybatis.spring.boot</groupId>
+                <artifactId>mybatis-spring-boot-starter</artifactId>
+                <version>${mybatis-spring-boot-starter.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.pagehelper</groupId>
+                <artifactId>pagehelper-spring-boot-starter</artifactId>
+                <version>${pagehelper-spring-boot-starter.version}</version>
             </dependency>
 
             <!-- dameng -->
@@ -241,6 +252,31 @@
                 <groupId>net.devh</groupId>
                 <artifactId>grpc-client-spring-boot-starter</artifactId>
                 <version>${grpc-spring-boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j</artifactId>
+                <version>${langchain4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j-open-ai</artifactId>
+                <version>${langchain4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j-qianfan</artifactId>
+                <version>${langchain4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j-dashscope</artifactId>
+                <version>${langchain4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j-reactor</artifactId>
+                <version>${langchain4j.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

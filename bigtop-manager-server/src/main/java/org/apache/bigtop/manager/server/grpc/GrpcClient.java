@@ -20,7 +20,6 @@ package org.apache.bigtop.manager.server.grpc;
 
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
-import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 
 import io.grpc.CallOptions;
 import io.grpc.Channel;
@@ -34,6 +33,7 @@ import io.grpc.stub.AbstractStub;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Constructor;
+import java.net.InetAddress;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -48,52 +48,54 @@ public class GrpcClient {
     private static final Map<String, Map<String, AbstractAsyncStub<?>>> ASYNC_STUBS = new ConcurrentHashMap<>();
     private static final Map<String, Map<String, AbstractFutureStub<?>>> FUTURE_STUBS = new ConcurrentHashMap<>();
 
-    public static ManagedChannel createChannel(String host) {
-        int port = SpringContextHolder.getApplicationContext()
-                .getEnvironment()
-                .getRequiredProperty("bigtop.manager.grpc.port", Integer.class);
-        return createChannel(host, port);
-    }
-
     public static Boolean isChannelAlive(String host) {
         ManagedChannel channel = CHANNELS.get(host);
         return channel != null && !channel.isShutdown() && !channel.isTerminated();
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends AbstractBlockingStub<T>> T getBlockingStub(String host, Class<T> clazz) {
+    public static <T extends AbstractBlockingStub<T>> T getBlockingStub(String host, Integer grpcPort, Class<T> clazz) {
         Map<String, AbstractBlockingStub<?>> innerMap =
                 BLOCKING_STUBS.computeIfAbsent(host, k -> new ConcurrentHashMap<>());
         return (T) innerMap.computeIfAbsent(clazz.getName(), k -> {
-            T instance = T.newStub(getFactory(clazz), getChannel(host));
+            T instance = T.newStub(getFactory(clazz), getChannel(host, grpcPort));
             log.info("Instance: {} created.", k);
             return instance;
         });
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends AbstractAsyncStub<T>> T getAsyncStub(String host, Class<T> clazz) {
+    public static <T extends AbstractAsyncStub<T>> T getAsyncStub(String host, Integer grpcPort, Class<T> clazz) {
         Map<String, AbstractAsyncStub<?>> innerMap = ASYNC_STUBS.computeIfAbsent(host, k -> new ConcurrentHashMap<>());
         return (T) innerMap.computeIfAbsent(clazz.getName(), k -> {
-            T instance = T.newStub(getFactory(clazz), getChannel(host));
+            T instance = T.newStub(getFactory(clazz), getChannel(host, grpcPort));
             log.info("Instance: {} created.", k);
             return instance;
         });
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends AbstractFutureStub<T>> T getFutureStub(String host, Class<T> clazz) {
+    public static <T extends AbstractFutureStub<T>> T getFutureStub(String host, Integer grpcPort, Class<T> clazz) {
         Map<String, AbstractFutureStub<?>> innerMap =
                 FUTURE_STUBS.computeIfAbsent(host, k -> new ConcurrentHashMap<>());
         return (T) innerMap.computeIfAbsent(clazz.getName(), k -> {
-            T instance = T.newStub(getFactory(clazz), getChannel(host));
+            T instance = T.newStub(getFactory(clazz), getChannel(host, grpcPort));
             log.info("Instance: {} created.", k);
             return instance;
         });
     }
 
     private static ManagedChannel createChannel(String host, Integer port) {
-        ManagedChannel channel = ManagedChannelBuilder.forAddress(host, port)
+        String ipv4;
+        try {
+            InetAddress address = InetAddress.getByName(host);
+            ipv4 = address.getHostAddress();
+        } catch (Exception e) {
+            log.error("Unable to resolve host: {}", host);
+            throw new ApiException(ApiExceptionEnum.HOST_UNABLE_TO_RESOLVE, host);
+        }
+
+        ManagedChannel channel = ManagedChannelBuilder.forAddress(ipv4, port)
                 .usePlaintext()
                 .keepAliveTime(60, TimeUnit.SECONDS)
                 .keepAliveWithoutCalls(true)
@@ -119,11 +121,11 @@ public class GrpcClient {
         }
     }
 
-    private static ManagedChannel getChannel(String host) {
+    private static ManagedChannel getChannel(String host, Integer grpcPort) {
         if (isChannelAlive(host)) {
             return CHANNELS.get(host);
         } else {
-            return createChannel(host);
+            return createChannel(host, grpcPort);
         }
     }
 

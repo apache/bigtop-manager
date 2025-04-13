@@ -17,7 +17,125 @@
  * under the License.
  */
 
+export interface CommandRequest {
+  clusterCommand?: ClusterCommandReq
+  clusterId?: number
+  command: keyof typeof Command
+  commandLevel: keyof typeof CommandLevel
+  componentCommands?: ComponentCommandReq[]
+  customCommand?: string
+  hostCommands?: HostCommandReq[]
+  serviceCommands?: ServiceCommandReq[]
+  [property: string]: any
+}
+
+export interface ClusterCommandReq {
+  desc?: string
+  displayName: string
+  hosts: HostReq[]
+  name: string
+  rootDir?: string
+  type: number
+  userGroup?: string
+  [property: string]: any
+}
+
+export interface HostReq {
+  agentDir?: string
+  authType?: number | string
+  clusterId?: number
+  desc?: string
+  grpcPort?: number
+  hostnames?: string[]
+  sshKeyFilename?: string
+  sshKeyPassword?: string
+  sshKeyString?: string
+  sshPassword?: string
+  sshPort?: number
+  sshUser?: string
+  [property: string]: any
+}
+
+export enum Command {
+  Add = 'Add',
+  Check = 'Check',
+  Configure = 'Configure',
+  Custom = 'Custom',
+  Init = 'Init',
+  Prepare = 'Prepare',
+  Restart = 'Restart',
+  Start = 'Start',
+  Status = 'Status',
+  Stop = 'Stop',
+  More = 'More'
+}
+
+export enum CommandLevel {
+  cluster = 'cluster',
+  component = 'component',
+  host = 'host',
+  service = 'service'
+}
+
+export interface ComponentCommandReq {
+  componentName: string
+  hostnames: string[]
+  [property: string]: any
+}
+
+export interface HostCommandReq {
+  agentDir?: string
+  authType?: number
+  clusterId?: number
+  desc?: string
+  grpcPort?: number
+  hostnames?: string[]
+  sshKeyFilename?: string
+  sshKeyPassword?: string
+  sshKeyString?: string
+  sshPassword?: string
+  sshPort?: number
+  sshUser?: string
+  [property: string]: any
+}
+
+export interface ServiceCommandReq {
+  componentHosts?: ComponentHostReq[]
+  configs?: ServiceConfigReq[]
+  serviceName: string
+  [property: string]: any
+}
+
+export interface ComponentHostReq {
+  componentName: string
+  hostnames: string[]
+  [property: string]: any
+}
+
+export interface ServiceConfigReq {
+  id?: number
+  name?: string
+  properties: PropertyReq[]
+  [property: string]: any
+}
+
+export interface PropertyReq {
+  attrs?: AttrsReq
+  desc?: string
+  displayName?: string
+  name: string
+  value?: string
+  [property: string]: any
+}
+
+export interface AttrsReq {
+  type?: string
+  [property: string]: any
+}
+
 export interface CommandVO {
-  id: number
-  state: string
+  id?: number
+  name?: string
+  state?: string
+  [property: string]: any
 }

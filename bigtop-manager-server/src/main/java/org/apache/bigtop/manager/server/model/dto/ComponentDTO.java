@@ -25,7 +25,7 @@ import java.util.List;
 @Data
 public class ComponentDTO {
 
-    private String componentName;
+    private String name;
 
     private String displayName;
 
@@ -33,9 +33,7 @@ public class ComponentDTO {
 
     private String cardinality;
 
-    private ScriptDTO commandScript;
-
-    private List<CustomCommandDTO> customCommands;
+    private List<String> customCommands;
 
     private QuickLinkDTO quickLink;
 }

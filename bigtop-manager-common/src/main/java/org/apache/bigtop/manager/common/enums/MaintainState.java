@@ -22,20 +22,25 @@ import org.apache.bigtop.manager.common.utils.CaseUtils;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+@AllArgsConstructor
 @Getter
 public enum MaintainState {
-    UNINSTALLED,
+    UNINSTALLED("uninstalled", "Uninstalled"),
 
-    INSTALLED,
+    INSTALLED("installed", "Installed"),
 
-    MAINTAINED,
+    MAINTAINED("maintained", "Maintained"),
 
-    STARTED,
+    STARTED("started", "Started"),
 
-    STOPPED,
-    ;
+    STOPPED("stopped", "Stopped");
+
+    private final String code;
+
+    private final String name;
 
     @JsonCreator
     public static MaintainState fromString(String value) {

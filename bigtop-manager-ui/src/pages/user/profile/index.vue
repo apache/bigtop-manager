@@ -102,12 +102,7 @@
       @cancel="cancelEdit"
     >
       <br />
-      <a-form
-        ref="formRef"
-        name="profileForm"
-        :model="editUser"
-        layout="vertical"
-      >
+      <a-form ref="formRef" name="profileForm" :model="editUser" layout="vertical">
         <a-form-item
           :label="$t('user.nickname')"
           name="nickname"

@@ -18,23 +18,30 @@
  */
 package org.apache.bigtop.manager.server.service;
 
+import org.apache.bigtop.manager.dao.query.ComponentQuery;
 import org.apache.bigtop.manager.server.model.vo.ComponentVO;
-
-import java.util.List;
+import org.apache.bigtop.manager.server.model.vo.PageVO;
 
 public interface ComponentService {
 
     /**
-     * Get all components.
+     * List components.
      *
      * @return components
      */
-    List<ComponentVO> list(Long clusterId);
+    PageVO<ComponentVO> list(ComponentQuery query);
 
     /**
-     * Get a component by id.
+     * Get component details.
      *
      * @return component
      */
     ComponentVO get(Long id);
+
+    /**
+     * Remove a component.
+     *
+     * @return component
+     */
+    Boolean remove(Long id);
 }

@@ -20,9 +20,16 @@ package org.apache.bigtop.manager.server.utils;
 
 import org.apache.bigtop.manager.server.model.dto.AttrsDTO;
 import org.apache.bigtop.manager.server.model.dto.PropertyDTO;
+import org.apache.bigtop.manager.server.model.dto.ServiceConfigDTO;
 import org.apache.bigtop.manager.server.stack.model.AttrsModel;
 import org.apache.bigtop.manager.server.stack.model.PropertyModel;
 import org.apache.bigtop.manager.server.stack.xml.ConfigurationXml;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import org.springframework.beans.BeanUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,9 +60,9 @@ public class StackConfigUtils {
     private static PropertyDTO getPropertyDTO(PropertyModel propertyModel) {
         PropertyDTO propertyDTO = new PropertyDTO();
         propertyDTO.setDisplayName(propertyModel.getDisplayName());
-        propertyDTO.setDesc(propertyModel.getDesc());
+        propertyDTO.setDesc(StringUtils.strip(propertyModel.getDesc()));
         propertyDTO.setName(propertyModel.getName());
-        propertyDTO.setValue(propertyModel.getValue());
+        propertyDTO.setValue(StringUtils.strip(propertyModel.getValue()));
         if (propertyModel.getAttrs() != null) {
             AttrsModel attrsModel = propertyModel.getAttrs();
             AttrsDTO attrsDTO = new AttrsDTO();
@@ -66,23 +73,81 @@ public class StackConfigUtils {
         return propertyDTO;
     }
 
-    /**
-     * extract config from List<Map<String,Object>> to Map<String,Object>
-     *
-     * @param list List<PropertyModel>
-     * @return Map<String, Object>
-     */
-    public static Map<String, Object> extractConfigMap(List<PropertyDTO> list) {
-        if (list == null) {
-            return null;
+    public static List<ServiceConfigDTO> mergeServiceConfigs(
+            List<ServiceConfigDTO> oriConfigs, List<ServiceConfigDTO> overrideConfigs) {
+        // To avoid to change the original configs, we use cloned object
+        List<ServiceConfigDTO> mergedConfigs = new ArrayList<>();
+        for (ServiceConfigDTO oriConfig : oriConfigs) {
+            ServiceConfigDTO mergedConfig = new ServiceConfigDTO();
+            BeanUtils.copyProperties(oriConfig, mergedConfig);
+            mergedConfigs.add(mergedConfig);
         }
 
-        Map<String, Object> hashMap = new HashMap<>();
-        for (PropertyDTO property : list) {
-            String key = property.getName();
-            Object value = property.getValue();
-            hashMap.put(key, value);
+        if (CollectionUtils.isEmpty(overrideConfigs)) {
+            return mergedConfigs;
         }
-        return hashMap;
+
+        // Assign id for each service config
+        for (ServiceConfigDTO config : mergedConfigs) {
+            config.setId(overrideConfigs.stream()
+                    .filter(x -> x.getName().equals(config.getName()))
+                    .findFirst()
+                    .map(ServiceConfigDTO::getId)
+                    .orElse(null));
+        }
+
+        Map<String, Map<String, String>> overrideConfigsMap = serviceConfig2Map(overrideConfigs);
+        for (ServiceConfigDTO mergedConfig : mergedConfigs) {
+            String configName = mergedConfig.getName();
+            if (!overrideConfigsMap.containsKey(configName)) {
+                continue;
+            }
+
+            // Override existing properties
+            Map<String, String> overridePropertiesMap = overrideConfigsMap.get(configName);
+            for (PropertyDTO property : mergedConfig.getProperties()) {
+                String propertyName = property.getName();
+                String value = overridePropertiesMap.remove(propertyName);
+                if (value != null) {
+                    property.setValue(value);
+                }
+            }
+
+            // We may still have some properties added by user manually
+            if (MapUtils.isNotEmpty(overridePropertiesMap)) {
+                for (Map.Entry<String, String> entry : overridePropertiesMap.entrySet()) {
+                    PropertyDTO property = new PropertyDTO();
+                    property.setName(entry.getKey());
+                    property.setValue(entry.getValue());
+                    mergedConfig.getProperties().add(property);
+                }
+            }
+        }
+
+        return mergedConfigs;
+    }
+
+    /**
+     * extract config from List<ServiceConfigDTO> to Map<String, Map<String, String>>
+     *
+     * @param configs List<ServiceConfigDTO>
+     * @return Map<String, Map<String, String>>
+     */
+    private static Map<String, Map<String, String>> serviceConfig2Map(List<ServiceConfigDTO> configs) {
+        Map<String, Map<String, String>> outerMap = new HashMap<>();
+        if (CollectionUtils.isEmpty(configs)) {
+            return outerMap;
+        }
+
+        for (ServiceConfigDTO config : configs) {
+            Map<String, String> innerMap = new HashMap<>();
+            for (PropertyDTO property : config.getProperties()) {
+                innerMap.put(property.getName(), property.getValue());
+            }
+
+            outerMap.put(config.getName(), innerMap);
+        }
+
+        return outerMap;
     }
 }

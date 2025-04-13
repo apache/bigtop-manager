@@ -17,14 +17,17 @@
  * under the License.
  */
 
-import { HostComponentVO } from '@/api/component/types.ts'
-import request from '@/api/request.ts'
+import { get, del } from '../request-util'
+import type { ComponentParams, ComponentVO, ComponentList } from './types'
 
-export const getHostComponents = (
-  clusterId: number
-): Promise<HostComponentVO[]> => {
-  return request({
-    method: 'get',
-    url: '/clusters/' + clusterId + '/host-components'
-  })
+export const getComponents = (params: ComponentParams) => {
+  return get<ComponentList>(`/clusters/${params.clusterId}/components`, params)
+}
+
+export const getComponent = (pathParams: { clusterId: number; id: number }) => {
+  return get<ComponentVO>(`/clusters/${pathParams.clusterId}/components/${pathParams.id}`)
+}
+
+export const deleteComponent = (pathParams: { clusterId: number; id: number }) => {
+  return del<boolean>(`/clusters/${pathParams.clusterId}/components/${pathParams.id}`)
 }

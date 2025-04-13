@@ -18,46 +18,56 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
-import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
-import org.apache.bigtop.manager.server.exception.ApiException;
+import org.apache.bigtop.manager.dao.po.ServicePO;
+import org.apache.bigtop.manager.dao.repository.ClusterDao;
+import org.apache.bigtop.manager.dao.repository.ServiceDao;
+import org.apache.bigtop.manager.server.model.converter.ClusterConverter;
+import org.apache.bigtop.manager.server.model.converter.ServiceConverter;
+import org.apache.bigtop.manager.server.model.converter.StackConverter;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.model.dto.StackDTO;
-import org.apache.bigtop.manager.server.model.dto.TypeConfigDTO;
-import org.apache.bigtop.manager.server.model.mapper.ComponentMapper;
-import org.apache.bigtop.manager.server.model.mapper.ServiceMapper;
-import org.apache.bigtop.manager.server.model.mapper.StackMapper;
-import org.apache.bigtop.manager.server.model.mapper.TypeConfigMapper;
-import org.apache.bigtop.manager.server.model.vo.ServiceComponentVO;
-import org.apache.bigtop.manager.server.model.vo.ServiceConfigVO;
+import org.apache.bigtop.manager.server.model.vo.ClusterVO;
+import org.apache.bigtop.manager.server.model.vo.ServiceClusterVO;
 import org.apache.bigtop.manager.server.model.vo.StackVO;
 import org.apache.bigtop.manager.server.service.StackService;
 import org.apache.bigtop.manager.server.utils.StackUtils;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.collections4.CollectionUtils;
 
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
 
+import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class StackServiceImpl implements StackService {
 
+    @Resource
+    private ClusterDao clusterDao;
+
+    @Resource
+    private ServiceDao serviceDao;
+
     @Override
     public List<StackVO> list() {
         List<StackVO> stackVOList = new ArrayList<>();
-        Map<String, ImmutablePair<StackDTO, List<ServiceDTO>>> stackKeyMap = StackUtils.getStackKeyMap();
 
-        for (ImmutablePair<StackDTO, List<ServiceDTO>> pair : stackKeyMap.values()) {
-            StackDTO stackDTO = pair.left;
-            List<ServiceDTO> serviceDTOList = pair.right;
+        for (Map.Entry<StackDTO, List<ServiceDTO>> entry : StackUtils.STACK_SERVICE_MAP.entrySet()) {
+            StackDTO stackDTO = entry.getKey();
+            List<ServiceDTO> serviceDTOList = entry.getValue();
+            for (ServiceDTO serviceDTO : serviceDTOList) {
+                serviceDTO.setConfigs(StackUtils.SERVICE_CONFIG_MAP.get(serviceDTO.getName()));
+            }
 
-            StackVO stackVO = StackMapper.INSTANCE.fromDTO2VO(stackDTO);
-            stackVO.setServices(ServiceMapper.INSTANCE.fromDTO2VO(serviceDTOList));
+            StackVO stackVO = StackConverter.INSTANCE.fromDTO2VO(stackDTO);
+            stackVO.setServices(ServiceConverter.INSTANCE.fromDTO2VO(serviceDTOList));
             stackVOList.add(stackVO);
         }
 
@@ -65,40 +75,31 @@ public class StackServiceImpl implements StackService {
     }
 
     @Override
-    public List<ServiceComponentVO> components(String stackName, String stackVersion) {
-        List<ServiceComponentVO> list = new ArrayList<>();
-
-        ImmutablePair<StackDTO, List<ServiceDTO>> pair =
-                StackUtils.getStackKeyMap().get(StackUtils.fullStackName(stackName, stackVersion));
-        if (pair == null) {
-            throw new ApiException(ApiExceptionEnum.STACK_NOT_FOUND);
-        }
-
-        List<ServiceDTO> serviceDTOList = pair.right;
+    public List<ServiceClusterVO> serviceClusters() {
+        List<ServiceClusterVO> res = new ArrayList<>();
+        // ID - ClusterVO map
+        Map<Long, ClusterVO> clusterVOMap = ClusterConverter.INSTANCE.fromPO2VO(clusterDao.findAll()).stream()
+                .collect(Collectors.toMap(ClusterVO::getId, Function.identity()));
+        // Name - ServicePO map
+        Map<String, List<ServicePO>> servicePONameMap =
+                serviceDao.findAll().stream().collect(Collectors.groupingBy(ServicePO::getName));
+        List<ServiceDTO> serviceDTOList = StackUtils.getAllStacks().stream()
+                .map(StackUtils::getServiceDTOList)
+                .flatMap(List::stream)
+                .toList();
         for (ServiceDTO serviceDTO : serviceDTOList) {
-            ServiceComponentVO element = new ServiceComponentVO();
-            element.setServiceName(serviceDTO.getServiceName());
-            element.setComponents(ComponentMapper.INSTANCE.fromDTO2VO(serviceDTO.getComponents()));
-            list.add(element);
+            List<ClusterVO> clusterVOList = new ArrayList<>();
+            List<ServicePO> servicePOList = servicePONameMap.get(serviceDTO.getName());
+            if (!CollectionUtils.isEmpty(servicePOList)) {
+                for (ServicePO servicePO : servicePOList) {
+                    ClusterVO clusterVO = clusterVOMap.get(servicePO.getClusterId());
+                    clusterVOList.add(clusterVO);
+                }
+            }
+
+            res.add(new ServiceClusterVO(serviceDTO.getName(), clusterVOList));
         }
 
-        return list;
-    }
-
-    @Override
-    public List<ServiceConfigVO> configurations(String stackName, String stackVersion) {
-        List<ServiceConfigVO> list = new ArrayList<>();
-        Map<String, Map<String, List<TypeConfigDTO>>> stackConfigMap = StackUtils.getStackConfigMap();
-        Map<String, List<TypeConfigDTO>> serviceConfigMap =
-                stackConfigMap.get(StackUtils.fullStackName(stackName, stackVersion));
-
-        for (Map.Entry<String, List<TypeConfigDTO>> entry : serviceConfigMap.entrySet()) {
-            ServiceConfigVO element = new ServiceConfigVO();
-            element.setServiceName(entry.getKey());
-            element.setConfigs(TypeConfigMapper.INSTANCE.fromDTO2VO(entry.getValue()));
-            list.add(element);
-        }
-
-        return list;
+        return res;
     }
 }

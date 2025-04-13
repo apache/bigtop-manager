@@ -22,28 +22,33 @@ import org.apache.bigtop.manager.common.utils.CaseUtils;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
+@AllArgsConstructor
+@Getter
 public enum Command {
-    CREATE,
+    // Available for: Cluster, Host, Service, Component
+    // Remove is not a command because it won't create job, please refer to the related API for remove action.
+    ADD("add", "Add"),
+    START("start", "Start"),
+    STOP("stop", "Stop"),
+    RESTART("restart", "Restart"),
 
-    INSTALL,
+    // Available for: Service
+    CHECK("check", "Check"),
+    CONFIGURE("configure", "Configure"),
+    CUSTOM("custom", "Custom"),
 
-    UNINSTALL,
-
-    START,
-
-    STOP,
-
-    STATUS,
-
-    RESTART,
-
-    CONFIGURE,
-
-    CHECK,
-
-    CUSTOM,
+    // Internal use only, not available for API call
+    INIT("init", "Init"),
+    PREPARE("prepare", "Prepare"),
+    STATUS("status", "Status"),
     ;
+
+    private final String code;
+
+    private final String name;
 
     @JsonCreator
     public static Command fromString(String value) {

@@ -16,25 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 export default {
-  switch: '切换集群',
+  base_info: '基本信息',
+  cluster_config: '集群配置',
+  cluster_info: '集群信息',
+  component_info: '组件信息',
+  host_config: '主机管理',
   create: '创建集群',
-  set_cluster_name: '设置集群名称',
-  set_cluster_name_title: '让我们来开始吧',
-  set_cluster_name_sub_title: '请跟随后续步骤来创建你的集群',
-  set_cluster_name_input: '输入你的集群名',
-  set_cluster_name_valid: '集群名不能为空',
-  choose_stack: '选择组件栈',
-  set_repository: '设置源',
-  set_hosts: '设置节点',
-  set_hosts_placeholder: '请输入主机名，每行一个。',
-  set_hosts_valid: '主机名不能为空。',
+  name: '集群名',
+  display_name: '集群显示名',
+  description: '集群描述',
+  root_directory: '集群根目录',
+  user_group: '集群用户组',
+  config_source: '配置源',
+  install_dependencies: '安装依赖',
+  add_host: '新增主机',
+  edit_host: '编辑主机',
+  view_log: '查看日志',
+  source: '配置源',
   show_hosts_resolved: '解析后的主机名列表',
-  not_exist_title: '集群不存在',
-  not_exist_sub_title: '集群不存在，请先创建',
-  create_success_title: '创建成功',
-  create_success_sub_title: '集群已创建成功，快点开始使用吧',
-  create_fail_title: '创建失败',
-  create_fail_sub_title: '集群创建失败，请重试'
+  cluster_unavailable_message: '抱歉，你还没有集群，无法使用集群管理能力。'
 }

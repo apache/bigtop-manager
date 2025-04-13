@@ -17,46 +17,55 @@
  * under the License.
  */
 
-export enum State {
-  Pending = '#1677ff',
-  Processing = '#1677fe',
-  Successful = '#52c41a',
-  Failed = '#ff4d4f',
-  Canceled = '#80868b'
-}
+import type { PageVO } from '@/api/types'
+import { JobState } from '@/enums/state'
 
-export type StateType = keyof typeof State
+export type JobList = PageVO<JobVO>
+export type StageList = PageVO<StageVO>
+export type TaskList = PageVO<TaskVO>
 
-interface BaseVO {
-  id: number
-  name: string
-  state: StateType
+export type JobParams = { clusterId: number; jobId: number }
+export type TaskParams = JobParams & { stageId: number }
+export type TaskLogParams = TaskParams & { taskId: number }
+
+export type StateType = keyof typeof JobState
+
+export type JobListParams = { clusterId: number }
+export type StageListParams = JobParams
+export type TaskListParams = TaskParams
+
+export interface JobVO {
   createTime?: string
+  id?: number
+  name?: string
+  stages?: StageVO[]
+  state?: StateType
   updateTime?: string
-  progress?: number
+  [property: string]: any
 }
 
-export interface JobVO extends BaseVO {
-  stages: StageVO[]
+export interface StageVO {
+  createTime?: string
+  id?: number
+  name?: string
+  order?: number
+  state?: StateType
+  tasks?: TaskVO[]
+  updateTime?: string
+  [property: string]: any
 }
 
-export interface StageVO extends BaseVO {
-  order: number
-  tasks: TaskVO[]
+export interface TaskVO {
+  createTime?: string
+  hostname?: string
+  id?: number
+  name?: string
+  state?: StateType
+  updateTime?: string
+  [property: string]: any
 }
 
-export interface TaskVO extends BaseVO {
-  hostname: string
-}
-
-export interface Pagination {
-  pageNum: number
-  pageSize: number
-  sort?: 'asc' | 'desc'
-  orderBy?: string
-}
-
-export interface OuterData {
-  meta: JobVO[]
-  currItem: StageVO | TaskVO | undefined
+export interface LogsRes {
+  promise: Promise<any>
+  cancel: () => void
 }

@@ -17,14 +17,6 @@
 # under the License.
 #
 
-bigtop:
-  manager:
-    orm:
-      # hibernate/eclipselink(default=eclipselink)
-      type: eclipselink
-    grpc:
-      port: 8835
-
 spring:
   banner:
     charset: utf-8
@@ -54,29 +46,6 @@ spring:
   jackson:
     default-property-inclusion: non-null
 
-  jpa:
-    show-sql: true
-    properties:
-      eclipselink:
-        ddl-generation: create-or-extend-tables
-        weaving: false
-        persistence-context:
-          persist-on-commit: false
-        cache:
-          shared:
-            default: false
-        logging:
-          connection: false
-          logger: org.eclipse.persistence.logging.slf4j.SLF4JLogger
-          parameters: true
-          session: false
-          thread: false
-          timestamp: false
-          level:
-            connection: FINE
-            sql: FINEST
-            jpa: FINER
-
   messages:
     basename: i18n/messages
 
@@ -86,8 +55,9 @@ spring:
 springdoc:
   packages-to-scan: org.apache.bigtop.manager.server
   swagger-ui:
-    defaultModelsExpandDepth: -1
+    default-models-expand-depth: -1
 
-monitoring:
-  prometheus-host: "http://localhost:9090"
-  agent-host-job-name: "bm-agent-host"
+pagehelper:
+  reasonable: false
+  params: count=countSql
+  support-methods-arguments: true

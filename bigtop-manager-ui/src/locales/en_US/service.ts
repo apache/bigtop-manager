@@ -16,27 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 export default {
-  start_all: 'Start All',
-  stop_all: 'Stop All',
-  add: 'Add service',
-  service: 'Service',
-  service_name: 'Service Name',
-  service_selected: 'Selected {0} Services',
-  service_account: 'Service Account',
-  service_user: 'Service User',
-  service_group: 'Service Group',
-  choose_services: 'Choose Services',
-  assign_components: 'Assign Components',
-  configure_services: 'Configure Services',
-  add_success_title: 'Congratulations!',
-  add_success_sub_title: 'Service added successfully, please enjoy it.',
-  add_fail_title: 'Oh no!',
-  add_fail_sub_title: 'Service added failed, please retry it.',
-  summary: 'Summary',
-  config: 'Config',
-  components: 'Components',
-  quick_links: 'Quick Links',
-  no_link: 'No Link'
+  name: 'Service Name',
+  required_restart: 'Restart',
+  select_service: 'Services',
+  assign_component: 'Assign Component',
+  configure_service: 'Configure Service',
+  service_overview: 'Service Overview',
+  install_component: 'Install',
+  service_list: 'Service List',
+  pending_installation_services: 'Selected Services',
+  select_host: 'Select  Host',
+  host_preview: 'Host Preview',
+  please_enter_search_keyword: 'Please enter search keyword',
+  component_host_assignment: 'Assign at least one host for each component',
+  service_selection: 'Please select services to install',
+  dependencies_conflict_msg: '{0} requires infra service {1} to be installed first',
+  dependencies_msg: '{0} requires service {1}, add it also?',
+  capture_snapshot: 'Capture Snapshot',
+  snapshot_management: 'Snapshot Management',
+  snapshot_name: 'Name',
+  snapshot_description: 'Description',
+  snapshot_notes: 'Snapshot Notes'
 }

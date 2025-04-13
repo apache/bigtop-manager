@@ -18,26 +18,32 @@
  */
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.zookeeper;
 
-import org.apache.bigtop.manager.common.message.entity.payload.CommandPayload;
-import org.apache.bigtop.manager.stack.common.annotations.GlobalParams;
-import org.apache.bigtop.manager.stack.common.utils.BaseParams;
-import org.apache.bigtop.manager.stack.common.utils.LocalSettings;
+import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
+import org.apache.bigtop.manager.stack.bigtop.param.BigtopParams;
+import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
+import org.apache.bigtop.manager.stack.core.spi.param.Params;
+import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
 
+import com.google.auto.service.AutoService;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.Map;
 
 @Getter
-public class ZookeeperParams extends BaseParams {
+@AutoService(Params.class)
+@NoArgsConstructor
+public class ZookeeperParams extends BigtopParams {
 
-    private String zookeeperLogDir = "/var/log/zookeeper";
-    private String zookeeperPidDir = "/var/run/zookeeper";
-    private String zookeeperDataDir = "/hadoop/zookeeper";
-    private String zookeeperPidFile = zookeeperPidDir + "/zookeeper_server.pid";
+    private final String zookeeperLogDir = "/var/log/zookeeper";
+    private final String zookeeperPidDir = "/var/run/zookeeper";
+    private final String zookeeperPidFile = zookeeperPidDir + "/zookeeper_server.pid";
 
-    public ZookeeperParams(CommandPayload commandPayload) {
-        super(commandPayload);
-        globalParamsMap.put("java_home", "/usr/local/java");
+    private String zookeeperDataDir;
+
+    public ZookeeperParams(ComponentCommandPayload componentCommandPayload) {
+        super(componentCommandPayload);
+        globalParamsMap.put("java_home", javaHome());
         globalParamsMap.put("zookeeper_home", serviceHome());
         globalParamsMap.put("security_enabled", false);
         globalParamsMap.put("zookeeper_pid_file", zookeeperPidFile);
@@ -45,17 +51,18 @@ public class ZookeeperParams extends BaseParams {
 
     @GlobalParams
     public Map<String, Object> zooCfg() {
-        Map<String, Object> zooCfg = LocalSettings.configurations(serviceName(), "zoo.cfg");
+        Map<String, Object> zooCfg = LocalSettings.configurations(getServiceName(), "zoo.cfg");
         zookeeperDataDir = (String) zooCfg.get("dataDir");
         return zooCfg;
     }
 
     @GlobalParams
     public Map<String, Object> zookeeperEnv() {
-        Map<String, Object> zookeeperEnv = LocalSettings.configurations(serviceName(), "zookeeper-env");
-        zookeeperLogDir = (String) zookeeperEnv.get("zookeeper_log_dir");
-        zookeeperPidDir = (String) zookeeperEnv.get("zookeeper_pid_dir");
-        zookeeperPidFile = zookeeperPidDir + "/zookeeper_server.pid";
-        return zookeeperEnv;
+        return LocalSettings.configurations(getServiceName(), "zookeeper-env");
+    }
+
+    @Override
+    public String getServiceName() {
+        return "zookeeper";
     }
 }

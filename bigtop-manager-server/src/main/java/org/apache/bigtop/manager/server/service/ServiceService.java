@@ -18,6 +18,13 @@
  */
 package org.apache.bigtop.manager.server.service;
 
+import org.apache.bigtop.manager.dao.query.ServiceQuery;
+import org.apache.bigtop.manager.server.model.req.ServiceConfigReq;
+import org.apache.bigtop.manager.server.model.req.ServiceConfigSnapshotReq;
+import org.apache.bigtop.manager.server.model.vo.PageVO;
+import org.apache.bigtop.manager.server.model.vo.ServiceConfigSnapshotVO;
+import org.apache.bigtop.manager.server.model.vo.ServiceConfigVO;
+import org.apache.bigtop.manager.server.model.vo.ServiceUserVO;
 import org.apache.bigtop.manager.server.model.vo.ServiceVO;
 
 import java.util.List;
@@ -25,11 +32,18 @@ import java.util.List;
 public interface ServiceService {
 
     /**
-     * Get all stacks.
+     * Get services by query.
      *
-     * @return Stacks
+     * @return services
      */
-    List<ServiceVO> list(Long clusterId);
+    PageVO<ServiceVO> list(ServiceQuery query);
+
+    /**
+     * Get service users.
+     *
+     * @return service users
+     */
+    PageVO<ServiceUserVO> serviceUsers(Long clusterId);
 
     /**
      * Get a service.
@@ -37,4 +51,23 @@ public interface ServiceService {
      * @return service
      */
     ServiceVO get(Long id);
+
+    /**
+     * Remove a service.
+     *
+     * @return service
+     */
+    Boolean remove(Long id);
+
+    List<ServiceConfigVO> listConf(Long clusterId, Long serviceId);
+
+    List<ServiceConfigVO> updateConf(Long clusterId, Long serviceId, List<ServiceConfigReq> reqs);
+
+    List<ServiceConfigSnapshotVO> listConfSnapshots(Long clusterId, Long serviceId);
+
+    ServiceConfigSnapshotVO takeConfSnapshot(Long clusterId, Long serviceId, ServiceConfigSnapshotReq req);
+
+    List<ServiceConfigVO> recoveryConfSnapshot(Long clusterId, Long serviceId, Long snapshotId);
+
+    Boolean deleteConfSnapshot(Long clusterId, Long serviceId, Long snapshotId);
 }

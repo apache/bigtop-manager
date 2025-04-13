@@ -18,8 +18,6 @@
  */
 package org.apache.bigtop.manager.server.model.vo;
 
-import org.apache.bigtop.manager.common.enums.MaintainState;
-
 import lombok.Data;
 
 @Data
@@ -27,15 +25,29 @@ public class ClusterVO {
 
     private Long id;
 
-    private String clusterName;
+    private String name;
 
-    private Integer clusterType;
+    private String displayName;
 
-    private String stackName;
+    private String desc;
 
-    private String stackVersion;
+    private Integer type;
 
-    private Boolean selected;
+    private String userGroup;
 
-    private MaintainState state;
+    private String rootDir;
+
+    private Integer status;
+
+    private String createUser;
+
+    private Long totalHost;
+
+    private Long totalService;
+
+    private Long totalProcessor;
+
+    private Long totalMemory;
+
+    private Long totalDisk;
 }

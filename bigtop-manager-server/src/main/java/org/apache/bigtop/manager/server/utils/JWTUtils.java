@@ -31,7 +31,7 @@ public class JWTUtils {
 
     public static final String CLAIM_USERNAME = "username";
 
-    private static final String SIGN = "r0PGVyvjKOxUBwGt";
+    protected static final String SIGN = "r0PGVyvjKOxUBwGt";
 
     public static String generateToken(Long id, String username) {
         Calendar calendar = Calendar.getInstance();
