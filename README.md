@@ -10,7 +10,7 @@
 [![Contributors](https://img.shields.io/github/contributors/apache/bigtop-manager)](https://github.com/apache/bigtop-manager/graphs/contributors)
 [![License](https://img.shields.io/github/license/apache/bigtop-manager)](https://github.com/apache/bigtop-manager/LICENSE)
 
-<b>A new generation of bigdata cluster management platform</b>
+<b>✨ A new generation of bigdata cluster management platform ✨</b>
 </div>
 
 ## Introduction
@@ -21,14 +21,14 @@ Our goal is to provide an easy deployment solution not only for Apache Bigtop co
 ## Documents
 See [Documents](./docs).
 
+## Stargazers
+![Stargazers](https://starchart.cc/apache/bigtop-manager.svg)
+
 ## Code of Conduct
 Participate in this project in accordance with the Contributor Covenant [Code of Conduct](https://www.apache.org/foundation/policies/conduct).
 
 ## Contributors
 We appreciate all developers for their contributions. See the [List Of Contributors](https://github.com/apache/bigtop-manager/graphs/contributors).
-
-## Stars
-![Stars](https://starchart.cc/apache/bigtop-manager.svg)
 
 ## License
 [Apache 2.0 License](LICENSE)
