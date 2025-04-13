@@ -176,7 +176,7 @@ public class OSDetection {
 
     private static String standardizeArch(String arch) {
         return switch (arch) {
-            case "amd64" -> "x86_64";
+            case "amd64", "x86_64" -> "x86_64";
             case "arm64", "aarch64" -> "aarch64";
             case "x86" -> "i386";
             case "arm" -> "armv7l";
