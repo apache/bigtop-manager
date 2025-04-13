@@ -31,19 +31,16 @@ import org.apache.bigtop.manager.grpc.generated.ComponentStatusRequest;
 import org.apache.bigtop.manager.grpc.generated.ComponentStatusServiceGrpc;
 import org.apache.bigtop.manager.server.enums.HealthyStatusEnum;
 import org.apache.bigtop.manager.server.grpc.GrpcClient;
-
 import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
 import org.apache.bigtop.manager.server.utils.StackUtils;
+
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 
 import jakarta.annotation.Resource;
-import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -70,14 +67,16 @@ public class ComponentStatusTimer {
         for (ComponentPO componentPO : componentPOList) {
             ComponentDTO componentDTO = StackUtils.getComponentDTO(componentPO.getName());
             String category = componentDTO.getCategory();
-            if (HealthyStatusEnum.fromCode(componentPO.getStatus()) == HealthyStatusEnum.UNKNOWN || category.equals(ComponentCategories.CLIENT)) {
+            if (HealthyStatusEnum.fromCode(componentPO.getStatus()) == HealthyStatusEnum.UNKNOWN
+                    || category.equals(ComponentCategories.CLIENT)) {
                 continue;
             }
 
             ComponentPO componentDetailsPO = componentDao.findDetailsById(componentPO.getId());
             HostPO hostPO = hostDao.findById(componentPO.getHostId());
             ComponentStatusRequest request = ComponentStatusRequest.newBuilder()
-                    .setStackName(CaseUtils.toLowerCase(componentDetailsPO.getStack().split("-")[0]))
+                    .setStackName(
+                            CaseUtils.toLowerCase(componentDetailsPO.getStack().split("-")[0]))
                     .setStackVersion(componentDetailsPO.getStack().split("-")[1])
                     .setServiceName(componentDetailsPO.getServiceName())
                     .setServiceUser(componentDetailsPO.getServiceUser())
@@ -100,8 +99,8 @@ public class ComponentStatusTimer {
         componentDao.partialUpdateByIds(componentPOList);
 
         // Update services
-        Map<Long, List<ComponentPO>> componentPOMap = componentPOList.stream()
-                .collect(Collectors.groupingBy(ComponentPO::getServiceId));
+        Map<Long, List<ComponentPO>> componentPOMap =
+                componentPOList.stream().collect(Collectors.groupingBy(ComponentPO::getServiceId));
         for (Map.Entry<Long, List<ComponentPO>> entry : componentPOMap.entrySet()) {
             Long serviceId = entry.getKey();
             List<ComponentPO> components = entry.getValue();

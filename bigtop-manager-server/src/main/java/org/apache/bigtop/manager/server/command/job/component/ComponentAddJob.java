@@ -108,7 +108,9 @@ public class ComponentAddJob extends AbstractComponentJob {
             componentPO.setClusterId(clusterId);
             componentPO.setHostId(hostPO.getId());
             componentPO.setServiceId(servicePO.getId());
-            HealthyStatusEnum status = ComponentCategories.CLIENT.equals(componentDTO.getCategory()) ? HealthyStatusEnum.HEALTHY : HealthyStatusEnum.UNKNOWN;
+            HealthyStatusEnum status = ComponentCategories.CLIENT.equals(componentDTO.getCategory())
+                    ? HealthyStatusEnum.HEALTHY
+                    : HealthyStatusEnum.UNKNOWN;
             componentPO.setStatus(status.getCode());
             componentPOList.add(componentPO);
         }
