@@ -17,7 +17,7 @@
 #
 
 github:
-  description: "Bigtop Manager provides a modern, low-threshold web application to simplify the deployment and management of components for Bigtop, similar to Apache Ambari and Cloudera Manager."
+  description: "Bigtop Manager is a modern, AI-driven web application designed to simplify the complexity of bigdata cluster management."
   homepage: https://bigtop.apache.org
   labels:
     - java
