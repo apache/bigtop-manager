@@ -17,7 +17,7 @@
 
 ![Stack](https://github.com/user-attachments/assets/faf1112c-f0a6-4353-ba63-83abbb819c29)
 
-目前由于 Bigtop Manager 没有提供官方 Repository，所以您需要自己设置
+目前由于我们没有提供官方 Repository，所以您需要自己设置
 
 您可以使用第三方提供的 Repository： http://213.146.155.38/release/1.0.0/
 
@@ -47,7 +47,7 @@
 
 ![Host](https://github.com/user-attachments/assets/c836e570-fa6a-411f-b3b4-0efb4b55d6ef)
 
-### 作业
-最后等待作业运行成功即可，若失败则需找到问题并重试
+### 创建集群
+最后等待集群创建成功即可，若失败则解决问题后重试
 
 ![Create Cluster](https://github.com/user-attachments/assets/339a289e-c718-4953-bdb2-15232978fd49)
