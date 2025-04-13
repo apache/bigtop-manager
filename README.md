@@ -16,7 +16,7 @@
 ## Introduction
 Bigtop Manager is a modern, AI-driven web application designed to simplify the complexity of bigdata cluster management.
 
-Our goal is to provide an easy deployment solution not only for Apache Bigtop components, but also other community version bigdata components.
+Provides an easy deployment solution not only for Apache Bigtop components, but also other community version bigdata components.
 
 ## Documents
 See [Documents](./docs).
