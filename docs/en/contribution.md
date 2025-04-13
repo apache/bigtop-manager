@@ -47,10 +47,21 @@ pnpm dev
 
 Then access `localhost:5173` in your browser. Next, enjoy your development journey!
 
-### Dev Mode
-In normal development, we need a Linux host to deploy corresponding services and components, which invisibly raises the threshold and makes it easy to be affected when encountering issues unrelated to big data services. Therefore, we provide a **development mode** that allows developers to directly debug via Intellij IDEA on local machines (both Windows and MacOS are supported). You only need to add the environment variable `DEV_MODE=true` when starting up — the Agent will automatically mock all component operations and return `true` by default. 
+### Development Mode
+To reduce the complexity of development environment dependencies for big data components, we support development mode:
 
-As shown in the figure below
+#### Environment Decoupling Design
+Traditional deployment requires developers to set up a complete Linux service cluster, with the following pain points:
+* High environmental configuration complexity raises the development threshold
+* Non-component issues (such as scheduling problems, etc.) easily hinder development
+
+#### Lightweight Debugging Mechanism
+Activate developer mode via the `DEV_MODE=true` environment variable to achieve:
+* **Mock component operations**: The Agent automatically intercepts component calls and returns a preset success status
+* **Cross-platform support**: Fully compatible with Windows/MacOS/Linux development environments (IntelliJ IDEA recommended)
+
+#### Quick Activation
+Users can enable it through the following method: 
 ![DEV_MODE](https://github.com/user-attachments/assets/d0e59fad-4287-4be5-a57c-d5c656e0dbb2)
 
 # Modules and Functions
