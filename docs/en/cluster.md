@@ -9,7 +9,7 @@ When creating a cluster, users need to fill in the following information:
 - **Name**: The unique identifier of the cluster, a key information for the code to recognize the cluster.
 - **DisplayName**: The display name of the cluster, shown on the page for users to distinguish.
 - **Description**: A detailed description of the cluster.
-- **Root Directory**: The address where cluster services are installed. Corresponding service directories will be created here. For example, if this is `/opt`, ZooKeeper will be installed under `/opt/zookeeper`.
+- **Root Directory**: The address where cluster services are installed. Corresponding service directories will be created here. For example, if this is `/opt`, ZooKeeper will be installed under `/opt/services/zookeeper`.
 - **User Group**: The user group for cluster services. A separate username will be created for each service. If this is `hadoop`, the file permissions for ZooKeeper will be `zookeeper:hadoop`.
 
 ![Basic Info](https://github.com/user-attachments/assets/4fb8ccad-0694-4b9a-a0ac-33c736575391)

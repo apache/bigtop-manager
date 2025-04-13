@@ -7,7 +7,7 @@
 * Name：集群唯一标识，是代码识别集群的关键信息
 * DisplayName：集群显示名，展示在页面上供用户区分
 * Description：集群描述，描述集群详细信息
-* Root Directory：集群服务安装的地址，对应的服务目录会创建至该处，若此处为 `/opt` 则 ZooKeeper 会被安装在 `/opt/zookeeper` 下
+* Root Directory：集群服务安装的地址，对应的服务目录会创建至该处，若此处为 `/opt` 则 ZooKeeper 会被安装在 `/opt/services/zookeeper` 下
 * User Group：集群服务的用户组，每个服务会分别创建一个用户名，如此处为 `hadoop`，则 ZooKeeper 文件对应的权限则为 `zookeeper:hadoop`
 
 ![Basic Info](https://github.com/user-attachments/assets/4fb8ccad-0694-4b9a-a0ac-33c736575391)
