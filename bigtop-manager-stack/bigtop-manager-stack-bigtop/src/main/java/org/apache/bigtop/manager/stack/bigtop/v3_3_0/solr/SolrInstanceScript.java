@@ -53,9 +53,15 @@ public class SolrInstanceScript extends AbstractServerScript {
     }
 
     @Override
+    public ShellResult init(Params params) {
+        createZNode(params);
+
+        return super.init(params);
+    }
+
+    @Override
     public ShellResult start(Params params) {
         configure(params);
-        createZNode(params);
         SolrParams solrParams = (SolrParams) params;
         String cmd = MessageFormat.format(
                 "{0}/bin/solr start -cloud -noprompt -s {0}/server/solr -z {1}",

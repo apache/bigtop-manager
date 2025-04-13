@@ -18,6 +18,7 @@
  */
 package org.apache.bigtop.manager.server.command.job.component;
 
+import org.apache.bigtop.manager.common.constants.ComponentCategories;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.po.HostPO;
@@ -107,7 +108,8 @@ public class ComponentAddJob extends AbstractComponentJob {
             componentPO.setClusterId(clusterId);
             componentPO.setHostId(hostPO.getId());
             componentPO.setServiceId(servicePO.getId());
-            componentPO.setStatus(HealthyStatusEnum.UNKNOWN.getCode());
+            HealthyStatusEnum status = ComponentCategories.CLIENT.equals(componentDTO.getCategory()) ? HealthyStatusEnum.HEALTHY : HealthyStatusEnum.UNKNOWN;
+            componentPO.setStatus(status.getCode());
             componentPOList.add(componentPO);
         }
 
