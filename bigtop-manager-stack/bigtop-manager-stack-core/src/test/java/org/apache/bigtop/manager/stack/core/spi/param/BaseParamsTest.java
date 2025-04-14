@@ -65,8 +65,8 @@ public class BaseParamsTest {
         arch.add("mockArch");
 
         List<PackageInfo> packages = new ArrayList<>();
-        packages.add(new PackageInfo("package1", "testChecksum1"));
-        packages.add(new PackageInfo("package2", "testChecksum2"));
+        packages.add(new PackageInfo(null, "package1", "testChecksum1"));
+        packages.add(new PackageInfo(null, "package2", "testChecksum2"));
 
         List<PackageSpecificInfo> packageSpecifics = new ArrayList<>();
         PackageSpecificInfo packageSpecific = new PackageSpecificInfo();

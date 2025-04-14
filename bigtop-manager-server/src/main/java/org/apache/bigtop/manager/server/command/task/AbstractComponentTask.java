@@ -127,6 +127,7 @@ public abstract class AbstractComponentTask extends AbstractTask {
             List<PackageInfo> packageInfoList = new ArrayList<>();
             for (PackageDTO packageDTO : packageSpecificDTO.getPackages()) {
                 PackageInfo packageInfo = new PackageInfo();
+                packageInfo.setUrl(packageDTO.getUrl());
                 packageInfo.setName(packageDTO.getName());
                 packageInfo.setChecksum(packageDTO.getChecksum());
                 packageInfoList.add(packageInfo);
