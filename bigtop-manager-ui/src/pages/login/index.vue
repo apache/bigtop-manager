@@ -24,14 +24,11 @@
   import { login } from '@/api/login'
   import { message } from 'ant-design-vue'
   import { useI18n } from 'vue-i18n'
-  import { useStackStore } from '@/store/stack'
-
   import md5 from 'md5'
   import SelectLang from '@/components/select-lang/index.vue'
 
   const i18n = useI18n()
   const router = useRouter()
-  const stackStore = useStackStore()
 
   const formRef = shallowRef()
   const submitLoading = shallowRef(false)
@@ -57,8 +54,6 @@
       } else {
         sessionStorage.setItem('Token', res.token)
       }
-
-      stackStore.loadStacks()
       message.success(i18n.t('login.login_success'))
       router.push('/')
     } catch (e) {
