@@ -167,7 +167,7 @@
   // }
 
   const onSave = () => {
-    menuStore.updateSiderMenu()
+    menuStore.updateSider()
   }
 </script>
 

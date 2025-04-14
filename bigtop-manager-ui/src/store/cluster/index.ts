@@ -35,7 +35,7 @@ export const useClusterStore = defineStore(
     const loading = ref(false)
     const currCluster = ref<ClusterVO>({})
     const clusterId = computed(() => (route.params.id as string) || undefined)
-    const hasCluster = computed(() => clusters.value.length > 0)
+    const clusterCount = computed(() => clusters.value.length)
 
     watch(
       () => clusters.value,
@@ -61,10 +61,9 @@ export const useClusterStore = defineStore(
       try {
         loading.value = true
         currCluster.value = await getCluster(parseInt(clusterId.value))
-        currCluster.value.id != undefined && (await serviceStore.getServices(currCluster.value.id))
+        await serviceStore.getServices(currCluster.value.id!)
       } catch (error) {
         currCluster.value = {}
-        clusters.value = [{ id: 1, name: '222' }]
         console.log('error :>> ', error)
       } finally {
         loading.value = false
@@ -72,14 +71,19 @@ export const useClusterStore = defineStore(
     }
 
     const loadClusters = async () => {
-      clusters.value = await getClusterList()
+      try {
+        clusters.value = await getClusterList()
+      } catch (error) {
+        clusters.value.length = 0
+        console.log('error :>> ', error)
+      }
     }
 
     return {
       clusters,
       loading,
       currCluster,
-      hasCluster,
+      clusterCount,
       addCluster,
       delCluster,
       loadClusters,

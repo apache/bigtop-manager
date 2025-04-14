@@ -24,18 +24,21 @@
 
   import { useUserStore } from '@/store/user'
   import { useMenuStore } from '@/store/menu'
-  import { useStackStore } from '@/store/stack'
   import { useInstalledStore } from '@/store/installed'
+  import { useClusterStore } from '@/store/cluster'
+  import { onMounted } from 'vue'
 
   const userStore = useUserStore()
   const menuStore = useMenuStore()
   const installedStore = useInstalledStore()
-  const stackStore = useStackStore()
+  const clusterStore = useClusterStore()
 
-  installedStore.getServicesOfInfra()
-  userStore.getUserInfo()
-  menuStore.setupMenu()
-  stackStore.loadStacks()
+  onMounted(async () => {
+    await clusterStore.loadClusters()
+    installedStore.getServicesOfInfra()
+    userStore.getUserInfo()
+    menuStore.setupMenu()
+  })
 </script>
 
 <template>

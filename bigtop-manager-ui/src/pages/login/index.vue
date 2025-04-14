@@ -18,14 +18,20 @@
 -->
 
 <script setup lang="ts">
+  import { useRouter } from 'vue-router'
   import { reactive, shallowRef } from 'vue'
-  import SelectLang from '@/components/select-lang/index.vue'
   import { UserOutlined, LockOutlined } from '@ant-design/icons-vue'
   import { login } from '@/api/login'
-  import router from '@/router'
-  import md5 from 'md5'
   import { message } from 'ant-design-vue'
   import { useI18n } from 'vue-i18n'
+  import { useStackStore } from '@/store/stack'
+
+  import md5 from 'md5'
+  import SelectLang from '@/components/select-lang/index.vue'
+
+  const i18n = useI18n()
+  const router = useRouter()
+  const stackStore = useStackStore()
 
   const formRef = shallowRef()
   const submitLoading = shallowRef(false)
@@ -36,7 +42,6 @@
     remember: true
   })
 
-  const i18n = useI18n()
   const submit = async () => {
     submitLoading.value = true
     const hide = message.loading(i18n.t('login.logging_in'), 0)
@@ -53,8 +58,9 @@
         sessionStorage.setItem('Token', res.token)
       }
 
+      stackStore.loadStacks()
       message.success(i18n.t('login.login_success'))
-      await router.push('/')
+      router.push('/')
     } catch (e) {
       console.warn(e)
     } finally {
