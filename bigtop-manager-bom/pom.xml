@@ -49,7 +49,7 @@
         <oshi-core.version>6.4.11</oshi-core.version>
         <micrometer.version>1.12.4</micrometer.version>
         <jdbc.dm.version>8.1.2.192</jdbc.dm.version>
-        <sshd.version>2.14.0</sshd.version>
+        <sshd.version>2.15.0</sshd.version>
         <langchain4j.version>0.35.0</langchain4j.version>
         <mybatis-spring-boot-starter.version>3.0.3</mybatis-spring-boot-starter.version>
         <pagehelper-spring-boot-starter.version>2.1.0</pagehelper-spring-boot-starter.version>
