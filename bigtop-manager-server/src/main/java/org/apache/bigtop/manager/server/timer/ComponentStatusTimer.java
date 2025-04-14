@@ -105,9 +105,16 @@ public class ComponentStatusTimer {
             Long serviceId = entry.getKey();
             List<ComponentPO> components = entry.getValue();
             ServicePO servicePO = serviceDao.findById(serviceId);
+            boolean hasUnknownComponent = components.stream()
+                    .anyMatch(component -> Objects.equals(component.getStatus(), HealthyStatusEnum.UNKNOWN.getCode()));
+            if (hasUnknownComponent) {
+                continue;
+            }
+
             List<ComponentPO> healthyComponents = components.stream()
                     .filter(component -> Objects.equals(component.getStatus(), HealthyStatusEnum.HEALTHY.getCode()))
                     .toList();
+
             if (healthyComponents.size() == components.size()) {
                 servicePO.setStatus(HealthyStatusEnum.HEALTHY.getCode());
                 servicePO.setRestartFlag(false);
