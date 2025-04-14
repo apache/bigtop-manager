@@ -75,7 +75,7 @@
     }
   }
 
-  const pollJobDetails = (execFunc: Function, interval: number = 200): void => {
+  const pollJobDetails = (execFunc: Function, interval: number = 1000): void => {
     let firstPoll = true
     let firstPollCompleted = false
     const intervalId = setInterval(async () => {
