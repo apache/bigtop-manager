@@ -52,6 +52,7 @@ public class ServiceStartJob extends AbstractServiceJob {
             Long clusterId = commandDTO.getClusterId();
             String serviceName = serviceCommand.getServiceName();
             ServicePO servicePO = serviceDao.findByClusterIdAndName(clusterId, serviceName);
+            servicePO.setRestartFlag(false);
             servicePO.setStatus(HealthyStatusEnum.HEALTHY.getCode());
             serviceDao.partialUpdateById(servicePO);
         }
