@@ -18,38 +18,19 @@
 -->
 
 <script setup lang="ts">
-  import { ref, toRefs } from 'vue'
+  import { ref } from 'vue'
+  import { storeToRefs } from 'pinia'
+  import { useMenuStore } from '@/store/menu/index'
   import SelectLang from '@/components/select-lang/index.vue'
   import UserAvatar from '@/components/user-avatar/index.vue'
   import AiAssistant from '@/components/ai-assistant/index.vue'
 
-  import { RouteRecordRaw } from 'vue-router'
-
-  interface Props {
-    headerSelectedKey: string
-    headerMenus: RouteRecordRaw[]
-  }
-
-  interface Emits {
-    (event: 'onHeaderClick', key: string): void
-  }
-
-  const props = withDefaults(defineProps<Props>(), {
-    headerSelectedKey: '',
-    headerMenus: () => []
-  })
-
-  const { headerSelectedKey, headerMenus } = toRefs(props)
   const githubUrl = import.meta.env.VITE_GITHUB_URL
   const bigtopMangerDocURL = import.meta.env.VITE_BIGTOP_MANAGER_DOC_URL
+  const menuStore = useMenuStore()
   const spaceSize = ref(16)
   const aiAssistantRef = ref<InstanceType<typeof AiAssistant> | null>(null)
-
-  const emits = defineEmits<Emits>()
-
-  const handleHeaderSelect = ({ key }: any) => {
-    emits('onHeaderClick', key)
-  }
+  const { headerSelectedKey, headerMenus } = storeToRefs(menuStore)
 
   const handleCommunication = () => {
     aiAssistantRef.value?.controlVisible()
@@ -62,7 +43,12 @@
       <svg-icon name="bm_logo" />
     </h1>
     <div class="header-menu">
-      <a-menu :selected-keys="[headerSelectedKey]" theme="dark" mode="horizontal" @select="handleHeaderSelect">
+      <a-menu
+        :selected-keys="[headerSelectedKey]"
+        theme="dark"
+        mode="horizontal"
+        @select="({ key }) => menuStore.onHeaderClick(key)"
+      >
         <a-menu-item v-for="route of headerMenus" :key="route.path">
           {{ $t(route.meta?.title || '') }}
         </a-menu-item>

@@ -178,7 +178,7 @@
           </div>
           <div class="header-restart-status">
             <span class="small-gray">{{ `${$t('common.restart')}` }}</span>
-            <status-dot :color="CommonStatus[statusColors[item.status]]" />
+            <status-dot :color="item.restartFlag ? 'error' : 'success'" />
             <span class="small">{{ `${item.restartFlag ? $t('common.required') : $t('common.not_required')}` }}</span>
           </div>
         </div>

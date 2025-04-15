@@ -28,6 +28,7 @@ export const dynamicRoutes: RouteRecordRaw[] = mergeRouteModules(dynamicRoutesFi
 
 const routes: RouteRecordRaw[] = [
   {
+    name: 'Login',
     path: '/login',
     component: () => import('@/pages/login/index.vue')
   },

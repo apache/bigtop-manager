@@ -27,6 +27,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PackageDTO {
 
+    private String url;
+
     private String name;
 
     private String checksum;

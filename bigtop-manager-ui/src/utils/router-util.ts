@@ -29,30 +29,5 @@ export const mergeRouteModules = (routeModules: Record<string, unknown>): RouteR
     mergedRoutes.push(...moduleRoutes)
   }
 
-  return getMergeRoutes(mergedRoutes)
-}
-
-const getMergeRoutes = <T extends RouteRecordRaw>(routes: T[]): T[] => {
-  const mergedMap = new Map()
-  routes.forEach((route: T) => {
-    const firstLevelPath = route.path.split('/')[1]
-    if (!mergedMap.has(firstLevelPath)) {
-      mergedMap.set(firstLevelPath, {
-        path: `/${firstLevelPath}/`,
-        component: route.component,
-        meta: route.meta,
-        children: [],
-        redirect: route.redirect || undefined
-      })
-    }
-    if (route.children) {
-      const existingRoute = mergedMap.get(firstLevelPath)
-      route.children.forEach((child) => {
-        if (!existingRoute.children.some((c: T) => c.path === child.path)) {
-          existingRoute.children.push(child)
-        }
-      })
-    }
-  })
-  return Array.from(mergedMap.values())
+  return mergedRoutes
 }
