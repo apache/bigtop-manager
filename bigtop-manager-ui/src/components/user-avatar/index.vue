@@ -24,12 +24,10 @@
   import { storeToRefs } from 'pinia'
   import router from '@/router'
   import { useI18n } from 'vue-i18n'
-  import { useMenuStore } from '@/store/menu'
 
   const i18n = useI18n()
 
   const userStore = useUserStore()
-  const menuStore = useMenuStore()
   const { userVO } = storeToRefs(userStore)
 
   const logout = async () => {
@@ -37,7 +35,6 @@
     try {
       await userStore.logout()
       message.success(i18n.t('login.logout_success'))
-      menuStore.cleanUpMenu()
       await router.push({ path: '/login' })
     } catch (e) {
       console.warn(e)

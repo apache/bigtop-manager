@@ -18,43 +18,37 @@
 -->
 
 <script setup lang="ts">
-  import { onMounted } from 'vue'
   import LayoutFooter from '@/layouts/footer.vue'
   import LayoutHeader from '@/layouts/header.vue'
   import LayoutSider from '@/layouts/sider.vue'
+
   import { useUserStore } from '@/store/user'
   import { useMenuStore } from '@/store/menu'
-  import { useStackStore } from '@/store/stack'
   import { useInstalledStore } from '@/store/installed'
-  import { storeToRefs } from 'pinia'
+  import { useClusterStore } from '@/store/cluster'
+  import { useStackStore } from '@/store/stack'
+  import { onMounted } from 'vue'
 
   const userStore = useUserStore()
   const menuStore = useMenuStore()
   const installedStore = useInstalledStore()
   const stackStore = useStackStore()
-  const { headerSelectedKey, headerMenus, siderMenuSelectedKey, siderMenus } = storeToRefs(menuStore)
+  const clusterStore = useClusterStore()
 
-  onMounted(() => {
+  onMounted(async () => {
+    stackStore.loadStacks()
+    await clusterStore.loadClusters()
     installedStore.getServicesOfInfra()
     userStore.getUserInfo()
-    menuStore.setUpMenu()
-    stackStore.loadStacks()
+    menuStore.setupMenu()
   })
 </script>
 
 <template>
   <a-layout class="layout">
-    <layout-header
-      :header-selected-key="headerSelectedKey"
-      :header-menus="headerMenus"
-      @on-header-click="menuStore.onHeaderClick"
-    />
+    <layout-header />
     <a-layout>
-      <layout-sider
-        :sider-menu-selected-key="siderMenuSelectedKey"
-        :sider-menus="siderMenus"
-        @on-sider-click="menuStore.onSiderClick"
-      />
+      <layout-sider />
       <a-layout class="layout-inner">
         <router-view :key="$route.fullPath" />
         <layout-footer />

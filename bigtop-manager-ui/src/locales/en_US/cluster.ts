@@ -29,12 +29,12 @@ export default {
   description: 'Description',
   root_directory: 'Root Directory',
   user_group: 'User Group',
-  config_source: 'Configuration Source',
+  config_source: 'Repository',
   install_dependencies: 'Install Dependencies',
   add_host: 'Add Host',
   edit_host: 'Edit Host',
   view_log: 'View Log',
-  source: 'Source',
+  source: 'Repository',
   show_hosts_resolved: 'Resolved Hostnames',
   cluster_unavailable_message: 'Sorry, you need to create cluster to use this feature.'
 }

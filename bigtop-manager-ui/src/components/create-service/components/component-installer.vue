@@ -75,10 +75,12 @@
     }
   }
 
-  const pollJobDetails = (execFunc: Function, interval: number = 200): void => {
+  const pollJobDetails = (execFunc: Function, interval: number = 1000): void => {
     let firstPoll = true
     let firstPollCompleted = false
-    const intervalId = setInterval(async () => {
+    let intervalId: NodeJS.Timeout
+
+    const poll = async () => {
       if (firstPoll) {
         spinning.value = true
         firstPoll = false
@@ -91,7 +93,10 @@
       if (result) {
         clearInterval(intervalId)
       }
-    }, interval)
+    }
+
+    intervalId = setInterval(poll, interval)
+    poll()
   }
 
   const viewLogs = (stage: StageVO, task: TaskVO) => {

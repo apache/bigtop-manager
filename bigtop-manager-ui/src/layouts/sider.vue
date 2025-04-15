@@ -18,100 +18,116 @@
 -->
 
 <script setup lang="ts">
-  import { toRefs, ref, watch } from 'vue'
-  import { useRouter } from 'vue-router'
-  import { RouteExceptions } from '@/enums'
-  import { useMenuStore } from '@/store/menu'
-  import type { MenuItem } from '@/store/menu/types'
+  import { useRouter, useRoute } from 'vue-router'
+  import { useMenuStore } from '@/store/menu/index'
+  import { storeToRefs } from 'pinia'
+  import { computed, ref, watch } from 'vue'
+  import { useClusterStore } from '@/store/cluster'
   import type { ClusterStatusType } from '@/api/cluster/types'
 
-  interface Props {
-    siderMenuSelectedKey: string
-    siderMenus: MenuItem[]
-  }
-
-  const props = withDefaults(defineProps<Props>(), {
-    siderMenuSelectedKey: ''
-  })
-
-  const { siderMenuSelectedKey } = toRefs(props)
   const router = useRouter()
+  const route = useRoute()
   const menuStore = useMenuStore()
-  const menus = ref<MenuItem[]>([])
-  const emits = defineEmits(['onSiderClick'])
-  const clusterStatus = ref<Record<ClusterStatusType, string>>({
-    1: 'success',
-    2: 'error',
-    3: 'warning'
-  })
+  const clusterStore = useClusterStore()
+  const routeParamsLen = ref(0)
+  const openKeys = ref<string[]>(['clusters'])
+  const { siderMenuSelectedKey, headerSelectedKey, siderMenus, routePathFromClusters } = storeToRefs(menuStore)
+  const { clusters, clusterCount } = storeToRefs(clusterStore)
+
+  const showCreateClusterBtn = computed(() => headerSelectedKey.value === '/cluster-manage')
+  const selectMenuKeyFromClusters = computed(() => siderMenuSelectedKey.value.includes(routePathFromClusters.value))
+  const clusterStatus = computed(
+    (): Record<ClusterStatusType, string> => ({
+      1: 'success',
+      2: 'error',
+      3: 'warning'
+    })
+  )
 
   watch(
-    () => props.siderMenus,
-    (val) => {
-      menus.value = []
-      menus.value = val
+    () => route,
+    (newRoute) => {
+      const { params, path, meta } = newRoute
+      routeParamsLen.value = Object.keys(params).length
+      if (path.includes(routePathFromClusters.value) && routeParamsLen.value > 0 && clusterCount.value > 0) {
+        const cluster = clusters.value.find((v) => `${v.id}` === params.id)
+        cluster && (siderMenuSelectedKey.value = `${routePathFromClusters.value}/${cluster.name}/${cluster.id}`)
+      } else {
+        siderMenuSelectedKey.value = meta.activeMenu ?? path
+      }
     },
     {
-      deep: true
+      deep: true,
+      immediate: true
     }
   )
 
-  const toggleActivatedIcon = (menuItem: MenuItem) => {
+  const toggleActivatedIcon = (menuItem: { key: string; icon: string }) => {
     const { key, icon } = menuItem
-    if (menuStore.isDynamicRouteMatched) {
-      return key === RouteExceptions.SPECIAL_ROUTE_PATH ? `${icon}_activated` : icon
-    } else {
-      return key === siderMenuSelectedKey.value ? `${icon}_activated` : icon
-    }
+    const matchedRouteFromClusters = selectMenuKeyFromClusters.value && routeParamsLen.value > 0
+    return key === siderMenuSelectedKey.value || (matchedRouteFromClusters && key === 'clusters')
+      ? `${icon}_activated`
+      : icon
   }
 
   const addCluster = () => {
     router.push({ name: 'CreateCluster' })
   }
-
-  const onSiderClick = ({ key }: any) => {
-    emits('onSiderClick', key)
-  }
 </script>
 
 <template>
   <a-layout-sider class="sider">
-    <a-menu :selected-keys="[siderMenuSelectedKey]" mode="inline" @select="onSiderClick">
-      <template v-for="menuItem in menus" :key="menuItem.key">
-        <a-sub-menu
-          v-if="menuItem.children && menuItem.name === RouteExceptions.SPECIAL_ROUTE_NAME"
-          :key="menuItem.key"
-        >
+    <a-menu
+      v-model="openKeys"
+      :selected-keys="[siderMenuSelectedKey]"
+      mode="inline"
+      @select="({ key }) => menuStore.onSiderClick(key)"
+    >
+      <template v-for="menuItem in siderMenus" :key="menuItem.path">
+        <a-sub-menu v-if="menuItem.name === 'Clusters'" :key="menuItem.path">
           <template #icon>
-            <svg-icon style="height: 16px; width: 16px" :name="toggleActivatedIcon(menuItem)" />
+            <svg-icon
+              style="height: 16px; width: 16px"
+              :name="
+                toggleActivatedIcon({
+                  key: (menuItem.redirect as string) || menuItem.path,
+                  icon: menuItem.meta?.icon || ''
+                })
+              "
+            />
           </template>
           <template #title>
-            <span>{{ $t(menuItem.label) }}</span>
+            <span>{{ $t(menuItem.meta!.title!) }}</span>
           </template>
-          <a-menu-item v-for="child in menuItem.children" :key="child.key">
+          <a-menu-item
+            v-for="child in clusters"
+            :key="`${routePathFromClusters}/${child.name}/${child.id}`"
+            :title="child.displayName"
+          >
             <template #icon>
-              <div
-                style="height: 10px; margin-inline: 7px; display: flex; justify-content: center; align-items: flex-end"
-              >
+              <div class="cluster-status">
                 <status-dot :size="8" :color="clusterStatus[child.status as ClusterStatusType] as any" />
               </div>
             </template>
             <div>
-              <span>{{ child.label }}</span>
+              <span>{{ child.displayName }}</span>
             </div>
           </a-menu-item>
         </a-sub-menu>
         <template v-else>
-          <a-menu-item :key="menuItem.key">
+          <a-menu-item v-if="!menuItem.meta?.hidden" :key="menuItem.redirect">
             <template #icon>
-              <svg-icon style="height: 16px; width: 16px" :name="toggleActivatedIcon(menuItem)" />
+              <svg-icon
+                style="height: 16px; width: 16px"
+                :name="toggleActivatedIcon({ key: menuItem.redirect as string, icon: menuItem.meta?.icon || '' })"
+              />
             </template>
-            <span>{{ $t(menuItem.label) }}</span>
+            <span>{{ $t(menuItem.meta!.title!) }}</span>
           </a-menu-item>
         </template>
       </template>
     </a-menu>
-    <div v-show="menuStore.isCreateClusterVisible">
+    <div v-if="showCreateClusterBtn">
       <a-divider />
       <div class="create-option">
         <a-button type="primary" ghost @click="addCluster">
@@ -125,6 +141,13 @@
 </template>
 
 <style scoped lang="scss">
+  .cluster-status {
+    height: 10px;
+    margin-inline: 7px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+  }
   @mixin reset-sider-menu {
     width: 100%;
     border-radius: 0;

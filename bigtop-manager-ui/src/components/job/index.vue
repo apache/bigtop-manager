@@ -27,10 +27,12 @@
   import CustomProgress from './custom-progress.vue'
   import type { JobVO, StageVO, StateType, TaskListParams, TaskVO } from '@/api/job/types'
   import type { ClusterVO } from '@/api/cluster/types'
+  import type { ListParams } from '@/api/types'
 
   interface BreadcrumbItem {
     id: string
     name: ComputedRef<string> | string
+    pagination: ListParams
   }
   const POLLING_INTERVAL = 3000
   const { t } = useI18n()
@@ -39,17 +41,15 @@
   const breadcrumbs = ref<BreadcrumbItem[]>([
     {
       name: computed(() => t('job.job_list')),
-      id: `clusterId-${clusterInfo.id}`
+      id: `clusterId-${clusterInfo.id}`,
+      pagination: {
+        pageNum: 1,
+        pageSize: 10,
+        sort: 'desc'
+      }
     }
   ])
-  const status = shallowRef<Record<StateType, string>>({
-    Pending: 'installing',
-    Processing: 'processing',
-    Failed: 'failed',
-    Canceled: 'canceled',
-    Successful: 'success'
-  })
-  const apiMap = shallowRef([
+  const apiMap = ref([
     {
       key: 'clusterId',
       api: getJobList
@@ -63,6 +63,13 @@
       api: getTaskList
     }
   ])
+  const status = shallowRef<Record<StateType, string>>({
+    Pending: 'installing',
+    Processing: 'processing',
+    Failed: 'failed',
+    Canceled: 'canceled',
+    Successful: 'success'
+  })
   const logsViewState = reactive<LogViewProps>({
     open: false
   })
@@ -100,13 +107,14 @@
   const apiParams = computed(
     (): TaskListParams =>
       breadcrumbs.value.reduce((pre, val, index) => {
+        const apiMapKey = apiMap.value[index].key
         return Object.assign(pre, {
-          [`${apiMap.value[index].key}`]: val.id.replace(`${apiMap.value[index].key}-`, '')
+          [`${apiMapKey}`]: val.id.replace(`${apiMapKey}-`, '')
         })
       }, {} as TaskListParams)
   )
 
-  const { dataSource, loading, filtersParams, paginationProps, onChange } = useBaseTable<JobVO | StageVO | TaskVO>({
+  const { dataSource, loading, paginationProps, onChange } = useBaseTable<JobVO | StageVO | TaskVO>({
     columns: columns.value
   })
 
@@ -114,14 +122,15 @@
     if (breadcrumb.id !== currBreadcrumb.value?.id) {
       const index = breadcrumbs.value.findIndex((v) => v.id === breadcrumb.id)
       breadcrumbs.value.splice(index + 1, breadcrumbLen.value - index - 1)
+      updataPaginationsInBaseTable(currBreadcrumb.value?.pagination)
       stopPolling()
       startPolling()
     }
   }
 
   const updateBreadcrumbs = (data: BreadcrumbItem) => {
+    // task log open
     if (breadcrumbLen.value + 1 > apiMap.value.length) {
-      // task log open
       logsViewState.open = true
       logsViewState.subTitle = data.name as string
       logsViewState.payLoad = {
@@ -130,15 +139,26 @@
       }
       return
     }
+
     const currId = `${apiMap.value[breadcrumbLen.value].key}-${data.id}`
     const index = breadcrumbs.value.findIndex((v) => v.id === currId)
     if (index === -1) {
-      breadcrumbs.value.push({
-        id: currId,
-        name: data.name as string
-      })
+      const newBreadcrumb = createBreadcrumbItem({ id: currId, name: data.name as string })
+      breadcrumbs.value.push(newBreadcrumb)
       stopPolling()
+      updataPaginationsInBaseTable()
       startPolling()
+    }
+  }
+
+  const createBreadcrumbItem = (item: { id: string; name: string }) => {
+    return {
+      id: item.id,
+      name: item.name,
+      pagination: {
+        pageNum: 1,
+        pageSize: 10
+      }
     }
   }
 
@@ -152,7 +172,7 @@
         loading.value = true
       }
       const { api } = apiMap.value[breadcrumbs.value.length - 1]
-      const res = await api(apiParams.value, { ...filtersParams.value, sort: 'desc' })
+      const res = await api(apiParams.value, currBreadcrumb.value!.pagination)
       dataSource.value = res.content
       paginationProps.value.total = res.total
     } catch (error) {
@@ -163,7 +183,24 @@
     }
   }
 
+  const updataPaginationsInBaseTable = (pagination: ListParams = { pageNum: 1, pageSize: 10 }) => {
+    if (paginationProps.value) {
+      paginationProps.value.current = pagination.pageNum
+      paginationProps.value.pageSize = pagination.pageSize
+    }
+  }
+
+  const updataPaginationsInBreadcrumbs = (pagination: ListParams) => {
+    const index = breadcrumbs.value.findIndex((v) => v.id === currBreadcrumb.value?.id)
+    if (index != -1) {
+      breadcrumbs.value[index].pagination.pageNum = pagination.pageNum
+      breadcrumbs.value[index].pagination.pageSize = pagination.pageSize
+    }
+  }
+
   const tableChange: TableProps['onChange'] = (...args) => {
+    const { current: pageNum, pageSize } = args[0]
+    updataPaginationsInBreadcrumbs({ pageNum, pageSize })
     onChange(...args)
     stopPolling()
     startPolling()

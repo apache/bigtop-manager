@@ -25,15 +25,16 @@ import Antd, { message } from 'ant-design-vue'
 import components from '@/components/common'
 import directives from '@/directives'
 import VueDOMPurifyHTML from 'vue-dompurify-html'
+
 interface PluginOptions {
   antdMessageMaxCount: number
 }
 
 export default {
   install(app: App, options: PluginOptions) {
+    app.use(pinia)
     app.use(Antd)
     app.use(router)
-    app.use(pinia)
     app.use(i18n)
     app.use(directives)
     app.use(components)
