@@ -27,6 +27,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PackageInfo {
 
+    private String url;
+
     private String name;
 
     private String checksum;

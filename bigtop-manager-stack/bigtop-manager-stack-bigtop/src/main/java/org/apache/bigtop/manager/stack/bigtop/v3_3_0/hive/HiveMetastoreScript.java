@@ -21,8 +21,6 @@ package org.apache.bigtop.manager.stack.bigtop.v3_3_0.hive;
 import org.apache.bigtop.manager.common.constants.Constants;
 import org.apache.bigtop.manager.common.constants.MessageConstants;
 import org.apache.bigtop.manager.common.shell.ShellResult;
-import org.apache.bigtop.manager.common.utils.os.OSDetection;
-import org.apache.bigtop.manager.grpc.pojo.RepoInfo;
 import org.apache.bigtop.manager.stack.core.exception.StackException;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.spi.script.AbstractServerScript;
@@ -115,12 +113,8 @@ public class HiveMetastoreScript extends AbstractServerScript {
     }
 
     private void downloadMySQLJdbcDriver(Params params) {
-        RepoInfo repoInfo = LocalSettings.repos().stream()
-                .filter(r -> OSDetection.getArch().equals(r.getArch()) && r.getType() == 2)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Cannot find repo for os: [" + OSDetection.getOS()
-                        + "] and arch: [" + OSDetection.getArch() + "]"));
-        String mysqlDriver = repoInfo.getBaseUrl() + "/mysql-connector-j-8.0.33.jar";
+        String mysqlDriver =
+                "https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/8.0.33/mysql-connector-j-8.0.33.jar";
         TarballDownloader.download(mysqlDriver, params.stackHome());
         LinuxFileUtils.moveFile(params.stackHome() + "/mysql-connector-j-8.0.33.jar", params.serviceHome() + "/lib/");
         LinuxFileUtils.updateOwner(params.serviceHome() + "/lib", params.user(), params.group(), true);
@@ -137,12 +131,16 @@ public class HiveMetastoreScript extends AbstractServerScript {
                     && shellResult.getErrMsg().contains("Table '" + clusterName + "_hive.VERSION' doesn't exist")) {
                 // init schema
                 cmd = hiveParams.serviceHome() + "/bin/schematool -initSchema -dbType mysql";
+                // TODO previous cmd will kill agent application, not sure why
+                // temp solve by running with nohup and wait for 5 seconds to let it finish
+                cmd = "nohup " + cmd + " > /dev/null 2>&1 &";
                 shellResult = LinuxOSUtils.sudoExecCmd(cmd, hiveParams.user());
+                Thread.sleep(5000);
                 if (shellResult.getExitCode() != MessageConstants.SUCCESS_CODE) {
                     throw new StackException(shellResult.getErrMsg());
                 }
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new StackException(e);
         }
     }
