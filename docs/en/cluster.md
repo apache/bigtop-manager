@@ -24,7 +24,7 @@ Expect for our official repository, users can also set their own repository whic
 We also provide other ways for you download dependencies:
 * BaiduNetdisk: https://pan.baidu.com/s/162FXYsaRuwFQjrOlMuDRjg?pwd=hufb
 
-![Repository](https://github.com/user-attachments/assets/dc06935b-f3d0-42c7-b535-d5f6f15f6356)
+![Repository](https://github.com/user-attachments/assets/6b235122-ffdf-4d16-a4b4-994525f12d51)
 
 ### Hosts
 #### Add a Host

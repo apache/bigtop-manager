@@ -22,7 +22,7 @@
 我们也提供了其他方式供您下载相应的依赖：
 * 百度云：https://pan.baidu.com/s/162FXYsaRuwFQjrOlMuDRjg?pwd=hufb
 
-![Repository](https://github.com/user-attachments/assets/dc06935b-f3d0-42c7-b535-d5f6f15f6356)
+![Repository](https://github.com/user-attachments/assets/6b235122-ffdf-4d16-a4b4-994525f12d51)
 
 ### 主机
 #### 新增主机
