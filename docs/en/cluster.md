@@ -19,9 +19,10 @@ The stack page is a display page that mainly shows which optional services are a
 
 ![Stack](https://github.com/user-attachments/assets/faf1112c-f0a6-4353-ba63-83abbb819c29)
 
-Currently, since we do not provide an official repository, you need to set it up yourself.  
-You can use a third-party repository: http://213.146.155.38/release/1.0.0/  
-Or if you are in China, you can download the corresponding packages from BaiduNetdisk and set up a local repository: https://pan.baidu.com/s/162FXYsaRuwFQjrOlMuDRjg?pwd=hufb
+Expect for our official repository, users can also set their own repository which can configured here
+
+We also provide other ways for you download dependencies:
+* BaiduNetdisk: https://pan.baidu.com/s/162FXYsaRuwFQjrOlMuDRjg?pwd=hufb
 
 ![Repository](https://github.com/user-attachments/assets/dc06935b-f3d0-42c7-b535-d5f6f15f6356)
 

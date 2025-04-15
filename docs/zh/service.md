@@ -15,7 +15,7 @@
 ### 选择服务
 在这个页面中，用户可以选择自己想要安装的服务，其中每个服务的右上角有 License 标识
 * **绿色**：表明该 License 与 Apache License 兼容
-* **红色**：代表该 License 与 Apache License 不兼容，目前不兼容的服务有 Infra Stack 中的 MySQL 与 Grafana，注意事项用户可查看 [ASF 3rd Party License Policy](https://apache.org/legal/resolved.html)，大部分情况下用户无需关心。
+* **红色**：表明该 License 与 Apache License 不兼容，对应服务在安装时默认通过官方服务器下载，用户配置的 Repository 无效，目前不兼容的服务有 Infra Stack 中的 MySQL 与 Grafana。
 
 ![Service](https://github.com/user-attachments/assets/0b6a9dfc-e4c4-48f2-8ca4-8b31ba558578)
 

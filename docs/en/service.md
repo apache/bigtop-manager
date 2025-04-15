@@ -17,7 +17,7 @@ The services displayed differ by entry. Below, we use the ZooKeeper service in t
 ### Select Services
 On this page, users can select the service we want to install. Each service has a **License** icon in the upper right corner:
 * **Green**: Indicates the license is compatible with the Apache License.
-* **Red**: Indicates incompatibility. Currently incompatible services include MySQL and Grafana in the Infra Stack. For details, refer to the [ASF 3rd Party License Policy](https://apache.org/legal/resolved.html) (users generally do not need to worry about this in most cases).
+* **Red**: Indicates license incompatibility. For such services, installation will default to downloading from the official website, user-configured repository will be inactive. Currently incompatible services include MySQL and Grafana in the Infra Stack.
 
 ![Service](https://github.com/user-attachments/assets/0b6a9dfc-e4c4-48f2-8ca4-8b31ba558578)
 

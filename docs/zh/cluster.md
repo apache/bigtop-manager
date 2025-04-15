@@ -17,11 +17,10 @@
 
 ![Stack](https://github.com/user-attachments/assets/faf1112c-f0a6-4353-ba63-83abbb819c29)
 
-目前由于我们没有提供官方 Repository，所以您需要自己设置
+除了官方 Repository 外，用户也可以搭建自己的 Repository 并在此处进行配置
 
-您可以使用第三方提供的 Repository： http://213.146.155.38/release/1.0.0/
-
-或者如果您在中国，您可以从百度云上下载对应的包自己搭建本地 Repository：https://pan.baidu.com/s/162FXYsaRuwFQjrOlMuDRjg?pwd=hufb
+我们也提供了其他方式供您下载相应的依赖：
+* 百度云：https://pan.baidu.com/s/162FXYsaRuwFQjrOlMuDRjg?pwd=hufb
 
 ![Repository](https://github.com/user-attachments/assets/dc06935b-f3d0-42c7-b535-d5f6f15f6356)
 
