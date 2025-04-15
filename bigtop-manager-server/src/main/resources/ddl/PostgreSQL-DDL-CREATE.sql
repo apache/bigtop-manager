@@ -351,10 +351,10 @@ VALUES ('admin', '21232f297a57a5a743894a0e4a801fc3', 'Administrator', true);
 
 INSERT INTO repo (name, arch, base_url, type)
 VALUES
-('Service tarballs', 'x86_64', 'http://your-repo/', 1),
-('Service tarballs', 'aarch64', 'http://your-repo/', 1),
-('BM tools', 'x86_64', 'http://your-repo/', 2),
-('BM tools', 'aarch64', 'http://your-repo/', 2);
+('Service tarballs', 'x86_64', 'http://repos.bigtop.apache.org/releases/bigtop-manager/1.0.0/tarballs', 1),
+('Service tarballs', 'aarch64', 'http://repos.bigtop.apache.org/releases/bigtop-manager/1.0.0/tarballs', 1),
+('BM tools', 'x86_64', 'http://repos.bigtop.apache.org/releases/bigtop-manager/1.0.0/tools', 2),
+('BM tools', 'aarch64', 'http://repos.bigtop.apache.org/releases/bigtop-manager/1.0.0/tools', 2);
 
 INSERT INTO llm_platform (credential, name, support_models)
 VALUES
