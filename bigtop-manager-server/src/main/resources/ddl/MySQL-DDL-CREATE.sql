@@ -126,7 +126,7 @@ CREATE TABLE `repo`
     `id`          BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
     `name`        VARCHAR(32) DEFAULT NULL,
     `arch`        VARCHAR(32) DEFAULT NULL,
-    `base_url`    VARCHAR(64) DEFAULT NULL,
+    `base_url`    VARCHAR(256) DEFAULT NULL,
     `type`        INT DEFAULT NULL COMMENT '1-services, 2-tools',
     `create_time` DATETIME    DEFAULT CURRENT_TIMESTAMP,
     `update_time` DATETIME    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
