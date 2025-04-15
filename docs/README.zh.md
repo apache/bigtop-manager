@@ -7,3 +7,5 @@
 * [集群](./zh/cluster.md): 如何创建一个集群。
 * [服务](./zh/service.md): 如何添加一个服务。
 * [贡献](./zh/contribution.md): 如何为项目做出贡献。
+* [部署](./zh/install.md): 如何部署项目.
+* [环境准备](./zh/prepare.md): 如何为项目部署做环境准备.
