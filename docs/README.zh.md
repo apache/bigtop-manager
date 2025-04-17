@@ -9,3 +9,4 @@
 * [集群](./zh/cluster.md): 如何创建一个集群。
 * [服务](./zh/service.md): 如何添加一个服务。
 * [贡献](./zh/contribution.md): 如何为项目做出贡献。
+* [发版](./zh/release.md): 如何发版。
