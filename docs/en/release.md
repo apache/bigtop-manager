@@ -121,7 +121,7 @@ Since the project is managed by `Apache Jira`, you can easily obtain the corresp
 * Click the version you want to release.
 * There will be a `Release Notes` page at the top of the page. Just click to open it.
 
-Before generating release notes, you should review if all JIRA issues addressed in this release have the correct fixVersion and unrelated issues don't have that fixVersion.
+Before generating release notes, you should review if all JIRA issues addressed in this release have the correct `fixVersion` and unrelated issues don't have that `fixVersion`.
 
 Now we have obtained the release notes page: https://issues.apache.org/jira/secure/ReleaseNote.jspa?projectId=12311420&version=12354831
 
