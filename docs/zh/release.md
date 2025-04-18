@@ -114,14 +114,16 @@ $ svn commit -m "Adding Zhiguo Wu's code signing key"
 ```
 
 ## 开始发版
-### 版本说明
-由于项目由 `Apache Jira` 管理，您可以很简单的获取对应的版本说明
+### Release Notes
+由于项目由 `Apache Jira` 管理，您可以很简单的获取对应的 Release Notes
 * 进入 [Bigtop Jira](https://issues.apache.org/jira/projects/BIGTOP) 页面
 * 点击左侧的 `Release` 菜单
 * 点击您想要发布的版本
 * 页面上方会有 `Release Notes` 页面，点开即可
 
-现在我们获得了版本说明页面：https://issues.apache.org/jira/secure/ReleaseNote.jspa?projectId=12311420&version=12354831
+在生成 Release Notes 之前，您需要检查所有 JIRA ISSUE 是否都已修复并且 `fixVersion` 是正确的，且相应的 `fixVersion` 下没有不相关的 ISSUE
+
+现在我们获得了 Release Notes：https://issues.apache.org/jira/secure/ReleaseNote.jspa?projectId=12311420&version=12354831
 
 ### 上传依赖包
 将 Bigtop/Infra/Extra Stack 服务软件包及对应的 Tools 软件包上传至 `repos.bigtop.apache.org`，获取对应的 URL：http://repos.bigtop.apache.org/releases/bigtop-manager/1.0.0
