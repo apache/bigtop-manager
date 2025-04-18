@@ -20,7 +20,6 @@ package org.apache.bigtop.manager.stack.core.tarball;
 
 import org.apache.bigtop.manager.stack.core.exception.StackException;
 
-import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
@@ -77,7 +76,7 @@ public class TarballExtractor {
 
     private static boolean extract(TarArchiveInputStream ais, Path destDir, int skipLevels) {
         try {
-            ArchiveEntry entry;
+            TarArchiveEntry entry;
             while ((entry = ais.getNextEntry()) != null) {
                 String entryName = entry.getName();
                 Path entryPath = Paths.get(entryName);
@@ -93,8 +92,8 @@ public class TarballExtractor {
 
                 if (entry.isDirectory()) {
                     createDirectories(outputPath);
-                } else if (entry instanceof TarArchiveEntry tarEntry && tarEntry.isSymbolicLink()) {
-                    createSymbolicLink(outputPath, tarEntry.getLinkName());
+                } else if (entry.isSymbolicLink()) {
+                    createSymbolicLink(outputPath, entry.getLinkName());
                 } else {
                     createFile(outputPath, ais);
                 }
