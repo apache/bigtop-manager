@@ -16,22 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.dto;
+package org.apache.bigtop.manager.grpc.pojo;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class RepoDTO {
-
-    private Integer id;
+public class ToolInfo {
 
     private String name;
 
+    private String baseUrl;
+
+    private String pkgName;
+
     private String arch;
 
-    private String baseUrl;
+    private String checksum;
 }

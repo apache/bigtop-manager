@@ -133,19 +133,15 @@ Update the DDL files for `MySQL` and `PostgreSQL` in the `bigtop-manager-server/
 ```sql
 INSERT INTO repo (name, arch, base_url, type)
 VALUES
-('Service tarballs', 'x86_64', 'http://your-repo/', 1),
-('Service tarballs', 'aarch64', 'http://your-repo/', 1),
-('BM tools', 'x86_64', 'http://your-repo/', 2),
-('BM tools', 'aarch64', 'http://your-repo/', 2);
+('Service tarballs', 'x86_64', 'http://your-repo/'),
+('Service tarballs', 'aarch64', 'http://your-repo/'),
 ```
 to
 ```sql
 INSERT INTO repo (name, arch, base_url, type)
 VALUES
-('Service tarballs', 'x86_64', 'http://repos.bigtop.apache.org/releases/bigtop-manager/1.0.0/tarballs', 1),
-('Service tarballs', 'aarch64', 'http://repos.bigtop.apache.org/releases/bigtop-manager/1.0.0/tarballs', 1),
-('BM tools', 'x86_64', 'http://repos.bigtop.apache.org/releases/bigtop-manager/1.0.0/tools', 2),
-('BM tools', 'aarch64', 'http://repos.bigtop.apache.org/releases/bigtop-manager/1.0.0/tools', 2);
+('Service tarballs', 'x86_64', 'http://repos.bigtop.apache.org/releases/bigtop-manager/1.0.0/'),
+('Service tarballs', 'aarch64', 'http://repos.bigtop.apache.org/releases/bigtop-manager/1.0.0/'),
 ```
 
 ### Upgrade the Version Number
@@ -187,6 +183,7 @@ $ svn commit -m "Preparing Release Bigtop Manager 1.0.0 RC0"
 ### Initiate a Vote
 Initiate a vote according to the [VOTE](#vote) template
 * If the vote is failed, rerun the above steps after making the required modifications. At the same time, increment the Release Candidate by +1. If according to the above example, the next Release Candidate will be RC1.
+* If you like to cancel a vote due to some issue, you can use [CANCEL](#cancel) template.
 * If the vote is passed, proceed to the [Vote Passes](#vote-passes) operation.
 
 ## Vote Passes
@@ -305,6 +302,19 @@ Please vote accordingly:
 [ ] +1 approve
 [ ] +0 no opinion
 [ ] -1 disapprove with the reason
+
+Best Regards,
+Zhiguo Wu
+```
+
+### CANCEL
+```
+To: "Bigtop Developers List" <dev@bigtop.apache.org>
+Subject: [CANCEL] [VOTE] Release Apache Bigtop Manager 1.0.0 RC0
+
+Hello Community,
+
+Due to some license issues, I'd like to cancel the vote for release Apache Bigtop Manager 1.0.0 RC0, the next vote for RC1 will be sent out in a few days.
 
 Best Regards,
 Zhiguo Wu

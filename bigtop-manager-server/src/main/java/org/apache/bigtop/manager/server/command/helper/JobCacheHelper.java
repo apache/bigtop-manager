@@ -25,18 +25,21 @@ import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.po.RepoPO;
 import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
+import org.apache.bigtop.manager.dao.po.ToolPO;
 import org.apache.bigtop.manager.dao.query.ComponentQuery;
 import org.apache.bigtop.manager.dao.repository.ClusterDao;
 import org.apache.bigtop.manager.dao.repository.ComponentDao;
 import org.apache.bigtop.manager.dao.repository.HostDao;
 import org.apache.bigtop.manager.dao.repository.RepoDao;
 import org.apache.bigtop.manager.dao.repository.ServiceConfigDao;
+import org.apache.bigtop.manager.dao.repository.ToolDao;
 import org.apache.bigtop.manager.grpc.generated.JobCacheReply;
 import org.apache.bigtop.manager.grpc.generated.JobCacheRequest;
 import org.apache.bigtop.manager.grpc.generated.JobCacheServiceGrpc;
 import org.apache.bigtop.manager.grpc.payload.JobCachePayload;
 import org.apache.bigtop.manager.grpc.pojo.ClusterInfo;
 import org.apache.bigtop.manager.grpc.pojo.RepoInfo;
+import org.apache.bigtop.manager.grpc.pojo.ToolInfo;
 import org.apache.bigtop.manager.server.exception.ServerException;
 import org.apache.bigtop.manager.server.grpc.GrpcClient;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
@@ -63,6 +66,7 @@ public class JobCacheHelper {
     private static RepoDao repoDao;
     private static HostDao hostDao;
     private static ComponentDao componentDao;
+    private static ToolDao toolDao;
 
     private static final AtomicBoolean INITIALIZED = new AtomicBoolean(false);
 
@@ -72,6 +76,7 @@ public class JobCacheHelper {
         repoDao = SpringContextHolder.getBean(RepoDao.class);
         hostDao = SpringContextHolder.getBean(HostDao.class);
         componentDao = SpringContextHolder.getBean(ComponentDao.class);
+        toolDao = SpringContextHolder.getBean(ToolDao.class);
 
         INITIALIZED.set(true);
     }
@@ -127,11 +132,24 @@ public class JobCacheHelper {
         }
 
         ClusterPO clusterPO = clusterDao.findById(clusterId);
+        List<ToolPO> toolPOList = toolDao.findAll();
 
         ClusterInfo clusterInfo = new ClusterInfo();
         clusterInfo.setName(clusterPO.getName());
         clusterInfo.setUserGroup(clusterPO.getUserGroup());
         clusterInfo.setRootDir(clusterPO.getRootDir());
+
+        List<ToolInfo> toolInfoList = new ArrayList<>();
+        for (ToolPO toolPO : toolPOList) {
+            ToolInfo toolInfo = new ToolInfo();
+            toolInfo.setName(toolPO.getName());
+            toolInfo.setBaseUrl(toolPO.getBaseUrl());
+            toolInfo.setPkgName(toolPO.getPkgName());
+            toolInfo.setArch(toolPO.getArch());
+            toolInfo.setChecksum(toolPO.getChecksum());
+            toolInfoList.add(toolInfo);
+        }
+        clusterInfo.setTools(toolInfoList);
 
         Map<String, Map<String, String>> serviceConfigMap = payload.getConfigurations();
         serviceConfigMap.putAll(getServiceConfigMap(clusterId));
@@ -162,7 +180,6 @@ public class JobCacheHelper {
             repoInfo.setName(repoPO.getName());
             repoInfo.setArch(repoPO.getArch());
             repoInfo.setBaseUrl(repoPO.getBaseUrl());
-            repoInfo.setType(repoPO.getType());
             repoList.add(repoInfo);
         });
 

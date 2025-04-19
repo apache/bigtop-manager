@@ -24,7 +24,7 @@ import org.apache.bigtop.manager.grpc.pojo.RepoInfo;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.spi.script.AbstractClientScript;
 import org.apache.bigtop.manager.stack.core.spi.script.Script;
-import org.apache.bigtop.manager.stack.core.tarball.TarballDownloader;
+import org.apache.bigtop.manager.stack.core.tarball.FileDownloader;
 
 import com.google.auto.service.AutoService;
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +52,7 @@ public class TezClientScript extends AbstractClientScript {
         String stackHome = params.stackHome();
         for (PackageInfo packageInfo : packages) {
             String remoteUrl = repoUrl + File.separator + packageInfo.getName();
-            TarballDownloader.download(remoteUrl, stackHome, packageInfo);
+            FileDownloader.download(remoteUrl, stackHome, packageInfo);
         }
 
         return ShellResult.success();

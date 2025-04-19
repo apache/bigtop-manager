@@ -174,8 +174,8 @@ public class LocalSettingsTest {
 
     @Test
     public void testRepos() {
-        RepoInfo repo1 = new RepoInfo("repo1", "x86_64", "http://repo1.com", 1);
-        RepoInfo repo2 = new RepoInfo("repo2", "arch64", "http://repo2.com", 2);
+        RepoInfo repo1 = new RepoInfo("repo1", "x86_64", "http://repo1.com");
+        RepoInfo repo2 = new RepoInfo("repo2", "arch64", "http://repo2.com");
         List<RepoInfo> repoInfoList = List.of(repo1, repo2);
 
         File file = mock(File.class);
@@ -190,8 +190,8 @@ public class LocalSettingsTest {
         localSettingsMockedStatic.when(LocalSettings::repos).thenCallRealMethod();
 
         List<RepoInfo> expectedRepoInfoList = List.of(
-                new RepoInfo("repo1", "x86_64", "http://repo1.com", 1),
-                new RepoInfo("repo2", "arch64", "http://repo2.com", 2));
+                new RepoInfo("repo1", "x86_64", "http://repo1.com"),
+                new RepoInfo("repo2", "arch64", "http://repo2.com"));
         assertEquals(expectedRepoInfoList, LocalSettings.repos());
     }
 

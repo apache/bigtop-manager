@@ -95,8 +95,7 @@ public abstract class BaseParams implements Params {
     @Override
     public RepoInfo repo() {
         return LocalSettings.repos().stream()
-                // Use service tarballs repo(type == 1)
-                .filter(r -> OSDetection.getArch().equals(r.getArch()) && r.getType() == 1)
+                .filter(r -> OSDetection.getArch().equals(r.getArch()))
                 .findFirst()
                 .orElseThrow(() -> new StackException(
                         "Cannot find repo for os: [{0}] and arch: [{1}]", OSDetection.getOS(), OSDetection.getArch()));
