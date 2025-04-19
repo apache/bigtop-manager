@@ -361,10 +361,10 @@ CREATE INDEX idx_message_user_id ON llm_chat_message (user_id);
 INSERT INTO "user" (username, password, nickname, status)
 VALUES ('admin', '21232f297a57a5a743894a0e4a801fc3', 'Administrator', true);
 
-INSERT INTO repo (name, arch, base_url, type)
+INSERT INTO repo (name, arch, base_url)
 VALUES
 ('Service tarballs', 'x86_64', 'http://your-repo/'),
-('Service tarballs', 'aarch64', 'http://your-repo/'),
+('Service tarballs', 'aarch64', 'http://your-repo/');
 
 INSERT INTO llm_platform (credential, name, support_models)
 VALUES
