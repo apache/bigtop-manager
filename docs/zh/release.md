@@ -133,19 +133,15 @@ $ svn commit -m "Adding Zhiguo Wu's code signing key"
 ```sql
 INSERT INTO repo (name, arch, base_url, type)
 VALUES
-('Service tarballs', 'x86_64', 'http://your-repo/', 1),
-('Service tarballs', 'aarch64', 'http://your-repo/', 1),
-('BM tools', 'x86_64', 'http://your-repo/', 2),
-('BM tools', 'aarch64', 'http://your-repo/', 2);
+('Service tarballs', 'x86_64', 'http://your-repo/'),
+('Service tarballs', 'aarch64', 'http://your-repo/'),
 ```
 改为
 ```sql
 INSERT INTO repo (name, arch, base_url, type)
 VALUES
-('Service tarballs', 'x86_64', 'http://repos.bigtop.apache.org/releases/bigtop-manager/1.0.0/tarballs', 1),
-('Service tarballs', 'aarch64', 'http://repos.bigtop.apache.org/releases/bigtop-manager/1.0.0/tarballs', 1),
-('BM tools', 'x86_64', 'http://repos.bigtop.apache.org/releases/bigtop-manager/1.0.0/tools', 2),
-('BM tools', 'aarch64', 'http://repos.bigtop.apache.org/releases/bigtop-manager/1.0.0/tools', 2);
+('Service tarballs', 'x86_64', 'http://repos.bigtop.apache.org/releases/bigtop-manager/1.0.0/'),
+('Service tarballs', 'aarch64', 'http://repos.bigtop.apache.org/releases/bigtop-manager/1.0.0/'),
 ```
 
 ### 升级版本号

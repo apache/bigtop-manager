@@ -133,7 +133,6 @@ public class BaseParamsTest {
     @Test
     public void testRepo() {
         RepoInfo repo = mockBaseParams.repo();
-        assertEquals(1, repo.getType());
         assertEquals("repo2", repo.getName());
         assertEquals("mockArch", repo.getArch());
     }
