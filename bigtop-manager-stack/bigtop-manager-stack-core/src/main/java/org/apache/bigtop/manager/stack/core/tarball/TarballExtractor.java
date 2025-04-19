@@ -27,8 +27,8 @@ import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -42,99 +42,135 @@ public class TarballExtractor {
         extractTarball(source, dest, 0);
     }
 
-    public static void extractTarball(String source, String dest, Integer skipLevels) {
-        File tarball = new File(source);
-        File destDir = new File(dest);
+    public static void extractTarball(String source, String dest, int skipLevels) {
+        Path sourcePath = Paths.get(source);
+        Path destPath = Paths.get(dest);
 
-        if (isTar(source)) {
-            extractTar(tarball, tis -> extract(tis, destDir, skipLevels));
+        if (!Files.exists(sourcePath) || !Files.isRegularFile(sourcePath)) {
+            log.error("Source file does not exist or is not a file: {}", source);
+            throw new IllegalArgumentException("Source file does not exist or is not a file: " + source);
+        }
+
+        if (!Files.exists(destPath)) {
+            try {
+                Files.createDirectories(destPath);
+            } catch (IOException e) {
+                log.error("Failed to create destination directory: {}", dest, e);
+                throw new StackException(e);
+            }
+        }
+
+        Function<TarArchiveInputStream, Boolean> func = ais -> extract(ais, destPath, skipLevels);
+
+        String sourceFileName = sourcePath.getFileName().toString();
+        if (isTar(sourceFileName)) {
+            extractTar(sourcePath, func);
         } else if (isTarGz(source)) {
-            extractTarGz(tarball, tis -> extract(tis, destDir, skipLevels));
+            extractTarGz(sourcePath, func);
         } else if (isTarXz(source)) {
-            extractTarXz(tarball, tis -> extract(tis, destDir, skipLevels));
+            extractTarXz(sourcePath, func);
         } else {
-            log.info("Unsupported file type: {}", source);
+            log.error("Unsupported file type: {}", source);
         }
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    private static Boolean extract(TarArchiveInputStream tis, File destDir, Integer skipLevels) {
+    private static boolean extract(TarArchiveInputStream ais, Path destDir, int skipLevels) {
         try {
             TarArchiveEntry entry;
-            while ((entry = tis.getNextEntry()) != null) {
+            while ((entry = ais.getNextEntry()) != null) {
                 String entryName = entry.getName();
-                String[] parts = entryName.split("/");
-                if (parts.length <= skipLevels) {
-                    continue; // Skip this entry
+                Path entryPath = Paths.get(entryName);
+
+                // Check if it is necessary to skip directories at the specified level
+                if (entryPath.getNameCount() <= skipLevels) {
+                    // Skip this entry
+                    continue;
                 }
-                StringBuilder newName = new StringBuilder();
-                for (int i = skipLevels; i < parts.length; i++) {
-                    newName.append(parts[i]);
-                    if (i < parts.length - 1) {
-                        newName.append(File.separator);
-                    }
-                }
-                File outputFile = new File(destDir, newName.toString());
+
+                Path relativePath = entryPath.subpath(skipLevels, entryPath.getNameCount());
+                Path outputPath = destDir.resolve(relativePath);
 
                 if (entry.isDirectory()) {
-                    if (!outputFile.exists()) {
-                        outputFile.mkdirs();
-                    }
+                    createDirectories(outputPath);
                 } else if (entry.isSymbolicLink()) {
-                    Path link = Paths.get(outputFile.getAbsolutePath());
-                    Path target = Paths.get(entry.getLinkName());
-                    Files.createSymbolicLink(link, target);
+                    createSymbolicLink(outputPath, entry.getLinkName());
                 } else {
-                    File parent = outputFile.getParentFile();
-                    if (!parent.exists()) {
-                        parent.mkdirs();
-                    }
-
-                    try (FileOutputStream fos = new FileOutputStream(outputFile)) {
-                        byte[] buffer = new byte[1024];
-                        int len;
-                        while ((len = tis.read(buffer)) != -1) {
-                            fos.write(buffer, 0, len);
-                        }
-                    }
+                    createFile(outputPath, ais);
                 }
             }
         } catch (Exception e) {
-            log.info("Error extracting tarball", e);
+            log.error("Error extracting archive", e);
             throw new StackException(e);
         }
-
         return true;
     }
 
-    private static void extractTar(File tarball, Function<TarArchiveInputStream, Boolean> func) {
-        try (InputStream fis = Files.newInputStream(tarball.toPath());
-                TarArchiveInputStream tis = new TarArchiveInputStream(fis)) {
-            func.apply(tis);
-        } catch (Exception e) {
-            log.error("Error extracting tarball", e);
+    private static void createDirectories(Path path) {
+        if (!Files.exists(path)) {
+            try {
+                Files.createDirectories(path);
+            } catch (IOException e) {
+                log.error("Failed to create directory: {}", path, e);
+                throw new StackException(e);
+            }
+        }
+    }
+
+    private static void createSymbolicLink(Path linkPath, String targetName) {
+        Path targetPath = linkPath.getParent().resolve(targetName).normalize();
+        if (!targetPath.isAbsolute()) {
+            targetPath = linkPath.getParent().resolve(targetPath).normalize();
+        }
+
+        createDirectories(linkPath.getParent());
+
+        try {
+            Files.createSymbolicLink(linkPath, targetPath);
+        } catch (IOException e) {
+            log.error("Failed to create symbolic link from {} to {}", linkPath, targetPath, e);
             throw new StackException(e);
         }
     }
 
-    private static void extractTarGz(File tarball, Function<TarArchiveInputStream, Boolean> func) {
-        try (InputStream fis = Files.newInputStream(tarball.toPath());
+    private static void createFile(Path filePath, InputStream inputStream) {
+        createDirectories(filePath.getParent());
+
+        try (FileOutputStream fos = new FileOutputStream(filePath.toFile())) {
+            inputStream.transferTo(fos);
+        } catch (IOException e) {
+            log.error("Failed to create file: {}", filePath, e);
+            throw new StackException(e);
+        }
+    }
+
+    private static void extractTar(Path tarball, Function<TarArchiveInputStream, Boolean> func) {
+        try (InputStream fis = Files.newInputStream(tarball);
+                TarArchiveInputStream tis = new TarArchiveInputStream(fis)) {
+            func.apply(tis);
+        } catch (Exception e) {
+            log.error("Error processing tar file", e);
+            throw new StackException(e);
+        }
+    }
+
+    private static void extractTarGz(Path tarball, Function<TarArchiveInputStream, Boolean> func) {
+        try (InputStream fis = Files.newInputStream(tarball);
                 GzipCompressorInputStream gis = new GzipCompressorInputStream(fis);
                 TarArchiveInputStream tis = new TarArchiveInputStream(gis)) {
             func.apply(tis);
         } catch (Exception e) {
-            log.error("Error extracting tarball", e);
+            log.error("Error processing tar.gz file", e);
             throw new StackException(e);
         }
     }
 
-    private static void extractTarXz(File tarball, Function<TarArchiveInputStream, Boolean> func) {
-        try (InputStream fis = Files.newInputStream(tarball.toPath());
+    private static void extractTarXz(Path tarball, Function<TarArchiveInputStream, Boolean> func) {
+        try (InputStream fis = Files.newInputStream(tarball);
                 XZCompressorInputStream xzis = new XZCompressorInputStream(fis);
                 TarArchiveInputStream tis = new TarArchiveInputStream(xzis)) {
             func.apply(tis);
         } catch (Exception e) {
-            log.error("Error extracting tarball", e);
+            log.error("Error processing tar.xz file", e);
             throw new StackException(e);
         }
     }
