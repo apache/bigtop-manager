@@ -128,8 +128,6 @@ CREATE TABLE repo
     PRIMARY KEY (id)
 );
 
-COMMENT ON COLUMN repo.type IS '1-services, 2-tools';
-
 CREATE TABLE service
 (
     id                BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY,
