@@ -57,9 +57,8 @@ public class BaseParamsTest {
     @BeforeEach
     public void setUp() {
         List<RepoInfo> repos = new ArrayList<>();
-        repos.add(new RepoInfo("repo1", "mockArch", "testURL", 2));
-        repos.add(new RepoInfo("repo2", "mockArch", "testURL", 1));
-        repos.add(new RepoInfo("repo3", "mockArch", "testURL", 1));
+        repos.add(new RepoInfo("repo2", "mockArch", "testURL"));
+        repos.add(new RepoInfo("repo3", "mockArch", "testURL"));
 
         List<String> arch = new ArrayList<>();
         arch.add("mockArch");
