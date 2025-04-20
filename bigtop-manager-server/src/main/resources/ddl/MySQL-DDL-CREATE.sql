@@ -126,8 +126,7 @@ CREATE TABLE `repo`
     `id`          BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
     `name`        VARCHAR(32) DEFAULT NULL,
     `arch`        VARCHAR(32) DEFAULT NULL,
-    `base_url`    VARCHAR(256) DEFAULT NULL,
-    `type`        INT DEFAULT NULL COMMENT '1-services, 2-tools',
+    `base_url`    VARCHAR(255) DEFAULT NULL,
     `create_time` DATETIME    DEFAULT CURRENT_TIMESTAMP,
     `update_time` DATETIME    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `create_by`   BIGINT,
@@ -332,16 +331,29 @@ CREATE TABLE `llm_chat_message`
     KEY              `idx_user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE `tool`
+(
+    `id`          BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `name`        VARCHAR(64) DEFAULT NULL,
+    `base_url`    VARCHAR(255) DEFAULT NULL,
+    `pkg_name`    VARCHAR(64) DEFAULT NULL,
+    `arch`        VARCHAR(64) DEFAULT NULL,
+    `checksum`    VARCHAR(255) DEFAULT NULL,
+    `create_time` DATETIME    DEFAULT CURRENT_TIMESTAMP,
+    `update_time` DATETIME    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `create_by`   BIGINT,
+    `update_by`   BIGINT,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- Adding default admin user
 INSERT INTO user (username, password, nickname, status)
 VALUES ('admin', '21232f297a57a5a743894a0e4a801fc3', 'Administrator', true);
 
-INSERT INTO repo (name, arch, base_url, type)
+INSERT INTO repo (name, arch, base_url)
 VALUES
-('Service tarballs', 'x86_64', 'http://your-repo/', 1),
-('Service tarballs', 'aarch64', 'http://your-repo/', 1),
-('BM tools', 'x86_64', 'http://your-repo/', 2),
-('BM tools', 'aarch64', 'http://your-repo/', 2);
+('Service tarballs', 'x86_64', 'http://your-repo/'),
+('Service tarballs', 'aarch64', 'http://your-repo/');
 
 -- Adding default llm platform
 INSERT INTO llm_platform (credential, name, support_models)
@@ -366,3 +378,9 @@ WHERE `name` = 'QianFan';
 UPDATE `llm_platform`
 SET `desc` = 'Get your API Key in https://platform.deepseek.com'
 WHERE `name` = 'DeepSeek';
+
+INSERT INTO tool (name, base_url, pkg_name, arch, checksum)
+VALUES
+('jdk8', 'https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u452-b09/', 'OpenJDK8U-jdk_x64_linux_hotspot_8u452b09.tar.gz', 'x86_64', 'SHA-256:9448308a21841960a591b47927cf2d44fdc4c0533a5f8111a4b243a6bafb5d27'),
+('jdk8', 'https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u452-b09/', 'OpenJDK8U-jdk_aarch64_linux_hotspot_8u452b09.tar.gz', 'aarch64', 'SHA-256:d8a1aecea0913b7a1e0d737ba6f7ea99059b3f6fd17813d4a24e8b3fc3aee278'),
+('mysql-connector-j', 'https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/8.0.33/', 'mysql-connector-j-8.0.33.jar', 'x86_64,aarch64', 'SHA-256:e2a3b2fc726a1ac64e998585db86b30fa8bf3f706195b78bb77c5f99bf877bd9');

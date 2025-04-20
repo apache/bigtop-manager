@@ -19,12 +19,12 @@ The stack page is a display page that mainly shows which optional services are a
 
 ![Stack](https://github.com/user-attachments/assets/faf1112c-f0a6-4353-ba63-83abbb819c29)
 
-Expect for our official repository, users can also set their own repository which can configured here
+Expect for our official repository, users can also set their own repository which can configured here(due to license issue, MySQL/Grafana in Infra Stack are downloaded from the official website instead of the repository).
 
 We also provide other ways for you download dependencies:
 * BaiduNetdisk: https://pan.baidu.com/s/162FXYsaRuwFQjrOlMuDRjg?pwd=hufb
 
-![Repository](https://github.com/user-attachments/assets/6b235122-ffdf-4d16-a4b4-994525f12d51)
+![Repository](https://github.com/user-attachments/assets/9ff12f07-5a15-42e7-84d7-a3eab3455468)
 
 ### Hosts
 #### Add a Host

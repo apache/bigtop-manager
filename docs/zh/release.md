@@ -133,19 +133,15 @@ $ svn commit -m "Adding Zhiguo Wu's code signing key"
 ```sql
 INSERT INTO repo (name, arch, base_url, type)
 VALUES
-('Service tarballs', 'x86_64', 'http://your-repo/', 1),
-('Service tarballs', 'aarch64', 'http://your-repo/', 1),
-('BM tools', 'x86_64', 'http://your-repo/', 2),
-('BM tools', 'aarch64', 'http://your-repo/', 2);
+('Service tarballs', 'x86_64', 'http://your-repo/'),
+('Service tarballs', 'aarch64', 'http://your-repo/'),
 ```
 改为
 ```sql
 INSERT INTO repo (name, arch, base_url, type)
 VALUES
-('Service tarballs', 'x86_64', 'http://repos.bigtop.apache.org/releases/bigtop-manager/1.0.0/tarballs', 1),
-('Service tarballs', 'aarch64', 'http://repos.bigtop.apache.org/releases/bigtop-manager/1.0.0/tarballs', 1),
-('BM tools', 'x86_64', 'http://repos.bigtop.apache.org/releases/bigtop-manager/1.0.0/tools', 2),
-('BM tools', 'aarch64', 'http://repos.bigtop.apache.org/releases/bigtop-manager/1.0.0/tools', 2);
+('Service tarballs', 'x86_64', 'http://repos.bigtop.apache.org/releases/bigtop-manager/1.0.0/'),
+('Service tarballs', 'aarch64', 'http://repos.bigtop.apache.org/releases/bigtop-manager/1.0.0/'),
 ```
 
 ### 升级版本号
@@ -187,6 +183,7 @@ $ svn commit -m "Preparing Release Bigtop Manager 1.0.0 RC0"
 ### 发起投票
 根据 [VOTE 邮件模板](#vote) 发起投票
 * 若投票未通过，则按要求修改完成后重复以上步骤，同时 Release Candidate +1，若根据以上案例，下一个 Release Candidate 即为 RC1
+* 若由于某些问题你想要取消投票，则可以参考 [CANCEL 邮件模板](#cancel) 来取消
 * 若投票通过，进入 [发版成功](#发版成功) 操作
 
 ## 发版成功
@@ -305,6 +302,19 @@ Please vote accordingly:
 [ ] +1 approve
 [ ] +0 no opinion
 [ ] -1 disapprove with the reason
+
+Best Regards,
+Zhiguo Wu
+```
+
+### CANCEL
+```
+To: "Bigtop Developers List" <dev@bigtop.apache.org>
+Subject: [CANCEL] [VOTE] Release Apache Bigtop Manager 1.0.0 RC0
+
+Hello Community,
+
+Due to some license issues, I'd like to cancel the vote for release Apache Bigtop Manager 1.0.0 RC0, the next vote for RC1 will be sent out in a few days.
 
 Best Regards,
 Zhiguo Wu
