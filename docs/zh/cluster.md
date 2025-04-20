@@ -17,12 +17,12 @@
 
 ![Stack](https://github.com/user-attachments/assets/faf1112c-f0a6-4353-ba63-83abbb819c29)
 
-除了官方 Repository 外，用户也可以搭建自己的 Repository 并在此处进行配置
+除了官方 Repository 外，用户也可以搭建自己的 Repository 并在此处进行配置（注意 Infra 中的 MySQL/Grafana 由于 License 原因，是从官方网站下载而不是从 Repository 下载）
 
 我们也提供了其他方式供您下载相应的依赖：
 * 百度云：https://pan.baidu.com/s/162FXYsaRuwFQjrOlMuDRjg?pwd=hufb
 
-![Repository](https://github.com/user-attachments/assets/6b235122-ffdf-4d16-a4b4-994525f12d51)
+![Repository](https://github.com/user-attachments/assets/9ff12f07-5a15-42e7-84d7-a3eab3455468)
 
 ### 主机
 #### 新增主机

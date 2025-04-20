@@ -32,6 +32,4 @@ public class RepoInfo {
     private String arch;
 
     private String baseUrl;
-
-    private Integer type;
 }
