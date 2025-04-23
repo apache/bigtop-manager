@@ -20,7 +20,7 @@ usage() {
     echo "  commands:"
     echo "       -c NUM_INSTANCES, --create NUM_INSTANCES  - Create Docker containers based bigtop-manager cluster, defaults to 3"
     echo "       -e, --database                            - The specified database, defaults to postgres"
-    echo "       -o, --os                                  - Specify the operating system, default is trunk-rocky-8"
+    echo "       -o, --os                                  - Specify the operating system, default is rocky-8"
     echo "       --skip-compile                            - Skip Compile"
     echo "       -d, --destroy                             - Destroy all containers"
     echo "       -h, --help"
@@ -32,8 +32,8 @@ log() {
 }
 
 build() {
-    log "Build on docker $SKIP_BUILD"
-    if ! $SKIP_BUILD; then
+    log "Build on docker: $SKIP_COMPILE"
+    if ! $SKIP_COMPILE; then
       log "Compiling bigtop-manager"
       docker run -it --rm -u $(id -u):$(id -g) \
         -v $PWD/../../../:/opt/develop/bigtop-manager/ \
@@ -67,21 +67,20 @@ create_container() {
     log "Create ${container_name}"
     if [ $i -eq 1 ]; then
       docker run -itd -p 15005:5005 -p 15006:5006 -p 18080:8080 --name ${container_name} --hostname ${container_name} --network bigtop-manager --cap-add=SYS_TIME bigtop-manager/develop:${OS}
-      docker cp ../../../bigtop-manager-server/target/bigtop-manager-server.tar.gz ${container_name}:/opt/
+      docker cp ../../../bigtop-manager-dist/target/apache-bigtop-manager-*-server.tar.gz ${container_name}:/opt/bigtop-manager-server.tar.gz
       docker exec ${container_name} bash -c "cd /opt && tar -zxvf bigtop-manager-server.tar.gz"
+      docker exec ${container_name} bash -c "ssh-keygen -f '/root/.ssh/id_rsa' -N '' -t rsa"
       SERVER_PUB_KEY=`docker exec ${container_name} /bin/cat /root/.ssh/id_rsa.pub`
     else
       docker run -itd --name ${container_name} --hostname ${container_name} --network bigtop-manager --cap-add=SYS_TIME bigtop-manager/develop:${OS}
     fi
-      docker cp ../../../bigtop-manager-agent/target/bigtop-manager-agent.tar.gz ${container_name}:/opt/
-      docker exec ${container_name} bash -c "cd /opt && tar -zxvf bigtop-manager-agent.tar.gz"
-      docker exec ${container_name} bash -c "echo '$SERVER_PUB_KEY' > /root/.ssh/authorized_keys"
-      docker exec ${container_name} ssh-keygen -N '' -t rsa -b 2048 -f /etc/ssh/ssh_host_rsa_key
-      docker exec ${container_name} ssh-keygen -N '' -t ecdsa -b 256 -f /etc/ssh/ssh_host_ecdsa_key
-      docker exec ${container_name} ssh-keygen -N '' -t ed25519 -b 256 -f /etc/ssh/ssh_host_ed25519_key
-      docker exec ${container_name} /bin/systemctl start sshd
 
-      docker exec ${container_name} bash -c "systemctl start chronyd && chronyc tracking"
+    docker exec ${container_name} bash -c "echo '$SERVER_PUB_KEY' > /root/.ssh/authorized_keys"
+    docker exec ${container_name} ssh-keygen -N '' -t rsa -b 2048 -f /etc/ssh/ssh_host_rsa_key
+    docker exec ${container_name} ssh-keygen -N '' -t ecdsa -b 256 -f /etc/ssh/ssh_host_ecdsa_key
+    docker exec ${container_name} ssh-keygen -N '' -t ed25519 -b 256 -f /etc/ssh/ssh_host_ed25519_key
+    docker exec ${container_name} /bin/systemctl start sshd
+    docker exec ${container_name} bash -c "systemctl start chronyd && chronyc tracking"
   done
 
   containers=($(docker network inspect bigtop-manager -f '{{range .Containers}}{{.Name}}{{" "}}{{end}}'))
@@ -109,14 +108,12 @@ create_container() {
         docker exec ${container} bash -c "sed -i 's/localhost:5432/bm-mysql:3306/' /opt/bigtop-manager-server/conf/application.yml"
         docker exec ${container} bash -c "sed -i 's/postgres/root/' /opt/bigtop-manager-server/conf/application.yml"
       elif [ $DATABASE == "postgres" ]; then
-        docker exec ${container} bash -c "yum install postgresql -y"
         docker exec ${container} bash -c "PGPASSWORD=postgres psql -h bm-postgres -p5432 -U postgres -c 'create database bigtop_manager'"
         docker exec ${container} bash -c "PGPASSWORD=postgres psql -h bm-postgres -p5432 -U postgres -d bigtop_manager -f /opt/bigtop-manager-server/ddl/PostgreSQL-DDL-CREATE.sql"
         docker exec ${container} bash -c "sed -i 's/localhost:5432/bm-postgres:5432/' /opt/bigtop-manager-server/conf/application.yml"
       fi
       docker exec ${container} bash -c "nohup /bin/bash /opt/bigtop-manager-server/bin/start.sh --debug > /dev/null 2>&1 &"
     fi
-    docker exec ${container} bash -c "nohup /bin/bash /opt/bigtop-manager-agent/bin/start.sh --debug > /dev/null 2>&1 &"
     log "All Service Started!!!"
   done
 
@@ -125,7 +122,7 @@ create_container() {
 create_db() {
   if [ $DATABASE == "mysql" ]; then
     docker run --restart=always -it -d \
-       -p 3306:3306 \
+       -p 13306:3306 \
        --cap-add=SYS_TIME \
        --network bigtop-manager \
        --name bm-mysql \
@@ -150,7 +147,7 @@ create_db() {
     done
   elif [ $DATABASE == "postgres" ]; then
     docker run --restart=always -d \
-      -p 5432:5432 \
+      -p 15432:5432 \
       --network bigtop-manager \
       --name bm-postgres \
       --hostname bm-postgres \
@@ -167,9 +164,9 @@ echo $PWD
 PROG=`basename $0`
 
 DATABASE=postgres
-OS=trunk-rocky-8
+OS=rocky-8
 NUM_INSTANCES=3
-SKIP_BUILD=false
+SKIP_COMPILE=false
 
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -189,8 +186,8 @@ while [ $# -gt 0 ]; do
           echo "Requires a os" 1>&2
           usage
         fi
-        if [ $2 != "trunk-rocky-8" ] && [ $2 != "trunk-centos-7" ] && [ $2 != "trunk-openeuler-22" ]; then
-          echo "The OS should be [trunk-rocky-8], [trunk-centos-7], or [trunk-openeuler-22]" 1>&2
+        if [ $2 != "rocky-8" ] && [ $2 != "openeuler-24" ]; then
+          echo "The OS should be [rocky-8] or [openeuler-24]" 1>&2
           usage
         fi
         OS=$2
@@ -207,7 +204,7 @@ while [ $# -gt 0 ]; do
         NUM_INSTANCES=$2
         shift 2;;
     --skip-compile)
-        SKIP_BUILD=true
+        SKIP_COMPILE=true
         shift;;
     -d|--destroy)
         destroy
@@ -221,7 +218,7 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-log "DATABASE: $DATABASE; OS: $OS; NUM_INSTANCES: $NUM_INSTANCES; SKIP_BUILD: $SKIP_BUILD; "
+log "DATABASE: $DATABASE; OS: $OS; NUM_INSTANCES: $NUM_INSTANCES; SKIP_COMPILE: $SKIP_COMPILE; "
 
 build
 
