@@ -353,7 +353,7 @@ Hello Community,
 I am glad to announce that Apache Bigtop Manager 1.0.0 has been released.
 
 The source release can be downloaded here:
-https://www.apache.org/dyn/closer.cgi/bigtop/bigtop-manager-1.0.0
+https://www.apache.org/dyn/closer.cgi/bigtop/bigtop-manager-1.0.0/
 
 Detailed release notes can be checked here:
 https://issues.apache.org/jira/secure/ReleaseNote.jspa?projectId=12311420&version=12354831
