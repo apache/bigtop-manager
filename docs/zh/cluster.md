@@ -15,6 +15,8 @@
 ### 组件栈
 组件栈页面为展示页面，主要显示后续安装服务时有哪些可选服务
 
+目前 Bigtop 组件栈提供的是 Apache Bigtop 生成的 tarball 文件而非 rpm/deb 包
+
 ![Stack](https://github.com/user-attachments/assets/faf1112c-f0a6-4353-ba63-83abbb819c29)
 
 除了官方 Repository 外，用户也可以搭建自己的 Repository 并在此处进行配置（注意 Infra 中的 MySQL/Grafana 由于 License 原因，是从官方网站下载而不是从 Repository 下载）

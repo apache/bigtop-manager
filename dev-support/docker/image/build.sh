@@ -33,46 +33,31 @@ echo $PWD
 if [ $# != 1 ]; then
   echo "Creates bigtop-manager/develop image"
   echo
-  echo "Usage: build.sh <PREFIX-OS-VERSION>"
+  echo "Usage: build.sh <OS-VERSION>"
   echo
-  echo "Example: build.sh trunk-rocky-8"
-  echo "       : build.sh 1.0.0-rocky-8"
+  echo "Example: build.sh rocky-8"
   exit 1
 fi
 
-PREFIX=$(echo "$1" | cut -d '-' -f 1)
-OS=$(echo "$1" | cut -d '-' -f 2)
-VERSION=$(echo "$1" | cut -d '-' -f 3-)
+OS=$(echo "$1" | cut -d '-' -f 1)
+VERSION=$(echo "$1" | cut -d '-' -f 2-)
 
 
 # Decimals are not supported. Either use integers only
 # e.g. 16.04 -> 16
 VERSION_INT=$(echo "$VERSION" | cut -d '.' -f 1)
 
-log "PREFIX: ${PREFIX}; OS: ${OS}; VERSION: ${VERSION}; VERSION_INT: ${VERSION_INT}"
-DOCKER_OS=${OS}
-DOCKER_VERSION=${VERSION}
-CUSTOM_REPO=""
+log "OS: ${OS}; VERSION: ${VERSION}; VERSION_INT: ${VERSION_INT}"
 case ${OS}-${VERSION_INT} in
-    centos-7)
-      CUSTOM_REPO="RUN mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.back \
-      && curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo"
-        ;;
     rocky-8)
-      DOCKER_OS=rockylinux
+      DOCKERFILE="Dockerfile.rocky8"
         ;;
-    openeuler-22)
-      DOCKER_OS=openeuler/openeuler
-      DOCKER_VERSION=22.03
+    openeuler-24)
+      DOCKERFILE="Dockerfile.openeuler24"
         ;;
     *)
         echo "Unsupported OS ${OS}-${VERSION}."
         exit 1
 esac
 
-# generate Dockerfile for build
-sed -e "s|OS|${DOCKER_OS}|;s|VERSION|${DOCKER_VERSION}|" Dockerfile.template |
- sed -e "/MAINTAINER dev@bigtop.apache.org/a\\$CUSTOM_REPO" > Dockerfile
-
-docker build --rm --no-cache -t bigtop-manager/develop:${PREFIX}-${OS}-${VERSION} -f Dockerfile ../..
-rm -f Dockerfile
+docker build --rm --no-cache -t bigtop-manager/develop:${OS}-${VERSION} -f ${DOCKERFILE} ../..
