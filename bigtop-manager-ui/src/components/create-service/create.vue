@@ -74,13 +74,13 @@
   const validateDependenciesOfServiceSelection = async () => {
     let selectedServiceNames = new Set(selectedServices.value.map((service) => service.name))
     for (const selectedService of selectedServices.value) {
-      const serviceDependencies = await confirmServiceDependencies(selectedService)
+      const serviceDependencies = await confirmServiceDependencies('add', selectedService)
       if (serviceDependencies.length === 0) {
         return false
       }
       for (const service of serviceDependencies) {
         if (!selectedServiceNames.has(service.name)) {
-          compRef.value.addInstallItem(service)
+          compRef.value.modifyInstallItems('add', service)
           selectedServiceNames.add(service.name)
         }
       }

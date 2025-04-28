@@ -95,17 +95,13 @@
     setDataByCurrent(state.selectedData)
   }
 
-  const addInstallItem = async (item: ExpandServiceVO) => {
-    const items = await confirmServiceDependencies(item)
+  const modifyInstallItems = async (type: 'add' | 'remove', item: ExpandServiceVO) => {
+    const items = await confirmServiceDependencies(type, item)
     if (items.length > 0) {
       items.forEach((i) => {
-        handleInstallItem(i, state.isAddableData, state.selectedData)
+        handleInstallItem(i, state.selectedData, state.isAddableData)
       })
     }
-  }
-
-  const removeInstallItem = (item: ExpandServiceVO) => {
-    handleInstallItem(item, state.selectedData, state.isAddableData)
   }
 
   const splitSearchStr = (splitStr: string) => {
@@ -193,7 +189,7 @@
   })
 
   defineExpose({
-    addInstallItem
+    modifyInstallItems
   })
 </script>
 
@@ -208,7 +204,7 @@
         <template #renderItem="{ item }">
           <a-list-item>
             <template #actions>
-              <a-button type="primary" @click="addInstallItem(item)">{{ $t('common.add') }}</a-button>
+              <a-button type="primary" @click="modifyInstallItems('add', item)">{{ $t('common.add') }}</a-button>
             </template>
             <a-list-item-meta>
               <template #title>
@@ -258,7 +254,7 @@
         <template #renderItem="{ item }">
           <a-list-item>
             <template #actions>
-              <a-button danger :disabled="item.isInstalled" type="primary" @click="removeInstallItem(item)">
+              <a-button danger :disabled="item.isInstalled" type="primary" @click="modifyInstallItems('remove', item)">
                 {{ $t('common.remove') }}
               </a-button>
             </template>

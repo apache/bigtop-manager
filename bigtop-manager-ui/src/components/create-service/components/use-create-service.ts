@@ -167,6 +167,27 @@ const useCreateService = () => {
     return true
   }
 
+  const notifyDependents = async (
+    targetService: ExpandServiceVO,
+    collected: ExpandServiceVO[]
+  ): Promise<ProcessResult> => {
+    for (const service of selectedServices.value) {
+      if (!service.requiredServices?.includes(targetService.name!)) continue
+
+      const shouldRemove = await confirmRequiredServicesChanges('remove', service, targetService)
+      if (!shouldRemove) return { success: false }
+      collected.push(service)
+
+      const result = await notifyDependents(service, collected)
+      if (!result.success) {
+        collected.splice(collected.indexOf(service), 1)
+        processedServices.value.delete(service.name!)
+        return result
+      }
+    }
+    return { success: true }
+  }
+
   const processDependencies = async (
     targetService: ExpandServiceVO,
     serviceMap: Map<string, ExpandServiceVO>,
@@ -188,7 +209,7 @@ const useCreateService = () => {
 
       if (dependency.isInstalled) continue
 
-      const shouldAdd = await confirmRequiredServicesToInstall(targetService, dependency)
+      const shouldAdd = await confirmRequiredServicesChanges('add', targetService, dependency)
       if (!shouldAdd) return { success: false }
 
       collected.push(dependency)
@@ -208,14 +229,21 @@ const useCreateService = () => {
     return new Map(services.map((s) => [s.name as string, s as ExpandServiceVO]))
   }
 
-  const handlePreSelectedServiceDependencies = async (preSelectedService: ExpandServiceVO) => {
-    const serviceMap =
-      creationMode.value == 'public'
-        ? getServiceMap(servicesOfInfra.value)
-        : getServiceMap(servicesOfExcludeInfra.value)
-
+  const handlePreSelectedServiceDependencies = async (type: 'add' | 'remove', preSelectedService: ExpandServiceVO) => {
+    let serviceMap = new Map()
+    let dependenciesSuccess: ProcessResult = { success: false }
     const result: ExpandServiceVO[] = []
-    const dependenciesSuccess = await processDependencies(preSelectedService, serviceMap, servicesOfInfra.value, result)
+    if (type === 'add') {
+      serviceMap =
+        creationMode.value == 'public'
+          ? getServiceMap(servicesOfInfra.value)
+          : getServiceMap(servicesOfExcludeInfra.value)
+    }
+    if (type === 'add') {
+      dependenciesSuccess = await processDependencies(preSelectedService, serviceMap, servicesOfInfra.value, result)
+    } else {
+      dependenciesSuccess = await notifyDependents(preSelectedService, result)
+    }
     if (dependenciesSuccess.success) {
       result.unshift(preSelectedService)
       return result
@@ -223,22 +251,32 @@ const useCreateService = () => {
     return []
   }
 
-  const confirmServiceDependencies = async (preSelectedService: ExpandServiceVO) => {
+  const confirmServiceDependencies = async (type: 'add' | 'remove', preSelectedService: ExpandServiceVO) => {
     const { requiredServices } = preSelectedService
-    if (!requiredServices) {
+    if (!requiredServices && type === 'add') {
       return [preSelectedService]
     }
-    if (creationMode.value === 'internal' && validServiceFromInfra(preSelectedService, requiredServices)) {
+
+    if (
+      type === 'add' &&
+      creationMode.value === 'internal' &&
+      validServiceFromInfra(preSelectedService, requiredServices!)
+    ) {
       return []
     } else {
-      return await handlePreSelectedServiceDependencies(preSelectedService)
+      return await handlePreSelectedServiceDependencies(type, preSelectedService)
     }
   }
 
-  const confirmRequiredServicesToInstall = (targetService: ExpandServiceVO, requiredService: ExpandServiceVO) => {
+  const confirmRequiredServicesChanges = (
+    type: 'add' | 'remove',
+    targetService: ExpandServiceVO,
+    requiredService: ExpandServiceVO
+  ) => {
+    const content = type === 'add' ? 'dependencies_add_msg' : 'dependencies_del_msg'
     return new Promise((resolve) => {
       Modal.confirm({
-        content: t('service.dependencies_msg', [targetService.displayName, requiredService.displayName]),
+        content: t(content, [targetService.displayName, requiredService.displayName]),
         icon: createVNode(SvgIcon, { name: 'unknown' }),
         cancelText: t('common.no'),
         okText: t('common.yes'),

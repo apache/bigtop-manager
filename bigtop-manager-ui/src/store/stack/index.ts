@@ -31,6 +31,7 @@ export interface StackRelationMap {
     stack: string
     components: string[]
     configs: ServiceConfig
+    requiredServices: string[]
   }
   components: {
     service: string
@@ -62,7 +63,8 @@ export const useStackStore = defineStore(
             displayName,
             stack: stackName,
             components: components!.map(({ name }) => name),
-            configs
+            configs,
+            requiredServices: service.requiredServices
           }
           for (const component of components!) {
             relationMap.components[component.name!] = {
