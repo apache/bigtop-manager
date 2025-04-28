@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import { ref, shallowRef } from 'vue'
+import { nextTick, ref, shallowRef } from 'vue'
 import { RouteRecordRaw, useRoute, useRouter } from 'vue-router'
 import { dynamicRoutes as dr } from '@/router/routes/index'
 import { defineStore } from 'pinia'
@@ -75,7 +75,8 @@ export const useMenuStore = defineStore(
 
     const updateSider = async () => {
       await clusterStore.loadClusters()
-      const { id, name } = clusterStore.clusters[clusterStore.clusterCount]
+      const { id, name } = clusterStore.clusters[clusterStore.clusterCount - 1]
+      await nextTick()
       onSiderClick(`${routePathFromClusters.value}/${name}/${id}`)
     }
 

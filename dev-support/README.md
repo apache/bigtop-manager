@@ -32,25 +32,24 @@ yum install -y git docker
 ```shell
 git clone https://github.com/apache/bigtop-manager.git
 ```
-> You need to change the `node.version` in the `pom.xml` file under the `bigtop-manager-ui` module to `16.x` if you are using CentOS-7.
 
 ### **Step 3**: Build develop basic image
-Run the setup command, you will get `bigtop-manager/develop:trunk-rocky-8` image. It has the environment needed to compile Bigtop-Manager and run servers such as Bigtop-Manager Server, Bigtop-Manager Agent, Mysql, etc.
+Run the setup command, you will get `bigtop-manager/develop:rocky-8` image. It has the environment needed to compile Bigtop-Manager and run servers such as Bigtop-Manager Server, Bigtop-Manager Agent, Mysql, etc.
 
 **RHEL (Rocky 8) :**
 ```shell
-/bin/bash dev-support/docker/image/build.sh trunk-rocky-8
+/bin/bash dev-support/docker/image/build.sh rocky-8
 ```
 ### **Step 4**: Build source & create cluster
-* Bigtop Manager UI、Bigtop Manager Server Debug Port、MariaDB Server are also exposed to local ports: 8080、5005、3306.
-* Docker hostnames are: bigtop-manager-server、bigtop-manager-agent-01、bigtop-manager-agent-02.
+* Bigtop Manager UI、Bigtop Manager Server Debug Port、MariaDB Server are also exposed to local ports: 18080、15005、13306.
+* Docker hostnames are: bm-1、bm-2、bm-3 and etc.
 
 **RHEL (Rocky 8) :**
 ```shell
-/bin/bash dev-support/docker/containers/build.sh -e postgres -c 3 -o trunk-rocky-8 [--skip-compile]
+/bin/bash dev-support/docker/containers/build.sh -e postgres -c 3 -o rocky-8 [--skip-compile]
 ```
 ### **Step 5**: Access Web UI
-Now you can access Web UI which exposes on `http://localhost:8080`. Log in with username `admin` and password `admin`.
+Now you can access Web UI which exposes on `http://localhost:18080`. Log in with username `admin` and password `admin`.
 ### **Step 6**: Clear cluster
 Clean up the containers when you are done developing or testing.
 

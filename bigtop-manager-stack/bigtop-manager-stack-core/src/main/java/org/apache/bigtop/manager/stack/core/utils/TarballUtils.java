@@ -19,8 +19,10 @@
 package org.apache.bigtop.manager.stack.core.utils;
 
 import org.apache.bigtop.manager.grpc.pojo.PackageInfo;
-import org.apache.bigtop.manager.stack.core.tarball.TarballDownloader;
+import org.apache.bigtop.manager.stack.core.tarball.FileDownloader;
 import org.apache.bigtop.manager.stack.core.tarball.TarballExtractor;
+
+import org.apache.commons.lang3.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,9 +40,11 @@ public class TarballUtils {
             return;
         }
 
-        String remoteUrl = repoUrl + File.separator + packageInfo.getName();
+        String remoteUrl = StringUtils.isEmpty(packageInfo.getUrl())
+                ? repoUrl + File.separator + packageInfo.getName()
+                : packageInfo.getUrl() + File.separator + packageInfo.getName();
         File localFile = new File(stackHome + File.separator + packageInfo.getName());
-        TarballDownloader.download(remoteUrl, stackHome, packageInfo);
+        FileDownloader.download(remoteUrl, stackHome, packageInfo);
 
         log.info("Extracting [{}] to [{}]", localFile.getAbsolutePath(), serviceHome);
         TarballExtractor.extractTarball(localFile.getAbsolutePath(), serviceHome, skipLevels);

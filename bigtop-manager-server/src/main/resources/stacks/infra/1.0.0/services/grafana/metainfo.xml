@@ -54,6 +54,7 @@
                 </architectures>
                 <packages>
                     <package>
+                        <url>https://dl.grafana.com/oss/release</url>
                         <name>grafana-11.4.0.linux-amd64.tar.gz</name>
                         <checksum>SHA-256:3550c73f4455435642976e82cc89aa354f076a75b766a408781107f4f5d4744c</checksum>
                     </package>
@@ -65,6 +66,7 @@
                 </architectures>
                 <packages>
                     <package>
+                        <url>https://dl.grafana.com/oss/release</url>
                         <name>grafana-11.4.0.linux-arm64.tar.gz</name>
                         <checksum>SHA-256:c978b46a61d92883119131641c03b8a1323a284e74ab9a20e7e48207dc1a11e1</checksum>
                     </package>

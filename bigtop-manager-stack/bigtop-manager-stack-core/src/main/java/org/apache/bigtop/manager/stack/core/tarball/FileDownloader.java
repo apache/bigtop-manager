@@ -19,6 +19,7 @@
 package org.apache.bigtop.manager.stack.core.tarball;
 
 import org.apache.bigtop.manager.grpc.pojo.PackageInfo;
+import org.apache.bigtop.manager.grpc.pojo.ToolInfo;
 import org.apache.bigtop.manager.stack.core.exception.StackException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +31,16 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 @Slf4j
-public class TarballDownloader {
+public class FileDownloader {
+
+    public static void download(String remoteUrl, String saveDir, ToolInfo toolInfo) {
+        PackageInfo packageInfo = new PackageInfo();
+        packageInfo.setUrl(toolInfo.getBaseUrl());
+        packageInfo.setName(toolInfo.getPkgName());
+        packageInfo.setChecksum(toolInfo.getChecksum());
+
+        download(remoteUrl, saveDir, packageInfo);
+    }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void download(String remoteUrl, String saveDir, PackageInfo packageInfo) {

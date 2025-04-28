@@ -16,22 +16,37 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.dto;
+package org.apache.bigtop.manager.dao.po;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import java.io.Serializable;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class RepoDTO {
+@EqualsAndHashCode(callSuper = true)
+@Table(name = "tool")
+public class ToolPO extends BasePO implements Serializable {
 
-    private Integer id;
+    @Id
+    @Column(name = "id")
+    private Long id;
 
+    @Column(name = "name")
     private String name;
 
+    @Column(name = "base_url")
+    private String baseUrl;
+
+    @Column(name = "pkg_name")
+    private String pkgName;
+
+    @Column(name = "arch")
     private String arch;
 
-    private String baseUrl;
+    @Column(name = "checksum")
+    private String checksum;
 }

@@ -27,6 +27,8 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class PackageModel {
 
+    private String url;
+
     private String name;
 
     private String checksum;

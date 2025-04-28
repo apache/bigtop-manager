@@ -46,7 +46,7 @@
     </modules>
 
     <properties>
-        <revision>0.0.1-SNAPSHOT</revision>
+        <revision>1.1.0-SNAPSHOT</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>17</java.version>
         <maven-assembly-plugin.version>3.7.1</maven-assembly-plugin.version>

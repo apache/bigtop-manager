@@ -218,9 +218,7 @@ public class HostServiceImpl implements HostService {
     @Override
     public Boolean installDependencies(List<HostDTO> hostDTOList) {
         List<RepoPO> repoPOList = repoDao.findAll();
-        Map<String, RepoPO> archRepoMap = repoPOList.stream()
-                .filter(repoPO -> repoPO.getType() == 2)
-                .collect(Collectors.toMap(RepoPO::getArch, repo -> repo));
+        Map<String, RepoPO> archRepoMap = repoPOList.stream().collect(Collectors.toMap(RepoPO::getArch, repo -> repo));
 
         // Clear cache list
         installedStatus.clear();

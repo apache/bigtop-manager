@@ -57,16 +57,15 @@ public class BaseParamsTest {
     @BeforeEach
     public void setUp() {
         List<RepoInfo> repos = new ArrayList<>();
-        repos.add(new RepoInfo("repo1", "mockArch", "testURL", 2));
-        repos.add(new RepoInfo("repo2", "mockArch", "testURL", 1));
-        repos.add(new RepoInfo("repo3", "mockArch", "testURL", 1));
+        repos.add(new RepoInfo("repo2", "mockArch", "testURL"));
+        repos.add(new RepoInfo("repo3", "mockArch", "testURL"));
 
         List<String> arch = new ArrayList<>();
         arch.add("mockArch");
 
         List<PackageInfo> packages = new ArrayList<>();
-        packages.add(new PackageInfo("package1", "testChecksum1"));
-        packages.add(new PackageInfo("package2", "testChecksum2"));
+        packages.add(new PackageInfo(null, "package1", "testChecksum1"));
+        packages.add(new PackageInfo(null, "package2", "testChecksum2"));
 
         List<PackageSpecificInfo> packageSpecifics = new ArrayList<>();
         PackageSpecificInfo packageSpecific = new PackageSpecificInfo();
@@ -133,7 +132,6 @@ public class BaseParamsTest {
     @Test
     public void testRepo() {
         RepoInfo repo = mockBaseParams.repo();
-        assertEquals(1, repo.getType());
         assertEquals("repo2", repo.getName());
         assertEquals("mockArch", repo.getArch());
     }

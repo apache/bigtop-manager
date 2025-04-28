@@ -21,13 +21,12 @@ package org.apache.bigtop.manager.stack.bigtop.v3_3_0.hive;
 import org.apache.bigtop.manager.common.constants.Constants;
 import org.apache.bigtop.manager.common.constants.MessageConstants;
 import org.apache.bigtop.manager.common.shell.ShellResult;
-import org.apache.bigtop.manager.common.utils.os.OSDetection;
-import org.apache.bigtop.manager.grpc.pojo.RepoInfo;
+import org.apache.bigtop.manager.grpc.pojo.ToolInfo;
 import org.apache.bigtop.manager.stack.core.exception.StackException;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.spi.script.AbstractServerScript;
 import org.apache.bigtop.manager.stack.core.spi.script.Script;
-import org.apache.bigtop.manager.stack.core.tarball.TarballDownloader;
+import org.apache.bigtop.manager.stack.core.tarball.FileDownloader;
 import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
 import org.apache.bigtop.manager.stack.core.utils.linux.LinuxFileUtils;
 import org.apache.bigtop.manager.stack.core.utils.linux.LinuxOSUtils;
@@ -35,6 +34,7 @@ import org.apache.bigtop.manager.stack.core.utils.linux.LinuxOSUtils;
 import com.google.auto.service.AutoService;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Properties;
@@ -115,13 +115,9 @@ public class HiveMetastoreScript extends AbstractServerScript {
     }
 
     private void downloadMySQLJdbcDriver(Params params) {
-        RepoInfo repoInfo = LocalSettings.repos().stream()
-                .filter(r -> OSDetection.getArch().equals(r.getArch()) && r.getType() == 2)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Cannot find repo for os: [" + OSDetection.getOS()
-                        + "] and arch: [" + OSDetection.getArch() + "]"));
-        String mysqlDriver = repoInfo.getBaseUrl() + "/mysql-connector-j-8.0.33.jar";
-        TarballDownloader.download(mysqlDriver, params.stackHome());
+        ToolInfo tool = LocalSettings.getTool("mysql-connector-j");
+        String downloadUrl = tool.getBaseUrl() + File.separator + tool.getPkgName();
+        FileDownloader.download(downloadUrl, params.stackHome(), tool);
         LinuxFileUtils.moveFile(params.stackHome() + "/mysql-connector-j-8.0.33.jar", params.serviceHome() + "/lib/");
         LinuxFileUtils.updateOwner(params.serviceHome() + "/lib", params.user(), params.group(), true);
         LinuxFileUtils.updatePermissions(params.serviceHome() + "/lib", Constants.PERMISSION_755, true);
@@ -137,12 +133,16 @@ public class HiveMetastoreScript extends AbstractServerScript {
                     && shellResult.getErrMsg().contains("Table '" + clusterName + "_hive.VERSION' doesn't exist")) {
                 // init schema
                 cmd = hiveParams.serviceHome() + "/bin/schematool -initSchema -dbType mysql";
+                // TODO previous cmd will kill agent application, not sure why
+                // temp solve by running with nohup and wait for 5 seconds to let it finish
+                cmd = "nohup " + cmd + " > /dev/null 2>&1 &";
                 shellResult = LinuxOSUtils.sudoExecCmd(cmd, hiveParams.user());
+                Thread.sleep(5000);
                 if (shellResult.getExitCode() != MessageConstants.SUCCESS_CODE) {
                     throw new StackException(shellResult.getErrMsg());
                 }
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new StackException(e);
         }
     }

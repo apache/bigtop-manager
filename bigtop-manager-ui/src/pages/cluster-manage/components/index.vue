@@ -19,6 +19,7 @@
 <script setup lang="ts">
   import { ref, reactive, computed, onMounted, watchEffect } from 'vue'
   import useBaseTable from '@/composables/use-base-table'
+  import SetSource from '@/pages/cluster-manage/cluster/components/set-source.vue'
   import { useI18n } from 'vue-i18n'
   import { useStackStore } from '@/store/stack'
   import { storeToRefs } from 'pinia'
@@ -34,10 +35,13 @@
     stackSelected: 'Bigtop',
     stackGroup: ['Bigtop', 'Infra', 'Extra']
   })
+
+  const data = ref<ServiceVO[]>([])
+  const setSourceRef = ref<InstanceType<typeof SetSource>>()
+
   const currentStack = computed(() =>
     stacks.value.find((stack) => stack.stackName.toUpperCase() === store.stackSelected.toUpperCase())
   )
-  const data = ref<ServiceVO[]>([])
   const columns = computed((): TableColumnType[] => [
     {
       title: '#',
@@ -84,7 +88,7 @@
   })
 
   const handleSetSource = () => {
-    // setSourceRef.value?.handleOpen()
+    setSourceRef.value?.handleOpen()
   }
 
   onMounted(() => {
@@ -118,6 +122,7 @@
         </template>
       </a-table>
     </div>
+    <set-source ref="setSourceRef" />
   </div>
 </template>
 

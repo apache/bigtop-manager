@@ -124,7 +124,9 @@
 
   const pollUntilInstalled = (interval: number = 1000): void => {
     let isInitialized = false
-    const intervalId = setInterval(async () => {
+    let intervalId: NodeJS.Timeout
+
+    const poll = async () => {
       if (!isInitialized) {
         stepData.value[current.value] = stepData.value[current.value].map((item: HostReq) => ({
           ...item,
@@ -137,7 +139,10 @@
         installing.value = false
         clearInterval(intervalId)
       }
-    }, interval)
+    }
+
+    intervalId = setInterval(poll, interval)
+    poll()
   }
 
   const mergeByHostname = (arr1: any[], arr2: any[]): any[] => {
