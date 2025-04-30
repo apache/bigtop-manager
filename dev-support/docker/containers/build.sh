@@ -75,7 +75,7 @@ create_container() {
       docker run -itd --name ${container_name} --hostname ${container_name} --network bigtop-manager --cap-add=SYS_TIME bigtop-manager/develop:${OS}
     fi
 
-    docker exec ${container_name} bash -c "echo '$SERVER_PUB_KEY' > /root/.ssh/authorized_keys"
+    docker exec ${container_name} bash -c "mkdir -p /root/.ssh && echo '$SERVER_PUB_KEY' > /root/.ssh/authorized_keys"
     docker exec ${container_name} ssh-keygen -N '' -t rsa -b 2048 -f /etc/ssh/ssh_host_rsa_key
     docker exec ${container_name} ssh-keygen -N '' -t ecdsa -b 256 -f /etc/ssh/ssh_host_ecdsa_key
     docker exec ${container_name} ssh-keygen -N '' -t ed25519 -b 256 -f /etc/ssh/ssh_host_ed25519_key
