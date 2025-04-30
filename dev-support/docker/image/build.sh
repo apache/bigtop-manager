@@ -30,6 +30,9 @@ BIN_DIR=$(dirname $0)
 cd $BIN_DIR
 echo $PWD
 
+# Ensure the script has executable permissions
+chmod 755 build.sh
+
 if [ $# != 1 ]; then
   echo "Creates bigtop-manager/develop image"
   echo
