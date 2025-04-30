@@ -30,7 +30,6 @@ BIN_DIR=$(dirname $0)
 cd $BIN_DIR
 echo $PWD
 
-
 if [ $# != 1 ]; then
   echo "Creates bigtop-manager/develop image"
   echo
