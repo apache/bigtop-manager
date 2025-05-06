@@ -201,14 +201,14 @@
     state.searchText = selectedKeys[0] as string
     state.searchedColumn = dataIndex
     stopPolling()
-    startPolling()
+    startPolling(true, true)
   }
 
   const handleReset = (clearFilters: (param?: FilterResetProps) => void) => {
     clearFilters({ confirm: true })
     state.searchText = ''
     stopPolling()
-    startPolling()
+    startPolling(true, true)
   }
 
   const dropdownMenuClick: GroupItem['dropdownMenuClickEvent'] = async ({ key }) => {
@@ -301,8 +301,8 @@
     startPolling()
   }
 
-  const startPolling = () => {
-    getComponentList(true, true)
+  const startPolling = (isReset = false, isFirstCall = false) => {
+    getComponentList(isReset, isFirstCall)
     pollingIntervalId.value = setInterval(() => {
       getComponentList()
     }, POLLING_INTERVAL)
