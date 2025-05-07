@@ -99,7 +99,11 @@
     const items = await confirmServiceDependencies(type, item)
     if (items.length > 0) {
       items.forEach((i) => {
-        handleInstallItem(i, state.selectedData, state.isAddableData)
+        if (type === 'add') {
+          handleInstallItem(i, state.isAddableData, state.selectedData)
+        } else {
+          handleInstallItem(i, state.selectedData, state.isAddableData)
+        }
       })
     }
   }
