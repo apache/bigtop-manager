@@ -273,10 +273,10 @@ const useCreateService = () => {
     targetService: ExpandServiceVO,
     requiredService: ExpandServiceVO
   ) => {
-    const content = type === 'add' ? 'dependencies_add_msg' : 'dependencies_del_msg'
+    const content = type === 'add' ? 'dependencies_add_msg' : 'dependencies_remove_msg'
     return new Promise((resolve) => {
       Modal.confirm({
-        content: t(content, [targetService.displayName, requiredService.displayName]),
+        content: t(`service.${content}`, [targetService.displayName, requiredService.displayName]),
         icon: createVNode(SvgIcon, { name: 'unknown' }),
         cancelText: t('common.no'),
         okText: t('common.yes'),
