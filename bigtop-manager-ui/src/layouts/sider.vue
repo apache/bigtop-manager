@@ -32,7 +32,7 @@
   const routeParamsLen = ref(0)
   const openKeys = ref<string[]>(['clusters'])
   const { siderMenuSelectedKey, headerSelectedKey, siderMenus, routePathFromClusters } = storeToRefs(menuStore)
-  const { clusters, clusterCount } = storeToRefs(clusterStore)
+  const { clusterCount, clusterMap } = storeToRefs(clusterStore)
 
   const showCreateClusterBtn = computed(() => headerSelectedKey.value === '/cluster-manage')
   const selectMenuKeyFromClusters = computed(() => siderMenuSelectedKey.value.includes(routePathFromClusters.value))
@@ -48,10 +48,12 @@
     () => route,
     (newRoute) => {
       const { params, path, meta } = newRoute
+      const targetCluster = clusterMap.value[`${params.id}`]
       routeParamsLen.value = Object.keys(params).length
       if (path.includes(routePathFromClusters.value) && routeParamsLen.value > 0 && clusterCount.value > 0) {
-        const cluster = clusters.value.find((v) => `${v.id}` === params.id)
-        cluster && (siderMenuSelectedKey.value = `${routePathFromClusters.value}/${cluster.name}/${cluster.id}`)
+        if (targetCluster) {
+          siderMenuSelectedKey.value = `${routePathFromClusters.value}/${targetCluster.name}/${targetCluster.id}`
+        }
       } else {
         siderMenuSelectedKey.value = meta.activeMenu ?? path
       }
@@ -100,7 +102,7 @@
             <span>{{ $t(menuItem.meta!.title!) }}</span>
           </template>
           <a-menu-item
-            v-for="child in clusters"
+            v-for="child of clusterMap"
             :key="`${routePathFromClusters}/${child.name}/${child.id}`"
             :title="child.displayName"
           >

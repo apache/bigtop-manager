@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, watchEffect } from 'vue'
 import { defineStore } from 'pinia'
 import { useRoute } from 'vue-router'
 import { getCluster, getClusterList } from '@/api/cluster'
@@ -31,9 +31,10 @@ export const useClusterStore = defineStore(
     const route = useRoute()
     const installedStore = useInstalledStore()
     const serviceStore = useServiceStore()
-    const clusters = ref<ClusterVO[]>([])
     const loading = ref(false)
+    const clusters = ref<ClusterVO[]>([])
     const currCluster = ref<ClusterVO>({})
+    const clusterMap = ref<Record<string, ClusterVO>>({})
     const clusterId = computed(() => (route.params.id as string) || undefined)
     const clusterCount = computed(() => clusters.value.length)
 
@@ -45,6 +46,16 @@ export const useClusterStore = defineStore(
         })
       }
     )
+
+    watchEffect(() => {
+      clusters.value.reduce(
+        (pre, cluster) => {
+          pre[cluster.id!] = cluster
+          return pre
+        },
+        clusterMap.value as Record<string, ClusterVO>
+      )
+    })
 
     const addCluster = async () => {
       await loadClusters()
@@ -81,6 +92,7 @@ export const useClusterStore = defineStore(
 
     return {
       clusters,
+      clusterMap,
       loading,
       currCluster,
       clusterCount,
@@ -93,7 +105,7 @@ export const useClusterStore = defineStore(
   {
     persist: {
       storage: sessionStorage,
-      paths: ['clusters']
+      paths: ['clusterMap']
     }
   }
 )
