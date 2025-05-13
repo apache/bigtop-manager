@@ -83,7 +83,7 @@
       v-model="openKeys"
       :selected-keys="[siderMenuSelectedKey]"
       mode="inline"
-      @select="({ key }) => menuStore.onSiderClick(key)"
+      @click="({ key }) => menuStore.onSiderClick(key)"
     >
       <template v-for="menuItem in siderMenus" :key="menuItem.path">
         <a-sub-menu v-if="menuItem.name === 'Clusters'" :key="menuItem.path">

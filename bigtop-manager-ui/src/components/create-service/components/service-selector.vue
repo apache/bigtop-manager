@@ -31,6 +31,7 @@
   }
 
   const searchStr = ref('')
+  const spinning = ref(false)
   const licenseOfConflictService = shallowRef(['AGPL-3.0', 'GPLv2'])
   const state = reactive<State>({
     isAddableData: [],
@@ -189,7 +190,10 @@
   }
 
   onActivated(async () => {
-    await addInstalledSymbolForSelectedServices(checkSelectedServicesOnlyInstalled.value)
+    spinning.value = true
+    addInstalledSymbolForSelectedServices(checkSelectedServicesOnlyInstalled.value).finally(() => {
+      spinning.value = false
+    })
   })
 
   defineExpose({
@@ -199,7 +203,7 @@
 
 <template>
   <div class="service-selector">
-    <div>
+    <a-spin :spinning="spinning">
       <div class="list-title">
         <div>{{ $t('service.select_service') }}</div>
         <a-input v-model:value="searchStr" :placeholder="$t('service.please_enter_search_keyword')" />
@@ -248,7 +252,7 @@
           </a-list-item>
         </template>
       </a-list>
-    </div>
+    </a-spin>
     <a-divider type="vertical" class="divider" />
     <div>
       <div class="list-title">
