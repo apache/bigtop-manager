@@ -42,7 +42,7 @@
     selectedServices,
     servicesOfInfra,
     servicesOfExcludeInfra,
-    installedStore,
+    serviceStore,
     creationMode,
     creationModeType,
     confirmServiceDependencies,
@@ -130,7 +130,7 @@
   }
 
   const initInstalledServicesDetail = async () => {
-    const detailRes = await installedStore.getInstalledServicesDetailByKey(`${clusterId.value}`)
+    const detailRes = await serviceStore.getInstalledServicesDetailByKey(`${clusterId.value}`)
     const detailMap = new Map<string, ExpandServiceVO>()
     if (!detailRes) {
       return detailMap
@@ -164,7 +164,7 @@
   const addInstalledSymbolForSelectedServices = async (onlyInstalled: boolean) => {
     if (onlyInstalled) {
       const installedServiceMap = await initInstalledServicesDetail()
-      const installedServiceNames = installedStore.getInstalledNamesOrIdsOfServiceByKey(`${clusterId.value}`)
+      const installedServiceNames = serviceStore.getInstalledNamesOrIdsOfServiceByKey(`${clusterId.value}`)
       const inherentServices = creationMode.value === 'internal' ? servicesOfExcludeInfra.value : servicesOfInfra.value
 
       if (creationModeType.value === 'component' && installedServiceMap.has(routeParams.value.service)) {

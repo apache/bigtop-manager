@@ -21,15 +21,14 @@ import { defineStore, storeToRefs } from 'pinia'
 import { computed, ref } from 'vue'
 import { getService, getServiceList } from '@/api/service'
 import { useStackStore } from '@/store/stack'
-import { InstalledMapItem, useInstalledStore } from '@/store/installed'
 import type { ServiceListParams, ServiceVO } from '@/api/service/types'
 
 export const useServiceStore = defineStore(
   'service',
   () => {
     const stackStore = useStackStore()
-    const installedStore = useInstalledStore()
     const services = ref<ServiceVO[]>([])
+    const serviceMap = ref<Record<string, (ServiceVO & { clusterId: number })[]>>({})
     const total = ref(0)
     const loading = ref(false)
     const { stacks } = storeToRefs(stackStore)
@@ -46,14 +45,9 @@ export const useServiceStore = defineStore(
         const data = await getServiceList(clusterId, { ...filterParams, pageNum: 1, pageSize: 100 })
         services.value = data.content
         total.value = data.total
-        const serviceMap = services.value.map((v) => ({
-          serviceId: v.id,
-          serviceName: v.name,
-          serviceDisplayName: v.displayName,
-          clusterId: clusterId
-        })) as InstalledMapItem[]
-        installedStore.setInstalledMapKeyOfValue(`${clusterId}`, serviceMap)
+        serviceMap.value[clusterId] = data.content.map((service) => ({ ...service, clusterId }))
       } catch (error) {
+        serviceMap.value = {}
         console.log('error :>> ', error)
       } finally {
         loading.value = false
@@ -68,16 +62,47 @@ export const useServiceStore = defineStore(
       }
     }
 
+    const getServicesOfInfra = async () => {
+      await getServices(0)
+    }
+
+    const getInstalledNamesOrIdsOfServiceByKey = (key: string, flag: 'names' | 'ids' = 'names') => {
+      return Object.values(serviceMap.value[key] || {}).map((service: ServiceVO) => {
+        if (flag === 'ids') {
+          return service.id
+        } else {
+          return service.name
+        }
+      })
+    }
+
+    const getInstalledServicesDetailByKey = async (key: string): Promise<ServiceVO[] | undefined> => {
+      try {
+        const serviceIds = getInstalledNamesOrIdsOfServiceByKey(key, 'ids')
+        const allDetail = serviceIds?.map((id) => getServiceDetail(Number(key), Number(id))) as Promise<ServiceVO>[]
+        return await Promise.all(allDetail)
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
     return {
+      serviceMap,
       services,
       loading,
+      serviceNames,
+      locateStackWithService,
       getServices,
       getServiceDetail,
-      serviceNames,
-      locateStackWithService
+      getServicesOfInfra,
+      getInstalledServicesDetailByKey,
+      getInstalledNamesOrIdsOfServiceByKey
     }
   },
   {
-    persist: false
+    persist: {
+      storage: sessionStorage,
+      paths: ['serviceMap']
+    }
   }
 )

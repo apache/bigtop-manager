@@ -22,7 +22,7 @@ import { message, Modal } from 'ant-design-vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import { ExpandServiceVO, useStackStore } from '@/store/stack'
-import { useInstalledStore } from '@/store/installed'
+import { useServiceStore } from '@/store/service'
 import { execCommand } from '@/api/command'
 import useSteps from '@/composables/use-steps'
 import SvgIcon from '@/components/common/svg-icon/index.vue'
@@ -78,7 +78,7 @@ const useCreateService = () => {
     setupStore()
     isChange = true
   }
-  const installedStore = useInstalledStore()
+  const serviceStore = useServiceStore()
   const route = useRoute()
   const { t } = useI18n()
   const processedServices = ref(new Set())
@@ -155,7 +155,7 @@ const useCreateService = () => {
   // Validate services from infra
   const validServiceFromInfra = (targetService: ExpandServiceVO, requiredServices: string[]) => {
     const servicesOfInfraNames = servicesOfInfra.value.map((v) => v.name)
-    const installedServicesOfInfra = installedStore.getInstalledNamesOrIdsOfServiceByKey('0', 'names')
+    const installedServicesOfInfra = serviceStore.getInstalledNamesOrIdsOfServiceByKey('0', 'names')
     const set = new Set(installedServicesOfInfra)
     const missServices = requiredServices.reduce((acc, name) => {
       !set.has(name) && servicesOfInfraNames.includes(name) && acc.push(name)
@@ -329,7 +329,7 @@ const useCreateService = () => {
     selectedServicesMeta,
     servicesOfExcludeInfra,
     servicesOfInfra,
-    installedStore,
+    serviceStore,
     allComps,
     afterCreateRes,
     scope,

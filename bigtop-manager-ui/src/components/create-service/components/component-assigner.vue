@@ -50,7 +50,7 @@
   })
   const {
     clusterId,
-    installedStore,
+    serviceStore,
     allComps,
     allCompsMeta,
     creationModeType,
@@ -67,7 +67,7 @@
 
   const currCompInfo = computed(() => allComps.value.get(currComp.value.split('/')[1]))
   const currCompInfoMeta = computed(() => allCompsMeta.value.get(currComp.value.split('/')[1]))
-  const installedServices = computed(() => installedStore.getInstalledNamesOrIdsOfServiceByKey(`${clusterId.value}`))
+  const installedServices = computed(() => serviceStore.getInstalledNamesOrIdsOfServiceByKey(`${clusterId.value}`))
   const hostsOfCurrComp = computed((): HostVO[] => {
     const temp = currComp.value.split('/').at(-1)
     return allComps.value.has(temp!) ? allComps.value.get(temp!)?.hosts ?? [] : []

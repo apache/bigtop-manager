@@ -36,7 +36,7 @@
     isView: false
   })
 
-  const { clusterId, installedStore, selectedServices } = useCreateService()
+  const { clusterId, serviceStore, selectedServices } = useCreateService()
   const searchStr = ref('')
   const currService = ref<Key>('')
   const configs = ref<ServiceConfigReq[]>([])
@@ -65,7 +65,7 @@
 
   const serviceList = computed(() => selectedServices.value)
   const disabled = computed(() => {
-    return installedStore
+    return serviceStore
       .getInstalledNamesOrIdsOfServiceByKey(`${clusterId.value}`)
       .includes(currService.value.toString().split('/').at(-1)!)
   })
@@ -73,7 +73,7 @@
   // const disabled = computed(() => {
   //   return creationModeType.value === 'component'
   //     ? false
-  //     : installedStore
+  //     : serviceStore
   //         .getInstalledNamesOrIdsOfServiceByKey(`${clusterId.value}`)
   //         .includes(currService.value.toString().split('/').at(-1)!)
   // })
