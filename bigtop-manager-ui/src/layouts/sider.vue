@@ -52,7 +52,8 @@
       routeParamsLen.value = Object.keys(params).length
       if (path.includes(routePathFromClusters.value) && routeParamsLen.value > 0 && clusterCount.value > 0) {
         if (targetCluster) {
-          siderMenuSelectedKey.value = `${routePathFromClusters.value}/${targetCluster.name}/${targetCluster.id}`
+          // siderMenuSelectedKey.value = `${routePathFromClusters.value}/${targetCluster.name}/${targetCluster.id}`
+          siderMenuSelectedKey.value = `${routePathFromClusters.value}/${targetCluster.id}`
         }
       } else {
         siderMenuSelectedKey.value = meta.activeMenu ?? path
@@ -103,7 +104,7 @@
           </template>
           <a-menu-item
             v-for="child of clusterMap"
-            :key="`${routePathFromClusters}/${child.name}/${child.id}`"
+            :key="`${routePathFromClusters}/${child.id}`"
             :title="child.displayName"
           >
             <template #icon>

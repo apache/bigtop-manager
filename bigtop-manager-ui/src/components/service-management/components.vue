@@ -31,6 +31,7 @@
   import type { ComponentVO } from '@/api/component/types'
   import type { FilterConfirmProps, FilterResetProps } from 'ant-design-vue/es/table/interface'
   import type { Command, CommandRequest } from '@/api/command/types'
+  import type { ServiceVO } from '@/api/service/types'
 
   type Key = string | number
   interface TableState {
@@ -40,20 +41,13 @@
     selectedRows: ComponentVO[]
   }
 
-  interface ServieceInfo {
-    cluster: string
-    id: number
-    service: string
-    serviceId: number
-  }
-
   const POLLING_INTERVAL = 3000
   const { t } = useI18n()
   const jobProgressStore = useJobProgress()
   const stackStore = useStackStore()
   const route = useRoute()
   const router = useRouter()
-  const attrs = useAttrs()
+  const attrs = useAttrs() as unknown as Required<ServiceVO> & { clusterId: number }
   const { stacks, stackRelationMap } = storeToRefs(stackStore)
   const searchInputRef = ref()
   const pollingIntervalId = ref<any>(null)
@@ -70,7 +64,6 @@
     selectedRows: []
   })
 
-  const currServiceInfo = computed(() => route.params as unknown as ServieceInfo)
   const componentsFromStack = computed(
     () =>
       new Map(
@@ -90,7 +83,7 @@
       key: 'name',
       ellipsis: true,
       filterMultiple: false,
-      filters: [...(componentsFromStack.value.get(currServiceInfo.value.service)?.values() || [])]?.map((v) => ({
+      filters: [...(componentsFromStack.value.get(attrs.name)?.values() || [])]?.map((v) => ({
         text: v?.displayName || '',
         value: v?.name || ''
       }))
@@ -241,14 +234,11 @@
 
   const execOperation = async () => {
     try {
-      await jobProgressStore.processCommand(
-        { ...commandRequest.value, clusterId: currServiceInfo.value.id },
-        async () => {
-          getComponentList(true, true)
-          state.selectedRowKeys = []
-          state.selectedRows = []
-        }
-      )
+      await jobProgressStore.processCommand({ ...commandRequest.value, clusterId: attrs.clusterId }, async () => {
+        getComponentList(true, true)
+        state.selectedRowKeys = []
+        state.selectedRows = []
+      })
     } catch (error) {
       console.log('error :>> ', error)
     }
@@ -259,7 +249,7 @@
       title: t('common.delete_msg'),
       async onOk() {
         try {
-          const data = await deleteComponent({ clusterId: currServiceInfo.value.id, id: row.id! })
+          const data = await deleteComponent({ clusterId: attrs.clusterId, id: row.id! })
           if (data) {
             message.success(t('common.delete_success'))
             getComponentList(true, true)
@@ -272,8 +262,8 @@
   }
 
   const getComponentList = async (isReset = false, isFirstCall = false) => {
-    const { id: clusterId, serviceId } = currServiceInfo.value
-    if (attrs.id == undefined || !paginationProps.value) {
+    const { clusterId, id: serviceId } = attrs
+    if (!paginationProps.value) {
       loading.value = false
       return
     }
@@ -316,9 +306,8 @@
   }
 
   const addComponent = () => {
-    const { cluster: clusterId } = route.params
-    const creationMode = clusterId == '0' ? 'public' : 'internal'
-    const routerName = clusterId == '0' ? 'CreateInfraComponent' : 'CreateComponent'
+    const creationMode = Number(attrs.clusterId) === 0 ? 'public' : 'internal'
+    const routerName = Number(attrs.clusterId) === 0 ? 'CreateInfraComponent' : 'CreateComponent'
     router.push({
       name: routerName,
       params: { ...route.params, creationMode, type: 'component' }

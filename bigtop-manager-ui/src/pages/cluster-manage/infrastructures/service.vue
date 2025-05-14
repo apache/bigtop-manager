@@ -119,8 +119,6 @@
       name: 'InfraServiceDetail',
       params: {
         id: clusterInfo.id,
-        service: payload.name,
-        cluster: clusterInfo.name,
         serviceId: payload.id
       }
     })

@@ -32,7 +32,7 @@
   }
 
   const { t } = useI18n()
-  const attrs = useAttrs()
+  const attrs = useAttrs() as unknown as Required<ServiceVO> & { clusterId: number }
   const currTimeRange = ref<TimeRangeText>('15m')
   const chartData = ref({
     chart1: [],
@@ -45,7 +45,6 @@
     2: 'unhealthy',
     3: 'unknown'
   })
-  const serviceDetail = computed(() => attrs as unknown as ServiceVO)
   const serviceKeys = computed(() => Object.keys(baseConfig.value) as (keyof ServiceVO)[])
   const noChartData = computed(() => Object.values(chartData.value).every((v) => v.length === 0))
   const timeRanges = computed((): TimeRangeItem[] => [
@@ -119,27 +118,27 @@
                         <a-tag
                           v-if="key === 'status'"
                           class="reset-tag"
-                          :color="CommonStatus[statusColors[serviceDetail[key]]]"
+                          :color="CommonStatus[statusColors[attrs[key]]]"
                         >
-                          <status-dot :color="CommonStatus[statusColors[serviceDetail[key]]]" />
-                          {{ serviceDetail[key] && $t(`common.${statusColors[serviceDetail[key]]}`) }}
+                          <status-dot :color="CommonStatus[statusColors[attrs[key]]]" />
+                          {{ attrs[key] && $t(`common.${statusColors[attrs[key]]}`) }}
                         </a-tag>
                         <a-typography-text
                           v-else-if="key === 'stack'"
                           class="desc-sub-item-desc-column"
-                          :content="serviceDetail[key]?.toLowerCase()"
+                          :content="attrs[key]?.toLowerCase()"
                         />
                         <a-typography-text
                           v-else-if="key === 'restartFlag'"
                           class="desc-sub-item-desc-column"
-                          :content="serviceDetail[key] ? $t('common.yes') : $t('common.no')"
+                          :content="attrs[key] ? $t('common.yes') : $t('common.no')"
                         />
                         <a-typography-text
                           v-else-if="['kerberos', 'metrics'].includes(key)"
                           class="desc-sub-item-desc-column"
                           :content="$t('common.disabled')"
                         />
-                        <a-typography-text v-else class="desc-sub-item-desc-column" :content="serviceDetail[key]" />
+                        <a-typography-text v-else class="desc-sub-item-desc-column" :content="attrs[key]" />
                       </div>
                     </template>
                   </div>

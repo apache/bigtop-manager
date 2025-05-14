@@ -39,7 +39,7 @@
   })
   const {
     clusterId,
-    routeParams,
+    serviceId,
     selectedServices,
     servicesOfInfra,
     servicesOfExcludeInfra,
@@ -50,9 +50,8 @@
     setDataByCurrent
   } = useCreateService()
   const { isAddableData } = toRefs(state)
-  const checkSelectedServicesOnlyInstalled = computed(
-    () => selectedServices.value.filter((v: ExpandServiceVO) => !v.isInstalled).length === 0
-  )
+  const targetServiceName = computed(() => serviceStore.serviceFlatMap[serviceId.value].name!)
+  const checkIfInstalled = computed(() => selectedServices.value.filter((v) => !v.isInstalled).length === 0)
   const filterAddableData = computed(() =>
     isAddableData.value.filter(
       (v) =>
@@ -147,51 +146,62 @@
     }
   }
 
-  const mergeInherentServiceAndInstalledService = (
+  const buildCompleteServiceInfo = (
     installedServiceMap: Map<string, ExpandServiceVO>,
     inherentServices: ServiceVO[]
   ) => {
-    const inherentService = inherentServices.filter((v) => v.name === routeParams.value.service)[0]
-    const installedService = { ...installedServiceMap.get(routeParams.value.service)! }
-    installedService.license = inherentService.license
-    const map = new Map(installedService.components!.map((item) => [item.name, item]))
-    inherentService.components!.forEach((item) => {
-      !map.has(item.name) && map.set(item.name, { ...item, hosts: [], uninstall: true })
-    })
-    installedService.components = [...map.values()]
-    return installedService
+    const inherent = inherentServices.find((v) => v.name === targetServiceName.value)!
+    const installed = { ...installedServiceMap.get(targetServiceName.value)! }
+
+    const mergedComponentsMap = new Map(
+      (installed.components ?? []).map((component) => [component.name, { ...component }])
+    )
+    for (const component of inherent.components ?? []) {
+      if (!mergedComponentsMap.has(component.name)) {
+        mergedComponentsMap.set(component.name, { ...component, hosts: [], uninstall: true })
+      }
+    }
+    installed.components = [...mergedComponentsMap.values()]
+    installed.license = inherent.license
+
+    return installed as ExpandServiceVO
   }
 
-  const addInstalledSymbolForSelectedServices = async (onlyInstalled: boolean) => {
-    if (onlyInstalled) {
-      const installedServiceMap = await initInstalledServicesDetail()
-      const installedServiceNames = serviceStore.getInstalledNamesOrIdsOfServiceByKey(`${clusterId.value}`)
-      const inherentServices = creationMode.value === 'internal' ? servicesOfExcludeInfra.value : servicesOfInfra.value
+  const markSelectedAsInstalled = async (hasInstalled: boolean) => {
+    if (!hasInstalled) {
+      state.selectedData = [...selectedServices.value]
+      return
+    }
+    const installedServiceMap = await initInstalledServicesDetail()
+    const installedServiceNames = serviceStore.getInstalledNamesOrIdsOfServiceByKey(`${clusterId.value}`)
+    const inherentServices = creationMode.value === 'internal' ? servicesOfExcludeInfra.value : servicesOfInfra.value
 
-      if (creationModeType.value === 'component' && installedServiceMap.has(routeParams.value.service)) {
-        state.selectedData[0] = mergeInherentServiceAndInstalledService(installedServiceMap, inherentServices)
-        state.selectedData[0].isInstalled = true
-        state.isAddableData = []
-      } else {
-        for (const service of inherentServices) {
-          if (installedServiceNames.includes(service.name || '')) {
-            Object.assign(service, installedServiceMap.get(service.name!))
+    if (creationModeType.value === 'component' && installedServiceMap.has(targetServiceName.value!)) {
+      const completeService = buildCompleteServiceInfo(installedServiceMap, inherentServices)
+      state.selectedData[0] = { ...completeService, isInstalled: true }
+      state.isAddableData = []
+    } else {
+      for (const service of inherentServices) {
+        const name = service.name || ''
+        if (installedServiceNames.includes(name)) {
+          const installed = installedServiceMap.get(name)
+          if (installed) {
+            Object.assign(service, installed)
             service.isInstalled = true
-            state.selectedData.push(service as ExpandServiceVO)
-          } else {
-            state.isAddableData.push(service as ExpandServiceVO)
           }
+          state.selectedData.push(service as ExpandServiceVO)
+        } else {
+          state.isAddableData.push(service as ExpandServiceVO)
         }
       }
-      setDataByCurrent(state.selectedData)
-    } else {
-      state.selectedData = [...selectedServices.value]
     }
+
+    setDataByCurrent(state.selectedData)
   }
 
   onActivated(async () => {
     spinning.value = true
-    addInstalledSymbolForSelectedServices(checkSelectedServicesOnlyInstalled.value).finally(() => {
+    markSelectedAsInstalled(checkIfInstalled.value).finally(() => {
       spinning.value = false
     })
   })
@@ -254,7 +264,7 @@
       </a-list>
     </a-spin>
     <a-divider type="vertical" class="divider" />
-    <div>
+    <a-spin :spinning="spinning">
       <div class="list-title">
         <div>{{ $t('service.pending_installation_services') }}</div>
       </div>
@@ -294,7 +304,7 @@
           </a-list-item>
         </template>
       </a-list>
-    </div>
+    </a-spin>
   </div>
 </template>
 

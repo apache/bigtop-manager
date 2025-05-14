@@ -39,6 +39,17 @@ export const useServiceStore = defineStore(
       )
     })
 
+    const serviceFlatMap = computed(() => {
+      const result: Record<string, ServiceVO> = {}
+
+      for (const services of Object.values(serviceMap.value)) {
+        for (const service of services) {
+          result[service.id!] = service
+        }
+      }
+      return result
+    })
+
     const getServices = async (clusterId: number, filterParams?: ServiceListParams) => {
       try {
         loading.value = true
@@ -92,6 +103,7 @@ export const useServiceStore = defineStore(
       loading,
       serviceNames,
       locateStackWithService,
+      serviceFlatMap,
       getServices,
       getServiceDetail,
       getServicesOfInfra,

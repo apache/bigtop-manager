@@ -36,13 +36,6 @@ interface ProcessResult {
   conflictService?: ExpandServiceVO
 }
 
-interface RouteParams {
-  service: string
-  serviceId: number
-  id: number
-  cluster: string
-}
-
 interface CompItem extends ComponentVO {
   hosts: HostVO[]
 }
@@ -86,7 +79,7 @@ const useCreateService = () => {
   const clusterId = computed(() => Number(route.params.id))
   const creationMode = computed(() => route.params.creationMode as 'internal' | 'public')
   const creationModeType = computed(() => route.params.type)
-  const routeParams = computed(() => route.params as unknown as RouteParams)
+  const serviceId = computed(() => Number(route.params.serviceId))
 
   const commandRequest = ref<CommandRequest>({
     command: 'Add',
@@ -323,6 +316,7 @@ const useCreateService = () => {
   return {
     steps,
     clusterId,
+    serviceId,
     current,
     stepsLimit,
     selectedServices,
@@ -335,7 +329,6 @@ const useCreateService = () => {
     scope,
     creationMode,
     creationModeType,
-    routeParams,
     allCompsMeta,
     setDataByCurrent,
     addComponentForService,

@@ -56,8 +56,8 @@ export const useMenuStore = defineStore(
         siderMenuSelectedKey.value = siderMenus.value[0].redirect
       } else {
         if (clusterList.value.length > 0) {
-          const { id, name } = clusterList.value[0]
-          onSiderClick(`${routePathFromClusters.value}/${name}/${id}`)
+          const { id } = clusterList.value[0]
+          onSiderClick(`${routePathFromClusters.value}/${id}`)
         } else {
           onSiderClick(`${routePathFromClusters.value}/default`)
         }
@@ -76,9 +76,9 @@ export const useMenuStore = defineStore(
 
     const updateSider = async () => {
       await clusterStore.loadClusters()
-      const { id, name } = clusterList.value[clusterList.value.length - 1]
+      const { id } = clusterList.value[clusterList.value.length - 1]
       await nextTick()
-      onSiderClick(`${routePathFromClusters.value}/${name}/${id}`)
+      onSiderClick(`${routePathFromClusters.value}/${id}`)
     }
 
     const setupMenu = async () => {
