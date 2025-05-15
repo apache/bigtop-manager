@@ -52,7 +52,7 @@ export const useMenuStore = defineStore(
 
     const setupSider = () => {
       siderMenus.value = baseRoutesMap.value[headerSelectedKey.value]?.children || []
-      if (siderMenus.value[0].redirect) {
+      if (siderMenus.value[0]?.redirect) {
         siderMenuSelectedKey.value = siderMenus.value[0].redirect
       } else {
         if (clusterList.value.length > 0) {

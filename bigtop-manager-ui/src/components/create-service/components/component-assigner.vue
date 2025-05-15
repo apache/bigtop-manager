@@ -26,6 +26,7 @@
   import useCreateService from './use-create-service'
   import useBaseTable from '@/composables/use-base-table'
   import TreeSelector from './tree-selector.vue'
+  // import { isValidCardinality } from '@/utils/tools'
   import type { FilterConfirmProps, FilterResetProps, TableRowSelection } from 'ant-design-vue/es/table/interface'
   import type { Key } from 'ant-design-vue/es/_util/type'
 
@@ -56,6 +57,7 @@
     creationModeType,
     selectedServices,
     updateHostsForComponent
+    // getCardinalityOfComponent
   } = useCreateService()
 
   const serviceList = computed(() =>
@@ -142,6 +144,12 @@
   }
 
   const getCheckboxProps: TableRowSelection['getCheckboxProps'] = (record) => {
+    // let checkInstallLimit = true
+    // const { name, hosts } = currCompInfo.value!
+    // const cardinality = getCardinalityOfComponent(name!)
+    // if (cardinality && hosts) {
+    //   checkInstallLimit = isValidCardinality(cardinality, hosts.length)
+    // }
     return {
       disabled: validateHostIsCheck(record),
       name: record.hostname

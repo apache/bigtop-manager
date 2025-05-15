@@ -21,7 +21,7 @@ import { computed, ComputedRef, createVNode, effectScope, Ref, ref, watch } from
 import { message, Modal } from 'ant-design-vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
-import { ExpandServiceVO, useStackStore } from '@/store/stack'
+import { ComponentMap, ExpandServiceVO, useStackStore } from '@/store/stack'
 import { useServiceStore } from '@/store/service'
 import { execCommand } from '@/api/command'
 import useSteps from '@/composables/use-steps'
@@ -90,10 +90,9 @@ const useCreateService = () => {
   const allComps = computed(() => {
     return new Map(
       selectedServices.value.flatMap((s) =>
-        s.components!.map((comp) => [
-          comp.name,
-          { serviceName: s.name, serviceDisplayName: s.displayName, serviceId: s.id, ...comp }
-        ])
+        s.components!.map((comp) => {
+          return [comp.name, { serviceName: s.name, serviceDisplayName: s.displayName, serviceId: s.id, ...comp }]
+        })
       )
     ) as Map<string, CompItem>
   })
@@ -313,6 +312,11 @@ const useCreateService = () => {
     }
   }
 
+  const getCardinalityOfComponent = (componentName: string) => {
+    const { cardinality } = useStackStore().stackRelationMap?.components[componentName] as ComponentMap
+    return cardinality
+  }
+
   return {
     steps,
     clusterId,
@@ -336,7 +340,8 @@ const useCreateService = () => {
     confirmServiceDependencies,
     createService,
     previousStep,
-    nextStep
+    nextStep,
+    getCardinalityOfComponent
   }
 }
 

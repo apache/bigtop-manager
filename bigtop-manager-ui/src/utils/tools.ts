@@ -113,3 +113,25 @@ export const processData = (data: Data): Result => {
   }
   return result
 }
+
+export const isValidCardinality = (cardinality: string, count: number): boolean => {
+  if (/^\d+$/.test(cardinality)) {
+    const expected = parseInt(cardinality, 10)
+    return count === expected
+  }
+
+  if (/^\d+-\d+$/.test(cardinality)) {
+    const [minStr, maxStr] = cardinality.split('-')
+    const min = parseInt(minStr, 10)
+    const max = parseInt(maxStr, 10)
+    return count >= min && count <= max
+  }
+
+  if (/^\d+\+$/.test(cardinality)) {
+    const min = parseInt(cardinality.slice(0, -1), 10)
+    return count >= min
+  }
+
+  console.warn(`Unrecognized cardinality format: ${cardinality}`)
+  return false
+}

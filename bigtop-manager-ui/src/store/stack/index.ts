@@ -25,18 +25,20 @@ import type { ServiceConfig, ServiceVO } from '@/api/service/types'
 import type { StackVO } from '@/api/stack/types'
 
 export type ExpandServiceVO = ServiceVO & { order: number }
+export type ServiceMap = {
+  displayName: string
+  stack: string
+  components: string[]
+  configs: ServiceConfig
+  requiredServices: string[]
+}
+export type ComponentMap = {
+  service: string
+  stack: string
+} & ComponentVO
 export interface StackRelationMap {
-  services: {
-    displayName: string
-    stack: string
-    components: string[]
-    configs: ServiceConfig
-    requiredServices: string[]
-  }
-  components: {
-    service: string
-    stack: string
-  } & ComponentVO
+  services: ServiceMap
+  components: ComponentMap
 }
 
 export const useStackStore = defineStore(
