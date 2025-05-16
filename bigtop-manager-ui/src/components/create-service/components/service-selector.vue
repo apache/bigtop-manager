@@ -21,6 +21,7 @@
   import { computed, onActivated, reactive, ref, shallowRef, toRefs } from 'vue'
   import { usePngImage } from '@/utils/tools'
   import useCreateService from './use-create-service'
+  import { useStackStore } from '@/store/stack'
   import type { ExpandServiceVO } from '@/store/stack'
   import type { ComponentVO } from '@/api/component/types.ts'
   import type { ServiceVO } from '@/api/service/types'
@@ -30,6 +31,7 @@
     selectedData: ExpandServiceVO[]
   }
 
+  const stackStore = useStackStore()
   const searchStr = ref('')
   const spinning = ref(false)
   const licenseOfConflictService = shallowRef(['AGPL-3.0', 'GPLv2'])
@@ -119,7 +121,8 @@
         if (!acc[name!]) {
           acc[name!] = {
             ...item,
-            hosts: [{ hostname, name: hostname, displayName: hostname }]
+            hosts: [{ hostname, name: hostname, displayName: hostname }],
+            cardinality: stackStore.stackRelationMap?.components[item.name!].cardinality
           }
         } else {
           acc[name!].hosts.push({ hostname, name: hostname, displayName: hostname })

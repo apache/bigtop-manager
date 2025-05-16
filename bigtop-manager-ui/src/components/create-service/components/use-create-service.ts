@@ -21,7 +21,7 @@ import { computed, ComputedRef, createVNode, effectScope, Ref, ref, watch } from
 import { message, Modal } from 'ant-design-vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
-import { ComponentMap, ExpandServiceVO, useStackStore } from '@/store/stack'
+import { ExpandServiceVO, useStackStore } from '@/store/stack'
 import { useServiceStore } from '@/store/service'
 import { execCommand } from '@/api/command'
 import useSteps from '@/composables/use-steps'
@@ -312,9 +312,34 @@ const useCreateService = () => {
     }
   }
 
-  const getCardinalityOfComponent = (componentName: string) => {
-    const { cardinality } = useStackStore().stackRelationMap?.components[componentName] as ComponentMap
-    return cardinality
+  const validCardinality = (cardinality: string, count: number, displayName: string): boolean => {
+    if (/^\d+$/.test(cardinality)) {
+      const expected = parseInt(cardinality, 10)
+      if (count != expected) {
+        message.error(t('service.exact', [displayName, expected]))
+        return false
+      }
+    }
+
+    if (/^\d+-\d+$/.test(cardinality)) {
+      const [minStr, maxStr] = cardinality.split('-')
+      const min = parseInt(minStr, 10)
+      const max = parseInt(maxStr, 10)
+      if (count < min || count > max) {
+        message.error(t('service.range', [displayName, min, max]))
+        return false
+      }
+    }
+
+    if (/^\d+\+$/.test(cardinality)) {
+      const min = parseInt(cardinality.slice(0, -1), 10)
+      if (count < min) {
+        message.error(t('service.minOnly', [displayName, min]))
+        return false
+      }
+    }
+
+    return true
   }
 
   return {
@@ -341,7 +366,7 @@ const useCreateService = () => {
     createService,
     previousStep,
     nextStep,
-    getCardinalityOfComponent
+    validCardinality
   }
 }
 

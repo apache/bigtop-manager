@@ -26,7 +26,6 @@
   import useCreateService from './use-create-service'
   import useBaseTable from '@/composables/use-base-table'
   import TreeSelector from './tree-selector.vue'
-  // import { isValidCardinality } from '@/utils/tools'
   import type { FilterConfirmProps, FilterResetProps, TableRowSelection } from 'ant-design-vue/es/table/interface'
   import type { Key } from 'ant-design-vue/es/_util/type'
 
@@ -56,8 +55,8 @@
     allCompsMeta,
     creationModeType,
     selectedServices,
-    updateHostsForComponent
-    // getCardinalityOfComponent
+    updateHostsForComponent,
+    validCardinality
   } = useCreateService()
 
   const serviceList = computed(() =>
@@ -144,12 +143,6 @@
   }
 
   const getCheckboxProps: TableRowSelection['getCheckboxProps'] = (record) => {
-    // let checkInstallLimit = true
-    // const { name, hosts } = currCompInfo.value!
-    // const cardinality = getCardinalityOfComponent(name!)
-    // if (cardinality && hosts) {
-    //   checkInstallLimit = isValidCardinality(cardinality, hosts.length)
-    // }
     return {
       disabled: validateHostIsCheck(record),
       name: record.hostname
@@ -157,8 +150,18 @@
   }
 
   const onSelectChange: TableRowSelection['onChange'] = (selectedRowKeys, selectedRows) => {
-    allComps.value.has(currComp.value.split('/').at(-1)!) && updateHostsForComponent(currComp.value, selectedRows)
-    state.selectedRowKeys = selectedRowKeys
+    const { cardinality, displayName } = currCompInfo.value || {}
+    const newCount = selectedRowKeys.length
+    const compKey = currComp.value.split('/').at(-1)!
+    const shouldValidate = !!cardinality
+    const isValid = !shouldValidate || validCardinality(cardinality, newCount, displayName || '')
+
+    if (isValid) {
+      state.selectedRowKeys = selectedRowKeys
+      if (allComps.value.has(compKey)) {
+        updateHostsForComponent(currComp.value, selectedRows)
+      }
+    }
   }
 
   const resetSelectedRowKeys = (key: string) => {

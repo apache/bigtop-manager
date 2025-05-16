@@ -38,5 +38,8 @@ export default {
   snapshot_management: '快照管理',
   snapshot_name: '快照名',
   snapshot_description: '快照描述',
-  snapshot_notes: '快照备注'
+  snapshot_notes: '快照备注',
+  exact: '{0} 需要 {1} 个主机',
+  range: '{0} 需要 {1} 到 {2} 个主机',
+  minOnly: '{0} 至少需要 {1} 个主机'
 }

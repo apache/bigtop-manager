@@ -38,5 +38,8 @@ export default {
   snapshot_management: 'Snapshot Management',
   snapshot_name: 'Name',
   snapshot_description: 'Description',
-  snapshot_notes: 'Snapshot Notes'
+  snapshot_notes: 'Snapshot Notes',
+  exact: '{0} requires exactly {1} host(s).',
+  range: '{0} requires between {1} and {2} host(s).',
+  minOnly: '{0} requires at least {1} host(s).'
 }

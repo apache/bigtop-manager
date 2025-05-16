@@ -35,7 +35,6 @@
     stepsLimit,
     steps,
     allComps,
-    allCompsMeta,
     creationModeType,
     afterCreateRes,
     selectedServices,
@@ -44,19 +43,11 @@
     nextStep,
     createService,
     confirmServiceDependencies,
-    addComponentForService
+    addComponentForService,
+    validCardinality
   } = useCreateService()
   const compRef = ref<any>()
   const currComp = computed(() => components.value[current.value])
-  const noUninstallComponent = computed(() => {
-    return (
-      current.value === 1 &&
-      creationModeType.value === 'component' &&
-      Array.from(allComps.value).every(
-        ([compName, { hosts }]) => hosts.length === allCompsMeta.value.get(compName)?.hosts?.length
-      )
-    )
-  })
 
   const validateServiceSelection = async () => {
     if (creationModeType.value === 'component') {
@@ -89,12 +80,17 @@
   }
 
   const validateComponentAssignments = () => {
-    const allComponents = Array.from(allComps.value.values())
-    const isValid = allComponents.every((comp) => comp?.hosts?.length > 0)
-    if (!isValid) {
-      message.error(t('service.component_host_assignment'))
+    let valid = true
+    for (const info of allComps.value.values()) {
+      if (!info.cardinality) {
+        continue
+      }
+      valid = validCardinality(info.cardinality, info.hosts.length, info.displayName!)
+      if (!valid) {
+        return
+      }
     }
-    return isValid
+    return valid
   }
 
   const stepValidators = [validateServiceSelection, validateComponentAssignments, () => true, () => true]
@@ -147,7 +143,7 @@
             {{ $t('common.prev') }}
           </a-button>
           <template v-if="current >= 0 && current <= stepsLimit - 1">
-            <a-button :disabled="noUninstallComponent" type="primary" @click="proceedToNextStep">
+            <a-button :disabled="false" type="primary" @click="proceedToNextStep">
               {{ $t('common.next') }}
             </a-button>
           </template>
