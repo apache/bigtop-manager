@@ -32,5 +32,7 @@ public interface ComponentDao extends BaseDao<ComponentPO> {
 
     List<ComponentPO> findByQuery(@Param("query") ComponentQuery query);
 
+    ComponentPO findByNameAndHostname(@Param("name") String name, @Param("hostname") String hostname);
+
     ComponentPO findDetailsById(@Param("id") Long id);
 }

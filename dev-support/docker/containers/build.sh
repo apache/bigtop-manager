@@ -48,14 +48,13 @@ build() {
 
 destroy() {
   log "Destroy Containers!!!"
-  docker rm -f $(docker network inspect bigtop-manager -f '{{range .Containers}}{{.Name}}{{" "}}{{end}}')
-  docker network rm bigtop-manager
+  docker rm -f $(docker ps -q --filter network=bigtop-manager --filter "name=^bm-")
   exit 0
 }
 
 create() {
   log "Create Containers!!!"
-  docker network create --driver bridge bigtop-manager
+  docker network inspect bigtop-manager >/dev/null 2>&1 || docker network create --driver bridge bigtop-manager
   create_db
   create_container
 }
@@ -75,6 +74,7 @@ create_container() {
       docker run -itd --name ${container_name} --hostname ${container_name} --network bigtop-manager --cap-add=SYS_TIME bigtop-manager/develop:${OS}
     fi
 
+    docker cp ../../../bigtop-manager-dist/target/apache-bigtop-manager-*-agent.tar.gz ${container_name}:/opt/bigtop-manager-agent.tar.gz
     docker exec ${container_name} bash -c "mkdir -p /root/.ssh && echo '$SERVER_PUB_KEY' > /root/.ssh/authorized_keys"
     docker exec ${container_name} ssh-keygen -N '' -t rsa -b 2048 -f /etc/ssh/ssh_host_rsa_key
     docker exec ${container_name} ssh-keygen -N '' -t ecdsa -b 256 -f /etc/ssh/ssh_host_ecdsa_key

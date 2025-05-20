@@ -23,7 +23,6 @@ import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.po.ServicePO;
-import org.apache.bigtop.manager.dao.query.ComponentQuery;
 import org.apache.bigtop.manager.server.command.helper.ComponentStageHelper;
 import org.apache.bigtop.manager.server.command.job.JobContext;
 import org.apache.bigtop.manager.server.enums.HealthyStatusEnum;
@@ -142,9 +141,7 @@ public class ComponentAddJob extends AbstractComponentJob {
     }
 
     private Boolean checkComponentInstalled(String componentName, String hostname) {
-        ComponentQuery query =
-                ComponentQuery.builder().name(componentName).hostname(hostname).build();
-        List<ComponentPO> componentPOList = componentDao.findByQuery(query);
-        return componentPOList.size() == 1;
+        ComponentPO componentPO = componentDao.findByNameAndHostname(componentName, hostname);
+        return componentPO != null;
     }
 }
