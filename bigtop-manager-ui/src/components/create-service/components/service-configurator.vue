@@ -19,10 +19,12 @@
 
 <script setup lang="ts">
   import { computed, onActivated, onDeactivated, ref, shallowRef, watch } from 'vue'
+  import { storeToRefs } from 'pinia'
   import { debounce } from 'lodash'
   import { Empty } from 'ant-design-vue'
   import TreeSelector from './tree-selector.vue'
-  import useCreateService from './use-create-service'
+  import { useServiceCreateStore } from '@/store/service-create'
+  import { useServiceStore } from '@/store/service'
   import type { ServiceConfigReq } from '@/api/command/types'
   import type { ComponentVO } from '@/api/component/types'
   import type { Key } from 'ant-design-vue/es/_util/type'
@@ -36,7 +38,9 @@
     isView: false
   })
 
-  const { clusterId, serviceStore, selectedServices } = useCreateService()
+  const createStore = useServiceCreateStore()
+  const serviceStore = useServiceStore()
+  const { stepContext, selectedServices } = storeToRefs(createStore)
   const searchStr = ref('')
   const currService = ref<Key>('')
   const configs = ref<ServiceConfigReq[]>([])
@@ -65,8 +69,9 @@
 
   const serviceList = computed(() => selectedServices.value)
   const disabled = computed(() => {
+    const clusterId = stepContext.value.clusterId
     return serviceStore
-      .getInstalledNamesOrIdsOfServiceByKey(`${clusterId.value}`)
+      .getInstalledNamesOrIdsOfServiceByKey(`${clusterId}`)
       .includes(currService.value.toString().split('/').at(-1)!)
   })
 

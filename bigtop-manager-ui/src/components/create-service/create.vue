@@ -18,39 +18,28 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onUnmounted, ref, shallowRef } from 'vue'
+  import { computed, onUnmounted, ref, shallowRef, watch } from 'vue'
   import { message } from 'ant-design-vue'
   import { useI18n } from 'vue-i18n'
-  import useCreateService from './components/use-create-service'
+  import { storeToRefs } from 'pinia'
+  import { useRoute } from 'vue-router'
+  import { StepContext, useServiceCreateStore } from '@/store/service-create'
   import ServiceSelector from './components/service-selector.vue'
   import ComponentAssigner from './components/component-assigner.vue'
   import ServiceConfigurator from './components/service-configurator.vue'
   import ComponentInstaller from './components/component-installer.vue'
 
   const { t } = useI18n()
-  const components = shallowRef<any[]>([ServiceSelector, ComponentAssigner, ServiceConfigurator, ServiceConfigurator])
-  const {
-    scope,
-    current,
-    stepsLimit,
-    steps,
-    allComps,
-    creationModeType,
-    afterCreateRes,
-    selectedServices,
-    setDataByCurrent,
-    previousStep,
-    nextStep,
-    createService,
-    confirmServiceDependencies,
-    addComponentForService,
-    validCardinality
-  } = useCreateService()
+  const route = useRoute()
+  const createStore = useServiceCreateStore()
+  const { current, stepsLimit, stepContext, selectedServices, createdPayload } = storeToRefs(createStore)
+
   const compRef = ref<any>()
+  const components = shallowRef<any[]>([ServiceSelector, ComponentAssigner, ServiceConfigurator, ServiceConfigurator])
   const currComp = computed(() => components.value[current.value])
 
   const validateServiceSelection = async () => {
-    if (creationModeType.value === 'component') {
+    if (stepContext.value.type === 'component') {
       return true
     }
 
@@ -65,7 +54,7 @@
   const validateDependenciesOfServiceSelection = async () => {
     let selectedServiceNames = new Set(selectedServices.value.map((service) => service.name))
     for (const selectedService of selectedServices.value) {
-      const serviceDependencies = await confirmServiceDependencies('add', selectedService)
+      const serviceDependencies = await createStore.confirmServiceDependencyAction('add', selectedService)
       if (serviceDependencies.length === 0) {
         return false
       }
@@ -81,11 +70,11 @@
 
   const validateComponentAssignments = () => {
     let valid = true
-    for (const info of allComps.value.values()) {
+    for (const info of createStore.allComps.values()) {
       if (!info.cardinality) {
         continue
       }
-      valid = validCardinality(info.cardinality, info.hosts.length, info.displayName!)
+      valid = createStore.validCardinality(info.cardinality, info.hosts.length, info.displayName!)
       if (!valid) {
         return
       }
@@ -96,19 +85,36 @@
   const stepValidators = [validateServiceSelection, validateComponentAssignments, () => true, () => true]
 
   const proceedToNextStep = async () => {
-    if (current.value < 3) {
-      ;(await stepValidators[current.value]()) && nextStep()
+    const { type } = stepContext.value
+    if (current.value < 3 && (await stepValidators[current.value]())) {
+      createStore.nextStep()
     } else if (current.value === 3) {
-      const state = creationModeType.value === 'component' ? await addComponentForService() : await createService()
+      const action = type === 'component' ? createStore.attachComponentToService : createStore.createService
+      const state = await action()
       if (state) {
-        nextStep()
+        createStore.nextStep()
       }
     }
   }
 
+  const setupStepCtx = () => {
+    const { id: clusterId, serviceId, creationMode, type } = route.params as StepContext
+    createStore.setStepContext({ clusterId, serviceId, creationMode, type })
+  }
+
+  watch(
+    () => route,
+    () => {
+      createStore.$reset()
+      setupStepCtx()
+    },
+    {
+      immediate: true
+    }
+  )
+
   onUnmounted(() => {
-    scope.stop()
-    setDataByCurrent([])
+    createStore.$reset()
   })
 </script>
 
@@ -117,7 +123,7 @@
     <header-card>
       <div class="steps-wrp">
         <a-steps :current="current">
-          <a-step v-for="step in steps" :key="step" :disabled="true">
+          <a-step v-for="step in createStore.steps" :key="step" :disabled="true">
             <template #title>
               <span>{{ $t(step) }}</span>
             </template>
@@ -126,8 +132,8 @@
       </div>
     </header-card>
     <main-card>
-      <template v-for="stepItem in steps" :key="stepItem.title">
-        <div v-show="steps[current] === stepItem" class="step-title">
+      <template v-for="stepItem in createStore.steps" :key="stepItem.title">
+        <div v-show="createStore.steps[current] === stepItem" class="step-title">
           <h5>{{ $t(stepItem) }}</h5>
           <section :class="{ 'step-content': current < stepsLimit }"></section>
         </div>
@@ -135,11 +141,11 @@
       <keep-alive>
         <component :is="currComp" ref="compRef" :is-view="current === 3" />
       </keep-alive>
-      <component-installer v-if="current == stepsLimit" :step-data="afterCreateRes" />
+      <component-installer v-if="current == stepsLimit" :step-data="createdPayload" />
       <div class="step-action">
         <a-space>
           <a-button v-show="current != stepsLimit" @click="() => $router.go(-1)">{{ $t('common.exit') }}</a-button>
-          <a-button v-show="current > 0 && current < stepsLimit" type="primary" @click="previousStep">
+          <a-button v-show="current > 0 && current < stepsLimit" type="primary" @click="createStore.previousStep">
             {{ $t('common.prev') }}
           </a-button>
           <template v-if="current >= 0 && current <= stepsLimit - 1">

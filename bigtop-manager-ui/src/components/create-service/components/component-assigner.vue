@@ -18,14 +18,16 @@
 -->
 
 <script setup lang="ts">
-  import { useI18n } from 'vue-i18n'
   import { computed, onActivated, reactive, ref, shallowRef } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { TableColumnType, Empty } from 'ant-design-vue'
-  import { HostVO } from '@/api/hosts/types'
   import { getHosts } from '@/api/hosts'
-  import useCreateService from './use-create-service'
+  import { useServiceCreateStore } from '@/store/service-create'
+  import { useServiceStore } from '@/store/service'
+  import { storeToRefs } from 'pinia'
   import useBaseTable from '@/composables/use-base-table'
   import TreeSelector from './tree-selector.vue'
+  import type { HostVO } from '@/api/hosts/types'
   import type { FilterConfirmProps, FilterResetProps, TableRowSelection } from 'ant-design-vue/es/table/interface'
   import type { Key } from 'ant-design-vue/es/_util/type'
 
@@ -36,6 +38,10 @@
   }
 
   const { t } = useI18n()
+  const createStore = useServiceCreateStore()
+  const serviceStore = useServiceStore()
+  const { stepContext, selectedServices, allComps, allCompsMeta } = storeToRefs(createStore)
+
   const searchInputRef = ref()
   const currComp = ref<string>('')
   const fieldNames = shallowRef({
@@ -48,16 +54,6 @@
     searchedColumn: '',
     selectedRowKeys: []
   })
-  const {
-    clusterId,
-    serviceStore,
-    allComps,
-    allCompsMeta,
-    creationModeType,
-    selectedServices,
-    updateHostsForComponent,
-    validCardinality
-  } = useCreateService()
 
   const serviceList = computed(() =>
     selectedServices.value.map((v) => ({
@@ -68,7 +64,9 @@
 
   const currCompInfo = computed(() => allComps.value.get(currComp.value.split('/')[1]))
   const currCompInfoMeta = computed(() => allCompsMeta.value.get(currComp.value.split('/')[1]))
-  const installedServices = computed(() => serviceStore.getInstalledNamesOrIdsOfServiceByKey(`${clusterId.value}`))
+  const installedServices = computed(() =>
+    serviceStore.getInstalledNamesOrIdsOfServiceByKey(`${stepContext.value.clusterId}`)
+  )
   const hostsOfCurrComp = computed((): HostVO[] => {
     const temp = currComp.value.split('/').at(-1)
     return allComps.value.has(temp!) ? allComps.value.get(temp!)?.hosts ?? [] : []
@@ -116,7 +114,8 @@
       return
     }
     try {
-      const res = await getHosts({ ...filtersParams.value, clusterId: clusterId.value })
+      const { clusterId } = stepContext.value
+      const res = await getHosts({ ...filtersParams.value, clusterId })
       dataSource.value = res.content.map((v) => ({ ...v, name: v.id, displayName: v.hostname }))
       paginationProps.value.total = res.total
       loading.value = false
@@ -134,8 +133,9 @@
   })
 
   const validateHostIsCheck = (host: HostVO) => {
+    const { type } = stepContext.value
     const notAdd = currCompInfoMeta.value?.hosts.findIndex((v) => v.hostname === host.hostname) == -1
-    if (creationModeType.value === 'component') {
+    if (type === 'component') {
       return !currCompInfo.value?.uninstall && !notAdd
     } else {
       return installedServices.value.includes(currComp.value.split('/')[0]) && !notAdd
@@ -154,12 +154,12 @@
     const newCount = selectedRowKeys.length
     const compKey = currComp.value.split('/').at(-1)!
     const shouldValidate = !!cardinality
-    const isValid = !shouldValidate || validCardinality(cardinality, newCount, displayName || '')
+    const isValid = !shouldValidate || createStore.validCardinality(cardinality, newCount, displayName || '')
 
     if (isValid) {
       state.selectedRowKeys = selectedRowKeys
       if (allComps.value.has(compKey)) {
-        updateHostsForComponent(currComp.value, selectedRows)
+        createStore.setComponentHosts(currComp.value, selectedRows)
       }
     }
   }
