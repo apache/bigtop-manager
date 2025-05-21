@@ -34,6 +34,12 @@
             <directoryMode>0755</directoryMode>
         </fileSet>
         <fileSet>
+            <directory>${project.basedir}/../bigtop-manager-server/src/main/resources/scripts</directory>
+            <outputDirectory>scripts</outputDirectory>
+            <fileMode>0755</fileMode>
+            <directoryMode>0755</directoryMode>
+        </fileSet>
+        <fileSet>
             <directory>${project.basedir}/../bigtop-manager-server/src/main/resources</directory>
             <includes>
                 <include>*.yml</include>

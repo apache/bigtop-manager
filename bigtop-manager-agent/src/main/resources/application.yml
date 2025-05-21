@@ -30,7 +30,7 @@ server:
 
 grpc:
   server:
-    port: 8835
+    port: ${GRPC_PORT:8835}
 
 logging:
   level:

@@ -21,4 +21,9 @@ package org.apache.bigtop.manager.dao.repository;
 
 import org.apache.bigtop.manager.dao.po.ToolPO;
 
-public interface ToolDao extends BaseDao<ToolPO> {}
+import org.apache.ibatis.annotations.Param;
+
+public interface ToolDao extends BaseDao<ToolPO> {
+
+    ToolPO findByName(@Param("name") String name);
+}

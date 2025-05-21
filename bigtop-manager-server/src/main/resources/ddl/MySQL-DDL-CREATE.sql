@@ -381,6 +381,7 @@ WHERE `name` = 'DeepSeek';
 
 INSERT INTO tool (name, base_url, pkg_name, arch, checksum)
 VALUES
+('agent', 'http://your-repo/', 'bigtop-manager-agent.tar.gz', 'x86_64,aarch64', null),
 ('jdk8', 'https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u452-b09/', 'OpenJDK8U-jdk_x64_linux_hotspot_8u452b09.tar.gz', 'x86_64', 'SHA-256:9448308a21841960a591b47927cf2d44fdc4c0533a5f8111a4b243a6bafb5d27'),
 ('jdk8', 'https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u452-b09/', 'OpenJDK8U-jdk_aarch64_linux_hotspot_8u452b09.tar.gz', 'aarch64', 'SHA-256:d8a1aecea0913b7a1e0d737ba6f7ea99059b3f6fd17813d4a24e8b3fc3aee278'),
 ('mysql-connector-j', 'https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/8.0.33/', 'mysql-connector-j-8.0.33.jar', 'x86_64,aarch64', 'SHA-256:e2a3b2fc726a1ac64e998585db86b30fa8bf3f706195b78bb77c5f99bf877bd9');
