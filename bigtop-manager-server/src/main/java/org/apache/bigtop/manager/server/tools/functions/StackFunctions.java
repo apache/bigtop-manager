@@ -105,4 +105,11 @@ public class StackFunctions {
         functions.putAll(getServiceByName());
         return functions;
     }
+
+    public Map<ToolSpecification, ToolExecutor> getReadonlyFunctions() {
+        Map<ToolSpecification, ToolExecutor> functions = new HashMap<>();
+        functions.putAll(listStackAndService());
+        functions.putAll(getServiceByName());
+        return functions;
+    }
 }
