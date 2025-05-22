@@ -52,7 +52,7 @@ export interface CompItem extends ComponentVO {
   hosts: HostVO[]
 }
 
-export const useServiceCreateStore = defineStore(
+export const useCreateServiceStore = defineStore(
   'service-create',
   () => {
     const validations = useValidations()

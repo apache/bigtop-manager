@@ -23,7 +23,7 @@
   import { useI18n } from 'vue-i18n'
   import { storeToRefs } from 'pinia'
   import { useRoute } from 'vue-router'
-  import { StepContext, useServiceCreateStore } from '@/store/service-create'
+  import { StepContext, useCreateServiceStore } from '@/store/create-service'
   import ServiceSelector from './components/service-selector.vue'
   import ComponentAssigner from './components/component-assigner.vue'
   import ServiceConfigurator from './components/service-configurator.vue'
@@ -31,7 +31,7 @@
 
   const { t } = useI18n()
   const route = useRoute()
-  const createStore = useServiceCreateStore()
+  const createStore = useCreateServiceStore()
   const { current, stepsLimit, stepContext, selectedServices, createdPayload } = storeToRefs(createStore)
 
   const compRef = ref<any>()

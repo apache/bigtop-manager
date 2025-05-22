@@ -22,7 +22,7 @@
   import { useI18n } from 'vue-i18n'
   import { TableColumnType, Empty } from 'ant-design-vue'
   import { getHosts } from '@/api/hosts'
-  import { useServiceCreateStore } from '@/store/service-create'
+  import { useCreateServiceStore } from '@/store/create-service'
   import { useServiceStore } from '@/store/service'
   import { storeToRefs } from 'pinia'
   import useBaseTable from '@/composables/use-base-table'
@@ -38,7 +38,7 @@
   }
 
   const { t } = useI18n()
-  const createStore = useServiceCreateStore()
+  const createStore = useCreateServiceStore()
   const serviceStore = useServiceStore()
   const { stepContext, selectedServices, allComps, allCompsMeta } = storeToRefs(createStore)
 

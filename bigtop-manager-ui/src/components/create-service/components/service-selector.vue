@@ -22,7 +22,7 @@
   import { usePngImage } from '@/utils/tools'
   import { useStackStore } from '@/store/stack'
   import { useServiceStore } from '@/store/service'
-  import { useServiceCreateStore } from '@/store/service-create'
+  import { useCreateServiceStore } from '@/store/create-service'
   import { storeToRefs } from 'pinia'
   import type { ExpandServiceVO } from '@/store/stack'
   import type { ComponentVO } from '@/api/component/types.ts'
@@ -34,7 +34,7 @@
   }
 
   const stackStore = useStackStore()
-  const createStore = useServiceCreateStore()
+  const createStore = useCreateServiceStore()
   const serviceStore = useServiceStore()
   const searchStr = ref('')
   const spinning = ref(false)

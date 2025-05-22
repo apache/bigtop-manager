@@ -23,7 +23,7 @@
   import { debounce } from 'lodash'
   import { Empty } from 'ant-design-vue'
   import TreeSelector from './tree-selector.vue'
-  import { useServiceCreateStore } from '@/store/service-create'
+  import { useCreateServiceStore } from '@/store/create-service'
   import { useServiceStore } from '@/store/service'
   import type { ServiceConfigReq } from '@/api/command/types'
   import type { ComponentVO } from '@/api/component/types'
@@ -38,7 +38,7 @@
     isView: false
   })
 
-  const createStore = useServiceCreateStore()
+  const createStore = useCreateServiceStore()
   const serviceStore = useServiceStore()
   const { stepContext, selectedServices } = storeToRefs(createStore)
   const searchStr = ref('')
