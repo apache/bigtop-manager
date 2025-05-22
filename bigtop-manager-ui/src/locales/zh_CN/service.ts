@@ -32,10 +32,14 @@ export default {
   component_host_assignment: '每个组件至少分配一个主机',
   service_selection: '请选择需要安装的服务',
   dependencies_conflict_msg: '{0} 依赖于基础服务 {1}，请先前往安装',
-  dependencies_msg: '{0} 依赖于服务 {1}, 是否一起安装？',
+  dependencies_add_msg: '{0} 依赖于服务 {1}, 是否一起安装？',
+  dependencies_remove_msg: '{0} 依赖于服务 {1}, 是否一起移除？',
   capture_snapshot: '拍摄快照',
   snapshot_management: '快照管理',
   snapshot_name: '快照名',
   snapshot_description: '快照描述',
-  snapshot_notes: '快照备注'
+  snapshot_notes: '快照备注',
+  exact: '{0} 需要 {1} 个主机',
+  range: '{0} 需要 {1} 到 {2} 个主机',
+  minOnly: '{0} 至少需要 {1} 个主机'
 }

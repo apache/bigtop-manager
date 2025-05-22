@@ -24,9 +24,9 @@
   import { formatFromByte } from '@/utils/storage.ts'
   import { usePngImage } from '@/utils/tools'
   import { CommonStatus, CommonStatusTexts } from '@/enums/state.ts'
+  import { useServiceStore } from '@/store/service'
   import { useJobProgress } from '@/store/job-progress'
   import { useStackStore } from '@/store/stack'
-  import { useInstalledStore } from '@/store/installed'
   import { getComponentsByHost } from '@/api/hosts'
   import { Command } from '@/api/command/types'
   import CategoryChart from '@/pages/cluster-manage/cluster/components/category-chart.vue'
@@ -50,8 +50,8 @@
   const { hostInfo } = toRefs(props)
   const { t } = useI18n()
   const stackStore = useStackStore()
+  const serviceStore = useServiceStore()
   const jobProgressStore = useJobProgress()
-  const installedStore = useInstalledStore()
   const currTimeRange = ref<TimeRangeText>('15m')
   const statusColors = shallowRef<Record<HostStatusType, keyof typeof CommonStatusTexts>>({
     1: 'healthy',
@@ -133,9 +133,9 @@
 
   const handleHostOperate = async (item: MenuItem, component: ComponentVO) => {
     const { serviceName } = component
-    const installedServiceMap = Object.values(installedStore.installedServiceMap)
+    const installedServiceMap = Object.values(serviceStore.serviceMap)
       .flat()
-      .filter((v) => v.serviceName === serviceName)
+      .filter((v) => v.name === serviceName)
     if (installedServiceMap.length > 0) {
       try {
         await jobProgressStore.processCommand(

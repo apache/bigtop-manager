@@ -48,7 +48,7 @@
   const { t } = useI18n()
   const emits = defineEmits<Emits>()
   const clusterStore = useClusterStore()
-  const { clusters } = storeToRefs(clusterStore)
+  const { clusterMap } = storeToRefs(clusterStore)
   const installing = ref(false)
   const open = ref(false)
   const searchInputRef = ref()
@@ -60,7 +60,6 @@
     selectedRowKeys: []
   })
   const allInstallSuccess = computed(() => dataSource.value.every((v) => v.status === Status.Success))
-  const clusterNameMap = computed(() => new Map(clusters.value.map((v) => [v.id, v])))
   const columns = computed((): TableColumnType<HostReq & { status: string }>[] => [
     {
       title: t('host.hostname'),
@@ -312,8 +311,8 @@
         </template>
         <template #bodyCell="{ record, column }">
           <template v-if="column.key === 'clusterId'">
-            <span :title="`${clusterNameMap.get(record.clusterId)?.displayName}`">
-              {{ clusterNameMap.get(record.clusterId)?.displayName }}
+            <span :title="`${clusterMap[record.clusterId]?.displayName}`">
+              {{ clusterMap[record.clusterId]?.displayName }}
             </span>
           </template>
           <template v-if="column.key === 'status'">

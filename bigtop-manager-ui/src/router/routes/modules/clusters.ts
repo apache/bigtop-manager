@@ -50,7 +50,7 @@ const routes: RouteRecordRaw[] = [
           },
           {
             name: 'ClusterDetail',
-            path: ':cluster/:id',
+            path: ':id',
             component: () => import('@/pages/cluster-manage/cluster/index.vue'),
             meta: {
               hidden: true
@@ -66,7 +66,7 @@ const routes: RouteRecordRaw[] = [
           },
           {
             name: 'CreateService',
-            path: ':cluster/:id/create-service/:creationMode?',
+            path: ':id/create-service/:creationMode?',
             component: () => import('@/components/create-service/create.vue'),
             meta: {
               hidden: true
@@ -74,7 +74,7 @@ const routes: RouteRecordRaw[] = [
           },
           {
             name: 'ServiceDetail',
-            path: ':cluster/:id/service-detail/:service/:serviceId',
+            path: ':id/service-detail/:serviceId',
             component: () => import('@/components/service-management/index.vue'),
             meta: {
               hidden: true
@@ -82,7 +82,7 @@ const routes: RouteRecordRaw[] = [
           },
           {
             name: 'CreateComponent',
-            path: ':cluster/:id/create-component/:service/:serviceId/:creationMode?/:type',
+            path: ':id/create-component/:serviceId/:creationMode?/:type',
             component: () => import('@/components/create-service/create.vue'),
             meta: {
               hidden: true
@@ -119,7 +119,7 @@ const routes: RouteRecordRaw[] = [
           },
           {
             name: 'InfraServiceDetail',
-            path: 'create-infra-service/service-detail/:id/:cluster/:service/:serviceId',
+            path: 'create-infra-service/service-detail/:id/:serviceId',
             component: () => import('@/components/service-management/index.vue'),
             meta: {
               hidden: true,
@@ -128,7 +128,7 @@ const routes: RouteRecordRaw[] = [
           },
           {
             name: 'CreateInfraComponent',
-            path: '/create-infra-service/create-infra-component/:id/:cluster/:service/:serviceId/:creationMode/:type',
+            path: '/create-infra-service/create-infra-component/:id/:serviceId/:creationMode/:type',
             component: () => import('@/components/create-service/create.vue'),
             meta: {
               hidden: true,

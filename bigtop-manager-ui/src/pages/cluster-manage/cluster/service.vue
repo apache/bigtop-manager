@@ -139,7 +139,7 @@
   const viewServiceDetail = (payload: ServiceVO) => {
     router.push({
       name: 'ServiceDetail',
-      params: { service: payload.name, serviceId: payload.id }
+      params: { serviceId: payload.id }
     })
   }
 

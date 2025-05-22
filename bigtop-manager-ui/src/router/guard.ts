@@ -20,8 +20,9 @@
 import type { NavigationGuardNext, Router } from 'vue-router'
 import { useClusterStore } from '@/store/cluster'
 function setCommonGuard(router: Router) {
-  router.beforeEach(async (to, from, next) => {
-    if (to.name === 'Clusters' && from.name !== 'Login') {
+  const token = localStorage.getItem('Token') ?? sessionStorage.getItem('Token') ?? undefined
+  router.beforeEach(async (to, _from, next) => {
+    if (to.name === 'Clusters' && token) {
       checkClusterSelect(next)
     } else {
       next()
