@@ -45,6 +45,7 @@
         <janino.version>3.0.16</janino.version>
         <jaxb-runtime.version>4.0.4</jaxb-runtime.version>
         <commons-text.version>1.11.0</commons-text.version>
+        <password4j.version>1.8.3</password4j.version>
         <prometheus-java-client.version>1.0.0</prometheus-java-client.version>
         <oshi-core.version>6.4.11</oshi-core.version>
         <micrometer.version>1.12.4</micrometer.version>
@@ -159,6 +160,12 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-text</artifactId>
                 <version>${commons-text.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.password4j</groupId>
+                <artifactId>password4j</artifactId>
+                <version>${password4j.version}</version>
             </dependency>
 
             <!-- prometheus java client -->

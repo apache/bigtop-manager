@@ -26,8 +26,12 @@ import org.apache.bigtop.manager.server.model.dto.LoginDTO;
 import org.apache.bigtop.manager.server.model.vo.LoginVO;
 import org.apache.bigtop.manager.server.service.LoginService;
 import org.apache.bigtop.manager.server.utils.JWTUtils;
+import org.apache.bigtop.manager.server.utils.RSAUtils;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import com.password4j.Password;
 
 import jakarta.annotation.Resource;
 
@@ -37,10 +41,21 @@ public class LoginServiceImpl implements LoginService {
     @Resource
     private UserDao userDao;
 
+    @Value("${encrypt.private-key}")
+    private String privateKey;
+
     @Override
     public LoginVO login(LoginDTO loginDTO) {
         UserPO userPO = userDao.findByUsername(loginDTO.getUsername());
-        if (userPO == null || !loginDTO.getPassword().equalsIgnoreCase(userPO.getPassword())) {
+
+        String rawPassword;
+        try {
+            rawPassword = RSAUtils.decrypt(loginDTO.getPassword(), privateKey);
+        } catch (Exception e) {
+            throw new ApiException(ApiExceptionEnum.INCORRECT_USERNAME_OR_PASSWORD);
+        }
+
+        if (userPO == null || !Password.check(rawPassword, userPO.getPassword()).withBcrypt()) {
             throw new ApiException(ApiExceptionEnum.INCORRECT_USERNAME_OR_PASSWORD);
         }
 
