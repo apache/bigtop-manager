@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { computed, ref, shallowRef, toRefs } from 'vue'
+import { computed, ref, shallowRef } from 'vue'
 import { defineStore } from 'pinia'
 import useSteps from '@/composables/use-steps'
 import { useValidations } from './validation'
@@ -72,13 +72,12 @@ export const useCreateServiceStore = defineStore(
       commandLevel: 'service'
     })
     const { current, stepsLimit, previousStep, nextStep } = useSteps(steps.value)
-    const { creationMode, clusterId } = toRefs(stepContext.value)
-
     const infraServices = computed(() => stackStore.getServicesByExclude(['bigtop', 'extra']) as ExpandServiceVO[])
     const excludeInfraServices = computed(() => stackStore.getServicesByExclude(['infra']))
     const infraServiceNames = computed(() => infraServices.value.map((v) => v.name!))
     const processedServices = computed(() => new Set(selectedServices.value.map((v) => v.name)))
-    const currentClusterId = computed(() => (creationMode.value === 'internal' ? clusterId.value : 0))
+    const creationMode = computed(() => stepContext.value.creationMode)
+    const currentClusterId = computed(() => (creationMode.value === 'internal' ? stepContext.value.clusterId : 0))
 
     const allComps = computed(() => {
       return new Map(

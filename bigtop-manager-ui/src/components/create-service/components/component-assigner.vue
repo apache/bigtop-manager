@@ -153,12 +153,15 @@
     const { cardinality, displayName } = currCompInfo.value || {}
     const newCount = selectedRowKeys.length
     const compKey = currComp.value.split('/').at(-1)!
+    const isInAllComps = allComps.value.has(compKey)
     const shouldValidate = !!cardinality
     const isValid = !shouldValidate || createStore.validCardinality(cardinality, newCount, displayName || '')
 
-    if (isValid) {
+    const isDeselecting = newCount < state.selectedRowKeys.length
+
+    if (isValid || isDeselecting) {
       state.selectedRowKeys = selectedRowKeys
-      if (allComps.value.has(compKey)) {
+      if (isInAllComps) {
         createStore.setComponentHosts(currComp.value, selectedRows)
       }
     }

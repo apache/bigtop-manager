@@ -121,7 +121,7 @@
   }
 
   const addService: GroupItem['clickEvent'] = () => {
-    router.push({ name: 'CreateService', params: { creationMode: 'internal' } })
+    router.push({ name: 'CreateService', params: { id: currCluster.value.id, creationMode: 'internal' } })
   }
 
   onMounted(() => {

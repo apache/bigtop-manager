@@ -149,10 +149,6 @@
   ) => {
     const inherent = inherentServices.find((v) => v.name === targetServiceName.value)!
     const installed = { ...installedServiceMap.get(targetServiceName.value)! }
-
-    console.log('installed', installed)
-    console.log('inherent', inherent)
-
     const mergedComponentsMap = new Map(
       (installed.components ?? []).map((component) => [component.name, { ...component }])
     )
