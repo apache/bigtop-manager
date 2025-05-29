@@ -32,8 +32,7 @@
   const router = useRouter()
   const activeKey = ref('1')
   const currCluster = shallowRef<ClusterVO>({
-    id: 0,
-    name: '0'
+    id: 0
   })
 
   const tabs = computed((): TabItem[] => [
@@ -62,7 +61,7 @@
   })
 
   const addService: GroupItem['clickEvent'] = () => {
-    router.push({ name: 'CreateInfraService', params: { id: 0, cluster: 0, creationMode: 'public' } })
+    router.push({ name: 'CreateInfraService', params: { id: 0, creationMode: 'public' } })
   }
 </script>
 
