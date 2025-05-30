@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { onActivated, inject, useAttrs, shallowRef, ref, onDeactivated, ComputedRef } from 'vue'
+  import { onActivated, inject, useAttrs, shallowRef, ref, onDeactivated } from 'vue'
   import { debounce } from 'lodash'
   import { useI18n } from 'vue-i18n'
   import { Empty, message } from 'ant-design-vue'
@@ -27,16 +27,8 @@
   import SnapshotManagement from './components/snapshot-management.vue'
   import type { Property, ServiceConfig, ServiceVO } from '@/api/service/types'
 
-  interface ServieceInfo {
-    cluster: string
-    id: number
-    service: string
-    serviceId: number
-  }
-
-  const { routeParams }: { routeParams: ComputedRef<ServieceInfo> } = inject('service') as any
-  const attrs = useAttrs() as unknown as ServiceVO
   const { t } = useI18n()
+  const attrs = useAttrs() as unknown as Required<ServiceVO> & { clusterId: number }
   const getServiceDetail = inject('getServiceDetail') as () => any
   const searchStr = ref('')
   const loading = ref(false)
@@ -99,9 +91,9 @@
 
   const saveConfigs = async () => {
     try {
-      const { serviceId, id: clusterId } = routeParams.value
+      const { id, clusterId } = attrs
       loading.value = true
-      const data = await updateServiceConfigs({ id: serviceId, clusterId }, [...configs.value])
+      const data = await updateServiceConfigs({ id, clusterId }, [...configs.value])
       if (data) {
         message.success(t('common.update_success'))
         getServiceDetail()
@@ -114,13 +106,13 @@
   }
 
   const onCaptureSnapshot = () => {
-    const { serviceId, id: clusterId } = routeParams.value
-    captureRef.value?.handleOpen({ id: serviceId, clusterId })
+    const { id, clusterId } = attrs
+    captureRef.value?.handleOpen({ id, clusterId })
   }
 
   const openSnapshotManagement = () => {
-    const { serviceId, id: clusterId } = routeParams.value
-    snapshotRef.value?.handleOpen({ id: serviceId, clusterId })
+    const { id, clusterId } = attrs
+    snapshotRef.value?.handleOpen({ id, clusterId })
   }
 
   onActivated(async () => {

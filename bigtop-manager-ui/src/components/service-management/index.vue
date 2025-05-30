@@ -32,10 +32,8 @@
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { ServiceVO } from '@/api/service/types'
 
-  interface ServieceInfo {
-    cluster: string
+  interface RouteParams {
     id: number
-    service: string
     serviceId: number
   }
 
@@ -43,10 +41,10 @@
   const route = useRoute()
   const serviceStore = useServiceStore()
   const jobProgressStore = useJobProgress()
-  const { loading } = storeToRefs(serviceStore)
+  const { loading, serviceMap } = storeToRefs(serviceStore)
   const activeKey = ref('1')
   const serviceDetail = shallowRef<ServiceVO>()
-  const routeParams = computed(() => route.params as unknown as ServieceInfo)
+  const routeParams = computed(() => route.params as unknown as RouteParams)
   const tabs = computed((): TabItem[] => [
     {
       key: '1',
@@ -90,13 +88,15 @@
   })
 
   const dropdownMenuClick: GroupItem['dropdownMenuClickEvent'] = async ({ key }) => {
+    const { id: clusterId, serviceId } = routeParams.value
+    const serviceName = serviceMap.value[clusterId].filter((service) => Number(serviceId) === service.id)[0].name!
     try {
       await jobProgressStore.processCommand(
         {
           command: key as keyof typeof Command,
-          clusterId: routeParams.value.id,
+          clusterId,
           commandLevel: 'service',
-          serviceCommands: [{ serviceName: routeParams.value.service, installed: true }]
+          serviceCommands: [{ serviceName, installed: true }]
         },
         getServiceDetail
       )
@@ -118,7 +118,6 @@
   }
 
   provide('getServiceDetail', getServiceDetail)
-  provide('service', { routeParams })
 
   onMounted(() => {
     getServiceDetail()
@@ -136,7 +135,7 @@
     <main-card v-model:active-key="activeKey" :tabs="tabs">
       <template #tab-item>
         <keep-alive>
-          <component :is="getCompName" v-bind="serviceDetail"></component>
+          <component :is="getCompName" v-bind="{ ...serviceDetail, clusterId: routeParams.id }"></component>
         </keep-alive>
       </template>
     </main-card>

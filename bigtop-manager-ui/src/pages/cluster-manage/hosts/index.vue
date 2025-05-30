@@ -55,7 +55,7 @@
     selectedRowKeys: []
   })
   const filtersOfClusterDisplayName = computed(() =>
-    clusterStore.clusters.map((v) => ({
+    Object.values(clusterStore.clusterMap).map((v) => ({
       text: v.displayName || v.name,
       value: v.id!
     }))
@@ -212,7 +212,7 @@
   }
 
   const editHost = (row: HostVO) => {
-    const cluster = clusterStore.clusters.find((v) => v.name === row.clusterName)
+    const cluster = Object.values(clusterStore.clusterMap).find((v) => v.name === row.clusterName)
     const formatHost = { ...row, displayName: row.clusterDisplayName, clusterId: cluster?.id }
     hostCreateRef.value?.handleOpen('EDIT', formatHost)
   }

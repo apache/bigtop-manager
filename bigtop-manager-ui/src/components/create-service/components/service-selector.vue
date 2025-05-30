@@ -20,7 +20,10 @@
 <script setup lang="ts">
   import { computed, onActivated, reactive, ref, shallowRef, toRefs } from 'vue'
   import { usePngImage } from '@/utils/tools'
-  import useCreateService from './use-create-service'
+  import { useStackStore } from '@/store/stack'
+  import { useServiceStore } from '@/store/service'
+  import { useCreateServiceStore } from '@/store/create-service'
+  import { storeToRefs } from 'pinia'
   import type { ExpandServiceVO } from '@/store/stack'
   import type { ComponentVO } from '@/api/component/types.ts'
   import type { ServiceVO } from '@/api/service/types'
@@ -30,28 +33,20 @@
     selectedData: ExpandServiceVO[]
   }
 
+  const stackStore = useStackStore()
+  const createStore = useCreateServiceStore()
+  const serviceStore = useServiceStore()
   const searchStr = ref('')
+  const spinning = ref(false)
   const licenseOfConflictService = shallowRef(['AGPL-3.0', 'GPLv2'])
   const state = reactive<State>({
     isAddableData: [],
     selectedData: []
   })
-  const {
-    clusterId,
-    routeParams,
-    selectedServices,
-    servicesOfInfra,
-    servicesOfExcludeInfra,
-    installedStore,
-    creationMode,
-    creationModeType,
-    confirmServiceDependencies,
-    setDataByCurrent
-  } = useCreateService()
+  const { stepContext, selectedServices, infraServices, excludeInfraServices } = storeToRefs(createStore)
   const { isAddableData } = toRefs(state)
-  const checkSelectedServicesOnlyInstalled = computed(
-    () => selectedServices.value.filter((v: ExpandServiceVO) => !v.isInstalled).length === 0
-  )
+  const targetServiceName = computed(() => serviceStore.serviceFlatMap[stepContext.value.serviceId].name!)
+  const checkIfInstalled = computed(() => selectedServices.value.filter((v) => !v.isInstalled).length === 0)
   const filterAddableData = computed(() =>
     isAddableData.value.filter(
       (v) =>
@@ -92,20 +87,20 @@
   const handleInstallItem = (item: ExpandServiceVO, from: ExpandServiceVO[], to: ExpandServiceVO[]) => {
     item.components = item.components?.map((v) => ({ ...v, hosts: [] }))
     moveItem(from, to, item)
-    setDataByCurrent(state.selectedData)
+    createStore.updateSelectedService(state.selectedData)
   }
 
-  const addInstallItem = async (item: ExpandServiceVO) => {
-    const items = await confirmServiceDependencies(item)
+  const modifyInstallItems = async (type: 'add' | 'remove', item: ExpandServiceVO) => {
+    const items = await createStore.confirmServiceDependencyAction(type, item)
     if (items.length > 0) {
       items.forEach((i) => {
-        handleInstallItem(i, state.isAddableData, state.selectedData)
+        if (type === 'add') {
+          handleInstallItem(i, state.isAddableData, state.selectedData)
+        } else {
+          handleInstallItem(i, state.selectedData, state.isAddableData)
+        }
       })
     }
-  }
-
-  const removeInstallItem = (item: ExpandServiceVO) => {
-    handleInstallItem(item, state.selectedData, state.isAddableData)
   }
 
   const splitSearchStr = (splitStr: string) => {
@@ -119,7 +114,8 @@
         if (!acc[name!]) {
           acc[name!] = {
             ...item,
-            hosts: [{ hostname, name: hostname, displayName: hostname }]
+            hosts: [{ hostname, name: hostname, displayName: hostname }],
+            cardinality: stackStore.stackRelationMap?.components[item.name!].cardinality
           }
         } else {
           acc[name!].hosts.push({ hostname, name: hostname, displayName: hostname })
@@ -130,7 +126,8 @@
   }
 
   const initInstalledServicesDetail = async () => {
-    const detailRes = await installedStore.getInstalledServicesDetailByKey(`${clusterId.value}`)
+    const clusterId = stepContext.value.clusterId
+    const detailRes = await serviceStore.getInstalledServicesDetailByKey(`${clusterId}`)
     const detailMap = new Map<string, ExpandServiceVO>()
     if (!detailRes) {
       return detailMap
@@ -146,60 +143,77 @@
     }
   }
 
-  const mergeInherentServiceAndInstalledService = (
+  const buildCompleteServiceInfo = (
     installedServiceMap: Map<string, ExpandServiceVO>,
     inherentServices: ServiceVO[]
   ) => {
-    const inherentService = inherentServices.filter((v) => v.name === routeParams.value.service)[0]
-    const installedService = { ...installedServiceMap.get(routeParams.value.service)! }
-    installedService.license = inherentService.license
-    const map = new Map(installedService.components!.map((item) => [item.name, item]))
-    inherentService.components!.forEach((item) => {
-      !map.has(item.name) && map.set(item.name, { ...item, hosts: [], uninstall: true })
-    })
-    installedService.components = [...map.values()]
-    return installedService
+    const inherent = inherentServices.find((v) => v.name === targetServiceName.value)!
+    const installed = { ...installedServiceMap.get(targetServiceName.value)! }
+    const mergedComponentsMap = new Map(
+      (installed.components ?? []).map((component) => [component.name, { ...component }])
+    )
+    for (const component of inherent.components ?? []) {
+      if (!mergedComponentsMap.has(component.name)) {
+        mergedComponentsMap.set(component.name, { ...component, hosts: [], uninstall: true })
+      }
+    }
+    installed.components = [...mergedComponentsMap.values()]
+    installed.license = inherent.license
+
+    return installed as ExpandServiceVO
   }
 
-  const addInstalledSymbolForSelectedServices = async (onlyInstalled: boolean) => {
-    if (onlyInstalled) {
-      const installedServiceMap = await initInstalledServicesDetail()
-      const installedServiceNames = installedStore.getInstalledNamesOrIdsOfServiceByKey(`${clusterId.value}`)
-      const inherentServices = creationMode.value === 'internal' ? servicesOfExcludeInfra.value : servicesOfInfra.value
+  const markSelectedAsInstalled = async (hasInstalled: boolean) => {
+    const { type, creationMode, clusterId } = stepContext.value
+    if (!hasInstalled) {
+      state.selectedData = [...selectedServices.value]
+      return
+    }
+    const installedServiceMap = await initInstalledServicesDetail()
+    const installedServiceNames = serviceStore.getInstalledNamesOrIdsOfServiceByKey(`${clusterId}`)
+    const rawServices = creationMode === 'internal' ? excludeInfraServices.value : infraServices.value
+    // Clone to prevent mutation of original data
+    const inherentServices = rawServices.map((s) => ({ ...s }))
 
-      if (creationModeType.value === 'component' && installedServiceMap.has(routeParams.value.service)) {
-        state.selectedData[0] = mergeInherentServiceAndInstalledService(installedServiceMap, inherentServices)
-        state.selectedData[0].isInstalled = true
-        state.isAddableData = []
-      } else {
-        for (const service of inherentServices) {
-          if (installedServiceNames.includes(service.name || '')) {
-            Object.assign(service, installedServiceMap.get(service.name!))
+    if (type === 'component' && installedServiceMap.has(targetServiceName.value!)) {
+      const completeService = buildCompleteServiceInfo(installedServiceMap, inherentServices)
+      state.selectedData[0] = { ...completeService, isInstalled: true }
+      state.isAddableData = []
+    } else {
+      for (const service of inherentServices) {
+        const name = service.name || ''
+        if (installedServiceNames.includes(name)) {
+          const installed = installedServiceMap.get(name)
+          if (installed) {
+            Object.assign(service, installed)
             service.isInstalled = true
-            state.selectedData.push(service as ExpandServiceVO)
-          } else {
-            state.isAddableData.push(service as ExpandServiceVO)
           }
+          state.selectedData.push(service as ExpandServiceVO)
+        } else {
+          state.isAddableData.push(service as ExpandServiceVO)
         }
       }
-      setDataByCurrent(state.selectedData)
-    } else {
-      state.selectedData = [...selectedServices.value]
     }
+
+    createStore.updateSelectedService(state.selectedData)
+    createStore.setTempData(state.selectedData)
   }
 
   onActivated(async () => {
-    await addInstalledSymbolForSelectedServices(checkSelectedServicesOnlyInstalled.value)
+    spinning.value = true
+    markSelectedAsInstalled(checkIfInstalled.value).finally(() => {
+      spinning.value = false
+    })
   })
 
   defineExpose({
-    addInstallItem
+    modifyInstallItems
   })
 </script>
 
 <template>
   <div class="service-selector">
-    <div>
+    <a-spin :spinning="spinning">
       <div class="list-title">
         <div>{{ $t('service.select_service') }}</div>
         <a-input v-model:value="searchStr" :placeholder="$t('service.please_enter_search_keyword')" />
@@ -208,7 +222,7 @@
         <template #renderItem="{ item }">
           <a-list-item>
             <template #actions>
-              <a-button type="primary" @click="addInstallItem(item)">{{ $t('common.add') }}</a-button>
+              <a-button type="primary" @click="modifyInstallItems('add', item)">{{ $t('common.add') }}</a-button>
             </template>
             <a-list-item-meta>
               <template #title>
@@ -248,9 +262,9 @@
           </a-list-item>
         </template>
       </a-list>
-    </div>
+    </a-spin>
     <a-divider type="vertical" class="divider" />
-    <div>
+    <a-spin :spinning="spinning">
       <div class="list-title">
         <div>{{ $t('service.pending_installation_services') }}</div>
       </div>
@@ -258,7 +272,7 @@
         <template #renderItem="{ item }">
           <a-list-item>
             <template #actions>
-              <a-button danger :disabled="item.isInstalled" type="primary" @click="removeInstallItem(item)">
+              <a-button danger :disabled="item.isInstalled" type="primary" @click="modifyInstallItems('remove', item)">
                 {{ $t('common.remove') }}
               </a-button>
             </template>
@@ -290,7 +304,7 @@
           </a-list-item>
         </template>
       </a-list>
-    </div>
+    </a-spin>
   </div>
 </template>
 

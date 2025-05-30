@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import { nextTick, ref, shallowRef } from 'vue'
+import { computed, nextTick, ref, shallowRef } from 'vue'
 import { RouteRecordRaw, useRoute, useRouter } from 'vue-router'
 import { dynamicRoutes as dr } from '@/router/routes/index'
 import { defineStore } from 'pinia'
@@ -35,6 +35,7 @@ export const useMenuStore = defineStore(
     const headerSelectedKey = ref()
     const siderMenuSelectedKey = ref()
     const routePathFromClusters = shallowRef('/cluster-manage/clusters')
+    const clusterList = computed(() => Object.values(clusterStore.clusterMap))
 
     const buildMenuMap = () => {
       baseRoutesMap.value = dr.reduce((buildRes, { path, name, meta, children }) => {
@@ -46,17 +47,17 @@ export const useMenuStore = defineStore(
     const setupHeader = () => {
       headerSelectedKey.value = route.matched[0].path ?? '/cluster-manage'
       headerMenus.value = Object.values(baseRoutesMap.value)
-      siderMenus.value = baseRoutesMap.value[headerSelectedKey.value].children || []
+      siderMenus.value = baseRoutesMap.value[headerSelectedKey.value]?.children || []
     }
 
     const setupSider = () => {
-      siderMenus.value = baseRoutesMap.value[headerSelectedKey.value].children || []
-      if (siderMenus.value[0].redirect) {
+      siderMenus.value = baseRoutesMap.value[headerSelectedKey.value]?.children || []
+      if (siderMenus.value[0]?.redirect) {
         siderMenuSelectedKey.value = siderMenus.value[0].redirect
       } else {
-        if (clusterStore.clusters[0]) {
-          const { id, name } = clusterStore.clusters[0]
-          onSiderClick(`${routePathFromClusters.value}/${name}/${id}`)
+        if (clusterList.value.length > 0) {
+          const { id } = clusterList.value[0]
+          onSiderClick(`${routePathFromClusters.value}/${id}`)
         } else {
           onSiderClick(`${routePathFromClusters.value}/default`)
         }
@@ -75,9 +76,9 @@ export const useMenuStore = defineStore(
 
     const updateSider = async () => {
       await clusterStore.loadClusters()
-      const { id, name } = clusterStore.clusters[clusterStore.clusterCount - 1]
+      const { id } = clusterList.value[clusterList.value.length - 1]
       await nextTick()
-      onSiderClick(`${routePathFromClusters.value}/${name}/${id}`)
+      onSiderClick(`${routePathFromClusters.value}/${id}`)
     }
 
     const setupMenu = async () => {
@@ -100,7 +101,7 @@ export const useMenuStore = defineStore(
   },
   {
     persist: {
-      storage: sessionStorage,
+      storage: localStorage,
       paths: ['headerMenus', 'siderMenus']
     }
   }

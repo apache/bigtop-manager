@@ -90,12 +90,8 @@ export const useJobProgress = defineStore('job-progress', () => {
   }))
 
   const getClusterDisplayName = (clusterId: number) => {
-    const clusters = clusterStore.clusters
-    const index = clusters.findIndex((v) => v.id == clusterId)
-    if (index != -1) {
-      return clusters[index].displayName
-    }
-    return 'Global'
+    const targetCluster = clusterStore.clusterMap[clusterId]
+    return targetCluster ? targetCluster.displayName : 'Global'
   }
 
   const createStateIcon = (execRes: CommandRes) => {

@@ -380,7 +380,7 @@
 
   const getClusterSelectOptions = async () => {
     await nextTick()
-    const formatClusters = clusterStore.clusters.map((v) => ({ ...v, clusterId: v.id }))
+    const formatClusters = Object.values(clusterStore.clusterMap).map((v) => ({ ...v, clusterId: v.id }))
     autoFormRef.value?.setOptions('clusterId', formatClusters)
   }
 
