@@ -24,7 +24,7 @@
   import { login } from '@/api/login'
   import { message } from 'ant-design-vue'
   import { useI18n } from 'vue-i18n'
-  import md5 from 'md5'
+  import { encrypt } from '@/utils/jsencrypt'
   import SelectLang from '@/components/select-lang/index.vue'
 
   const i18n = useI18n()
@@ -46,7 +46,7 @@
       await formRef.value?.validate()
       const res = await login({
         username: loginModel.username,
-        password: md5(loginModel.password)
+        password: encrypt(loginModel.password)
       })
 
       if (loginModel.remember) {
