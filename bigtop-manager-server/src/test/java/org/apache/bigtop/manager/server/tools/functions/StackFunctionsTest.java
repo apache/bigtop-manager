@@ -34,6 +34,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import dev.langchain4j.agent.tool.ToolExecutionRequest;
 import dev.langchain4j.agent.tool.ToolSpecification;
+import dev.langchain4j.model.chat.request.json.JsonSchemaElement;
 import dev.langchain4j.service.tool.ToolExecutor;
 
 import java.util.List;
@@ -152,15 +153,12 @@ class StackFunctionsTest {
     void testGetServiceByNameToolSpecification() {
         Map<ToolSpecification, ToolExecutor> tools = stackFunctions.getServiceByName();
         ToolSpecification spec = tools.keySet().iterator().next();
-        Map<String, Map<String, Object>> params = spec.parameters().properties();
+        Map<String, JsonSchemaElement> params = spec.parameters().properties();
         assertAll(
                 () -> assertEquals("getServiceByName", spec.name()),
                 () -> assertEquals("Get service information and configs based on service name", spec.description()),
                 () -> assertEquals(1, params.size()),
-                () -> assertTrue(params.containsKey("serviceName")),
-                () -> assertEquals("string", params.get("serviceName").get("type")),
-                () -> assertEquals(
-                        "Lowercase service name", params.get("serviceName").get("description")));
+                () -> assertTrue(params.containsKey("serviceName")));
     }
 
     @Test

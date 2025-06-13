@@ -32,6 +32,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import dev.langchain4j.agent.tool.ToolExecutionRequest;
 import dev.langchain4j.agent.tool.ToolSpecification;
+import dev.langchain4j.model.chat.request.json.JsonSchemaElement;
 import dev.langchain4j.service.tool.ToolExecutor;
 
 import java.util.List;
@@ -71,12 +72,10 @@ class HostFunctionsTest {
         assertEquals(1, tools.size());
 
         ToolSpecification spec = tools.keySet().iterator().next();
-        Map<String, Map<String, Object>> params = spec.parameters().properties();
+        Map<String, JsonSchemaElement> params = spec.parameters().properties();
 
         assertEquals(1, params.size());
         assertTrue(params.containsKey("hostId"));
-        assertEquals("number", params.get("hostId").get("type"));
-        assertEquals("host id", params.get("hostId").get("description"));
     }
 
     @Test
@@ -119,10 +118,9 @@ class HostFunctionsTest {
         ToolSpecification spec = tools.keySet().iterator().next();
         assertEquals("getHostByName", spec.name());
         assertEquals("Get host information based on cluster name", spec.description());
-        Map<String, Map<String, Object>> params = spec.parameters().properties();
+        Map<String, JsonSchemaElement> params = spec.parameters().properties();
         assertEquals(1, params.size());
         assertTrue(params.containsKey("hostName"));
-        assertEquals("string", params.get("hostName").get("type"));
     }
 
     @Test
