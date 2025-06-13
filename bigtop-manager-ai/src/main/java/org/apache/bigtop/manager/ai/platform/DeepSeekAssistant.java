@@ -24,8 +24,8 @@ import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 
 import dev.langchain4j.internal.ValidationUtils;
 import dev.langchain4j.memory.ChatMemory;
-import dev.langchain4j.model.chat.ChatLanguageModel;
-import dev.langchain4j.model.chat.StreamingChatLanguageModel;
+import dev.langchain4j.model.chat.ChatModel;
+import dev.langchain4j.model.chat.StreamingChatModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
 import dev.langchain4j.service.AiServices;
@@ -50,7 +50,7 @@ public class DeepSeekAssistant extends AbstractAIAssistant {
     public static class Builder extends AbstractAIAssistant.Builder {
 
         @Override
-        public ChatLanguageModel getChatLanguageModel() {
+        public ChatModel getChatModel() {
             String model = ValidationUtils.ensureNotNull(config.getModel(), "model");
             String apiKey =
                     ValidationUtils.ensureNotNull(config.getCredentials().get("apiKey"), "apiKey");
@@ -62,7 +62,7 @@ public class DeepSeekAssistant extends AbstractAIAssistant {
         }
 
         @Override
-        public StreamingChatLanguageModel getStreamingChatLanguageModel() {
+        public StreamingChatModel getStreamingChatModel() {
             String model = ValidationUtils.ensureNotNull(config.getModel(), "model");
             String apiKey =
                     ValidationUtils.ensureNotNull(config.getCredentials().get("apiKey"), "apiKey");
@@ -75,8 +75,8 @@ public class DeepSeekAssistant extends AbstractAIAssistant {
 
         public AIAssistant build() {
             AIAssistant.Service aiService = AiServices.builder(AIAssistant.Service.class)
-                    .chatLanguageModel(getChatLanguageModel())
-                    .streamingChatLanguageModel(getStreamingChatLanguageModel())
+                    .chatModel(getChatModel())
+                    .streamingChatModel(getStreamingChatModel())
                     .chatMemory(getChatMemory())
                     .toolProvider(toolProvider)
                     .systemMessageProvider(threadId -> {

@@ -50,7 +50,8 @@
         <micrometer.version>1.12.4</micrometer.version>
         <jdbc.dm.version>8.1.2.192</jdbc.dm.version>
         <sshd.version>2.15.0</sshd.version>
-        <langchain4j.version>0.35.0</langchain4j.version>
+        <langchain4j-core.version>1.0.1</langchain4j-core.version>
+        <langchain4j.version>1.0.1-beta6</langchain4j.version>
         <mybatis-spring-boot-starter.version>3.0.3</mybatis-spring-boot-starter.version>
         <pagehelper-spring-boot-starter.version>2.1.0</pagehelper-spring-boot-starter.version>
     </properties>
@@ -256,21 +257,21 @@
             <dependency>
                 <groupId>dev.langchain4j</groupId>
                 <artifactId>langchain4j</artifactId>
-                <version>${langchain4j.version}</version>
+                <version>${langchain4j-core.version}</version>
             </dependency>
             <dependency>
                 <groupId>dev.langchain4j</groupId>
                 <artifactId>langchain4j-open-ai</artifactId>
+                <version>${langchain4j-core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j-community-qianfan</artifactId>
                 <version>${langchain4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>dev.langchain4j</groupId>
-                <artifactId>langchain4j-qianfan</artifactId>
-                <version>${langchain4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>dev.langchain4j</groupId>
-                <artifactId>langchain4j-dashscope</artifactId>
+                <artifactId>langchain4j-community-dashscope</artifactId>
                 <version>${langchain4j.version}</version>
             </dependency>
             <dependency>
