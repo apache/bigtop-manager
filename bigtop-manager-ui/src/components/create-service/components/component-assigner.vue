@@ -70,7 +70,7 @@
   const installedServices = computed(() => installedStore.getInstalledNamesOrIdsOfServiceByKey(`${clusterId.value}`))
   const hostsOfCurrComp = computed((): HostVO[] => {
     const temp = currComp.value.split('/').at(-1)
-    return allComps.value.has(temp!) ? allComps.value.get(temp!)?.hosts ?? [] : []
+    return allComps.value.has(temp!) ? (allComps.value.get(temp!)?.hosts ?? []) : []
   })
 
   const columns = computed((): TableColumnType<HostVO>[] => [
@@ -155,8 +155,8 @@
 
   const resetSelectedRowKeys = (key: string) => {
     state.selectedRowKeys = allComps.value.has(key)
-        ? (allComps.value.get(key)?.hosts.map((v: HostVO) => v.hostname) as Key[]) ?? ([] as Key[])
-        : []
+      ? ((allComps.value.get(key)?.hosts.map((v: HostVO) => v.hostname) as Key[]) ?? ([] as Key[]))
+      : []
   }
 
   const treeSelectedChange = (keyPath: string) => {
