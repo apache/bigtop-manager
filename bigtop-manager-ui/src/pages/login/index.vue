@@ -21,11 +21,12 @@
   import { useRouter } from 'vue-router'
   import { reactive, shallowRef } from 'vue'
   import { UserOutlined, LockOutlined } from '@ant-design/icons-vue'
-  import { login } from '@/api/login'
+  import { genKey, login } from '@/api/login'
   import { message } from 'ant-design-vue'
   import { useI18n } from 'vue-i18n'
-  import { encrypt } from '@/utils/jsencrypt'
   import SelectLang from '@/components/select-lang/index.vue'
+  import { AESUtils } from '@/utils/aes.ts'
+  import { Base64Utils } from '@/utils/base64.ts'
 
   const i18n = useI18n()
   const router = useRouter()
@@ -44,9 +45,16 @@
     const hide = message.loading(i18n.t('login.logging_in'), 0)
     try {
       await formRef.value?.validate()
+
+      const keyStr = await genKey(loginModel.username).then(async (res: string) => {
+        return Base64Utils.base64Decode(res)
+      })
+
+      const encryptedPwd = AESUtils.encrypt(loginModel.password, keyStr)
+
       const res = await login({
         username: loginModel.username,
-        password: encrypt(loginModel.password)
+        password: encryptedPwd
       })
 
       if (loginModel.remember) {
@@ -90,7 +98,7 @@
           <div class="login-body-right">
             <div class="login-body-right-tips">{{ $t('login.tips') }}</div>
             <a-form ref="formRef" class="login-body-right-form" :model="loginModel">
-              <a-tabs v-model:activeKey="loginModel.type" centered>
+              <a-tabs v-model:active-key="loginModel.type" centered>
                 <a-tab-pane key="account" :tab="$t('login.tab_account')" />
               </a-tabs>
               <template v-if="loginModel.type === 'account'">

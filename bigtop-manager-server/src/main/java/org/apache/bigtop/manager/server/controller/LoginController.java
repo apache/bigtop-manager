@@ -26,9 +26,12 @@ import org.apache.bigtop.manager.server.model.dto.LoginDTO;
 import org.apache.bigtop.manager.server.model.req.LoginReq;
 import org.apache.bigtop.manager.server.model.vo.LoginVO;
 import org.apache.bigtop.manager.server.service.LoginService;
+import org.apache.bigtop.manager.server.utils.AESUtils;
+import org.apache.bigtop.manager.server.utils.CacheUtils;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
 
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,6 +47,20 @@ public class LoginController {
 
     @Resource
     private LoginService loginService;
+
+    @Operation(summary = "genKey", description = "Generate Key")
+    @GetMapping(value = "/genKey")
+    public ResponseEntity<String> genKey(String username) {
+        if (!StringUtils.hasText(username)) {
+            throw new ApiException(ApiExceptionEnum.USERNAME_OR_PASSWORD_REQUIRED);
+        }
+
+        String key = AESUtils.randomString(32);
+        String encodeKey = AESUtils.base64Encode(key);
+
+        CacheUtils.setCache(username, key);
+        return ResponseEntity.success(encodeKey);
+    }
 
     @Audit
     @Operation(summary = "login", description = "User Login")

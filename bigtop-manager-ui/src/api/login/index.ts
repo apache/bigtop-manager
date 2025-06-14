@@ -20,6 +20,16 @@
 import { LoginReq, LoginVO } from '@/api/login/types.ts'
 import request from '@/api/request.ts'
 
+export const genKey = (username: string): Promise<string> => {
+  return request({
+    method: 'get',
+    url: '/genKey',
+    params: {
+      username
+    }
+  })
+}
+
 export const login = (data: LoginReq): Promise<LoginVO> => {
   return request({
     method: 'post',

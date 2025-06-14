@@ -20,41 +20,32 @@ package org.apache.bigtop.manager.server.utils;
 
 import org.junit.jupiter.api.Test;
 
-import java.security.KeyPair;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class RSAUtilsTest {
+public class AESUtilsTest {
 
     @Test
-    public void testEncryptAndDecrypt() throws Exception {
-        // 1. Generate RSA key pairs
-        KeyPair keyPair = RSAUtils.generateRsaKeyPair(2048);
+    public void testRandomString() {
+        int length = 32;
+        String randomString = AESUtils.randomString(length);
+        assertEquals(length, randomString.length());
+    }
 
-        // 2. Retrieve byte arrays for public and private keys
-        PublicKey publicKey = keyPair.getPublic();
-        PrivateKey privateKey = keyPair.getPrivate();
-
-        // 3. Convert to PEM format string
-        String publicKeyPEM = RSAUtils.toPemPublicKey(publicKey);
-        String privateKeyPEM = RSAUtils.toPemPrivateKey(privateKey);
-        String publicKeyStr = publicKeyPEM.replaceAll("\\s", "");
-        String privateKeyStr = privateKeyPEM.replaceAll("\\s", "");
-
-        String rawPassword = "password";
-        String encrypt = RSAUtils.encrypt(rawPassword, publicKeyStr);
-        String decrypt = RSAUtils.decrypt(encrypt, privateKeyStr);
-        assertEquals(rawPassword, decrypt);
+    @Test
+    public void testEncryptAndDecrypt() {
+        String data = "username";
+        String key = AESUtils.randomString(32);
+        String encryptedData = AESUtils.encrypt(data, key);
+        String decryptedData = AESUtils.decrypt(encryptedData, key);
+        assertEquals(data, decryptedData);
     }
 
     @Test
     public void testGenBcryptAndCheckBcrypt() {
         String rawPassword = "password";
-        String hashedPassword = RSAUtils.getBcryptPassword(rawPassword);
-        boolean check = RSAUtils.checkBcryptPassword(rawPassword, hashedPassword);
+        String hashedPassword = AESUtils.getBcryptPassword(rawPassword);
+        boolean check = AESUtils.checkBcryptPassword(rawPassword, hashedPassword);
         assertTrue(check);
     }
 }

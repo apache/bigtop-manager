@@ -44,6 +44,7 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(authInterceptor)
                 .addPathPatterns("/**")
                 // Server APIs
+                .excludePathPatterns("/api/genKey")
                 .excludePathPatterns("/api/login")
                 // Frontend pages
                 .excludePathPatterns("/", "/ui/**", "/favicon.ico", "/error")

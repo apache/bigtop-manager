@@ -25,10 +25,10 @@ import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.model.dto.LoginDTO;
 import org.apache.bigtop.manager.server.model.vo.LoginVO;
 import org.apache.bigtop.manager.server.service.LoginService;
+import org.apache.bigtop.manager.server.utils.AESUtils;
+import org.apache.bigtop.manager.server.utils.CacheUtils;
 import org.apache.bigtop.manager.server.utils.JWTUtils;
-import org.apache.bigtop.manager.server.utils.RSAUtils;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.password4j.Password;
@@ -41,30 +41,37 @@ public class LoginServiceImpl implements LoginService {
     @Resource
     private UserDao userDao;
 
-    @Value("${encrypt.private-key}")
-    private String privateKey;
-
     @Override
     public LoginVO login(LoginDTO loginDTO) {
-        UserPO userPO = userDao.findByUsername(loginDTO.getUsername());
+        String username = loginDTO.getUsername();
+        String password = loginDTO.getPassword();
 
-        String rawPassword;
-        try {
-            rawPassword = RSAUtils.decrypt(loginDTO.getPassword(), privateKey);
-        } catch (Exception e) {
+        UserPO user = userDao.findByUsername(username);
+        if (user == null) {
             throw new ApiException(ApiExceptionEnum.INCORRECT_USERNAME_OR_PASSWORD);
         }
 
-        if (userPO == null || !Password.check(rawPassword, userPO.getPassword()).withBcrypt()) {
-            throw new ApiException(ApiExceptionEnum.INCORRECT_USERNAME_OR_PASSWORD);
-        }
-
-        if (!userPO.getStatus()) {
+        if (!user.getStatus()) {
             throw new ApiException(ApiExceptionEnum.USER_IS_DISABLED);
         }
 
-        String token = JWTUtils.generateToken(userPO.getId(), userPO.getUsername());
+        String key = CacheUtils.getCache(username);
+        if (key == null) {
+            throw new ApiException(ApiExceptionEnum.INCORRECT_USERNAME_OR_PASSWORD);
+        }
 
+        String rawPassword = AESUtils.decrypt(password, key);
+        if (rawPassword == null) {
+            throw new ApiException(ApiExceptionEnum.INCORRECT_USERNAME_OR_PASSWORD);
+        }
+
+        if (!Password.check(rawPassword, user.getPassword()).withBcrypt()) {
+            throw new ApiException(ApiExceptionEnum.INCORRECT_USERNAME_OR_PASSWORD);
+        }
+
+        CacheUtils.removeCache(username);
+
+        String token = JWTUtils.generateToken(user.getId(), user.getUsername());
         LoginVO loginVO = new LoginVO();
         loginVO.setToken(token);
         return loginVO;
