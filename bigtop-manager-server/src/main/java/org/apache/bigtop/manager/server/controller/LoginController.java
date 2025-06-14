@@ -26,9 +26,13 @@ import org.apache.bigtop.manager.server.model.dto.LoginDTO;
 import org.apache.bigtop.manager.server.model.req.LoginReq;
 import org.apache.bigtop.manager.server.model.vo.LoginVO;
 import org.apache.bigtop.manager.server.service.LoginService;
+import org.apache.bigtop.manager.server.utils.CacheUtils;
+import org.apache.bigtop.manager.server.utils.PasswordUtils;
+import org.apache.bigtop.manager.server.utils.Pbkdf2Utils;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
 
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,6 +48,21 @@ public class LoginController {
 
     @Resource
     private LoginService loginService;
+
+    @Operation(summary = "salt", description = "Generate salt")
+    @GetMapping(value = "/salt")
+    public ResponseEntity<String> salt(String username) {
+        String salt = Pbkdf2Utils.generateSalt(username);
+        return ResponseEntity.success(salt);
+    }
+
+    @Operation(summary = "nonce", description = "Generate nonce")
+    @GetMapping(value = "/nonce")
+    public ResponseEntity<String> nonce(String username) {
+        String nonce = PasswordUtils.randomString(16);
+        CacheUtils.setCache(username, nonce);
+        return ResponseEntity.success(nonce);
+    }
 
     @Audit
     @Operation(summary = "login", description = "User Login")

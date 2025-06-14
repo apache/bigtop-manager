@@ -25,7 +25,9 @@ import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.model.dto.LoginDTO;
 import org.apache.bigtop.manager.server.model.vo.LoginVO;
 import org.apache.bigtop.manager.server.service.LoginService;
+import org.apache.bigtop.manager.server.utils.CacheUtils;
 import org.apache.bigtop.manager.server.utils.JWTUtils;
+import org.apache.bigtop.manager.server.utils.PasswordUtils;
 
 import org.springframework.stereotype.Service;
 
@@ -39,17 +41,31 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public LoginVO login(LoginDTO loginDTO) {
-        UserPO userPO = userDao.findByUsername(loginDTO.getUsername());
-        if (userPO == null || !loginDTO.getPassword().equalsIgnoreCase(userPO.getPassword())) {
+        String username = loginDTO.getUsername();
+        String password = loginDTO.getPassword();
+        String nonce = loginDTO.getNonce();
+
+        UserPO user = userDao.findByUsername(username);
+        if (user == null) {
             throw new ApiException(ApiExceptionEnum.INCORRECT_USERNAME_OR_PASSWORD);
         }
 
-        if (!userPO.getStatus()) {
+        if (!user.getStatus()) {
             throw new ApiException(ApiExceptionEnum.USER_IS_DISABLED);
         }
 
-        String token = JWTUtils.generateToken(userPO.getId(), userPO.getUsername());
+        String cache = CacheUtils.getCache(username);
+        if (cache == null || !cache.equals(nonce)) {
+            throw new ApiException(ApiExceptionEnum.INCORRECT_USERNAME_OR_PASSWORD);
+        }
 
+        if (!PasswordUtils.checkBcryptPassword(password, user.getPassword())) {
+            throw new ApiException(ApiExceptionEnum.INCORRECT_USERNAME_OR_PASSWORD);
+        }
+
+        CacheUtils.removeCache(username);
+
+        String token = JWTUtils.generateToken(user.getId(), user.getUsername());
         LoginVO loginVO = new LoginVO();
         loginVO.setToken(token);
         return loginVO;

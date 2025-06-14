@@ -38,7 +38,7 @@ CREATE TABLE "user"
 (
     id          BIGINT CHECK (id > 0) NOT NULL GENERATED ALWAYS AS IDENTITY,
     username    VARCHAR(32)  DEFAULT NULL,
-    password    VARCHAR(32)  DEFAULT NULL,
+    password    VARCHAR(255)  DEFAULT NULL,
     nickname    VARCHAR(32)  DEFAULT NULL,
     status      BOOLEAN          DEFAULT TRUE,
     create_time TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
@@ -359,7 +359,7 @@ CREATE INDEX idx_thread_id ON llm_chat_message (thread_id);
 CREATE INDEX idx_message_user_id ON llm_chat_message (user_id);
 
 INSERT INTO "user" (username, password, nickname, status)
-VALUES ('admin', '21232f297a57a5a743894a0e4a801fc3', 'Administrator', true);
+VALUES ('admin', '$2b$10$bdTvADKA0dSJYT3wMU3LFeIEnxzKQHeWN3XcHJ5jQpsIo7ju1U5Yi', 'Administrator', true);
 
 INSERT INTO repo (name, arch, base_url)
 VALUES
