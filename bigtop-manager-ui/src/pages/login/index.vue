@@ -21,12 +21,11 @@
   import { useRouter } from 'vue-router'
   import { reactive, shallowRef } from 'vue'
   import { UserOutlined, LockOutlined } from '@ant-design/icons-vue'
-  import { genKey, login } from '@/api/login'
+  import { getSalt, getNonce, login } from '@/api/login'
   import { message } from 'ant-design-vue'
   import { useI18n } from 'vue-i18n'
   import SelectLang from '@/components/select-lang/index.vue'
-  import { AESUtils } from '@/utils/aes.ts'
-  import { Base64Utils } from '@/utils/base64.ts'
+  import { deriveKey } from '@/utils/pbkdf2.ts'
 
   const i18n = useI18n()
   const router = useRouter()
@@ -45,16 +44,22 @@
     const hide = message.loading(i18n.t('login.logging_in'), 0)
     try {
       await formRef.value?.validate()
+      const username = loginModel.username
 
-      const keyStr = await genKey(loginModel.username).then(async (res: string) => {
-        return Base64Utils.base64Decode(res)
+      const salt = await getSalt(username).then(async (res: string) => {
+        return res
       })
 
-      const encryptedPwd = AESUtils.encrypt(loginModel.password, keyStr)
+      const nonce = await getNonce(username).then(async (res: string) => {
+        return res
+      })
+
+      const encryptPwd = deriveKey(loginModel.password, salt)
 
       const res = await login({
-        username: loginModel.username,
-        password: encryptedPwd
+        username: username,
+        password: encryptPwd,
+        nonce: nonce
       })
 
       if (loginModel.remember) {

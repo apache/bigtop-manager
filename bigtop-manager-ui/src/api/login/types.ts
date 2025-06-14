@@ -20,6 +20,7 @@
 export interface LoginReq {
   username: string
   password: string
+  nonce: string
 }
 
 export interface LoginVO {

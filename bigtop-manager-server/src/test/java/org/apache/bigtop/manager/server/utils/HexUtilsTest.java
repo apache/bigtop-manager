@@ -16,41 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.bigtop.manager.server.utils;
 
-import { LoginReq, LoginVO } from '@/api/login/types.ts'
-import request from '@/api/request.ts'
+import org.junit.jupiter.api.Test;
 
-export const getSalt = (username: string): Promise<string> => {
-  return request({
-    method: 'get',
-    url: '/salt',
-    params: {
-      username
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class HexUtilsTest {
+
+    @Test
+    public void testHex() {
+        byte[] bytes = HexUtils.hexToBytes("abc123");
+        String hex = HexUtils.bytesToHex(bytes);
+        assertEquals("abc123", hex);
     }
-  })
-}
-
-export const getNonce = (username: string): Promise<string> => {
-  return request({
-    method: 'get',
-    url: '/nonce',
-    params: {
-      username
-    }
-  })
-}
-
-export const login = (data: LoginReq): Promise<LoginVO> => {
-  return request({
-    method: 'post',
-    url: '/login',
-    data
-  })
-}
-
-export const test = () => {
-  return request({
-    method: 'get',
-    url: '/test'
-  })
 }

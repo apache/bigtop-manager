@@ -348,7 +348,7 @@ CREATE TABLE `tool`
 
 -- Adding default admin user
 INSERT INTO user (username, password, nickname, status)
-VALUES ('admin', '$2b$10$Uoqi6pzZkEtPSRHjEid2Ne/k45hN7hhGyERQoFj1V7Fpe8ZGlrw3u', 'Administrator', true);
+VALUES ('admin', '$2b$10$bdTvADKA0dSJYT3wMU3LFeIEnxzKQHeWN3XcHJ5jQpsIo7ju1U5Yi', 'Administrator', true);
 
 INSERT INTO repo (name, arch, base_url)
 VALUES

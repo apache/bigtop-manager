@@ -26,8 +26,9 @@ import org.apache.bigtop.manager.server.model.dto.LoginDTO;
 import org.apache.bigtop.manager.server.model.req.LoginReq;
 import org.apache.bigtop.manager.server.model.vo.LoginVO;
 import org.apache.bigtop.manager.server.service.LoginService;
-import org.apache.bigtop.manager.server.utils.AESUtils;
 import org.apache.bigtop.manager.server.utils.CacheUtils;
+import org.apache.bigtop.manager.server.utils.PasswordUtils;
+import org.apache.bigtop.manager.server.utils.Pbkdf2Utils;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
 
 import org.springframework.util.StringUtils;
@@ -48,18 +49,19 @@ public class LoginController {
     @Resource
     private LoginService loginService;
 
-    @Operation(summary = "genKey", description = "Generate Key")
-    @GetMapping(value = "/genKey")
-    public ResponseEntity<String> genKey(String username) {
-        if (!StringUtils.hasText(username)) {
-            throw new ApiException(ApiExceptionEnum.USERNAME_OR_PASSWORD_REQUIRED);
-        }
+    @Operation(summary = "salt", description = "Generate salt")
+    @GetMapping(value = "/salt")
+    public ResponseEntity<String> salt(String username) {
+        String salt = Pbkdf2Utils.generateSalt(username);
+        return ResponseEntity.success(salt);
+    }
 
-        String key = AESUtils.randomString(32);
-        String encodeKey = AESUtils.base64Encode(key);
-
-        CacheUtils.setCache(username, key);
-        return ResponseEntity.success(encodeKey);
+    @Operation(summary = "nonce", description = "Generate nonce")
+    @GetMapping(value = "/nonce")
+    public ResponseEntity<String> nonce(String username) {
+        String nonce = PasswordUtils.randomString(16);
+        CacheUtils.setCache(username, nonce);
+        return ResponseEntity.success(nonce);
     }
 
     @Audit

@@ -25,13 +25,11 @@ import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.model.dto.LoginDTO;
 import org.apache.bigtop.manager.server.model.vo.LoginVO;
 import org.apache.bigtop.manager.server.service.LoginService;
-import org.apache.bigtop.manager.server.utils.AESUtils;
 import org.apache.bigtop.manager.server.utils.CacheUtils;
 import org.apache.bigtop.manager.server.utils.JWTUtils;
+import org.apache.bigtop.manager.server.utils.PasswordUtils;
 
 import org.springframework.stereotype.Service;
-
-import com.password4j.Password;
 
 import jakarta.annotation.Resource;
 
@@ -45,6 +43,7 @@ public class LoginServiceImpl implements LoginService {
     public LoginVO login(LoginDTO loginDTO) {
         String username = loginDTO.getUsername();
         String password = loginDTO.getPassword();
+        String nonce = loginDTO.getNonce();
 
         UserPO user = userDao.findByUsername(username);
         if (user == null) {
@@ -55,17 +54,12 @@ public class LoginServiceImpl implements LoginService {
             throw new ApiException(ApiExceptionEnum.USER_IS_DISABLED);
         }
 
-        String key = CacheUtils.getCache(username);
-        if (key == null) {
+        String cache = CacheUtils.getCache(username);
+        if (cache == null || !cache.equals(nonce)) {
             throw new ApiException(ApiExceptionEnum.INCORRECT_USERNAME_OR_PASSWORD);
         }
 
-        String rawPassword = AESUtils.decrypt(password, key);
-        if (rawPassword == null) {
-            throw new ApiException(ApiExceptionEnum.INCORRECT_USERNAME_OR_PASSWORD);
-        }
-
-        if (!Password.check(rawPassword, user.getPassword()).withBcrypt()) {
+        if (!PasswordUtils.checkBcryptPassword(password, user.getPassword())) {
             throw new ApiException(ApiExceptionEnum.INCORRECT_USERNAME_OR_PASSWORD);
         }
 

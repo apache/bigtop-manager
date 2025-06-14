@@ -16,41 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.bigtop.manager.server.utils;
 
-import { LoginReq, LoginVO } from '@/api/login/types.ts'
-import request from '@/api/request.ts'
+import org.junit.jupiter.api.Test;
 
-export const getSalt = (username: string): Promise<string> => {
-  return request({
-    method: 'get',
-    url: '/salt',
-    params: {
-      username
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class PasswordUtilsTest {
+
+    @Test
+    public void testRandomString() {
+        int length = 32;
+        String randomString = PasswordUtils.randomString(length);
+        assertEquals(length, randomString.length());
     }
-  })
-}
 
-export const getNonce = (username: string): Promise<string> => {
-  return request({
-    method: 'get',
-    url: '/nonce',
-    params: {
-      username
+    @Test
+    public void testGenBcryptAndCheckBcrypt() {
+        String rawPassword = "password";
+        String hashedPassword = PasswordUtils.getBcryptPassword(rawPassword);
+        boolean check = PasswordUtils.checkBcryptPassword(rawPassword, hashedPassword);
+        assertTrue(check);
     }
-  })
-}
-
-export const login = (data: LoginReq): Promise<LoginVO> => {
-  return request({
-    method: 'post',
-    url: '/login',
-    data
-  })
-}
-
-export const test = () => {
-  return request({
-    method: 'get',
-    url: '/test'
-  })
 }
