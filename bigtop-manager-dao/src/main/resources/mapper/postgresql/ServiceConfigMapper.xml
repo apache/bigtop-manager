@@ -31,6 +31,18 @@
         ${alias}.id, ${alias}.name, ${alias}.properties_json, ${alias}.cluster_id, ${alias}.service_id, ${alias}.create_time, ${alias}.update_time
     </sql>
 
+    <select id="findByServiceIdAndName" resultType="org.apache.bigtop.manager.dao.po.ServiceConfigPO">
+        SELECT
+        <include refid="baseColumnsV2">
+            <property name="alias" value="sc"/>
+        </include>, s.name as service_name
+        FROM service_config sc
+        LEFT JOIN service s
+        ON sc.service_id = s.id
+        WHERE sc.service_id = #{serviceId}
+        AND sc.name = #{name}
+    </select>
+
     <select id="findByServiceId" resultType="org.apache.bigtop.manager.dao.po.ServiceConfigPO">
         SELECT
         <include refid="baseColumnsV2">

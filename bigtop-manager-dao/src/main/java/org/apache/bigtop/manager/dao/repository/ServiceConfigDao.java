@@ -27,6 +27,8 @@ import java.util.List;
 
 public interface ServiceConfigDao extends BaseDao<ServiceConfigPO> {
 
+    ServiceConfigPO findByServiceIdAndName(@Param("serviceId") Long serviceId, @Param("name") String name);
+
     List<ServiceConfigPO> findByServiceId(@Param("serviceId") Long serviceId);
 
     List<ServiceConfigPO> findByClusterId(@Param("clusterId") Long clusterId);
