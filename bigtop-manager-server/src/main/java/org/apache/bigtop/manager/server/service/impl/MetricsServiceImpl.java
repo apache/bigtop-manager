@@ -20,9 +20,14 @@ package org.apache.bigtop.manager.server.service.impl;
 
 import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.po.HostPO;
+import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
 import org.apache.bigtop.manager.dao.query.ComponentQuery;
 import org.apache.bigtop.manager.dao.repository.ComponentDao;
 import org.apache.bigtop.manager.dao.repository.HostDao;
+import org.apache.bigtop.manager.dao.repository.ServiceConfigDao;
+import org.apache.bigtop.manager.server.model.converter.ServiceConfigConverter;
+import org.apache.bigtop.manager.server.model.dto.PropertyDTO;
+import org.apache.bigtop.manager.server.model.dto.ServiceConfigDTO;
 import org.apache.bigtop.manager.server.proxy.PrometheusProxy;
 import org.apache.bigtop.manager.server.service.MetricsService;
 
@@ -44,6 +49,9 @@ public class MetricsServiceImpl implements MetricsService {
 
     @Resource
     private ComponentDao componentDao;
+
+    @Resource
+    private ServiceConfigDao serviceConfigDao;
 
     @Override
     public JsonNode queryAgentsHealthyStatus() {
@@ -88,7 +96,21 @@ public class MetricsServiceImpl implements MetricsService {
         } else {
             ComponentPO componentPO = componentPOList.get(0);
             HostPO hostPO = hostDao.findById(componentPO.getHostId());
-            return new PrometheusProxy(hostPO.getHostname());
+            ServiceConfigPO serviceConfigPO =
+                    serviceConfigDao.findByServiceIdAndName(componentPO.getServiceId(), "prometheus");
+            int port = 9090;
+            ServiceConfigDTO serviceConfigDTO = ServiceConfigConverter.INSTANCE.fromPO2DTO(serviceConfigPO);
+            for (PropertyDTO property : serviceConfigDTO.getProperties()) {
+                if ("port".equals(property.getName())) {
+                    port = Integer.parseInt(property.getValue());
+                    if (port <= 0) {
+                        log.warn("Invalid port {} for Prometheus server, using default port 9090", port);
+                        port = 9090; // Default Prometheus port
+                    }
+                }
+            }
+
+            return new PrometheusProxy(hostPO.getHostname(), port);
         }
     }
 }

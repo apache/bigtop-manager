@@ -28,7 +28,6 @@ import org.apache.bigtop.manager.dao.query.ComponentQuery;
 import org.apache.bigtop.manager.dao.query.HostQuery;
 import org.apache.bigtop.manager.dao.repository.ComponentDao;
 import org.apache.bigtop.manager.dao.repository.HostDao;
-import org.apache.bigtop.manager.dao.repository.RepoDao;
 import org.apache.bigtop.manager.dao.repository.ToolDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.enums.HealthyStatusEnum;
@@ -71,9 +70,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class HostServiceImpl implements HostService {
-
-    @Resource
-    private RepoDao repoDao;
 
     @Resource
     private HostDao hostDao;
