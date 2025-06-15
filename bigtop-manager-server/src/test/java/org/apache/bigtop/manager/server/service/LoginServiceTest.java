@@ -25,7 +25,11 @@ import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.model.dto.LoginDTO;
 import org.apache.bigtop.manager.server.service.impl.LoginServiceImpl;
+import org.apache.bigtop.manager.server.utils.CacheUtils;
+import org.apache.bigtop.manager.server.utils.PasswordUtils;
+import org.apache.bigtop.manager.server.utils.Pbkdf2Utils;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -33,6 +37,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -46,34 +51,67 @@ public class LoginServiceTest {
     @InjectMocks
     private LoginService loginService = new LoginServiceImpl();
 
+    private static final String USERNAME = "root";
+    private static final String RAW_PASSWORD = "123456";
+
+    private UserPO mockUser;
+    private String nonce;
+
+    @BeforeEach
+    public void setUp() {
+        nonce = PasswordUtils.randomString(16);
+        CacheUtils.setCache(USERNAME, nonce);
+
+        mockUser = new UserPO();
+        mockUser.setUsername(USERNAME);
+        mockUser.setPassword(Pbkdf2Utils.getBcryptPassword(USERNAME, RAW_PASSWORD));
+        mockUser.setStatus(true);
+    }
+
     @Test
-    public void testLogin() {
+    public void testLogin_WhenUserNotFound_ShouldThrowException() {
         when(userDao.findByUsername(any())).thenReturn(null);
-        assertEquals(
-                ApiExceptionEnum.INCORRECT_USERNAME_OR_PASSWORD,
-                assertThrows(ApiException.class, () -> loginService.login(new LoginDTO()))
-                        .getEx());
 
-        UserPO userPO = new UserPO();
-        userPO.setStatus(false);
-        userPO.setPassword("wrong_password");
-        LoginDTO loginDTO = new LoginDTO();
-        loginDTO.setPassword("password");
-        when(userDao.findByUsername(any())).thenReturn(userPO);
-        assertEquals(
-                ApiExceptionEnum.INCORRECT_USERNAME_OR_PASSWORD,
-                assertThrows(ApiException.class, () -> loginService.login(loginDTO))
-                        .getEx());
+        ApiException exception = assertThrows(ApiException.class, () -> loginService.login(new LoginDTO()));
+        assertEquals(ApiExceptionEnum.INCORRECT_USERNAME_OR_PASSWORD, exception.getEx());
+    }
 
-        userPO.setPassword("password");
-        when(userDao.findByUsername(any())).thenReturn(userPO);
-        assertEquals(
-                ApiExceptionEnum.USER_IS_DISABLED,
-                assertThrows(ApiException.class, () -> loginService.login(loginDTO))
-                        .getEx());
+    @Test
+    public void testLogin_WhenPasswordMismatch_ShouldThrowException() {
+        LoginDTO loginDTO = createLoginDTO("wrong_password");
 
-        userPO.setStatus(true);
-        when(userDao.findByUsername(any())).thenReturn(userPO);
-        assert loginService.login(loginDTO) != null;
+        when(userDao.findByUsername(any())).thenReturn(mockUser);
+
+        ApiException exception = assertThrows(ApiException.class, () -> loginService.login(loginDTO));
+        assertEquals(ApiExceptionEnum.INCORRECT_USERNAME_OR_PASSWORD, exception.getEx());
+    }
+
+    @Test
+    public void testLogin_WhenUserIsDisabled_ShouldThrowException() {
+        mockUser.setStatus(false);
+        LoginDTO loginDTO = createLoginDTO(RAW_PASSWORD);
+
+        when(userDao.findByUsername(any())).thenReturn(mockUser);
+
+        ApiException exception = assertThrows(ApiException.class, () -> loginService.login(loginDTO));
+        assertEquals(ApiExceptionEnum.USER_IS_DISABLED, exception.getEx());
+    }
+
+    @Test
+    public void testLogin_WhenValidCredentials_ShouldReturnToken() {
+        LoginDTO loginDTO = createLoginDTO(RAW_PASSWORD);
+
+        when(userDao.findByUsername(any())).thenReturn(mockUser);
+
+        Object result = loginService.login(loginDTO);
+        assertNotNull(result);
+    }
+
+    private LoginDTO createLoginDTO(String password) {
+        LoginDTO dto = new LoginDTO();
+        dto.setUsername(USERNAME);
+        dto.setPassword(Pbkdf2Utils.getPbkdf2Password(USERNAME, password));
+        dto.setNonce(nonce);
+        return dto;
     }
 }

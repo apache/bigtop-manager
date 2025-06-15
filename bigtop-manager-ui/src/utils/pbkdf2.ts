@@ -17,40 +17,23 @@
  * under the License.
  */
 
-import { LoginReq, LoginVO } from '@/api/login/types.ts'
-import request from '@/api/request.ts'
+import forge from 'node-forge'
 
-export const getSalt = (username: string): Promise<string> => {
-  return request({
-    method: 'get',
-    url: '/salt',
-    params: {
-      username
-    }
-  })
-}
+/**
+ * Derives a cryptographic key using PBKDF2 and returns it as a hexadecimal string.
+ *
+ * @param password - The user's password
+ * @param salt - The salt value used in key derivation
+ * @returns A hexadecimal string representation of the derived key
+ */
+export function deriveKey(password: string, salt: string): string {
+  const iterations = 600000
+  // Key size in bytes: 32 bytes = 256 bits
+  const keySizeInBytes = 32
 
-export const getNonce = (username: string): Promise<string> => {
-  return request({
-    method: 'get',
-    url: '/nonce',
-    params: {
-      username
-    }
-  })
-}
+  // Derive key using PBKDF2 with HMAC-SHA256
+  const derivedKey = forge.pkcs5.pbkdf2(password, salt, iterations, keySizeInBytes, 'sha256')
 
-export const login = (data: LoginReq): Promise<LoginVO> => {
-  return request({
-    method: 'post',
-    url: '/login',
-    data
-  })
-}
-
-export const test = () => {
-  return request({
-    method: 'get',
-    url: '/test'
-  })
+  // Convert byte array to hexadecimal string
+  return forge.util.bytesToHex(derivedKey)
 }
