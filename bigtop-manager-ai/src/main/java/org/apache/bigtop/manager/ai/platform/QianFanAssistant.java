@@ -22,12 +22,12 @@ import org.apache.bigtop.manager.ai.core.AbstractAIAssistant;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 
+import dev.langchain4j.community.model.qianfan.QianfanChatModel;
+import dev.langchain4j.community.model.qianfan.QianfanStreamingChatModel;
 import dev.langchain4j.internal.ValidationUtils;
 import dev.langchain4j.memory.ChatMemory;
-import dev.langchain4j.model.chat.ChatLanguageModel;
-import dev.langchain4j.model.chat.StreamingChatLanguageModel;
-import dev.langchain4j.model.qianfan.QianfanChatModel;
-import dev.langchain4j.model.qianfan.QianfanStreamingChatModel;
+import dev.langchain4j.model.chat.ChatModel;
+import dev.langchain4j.model.chat.StreamingChatModel;
 import dev.langchain4j.service.AiServices;
 
 public class QianFanAssistant extends AbstractAIAssistant {
@@ -49,8 +49,8 @@ public class QianFanAssistant extends AbstractAIAssistant {
 
         public AIAssistant build() {
             AIAssistant.Service aiService = AiServices.builder(AIAssistant.Service.class)
-                    .chatLanguageModel(getChatLanguageModel())
-                    .streamingChatLanguageModel(getStreamingChatLanguageModel())
+                    .chatModel(getChatModel())
+                    .streamingChatModel(getStreamingChatModel())
                     .chatMemory(getChatMemory())
                     .toolProvider(toolProvider)
                     .systemMessageProvider(threadId -> {
@@ -64,7 +64,7 @@ public class QianFanAssistant extends AbstractAIAssistant {
         }
 
         @Override
-        public ChatLanguageModel getChatLanguageModel() {
+        public ChatModel getChatModel() {
             String model = ValidationUtils.ensureNotNull(config.getModel(), "model");
             String apiKey =
                     ValidationUtils.ensureNotNull(config.getCredentials().get("apiKey"), "apiKey");
@@ -78,7 +78,7 @@ public class QianFanAssistant extends AbstractAIAssistant {
         }
 
         @Override
-        public StreamingChatLanguageModel getStreamingChatLanguageModel() {
+        public StreamingChatModel getStreamingChatModel() {
             String model = ValidationUtils.ensureNotNull(config.getModel(), "model");
             String apiKey =
                     ValidationUtils.ensureNotNull(config.getCredentials().get("apiKey"), "apiKey");

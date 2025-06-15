@@ -22,8 +22,8 @@ import org.apache.bigtop.manager.ai.core.config.AIAssistantConfig;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 
 import dev.langchain4j.memory.ChatMemory;
-import dev.langchain4j.model.chat.ChatLanguageModel;
-import dev.langchain4j.model.chat.StreamingChatLanguageModel;
+import dev.langchain4j.model.chat.ChatModel;
+import dev.langchain4j.model.chat.StreamingChatModel;
 import dev.langchain4j.service.tool.ToolProvider;
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 import reactor.core.publisher.Flux;
@@ -82,9 +82,9 @@ public interface AIAssistant {
 
         AIAssistant build();
 
-        ChatLanguageModel getChatLanguageModel();
+        ChatModel getChatModel();
 
-        StreamingChatLanguageModel getStreamingChatLanguageModel();
+        StreamingChatModel getStreamingChatModel();
 
         ChatMemory getChatMemory();
     }

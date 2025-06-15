@@ -26,8 +26,8 @@ import org.apache.bigtop.manager.server.service.HostService;
 
 import org.springframework.stereotype.Component;
 
-import dev.langchain4j.agent.tool.JsonSchemaProperty;
 import dev.langchain4j.agent.tool.ToolSpecification;
+import dev.langchain4j.model.chat.request.json.JsonObjectSchema;
 import dev.langchain4j.service.tool.ToolExecutor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,7 +45,10 @@ public class HostFunctions {
         ToolSpecification toolSpecification = ToolSpecification.builder()
                 .name("getHostById")
                 .description("Get host information based on ID")
-                .addParameter("hostId", JsonSchemaProperty.NUMBER, JsonSchemaProperty.description("host id"))
+                .parameters(JsonObjectSchema.builder()
+                        .description("Host ID")
+                        .addNumberProperty("hostId")
+                        .build())
                 .build();
         ToolExecutor toolExecutor = (toolExecutionRequest, memoryId) -> {
             Map<String, Object> arguments = JsonUtils.readFromString(toolExecutionRequest.arguments());
@@ -64,7 +67,10 @@ public class HostFunctions {
         ToolSpecification toolSpecification = ToolSpecification.builder()
                 .name("getHostByName")
                 .description("Get host information based on cluster name")
-                .addParameter("hostName", JsonSchemaProperty.STRING, JsonSchemaProperty.description("host name"))
+                .parameters(JsonObjectSchema.builder()
+                        .description("Host name")
+                        .addStringProperty("hostName")
+                        .build())
                 .build();
         ToolExecutor toolExecutor = (toolExecutionRequest, memoryId) -> {
             Map<String, Object> arguments = JsonUtils.readFromString(toolExecutionRequest.arguments());
