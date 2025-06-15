@@ -48,7 +48,7 @@ build() {
 
 destroy() {
   log "Destroy Containers!!!"
-  docker rm -f $(docker ps -q --filter network=bigtop-manager --filter "name=^bm-")
+  docker rm -f $(docker ps -aq --filter network=bigtop-manager --filter "name=^bm-")
   exit 0
 }
 
