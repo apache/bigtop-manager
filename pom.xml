@@ -226,9 +226,7 @@
                     <configuration>
                         <source>${java.version}</source>
                         <failOnError>false</failOnError>
-                        <aggregate>true</aggregate>
                         <skip>${maven.javadoc.skip}</skip>
-                        <additionalparam>-Xdoclint:none</additionalparam>
                     </configuration>
                     <executions>
                         <execution>
