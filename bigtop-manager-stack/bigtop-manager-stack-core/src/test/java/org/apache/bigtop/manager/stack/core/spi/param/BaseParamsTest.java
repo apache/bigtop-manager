@@ -37,6 +37,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mockStatic;
@@ -103,6 +104,27 @@ public class BaseParamsTest {
         localSettingsMockedStatic.close();
         osDetectionMockedStatic.close();
         netUtilsMockedStatic.close();
+    }
+
+    @Test
+    public void testInitGlobalParams() {
+        Map<String, Object> globalParamsMap = mockBaseParams.getGlobalParamsMap();
+        globalParamsMap.put("a1", "k1");
+        globalParamsMap.put("a2", "k2");
+        globalParamsMap.put("a3", "k3");
+        globalParamsMap.put("k1_k2", "kk1");
+        globalParamsMap.put("kk1_k3", "value");
+        globalParamsMap.put("key", "${key3}");
+        globalParamsMap.put("key1", "${k1_${a2}}_${a3}");
+        globalParamsMap.put("key2", "${${k1_${a2}}_${a3}}");
+        globalParamsMap.put("key3", "${key1}");
+        globalParamsMap.put("key4", "${not_exists}");
+        mockBaseParams.initGlobalParams();
+        assertEquals("kk1_k3", globalParamsMap.get("key"));
+        assertEquals("kk1_k3", globalParamsMap.get("key1"));
+        assertEquals("value", mockBaseParams.getGlobalParamsMap().get("key2"));
+        assertEquals("kk1_k3", globalParamsMap.get("key3"));
+        assertEquals("${not_exists}", globalParamsMap.get("key4"));
     }
 
     @Test

@@ -83,6 +83,7 @@ public class StackExecutor {
                     .getClass()
                     .getDeclaredConstructor(ComponentCommandPayload.class)
                     .newInstance(payload);
+            params.initGlobalParams();
             if (Environments.isDevMode()) {
                 log.info("Executing {}::{} on dev mode", script.getName(), method.getName());
                 return ShellResult.success();
