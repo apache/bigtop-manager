@@ -110,11 +110,11 @@ public class GrafanaParams extends InfraParams {
         }
         prometheusServer = prometheusServers.get(0);
 
-        Map<String, Object> prometheus_configuration = LocalSettings.configurations("prometheus", "prometheus");
-        if (prometheus_configuration == null) {
+        Map<String, Object> prometheusConf = LocalSettings.configurations("prometheus", "prometheus");
+        if (prometheusConf == null) {
             return configuration;
         }
-        prometheusPort = (String) prometheus_configuration.get("port");
+        prometheusPort = (String) prometheusConf.get("port");
         return configuration;
     }
 

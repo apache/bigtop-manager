@@ -27,6 +27,8 @@ import java.util.List;
 
 public interface Params extends PrioritySPI {
 
+    void initGlobalParams();
+
     String confDir();
 
     String user();
