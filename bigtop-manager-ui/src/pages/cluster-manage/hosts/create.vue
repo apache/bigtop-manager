@@ -366,12 +366,16 @@
       formValue.value = Object.assign(formValue.value, {
         ...payload,
         authType: `${payload?.authType ?? 1}`,
-        inputType: `${payload?.inputType ?? 1}`
+        inputType: `${payload?.inputType ?? 1}`,
+        sshPort: 22,
+        grpcPort: 8835
       })
     } else {
       Object.assign(formValue.value, {
         authType: '1',
-        inputType: '1'
+        inputType: '1',
+        sshPort: 22,
+        grpcPort: 8835
       })
     }
 
