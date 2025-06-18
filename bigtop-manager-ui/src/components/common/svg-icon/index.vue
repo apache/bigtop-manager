@@ -77,7 +77,5 @@
 </script>
 
 <template>
-  <div v-if="props.name">
-    <component :is="isIcon" />
-  </div>
+    <component v-if="props.name" :is="isIcon" />
 </template>
