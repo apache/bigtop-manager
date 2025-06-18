@@ -20,33 +20,64 @@
 <script setup lang="ts">
   import { computed } from 'vue'
 
-  interface SvgIconProps {
-    prefix?: string
-    name: string
-    color?: string
-  }
+  const icons = {
+  "avatar": IconSvgAvatar,
+  "bm-logo": IconSvgBmLogo,
+  "book": IconSvgBook,
+  "bottom-activated": IconSvgBottomActivated,
+  "bottom": IconSvgBottom,
+  "canceled": IconSvgCanceled,
+  "chat-avatar": IconSvgChatAvatar,
+  "chatbot": IconSvgChatbot,
+  "close": IconSvgClose,
+  "clusters-activated": IconSvgClustersActivated,
+  "clusters": IconSvgClusters,
+  "communication": IconSvgCommunication,
+  "components-activated": IconSvgComponentsActivated,
+  "components": IconSvgComponents,
+  "copy": IconSvgCopy,
+  "download": IconSvgDownload,
+  "error": IconSvgError,
+  "exit-screen": IconSvgExitScreen,
+  "failed": IconSvgFailed,
+  "filter-activated": IconSvgFilterActivated,
+  "filter": IconSvgFilter,
+  "full-screen": IconSvgFullScreen,
+  "github": IconSvgGithub,
+  "history": IconSvgHistory,
+  "hosts-activated": IconSvgHostsActivated,
+  "hosts": IconSvgHosts,
+  "infrastructures-activated": IconSvgInfrastructuresActivated,
+  "infrastructures": IconSvgInfrastructures,
+  "installing": IconSvgInstalling,
+  "language": IconSvgLanguage,
+  "llm-config-activated": IconSvgLlmConfigActivated,
+  "llm-config": IconSvgLlmConfig,
+  "more-line": IconSvgMoreLine,
+  "more": IconSvgMore,
+  "plus-dark": IconSvgPlusDark,
+  "plus-gray": IconSvgPlusGray,
+  "plus": IconSvgPlus,
+  "processing": IconSvgProcessing,
+  "question": IconSvgQuestion,
+  "remove": IconSvgRemove,
+  "restart": IconSvgRestart,
+  "retry": IconSvgRetry,
+  "search-activated": IconSvgSearchActivated,
+  "search": IconSvgSearch,
+  "send": IconSvgSend,
+  "start": IconSvgStart,
+  "stop": IconSvgStop,
+  "success": IconSvgSuccess,
+  "unknown": IconSvgUnknown,
+};
 
-  const props = withDefaults(defineProps<SvgIconProps>(), {
-    prefix: 'icon',
-    color: '#000'
-  })
-
-  const symbolId = computed(() => `#${props.prefix}-${props.name}`)
+  const props = defineProps<{ name: string | undefined }>()
+  const isIcon = computed(() => props.name && icons[props.name])
 </script>
 
 <template>
-  <svg class="svg-icon" aria-hidden="true">
-    <use :xlink:href="symbolId" :fill="color" />
-  </svg>
+  <div v-if="props.name">
+    <component :is="isIcon" />
+  </div>
 </template>
-
-<style lang="scss" scoped>
-  .svg-icon {
-    height: 1.2em;
-    width: 1.2em;
-    margin: 0 6px;
-    vertical-align: -0.25em;
-    overflow: hidden;
-    flex-shrink: 0;
-  }
-</style>

@@ -66,7 +66,7 @@
       ? filterActions(['EXITSCREEN', 'CLOSE'])
       : filterActions(['ADD', 'RECORDS', 'FULLSCREEN', 'CLOSE'])
   })
-  const addIcon = computed(() => (threads.value.length >= 10 ? 'plus_gray' : 'plus'))
+  const addIcon = computed(() => (threads.value.length >= 10 ? 'plus-gray' : 'plus'))
   const addState = computed(() => threads.value.length >= 10 || loadingChatRecords.value || !hasActivePlatform.value)
   const actionGroup = computed((): GroupItem<ActionType>[] => [
     {
@@ -84,13 +84,13 @@
     },
     {
       tip: 'full_screen',
-      icon: 'full_screen',
+      icon: 'full-screen',
       action: 'FULLSCREEN',
       clickEvent: toggleFullScreen
     },
     {
       tip: 'exit_screen',
-      icon: 'exit_screen',
+      icon: 'exit-screen',
       action: 'EXITSCREEN',
       clickEvent: toggleFullScreen
     },

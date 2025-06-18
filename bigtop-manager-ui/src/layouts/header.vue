@@ -40,7 +40,7 @@
 <template>
   <a-layout-header class="header">
     <h1 class="header-left common-layout">
-      <svg-icon name="bm_logo" />
+      <svg-icon name="bm-logo" />
     </h1>
     <div class="header-menu">
       <a-menu

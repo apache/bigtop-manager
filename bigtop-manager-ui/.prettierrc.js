@@ -17,7 +17,7 @@
  * under the License.
  */
 
-module.exports = {
+export default {
   useTabs: false,
   printWidth: 120,
   semi: false,

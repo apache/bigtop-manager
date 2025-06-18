@@ -362,8 +362,8 @@
         </div>
       </template>
       <template #customFilterIcon="{ filtered, column }">
-        <svg-icon v-if="!['name', 'status'].includes(column.key)" :name="filtered ? 'search_activated' : 'search'" />
-        <svg-icon v-else :name="filtered ? 'filter_activated' : 'filter'" />
+        <svg-icon v-if="!['name', 'status'].includes(column.key)" :name="filtered ? 'search-activated' : 'search'" />
+        <svg-icon v-else :name="filtered ? 'filter-activated' : 'filter'" />
       </template>
       <template #bodyCell="{ record, column }">
         <template v-if="['status'].includes(column.key)">

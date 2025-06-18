@@ -69,7 +69,7 @@
     const { key, icon } = menuItem
     const matchedRouteFromClusters = selectMenuKeyFromClusters.value && routeParamsLen.value > 0
     return key === siderMenuSelectedKey.value || (matchedRouteFromClusters && key === 'clusters')
-      ? `${icon}_activated`
+      ? `${icon}-activated`
       : icon
   }
 

@@ -9,7 +9,7 @@
       "@/*": ["src/*"]
     },
     "skipLibCheck": true,
-    "types": ["vitest", "vitest/globals", "vite/client", "vite-plugin-svg-icons/client"],
+    "types": ["vitest", "vitest/globals", "vite/client"],
     /* Bundler mode */
     //     "moduleResolution": "Bundler",
     "moduleResolution": "Node",
@@ -24,7 +24,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noImplicitAny": false,
+    "noImplicitAny": false
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "src/types/**/*.d.ts"],
   "references": [
