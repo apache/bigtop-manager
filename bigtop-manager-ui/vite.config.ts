@@ -26,7 +26,6 @@ import AutoImport from 'unplugin-auto-import/vite'
 import IconsResolver from 'unplugin-icons/resolver'
 import { FileSystemIconLoader } from 'unplugin-icons/loaders'
 
-
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd())
@@ -89,28 +88,28 @@ export default defineConfig(({ mode }) => {
       }
     },
     build: {
-			outDir: 'dist',
-			sourcemap: true,
-			reportCompressedSize: true,
-			chunkSizeWarningLimit: 1024,
-			rollupOptions: {
-				output: {
-					chunkFileNames: 'static/js/[name]-[hash].js',
-					entryFileNames: 'static/js/[name]-[hash].js',
-					assetFileNames: 'static/[ext]/name-[hash].[ext]',
-					manualChunks(id) {
-						if (id.includes('node_modules/lodash-es')) {
-							return 'lodash';
-						}
-					},
-				},
-			},
-			terserOptions: {
-				compress: {
-					drop_console: true, // remove console
-					drop_debugger: true, // remove debugger
-				},
-			},
-		},
+      outDir: 'dist',
+      sourcemap: true,
+      reportCompressedSize: true,
+      chunkSizeWarningLimit: 1024,
+      rollupOptions: {
+        output: {
+          chunkFileNames: 'static/js/[name]-[hash].js',
+          entryFileNames: 'static/js/[name]-[hash].js',
+          assetFileNames: 'static/[ext]/name-[hash].[ext]',
+          manualChunks(id) {
+            if (id.includes('node_modules/lodash-es')) {
+              return 'lodash'
+            }
+          }
+        }
+      },
+      terserOptions: {
+        compress: {
+          drop_console: true, // remove console
+          drop_debugger: true // remove debugger
+        }
+      }
+    }
   }
 })
