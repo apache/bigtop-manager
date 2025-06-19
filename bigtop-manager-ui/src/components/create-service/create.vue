@@ -18,16 +18,17 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onUnmounted, ref, shallowRef, watch } from 'vue'
-  import { message } from 'ant-design-vue'
+  import { computed, h, onUnmounted, ref, shallowRef, watch } from 'vue'
+  import { message, Modal } from 'ant-design-vue'
   import { useI18n } from 'vue-i18n'
   import { storeToRefs } from 'pinia'
-  import { useRoute } from 'vue-router'
+  import { onBeforeRouteLeave, useRoute } from 'vue-router'
   import { StepContext, useCreateServiceStore } from '@/store/create-service'
   import ServiceSelector from './components/service-selector.vue'
   import ComponentAssigner from './components/component-assigner.vue'
   import ServiceConfigurator from './components/service-configurator.vue'
   import ComponentInstaller from './components/component-installer.vue'
+  import SvgIcon from '@/components/common/svg-icon/index.vue'
 
   const { t } = useI18n()
   const route = useRoute()
@@ -37,7 +38,7 @@
   const compRef = ref<any>()
   const components = shallowRef<any[]>([ServiceSelector, ComponentAssigner, ServiceConfigurator, ServiceConfigurator])
   const currComp = computed(() => components.value[current.value])
-  const isDone = computed(() => ['Successful', 'Failed'].includes(createdPayload.state))
+  const isDone = computed(() => ['Successful', 'Failed'].includes(createdPayload.value.state ?? ''))
 
   /**
    * Validate the service selection step
@@ -127,6 +128,29 @@
 
   onUnmounted(() => {
     createStore.$reset()
+  })
+
+  onBeforeRouteLeave((_to, _from, next) => {
+    if (current.value === stepsLimit.value && !isDone.value) {
+      Modal.confirm({
+        title: () =>
+          h('div', { style: { display: 'flex' } }, [
+            h(SvgIcon, { name: 'unknown', style: { width: '24px', height: '24px' } }),
+            h('span', t('common.exit_confirm'))
+          ]),
+        content: h('div', { style: { paddingLeft: '36px' } }, t('common.installing_exit_confirm_content')),
+        cancelText: t('common.no'),
+        icon: null,
+        okText: t('common.yes'),
+        onOk: () => {
+          next()
+          Modal.destroyAll()
+          createStore.$reset()
+        }
+      })
+      return
+    }
+    next()
   })
 </script>
 

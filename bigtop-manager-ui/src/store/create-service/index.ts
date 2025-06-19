@@ -116,6 +116,10 @@ export const useCreateServiceStore = defineStore(
       stepContext.value = partial
     }
 
+    function updateInstalledStatus(state: string) {
+      createdPayload.value.state = state
+    }
+
     async function confirmServiceDependencyAction(type: 'add' | 'remove', preSelectedService: ExpandServiceVO) {
       const { requiredServices } = preSelectedService
       if (!requiredServices && type === 'add') {
@@ -130,15 +134,15 @@ export const useCreateServiceStore = defineStore(
     }
 
     async function handleServiceDependencyConfirm(type: 'add' | 'remove', preSelectedService: ExpandServiceVO) {
-      let dependenciesSuccess: ProcessResult = { success: false }
       const result: ExpandServiceVO[] = []
-      if (type === 'add') {
-        const target = creationMode.value === 'public' ? infraServices.value : excludeInfraServices.value
-        const serviceMap = getServiceMap(target)
-        dependenciesSuccess = await processDependencies(preSelectedService, serviceMap, infraServices.value, result)
-      } else {
-        dependenciesSuccess = await notifyDependents(preSelectedService, result)
-      }
+      const target = creationMode.value === 'public' ? infraServices.value : excludeInfraServices.value
+      const serviceMap = getServiceMap(target)
+
+      const dependenciesSuccess =
+        type === 'add'
+          ? await processDependencies(preSelectedService, serviceMap, infraServices.value, result)
+          : await notifyDependents(preSelectedService, result)
+
       if (dependenciesSuccess.success) {
         result.unshift(preSelectedService)
         return result
@@ -287,6 +291,7 @@ export const useCreateServiceStore = defineStore(
       allComps,
       allCompsMeta,
       updateSelectedService,
+      updateInstalledStatus,
       setStepContext,
       setTempData,
       confirmServiceDependencyAction,

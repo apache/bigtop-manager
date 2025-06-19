@@ -36,9 +36,9 @@
   const clusterStore = useClusterStore()
 
   onMounted(async () => {
-    stackStore.loadStacks()
+    await stackStore.loadStacks()
     await clusterStore.loadClusters()
-    serviceStore.getServicesOfInfra()
+    await serviceStore.getServicesOfInfra()
     userStore.getUserInfo()
     menuStore.setupMenu()
   })

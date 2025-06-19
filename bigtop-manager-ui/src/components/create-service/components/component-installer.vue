@@ -22,11 +22,14 @@
   import { Empty } from 'ant-design-vue'
   import { getJobDetails, retryJob } from '@/api/job'
   import { CommandVO } from '@/api/command/types'
+  import { useCreateServiceStore } from '@/store/create-service'
   import LogsView, { type LogViewProps } from '@/components/log-view/index.vue'
   import type { JobVO, StageVO, StateType, TaskVO } from '@/api/job/types'
 
   const props = defineProps<{ stepData: CommandVO }>()
   const { stepData } = toRefs(props)
+
+  const createStore = useCreateServiceStore()
   const activeKey = ref<number[]>([])
   const jobDetail = ref<JobVO>({})
   const spinning = ref(false)
@@ -55,6 +58,7 @@
     try {
       const data = await getJobDetails({ jobId, clusterId })
       jobDetail.value = data
+      createStore.updateInstalledStatus(data.state as StateType)
       return ['Successful', 'Failed'].includes(data.state as StateType)
     } catch (error) {
       console.log('error :>> ', error)

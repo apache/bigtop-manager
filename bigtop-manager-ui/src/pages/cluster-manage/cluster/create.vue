@@ -19,12 +19,14 @@
 
 <script setup lang="ts">
   import { useMenuStore } from '@/store/menu'
-  import { message } from 'ant-design-vue'
-  import { computed, ref, shallowRef } from 'vue'
+  import { message, Modal } from 'ant-design-vue'
+  import { computed, h, ref, shallowRef } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { getInstalledStatus, installDependencies } from '@/api/hosts'
   import { InstalledStatusVO, Status } from '@/api/hosts/types'
   import { execCommand } from '@/api/command'
+  import { onBeforeRouteLeave } from 'vue-router'
+  import SvgIcon from '@/components/common/svg-icon/index.vue'
   import useSteps from '@/composables/use-steps'
   import ClusterBase from './components/cluster-base.vue'
   import ComponentInfo from './components/component-info.vue'
@@ -174,6 +176,28 @@
   const onSave = () => {
     menuStore.updateSider()
   }
+
+  onBeforeRouteLeave((_to, _from, next) => {
+    if (current.value === stepsLimit.value && !isDone.value) {
+      Modal.confirm({
+        title: () =>
+          h('div', { style: { display: 'flex' } }, [
+            h(SvgIcon, { name: 'unknown', style: { width: '24px', height: '24px' } }),
+            h('span', t('common.exit_confirm'))
+          ]),
+        content: h('div', { style: { paddingLeft: '36px' } }, t('common.installing_exit_confirm_content')),
+        cancelText: t('common.no'),
+        icon: null,
+        okText: t('common.yes'),
+        onOk: () => {
+          next()
+          Modal.destroyAll()
+        }
+      })
+      return
+    }
+    next()
+  })
 </script>
 
 <template>

@@ -51,13 +51,13 @@
   display: none !important;
 }
 
-:where(.ant-modal-header) {
-  margin-bottom: 16px !important;
-}
-
 .header-title {
   font-weight: 500;
   margin-bottom: $space-md;
+}
+
+:where(.ant-modal-confirm-content) {
+  max-width: 100% !important;
 }
 
 .ellipsis {
