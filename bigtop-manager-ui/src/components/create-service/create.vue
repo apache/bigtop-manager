@@ -37,6 +37,7 @@
   const compRef = ref<any>()
   const components = shallowRef<any[]>([ServiceSelector, ComponentAssigner, ServiceConfigurator, ServiceConfigurator])
   const currComp = computed(() => components.value[current.value])
+  const isDone = computed(() => ['Successful', 'Failed'].includes(createdPayload.state))
 
   /**
    * Validate the service selection step
@@ -94,9 +95,6 @@
 
   const stepValidators = [validateServiceSelection, validateComponentAssignments, () => true, () => true]
 
-  /**
-   * Proceed to the next step
-   */
   const proceedToNextStep = async () => {
     const { type } = stepContext.value
 
@@ -111,9 +109,6 @@
     }
   }
 
-  /**
-   * Set up the step context
-   */
   const setupStepCtx = () => {
     const { id: clusterId, serviceId, creationMode, type } = route.params as StepContext
     createStore.setStepContext({ clusterId, serviceId, creationMode, type })
@@ -170,7 +165,7 @@
               {{ $t('common.next') }}
             </a-button>
           </template>
-          <a-button v-show="current === stepsLimit" type="primary" @click="$router.go(-1)">
+          <a-button v-show="current === stepsLimit && isDone" type="primary" @click="$router.go(-1)">
             {{ $t('common.done') }}
           </a-button>
         </a-space>
