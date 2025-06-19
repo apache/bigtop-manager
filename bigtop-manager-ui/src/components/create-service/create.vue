@@ -38,26 +38,35 @@
   const components = shallowRef<any[]>([ServiceSelector, ComponentAssigner, ServiceConfigurator, ServiceConfigurator])
   const currComp = computed(() => components.value[current.value])
 
-  const validateServiceSelection = async () => {
+  /**
+   * Validate the service selection step
+   */
+  const validateServiceSelection = async (): Promise<boolean> => {
     if (stepContext.value.type === 'component') {
       return true
     }
 
-    if (selectedServices.value.filter((v) => !v.isInstalled).length === 0) {
+    const uninstalledServices = selectedServices.value.filter((v) => !v.isInstalled)
+    if (uninstalledServices.length === 0) {
       message.error(t('service.service_selection'))
       return false
-    } else {
-      return await validateDependenciesOfServiceSelection()
     }
+
+    return await validateDependenciesOfServiceSelection()
   }
 
+  /**
+   * Validate service dependencies
+   */
   const validateDependenciesOfServiceSelection = async () => {
     let selectedServiceNames = new Set(selectedServices.value.map((service) => service.name))
+
     for (const selectedService of selectedServices.value) {
       const serviceDependencies = await createStore.confirmServiceDependencyAction('add', selectedService)
       if (serviceDependencies.length === 0) {
         return false
       }
+
       for (const service of serviceDependencies) {
         if (!selectedServiceNames.has(service.name)) {
           compRef.value.modifyInstallItems('add', service)
@@ -68,24 +77,29 @@
     return true
   }
 
-  const validateComponentAssignments = () => {
-    let valid = true
+  /**
+   * Validate the component assignment step
+   */
+  const validateComponentAssignments = (): boolean => {
     for (const info of createStore.allComps.values()) {
-      if (!info.cardinality) {
-        continue
-      }
-      valid = createStore.validCardinality(info.cardinality, info.hosts.length, info.displayName!)
-      if (!valid) {
-        return
+      if (!info.cardinality) continue
+
+      const isValid = createStore.validCardinality(info.cardinality, info.hosts?.length ?? 0, info.displayName!)
+      if (!isValid) {
+        return false
       }
     }
-    return valid
+    return true
   }
 
   const stepValidators = [validateServiceSelection, validateComponentAssignments, () => true, () => true]
 
+  /**
+   * Proceed to the next step
+   */
   const proceedToNextStep = async () => {
     const { type } = stepContext.value
+
     if (current.value < 3 && (await stepValidators[current.value]())) {
       createStore.nextStep()
     } else if (current.value === 3) {
@@ -97,6 +111,9 @@
     }
   }
 
+  /**
+   * Set up the step context
+   */
   const setupStepCtx = () => {
     const { id: clusterId, serviceId, creationMode, type } = route.params as StepContext
     createStore.setStepContext({ clusterId, serviceId, creationMode, type })

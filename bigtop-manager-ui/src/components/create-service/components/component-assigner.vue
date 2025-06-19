@@ -69,7 +69,7 @@
   )
   const hostsOfCurrComp = computed((): HostVO[] => {
     const temp = currComp.value.split('/').at(-1)
-    return allComps.value.has(temp!) ? allComps.value.get(temp!)?.hosts ?? [] : []
+    return allComps.value.get(temp!)?.hosts ?? []
   })
 
   const columns = computed((): TableColumnType<HostVO>[] => [
@@ -96,10 +96,8 @@
 
   const handleSearch = (selectedKeys: Key[], confirm: (param?: FilterConfirmProps) => void, dataIndex: string) => {
     confirm()
-    Object.assign(state, {
-      searchText: selectedKeys[0] as string,
-      searchedColumn: dataIndex
-    })
+    state.searchText = selectedKeys[0] as string
+    state.searchedColumn = dataIndex
   }
 
   const handleReset = (clearFilters: (param?: FilterResetProps) => void) => {
@@ -120,7 +118,7 @@
       paginationProps.value.total = res.total
       loading.value = false
     } catch (error) {
-      console.log('error :>> ', error)
+      console.error('Error fetching host list:', error)
     } finally {
       loading.value = false
     }
@@ -142,35 +140,28 @@
     }
   }
 
-  const getCheckboxProps: TableRowSelection['getCheckboxProps'] = (record) => {
-    return {
-      disabled: validateHostIsCheck(record),
-      name: record.hostname
-    }
-  }
+  const getCheckboxProps: TableRowSelection['getCheckboxProps'] = (record) => ({
+    disabled: validateHostIsCheck(record),
+    name: record.hostname
+  })
 
   const onSelectChange: TableRowSelection['onChange'] = (selectedRowKeys, selectedRows) => {
     const { cardinality, displayName } = currCompInfo.value || {}
     const newCount = selectedRowKeys.length
     const compKey = currComp.value.split('/').at(-1)!
-    const isInAllComps = allComps.value.has(compKey)
-    const shouldValidate = !!cardinality
-    const isValid = !shouldValidate || createStore.validCardinality(cardinality, newCount, displayName || '')
+    const isValid = !cardinality || createStore.validCardinality(cardinality, newCount, displayName || '')
 
-    const isDeselecting = newCount < state.selectedRowKeys.length
-
-    if (isValid || isDeselecting) {
+    if (isValid || newCount < state.selectedRowKeys.length) {
       state.selectedRowKeys = selectedRowKeys
-      if (isInAllComps) {
+      if (allComps.value.has(compKey)) {
         createStore.setComponentHosts(currComp.value, selectedRows)
       }
     }
   }
 
   const resetSelectedRowKeys = (key: string) => {
-    state.selectedRowKeys = allComps.value.has(key)
-      ? (allComps.value.get(key)?.hosts.map((v: HostVO) => v.hostname) as Key[]) ?? ([] as Key[])
-      : []
+    const hosts = allComps.value.get(key)?.hosts ?? []
+    state.selectedRowKeys = hosts.map((v: HostVO) => v.hostname) as Key[]
   }
 
   const treeSelectedChange = (keyPath: string) => {
