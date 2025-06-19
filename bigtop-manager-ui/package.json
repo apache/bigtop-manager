@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --open --mode development",
-    "build": "vue-tsc && vite build --mode production",
+    "build": "vite build && vue-tsc --noEmit",
     "preview": "vite preview",
     "lint": "eslint src --ext .ts,.tsx,.vue",
     "prettier": "prettier --write \"src/**/*.{vue,ts,tsx}\"",
