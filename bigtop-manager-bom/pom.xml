@@ -31,7 +31,8 @@
     <description>Bigtop Manager Bom</description>
 
     <properties>
-        <spring-boot.version>3.1.1</spring-boot.version>
+        <spring-ai.version>1.0.0-M6</spring-ai.version>
+        <spring-boot.version>3.3.6</spring-boot.version>
         <springdoc.version>2.2.0</springdoc.version>
         <freemarker.version>2.3.32</freemarker.version>
         <common-lang3.version>3.14.0</common-lang3.version>
@@ -269,6 +270,19 @@
                 <artifactId>langchain4j-community-qianfan</artifactId>
                 <version>${langchain4j.version}</version>
             </dependency>
+
+            <!--            <dependency>-->
+            <!--                <groupId>org.springframework.ai</groupId>-->
+            <!--                <artifactId>spring-ai-starter-mcp-server-webflux</artifactId>-->
+            <!--                <version>${spring-ai.version}</version>-->
+            <!--            </dependency>-->
+
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-mcp-server-webflux-spring-boot-starter</artifactId>
+                <version>${spring-ai.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>dev.langchain4j</groupId>
                 <artifactId>langchain4j-community-dashscope</artifactId>

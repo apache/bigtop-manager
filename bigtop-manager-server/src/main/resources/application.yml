@@ -18,6 +18,19 @@
 #
 
 spring:
+  ai:
+    mcp:
+      server:
+        name: webflux-mcp-server
+        version: 1.0.0
+        type: ASYNC  # Recommended for reactive applications
+        instructions: "This reactive server provides weather information tools and resources"
+        sse-endpoint: /mcp/sse
+        capabilities:
+          tool: true
+          resource: true
+          prompt: true
+          completion: true
   banner:
     charset: utf-8
   application:

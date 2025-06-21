@@ -18,6 +18,8 @@
  */
 package org.apache.bigtop.manager.server.config;
 
+// import org.apache.bigtop.manager.server.interceptor.AuthInterceptor;
+
 import org.apache.bigtop.manager.server.interceptor.AuthInterceptor;
 
 import org.springframework.context.annotation.Configuration;
@@ -45,6 +47,12 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns("/**")
                 // Server APIs
                 .excludePathPatterns("/api/login")
+                // MCP APIs
+                .excludePathPatterns("/mcp")
+                //                .excludePathPatterns("/**")
+                .excludePathPatterns("/mcp/**")
+                .excludePathPatterns("/sse")
+                .excludePathPatterns("/sse/**")
                 // Frontend pages
                 .excludePathPatterns("/", "/ui/**", "/favicon.ico", "/error")
                 // Swagger pages

@@ -33,6 +33,7 @@ import org.apache.bigtop.manager.server.service.ClusterService;
 
 import org.apache.commons.collections4.CollectionUtils;
 
+import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
@@ -60,6 +61,7 @@ public class ClusterServiceImpl implements ClusterService {
     }
 
     @Override
+    @Tool(description = "Get cluster details by ID")
     public ClusterVO get(Long id) {
         ClusterPO clusterPO = clusterDao.findDetailsById(id);
 

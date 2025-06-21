@@ -31,11 +31,13 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
+import lombok.extern.slf4j.Slf4j;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Component
+@Slf4j
 public class AuthInterceptor implements HandlerInterceptor {
 
     private ResponseEntity<?> responseEntity;
@@ -43,6 +45,7 @@ public class AuthInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
+        log.info(request.getRequestURI());
         if (checkLogin(request) && checkPermission()) {
             return HandlerInterceptor.super.preHandle(request, response, handler);
         } else {
