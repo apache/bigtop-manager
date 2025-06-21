@@ -16,41 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.stack.core.spi.param;
+package org.apache.bigtop.manager.server.utils;
 
-import org.apache.bigtop.manager.grpc.pojo.PackageInfo;
-import org.apache.bigtop.manager.grpc.pojo.RepoInfo;
-import org.apache.bigtop.manager.grpc.pojo.TemplateInfo;
-import org.apache.bigtop.manager.stack.core.spi.PrioritySPI;
+import org.junit.jupiter.api.Test;
 
-import java.util.List;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public interface Params extends PrioritySPI {
+public class HexUtilsTest {
 
-    void initGlobalParams();
-
-    String confDir();
-
-    String user();
-
-    String group();
-
-    RepoInfo repo();
-
-    List<PackageInfo> packages();
-
-    List<TemplateInfo> templates();
-
-    String javaHome();
-
-    String stackHome();
-
-    String serviceHome();
-
-    String getServiceName();
-
-    @Override
-    default String getName() {
-        return getServiceName();
+    @Test
+    public void testHex() {
+        byte[] bytes = HexUtils.hexToBytes("abc123");
+        String hex = HexUtils.bytesToHex(bytes);
+        assertEquals("abc123", hex);
     }
 }

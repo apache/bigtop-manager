@@ -16,41 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.stack.core.spi.param;
 
-import org.apache.bigtop.manager.grpc.pojo.PackageInfo;
-import org.apache.bigtop.manager.grpc.pojo.RepoInfo;
-import org.apache.bigtop.manager.grpc.pojo.TemplateInfo;
-import org.apache.bigtop.manager.stack.core.spi.PrioritySPI;
+import forge from 'node-forge'
 
-import java.util.List;
+/**
+ * Derives a cryptographic key using PBKDF2 and returns it as a hexadecimal string.
+ *
+ * @param password - The user's password
+ * @param salt - The salt value used in key derivation
+ * @returns A hexadecimal string representation of the derived key
+ */
+export function deriveKey(password: string, salt: string): string {
+  const iterations = 600000
+  // Key size in bytes: 32 bytes = 256 bits
+  const keySizeInBytes = 32
 
-public interface Params extends PrioritySPI {
+  // Derive key using PBKDF2 with HMAC-SHA256
+  const derivedKey = forge.pkcs5.pbkdf2(password, salt, iterations, keySizeInBytes, 'sha256')
 
-    void initGlobalParams();
-
-    String confDir();
-
-    String user();
-
-    String group();
-
-    RepoInfo repo();
-
-    List<PackageInfo> packages();
-
-    List<TemplateInfo> templates();
-
-    String javaHome();
-
-    String stackHome();
-
-    String serviceHome();
-
-    String getServiceName();
-
-    @Override
-    default String getName() {
-        return getServiceName();
-    }
+  // Convert byte array to hexadecimal string
+  return forge.util.bytesToHex(derivedKey)
 }

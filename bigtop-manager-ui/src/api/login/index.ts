@@ -20,6 +20,26 @@
 import { LoginReq, LoginVO } from '@/api/login/types.ts'
 import request from '@/api/request.ts'
 
+export const getSalt = (username: string): Promise<string> => {
+  return request({
+    method: 'get',
+    url: '/salt',
+    params: {
+      username
+    }
+  })
+}
+
+export const getNonce = (username: string): Promise<string> => {
+  return request({
+    method: 'get',
+    url: '/nonce',
+    params: {
+      username
+    }
+  })
+}
+
 export const login = (data: LoginReq): Promise<LoginVO> => {
   return request({
     method: 'post',

@@ -55,8 +55,10 @@ public class PrometheusProxy {
     public static final String DISK_READ = "diskRead";
     public static final String DISK_WRITE = "diskWrite";
 
-    public PrometheusProxy(String prometheusHost) {
-        this.webClient = WebClient.builder().baseUrl(prometheusHost).build();
+    public PrometheusProxy(String prometheusHost, Integer prometheusPort) {
+        this.webClient = WebClient.builder()
+                .baseUrl("http://" + prometheusHost + ":" + prometheusPort)
+                .build();
     }
     /**
      * Retrieve current data
@@ -286,7 +288,11 @@ public class PrometheusProxy {
                 JsonNode agentCpuMetric = agentCpus.get(0).get("metric");
                 ObjectNode agentInfo = objectMapper.createObjectNode();
                 agentInfo.put("hostname", agentCpuMetric.get("hostname").asText());
-                agentInfo.put("cpuInfo", agentCpuMetric.get("cpu_info").asText());
+                agentInfo.put(
+                        "cpuInfo",
+                        agentCpuMetric.get("cpu_info") == null
+                                ? ""
+                                : agentCpuMetric.get("cpu_info").asText());
                 agentInfo.put("iPv4addr", agentCpuMetric.get("iPv4addr").asText());
                 agentInfo.put("os", agentCpuMetric.get("os").asText());
                 agentInfo.put("architecture", agentCpuMetric.get("arch").asText());
@@ -328,7 +334,11 @@ public class PrometheusProxy {
                 // metric
                 JsonNode agentCpuMetrics = agentCpu.get(0).get("metric");
                 agentCpuInfo.put("hostname", agentCpuMetrics.get("hostname").asText());
-                agentCpuInfo.put("cpuInfo", agentCpuMetrics.get("cpu_info").asText());
+                agentCpuInfo.put(
+                        "cpuInfo",
+                        agentCpuInfo.get("cpu_info") == null
+                                ? ""
+                                : agentCpuInfo.get("cpu_info").asText());
                 agentCpuInfo.put("iPv4addr", agentCpuMetrics.get("iPv4addr").asText());
                 agentCpuInfo.put("os", agentCpuMetrics.get("os").asText());
                 agentCpuInfo.put("architecture", agentCpuMetrics.get("arch").asText());

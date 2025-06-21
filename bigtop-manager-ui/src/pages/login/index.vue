@@ -21,11 +21,11 @@
   import { useRouter } from 'vue-router'
   import { reactive, shallowRef } from 'vue'
   import { UserOutlined, LockOutlined } from '@ant-design/icons-vue'
-  import { login } from '@/api/login'
+  import { getSalt, getNonce, login } from '@/api/login'
   import { message } from 'ant-design-vue'
   import { useI18n } from 'vue-i18n'
-  import md5 from 'md5'
   import SelectLang from '@/components/select-lang/index.vue'
+  import { deriveKey } from '@/utils/pbkdf2.ts'
 
   const i18n = useI18n()
   const router = useRouter()
@@ -44,9 +44,22 @@
     const hide = message.loading(i18n.t('login.logging_in'), 0)
     try {
       await formRef.value?.validate()
+      const username = loginModel.username
+
+      const salt = await getSalt(username).then(async (res: string) => {
+        return res
+      })
+
+      const nonce = await getNonce(username).then(async (res: string) => {
+        return res
+      })
+
+      const encryptPwd = deriveKey(loginModel.password, salt)
+
       const res = await login({
-        username: loginModel.username,
-        password: md5(loginModel.password)
+        username: username,
+        password: encryptPwd,
+        nonce: nonce
       })
 
       if (loginModel.remember) {
@@ -90,7 +103,7 @@
           <div class="login-body-right">
             <div class="login-body-right-tips">{{ $t('login.tips') }}</div>
             <a-form ref="formRef" class="login-body-right-form" :model="loginModel">
-              <a-tabs v-model:activeKey="loginModel.type" centered>
+              <a-tabs v-model:active-key="loginModel.type" centered>
                 <a-tab-pane key="account" :tab="$t('login.tab_account')" />
               </a-tabs>
               <template v-if="loginModel.type === 'account'">

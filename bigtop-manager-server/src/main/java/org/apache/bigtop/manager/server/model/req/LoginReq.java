@@ -29,4 +29,7 @@ public class LoginReq {
 
     @Schema(example = "admin")
     private String password;
+
+    @Schema(example = "nonce")
+    private String nonce;
 }

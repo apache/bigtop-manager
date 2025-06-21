@@ -16,41 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.stack.core.spi.param;
+package org.apache.bigtop.manager.server.utils;
 
-import org.apache.bigtop.manager.grpc.pojo.PackageInfo;
-import org.apache.bigtop.manager.grpc.pojo.RepoInfo;
-import org.apache.bigtop.manager.grpc.pojo.TemplateInfo;
-import org.apache.bigtop.manager.stack.core.spi.PrioritySPI;
+import org.junit.jupiter.api.Test;
 
-import java.util.List;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public interface Params extends PrioritySPI {
+public class Pbkdf2UtilsTest {
 
-    void initGlobalParams();
-
-    String confDir();
-
-    String user();
-
-    String group();
-
-    RepoInfo repo();
-
-    List<PackageInfo> packages();
-
-    List<TemplateInfo> templates();
-
-    String javaHome();
-
-    String stackHome();
-
-    String serviceHome();
-
-    String getServiceName();
-
-    @Override
-    default String getName() {
-        return getServiceName();
+    @Test
+    public void testGetPbkdf2Password() {
+        String pbkdf2Password = Pbkdf2Utils.getPbkdf2Password("root", "root");
+        assertEquals("5088ada7c4a74b6412740737bf300f98776813f0a3d3ecc6de7f9f1926c7692b", pbkdf2Password);
     }
 }

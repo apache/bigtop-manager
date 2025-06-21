@@ -16,41 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.stack.core.spi.param;
+package org.apache.bigtop.manager.server.utils;
 
-import org.apache.bigtop.manager.grpc.pojo.PackageInfo;
-import org.apache.bigtop.manager.grpc.pojo.RepoInfo;
-import org.apache.bigtop.manager.grpc.pojo.TemplateInfo;
-import org.apache.bigtop.manager.stack.core.spi.PrioritySPI;
+import org.junit.jupiter.api.Test;
 
-import java.util.List;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public interface Params extends PrioritySPI {
+public class PasswordUtilsTest {
 
-    void initGlobalParams();
+    @Test
+    public void testRandomString() {
+        int length = 32;
+        String randomString = PasswordUtils.randomString(length);
+        assertEquals(length, randomString.length());
+    }
 
-    String confDir();
-
-    String user();
-
-    String group();
-
-    RepoInfo repo();
-
-    List<PackageInfo> packages();
-
-    List<TemplateInfo> templates();
-
-    String javaHome();
-
-    String stackHome();
-
-    String serviceHome();
-
-    String getServiceName();
-
-    @Override
-    default String getName() {
-        return getServiceName();
+    @Test
+    public void testGenBcryptAndCheckBcrypt() {
+        String rawPassword = "password";
+        String hashedPassword = PasswordUtils.getBcryptPassword(rawPassword);
+        boolean check = PasswordUtils.checkBcryptPassword(rawPassword, hashedPassword);
+        assertTrue(check);
     }
 }

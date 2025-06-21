@@ -57,7 +57,7 @@ CREATE TABLE `user`
 (
     `id`          BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
     `username`    VARCHAR(32) DEFAULT NULL,
-    `password`    VARCHAR(32) DEFAULT NULL,
+    `password`    VARCHAR(255) DEFAULT NULL,
     `nickname`    VARCHAR(32) DEFAULT NULL,
     `status`      BIT(1)      DEFAULT 1 COMMENT '0-Disable, 1-Enable',
     `create_time` DATETIME    DEFAULT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -348,7 +348,7 @@ CREATE TABLE `tool`
 
 -- Adding default admin user
 INSERT INTO user (username, password, nickname, status)
-VALUES ('admin', '21232f297a57a5a743894a0e4a801fc3', 'Administrator', true);
+VALUES ('admin', '$2b$10$bdTvADKA0dSJYT3wMU3LFeIEnxzKQHeWN3XcHJ5jQpsIo7ju1U5Yi', 'Administrator', true);
 
 INSERT INTO repo (name, arch, base_url)
 VALUES
