@@ -56,6 +56,7 @@
         <langchain4j.version>1.0.1-beta6</langchain4j.version>
         <mybatis-spring-boot-starter.version>3.0.3</mybatis-spring-boot-starter.version>
         <pagehelper-spring-boot-starter.version>2.1.0</pagehelper-spring-boot-starter.version>
+        <victools.version>4.29.0</victools.version>
     </properties>
 
     <dependencyManagement>
@@ -282,6 +283,12 @@
                 <groupId>org.springframework.ai</groupId>
                 <artifactId>spring-ai-starter-mcp-server-webmvc</artifactId>
                 <version>${spring-ai.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.victools</groupId>
+                <artifactId>jsonschema-module-jackson</artifactId>
+                <version>${victools.version}</version>
             </dependency>
 
             <dependency>
