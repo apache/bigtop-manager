@@ -134,6 +134,8 @@ dependency:
       license: EPL-2.0
     - name: jakarta.annotation:jakarta.annotation-api
       license: EPL-2.0
+    - name: com.github.victools:jsonschema-module-jackson
+      license: Apache-2.0
   excludes:
     # Go license
     - name: com.google.re2j:re2j
