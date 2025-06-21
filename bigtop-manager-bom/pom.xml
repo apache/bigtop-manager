@@ -31,8 +31,8 @@
     <description>Bigtop Manager Bom</description>
 
     <properties>
-        <spring-ai.version>1.0.0-M8</spring-ai.version>
-        <spring-boot.version>3.3.6</spring-boot.version>
+        <spring-ai.version>1.0.0-RC1</spring-ai.version>
+        <spring-boot.version>3.1.1</spring-boot.version>
         <springdoc.version>2.2.0</springdoc.version>
         <freemarker.version>2.3.32</freemarker.version>
         <common-lang3.version>3.14.0</common-lang3.version>

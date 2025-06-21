@@ -44,7 +44,7 @@ public class ServerApplication {
     }
 
     @Bean
-    public ToolCallbackProvider weatherTools(LLMConfigService llmConfigService, ClusterService clusterService) {
+    public ToolCallbackProvider mcpTools(LLMConfigService llmConfigService, ClusterService clusterService) {
         return MethodToolCallbackProvider.builder()
                 .toolObjects(llmConfigService, clusterService)
                 .build();
