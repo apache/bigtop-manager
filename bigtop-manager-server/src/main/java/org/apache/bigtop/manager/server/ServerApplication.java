@@ -20,6 +20,7 @@ package org.apache.bigtop.manager.server;
 
 import org.apache.bigtop.manager.server.service.ClusterService;
 import org.apache.bigtop.manager.server.service.LLMConfigService;
+import org.apache.bigtop.manager.server.service.StackService;
 
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.tool.method.MethodToolCallbackProvider;
@@ -44,9 +45,10 @@ public class ServerApplication {
     }
 
     @Bean
-    public ToolCallbackProvider mcpTools(LLMConfigService llmConfigService, ClusterService clusterService) {
+    public ToolCallbackProvider mcpTools(
+            LLMConfigService llmConfigService, ClusterService clusterService, StackService stackService) {
         return MethodToolCallbackProvider.builder()
-                .toolObjects(llmConfigService, clusterService)
+                .toolObjects(llmConfigService, clusterService, stackService)
                 .build();
     }
 }
