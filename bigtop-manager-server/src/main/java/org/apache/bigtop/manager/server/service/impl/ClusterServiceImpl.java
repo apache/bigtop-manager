@@ -61,7 +61,7 @@ public class ClusterServiceImpl implements ClusterService {
     }
 
     @Override
-    @Tool(description = "Get cluster details by ID")
+    @Tool(description = "Get cluster details by ID, arg0 represents cluster ID", name = "GetClusterDetailsByID")
     public ClusterVO get(Long id) {
         ClusterPO clusterPO = clusterDao.findDetailsById(id);
 

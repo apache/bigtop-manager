@@ -19,6 +19,7 @@
 package org.apache.bigtop.manager.server;
 
 import org.apache.bigtop.manager.server.service.ClusterService;
+import org.apache.bigtop.manager.server.service.LLMConfigService;
 
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.tool.method.MethodToolCallbackProvider;
@@ -43,7 +44,9 @@ public class ServerApplication {
     }
 
     @Bean
-    public ToolCallbackProvider weatherTools(ClusterService clusterService) {
-        return MethodToolCallbackProvider.builder().toolObjects(clusterService).build();
+    public ToolCallbackProvider weatherTools(LLMConfigService llmConfigService, ClusterService clusterService) {
+        return MethodToolCallbackProvider.builder()
+                .toolObjects(llmConfigService, clusterService)
+                .build();
     }
 }
