@@ -18,8 +18,17 @@
  */
 package org.apache.bigtop.manager.server;
 
+import org.apache.bigtop.manager.server.service.ClusterService;
+import org.apache.bigtop.manager.server.service.CommandService;
+import org.apache.bigtop.manager.server.service.HostService;
+import org.apache.bigtop.manager.server.service.LLMConfigService;
+import org.apache.bigtop.manager.server.service.StackService;
+
+import org.springframework.ai.tool.ToolCallbackProvider;
+import org.springframework.ai.tool.method.MethodToolCallbackProvider;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
@@ -35,5 +44,17 @@ public class ServerApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(ServerApplication.class, args);
+    }
+
+    @Bean
+    public ToolCallbackProvider mcpTools(
+            LLMConfigService llmConfigService,
+            ClusterService clusterService,
+            StackService stackService,
+            CommandService commandService,
+            HostService hostService) {
+        return MethodToolCallbackProvider.builder()
+                .toolObjects(llmConfigService, clusterService, stackService, commandService, hostService)
+                .build();
     }
 }

@@ -19,6 +19,7 @@
 package org.apache.bigtop.manager.server.config;
 
 import org.apache.bigtop.manager.server.interceptor.AuthInterceptor;
+import org.apache.bigtop.manager.server.interceptor.MCPInterceptor;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -35,6 +36,9 @@ public class WebConfig implements WebMvcConfigurer {
     @Resource
     private AuthInterceptor authInterceptor;
 
+    @Resource
+    private MCPInterceptor mcpInterceptor;
+
     private static final String API_PREFIX = "/api";
 
     private static final String PREFIXED_PACKAGE = "org.apache.bigtop.manager.server.controller";
@@ -45,10 +49,14 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns("/**")
                 // Server APIs
                 .excludePathPatterns("/api/salt", "/api/nonce", "/api/login")
+                // MCP APIs
+                .excludePathPatterns("/mcp/**")
                 // Frontend pages
                 .excludePathPatterns("/", "/ui/**", "/favicon.ico", "/error")
                 // Swagger pages
                 .excludePathPatterns("/swagger-ui/**", "/v3/**", "/swagger-ui.html");
+
+        registry.addInterceptor(mcpInterceptor).addPathPatterns("/mcp/**");
     }
 
     @Override
