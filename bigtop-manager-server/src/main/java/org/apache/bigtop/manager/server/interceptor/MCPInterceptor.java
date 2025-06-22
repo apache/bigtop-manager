@@ -43,7 +43,7 @@ public class MCPInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
-        if (checkLogin(request)) {
+        if (checkAuthenticated(request)) {
             return HandlerInterceptor.super.preHandle(request, response, handler);
         } else {
             response.setHeader("Content-Type", "application/json; charset=UTF-8");
@@ -69,7 +69,7 @@ public class MCPInterceptor implements HandlerInterceptor {
         SessionUserHolder.clear();
     }
 
-    private Boolean checkLogin(HttpServletRequest request) {
+    private Boolean checkAuthenticated(HttpServletRequest request) {
         String token = request.getHeader("Token");
         if (StringUtils.isBlank(token)) {
             responseEntity = ResponseEntity.error(ApiExceptionEnum.NEED_LOGIN);
