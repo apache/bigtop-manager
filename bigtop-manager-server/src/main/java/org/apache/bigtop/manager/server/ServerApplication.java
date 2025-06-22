@@ -19,6 +19,8 @@
 package org.apache.bigtop.manager.server;
 
 import org.apache.bigtop.manager.server.service.ClusterService;
+import org.apache.bigtop.manager.server.service.CommandService;
+import org.apache.bigtop.manager.server.service.HostService;
 import org.apache.bigtop.manager.server.service.LLMConfigService;
 import org.apache.bigtop.manager.server.service.StackService;
 
@@ -46,9 +48,13 @@ public class ServerApplication {
 
     @Bean
     public ToolCallbackProvider mcpTools(
-            LLMConfigService llmConfigService, ClusterService clusterService, StackService stackService) {
+            LLMConfigService llmConfigService,
+            ClusterService clusterService,
+            StackService stackService,
+            CommandService commandService,
+            HostService hostService) {
         return MethodToolCallbackProvider.builder()
-                .toolObjects(llmConfigService, clusterService, stackService)
+                .toolObjects(llmConfigService, clusterService, stackService, commandService, hostService)
                 .build();
     }
 }

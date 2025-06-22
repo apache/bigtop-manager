@@ -92,7 +92,7 @@ public class StackServiceImpl implements StackService {
         return res;
     }
 
-    @Tool(description = "List supported stacks")
+    @Tool(name = "ListStacks", description = "List supported stacks")
     public List<StackVO> listStacks() {
         return list(false);
     }

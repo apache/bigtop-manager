@@ -46,6 +46,8 @@ import org.apache.bigtop.manager.server.service.HostService;
 import org.apache.bigtop.manager.server.utils.PageUtils;
 import org.apache.bigtop.manager.server.utils.RemoteSSHUtils;
 
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -98,7 +100,25 @@ public class HostServiceImpl implements HostService {
     }
 
     @Override
-    public List<HostVO> add(HostDTO hostDTO) {
+    @Tool(name = "AddHost", description = "Add hosts to bigtop manager")
+    public List<HostVO> add(
+            @ToolParam(
+                            required = true,
+                            description =
+                                    """
+           Example of adding a host:
+            {
+                "hostnames": [
+                    "hostname"
+                ],
+                "agentDir": "/opt", # Path to install Bigtop Manager agent
+                "sshUser": "username",
+                "sshPort": 22,
+                "authType": 3, # 1: password, 2: key, 3: no auth
+                "grpcPort": 8835,
+            }
+            """)
+                    HostDTO hostDTO) {
         List<HostPO> hostPOList = HostConverter.INSTANCE.fromDTO2POListUsingHostnames(hostDTO);
         for (HostPO hostPO : hostPOList) {
             hostPO.setStatus(HealthyStatusEnum.HEALTHY.getCode());
@@ -220,7 +240,24 @@ public class HostServiceImpl implements HostService {
     }
 
     @Override
-    public Boolean installDependencies(List<HostDTO> hostDTOList) {
+    @Tool(name = "InstallDependencies", description = "Install dependencies on hosts")
+    public Boolean installDependencies(
+            @ToolParam(
+                            required = true,
+                            description =
+                                    """
+            {
+                "hostnames": [
+                    "hostname"
+                ],
+                "agentDir": "/opt/apps", # Path to install Bigtop Manager agent
+                "sshUser": "username",
+                "sshPort": 22,
+                "authType": 3, # 1: password, 2: key, 3: no auth
+                "grpcPort": 8835,
+            }
+            """)
+                    List<HostDTO> hostDTOList) {
         // Clear cache list
         installedStatus.clear();
 
