@@ -30,7 +30,7 @@
   import useSteps from '@/composables/use-steps'
   import ClusterBase from './components/cluster-base.vue'
   import ComponentInfo from './components/component-info.vue'
-  import HostConfig from './components/host-config.vue'
+  import HostManage from './components/host-manage.vue'
   import CheckWorkflow from './components/check-workflow.vue'
   import type { ClusterCommandReq, CommandRequest, CommandVO, HostReq } from '@/api/command/types'
 
@@ -44,7 +44,7 @@
     commandLevel: 'cluster'
   })
   const installStatus = shallowRef<InstalledStatusVO[]>([])
-  const components = shallowRef<any[]>([ClusterBase, ComponentInfo, HostConfig, CheckWorkflow])
+  const components = shallowRef<any[]>([ClusterBase, ComponentInfo, HostManage, CheckWorkflow])
   const isInstall = computed(() => current.value === 2)
   const hasUnknownHost = computed(() => stepData.value[2].filter((v) => v.status === Status.Unknown).length == 0)
   const allInstallSuccess = computed(

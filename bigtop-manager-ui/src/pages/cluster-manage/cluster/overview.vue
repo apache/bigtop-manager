@@ -29,8 +29,8 @@
   import { useStackStore } from '@/store/stack'
   import { Empty } from 'ant-design-vue'
 
-  import GaugeChart from './components/gauge-chart.vue'
-  import CategoryChart from './components/category-chart.vue'
+  import GaugeChart from '@/components/charts/gauge-chart.vue'
+  import CategoryChart from '@/components/charts/category-chart.vue'
 
   import type { ClusterStatusType, ClusterVO } from '@/api/cluster/types'
   import type { ServiceListParams, ServiceVO } from '@/api/service/types'

@@ -59,7 +59,7 @@ const routes: RouteRecordRaw[] = [
           {
             name: 'CreateCluster',
             path: 'create-cluster',
-            component: () => import('@/pages/cluster-manage/cluster/create.vue'),
+            component: () => import('@/components/create-cluster/create.vue'),
             meta: {
               hidden: true
             }
