@@ -123,6 +123,7 @@ public class HostController {
     @Operation(summary = "Install dependencies", description = "Install dependencies on a host")
     @PostMapping("/install-dependencies")
     public ResponseEntity<Boolean> installDependencies(@RequestBody @Validated List<HostReq> hostReqs) {
+        hostService.validate(hostReqs);
         List<HostDTO> hostDTOList = new ArrayList<>();
         hostReqs.forEach(hostReq -> hostDTOList.add(HostConverter.INSTANCE.fromReq2DTO(hostReq)));
         return ResponseEntity.success(hostService.installDependencies(hostDTOList));

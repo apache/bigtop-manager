@@ -38,6 +38,7 @@ import org.apache.bigtop.manager.server.model.converter.ComponentConverter;
 import org.apache.bigtop.manager.server.model.converter.HostConverter;
 import org.apache.bigtop.manager.server.model.dto.HostDTO;
 import org.apache.bigtop.manager.server.model.query.PageQuery;
+import org.apache.bigtop.manager.server.model.req.HostReq;
 import org.apache.bigtop.manager.server.model.vo.ComponentVO;
 import org.apache.bigtop.manager.server.model.vo.HostVO;
 import org.apache.bigtop.manager.server.model.vo.InstalledStatusVO;
@@ -45,6 +46,8 @@ import org.apache.bigtop.manager.server.model.vo.PageVO;
 import org.apache.bigtop.manager.server.service.HostService;
 import org.apache.bigtop.manager.server.utils.PageUtils;
 import org.apache.bigtop.manager.server.utils.RemoteSSHUtils;
+
+import org.apache.commons.collections4.CollectionUtils;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -250,6 +253,21 @@ public class HostServiceImpl implements HostService {
     @Override
     public List<InstalledStatusVO> installedStatus() {
         return installedStatus;
+    }
+
+    @Override
+    public void validate(List<HostReq> hostReqs) {
+        List<String> hostnames = hostReqs.stream()
+                .flatMap(hostDTO -> hostDTO.getHostnames().stream())
+                .distinct()
+                .toList();
+
+        List<HostPO> existsHostList = hostDao.findAllByHostnames(hostnames);
+        if (CollectionUtils.isNotEmpty(existsHostList)) {
+            List<String> existsHostnames =
+                    existsHostList.stream().map(HostPO::getHostname).toList();
+            throw new ApiException(ApiExceptionEnum.HOST_ASSIGNED, String.join(",", existsHostnames));
+        }
     }
 
     public void installDependencies(HostDTO hostDTO, String hostname, InstalledStatusVO installedStatusVO) {
