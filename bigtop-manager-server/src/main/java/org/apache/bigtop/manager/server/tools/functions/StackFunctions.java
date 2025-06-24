@@ -27,8 +27,8 @@ import org.apache.bigtop.manager.server.service.StackService;
 
 import org.springframework.stereotype.Component;
 
-import dev.langchain4j.agent.tool.JsonSchemaProperty;
 import dev.langchain4j.agent.tool.ToolSpecification;
+import dev.langchain4j.model.chat.request.json.JsonObjectSchema;
 import dev.langchain4j.service.tool.ToolExecutor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -67,10 +67,10 @@ public class StackFunctions {
         ToolSpecification toolSpecification = ToolSpecification.builder()
                 .name("getServiceByName")
                 .description("Get service information and configs based on service name")
-                .addParameter(
-                        "serviceName",
-                        JsonSchemaProperty.STRING,
-                        JsonSchemaProperty.description("Lowercase service name"))
+                .parameters(JsonObjectSchema.builder()
+                        .addStringProperty("serviceName")
+                        .description("Service name")
+                        .build())
                 .build();
         ToolExecutor toolExecutor = (toolExecutionRequest, memoryId) -> {
             Map<String, Object> arguments = JsonUtils.readFromString(toolExecutionRequest.arguments());

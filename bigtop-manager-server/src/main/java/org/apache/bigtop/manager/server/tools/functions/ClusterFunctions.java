@@ -24,8 +24,8 @@ import org.apache.bigtop.manager.server.service.ClusterService;
 
 import org.springframework.stereotype.Component;
 
-import dev.langchain4j.agent.tool.JsonSchemaProperty;
 import dev.langchain4j.agent.tool.ToolSpecification;
+import dev.langchain4j.model.chat.request.json.JsonObjectSchema;
 import dev.langchain4j.service.tool.ToolExecutor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -55,7 +55,10 @@ public class ClusterFunctions {
         ToolSpecification toolSpecification = ToolSpecification.builder()
                 .name("getClusterById")
                 .description("Get cluster information based on ID")
-                .addParameter("clusterId", JsonSchemaProperty.NUMBER, JsonSchemaProperty.description("cluster id"))
+                .parameters(JsonObjectSchema.builder()
+                        .description("Cluster ID")
+                        .addNumberProperty("clusterId")
+                        .build())
                 .build();
         ToolExecutor toolExecutor = (toolExecutionRequest, memoryId) -> {
             Map<String, Object> arguments = JsonUtils.readFromString(toolExecutionRequest.arguments());
@@ -74,7 +77,10 @@ public class ClusterFunctions {
         ToolSpecification toolSpecification = ToolSpecification.builder()
                 .name("getClusterByName")
                 .description("Get cluster information based on cluster name")
-                .addParameter("clusterName", JsonSchemaProperty.STRING, JsonSchemaProperty.description("cluster name"))
+                .parameters(JsonObjectSchema.builder()
+                        .description("Cluster name")
+                        .addStringProperty("clusterName")
+                        .build())
                 .build();
         ToolExecutor toolExecutor = (toolExecutionRequest, memoryId) -> {
             Map<String, Object> arguments = JsonUtils.readFromString(toolExecutionRequest.arguments());

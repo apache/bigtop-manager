@@ -47,8 +47,8 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
-import dev.langchain4j.agent.tool.JsonSchemaProperty;
 import dev.langchain4j.agent.tool.ToolSpecification;
+import dev.langchain4j.model.chat.request.json.JsonObjectSchema;
 import dev.langchain4j.service.tool.ToolExecutor;
 import dev.langchain4j.service.tool.ToolProvider;
 import dev.langchain4j.service.tool.ToolProviderResult;
@@ -318,7 +318,10 @@ public class LLMConfigServiceImpl implements LLMConfigService {
             ToolSpecification toolSpecification = ToolSpecification.builder()
                     .name("getFlag")
                     .description("Get flag based on key")
-                    .addParameter("key", JsonSchemaProperty.STRING, JsonSchemaProperty.description("Lowercase key"))
+                    .parameters(JsonObjectSchema.builder()
+                            .addStringProperty("key")
+                            .description("Lowercase key to get flag")
+                            .build())
                     .build();
             ToolExecutor toolExecutor = (toolExecutionRequest, memoryId) -> {
                 Map<String, Object> arguments = JsonUtils.readFromString(toolExecutionRequest.arguments());
