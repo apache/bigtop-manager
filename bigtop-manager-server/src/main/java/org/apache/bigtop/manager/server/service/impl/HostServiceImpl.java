@@ -256,8 +256,8 @@ public class HostServiceImpl implements HostService {
     }
 
     @Override
-    public Boolean validate(HostnameReq hostnameReq) {
-        List<HostPO> existsHostList = hostDao.findAllByHostnames(hostnameReq.getHostnames());
+    public Boolean checkDuplicate(HostDTO hostReq) {
+        List<HostPO> existsHostList = hostDao.findAllByHostnames(hostReq.getHostnames());
         if (CollectionUtils.isNotEmpty(existsHostList)) {
             List<String> existsHostnames =
                     existsHostList.stream().map(HostPO::getHostname).toList();
