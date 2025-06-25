@@ -33,4 +33,6 @@ public final class Constants {
     public static final String PERMISSION_777 = "777";
 
     public static final String ROOT_USER = "root";
+
+    public static final String ROOT_GROUP = "root";
 }
