@@ -22,6 +22,7 @@ import org.apache.bigtop.manager.dao.query.HostQuery;
 import org.apache.bigtop.manager.server.model.converter.HostConverter;
 import org.apache.bigtop.manager.server.model.dto.HostDTO;
 import org.apache.bigtop.manager.server.model.req.HostReq;
+import org.apache.bigtop.manager.server.model.req.HostnameReq;
 import org.apache.bigtop.manager.server.model.req.IdsReq;
 import org.apache.bigtop.manager.server.model.vo.ComponentVO;
 import org.apache.bigtop.manager.server.model.vo.HostVO;
@@ -132,5 +133,11 @@ public class HostController {
     @GetMapping("/installed-status")
     public ResponseEntity<List<InstalledStatusVO>> installedStatus() {
         return ResponseEntity.success(hostService.installedStatus());
+    }
+
+    @Operation(summary = "check-duplicate", description = "check hostname duplicate")
+    @PostMapping("/check-duplicate")
+    public ResponseEntity<Boolean> checkDuplicate(@RequestBody @Validated HostnameReq hostnameReq) {
+        return ResponseEntity.success(hostService.validate(hostnameReq));
     }
 }

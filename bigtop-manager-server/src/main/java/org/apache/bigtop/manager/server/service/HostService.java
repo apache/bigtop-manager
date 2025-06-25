@@ -20,6 +20,7 @@ package org.apache.bigtop.manager.server.service;
 
 import org.apache.bigtop.manager.dao.query.HostQuery;
 import org.apache.bigtop.manager.server.model.dto.HostDTO;
+import org.apache.bigtop.manager.server.model.req.HostnameReq;
 import org.apache.bigtop.manager.server.model.vo.ComponentVO;
 import org.apache.bigtop.manager.server.model.vo.HostVO;
 import org.apache.bigtop.manager.server.model.vo.InstalledStatusVO;
@@ -102,4 +103,10 @@ public interface HostService {
      * @return installed status
      */
     List<InstalledStatusVO> installedStatus();
+
+    /**
+     * validate host exists
+     * @param hostnameReq hostnames
+     */
+    Boolean validate(HostnameReq hostnameReq);
 }
