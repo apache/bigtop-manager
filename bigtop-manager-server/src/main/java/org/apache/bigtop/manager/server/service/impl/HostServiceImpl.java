@@ -38,6 +38,7 @@ import org.apache.bigtop.manager.server.model.converter.ComponentConverter;
 import org.apache.bigtop.manager.server.model.converter.HostConverter;
 import org.apache.bigtop.manager.server.model.dto.HostDTO;
 import org.apache.bigtop.manager.server.model.query.PageQuery;
+import org.apache.bigtop.manager.server.model.req.HostReq;
 import org.apache.bigtop.manager.server.model.vo.ComponentVO;
 import org.apache.bigtop.manager.server.model.vo.HostVO;
 import org.apache.bigtop.manager.server.model.vo.InstalledStatusVO;
@@ -255,7 +256,7 @@ public class HostServiceImpl implements HostService {
     }
 
     @Override
-    public Boolean checkDuplicate(HostDTO hostReq) {
+    public Boolean checkDuplicate(HostReq hostReq) {
         List<HostPO> existsHostList = hostDao.findAllByHostnames(hostReq.getHostnames());
         if (CollectionUtils.isNotEmpty(existsHostList)) {
             List<String> existsHostnames =

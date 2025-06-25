@@ -136,7 +136,7 @@ public class HostController {
 
     @Operation(summary = "check-duplicate", description = "check hostname duplicate")
     @PostMapping("/check-duplicate")
-    public ResponseEntity<Boolean> checkDuplicate(@RequestBody @Validated HostDTO hostReq) {
+    public ResponseEntity<Boolean> checkDuplicate(@RequestBody @Validated HostReq hostReq) {
         return ResponseEntity.success(hostService.checkDuplicate(hostReq));
     }
 }
