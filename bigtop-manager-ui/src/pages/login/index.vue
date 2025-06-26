@@ -27,12 +27,10 @@
   import SelectLang from '@/components/select-lang/login-lang.vue'
   import { deriveKey } from '@/utils/pbkdf2.ts'
   import { useStackStore } from '@/store/stack'
-  import { useUserStore } from '@/store/user'
   import { useMenuStore } from '@/store/menu'
 
   const i18n = useI18n()
   const stackStore = useStackStore()
-  const userStore = useUserStore()
   const menuStore = useMenuStore()
 
   const router = useRouter()
@@ -74,7 +72,6 @@
       } else {
         sessionStorage.setItem('Token', res.token)
       }
-      userStore.getUserInfo()
       stackStore.loadStacks()
       menuStore.setupMenu()
 
