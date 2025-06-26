@@ -37,8 +37,9 @@ import java.util.Map;
 @NoArgsConstructor
 public class MySQLParams extends InfraParams {
 
-    private String mysqlLogDir = "/var/log/mysql";
-    private String mysqlPidDir = "/var/run/mysql";
+    private String mysqlLogDir;
+    private String mysqlPidDir;
+    private String mysqlDataDir;
 
     private String rootPassword;
     private String myCnfContent;
@@ -54,6 +55,16 @@ public class MySQLParams extends InfraParams {
         common();
     }
 
+    @Override
+    public void initGlobalParams() {
+        super.initGlobalParams();
+
+        Map<String, Object> map = getGlobalParamsMap();
+        mysqlPidDir = map.get("mysql_pid_dir").toString();
+        mysqlLogDir = map.get("mysql_log_dir").toString();
+        mysqlDataDir = map.get("mysql_data_dir").toString();
+    }
+
     public Map<String, Object> common() {
         Map<String, Object> common = LocalSettings.configurations(getServiceName(), "common");
         rootPassword = common.get("root_password").toString();
@@ -63,8 +74,6 @@ public class MySQLParams extends InfraParams {
     @GlobalParams
     public Map<String, Object> myCnf() {
         Map<String, Object> myCnf = LocalSettings.configurations(getServiceName(), "my.cnf");
-        mysqlPidDir = myCnf.get("mysql_pid_dir").toString();
-        mysqlLogDir = myCnf.get("mysql_log_dir").toString();
         myCnfContent = myCnf.get("content").toString();
         return myCnf;
     }

@@ -16,7 +16,7 @@
 FROM openeuler/openeuler:24.03
 
 RUN dnf install -y sudo wget openssh-clients openssh-server mariadb mariadb-server net-tools chrony krb5-server krb5-libs krb5-workstation git python3 procps-ng
-RUN dnf install -y postgresql java-17-openjdk-devel vim
+RUN dnf install -y postgresql java-17-openjdk-devel vim numactl
 
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk
 ENV PATH=$JAVA_HOME/bin:$PATH
