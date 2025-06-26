@@ -106,7 +106,7 @@ public interface HostService {
 
     /**
      * validate host exists
-     * @param hostReq hostnames
+     * @param hostDTO hostnames
      */
-    Boolean checkDuplicate(HostReq hostReq);
+    Boolean checkDuplicate(HostDTO hostDTO);
 }
