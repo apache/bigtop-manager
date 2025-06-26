@@ -102,4 +102,10 @@ public interface HostService {
      * @return installed status
      */
     List<InstalledStatusVO> installedStatus();
+
+    /**
+     * validate host exists
+     * @param hostDTO hostnames
+     */
+    Boolean checkDuplicate(HostDTO hostDTO);
 }

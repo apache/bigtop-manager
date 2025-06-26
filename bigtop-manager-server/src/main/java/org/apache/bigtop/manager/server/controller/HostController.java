@@ -133,4 +133,11 @@ public class HostController {
     public ResponseEntity<List<InstalledStatusVO>> installedStatus() {
         return ResponseEntity.success(hostService.installedStatus());
     }
+
+    @Operation(summary = "check-duplicate", description = "check hostname duplicate")
+    @PostMapping("/check-duplicate")
+    public ResponseEntity<Boolean> checkDuplicate(@RequestBody @Validated HostReq hostReq) {
+        HostDTO hostDTO = HostConverter.INSTANCE.fromReq2DTO(hostReq);
+        return ResponseEntity.success(hostService.checkDuplicate(hostDTO));
+    }
 }
