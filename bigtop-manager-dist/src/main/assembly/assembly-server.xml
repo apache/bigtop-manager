@@ -32,12 +32,14 @@
             <outputDirectory>bin</outputDirectory>
             <fileMode>0755</fileMode>
             <directoryMode>0755</directoryMode>
+            <lineEnding>unix</lineEnding>
         </fileSet>
         <fileSet>
             <directory>${project.basedir}/../bigtop-manager-server/src/main/resources/scripts</directory>
             <outputDirectory>scripts</outputDirectory>
             <fileMode>0755</fileMode>
             <directoryMode>0755</directoryMode>
+            <lineEnding>unix</lineEnding>
         </fileSet>
         <fileSet>
             <directory>${project.basedir}/../bigtop-manager-server/src/main/resources</directory>
