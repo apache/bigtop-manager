@@ -47,7 +47,7 @@
 port=3306
 basedir=${mysql_home}
 datadir=${mysql_data_dir}
-socket=/var/lib/mysql/mysql.sock
+socket=/tmp/mysql.sock
 pid-file = ${mysql_pid_dir}/mysqld.pid
 log-error = ${mysql_log_dir}/error.log
 general-log-file = ${mysql_log_dir}/general.log
@@ -56,7 +56,7 @@ log-bin = ${mysql_log_dir}/mysql-bin.log
 default-storage-engine=INNODB
 
 [client]
-socket=/var/lib/mysql/mysql.sock
+socket=/tmp/mysql.sock
 ]]>
         </value>
         <attrs>
