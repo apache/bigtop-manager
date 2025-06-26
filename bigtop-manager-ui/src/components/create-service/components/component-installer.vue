@@ -139,20 +139,24 @@
           <template #header>
             <div class="stage-item">
               <span>{{ stage.name }}</span>
-              <svg-icon :name="stage.state && status[stage.state]"></svg-icon>
+              <div style="min-width: 100px">
+                <svg-icon :name="stage.state && status[stage.state]"></svg-icon>
+              </div>
             </div>
           </template>
           <div v-for="task in stage.tasks" :key="task.id" class="task-item">
             <span>{{ task.name }}</span>
             <a-space :size="16">
               <svg-icon :name="task.state && status[task.state]"></svg-icon>
-              <a-button
-                v-if="task.state && !['Canceled', 'Pending'].includes(task.state)"
-                type="link"
-                @click="viewLogs(stage, task)"
-              >
-                {{ $t('cluster.view_log') }}
-              </a-button>
+              <div style="min-width: 62px">
+                <a-button
+                  v-if="task.state && !['Canceled', 'Pending'].includes(task.state)"
+                  type="link"
+                  @click="viewLogs(stage, task)"
+                >
+                  {{ $t('cluster.view_log') }}
+                </a-button>
+              </div>
             </a-space>
           </div>
         </a-collapse-panel>
@@ -190,7 +194,6 @@
     }
   }
   .stage-item {
-    margin-right: 68px;
     @include flexbox($justify: space-between, $align: center);
   }
   .task-item {

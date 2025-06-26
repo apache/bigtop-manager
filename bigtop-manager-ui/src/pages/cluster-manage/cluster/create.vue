@@ -23,15 +23,17 @@
   import { computed, h, ref, shallowRef } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { getInstalledStatus, installDependencies } from '@/api/hosts'
-  import { InstalledStatusVO, Status } from '@/api/hosts/types'
   import { execCommand } from '@/api/command'
   import { onBeforeRouteLeave } from 'vue-router'
+
   import SvgIcon from '@/components/common/svg-icon/index.vue'
   import useSteps from '@/composables/use-steps'
   import ClusterBase from './components/cluster-base.vue'
   import ComponentInfo from './components/component-info.vue'
   import HostConfig from './components/host-config.vue'
   import CheckWorkflow from './components/check-workflow.vue'
+
+  import { type InstalledStatusVO, Status } from '@/api/hosts/types'
   import type { ClusterCommandReq, CommandRequest, CommandVO, HostReq } from '@/api/command/types'
 
   const { t } = useI18n()
@@ -43,10 +45,13 @@
     command: 'Add',
     commandLevel: 'cluster'
   })
+
   const installStatus = shallowRef<InstalledStatusVO[]>([])
   const components = shallowRef<any[]>([ClusterBase, ComponentInfo, HostConfig, CheckWorkflow])
+
   const isInstall = computed(() => current.value === 2)
   const hasUnknownHost = computed(() => stepData.value[2].filter((v) => v.status === Status.Unknown).length == 0)
+
   const allInstallSuccess = computed(
     () =>
       stepData.value[2].length != 0 &&

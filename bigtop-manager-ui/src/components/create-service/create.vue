@@ -23,12 +23,14 @@
   import { useI18n } from 'vue-i18n'
   import { storeToRefs } from 'pinia'
   import { onBeforeRouteLeave, useRoute } from 'vue-router'
-  import { StepContext, useCreateServiceStore } from '@/store/create-service'
+
   import ServiceSelector from './components/service-selector.vue'
   import ComponentAssigner from './components/component-assigner.vue'
   import ServiceConfigurator from './components/service-configurator.vue'
   import ComponentInstaller from './components/component-installer.vue'
   import SvgIcon from '@/components/common/svg-icon/index.vue'
+
+  import { type StepContext, useCreateServiceStore } from '@/store/create-service'
 
   const { t } = useI18n()
   const route = useRoute()
