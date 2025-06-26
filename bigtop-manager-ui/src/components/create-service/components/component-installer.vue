@@ -195,6 +195,10 @@
   }
   .stage-item {
     @include flexbox($justify: space-between, $align: center);
+    .svg-icon {
+      width: 16px;
+      height: 16px;
+    }
   }
   .task-item {
     height: 45px;
@@ -205,6 +209,10 @@
     @include flexbox($justify: space-between, $align: center);
     &:last-child {
       border-bottom: 1px solid $color-border-secondary;
+    }
+    .svg-icon {
+      width: 16px;
+      height: 16px;
     }
   }
 </style>
