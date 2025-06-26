@@ -44,6 +44,7 @@ public class MySQLSetup {
 
         LinuxFileUtils.createDirectories(mysqlParams.getMysqlLogDir(), mysqlUser, mysqlGroup, PERMISSION_755, true);
         LinuxFileUtils.createDirectories(mysqlParams.getMysqlPidDir(), mysqlUser, mysqlGroup, PERMISSION_755, true);
+        LinuxFileUtils.createDirectories(mysqlParams.getMysqlDataDir(), mysqlUser, mysqlGroup, PERMISSION_755, true);
 
         LinuxFileUtils.toFileByTemplate(
                 mysqlParams.getMyCnfContent(),
