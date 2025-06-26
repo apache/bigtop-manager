@@ -18,10 +18,10 @@
 -->
 
 <script setup lang="ts">
+  import { computed, onMounted, ref, watch } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
   import { useMenuStore } from '@/store/menu/index'
   import { storeToRefs } from 'pinia'
-  import { computed, ref, watch } from 'vue'
   import { useClusterStore } from '@/store/cluster'
   import type { ClusterStatusType } from '@/api/cluster/types'
 
@@ -44,27 +44,32 @@
     })
   )
 
-  watch(
-    () => route,
-    (newRoute) => {
-      const { params, path, meta } = newRoute
-      const targetCluster = clusterMap.value[`${params.id}`]
-      routeParamsLen.value = Object.keys(params).length
-      if (path.includes(routePathFromClusters.value) && routeParamsLen.value > 0 && clusterCount.value > 0) {
-        if (targetCluster) {
-          // siderMenuSelectedKey.value = `${routePathFromClusters.value}/${targetCluster.name}/${targetCluster.id}`
-          siderMenuSelectedKey.value = `${routePathFromClusters.value}/${targetCluster.id}`
-        }
-      } else {
-        siderMenuSelectedKey.value = meta.activeMenu ?? path
-      }
-    },
-    {
-      deep: true,
-      immediate: true
-    }
-  )
+  /**
+   * Handles route changes and updates the selected menu key.
+   */
+  const handleRouteChange = async (newRoute: typeof route) => {
+    const { params, path, meta, name } = newRoute
+    const clusterId = params.id
+    const isClusterPath = path.includes(routePathFromClusters.value)
+    const isNotCreatingCluster = name !== 'CreateCluster'
 
+    routeParamsLen.value = Object.keys(params).length
+
+    if (isClusterPath && clusterCount.value > 0 && isNotCreatingCluster) {
+      if (clusterId && clusterMap.value[`${clusterId}`]) {
+        siderMenuSelectedKey.value = `${routePathFromClusters.value}/${clusterId}`
+      } else {
+        siderMenuSelectedKey.value = ''
+        menuStore.setupSider()
+      }
+    } else {
+      siderMenuSelectedKey.value = meta.activeMenu ?? path
+    }
+  }
+
+  /**
+   * Toggles the activated icon for menu items.
+   */
   const toggleActivatedIcon = (menuItem: { key: string; icon: string }) => {
     const { key, icon } = menuItem
     const matchedRouteFromClusters = selectMenuKeyFromClusters.value && routeParamsLen.value > 0
@@ -76,6 +81,16 @@
   const addCluster = () => {
     router.push({ name: 'CreateCluster' })
   }
+
+  onMounted(async () => {
+    try {
+      await clusterStore.loadClusters()
+    } catch (error) {
+      console.error('Failed to load clusters:', error)
+    }
+  })
+
+  watch(() => route, handleRouteChange, { deep: true, immediate: true })
 </script>
 
 <template>

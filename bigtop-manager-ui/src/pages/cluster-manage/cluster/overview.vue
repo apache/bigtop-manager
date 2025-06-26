@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onActivated, ref, shallowRef, useAttrs, watch, watchEffect } from 'vue'
+  import { computed, onActivated, ref, shallowRef, toRefs, watchEffect } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { storeToRefs } from 'pinia'
   import { formatFromByte } from '@/utils/storage'
@@ -27,13 +27,15 @@
   import { useServiceStore } from '@/store/service'
   import { useJobProgress } from '@/store/job-progress'
   import { useStackStore } from '@/store/stack'
+  import { useClusterStore } from '@/store/cluster'
   import { Empty } from 'ant-design-vue'
+  import { useRoute } from 'vue-router'
 
   import GaugeChart from '@/components/charts/gauge-chart.vue'
   import CategoryChart from '@/components/charts/category-chart.vue'
 
   import type { ClusterStatusType, ClusterVO } from '@/api/cluster/types'
-  import type { ServiceListParams, ServiceVO } from '@/api/service/types'
+  import type { ServiceVO } from '@/api/service/types'
   import type { MenuItem } from '@/store/menu/types'
   import type { StackVO } from '@/api/stack/types'
   import type { Command } from '@/api/command/types'
@@ -44,11 +46,15 @@
     time: string
   }
 
+  const props = defineProps<{ payload: ClusterVO }>()
+  const emits = defineEmits<{ (event: 'update:payload', value: ClusterVO): void }>()
+
   const { t } = useI18n()
-  const attrs = useAttrs() as ClusterVO
+  const route = useRoute()
   const jobProgressStore = useJobProgress()
   const stackStore = useStackStore()
   const serviceStore = useServiceStore()
+  const clusterStore = useClusterStore()
   const currTimeRange = ref<TimeRangeText>('15m')
   const chartData = ref({
     chart1: [],
@@ -64,40 +70,27 @@
   const { serviceNames } = storeToRefs(serviceStore)
   const locateStackWithService = shallowRef<StackVO[]>([])
 
+  const { payload } = toRefs(props)
+
   const clusterDetail = computed(() => ({
-    ...attrs,
-    totalMemory: formatFromByte(attrs.totalMemory as number),
-    totalDisk: formatFromByte(attrs.totalDisk as number)
+    ...payload.value,
+    totalMemory: formatFromByte(payload.value.totalMemory as number),
+    totalDisk: formatFromByte(payload.value.totalDisk as number)
   }))
+
+  const clusterId = computed(() => route.params.id as unknown as number)
   const noChartData = computed(() => Object.values(chartData.value).every((v) => v.length === 0))
   const timeRanges = computed((): TimeRangeItem[] => [
-    {
-      text: '1m',
-      time: ''
-    },
-    {
-      text: '15m',
-      time: ''
-    },
-    {
-      text: '30m',
-      time: ''
-    },
-    {
-      text: '1h',
-      time: ''
-    },
-    {
-      text: '6h',
-      time: ''
-    },
-    {
-      text: '30h',
-      time: ''
-    }
+    { text: '1m', time: '' },
+    { text: '15m', time: '' },
+    { text: '30m', time: '' },
+    { text: '1h', time: '' },
+    { text: '6h', time: '' },
+    { text: '30h', time: '' }
   ])
-  const baseConfig = computed((): Partial<Record<keyof ClusterVO, string>> => {
-    return {
+
+  const baseConfig = computed(
+    (): Partial<Record<keyof ClusterVO, string>> => ({
       status: t('overview.cluster_status'),
       displayName: t('overview.cluster_name'),
       desc: t('overview.cluster_desc'),
@@ -107,36 +100,29 @@
       totalProcessor: t('overview.core_count'),
       totalDisk: t('overview.disk_size'),
       createUser: t('overview.creator')
-    }
-  })
-  const unitOfBaseConfig = computed((): Partial<Record<keyof ClusterVO, string>> => {
-    return {
+    })
+  )
+
+  const unitOfBaseConfig = computed(
+    (): Partial<Record<keyof ClusterVO, string>> => ({
       totalHost: t('overview.unit_host'),
       totalService: t('overview.unit_service'),
       totalProcessor: t('overview.unit_core')
-    }
-  })
+    })
+  )
+
   const detailKeys = computed(() => Object.keys(baseConfig.value) as (keyof ClusterVO)[])
   const serviceOperates = computed(() => [
-    {
-      action: 'Start',
-      text: t('common.start', [t('common.service')])
-    },
-    {
-      action: 'Restart',
-      text: t('common.restart', [t('common.service')])
-    },
-    {
-      action: 'Stop',
-      text: t('common.stop', [t('common.service')])
-    }
+    { action: 'Start', text: t('common.start', [t('common.service')]) },
+    { action: 'Restart', text: t('common.restart', [t('common.service')]) },
+    { action: 'Stop', text: t('common.stop', [t('common.service')]) }
   ])
 
   const handleServiceOperate = async (item: MenuItem, service: ServiceVO) => {
     try {
       await jobProgressStore.processCommand({
         command: item.key as keyof typeof Command,
-        clusterId: attrs.id,
+        clusterId: clusterId.value,
         commandLevel: 'service',
         serviceCommands: [{ serviceName: service.name!, installed: true }]
       })
@@ -149,16 +135,17 @@
     currTimeRange.value = time.text
   }
 
-  const getServices = (filters?: ServiceListParams) => {
-    attrs.id != undefined && serviceStore.getServices(attrs.id, filters)
-  }
-
   const servicesFromCurrentCluster = (stack: StackVO) => {
     return stack.services.filter((v) => serviceNames.value.includes(v.name))
   }
 
-  onActivated(() => {
-    getServices()
+  onActivated(async () => {
+    try {
+      await clusterStore.getClusterDetail(clusterId.value)
+      emits('update:payload', clusterStore.currCluster)
+    } catch (error) {
+      console.error('Failed to get cluster detail:', error)
+    }
   })
 
   watchEffect(() => {
@@ -166,14 +153,6 @@
       item.services.some((service) => service.name && serviceNames.value.includes(service.name))
     )
   })
-
-  watch(
-    () => attrs,
-    () => {
-      getServices()
-    },
-    { immediate: true, deep: true }
-  )
 </script>
 
 <template>

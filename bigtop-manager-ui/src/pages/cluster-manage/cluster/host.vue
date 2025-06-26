@@ -24,9 +24,11 @@
   import { getHosts } from '@/api/hosts'
   import * as hostApi from '@/api/hosts'
   import { useRouter } from 'vue-router'
+
   import useBaseTable from '@/composables/use-base-table'
   import HostCreate from '@/pages/cluster-manage/hosts/create.vue'
   import InstallDependencies from '@/pages/cluster-manage/hosts/install-dependencies.vue'
+
   import type { FilterConfirmProps, FilterResetProps } from 'ant-design-vue/es/table/interface'
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { HostVO } from '@/api/hosts/types'
@@ -34,6 +36,7 @@
   import type { HostReq } from '@/api/command/types'
 
   type Key = string | number
+
   interface TableState {
     selectedRowKeys: Key[]
     searchText: string
@@ -43,10 +46,12 @@
   const { t } = useI18n()
   const router = useRouter()
   const attrs = useAttrs() as ClusterVO
+
   const searchInputRef = ref()
   const hostCreateRef = ref<InstanceType<typeof HostCreate> | null>(null)
   const installRef = ref<InstanceType<typeof InstallDependencies> | null>(null)
   const hostStatus = ref(['INSTALLING', 'SUCCESS', 'FAILED', 'UNKNOWN'])
+
   const state = reactive<TableState>({
     searchText: '',
     searchedColumn: '',
@@ -93,18 +98,9 @@
       ellipsis: true,
       filterMultiple: false,
       filters: [
-        {
-          text: t('common.success'),
-          value: 1
-        },
-        {
-          text: t('common.failed'),
-          value: 2
-        },
-        {
-          text: t('common.unknown'),
-          value: 3
-        }
+        { text: t('common.success'), value: 1 },
+        { text: t('common.failed'), value: 2 },
+        { text: t('common.unknown'), value: 3 }
       ]
     },
     {
@@ -121,15 +117,8 @@
   })
 
   const operations = computed((): GroupItem[] => [
-    {
-      text: 'edit',
-      clickEvent: (_item, args) => handleEdit(args)
-    },
-    {
-      text: 'remove',
-      danger: true,
-      clickEvent: (_item, args) => deleteHost([args.id])
-    }
+    { text: 'edit', clickEvent: (_item, args) => handleEdit(args) },
+    { text: 'remove', danger: true, clickEvent: (_item, args) => deleteHost([args.id]) }
   ])
 
   const onFilterDropdownOpenChange = (visible: boolean) => {

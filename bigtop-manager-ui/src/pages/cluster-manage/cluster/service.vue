@@ -26,7 +26,9 @@
   import { CommonStatus, CommonStatusTexts } from '@/enums/state'
   import { useRouter } from 'vue-router'
   import { useJobProgress } from '@/store/job-progress'
+
   import FilterForm from '@/components/common/filter-form/index.vue'
+
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { FilterFormItem } from '@/components/common/filter-form/types'
   import type { ServiceListParams, ServiceStatusType, ServiceVO } from '@/api/service/types'
@@ -41,6 +43,7 @@
   const jobProgressStore = useJobProgress()
   const serviceStore = useServiceStore()
   const { services, loading } = toRefs(serviceStore)
+
   const statusColors = shallowRef<Record<ServiceStatusType, keyof typeof CommonStatusTexts>>({
     1: 'healthy',
     2: 'unhealthy',
@@ -89,14 +92,8 @@
       key: 'restartFlag',
       label: t('service.required_restart'),
       options: [
-        {
-          label: t('common.required'),
-          value: true
-        },
-        {
-          label: t('common.not_required'),
-          value: false
-        }
+        { label: t('common.required'), value: true },
+        { label: t('common.not_required'), value: false }
       ]
     },
     {
@@ -104,18 +101,9 @@
       key: 'status',
       label: t('common.status'),
       options: [
-        {
-          label: t(`common.${statusColors.value[1]}`),
-          value: 1
-        },
-        {
-          label: t(`common.${statusColors.value[2]}`),
-          value: 2
-        },
-        {
-          label: t(`common.${statusColors.value[3]}`),
-          value: 3
-        }
+        { label: t(`common.${statusColors.value[1]}`), value: 1 },
+        { label: t(`common.${statusColors.value[2]}`), value: 2 },
+        { label: t(`common.${statusColors.value[3]}`), value: 3 }
       ]
     }
   ])

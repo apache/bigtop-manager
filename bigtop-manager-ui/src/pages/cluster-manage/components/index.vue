@@ -19,7 +19,7 @@
 <script setup lang="ts">
   import { ref, reactive, computed, onMounted, watchEffect } from 'vue'
   import useBaseTable from '@/composables/use-base-table'
-  import SetSource from '@/pages/cluster-manage/cluster/components/set-source.vue'
+  import SetSource from '@/components/create-cluster/components/set-source.vue'
   import { useI18n } from 'vue-i18n'
   import { useStackStore } from '@/store/stack'
   import { storeToRefs } from 'pinia'
