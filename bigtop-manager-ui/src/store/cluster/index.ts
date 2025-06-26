@@ -46,8 +46,9 @@ export const useClusterStore = defineStore(
           {} as Record<string, ClusterVO>
         )
       } catch (error) {
+        const token = localStorage.getItem('Token') ?? sessionStorage.getItem('Token') ?? undefined
         clusterMap.value = {}
-        menuStore.setupMenu()
+        token && menuStore.setupMenu()
         console.error('Failed to get clusters:', error)
       }
     }

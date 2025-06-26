@@ -24,7 +24,7 @@
   import { getSalt, getNonce, login } from '@/api/login'
   import { message } from 'ant-design-vue'
   import { useI18n } from 'vue-i18n'
-  import SelectLang from '@/components/select-lang/index.vue'
+  import SelectLang from '@/components/select-lang/login-lang.vue'
   import { deriveKey } from '@/utils/pbkdf2.ts'
   import { useStackStore } from '@/store/stack'
   import { useUserStore } from '@/store/user'

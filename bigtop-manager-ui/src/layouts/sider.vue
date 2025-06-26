@@ -48,6 +48,12 @@
    * Handles route changes and updates the selected menu key.
    */
   const handleRouteChange = async (newRoute: typeof route) => {
+    const token = localStorage.getItem('Token') ?? sessionStorage.getItem('Token') ?? undefined
+
+    if (!token) {
+      return
+    }
+
     const { params, path, meta, name } = newRoute
     const clusterId = params.id
     const isClusterPath = path.includes(routePathFromClusters.value)
@@ -87,7 +93,14 @@
     await clusterStore.loadClusters()
   })
 
-  watch(() => route, handleRouteChange, { deep: true, immediate: true })
+  watch(
+    () => [route, clusterCount],
+    (val) => {
+      const [newRoute] = val
+      handleRouteChange(newRoute as typeof route)
+    },
+    { deep: true, immediate: true }
+  )
 </script>
 
 <template>

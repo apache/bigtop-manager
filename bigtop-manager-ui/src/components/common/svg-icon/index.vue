@@ -69,7 +69,8 @@
     start: IconSvgStart,
     stop: IconSvgStop,
     success: IconSvgSuccess,
-    unknown: IconSvgUnknown
+    unknown: IconSvgUnknown,
+    'carbon-langauge': IconSvgCarbonLangauge
   }
 
   const props = defineProps<{ name: string | undefined }>()
