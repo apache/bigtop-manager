@@ -18,42 +18,22 @@
 -->
 
 <script setup lang="ts">
-  import { onBeforeUnmount, onMounted, shallowRef } from 'vue'
-  import * as echarts from 'echarts/core'
-  import { GridComponent, GridComponentOption, TooltipComponent, TooltipComponentOption } from 'echarts/components'
-  import { LineChart, LineSeriesOption } from 'echarts/charts'
-  import { UniversalTransition } from 'echarts/features'
-  import { CanvasRenderer } from 'echarts/renderers'
-
-  echarts.use([GridComponent, LineChart, TooltipComponent, CanvasRenderer, UniversalTransition])
-
-  type EChartsOption = echarts.ComposeOption<GridComponentOption | TooltipComponentOption | LineSeriesOption>
+  import dayjs from 'dayjs'
+  import { computed, onMounted, toRefs, watchEffect } from 'vue'
+  import { type EChartsOption, useChart } from '@/composables/use-chart'
 
   const props = defineProps<{
     chartId: string
     title: string
+    data?: any[]
+    timeDistance?: string
   }>()
 
-  const myChart = shallowRef<echarts.ECharts | null>(null)
+  const { data, chartId, title, timeDistance } = toRefs(props)
+  const { initChart, setOptions } = useChart()
 
-  const generateTimeLabels = () => {
-    const times = [] as Array<string>
-    for (let h = 0; h < 24; h++) {
-      for (let m = 0; m < 60; m += 15) {
-        const hour = h.toString().padStart(2, '0')
-        const minute = m.toString().padStart(2, '0')
-        times.push(`${hour}:${minute}`)
-      }
-    }
-    return times
-  }
-
-  const initCharts = () => {
-    const chartDom = document.getElementById(`${props.chartId}`)
-    myChart.value = echarts.init(chartDom, null, {
-      devicePixelRatio: window.devicePixelRatio
-    })
-    const option: EChartsOption = {
+  const option = computed(
+    (): EChartsOption => ({
       grid: {
         top: '20px',
         left: '40px',
@@ -64,10 +44,6 @@
         trigger: 'axis',
         backgroundColor: '#000',
         borderColor: 'rgba(236,236,236,0.1)',
-        // formatter: (params) => {
-        //   console.log('params :>> ', params)
-        //   return ''
-        // },
         textStyle: {
           color: '#fff'
         },
@@ -81,13 +57,12 @@
       xAxis: [
         {
           type: 'category',
-          data: generateTimeLabels(),
+          data: [],
           axisPointer: {
             type: 'line'
           },
           axisLabel: {
-            interval: 14,
-            fontSize: 8
+            fontSize: 10
           }
         }
       ],
@@ -111,37 +86,67 @@
       ],
       series: [
         {
-          name: props.title,
+          name: title.value,
           type: 'line',
-          data: Array.from({ length: generateTimeLabels().length }, () => Math.floor(Math.random() * 0)),
+          data: [],
           lineStyle: {
             color: '#49A4FF',
             width: 2
           }
         }
       ]
+    })
+  )
+
+  const intervalToMs = (interval: string): number => {
+    const unit = interval.replace(/\d+/g, '')
+    const value = parseInt(interval)
+
+    switch (unit) {
+      case 'm':
+        return value * 60 * 1000
+      case 'h':
+        return value * 60 * 60 * 1000
+      default:
+        throw new Error('Unsupported interval: ' + interval)
     }
-    option && myChart.value.setOption(option)
   }
 
-  const resizeChart = () => {
-    myChart.value?.resize()
+  const getTimePoints = (interval: string = '15m'): string[] => {
+    const now = dayjs()
+    const gap = intervalToMs(interval)
+    const result: string[] = []
+
+    for (let i = 5; i >= 0; i--) {
+      const time = now.subtract(i * gap, 'millisecond')
+      result.push(time.format('HH:mm'))
+    }
+
+    return result
   }
 
   onMounted(() => {
-    initCharts()
-    window.addEventListener('resize', resizeChart, true)
+    const selector = document.getElementById(`${chartId.value}`)
+    selector && initChart(selector!, option.value)
   })
 
-  onBeforeUnmount(() => {
-    window.removeEventListener('resize', resizeChart, true)
+  watchEffect(() => {
+    setOptions({
+      xAxis: [{ data: getTimePoints(timeDistance.value) || [] }]
+    })
+  })
+
+  watchEffect(() => {
+    setOptions({
+      series: [{ data: [{ value: data.value ?? [] }] }]
+    })
   })
 </script>
 
 <template>
   <div class="chart">
-    <div class="chart-title">{{ $props.title }}</div>
-    <div :id="$props.chartId" style="height: 260px; width: 100%"></div>
+    <div class="chart-title">{{ title }}</div>
+    <div :id="chartId" style="height: 260px; width: 100%"></div>
   </div>
 </template>
 

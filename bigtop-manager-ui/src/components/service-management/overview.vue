@@ -21,8 +21,8 @@
   import { computed, ref, shallowRef, useAttrs } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { CommonStatus, CommonStatusTexts } from '@/enums/state'
-  import GaugeChart from '@/pages/cluster-manage/cluster/components/gauge-chart.vue'
-  import CategoryChart from '@/pages/cluster-manage/cluster/components/category-chart.vue'
+  import GaugeChart from '@/components/charts/gauge-chart.vue'
+  import CategoryChart from '@/components/charts/category-chart.vue'
   import type { ServiceVO, ServiceStatusType } from '@/api/service/types'
 
   type TimeRangeText = '1m' | '15m' | '30m' | '1h' | '6h' | '30h'
