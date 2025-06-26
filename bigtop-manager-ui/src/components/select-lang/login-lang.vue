@@ -33,7 +33,7 @@
 <template>
   <a-dropdown placement="bottom">
     <div class="icon">
-      <svg-icon name="carbon-langauge" />
+      <svg-icon name="carbon-language" />
     </div>
     <template #overlay>
       <a-menu :selected-keys="[locale]" @click="handleClick">
