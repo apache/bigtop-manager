@@ -20,8 +20,10 @@ import { computed, ref, shallowRef } from 'vue'
 import { defineStore } from 'pinia'
 import useSteps from '@/composables/use-steps'
 import { useValidations } from './validation'
-import { ExpandServiceVO, useStackStore } from '@/store/stack'
 import { execCommand } from '@/api/command'
+
+import { type ExpandServiceVO, useStackStore } from '@/store/stack'
+
 import type { ServiceVO } from '@/api/service/types'
 import type { CommandRequest, CommandVO, ComponentCommandReq, ServiceCommandReq } from '@/api/command/types'
 import type { HostVO } from '@/api/hosts/types'
@@ -59,6 +61,7 @@ export const useCreateServiceStore = defineStore(
     const stackStore = useStackStore()
 
     const steps = shallowRef(STEPS_TITLES)
+
     const selectedServices = ref<ExpandServiceVO[]>([])
     const selectedServicesMeta = ref<ExpandServiceVO[]>([])
     const createdPayload = ref<CommandVO>({})
@@ -71,7 +74,9 @@ export const useCreateServiceStore = defineStore(
       command: 'Add',
       commandLevel: 'service'
     })
+
     const { current, stepsLimit, previousStep, nextStep } = useSteps(steps.value)
+
     const infraServices = computed(() => stackStore.getServicesByExclude(['bigtop', 'extra']) as ExpandServiceVO[])
     const excludeInfraServices = computed(() => stackStore.getServicesByExclude(['infra']))
     const infraServiceNames = computed(() => infraServices.value.map((v) => v.name!))

@@ -153,6 +153,12 @@
       item.services.some((service) => service.name && serviceNames.value.includes(service.name))
     )
   })
+
+  watchEffect(() => {
+    locateStackWithService.value = stackStore.stacks.filter((item) =>
+      item.services.some((service) => service.name && serviceNames.value.includes(service.name))
+    )
+  })
 </script>
 
 <template>

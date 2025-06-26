@@ -31,6 +31,12 @@
         <display-name>MySQL PID Dir</display-name>
         <description>MySQL Pid Dir</description>
     </property>
+    <property>
+        <name>mysql_data_dir</name>
+        <value>${mysql_home}/data</value>
+        <display-name>MySQL Data Dir</display-name>
+        <description>MySQL Data Dir</description>
+    </property>
     <!-- my.cnf -->
     <property>
         <name>content</name>
@@ -40,13 +46,17 @@
 [mysqld]
 port=3306
 basedir=${mysql_home}
-datadir=${mysql_home}/data
+datadir=${mysql_data_dir}
+socket=/tmp/mysql.sock
 pid-file = ${mysql_pid_dir}/mysqld.pid
 log-error = ${mysql_log_dir}/error.log
 general-log-file = ${mysql_log_dir}/general.log
 slow-query-log-file = ${mysql_log_dir}/slow.log
 log-bin = ${mysql_log_dir}/mysql-bin.log
 default-storage-engine=INNODB
+
+[client]
+socket=/tmp/mysql.sock
 ]]>
         </value>
         <attrs>
