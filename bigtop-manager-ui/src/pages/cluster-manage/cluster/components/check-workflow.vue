@@ -21,19 +21,24 @@
   import { computed, onMounted, reactive, ref, shallowRef, toRefs } from 'vue'
   import { Empty } from 'ant-design-vue'
   import { getJobDetails, retryJob } from '@/api/job'
-  import { CommandVO } from '@/api/command/types'
+
   import LogsView, { type LogViewProps } from '@/components/log-view/index.vue'
+
   import type { JobVO, StageVO, StateType, TaskVO } from '@/api/job/types'
+  import type { CommandVO } from '@/api/command/types'
 
   const props = defineProps<{ stepData: CommandVO }>()
   const emits = defineEmits(['updateData'])
+
   const { stepData } = toRefs(props)
+
   const activeKey = ref<number[]>([])
   const jobDetail = ref<JobVO>({})
   const spinning = ref(false)
   const logsViewState = reactive<LogViewProps>({
     open: false
   })
+
   const status = shallowRef<Record<StateType, string>>({
     Pending: 'installing',
     Processing: 'processing',
@@ -41,6 +46,7 @@
     Canceled: 'canceled',
     Successful: 'success'
   })
+
   const stages = computed(() => {
     if (jobDetail.value.stages) {
       return [...jobDetail.value.stages].sort((a, b) => a.order! - b.order!)
@@ -128,29 +134,33 @@
     <a-empty v-if="stages.length == 0" :image="Empty.PRESENTED_IMAGE_SIMPLE" />
     <div v-else class="check-workflow">
       <div class="retry">
-        <a-button v-if="stepData.state === 'Failed'" type="link" @click="handleRetryJob">{{
-          $t('common.retry')
-        }}</a-button>
+        <a-button v-if="stepData.state === 'Failed'" type="link" @click="handleRetryJob">
+          {{ $t('common.retry') }}
+        </a-button>
       </div>
       <a-collapse v-model:active-key="activeKey" :bordered="false" :ghost="true">
         <a-collapse-panel v-for="stage in stages" :key="stage.id">
           <template #header>
             <div class="stage-item">
               <span>{{ stage.name }}</span>
-              <svg-icon :name="stage.state && status[stage.state]"></svg-icon>
+              <div style="min-width: 100px">
+                <svg-icon :name="stage.state && status[stage.state]"></svg-icon>
+              </div>
             </div>
           </template>
           <div v-for="task in stage.tasks" :key="task.id" class="task-item">
             <span>{{ task.name }}</span>
             <a-space :size="16">
               <svg-icon :name="task.state && status[task.state]"></svg-icon>
-              <a-button
-                v-if="task.state && !['Canceled', 'Pending'].includes(task.state)"
-                type="link"
-                @click="viewLogs(stage, task)"
-              >
-                {{ $t('cluster.view_log') }}
-              </a-button>
+              <div style="min-width: 62px">
+                <a-button
+                  v-if="task.state && !['Canceled', 'Pending'].includes(task.state)"
+                  type="link"
+                  @click="viewLogs(stage, task)"
+                >
+                  {{ $t('cluster.view_log') }}
+                </a-button>
+              </div>
             </a-space>
           </div>
         </a-collapse-panel>
@@ -188,8 +198,11 @@
     }
   }
   .stage-item {
-    margin-right: 68px;
     @include flexbox($justify: space-between, $align: center);
+    .svg-icon {
+      width: 16px;
+      height: 16px;
+    }
   }
   .task-item {
     height: 45px;
@@ -200,6 +213,10 @@
     @include flexbox($justify: space-between, $align: center);
     &:last-child {
       border-bottom: 1px solid $color-border-secondary;
+    }
+    .svg-icon {
+      width: 16px;
+      height: 16px;
     }
   }
 </style>

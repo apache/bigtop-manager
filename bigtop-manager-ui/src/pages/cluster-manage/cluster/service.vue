@@ -71,7 +71,7 @@
     },
     {
       action: 'More',
-      icon: 'more_line',
+      icon: 'more-line',
       clickEvent: (item, args) => {
         handleServiceOperate(item!.action!, args)
       }

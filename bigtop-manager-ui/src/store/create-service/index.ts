@@ -20,8 +20,10 @@ import { computed, ref, shallowRef } from 'vue'
 import { defineStore } from 'pinia'
 import useSteps from '@/composables/use-steps'
 import { useValidations } from './validation'
-import { ExpandServiceVO, useStackStore } from '@/store/stack'
 import { execCommand } from '@/api/command'
+
+import { type ExpandServiceVO, useStackStore } from '@/store/stack'
+
 import type { ServiceVO } from '@/api/service/types'
 import type { CommandRequest, CommandVO, ComponentCommandReq, ServiceCommandReq } from '@/api/command/types'
 import type { HostVO } from '@/api/hosts/types'
@@ -59,6 +61,7 @@ export const useCreateServiceStore = defineStore(
     const stackStore = useStackStore()
 
     const steps = shallowRef(STEPS_TITLES)
+
     const selectedServices = ref<ExpandServiceVO[]>([])
     const selectedServicesMeta = ref<ExpandServiceVO[]>([])
     const createdPayload = ref<CommandVO>({})
@@ -71,7 +74,9 @@ export const useCreateServiceStore = defineStore(
       command: 'Add',
       commandLevel: 'service'
     })
+
     const { current, stepsLimit, previousStep, nextStep } = useSteps(steps.value)
+
     const infraServices = computed(() => stackStore.getServicesByExclude(['bigtop', 'extra']) as ExpandServiceVO[])
     const excludeInfraServices = computed(() => stackStore.getServicesByExclude(['infra']))
     const infraServiceNames = computed(() => infraServices.value.map((v) => v.name!))
@@ -116,6 +121,10 @@ export const useCreateServiceStore = defineStore(
       stepContext.value = partial
     }
 
+    function updateInstalledStatus(state: string) {
+      createdPayload.value.state = state
+    }
+
     async function confirmServiceDependencyAction(type: 'add' | 'remove', preSelectedService: ExpandServiceVO) {
       const { requiredServices } = preSelectedService
       if (!requiredServices && type === 'add') {
@@ -130,15 +139,15 @@ export const useCreateServiceStore = defineStore(
     }
 
     async function handleServiceDependencyConfirm(type: 'add' | 'remove', preSelectedService: ExpandServiceVO) {
-      let dependenciesSuccess: ProcessResult = { success: false }
       const result: ExpandServiceVO[] = []
-      if (type === 'add') {
-        const target = creationMode.value === 'public' ? infraServices.value : excludeInfraServices.value
-        const serviceMap = getServiceMap(target)
-        dependenciesSuccess = await processDependencies(preSelectedService, serviceMap, infraServices.value, result)
-      } else {
-        dependenciesSuccess = await notifyDependents(preSelectedService, result)
-      }
+      const target = creationMode.value === 'public' ? infraServices.value : excludeInfraServices.value
+      const serviceMap = getServiceMap(target)
+
+      const dependenciesSuccess =
+        type === 'add'
+          ? await processDependencies(preSelectedService, serviceMap, infraServices.value, result)
+          : await notifyDependents(preSelectedService, result)
+
       if (dependenciesSuccess.success) {
         result.unshift(preSelectedService)
         return result
@@ -287,6 +296,7 @@ export const useCreateServiceStore = defineStore(
       allComps,
       allCompsMeta,
       updateSelectedService,
+      updateInstalledStatus,
       setStepContext,
       setTempData,
       confirmServiceDependencyAction,

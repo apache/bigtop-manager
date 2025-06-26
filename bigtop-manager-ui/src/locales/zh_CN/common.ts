@@ -125,5 +125,6 @@ export default {
   disabled: '关闭',
   restore: '恢复',
   selected: '选中',
-  feature_not_supported: '功能暂不支持'
+  feature_not_supported: '功能暂不支持',
+  installing_exit_confirm_content: '正在安装中，退出页面将导致安装失败。是否确定退出？'
 }

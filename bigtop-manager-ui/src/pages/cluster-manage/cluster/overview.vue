@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onActivated, ref, shallowRef, useAttrs } from 'vue'
+  import { computed, onActivated, ref, shallowRef, useAttrs, watch, watchEffect } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { storeToRefs } from 'pinia'
   import { formatFromByte } from '@/utils/storage'
@@ -26,9 +26,12 @@
   import { CommonStatus, CommonStatusTexts } from '@/enums/state'
   import { useServiceStore } from '@/store/service'
   import { useJobProgress } from '@/store/job-progress'
+  import { useStackStore } from '@/store/stack'
   import { Empty } from 'ant-design-vue'
+
   import GaugeChart from './components/gauge-chart.vue'
   import CategoryChart from './components/category-chart.vue'
+
   import type { ClusterStatusType, ClusterVO } from '@/api/cluster/types'
   import type { ServiceListParams, ServiceVO } from '@/api/service/types'
   import type { MenuItem } from '@/store/menu/types'
@@ -44,6 +47,7 @@
   const { t } = useI18n()
   const attrs = useAttrs() as ClusterVO
   const jobProgressStore = useJobProgress()
+  const stackStore = useStackStore()
   const serviceStore = useServiceStore()
   const currTimeRange = ref<TimeRangeText>('15m')
   const chartData = ref({
@@ -57,7 +61,8 @@
     2: 'unhealthy',
     3: 'unknown'
   })
-  const { locateStackWithService, serviceNames } = storeToRefs(serviceStore)
+  const { serviceNames } = storeToRefs(serviceStore)
+  const locateStackWithService = shallowRef<StackVO[]>([])
 
   const clusterDetail = computed(() => ({
     ...attrs,
@@ -155,6 +160,20 @@
   onActivated(() => {
     getServices()
   })
+
+  watchEffect(() => {
+    locateStackWithService.value = stackStore.stacks.filter((item) =>
+      item.services.some((service) => service.name && serviceNames.value.includes(service.name))
+    )
+  })
+
+  watch(
+    () => attrs,
+    () => {
+      getServices()
+    },
+    { immediate: true, deep: true }
+  )
 </script>
 
 <template>

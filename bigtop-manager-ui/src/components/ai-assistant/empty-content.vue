@@ -34,8 +34,8 @@
   })
   const aiChatStore = useAiChatStore()
   const { hasActivePlatform, threads, chatRecords } = storeToRefs(aiChatStore)
-  const emptyState = usePngImage('ai_helper')
-  const disabledState = usePngImage('ai_disabled')
+  const emptyState = usePngImage('ai-helper')
+  const disabledState = usePngImage('ai-disabled')
 
   const goSetUpLlmConfig = () => {
     emits('goSetUp')

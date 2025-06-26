@@ -31,7 +31,7 @@
 <template>
   <div class="chat-item">
     <div class="chat-item-avatar">
-      <svg-icon :name="isUser ? 'chat_avatar' : 'chatbot'" />
+      <svg-icon :name="isUser ? 'chat-avatar' : 'chatbot'" />
     </div>
     <article class="chat-item-message">
       <div class="msg-wrp">

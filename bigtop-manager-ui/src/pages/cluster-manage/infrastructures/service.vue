@@ -91,7 +91,7 @@
     },
     {
       action: 'More',
-      icon: 'more_line',
+      icon: 'more-line',
       clickEvent: (item, args) => {
         infraAction(item!.action!, args)
       }
