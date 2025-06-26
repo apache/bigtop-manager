@@ -140,18 +140,8 @@
   }
 
   onActivated(async () => {
-    try {
-      await clusterStore.getClusterDetail(clusterId.value)
-      emits('update:payload', clusterStore.currCluster)
-    } catch (error) {
-      console.error('Failed to get cluster detail:', error)
-    }
-  })
-
-  watchEffect(() => {
-    locateStackWithService.value = stackStore.stacks.filter((item) =>
-      item.services.some((service) => service.name && serviceNames.value.includes(service.name))
-    )
+    await clusterStore.getClusterDetail(clusterId.value)
+    emits('update:payload', clusterStore.currCluster)
   })
 
   watchEffect(() => {
@@ -184,7 +174,7 @@
                         <a-typography-text
                           class="desc-sub-item-desc-column"
                           type="secondary"
-                          :content="baseConfig[base]"
+                          :content="baseConfig[base] ?? '--'"
                         />
                         <a-tag
                           v-if="base === 'status'"
@@ -202,8 +192,8 @@
                           class="desc-sub-item-desc-column"
                           :content="
                             Object.keys(unitOfBaseConfig).includes(base)
-                              ? `${clusterDetail[base]} ${unitOfBaseConfig[base]}`
-                              : `${clusterDetail[base]}`
+                              ? `${clusterDetail[base] ?? '--'} ${unitOfBaseConfig[base]}`
+                              : `${clusterDetail[base] ?? '--'}`
                           "
                         />
                       </div>

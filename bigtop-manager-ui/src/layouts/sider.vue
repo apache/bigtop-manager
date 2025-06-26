@@ -58,6 +58,7 @@
     if (isClusterPath && clusterCount.value > 0 && isNotCreatingCluster) {
       if (clusterId && clusterMap.value[`${clusterId}`]) {
         siderMenuSelectedKey.value = `${routePathFromClusters.value}/${clusterId}`
+        openKeys.value.push(siderMenuSelectedKey.value)
       } else {
         siderMenuSelectedKey.value = ''
         menuStore.setupSider()
@@ -83,11 +84,7 @@
   }
 
   onMounted(async () => {
-    try {
-      await clusterStore.loadClusters()
-    } catch (error) {
-      console.error('Failed to load clusters:', error)
-    }
+    await clusterStore.loadClusters()
   })
 
   watch(() => route, handleRouteChange, { deep: true, immediate: true })
@@ -96,7 +93,7 @@
 <template>
   <a-layout-sider class="sider">
     <a-menu
-      v-model="openKeys"
+      :open-keys="openKeys"
       :selected-keys="[siderMenuSelectedKey]"
       mode="inline"
       @click="({ key }) => menuStore.onSiderClick(key)"
