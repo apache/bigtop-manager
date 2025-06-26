@@ -21,14 +21,6 @@
   import LayoutFooter from '@/layouts/footer.vue'
   import LayoutHeader from '@/layouts/header.vue'
   import LayoutSider from '@/layouts/sider.vue'
-  import { onMounted } from 'vue'
-  import { useUserStore } from '@/store/user'
-
-  const userStore = useUserStore()
-
-  onMounted(() => {
-    userStore.getUserInfo()
-  })
 </script>
 
 <template>
