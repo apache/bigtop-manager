@@ -57,6 +57,16 @@ public class GrafanaParams extends InfraParams {
 
     public GrafanaParams(ComponentCommandPayload componentCommandPayload) {
         super(componentCommandPayload);
+
+        globalParamsMap.put("grafana_user", user());
+        globalParamsMap.put("grafana_group", group());
+        globalParamsMap.put("grafana_home", serviceHome());
+    }
+
+    @Override
+    public void initGlobalParams() {
+        super.initGlobalParams();
+
         globalParamsMap.put("port", grafanaPort);
         globalParamsMap.put("log_level", grafanaLogLevel);
         globalParamsMap.put("provisioning_path", provisioningDir());
