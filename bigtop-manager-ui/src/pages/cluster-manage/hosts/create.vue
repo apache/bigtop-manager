@@ -292,7 +292,7 @@
       },
       controlProps: {
         disabled: isEdit.value,
-        placeholder: t('host.default_agent_path')
+        placeholder: t('common.enter_error', [`${t('host.default_agent_path')}`.toLowerCase()])
       }
     },
     {
@@ -303,7 +303,7 @@
         label: t('host.ssh_port')
       },
       controlProps: {
-        placeholder: t('common.enter_error', [`${t('host.ssh_port')}`.toLowerCase()])
+        placeholder: t('common.enter_error', [`${t('host.default_ssh_port')}`.toLowerCase()])
       }
     },
     {
@@ -314,7 +314,7 @@
         label: t('host.grpc_port')
       },
       controlProps: {
-        placeholder: t('host.default_grpc_port')
+        placeholder: t('common.enter_error', [`${t('host.default_grpc_port')}`.toLowerCase()])
       }
     },
     {
@@ -366,12 +366,16 @@
       formValue.value = Object.assign(formValue.value, {
         ...payload,
         authType: `${payload?.authType ?? 1}`,
-        inputType: `${payload?.inputType ?? 1}`
+        inputType: `${payload?.inputType ?? 1}`,
+        sshPort: 22,
+        grpcPort: 8835
       })
     } else {
       Object.assign(formValue.value, {
         authType: '1',
-        inputType: '1'
+        inputType: '1',
+        sshPort: 22,
+        grpcPort: 8835
       })
     }
 
