@@ -45,12 +45,6 @@
                 <cardinality>1+</cardinality>
             </component>
             
-            <component>
-                <name>doris_client</name>
-                <display-name>Doris Client</display-name>
-                <category>client</category>
-                <cardinality>1+</cardinality>
-            </component>
         </components>
 
         <package-specifics>
