@@ -25,7 +25,6 @@
   import { getInstalledStatus, installDependencies } from '@/api/hosts'
   import { execCommand } from '@/api/command'
   import { onBeforeRouteLeave } from 'vue-router'
-
   import SvgIcon from '@/components/common/svg-icon/index.vue'
   import useSteps from '@/composables/use-steps'
   import ClusterBase from './components/cluster-base.vue'
@@ -49,7 +48,6 @@
 
   const installStatus = shallowRef<InstalledStatusVO[]>([])
   const components = shallowRef<any[]>([ClusterBase, ComponentInfo, HostManage, CheckWorkflow])
-
   const isInstall = computed(() => current.value === 2)
   const currentStepItems = computed(() => stepData.value[2])
   const hasNoUnknownHosts = computed(() => currentStepItems.value.every((item) => item.status !== Status.Unknown))
