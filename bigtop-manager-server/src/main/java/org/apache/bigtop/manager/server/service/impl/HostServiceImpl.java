@@ -46,6 +46,8 @@ import org.apache.bigtop.manager.server.service.HostService;
 import org.apache.bigtop.manager.server.utils.PageUtils;
 import org.apache.bigtop.manager.server.utils.RemoteSSHUtils;
 
+import org.apache.commons.collections4.CollectionUtils;
+
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.beans.BeanUtils;
@@ -287,6 +289,17 @@ public class HostServiceImpl implements HostService {
     @Override
     public List<InstalledStatusVO> installedStatus() {
         return installedStatus;
+    }
+
+    @Override
+    public Boolean checkDuplicate(HostDTO hostDTO) {
+        List<HostPO> existsHostList = hostDao.findAllByHostnames(hostDTO.getHostnames());
+        if (CollectionUtils.isNotEmpty(existsHostList)) {
+            List<String> existsHostnames =
+                    existsHostList.stream().map(HostPO::getHostname).toList();
+            throw new ApiException(ApiExceptionEnum.HOST_ASSIGNED, String.join(",", existsHostnames));
+        }
+        return true;
     }
 
     public void installDependencies(HostDTO hostDTO, String hostname, InstalledStatusVO installedStatusVO) {

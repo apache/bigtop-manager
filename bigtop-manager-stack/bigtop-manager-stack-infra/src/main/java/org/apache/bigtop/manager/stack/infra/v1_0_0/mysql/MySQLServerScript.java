@@ -56,7 +56,8 @@ public class MySQLServerScript extends AbstractServerScript {
     public ShellResult init(Params params) {
         String user = params.user();
         String binDir = params.serviceHome() + "/bin";
-        runCommand(binDir + "/mysqld --initialize-insecure", user);
+        String confPath = params.serviceHome() + "/my.cnf";
+        runCommand(binDir + "/mysqld --defaults-file=" + confPath + " --initialize-insecure", user);
         return ShellResult.success();
     }
 
@@ -93,24 +94,28 @@ public class MySQLServerScript extends AbstractServerScript {
         MySQLParams mysqlParams = (MySQLParams) params;
         String user = params.user();
         String binDir = params.serviceHome() + "/bin";
+        String confPath = params.serviceHome() + "/my.cnf";
         String password = mysqlParams.getRootPassword();
         runCommand(
                 MessageFormat.format(
-                        "{0}/mysql -u root -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY ''{1}'';\"",
-                        binDir, password),
+                        "{0}/mysql --defaults-file={1} -u root -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY ''{2}'';\"",
+                        binDir, confPath, password),
                 user);
         runCommand(
                 MessageFormat.format(
-                        "{0}/mysql -u root -p''{1}'' -e \"CREATE USER ''root''@''%'' IDENTIFIED BY ''{1}'';\"",
-                        binDir, password),
+                        "{0}/mysql --defaults-file={1} -u root -p''{2}'' -e \"CREATE USER ''root''@''%'' IDENTIFIED BY ''{2}'';\"",
+                        binDir, confPath, password),
                 user);
         runCommand(
                 MessageFormat.format(
-                        "{0}/mysql -u root -p''{1}'' -e \"GRANT ALL PRIVILEGES ON *.* TO ''root''@''%'' WITH GRANT OPTION;\"",
-                        binDir, password),
+                        "{0}/mysql --defaults-file={1} -u root -p''{2}'' -e \"GRANT ALL PRIVILEGES ON *.* TO ''root''@''%'' WITH GRANT OPTION;\"",
+                        binDir, confPath, password),
                 user);
         runCommand(
-                MessageFormat.format("{0}/mysql -u root -p''{1}'' -e \"FLUSH PRIVILEGES;\"", binDir, password), user);
+                MessageFormat.format(
+                        "{0}/mysql --defaults-file={1} -u root -p''{2}'' -e \"FLUSH PRIVILEGES;\"",
+                        binDir, confPath, password),
+                user);
         return ShellResult.success();
     }
 

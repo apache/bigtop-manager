@@ -20,12 +20,16 @@ package org.apache.bigtop.manager.server.command.validator;
 
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
+import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.repository.ClusterDao;
+import org.apache.bigtop.manager.dao.repository.HostDao;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.enums.CommandLevel;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.model.dto.command.ClusterCommandDTO;
+
+import org.apache.commons.collections4.CollectionUtils;
 
 import org.springframework.stereotype.Component;
 
@@ -37,6 +41,9 @@ public class ClusterAddValidator implements CommandValidator {
 
     @Resource
     private ClusterDao clusterDao;
+
+    @Resource
+    private HostDao hostDao;
 
     @Override
     public List<CommandIdentifier> getCommandIdentifiers() {
@@ -52,6 +59,16 @@ public class ClusterAddValidator implements CommandValidator {
 
         if (clusterPO != null) {
             throw new ApiException(ApiExceptionEnum.CLUSTER_EXISTS, clusterName);
+        }
+
+        List<String> hostnames = clusterCommand.getHosts().stream()
+                .flatMap(hostCommandDTO -> hostCommandDTO.getHostnames().stream())
+                .toList();
+        List<HostPO> hostPOList = hostDao.findAllByHostnames(hostnames);
+        if (CollectionUtils.isNotEmpty(hostPOList)) {
+            List<String> existsHostnames =
+                    hostPOList.stream().map(HostPO::getHostname).toList();
+            throw new ApiException(ApiExceptionEnum.HOST_ASSIGNED, String.join(",", existsHostnames));
         }
     }
 }

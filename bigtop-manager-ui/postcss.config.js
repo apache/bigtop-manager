@@ -17,13 +17,13 @@
  * under the License.
  */
 
-const autoprefixer = require('autoprefixer')
-const cssnano = require('cssnano')
+import autoprefixer from 'autoprefixer'
+import cssnanoPlugin from 'cssnano'
 
-module.exports = {
+export default {
   plugins: [
     autoprefixer(),
-    cssnano({
+    cssnanoPlugin({
       preset: 'default'
     })
   ]

@@ -151,7 +151,7 @@
             <template #extra>
               <a-button type="text" shape="circle" @click.stop="manualAddPropertyForConfig(config)">
                 <template #icon>
-                  <svg-icon name="plus_dark" />
+                  <svg-icon name="plus-dark" />
                 </template>
               </a-button>
             </template>

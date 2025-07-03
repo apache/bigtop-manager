@@ -50,6 +50,9 @@ export const useUserStore = defineStore(
     }
   },
   {
-    persist: false
+    persist: {
+      storage: localStorage,
+      paths: ['userVO']
+    }
   }
 )

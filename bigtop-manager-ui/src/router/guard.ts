@@ -17,23 +17,22 @@
  * under the License.
  */
 
-import type { NavigationGuardNext, Router } from 'vue-router'
-import { useClusterStore } from '@/store/cluster'
+import type { Router } from 'vue-router'
 function setCommonGuard(router: Router) {
   const token = localStorage.getItem('Token') ?? sessionStorage.getItem('Token') ?? undefined
+
   router.beforeEach(async (to, _from, next) => {
+    if (!token) {
+      next()
+      return
+    }
+
     if (to.name === 'Clusters' && token) {
-      checkClusterSelect(next)
+      next({ name: 'Default' })
     } else {
       next()
     }
   })
-}
-
-function checkClusterSelect(next: NavigationGuardNext) {
-  const clusterStore = useClusterStore()
-  clusterStore.clusterCount === 0 && clusterStore.loadClusters()
-  clusterStore.clusterCount === 0 && next({ name: 'Default' })
 }
 
 function createRouterGuard(router: Router) {

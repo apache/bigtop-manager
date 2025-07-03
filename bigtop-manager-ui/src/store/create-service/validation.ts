@@ -28,30 +28,43 @@ export function useValidations() {
   const { t } = useI18n()
   const serviceStore = useServiceStore()
 
-  // Validate services from infra
+  /**
+   * Validate services from infrastructure
+   * @param targetService - The service being validated
+   * @param requiredServices - List of required services
+   * @param infraServiceNames - List of available infrastructure services
+   * @returns Whether there are missing services
+   */
   function validServiceFromInfra(
     targetService: ExpandServiceVO,
-    requiredServices: string[],
+    requiredServices: string[] | undefined,
     infraServiceNames: string[]
   ) {
-    const installedInfra = serviceStore.getInstalledNamesOrIdsOfServiceByKey('0', 'names')
-    const set = new Set(installedInfra)
-    const missServices = requiredServices.reduce((acc, name) => {
-      !set.has(name) && infraServiceNames.includes(name) && acc.push(name)
-      return acc
-    }, [] as string[])
+    const installedInfra = new Set(serviceStore.getInstalledNamesOrIdsOfServiceByKey('0', 'names'))
+    const missingServices = (requiredServices ?? []).filter(
+      (name) => !installedInfra.has(name) && infraServiceNames.includes(name)
+    )
 
-    if (missServices.length === 0) return false
-    message.error(t('service.dependencies_conflict_msg', [targetService.displayName!, missServices.join(',')]))
+    if (missingServices.length === 0) return false
+
+    message.error(t('service.dependencies_conflict_msg', [targetService.displayName!, missingServices.join(',')]))
     return true
   }
 
+  /**
+   * Confirm dependency addition or removal
+   * @param type - The action type ('add' or 'remove')
+   * @param targetService - The target service
+   * @param requiredService - The required service
+   * @returns A promise resolving to the user's decision
+   */
   function confirmDependencyAddition(
     type: 'add' | 'remove',
     targetService: ExpandServiceVO,
     requiredService: ExpandServiceVO
   ) {
     const content = type === 'add' ? 'dependencies_add_msg' : 'dependencies_remove_msg'
+
     return new Promise((resolve) => {
       Modal.confirm({
         content: t(`service.${content}`, [targetService.displayName, requiredService.displayName]),
@@ -67,31 +80,53 @@ export function useValidations() {
     })
   }
 
-  function validCardinality(cardinality: string, count: number, displayName: string): boolean {
+  /**
+   * Parse cardinality string into a structured object
+   * @param cardinality - The cardinality string
+   * @returns Parsed cardinality object
+   */
+  function parseCardinality(cardinality: string): { min?: number; max?: number } {
     if (/^\d+$/.test(cardinality)) {
-      const expected = parseInt(cardinality, 10)
-      if (count != expected) {
-        message.error(t('service.exact', [displayName, expected]))
-        return false
-      }
+      const value = parseInt(cardinality, 10)
+      return { min: value, max: value }
     }
 
     if (/^\d+-\d+$/.test(cardinality)) {
-      const [minStr, maxStr] = cardinality.split('-')
-      const min = parseInt(minStr, 10)
-      const max = parseInt(maxStr, 10)
-      if (count < min || count > max) {
-        message.error(t('service.range', [displayName, min, max]))
-        return false
-      }
+      const [min, max] = cardinality.split('-').map((v) => parseInt(v, 10))
+      return { min, max }
     }
 
     if (/^\d+\+$/.test(cardinality)) {
       const min = parseInt(cardinality.slice(0, -1), 10)
-      if (count < min) {
-        message.error(t('service.minOnly', [displayName, min]))
-        return false
-      }
+      return { min }
+    }
+
+    return {}
+  }
+
+  /**
+   * Validate cardinality constraints
+   * @param cardinality - The cardinality string
+   * @param count - The current count
+   * @param displayName - The display name of the comp
+   * @returns Whether the cardinality is valid
+   */
+  function validCardinality(cardinality: string, count: number, displayName: string): boolean {
+    const { min, max } = parseCardinality(cardinality)
+
+    if (min !== undefined && max !== undefined && (count < min || count > max)) {
+      message.error(t('service.range', [displayName, min, max]))
+      return false
+    }
+
+    if (min !== undefined && max === undefined && count < min) {
+      message.error(t('service.minOnly', [displayName, min]))
+      return false
+    }
+
+    if (min === max && count !== min) {
+      message.error(t('service.exact', [displayName, min]))
+      return false
     }
 
     return true

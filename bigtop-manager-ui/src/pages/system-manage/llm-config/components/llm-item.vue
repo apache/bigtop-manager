@@ -227,7 +227,7 @@
     </template>
     <template v-else>
       <div class="llm-card-action" @click="handleCreateLlmConfig">
-        <svg-icon name="plus_dark" />
+        <svg-icon name="plus-dark" />
         <a-typography-text type="secondary" :content="$t('llmConfig.add_authorization')" />
       </div>
     </template>
