@@ -279,7 +279,7 @@ public class HostServiceImpl implements HostService {
                     + "\nEOF\n"
                     + "chmod +x ./setup-agent.sh && ./setup-agent.sh " + path + " " + repoUrl + " " + grpcPort;
         } catch (IOException e) {
-            log.error("Unable to setup agent, hostname: {}, msg: {}", hostname, e.getMessage());
+            log.error("Unable to write agent script, hostname: {}, msg: {}", hostname, e.getMessage());
 
             installedStatusVO.setStatus(InstalledStatusEnum.FAILED);
             installedStatusVO.setMessage(e.getMessage());
@@ -288,10 +288,15 @@ public class HostServiceImpl implements HostService {
 
         ShellResult result = execCommandOnRemoteHost(hostDTO, hostname, command);
         if (result.getExitCode() != MessageConstants.SUCCESS_CODE) {
-            log.error("Unable to setup agent, hostname: {}, msg: {}", hostname, result.getErrMsg());
+            // Get log from file
+            command = "cat setup-agent.log";
+            ShellResult agentLog = execCommandOnRemoteHost(hostDTO, hostname, command);
+
+            log.error("Unable to setup agent, hostname: {}, msg: {}", hostname, result);
+            log.error("Agent log: {}", agentLog);
 
             installedStatusVO.setStatus(InstalledStatusEnum.FAILED);
-            installedStatusVO.setMessage(result.getErrMsg());
+            installedStatusVO.setMessage(agentLog.getOutput());
             return;
         }
 
