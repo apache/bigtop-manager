@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one
+  ~ or more contributor license agreements.  See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership.  The ASF licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+-->
+
+<configuration>
+    <property>
+        <name>meta_dir</name>
+        <display-name>meta_dir</display-name>
+        <value>${doris_fe_home}/doris-meta</value>
+        <description>Default: DORIS_HOME_DIR + "/doris-meta".
+            Doris meta data will be saved here.The storage of this dir is highly recommended as to be.</description>
+    </property>
+    <property>
+        <name>http_port</name>
+        <value>8030</value>
+        <description>HTTP bind port. All FE http ports must be same currently.</description>
+        <on-ambari-upgrade add="true" />
+    </property>
+    <property>
+        <name>query_port</name>
+        <value>9030</value>
+        <description>FE MySQL server port.</description>
+        <on-ambari-upgrade add="true" />
+    </property>
+    <property>
+        <name>rpc_port</name>
+        <value>9020</value>
+        <description>FE Thrift Server port.</description>
+    </property>
+    <property>
+        <name>edit_log_port</name>
+        <value>9010</value>
+        <description>bdbje port.</description>
+    </property>
+
+</configuration>
