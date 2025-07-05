@@ -178,7 +178,7 @@ const routes: RouteRecordRaw[] = [
           {
             name: 'HostCreation',
             path: 'add',
-            component: () => import('@/pages/cluster-manage/hosts/create.vue'),
+            component: () => import('@/components/create-host/create.vue'),
             meta: {
               hidden: true,
               activeMenu: '/cluster-manage/hosts/list'

@@ -70,7 +70,8 @@
     stop: IconSvgStop,
     success: IconSvgSuccess,
     unknown: IconSvgUnknown,
-    'carbon-language': IconSvgCarbonLanguage
+    'carbon-language': IconSvgCarbonLanguage,
+    warn: IconSvgWarn
   }
 
   const props = defineProps<{ name: string | undefined }>()
