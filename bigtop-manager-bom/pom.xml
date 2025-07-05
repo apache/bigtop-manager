@@ -31,6 +31,7 @@
     <description>Bigtop Manager Bom</description>
 
     <properties>
+        <spring-ai.version>1.0.0-RC1</spring-ai.version>
         <spring-boot.version>3.1.1</spring-boot.version>
         <springdoc.version>2.2.0</springdoc.version>
         <freemarker.version>2.3.32</freemarker.version>
@@ -55,6 +56,7 @@
         <langchain4j.version>1.0.1-beta6</langchain4j.version>
         <mybatis-spring-boot-starter.version>3.0.3</mybatis-spring-boot-starter.version>
         <pagehelper-spring-boot-starter.version>2.1.0</pagehelper-spring-boot-starter.version>
+        <victools.version>4.29.0</victools.version>
     </properties>
 
     <dependencyManagement>
@@ -276,11 +278,25 @@
                 <artifactId>langchain4j-community-qianfan</artifactId>
                 <version>${langchain4j.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-starter-mcp-server-webmvc</artifactId>
+                <version>${spring-ai.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.victools</groupId>
+                <artifactId>jsonschema-module-jackson</artifactId>
+                <version>${victools.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>dev.langchain4j</groupId>
                 <artifactId>langchain4j-community-dashscope</artifactId>
                 <version>${langchain4j.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>dev.langchain4j</groupId>
                 <artifactId>langchain4j-reactor</artifactId>

@@ -44,6 +44,7 @@ import org.apache.bigtop.manager.server.model.vo.PlatformVO;
 import org.apache.bigtop.manager.server.service.LLMConfigService;
 
 import org.jetbrains.annotations.NotNull;
+import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -82,6 +83,7 @@ public class LLMConfigServiceImpl implements LLMConfigService {
     private static final String TEST_KEY = "bm";
 
     @Override
+    @Tool(name = "ListLLMPlatforms", description = "List all LLM platforms")
     public List<PlatformVO> platforms() {
         List<PlatformPO> platformPOs = platformDao.findAll();
         return PlatformConverter.INSTANCE.fromPO2VO(platformPOs);
