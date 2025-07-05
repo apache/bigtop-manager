@@ -21,20 +21,25 @@
 set -e
 
 [ $# -lt 3 ] && {
-    log "Usage: $0 <dir_prefix> <repo_url> <grpc_port> [checksum_alg checksum_value]"
+    info "Usage: $0 <dir_prefix> <repo_url> <grpc_port> [checksum_alg checksum_value]"
     exit 1
 }
 
 USER=$(whoami)
 GROUP=$(id -gn)
 
-log() {
+info() {
+    echo $1 >> setup-agent.log 2>&1
+}
+
+error () {
+    echo $1 >&2
     echo $1 >> setup-agent.log 2>&1
 }
 
 check_sudo() {
     if ! sudo -n true 2>/dev/null; then
-        log "ERROR: User '$USER' doesn't have sudo privileges"
+        error "User '$USER' doesn't have sudo privileges"
         exit 1
     fi
 }
@@ -63,7 +68,7 @@ validate_checksum() {
 
     local calc_val=$($sum_cmd "$file" | awk '{print $1}')
     [ "$calc_val" = "$CHECK_VAL" ] || {
-        log "Checksum mismatch: Expected ${CHECK_ALG}=$CHECK_VAL, Found=$calc_val"
+        error "Checksum mismatch: Expected ${CHECK_ALG}=$CHECK_VAL, Found=$calc_val"
         return 1
     }
 }
@@ -74,15 +79,17 @@ handle_tar_file() {
     if [ -f "$TAR_FILE" ]; then
         if [ -n "$CHECK_ALG" ]; then
             validate_checksum "$TAR_FILE" || {
-                log "Removing invalid file: $TAR_FILE"
+                info "Removing invalid file: $TAR_FILE"
                 rm -f "$TAR_FILE"
-                return 1
             }
+        else
+            info "Using existing file: $TAR_FILE"
+            return 0
         fi
-        return 0
     fi
 
     # Download file
+    info "Downloading agent tarball from $DOWNLOAD_URL to $TAR_FILE"
     if command -v wget &> /dev/null; then
         wget -q "$DOWNLOAD_URL" -O "$TAR_FILE"
     else
@@ -91,10 +98,10 @@ handle_tar_file() {
 
     # Post-download validation
     if [ -n "$CHECK_ALG" ]; then
-      log "Validating checksum"
+      info "Validating checksum"
       validate_checksum "$TAR_FILE" || {
           rm -f "$TAR_FILE"
-          log "Downloaded file checksum validation failed"
+          error "Downloaded file checksum validation failed"
           exit 1
       }
     fi
@@ -111,23 +118,31 @@ deploy_agent() {
 start() {
     export GRPC_PORT="$GRPC_PORT"
 
-    log "Prepare to start agent"
+    info "Prepare to start agent"
     if ! pgrep -f "${PROCESS_NAME}" > /dev/null; then
-        log "Starting agent"
-        log "nohup ${TARGET_DIR}/bin/start.sh --debug > /dev/null 2>&1 &"
-        nohup ${TARGET_DIR}/bin/start.sh --debug > /dev/null 2>&1 &
+        info "Starting agent"
+        nohup ${TARGET_DIR}/bin/start.sh --debug > /dev/null 2>>setup-agent.log &
         sleep 10
         if ! pgrep -f "${PROCESS_NAME}" > /dev/null; then
-          log "Failed to start agent, please check the log"
+          error "Failed to start agent, please check the log"
           exit 1
+        else
+          info "Agent started successfully"
         fi
     else
-        log "Agent is already running"
+        info "Agent is already running"
     fi
 }
 
 # Remove previous log file
 rm -f setup-agent.log
+
+# Log variables
+info "DIR_PREFIX: $DIR_PREFIX"
+info "REPO_URL: $REPO_URL"
+info "GRPC_PORT: $GRPC_PORT"
+info "CHECK_ALG: $CHECK_ALG"
+info "CHECK_VAL: $CHECK_VAL"
 
 # Run deployment
 deploy_agent
