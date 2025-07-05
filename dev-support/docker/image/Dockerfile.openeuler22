@@ -13,14 +13,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM openeuler/openeuler:24.03
+FROM openeuler/openeuler:22.03
 
 RUN dnf install -y sudo wget openssh-clients openssh-server mariadb mariadb-server net-tools chrony krb5-server krb5-libs krb5-workstation git python3 procps-ng
 RUN dnf install -y postgresql java-17-openjdk-devel vim numactl
 
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk
 ENV PATH=$JAVA_HOME/bin:$PATH
-RUN wget --no-check-certificate https://archive.apache.org/dist/maven/maven-3/3.8.8/apache-maven-3.8.8-bin.tar.gz && \
+RUN wget --no-check-certificate https://archive.apache.org/dist/maven/maven-3/3.8.8/binaries/apache-maven-3.8.8-bin.tar.gz && \
     tar -xvf apache-maven-3.8.8-bin.tar.gz && \
     mv apache-maven-3.8.8 /usr/lib/maven
 ENV PATH=${PATH}:/usr/lib/maven/bin

@@ -18,6 +18,8 @@
 # under the License.
 #
 
+set -e
+
 BIN_DIR=$(dirname $0)
 BIGTOP_MANAGER_HOME=${BIGTOP_MANAGER_HOME:-$(cd $BIN_DIR/..; pwd)}
 
