@@ -30,13 +30,11 @@
         <name>http_port</name>
         <value>8030</value>
         <description>HTTP bind port. All FE http ports must be same currently.</description>
-        <on-ambari-upgrade add="true" />
     </property>
     <property>
         <name>query_port</name>
         <value>9030</value>
         <description>FE MySQL server port.</description>
-        <on-ambari-upgrade add="true" />
     </property>
     <property>
         <name>rpc_port</name>

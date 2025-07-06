@@ -26,7 +26,6 @@ import org.apache.bigtop.manager.stack.extra.param.ExtraParams;
 
 import com.google.auto.service.AutoService;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -34,7 +33,6 @@ import java.util.Map;
 
 @Slf4j
 @Getter
-@NoArgsConstructor
 @AutoService(Params.class)
 public class DorisParams extends ExtraParams {
 
@@ -90,11 +88,11 @@ public class DorisParams extends ExtraParams {
     }
 
     public int dorisFeHttpPort() {
-        return (Integer) dorisFeConf().get("http_port");
+        return Integer.parseInt(dorisFeConf().get("http_port").toString());
     }
 
     public int dorisFeEditLogPort() {
-        return (Integer) dorisFeConf().get("edit_log_port");
+        return Integer.parseInt(dorisFeConf().get("edit_log_port").toString());
     }
 
     /*================================FE===================================================*/
@@ -143,36 +141,36 @@ public class DorisParams extends ExtraParams {
 
     public String dorisConf() {
         return (String)
-                LocalSettings.configurations(getServiceName(), "doris.conf.xml").get("content");
+                LocalSettings.configurations(getServiceName(), "doris.conf").get("content");
     }
 
     public String dorisSysctlConf() {
-        return (String) LocalSettings.configurations(getServiceName(), "doris-sysctl.conf.xml")
+        return (String) LocalSettings.configurations(getServiceName(), "doris-sysctl.conf")
                 .get("content");
     }
 
     public String dorisFeConfContent() {
-        return (String) LocalSettings.configurations(getServiceName(), "doris-fe-conf-template.xml")
+        return (String) LocalSettings.configurations(getServiceName(), "doris-fe-conf-template")
                 .get("content");
     }
 
     public String dorisBeConfContent() {
-        return (String) LocalSettings.configurations(getServiceName(), "doris-be-conf-template.xml")
+        return (String) LocalSettings.configurations(getServiceName(), "doris-be-conf-template")
                 .get("content");
     }
 
     @GlobalParams
     public Map<String, Object> dorisFeConf() {
-        return LocalSettings.configurations(getServiceName(), "doris-fe-conf.xml");
+        return LocalSettings.configurations(getServiceName(), "doris-fe-conf");
     }
 
     @GlobalParams
     public Map<String, Object> dorisBeConf() {
-        return LocalSettings.configurations(getServiceName(), "doris-be-conf.xml");
+        return LocalSettings.configurations(getServiceName(), "doris-be-conf");
     }
 
     @GlobalParams
     public Map<String, Object> dorisEnv() {
-        return LocalSettings.configurations(getServiceName(), "doris-env.xml");
+        return LocalSettings.configurations(getServiceName(), "doris-env");
     }
 }

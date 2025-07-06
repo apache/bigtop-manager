@@ -67,30 +67,24 @@ public class DorisFEScript extends AbstractServerScript {
         LinuxFileUtils.removeDirectories(dorisParams.dorisFePidDir());
 
         // Check if the FE is already registered
-        Pair<String, List<String>> registerFeList = DorisService.getRegisterFeList(dorisParams);
+        Pair<String, List<String>> registerFeList = DorisService.getRegisteredFeList(dorisParams);
 
-        if (registerFeList.getRight().contains(hostname)) {
-            String cmd = MessageFormat.format("{0}/start_fe.sh --daemon", dorisParams.dorisFeBinDir());
-
-            try {
+        try {
+            if (registerFeList.getRight().isEmpty() || registerFeList.getRight().contains(hostname)) {
+                String cmd = MessageFormat.format("{0}/start_fe.sh --daemon", dorisParams.dorisFeBinDir());
                 return LinuxOSUtils.sudoExecCmd(cmd, dorisParams.user());
-            } catch (Exception e) {
-                throw new StackException(e);
-            }
+            } else {
+                // Register FE in Doris service
+                DorisService.registerFollower(dorisParams);
 
-        } else {
-            // Register FE in Doris service
-            DorisService.registerFollower(dorisParams);
+                String cmd = MessageFormat.format(
+                        "{0}/start_fe.sh --helper {1}:{2} --daemon",
+                        dorisParams.dorisFeBinDir(), registerFeList.getLeft(), dorisParams.dorisFeEditLogPort());
 
-            String cmd = MessageFormat.format(
-                    "{0}/start_fe.sh --helper {1}:{2} --daemon",
-                    dorisParams.dorisFeBinDir(), registerFeList.getLeft(), dorisParams.dorisFeEditLogPort());
-
-            try {
                 return LinuxOSUtils.sudoExecCmd(cmd, dorisParams.user());
-            } catch (Exception e) {
-                throw new StackException(e);
             }
+        } catch (IOException e) {
+            throw new StackException(e);
         }
     }
 

@@ -69,7 +69,7 @@ public class DorisSetup {
 
             LinuxFileUtils.toFileByTemplate(
                     dorisParams.dorisFeConfContent(),
-                    MessageFormat.format("{0}/fe.conf", dorisParams.confDir()),
+                    MessageFormat.format("{0}/fe.conf", dorisParams.dorisFeConfDir()),
                     user,
                     group,
                     Constants.PERMISSION_644,
@@ -84,7 +84,7 @@ public class DorisSetup {
 
             LinuxFileUtils.toFileByTemplate(
                     dorisParams.dorisBeConfContent(),
-                    MessageFormat.format("{0}/be.conf", dorisParams.confDir()),
+                    MessageFormat.format("{0}/be.conf", dorisParams.dorisBeConfDir()),
                     user,
                     group,
                     Constants.PERMISSION_644,

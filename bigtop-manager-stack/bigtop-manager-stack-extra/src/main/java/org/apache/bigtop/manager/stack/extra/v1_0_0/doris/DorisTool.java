@@ -29,14 +29,15 @@ public class DorisTool {
         this.connection = null;
     }
 
-    public void connect() throws SQLException {
+    public void connect() throws SQLException, ClassNotFoundException {
         String url = String.format("jdbc:mysql://%s:%d/%s", host, port, database);
         int attempt = 0;
         while (true) {
             try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
                 connection = DriverManager.getConnection(url, user, password);
                 return;
-            } catch (SQLException e) {
+            } catch (SQLException | ClassNotFoundException e) {
                 attempt++;
                 if (attempt > MAX_RETRIES) {
                     throw e;

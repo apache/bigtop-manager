@@ -18,6 +18,9 @@ import java.util.List;
 public class DorisService {
     public static void registerBe(DorisParams dorisParams) {
         String aliveFe = getAliveFe(dorisParams);
+        if (aliveFe == null) {
+            return;
+        }
         String sql = "ALTER SYSTEM ADD BACKEND '?:?'";
         DorisTool dorisTool = new DorisTool(aliveFe, "root", "", "mysql", dorisParams.dorisFeHttpPort());
         try {
@@ -32,6 +35,9 @@ public class DorisService {
 
     public static List<String> getBeList(DorisParams dorisParams) {
         String aliveFe = getAliveFe(dorisParams);
+        if (aliveFe == null) {
+            return List.of();
+        }
         String sql = "SHOW BACKENDS";
         DorisTool dorisTool = new DorisTool(aliveFe, "root", "", "mysql", dorisParams.dorisFeHttpPort());
         List<String> beList = new ArrayList<>();
@@ -53,38 +59,46 @@ public class DorisService {
     }
 
     public static String getFeMaster(DorisParams dorisParams) throws SQLException, IOException {
-        return getRegisterFeList(dorisParams).getLeft();
+        return getRegisteredFeList(dorisParams).getLeft();
     }
 
     public static String getAliveFe(DorisParams dorisParams) {
         int dorisFeHttpPort = dorisParams.dorisFeHttpPort();
         List<String> feHosts = dorisParams.dorisFeHosts();
-        String feHost = feHosts.get(0);
+        String aliveFe = null;
 
         MessageFormat messageFormat =
                 new MessageFormat("curl -s -o /dev/null -w'%{{http_code}}' http://{0}:{1}/api/bootstrap");
         try {
             for (String host : feHosts) {
-                String cmd = messageFormat.format(new Object[] {host, dorisFeHttpPort});
+                String cmd = messageFormat.format(new Object[]{host, dorisFeHttpPort});
                 ShellResult shellResult = LinuxOSUtils.execCmd(cmd);
                 Integer exitCode = shellResult.getExitCode();
                 String output = shellResult.getOutput();
                 if (exitCode == 0 && "200".equals(output)) {
-                    feHost = host;
+                    aliveFe = host;
                     break;
                 }
             }
         } catch (Exception e) {
             log.error("Error checking alive FE hosts: {}", e.getMessage(), e);
         }
-        return feHost;
+        if (aliveFe == null) {
+            log.warn("No alive FE host found in the list: {}", feHosts);
+        } else {
+            log.info("Alive FE host: {}", aliveFe);
+        }
+        return aliveFe;
     }
 
-    public static Pair<String, List<String>> getRegisterFeList(DorisParams dorisParams) {
-        String feMasterHost = getAliveFe(dorisParams);
+    public static Pair<String, List<String>> getRegisteredFeList(DorisParams dorisParams) {
+        String aliveFe = getAliveFe(dorisParams);
+        if (aliveFe == null) {
+            return Pair.of(null, List.of());
+        }
         List<String> registeredFeHosts = new ArrayList<>();
         String sql = "SHOW FRONTENDS";
-        DorisTool dorisTool = new DorisTool(feMasterHost, "root", "", "mysql", dorisParams.dorisFeHttpPort());
+        DorisTool dorisTool = new DorisTool(aliveFe, "root", "", "mysql", dorisParams.dorisFeHttpPort());
         try {
             dorisTool.connect();
             try (ResultSet resultSet = dorisTool.executeQuery(sql)) {
@@ -93,20 +107,20 @@ public class DorisService {
                     boolean isMaster = resultSet.getBoolean("IsMaster");
                     registeredFeHosts.add(host);
                     if (isMaster) {
-                        feMasterHost = host;
+                        aliveFe = host;
                     }
                 }
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             log.error("Error executing SQL query: {}", sql, e);
         } finally {
             dorisTool.close();
         }
-        return Pair.of(feMasterHost, registeredFeHosts);
+        return Pair.of(aliveFe, registeredFeHosts);
     }
 
     public static void registerFollower(DorisParams dorisParams) {
-        Pair<String, List<String>> registerFeList = getRegisterFeList(dorisParams);
+        Pair<String, List<String>> registerFeList = getRegisteredFeList(dorisParams);
         if (registerFeList.getKey().contains(dorisParams.hostname())) {
             log.info("Doris FE {} already registered", dorisParams.hostname());
         } else {
