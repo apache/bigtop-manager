@@ -31,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.text.MessageFormat;
 
-import static org.apache.bigtop.manager.common.constants.Constants.PERMISSION_755;
+import static org.apache.bigtop.manager.common.constants.Constants.*;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -41,6 +41,8 @@ public class DorisSetup {
         DorisParams dorisParams = (DorisParams) params;
         String user = dorisParams.user();
         String group = dorisParams.group();
+
+        log.info("dorisParams.getGlobalParamsMap() {}", dorisParams.getGlobalParamsMap());
 
         LinuxFileUtils.toFileByTemplate(
                 dorisParams.dorisConf(),

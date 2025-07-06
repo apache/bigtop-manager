@@ -76,7 +76,9 @@ public class LinuxOSUtils {
         builderParameters.add("sh");
         builderParameters.add("-c");
         builderParameters.add(command);
-        return ShellExecutor.execCommand(builderParameters);
+        ShellResult shellResult = ShellExecutor.execCommand(builderParameters);
+        log.info("Executing command: {}, shellResult: {}", builderParameters, shellResult);
+        return shellResult;
     }
 
     /**
@@ -92,7 +94,9 @@ public class LinuxOSUtils {
         while (st.hasMoreTokens()) {
             builderParameters.add(st.nextToken());
         }
-        return ShellExecutor.execCommand(builderParameters);
+        ShellResult shellResult = ShellExecutor.execCommand(builderParameters);
+        log.info("Command executed: {}, shellResult: {}", command, shellResult);
+        return shellResult;
     }
 
     public static ShellResult checkProcess(String filepath) {

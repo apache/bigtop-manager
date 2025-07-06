@@ -133,7 +133,7 @@ enable_single_replica_load =true
 
 ]]>
         </value>
-        <description>Template for flink-conf.yaml</description>
+        <description>Template for be.conf</description>
     </property>
 
 

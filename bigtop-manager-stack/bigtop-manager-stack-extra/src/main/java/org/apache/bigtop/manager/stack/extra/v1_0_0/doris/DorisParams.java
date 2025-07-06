@@ -18,10 +18,12 @@
  */
 package org.apache.bigtop.manager.stack.extra.v1_0_0.doris;
 
+import lombok.NoArgsConstructor;
 import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
+import org.apache.bigtop.manager.stack.core.utils.template.BaseTemplate;
 import org.apache.bigtop.manager.stack.extra.param.ExtraParams;
 
 import com.google.auto.service.AutoService;
@@ -34,6 +36,7 @@ import java.util.Map;
 @Slf4j
 @Getter
 @AutoService(Params.class)
+@NoArgsConstructor
 public class DorisParams extends ExtraParams {
 
     private final String limitsConfDir = "/etc/security/limits.d";
@@ -45,7 +48,6 @@ public class DorisParams extends ExtraParams {
         globalParamsMap.put("doris_user", user());
         globalParamsMap.put("doris_group", group());
         globalParamsMap.put("doris_home", serviceHome());
-        globalParamsMap.put("doris_conf_dir", confDir());
         globalParamsMap.put("doris_fe_home", dorisFeHome());
         globalParamsMap.put("doris_be_home", dorisBeHome());
     }
@@ -65,13 +67,13 @@ public class DorisParams extends ExtraParams {
 
     public String dorisFeMetaDir() {
         return dorisFeConf().get("meta_dir") != null
-                ? (String) dorisFeConf().get("meta_dir")
+                ? BaseTemplate.writeCustomTemplateAsString(globalParamsMap, (String) dorisFeConf().get("meta_dir"))
                 : dorisFeHome() + "/doris-meta";
     }
 
     public String dorisFeLogDir() {
         return dorisEnv().get("doris_fe_log_dir") != null
-                ? (String) dorisEnv().get("doris_fe_log_dir")
+                ? BaseTemplate.writeCustomTemplateAsString(globalParamsMap, (String) dorisEnv().get("doris_fe_log_dir"))
                 : dorisFeHome() + "/log";
     }
 
@@ -111,13 +113,13 @@ public class DorisParams extends ExtraParams {
 
     public String dorisBeStorage() {
         return dorisBeConf().get("storage_root_path") != null
-                ? (String) dorisBeConf().get("storage_root_path")
+                ? BaseTemplate.writeCustomTemplateAsString(globalParamsMap, (String) dorisBeConf().get("storage_root_path"))
                 : dorisBeHome() + "/storage";
     }
 
     public String dorisBeLogDir() {
         return dorisEnv().get("doris_be_log_dir") != null
-                ? (String) dorisEnv().get("doris_be_log_dir")
+                ? BaseTemplate.writeCustomTemplateAsString(globalParamsMap, (String) dorisEnv().get("doris_be_log_dir"))
                 : dorisBeHome() + "/log";
     }
 
@@ -171,6 +173,6 @@ public class DorisParams extends ExtraParams {
 
     @GlobalParams
     public Map<String, Object> dorisEnv() {
-        return LocalSettings.configurations(getServiceName(), "doris-env");
+        return LocalSettings.configurations(getServiceName(), "doris-env.sh");
     }
 }

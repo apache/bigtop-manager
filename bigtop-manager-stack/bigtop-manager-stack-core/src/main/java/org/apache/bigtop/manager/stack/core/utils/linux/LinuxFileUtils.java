@@ -176,6 +176,7 @@ public class LinuxFileUtils {
 
         try {
             ShellResult shellResult = sudoExecCmd(builderParameters);
+            log.info("LinuxFileUtils.createDirectories {} result: {}", builderParameters, shellResult);
             if (shellResult.getExitCode() != MessageConstants.SUCCESS_CODE) {
                 throw new StackException(shellResult.getErrMsg());
             }

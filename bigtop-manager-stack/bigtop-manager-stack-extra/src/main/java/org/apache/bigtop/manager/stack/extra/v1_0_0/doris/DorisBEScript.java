@@ -60,7 +60,7 @@ public class DorisBEScript extends AbstractServerScript {
     public ShellResult start(Params params) {
         configure(params);
         DorisParams dorisParams = (DorisParams) params;
-        LinuxFileUtils.removeDirectories(dorisParams.dorisBePidDir());
+        LinuxFileUtils.removeDirectories(dorisParams.dorisBePidFile());
 
         // Register BE in Doris service
         DorisService.registerBe(dorisParams);

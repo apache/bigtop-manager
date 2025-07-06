@@ -21,11 +21,11 @@
 <configuration>
     <property>
         <name>doris_fe_log_dir</name>
-        <value>${doris_fe_home}/fe</value>
+        <value>${doris_fe_home}/log</value>
     </property>
     <property>
         <name>doris_be_log_dir</name>
-        <value>${doris_be_home}/be</value>
+        <value>${doris_be_home}/log</value>
     </property>
     <property>
         <name>doris_fe_pid_dir</name>
