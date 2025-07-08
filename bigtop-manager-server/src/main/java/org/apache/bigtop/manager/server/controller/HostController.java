@@ -46,6 +46,7 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
@@ -54,6 +55,7 @@ import java.util.List;
 @Tag(name = "Host Controller")
 @RestController
 @RequestMapping("/hosts")
+@Slf4j
 public class HostController {
 
     @Resource

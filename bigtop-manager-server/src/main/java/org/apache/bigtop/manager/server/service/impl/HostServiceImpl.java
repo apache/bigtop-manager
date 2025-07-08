@@ -86,6 +86,10 @@ public class HostServiceImpl implements HostService {
 
     private final ExecutorService executorService = Executors.newFixedThreadPool(5);
 
+    private static final Integer DEFAULT_GRPC_PORT = 8835;
+    private static final Integer DEFAULT_SSH_PORT = 22;
+    private static final String DEFAULT_AGENT_DIR = "/opt";
+
     @Override
     public PageVO<HostVO> list(HostQuery hostQuery) {
         PageQuery pageQuery = PageUtils.getPageQuery();
@@ -101,6 +105,7 @@ public class HostServiceImpl implements HostService {
 
     @Override
     public List<HostVO> add(HostDTO hostDTO) {
+        setDefaultValues(hostDTO);
         List<HostPO> hostPOList = HostConverter.INSTANCE.fromDTO2POListUsingHostnames(hostDTO);
         for (HostPO hostPO : hostPOList) {
             hostPO.setStatus(HealthyStatusEnum.HEALTHY.getCode());
@@ -227,6 +232,7 @@ public class HostServiceImpl implements HostService {
         installedStatus.clear();
 
         for (HostDTO hostDTO : hostDTOList) {
+            setDefaultValues(hostDTO);
             for (String hostname : hostDTO.getHostnames()) {
                 InstalledStatusVO installedStatusVO = new InstalledStatusVO();
                 installedStatusVO.setHostname(hostname);
@@ -316,6 +322,21 @@ public class HostServiceImpl implements HostService {
         } catch (Exception e) {
             log.error("Unable to exec command on host, hostname: {}, command: {}", hostname, command, e);
             throw new RuntimeException(e);
+        }
+    }
+
+    private void setDefaultValues(HostDTO hostDTO) {
+        if (hostDTO == null) {
+            return;
+        }
+        if (hostDTO.getGrpcPort() == null) {
+            hostDTO.setGrpcPort(DEFAULT_GRPC_PORT);
+        }
+        if (hostDTO.getSshPort() == null) {
+            hostDTO.setSshPort(DEFAULT_SSH_PORT);
+        }
+        if (hostDTO.getAgentDir() == null) {
+            hostDTO.setAgentDir(DEFAULT_AGENT_DIR);
         }
     }
 }
