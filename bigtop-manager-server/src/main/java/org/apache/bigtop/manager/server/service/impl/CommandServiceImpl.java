@@ -41,7 +41,6 @@ import org.apache.bigtop.manager.server.model.vo.CommandVO;
 import org.apache.bigtop.manager.server.service.CommandService;
 
 import org.springframework.ai.tool.annotation.Tool;
-import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
@@ -66,75 +65,7 @@ public class CommandServiceImpl implements CommandService {
 
     @Override
     @Tool(name = "Command", description = "Add cluster or add services")
-    public CommandVO command(
-            @ToolParam(
-                            required = true,
-                            description =
-                                    """
-            Example of adding a cluster:
-            {
-                "command": "add", # Do not modify
-                "commandLevel": "cluster", # Do not modify
-                "clusterCommand": {
-                    "name": "cluster_name",
-                    "desc": "cluster_desc",
-                    "type": 1,
-                    "userGroup": "hadoop",
-                    "rootDir": "root directory of cluster",
-                    "hosts": {
-                        "hostnames": [
-                            "hostname"
-                        ],
-                        "agentDir": "path of bigtop-manager agent",
-                        "sshUser": "username",
-                        "sshPort": 22,
-                        "authType": 3,
-                        "grpcPort": 8835,
-                        "desc": "vm"
-                    }
-                }
-            }
-            Example of adding services:
-            {
-                "command": "add", # Do not modify
-                "clusterId": 1,
-                "commandLevel": "service", # Do not modify
-                "serviceCommands": [
-                    {
-                        "serviceName": "prometheus",
-                        "componentHosts": [
-                            {
-                                "componentName": "prometheus_server",
-                                "hostnames": [ # The host that has been added to the cluster
-                                    "hostname"
-                                ]
-                            }
-                        ],
-                        "configs": [
-                            {
-                                "name": "prometheus",
-                                "properties": [
-                                    {
-                                        "name": "port",
-                                        "value": "9090",
-                                    }
-                                ]
-                            },
-                            {
-                                "name": "prometheus-rule",
-                                "properties": [
-                                    {
-                                        "name": "rules_file_name",
-                                        "value": "prometheus_rules.yml",
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            }
-            """)
-                    CommandDTO commandDTO) {
+    public CommandVO command(CommandDTO commandDTO) {
         CommandIdentifier commandIdentifier =
                 new CommandIdentifier(commandDTO.getCommandLevel(), commandDTO.getCommand());
 

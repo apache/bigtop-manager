@@ -143,11 +143,11 @@ dependency:
     - name: com.github.victools:jsonschema-module-swagger-2
       license: Apache-2.0
     - name: org.antlr:antlr-runtime
-      license: BSD-3-Clause
+      license: BSD
     - name: org.antlr:antlr4-runtime
       license: BSD-3-Clause
     - name: org.antlr:ST4
-      license: BSD-3-Clause
+      license: BSD
   excludes:
     # Go license
     - name: com.google.re2j:re2j

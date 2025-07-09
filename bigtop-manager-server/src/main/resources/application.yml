@@ -21,8 +21,7 @@ spring:
   ai:
     mcp:
       server:
-        name: webmvc-mcp-server
-        version: 1.0.0
+        name: bigtop-manager-mcp-server
         type: ASYNC
         sse-endpoint: /mcp/sse
         sse-message-endpoint: /mcp/messages

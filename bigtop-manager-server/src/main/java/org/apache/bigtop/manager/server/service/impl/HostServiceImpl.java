@@ -103,24 +103,7 @@ public class HostServiceImpl implements HostService {
 
     @Override
     @Tool(name = "AddHost", description = "Add hosts to bigtop manager")
-    public List<HostVO> add(
-            @ToolParam(
-                            required = true,
-                            description =
-                                    """
-           Example of adding a host:
-            {
-                "hostnames": [
-                    "hostname"
-                ],
-                "agentDir": "/opt", # Path to install Bigtop Manager agent
-                "sshUser": "username",
-                "sshPort": 22,
-                "authType": 3, # 1: password, 2: key, 3: no auth
-                "grpcPort": 8835,
-            }
-            """)
-                    HostDTO hostDTO) {
+    public List<HostVO> add(HostDTO hostDTO) {
         List<HostPO> hostPOList = HostConverter.INSTANCE.fromDTO2POListUsingHostnames(hostDTO);
         for (HostPO hostPO : hostPOList) {
             hostPO.setStatus(HealthyStatusEnum.HEALTHY.getCode());
