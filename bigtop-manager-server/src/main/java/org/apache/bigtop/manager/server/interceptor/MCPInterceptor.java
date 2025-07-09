@@ -19,7 +19,6 @@
 package org.apache.bigtop.manager.server.interceptor;
 
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.server.holder.SessionUserHolder;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
 
 import org.springframework.stereotype.Component;
@@ -57,10 +56,6 @@ public class MCPInterceptor implements HandlerInterceptor {
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
             throws Exception {
         HandlerInterceptor.super.afterCompletion(request, response, handler, ex);
-    }
-
-    private void clearStatus() {
-        SessionUserHolder.clear();
     }
 
     private Boolean checkAuthenticated(HttpServletRequest request) {
