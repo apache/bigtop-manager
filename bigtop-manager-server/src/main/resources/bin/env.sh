@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -17,5 +18,49 @@
 # under the License.
 #
 
+set -e
+
+JAVA_SEARCH_DIRS=(
+  "/usr/local/java*"
+  "/usr/lib/jvm/java-*"
+  "/usr/java/jdk*"
+  "/opt/java*"
+  "/opt/jdk*"
+  "/usr/lib/jvm/*"
+)
+
+# Find a suitable Java (version >= 17)
+find_java() {
+  if [ -n "$JAVA_HOME" ] && [ -x "$JAVA_HOME/bin/java" ]; then
+    JAVA_CANDIDATES=("$JAVA_HOME/bin/java")
+  else
+    JAVA_CANDIDATES=()
+    JAVA_PATH=$(command -v java 2>/dev/null || true)
+    [ -n "$JAVA_PATH" ] && JAVA_CANDIDATES+=("$JAVA_PATH")
+
+    for pattern in "${JAVA_SEARCH_DIRS[@]}"; do
+      for dir in $(compgen -G "$pattern" 2>/dev/null); do
+        # Check privileges, make sure the script won't exit
+        [ -x "$dir/bin/java" ] 2>/dev/null || true
+        [ -x "$dir/bin/java" ] && JAVA_CANDIDATES+=("$dir/bin/java")
+      done
+    done
+  fi
+
+  for JAVA_CMD in "${JAVA_CANDIDATES[@]}"; do
+    VERSION_STR=$("$JAVA_CMD" -version 2>&1 | awk -F '"' '/version/ {print $2}')
+    MAJOR_VERSION=$(echo "$VERSION_STR" | awk -F. '{if ($1 == "1") print $2; else print $1}')
+    if [ "$MAJOR_VERSION" -ge 17 ]; then
+      export JAVA_CMD
+      return 0
+    fi
+  done
+
+  echo "Error: Java 17 or higher is required. No suitable java found." >&2
+  exit 1
+}
+
+find_java
 
 export JAVA_OPTS=""
+export JAVA_CMD

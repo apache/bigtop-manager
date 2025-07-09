@@ -274,10 +274,14 @@ public class HostServiceImpl implements HostService {
         try {
             String script = ProjectPathUtils.getServerScriptPath() + File.separator + "setup-agent.sh";
             String content = Files.readString(Path.of(script));
-            command = "cat << 'EOF' > ./setup-agent.sh\n"
-                    + content
-                    + "\nEOF\n"
-                    + "chmod +x ./setup-agent.sh && ./setup-agent.sh " + path + " " + repoUrl + " " + grpcPort;
+            command = "cat << 'EOF' > ./setup-agent.sh\n" + content + "\nEOF\n" + "chmod +x ./setup-agent.sh";
+            ShellResult result = execCommandOnRemoteHost(hostDTO, hostname, command);
+            if (result.getExitCode() != MessageConstants.SUCCESS_CODE) {
+                log.error("Unable to write agent script, hostname: {}, msg: {}", hostname, result);
+                installedStatusVO.setStatus(InstalledStatusEnum.FAILED);
+                installedStatusVO.setMessage(result.getErrMsg());
+                return;
+            }
         } catch (IOException e) {
             log.error("Unable to write agent script, hostname: {}, msg: {}", hostname, e.getMessage());
             installedStatusVO.setStatus(InstalledStatusEnum.FAILED);
@@ -285,6 +289,7 @@ public class HostServiceImpl implements HostService {
             return;
         }
 
+        command = "./setup-agent.sh " + path + " " + repoUrl + " " + grpcPort;
         ShellResult result = execCommandOnRemoteHost(hostDTO, hostname, command);
         if (result.getExitCode() != MessageConstants.SUCCESS_CODE) {
             log.error("Unable to setup agent, hostname: {}, msg: {}", hostname, result);
