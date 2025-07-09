@@ -49,7 +49,6 @@ import org.apache.bigtop.manager.server.utils.RemoteSSHUtils;
 import org.apache.commons.collections4.CollectionUtils;
 
 import org.springframework.ai.tool.annotation.Tool;
-import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -226,23 +225,7 @@ public class HostServiceImpl implements HostService {
 
     @Override
     @Tool(name = "InstallDependencies", description = "Install dependencies on hosts")
-    public Boolean installDependencies(
-            @ToolParam(
-                            required = true,
-                            description =
-                                    """
-            {
-                "hostnames": [
-                    "hostname"
-                ],
-                "agentDir": "/opt/apps", # Path to install Bigtop Manager agent
-                "sshUser": "username",
-                "sshPort": 22,
-                "authType": 3, # 1: password, 2: key, 3: no auth
-                "grpcPort": 8835,
-            }
-            """)
-                    List<HostDTO> hostDTOList) {
+    public Boolean installDependencies(List<HostDTO> hostDTOList) {
         // Clear cache list
         installedStatus.clear();
 
