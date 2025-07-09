@@ -21,7 +21,6 @@ package org.apache.bigtop.manager.server.service;
 
 import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.repository.ClusterDao;
-import org.apache.bigtop.manager.dao.repository.RepoDao;
 import org.apache.bigtop.manager.dao.repository.ServiceDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
