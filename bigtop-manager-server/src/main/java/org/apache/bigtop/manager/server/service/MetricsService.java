@@ -18,13 +18,12 @@
  */
 package org.apache.bigtop.manager.server.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.bigtop.manager.server.model.vo.ClusterMetricsVO;
+import org.apache.bigtop.manager.server.model.vo.HostMetricsVO;
 
 public interface MetricsService {
 
-    JsonNode queryAgentsHealthyStatus();
+    HostMetricsVO queryAgentsInfo(Long id, String interval);
 
-    JsonNode queryAgentsInfo(Long id, String interval);
-
-    JsonNode queryClustersInfo(Long clusterId, String interval);
+    ClusterMetricsVO queryClustersInfo(Long clusterId, String interval);
 }

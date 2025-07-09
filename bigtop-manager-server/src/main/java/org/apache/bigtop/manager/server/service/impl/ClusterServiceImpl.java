@@ -62,11 +62,12 @@ public class ClusterServiceImpl implements ClusterService {
     @Override
     public ClusterVO get(Long id) {
         ClusterPO clusterPO = clusterDao.findDetailsById(id);
-
         if (clusterPO == null) {
             throw new ApiException(ApiExceptionEnum.CLUSTER_NOT_FOUND);
         }
 
+        int serviceNum = serviceDao.countByClusterId(id);
+        clusterPO.setTotalService((long) serviceNum);
         return ClusterConverter.INSTANCE.fromPO2VO(clusterPO);
     }
 

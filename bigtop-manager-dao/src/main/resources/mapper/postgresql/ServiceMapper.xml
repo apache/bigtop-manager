@@ -52,6 +52,14 @@
         </where>
     </select>
 
+    <select id="countByClusterId" parameterType="java.lang.Long" resultType="int">
+        select
+        count(*)
+        from service
+        where
+        cluster_id = #{clusterId}
+    </select>
+
     <select id="findByClusterId" parameterType="java.lang.Long" resultType="org.apache.bigtop.manager.dao.po.ServicePO">
         select
         <include refid="baseColumns" />
