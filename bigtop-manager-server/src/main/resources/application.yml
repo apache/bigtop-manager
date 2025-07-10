@@ -18,6 +18,13 @@
 #
 
 spring:
+  ai:
+    mcp:
+      server:
+        name: bigtop-manager-mcp-server
+        type: ASYNC
+        sse-endpoint: /mcp/sse
+        sse-message-endpoint: /mcp/messages
   banner:
     charset: utf-8
   application:

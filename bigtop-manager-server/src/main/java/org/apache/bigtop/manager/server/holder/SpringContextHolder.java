@@ -20,6 +20,7 @@ package org.apache.bigtop.manager.server.holder;
 
 import org.apache.bigtop.manager.server.command.factory.JobFactory;
 import org.apache.bigtop.manager.server.command.validator.CommandValidator;
+import org.apache.bigtop.manager.server.mcp.tool.McpTool;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -51,5 +52,9 @@ public class SpringContextHolder implements ApplicationContextAware {
 
     public static Map<String, JobFactory> getJobFactories() {
         return applicationContext.getBeansOfType(JobFactory.class);
+    }
+
+    public static Map<String, McpTool> getMcpTools() {
+        return applicationContext.getBeansOfType(McpTool.class);
     }
 }

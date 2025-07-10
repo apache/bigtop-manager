@@ -41,6 +41,7 @@ header:
     - 'pnpm-lock.yaml'
     - '**/*.txt'
     - '**/*.md'
+    - '**/*.prompt'
 
   comment: on-failure
 
@@ -108,6 +109,20 @@ dependency:
     - name: com.sun.istack:istack-commons-runtime
       license: EDL-1.0
     - name: org.jline:jline
+      license: BSD-3-Clause
+    - name: com.github.victools:jsonschema-module-jackson
+      license: Apache-2.0
+    - name: com.fasterxml.jackson.module:jackson-module-jsonSchema
+      license: Apache-2.0
+    - name: io.swagger.core.v3:swagger-annotations
+      license: Apache-2.0
+    - name: com.github.victools:jsonschema-module-swagger-2
+      license: Apache-2.0
+    - name: org.antlr:antlr-runtime
+      license: BSD-3-Clause
+    - name: org.antlr:antlr4-runtime
+      license: BSD-3-Clause
+    - name: org.antlr:ST4
       license: BSD-3-Clause
     # Weak compatible licenses
     - name: javax.servlet.jsp:jsp-api

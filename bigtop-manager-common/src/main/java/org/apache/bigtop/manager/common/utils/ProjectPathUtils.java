@@ -51,6 +51,10 @@ public class ProjectPathUtils {
         return getProjectStoreDir() + File.separator + "agent-caches";
     }
 
+    public static String getPromptsPath() {
+        return getProjectResourcesDir() + File.separator + "prompts";
+    }
+
     private static String getProjectResourcesDir() {
         if (Environments.isDevMode()) {
             return Objects.requireNonNull(ProjectPathUtils.class.getResource("/"))
