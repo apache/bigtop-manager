@@ -41,7 +41,7 @@ header:
     - 'pnpm-lock.yaml'
     - '**/*.txt'
     - '**/*.md'
-    - '**/resources/prompts/**'
+    - '**/*.prompt'
 
   comment: on-failure
 

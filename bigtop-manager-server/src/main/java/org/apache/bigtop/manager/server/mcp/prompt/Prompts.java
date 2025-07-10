@@ -29,7 +29,7 @@ import java.io.File;
  */
 public class Prompts {
 
-    public static final String SAMPLE = getText("sample");
+    public static final String SAMPLE = getText("sample.prompt");
 
     private static String getText(String filename) {
         String promptPath = ProjectPathUtils.getPromptsPath();
