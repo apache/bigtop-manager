@@ -31,6 +31,7 @@
   const clusterStore = useClusterStore()
   const routeParamsLen = ref(0)
   const openKeys = ref<string[]>(['clusters'])
+
   const { siderMenuSelectedKey, headerSelectedKey, siderMenus, routePathFromClusters } = storeToRefs(menuStore)
   const { clusterCount, clusterMap } = storeToRefs(clusterStore)
 
@@ -49,29 +50,27 @@
    */
   const handleRouteChange = async (newRoute: typeof route) => {
     const token = localStorage.getItem('Token') ?? sessionStorage.getItem('Token') ?? undefined
+    const { params, path, meta, name: RouteName } = newRoute
 
     if (!token) {
       return
     }
 
-    const { params, path, meta, name } = newRoute
-    const clusterId = params.id
-    const isClusterPath = path.includes(routePathFromClusters.value)
-    const isNotCreatingCluster = name !== 'CreateCluster'
-
     routeParamsLen.value = Object.keys(params).length
 
-    if (isClusterPath && clusterCount.value > 0 && isNotCreatingCluster) {
-      if (clusterId && clusterMap.value[`${clusterId}`]) {
-        siderMenuSelectedKey.value = `${routePathFromClusters.value}/${clusterId}`
+    if (path.includes(routePathFromClusters.value) && RouteName !== 'CreateCluster') {
+      if (params.id && clusterMap.value[`${params.id}`]) {
+        siderMenuSelectedKey.value = `${routePathFromClusters.value}/${params.id}`
         openKeys.value.push(siderMenuSelectedKey.value)
-      } else {
-        siderMenuSelectedKey.value = ''
-        menuStore.setupSider()
+        return
       }
-    } else {
-      siderMenuSelectedKey.value = meta.activeMenu ?? path
+
+      siderMenuSelectedKey.value = ''
+      menuStore.setupSider()
+      return
     }
+
+    siderMenuSelectedKey.value = meta.activeMenu ?? path
   }
 
   /**
@@ -89,8 +88,8 @@
     router.push({ name: 'CreateCluster' })
   }
 
-  onMounted(async () => {
-    await clusterStore.loadClusters()
+  onMounted(() => {
+    clusterStore.loadClusters()
   })
 
   watch(

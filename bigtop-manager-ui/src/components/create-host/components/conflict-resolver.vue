@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { computed, shallowRef } from 'vue'
+  import { computed } from 'vue'
   import { useI18n } from 'vue-i18n'
 
   import type { HostReq } from '@/api/command/types'
@@ -26,11 +26,12 @@
 
   type conflictItem = HostReq & { strategy: 'override' | 'keep' }
 
-  defineProps<{ parsedHosts: conflictItem[]; duplicateHostnames: string[] }>()
-  defineEmits<{ (event: 'update:parsedHosts', val: conflictItem[]): void }>()
+  const props = defineProps<{ parsedHosts: conflictItem[]; duplicateHostnames: string[] }>()
+  const emits = defineEmits<{ (event: 'update:parsedHosts', val: conflictItem[]): void }>()
+
+  const options = ['keep', 'override']
 
   const { t } = useI18n()
-  const options = shallowRef(['keep', 'override'])
   const columns = computed((): TableColumnType[] => [
     {
       title: t('host.hostname'),
@@ -39,18 +40,27 @@
       ellipsis: true
     },
     {
+      title: t('common.operation'),
       key: 'operation',
       width: '200px',
       fixed: 'right'
     }
   ])
+
+  const handleStrategyChange = (hostname: string, strategy: 'keep' | 'override') => {
+    const updated = props.parsedHosts.map((item) => (item.hostname === hostname ? { ...item, strategy } : item))
+    emits('update:parsedHosts', updated)
+  }
 </script>
 
 <template>
   <div>
-    <a-table :data-source="$props.parsedHosts" :columns="columns">
+    <a-table
+      :data-source="$props.parsedHosts.filter((v) => $props.duplicateHostnames.includes(v.hostname))"
+      :columns="columns"
+    >
       <template #headerCell="{ column }">
-        <template v-if="column === 'operation'">
+        <template v-if="column.key === 'operation'">
           <a-dropdown :get-popup-container="(trigger) => trigger.parentNode">
             <a class="ant-dropdown-link" @click.prevent> {{ t('common.operation') }} </a>
             <template #overlay>
@@ -65,9 +75,9 @@
       <template #bodyCell="{ record, column }">
         <template v-if="column.key === 'operation'">
           <a-radio-group
-            v-model:value="record.strategy"
+            :value="record.strategy"
             style="display: flex"
-            :disabled="!$props.duplicateHostnames.includes(record.hostname)"
+            @change="(e) => handleStrategyChange(record.hostname, e.target.value)"
           >
             <a-radio v-for="opt in options" :key="opt" :value="opt">{{ opt }}</a-radio>
           </a-radio-group>
