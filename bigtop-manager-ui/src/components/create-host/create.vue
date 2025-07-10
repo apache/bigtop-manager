@@ -352,26 +352,31 @@
   ])
 
   const filterFormItems = computed((): FormItemState[] => {
-    const baseItems = [...formItems.value]
-    const isPublic = props.isPublic
-
     if (formValue.value.authType === '1') {
-      baseItems.splice(2, 0, ...formItemsForSshPassword.value)
+      const data = [...formItems.value]
+      data.splice(2, 0, ...formItemsForSshPassword.value)
+      return props.isPublic ? [...formItemsOfPublicHost.value, ...data] : data
     } else if (formValue.value.authType === '2') {
-      baseItems.splice(2, 0, ...formItemsForSshKeyPassword.value)
+      const data = [...formItems.value]
+      data.splice(2, 0, ...formItemsForSshKeyPassword.value)
+      return props.isPublic ? [...formItemsOfPublicHost.value, ...data] : data
     }
-
-    return isPublic ? [...formItemsOfPublicHost.value, ...baseItems] : baseItems
+    return props.isPublic ? [...formItemsOfPublicHost.value, ...formItems.value] : [...formItems.value]
   })
 
   watch(
-    () => formValue.value.inputType,
-    (inputType) => {
-      const hiddenMap: Record<string, string[]> = {
-        '1': ['sshKeyString'],
-        '2': ['sshKeyFilename']
+    () => formValue.value,
+    (val) => {
+      if (val.inputType && val.inputType === '1') {
+        hiddenItems.value = ['sshKeyString']
+      } else if (val.inputType && val.inputType === '2') {
+        hiddenItems.value = ['sshKeyFilename']
+      } else {
+        hiddenItems.value = []
       }
-      hiddenItems.value = hiddenMap[inputType] ?? []
+    },
+    {
+      deep: true
     }
   )
 
