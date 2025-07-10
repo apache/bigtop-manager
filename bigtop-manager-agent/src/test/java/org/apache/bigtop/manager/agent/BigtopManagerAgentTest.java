@@ -36,7 +36,7 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class AgentApplicationTest {
+public class BigtopManagerAgentTest {
 
     @Mock
     private MeterRegistry meterRegistry;
@@ -54,13 +54,13 @@ public class AgentApplicationTest {
     private MultiGauge diskIOMultiGauge;
 
     @InjectMocks
-    private AgentApplication agentApplication;
+    private BigtopManagerAgent bigtopManagerAgent;
 
     @Test
     public void testDiskMultiGaugeBean() {
         try (MockedStatic<AgentHostMonitoring> mockedStatic = mockStatic(AgentHostMonitoring.class)) {
             when(AgentHostMonitoring.newDiskMultiGauge(meterRegistry)).thenReturn(diskMultiGauge);
-            MultiGauge result = agentApplication.diskMultiGauge(meterRegistry);
+            MultiGauge result = bigtopManagerAgent.diskMultiGauge(meterRegistry);
             assertNotNull(result);
         }
     }
@@ -69,7 +69,7 @@ public class AgentApplicationTest {
     public void testCPUMultiGaugeBean() {
         try (MockedStatic<AgentHostMonitoring> mockedStatic = mockStatic(AgentHostMonitoring.class)) {
             when(AgentHostMonitoring.newCPUMultiGauge(meterRegistry)).thenReturn(cpuMultiGauge);
-            MultiGauge result = agentApplication.cpuMultiGauge(meterRegistry);
+            MultiGauge result = bigtopManagerAgent.cpuMultiGauge(meterRegistry);
             assertNotNull(result);
         }
     }
@@ -78,7 +78,7 @@ public class AgentApplicationTest {
     public void testMemMultiGaugeBean() {
         try (MockedStatic<AgentHostMonitoring> mockedStatic = mockStatic(AgentHostMonitoring.class)) {
             when(AgentHostMonitoring.newMemMultiGauge(meterRegistry)).thenReturn(memMultiGauge);
-            MultiGauge result = agentApplication.memMultiGauge(meterRegistry);
+            MultiGauge result = bigtopManagerAgent.memMultiGauge(meterRegistry);
             assertNotNull(result);
         }
     }
@@ -87,7 +87,7 @@ public class AgentApplicationTest {
     public void testDiskIOMultiGaugeBean() {
         try (MockedStatic<AgentHostMonitoring> mockedStatic = mockStatic(AgentHostMonitoring.class)) {
             when(AgentHostMonitoring.newDiskIOMultiGauge(meterRegistry)).thenReturn(diskIOMultiGauge);
-            MultiGauge result = agentApplication.diskIOMultiGauge(meterRegistry);
+            MultiGauge result = bigtopManagerAgent.diskIOMultiGauge(meterRegistry);
             assertNotNull(result);
         }
     }
@@ -95,8 +95,8 @@ public class AgentApplicationTest {
     @Test
     public void testMainMethod() {
         try (MockedStatic<SpringApplication> mockedStatic = mockStatic(SpringApplication.class)) {
-            AgentApplication.main(new String[] {});
-            mockedStatic.verify(() -> SpringApplication.run(AgentApplication.class, new String[] {}));
+            BigtopManagerAgent.main(new String[] {});
+            mockedStatic.verify(() -> SpringApplication.run(BigtopManagerAgent.class, new String[] {}));
         }
     }
 }
