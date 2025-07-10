@@ -31,9 +31,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
             "org.apache.bigtop.manager.common",
             "org.apache.bigtop.manager.ai"
         })
-public class ServerApplication {
+public class BigtopManagerServer {
 
     public static void main(String[] args) {
-        SpringApplication.run(ServerApplication.class, args);
+        SpringApplication.run(BigtopManagerServer.class, args);
     }
 }
