@@ -55,7 +55,7 @@ CHECK_VAL="${5:-}"
 TAR_FILE="${DIR_PREFIX}/bigtop-manager-agent.tar.gz"
 TARGET_DIR="${DIR_PREFIX}/bigtop-manager-agent"
 DOWNLOAD_URL="${REPO_URL}/bigtop-manager-agent.tar.gz"
-PROCESS_NAME="org.apache.bigtop.manager.agent.AgentApplication"
+PROCESS_NAME="org.apache.bigtop.manager.agent.BigtopManagerAgent"
 
 validate_checksum() {
     local file="$1"
