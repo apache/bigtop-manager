@@ -30,6 +30,8 @@
   import { useClusterStore } from '@/store/cluster'
   import { Empty } from 'ant-design-vue'
   import { useRoute } from 'vue-router'
+  import { getClusterMetricsInfo } from '@/api/metrics'
+  import { parsePercentageNumbers } from '@/utils/chart'
 
   import GaugeChart from '@/components/charts/gauge-chart.vue'
   import CategoryChart from '@/components/charts/category-chart.vue'
@@ -39,12 +41,7 @@
   import type { MenuItem } from '@/store/menu/types'
   import type { StackVO } from '@/api/stack/types'
   import type { Command } from '@/api/command/types'
-
-  type TimeRangeText = '1m' | '15m' | '30m' | '1h' | '6h' | '30h'
-  type TimeRangeItem = {
-    text: TimeRangeText
-    time: string
-  }
+  import type { MetricsData, TimeRangeType } from '@/api/metrics/types'
 
   const props = defineProps<{ payload: ClusterVO }>()
   const emits = defineEmits<{ (event: 'update:payload', value: ClusterVO): void }>()
@@ -55,21 +52,19 @@
   const stackStore = useStackStore()
   const serviceStore = useServiceStore()
   const clusterStore = useClusterStore()
-  const currTimeRange = ref<TimeRangeText>('15m')
-  const chartData = ref({
-    chart1: [],
-    chart2: [],
-    chart3: [],
-    chart4: []
-  })
+
+  const currTimeRange = ref<TimeRangeType>('15m')
+  const chartData = ref<Partial<MetricsData>>({})
+
+  const timeRanges = shallowRef<TimeRangeType[]>(['1m', '15m', '30m', '1h', '3h', '6h'])
+  const locateStackWithService = shallowRef<StackVO[]>([])
   const statusColors = shallowRef<Record<ClusterStatusType, keyof typeof CommonStatusTexts>>({
     1: 'healthy',
     2: 'unhealthy',
     3: 'unknown'
   })
-  const { serviceNames } = storeToRefs(serviceStore)
-  const locateStackWithService = shallowRef<StackVO[]>([])
 
+  const { serviceNames } = storeToRefs(serviceStore)
   const { payload } = toRefs(props)
 
   const clusterDetail = computed(() => ({
@@ -77,17 +72,6 @@
     totalMemory: formatFromByte(payload.value.totalMemory as number),
     totalDisk: formatFromByte(payload.value.totalDisk as number)
   }))
-
-  const clusterId = computed(() => route.params.id as unknown as number)
-  const noChartData = computed(() => Object.values(chartData.value).every((v) => v.length === 0))
-  const timeRanges = computed((): TimeRangeItem[] => [
-    { text: '1m', time: '' },
-    { text: '15m', time: '' },
-    { text: '30m', time: '' },
-    { text: '1h', time: '' },
-    { text: '6h', time: '' },
-    { text: '30h', time: '' }
-  ])
 
   const baseConfig = computed(
     (): Partial<Record<keyof ClusterVO, string>> => ({
@@ -111,12 +95,15 @@
     })
   )
 
+  const serviceOperates = computed(() => ({
+    Start: t('common.start', [t('common.service')]),
+    Restart: t('common.restart', [t('common.service')]),
+    Stop: t('common.stop', [t('common.service')])
+  }))
+
+  const clusterId = computed(() => route.params.id as unknown as number)
+  const noChartData = computed(() => Object.values(chartData.value).length === 0)
   const detailKeys = computed(() => Object.keys(baseConfig.value) as (keyof ClusterVO)[])
-  const serviceOperates = computed(() => [
-    { action: 'Start', text: t('common.start', [t('common.service')]) },
-    { action: 'Restart', text: t('common.restart', [t('common.service')]) },
-    { action: 'Stop', text: t('common.stop', [t('common.service')]) }
-  ])
 
   const handleServiceOperate = async (item: MenuItem, service: ServiceVO) => {
     try {
@@ -131,17 +118,29 @@
     }
   }
 
-  const handleTimeRange = (time: TimeRangeItem) => {
-    currTimeRange.value = time.text
+  const handleTimeRange = (time: TimeRangeType) => {
+    if (currTimeRange.value !== time) {
+      currTimeRange.value = time
+      getClusterMetrics()
+    }
   }
 
   const servicesFromCurrentCluster = (stack: StackVO) => {
     return stack.services.filter((v) => serviceNames.value.includes(v.name))
   }
 
+  const getClusterMetrics = async () => {
+    try {
+      chartData.value = await getClusterMetricsInfo({ id: clusterId.value }, { interval: currTimeRange.value })
+    } catch (error) {
+      console.log('Failed to fetch cluster metrics:', error)
+    }
+  }
+
   onActivated(async () => {
     await clusterStore.getClusterDetail(clusterId.value)
     emits('update:payload', clusterStore.currCluster)
+    getClusterMetrics()
   })
 
   watchEffect(() => {
@@ -238,8 +237,8 @@
                 </a-button>
                 <template #overlay>
                   <a-menu @click="handleServiceOperate($event, service)">
-                    <a-menu-item v-for="operate in serviceOperates" :key="operate.action">
-                      <span>{{ operate.text }}</span>
+                    <a-menu-item v-for="[operate, text] of Object.entries(serviceOperates)" :key="operate">
+                      <span>{{ text }}</span>
                     </a-menu-item>
                   </a-menu>
                 </template>
@@ -254,13 +253,13 @@
           <a-space :size="12">
             <div
               v-for="time in timeRanges"
-              :key="time.text"
+              :key="time"
               tabindex="0"
               class="time-range"
-              :class="{ 'time-range-activated': currTimeRange === time.text }"
+              :class="{ 'time-range-activated': currTimeRange === time }"
               @click="handleTimeRange(time)"
             >
-              {{ time.text }}
+              {{ time }}
             </div>
           </a-space>
         </div>
@@ -272,22 +271,40 @@
         <a-row v-else class="box-content">
           <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
             <div class="chart-item-wrp">
-              <gauge-chart chart-id="chart1" :title="$t('overview.memory_usage')" />
+              <gauge-chart
+                chart-id="chart1"
+                :percent="parseFloat(chartData.memoryUsageCur ?? '0') * 100"
+                :title="$t('overview.memory_usage')"
+              />
             </div>
           </a-col>
           <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
             <div class="chart-item-wrp">
-              <gauge-chart chart-id="chart2" :title="$t('overview.cpu_usage')" />
+              <gauge-chart
+                chart-id="chart2"
+                :percent="parseFloat(chartData.cpuUsageCur ?? '0') * 100"
+                :title="$t('overview.cpu_usage')"
+              />
             </div>
           </a-col>
           <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
             <div class="chart-item-wrp">
-              <category-chart chart-id="chart4" :title="$t('overview.cpu_usage')" />
+              <category-chart
+                chart-id="chart4"
+                :time-distance="currTimeRange"
+                :data="parsePercentageNumbers(chartData.cpuUsage ?? [])"
+                :title="$t('overview.cpu_usage')"
+              />
             </div>
           </a-col>
           <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
             <div class="chart-item-wrp">
-              <category-chart chart-id="chart3" :title="$t('overview.memory_usage')" />
+              <category-chart
+                chart-id="chart3"
+                :time-distance="currTimeRange"
+                :data="parsePercentageNumbers(chartData.memoryUsage ?? [])"
+                :title="$t('overview.memory_usage')"
+              />
             </div>
           </a-col>
         </a-row>

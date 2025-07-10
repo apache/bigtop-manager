@@ -21,24 +21,38 @@
   import dayjs from 'dayjs'
   import { computed, onMounted, toRefs, watchEffect } from 'vue'
   import { type EChartsOption, useChart } from '@/composables/use-chart'
+  import { formatSeriesData, roundFixed } from '@/utils/chart'
 
-  const props = defineProps<{
+  interface Props {
     chartId: string
     title: string
-    data?: any[]
+    data?: any
     timeDistance?: string
-  }>()
+    legendMap?: [string, string][] | undefined
+    config?: EChartsOption
+    yAxisUnit?: string
+  }
 
-  const { data, chartId, title, timeDistance } = toRefs(props)
+  const props = withDefaults(defineProps<Props>(), {
+    yAxisUnit: '%',
+    timeDistance: '15m',
+    data: () => [],
+    legendMap: undefined,
+    config: () => {
+      return {}
+    }
+  })
+
+  const { data, chartId, title, config, legendMap } = toRefs(props)
   const { initChart, setOptions } = useChart()
 
   const option = computed(
     (): EChartsOption => ({
       grid: {
-        top: '20px',
+        top: '30px',
         left: '40px',
         right: '30px',
-        bottom: '20px'
+        bottom: '30px'
       },
       tooltip: {
         trigger: 'axis',
@@ -46,17 +60,12 @@
         borderColor: 'rgba(236,236,236,0.1)',
         textStyle: {
           color: '#fff'
-        },
-        axisPointer: {
-          type: 'cross',
-          crossStyle: {
-            color: '#999'
-          }
         }
       },
       xAxis: [
         {
           type: 'category',
+          boundaryGap: false,
           data: [],
           axisPointer: {
             type: 'line'
@@ -72,15 +81,14 @@
           axisPointer: {
             type: 'shadow',
             label: {
-              formatter: '{value} %'
+              formatter: '{value}' + `${props.yAxisUnit ?? ''}`
             }
           },
-          min: 0,
-          max: 100,
-          interval: 20,
           axisLabel: {
+            width: 32,
             fontSize: 8,
-            formatter: '{value} %'
+            formatter: '{value}' + `${props.yAxisUnit ?? ''}`,
+            overflow: 'truncate'
           }
         }
       ],
@@ -98,32 +106,32 @@
     })
   )
 
-  const intervalToMs = (interval: string): number => {
-    const unit = interval.replace(/\d+/g, '')
-    const value = parseInt(interval)
+  // const intervalToMs = (interval: string): number => {
+  //   const unit = interval.replace(/\d+/g, '')
+  //   const value = parseInt(interval)
 
-    switch (unit) {
-      case 'm':
-        return value * 60 * 1000
-      case 'h':
-        return value * 60 * 60 * 1000
-      default:
-        throw new Error('Unsupported interval: ' + interval)
-    }
-  }
+  //   switch (unit) {
+  //     case 'm':
+  //       return value * 60 * 1000
+  //     case 'h':
+  //       return value * 60 * 60 * 1000
+  //     default:
+  //       throw new Error('Unsupported interval: ' + interval)
+  //   }
+  // }
 
-  const getTimePoints = (interval: string = '15m'): string[] => {
-    const now = dayjs()
-    const gap = intervalToMs(interval)
-    const result: string[] = []
+  // const getTimePoints = (interval: string = '15m'): string[] => {
+  //   const now = dayjs()
+  //   const gap = intervalToMs(interval)
+  //   const result: string[] = []
 
-    for (let i = 5; i >= 0; i--) {
-      const time = now.subtract(i * gap, 'millisecond')
-      result.push(time.format('HH:mm'))
-    }
+  //   for (let i = 5; i >= 0; i--) {
+  //     const time = now.subtract(i * gap, 'millisecond')
+  //     result.push(time.format('HH:mm'))
+  //   }
 
-    return result
-  }
+  //   return result
+  // }
 
   onMounted(() => {
     const selector = document.getElementById(`${chartId.value}`)
@@ -132,14 +140,22 @@
 
   watchEffect(() => {
     setOptions({
-      xAxis: [{ data: getTimePoints(timeDistance.value) || [] }]
+      xAxis: [{ data: Object.keys(data.value).map((v) => dayjs(Number(v) * 1000).format('HH:mm')) || [] }]
     })
   })
 
   watchEffect(() => {
-    setOptions({
-      series: [{ data: [{ value: data.value ?? [] }] }]
-    })
+    let series = [] as any,
+      legend = [] as any
+
+    if (legendMap.value) {
+      legend = new Map(legendMap.value).values()
+      series = formatSeriesData(data.value, legendMap.value)
+    } else {
+      series = [{ name: title.value.toLowerCase(), data: Object.values(data.value).map((v) => roundFixed(Number(v))) }]
+    }
+
+    setOptions({ ...config.value, legend, series })
   })
 </script>
 

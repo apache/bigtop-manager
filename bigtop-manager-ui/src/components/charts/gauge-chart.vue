@@ -19,6 +19,8 @@
 
 <script setup lang="ts">
   import { onMounted, shallowRef, toRefs, watchEffect } from 'vue'
+  import { roundFixed } from '@/utils/chart'
+
   import { type EChartsOption, useChart } from '@/composables/use-chart'
 
   interface GaugeChartProps {
@@ -96,9 +98,7 @@
   })
 
   watchEffect(() => {
-    setOptions({
-      series: [{ data: [{ value: percent.value.toFixed(2) === 'NaN' ? 0 : percent.value.toFixed(2) }] }]
-    })
+    setOptions({ series: [{ data: [{ value: roundFixed(percent.value) }] }] })
   })
 </script>
 
