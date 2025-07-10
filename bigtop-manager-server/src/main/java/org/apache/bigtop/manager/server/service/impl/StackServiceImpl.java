@@ -24,8 +24,6 @@ import org.apache.bigtop.manager.dao.repository.ServiceDao;
 import org.apache.bigtop.manager.server.model.converter.ClusterConverter;
 import org.apache.bigtop.manager.server.model.converter.ServiceConverter;
 import org.apache.bigtop.manager.server.model.converter.StackConverter;
-import org.apache.bigtop.manager.server.model.dto.PropertyDTO;
-import org.apache.bigtop.manager.server.model.dto.ServiceConfigDTO;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.model.dto.StackDTO;
 import org.apache.bigtop.manager.server.model.vo.ClusterVO;
@@ -36,7 +34,6 @@ import org.apache.bigtop.manager.server.utils.StackUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 
-import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
@@ -60,7 +57,21 @@ public class StackServiceImpl implements StackService {
 
     @Override
     public List<StackVO> list() {
-        return list(true);
+        List<StackVO> stackVOList = new ArrayList<>();
+
+        for (Map.Entry<StackDTO, List<ServiceDTO>> entry : StackUtils.STACK_SERVICE_MAP.entrySet()) {
+            StackDTO stackDTO = entry.getKey();
+            List<ServiceDTO> serviceDTOList = entry.getValue();
+            for (ServiceDTO serviceDTO : serviceDTOList) {
+                serviceDTO.setConfigs(StackUtils.SERVICE_CONFIG_MAP.get(serviceDTO.getName()));
+            }
+
+            StackVO stackVO = StackConverter.INSTANCE.fromDTO2VO(stackDTO);
+            stackVO.setServices(ServiceConverter.INSTANCE.fromDTO2VO(serviceDTOList));
+            stackVOList.add(stackVO);
+        }
+
+        return stackVOList;
     }
 
     @Override
@@ -90,36 +101,5 @@ public class StackServiceImpl implements StackService {
         }
 
         return res;
-    }
-
-    @Tool(name = "ListStacks", description = "List supported stacks")
-    public List<StackVO> listStacks() {
-        return list(false);
-    }
-
-    public List<StackVO> list(Boolean showContent) {
-        List<StackVO> stackVOList = new ArrayList<>();
-        for (Map.Entry<StackDTO, List<ServiceDTO>> entry : StackUtils.STACK_SERVICE_MAP.entrySet()) {
-            StackDTO stackDTO = entry.getKey();
-            List<ServiceDTO> serviceDTOList = entry.getValue();
-            for (ServiceDTO serviceDTO : serviceDTOList) {
-                List<ServiceConfigDTO> serviceConfigDTOs = StackUtils.SERVICE_CONFIG_MAP.get(serviceDTO.getName());
-                if (!showContent) {
-                    for (ServiceConfigDTO serviceConfigDTO : serviceConfigDTOs) {
-                        for (PropertyDTO propertyDTO : serviceConfigDTO.getProperties()) {
-                            if (propertyDTO.getName().equals("content")) {
-                                propertyDTO.setValue(null);
-                            }
-                        }
-                    }
-                }
-                serviceDTO.setConfigs(StackUtils.SERVICE_CONFIG_MAP.get(serviceDTO.getName()));
-            }
-
-            StackVO stackVO = StackConverter.INSTANCE.fromDTO2VO(stackDTO);
-            stackVO.setServices(ServiceConverter.INSTANCE.fromDTO2VO(serviceDTOList));
-            stackVOList.add(stackVO);
-        }
-        return stackVOList;
     }
 }

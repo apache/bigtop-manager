@@ -16,24 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server;
+package org.apache.bigtop.manager.server.mcp.prompt;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.annotation.EnableScheduling;
+import org.apache.bigtop.manager.common.utils.FileUtils;
+import org.apache.bigtop.manager.common.utils.ProjectPathUtils;
+import org.apache.bigtop.manager.server.exception.ServerException;
 
-@EnableAsync
-@EnableScheduling
-@SpringBootApplication(
-        scanBasePackages = {
-            "org.apache.bigtop.manager.server",
-            "org.apache.bigtop.manager.common",
-            "org.apache.bigtop.manager.ai"
-        })
-public class BigtopManagerServer {
+import java.io.File;
 
-    public static void main(String[] args) {
-        SpringApplication.run(BigtopManagerServer.class, args);
+/**
+ * Static prompts for tools.
+ */
+public class Prompts {
+
+    public static final String SAMPLE = getText("sample");
+
+    private static String getText(String filename) {
+        String promptPath = ProjectPathUtils.getPromptsPath();
+        String filePath = promptPath + File.separator + filename;
+
+        try {
+            return FileUtils.readFile2Str(new File(filePath));
+        } catch (Exception e) {
+            throw new ServerException("Error reading prompt file: " + filePath, e);
+        }
     }
 }

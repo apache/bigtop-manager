@@ -48,7 +48,6 @@ import org.apache.bigtop.manager.server.utils.RemoteSSHUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 
-import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -105,7 +104,6 @@ public class HostServiceImpl implements HostService {
     }
 
     @Override
-    @Tool(name = "AddHost", description = "Add hosts to bigtop manager")
     public List<HostVO> add(HostDTO hostDTO) {
         setDefaultValues(hostDTO);
         List<HostPO> hostPOList = HostConverter.INSTANCE.fromDTO2POListUsingHostnames(hostDTO);
@@ -229,7 +227,6 @@ public class HostServiceImpl implements HostService {
     }
 
     @Override
-    @Tool(name = "InstallDependencies", description = "Install dependencies on hosts")
     public Boolean installDependencies(List<HostDTO> hostDTOList) {
         // Clear cache list
         installedStatus.clear();

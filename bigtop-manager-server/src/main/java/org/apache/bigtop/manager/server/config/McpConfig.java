@@ -16,24 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server;
+package org.apache.bigtop.manager.server.config;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.annotation.EnableScheduling;
+import org.apache.bigtop.manager.server.holder.SpringContextHolder;
+import org.apache.bigtop.manager.server.mcp.tool.McpTool;
 
-@EnableAsync
-@EnableScheduling
-@SpringBootApplication(
-        scanBasePackages = {
-            "org.apache.bigtop.manager.server",
-            "org.apache.bigtop.manager.common",
-            "org.apache.bigtop.manager.ai"
-        })
-public class BigtopManagerServer {
+import org.springframework.ai.tool.ToolCallbackProvider;
+import org.springframework.ai.tool.method.MethodToolCallbackProvider;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-    public static void main(String[] args) {
-        SpringApplication.run(BigtopManagerServer.class, args);
+@Configuration
+public class McpConfig {
+
+    @Bean
+    public ToolCallbackProvider mcpTools() {
+        return MethodToolCallbackProvider.builder()
+                .toolObjects(
+                        (Object[]) SpringContextHolder.getMcpTools().values().toArray(new McpTool[0]))
+                .build();
     }
 }

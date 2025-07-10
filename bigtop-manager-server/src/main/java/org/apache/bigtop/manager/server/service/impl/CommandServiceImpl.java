@@ -40,7 +40,6 @@ import org.apache.bigtop.manager.server.model.dto.CommandDTO;
 import org.apache.bigtop.manager.server.model.vo.CommandVO;
 import org.apache.bigtop.manager.server.service.CommandService;
 
-import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
@@ -64,7 +63,6 @@ public class CommandServiceImpl implements CommandService {
     private TaskDao taskDao;
 
     @Override
-    @Tool(name = "Command", description = "Add cluster or add services")
     public CommandVO command(CommandDTO commandDTO) {
         CommandIdentifier commandIdentifier =
                 new CommandIdentifier(commandDTO.getCommandLevel(), commandDTO.getCommand());
