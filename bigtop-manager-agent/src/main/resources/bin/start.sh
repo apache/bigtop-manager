@@ -18,6 +18,8 @@
 # under the License.
 #
 
+set -e
+
 BIN_DIR=$(dirname $0)
 BIGTOP_MANAGER_HOME=${BIGTOP_MANAGER_HOME:-$(cd $BIN_DIR/..; pwd)}
 
@@ -60,6 +62,6 @@ fi
 
 cd $BIGTOP_MANAGER_HOME
 
-$JAVA_HOME/bin/java $JAVA_OPTS \
+$JAVA_CMD $JAVA_OPTS \
   -cp "${BIGTOP_MANAGER_HOME}/conf":"${BIGTOP_MANAGER_HOME}/libs/*" \
-  org.apache.bigtop.manager.agent.AgentApplication
+  org.apache.bigtop.manager.agent.BigtopManagerAgent

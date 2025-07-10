@@ -43,5 +43,6 @@ export default {
   description: 'Description',
   key_password_not_match: 'Key Passwords do not match.',
   default_agent_path: 'Agent application installed path, default to /opt',
-  default_grpc_port: 'Agent application grpc port, default to 8835'
+  default_grpc_port: 'Agent application grpc port, default to 8835',
+  default_ssh_port: 'Agent application ssh port, default to 22'
 }

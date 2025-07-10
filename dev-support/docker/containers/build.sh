@@ -186,8 +186,8 @@ while [ $# -gt 0 ]; do
           echo "Requires a os" 1>&2
           usage
         fi
-        if [ $2 != "rocky-8" ] && [ $2 != "openeuler-24" ]; then
-          echo "The OS should be [rocky-8] or [openeuler-24]" 1>&2
+        if [ $2 != "rocky-8" ] && [ $2 != "openeuler-22" ] && [ $2 != "openeuler-24" ]; then
+          echo "The OS should be [rocky-8], [openeuler-22] or [openeuler-24]" 1>&2
           usage
         fi
         OS=$2
@@ -197,8 +197,8 @@ while [ $# -gt 0 ]; do
           echo "Requires a container number" 1>&2
           usage
         fi
-        if [ $2 -gt 10 ] || [ $2 -lt 3 ]; then
-          echo "NUM-INSTANCES should be between [3-10]" 1>&2
+        if [ $2 -gt 10 ] || [ $2 -lt 1 ]; then
+          echo "NUM-INSTANCES should be between [1-10]" 1>&2
           usage
         fi
         NUM_INSTANCES=$2
