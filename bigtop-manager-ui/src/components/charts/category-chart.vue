@@ -123,7 +123,7 @@
       legend = new Map(legendMap.value).values()
       series = formatSeriesData(data.value, legendMap.value)
     } else {
-      series = [{ name: title.value.toLowerCase(), data: Object.values(data.value).map((v) => roundFixed(Number(v))) }]
+      series = [{ name: title.value.toLowerCase(), data: Object.values(data.value).map((v) => roundFixed(v)) }]
     }
 
     setOptions({

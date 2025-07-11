@@ -48,20 +48,27 @@ export const formatSeriesData = <T>(data: Partial<T>, legendMap: [string, string
   const series = createSeriesForChart(legendMap)
 
   for (const [key, value] of series) {
-    value.data = data[key]
+    value.data = data[key].map((v: string) => roundFixed(v))
   }
 
   return Array.from(series.values())
 }
 
 /**
- * Rounds a number to a fixed number of decimal places.
+ * Rounds a number to fixed decimals with accurate rounding.
+ * Returns a string with trailing zeros if needed.
+ * Invalid inputs return a fallback string (default "0.00").
  *
  * @param num - The number to round.
- * @param decimals - The number of decimal places to keep (default is 2).
- * @returns The rounded number.
+ * @param decimals - Number of decimal places (default 2).
+ * @param fallback - Fallback string for invalid input (default "0.00").
+ * @returns Rounded number as a string.
  */
-export const roundFixed = (num: number, decimals = 2) => {
+export const roundFixed = (num: unknown, decimals = 2, fallback = '0.00'): string => {
+  const n = Number(num)
+  if (!isFinite(n)) return fallback
+
   const factor = 10 ** decimals
-  return Math.round((num + Number.EPSILON) * factor) / factor
+  const rounded = Math.round((n + Number.EPSILON) * factor) / factor
+  return rounded.toFixed(decimals)
 }

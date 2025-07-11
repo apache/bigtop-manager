@@ -330,8 +330,8 @@
                 :y-axis-unit="''"
                 :legend-map="[
                   ['systemLoad1', 'load1'],
-                  ['systemLoad5', 'load2'],
-                  ['systemLoad15', 'load3']
+                  ['systemLoad5', 'load5'],
+                  ['systemLoad15', 'load15']
                 ]"
               />
             </div>
