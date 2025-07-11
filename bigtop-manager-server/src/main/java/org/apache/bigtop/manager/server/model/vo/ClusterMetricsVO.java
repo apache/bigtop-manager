@@ -28,7 +28,6 @@ public class ClusterMetricsVO {
     private String cpuUsageCur;
     private String memoryUsageCur;
 
-    // timestamp - value pairs for various metrics
     private List<String> timestamps;
     private List<String> cpuUsage;
     private List<String> memoryUsage;
