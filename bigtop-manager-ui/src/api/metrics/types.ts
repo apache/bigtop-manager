@@ -26,12 +26,12 @@ export type MetricsData = {
   fileDescriptorUsage: string
   diskReadCur: string
   diskWriteCur: string
-
-  cpuUsage: Record<string, string>
-  systemLoad1: Record<string, string>
-  systemLoad5: Record<string, string>
-  systemLoad15: Record<string, string>
-  memoryUsage: Record<string, string>
-  diskRead: Record<string, string>
-  diskWrite: Record<string, string>
+  cpuUsage: string[]
+  systemLoad1: string[]
+  systemLoad5: string[]
+  systemLoad15: string[]
+  memoryUsage: string[]
+  diskRead: string[]
+  diskWrite: string[]
+  timestamps: string[]
 }

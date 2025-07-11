@@ -31,7 +31,6 @@
   import { Empty } from 'ant-design-vue'
   import { useRoute } from 'vue-router'
   import { getClusterMetricsInfo } from '@/api/metrics'
-  import { parsePercentageNumbers } from '@/utils/chart'
 
   import GaugeChart from '@/components/charts/gauge-chart.vue'
   import CategoryChart from '@/components/charts/category-chart.vue'
@@ -265,7 +264,7 @@
         </div>
         <template v-if="noChartData">
           <div class="box-empty">
-            <a-empty />
+            <a-empty :image="Empty.PRESENTED_IMAGE_SIMPLE" />
           </div>
         </template>
         <a-row v-else class="box-content">
@@ -273,7 +272,7 @@
             <div class="chart-item-wrp">
               <gauge-chart
                 chart-id="chart1"
-                :percent="parseFloat(chartData.memoryUsageCur ?? '0') * 100"
+                :percent="parseFloat(chartData?.memoryUsageCur ?? '0')"
                 :title="$t('overview.memory_usage')"
               />
             </div>
@@ -282,7 +281,7 @@
             <div class="chart-item-wrp">
               <gauge-chart
                 chart-id="chart2"
-                :percent="parseFloat(chartData.cpuUsageCur ?? '0') * 100"
+                :percent="parseFloat(chartData?.cpuUsageCur ?? '0')"
                 :title="$t('overview.cpu_usage')"
               />
             </div>
@@ -291,8 +290,8 @@
             <div class="chart-item-wrp">
               <category-chart
                 chart-id="chart4"
-                :time-distance="currTimeRange"
-                :data="parsePercentageNumbers(chartData.cpuUsage ?? [])"
+                :x-axis-data="chartData?.timestamps"
+                :data="chartData?.cpuUsage ?? []"
                 :title="$t('overview.cpu_usage')"
               />
             </div>
@@ -301,8 +300,8 @@
             <div class="chart-item-wrp">
               <category-chart
                 chart-id="chart3"
-                :time-distance="currTimeRange"
-                :data="parsePercentageNumbers(chartData.memoryUsage ?? [])"
+                :x-axis-data="chartData?.timestamps"
+                :data="chartData?.memoryUsage ?? []"
                 :title="$t('overview.memory_usage')"
               />
             </div>
@@ -330,7 +329,7 @@
 
     &-content {
       border-radius: 8px;
-      overflow: hidden;
+      overflow: visible;
       box-sizing: border-box;
       border: 1px solid $color-border;
     }

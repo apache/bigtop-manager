@@ -27,23 +27,27 @@
     chartId: string
     title: string
     data?: any
-    timeDistance?: string
     legendMap?: [string, string][] | undefined
     config?: EChartsOption
+    xAxisData?: string[]
     yAxisUnit?: string
   }
 
   const props = withDefaults(defineProps<Props>(), {
     yAxisUnit: '%',
-    timeDistance: '15m',
-    data: () => [],
     legendMap: undefined,
+    xAxisData: () => {
+      return []
+    },
+    data: () => {
+      return {}
+    },
     config: () => {
       return {}
     }
   })
 
-  const { data, chartId, title, config, legendMap } = toRefs(props)
+  const { data, chartId, title, config, legendMap, xAxisData } = toRefs(props)
   const { initChart, setOptions } = useChart()
 
   const option = computed(
@@ -106,42 +110,9 @@
     })
   )
 
-  // const intervalToMs = (interval: string): number => {
-  //   const unit = interval.replace(/\d+/g, '')
-  //   const value = parseInt(interval)
-
-  //   switch (unit) {
-  //     case 'm':
-  //       return value * 60 * 1000
-  //     case 'h':
-  //       return value * 60 * 60 * 1000
-  //     default:
-  //       throw new Error('Unsupported interval: ' + interval)
-  //   }
-  // }
-
-  // const getTimePoints = (interval: string = '15m'): string[] => {
-  //   const now = dayjs()
-  //   const gap = intervalToMs(interval)
-  //   const result: string[] = []
-
-  //   for (let i = 5; i >= 0; i--) {
-  //     const time = now.subtract(i * gap, 'millisecond')
-  //     result.push(time.format('HH:mm'))
-  //   }
-
-  //   return result
-  // }
-
   onMounted(() => {
     const selector = document.getElementById(`${chartId.value}`)
     selector && initChart(selector!, option.value)
-  })
-
-  watchEffect(() => {
-    setOptions({
-      xAxis: [{ data: Object.keys(data.value).map((v) => dayjs(Number(v) * 1000).format('HH:mm')) || [] }]
-    })
   })
 
   watchEffect(() => {
@@ -155,7 +126,14 @@
       series = [{ name: title.value.toLowerCase(), data: Object.values(data.value).map((v) => roundFixed(Number(v))) }]
     }
 
-    setOptions({ ...config.value, legend, series })
+    setOptions({
+      xAxis: xAxisData.value
+        ? [{ data: xAxisData.value?.map((v) => dayjs(Number(v) * 1000).format('HH:mm')) || [] }]
+        : [],
+      ...config.value,
+      legend,
+      series
+    })
   })
 </script>
 

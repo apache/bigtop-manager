@@ -55,24 +55,6 @@ export const formatSeriesData = <T>(data: Partial<T>, legendMap: [string, string
 }
 
 /**
- * Converts a list of ratio strings (e.g. "0.632") to percentage numbers,
- * multiplied by 100 and rounded to two decimals.
- * If all values are zero, returns an array of 0s.
- *
- * @param values - An array of numeric strings representing ratios.
- * @returns An array of numbers in percentage format (e.g. 63.26).
- */
-export const parsePercentageNumbers = (values: string[]): number[] => {
-  const allZero = values.every((val) => parseFloat(val) === 0)
-
-  if (allZero) {
-    return values.map(() => 0)
-  }
-
-  return values.map((val) => parseFloat(val) * 100)
-}
-
-/**
  * Rounds a number to a fixed number of decimal places.
  *
  * @param num - The number to round.
