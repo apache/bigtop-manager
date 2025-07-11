@@ -99,13 +99,13 @@ public class ComponentStageHelper {
                     stages.add(new ComponentConfigureStage(stageContext));
                     break;
                 case INIT:
-                    stageContext = createStageContext(componentName, hostnames, commandDTO);
+                    stageContext = createStageContext(componentName, List.of(hostnames.get(0)), commandDTO);
                     stages.add(new ComponentInitStage(stageContext));
                     break;
                 case PREPARE:
                     // Prepare phase runs after component started, client component shouldn't create this.
                     if (!StackUtils.isClientComponent(componentName)) {
-                        stageContext = createStageContext(componentName, hostnames, commandDTO);
+                        stageContext = createStageContext(componentName, List.of(hostnames.get(0)), commandDTO);
                         stages.add(new ComponentPrepareStage(stageContext));
                     }
                     break;

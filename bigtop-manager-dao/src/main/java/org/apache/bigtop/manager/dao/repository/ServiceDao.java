@@ -30,6 +30,8 @@ public interface ServiceDao extends BaseDao<ServicePO> {
 
     List<ServicePO> findByQuery(@Param("query") ServiceQuery query);
 
+    int countByClusterId(@Param("clusterId") Long clusterId);
+
     List<ServicePO> findByClusterId(@Param("clusterId") Long clusterId);
 
     ServicePO findByClusterIdAndName(@Param("clusterId") Long clusterId, @Param("name") String name);
