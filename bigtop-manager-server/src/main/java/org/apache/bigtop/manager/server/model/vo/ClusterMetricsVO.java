@@ -20,7 +20,7 @@ package org.apache.bigtop.manager.server.model.vo;
 
 import lombok.Data;
 
-import java.util.Map;
+import java.util.List;
 
 @Data
 public class ClusterMetricsVO {
@@ -29,6 +29,7 @@ public class ClusterMetricsVO {
     private String memoryUsageCur;
 
     // timestamp - value pairs for various metrics
-    private Map<String, String> cpuUsage;
-    private Map<String, String> memoryUsage;
+    private List<String> timestamps;
+    private List<String> cpuUsage;
+    private List<String> memoryUsage;
 }

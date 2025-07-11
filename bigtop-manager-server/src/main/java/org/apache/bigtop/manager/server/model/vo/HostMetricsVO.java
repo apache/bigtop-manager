@@ -20,7 +20,7 @@ package org.apache.bigtop.manager.server.model.vo;
 
 import lombok.Data;
 
-import java.util.Map;
+import java.util.List;
 
 @Data
 public class HostMetricsVO {
@@ -32,12 +32,12 @@ public class HostMetricsVO {
     private String diskReadCur;
     private String diskWriteCur;
 
-    // timestamp - value pairs for various metrics
-    private Map<String, String> cpuUsage;
-    private Map<String, String> systemLoad1;
-    private Map<String, String> systemLoad5;
-    private Map<String, String> systemLoad15;
-    private Map<String, String> memoryUsage;
-    private Map<String, String> diskRead;
-    private Map<String, String> diskWrite;
+    private List<String> timestamps;
+    private List<String> cpuUsage;
+    private List<String> systemLoad1;
+    private List<String> systemLoad5;
+    private List<String> systemLoad15;
+    private List<String> memoryUsage;
+    private List<String> diskRead;
+    private List<String> diskWrite;
 }

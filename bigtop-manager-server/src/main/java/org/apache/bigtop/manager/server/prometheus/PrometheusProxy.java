@@ -35,6 +35,7 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +59,8 @@ public class PrometheusProxy {
     public static final String DISK_READ = "diskRead";
     public static final String DISK_WRITE = "diskWrite";
 
+    private static final ThreadLocal<List<String>> timestampCache = ThreadLocal.withInitial(ArrayList::new);
+
     public PrometheusProxy(String prometheusHost, Integer prometheusPort) {
         this.webClient = WebClient.builder()
                 .baseUrl("http://" + prometheusHost + ":" + prometheusPort)
@@ -75,15 +78,15 @@ public class PrometheusProxy {
                 .block();
     }
 
-    public PrometheusResponse queryRange(String query, long start, long end, String step) {
+    public PrometheusResponse queryRange(String query, String start, String end, String step) {
         return webClient
                 .post()
                 .uri(uriBuilder -> uriBuilder.path("/api/v1/query_range").build())
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(BodyInserters.fromFormData("query", query)
                         .with("timeout", "10")
-                        .with("start", String.valueOf(start))
-                        .with("end", String.valueOf(end))
+                        .with("start", start)
+                        .with("end", end)
                         .with("step", step))
                 .retrieve()
                 .bodyToMono(PrometheusResponse.class)
@@ -91,7 +94,7 @@ public class PrometheusProxy {
     }
 
     public HostMetricsVO queryAgentsInfo(String agentIpv4, String interval) {
-        List<Long> timestamps = getTimeStampsList(processInternal(interval));
+        timestampCache.set(getTimestampsList(processInternal(interval)));
 
         HostMetricsVO res = new HostMetricsVO();
         if (!agentIpv4.isBlank()) {
@@ -126,26 +129,26 @@ public class PrometheusProxy {
             res.setDiskWriteCur(agentDiskIO.get(DISK_WRITE).toString());
 
             // Range metrics
-            Map<String, Map<String, BigDecimal>> agentCpuInterval = retrieveAgentCpu(agentIpv4, interval, timestamps);
-            Map<String, Map<String, BigDecimal>> agentMemInterval =
-                    retrieveAgentMemory(agentIpv4, interval, timestamps);
-            Map<String, Map<String, BigDecimal>> agentDiskIOInterval =
-                    retrieveAgentDiskIO(agentIpv4, interval, timestamps);
+            Map<String, List<BigDecimal>> agentCpuInterval = retrieveAgentCpu(agentIpv4, interval);
+            Map<String, List<BigDecimal>> agentMemInterval = retrieveAgentMemory(agentIpv4, interval);
+            Map<String, List<BigDecimal>> agentDiskIOInterval = retrieveAgentDiskIO(agentIpv4, interval);
 
-            res.setCpuUsage(extractMap(agentCpuInterval.get(CPU_USAGE), 100));
-            res.setSystemLoad1(extractMap(agentCpuInterval.get(CPU_LOAD_AVG_MIN_1)));
-            res.setSystemLoad5(extractMap(agentCpuInterval.get(CPU_LOAD_AVG_MIN_5)));
-            res.setSystemLoad15(extractMap(agentCpuInterval.get(CPU_LOAD_AVG_MIN_15)));
-            res.setMemoryUsage(extractMap(agentMemInterval.get("memUsage"), 100));
-            res.setDiskRead(extractMap(agentDiskIOInterval.get(DISK_READ)));
-            res.setDiskWrite(extractMap(agentDiskIOInterval.get(DISK_WRITE)));
+            res.setCpuUsage(convertList(agentCpuInterval.get(CPU_USAGE), 100));
+            res.setSystemLoad1(convertList(agentCpuInterval.get(CPU_LOAD_AVG_MIN_1)));
+            res.setSystemLoad5(convertList(agentCpuInterval.get(CPU_LOAD_AVG_MIN_5)));
+            res.setSystemLoad15(convertList(agentCpuInterval.get(CPU_LOAD_AVG_MIN_15)));
+            res.setMemoryUsage(convertList(agentMemInterval.get("memUsage"), 100));
+            res.setDiskRead(convertList(agentDiskIOInterval.get(DISK_READ)));
+            res.setDiskWrite(convertList(agentDiskIOInterval.get(DISK_WRITE)));
         }
 
+        res.setTimestamps(timestampCache.get());
+        timestampCache.remove();
         return res;
     }
 
     public ClusterMetricsVO queryClustersInfo(List<String> agentIpv4s, String interval) {
-        List<Long> timestamps = getTimeStampsList(processInternal(interval));
+        timestampCache.set(getTimestampsList(processInternal(interval)));
 
         ClusterMetricsVO res = new ClusterMetricsVO();
         if (!agentIpv4s.isEmpty()) {
@@ -155,8 +158,8 @@ public class PrometheusProxy {
             BigDecimal usedPhysicalCores = new BigDecimal("0.0");
             BigDecimal totalMemIdle = new BigDecimal("0.0");
 
-            Map<String, BigDecimal> timeUsedCores = new HashMap<>();
-            Map<String, BigDecimal> timeMemIdle = new HashMap<>();
+            List<BigDecimal> timeUsedCores = getEmptyList();
+            List<BigDecimal> timeMemIdle = getEmptyList();
 
             for (String agentIpv4 : agentIpv4s) {
                 // Instant Metrics
@@ -180,20 +183,33 @@ public class PrometheusProxy {
                 totalMemSpace = totalMemSpace.add(memTotal);
 
                 // Range Metrics
-                Map<String, BigDecimal> cpuUsageInterval =
-                        retrieveAgentCpu(agentIpv4, interval, timestamps).get(CPU_USAGE);
-                for (Map.Entry<String, BigDecimal> entry : cpuUsageInterval.entrySet()) {
-                    String timestamp = entry.getKey();
-                    BigDecimal usedCoresAtTime = entry.getValue().multiply(physicalCores);
-                    timeUsedCores.merge(timestamp, usedCoresAtTime, BigDecimal::add);
+                List<BigDecimal> cpuUsageInterval =
+                        retrieveAgentCpu(agentIpv4, interval).get(CPU_USAGE);
+                for (int i = 0; i < cpuUsageInterval.size(); i++) {
+                    BigDecimal c = cpuUsageInterval.get(i);
+                    if (c != null) {
+                        c = c.multiply(physicalCores);
+                        BigDecimal b = timeUsedCores.get(i);
+                        if (b == null) {
+                            b = new BigDecimal("0.0");
+                        }
+
+                        timeUsedCores.set(i, c.add(b));
+                    }
                 }
 
-                Map<String, BigDecimal> memIdleInterval =
-                        retrieveAgentMemory(agentIpv4, interval, timestamps).get(MEM_IDLE);
-                for (Map.Entry<String, BigDecimal> entry : memIdleInterval.entrySet()) {
-                    String timestamp = entry.getKey();
-                    BigDecimal memIdleAtTime = entry.getValue();
-                    timeMemIdle.merge(timestamp, memIdleAtTime, BigDecimal::add);
+                List<BigDecimal> memIdleInterval =
+                        retrieveAgentMemory(agentIpv4, interval).get(MEM_IDLE);
+                for (int i = 0; i < memIdleInterval.size(); i++) {
+                    BigDecimal m = memIdleInterval.get(i);
+                    if (m != null) {
+                        BigDecimal b = timeMemIdle.get(i);
+                        if (b == null) {
+                            b = new BigDecimal("0.0");
+                        }
+
+                        timeMemIdle.set(i, m.add(b));
+                    }
                 }
             }
 
@@ -209,29 +225,31 @@ public class PrometheusProxy {
                     .toString());
 
             // Range Metrics
-            Map<String, String> cpuUsageMap = new HashMap<>();
-            Map<String, String> memUsageMap = new HashMap<>();
+            List<BigDecimal> cpuUsageList = getEmptyList();
+            List<BigDecimal> memUsageList = getEmptyList();
 
-            for (Map.Entry<String, BigDecimal> entry : timeUsedCores.entrySet()) {
-                String timestamp = entry.getKey();
-                BigDecimal usedCores = entry.getValue();
-                BigDecimal cpuUsage = usedCores.divide(totalPhysicalCores, 4, RoundingMode.HALF_UP);
-                cpuUsageMap.put(
-                        timestamp, cpuUsage.multiply(new BigDecimal("100")).toString());
+            for (int i = 0; i < timeUsedCores.size(); i++) {
+                BigDecimal usedCores = timeUsedCores.get(i);
+                if (usedCores != null) {
+                    usedCores = usedCores.divide(totalPhysicalCores, 4, RoundingMode.HALF_UP);
+                    cpuUsageList.set(i, usedCores);
+                }
             }
 
-            for (Map.Entry<String, BigDecimal> entry : timeMemIdle.entrySet()) {
-                String timestamp = entry.getKey();
-                BigDecimal memIdle = entry.getValue();
-                BigDecimal memUsage = totalMemSpace.subtract(memIdle).divide(totalMemSpace, 4, RoundingMode.HALF_UP);
-                memUsageMap.put(
-                        timestamp, memUsage.multiply(new BigDecimal("100")).toString());
+            for (int i = 0; i < timeMemIdle.size(); i++) {
+                BigDecimal memIdle = timeMemIdle.get(i);
+                if (memIdle != null) {
+                    memIdle = totalMemSpace.subtract(memIdle).divide(totalMemSpace, 4, RoundingMode.HALF_UP);
+                    memUsageList.set(i, memIdle);
+                }
             }
 
-            res.setCpuUsage(cpuUsageMap);
-            res.setMemoryUsage(memUsageMap);
+            res.setCpuUsage(convertList(cpuUsageList, 100));
+            res.setMemoryUsage(convertList(memUsageList, 100));
         }
 
+        res.setTimestamps(timestampCache.get());
+        timestampCache.remove();
         return res;
     }
 
@@ -255,21 +273,23 @@ public class PrometheusProxy {
         return map;
     }
 
-    public Map<String, Map<String, BigDecimal>> retrieveAgentCpu(
-            String iPv4addr, String interval, List<Long> timestamps) {
-        Map<String, Map<String, BigDecimal>> map = new HashMap<>();
+    public Map<String, List<BigDecimal>> retrieveAgentCpu(String iPv4addr, String interval) {
+        List<String> timestamps = timestampCache.get();
+        Map<String, List<BigDecimal>> map = new HashMap<>();
         String params = String.format("agent_host_monitoring_cpu{iPv4addr=\"%s\"}", iPv4addr);
         PrometheusResponse response = queryRange(
                 params,
-                timestamps.get(timestamps.size() - 1),
                 timestamps.get(0),
+                timestamps.get(timestamps.size() - 1),
                 number2Param(processInternal(interval)));
 
         for (PrometheusResult result : response.getData().getResult()) {
             String key = result.getMetric().get("cpuUsage");
-            Map<String, BigDecimal> innerMap = map.computeIfAbsent(key, k -> new HashMap<>());
+            List<BigDecimal> list = map.computeIfAbsent(key, k -> getEmptyList());
             for (List<String> value : result.getValues()) {
-                innerMap.put(value.get(0), new BigDecimal(value.get(1)));
+                String timestamp = value.get(0);
+                int index = timestamps.indexOf(timestamp);
+                list.set(index, new BigDecimal(value.get(1)));
             }
         }
 
@@ -288,40 +308,40 @@ public class PrometheusProxy {
         return map;
     }
 
-    public Map<String, Map<String, BigDecimal>> retrieveAgentMemory(
-            String iPv4addr, String interval, List<Long> timestamps) {
-        Map<String, Map<String, BigDecimal>> map = new HashMap<>();
+    public Map<String, List<BigDecimal>> retrieveAgentMemory(String iPv4addr, String interval) {
+        List<String> timestamps = timestampCache.get();
+        Map<String, List<BigDecimal>> map = new HashMap<>();
         String params = String.format("agent_host_monitoring_mem{iPv4addr=\"%s\"}", iPv4addr);
         PrometheusResponse response = queryRange(
                 params,
-                timestamps.get(timestamps.size() - 1),
                 timestamps.get(0),
+                timestamps.get(timestamps.size() - 1),
                 number2Param(processInternal(interval)));
 
         for (PrometheusResult result : response.getData().getResult()) {
             String key = result.getMetric().get("memUsage");
-            Map<String, BigDecimal> innerMap = map.computeIfAbsent(key, k -> new HashMap<>());
+            List<BigDecimal> list = map.computeIfAbsent(key, k -> getEmptyList());
             for (List<String> value : result.getValues()) {
-                innerMap.put(value.get(0), new BigDecimal(value.get(1)));
+                String timestamp = value.get(0);
+                int index = timestamps.indexOf(timestamp);
+                list.set(index, new BigDecimal(value.get(1)));
             }
         }
 
-        Map<String, BigDecimal> memTotalMap = map.get(MEM_TOTAL);
-        Map<String, BigDecimal> memIdleMap = map.get(MEM_IDLE);
-        Map<String, BigDecimal> memUsageMap = new HashMap<>();
+        List<BigDecimal> memTotalList = map.get(MEM_TOTAL) == null ? getEmptyList() : map.get(MEM_TOTAL);
+        List<BigDecimal> memIdleList = map.get(MEM_IDLE) == null ? getEmptyList() : map.get(MEM_IDLE);
+        List<BigDecimal> memUsageList = getEmptyList();
 
-        for (Map.Entry<String, BigDecimal> entry : memTotalMap.entrySet()) {
-            String timestamp = entry.getKey();
-            BigDecimal memTotal = entry.getValue();
-            BigDecimal memIdle = memIdleMap.get(timestamp);
-            if (memIdle != null) {
+        for (int i = 0; i < memTotalList.size(); i++) {
+            BigDecimal memTotal = memTotalList.get(i);
+            BigDecimal memIdle = memIdleList.get(i);
+            if (memTotal != null && memIdle != null) {
                 BigDecimal memUsage = memTotal.subtract(memIdle).divide(memTotal, 4, RoundingMode.HALF_UP);
-                memUsageMap.put(timestamp, memUsage);
+                memUsageList.set(i, memUsage);
             }
         }
 
-        map.put("memUsage", memUsageMap);
-
+        map.put("memUsage", memUsageList);
         return map;
     }
 
@@ -367,67 +387,86 @@ public class PrometheusProxy {
         return map;
     }
 
-    public Map<String, Map<String, BigDecimal>> retrieveAgentDiskIO(
-            String iPv4addr, String interval, List<Long> timestamps) {
-        Map<String, Map<String, BigDecimal>> map = new HashMap<>();
+    public Map<String, List<BigDecimal>> retrieveAgentDiskIO(String iPv4addr, String interval) {
+        List<String> timestamps = timestampCache.get();
+        Map<String, List<BigDecimal>> map = new HashMap<>();
         String params = String.format("agent_host_monitoring_diskIO{iPv4addr=\"%s\"}", iPv4addr);
         PrometheusResponse response = queryRange(
                 params,
-                timestamps.get(timestamps.size() - 1),
                 timestamps.get(0),
+                timestamps.get(timestamps.size() - 1),
                 number2Param(processInternal(interval)));
 
-        Map<String, BigDecimal> diskWriteMap = new HashMap<>();
-        Map<String, BigDecimal> diskReadMap = new HashMap<>();
+        List<BigDecimal> diskWriteList = getEmptyList();
+        List<BigDecimal> diskReadList = getEmptyList();
 
         for (PrometheusResult result : response.getData().getResult()) {
             String key = result.getMetric().get("diskIO");
             for (List<String> value : result.getValues()) {
+                String timestamp = value.get(0);
+                int index = timestamps.indexOf(timestamp);
                 if (Objects.equals(key, DISK_WRITE)) {
-                    BigDecimal w = diskWriteMap.computeIfAbsent(value.get(0), k -> new BigDecimal("0.0"));
+                    BigDecimal w = diskWriteList.get(index);
+                    if (w == null) {
+                        w = new BigDecimal("0.0");
+                    }
+
                     w = w.add(new BigDecimal(value.get(1)));
-                    diskWriteMap.put(value.get(0), w);
+                    diskWriteList.set(index, w);
                 } else {
-                    BigDecimal r = diskReadMap.computeIfAbsent(value.get(0), k -> new BigDecimal("0.0"));
+                    BigDecimal r = diskReadList.get(index);
+                    if (r == null) {
+                        r = new BigDecimal("0.0");
+                    }
+
                     r = r.add(new BigDecimal(value.get(1)));
-                    diskReadMap.put(value.get(0), r);
+                    diskReadList.set(index, r);
                 }
             }
         }
 
-        map.put(DISK_WRITE, diskWriteMap);
-        map.put(DISK_READ, diskReadMap);
+        map.put(DISK_WRITE, diskWriteList);
+        map.put(DISK_READ, diskReadList);
         return map;
     }
 
-    private Map<String, String> extractMap(Map<String, BigDecimal> map) {
-        return extractMap(map, 1);
+    private List<String> convertList(List<BigDecimal> list) {
+        return convertList(list, 1);
     }
 
-    private Map<String, String> extractMap(Map<String, BigDecimal> map, Integer multiply) {
-        Map<String, String> resultMap = new HashMap<>();
-        for (Map.Entry<String, BigDecimal> entry : map.entrySet()) {
-            resultMap.put(
-                    entry.getKey(),
-                    entry.getValue().multiply(new BigDecimal(multiply)).toString());
+    private List<String> convertList(List<BigDecimal> list, Integer multiply) {
+        List<String> resultList = getEmptyList();
+        if (list == null) {
+            Collections.fill(resultList, "");
+        } else {
+            for (int i = 0; i < list.size(); i++) {
+                BigDecimal value = list.get(i);
+                if (value != null) {
+                    resultList.set(i, value.multiply(new BigDecimal(multiply)).toString());
+                } else {
+                    resultList.set(i, "");
+                }
+            }
         }
-        return resultMap;
+
+        return resultList;
     }
 
-    private static List<Long> getTimeStampsList(int step) {
+    private static List<String> getTimestampsList(int step) {
         // format
         String currentTimeStr = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
         String currentDateStr = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime currentDateTime = LocalDateTime.parse(currentDateStr + " " + currentTimeStr, formatter);
         // get 8 point
-        List<Long> timestamps = new ArrayList<>();
+        List<String> timestamps = new ArrayList<>();
         ZoneId zid = ZoneId.systemDefault();
-        for (int i = 0; i < 7; i++) {
+        for (int i = 6; i >= 0; i--) {
             LocalDateTime pastTime = currentDateTime.minus(Duration.ofSeconds((long) step * i));
             long timestamp = pastTime.atZone(zid).toInstant().toEpochMilli() / 1000L;
-            timestamps.add(timestamp);
+            timestamps.add(String.valueOf(timestamp));
         }
+
         return timestamps;
     }
 
@@ -435,7 +474,7 @@ public class PrometheusProxy {
         return String.format("%ss", step);
     }
 
-    private int processInternal(String internal) {
+    private static int processInternal(String internal) {
         int inter = Integer.parseInt(internal.substring(0, internal.length() - 1));
         if (internal.endsWith("m")) return inter * 60;
         else if (internal.endsWith("h")) {
@@ -444,14 +483,8 @@ public class PrometheusProxy {
         return inter;
     }
 
-    public static void main(String[] args) {
-        String ipv4addr = "172.18.0.4";
-        String interval = "1m";
-        PrometheusProxy proxy = new PrometheusProxy("localhost", 19090);
-
-        //        proxy.retrieveAgentCpu(ipv4addr);
-        Object o = proxy.queryAgentsInfo(ipv4addr, interval);
-        //        Map<String, Object> res = proxy.queryAgentsInfo("172.18.0.3", "1m");
-        System.out.println();
+    private <T> List<T> getEmptyList() {
+        int size = timestampCache.get().size();
+        return new ArrayList<>(Collections.nCopies(size, null));
     }
 }
