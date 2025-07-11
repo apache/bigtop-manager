@@ -40,6 +40,8 @@
 # specific language governing permissions and limitations
 # under the License.
 
+JAVA_HOME=${java_home}
+
 CUR_DATE=`date +%Y%m%d-%H%M%S`
 
 JAVA_HOME=${java_home}

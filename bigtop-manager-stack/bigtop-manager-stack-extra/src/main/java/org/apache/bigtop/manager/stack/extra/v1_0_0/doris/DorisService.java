@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,11 +66,10 @@ public class DorisService {
         List<String> feHosts = dorisParams.dorisFeHosts();
         String aliveFe = null;
 
-        MessageFormat messageFormat =
-                new MessageFormat("curl -s -o /dev/null -w'%{{http_code}}' http://{0}:{1}/api/bootstrap");
+        String template = "curl -s -o /dev/null -w'%{http_code}' http://%s:%d/api/bootstrap";
         try {
             for (String host : feHosts) {
-                String cmd = messageFormat.format(new Object[]{host, dorisFeHttpPort});
+                String cmd = String.format(template, host, dorisFeHttpPort);
                 ShellResult shellResult = LinuxOSUtils.execCmd(cmd);
                 Integer exitCode = shellResult.getExitCode();
                 String output = shellResult.getOutput();

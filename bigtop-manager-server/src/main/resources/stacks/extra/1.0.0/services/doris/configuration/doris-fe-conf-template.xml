@@ -46,6 +46,8 @@
 ## see fe/src/org/apache/doris/common/Config.java
 #####################################################################
 
+JAVA_HOME=${java_home}
+
 CUR_DATE=`date +%Y%m%d-%H%M%S`
 
 # Log dir
