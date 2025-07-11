@@ -56,6 +56,16 @@ public class PrometheusParams extends InfraParams {
 
     public PrometheusParams(ComponentCommandPayload componentCommandPayload) {
         super(componentCommandPayload);
+
+        globalParamsMap.put("prometheus_user", user());
+        globalParamsMap.put("prometheus_group", group());
+        globalParamsMap.put("prometheus_home", serviceHome());
+    }
+
+    @Override
+    public void initGlobalParams() {
+        super.initGlobalParams();
+
         setAgentScrapeJob();
         scrapeJobs = new ArrayList<>();
         scrapeJobs.add(prometheusScrapeJob);

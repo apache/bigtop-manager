@@ -16,14 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.service;
+package org.apache.bigtop.manager.server;
 
-import org.apache.bigtop.manager.server.model.vo.ClusterMetricsVO;
-import org.apache.bigtop.manager.server.model.vo.HostMetricsVO;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
-public interface MetricsService {
+@EnableAsync
+@EnableScheduling
+@SpringBootApplication(
+        scanBasePackages = {
+            "org.apache.bigtop.manager.server",
+            "org.apache.bigtop.manager.common",
+            "org.apache.bigtop.manager.ai"
+        })
+public class BigtopManagerServer {
 
-    HostMetricsVO queryAgentsInfo(Long id, String interval);
-
-    ClusterMetricsVO queryClustersInfo(Long clusterId, String interval);
+    public static void main(String[] args) {
+        SpringApplication.run(BigtopManagerServer.class, args);
+    }
 }

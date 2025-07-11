@@ -324,7 +324,7 @@
         label: t('host.ssh_port')
       },
       controlProps: {
-        placeholder: t('common.enter_error', [`${t('host.ssh_port')}`.toLowerCase()])
+        placeholder: t('host.default_ssh_port')
       }
     },
     {

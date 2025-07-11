@@ -33,10 +33,10 @@ import io.micrometer.core.instrument.MultiGauge;
 @EnableAsync
 @EnableScheduling
 @SpringBootApplication(scanBasePackages = {"org.apache.bigtop.manager.agent", "org.apache.bigtop.manager.common"})
-public class AgentApplication {
+public class BigtopManagerAgent {
 
     public static void main(String[] args) {
-        SpringApplication.run(AgentApplication.class, args);
+        SpringApplication.run(BigtopManagerAgent.class, args);
     }
 
     @Bean

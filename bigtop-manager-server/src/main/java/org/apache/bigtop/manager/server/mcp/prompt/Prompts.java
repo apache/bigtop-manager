@@ -16,14 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.service;
+package org.apache.bigtop.manager.server.mcp.prompt;
 
-import org.apache.bigtop.manager.server.model.vo.ClusterMetricsVO;
-import org.apache.bigtop.manager.server.model.vo.HostMetricsVO;
+import org.apache.bigtop.manager.common.utils.FileUtils;
+import org.apache.bigtop.manager.common.utils.ProjectPathUtils;
+import org.apache.bigtop.manager.server.exception.ServerException;
 
-public interface MetricsService {
+import java.io.File;
 
-    HostMetricsVO queryAgentsInfo(Long id, String interval);
+/**
+ * Static prompts for tools.
+ */
+public class Prompts {
 
-    ClusterMetricsVO queryClustersInfo(Long clusterId, String interval);
+    public static final String SAMPLE = getText("sample.prompt");
+
+    private static String getText(String filename) {
+        String promptPath = ProjectPathUtils.getPromptsPath();
+        String filePath = promptPath + File.separator + filename;
+
+        try {
+            return FileUtils.readFile2Str(new File(filePath));
+        } catch (Exception e) {
+            throw new ServerException("Error reading prompt file: " + filePath, e);
+        }
+    }
 }

@@ -18,7 +18,6 @@
  */
 package org.apache.bigtop.manager.server.aop;
 
-import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.AuditLogPO;
 import org.apache.bigtop.manager.dao.repository.AuditLogDao;
 import org.apache.bigtop.manager.server.holder.SessionUserHolder;
@@ -82,7 +81,9 @@ public class AuditAspect {
             auditLogPO.setTagDesc(apiDesc);
             auditLogPO.setOperationSummary(operationSummary);
             auditLogPO.setOperationDesc(operationDesc);
-            auditLogPO.setArgs(JsonUtils.writeAsString(joinPoint.getArgs()));
+
+            // Temporary disable since params of command api sometimes are too long
+            // auditLogPO.setArgs(JsonUtils.writeAsString(joinPoint.getArgs()));
 
             log.debug("auditLog: {}", auditLogPO);
             log.debug("request method：{}.{}", joinPoint.getSignature().getDeclaringTypeName(), methodName);

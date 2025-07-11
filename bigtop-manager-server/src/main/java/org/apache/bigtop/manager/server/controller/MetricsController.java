@@ -18,6 +18,8 @@
  */
 package org.apache.bigtop.manager.server.controller;
 
+import org.apache.bigtop.manager.server.model.vo.ClusterMetricsVO;
+import org.apache.bigtop.manager.server.model.vo.HostMetricsVO;
 import org.apache.bigtop.manager.server.service.MetricsService;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
 
@@ -27,7 +29,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -35,29 +36,23 @@ import jakarta.annotation.Resource;
 
 @Tag(name = "Metrics Controller")
 @RestController
-@RequestMapping("metrics")
+@RequestMapping("/metrics")
 public class MetricsController {
 
     @Resource
     private MetricsService metricsService;
 
-    @Operation(summary = "hosts healthy", description = "hosts healthy check")
-    @GetMapping("hostshealthy")
-    public ResponseEntity<JsonNode> agentHostsHealthyStatus() {
-        return ResponseEntity.success(metricsService.queryAgentsHealthyStatus());
-    }
-
     @Operation(summary = "host info", description = "host info query")
-    @GetMapping("hosts/{id}")
-    public ResponseEntity<JsonNode> queryAgentInfo(
-            @RequestParam(value = "interval", defaultValue = "1m") String interval, @PathVariable String id) {
-        return ResponseEntity.success(metricsService.queryAgentsInfo(Long.valueOf(id), interval));
+    @GetMapping("/hosts/{id}")
+    public ResponseEntity<HostMetricsVO> queryAgentInfo(
+            @RequestParam(value = "interval", defaultValue = "1m") String interval, @PathVariable Long id) {
+        return ResponseEntity.success(metricsService.queryAgentsInfo(id, interval));
     }
 
     @Operation(summary = "cluster info", description = "cluster info query")
-    @GetMapping("clusters/{id}")
-    public ResponseEntity<JsonNode> queryCluster(
-            @RequestParam(value = "interval", defaultValue = "1m") String interval, @PathVariable String id) {
-        return ResponseEntity.success(metricsService.queryClustersInfo(Long.valueOf(id), interval));
+    @GetMapping("/clusters/{id}")
+    public ResponseEntity<ClusterMetricsVO> queryCluster(
+            @RequestParam(value = "interval", defaultValue = "1m") String interval, @PathVariable Long id) {
+        return ResponseEntity.success(metricsService.queryClustersInfo(id, interval));
     }
 }

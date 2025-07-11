@@ -16,14 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.service;
+package org.apache.bigtop.manager.server.prometheus;
 
-import org.apache.bigtop.manager.server.model.vo.ClusterMetricsVO;
-import org.apache.bigtop.manager.server.model.vo.HostMetricsVO;
+import lombok.Data;
 
-public interface MetricsService {
+/**
+ * <a href="https://prometheus.io/docs/prometheus/latest/querying/api/">Prometheus HTTP API</a>
+ */
+@Data
+public class PrometheusResponse {
 
-    HostMetricsVO queryAgentsInfo(Long id, String interval);
+    // "success" | "error"
+    private String status;
 
-    ClusterMetricsVO queryClustersInfo(Long clusterId, String interval);
+    private PrometheusData data;
+
+    // Only set if status is "error". The data field may still hold additional data.
+    private String errorType;
+
+    private String error;
 }

@@ -52,6 +52,9 @@ case ${OS}-${VERSION_INT} in
     rocky-8)
       DOCKERFILE="Dockerfile.rocky8"
         ;;
+    openeuler-22)
+      DOCKERFILE="Dockerfile.openeuler22"
+        ;;
     openeuler-24)
       DOCKERFILE="Dockerfile.openeuler24"
         ;;

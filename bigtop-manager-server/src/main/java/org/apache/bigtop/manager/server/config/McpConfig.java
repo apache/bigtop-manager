@@ -16,14 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.service;
+package org.apache.bigtop.manager.server.config;
 
-import org.apache.bigtop.manager.server.model.vo.ClusterMetricsVO;
-import org.apache.bigtop.manager.server.model.vo.HostMetricsVO;
+import org.apache.bigtop.manager.server.holder.SpringContextHolder;
+import org.apache.bigtop.manager.server.mcp.tool.McpTool;
 
-public interface MetricsService {
+import org.springframework.ai.tool.ToolCallbackProvider;
+import org.springframework.ai.tool.method.MethodToolCallbackProvider;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-    HostMetricsVO queryAgentsInfo(Long id, String interval);
+@Configuration
+public class McpConfig {
 
-    ClusterMetricsVO queryClustersInfo(Long clusterId, String interval);
+    @Bean
+    public ToolCallbackProvider mcpTools() {
+        return MethodToolCallbackProvider.builder()
+                .toolObjects(
+                        (Object[]) SpringContextHolder.getMcpTools().values().toArray(new McpTool[0]))
+                .build();
+    }
 }
