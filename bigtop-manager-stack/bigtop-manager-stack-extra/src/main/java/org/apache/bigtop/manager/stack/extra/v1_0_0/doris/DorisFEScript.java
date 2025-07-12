@@ -67,10 +67,10 @@ public class DorisFEScript extends AbstractServerScript {
         LinuxFileUtils.removeDirectories(dorisParams.dorisFePidFile());
 
         // Check if the FE is already registered
-        Pair<String, List<String>> registerFeList = DorisService.getRegisteredFeList(dorisParams);
+        Pair<String, List<String>> registeredFeList = DorisService.getRegisteredFeList(dorisParams);
 
         try {
-            if (registerFeList.getRight().isEmpty() || registerFeList.getRight().contains(hostname)) {
+            if (registeredFeList.getRight().isEmpty() || registeredFeList.getRight().contains(hostname)) {
                 String cmd = MessageFormat.format("{0}/start_fe.sh --daemon", dorisParams.dorisFeBinDir());
                 return LinuxOSUtils.sudoExecCmd(cmd, dorisParams.user());
             } else {
@@ -79,7 +79,7 @@ public class DorisFEScript extends AbstractServerScript {
 
                 String cmd = MessageFormat.format(
                         "{0}/start_fe.sh --helper {1}:{2} --daemon",
-                        dorisParams.dorisFeBinDir(), registerFeList.getLeft(), dorisParams.dorisFeEditLogPort());
+                        dorisParams.dorisFeBinDir(), registeredFeList.getLeft(), dorisParams.dorisFeEditLogPort());
 
                 return LinuxOSUtils.sudoExecCmd(cmd, dorisParams.user());
             }

@@ -3,6 +3,7 @@ package org.apache.bigtop.manager.stack.extra.v1_0_0.doris;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.stack.core.utils.linux.LinuxOSUtils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,11 +22,11 @@ public class DorisService {
         if (aliveFe == null) {
             return;
         }
-        String sql = "ALTER SYSTEM ADD BACKEND '?:?'";
-        DorisTool dorisTool = new DorisTool(aliveFe, "root", "", "mysql", dorisParams.dorisFeHttpPort());
+        String sql = MessageFormat.format("ALTER SYSTEM ADD BACKEND ''{0}:{1,number,#}''", dorisParams.hostname(), dorisParams.dorisBeHeartbeatPort());
+        DorisTool dorisTool = new DorisTool(aliveFe, "root", "", "mysql", dorisParams.dorisFeQueryPort());
         try {
             dorisTool.connect();
-            dorisTool.executeUpdate(sql, dorisParams.hostname(), dorisParams.dorisBeHeartbeatPort());
+            dorisTool.executeUpdate(sql);
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
@@ -38,7 +40,7 @@ public class DorisService {
             return List.of();
         }
         String sql = "SHOW BACKENDS";
-        DorisTool dorisTool = new DorisTool(aliveFe, "root", "", "mysql", dorisParams.dorisFeHttpPort());
+        DorisTool dorisTool = new DorisTool(aliveFe, "root", "", "mysql", dorisParams.dorisFeQueryPort());
         List<String> beList = new ArrayList<>();
         try {
             dorisTool.connect();
@@ -66,16 +68,26 @@ public class DorisService {
         List<String> feHosts = dorisParams.dorisFeHosts();
         String aliveFe = null;
 
-        String template = "curl -s -o /dev/null -w'%{http_code}' http://%s:%d/api/bootstrap";
+        MessageFormat messageFormat =
+                new MessageFormat("curl -s -o /dev/null -w '%{http_code}' http://{0}:{1,number,#}/api/bootstrap");
         try {
             for (String host : feHosts) {
-                String cmd = String.format(template, host, dorisFeHttpPort);
-                ShellResult shellResult = LinuxOSUtils.execCmd(cmd);
-                Integer exitCode = shellResult.getExitCode();
-                String output = shellResult.getOutput();
-                if (exitCode == 0 && "200".equals(output)) {
-                    aliveFe = host;
-                    break;
+                String cmd = messageFormat.format(new Object[]{host, dorisFeHttpPort});
+                ShellResult shellResult;
+                int attempts = 0;
+                while (attempts < 10) {
+                    shellResult = LinuxOSUtils.execCmd(cmd);
+                    if (shellResult.getExitCode() == 0 && StringUtils.equals(shellResult.getOutput().trim(), "200")) {
+                        aliveFe = host;
+                        break;
+                    }
+                    attempts++;
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        break;
+                    }
                 }
             }
         } catch (Exception e) {
@@ -96,7 +108,7 @@ public class DorisService {
         }
         List<String> registeredFeHosts = new ArrayList<>();
         String sql = "SHOW FRONTENDS";
-        DorisTool dorisTool = new DorisTool(aliveFe, "root", "", "mysql", dorisParams.dorisFeHttpPort());
+        DorisTool dorisTool = new DorisTool(aliveFe, "root", "", "mysql", dorisParams.dorisFeQueryPort());
         try {
             dorisTool.connect();
             try (ResultSet resultSet = dorisTool.executeQuery(sql)) {
@@ -123,14 +135,14 @@ public class DorisService {
             log.info("Doris FE {} already registered", dorisParams.hostname());
         } else {
             DorisTool dorisTool =
-                    new DorisTool(registerFeList.getLeft(), "root", "", "mysql", dorisParams.dorisFeHttpPort());
+                    new DorisTool(registerFeList.getLeft(), "root", "", "mysql", dorisParams.dorisFeQueryPort());
 
             try {
                 dorisTool.connect();
 
-                String sql = "ALTER SYSTEM ADD FOLLOWER '?:?'";
+                String sql = MessageFormat.format("ALTER SYSTEM ADD FOLLOWER ''{0}:{1,number,#}''", dorisParams.hostname(), dorisParams.dorisFeEditLogPort());
 
-                dorisTool.executeUpdate(sql, dorisParams.hostname(), dorisParams.dorisFeEditLogPort());
+                dorisTool.executeUpdate(sql);
             } catch (Exception e) {
                 log.error("Error registering follower FE: {}", e.getMessage(), e);
             } finally {

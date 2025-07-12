@@ -97,6 +97,10 @@ public class DorisParams extends ExtraParams {
         return Integer.parseInt(dorisFeConf().get("edit_log_port").toString());
     }
 
+    public int dorisFeQueryPort() {
+        return Integer.parseInt(dorisFeConf().get("query_port").toString());
+    }
+
     /*================================FE===================================================*/
     /*================================BE===================================================*/
     public String dorisBeHome() {
@@ -132,7 +136,7 @@ public class DorisParams extends ExtraParams {
     }
 
     public int dorisBeHeartbeatPort() {
-        return (Integer) dorisBeConf().get("heartbeat_service_port");
+        return Integer.parseInt(dorisBeConf().get("heartbeat_service_port").toString());
     }
     /*================================BE===================================================*/
 
