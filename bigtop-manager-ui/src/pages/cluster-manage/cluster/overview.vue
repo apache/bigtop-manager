@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onActivated, ref, shallowRef, toRefs, watchEffect } from 'vue'
+  import { computed, onActivated, onDeactivated, onUnmounted, ref, shallowRef, toRefs, watchEffect } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { storeToRefs } from 'pinia'
   import { formatFromByte } from '@/utils/storage'
@@ -31,6 +31,7 @@
   import { Empty } from 'ant-design-vue'
   import { useRoute } from 'vue-router'
   import { getClusterMetricsInfo } from '@/api/metrics'
+  import { useIntervalFn } from '@vueuse/core'
 
   import GaugeChart from '@/components/charts/gauge-chart.vue'
   import CategoryChart from '@/components/charts/category-chart.vue'
@@ -55,7 +56,7 @@
   const currTimeRange = ref<TimeRangeType>('15m')
   const chartData = ref<Partial<MetricsData>>({})
 
-  const timeRanges = shallowRef<TimeRangeType[]>(['1m', '15m', '30m', '1h', '3h', '6h'])
+  const timeRanges = shallowRef<TimeRangeType[]>(['1m', '5m', '15m', '30m', '1h', '2h'])
   const locateStackWithService = shallowRef<StackVO[]>([])
   const statusColors = shallowRef<Record<ClusterStatusType, keyof typeof CommonStatusTexts>>({
     1: 'healthy',
@@ -136,11 +137,18 @@
     }
   }
 
+  const { pause, resume } = useIntervalFn(getClusterMetrics, 30000, { immediate: true })
+
   onActivated(async () => {
     await clusterStore.getClusterDetail(clusterId.value)
     emits('update:payload', clusterStore.currCluster)
     getClusterMetrics()
+    resume()
   })
+
+  onDeactivated(() => pause())
+
+  onUnmounted(() => pause())
 
   watchEffect(() => {
     locateStackWithService.value = stackStore.stacks.filter((item) =>
@@ -272,17 +280,23 @@
             <div class="chart-item-wrp">
               <gauge-chart
                 chart-id="chart1"
-                :percent="parseFloat(chartData?.memoryUsageCur ?? '0')"
+                :percent="chartData?.memoryUsageCur"
                 :title="$t('overview.memory_usage')"
               />
             </div>
           </a-col>
           <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
             <div class="chart-item-wrp">
-              <gauge-chart
-                chart-id="chart2"
-                :percent="parseFloat(chartData?.cpuUsageCur ?? '0')"
-                :title="$t('overview.cpu_usage')"
+              <gauge-chart chart-id="chart2" :percent="chartData?.cpuUsageCur" :title="$t('overview.cpu_usage')" />
+            </div>
+          </a-col>
+          <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
+            <div class="chart-item-wrp">
+              <category-chart
+                chart-id="chart3"
+                :x-axis-data="chartData?.timestamps"
+                :data="chartData?.memoryUsage ?? []"
+                :title="$t('overview.memory_usage')"
               />
             </div>
           </a-col>
@@ -293,16 +307,6 @@
                 :x-axis-data="chartData?.timestamps"
                 :data="chartData?.cpuUsage ?? []"
                 :title="$t('overview.cpu_usage')"
-              />
-            </div>
-          </a-col>
-          <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-            <div class="chart-item-wrp">
-              <category-chart
-                chart-id="chart3"
-                :x-axis-data="chartData?.timestamps"
-                :data="chartData?.memoryUsage ?? []"
-                :title="$t('overview.memory_usage')"
               />
             </div>
           </a-col>

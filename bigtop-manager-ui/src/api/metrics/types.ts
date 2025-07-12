@@ -17,8 +17,7 @@
  * under the License.
  */
 
-export type TimeRangeType = '1m' | '15m' | '30m' | '1h' | '3h' | '6h'
-
+export type TimeRangeType = '1m' | '5m' | '15m' | '30m' | '1h' | '2h'
 export type MetricsData = {
   cpuUsageCur: string
   memoryUsageCur: string

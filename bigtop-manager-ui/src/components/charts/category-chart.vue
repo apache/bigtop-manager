@@ -20,8 +20,8 @@
 <script setup lang="ts">
   import dayjs from 'dayjs'
   import { computed, onMounted, toRefs, watchEffect } from 'vue'
+  import { roundFixed } from '@/utils/storage'
   import { type EChartsOption, useChart } from '@/composables/use-chart'
-  import { formatSeriesData, roundFixed } from '@/utils/chart'
 
   interface Props {
     chartId: string
@@ -30,11 +30,13 @@
     legendMap?: [string, string][] | undefined
     config?: EChartsOption
     xAxisData?: string[]
-    yAxisUnit?: string
+    formatter?: {
+      yAxis?: (value: unknown) => string
+      tooltip?: (value: unknown) => string
+    }
   }
 
   const props = withDefaults(defineProps<Props>(), {
-    yAxisUnit: '%',
     legendMap: undefined,
     xAxisData: () => {
       return []
@@ -44,11 +46,15 @@
     },
     config: () => {
       return {}
+    },
+    formatter: () => {
+      return {}
     }
   })
 
   const { data, chartId, title, config, legendMap, xAxisData } = toRefs(props)
   const { initChart, setOptions } = useChart()
+  const baseConfig = { type: 'line' }
 
   const option = computed(
     (): EChartsOption => ({
@@ -82,16 +88,9 @@
       yAxis: [
         {
           type: 'value',
-          axisPointer: {
-            type: 'shadow',
-            label: {
-              formatter: '{value}' + `${props.yAxisUnit ?? ''}`
-            }
-          },
           axisLabel: {
             width: 32,
             fontSize: 8,
-            formatter: '{value}' + `${props.yAxisUnit ?? ''}`,
             overflow: 'truncate'
           }
         }
@@ -110,6 +109,51 @@
     })
   )
 
+  const defaultTooltipFormatter = (val: unknown) => {
+    const num = roundFixed(val)
+    return num ? `${num} %` : '--'
+  }
+
+  const tooltipHtml = (item: any) => {
+    return `
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; gap: 12px">
+            <div style="display: flex; align-items: center;">
+              <div>${item.marker}${item.seriesName}</div>
+            </div>
+            <div>${item.valueText}</div>
+          </div>
+        `
+  }
+
+  const createTooltipFormatter = (formatValue?: (value: unknown) => string) => {
+    const format = formatValue ?? defaultTooltipFormatter
+    return (params: any) => {
+      const title = params[0]?.axisValueLabel ?? ''
+      const lines = params
+        .map((item: any) => {
+          const valueText = format(item.value)
+          return tooltipHtml({ ...item, valueText })
+        })
+        .join('')
+      return `<div style="margin-bottom: 4px;">${title}</div>${lines}`
+    }
+  }
+
+  /**
+   * Generates ECharts series config by mapping legend keys to data and formatting values.
+   *
+   * @param data - A partial object containing data arrays for each series key.
+   * @param legendMap - An array of [key, displayName] pairs.
+   * @returns An array of ECharts series config objects with populated and formatted data.
+   */
+  const generateChartSeries = <T,>(data: Partial<T>, legendMap: [string, string][]) => {
+    return legendMap.map(([key, name]) => ({
+      name,
+      ...baseConfig,
+      data: (data[key] || []).map((v: unknown) => roundFixed(v))
+    }))
+  }
+
   onMounted(() => {
     const selector = document.getElementById(`${chartId.value}`)
     selector && initChart(selector!, option.value)
@@ -121,15 +165,30 @@
 
     if (legendMap.value) {
       legend = new Map(legendMap.value).values()
-      series = formatSeriesData(data.value, legendMap.value)
+      series = generateChartSeries(data.value, legendMap.value)
     } else {
-      series = [{ name: title.value.toLowerCase(), data: Object.values(data.value).map((v) => roundFixed(v)) }]
+      series = [
+        {
+          name: title.value.toLowerCase(),
+          data: data.value.map((v) => roundFixed(v))
+        }
+      ]
     }
 
     setOptions({
+      tooltip: {
+        formatter: createTooltipFormatter(props.formatter.tooltip)
+      },
       xAxis: xAxisData.value
         ? [{ data: xAxisData.value?.map((v) => dayjs(Number(v) * 1000).format('HH:mm')) || [] }]
         : [],
+      yAxis: [
+        {
+          axisLabel: {
+            formatter: props.formatter.yAxis ?? '{value} %'
+          }
+        }
+      ],
       ...config.value,
       legend,
       series

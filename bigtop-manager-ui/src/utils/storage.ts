@@ -36,3 +36,30 @@ export const formatFromByte = (value: number): string => {
     return `${(value / 1024 ** 5).toFixed(2)} PB`
   }
 }
+
+/**
+ * Safely rounds a value to a fixed number of decimal places.
+ *
+ * @param num - The value to round.
+ * @param decimals - Decimal places to keep (default: 2).
+ * @param fallback - Fallback string if value is not finite (default: '0.00').
+ * @param preserveEmpty - If true, returns null or '' as-is; otherwise, falls back (default: true).
+ * @returns Rounded string, fallback, or original empty/null input.
+ */
+export const roundFixed = (
+  num: unknown,
+  decimals = 2,
+  fallback = '0.00',
+  preserveEmpty = true
+): string | null | undefined => {
+  if (preserveEmpty && (num === '' || num === null || num === undefined)) {
+    return num
+  }
+
+  const n = Number(num)
+  if (!isFinite(n)) return fallback
+
+  const factor = 10 ** decimals
+  const rounded = Math.round((n + Number.EPSILON) * factor) / factor
+  return rounded.toFixed(decimals)
+}
