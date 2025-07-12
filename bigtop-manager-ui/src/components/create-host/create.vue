@@ -18,21 +18,25 @@
 -->
 
 <script setup lang="ts">
-  import { computed, h, nextTick, ref, watch } from 'vue'
-  import { useI18n } from 'vue-i18n'
-  import { FormItemState } from '@/components/common/auto-form/types'
-  import { CheckCircleOutlined, UploadOutlined } from '@ant-design/icons-vue'
-  import { parseHostNamesAsPatternExpression } from '@/utils/array'
-  import { message, Modal } from 'ant-design-vue'
-  import { useLocaleStore } from '@/store/locale'
-  import { storeToRefs } from 'pinia'
-  import { uploadFile } from '@/api/upload-file'
+  import { computed, nextTick, ref, watch } from 'vue'
   import { Rule } from 'ant-design-vue/es/form'
-  import { updateHost } from '@/api/hosts'
+  import { message } from 'ant-design-vue'
+  import { storeToRefs } from 'pinia'
+  import { useI18n } from 'vue-i18n'
+  import { UploadOutlined } from '@ant-design/icons-vue'
+
+  import { useLocaleStore } from '@/store/locale'
   import { useClusterStore } from '@/store/cluster'
+
+  import { uploadFile } from '@/api/upload-file'
+  import { updateHost } from '@/api/hosts'
+
+  import ParsedPreview from './components/parsed-preview.vue'
+
   import type { UploadProps } from 'ant-design-vue'
   import type { HostReq } from '@/api/command/types'
   import type { HostParams, HostVO } from '@/api/hosts/types'
+  import type { FormItemState } from '@/components/common/auto-form/types'
 
   enum Mode {
     EDIT = 'cluster.edit_host',
@@ -40,18 +44,28 @@
   }
 
   interface Emits {
-    (event: 'onOk', type: keyof typeof Mode, value: HostReq | HostVO): void
+    (
+      event: 'onOk',
+      type: keyof typeof Mode,
+      value: HostReq | HostVO,
+      duplicateHosts?: HostReq & { strategy: 'override' | 'keep' }[]
+    ): void
   }
 
-  const props = withDefaults(defineProps<{ isPublic?: boolean; apiEditCaller?: boolean }>(), {
-    isPublic: false,
-    apiEditCaller: false
-  })
+  interface Props {
+    isPublic?: boolean
+    apiEditCaller?: boolean
+    currentHosts: HostReq[]
+  }
+
+  const props = withDefaults(defineProps<Props>(), { isPublic: false, apiEditCaller: false })
+  const emits = defineEmits<Emits>()
 
   const { t } = useI18n()
-  const emits = defineEmits<Emits>()
   const localeStore = useLocaleStore()
   const clusterStore = useClusterStore()
+  const { locale } = storeToRefs(localeStore)
+
   const open = ref(false)
   const loading = ref(false)
   const mode = ref<keyof typeof Mode>('ADD')
@@ -59,9 +73,13 @@
   const autoFormRef = ref<Comp.AutoFormInstance | null>(null)
   const formValue = ref<HostReq & { hostname?: string }>({})
   const fileName = ref('')
-  const { locale } = storeToRefs(localeStore)
+  const previewRef = ref<InstanceType<typeof ParsedPreview> | null>()
+
   const isEdit = computed(() => mode.value === 'EDIT')
 
+  /**
+   * Validates SSH password confirmation.
+   */
   const checkSshPassword = async (_rule: Rule, value: string) => {
     if (!value) {
       return Promise.reject(t('common.enter_error', [`${t('host.confirm_password')}`.toLowerCase()]))
@@ -73,6 +91,9 @@
     }
   }
 
+  /**
+   * Validates SSH key password confirmation.
+   */
   const checkSshKeyPassword = async (_rule: Rule, value: string) => {
     if (value != formValue.value?.sshKeyPassword) {
       return Promise.reject(t('host.key_password_not_match'))
@@ -331,185 +352,81 @@
   ])
 
   const filterFormItems = computed((): FormItemState[] => {
+    const baseItems = [...formItems.value]
+    const isPublic = props.isPublic
+
     if (formValue.value.authType === '1') {
-      const data = [...formItems.value]
-      data.splice(2, 0, ...formItemsForSshPassword.value)
-      return props.isPublic ? [...formItemsOfPublicHost.value, ...data] : data
+      baseItems.splice(2, 0, ...formItemsForSshPassword.value)
     } else if (formValue.value.authType === '2') {
-      const data = [...formItems.value]
-      data.splice(2, 0, ...formItemsForSshKeyPassword.value)
-      return props.isPublic ? [...formItemsOfPublicHost.value, ...data] : data
+      baseItems.splice(2, 0, ...formItemsForSshKeyPassword.value)
     }
-    return props.isPublic ? [...formItemsOfPublicHost.value, ...formItems.value] : [...formItems.value]
+
+    return isPublic ? [...formItemsOfPublicHost.value, ...baseItems] : baseItems
   })
 
   watch(
-    () => formValue.value,
-    (val) => {
-      if (val.inputType && val.inputType === '1') {
-        hiddenItems.value = ['sshKeyString']
-      } else if (val.inputType && val.inputType === '2') {
-        hiddenItems.value = ['sshKeyFilename']
-      } else {
-        hiddenItems.value = []
+    () => formValue.value.inputType,
+    (inputType) => {
+      const hiddenMap: Record<string, string[]> = {
+        '1': ['sshKeyString'],
+        '2': ['sshKeyFilename']
       }
-    },
-    {
-      deep: true
+      hiddenItems.value = hiddenMap[inputType] ?? []
     }
   )
 
-  const handleOpen = async (type: keyof typeof Mode, payload?: HostParams) => {
-    open.value = true
-    mode.value = type
-    if (payload) {
-      formValue.value = Object.assign(formValue.value, {
-        ...payload,
-        authType: `${payload?.authType ?? 1}`,
-        inputType: `${payload?.inputType ?? 1}`
-      })
-    } else {
-      Object.assign(formValue.value, {
-        authType: '1',
-        inputType: '1'
-      })
-    }
-
-    props.isPublic && (await getClusterSelectOptions())
-  }
-
-  const getClusterSelectOptions = async () => {
-    await nextTick()
-    const formatClusters = Object.values(clusterStore.clusterMap).map((v) => ({ ...v, clusterId: v.id }))
-    autoFormRef.value?.setOptions('clusterId', formatClusters)
-  }
-
+  /**
+   * Handles host editing.
+   */
   const editHost = async (hostConfig: HostReq) => {
     try {
       const data = await updateHost(hostConfig)
       if (data) {
-        loading.value = false
         message.success(t('common.update_success'))
         emits('onOk', mode.value, formValue.value)
         handleCancel()
       }
     } catch (error) {
-      console.log('error :>> ', error)
+      console.error('Error editing host:', error)
     } finally {
       loading.value = false
+    }
+  }
+
+  /**
+   * Handles parsed data from preview.
+   */
+  const handleParsed = ({ parsedData, confirmStatus, duplicateHosts }: any) => {
+    if (confirmStatus) {
+      Object.assign(formValue.value, parsedData)
+      emits('onOk', mode.value, formValue.value, duplicateHosts)
+      handleCancel()
     }
   }
 
   const handleOk = async () => {
     const validate = await autoFormRef.value?.getFormValidation()
     if (!validate) return
-    try {
-      if (!isEdit.value) {
-        const confirmStatus = await showHosts()
-        if (confirmStatus) {
-          emits('onOk', mode.value, formValue.value)
-          handleCancel()
-        }
-      } else {
-        if (props.apiEditCaller) {
-          loading.value = true
-          await editHost(formValue.value)
-        } else {
-          emits('onOk', mode.value, formValue.value)
-          handleCancel()
-        }
-      }
-    } catch (e) {
-      console.log(e)
+
+    if (!isEdit.value) {
+      previewRef.value?.parsed(props.currentHosts)
+    } else if (props.apiEditCaller) {
+      loading.value = true
+      await editHost(formValue.value)
+    } else {
+      emits('onOk', mode.value, formValue.value)
+      handleCancel()
     }
-  }
-
-  const createHostNameEls = (list: string[]) => {
-    const elStyles = {
-      contentStyle: {
-        marginInlineStart: '2.125rem',
-        width: '100%',
-        maxHeight: '31.25rem',
-        overflow: 'auto'
-      },
-      itemStyle: { margin: '0.625rem' },
-      iconWrpStyle: {
-        fontSize: '1.375rem',
-        fontWeight: 600,
-        color: 'green',
-        marginInlineEnd: '0.75rem'
-      },
-      titleStyle: {
-        fontSize: '1rem',
-        fontWeight: 600
-      },
-      redfIconStyle: {
-        display: 'flex',
-        alignItems: 'center'
-      }
-    }
-    const items = list.map((item: string, idx: number) => {
-      return h('li', { key: idx, style: elStyles.itemStyle }, item)
-    })
-    const iconWrpStyle = h(
-      'span',
-      {
-        style: elStyles.iconWrpStyle
-      },
-      [h(CheckCircleOutlined)]
-    )
-    const replaceTitle = h('span', { style: elStyles.titleStyle }, `${t('cluster.show_hosts_resolved')}`)
-    const reDefineIcon = h('div', { style: elStyles.redfIconStyle }, [iconWrpStyle, replaceTitle])
-    const box = h(
-      'div',
-      {
-        style: elStyles.contentStyle
-      },
-      items
-    )
-
-    return { box, reDefineIcon }
-  }
-
-  const showHosts = (): Promise<boolean> => {
-    const hostList = parseHostNamesAsPatternExpression(formValue.value.hostname as string)
-    const { box: content, reDefineIcon: icon } = createHostNameEls(hostList)
-    return new Promise((resolve) => {
-      Modal.confirm({
-        title: '',
-        icon,
-        centered: true,
-        width: '31.25rem',
-        content,
-        onOk() {
-          formValue.value.hostnames = hostList
-          resolve(true)
-        },
-        onCancel() {
-          resolve(false)
-          Modal.destroyAll()
-        }
-      })
-    })
   }
 
   const handleCancel = () => {
-    formValue.value = {
-      authType: '1',
-      inputType: '1'
-    }
+    formValue.value = { authType: '1', inputType: '1' }
     fileName.value = ''
     open.value = false
   }
 
   const beforeUpload: UploadProps['beforeUpload'] = (file) => {
-    // const isText = file.type === 'text/plain'
-    const checkLimitSize = file.size / 1024 <= 10
-    // if (!isText) {
-    //   message.error(t('common.file_type_error'))
-    //   return false
-    // }
-    if (!checkLimitSize) {
+    if (file.size / 1024 > 10) {
       message.error(t('common.file_size_error'))
       return false
     }
@@ -531,6 +448,25 @@
       message.error(t('common.upload_failed'))
       fileName.value = ''
     }
+  }
+
+  const handleOpen = async (type: keyof typeof Mode, payload?: HostParams) => {
+    open.value = true
+    mode.value = type
+
+    formValue.value = payload
+      ? { ...payload, authType: `${payload?.authType ?? 1}`, inputType: `${payload?.inputType ?? 1}` }
+      : { authType: '1', inputType: '1' }
+
+    if (props.isPublic) {
+      await getClusterSelectOptions()
+    }
+  }
+
+  const getClusterSelectOptions = async () => {
+    await nextTick()
+    const formatClusters = Object.values(clusterStore.clusterMap).map((v) => ({ ...v, clusterId: v.id }))
+    autoFormRef.value?.setOptions('clusterId', formatClusters)
   }
 
   defineExpose({
@@ -591,13 +527,11 @@
         </footer>
       </template>
     </a-modal>
+    <parsed-preview ref="previewRef" :is-public="$props.isPublic" :data="formValue" @parsed="handleParsed" />
   </div>
 </template>
 
 <style lang="scss" scoped>
-  .question {
-    cursor: pointer;
-  }
   .filename {
     color: $color-primary;
     padding-inline: $space-sm;
