@@ -28,7 +28,7 @@ import org.apache.bigtop.manager.dao.query.ComponentQuery;
 import org.apache.bigtop.manager.dao.query.HostQuery;
 import org.apache.bigtop.manager.dao.repository.ComponentDao;
 import org.apache.bigtop.manager.dao.repository.HostDao;
-import org.apache.bigtop.manager.dao.repository.ToolDao;
+import org.apache.bigtop.manager.dao.repository.RepoDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.enums.HealthyStatusEnum;
 import org.apache.bigtop.manager.server.enums.HostAuthTypeEnum;
@@ -47,6 +47,7 @@ import org.apache.bigtop.manager.server.utils.PageUtils;
 import org.apache.bigtop.manager.server.utils.RemoteSSHUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -80,7 +81,7 @@ public class HostServiceImpl implements HostService {
     private ComponentDao componentDao;
 
     @Resource
-    private ToolDao toolDao;
+    private RepoDao repoDao;
 
     private final List<InstalledStatusVO> installedStatus = new CopyOnWriteArrayList<>();
 
@@ -273,7 +274,7 @@ public class HostServiceImpl implements HostService {
 
     public void installDependencies(HostDTO hostDTO, String hostname, InstalledStatusVO installedStatusVO) {
         String path = hostDTO.getAgentDir();
-        String repoUrl = toolDao.findByName("agent").getBaseUrl();
+        String repoUrl = repoDao.findByName("agent").getBaseUrl();
         int grpcPort = hostDTO.getGrpcPort();
 
         String command;
@@ -340,7 +341,7 @@ public class HostServiceImpl implements HostService {
         if (hostDTO.getSshPort() == null) {
             hostDTO.setSshPort(DEFAULT_SSH_PORT);
         }
-        if (hostDTO.getAgentDir() == null) {
+        if (StringUtils.isBlank(hostDTO.getAgentDir())) {
             hostDTO.setAgentDir(DEFAULT_AGENT_DIR);
         }
     }

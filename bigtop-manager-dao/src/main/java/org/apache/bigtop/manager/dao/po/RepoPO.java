@@ -43,4 +43,13 @@ public class RepoPO extends BasePO implements Serializable {
 
     @Column(name = "base_url")
     private String baseUrl;
+
+    @Column(name = "pkg_name")
+    private String pkgName;
+
+    @Column(name = "checksum")
+    private String checksum;
+
+    @Column(name = "type")
+    private Integer type;
 }

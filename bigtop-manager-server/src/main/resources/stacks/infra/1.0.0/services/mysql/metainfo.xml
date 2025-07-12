@@ -53,7 +53,6 @@
                 </architectures>
                 <packages>
                     <package>
-                        <url>https://dev.mysql.com/get/Downloads/MySQL-8.0</url>
                         <name>mysql-8.0.40-linux-glibc2.28-x86_64.tar.xz</name>
                         <checksum>MD5:dcf2702f953d1969be44083f4f063f18</checksum>
                     </package>
@@ -65,7 +64,6 @@
                 </architectures>
                 <packages>
                     <package>
-                        <url>https://dev.mysql.com/get/Downloads/MySQL-8.0</url>
                         <name>mysql-8.0.40-linux-glibc2.28-aarch64.tar.xz</name>
                         <checksum>MD5:a79f41ce62784a1a0e081c76116008de</checksum>
                     </package>

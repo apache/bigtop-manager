@@ -19,6 +19,7 @@
 package org.apache.bigtop.manager.stack.infra.v1_0_0.mysql;
 
 import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
+import org.apache.bigtop.manager.grpc.pojo.RepoInfo;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
@@ -76,6 +77,11 @@ public class MySQLParams extends InfraParams {
         Map<String, Object> myCnf = LocalSettings.configurations(getServiceName(), "my.cnf");
         myCnfContent = myCnf.get("content").toString();
         return myCnf;
+    }
+
+    @Override
+    public RepoInfo repo() {
+        return LocalSettings.repo("mysql");
     }
 
     @Override

@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mockStatic;
 
 @ExtendWith(MockitoExtension.class)
@@ -58,15 +59,17 @@ public class BaseParamsTest {
     @BeforeEach
     public void setUp() {
         List<RepoInfo> repos = new ArrayList<>();
-        repos.add(new RepoInfo("repo2", "mockArch", "testURL"));
-        repos.add(new RepoInfo("repo3", "mockArch", "testURL"));
+        RepoInfo general = new RepoInfo("general", "mockArch", "testURL", "testPkgName", "testChecksum", 1);
+        RepoInfo test = new RepoInfo("test", "mockArch", "testURL", "testPkgName", "testChecksum", 1);
+        repos.add(general);
+        repos.add(test);
 
         List<String> arch = new ArrayList<>();
         arch.add("mockArch");
 
         List<PackageInfo> packages = new ArrayList<>();
-        packages.add(new PackageInfo(null, "package1", "testChecksum1"));
-        packages.add(new PackageInfo(null, "package2", "testChecksum2"));
+        packages.add(new PackageInfo("package1", "testChecksum1"));
+        packages.add(new PackageInfo("package2", "testChecksum2"));
 
         List<PackageSpecificInfo> packageSpecifics = new ArrayList<>();
         PackageSpecificInfo packageSpecific = new PackageSpecificInfo();
@@ -94,6 +97,7 @@ public class BaseParamsTest {
         osDetectionMockedStatic = mockStatic(OSDetection.class);
         netUtilsMockedStatic = mockStatic(NetUtils.class);
         netUtilsMockedStatic.when(NetUtils::getHostname).thenReturn("mockHostname");
+        localSettingsMockedStatic.when(() -> LocalSettings.repo(any())).thenReturn(general);
         localSettingsMockedStatic.when(LocalSettings::repos).thenReturn(repos);
         localSettingsMockedStatic.when(LocalSettings::cluster).thenReturn(clusterInfo);
         osDetectionMockedStatic.when(OSDetection::getArch).thenReturn("mockArch");
@@ -154,7 +158,7 @@ public class BaseParamsTest {
     @Test
     public void testRepo() {
         RepoInfo repo = mockBaseParams.repo();
-        assertEquals("repo2", repo.getName());
+        assertEquals("general", repo.getName());
         assertEquals("mockArch", repo.getArch());
     }
 
@@ -178,7 +182,7 @@ public class BaseParamsTest {
     @Test
     public void testJavaHome() {
         String javaHome = mockBaseParams.javaHome();
-        assertEquals("/mockRoot/tools/jdk", javaHome);
+        assertEquals("/mockRoot/dependencies/jdk", javaHome);
     }
 
     @Test

@@ -436,15 +436,11 @@ public class PrometheusProxy {
 
     private List<String> convertList(List<BigDecimal> list, Integer multiply) {
         List<String> resultList = getEmptyList();
-        if (list == null) {
-            Collections.fill(resultList, "");
-        } else {
+        if (list != null) {
             for (int i = 0; i < list.size(); i++) {
                 BigDecimal value = list.get(i);
                 if (value != null) {
                     resultList.set(i, value.multiply(new BigDecimal(multiply)).toString());
-                } else {
-                    resultList.set(i, "");
                 }
             }
         }
