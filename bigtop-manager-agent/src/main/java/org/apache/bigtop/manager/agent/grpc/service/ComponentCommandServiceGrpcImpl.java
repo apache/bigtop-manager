@@ -18,6 +18,7 @@
  */
 package org.apache.bigtop.manager.agent.grpc.service;
 
+import org.apache.bigtop.manager.agent.cache.Caches;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.grpc.generated.ComponentCommandReply;
@@ -36,8 +37,10 @@ public class ComponentCommandServiceGrpcImpl extends ComponentCommandServiceGrpc
 
     @Override
     public void exec(ComponentCommandRequest request, StreamObserver<ComponentCommandReply> responseObserver) {
-        ComponentCommandPayload payload = JsonUtils.readFromString(request.getPayload(), ComponentCommandPayload.class);
         try {
+            log.info("Running task {}", Caches.RUNNING_TASK);
+            ComponentCommandPayload payload =
+                    JsonUtils.readFromString(request.getPayload(), ComponentCommandPayload.class);
             ShellResult shellResult = StackExecutor.execute(payload);
             ComponentCommandReply reply = ComponentCommandReply.newBuilder()
                     .setCode(shellResult.getExitCode())
