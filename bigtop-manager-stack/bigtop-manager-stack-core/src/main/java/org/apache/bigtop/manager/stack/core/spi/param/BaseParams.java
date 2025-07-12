@@ -19,6 +19,7 @@
 package org.apache.bigtop.manager.stack.core.spi.param;
 
 import org.apache.bigtop.manager.common.utils.NetUtils;
+import org.apache.bigtop.manager.common.utils.os.OSDetection;
 import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
 import org.apache.bigtop.manager.grpc.pojo.PackageInfo;
 import org.apache.bigtop.manager.grpc.pojo.PackageSpecificInfo;
@@ -175,10 +176,9 @@ public abstract class BaseParams implements Params {
 
     @Override
     public List<PackageInfo> packages() {
-        RepoInfo repo = this.repo();
         List<PackageInfo> packageInfoList = new ArrayList<>();
         for (PackageSpecificInfo packageSpecificInfo : this.payload.getPackageSpecifics()) {
-            if (!packageSpecificInfo.getArch().contains(repo.getArch())) {
+            if (!packageSpecificInfo.getArch().contains(OSDetection.getArch())) {
                 continue;
             }
 
