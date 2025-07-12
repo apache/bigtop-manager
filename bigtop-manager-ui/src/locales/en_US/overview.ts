@@ -49,5 +49,7 @@ export default {
   service_name: 'Name',
   service_version: 'Version',
   metrics: 'Metrics',
-  kerberos: 'Kerberos'
+  kerberos: 'Kerberos',
+  system_load: 'System Load',
+  disk_io: 'Disk I/O'
 }

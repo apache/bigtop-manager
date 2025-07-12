@@ -19,23 +19,33 @@
 
 import * as echarts from 'echarts/core'
 import { GaugeChart, GaugeSeriesOption, LineChart, LineSeriesOption } from 'echarts/charts'
-import { GridComponent, GridComponentOption, TooltipComponent, TooltipComponentOption } from 'echarts/components'
+import {
+  TitleComponent,
+  GridComponent,
+  GridComponentOption,
+  TooltipComponent,
+  TooltipComponentOption,
+  LegendComponent,
+  LegendComponentOption
+} from 'echarts/components'
 import { UniversalTransition } from 'echarts/features'
 import { CanvasRenderer } from 'echarts/renderers'
 import { onBeforeUnmount, onMounted, shallowRef } from 'vue'
 
 export type EChartsOption = echarts.ComposeOption<
-  GaugeSeriesOption | GridComponentOption | TooltipComponentOption | LineSeriesOption
+  GaugeSeriesOption | GridComponentOption | TooltipComponentOption | LineSeriesOption | LegendComponentOption
 >
 
 echarts.use([
+  TitleComponent,
   GaugeChart,
   CanvasRenderer,
   GridComponent,
   LineChart,
   TooltipComponent,
   CanvasRenderer,
-  UniversalTransition
+  UniversalTransition,
+  LegendComponent
 ])
 
 export const useChart = () => {

@@ -23,6 +23,7 @@
   import { CommonStatus, CommonStatusTexts } from '@/enums/state'
   import GaugeChart from '@/components/charts/gauge-chart.vue'
   import CategoryChart from '@/components/charts/category-chart.vue'
+  import { Empty } from 'ant-design-vue'
   import type { ServiceVO, ServiceStatusType } from '@/api/service/types'
 
   type TimeRangeText = '1m' | '15m' | '30m' | '1h' | '6h' | '30h'
@@ -166,7 +167,7 @@
         </div>
         <template v-if="noChartData">
           <div class="box-empty">
-            <a-empty />
+            <a-empty :image="Empty.PRESENTED_IMAGE_SIMPLE" />
           </div>
         </template>
         <a-row v-else class="box-content">
@@ -213,7 +214,7 @@
 
     &-content {
       border-radius: 8px;
-      overflow: hidden;
+      overflow: visible;
       box-sizing: border-box;
       border: 1px solid $color-border;
     }

@@ -20,25 +20,49 @@
 <script setup lang="ts">
   import dayjs from 'dayjs'
   import { computed, onMounted, toRefs, watchEffect } from 'vue'
+  import { roundFixed } from '@/utils/storage'
   import { type EChartsOption, useChart } from '@/composables/use-chart'
 
-  const props = defineProps<{
+  interface Props {
     chartId: string
     title: string
-    data?: any[]
-    timeDistance?: string
-  }>()
+    data?: any
+    legendMap?: [string, string][] | undefined
+    config?: EChartsOption
+    xAxisData?: string[]
+    formatter?: {
+      yAxis?: (value: unknown) => string
+      tooltip?: (value: unknown) => string
+    }
+  }
 
-  const { data, chartId, title, timeDistance } = toRefs(props)
+  const props = withDefaults(defineProps<Props>(), {
+    legendMap: undefined,
+    xAxisData: () => {
+      return []
+    },
+    data: () => {
+      return {}
+    },
+    config: () => {
+      return {}
+    },
+    formatter: () => {
+      return {}
+    }
+  })
+
+  const { data, chartId, title, config, legendMap, xAxisData, formatter } = toRefs(props)
   const { initChart, setOptions } = useChart()
+  const baseConfig = { type: 'line' }
 
   const option = computed(
     (): EChartsOption => ({
       grid: {
-        top: '20px',
+        top: '30px',
         left: '40px',
         right: '30px',
-        bottom: '20px'
+        bottom: '30px'
       },
       tooltip: {
         trigger: 'axis',
@@ -47,16 +71,12 @@
         textStyle: {
           color: '#fff'
         },
-        axisPointer: {
-          type: 'cross',
-          crossStyle: {
-            color: '#999'
-          }
-        }
+        formatter: createTooltipFormatter(formatter.value.tooltip)
       },
       xAxis: [
         {
           type: 'category',
+          boundaryGap: false,
           data: [],
           axisPointer: {
             type: 'line'
@@ -69,18 +89,11 @@
       yAxis: [
         {
           type: 'value',
-          axisPointer: {
-            type: 'shadow',
-            label: {
-              formatter: '{value} %'
-            }
-          },
-          min: 0,
-          max: 100,
-          interval: 20,
           axisLabel: {
+            width: 32,
             fontSize: 8,
-            formatter: '{value} %'
+            overflow: 'truncate',
+            formatter: formatter.value.yAxis ?? '{value} %'
           }
         }
       ],
@@ -98,31 +111,50 @@
     })
   )
 
-  const intervalToMs = (interval: string): number => {
-    const unit = interval.replace(/\d+/g, '')
-    const value = parseInt(interval)
+  const defaultTooltipFormatter = (val: unknown) => {
+    const num = roundFixed(val)
+    return num ? `${num} %` : '--'
+  }
 
-    switch (unit) {
-      case 'm':
-        return value * 60 * 1000
-      case 'h':
-        return value * 60 * 60 * 1000
-      default:
-        throw new Error('Unsupported interval: ' + interval)
+  const tooltipHtml = (item: any) => {
+    return `
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; gap: 12px">
+            <div style="display: flex; align-items: center;">
+              <div>${item.marker}${item.seriesName}</div>
+            </div>
+            <div>${item.valueText}</div>
+          </div>
+        `
+  }
+
+  const createTooltipFormatter = (formatValue?: (value: unknown) => string) => {
+    const format = formatValue ?? defaultTooltipFormatter
+    console.log('format :>> ', format)
+    return (params: any) => {
+      const title = params[0]?.axisValueLabel ?? ''
+      const lines = params
+        .map((item: any) => {
+          const valueText = format(item.value)
+          return tooltipHtml({ ...item, valueText })
+        })
+        .join('')
+      return `<div style="margin-bottom: 4px;">${title}</div>${lines}`
     }
   }
 
-  const getTimePoints = (interval: string = '15m'): string[] => {
-    const now = dayjs()
-    const gap = intervalToMs(interval)
-    const result: string[] = []
-
-    for (let i = 5; i >= 0; i--) {
-      const time = now.subtract(i * gap, 'millisecond')
-      result.push(time.format('HH:mm'))
-    }
-
-    return result
+  /**
+   * Generates ECharts series config by mapping legend keys to data and formatting values.
+   *
+   * @param data - A partial object containing data arrays for each series key.
+   * @param legendMap - An array of [key, displayName] pairs.
+   * @returns An array of ECharts series config objects with populated and formatted data.
+   */
+  const generateChartSeries = <T,>(data: Partial<T>, legendMap: [string, string][]) => {
+    return legendMap.map(([key, name]) => ({
+      name,
+      ...baseConfig,
+      data: (data[key] || []).map((v: unknown) => roundFixed(v))
+    }))
   }
 
   onMounted(() => {
@@ -131,14 +163,28 @@
   })
 
   watchEffect(() => {
-    setOptions({
-      xAxis: [{ data: getTimePoints(timeDistance.value) || [] }]
-    })
-  })
+    let series = [] as any,
+      legend = [] as any
 
-  watchEffect(() => {
+    if (legendMap.value) {
+      legend = new Map(legendMap.value).values()
+      series = generateChartSeries(data.value, legendMap.value)
+    } else {
+      series = [
+        {
+          name: title.value.toLowerCase(),
+          data: data.value.map((v) => roundFixed(v))
+        }
+      ]
+    }
+
     setOptions({
-      series: [{ data: [{ value: data.value ?? [] }] }]
+      xAxis: xAxisData.value
+        ? [{ data: xAxisData.value?.map((v) => dayjs(Number(v) * 1000).format('HH:mm')) || [] }]
+        : [],
+      ...config.value,
+      legend,
+      series
     })
   })
 </script>
