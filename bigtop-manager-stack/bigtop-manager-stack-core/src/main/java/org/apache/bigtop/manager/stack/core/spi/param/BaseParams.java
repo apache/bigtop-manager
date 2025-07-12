@@ -19,14 +19,12 @@
 package org.apache.bigtop.manager.stack.core.spi.param;
 
 import org.apache.bigtop.manager.common.utils.NetUtils;
-import org.apache.bigtop.manager.common.utils.os.OSDetection;
 import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
 import org.apache.bigtop.manager.grpc.pojo.PackageInfo;
 import org.apache.bigtop.manager.grpc.pojo.PackageSpecificInfo;
 import org.apache.bigtop.manager.grpc.pojo.RepoInfo;
 import org.apache.bigtop.manager.grpc.pojo.TemplateInfo;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
-import org.apache.bigtop.manager.stack.core.exception.StackException;
 import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
 
 import lombok.NoArgsConstructor;
@@ -172,11 +170,7 @@ public abstract class BaseParams implements Params {
 
     @Override
     public RepoInfo repo() {
-        return LocalSettings.repos().stream()
-                .filter(r -> OSDetection.getArch().equals(r.getArch()))
-                .findFirst()
-                .orElseThrow(() -> new StackException(
-                        "Cannot find repo for os: [{0}] and arch: [{1}]", OSDetection.getOS(), OSDetection.getArch()));
+        return LocalSettings.repo("general");
     }
 
     @Override
@@ -202,7 +196,7 @@ public abstract class BaseParams implements Params {
     @Override
     public String javaHome() {
         String root = LocalSettings.cluster().getRootDir();
-        return MessageFormat.format("{0}/tools/jdk", root);
+        return MessageFormat.format("{0}/dependencies/jdk", root);
     }
 
     @Override
