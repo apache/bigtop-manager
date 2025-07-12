@@ -18,16 +18,17 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onUnmounted, ref, shallowRef, watch } from 'vue'
-  import { message } from 'ant-design-vue'
+  import { computed, h, onUnmounted, ref, shallowRef, watch } from 'vue'
+  import { message, Modal } from 'ant-design-vue'
   import { useI18n } from 'vue-i18n'
   import { storeToRefs } from 'pinia'
-  import { useRoute } from 'vue-router'
+  import { onBeforeRouteLeave, useRoute } from 'vue-router'
   import { StepContext, useCreateServiceStore } from '@/store/create-service'
   import ServiceSelector from './components/service-selector.vue'
   import ComponentAssigner from './components/component-assigner.vue'
   import ServiceConfigurator from './components/service-configurator.vue'
   import ComponentInstaller from './components/component-installer.vue'
+  import SvgIcon from '@/components/common/svg-icon/index.vue'
 
   const { t } = useI18n()
   const route = useRoute()
@@ -37,27 +38,37 @@
   const compRef = ref<any>()
   const components = shallowRef<any[]>([ServiceSelector, ComponentAssigner, ServiceConfigurator, ServiceConfigurator])
   const currComp = computed(() => components.value[current.value])
+  const isDone = computed(() => ['Successful', 'Failed'].includes(createdPayload.value.state ?? ''))
 
-  const validateServiceSelection = async () => {
+  /**
+   * Validate the service selection step
+   */
+  const validateServiceSelection = async (): Promise<boolean> => {
     if (stepContext.value.type === 'component') {
       return true
     }
 
-    if (selectedServices.value.filter((v) => !v.isInstalled).length === 0) {
+    const uninstalledServices = selectedServices.value.filter((v) => !v.isInstalled)
+    if (uninstalledServices.length === 0) {
       message.error(t('service.service_selection'))
       return false
-    } else {
-      return await validateDependenciesOfServiceSelection()
     }
+
+    return await validateDependenciesOfServiceSelection()
   }
 
+  /**
+   * Validate service dependencies
+   */
   const validateDependenciesOfServiceSelection = async () => {
     let selectedServiceNames = new Set(selectedServices.value.map((service) => service.name))
+
     for (const selectedService of selectedServices.value) {
       const serviceDependencies = await createStore.confirmServiceDependencyAction('add', selectedService)
       if (serviceDependencies.length === 0) {
         return false
       }
+
       for (const service of serviceDependencies) {
         if (!selectedServiceNames.has(service.name)) {
           compRef.value.modifyInstallItems('add', service)
@@ -68,24 +79,26 @@
     return true
   }
 
-  const validateComponentAssignments = () => {
-    let valid = true
+  /**
+   * Validate the component assignment step
+   */
+  const validateComponentAssignments = (): boolean => {
     for (const info of createStore.allComps.values()) {
-      if (!info.cardinality) {
-        continue
-      }
-      valid = createStore.validCardinality(info.cardinality, info.hosts.length, info.displayName!)
-      if (!valid) {
-        return
+      if (!info.cardinality) continue
+
+      const isValid = createStore.validCardinality(info.cardinality, info.hosts?.length ?? 0, info.displayName!)
+      if (!isValid) {
+        return false
       }
     }
-    return valid
+    return true
   }
 
   const stepValidators = [validateServiceSelection, validateComponentAssignments, () => true, () => true]
 
   const proceedToNextStep = async () => {
     const { type } = stepContext.value
+
     if (current.value < 3 && (await stepValidators[current.value]())) {
       createStore.nextStep()
     } else if (current.value === 3) {
@@ -115,6 +128,29 @@
 
   onUnmounted(() => {
     createStore.$reset()
+  })
+
+  onBeforeRouteLeave((_to, _from, next) => {
+    if (current.value === stepsLimit.value && !isDone.value) {
+      Modal.confirm({
+        title: () =>
+          h('div', { style: { display: 'flex' } }, [
+            h(SvgIcon, { name: 'unknown', style: { width: '24px', height: '24px' } }),
+            h('span', t('common.exit_confirm'))
+          ]),
+        content: h('div', { style: { paddingLeft: '36px' } }, t('common.installing_exit_confirm_content')),
+        cancelText: t('common.no'),
+        icon: null,
+        okText: t('common.yes'),
+        onOk: () => {
+          next()
+          Modal.destroyAll()
+          createStore.$reset()
+        }
+      })
+      return
+    }
+    next()
   })
 </script>
 
@@ -153,7 +189,7 @@
               {{ $t('common.next') }}
             </a-button>
           </template>
-          <a-button v-show="current === stepsLimit" type="primary" @click="$router.go(-1)">
+          <a-button v-show="current === stepsLimit && isDone" type="primary" @click="$router.go(-1)">
             {{ $t('common.done') }}
           </a-button>
         </a-space>

@@ -21,16 +21,25 @@
 set -e
 
 [ $# -lt 3 ] && {
-    echo "Usage: $0 <dir_prefix> <repo_url> <grpc_port> [checksum_alg checksum_value]" >&2
+    info "Usage: $0 <dir_prefix> <repo_url> <grpc_port> [checksum_alg checksum_value]"
     exit 1
 }
 
 USER=$(whoami)
 GROUP=$(id -gn)
 
+info() {
+    echo $1 >> setup-agent.log 2>&1
+}
+
+error () {
+    echo $1 >&2
+    echo $1 >> setup-agent.log 2>&1
+}
+
 check_sudo() {
     if ! sudo -n true 2>/dev/null; then
-        echo "ERROR: User '$USER' doesn't have sudo privileges" >&2
+        error "User '$USER' doesn't have sudo privileges"
         exit 1
     fi
 }
@@ -46,7 +55,7 @@ CHECK_VAL="${5:-}"
 TAR_FILE="${DIR_PREFIX}/bigtop-manager-agent.tar.gz"
 TARGET_DIR="${DIR_PREFIX}/bigtop-manager-agent"
 DOWNLOAD_URL="${REPO_URL}/bigtop-manager-agent.tar.gz"
-PROCESS_NAME="org.apache.bigtop.manager.agent.AgentApplication"
+PROCESS_NAME="org.apache.bigtop.manager.agent.BigtopManagerAgent"
 
 validate_checksum() {
     local file="$1"
@@ -59,7 +68,7 @@ validate_checksum() {
 
     local calc_val=$($sum_cmd "$file" | awk '{print $1}')
     [ "$calc_val" = "$CHECK_VAL" ] || {
-        echo "Checksum mismatch: Expected ${CHECK_ALG}=$CHECK_VAL, Found=$calc_val" >&2
+        error "Checksum mismatch: Expected ${CHECK_ALG}=$CHECK_VAL, Found=$calc_val"
         return 1
     }
 }
@@ -70,27 +79,29 @@ handle_tar_file() {
     if [ -f "$TAR_FILE" ]; then
         if [ -n "$CHECK_ALG" ]; then
             validate_checksum "$TAR_FILE" || {
-                echo "Removing invalid file: $TAR_FILE" >&2
+                info "Removing invalid file: $TAR_FILE"
                 rm -f "$TAR_FILE"
-                return 1
             }
+        else
+            info "Using existing file: $TAR_FILE"
+            return 0
         fi
-        return 0
     fi
 
     # Download file
+    info "Downloading agent tarball from $DOWNLOAD_URL to $TAR_FILE"
     if command -v wget &> /dev/null; then
-        wget "$DOWNLOAD_URL" -O "$TAR_FILE"
+        wget -q "$DOWNLOAD_URL" -O "$TAR_FILE"
     else
-        curl -L "$DOWNLOAD_URL" -o "$TAR_FILE"
+        curl -sL "$DOWNLOAD_URL" -o "$TAR_FILE"
     fi
 
     # Post-download validation
     if [ -n "$CHECK_ALG" ]; then
-      echo "Validating checksum"
+      info "Validating checksum"
       validate_checksum "$TAR_FILE" || {
           rm -f "$TAR_FILE"
-          echo "Downloaded file checksum validation failed" >&2
+          error "Downloaded file checksum validation failed"
           exit 1
       }
     fi
@@ -107,12 +118,32 @@ deploy_agent() {
 start() {
     export GRPC_PORT="$GRPC_PORT"
 
+    info "Prepare to start agent"
     if ! pgrep -f "${PROCESS_NAME}" > /dev/null; then
-        nohup ${TARGET_DIR}/bin/start.sh --debug > /dev/null 2>&1 &
+        info "Starting agent"
+        nohup ${TARGET_DIR}/bin/start.sh --debug > /dev/null 2>>setup-agent.log &
         sleep 10
-        pgrep -f "${PROCESS_NAME}" > /dev/null || exit 1
+        if ! pgrep -f "${PROCESS_NAME}" > /dev/null; then
+          error "Failed to start agent, please check the log"
+          exit 1
+        else
+          info "Agent started successfully"
+        fi
+    else
+        info "Agent is already running"
     fi
 }
 
+# Remove previous log file
+rm -f setup-agent.log
+
+# Log variables
+info "DIR_PREFIX: $DIR_PREFIX"
+info "REPO_URL: $REPO_URL"
+info "GRPC_PORT: $GRPC_PORT"
+info "CHECK_ALG: $CHECK_ALG"
+info "CHECK_VAL: $CHECK_VAL"
+
+# Run deployment
 deploy_agent
 start

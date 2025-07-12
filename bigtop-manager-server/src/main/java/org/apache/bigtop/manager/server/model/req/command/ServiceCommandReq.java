@@ -36,7 +36,7 @@ public class ServiceCommandReq {
     @NotNull @Schema(description = "Service name", example = "zookeeper")
     private String serviceName;
 
-    @NotNull @Schema(description = "Whether the service is already installed", example = "false")
+    @Schema(description = "Whether the service is already installed", example = "false")
     private Boolean installed;
 
     @NotEmpty(groups = {CommandGroupSequenceProvider.ServiceInstallCommandGroup.class})

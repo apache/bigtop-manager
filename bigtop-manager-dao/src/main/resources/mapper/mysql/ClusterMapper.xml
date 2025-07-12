@@ -36,11 +36,10 @@
             <property name="alias" value="c"/>
         </include>, u.nickname as create_user,
         count(h.id) as total_host, sum(h.available_processors) as total_processor,
-        sum(h.total_memory_size) as total_memory, sum(h.total_disk) as total_disk, count(s.id) as total_service
+        sum(h.total_memory_size) as total_memory, sum(h.total_disk) as total_disk
         from
         cluster c left join user u on c.create_by = u.id
         left join host h on c.id = h.cluster_id
-        left join service s on c.id = s.cluster_id
         where c.id = #{id}
         limit 1
     </select>

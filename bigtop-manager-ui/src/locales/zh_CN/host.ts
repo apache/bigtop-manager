@@ -43,5 +43,6 @@ export default {
   description: '备注',
   key_password_not_match: '密钥口令不一致。',
   default_agent_path: '代理应用程序安装路径，默认为/opt',
-  default_grpc_port: '代理应用程序gRPC端口，默认为8835'
+  default_grpc_port: '代理应用程序gRPC端口，默认为8835',
+  default_ssh_port: '代理应用程序SSH端口，默认为22'
 }

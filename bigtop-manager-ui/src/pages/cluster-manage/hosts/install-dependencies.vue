@@ -306,8 +306,8 @@
           </div>
         </template>
         <template #customFilterIcon="{ filtered, column }">
-          <svg-icon v-if="column.key === 'hostname'" :name="filtered ? 'search_activated' : 'search'" />
-          <svg-icon v-else :name="filtered ? 'filter_activated' : 'filter'" />
+          <svg-icon v-if="column.key === 'hostname'" :name="filtered ? 'search-activated' : 'search'" />
+          <svg-icon v-else :name="filtered ? 'filter-activated' : 'filter'" />
         </template>
         <template #bodyCell="{ record, column }">
           <template v-if="column.key === 'clusterId'">

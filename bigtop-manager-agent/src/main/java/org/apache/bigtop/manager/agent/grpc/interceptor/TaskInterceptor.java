@@ -43,11 +43,15 @@ public class TaskInterceptor implements ServerInterceptor {
     public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(
             ServerCall<ReqT, RespT> call, Metadata headers, ServerCallHandler<ReqT, RespT> next) {
         return new ForwardingServerCallListener.SimpleForwardingServerCallListener<>(next.startCall(call, headers)) {
+
+            private boolean taskRequest = false;
+
             @Override
             public void onMessage(ReqT message) {
                 super.onMessage(message);
+                taskRequest = isTaskRequest(message);
 
-                if (isTaskRequest(message)) {
+                if (taskRequest) {
                     try {
                         Method method = message.getClass().getDeclaredMethod("getTaskId");
                         Long taskId = (Long) method.invoke(message);
@@ -69,16 +73,20 @@ public class TaskInterceptor implements ServerInterceptor {
             public void onCancel() {
                 super.onCancel();
 
-                Caches.RUNNING_TASK = null;
-                MDC.clear();
+                if (taskRequest) {
+                    Caches.RUNNING_TASK = null;
+                    MDC.clear();
+                }
             }
 
             @Override
             public void onComplete() {
                 super.onComplete();
 
-                Caches.RUNNING_TASK = null;
-                MDC.clear();
+                if (taskRequest) {
+                    Caches.RUNNING_TASK = null;
+                    MDC.clear();
+                }
             }
 
             @Override

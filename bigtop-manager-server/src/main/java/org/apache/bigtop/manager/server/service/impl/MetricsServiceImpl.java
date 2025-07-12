@@ -28,13 +28,13 @@ import org.apache.bigtop.manager.dao.repository.ServiceConfigDao;
 import org.apache.bigtop.manager.server.model.converter.ServiceConfigConverter;
 import org.apache.bigtop.manager.server.model.dto.PropertyDTO;
 import org.apache.bigtop.manager.server.model.dto.ServiceConfigDTO;
-import org.apache.bigtop.manager.server.proxy.PrometheusProxy;
+import org.apache.bigtop.manager.server.model.vo.ClusterMetricsVO;
+import org.apache.bigtop.manager.server.model.vo.HostMetricsVO;
+import org.apache.bigtop.manager.server.prometheus.PrometheusProxy;
 import org.apache.bigtop.manager.server.service.MetricsService;
 
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 
 import jakarta.annotation.Resource;
@@ -54,20 +54,10 @@ public class MetricsServiceImpl implements MetricsService {
     private ServiceConfigDao serviceConfigDao;
 
     @Override
-    public JsonNode queryAgentsHealthyStatus() {
+    public HostMetricsVO queryAgentsInfo(Long id, String interval) {
         PrometheusProxy proxy = getProxy();
         if (proxy == null) {
-            return new ObjectMapper().createObjectNode();
-        }
-
-        return proxy.queryAgentsHealthyStatus();
-    }
-
-    @Override
-    public JsonNode queryAgentsInfo(Long id, String interval) {
-        PrometheusProxy proxy = getProxy();
-        if (proxy == null) {
-            return new ObjectMapper().createObjectNode();
+            return new HostMetricsVO();
         }
 
         String ipv4 = hostDao.findById(id).getIpv4();
@@ -75,10 +65,10 @@ public class MetricsServiceImpl implements MetricsService {
     }
 
     @Override
-    public JsonNode queryClustersInfo(Long clusterId, String interval) {
+    public ClusterMetricsVO queryClustersInfo(Long clusterId, String interval) {
         PrometheusProxy proxy = getProxy();
         if (proxy == null) {
-            return new ObjectMapper().createObjectNode();
+            return new ClusterMetricsVO();
         }
 
         List<String> ipv4s = hostDao.findAllByClusterId(clusterId).stream()

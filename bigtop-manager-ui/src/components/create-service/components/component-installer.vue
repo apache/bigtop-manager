@@ -22,11 +22,14 @@
   import { Empty } from 'ant-design-vue'
   import { getJobDetails, retryJob } from '@/api/job'
   import { CommandVO } from '@/api/command/types'
+  import { useCreateServiceStore } from '@/store/create-service'
   import LogsView, { type LogViewProps } from '@/components/log-view/index.vue'
   import type { JobVO, StageVO, StateType, TaskVO } from '@/api/job/types'
 
   const props = defineProps<{ stepData: CommandVO }>()
   const { stepData } = toRefs(props)
+
+  const createStore = useCreateServiceStore()
   const activeKey = ref<number[]>([])
   const jobDetail = ref<JobVO>({})
   const spinning = ref(false)
@@ -55,6 +58,7 @@
     try {
       const data = await getJobDetails({ jobId, clusterId })
       jobDetail.value = data
+      createStore.updateInstalledStatus(data.state as StateType)
       return ['Successful', 'Failed'].includes(data.state as StateType)
     } catch (error) {
       console.log('error :>> ', error)
@@ -135,20 +139,24 @@
           <template #header>
             <div class="stage-item">
               <span>{{ stage.name }}</span>
-              <svg-icon :name="stage.state && status[stage.state]"></svg-icon>
+              <div style="min-width: 100px">
+                <svg-icon :name="stage.state && status[stage.state]"></svg-icon>
+              </div>
             </div>
           </template>
           <div v-for="task in stage.tasks" :key="task.id" class="task-item">
             <span>{{ task.name }}</span>
             <a-space :size="16">
               <svg-icon :name="task.state && status[task.state]"></svg-icon>
-              <a-button
-                v-if="task.state && !['Canceled', 'Pending'].includes(task.state)"
-                type="link"
-                @click="viewLogs(stage, task)"
-              >
-                {{ $t('cluster.view_log') }}
-              </a-button>
+              <div style="min-width: 62px">
+                <a-button
+                  v-if="task.state && !['Canceled', 'Pending'].includes(task.state)"
+                  type="link"
+                  @click="viewLogs(stage, task)"
+                >
+                  {{ $t('cluster.view_log') }}
+                </a-button>
+              </div>
             </a-space>
           </div>
         </a-collapse-panel>
@@ -186,8 +194,11 @@
     }
   }
   .stage-item {
-    margin-right: 68px;
     @include flexbox($justify: space-between, $align: center);
+    .svg-icon {
+      width: 16px;
+      height: 16px;
+    }
   }
   .task-item {
     height: 45px;
@@ -198,6 +209,10 @@
     @include flexbox($justify: space-between, $align: center);
     &:last-child {
       border-bottom: 1px solid $color-border-secondary;
+    }
+    .svg-icon {
+      width: 16px;
+      height: 16px;
     }
   }
 </style>

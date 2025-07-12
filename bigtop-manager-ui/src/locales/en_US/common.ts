@@ -125,5 +125,7 @@ export default {
   disabled: 'Disabled',
   restore: 'Restore',
   selected: 'Selected',
-  feature_not_supported: 'Feature not supported yet'
+  feature_not_supported: 'Feature not supported yet',
+  installing_exit_confirm_content:
+    'Installation is in progress, exiting the page will cause the installation to fail. Are you sure you want to exit?'
 }

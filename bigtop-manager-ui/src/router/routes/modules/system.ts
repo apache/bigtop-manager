@@ -35,7 +35,7 @@ const routes: RouteRecordRaw[] = [
         path: 'llm-config',
         redirect: '/system-manage/llm-config/list',
         meta: {
-          icon: 'llm_config',
+          icon: 'llm-config',
           title: 'menu.llm_config'
         },
         children: [

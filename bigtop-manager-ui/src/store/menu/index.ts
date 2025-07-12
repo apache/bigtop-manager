@@ -29,14 +29,19 @@ export const useMenuStore = defineStore(
     const router = useRouter()
     const route = useRoute()
     const clusterStore = useClusterStore()
+
     const baseRoutesMap = ref<Record<string, RouteRecordRaw>>({})
     const headerMenus = ref<RouteRecordRaw[]>([])
     const siderMenus = ref<RouteRecordRaw[]>([])
     const headerSelectedKey = ref()
     const siderMenuSelectedKey = ref()
     const routePathFromClusters = shallowRef('/cluster-manage/clusters')
+
     const clusterList = computed(() => Object.values(clusterStore.clusterMap))
 
+    /**
+     * Build the mapping of base routes from dynamic routes.
+     */
     const buildMenuMap = () => {
       baseRoutesMap.value = dr.reduce((buildRes, { path, name, meta, children }) => {
         !meta?.hidden && (buildRes[path] = { path, name, meta, children })
@@ -44,24 +49,45 @@ export const useMenuStore = defineStore(
       }, {})
     }
 
+    /**
+     * Setup the header menu based on the current route.
+     */
     const setupHeader = () => {
-      headerSelectedKey.value = route.matched[0].path ?? '/cluster-manage'
+      if (route.matched[0].path === '/login') {
+        headerSelectedKey.value = '/cluster-manage'
+      } else {
+        headerSelectedKey.value = route.matched[0].path ?? '/cluster-manage'
+      }
       headerMenus.value = Object.values(baseRoutesMap.value)
       siderMenus.value = baseRoutesMap.value[headerSelectedKey.value]?.children || []
     }
 
-    const setupSider = () => {
+    /**
+     * Setup the sider menu and handle cluster-based navigation.
+     */
+    const setupSider = async () => {
       siderMenus.value = baseRoutesMap.value[headerSelectedKey.value]?.children || []
+
+      // If the first sider menu has a redirect, set it as the selected key
       if (siderMenus.value[0]?.redirect) {
         siderMenuSelectedKey.value = siderMenus.value[0].redirect
-      } else {
-        if (clusterList.value.length > 0) {
-          const { id } = clusterList.value[0]
-          onSiderClick(`${routePathFromClusters.value}/${id}`)
-        } else {
-          onSiderClick(`${routePathFromClusters.value}/default`)
-        }
+        return
       }
+
+      const targetPath =
+        clusterList.value.length > 0
+          ? `${routePathFromClusters.value}/${clusterList.value[0].id}`
+          : `${routePathFromClusters.value}/default`
+
+      navigateToSider(targetPath)
+    }
+
+    /**
+     * Navigate to a specific sider menu path.
+     * @param path - The path to navigate to.
+     */
+    const navigateToSider = (path: string) => {
+      router.push({ path })
     }
 
     const onHeaderClick = (key: string) => {
@@ -74,17 +100,38 @@ export const useMenuStore = defineStore(
       router.push({ path: key })
     }
 
+    /**
+     * Update the sider menu based on the last cluster in the list.
+     */
     const updateSider = async () => {
-      await clusterStore.loadClusters()
-      const { id } = clusterList.value[clusterList.value.length - 1]
-      await nextTick()
-      onSiderClick(`${routePathFromClusters.value}/${id}`)
+      try {
+        await clusterStore.loadClusters()
+        const lastClusterId = clusterList.value[clusterList.value.length - 1]?.id
+        if (lastClusterId) {
+          await nextTick()
+          navigateToSider(`${routePathFromClusters.value}/${lastClusterId}`)
+        }
+      } catch (error) {
+        console.error('Error updating sider menu:', error)
+      }
     }
 
-    const setupMenu = async () => {
+    /**
+     * Initialize the menu by setting up the header and sider menus.
+     */
+    const setupMenu = () => {
       buildMenuMap()
       setupHeader()
       setupSider()
+    }
+
+    const $reset = () => {
+      headerMenus.value = []
+      siderMenus.value = []
+      headerSelectedKey.value = undefined
+      siderMenuSelectedKey.value = undefined
+      baseRoutesMap.value = {}
+      clusterStore.$reset()
     }
 
     return {
@@ -93,16 +140,26 @@ export const useMenuStore = defineStore(
       headerSelectedKey,
       siderMenuSelectedKey,
       routePathFromClusters,
+      baseRoutesMap,
       setupMenu,
+      setupSider,
       updateSider,
       onHeaderClick,
-      onSiderClick
+      onSiderClick,
+      reset: $reset
     }
   },
   {
     persist: {
       storage: localStorage,
-      paths: ['headerMenus', 'siderMenus']
+      paths: [
+        'headerMenus',
+        'siderMenus',
+        'siderMenuSelectedKey',
+        'headerSelectedKey',
+        'routePathFromClusters',
+        'baseRoutesMap'
+      ]
     }
   }
 )

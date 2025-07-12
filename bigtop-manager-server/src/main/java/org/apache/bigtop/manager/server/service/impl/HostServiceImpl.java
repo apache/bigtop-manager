@@ -46,6 +46,8 @@ import org.apache.bigtop.manager.server.service.HostService;
 import org.apache.bigtop.manager.server.utils.PageUtils;
 import org.apache.bigtop.manager.server.utils.RemoteSSHUtils;
 
+import org.apache.commons.collections4.CollectionUtils;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -84,6 +86,10 @@ public class HostServiceImpl implements HostService {
 
     private final ExecutorService executorService = Executors.newFixedThreadPool(5);
 
+    private static final Integer DEFAULT_GRPC_PORT = 8835;
+    private static final Integer DEFAULT_SSH_PORT = 22;
+    private static final String DEFAULT_AGENT_DIR = "/opt";
+
     @Override
     public PageVO<HostVO> list(HostQuery hostQuery) {
         PageQuery pageQuery = PageUtils.getPageQuery();
@@ -99,6 +105,7 @@ public class HostServiceImpl implements HostService {
 
     @Override
     public List<HostVO> add(HostDTO hostDTO) {
+        setDefaultValues(hostDTO);
         List<HostPO> hostPOList = HostConverter.INSTANCE.fromDTO2POListUsingHostnames(hostDTO);
         for (HostPO hostPO : hostPOList) {
             hostPO.setStatus(HealthyStatusEnum.HEALTHY.getCode());
@@ -225,6 +232,7 @@ public class HostServiceImpl implements HostService {
         installedStatus.clear();
 
         for (HostDTO hostDTO : hostDTOList) {
+            setDefaultValues(hostDTO);
             for (String hostname : hostDTO.getHostnames()) {
                 InstalledStatusVO installedStatusVO = new InstalledStatusVO();
                 installedStatusVO.setHostname(hostname);
@@ -252,6 +260,17 @@ public class HostServiceImpl implements HostService {
         return installedStatus;
     }
 
+    @Override
+    public Boolean checkDuplicate(HostDTO hostDTO) {
+        List<HostPO> existsHostList = hostDao.findAllByHostnames(hostDTO.getHostnames());
+        if (CollectionUtils.isNotEmpty(existsHostList)) {
+            List<String> existsHostnames =
+                    existsHostList.stream().map(HostPO::getHostname).toList();
+            throw new ApiException(ApiExceptionEnum.HOST_ASSIGNED, String.join(",", existsHostnames));
+        }
+        return true;
+    }
+
     public void installDependencies(HostDTO hostDTO, String hostname, InstalledStatusVO installedStatusVO) {
         String path = hostDTO.getAgentDir();
         String repoUrl = toolDao.findByName("agent").getBaseUrl();
@@ -261,22 +280,25 @@ public class HostServiceImpl implements HostService {
         try {
             String script = ProjectPathUtils.getServerScriptPath() + File.separator + "setup-agent.sh";
             String content = Files.readString(Path.of(script));
-            command = "cat << 'EOF' > ./setup-agent.sh\n"
-                    + content
-                    + "\nEOF\n"
-                    + "chmod +x ./setup-agent.sh && ./setup-agent.sh " + path + " " + repoUrl + " " + grpcPort;
+            command = "cat << 'EOF' > ./setup-agent.sh\n" + content + "\nEOF\n" + "chmod +x ./setup-agent.sh";
+            ShellResult result = execCommandOnRemoteHost(hostDTO, hostname, command);
+            if (result.getExitCode() != MessageConstants.SUCCESS_CODE) {
+                log.error("Unable to write agent script, hostname: {}, msg: {}", hostname, result);
+                installedStatusVO.setStatus(InstalledStatusEnum.FAILED);
+                installedStatusVO.setMessage(result.getErrMsg());
+                return;
+            }
         } catch (IOException e) {
-            log.error("Unable to setup agent, hostname: {}, msg: {}", hostname, e.getMessage());
-
+            log.error("Unable to write agent script, hostname: {}, msg: {}", hostname, e.getMessage());
             installedStatusVO.setStatus(InstalledStatusEnum.FAILED);
             installedStatusVO.setMessage(e.getMessage());
             return;
         }
 
+        command = "./setup-agent.sh " + path + " " + repoUrl + " " + grpcPort;
         ShellResult result = execCommandOnRemoteHost(hostDTO, hostname, command);
         if (result.getExitCode() != MessageConstants.SUCCESS_CODE) {
-            log.error("Unable to setup agent, hostname: {}, msg: {}", hostname, result.getErrMsg());
-
+            log.error("Unable to setup agent, hostname: {}, msg: {}", hostname, result);
             installedStatusVO.setStatus(InstalledStatusEnum.FAILED);
             installedStatusVO.setMessage(result.getErrMsg());
             return;
@@ -305,6 +327,21 @@ public class HostServiceImpl implements HostService {
         } catch (Exception e) {
             log.error("Unable to exec command on host, hostname: {}, command: {}", hostname, command, e);
             throw new RuntimeException(e);
+        }
+    }
+
+    private void setDefaultValues(HostDTO hostDTO) {
+        if (hostDTO == null) {
+            return;
+        }
+        if (hostDTO.getGrpcPort() == null) {
+            hostDTO.setGrpcPort(DEFAULT_GRPC_PORT);
+        }
+        if (hostDTO.getSshPort() == null) {
+            hostDTO.setSshPort(DEFAULT_SSH_PORT);
+        }
+        if (hostDTO.getAgentDir() == null) {
+            hostDTO.setAgentDir(DEFAULT_AGENT_DIR);
         }
     }
 }

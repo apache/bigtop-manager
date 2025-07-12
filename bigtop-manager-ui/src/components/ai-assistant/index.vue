@@ -22,13 +22,13 @@
   import { useAiChatStore } from '@/store/ai-assistant'
   import { useLlmConfigStore } from '@/store/llm-config'
   import { storeToRefs } from 'pinia'
+  import { useMenuStore } from '@/store/menu'
   import EmptyContent from './empty-content.vue'
   import ChatInput from './chat-input.vue'
   import ChatHistory from './chat-history.vue'
   import ChatMessage from './chat-message.vue'
   import type { ChatMessageItem } from '@/api/ai-assistant/types'
   import type { GroupItem } from '@/components/common/button-group/types'
-  import { useRouter } from 'vue-router'
 
   enum Action {
     ADD,
@@ -40,9 +40,10 @@
 
   type ActionType = keyof typeof Action
 
-  const router = useRouter()
   const aiChatStore = useAiChatStore()
   const llmConfigStore = useLlmConfigStore()
+  const menuStore = useMenuStore()
+
   const { currThread, chatRecords, threads, messageReceiver, hasActivePlatform, loadingChatRecords } =
     storeToRefs(aiChatStore)
   const { currAuthPlatform } = storeToRefs(llmConfigStore)
@@ -66,7 +67,7 @@
       ? filterActions(['EXITSCREEN', 'CLOSE'])
       : filterActions(['ADD', 'RECORDS', 'FULLSCREEN', 'CLOSE'])
   })
-  const addIcon = computed(() => (threads.value.length >= 10 ? 'plus_gray' : 'plus'))
+  const addIcon = computed(() => (threads.value.length >= 10 ? 'plus-gray' : 'plus'))
   const addState = computed(() => threads.value.length >= 10 || loadingChatRecords.value || !hasActivePlatform.value)
   const actionGroup = computed((): GroupItem<ActionType>[] => [
     {
@@ -84,13 +85,13 @@
     },
     {
       tip: 'full_screen',
-      icon: 'full_screen',
+      icon: 'full-screen',
       action: 'FULLSCREEN',
       clickEvent: toggleFullScreen
     },
     {
       tip: 'exit_screen',
-      icon: 'exit_screen',
+      icon: 'exit-screen',
       action: 'EXITSCREEN',
       clickEvent: toggleFullScreen
     },
@@ -147,7 +148,7 @@
 
   const goSetUpLlmConfig = () => {
     controlVisible(false)
-    router.push('/system-manage/llm-config')
+    menuStore.onHeaderClick('/system-manage')
   }
 
   defineExpose({

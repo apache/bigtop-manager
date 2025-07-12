@@ -21,12 +21,15 @@
   import { computed, onActivated, useAttrs } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { getUserListOfService } from '@/api/cluster'
+
   import useBaseTable from '@/composables/use-base-table'
+
   import type { TableColumnType } from 'ant-design-vue'
   import type { ClusterVO, ServiceUserVO } from '@/api/cluster/types'
 
   const { t } = useI18n()
   const attrs = useAttrs() as ClusterVO
+
   const columns = computed((): TableColumnType[] => [
     {
       title: '#',
@@ -60,6 +63,7 @@
       ellipsis: true
     }
   ])
+
   const { dataSource, loading, filtersParams, paginationProps, onChange } = useBaseTable<ServiceUserVO>({
     columns: columns.value,
     rows: []

@@ -19,6 +19,35 @@
 
 @import './variables.scss';
 
+* {
+  outline: 0;
+}
+
+html {
+  --text-color: rgba(0, 0, 0, 0.85);
+  --text-color-desc: rgba(0, 0, 0, 0.45);
+  --bg-color: #fff;
+  --hover-color: rgba(0, 0, 0, 0.05);
+  --bg-color-container: #f0f2f5;
+  --c-shadow: 2px 0 8px 0 rgba(29, 35, 41, 0.05);
+}
+
+.m-0 {
+  margin: 0;
+}
+
+.p-0 {
+  padding: 0;
+}
+
+.hidden {
+  display: none;
+}
+
+.ant-table-body {
+  overflow-y: auto !important;
+}
+
 #app {
   width: 100%;
   box-sizing: border-box;
@@ -51,16 +80,14 @@
   display: none !important;
 }
 
-:where(.ant-modal-header) {
-  margin-bottom: 16px !important;
-}
-
-
 .header-title {
   font-weight: 500;
   margin-bottom: $space-md;
 }
 
+:where(.ant-modal-confirm-content) {
+  max-width: 100% !important;
+}
 
 .ellipsis {
   white-space: nowrap;
@@ -71,40 +98,37 @@
   position: relative;
 }
 
-
-.job-progress-notification{
-  &:hover{
+.job-progress-notification {
+  &:hover {
     background-color: $color-bg-layout;
     cursor: pointer;
   }
-  .ant-notification-notice-close{
+  .ant-notification-notice-close {
     top: 16px !important;
   }
-  :where(.ant-notification-notice-content){
- 
+  :where(.ant-notification-notice-content) {
     .ant-notification-notice-message,
     .ant-notification-notice-description {
       margin-left: 50px !important;
-      margin-bottom: 0 !important; 
+      margin-bottom: 0 !important;
       padding-inline-end: calc(24px / 2);
-      .ant-progress-line{
+      .ant-progress-line {
         margin-bottom: 6px !important;
       }
     }
-  
-    .ant-notification-notice-message{
+
+    .ant-notification-notice-message {
       font-size: 14px !important;
       font-weight: 500 !important;
     }
-  
-    .ant-notification-notice-icon{
+
+    .ant-notification-notice-icon {
       top: 50%;
       transform: translateY(-50%);
       margin: auto;
     }
   }
 }
-
 
 .text-loading::after {
   content: '';
@@ -136,4 +160,11 @@
   }
 }
 
-
+.svg-icon {
+  height: 1.2em;
+  width: 1.2em;
+  margin: 0 6px;
+  vertical-align: -0.25em;
+  overflow: hidden;
+  flex-shrink: 0;
+}

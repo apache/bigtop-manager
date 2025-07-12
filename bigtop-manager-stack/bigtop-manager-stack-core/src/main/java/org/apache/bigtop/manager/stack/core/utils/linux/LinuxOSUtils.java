@@ -76,6 +76,7 @@ public class LinuxOSUtils {
         builderParameters.add("sh");
         builderParameters.add("-c");
         builderParameters.add(command);
+        log.info("Running command: [{}], user: [{}]", command, tenant);
         return ShellExecutor.execCommand(builderParameters);
     }
 

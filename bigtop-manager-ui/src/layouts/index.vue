@@ -21,27 +21,6 @@
   import LayoutFooter from '@/layouts/footer.vue'
   import LayoutHeader from '@/layouts/header.vue'
   import LayoutSider from '@/layouts/sider.vue'
-
-  import { useUserStore } from '@/store/user'
-  import { useMenuStore } from '@/store/menu'
-  import { useClusterStore } from '@/store/cluster'
-  import { useStackStore } from '@/store/stack'
-  import { useServiceStore } from '@/store/service'
-  import { onMounted } from 'vue'
-
-  const userStore = useUserStore()
-  const menuStore = useMenuStore()
-  const serviceStore = useServiceStore()
-  const stackStore = useStackStore()
-  const clusterStore = useClusterStore()
-
-  onMounted(async () => {
-    stackStore.loadStacks()
-    await clusterStore.loadClusters()
-    serviceStore.getServicesOfInfra()
-    userStore.getUserInfo()
-    menuStore.setupMenu()
-  })
 </script>
 
 <template>

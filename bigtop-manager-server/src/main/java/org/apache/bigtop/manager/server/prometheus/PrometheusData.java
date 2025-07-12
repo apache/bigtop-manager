@@ -16,15 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-export {}
+package org.apache.bigtop.manager.server.prometheus;
 
-declare module 'vue' {
-  export interface GlobalComponents {
-    HeaderCard: (typeof import('@/components/common/header-card/index.vue'))['default']
-    MainCard: (typeof import('@/components/common/main-card/index.vue'))['default']
-    AutoForm: (typeof import('@/components/common/auto-form/index.vue'))['default']
-    ButtonGroup: (typeof import('@/components/common/button-group/index.vue'))['default']
-    MarkdownView: (typeof import('@/components/common/markdown-view/index.vue'))['default']
-    StatusDot: (typeof import('@/components/common/status-dot/index.vue'))['default']
-  }
+import lombok.Data;
+
+import java.util.List;
+
+@Data
+public class PrometheusData {
+
+    // "matrix" | "vector" | "scalar" | "string",
+    private String resultType;
+
+    private List<PrometheusResult> result;
 }

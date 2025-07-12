@@ -19,21 +19,20 @@
 
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
-import { useRoute } from 'vue-router'
 import { getCluster, getClusterList } from '@/api/cluster'
 import { useServiceStore } from '@/store/service'
+import { useMenuStore } from '@/store/menu'
 import type { ClusterVO } from '@/api/cluster/types.ts'
 
 export const useClusterStore = defineStore(
   'cluster',
   () => {
-    const route = useRoute()
     const serviceStore = useServiceStore()
+    const menuStore = useMenuStore()
     const loading = ref(false)
     const clusters = ref<ClusterVO[]>([])
     const currCluster = ref<ClusterVO>({})
     const clusterMap = ref<Record<string, ClusterVO>>({})
-    const clusterId = computed(() => (route.params.id as string) || undefined)
     const clusterCount = computed(() => Object.values(clusterMap.value).length)
 
     const loadClusters = async () => {
@@ -47,23 +46,25 @@ export const useClusterStore = defineStore(
           {} as Record<string, ClusterVO>
         )
       } catch (error) {
+        const token = localStorage.getItem('Token') ?? sessionStorage.getItem('Token') ?? undefined
         clusterMap.value = {}
-        console.log('error :>> ', error)
+        token && menuStore.setupMenu()
+        console.error('Failed to get clusters:', error)
       }
     }
 
-    const getClusterDetail = async () => {
-      if (clusterId.value == undefined) {
+    const getClusterDetail = async (clusterId: number) => {
+      if (clusterId == undefined) {
         currCluster.value = {}
         return
       }
       try {
         loading.value = true
-        currCluster.value = await getCluster(Number(clusterId.value))
-        await serviceStore.getServices(Number(clusterId.value))
+        currCluster.value = await getCluster(clusterId)
+        await serviceStore.getServices(clusterId)
       } catch (error) {
         currCluster.value = {}
-        console.log('error :>> ', error)
+        console.error('Failed to get cluster detail:', error)
       } finally {
         loading.value = false
       }

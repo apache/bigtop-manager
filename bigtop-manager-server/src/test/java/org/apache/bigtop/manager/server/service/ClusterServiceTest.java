@@ -21,7 +21,7 @@ package org.apache.bigtop.manager.server.service;
 
 import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.repository.ClusterDao;
-import org.apache.bigtop.manager.dao.repository.RepoDao;
+import org.apache.bigtop.manager.dao.repository.ServiceDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.model.dto.ClusterDTO;
@@ -49,7 +49,7 @@ public class ClusterServiceTest {
     private ClusterDao clusterDao;
 
     @Mock
-    private RepoDao repoDao;
+    private ServiceDao serviceDao;
 
     @InjectMocks
     private ClusterService clusterService = new ClusterServiceImpl();
@@ -73,6 +73,7 @@ public class ClusterServiceTest {
                 assertThrows(ApiException.class, () -> clusterService.get(1L)).getEx());
 
         when(clusterDao.findDetailsById(any())).thenReturn(clusterPO);
+        when(serviceDao.countByClusterId(any())).thenReturn(1);
         assert clusterService.get(1L).getName().equals(CLUSTER_NAME);
 
         ClusterDTO clusterDTO = new ClusterDTO();
