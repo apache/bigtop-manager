@@ -70,7 +70,8 @@ public class DorisFEScript extends AbstractServerScript {
         Pair<String, List<String>> registeredFeList = DorisService.getRegisteredFeList(dorisParams);
 
         try {
-            if (registeredFeList.getRight().isEmpty() || registeredFeList.getRight().contains(hostname)) {
+            if (registeredFeList.getRight().isEmpty()
+                    || registeredFeList.getRight().contains(hostname)) {
                 String cmd = MessageFormat.format("{0}/start_fe.sh --daemon", dorisParams.dorisFeBinDir());
                 return LinuxOSUtils.sudoExecCmd(cmd, dorisParams.user());
             } else {

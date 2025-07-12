@@ -18,7 +18,6 @@
  */
 package org.apache.bigtop.manager.stack.extra.v1_0_0.doris;
 
-import lombok.NoArgsConstructor;
 import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
@@ -28,6 +27,7 @@ import org.apache.bigtop.manager.stack.extra.param.ExtraParams;
 
 import com.google.auto.service.AutoService;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -67,13 +67,15 @@ public class DorisParams extends ExtraParams {
 
     public String dorisFeMetaDir() {
         return dorisFeConf().get("meta_dir") != null
-                ? BaseTemplate.writeCustomTemplateAsString(globalParamsMap, (String) dorisFeConf().get("meta_dir"))
+                ? BaseTemplate.writeCustomTemplateAsString(
+                        globalParamsMap, (String) dorisFeConf().get("meta_dir"))
                 : dorisFeHome() + "/doris-meta";
     }
 
     public String dorisFeLogDir() {
         return dorisEnv().get("doris_fe_log_dir") != null
-                ? BaseTemplate.writeCustomTemplateAsString(globalParamsMap, (String) dorisEnv().get("doris_fe_log_dir"))
+                ? BaseTemplate.writeCustomTemplateAsString(
+                        globalParamsMap, (String) dorisEnv().get("doris_fe_log_dir"))
                 : dorisFeHome() + "/log";
     }
 
@@ -117,13 +119,15 @@ public class DorisParams extends ExtraParams {
 
     public String dorisBeStorage() {
         return dorisBeConf().get("storage_root_path") != null
-                ? BaseTemplate.writeCustomTemplateAsString(globalParamsMap, (String) dorisBeConf().get("storage_root_path"))
+                ? BaseTemplate.writeCustomTemplateAsString(
+                        globalParamsMap, (String) dorisBeConf().get("storage_root_path"))
                 : dorisBeHome() + "/storage";
     }
 
     public String dorisBeLogDir() {
         return dorisEnv().get("doris_be_log_dir") != null
-                ? BaseTemplate.writeCustomTemplateAsString(globalParamsMap, (String) dorisEnv().get("doris_be_log_dir"))
+                ? BaseTemplate.writeCustomTemplateAsString(
+                        globalParamsMap, (String) dorisEnv().get("doris_be_log_dir"))
                 : dorisBeHome() + "/log";
     }
 

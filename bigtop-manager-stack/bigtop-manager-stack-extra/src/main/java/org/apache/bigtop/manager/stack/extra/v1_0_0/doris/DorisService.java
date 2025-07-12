@@ -22,7 +22,9 @@ public class DorisService {
         if (aliveFe == null) {
             return;
         }
-        String sql = MessageFormat.format("ALTER SYSTEM ADD BACKEND ''{0}:{1,number,#}''", dorisParams.hostname(), dorisParams.dorisBeHeartbeatPort());
+        String sql = MessageFormat.format(
+                "ALTER SYSTEM ADD BACKEND ''{0}:{1,number,#}''",
+                dorisParams.hostname(), dorisParams.dorisBeHeartbeatPort());
         DorisTool dorisTool = new DorisTool(aliveFe, "root", "", "mysql", dorisParams.dorisFeQueryPort());
         try {
             dorisTool.connect();
@@ -72,12 +74,13 @@ public class DorisService {
                 new MessageFormat("curl -s -o /dev/null -w '%{http_code}' http://{0}:{1,number,#}/api/bootstrap");
         try {
             for (String host : feHosts) {
-                String cmd = messageFormat.format(new Object[]{host, dorisFeHttpPort});
+                String cmd = messageFormat.format(new Object[] {host, dorisFeHttpPort});
                 ShellResult shellResult;
                 int attempts = 0;
                 while (attempts < 10) {
                     shellResult = LinuxOSUtils.execCmd(cmd);
-                    if (shellResult.getExitCode() == 0 && StringUtils.equals(shellResult.getOutput().trim(), "200")) {
+                    if (shellResult.getExitCode() == 0
+                            && StringUtils.equals(shellResult.getOutput().trim(), "200")) {
                         aliveFe = host;
                         break;
                     }
@@ -140,7 +143,9 @@ public class DorisService {
             try {
                 dorisTool.connect();
 
-                String sql = MessageFormat.format("ALTER SYSTEM ADD FOLLOWER ''{0}:{1,number,#}''", dorisParams.hostname(), dorisParams.dorisFeEditLogPort());
+                String sql = MessageFormat.format(
+                        "ALTER SYSTEM ADD FOLLOWER ''{0}:{1,number,#}''",
+                        dorisParams.hostname(), dorisParams.dorisFeEditLogPort());
 
                 dorisTool.executeUpdate(sql);
             } catch (Exception e) {

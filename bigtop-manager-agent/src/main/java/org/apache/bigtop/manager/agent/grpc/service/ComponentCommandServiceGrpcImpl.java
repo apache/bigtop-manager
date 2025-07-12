@@ -39,8 +39,8 @@ public class ComponentCommandServiceGrpcImpl extends ComponentCommandServiceGrpc
     public void exec(ComponentCommandRequest request, StreamObserver<ComponentCommandReply> responseObserver) {
         try {
             log.info("Running task {}", Caches.RUNNING_TASK);
-                       ComponentCommandPayload payload =
-                                       JsonUtils.readFromString(request.getPayload(), ComponentCommandPayload.class);
+            ComponentCommandPayload payload =
+                    JsonUtils.readFromString(request.getPayload(), ComponentCommandPayload.class);
             ShellResult shellResult = StackExecutor.execute(payload);
             ComponentCommandReply reply = ComponentCommandReply.newBuilder()
                     .setCode(shellResult.getExitCode())

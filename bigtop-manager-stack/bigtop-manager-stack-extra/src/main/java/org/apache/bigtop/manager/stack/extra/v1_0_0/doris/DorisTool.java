@@ -19,8 +19,7 @@ public class DorisTool {
     private Connection connection;
 
     public DorisTool(String host, String user, String password, String database, int port) {
-        this.jdbcUrl = String.format("jdbc:mysql://%s:%d/%s?useSSL=false&serverTimezone=UTC",
-                host, port, database);
+        this.jdbcUrl = String.format("jdbc:mysql://%s:%d/%s?useSSL=false&serverTimezone=UTC", host, port, database);
         this.user = user;
         this.password = password;
         log.info("Connecting to database... {}", jdbcUrl);

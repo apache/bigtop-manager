@@ -31,8 +31,6 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.text.MessageFormat;
 
-import static org.apache.bigtop.manager.common.constants.Constants.*;
-
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DorisSetup {
