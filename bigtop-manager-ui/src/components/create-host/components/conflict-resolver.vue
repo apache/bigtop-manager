@@ -59,19 +59,6 @@
       :data-source="$props.parsedHosts.filter((v) => $props.duplicateHostnames.includes(v.hostname))"
       :columns="columns"
     >
-      <template #headerCell="{ column }">
-        <template v-if="column.key === 'operation'">
-          <a-dropdown :get-popup-container="(trigger) => trigger.parentNode">
-            <a class="ant-dropdown-link" @click.prevent> {{ t('common.operation') }} </a>
-            <template #overlay>
-              <a-menu>
-                <a-menu-item key="keep">keep</a-menu-item>
-                <a-menu-item key="override">override</a-menu-item>
-              </a-menu>
-            </template>
-          </a-dropdown>
-        </template>
-      </template>
       <template #bodyCell="{ record, column }">
         <template v-if="column.key === 'operation'">
           <a-radio-group
