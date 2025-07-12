@@ -54,7 +54,7 @@
   const serviceStore = useServiceStore()
   const jobProgressStore = useJobProgress()
 
-  const currTimeRange = ref<TimeRangeType>('15m')
+  const currTimeRange = ref<TimeRangeType>('5m')
   const chartData = ref<Partial<MetricsData>>({})
 
   const componentsFromCurrentHost = shallowRef<Map<string, ComponentVO[]>>(new Map())
@@ -334,7 +334,7 @@
                 :data="chartData"
                 :title="$t('overview.system_load')"
                 :formatter="{
-                  tooltip: (val) => `${val ?? '--'}`,
+                  tooltip: (val) => `${val == null || val == '' ? '--' : val}`,
                   yAxis: (val) => `${val}`
                 }"
                 :legend-map="[
@@ -353,8 +353,8 @@
                 :data="chartData"
                 :title="$t('overview.disk_io')"
                 :formatter="{
-                  tooltip: (val) => `${val === undefined ? '--' : formatFromByte(val as number)}`,
-                  yAxis: (val) => formatFromByte(val as number)
+                  tooltip: (val) => `${val == null || val == '' ? '--' : formatFromByte(val as number, 0)}`,
+                  yAxis: (val) => formatFromByte(val as number, 0)
                 }"
                 :legend-map="[
                   ['diskRead', 'read'],

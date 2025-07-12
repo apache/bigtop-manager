@@ -17,7 +17,7 @@
  * under the License.
  */
 
-export const formatFromByte = (value: number): string => {
+export const formatFromByte = (value: number, decimals = 2): string => {
   if (isNaN(value)) {
     return ''
   }
@@ -25,15 +25,15 @@ export const formatFromByte = (value: number): string => {
   if (value < 1024) {
     return `${value} B`
   } else if (value < 1024 ** 2) {
-    return `${(value / 1024).toFixed(2)} KB`
+    return `${(value / 1024).toFixed(decimals)} KB`
   } else if (value < 1024 ** 3) {
-    return `${(value / 1024 ** 2).toFixed(2)} MB`
+    return `${(value / 1024 ** 2).toFixed(decimals)} MB`
   } else if (value < 1024 ** 4) {
-    return `${(value / 1024 ** 3).toFixed(2)} GB`
+    return `${(value / 1024 ** 3).toFixed(decimals)} GB`
   } else if (value < 1024 ** 5) {
-    return `${(value / 1024 ** 4).toFixed(2)} TB`
+    return `${(value / 1024 ** 4).toFixed(decimals)} TB`
   } else {
-    return `${(value / 1024 ** 5).toFixed(2)} PB`
+    return `${(value / 1024 ** 5).toFixed(decimals)} PB`
   }
 }
 

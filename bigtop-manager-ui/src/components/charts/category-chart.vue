@@ -52,7 +52,7 @@
     }
   })
 
-  const { data, chartId, title, config, legendMap, xAxisData } = toRefs(props)
+  const { data, chartId, title, config, legendMap, xAxisData, formatter } = toRefs(props)
   const { initChart, setOptions } = useChart()
   const baseConfig = { type: 'line' }
 
@@ -70,7 +70,8 @@
         borderColor: 'rgba(236,236,236,0.1)',
         textStyle: {
           color: '#fff'
-        }
+        },
+        formatter: createTooltipFormatter(formatter.value.tooltip)
       },
       xAxis: [
         {
@@ -91,7 +92,8 @@
           axisLabel: {
             width: 32,
             fontSize: 8,
-            overflow: 'truncate'
+            overflow: 'truncate',
+            formatter: formatter.value.yAxis ?? '{value} %'
           }
         }
       ],
@@ -127,6 +129,7 @@
 
   const createTooltipFormatter = (formatValue?: (value: unknown) => string) => {
     const format = formatValue ?? defaultTooltipFormatter
+    console.log('format :>> ', format)
     return (params: any) => {
       const title = params[0]?.axisValueLabel ?? ''
       const lines = params
@@ -176,19 +179,9 @@
     }
 
     setOptions({
-      tooltip: {
-        formatter: createTooltipFormatter(props.formatter.tooltip)
-      },
       xAxis: xAxisData.value
         ? [{ data: xAxisData.value?.map((v) => dayjs(Number(v) * 1000).format('HH:mm')) || [] }]
         : [],
-      yAxis: [
-        {
-          axisLabel: {
-            formatter: props.formatter.yAxis ?? '{value} %'
-          }
-        }
-      ],
       ...config.value,
       legend,
       series

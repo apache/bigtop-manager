@@ -53,7 +53,7 @@
   const serviceStore = useServiceStore()
   const clusterStore = useClusterStore()
 
-  const currTimeRange = ref<TimeRangeType>('15m')
+  const currTimeRange = ref<TimeRangeType>('5m')
   const chartData = ref<Partial<MetricsData>>({})
 
   const timeRanges = shallowRef<TimeRangeType[]>(['1m', '5m', '15m', '30m', '1h', '2h'])
