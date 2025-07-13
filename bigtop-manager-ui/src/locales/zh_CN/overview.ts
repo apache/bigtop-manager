@@ -49,5 +49,7 @@ export default {
   service_name: '服务名',
   service_version: '服务版本',
   metrics: '指标监控',
-  kerberos: 'Kerberos'
+  kerberos: 'Kerberos',
+  system_load: '系统负载',
+  disk_io: '磁盘 I/O'
 }
