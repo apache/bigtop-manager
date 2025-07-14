@@ -29,6 +29,7 @@ import job from '@/locales/zh_CN/job.ts'
 import overview from '@/locales/zh_CN/overview.ts'
 import service from '@/locales/zh_CN/service.ts'
 import infra from '@/locales/zh_CN/infra.ts'
+import component from '@/locales/zh_CN/component'
 
 export default {
   common,
@@ -42,5 +43,6 @@ export default {
   job,
   overview,
   service,
-  infra
+  infra,
+  component
 }

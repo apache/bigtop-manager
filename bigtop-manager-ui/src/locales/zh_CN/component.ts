@@ -16,33 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import common from '@/locales/en_US/common.ts'
-import menu from '@/locales/en_US/menu.ts'
-import login from '@/locales/en_US/login'
-import user from '@/locales/en_US/user.ts'
-import llmConfig from '@/locales/en_US/llm-config.ts'
-import aiAssistant from '@/locales/en_US/ai-assistant.ts'
-import cluster from '@/locales/en_US/cluster.ts'
-import host from '@/locales/en_US/host.ts'
-import job from '@/locales/en_US/job.ts'
-import overview from '@/locales/en_US/overview'
-import service from '@/locales/en_US/service'
-import infra from '@/locales/en_US/infra.ts'
-import component from '@/locales/en_US/component'
-
 export default {
-  common,
-  menu,
-  login,
-  user,
-  llmConfig,
-  aiAssistant,
-  cluster,
-  host,
-  job,
-  overview,
-  service,
-  infra,
-  component
+  pkg_name: '包名',
+  base_url: '地址',
+  note: '注: 源地址的改动对所有集群生效。',
+  dependency: '依赖',
+  update_all: '更新全部'
 }
