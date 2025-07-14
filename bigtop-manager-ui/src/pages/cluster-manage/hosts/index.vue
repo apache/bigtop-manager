@@ -27,7 +27,7 @@
   import * as hostApi from '@/api/hosts'
 
   import useBaseTable from '@/composables/use-base-table'
-  import HostCreate from '@/components/create-host/create.vue'
+  import HostCreate from '@/components/create-host/index.vue'
   import InstallDependencies from '@/components/create-host/install-dependencies.vue'
 
   import type { FilterConfirmProps, FilterResetProps, TableRowSelection } from 'ant-design-vue/es/table/interface'
