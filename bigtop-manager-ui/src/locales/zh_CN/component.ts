@@ -19,6 +19,7 @@
 export default {
   pkg_name: '包名',
   base_url: '地址',
+  new_base_url: '新地址',
   note: '注: 源地址的改动对所有集群生效。',
   dependency: '依赖',
   update_all: '更新全部'

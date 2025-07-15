@@ -18,11 +18,12 @@
 -->
 
 <script setup lang="ts">
-  import { computed, h, nextTick, reactive, ref, shallowRef, toRefs } from 'vue'
+  import { computed, nextTick, reactive, ref, shallowRef, toRefs } from 'vue'
   import { getRepoList, updateRepo } from '@/api/repo'
   import { useI18n } from 'vue-i18n'
+  import UpdateAddress from './update-address.vue'
 
-  import { type FormInstance, Input, message, Modal, type TableColumnType } from 'ant-design-vue'
+  import { type FormInstance, message, type TableColumnType } from 'ant-design-vue'
   import type { RepoVO } from '@/api/repo/types'
 
   const { t } = useI18n()
@@ -31,7 +32,7 @@
   const formRef = ref<FormInstance>()
   const type = ref<number>(1)
   const list = ref<RepoVO[]>([])
-  const newBaseUrl = ref('')
+  const updateAddressRef = ref<InstanceType<typeof UpdateAddress> | null>(null)
   const listTypeMap = shallowRef(['', 'serviceList', 'dependencyList'])
 
   const form = reactive<Record<string, RepoVO[]>>({
@@ -77,8 +78,7 @@
   const getSource = async () => {
     loading.value = true
     try {
-      const data = await getRepoList()
-      list.value = [...data]
+      list.value = await getRepoList()
       onTabsChange({ target: { value: type.value } })
     } catch (error) {
       console.log('error :>> ', error)
@@ -130,7 +130,6 @@
 
     if (types.length > 0) {
       onTabsChange({ target: { value: Number(types[0]) } })
-
       await nextTick() // wait tab rendered
 
       const idx = form[listTypeMap.value[type.value]].findIndex((v) => v.id === errorMap[type.value][0])
@@ -154,25 +153,13 @@
     form[listTypeMap.value[type.value]] = list.value.filter((v) => v.type === type.value)
   }
 
-  const setAllBaseUrl = () => {
-    newBaseUrl.value = ''
-    Modal.confirm({
-      icon: () => h('span', ''),
-      title: t('component.base_url'),
-      content: () =>
-        h(Input, {
-          value: newBaseUrl.value,
-          onChange: (e: any) => (newBaseUrl.value = e.target.value)
-        }),
-      centered: true,
-      onOk() {
-        console.log('newBaseUrl.value', newBaseUrl.value)
-        Modal.destroyAll()
-      },
-      onCancel() {
-        Modal.destroyAll()
-      }
-    })
+  const setNewAddress = () => {
+    updateAddressRef.value?.show()
+  }
+
+  const handleSetAddress = (newAddress: string) => {
+    list.value.forEach((v) => (v.baseUrl = newAddress))
+    message.success(t('common.update_success'))
   }
 
   defineExpose({
@@ -184,7 +171,7 @@
   <div class="set-source">
     <a-modal
       v-model:open="open"
-      width="600px"
+      width="60%"
       :centered="true"
       :mask="false"
       :title="$t('cluster.source')"
@@ -198,13 +185,13 @@
             {{ label }}
           </a-radio-button>
         </a-radio-group>
-        <a-button type="primary" @click="setAllBaseUrl">{{ $t('component.update_all') }}</a-button>
+        <a-button type="primary" @click="setNewAddress">{{ $t('component.update_all') }}</a-button>
       </div>
       <a-form ref="formRef" :model="form">
         <a-table
           v-show="type === 1"
           :loading="loading"
-          :scroll="{ y: 350, x: 400 }"
+          :scroll="{ y: 350 }"
           :data-source="[...serviceList]"
           :columns="columns"
           :pagination="false"
@@ -266,6 +253,7 @@
         </div>
       </template>
     </a-modal>
+    <update-address ref="updateAddressRef" @on-ok="handleSetAddress" />
   </div>
 </template>
 

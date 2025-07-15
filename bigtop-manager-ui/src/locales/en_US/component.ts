@@ -19,6 +19,7 @@
 export default {
   pkg_name: 'Package',
   base_url: 'Address',
+  new_base_url: 'New Address',
   note: 'Note: Changes to the source address will take effect for all clusters.',
   dependency: 'Dependency',
   update_all: 'Update All'
