@@ -30,14 +30,14 @@
   const { t } = useI18n()
   const visible = ref(false)
   const autoFormRef = ref<Comp.AutoFormInstance | null>(null)
-  const formValue = ref({ newAdress: '' })
+  const formValue = ref({ newAddress: '' })
 
   const formItems = computed((): FormItemState[] => [
     {
       type: 'input',
-      field: 'newAdress',
+      field: 'newAddress',
       formItemProps: {
-        name: 'newAdress',
+        name: 'newAddress',
         label: t('component.new_base_url'),
         rules: [
           {
@@ -57,7 +57,7 @@
     try {
       const validate = await autoFormRef.value?.getFormValidation()
       if (!validate) return
-      emits('onOk', formValue.value.newAdress)
+      emits('onOk', formValue.value.newAddress)
       onCancel()
     } catch (e) {
       console.log('Validation failed', e)
@@ -66,7 +66,7 @@
 
   const onCancel = () => {
     visible.value = false
-    formValue.value.newAdress = ''
+    formValue.value.newAddress = ''
     autoFormRef.value?.resetForm()
   }
 
