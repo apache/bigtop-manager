@@ -30,7 +30,7 @@
     "pinia-plugin-persistedstate": "^3.2.0",
     "vue": "^3.4.37",
     "vue-dompurify-html": "^5.1.0",
-    "vue-i18n": "^11.1.5",
+    "vue-i18n": "^11.1.10",
     "vue-router": "^4.2.4"
   },
   "devDependencies": {
