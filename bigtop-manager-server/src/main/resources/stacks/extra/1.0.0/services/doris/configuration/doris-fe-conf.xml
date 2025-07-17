@@ -46,5 +46,10 @@
         <value>9010</value>
         <description>bdbje port.</description>
     </property>
+    <property>
+        <name>fe_arrow_flight_sql_port</name>
+        <value>9090</value>
+        <description>fe_arrow_flight_sql_port.</description>
+    </property>
 
 </configuration>

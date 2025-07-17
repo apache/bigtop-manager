@@ -86,7 +86,7 @@ http_port = ${http_port}
 rpc_port = ${rpc_port}
 query_port = ${query_port}
 edit_log_port = ${edit_log_port}
-arrow_flight_sql_port = -1
+arrow_flight_sql_port = ${fe_arrow_flight_sql_port}
 
 # Choose one if there are more than one ip except loopback address.
 # Note that there should at most one ip match this list.

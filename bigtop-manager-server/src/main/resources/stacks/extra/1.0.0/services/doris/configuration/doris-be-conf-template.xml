@@ -72,7 +72,7 @@ be_port = ${be_port}
 webserver_port = ${webserver_port}
 heartbeat_service_port = ${heartbeat_service_port}
 brpc_port = ${brpc_port}
-arrow_flight_sql_port = -1
+arrow_flight_sql_port = ${be_arrow_flight_sql_port}
 
 # HTTPS configures
 enable_https = false

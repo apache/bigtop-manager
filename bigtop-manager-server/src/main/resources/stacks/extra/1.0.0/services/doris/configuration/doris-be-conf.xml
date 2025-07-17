@@ -50,5 +50,10 @@
         <value>8060</value>
         <description>The port of BRPC on BE, used for communication between BEs.</description>
     </property>
+    <property>
+        <name>be_arrow_flight_sql_port</name>
+        <value>9091</value>
+        <description>be_arrow_flight_sql_port.</description>
+    </property>
 
 </configuration>

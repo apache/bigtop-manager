@@ -63,11 +63,8 @@ public class DorisBEScript extends AbstractServerScript {
         DorisParams dorisParams = (DorisParams) params;
         LinuxFileUtils.removeDirectories(dorisParams.dorisBePidFile());
 
-        List<String> beList = DorisService.getBeList(dorisParams);
-        // Register BE in Doris service
-        if (!beList.contains(dorisParams.hostname())) {
-            DorisService.registerBe(dorisParams);
-        }
+        // Register BE
+        DorisService.registerBe(dorisParams);
 
         String cmd = MessageFormat.format("{0}/start_be.sh --daemon", dorisParams.dorisBeBinDir());
         try {

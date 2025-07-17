@@ -18,6 +18,7 @@
  */
 package org.apache.bigtop.manager.stack.extra.v1_0_0.doris;
 
+import org.apache.bigtop.manager.common.utils.NetUtils;
 import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
@@ -30,6 +31,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
 
@@ -143,6 +146,14 @@ public class DorisParams extends ExtraParams {
         return Integer.parseInt(dorisBeConf().get("heartbeat_service_port").toString());
     }
     /*================================BE===================================================*/
+
+    public String ip(){
+        try {
+            return InetAddress.getLocalHost().getHostAddress();
+        } catch (UnknownHostException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Override
     public String getServiceName() {
