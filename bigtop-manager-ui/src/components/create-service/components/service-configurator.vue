@@ -20,7 +20,7 @@
 <script setup lang="ts">
   import { computed, onActivated, onDeactivated, ref, shallowRef, watch } from 'vue'
   import { storeToRefs } from 'pinia'
-  import { debounce } from 'lodash'
+  import { debounce } from 'lodash-es'
   import { Empty } from 'ant-design-vue'
   import TreeSelector from './tree-selector.vue'
   import { useCreateServiceStore } from '@/store/create-service'
