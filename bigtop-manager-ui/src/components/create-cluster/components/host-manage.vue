@@ -24,7 +24,7 @@
   import { useI18n } from 'vue-i18n'
 
   import useBaseTable from '@/composables/use-base-table'
-  import HostCreate from '@/components/create-host/create.vue'
+  import HostCreate from '@/components/create-host/index.vue'
 
   import type { FilterConfirmProps, FilterResetProps } from 'ant-design-vue/es/table/interface'
   import type { GroupItem } from '@/components/common/button-group/types'

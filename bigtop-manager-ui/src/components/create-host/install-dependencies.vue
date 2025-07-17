@@ -27,7 +27,7 @@
   import { generateRandomId } from '@/utils/tools'
   import { execCommand } from '@/api/command'
 
-  import HostCreate from './create.vue'
+  import HostCreate from './index.vue'
   import useBaseTable from '@/composables/use-base-table'
 
   import { type InstalledStatusVO, Status } from '@/api/hosts/types'
