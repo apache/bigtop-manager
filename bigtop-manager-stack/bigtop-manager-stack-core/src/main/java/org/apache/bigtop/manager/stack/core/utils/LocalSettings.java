@@ -24,7 +24,6 @@ import org.apache.bigtop.manager.common.utils.ProjectPathUtils;
 import org.apache.bigtop.manager.common.utils.os.OSDetection;
 import org.apache.bigtop.manager.grpc.pojo.ClusterInfo;
 import org.apache.bigtop.manager.grpc.pojo.RepoInfo;
-import org.apache.bigtop.manager.grpc.pojo.ToolInfo;
 import org.apache.bigtop.manager.stack.core.exception.StackException;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -97,6 +96,18 @@ public class LocalSettings {
         return List.of();
     }
 
+    public static RepoInfo repo(String name) {
+        String arch = OSDetection.getArch();
+        List<RepoInfo> repoInfoList = repos();
+        for (RepoInfo repoInfo : repoInfoList) {
+            if (repoInfo.getName().equals(name) && repoInfo.getArch().contains(arch)) {
+                return repoInfo;
+            }
+        }
+        log.error("Cannot find repo: [{}], arch: [{}]", name, arch);
+        throw new StackException("Repo not found: " + name);
+    }
+
     public static List<RepoInfo> repos() {
         List<RepoInfo> repoInfoList = List.of();
         File file = createFile(ProjectPathUtils.getAgentCachePath() + CacheFiles.REPOS_INFO);
@@ -113,22 +124,6 @@ public class LocalSettings {
             clusterInfo = JsonUtils.readFromFile(file, new TypeReference<>() {});
         }
         return clusterInfo;
-    }
-
-    public static ToolInfo getTool(String name) {
-        return getTool(name, OSDetection.getArch());
-    }
-
-    public static ToolInfo getTool(String name, String arch) {
-        ClusterInfo clusterInfo = cluster();
-        for (ToolInfo toolInfo : clusterInfo.getTools()) {
-            if (toolInfo.getName().equals(name) && toolInfo.getArch().contains(arch)) {
-                return toolInfo;
-            }
-        }
-
-        log.error("Cannot find tool: [{}] for arch: [{}]", name, arch);
-        throw new StackException("Tool not found: " + name);
     }
 
     protected static File createFile(String fileName) {

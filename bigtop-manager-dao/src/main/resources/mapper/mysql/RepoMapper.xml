@@ -24,6 +24,18 @@
 <mapper namespace="org.apache.bigtop.manager.dao.repository.RepoDao">
 
     <sql id="baseColumns">
-        id, name, arch, base_url, type
+        id, name, arch, base_url, pkg_name, checksum, type
     </sql>
+    <sql id="baseColumnsV2">
+        ${alias}.id, ${alias}.name, ${alias}.arch, ${alias}.base_url, ${alias}.pkg_name, ${alias}.checksum, ${alias}.type
+    </sql>
+
+    <select id="findByName" resultType="org.apache.bigtop.manager.dao.po.RepoPO">
+        select
+        <include refid="baseColumns"/>
+        from
+        repo
+        where name = #{name}
+        limit 1
+    </select>
 </mapper>
