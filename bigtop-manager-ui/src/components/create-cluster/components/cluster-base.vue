@@ -23,7 +23,7 @@
   import { pick } from '@/utils/tools'
 
   import type { ClusterCommandReq } from '@/api/command/types'
-  import type { IFormItem } from '@/components/common/form-builder/types'
+  import type { FormItem } from '@/components/common/form-builder/types'
 
   type ClusterCommandReqKey = keyof ClusterCommandReq
 
@@ -46,7 +46,7 @@
     }
   ])
 
-  const baseInfoFormItems = computed((): IFormItem[] => [
+  const baseInfoFormItems = computed((): FormItem[] => [
     {
       type: 'input',
       field: 'name',
@@ -67,11 +67,11 @@
     }
   ])
 
-  const clusterConfigFormItems = computed((): IFormItem[] => [
+  const clusterConfigFormItems = computed((): FormItem[] => [
     {
       type: 'input',
       field: 'rootDir',
-      label: t('cluster.root_directory'),
+      label: t('cluster.root_dir'),
       required: true
     },
     {
@@ -137,6 +137,7 @@
           "
           v-model="collapse.formValue"
           :form-items="collapse.formItems"
+          :span="14"
         />
       </a-collapse-panel>
     </a-collapse>

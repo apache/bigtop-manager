@@ -25,11 +25,14 @@
   import { updateServiceConfigs } from '@/api/service'
   import CaptureSnapshot from './components/capture-snapshot.vue'
   import SnapshotManagement from './components/snapshot-management.vue'
+
   import type { Property, ServiceConfig, ServiceVO } from '@/api/service/types'
 
   const { t } = useI18n()
   const attrs = useAttrs() as unknown as Required<ServiceVO> & { clusterId: number }
+
   const getServiceDetail = inject('getServiceDetail') as () => any
+
   const searchStr = ref('')
   const loading = ref(false)
   const activeKey = ref<number[]>([])
@@ -38,6 +41,7 @@
   const captureRef = ref<InstanceType<typeof CaptureSnapshot>>()
   const snapshotRef = ref<InstanceType<typeof SnapshotManagement>>()
   const debouncedOnSearch = ref()
+
   const layout = shallowRef({
     labelCol: {
       xs: { span: 23 },

@@ -19,74 +19,54 @@
 <script setup lang="ts">
   import { computed, ref } from 'vue'
   import { useI18n } from 'vue-i18n'
-  import { FormItemState } from '@/components/common/auto-form/types'
 
-  interface Emits {
-    (event: 'onOk', value: string): void
-  }
+  import type { FormItem } from '@/components/common/form-builder/types'
 
-  const emits = defineEmits<Emits>()
+  const emits = defineEmits<{ (event: 'onOk', value: string): void }>()
 
   const { t } = useI18n()
-  const visible = ref(false)
-  const autoFormRef = ref<Comp.AutoFormInstance | null>(null)
+  const open = ref(false)
+  const formRef = ref<Comp.FormBuilderInstance | null>(null)
   const formValue = ref({ newAddress: '' })
 
-  const formItems = computed((): FormItemState[] => [
+  const formItems = computed((): FormItem[] => [
     {
       type: 'input',
       field: 'newAddress',
-      formItemProps: {
-        name: 'newAddress',
-        label: t('component.new_base_url'),
-        rules: [
-          {
-            required: true,
-            message: t('common.enter_error', [`${t('component.new_base_url')}`.toLowerCase()]),
-            trigger: 'blur'
-          }
-        ]
-      },
-      controlProps: {
-        placeholder: t('common.enter_error', [`${t('component.new_base_url')}`.toLowerCase()])
-      }
+      label: t('component.new_base_url'),
+      required: true
     }
   ])
 
   const onSubmit = async () => {
     try {
-      const validate = await autoFormRef.value?.getFormValidation()
+      const validate = await formRef.value?.validate()
       if (!validate) return
       emits('onOk', formValue.value.newAddress)
-      onCancel()
+      toggleVisible()
     } catch (e) {
       console.log('Validation failed', e)
     }
   }
 
-  const onCancel = () => {
-    visible.value = false
-    formValue.value.newAddress = ''
-    autoFormRef.value?.resetForm()
+  const toggleVisible = (visible = false) => {
+    open.value = visible
+    !visible && formRef.value?.resetForm()
   }
 
-  const show = () => {
-    visible.value = true
-  }
-
-  defineExpose({ show })
+  defineExpose({ toggleVisible })
 </script>
 
 <template>
   <a-modal
-    v-model:open="visible"
+    v-model:open="open"
     :centered="true"
     :destroy-on-close="true"
     :title="t('component.base_url')"
     @ok="onSubmit"
-    @cancel="onCancel"
+    @cancel="toggleVisible(false)"
   >
-    <auto-form ref="autoFormRef" v-model:form-value="formValue" :form-items="formItems" :show-button="false" />
+    <form-builder ref="formRef" v-model="formValue" :form-items="formItems" />
   </a-modal>
 </template>
 

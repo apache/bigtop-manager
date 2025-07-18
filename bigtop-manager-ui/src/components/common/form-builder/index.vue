@@ -1,32 +1,28 @@
 <script lang="ts" setup>
-  import type { FormInstance } from 'ant-design-vue'
-  import type { IFormItem } from './types'
-
   import { h, ref, computed } from 'vue'
   import { getFormItemComponent } from './config'
   import { isString } from 'lodash-es'
   import { useI18n } from 'vue-i18n'
 
+  import type { FormInstance, FormProps } from 'ant-design-vue'
+  import type { FormItem } from './types'
+
   interface Props {
-    formItems: IFormItem[]
-    formConfig?: Record<string, any>
+    formItems: FormItem[]
+    formConfig?: FormProps
     span?: number
     rules?: Record<string, any>
     gutter?: number[] | number | Record<string, any>
   }
 
-  const { t } = useI18n()
-
-  defineOptions({
-    name: 'FormBuilder'
-  })
+  defineOptions({ name: 'FormBuilder' })
 
   const props = withDefaults(defineProps<Props>(), {
     formItems: () => [],
-    formConfig: () => ({ colon: false }),
+    formConfig: () => ({ colon: false, labelAlign: 'left' }),
     rules: () => [],
     gutter: () => [8, 8],
-    span: 14
+    span: 24
   })
 
   /**
@@ -42,13 +38,12 @@
    *    set: (val) => emit('update:modelValue', val),
    *   })
    */
-  const formData = defineModel<Record<string, any>>({
-    default: () => ({})
-  })
+  const formData = defineModel<Record<string, any>>({ default: () => ({}) })
 
   const selectType = new Set(['select', 'date', 'time', 'treeSelect'])
   const baseFieldReg = /^(?:type|label|props|on|span|key|hidden|required|rules|col|formProps)$/
 
+  const { t } = useI18n()
   const formRef = ref<FormInstance>()
   const labelRefs = ref<HTMLElement[]>()
 
@@ -57,52 +52,52 @@
 
   // Calculate the max width of the label
   const defaultLabelCol = computed(() => {
-    let defaultLabelWidth = '60px'
+    let defaultLabelWidth = 60
     labelRefs.value?.forEach((label: HTMLElement) => {
-      if (Number.parseInt(defaultLabelWidth) < label!.offsetWidth) {
-        defaultLabelWidth = `${Number.parseFloat(`${label!.offsetWidth + 20}`).toFixed(2)}px`
+      const newWidth = label!.offsetWidth + 20
+      if (defaultLabelWidth < newWidth) {
+        defaultLabelWidth = newWidth
       }
     })
 
-    return defaultLabelWidth
+    return `${defaultLabelWidth}px`
   })
 
   // Merge rules
   const requiredRules = computed(() => {
-    const rules = props.formItems.reduce((pre, item) => {
+    return props.formItems.reduce((pre, item) => {
       const { type = 'input', label, required = false } = item
       if (!pre[item.field] && isString(type) && isString(label) && required) {
         const errorMsg = `${selectType.has(type) ? 'common.select_error' : 'common.enter_error'}`
-        pre[item.field] = [
+        pre[item.field] = props.rules[item.field] ?? [
           {
             required: true,
             message: t(`${errorMsg}`) + label.toLowerCase(),
             trigger: 'blur'
-          },
-          ...(props.rules[item.field] ?? [])
+          }
         ]
       }
       return pre
     }, {})
-    return rules
   })
 
   /**
    * Get form item props
    * @param formItem
    */
-  function getFormItemProps(formItem: IFormItem) {
+  function getFormItemProps(formItem: FormItem) {
     const { formProps = {} } = formItem
     const mergedProps = {
       ...formProps // else props
     }
+    // do something...
 
     return mergedProps
   }
 
   const ComponentItem = {
     props: ['item'],
-    setup({ item }: { item: IFormItem }) {
+    setup({ item }: { item: FormItem }) {
       // Filter invalid prop
       const props = Object.keys(item).reduce<Record<string, any>>(
         (prev, key) => {
@@ -114,7 +109,7 @@
         { ...item.props, formData: formData.value }
       )
 
-      // Add default placeholder
+      // Default placeholder
       if (!('placeholder' in props)) {
         if (typeof item.label != 'function') {
           const prefix = selectType.has((item.type as string) ?? '') ? 'common.select_error' : 'common.enter_error'
@@ -144,8 +139,13 @@
     return formRef.value?.validate()
   }
 
+  function resetForm(name?: string) {
+    formRef.value?.resetFields(name)
+  }
+
   defineExpose({
-    validate
+    validate,
+    resetForm
   })
 </script>
 

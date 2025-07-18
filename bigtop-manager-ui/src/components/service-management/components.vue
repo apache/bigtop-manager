@@ -27,6 +27,7 @@
   import { useJobProgress } from '@/store/job-progress'
   import useBaseTable from '@/composables/use-base-table'
   import { message, Modal, type TableColumnType, type TableProps } from 'ant-design-vue'
+
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { ComponentVO } from '@/api/component/types'
   import type { FilterConfirmProps, FilterResetProps } from 'ant-design-vue/es/table/interface'
@@ -48,15 +49,18 @@
   const route = useRoute()
   const router = useRouter()
   const attrs = useAttrs() as unknown as Required<ServiceVO> & { clusterId: number }
+
   const { stacks, stackRelationMap } = storeToRefs(stackStore)
   const searchInputRef = ref()
   const pollingIntervalId = ref<any>(null)
   const componentStatus = ref(['INSTALLING', 'SUCCESS', 'FAILED', 'UNKNOWN'])
+
   const commandRequest = shallowRef<CommandRequest>({
     command: 'Add',
     commandLevel: 'component',
     componentCommands: []
   })
+
   const state = reactive<TableState>({
     searchText: '',
     searchedColumn: '',

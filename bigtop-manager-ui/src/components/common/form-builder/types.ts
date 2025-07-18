@@ -19,7 +19,7 @@
 
 import { Component, VNode } from 'vue'
 
-export interface IFormItem<T extends object = Record<string, any>> {
+export interface FormItem<T extends object = Record<string, any>> {
   label?: string | (() => VNode)
   field: string
   placeholder?: any

@@ -24,6 +24,7 @@ import {
   DatePicker,
   Input,
   InputNumber,
+  InputPassword,
   Radio,
   RadioGroup,
   Select,
@@ -59,6 +60,7 @@ const formItemMap = new Map<string, Component>([
   ['input', transformModelValue(Input)],
   ['textarea', transformModelValue(Textarea)],
   ['number', transformModelValue(InputNumber)],
+  ['password', transformModelValue(InputPassword)],
   ['time', transformModelValue(TimePicker)],
   [
     'date',

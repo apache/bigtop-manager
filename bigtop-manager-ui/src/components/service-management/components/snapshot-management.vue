@@ -27,6 +27,7 @@
     getServiceConfigSnapshotsList,
     recoveryServiceConfigSnapshot
   } from '@/api/service'
+
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { ServiceConfigSnapshot, ServiceParams, SnapshotRecovery } from '@/api/service/types'
 
@@ -58,7 +59,7 @@
     {
       title: t('common.operation'),
       dataIndex: 'operation',
-      width: '160px',
+      width: '180px',
       key: 'operation',
       ellipsis: true
     }
@@ -155,9 +156,7 @@
       v-model:open="open"
       width="800px"
       :centered="true"
-      :mask="false"
       :title="$t('service.snapshot_management')"
-      :mask-closable="false"
       :destroy-on-close="true"
       @ok="handleOk"
       @cancel="handleCancel"
