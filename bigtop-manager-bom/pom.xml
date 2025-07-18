@@ -58,6 +58,7 @@
         <pagehelper-spring-boot-starter.version>2.1.0</pagehelper-spring-boot-starter.version>
         <victools.version>4.29.0</victools.version>
         <arrow.version>18.3.0</arrow.version>
+        <netty-buffer.version>4.1.123.Final</netty-buffer.version>
     </properties>
 
     <dependencyManagement>
@@ -244,11 +245,22 @@
                 <version>${arrow.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-buffer</artifactId>
+                <version>${netty-buffer.version}</version>
+            </dependency>
             <!-- gRPC -->
             <dependency>
                 <groupId>io.grpc</groupId>
                 <artifactId>grpc-netty</artifactId>
                 <version>${grpc.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>io.netty</groupId>
+                        <artifactId>netty-buffer</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>io.grpc</groupId>
