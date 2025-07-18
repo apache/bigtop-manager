@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class DorisTool {
@@ -58,8 +57,12 @@ public class DorisTool {
         while (attempt < MAX_RETRIES) {
             try {
                 Connection connection = DriverManager.getConnection(jdbcUrl, user, password);
-                log.info("Successfully connected to Doris");
-                return connection;
+                if (connection != null && !connection.isClosed()) {
+                    log.info("Successfully connected to Doris");
+                    return connection;
+                } else {
+                    log.warn("Connection is null or closed");
+                }
             } catch (SQLException e) {
                 lastException = e;
                 attempt++;
@@ -83,20 +86,13 @@ public class DorisTool {
         log.info("Executing SQL query: {}", sql);
 
         List<Map<String, Object>> resultList = new ArrayList<>();
-        Connection conn = null;
-        Statement stmt = null;
-        ResultSet rs = null;
 
-        try {
-            conn = connect();
-            stmt = conn.createStatement();
-            rs = stmt.executeQuery(sql);
-
-            // 获取结果集元数据
+        try (Connection conn = connect();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
             ResultSetMetaData metaData = rs.getMetaData();
             int columnCount = metaData.getColumnCount();
 
-            // 处理结果集
             while (rs.next()) {
                 Map<String, Object> row = new LinkedHashMap<>();
                 for (int i = 1; i <= columnCount; i++) {
@@ -108,30 +104,6 @@ public class DorisTool {
             }
 
             return resultList;
-        } finally {
-            closeQuietly(rs);
-            closeQuietly(stmt);
-            closeQuietly(conn);
         }
-    }
-
-    private void closeQuietly(AutoCloseable closeable) {
-        if (closeable != null) {
-            try {
-                closeable.close();
-            } catch (Exception e) {
-                log.debug("Error closing resource", e);
-            }
-        }
-    }
-
-    public <T> List<T> executeQuery(String sql, RowMapper<T> mapper) throws SQLException {
-        List<Map<String, Object>> rawResults = executeQuery(sql);
-        return rawResults.stream().map(mapper::mapRow).collect(Collectors.toList());
-    }
-
-    @FunctionalInterface
-    public interface RowMapper<T> {
-        T mapRow(Map<String, Object> row);
     }
 }

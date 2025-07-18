@@ -50,7 +50,7 @@ public class DorisService {
             return;
         }
         String sql = MessageFormat.format(
-                "ALTER SYSTEM ADD BACKEND ''{0}:{1,number,#}''", hostname, dorisParams.dorisBeHeartbeatPort());
+                "ALTER SYSTEM ADD BACKEND ''{0}:{1,number,#}'';", hostname, dorisParams.dorisBeHeartbeatPort());
         DorisTool dorisTool = new DorisTool(aliveFe, "root", "", dorisParams.dorisFeArrowFlightSqlPort());
         try {
             dorisTool.executeQuery(sql);
@@ -66,14 +66,14 @@ public class DorisService {
             log.error("getBeList: No FE alive!!!");
             return List.of();
         }
-        String sql = "SELECT * FROM BACKENDS()";
+        String sql = "SHOW BACKENDS;";
         DorisTool dorisTool = new DorisTool(aliveFe, "root", "", dorisParams.dorisFeArrowFlightSqlPort());
         List<String> beList = new ArrayList<>();
         try {
             beList = dorisTool.executeQuery(sql).stream()
-                    .map(map -> (String) map.get("_table_valued_function_backends.Host"))
+                    .map(map -> (String) map.get("Host"))
                     .collect(Collectors.toList());
-
+            log.info("getBeList: BE hosts found: {}", beList);
         } catch (Exception e) {
             log.error("Error executing SQL query: {}, {}", sql, e.getMessage());
         }
@@ -137,13 +137,13 @@ public class DorisService {
             return Pair.of(masterHost.get(), List.of());
         }
         List<String> feList = new ArrayList<>();
-        String sql = "SELECT * FROM FRONTENDS()";
+        String sql = "SHOW FRONTENDS;";
         DorisTool dorisTool = new DorisTool(aliveFe, "root", "", dorisParams.dorisFeArrowFlightSqlPort());
         try {
             dorisTool.executeQuery(sql).stream()
                     .map(map -> {
-                        String host = (String) map.get("_table_valued_function_frontends.Host");
-                        boolean isMaster = (Boolean) map.get("_table_valued_function_frontends.IsMaster");
+                        String host = (String) map.get("Host");
+                        boolean isMaster = Boolean.parseBoolean((String) map.get("IsMaster"));
                         if (isMaster) {
                             masterHost.set(host);
                         }
@@ -153,6 +153,7 @@ public class DorisService {
         } catch (Exception e) {
             log.error("Error executing SQL query: {} {}", sql, e.getMessage());
         }
+        log.info("getMasterAndFeList: FE hosts found: {}", feList);
         return Pair.of(masterHost.get(), feList);
     }
 
@@ -175,7 +176,7 @@ public class DorisService {
 
             try {
                 String sql = MessageFormat.format(
-                        "ALTER SYSTEM ADD FOLLOWER ''{0}:{1,number,#}''", hostname, dorisParams.dorisFeEditLogPort());
+                        "ALTER SYSTEM ADD FOLLOWER ''{0}:{1,number,#}'';", hostname, dorisParams.dorisFeEditLogPort());
 
                 dorisTool.executeQuery(sql);
             } catch (Exception e) {
