@@ -41,7 +41,7 @@ export function transformModelValue(component: Component, key = 'value'): Compon
   return defineComponent({
     setup(props: any, { attrs, slots, emit }) {
       return () => {
-        const { modelValue, ..._props } = { ...props, ...attrs }
+        const { modelValue = undefined, ..._props } = { ...props, ...attrs }
         return h(
           component,
           {
