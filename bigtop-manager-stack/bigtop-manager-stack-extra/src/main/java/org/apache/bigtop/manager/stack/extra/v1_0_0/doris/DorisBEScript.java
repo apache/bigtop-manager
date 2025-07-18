@@ -31,7 +31,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.List;
 import java.util.Properties;
 
 @Slf4j
@@ -63,15 +62,16 @@ public class DorisBEScript extends AbstractServerScript {
         DorisParams dorisParams = (DorisParams) params;
         LinuxFileUtils.removeDirectories(dorisParams.dorisBePidFile());
 
-        // Register BE
-        DorisService.registerBe(dorisParams);
-
         String cmd = MessageFormat.format("{0}/start_be.sh --daemon", dorisParams.dorisBeBinDir());
         try {
-            return LinuxOSUtils.sudoExecCmd(cmd, dorisParams.user());
+            LinuxOSUtils.sudoExecCmd(cmd, dorisParams.user());
         } catch (Exception e) {
             throw new StackException(e);
         }
+
+        // Register BE
+        DorisService.registerBe(dorisParams);
+        return ShellResult.success();
     }
 
     @Override
