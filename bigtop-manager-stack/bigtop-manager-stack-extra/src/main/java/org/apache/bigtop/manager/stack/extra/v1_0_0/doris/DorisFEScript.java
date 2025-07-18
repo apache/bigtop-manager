@@ -78,9 +78,6 @@ public class DorisFEScript extends AbstractServerScript {
                 String cmd = MessageFormat.format("{0}/start_fe.sh --daemon", dorisParams.dorisFeBinDir());
                 return LinuxOSUtils.sudoExecCmd(cmd, dorisParams.user());
             } else {
-                // Register FE in Doris service
-                DorisService.registerFollower(dorisParams);
-
                 String cmd = MessageFormat.format(
                         "{0}/start_fe.sh --helper {1}:{2,number,#} --daemon",
                         dorisParams.dorisFeBinDir(), feMaster, dorisParams.dorisFeEditLogPort());
@@ -90,6 +87,16 @@ public class DorisFEScript extends AbstractServerScript {
         } catch (IOException e) {
             throw new StackException(e);
         }
+    }
+
+    @Override
+    public ShellResult prepare(Params params) {
+        DorisParams dorisParams = (DorisParams) params;
+        // Register FE in Doris service
+        for (String dorisFeHost : dorisParams.dorisFeHosts()) {
+            DorisService.registerFollower(dorisParams, dorisFeHost);
+        }
+        return ShellResult.success();
     }
 
     @Override

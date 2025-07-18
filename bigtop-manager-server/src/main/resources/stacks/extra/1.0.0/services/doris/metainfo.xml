@@ -26,7 +26,7 @@
             Apache Doris is a modern data warehouse for real-time analytics.
             It delivers lightning-fast analytics on real-time data at scale.
         </desc>
-        <version>2.3.8</version>
+        <version>2.1.10</version>
         <user>doris</user>
         <license>Apache-2.0</license>
 

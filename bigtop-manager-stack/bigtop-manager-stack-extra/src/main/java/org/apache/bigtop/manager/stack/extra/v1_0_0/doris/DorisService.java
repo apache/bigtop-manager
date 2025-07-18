@@ -27,32 +27,35 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.sql.ResultSet;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class DorisService {
     public static void registerBe(DorisParams dorisParams) {
-        log.info("registerBe: ip {}, hostname {}", dorisParams.ip(), dorisParams.hostname());
-        List<String> beList = DorisService.getBeList(dorisParams);
-        if (beList.isEmpty() || beList.contains(dorisParams.hostname())) {
-            log.info("No FE alive or Doris BE {} already registered", dorisParams.hostname());
+        String hostname = dorisParams.hostname();
+        log.info("registerBe: ip {}, hostname {}", dorisParams.ip(), hostname);
+        String aliveFe = getAliveFe(dorisParams);
+        if (aliveFe == null) {
+            log.error("registerBe: No FE alive!!!");
             return;
         }
-        String aliveFe = getAliveFe(dorisParams);
+
+        List<String> beList = DorisService.getBeList(dorisParams);
+        if (beList.contains(hostname)) {
+            log.info("Doris BE {} already registered", hostname);
+            return;
+        }
         String sql = MessageFormat.format(
-                "ALTER SYSTEM ADD BACKEND ''{0}:{1,number,#}''",
-                dorisParams.hostname(), dorisParams.dorisBeHeartbeatPort());
-        DorisTool dorisTool = new DorisTool(aliveFe, "root", "", "mysql", dorisParams.dorisFeQueryPort());
+                "ALTER SYSTEM ADD BACKEND ''{0}:{1,number,#}''", hostname, dorisParams.dorisBeHeartbeatPort());
+        DorisTool dorisTool = new DorisTool(aliveFe, "root", "", dorisParams.dorisFeArrowFlightSqlPort());
         try {
-            dorisTool.connect();
-            dorisTool.executeUpdate(sql);
+            dorisTool.executeQuery(sql);
         } catch (Exception e) {
-            throw new RuntimeException(e);
-        } finally {
-            dorisTool.close();
+            log.error("Error registering Doris BE {} ", hostname, e);
         }
     }
 
@@ -60,25 +63,19 @@ public class DorisService {
         log.info("getBeList: ip {}, hostname {}", dorisParams.ip(), dorisParams.hostname());
         String aliveFe = getAliveFe(dorisParams);
         if (aliveFe == null) {
-            log.error("No FE alive!!!");
+            log.error("getBeList: No FE alive!!!");
             return List.of();
         }
-        String sql = "SHOW BACKENDS";
-        DorisTool dorisTool = new DorisTool(aliveFe, "root", "", "mysql", dorisParams.dorisFeQueryPort());
+        String sql = "SELECT * FROM BACKENDS()";
+        DorisTool dorisTool = new DorisTool(aliveFe, "root", "", dorisParams.dorisFeArrowFlightSqlPort());
         List<String> beList = new ArrayList<>();
         try {
-            dorisTool.connect();
+            beList = dorisTool.executeQuery(sql).stream()
+                    .map(map -> (String) map.get("_table_valued_function_backends.Host"))
+                    .collect(Collectors.toList());
 
-            try (ResultSet resultSet = dorisTool.executeQuery(sql)) {
-                while (resultSet.next()) {
-                    String host = resultSet.getString("Host");
-                    beList.add(host);
-                }
-            }
         } catch (Exception e) {
-            log.error("Error executing SQL query: {}", sql, e);
-        } finally {
-            dorisTool.close();
+            log.error("Error executing SQL query: {}, {}", sql, e.getMessage());
         }
         return beList;
     }
@@ -93,7 +90,7 @@ public class DorisService {
                 new MessageFormat("curl -s -o /dev/null -w '%{http_code}' http://{0}:{1,number,#}/api/bootstrap");
         try {
             for (String host : feHosts) {
-                String cmd = messageFormat.format(new Object[]{host, dorisFeHttpPort});
+                String cmd = messageFormat.format(new Object[] {host, dorisFeHttpPort});
                 ShellResult shellResult;
                 int attempts = 0;
                 while (attempts < 5) {
@@ -114,7 +111,7 @@ public class DorisService {
                 }
             }
         } catch (Exception e) {
-            log.error("Error checking alive FE hosts: {}", e.getMessage(), e);
+            log.error("Error checking alive FE hosts: {} {}", e.getMessage(), e.getMessage());
         }
         if (aliveFe == null) {
             log.warn("No alive FE host found in the list: {}", feHosts);
@@ -132,58 +129,57 @@ public class DorisService {
      */
     public static Pair<String, List<String>> getMasterAndFeList(DorisParams dorisParams) {
         log.info("getMasterAndFeList: ip {}, hostname {}", dorisParams.ip(), dorisParams.hostname());
+        AtomicReference<String> masterHost =
+                new AtomicReference<>(dorisParams.dorisFeHosts().get(0));
         String aliveFe = getAliveFe(dorisParams);
-        String masterHost = dorisParams.dorisFeHosts().get(0);
         if (aliveFe == null) {
-            return Pair.of(masterHost, List.of());
+            log.warn("getMasterAndFeList: No alive FE ");
+            return Pair.of(masterHost.get(), List.of());
         }
         List<String> feList = new ArrayList<>();
-        String sql = "SHOW FRONTENDS";
-        DorisTool dorisTool = new DorisTool(aliveFe, "root", "", "mysql", dorisParams.dorisFeQueryPort());
+        String sql = "SELECT * FROM FRONTENDS()";
+        DorisTool dorisTool = new DorisTool(aliveFe, "root", "", dorisParams.dorisFeArrowFlightSqlPort());
         try {
-            dorisTool.connect();
-            try (ResultSet resultSet = dorisTool.executeQuery(sql)) {
-                while (resultSet.next()) {
-                    String host = resultSet.getString("Host");
-                    boolean isMaster = resultSet.getBoolean("IsMaster");
-                    feList.add(host);
-                    if (isMaster) {
-                        masterHost = host;
-                    }
-                }
-            }
+            dorisTool.executeQuery(sql).stream()
+                    .map(map -> {
+                        String host = (String) map.get("_table_valued_function_frontends.Host");
+                        boolean isMaster = (Boolean) map.get("_table_valued_function_frontends.IsMaster");
+                        if (isMaster) {
+                            masterHost.set(host);
+                        }
+                        return host;
+                    })
+                    .forEach(feList::add);
         } catch (Exception e) {
-            log.error("Error executing SQL query: {}", sql, e);
-        } finally {
-            dorisTool.close();
+            log.error("Error executing SQL query: {} {}", sql, e.getMessage());
         }
-        return Pair.of(masterHost, feList);
+        return Pair.of(masterHost.get(), feList);
     }
 
-    public static void registerFollower(DorisParams dorisParams) {
-        log.info("registerFollower: ip {}, hostname {}", dorisParams.ip(), dorisParams.hostname());
+    public static void registerFollower(DorisParams dorisParams, String hostname) {
+        log.info("registerFollower: hostname {}", hostname);
+        String aliveFe = getAliveFe(dorisParams);
+        if (aliveFe == null) {
+            log.error("registerFollower: No FE alive!!!");
+            return;
+        }
+
         Pair<String, List<String>> masterAndFeList = getMasterAndFeList(dorisParams);
         List<String> feList = masterAndFeList.getRight();
         String feMaster = masterAndFeList.getLeft();
 
-        if (feList.isEmpty() || feList.contains(dorisParams.hostname())) {
-            log.info("No FE alive or Doris FE {} already registered", dorisParams.hostname());
+        if (feList.contains(hostname)) {
+            log.info("Doris FE {} already registered", hostname);
         } else {
-            DorisTool dorisTool =
-                    new DorisTool(feMaster, "root", "", "mysql", dorisParams.dorisFeQueryPort());
+            DorisTool dorisTool = new DorisTool(feMaster, "root", "", dorisParams.dorisFeArrowFlightSqlPort());
 
             try {
-                dorisTool.connect();
-
                 String sql = MessageFormat.format(
-                        "ALTER SYSTEM ADD FOLLOWER ''{0}:{1,number,#}''",
-                        dorisParams.hostname(), dorisParams.dorisFeEditLogPort());
+                        "ALTER SYSTEM ADD FOLLOWER ''{0}:{1,number,#}''", hostname, dorisParams.dorisFeEditLogPort());
 
-                dorisTool.executeUpdate(sql);
+                dorisTool.executeQuery(sql);
             } catch (Exception e) {
-                log.error("Error registering follower FE: {}", e.getMessage(), e);
-            } finally {
-                dorisTool.close();
+                log.error("Error registering Doris Follower: {}", e.getMessage());
             }
         }
     }

@@ -18,7 +18,6 @@
  */
 package org.apache.bigtop.manager.stack.extra.v1_0_0.doris;
 
-import org.apache.bigtop.manager.common.utils.NetUtils;
 import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
@@ -106,6 +105,10 @@ public class DorisParams extends ExtraParams {
         return Integer.parseInt(dorisFeConf().get("query_port").toString());
     }
 
+    public int dorisFeArrowFlightSqlPort() {
+        return Integer.parseInt(dorisFeConf().get("fe_arrow_flight_sql_port").toString());
+    }
+
     /*================================FE===================================================*/
     /*================================BE===================================================*/
     public String dorisBeHome() {
@@ -145,9 +148,13 @@ public class DorisParams extends ExtraParams {
     public int dorisBeHeartbeatPort() {
         return Integer.parseInt(dorisBeConf().get("heartbeat_service_port").toString());
     }
+
+    public int dorisBeArrowFlightSqlPort() {
+        return Integer.parseInt(dorisBeConf().get("be_arrow_flight_sql_port").toString());
+    }
     /*================================BE===================================================*/
 
-    public String ip(){
+    public String ip() {
         try {
             return InetAddress.getLocalHost().getHostAddress();
         } catch (UnknownHostException e) {
@@ -171,13 +178,11 @@ public class DorisParams extends ExtraParams {
     }
 
     public String dorisFeConfContent() {
-        return (String) LocalSettings.configurations(getServiceName(), "doris-fe-conf-template")
-                .get("content");
+        return (String) dorisFeConf().get("content");
     }
 
     public String dorisBeConfContent() {
-        return (String) LocalSettings.configurations(getServiceName(), "doris-be-conf-template")
-                .get("content");
+        return (String) dorisBeConf().get("content");
     }
 
     @GlobalParams

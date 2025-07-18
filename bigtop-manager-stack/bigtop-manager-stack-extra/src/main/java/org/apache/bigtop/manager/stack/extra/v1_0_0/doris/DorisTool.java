@@ -23,9 +23,15 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class DorisTool {
@@ -35,28 +41,25 @@ public class DorisTool {
     private final String jdbcUrl;
     private final String user;
     private final String password;
-    private Connection connection;
 
-    public DorisTool(String host, String user, String password, String database, int port) {
-        this.jdbcUrl = String.format("jdbc:mysql://%s:%d/%s?useSSL=false&serverTimezone=UTC", host, port, database);
+    public DorisTool(String host, String user, String password, int port) {
+        this.jdbcUrl = String.format(
+                "jdbc:arrow-flight-sql://%s:%d?useServerPrepStmts=false&cachePrepStmts=true&useSSL=false&useEncryption=false",
+                host, port);
         this.user = user;
         this.password = password;
         log.info("Connecting to database... {}", jdbcUrl);
     }
 
-    public synchronized void connect() throws SQLException {
-        if (isConnected()) {
-            return;
-        }
-
+    public Connection connect() throws SQLException {
         int attempt = 0;
         SQLException lastException = null;
 
         while (attempt < MAX_RETRIES) {
             try {
-                connection = DriverManager.getConnection(jdbcUrl, user, password);
+                Connection connection = DriverManager.getConnection(jdbcUrl, user, password);
                 log.info("Successfully connected to Doris");
-                return;
+                return connection;
             } catch (SQLException e) {
                 lastException = e;
                 attempt++;
@@ -76,38 +79,59 @@ public class DorisTool {
         throw new SQLException("Failed to connect after " + MAX_RETRIES + " attempts", lastException);
     }
 
-    public synchronized boolean isConnected() throws SQLException {
-        return connection != null && !connection.isClosed() && connection.isValid(5);
-    }
+    public List<Map<String, Object>> executeQuery(String sql) throws SQLException {
+        log.info("Executing SQL query: {}", sql);
 
-    public void close() {
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+
         try {
-            if (!connection.isClosed()) {
-                connection.close();
-                log.info("Database connection closed");
+            conn = connect();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+
+            // 获取结果集元数据
+            ResultSetMetaData metaData = rs.getMetaData();
+            int columnCount = metaData.getColumnCount();
+
+            // 处理结果集
+            while (rs.next()) {
+                Map<String, Object> row = new LinkedHashMap<>();
+                for (int i = 1; i <= columnCount; i++) {
+                    String columnName = metaData.getColumnLabel(i);
+                    Object value = rs.getObject(i);
+                    row.put(columnName, value);
+                }
+                resultList.add(row);
             }
-        } catch (SQLException e) {
-            log.error("Error closing connection", e);
+
+            return resultList;
         } finally {
-            connection = null;
+            closeQuietly(rs);
+            closeQuietly(stmt);
+            closeQuietly(conn);
         }
     }
 
-    public ResultSet executeQuery(String sql, Object... params) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement(sql);
-        setParameters(statement, params);
-        return statement.executeQuery();
-    }
-
-    public int executeUpdate(String sql, Object... params) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement(sql);
-        setParameters(statement, params);
-        return statement.executeUpdate();
-    }
-
-    private void setParameters(PreparedStatement statement, Object... params) throws SQLException {
-        for (int i = 0; i < params.length; i++) {
-            statement.setObject(i + 1, params[i]);
+    private void closeQuietly(AutoCloseable closeable) {
+        if (closeable != null) {
+            try {
+                closeable.close();
+            } catch (Exception e) {
+                log.debug("Error closing resource", e);
+            }
         }
+    }
+
+    public <T> List<T> executeQuery(String sql, RowMapper<T> mapper) throws SQLException {
+        List<Map<String, Object>> rawResults = executeQuery(sql);
+        return rawResults.stream().map(mapper::mapRow).collect(Collectors.toList());
+    }
+
+    @FunctionalInterface
+    public interface RowMapper<T> {
+        T mapRow(Map<String, Object> row);
     }
 }
