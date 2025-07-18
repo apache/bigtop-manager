@@ -26,8 +26,10 @@
   import { useClusterStore } from '@/store/cluster'
   import { generateRandomId } from '@/utils/tools'
   import { execCommand } from '@/api/command'
-  import HostCreate from '@/pages/cluster-manage/hosts/create.vue'
+
+  import HostCreate from './index.vue'
   import useBaseTable from '@/composables/use-base-table'
+
   import { type InstalledStatusVO, Status } from '@/api/hosts/types'
   import type { FilterConfirmProps, FilterResetProps } from 'ant-design-vue/es/table/interface'
   import type { GroupItem } from '@/components/common/button-group/types'
@@ -49,10 +51,12 @@
   const emits = defineEmits<Emits>()
   const clusterStore = useClusterStore()
   const { clusterMap } = storeToRefs(clusterStore)
+
   const installing = ref(false)
   const open = ref(false)
   const searchInputRef = ref()
   const hostCreateRef = ref<InstanceType<typeof HostCreate> | null>(null)
+
   const installStatus = shallowRef<InstalledStatusVO[]>([])
   const state = reactive<TableState>({
     searchText: '',
@@ -336,7 +340,7 @@
         </template>
       </a-table>
     </a-modal>
-    <host-create ref="hostCreateRef" :is-public="true" @on-ok="handleOk" />
+    <host-create ref="hostCreateRef" :current-hosts="dataSource" :is-public="true" @on-ok="handleOk" />
   </div>
 </template>
 

@@ -27,8 +27,6 @@
   import { useRouter } from 'vue-router'
   import { useJobProgress } from '@/store/job-progress'
 
-  import FilterForm from '@/components/common/filter-form/index.vue'
-
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { FilterFormItem } from '@/components/common/filter-form/types'
   import type { ServiceListParams, ServiceStatusType, ServiceVO } from '@/api/service/types'

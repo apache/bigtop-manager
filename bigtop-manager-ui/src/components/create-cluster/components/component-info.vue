@@ -24,7 +24,7 @@
   import { ServiceVO } from '@/api/service/types'
   import { useI18n } from 'vue-i18n'
   import useBaseTable from '@/composables/use-base-table'
-  import SetSource from './set-source.vue'
+  import SetSource from '@/components/set-source/index.vue'
   import type { TableColumnType } from 'ant-design-vue'
 
   const { t } = useI18n()

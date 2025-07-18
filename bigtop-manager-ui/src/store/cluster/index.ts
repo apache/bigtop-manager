@@ -21,14 +21,12 @@ import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { getCluster, getClusterList } from '@/api/cluster'
 import { useServiceStore } from '@/store/service'
-import { useMenuStore } from '@/store/menu'
 import type { ClusterVO } from '@/api/cluster/types.ts'
 
 export const useClusterStore = defineStore(
   'cluster',
   () => {
     const serviceStore = useServiceStore()
-    const menuStore = useMenuStore()
     const loading = ref(false)
     const clusters = ref<ClusterVO[]>([])
     const currCluster = ref<ClusterVO>({})
@@ -46,9 +44,7 @@ export const useClusterStore = defineStore(
           {} as Record<string, ClusterVO>
         )
       } catch (error) {
-        const token = localStorage.getItem('Token') ?? sessionStorage.getItem('Token') ?? undefined
         clusterMap.value = {}
-        token && menuStore.setupMenu()
         console.error('Failed to get clusters:', error)
       }
     }

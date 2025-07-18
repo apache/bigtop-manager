@@ -19,6 +19,7 @@
 package org.apache.bigtop.manager.stack.infra.v1_0_0.grafana;
 
 import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
+import org.apache.bigtop.manager.grpc.pojo.RepoInfo;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
@@ -138,11 +139,6 @@ public class GrafanaParams extends InfraParams {
         return configuration;
     }
 
-    @Override
-    public String getServiceName() {
-        return "grafana";
-    }
-
     public List<String> getClusters() {
         if (getClusterHosts() == null) {
             return null;
@@ -180,5 +176,15 @@ public class GrafanaParams extends InfraParams {
             globalParamsMap.put("default_cluster_name", defaultCluster);
             globalParamsMap.put("default_host_name", defaultHost);
         }
+    }
+
+    @Override
+    public RepoInfo repo() {
+        return LocalSettings.repo("grafana");
+    }
+
+    @Override
+    public String getServiceName() {
+        return "grafana";
     }
 }

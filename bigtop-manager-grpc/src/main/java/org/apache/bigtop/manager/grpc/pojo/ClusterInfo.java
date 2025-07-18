@@ -20,8 +20,6 @@ package org.apache.bigtop.manager.grpc.pojo;
 
 import lombok.Data;
 
-import java.util.List;
-
 @Data
 public class ClusterInfo {
 
@@ -30,6 +28,4 @@ public class ClusterInfo {
     private String userGroup;
 
     private String rootDir;
-
-    private List<ToolInfo> tools;
 }

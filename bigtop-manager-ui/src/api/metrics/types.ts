@@ -16,37 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.dao.po;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import java.io.Serializable;
-
-@Data
-@EqualsAndHashCode(callSuper = true)
-@Table(name = "tool")
-public class ToolPO extends BasePO implements Serializable {
-
-    @Id
-    @Column(name = "id")
-    private Long id;
-
-    @Column(name = "name")
-    private String name;
-
-    @Column(name = "base_url")
-    private String baseUrl;
-
-    @Column(name = "pkg_name")
-    private String pkgName;
-
-    @Column(name = "arch")
-    private String arch;
-
-    @Column(name = "checksum")
-    private String checksum;
+export type TimeRangeType = '1m' | '5m' | '15m' | '30m' | '1h' | '2h'
+export type MetricsData = {
+  cpuUsageCur: string
+  memoryUsageCur: string
+  diskUsageCur: string
+  fileDescriptorUsage: string
+  diskReadCur: string
+  diskWriteCur: string
+  cpuUsage: string[]
+  systemLoad1: string[]
+  systemLoad5: string[]
+  systemLoad15: string[]
+  memoryUsage: string[]
+  diskRead: string[]
+  diskWrite: string[]
+  timestamps: string[]
 }

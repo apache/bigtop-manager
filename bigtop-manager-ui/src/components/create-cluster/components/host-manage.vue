@@ -18,28 +18,34 @@
 -->
 
 <script setup lang="ts">
-  import { TableColumnType } from 'ant-design-vue'
+  import { PaginationProps, TableColumnType } from 'ant-design-vue'
   import { computed, reactive, ref, watch } from 'vue'
   import { generateRandomId } from '@/utils/tools'
   import { useI18n } from 'vue-i18n'
+
   import useBaseTable from '@/composables/use-base-table'
-  import HostCreate from '@/pages/cluster-manage/hosts/create.vue'
+  import HostCreate from '@/components/create-host/index.vue'
+
   import type { FilterConfirmProps, FilterResetProps } from 'ant-design-vue/es/table/interface'
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { HostReq } from '@/api/command/types'
 
   type Key = string | number
+  type conflictItem = HostReq & { strategy: 'override' | 'keep' }
+
   interface TableState {
     selectedRowKeys: Key[]
     searchText: string
     searchedColumn: string
   }
+
   const { t } = useI18n()
   const props = defineProps<{ stepData: HostReq[] }>()
   const emits = defineEmits(['updateData'])
-  const data = ref<HostReq[]>([])
+
   const searchInputRef = ref()
   const hostCreateRef = ref<InstanceType<typeof HostCreate> | null>(null)
+
   const state = reactive<TableState>({
     searchText: '',
     searchedColumn: '',
@@ -86,43 +92,19 @@
     }
   ])
 
-  const { loading, dataSource, paginationProps, onChange } = useBaseTable({
-    columns: columns.value,
-    rows: data.value
-  })
+  const { loading, dataSource, paginationProps, onChange } = useBaseTable<HostReq>({ columns: columns.value, rows: [] })
 
   const operations = computed((): GroupItem[] => [
-    {
-      text: 'edit',
-      clickEvent: (_item, args) => editHost(args)
-    },
-    {
-      text: 'remove',
-      danger: true,
-      clickEvent: (_item, args) => deleteHost(args)
-    }
+    { text: 'edit', clickEvent: (_item, args) => updateHost('EDIT', args) },
+    { text: 'remove', danger: true, clickEvent: (_item, args) => deleteHost(args) }
   ])
-
-  watch(
-    () => props.stepData,
-    (val) => {
-      dataSource.value = val
-    },
-    {
-      immediate: true
-    }
-  )
 
   const isContain = (source: string, target: string): boolean => {
     return source.toString().toLowerCase().includes(target.toLowerCase())
   }
 
   const onFilterDropdownOpenChange = (visible: boolean) => {
-    if (visible) {
-      setTimeout(() => {
-        searchInputRef.value.focus()
-      }, 100)
-    }
+    visible && setTimeout(searchInputRef.value.focus(), 100)
   }
 
   const onSelectChange = (selectedRowKeys: Key[]) => {
@@ -140,60 +122,108 @@
     state.searchText = ''
   }
 
-  const addHost = () => {
-    hostCreateRef.value?.handleOpen('ADD')
+  const updateHost = (type: 'ADD' | 'EDIT', row?: HostReq) => {
+    hostCreateRef.value?.handleOpen(type, row)
   }
 
-  const editHost = (row: HostReq) => {
-    hostCreateRef.value?.handleOpen('EDIT', row)
+  const deleteHost = (row?: HostReq) => {
+    if (row?.hostnames) {
+      dataSource.value = dataSource.value?.filter((v) => row!.key !== v.key)
+    } else {
+      dataSource.value = dataSource.value?.filter((v) => !state.selectedRowKeys.includes(v.key)) || []
+    }
+    updateStepData()
   }
 
   const updateStepData = () => {
-    const res = dataSource.value.map((v) => {
-      return {
-        ...v,
-        hostnames: [v.hostname]
-      }
-    })
+    Object.assign(paginationProps.value as PaginationProps, { total: dataSource.value.length })
+    const res = dataSource.value.map((v) => ({ ...v, hostnames: [v.hostname] }))
     emits('updateData', res)
   }
 
-  const addHostSuccess = (type: 'ADD' | 'EDIT', item: HostReq) => {
+  /**
+   * Merges duplicate hostnames based on strategy.
+   * @param list
+   * @param duplicateHosts
+   * @param config host config
+   */
+  const mergeByStrategy = (list: HostReq[], duplicateHosts: conflictItem[], config: HostReq): HostReq[] => {
+    const strategyMap = new Map<string, conflictItem>()
+    duplicateHosts.forEach((s) => strategyMap.set(s.hostname, s))
+
+    const existingHostnames = new Set<string>()
+    const mainPart: HostReq[] = []
+    const prependPart: HostReq[] = []
+
+    for (const item of list) {
+      existingHostnames.add(item.hostname)
+      const strategy = strategyMap.get(item.hostname)
+
+      if (!strategy) {
+        mainPart.push(item)
+      } else if (strategy.strategy === 'override') {
+        mainPart.push(generateNewHostItem(item.hostname, config))
+      } else {
+        mainPart.push(item)
+      }
+    }
+
+    for (const s of duplicateHosts) {
+      if (!existingHostnames.has(s.hostname)) {
+        prependPart.push(generateNewHostItem(s.hostname, config))
+      }
+    }
+
+    return [...prependPart, ...mainPart]
+  }
+
+  const generateNewHostItem = (hostname: string, config: HostReq): HostReq => ({
+    ...config,
+    key: generateRandomId(),
+    hostname: hostname,
+    status: 'UNKNOWN'
+  })
+
+  /**
+   * Handles successful addition or editing of hosts.
+   */
+  const addHostSuccess = (type: 'ADD' | 'EDIT', item: HostReq, duplicateHosts: any) => {
     if (type === 'ADD') {
-      const items = item.hostnames?.map((v) => {
-        return {
-          ...item,
-          key: generateRandomId(),
-          hostname: v,
-          status: 'UNKNOWN'
-        }
-      }) as HostReq[]
-      dataSource.value?.unshift(...items)
-    } else {
+      if (duplicateHosts.length > 0) {
+        dataSource.value = mergeByStrategy(dataSource.value, duplicateHosts, item)
+      } else {
+        const items = item.hostnames?.map((v) => generateNewHostItem(v, item)) as HostReq[]
+        dataSource.value?.unshift(...items)
+      }
+    }
+
+    if (type === 'EDIT') {
       const index = dataSource.value.findIndex((data) => data.key === item.key)
+
       if (index !== -1) {
         dataSource.value[index] = item
       }
     }
+
     updateStepData()
   }
 
-  const deleteHost = (row?: HostReq) => {
-    if (!row?.key) {
-      state.selectedRowKeys.length > 0 &&
-        (dataSource.value = dataSource.value?.filter((v) => !state.selectedRowKeys.includes(v.key)) || [])
-    } else {
-      dataSource.value = dataSource.value?.filter((v) => row.key !== v.key)
+  watch(
+    () => props.stepData,
+    (val) => {
+      dataSource.value = JSON.parse(JSON.stringify(val))
+    },
+    {
+      immediate: true
     }
-    updateStepData()
-  }
+  )
 </script>
 
 <template>
   <div class="host-config">
     <header>
       <a-space :size="16">
-        <a-button type="primary" @click="addHost">{{ $t('cluster.add_host') }}</a-button>
+        <a-button type="primary" @click="updateHost('ADD')">{{ $t('cluster.add_host') }}</a-button>
         <a-button type="primary" danger @click="deleteHost">{{ $t('common.bulk_remove') }}</a-button>
       </a-space>
     </header>
@@ -246,7 +276,7 @@
         </template>
       </template>
     </a-table>
-    <host-create ref="hostCreateRef" @on-ok="addHostSuccess" />
+    <host-create ref="hostCreateRef" :current-hosts="dataSource" @on-ok="addHostSuccess" />
   </div>
 </template>
 

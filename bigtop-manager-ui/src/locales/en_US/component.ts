@@ -16,20 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.grpc.pojo;
-
-import lombok.Data;
-
-@Data
-public class ToolInfo {
-
-    private String name;
-
-    private String baseUrl;
-
-    private String pkgName;
-
-    private String arch;
-
-    private String checksum;
+export default {
+  pkg_name: 'Package',
+  base_url: 'Address',
+  new_base_url: 'New Address',
+  note: 'Note: Changes to the source address will take effect for all clusters.',
+  dependency: 'Dependency',
+  update_all: 'Update All'
 }

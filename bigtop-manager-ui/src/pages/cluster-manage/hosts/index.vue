@@ -22,11 +22,14 @@
   import { computed, onMounted, onUnmounted, reactive, ref, shallowRef } from 'vue'
   import { useRouter } from 'vue-router'
   import { useI18n } from 'vue-i18n'
+
   import { useClusterStore } from '@/store/cluster'
   import * as hostApi from '@/api/hosts'
+
   import useBaseTable from '@/composables/use-base-table'
-  import HostCreate from '@/pages/cluster-manage/hosts/create.vue'
-  import InstallDependencies from '@/pages/cluster-manage/hosts/install-dependencies.vue'
+  import HostCreate from '@/components/create-host/index.vue'
+  import InstallDependencies from '@/components/create-host/install-dependencies.vue'
+
   import type { FilterConfirmProps, FilterResetProps, TableRowSelection } from 'ant-design-vue/es/table/interface'
   import type { HostReq } from '@/api/command/types'
   import type { GroupItem } from '@/components/common/button-group/types'
@@ -346,7 +349,13 @@
         </template>
       </template>
     </a-table>
-    <host-create ref="hostCreateRef" :api-edit-caller="true" :is-public="true" @on-ok="afterSetupHostConfig" />
+    <host-create
+      ref="hostCreateRef"
+      :current-hosts="dataSource"
+      :api-edit-caller="true"
+      :is-public="true"
+      @on-ok="afterSetupHostConfig"
+    />
     <install-dependencies ref="installRef" @on-install-success="getHostList(true)" />
   </div>
 </template>

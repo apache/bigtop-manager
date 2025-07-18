@@ -17,10 +17,13 @@
  * under the License.
  */
 export interface RepoVO {
+  type: number
   arch?: string
   baseUrl?: string
   id?: number
   name?: string
+  pkgName?: string
+  checksum?: string
   [property: string]: any
 }
 

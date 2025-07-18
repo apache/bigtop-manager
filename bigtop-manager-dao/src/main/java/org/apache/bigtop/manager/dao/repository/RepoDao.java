@@ -21,4 +21,9 @@ package org.apache.bigtop.manager.dao.repository;
 
 import org.apache.bigtop.manager.dao.po.RepoPO;
 
-public interface RepoDao extends BaseDao<RepoPO> {}
+import org.apache.ibatis.annotations.Param;
+
+public interface RepoDao extends BaseDao<RepoPO> {
+
+    RepoPO findByName(@Param("name") String name);
+}

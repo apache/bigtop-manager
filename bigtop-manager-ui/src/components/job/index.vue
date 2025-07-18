@@ -25,6 +25,7 @@
   import useBaseTable from '@/composables/use-base-table'
   import LogsView, { type LogViewProps } from '@/components/log-view/index.vue'
   import CustomProgress from './custom-progress.vue'
+
   import type { JobVO, StageVO, StateType, TaskListParams, TaskVO } from '@/api/job/types'
   import type { ClusterVO } from '@/api/cluster/types'
   import type { ListParams } from '@/api/types'

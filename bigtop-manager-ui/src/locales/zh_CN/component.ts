@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -16,14 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-package org.apache.bigtop.manager.dao.repository;
-
-import org.apache.bigtop.manager.dao.po.ToolPO;
-
-import org.apache.ibatis.annotations.Param;
-
-public interface ToolDao extends BaseDao<ToolPO> {
-
-    ToolPO findByName(@Param("name") String name);
+export default {
+  pkg_name: '包名',
+  base_url: '地址',
+  new_base_url: '新地址',
+  note: '注: 源地址的改动对所有集群生效。',
+  dependency: '依赖',
+  update_all: '更新全部'
 }

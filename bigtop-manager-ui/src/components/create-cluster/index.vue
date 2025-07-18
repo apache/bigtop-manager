@@ -37,6 +37,7 @@
 
   const { t } = useI18n()
   const menuStore = useMenuStore()
+
   const compRef = ref<any>()
   const installing = ref(false)
   const stepData = ref<[Partial<ClusterCommandReq>, any, HostReq[], CommandVO]>([{}, {}, [], {}])
@@ -48,16 +49,17 @@
   const installStatus = shallowRef<InstalledStatusVO[]>([])
   const components = shallowRef<any[]>([ClusterBase, ComponentInfo, HostManage, CheckWorkflow])
   const isInstall = computed(() => current.value === 2)
-  const hasUnknownHost = computed(() => stepData.value[2].filter((v) => v.status === Status.Unknown).length == 0)
-
+  const currentStepItems = computed(() => stepData.value[2])
+  const hasNoUnknownHosts = computed(() => currentStepItems.value.every((item) => item.status !== Status.Unknown))
   const allInstallSuccess = computed(
     () =>
-      stepData.value[2].length != 0 &&
-      stepData.value[2].every((v) => v.status === Status.Success) &&
-      hasUnknownHost.value
+      currentStepItems.value.length > 0 &&
+      currentStepItems.value.every((item) => item.status === Status.Success) &&
+      hasNoUnknownHosts.value
   )
   const getCompName = computed(() => components.value[current.value])
   const isDone = computed(() => ['Successful', 'Failed'].includes(stepData.value[stepData.value.length - 1].state))
+
   const steps = computed(() => [
     'cluster.cluster_info',
     'cluster.component_info',
@@ -69,18 +71,6 @@
 
   const updateData = (val: Partial<ClusterCommandReq> | any | HostReq[]) => {
     stepData.value[current.value] = val
-  }
-
-  const createCluster = async () => {
-    try {
-      commandRequest.value.clusterCommand = stepData.value[0] as ClusterCommandReq
-      commandRequest.value.clusterCommand.hosts = stepData.value[2]
-      stepData.value[stepData.value.length - 1] = await execCommand(commandRequest.value)
-      return true
-    } catch (error) {
-      console.log('error :>> ', error)
-      return false
-    }
   }
 
   const prepareNextStep = async () => {
@@ -101,42 +91,59 @@
     }
   }
 
+  /**
+   * Resolves installation dependencies by setting status and calling API.
+   * Starts polling to track progress.
+   */
   const resolveInstallDependencies = async () => {
+    const targetStepData = stepData.value[current.value]
+
     if (stepData.value[2].length == 0) {
       message.error(t('host.uninstallable'))
       return
     }
     try {
       installing.value = true
-      const data = await installDependencies(stepData.value[current.value])
-      data && pollUntilInstalled()
+      stepData.value[current.value] = setInstallItemStatus(targetStepData, Status.Installing)
+
+      const result = await installDependencies(stepData.value[current.value])
+      if (result) {
+        pollUntilInstalled()
+      }
     } catch (error) {
+      console.error('Error resolving dependencies:', error)
       installing.value = false
-      console.log('error :>> ', error)
+      stepData.value[current.value] = setInstallItemStatus(stepData.value[current.value], Status.Failed)
     }
   }
 
+  /**
+   * Records and updates current install status for items.
+   * @returns whether all items are no longer in "Installing" state
+   */
   const recordInstalledStatus = async () => {
     try {
       const data = await getInstalledStatus()
       installStatus.value = data
-      stepData.value[current.value] = mergeByHostname(stepData.value[current.value], data)
+      stepData.value[current.value] = setInstallItemStatus(stepData.value[current.value], data)
+
       return data.every((item) => item.status != Status.Installing)
     } catch (error) {
-      console.log('error :>> ', error)
+      console.error('Error recording installation status:', error)
     }
   }
 
+  /**
+   * Starts polling install status until all items are complete.
+   * @param interval polling interval in milliseconds (default: 1000)
+   */
   const pollUntilInstalled = (interval: number = 1000): void => {
     let isInitialized = false
     let intervalId: NodeJS.Timeout
 
     const poll = async () => {
       if (!isInitialized) {
-        stepData.value[current.value] = stepData.value[current.value].map((item: HostReq) => ({
-          ...item,
-          status: Status.Installing
-        }))
+        stepData.value[current.value] = setInstallItemStatus(stepData.value[current.value], Status.Installing)
         isInitialized = true
       }
       const result = await recordInstalledStatus()
@@ -150,34 +157,46 @@
     poll()
   }
 
-  const mergeByHostname = (arr1: any[], arr2: any[]): any[] => {
-    const mergedMap = new Map<string, any>()
-    for (const item of arr1) {
+  /**
+   * Merges install items with status.
+   * If status is an array, merge each item by hostname.
+   * If status is a string, apply it uniformly to all items.
+   *
+   * @param items original install item list
+   * @param status array of partial updates OR a uniform status string
+   * @returns merged install item list
+   */
+  const setInstallItemStatus = <T extends HostReq>(items: T[], status: T[] | string): T[] => {
+    const mergedMap = new Map<string, T>()
+
+    for (const item of items) {
       mergedMap.set(item.hostname, { ...item })
     }
-    for (const item of arr2) {
-      if (mergedMap.has(item.hostname)) {
-        mergedMap.set(item.hostname, { ...mergedMap.get(item.hostname), ...item })
-      } else {
-        mergedMap.set(item.hostname, { ...item })
+
+    if (Array.isArray(status)) {
+      for (const item of status) {
+        const mergedMapItem = mergedMap.get(item.hostname)
+        mergedMap.set(item.hostname, mergedMapItem ? { ...mergedMapItem, ...item } : { ...item })
+      }
+    } else {
+      for (const [hostname, item] of mergedMap) {
+        mergedMap.set(hostname, { ...item, status })
       }
     }
+
     return Array.from(mergedMap.values())
   }
 
-  // const changeStep = (step: number) => {
-  //   if (current.value > step) {
-  //     const previousCount = current.value - step
-  //     Array.from({ length: previousCount }).forEach(() => previousStep())
-  //   }
-  //   if (current.value < step) {
-  //     const nextCount = step - current.value
-  //     Array.from({ length: nextCount }).forEach(() => prepareNextStep())
-  //   }
-  // }
-
-  const onSave = () => {
-    menuStore.updateSider()
+  const createCluster = async () => {
+    try {
+      commandRequest.value.clusterCommand = stepData.value[0] as ClusterCommandReq
+      commandRequest.value.clusterCommand.hosts = stepData.value[2]
+      stepData.value[stepData.value.length - 1] = await execCommand(commandRequest.value)
+      return true
+    } catch (error) {
+      console.log('error :>> ', error)
+      return false
+    }
   }
 
   onBeforeRouteLeave((_to, _from, next) => {
@@ -243,7 +262,7 @@
               {{ $t('common.next') }}
             </a-button>
           </template>
-          <a-button v-show="current === stepsLimit && isDone" type="primary" @click="onSave"
+          <a-button v-show="current === stepsLimit && isDone" type="primary" @click="() => menuStore.updateSider()"
             >{{ $t('common.done') }}
           </a-button>
         </a-space>

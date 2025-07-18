@@ -26,7 +26,7 @@ import org.apache.bigtop.manager.grpc.generated.SetupJdkRequest;
 import org.apache.bigtop.manager.grpc.generated.SetupJdkServiceGrpc;
 import org.apache.bigtop.manager.grpc.pojo.ClusterInfo;
 import org.apache.bigtop.manager.grpc.pojo.PackageInfo;
-import org.apache.bigtop.manager.grpc.pojo.ToolInfo;
+import org.apache.bigtop.manager.grpc.pojo.RepoInfo;
 import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
 import org.apache.bigtop.manager.stack.core.utils.TarballUtils;
 import org.apache.bigtop.manager.stack.core.utils.linux.LinuxFileUtils;
@@ -53,17 +53,16 @@ public class SetupJdkServiceGrpcImpl extends SetupJdkServiceGrpc.SetupJdkService
 
             log.info("Setting up cluster jdk...");
             ClusterInfo clusterInfo = LocalSettings.cluster();
-            String toolsHome = clusterInfo.getRootDir() + "/tools";
+            String dependenciesHome = clusterInfo.getRootDir() + "/dependencies";
             String user = System.getProperty("user.name");
-            LinuxFileUtils.createDirectories(toolsHome, user, user, Constants.PERMISSION_755, true);
+            LinuxFileUtils.createDirectories(dependenciesHome, user, user, Constants.PERMISSION_755, true);
 
-            String jdkHome = toolsHome + "/jdk";
-            ToolInfo tool = LocalSettings.getTool("jdk8");
+            String jdkHome = dependenciesHome + "/jdk";
+            RepoInfo repoInfo = LocalSettings.repo("jdk8");
             PackageInfo packageInfo = new PackageInfo();
-            packageInfo.setUrl(tool.getBaseUrl());
-            packageInfo.setName(tool.getPkgName());
-            packageInfo.setChecksum(tool.getChecksum());
-            TarballUtils.installPackage(null, toolsHome, jdkHome, packageInfo, 1);
+            packageInfo.setName(repoInfo.getPkgName());
+            packageInfo.setChecksum(repoInfo.getChecksum());
+            TarballUtils.installPackage(repoInfo.getBaseUrl(), dependenciesHome, jdkHome, packageInfo, 1);
             LinuxFileUtils.createDirectories(jdkHome, user, user, Constants.PERMISSION_755, true);
 
             SetupJdkReply reply = SetupJdkReply.newBuilder()
