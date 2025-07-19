@@ -18,6 +18,7 @@
  */
 package org.apache.bigtop.manager.stack.extra.v1_0_0.doris;
 
+import org.apache.bigtop.manager.common.constants.MessageConstants;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.stack.core.exception.StackException;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
@@ -64,7 +65,10 @@ public class DorisBEScript extends AbstractServerScript {
 
         String cmd = MessageFormat.format("{0}/start_be.sh --daemon", dorisParams.dorisBeBinDir());
         try {
-            LinuxOSUtils.sudoExecCmd(cmd, dorisParams.user());
+            ShellResult sr = LinuxOSUtils.sudoExecCmd(cmd, dorisParams.user());
+            if (sr.getExitCode() != MessageConstants.SUCCESS_CODE) {
+                throw new StackException(sr.formatMessage("Failed to start Doris BE"));
+            }
         } catch (Exception e) {
             throw new StackException(e);
         }

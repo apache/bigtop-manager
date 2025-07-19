@@ -47,12 +47,12 @@ public class DorisTool {
                 host, port);
         this.user = user;
         this.password = password;
-        log.info("Connecting to database... {}", jdbcUrl);
+        log.info("Connecting to database: [jdbc:arrow-flight-sql://{}:{}]", host, port);
     }
 
-    public Connection connect() throws SQLException {
+    public Connection connect() throws Exception {
         int attempt = 0;
-        SQLException lastException = null;
+        Exception lastException = null;
 
         while (attempt < MAX_RETRIES) {
             try {
@@ -61,12 +61,12 @@ public class DorisTool {
                     log.info("Successfully connected to Doris");
                     return connection;
                 } else {
-                    log.warn("Connection is null or closed");
+                    throw new Exception("Connection is null or closed");
                 }
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 lastException = e;
                 attempt++;
-                log.warn("Connection attempt {} failed: {}", attempt, e.getMessage());
+                log.warn("Connection attempt [{}] failed: [{}]", attempt, e.getMessage());
 
                 if (attempt < MAX_RETRIES) {
                     try {
@@ -79,11 +79,11 @@ public class DorisTool {
             }
         }
 
-        throw new SQLException("Failed to connect after " + MAX_RETRIES + " attempts", lastException);
+        throw new Exception("Failed to connect after " + MAX_RETRIES + " attempts", lastException);
     }
 
-    public List<Map<String, Object>> executeQuery(String sql) throws SQLException {
-        log.info("Executing SQL query: {}", sql);
+    public List<Map<String, Object>> executeQuery(String sql) throws Exception {
+        log.info("Executing SQL query: [{}]", sql);
 
         List<Map<String, Object>> resultList = new ArrayList<>();
 

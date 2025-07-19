@@ -20,6 +20,7 @@
 package org.apache.bigtop.manager.stack.extra.v1_0_0.doris;
 
 import org.apache.bigtop.manager.common.shell.ShellResult;
+import org.apache.bigtop.manager.stack.core.exception.StackException;
 import org.apache.bigtop.manager.stack.core.utils.linux.LinuxOSUtils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -37,17 +38,15 @@ import java.util.stream.Collectors;
 public class DorisService {
     public static void registerBe(DorisParams dorisParams) {
         String hostname = dorisParams.hostname();
-        log.info("registerBe: ip {}, hostname {}", dorisParams.ip(), hostname);
+        log.info("Registering Doris BE: ip [{}], hostname [{}]", dorisParams.ip(), hostname);
         String aliveFe = getAliveFe(dorisParams);
         if (aliveFe == null) {
-            log.error("registerBe: No FE alive!!!");
-            return;
+            throw new StackException("Fail to register Doris BE: No FE alive!");
         }
 
-        List<String> beList = DorisService.getBeList(dorisParams);
+        List<String> beList = DorisService.getBeList(aliveFe, dorisParams);
         if (beList.contains(hostname)) {
-            log.info("Doris BE {} already registered", hostname);
-            return;
+            log.info("Doris BE [{}] already registered", hostname);
         }
         String sql = MessageFormat.format(
                 "ALTER SYSTEM ADD BACKEND ''{0}:{1,number,#}'';", hostname, dorisParams.dorisBeHeartbeatPort());
@@ -55,33 +54,29 @@ public class DorisService {
         try {
             dorisTool.executeQuery(sql);
         } catch (Exception e) {
-            log.error("Error registering Doris BE {} ", hostname, e);
+            log.error("Error register Doris BE [{}] ", hostname, e);
+            throw new StackException(e);
         }
     }
 
-    public static List<String> getBeList(DorisParams dorisParams) {
-        log.info("getBeList: ip {}, hostname {}", dorisParams.ip(), dorisParams.hostname());
-        String aliveFe = getAliveFe(dorisParams);
-        if (aliveFe == null) {
-            log.error("getBeList: No FE alive!!!");
-            return List.of();
-        }
+    public static List<String> getBeList(String aliveFe, DorisParams dorisParams) {
         String sql = "SHOW BACKENDS;";
         DorisTool dorisTool = new DorisTool(aliveFe, "root", "", dorisParams.dorisFeArrowFlightSqlPort());
-        List<String> beList = new ArrayList<>();
+        List<String> beList;
         try {
             beList = dorisTool.executeQuery(sql).stream()
                     .map(map -> (String) map.get("Host"))
                     .collect(Collectors.toList());
-            log.info("getBeList: BE hosts found: {}", beList);
+            log.info("BE hosts found: [{}]", beList);
         } catch (Exception e) {
-            log.error("Error executing SQL query: {}, {}", sql, e.getMessage());
+            log.error("Error executing SQL query: [{}], [{}]", sql, e.getMessage());
+            throw new StackException(e);
         }
+
         return beList;
     }
 
     public static String getAliveFe(DorisParams dorisParams) {
-        log.info("getAliveFe: ip {}, hostname {}", dorisParams.ip(), dorisParams.hostname());
         int dorisFeHttpPort = dorisParams.dorisFeHttpPort();
         List<String> feHosts = dorisParams.dorisFeHosts();
         String aliveFe = null;
@@ -102,7 +97,7 @@ public class DorisService {
                     }
                     attempts++;
                     try {
-                        log.info("Retry {} to connect {}", attempts, host);
+                        log.info("Retry [{}] to connect [{}]", attempts, host);
                         Thread.sleep(5000);
                     } catch (InterruptedException ie) {
                         Thread.currentThread().interrupt();
@@ -111,13 +106,16 @@ public class DorisService {
                 }
             }
         } catch (Exception e) {
-            log.error("Error checking alive FE hosts: {} {}", e.getMessage(), e.getMessage());
+            log.error("Error checking alive FE hosts: [{}] [{}]", e.getMessage(), e.getMessage());
+            throw new StackException(e);
         }
+
         if (aliveFe == null) {
-            log.warn("No alive FE host found in the list: {}", feHosts);
+            log.warn("No alive FE host found in the list: [{}]", feHosts);
         } else {
-            log.info("Alive FE host: {}", aliveFe);
+            log.info("Alive FE host: [{}]", aliveFe);
         }
+
         return aliveFe;
     }
 
@@ -128,12 +126,11 @@ public class DorisService {
      * @return (MasterFeHost, AllFeHost)
      */
     public static Pair<String, List<String>> getMasterAndFeList(DorisParams dorisParams) {
-        log.info("getMasterAndFeList: ip {}, hostname {}", dorisParams.ip(), dorisParams.hostname());
         AtomicReference<String> masterHost =
                 new AtomicReference<>(dorisParams.dorisFeHosts().get(0));
         String aliveFe = getAliveFe(dorisParams);
         if (aliveFe == null) {
-            log.warn("getMasterAndFeList: No alive FE ");
+            log.warn("No alive FE");
             return Pair.of(masterHost.get(), List.of());
         }
         List<String> feList = new ArrayList<>();
@@ -151,18 +148,18 @@ public class DorisService {
                     })
                     .forEach(feList::add);
         } catch (Exception e) {
-            log.error("Error executing SQL query: {} {}", sql, e.getMessage());
+            log.error("Error executing SQL query: [{}], msg: [{}]", sql, e.getMessage());
+            throw new StackException(e);
         }
-        log.info("getMasterAndFeList: FE hosts found: {}", feList);
+
+        log.info("FE hosts found: [{}]", feList);
         return Pair.of(masterHost.get(), feList);
     }
 
     public static void registerFollower(DorisParams dorisParams, String hostname) {
-        log.info("registerFollower: hostname {}", hostname);
         String aliveFe = getAliveFe(dorisParams);
         if (aliveFe == null) {
-            log.error("registerFollower: No FE alive!!!");
-            return;
+            throw new StackException("Error registering follower: No FE alive!");
         }
 
         Pair<String, List<String>> masterAndFeList = getMasterAndFeList(dorisParams);
@@ -170,7 +167,7 @@ public class DorisService {
         String feMaster = masterAndFeList.getLeft();
 
         if (feList.contains(hostname)) {
-            log.info("Doris FE {} already registered", hostname);
+            log.info("Doris FE [{}] already registered", hostname);
         } else {
             DorisTool dorisTool = new DorisTool(feMaster, "root", "", dorisParams.dorisFeArrowFlightSqlPort());
 
@@ -180,7 +177,8 @@ public class DorisService {
 
                 dorisTool.executeQuery(sql);
             } catch (Exception e) {
-                log.error("Error registering Doris Follower: {}", e.getMessage());
+                log.error("Error registering Doris Follower: [{}]", e.getMessage());
+                throw new StackException(e);
             }
         }
     }

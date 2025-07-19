@@ -65,7 +65,6 @@ public class DorisFEScript extends AbstractServerScript {
         DorisParams dorisParams = (DorisParams) params;
         String hostname = dorisParams.hostname();
         String ip = dorisParams.ip();
-        log.info("ip {}, hostname {}", ip, hostname);
         LinuxFileUtils.removeDirectories(dorisParams.dorisFePidFile());
 
         // Check if the FE is already registered
