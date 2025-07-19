@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one
+  ~ or more contributor license agreements.  See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership.  The ASF licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License.  You may obtain a copy of the License at
+  ~
+  ~    https://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+-->
+
+<metainfo>
+    <service>
+        <name>doris</name>
+        <display-name>Doris</display-name>
+        <desc>
+            Apache Doris is a modern data warehouse for real-time analytics.
+            It delivers lightning-fast analytics on real-time data at scale.
+        </desc>
+        <version>2.1.10</version>
+        <user>doris</user>
+        <license>Apache-2.0</license>
+
+        <components>
+            <component>
+                <name>doris_fe</name>
+                <display-name>Doris Frontend</display-name>
+                <category>server</category>
+                <cardinality>1+</cardinality>
+            </component>
+
+            <component>
+                <name>doris_be</name>
+                <display-name>Doris Backend</display-name>
+                <category>server</category>
+                <cardinality>1+</cardinality>
+            </component>
+            
+        </components>
+
+        <package-specifics>
+            <package-specific>
+                <architectures>
+                    <arch>x86_64</arch>
+                </architectures>
+                <packages>
+                    <package>
+                        <name>apache-doris-2.1.10-bin-x64-noavx2.tar.gz</name>
+                        <checksum>SHA-512:4238436ad0a6eedc4918018b90a71d39b59c640a96188a007ed109a8c317357bdb6bfd3ed7a8768ebf1d72df10dffd19f5c597235da5e693bd587f4326edcc14</checksum>
+                    </package>
+                </packages>
+            </package-specific>
+            <package-specific>
+                <architectures>
+                    <arch>aarch64</arch>
+                </architectures>
+                <packages>
+                    <package>
+                        <name>apache-doris-2.1.10-bin-arm64.tar.gz</name>
+                        <checksum>SHA-512:bf9140c547d7b30ff25276fb8a44e443f8518876edd60d56460bc2e60f12c4200261ece60a43909b7c0cd4758621ba9fe85a58c29fb056a43947ee1d2fb27cea</checksum>
+                    </package>
+                </packages>
+            </package-specific>
+        </package-specifics>
+    </service>
+</metainfo>

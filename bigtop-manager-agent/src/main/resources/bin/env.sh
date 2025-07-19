@@ -62,5 +62,7 @@ find_java() {
 
 find_java
 
-export JAVA_OPTS=""
+JAVA_OPTS="-server -Duser.timezone=${SPRING_JACKSON_TIME_ZONE} -Xms4g -Xmx4g -Xmn2g -XX:+IgnoreUnrecognizedVMOptions -XX:+PrintGCDateStamps -XX:+PrintGCDetails -Xloggc:gc.log -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=dump.hprof"
+JAVA_OPTS="${JAVA_OPTS} --add-opens=java.base/java.nio=org.apache.arrow.memory.core,ALL-UNNAMED"
+export JAVA_OPTS
 export JAVA_CMD
