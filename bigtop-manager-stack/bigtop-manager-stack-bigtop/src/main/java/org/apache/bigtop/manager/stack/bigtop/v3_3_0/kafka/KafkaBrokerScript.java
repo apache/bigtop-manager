@@ -57,7 +57,7 @@ public class KafkaBrokerScript extends AbstractServerScript {
         KafkaParams kafkaParams = (KafkaParams) params;
 
         String cmd = MessageFormat.format(
-                "{0}/bin/kafka-server-start.sh {0}/config/server.properties > /dev/null 2>&1 & echo -n $!>{1}",
+                "source {0}/config/kafka-env.sh ; {0}/bin/kafka-server-start.sh {0}/config/server.properties > /dev/null 2>&1 & echo -n $!>{1}",
                 kafkaParams.serviceHome(), kafkaParams.getKafkaPidFile());
         try {
             return LinuxOSUtils.sudoExecCmd(cmd, kafkaParams.user());
