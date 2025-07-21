@@ -37,6 +37,13 @@ import {
 import { isString } from 'lodash-es'
 import { type Component, h, defineComponent } from 'vue'
 
+/**
+ * Transforms a component's `v-model:value` binding into the standard `v-model` binding.
+ *
+ * @param component - The component to transform.
+ * @param key - The key to use for the model value, defaults to 'value'.
+ * @returns A new component that supports `v-model` shorthand.
+ */
 export function transformModelValue(component: Component, key = 'value'): Component {
   return defineComponent({
     setup(props: any, { attrs, slots, emit }) {
