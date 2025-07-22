@@ -91,8 +91,8 @@
     router.push({ name: 'CreateCluster' })
   }
 
-  onMounted(async () => {
-    await stackStore.loadStacks()
+  onMounted(() => {
+    stackStore.loadStacks()
     clusterStore.loadClusters()
   })
 
