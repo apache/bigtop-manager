@@ -30,7 +30,7 @@
     "pinia-plugin-persistedstate": "^3.2.0",
     "vue": "^3.4.37",
     "vue-dompurify-html": "^5.1.0",
-    "vue-i18n": "^11.1.5",
+    "vue-i18n": "^11.1.10",
     "vue-router": "^4.2.4"
   },
   "devDependencies": {
@@ -60,6 +60,11 @@
     "vite": "^5.4.19",
     "vitest": "^3.2.3",
     "vue-tsc": "^1.8.5"
+  },
+  "pnpm": {
+    "overrides": {
+      "axios>form-data": "4.0.4"
+    }
   },
   "browserslist": [
     "defaults",
