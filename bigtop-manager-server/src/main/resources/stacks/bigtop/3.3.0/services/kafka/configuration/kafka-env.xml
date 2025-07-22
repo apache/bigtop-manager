@@ -56,11 +56,6 @@ export JAVA_HOME=${java_home!}
 <#noparse>export PATH=$PATH:${JAVA_HOME}/bin</#noparse>
 export PID_DIR=${kafka_pid_dir!}
 export LOG_DIR=${kafka_log_dir!}
-<#if security_enabled >
-export KAFKA_OPTS="-Djavax.security.auth.useSubjectCredsOnly=false {{kafka_kerberos_params}}"
-<#else>
-export KAFKA_OPTS={{kafka_kerberos_params}}
-</#if>
 export CLASSPATH=$CLASSPATH:${kafka_conf_dir}
 ]]>
       </value>

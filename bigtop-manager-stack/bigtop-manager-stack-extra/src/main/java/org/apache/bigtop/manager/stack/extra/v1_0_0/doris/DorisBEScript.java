@@ -16,13 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.stack.bigtop.v3_3_0.kafka;
+package org.apache.bigtop.manager.stack.extra.v1_0_0.doris;
 
+import org.apache.bigtop.manager.common.constants.MessageConstants;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.stack.core.exception.StackException;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.spi.script.AbstractServerScript;
 import org.apache.bigtop.manager.stack.core.spi.script.Script;
+import org.apache.bigtop.manager.stack.core.utils.linux.LinuxFileUtils;
 import org.apache.bigtop.manager.stack.core.utils.linux.LinuxOSUtils;
 
 import com.google.auto.service.AutoService;
@@ -34,7 +36,7 @@ import java.util.Properties;
 
 @Slf4j
 @AutoService(Script.class)
-public class KafkaBrokerScript extends AbstractServerScript {
+public class DorisBEScript extends AbstractServerScript {
 
     @Override
     public ShellResult add(Params params) {
@@ -48,52 +50,55 @@ public class KafkaBrokerScript extends AbstractServerScript {
     public ShellResult configure(Params params) {
         super.configure(params);
 
-        return KafkaSetup.configure(params);
+        try {
+            return DorisSetup.config(params, "doris_be");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public ShellResult start(Params params) {
         configure(params);
-        KafkaParams kafkaParams = (KafkaParams) params;
+        DorisParams dorisParams = (DorisParams) params;
+        LinuxFileUtils.removeDirectories(dorisParams.dorisBePidFile());
 
-        String cmd = MessageFormat.format(
-                "source {0}/config/kafka-env.sh ; {0}/bin/kafka-server-start.sh {0}/config/server.properties > /dev/null 2>&1 & echo -n $!>{1}",
-                kafkaParams.serviceHome(), kafkaParams.getKafkaPidFile());
+        String cmd = MessageFormat.format("{0}/start_be.sh --daemon", dorisParams.dorisBeBinDir());
         try {
-            return LinuxOSUtils.sudoExecCmd(cmd, kafkaParams.user());
-        } catch (IOException e) {
+            ShellResult sr = LinuxOSUtils.sudoExecCmd(cmd, dorisParams.user());
+            if (sr.getExitCode() != MessageConstants.SUCCESS_CODE) {
+                throw new StackException(sr.formatMessage("Failed to start Doris BE"));
+            }
+        } catch (Exception e) {
             throw new StackException(e);
         }
+
+        // Register BE
+        DorisService.registerBe(dorisParams);
+        return ShellResult.success();
     }
 
     @Override
     public ShellResult stop(Params params) {
-        KafkaParams kafkaParams = (KafkaParams) params;
-        String cmd = MessageFormat.format("{0}/bin/kafka-server-stop.sh", kafkaParams.serviceHome());
+        DorisParams dorisParams = (DorisParams) params;
+        String cmd = MessageFormat.format("{0}/stop_be.sh", dorisParams.dorisBeBinDir());
         try {
-            return LinuxOSUtils.sudoExecCmd(cmd, kafkaParams.user());
-        } catch (IOException e) {
+            ShellResult shellResult = LinuxOSUtils.sudoExecCmd(cmd, dorisParams.user());
+            LinuxFileUtils.removeDirectories(dorisParams.dorisBePidDir());
+            return shellResult;
+        } catch (Exception e) {
             throw new StackException(e);
         }
     }
 
     @Override
     public ShellResult status(Params params) {
-        KafkaParams kafkaParams = (KafkaParams) params;
-        return LinuxOSUtils.checkProcess(kafkaParams.getKafkaPidFile());
-    }
-
-    public ShellResult test(Params params) {
-        KafkaParams kafkaParams = (KafkaParams) params;
-        try {
-            return LinuxOSUtils.sudoExecCmd("date", kafkaParams.user());
-        } catch (IOException e) {
-            throw new StackException(e);
-        }
+        DorisParams dorisParams = (DorisParams) params;
+        return LinuxOSUtils.checkProcess(dorisParams.dorisBePidFile());
     }
 
     @Override
     public String getComponentName() {
-        return "kafka_broker";
+        return "doris_be";
     }
 }

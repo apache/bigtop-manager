@@ -62,4 +62,8 @@ public class ShellResult {
     public static ShellResult fail() {
         return fail("Run shell fail.");
     }
+
+    public String formatMessage(String message) {
+        return MessageFormat.format(message + ", output: [{0}], err: [{1}]", output, errMsg);
+    }
 }

@@ -50,6 +50,8 @@ dependency:
     - pom.xml
     - bigtop-manager-bom/pom.xml
   licenses:
+    - name: org.apache.arrow:flight-sql-jdbc-driver
+      license: Apache-2.0
     - name: org.apache.hadoop.thirdparty:hadoop-shaded-protobuf_3_7
       license: Apache-2.0
     - name: org.apache.hadoop.thirdparty:hadoop-shaded-guava

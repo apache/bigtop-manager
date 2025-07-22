@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~ Licensed to the Apache Software Foundation (ASF) under one
   ~ or more contributor license agreements.  See the NOTICE file
@@ -20,30 +20,31 @@
 
 <metainfo>
     <service>
-        <name>mysql</name>
-        <display-name>MySQL</display-name>
+        <name>doris</name>
+        <display-name>Doris</display-name>
         <desc>
-            MySQL is an open source relational database management system (RDBMS) that’s used to store and manage data.
-            Its reliability, performance, scalability, and ease of use make MySQL a popular choice for developers.
+            Apache Doris is a modern data warehouse for real-time analytics.
+            It delivers lightning-fast analytics on real-time data at scale.
         </desc>
-        <version>8.0.40</version>
-        <user>mysql</user>
-        <license>GPLv2</license>
+        <version>2.1.10</version>
+        <user>doris</user>
+        <license>Apache-2.0</license>
 
         <components>
             <component>
-                <name>mysql_server</name>
-                <display-name>MySQL Server</display-name>
+                <name>doris_fe</name>
+                <display-name>Doris Frontend</display-name>
                 <category>server</category>
-                <cardinality>1</cardinality>
+                <cardinality>1+</cardinality>
             </component>
 
             <component>
-                <name>mysql_client</name>
-                <display-name>MySQL Client</display-name>
-                <category>client</category>
+                <name>doris_be</name>
+                <display-name>Doris Backend</display-name>
+                <category>server</category>
                 <cardinality>1+</cardinality>
             </component>
+            
         </components>
 
         <package-specifics>
@@ -53,8 +54,8 @@
                 </architectures>
                 <packages>
                     <package>
-                        <name>mysql-8.0.40-linux-glibc2.28-x86_64.tar.xz</name>
-                        <checksum>MD5:dcf2702f953d1969be44083f4f063f18</checksum>
+                        <name>apache-doris-2.1.10-bin-x64-noavx2.tar.gz</name>
+                        <checksum>SHA-512:4238436ad0a6eedc4918018b90a71d39b59c640a96188a007ed109a8c317357bdb6bfd3ed7a8768ebf1d72df10dffd19f5c597235da5e693bd587f4326edcc14</checksum>
                     </package>
                 </packages>
             </package-specific>
@@ -64,8 +65,8 @@
                 </architectures>
                 <packages>
                     <package>
-                        <name>mysql-8.0.40-linux-glibc2.28-aarch64.tar.xz</name>
-                        <checksum>MD5:a79f41ce62784a1a0e081c76116008de</checksum>
+                        <name>apache-doris-2.1.10-bin-arm64.tar.gz</name>
+                        <checksum>SHA-512:bf9140c547d7b30ff25276fb8a44e443f8518876edd60d56460bc2e60f12c4200261ece60a43909b7c0cd4758621ba9fe85a58c29fb056a43947ee1d2fb27cea</checksum>
                     </package>
                 </packages>
             </package-specific>

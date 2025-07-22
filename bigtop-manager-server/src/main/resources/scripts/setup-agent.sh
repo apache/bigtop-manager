@@ -38,6 +38,8 @@ error () {
 }
 
 check_sudo() {
+    # Refresh sudo privileges, currently only appears in openEuler24.03
+    sudo visudo -c 2>/dev/null || true
     if ! sudo -n true 2>/dev/null; then
         error "User '$USER' doesn't have sudo privileges"
         exit 1

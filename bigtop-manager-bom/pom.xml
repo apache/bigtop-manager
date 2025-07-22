@@ -57,6 +57,8 @@
         <mybatis-spring-boot-starter.version>3.0.3</mybatis-spring-boot-starter.version>
         <pagehelper-spring-boot-starter.version>2.1.0</pagehelper-spring-boot-starter.version>
         <victools.version>4.29.0</victools.version>
+        <arrow.version>18.3.0</arrow.version>
+        <netty-buffer.version>4.1.123.Final</netty-buffer.version>
     </properties>
 
     <dependencyManagement>
@@ -237,7 +239,18 @@
                 <scope>provided</scope>
             </dependency>
 
+            <dependency>
+                <groupId>org.apache.arrow</groupId>
+                <artifactId>flight-sql-jdbc-driver</artifactId>
+                <version>${arrow.version}</version>
+            </dependency>
+
             <!-- gRPC -->
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-netty</artifactId>
+                <version>${grpc.version}</version>
+            </dependency>
             <dependency>
                 <groupId>io.grpc</groupId>
                 <artifactId>grpc-stub</artifactId>

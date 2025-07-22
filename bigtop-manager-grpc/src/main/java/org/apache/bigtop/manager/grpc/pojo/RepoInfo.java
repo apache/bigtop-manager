@@ -32,4 +32,10 @@ public class RepoInfo {
     private String arch;
 
     private String baseUrl;
+
+    private String pkgName;
+
+    private String checksum;
+
+    private Integer type;
 }

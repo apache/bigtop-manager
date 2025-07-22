@@ -178,6 +178,7 @@ public class LinuxFileUtils {
         try {
             ShellResult shellResult = sudoExecCmd(builderParameters);
             if (shellResult.getExitCode() != MessageConstants.SUCCESS_CODE) {
+                log.error(shellResult.formatMessage("Failed to create directory"));
                 throw new StackException(shellResult.getErrMsg());
             }
         } catch (IOException e) {

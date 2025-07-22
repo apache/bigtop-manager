@@ -34,5 +34,9 @@
             <groupId>org.apache.bigtop</groupId>
             <artifactId>bigtop-manager-stack-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.arrow</groupId>
+            <artifactId>flight-sql-jdbc-driver</artifactId>
+        </dependency>
     </dependencies>
 </project>
