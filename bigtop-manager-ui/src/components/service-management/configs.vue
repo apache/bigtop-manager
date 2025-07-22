@@ -174,7 +174,7 @@
                   <a-textarea
                     v-if="property.isManual"
                     v-model:value="property.name"
-                    :auto-size="{ minRows: 1, maxRows: 5 }"
+                    :auto-size="{ minRows: 1, maxRows: 30 }"
                   />
                   <span v-else style="overflow-wrap: break-word" :title="property.displayName ?? property.name">
                     {{ property.displayName ?? property.name }}
@@ -183,7 +183,7 @@
               </a-col>
               <a-col v-bind="layout.wrapperCol">
                 <a-form-item>
-                  <a-textarea v-model:value="property.value" :auto-size="{ minRows: 1, maxRows: 5 }" />
+                  <a-textarea v-model:value="property.value" :rows="property?.attrs?.type === 'longtext' ? 10 : 1" />
                 </a-form-item>
               </a-col>
               <a-button type="text" shape="circle" @click="removeProperty(property, config)">

@@ -226,7 +226,7 @@
               </a-col>
               <a-col v-bind="layout.wrapperCol">
                 <a-form-item>
-                  <a-textarea v-model:value="property.value" :auto-size="{ minRows: 1, maxRows: 5 }" />
+                  <a-textarea v-model:value="property.value" :rows="property?.attrs?.type === 'longtext' ? 10 : 1" />
                 </a-form-item>
               </a-col>
               <a-button
