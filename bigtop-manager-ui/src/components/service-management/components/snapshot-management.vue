@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { computed, ref, shallowRef } from 'vue'
+  import { computed, ref, h, shallowRef } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { message, Modal, TableColumnType } from 'ant-design-vue'
   import useBaseTable from '@/composables/use-base-table'
@@ -27,6 +27,7 @@
     getServiceConfigSnapshotsList,
     recoveryServiceConfigSnapshot
   } from '@/api/service'
+  import SvgIcon from '@/components/common/svg-icon/index.vue'
 
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { ServiceConfigSnapshot, ServiceParams, SnapshotRecovery } from '@/api/service/types'
@@ -101,7 +102,12 @@
   const handleTableOperation = (item: GroupItem<OperationType>, payLoad: ServiceConfigSnapshot) => {
     const currOperation = operationMap.value[item.action!]
     Modal.confirm({
-      title: currOperation.modalTitle,
+      title: () =>
+        h('div', { style: { display: 'flex' } }, [
+          h(SvgIcon, { name: 'unknown', style: { width: '24px', height: '24px' } }),
+          h('p', currOperation.modalTitle)
+        ]),
+      icon: null,
       style: { top: '30vh' },
       async onOk() {
         try {

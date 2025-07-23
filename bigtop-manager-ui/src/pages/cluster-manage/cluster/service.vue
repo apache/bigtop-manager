@@ -114,7 +114,7 @@
         commandLevel: 'service',
         serviceCommands: [{ serviceName: service.name, installed: true }]
       } as CommandRequest
-      jobProgressStore.processCommand(execCommandParams, getServices)
+      jobProgressStore.processCommand(execCommandParams, getServices, { displayName: service.displayName })
     }
   }
 

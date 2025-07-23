@@ -28,7 +28,7 @@ import { getJobDetails } from '@/api/job'
 import SvgIcon from '@/components/common/svg-icon/index.vue'
 import JobModal from '@/components/job-modal/index.vue'
 
-import type { CommandRequest } from '@/api/command/types'
+import { type CommandRequest } from '@/api/command/types'
 import type { JobParams, JobVO } from '@/api/job/types'
 
 export type StatusType = 'processing' | 'success' | 'failed' | 'pending'
@@ -41,6 +41,8 @@ export interface JobStageProgressItem extends Partial<CommandRequest> {
   desc: string
   payLoad?: JobVO
 }
+
+type PayLoad = { displayName?: string | string[] } & Record<string, any>
 
 type JobStageProgress = Record<StatusType, () => JobStageProgressItem>
 
@@ -249,13 +251,32 @@ export const useJobProgress = defineStore('job-progress', () => {
    * @param payLoad additional payload for the command
    * @returns void
    */
-  const processCommand = (params: CommandRequest, nextAction?: (...args: any) => void, payLoad?: any) => {
+  const processCommand = (params: CommandRequest, nextAction?: (...args: any) => void, payLoad?: PayLoad) => {
+    const { displayName = '' } = payLoad as PayLoad
+    const action = t(`common.${params.command.toLowerCase()}`).toLowerCase()
+
+    let target = ''
+
+    if (typeof displayName === 'string') {
+      target = displayName
+    }
+
+    if (Array.isArray(displayName)) {
+      if (displayName.length > 1) {
+        target = t(`common.${params.commandLevel}`).toLowerCase() + 's'
+      } else {
+        target = displayName[0]
+      }
+    }
+
     Modal.confirm({
-      title: t('common.confirm_action', {
-        action: t(`common.${params.command.toLowerCase()}`).toLowerCase(),
-        target: payLoad?.displayName ?? t(`common.${params.commandLevel}`).toLowerCase()
-      }),
+      title: () =>
+        h('div', { style: { display: 'flex' } }, [
+          h(SvgIcon, { name: 'unknown', style: { width: '24px', height: '24px' } }),
+          h('p', t('common.confirm_action', { action, target }))
+        ]),
       style: { top: '30vh' },
+      icon: null,
       async onOk() {
         try {
           const { id: jobId, name } = await execCommand(params)

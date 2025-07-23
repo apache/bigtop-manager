@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onActivated, onDeactivated, reactive, ref, shallowRef, useAttrs } from 'vue'
+  import { computed, onActivated, h, onDeactivated, reactive, ref, shallowRef, useAttrs } from 'vue'
   import { storeToRefs } from 'pinia'
   import { useI18n } from 'vue-i18n'
   import { useRoute, useRouter } from 'vue-router'
@@ -27,6 +27,7 @@
   import { useJobProgress } from '@/store/job-progress'
   import useBaseTable from '@/composables/use-base-table'
   import { message, Modal, type TableColumnType, type TableProps } from 'ant-design-vue'
+  import SvgIcon from '@/components/common/svg-icon/index.vue'
 
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { ComponentVO } from '@/api/component/types'
@@ -223,8 +224,7 @@
       return map
     }, new Map())
     commandRequest.value.componentCommands = [...map.values()]
-    execOperation()
-    getComponentList(true, true)
+    execOperation(state.selectedRows)
   }
 
   const handleTableOperation = async (item: GroupItem<keyof typeof Command>, row: ComponentVO) => {
@@ -233,21 +233,31 @@
       componentName: row.name!,
       hostnames: [row.hostname!]
     })
-    execOperation()
+    execOperation([row])
   }
 
-  const execOperation = () => {
-    jobProgressStore.processCommand({ ...commandRequest.value, clusterId: attrs.clusterId }, async () => {
-      getComponentList(true, true)
-      state.selectedRowKeys = []
-      state.selectedRows = []
-    })
+  const execOperation = (rows?: ComponentVO[]) => {
+    const displayNameOfRows: string[] = rows ? rows.map((v) => v.displayName ?? '').filter((v) => v) : []
+    jobProgressStore.processCommand(
+      { ...commandRequest.value, clusterId: attrs.clusterId },
+      async () => {
+        getComponentList(true, true)
+        state.selectedRowKeys = []
+        state.selectedRows = []
+      },
+      { displayName: displayNameOfRows }
+    )
   }
 
   const handleDelete = async (row: ComponentVO) => {
     Modal.confirm({
-      title: t('common.delete_msg'),
+      title: () =>
+        h('div', { style: { display: 'flex' } }, [
+          h(SvgIcon, { name: 'unknown', style: { width: '24px', height: '24px' } }),
+          h('p', t('common.delete_msg'))
+        ]),
       style: { top: '30vh' },
+      icon: null,
       async onOk() {
         try {
           const data = await deleteComponent({ clusterId: attrs.clusterId, id: row.id! })

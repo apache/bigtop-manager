@@ -105,17 +105,19 @@
   const noChartData = computed(() => Object.values(chartData.value).length === 0)
   const detailKeys = computed(() => Object.keys(baseConfig.value) as (keyof ClusterVO)[])
 
-  const handleServiceOperate = async (item: MenuItem, service: ServiceVO) => {
-    try {
-      await jobProgressStore.processCommand({
+  const handleServiceOperate = (item: MenuItem, service: ServiceVO) => {
+    jobProgressStore.processCommand(
+      {
         command: item.key as keyof typeof Command,
         clusterId: clusterId.value,
         commandLevel: 'service',
         serviceCommands: [{ serviceName: service.name!, installed: true }]
-      })
-    } catch (error) {
-      console.log('error :>> ', error)
-    }
+      },
+      undefined,
+      {
+        displayName: service.displayName
+      }
+    )
   }
 
   const handleTimeRange = (time: TimeRangeType) => {

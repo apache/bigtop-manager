@@ -91,22 +91,21 @@
     return components[parseInt(activeKey.value) - 1]
   })
 
-  const dropdownMenuClick: GroupItem['dropdownMenuClickEvent'] = async ({ key }) => {
+  const dropdownMenuClick: GroupItem['dropdownMenuClickEvent'] = ({ key }) => {
     const { id: clusterId, serviceId } = routeParams.value
-    const serviceName = serviceMap.value[clusterId].filter((service) => Number(serviceId) === service.id)[0].name!
-    try {
-      await jobProgressStore.processCommand(
-        {
-          command: key as keyof typeof Command,
-          clusterId,
-          commandLevel: 'service',
-          serviceCommands: [{ serviceName, installed: true }]
-        },
-        getServiceDetail
-      )
-    } catch (error) {
-      console.log('error :>> ', error)
-    }
+    const service = serviceMap.value[clusterId].filter((service) => Number(serviceId) === service.id)[0]
+    jobProgressStore.processCommand(
+      {
+        command: key as keyof typeof Command,
+        clusterId,
+        commandLevel: 'service',
+        serviceCommands: [{ serviceName: service.name!, installed: true }]
+      },
+      getServiceDetail,
+      {
+        displayName: service.displayName
+      }
+    )
   }
 
   const getServiceDetail = async () => {

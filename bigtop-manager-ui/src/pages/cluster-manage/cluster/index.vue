@@ -99,7 +99,8 @@
         async () => {
           await clusterStore.loadClusters()
           await clusterStore.getClusterDetail(clusterInfo.value.id!)
-        }
+        },
+        { displayName: clusterInfo.value.displayName }
       )
     } catch (error) {
       console.error('Error processing command:', error)
