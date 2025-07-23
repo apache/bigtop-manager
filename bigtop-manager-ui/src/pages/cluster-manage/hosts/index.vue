@@ -222,6 +222,7 @@
 
   const deleteHost = (ids: number[]) => {
     Modal.confirm({
+      style: { top: '30vh' },
       title: ids.length > 1 ? t('common.delete_msgs') : t('common.delete_msg'),
       async onOk() {
         try {

@@ -71,6 +71,7 @@ export function useValidations() {
         icon: createVNode(SvgIcon, { name: 'unknown' }),
         cancelText: t('common.no'),
         okText: t('common.yes'),
+        style: { top: '30vh' },
         onOk: () => resolve(true),
         onCancel: () => {
           Modal.destroyAll()

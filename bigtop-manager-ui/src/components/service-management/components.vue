@@ -223,7 +223,7 @@
       return map
     }, new Map())
     commandRequest.value.componentCommands = [...map.values()]
-    await execOperation()
+    execOperation()
     getComponentList(true, true)
   }
 
@@ -233,24 +233,21 @@
       componentName: row.name!,
       hostnames: [row.hostname!]
     })
-    await execOperation()
+    execOperation()
   }
 
-  const execOperation = async () => {
-    try {
-      await jobProgressStore.processCommand({ ...commandRequest.value, clusterId: attrs.clusterId }, async () => {
-        getComponentList(true, true)
-        state.selectedRowKeys = []
-        state.selectedRows = []
-      })
-    } catch (error) {
-      console.log('error :>> ', error)
-    }
+  const execOperation = () => {
+    jobProgressStore.processCommand({ ...commandRequest.value, clusterId: attrs.clusterId }, async () => {
+      getComponentList(true, true)
+      state.selectedRowKeys = []
+      state.selectedRows = []
+    })
   }
 
   const handleDelete = async (row: ComponentVO) => {
     Modal.confirm({
       title: t('common.delete_msg'),
+      style: { top: '30vh' },
       async onOk() {
         try {
           const data = await deleteComponent({ clusterId: attrs.clusterId, id: row.id! })

@@ -125,6 +125,7 @@
       :width="480"
       :title="Mode[mode] && $t(Mode[mode])"
       :mask-closable="false"
+      :centered="true"
       :destroy-on-close="true"
       @ok="handleOk"
       @cancel="handleCancel"

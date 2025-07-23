@@ -52,29 +52,29 @@
     {
       action: 'Start',
       icon: 'start',
-      clickEvent: (item, args) => {
-        handleServiceOperate(item!.action!, args)
+      clickEvent: (item, payload) => {
+        handleServiceOperate(item!.action!, payload)
       }
     },
     {
       action: 'Stop',
       icon: 'stop',
-      clickEvent: (item, args) => {
-        handleServiceOperate(item!.action!, args)
+      clickEvent: (item, payload) => {
+        handleServiceOperate(item!.action!, payload)
       }
     },
     {
       action: 'Restart',
       icon: 'restart',
-      clickEvent: (item, args) => {
-        handleServiceOperate(item!.action!, args)
+      clickEvent: (item, payload) => {
+        handleServiceOperate(item!.action!, payload)
       }
     },
     {
       action: 'More',
       icon: 'more-line',
-      clickEvent: (item, args) => {
-        handleServiceOperate(item!.action!, args)
+      clickEvent: (item, payload) => {
+        handleServiceOperate(item!.action!, payload)
       }
     }
   ])
@@ -99,9 +99,9 @@
       key: 'status',
       label: t('common.status'),
       options: [
-        { label: t(`common.${statusColors.value[1]}`), value: 1 },
-        { label: t(`common.${statusColors.value[2]}`), value: 2 },
-        { label: t(`common.${statusColors.value[3]}`), value: 3 }
+        { label: t('common.healthy'), value: 1 },
+        { label: t('common.unhealthy'), value: 2 },
+        { label: t('common.unknown'), value: 3 }
       ]
     }
   ])

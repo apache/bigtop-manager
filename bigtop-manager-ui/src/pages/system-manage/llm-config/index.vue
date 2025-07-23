@@ -70,6 +70,7 @@
 
   const handleDeleteLlmConfig = (authId: string | number) => {
     Modal.confirm({
+      style: { top: '30vh' },
       title: t('common.delete_msg'),
       async onOk() {
         const success = await llmConfigStore.deleteAuthPlatform(authId)

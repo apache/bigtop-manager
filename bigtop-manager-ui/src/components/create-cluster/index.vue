@@ -209,6 +209,7 @@
           ]),
         content: h('div', { style: { paddingLeft: '36px' } }, t('common.installing_exit_confirm_content')),
         cancelText: t('common.no'),
+        style: { top: '30vh' },
         icon: null,
         okText: t('common.yes'),
         onOk: () => {

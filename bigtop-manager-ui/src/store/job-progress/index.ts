@@ -24,8 +24,10 @@ import { defineStore } from 'pinia'
 import { useClusterStore } from '@/store/cluster'
 import { execCommand } from '@/api/command'
 import { getJobDetails } from '@/api/job'
+
 import SvgIcon from '@/components/common/svg-icon/index.vue'
 import JobModal from '@/components/job-modal/index.vue'
+
 import type { CommandRequest } from '@/api/command/types'
 import type { JobParams, JobVO } from '@/api/job/types'
 
@@ -240,16 +242,32 @@ export const useJobProgress = defineStore('job-progress', () => {
     }, delay)
   }
 
-  const processCommand = async (params: CommandRequest, nextAction?: (...args: any) => void) => {
-    try {
-      const { id: jobId, name } = await execCommand(params)
-      if (jobId && name) {
-        progressMap.set(jobId, Object.assign(params, jobStageProgress.value.processing()))
-        openNotification({ jobId, clusterId: params.clusterId!, name }, nextAction)
+  /**
+   * Processes a command request by showing a confirmation modal.
+   * @param params command request parameters
+   * @param nextAction callback function to execute after the command is processed
+   * @param payLoad additional payload for the command
+   * @returns void
+   */
+  const processCommand = (params: CommandRequest, nextAction?: (...args: any) => void, payLoad?: any) => {
+    Modal.confirm({
+      title: t('common.confirm_action', {
+        action: t(`common.${params.command.toLowerCase()}`).toLowerCase(),
+        target: payLoad?.displayName ?? t(`common.${params.commandLevel}`).toLowerCase()
+      }),
+      style: { top: '30vh' },
+      async onOk() {
+        try {
+          const { id: jobId, name } = await execCommand(params)
+          if (jobId && name) {
+            progressMap.set(jobId, Object.assign(params, jobStageProgress.value.processing()))
+            openNotification({ jobId, clusterId: params.clusterId!, name }, nextAction)
+          }
+        } catch (error) {
+          console.log('error :>> ', error)
+        }
       }
-    } catch (error) {
-      console.log('error :>> ', error)
-    }
+    })
   }
 
   const onClick = (execRes: CommandRes) => {
@@ -260,7 +278,7 @@ export const useJobProgress = defineStore('job-progress', () => {
       zIndex: 9999,
       mask: false,
       closable: true,
-      centered: true,
+      style: { top: '30vh' },
       appContext: instance?.appContext,
       content: () => h(JobModal, { execRes, jobInfo: progressMap })
     })

@@ -102,6 +102,7 @@
     const currOperation = operationMap.value[item.action!]
     Modal.confirm({
       title: currOperation.modalTitle,
+      style: { top: '30vh' },
       async onOk() {
         try {
           const data = await currOperation.api({ ...serviceInfo.value, snapshotId: payLoad.id } as SnapshotRecovery)

@@ -31,13 +31,13 @@ export interface GroupItem<T = any> {
   tip?: string
   text?: string
   action?: T
-  hidden?: boolean | ((item?: GroupItem<T>, ...args: any[]) => boolean)
+  hidden?: boolean | ((item?: GroupItem<T>, ...payload: any[]) => boolean)
   type?: BtnType
   shape?: ShapeType
   disabled?: boolean
   danger?: boolean
   dropdownMenu?: DropdownMenu[]
-  clickEvent?: (item?: GroupItem<T>, ...args: any[]) => void
+  clickEvent?: (item?: GroupItem<T>, ...payload: any[]) => void
   dropdownMenuClickEvent?: MenuProps['onClick']
 }
 
