@@ -24,6 +24,7 @@
   import { useServiceStore } from '@/store/service'
   import { useCreateServiceStore } from '@/store/create-service'
   import { storeToRefs } from 'pinia'
+
   import type { ExpandServiceVO } from '@/store/stack'
   import type { ComponentVO } from '@/api/component/types.ts'
   import type { ServiceVO } from '@/api/service/types'
@@ -45,6 +46,7 @@
   })
   const { stepContext, selectedServices, infraServices, excludeInfraServices } = storeToRefs(createStore)
   const { isAddableData } = toRefs(state)
+
   const targetServiceName = computed(() => serviceStore.serviceFlatMap[stepContext.value.serviceId].name!)
   const checkIfInstalled = computed(() => selectedServices.value.filter((v) => !v.isInstalled).length === 0)
   const filterAddableData = computed(() =>

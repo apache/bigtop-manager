@@ -22,13 +22,14 @@
   import { storeToRefs } from 'pinia'
   import { debounce } from 'lodash-es'
   import { Empty } from 'ant-design-vue'
-  import TreeSelector from './tree-selector.vue'
   import { useCreateServiceStore } from '@/store/create-service'
   import { useServiceStore } from '@/store/service'
-  import type { ServiceConfigReq } from '@/api/command/types'
+
+  import TreeSelector from './tree-selector.vue'
+
   import type { ComponentVO } from '@/api/component/types'
   import type { Key } from 'ant-design-vue/es/_util/type'
-  import type { Property } from '@/api/service/types'
+  import type { Property, ServiceConfig } from '@/api/service/types'
 
   interface Props {
     isView?: boolean
@@ -43,11 +44,11 @@
   const { stepContext, selectedServices } = storeToRefs(createStore)
   const searchStr = ref('')
   const currService = ref<Key>('')
-  const configs = ref<ServiceConfigReq[]>([])
+  const configs = ref<ServiceConfig[]>([])
   const activeKey = ref<number[]>([])
   const debouncedOnSearch = ref()
   const hostPreviewList = ref<ComponentVO[]>([])
-  const filterConfigs = ref<ServiceConfigReq[]>([])
+  const filterConfigs = ref<ServiceConfig[]>([])
   const fieldNames = shallowRef({
     title: 'displayName',
     key: 'name'
@@ -100,11 +101,15 @@
     }
   }
 
-  const manualAddPropertyForConfig = (config: ServiceConfigReq) => {
+  const manualAddPropertyForConfig = (config: ServiceConfig) => {
     config.properties?.push(createNewProperty())
   }
 
-  const removeProperty = (property: Property, config: ServiceConfigReq) => {
+  const removeProperty = (property: Property, config: ServiceConfig) => {
+    if (!config.properties) {
+      return
+    }
+
     const index = config.properties.findIndex((v) => v.name === property.name)
     if (index != -1) {
       config.properties.splice(index, 1)
@@ -116,7 +121,7 @@
     const index = selectedServices.value.findIndex((v) => v.name === expandSelectedKeyPath.split('/').at(-1))
     if (index !== -1) {
       const temp = selectedServices.value[index]
-      configs.value = temp.configs as ServiceConfigReq[]
+      configs.value = temp.configs as ServiceConfig[]
       hostPreviewList.value = temp.components as ComponentVO[]
     } else {
       configs.value = []
@@ -129,16 +134,32 @@
     if (!searchStr.value) {
       filterConfigs.value = configs.value
     }
-    const lowerSearchTerm = searchStr.value.toLowerCase()
-    filterConfigs.value = configs.value.filter((config) => {
-      return config.properties.some((property) => {
-        return (
-          (property.displayName || '').toLowerCase().includes(lowerSearchTerm) ||
-          property.name.toLowerCase().includes(lowerSearchTerm) ||
-          (property.value && property.value.toString().toLowerCase().includes(lowerSearchTerm))
-        )
+    filterConfigs.value = getSearchConfig(configs.value, searchStr.value)
+  }
+
+  const getSearchConfig = (data: ServiceConfig[], keyword: string): ServiceConfig[] => {
+    const lowerKeyword = keyword.toLowerCase()
+
+    return data
+      .map((item) => {
+        const matchedProp = item.properties?.filter(({ name, displayName, value = '' }) => {
+          return (
+            name.toLowerCase().includes(lowerKeyword) ||
+            value.toLowerCase().includes(lowerKeyword) ||
+            displayName?.toLowerCase().includes(lowerKeyword)
+          )
+        })
+
+        if (matchedProp && matchedProp.length > 0) {
+          return {
+            ...item,
+            properties: matchedProp
+          }
+        }
+
+        return null
       })
-    })
+      .filter(Boolean) as ServiceConfig[]
   }
 
   // const splitSearchStr = (splitStr: string) => {

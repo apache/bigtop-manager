@@ -81,16 +81,33 @@
     if (!searchStr.value) {
       filterConfigs.value = configs.value
     }
-    const lowerSearchTerm = searchStr.value.toLowerCase()
-    filterConfigs.value = configs.value.filter((config) => {
-      return config.properties?.some((property) => {
-        return (
-          (property.displayName || '').toLowerCase().includes(lowerSearchTerm) ||
-          property.name.toLowerCase().includes(lowerSearchTerm) ||
-          (property.value && property.value.toString().toLowerCase().includes(lowerSearchTerm))
-        )
+
+    filterConfigs.value = getSearchConfig(configs.value, searchStr.value)
+  }
+
+  const getSearchConfig = (data: ServiceConfig[], keyword: string): ServiceConfig[] => {
+    const lowerKeyword = keyword.toLowerCase()
+
+    return data
+      .map((item) => {
+        const matchedProp = item.properties?.filter(({ name, displayName, value = '' }) => {
+          return (
+            name.toLowerCase().includes(lowerKeyword) ||
+            value.toLowerCase().includes(lowerKeyword) ||
+            displayName?.toLowerCase().includes(lowerKeyword)
+          )
+        })
+
+        if (matchedProp && matchedProp.length > 0) {
+          return {
+            ...item,
+            properties: matchedProp
+          }
+        }
+
+        return null
       })
-    })
+      .filter(Boolean) as ServiceConfig[]
   }
 
   const saveConfigs = async () => {
@@ -142,6 +159,7 @@
         </a-space>
         <a-input
           v-model:value="searchStr"
+          :allow-clear="true"
           :placeholder="$t('service.please_enter_search_keyword')"
           @input="debouncedOnSearch"
         />
@@ -219,8 +237,8 @@
       display: flex;
       justify-content: space-between;
       gap: 16px;
-      .ant-input {
-        flex: 0 1 160px;
+      .ant-input-affix-wrapper {
+        flex: 0 1 260px;
       }
     }
     :deep(.ant-collapse-header) {
