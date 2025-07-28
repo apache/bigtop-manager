@@ -20,7 +20,7 @@
   import { ref, shallowReactive, shallowRef, h, toRefs, watch } from 'vue'
   import { useAiChatStore } from '@/store/ai-assistant'
   import { storeToRefs } from 'pinia'
-  import { formatTime } from '@/utils/tools'
+  import { formatTime } from '@/utils/transform'
   import { EllipsisOutlined } from '@ant-design/icons-vue'
   import { message, Modal, Empty } from 'ant-design-vue'
   import { useI18n } from 'vue-i18n'
