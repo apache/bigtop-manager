@@ -80,6 +80,7 @@
   const filterConfigurations = () => {
     if (!searchStr.value) {
       filterConfigs.value = configs.value
+      return
     }
 
     filterConfigs.value = getSearchConfig(configs.value, searchStr.value)
