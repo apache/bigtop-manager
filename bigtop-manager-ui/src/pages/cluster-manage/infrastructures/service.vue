@@ -29,7 +29,7 @@
 
   import type { ServiceListParams, ServiceStatusType, ServiceVO } from '@/api/service/types'
   import type { GroupItem } from '@/components/common/button-group/types'
-  import type { FilterFormItem } from '@/components/common/filter-form/types'
+  import type { FilterFormItem } from '@/components/common/form-filter'
   import type { Command, CommandRequest } from '@/api/command/types'
 
   type GroupItemActionType = keyof typeof Command | 'More'
@@ -133,7 +133,7 @@
 <template>
   <a-spin :spinning="loading" class="service">
     <div class="infra-body">
-      <filter-form :filter-items="filterFormItems" @filter="getServices" />
+      <form-filter :filter-items="filterFormItems" @filter="getServices" />
       <a-empty v-if="services.length == 0" style="width: 100%" :image="Empty.PRESENTED_IMAGE_SIMPLE" />
       <div v-else class="service-item-wrp">
         <a-card

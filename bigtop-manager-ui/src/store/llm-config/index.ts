@@ -21,23 +21,16 @@ import { defineStore } from 'pinia'
 import { computed, ref, shallowRef, watch } from 'vue'
 import * as llmServer from '@/api/llm-config/index'
 
-import type {
-  AuthorizedPlatform,
-  LlmLogoFlag,
-  PlatformCredential,
-  UpdateAuthorizedPlatformConfig
-} from '@/api/llm-config/types'
+import type { AuthorizedPlatform, PlatformCredential, UpdateAuthorizedPlatformConfig } from '@/api/llm-config/types'
 
-import type { FormState } from '@/components/common/auto-form/types'
+type CurrPlatformKeys = keyof AuthorizedPlatform
 
-type BaseType = Record<string, unknown>
-type currPlatform = FormState<AuthorizedPlatform | BaseType>
-type currPlatformKeys = keyof currPlatform
 type Platform = {
-  id: LlmLogoFlag
+  id: number
   name: string
   supportModels: string[]
 }
+
 type ActiveAuthPlatform = {
   llmConfigId: string | number
   platformName: string
@@ -53,7 +46,7 @@ export const useLlmConfigStore = defineStore(
     const platforms = ref<Platform[]>([])
     const formCredentials = ref<PlatformCredential[]>([])
     const authorizedPlatforms = ref<AuthorizedPlatform[]>([])
-    const currPlatform = ref<currPlatform>({})
+    const currPlatform = ref<Partial<AuthorizedPlatform>>({})
     const currAuthPlatform = shallowRef<ActiveAuthPlatform>()
 
     const formKeys = computed(() => formCredentials.value.map((v) => v.name))
@@ -65,7 +58,7 @@ export const useLlmConfigStore = defineStore(
     const authCredentials = computed(() =>
       formCredentials.value.map((v) => ({
         key: v.name,
-        value: currPlatform.value[`${v.name as currPlatformKeys}`] as string
+        value: currPlatform.value[`${v.name as CurrPlatformKeys}`] as string
       }))
     )
 
@@ -116,8 +109,9 @@ export const useLlmConfigStore = defineStore(
 
     const getPlatformCredentials = async () => {
       try {
-        const platformId = currPlatform.value.platformId as number
-        formCredentials.value = await llmServer.getPlatformCredentials(platformId)
+        const { platformId } = currPlatform.value
+        formCredentials.value =
+          typeof platformId !== 'undefined' ? await llmServer.getPlatformCredentials(platformId) : []
       } catch (error) {
         console.log('error :>> ', error)
       }

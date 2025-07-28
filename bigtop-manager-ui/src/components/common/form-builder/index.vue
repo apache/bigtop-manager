@@ -38,7 +38,7 @@
 
   const props = withDefaults(defineProps<Props>(), {
     formItems: () => [],
-    formConfig: () => ({ colon: false, labelAlign: 'left' }),
+    formConfig: () => ({}),
     rules: () => [],
     gutter: () => [8, 8],
     span: 24
@@ -173,7 +173,7 @@
     ref="formRef"
     :model="formData"
     :rules="requiredRules"
-    v-bind="{ labelCol: { style: { width: defaultLabelCol } }, ...formConfig }"
+    v-bind="{ labelCol: { style: { width: defaultLabelCol } }, ...{ colon: false, labelAlign: 'left' }, ...formConfig }"
   >
     <a-row :gutter="props.gutter as any">
       <a-col v-for="item of formItemsComputed" :key="item.field" :span="item.span || span">

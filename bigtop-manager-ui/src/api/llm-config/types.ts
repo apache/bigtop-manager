@@ -30,15 +30,13 @@ export enum LlmLogo {
   'deepseek' = 4
 }
 
-export type LlmLogoFlag = `${LlmLogo}`
-
 export type AuthPlatformStatusType =
   | AuthPlatformStatus.ACTIVE
   | AuthPlatformStatus.AVAILABLE
   | AuthPlatformStatus.UNAVAILABLE
 
 export interface Platform {
-  id: LlmLogoFlag
+  id: number
   name: string
   supportModels: string
 }
@@ -50,8 +48,8 @@ export interface AuthorizedPlatformDesc {
 }
 
 export interface AuthorizedPlatform extends AuthorizedPlatformDesc {
-  id: number | string
-  platformId: LlmLogoFlag
+  id: number
+  platformId: number
   name: string
   status: AuthPlatformStatusType
 }
