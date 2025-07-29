@@ -19,13 +19,18 @@
 package org.apache.bigtop.manager.server.controller;
 
 import org.apache.bigtop.manager.server.annotations.Audit;
+import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
+import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.model.converter.UserConverter;
+import org.apache.bigtop.manager.server.model.dto.ChangePasswordDTO;
 import org.apache.bigtop.manager.server.model.dto.UserDTO;
+import org.apache.bigtop.manager.server.model.req.ChangePasswordReq;
 import org.apache.bigtop.manager.server.model.req.UserReq;
 import org.apache.bigtop.manager.server.model.vo.UserVO;
 import org.apache.bigtop.manager.server.service.UserService;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
 
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -58,5 +63,20 @@ public class UserController {
     public ResponseEntity<UserVO> update(@RequestBody @Validated UserReq userReq) {
         UserDTO userDTO = UserConverter.INSTANCE.fromReq2DTO(userReq);
         return ResponseEntity.success(userService.update(userDTO));
+    }
+
+    @Audit
+    @Operation(summary = "changePassword", description = "Change password")
+    @PutMapping("/change-password")
+    public ResponseEntity<UserVO> changePassword(@RequestBody @Validated ChangePasswordReq changePasswordReq) {
+        if (!StringUtils.hasText(changePasswordReq.getPassword())
+                || !StringUtils.hasText(changePasswordReq.getNewPassword())
+                || !StringUtils.hasText(changePasswordReq.getConfirmPassword())) {
+            throw new ApiException(ApiExceptionEnum.PASSWORD_NOT_EMPTY);
+        }
+
+        ChangePasswordDTO changePasswordDTO = UserConverter.INSTANCE.fromReq2DTO(changePasswordReq);
+        UserVO result = userService.changePassword(changePasswordDTO);
+        return ResponseEntity.success(result);
     }
 }
