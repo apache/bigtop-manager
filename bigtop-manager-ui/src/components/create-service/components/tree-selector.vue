@@ -71,7 +71,7 @@
     }
     const checkSelectedKey = checkSelectedKeys.value[0]
     if (selectedKey !== checkSelectedKey) {
-      const keyPath = `${e.node.parent?.key}/${selectedKey}`
+      const keyPath = e.node.parent?.key ? `${e.node.parent?.key}/${selectedKey}` : `${selectedKey}`
       checkSelectedKeys.value = selectedKeys
       emits('change', keyPath)
     }

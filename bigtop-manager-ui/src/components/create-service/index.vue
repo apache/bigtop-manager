@@ -85,9 +85,12 @@
    */
   const validateComponentAssignments = (): boolean => {
     for (const info of createStore.allComps.values()) {
-      if (!info.cardinality) continue
+      const { cardinality, hosts, displayName } = info
 
-      const isValid = createStore.validCardinality(info.cardinality, info.hosts?.length ?? 0, info.displayName!)
+      if (!cardinality) continue
+
+      const isValid = createStore.validCardinality(cardinality, hosts?.length ?? 0, displayName!)
+
       if (!isValid) {
         return false
       }

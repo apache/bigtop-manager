@@ -37,6 +37,7 @@
   const loading = ref(false)
   const activeKey = ref<number[]>([])
   const configs = ref<ServiceConfig[]>([])
+  const snapshotConfigs = ref<ServiceConfig[]>([])
   const filterConfigs = ref<ServiceConfig[]>([])
   const captureRef = ref<InstanceType<typeof CaptureSnapshot>>()
   const snapshotRef = ref<InstanceType<typeof SnapshotManagement>>()
@@ -80,6 +81,7 @@
   const filterConfigurations = () => {
     if (!searchStr.value) {
       filterConfigs.value = configs.value
+      return
     }
 
     filterConfigs.value = getSearchConfig(configs.value, searchStr.value)
@@ -110,11 +112,63 @@
       .filter(Boolean) as ServiceConfig[]
   }
 
+  const generateConfigsMap = (arr: ServiceConfig[]): Record<string, Record<string, any>> => {
+    const treeMap: Record<string, Record<string, any>> = {}
+
+    for (const { name, properties } of arr) {
+      if (!name) continue
+
+      const propMap: Record<string, any> = {}
+
+      for (const prop of properties ?? []) {
+        if (prop.isManual) continue
+        const key = prop.name
+        propMap[key] = {
+          name: prop.name,
+          value: prop.value,
+          ...(prop.id !== undefined && { id: prop.id }),
+          ...(prop.displayName !== undefined && { displayName: prop.displayName })
+        }
+      }
+
+      treeMap[name] = propMap
+    }
+
+    return treeMap
+  }
+
+  const getDiffConfigs = (configs: ServiceConfig[]) => {
+    const configMap = generateConfigsMap(snapshotConfigs.value)
+    const filterConfig = [] as ServiceConfig[]
+
+    for (const c of configs) {
+      const configName = c.name
+      if (!configName || !configMap[configName]) continue
+      const oldPropsMap = configMap[configName]
+
+      const diffProps = (c.properties ?? []).filter((prop) => {
+        if (prop.name === '') return false
+        const oldProp = oldPropsMap[prop.name]
+        if (!oldProp) return true
+        return oldProp && oldProp.value !== prop.value
+      })
+
+      if (diffProps.length > 0) {
+        filterConfig.push({
+          name: configName,
+          properties: diffProps.map(({ name, value }) => ({ name, value }))
+        })
+      }
+    }
+
+    return filterConfig
+  }
+
   const saveConfigs = async () => {
     try {
       const { id, clusterId } = attrs
       loading.value = true
-      const data = await updateServiceConfigs({ id, clusterId }, [...configs.value])
+      const data = await updateServiceConfigs({ id, clusterId }, [...getDiffConfigs(configs.value)])
       if (data) {
         message.success(t('common.update_success'))
         getServiceDetail()
@@ -139,6 +193,7 @@
   onActivated(async () => {
     await getServiceDetail()
     configs.value = attrs.configs as ServiceConfig[]
+    snapshotConfigs.value = JSON.parse(JSON.stringify(attrs.configs))
     filterConfigs.value = [...configs.value]
     debouncedOnSearch.value = debounce(filterConfigurations, 300)
   })

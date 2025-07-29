@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onActivated, onDeactivated, ref, shallowRef, watch } from 'vue'
+  import { computed, onActivated, onDeactivated, ref, shallowRef } from 'vue'
   import { storeToRefs } from 'pinia'
   import { debounce } from 'lodash-es'
   import { Empty } from 'ant-design-vue'
@@ -35,7 +35,7 @@
     isView?: boolean
   }
 
-  const props = withDefaults(defineProps<Props>(), {
+  withDefaults(defineProps<Props>(), {
     isView: false
   })
 
@@ -76,26 +76,10 @@
       .includes(currService.value.toString().split('/').at(-1)!)
   })
 
-  // const disabled = computed(() => {
-  //   return creationModeType.value === 'component'
-  //     ? false
-  //     : serviceStore
-  //         .getInstalledNamesOrIdsOfServiceByKey(`${clusterId.value}`)
-  //         .includes(currService.value.toString().split('/').at(-1)!)
-  // })
-
-  watch(
-    () => props.isView,
-    () => {
-      searchStr.value = ''
-      filterConfigs.value = configs.value
-    }
-  )
-
   const createNewProperty = () => {
     return {
       name: '',
-      displayName: '',
+      displayName: undefined,
       value: '',
       isManual: true
     }
@@ -132,7 +116,8 @@
 
   const filterConfigurations = () => {
     if (!searchStr.value) {
-      filterConfigs.value = configs.value
+      filterConfigs.value = [...configs.value]
+      return
     }
     filterConfigs.value = getSearchConfig(configs.value, searchStr.value)
   }
@@ -161,10 +146,6 @@
       })
       .filter(Boolean) as ServiceConfig[]
   }
-
-  // const splitSearchStr = (splitStr: string) => {
-  //   return splitStr.toString().split(new RegExp(`(?<=${searchStr.value})|(?=${searchStr.value})`, 'i'))
-  // }
 
   onActivated(() => {
     debouncedOnSearch.value = debounce(filterConfigurations, 300)
@@ -230,19 +211,6 @@
                   <span v-else style="overflow-wrap: break-word" :title="property.displayName ?? property.name">
                     {{ property.displayName ?? property.name }}
                   </span>
-
-                  <!-- <template v-else>
-                    <template v-for="(fragment, i) in splitSearchStr(item.displayName ?? item.name)">
-                      <mark v-if="fragment.toLowerCase() === searchStr.toLowerCase()" :key="i" class="highlight">
-                        {{ fragment }}
-                      </mark>
-                      <template v-else>
-                        <span :key="i" style="overflow-wrap: break-word" :title="item.displayName ?? item.name">
-                          {{ fragment }}
-                        </span>
-                      </template>
-                    </template>
-                  </template> -->
                 </a-form-item>
               </a-col>
               <a-col v-bind="layout.wrapperCol">

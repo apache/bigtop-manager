@@ -40,7 +40,7 @@
   const { t } = useI18n()
   const createStore = useCreateServiceStore()
   const serviceStore = useServiceStore()
-  const { stepContext, selectedServices, allComps, allCompsMeta } = storeToRefs(createStore)
+  const { stepContext, selectedServices, allComps, componentSnapshot } = storeToRefs(createStore)
 
   const searchInputRef = ref()
   const currComp = ref<string>('')
@@ -63,7 +63,7 @@
   )
 
   const currCompInfo = computed(() => allComps.value.get(currComp.value.split('/')[1]))
-  const currCompInfoMeta = computed(() => allCompsMeta.value.get(currComp.value.split('/')[1]))
+  const currCompSnapshot = computed(() => componentSnapshot.value.get(currComp.value.split('/')[1]))
   const installedServices = computed(() =>
     serviceStore.getInstalledNamesOrIdsOfServiceByKey(`${stepContext.value.clusterId}`)
   )
@@ -132,7 +132,7 @@
 
   const validateHostIsCheck = (host: HostVO) => {
     const { type } = stepContext.value
-    const notAdd = currCompInfoMeta.value?.hosts.findIndex((v) => v.hostname === host.hostname) == -1
+    const notAdd = currCompSnapshot.value?.hosts.findIndex((v) => v.hostname === host.hostname) == -1
     if (type === 'component') {
       return !currCompInfo.value?.uninstall && !notAdd
     } else {

@@ -16,16 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { computed, ref, shallowRef } from 'vue'
+import { computed, ref, shallowRef, toRaw } from 'vue'
 import { defineStore } from 'pinia'
 import useSteps from '@/composables/use-steps'
 import { useValidations } from './validation'
+import { cloneDeep } from 'lodash-es'
 import { execCommand } from '@/api/command'
 
 import { type ExpandServiceVO, useStackStore } from '@/store/stack'
 
-import type { ServiceVO } from '@/api/service/types'
-import type { CommandRequest, CommandVO, ComponentCommandReq, ServiceCommandReq } from '@/api/command/types'
+import type { ServiceConfig, ServiceVO } from '@/api/service/types'
+import type {
+  CommandRequest,
+  CommandVO,
+  ComponentCommandReq,
+  ComponentHostReq,
+  ServiceCommandReq,
+  ServiceConfigReq
+} from '@/api/command/types'
 import type { HostVO } from '@/api/hosts/types'
 import type { ComponentVO } from '@/api/component/types'
 
@@ -61,42 +69,35 @@ export const useCreateServiceStore = defineStore(
     const stackStore = useStackStore()
 
     const steps = shallowRef(STEPS_TITLES)
+    const { current, stepsLimit, previousStep, nextStep } = useSteps(steps.value)
 
     const selectedServices = ref<ExpandServiceVO[]>([])
-    const selectedServicesMeta = ref<ExpandServiceVO[]>([])
+    const snapshotSelectedServices = ref<ExpandServiceVO[]>([])
     const createdPayload = ref<CommandVO>({})
-    const stepContext = ref<StepContext>({
-      clusterId: 0,
-      serviceId: 0,
-      creationMode: 'internal'
-    })
+
     const commandRequest = ref<CommandRequest>({
       command: 'Add',
       commandLevel: 'service'
     })
 
-    const { current, stepsLimit, previousStep, nextStep } = useSteps(steps.value)
+    const stepContext = ref<StepContext>({
+      clusterId: 0,
+      serviceId: 0,
+      creationMode: 'internal'
+    })
+
+    const creationMode = computed(() => stepContext.value.creationMode)
+    const clusterId = computed(() => (creationMode.value === 'internal' ? stepContext.value.clusterId : 0))
 
     const infraServices = computed(() => stackStore.getServicesByExclude(['bigtop', 'extra']) as ExpandServiceVO[])
-    const excludeInfraServices = computed(() => stackStore.getServicesByExclude(['infra']))
     const infraServiceNames = computed(() => infraServices.value.map((v) => v.name!))
+    const excludeInfraServices = computed(() => stackStore.getServicesByExclude(['infra']))
+
     const processedServices = computed(() => new Set(selectedServices.value.map((v) => v.name)))
-    const creationMode = computed(() => stepContext.value.creationMode)
-    const currentClusterId = computed(() => (creationMode.value === 'internal' ? stepContext.value.clusterId : 0))
 
     const allComps = computed(() => {
       return new Map(
         selectedServices.value.flatMap((s) =>
-          s.components!.map((comp) => {
-            return [comp.name, { serviceName: s.name, serviceDisplayName: s.displayName, serviceId: s.id, ...comp }]
-          })
-        )
-      ) as Map<string, CompItem>
-    })
-
-    const allCompsMeta = computed(() => {
-      return new Map(
-        selectedServicesMeta.value.flatMap((s) =>
           s.components!.map((comp) => [
             comp.name,
             { serviceName: s.name, serviceDisplayName: s.displayName, serviceId: s.id, ...comp }
@@ -105,24 +106,77 @@ export const useCreateServiceStore = defineStore(
       ) as Map<string, CompItem>
     })
 
+    const componentSnapshot = computed(() => {
+      return new Map(
+        snapshotSelectedServices.value.flatMap((s) =>
+          s.components!.map((comp) => [
+            comp.name,
+            { serviceName: s.name, serviceDisplayName: s.displayName, serviceId: s.id, ...comp }
+          ])
+        )
+      ) as Map<string, CompItem>
+    })
+
+    const snapshotSelectedServiceMap = computed(() =>
+      snapshotSelectedServices.value.reduce(
+        (p, s) => {
+          if (!s.name) {
+            return p
+          }
+
+          if (!p[s.name]) {
+            s.configs && (p[s.name] = { configMap: generateConfigsMap(s.configs ?? []) })
+          }
+
+          return p
+        },
+        {} as Record<string, any>
+      )
+    )
+
     function getServiceMap(services: ServiceVO[]) {
       return new Map(services.map((s) => [s.name as string, s as ExpandServiceVO]))
     }
 
-    function updateSelectedService(partial: ExpandServiceVO[]) {
-      selectedServices.value = partial
+    function updateSelectedService(data: ExpandServiceVO[]) {
+      selectedServices.value = data
     }
 
-    function setTempData(partial: ExpandServiceVO[]) {
-      selectedServicesMeta.value = JSON.parse(JSON.stringify(partial))
+    function setTempData(data: ExpandServiceVO[]) {
+      snapshotSelectedServices.value = cloneDeep(data)
     }
 
-    function setStepContext(partial: StepContext) {
-      stepContext.value = partial
+    function setStepContext(data: StepContext) {
+      stepContext.value = data
     }
 
     function updateInstalledStatus(state: string) {
       createdPayload.value.state = state
+    }
+
+    function generateConfigsMap(arr: ServiceConfig[]): Record<string, Record<string, any>> {
+      const treeMap: Record<string, Record<string, any>> = {}
+
+      for (const { name, properties } of arr) {
+        if (!name) continue
+
+        const propMap: Record<string, any> = {}
+
+        for (const prop of properties ?? []) {
+          if (prop.isManual) continue
+          const key = prop.name
+          propMap[key] = {
+            name: prop.name,
+            value: prop.value,
+            ...(prop.id !== undefined && { id: prop.id }),
+            ...(prop.displayName !== undefined && { displayName: prop.displayName })
+          }
+        }
+
+        treeMap[name] = propMap
+      }
+
+      return treeMap
     }
 
     async function confirmServiceDependencyAction(type: 'add' | 'remove', preSelectedService: ExpandServiceVO) {
@@ -210,16 +264,52 @@ export const useCreateServiceStore = defineStore(
       return { success: true }
     }
 
-    function formatServiceData(services: ExpandServiceVO[]) {
-      return services.map((service) => ({
-        serviceName: service.name,
-        installed: service.isInstalled === undefined ? false : service.isInstalled,
-        componentHosts: (service.components || []).map((component) => ({
-          componentName: component.name,
-          hostnames: (component.hosts || []).map((host: HostVO) => host.hostname)
-        })),
-        configs: service.configs
-      })) as ServiceCommandReq[]
+    function getUninstalledDiffs(services: ExpandServiceVO[]) {
+      const diffRes = [] as ServiceCommandReq[]
+      const filterConfigMap = {} as Record<string, ServiceConfig[]>
+
+      for (const s of services) {
+        if (s.isInstalled || !s.name) continue
+
+        const serviceName = s.name
+        const snapshot = snapshotSelectedServiceMap.value[serviceName]
+        if (!snapshot) continue
+
+        const configMap = snapshot.configMap
+
+        for (const c of s.configs ?? []) {
+          const configName = c.name
+          if (!configName || !configMap[configName]) continue
+          const oldPropsMap = configMap[configName]
+
+          const diffProps = (c.properties ?? []).filter((prop) => {
+            if (prop.name === '') return false
+            const oldProp = oldPropsMap[prop.name]
+            if (!oldProp) return true
+            return oldProp && oldProp.value !== prop.value
+          })
+
+          if (diffProps.length > 0) {
+            filterConfigMap[serviceName] = []
+            filterConfigMap[serviceName].push({
+              name: configName,
+              properties: diffProps.map(({ name, value }) => ({ name, value }))
+            })
+          }
+        }
+
+        diffRes.push({
+          serviceName: s.name,
+          installed: false,
+          componentHosts: (s.components || []).map((component) => ({
+            componentName: component.name,
+            hostnames: (component.hosts || []).map((host: HostVO) => host.hostname)
+          })) as ComponentHostReq[],
+          configs: filterConfigMap[s.name] as ServiceConfigReq[]
+        })
+      }
+
+      return diffRes
     }
 
     function formatComponentData(components: Map<string, CompItem>) {
@@ -244,9 +334,9 @@ export const useCreateServiceStore = defineStore(
 
     async function createService() {
       try {
-        commandRequest.value.serviceCommands = formatServiceData(selectedServices.value)
-        createdPayload.value = await execCommand({ ...commandRequest.value, clusterId: currentClusterId.value })
-        Object.assign(createdPayload.value, { clusterId: currentClusterId.value })
+        commandRequest.value.serviceCommands = getUninstalledDiffs(toRaw(selectedServices.value))
+        createdPayload.value = await execCommand({ ...commandRequest.value, clusterId: clusterId.value })
+        Object.assign(createdPayload.value, { clusterId: clusterId.value })
         return true
       } catch (error) {
         console.log('error :>> ', error)
@@ -258,8 +348,8 @@ export const useCreateServiceStore = defineStore(
       try {
         commandRequest.value.commandLevel = 'component'
         commandRequest.value.componentCommands = formatComponentData(allComps.value)
-        createdPayload.value = await execCommand({ ...commandRequest.value, clusterId: currentClusterId.value })
-        Object.assign(createdPayload.value, { clusterId: currentClusterId.value })
+        createdPayload.value = await execCommand({ ...commandRequest.value, clusterId: clusterId.value })
+        Object.assign(createdPayload.value, { clusterId: clusterId.value })
         return true
       } catch (error) {
         console.log('error :>> ', error)
@@ -270,7 +360,7 @@ export const useCreateServiceStore = defineStore(
     function $reset() {
       current.value = 0
       selectedServices.value = []
-      selectedServicesMeta.value = []
+      snapshotSelectedServices.value = []
       createdPayload.value = {}
       stepContext.value = {
         clusterId: 0,
@@ -294,7 +384,7 @@ export const useCreateServiceStore = defineStore(
       nextStep,
       previousStep,
       allComps,
-      allCompsMeta,
+      componentSnapshot,
       updateSelectedService,
       updateInstalledStatus,
       setStepContext,
