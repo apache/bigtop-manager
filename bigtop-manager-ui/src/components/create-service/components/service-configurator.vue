@@ -42,17 +42,20 @@
   const createStore = useCreateServiceStore()
   const serviceStore = useServiceStore()
   const { stepContext, selectedServices } = storeToRefs(createStore)
+
   const searchStr = ref('')
   const currService = ref<Key>('')
-  const configs = ref<ServiceConfig[]>([])
+  const currConfigs = ref<ServiceConfig[]>([])
   const activeKey = ref<number[]>([])
   const debouncedOnSearch = ref()
   const hostPreviewList = ref<ComponentVO[]>([])
   const filterConfigs = ref<ServiceConfig[]>([])
+
   const fieldNames = shallowRef({
     title: 'displayName',
     key: 'name'
   })
+
   const layout = shallowRef({
     labelCol: {
       xs: { span: 23 },
@@ -68,72 +71,59 @@
     }
   })
 
+  const clusterId = computed(() => stepContext.value.clusterId)
   const serviceList = computed(() => selectedServices.value)
-  const disabled = computed(() => {
-    const clusterId = stepContext.value.clusterId
-    return serviceStore
-      .getInstalledNamesOrIdsOfServiceByKey(`${clusterId}`)
+
+  const disabled = computed(() =>
+    serviceStore
+      .getInstalledNamesOrIdsOfServiceByKey(`${clusterId.value}`)
       .includes(currService.value.toString().split('/').at(-1)!)
-  })
+  )
 
-  const createNewProperty = () => {
-    return {
-      name: '',
-      displayName: undefined,
-      value: '',
-      isManual: true
-    }
-  }
+  const handleSelect = (expandSelectedKeyPath: string) => {
+    const name = expandSelectedKeyPath.split('/').at(-1)
+    const service = selectedServices.value.find((v) => v.name === name)
 
-  const manualAddPropertyForConfig = (config: ServiceConfig) => {
-    config.properties?.push(createNewProperty())
-  }
-
-  const removeProperty = (property: Property, config: ServiceConfig) => {
-    if (!config.properties) {
-      return
-    }
-
-    const index = config.properties.findIndex((v) => v.name === property.name)
-    if (index != -1) {
-      config.properties.splice(index, 1)
-    }
-  }
-
-  const handleChange = (expandSelectedKeyPath: string) => {
     currService.value = expandSelectedKeyPath
-    const index = selectedServices.value.findIndex((v) => v.name === expandSelectedKeyPath.split('/').at(-1))
-    if (index !== -1) {
-      const temp = selectedServices.value[index]
-      configs.value = temp.configs as ServiceConfig[]
-      hostPreviewList.value = temp.components as ComponentVO[]
-    } else {
-      configs.value = []
-      hostPreviewList.value = []
-    }
+    currConfigs.value = service?.configs ?? []
+    hostPreviewList.value = service?.components ?? []
+
     filterConfigurations()
   }
 
-  const filterConfigurations = () => {
-    if (!searchStr.value) {
-      filterConfigs.value = [...configs.value]
-      return
+  const manualAddProperty = (config: ServiceConfig) => {
+    config.properties?.push(createStore.generateProperty())
+  }
+
+  const deleteProperty = (property: Property, config: ServiceConfig) => {
+    const props = config.properties
+    if (!Array.isArray(props)) return
+
+    const target = props.find((p) => p.name === property.name)
+    if (target) {
+      target.action = 'delete'
     }
-    filterConfigs.value = getSearchConfig(configs.value, searchStr.value)
+  }
+
+  const filterConfigurations = () => {
+    filterConfigs.value = getSearchConfig(currConfigs.value, searchStr.value)
   }
 
   const getSearchConfig = (data: ServiceConfig[], keyword: string): ServiceConfig[] => {
+    if (keyword === '') {
+      return [...data]
+    }
+
     const lowerKeyword = keyword.toLowerCase()
 
     return data
       .map((item) => {
-        const matchedProp = item.properties?.filter(({ name, displayName, value = '' }) => {
-          return (
+        const matchedProp = item.properties?.filter(
+          ({ name, displayName, value = '' }) =>
             name.toLowerCase().includes(lowerKeyword) ||
             value.toLowerCase().includes(lowerKeyword) ||
             displayName?.toLowerCase().includes(lowerKeyword)
-          )
-        })
+        )
 
         if (matchedProp && matchedProp.length > 0) {
           return {
@@ -148,8 +138,8 @@
   }
 
   onActivated(() => {
+    filterConfigurations()
     debouncedOnSearch.value = debounce(filterConfigurations, 300)
-    filterConfigs.value = [...configs.value]
   })
 
   onDeactivated(() => {
@@ -163,7 +153,7 @@
       <div class="list-title">
         <div>{{ $t('service.service_list') }}</div>
       </div>
-      <tree-selector :tree="serviceList" :field-names="fieldNames" @change="handleChange" />
+      <tree-selector :tree="serviceList" :field-names="fieldNames" @change="handleSelect" />
     </section>
     <a-divider type="vertical" class="divider" />
     <section>
@@ -176,6 +166,7 @@
         />
       </div>
       <a-empty v-if="filterConfigs.length === 0" :image="Empty.PRESENTED_IMAGE_SIMPLE" />
+      <!-- configs -->
       <a-form v-else :disabled="$props.isView || disabled" :label-wrap="true">
         <a-collapse v-model:active-key="activeKey" :bordered="false" :ghost="true">
           <a-collapse-panel v-for="config in filterConfigs" :key="config.id">
@@ -184,7 +175,7 @@
                 v-if="!$props.isView && !disabled"
                 type="text"
                 shape="circle"
-                @click.stop="manualAddPropertyForConfig(config)"
+                @click.stop="manualAddProperty(config)"
               >
                 <template #icon>
                   <svg-icon name="plus-dark" />
@@ -194,41 +185,38 @@
             <template #header>
               <span>{{ config.name }}</span>
             </template>
-            <a-row
-              v-for="(property, idx) in config.properties"
-              :key="idx"
-              justify="space-between"
-              :gutter="[16, 0]"
-              :wrap="true"
-            >
-              <a-col v-bind="layout.labelCol">
-                <a-form-item>
-                  <a-textarea
-                    v-if="property.isManual"
-                    v-model:value="property.name"
-                    :auto-size="{ minRows: 1, maxRows: 5 }"
-                  />
-                  <span v-else style="overflow-wrap: break-word" :title="property.displayName ?? property.name">
-                    {{ property.displayName ?? property.name }}
-                  </span>
-                </a-form-item>
-              </a-col>
-              <a-col v-bind="layout.wrapperCol">
-                <a-form-item>
-                  <a-textarea v-model:value="property.value" :rows="property?.attrs?.type === 'longtext' ? 10 : 1" />
-                </a-form-item>
-              </a-col>
-              <a-button
-                v-if="!$props.isView && !disabled"
-                type="text"
-                shape="circle"
-                @click="removeProperty(property, config)"
-              >
-                <template #icon>
-                  <svg-icon name="remove" />
-                </template>
-              </a-button>
-            </a-row>
+            <!-- properties -->
+            <template v-for="property in config.properties" :key="property.__key">
+              <a-row v-if="property.action != 'delete'" justify="space-between" :gutter="[16, 0]" :wrap="true">
+                <a-col v-bind="layout.labelCol">
+                  <a-form-item>
+                    <a-textarea
+                      v-if="property.isManual"
+                      v-model:value="property.name"
+                      :auto-size="{ minRows: 1, maxRows: 5 }"
+                    />
+                    <span v-else style="overflow-wrap: break-word" :title="property.displayName ?? property.name">
+                      {{ property.displayName ?? property.name }}
+                    </span>
+                  </a-form-item>
+                </a-col>
+                <a-col v-bind="layout.wrapperCol">
+                  <a-form-item>
+                    <a-textarea v-model:value="property.value" :rows="property?.attrs?.type === 'longtext' ? 10 : 1" />
+                  </a-form-item>
+                </a-col>
+                <a-button
+                  v-if="!$props.isView && !disabled"
+                  type="text"
+                  shape="circle"
+                  @click="deleteProperty(property, config)"
+                >
+                  <template #icon>
+                    <svg-icon name="remove" />
+                  </template>
+                </a-button>
+              </a-row>
+            </template>
           </a-collapse-panel>
         </a-collapse>
       </a-form>

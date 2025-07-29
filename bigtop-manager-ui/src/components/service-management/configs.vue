@@ -23,12 +23,15 @@
   import { useI18n } from 'vue-i18n'
   import { Empty, message } from 'ant-design-vue'
   import { updateServiceConfigs } from '@/api/service'
+  import { useCreateServiceStore } from '@/store/create-service'
+
   import CaptureSnapshot from './components/capture-snapshot.vue'
   import SnapshotManagement from './components/snapshot-management.vue'
 
   import type { Property, ServiceConfig, ServiceVO } from '@/api/service/types'
 
   const { t } = useI18n()
+  const createStore = useCreateServiceStore()
   const attrs = useAttrs() as unknown as Required<ServiceVO> & { clusterId: number }
 
   const getServiceDetail = inject('getServiceDetail') as () => any
@@ -58,47 +61,39 @@
     }
   })
 
-  const createNewProperty = () => {
-    return {
-      name: '',
-      displayName: '',
-      value: '',
-      isManual: true
-    }
-  }
-
   const manualAddPropertyForConfig = (config: ServiceConfig) => {
-    config.properties?.push(createNewProperty())
+    config.properties?.push(createStore.generateProperty())
   }
 
-  const removeProperty = (property: Property, config: ServiceConfig) => {
-    const index = (config.properties || []).findIndex((v) => v.name === property.name)
-    if (index != -1) {
-      config.properties?.splice(index, 1)
+  const deleteProperty = (property: Property, config: ServiceConfig) => {
+    const props = config.properties
+    if (!Array.isArray(props)) return
+
+    const target = props.find((p) => p.name === property.name)
+    if (target) {
+      target.action = 'delete'
     }
   }
 
   const filterConfigurations = () => {
-    if (!searchStr.value) {
-      filterConfigs.value = configs.value
-      return
-    }
-
     filterConfigs.value = getSearchConfig(configs.value, searchStr.value)
   }
 
   const getSearchConfig = (data: ServiceConfig[], keyword: string): ServiceConfig[] => {
+    if (keyword === '') {
+      return [...data]
+    }
+
     const lowerKeyword = keyword.toLowerCase()
 
     return data
       .map((item) => {
-        const matchedProp = item.properties?.filter(({ name, displayName, value = '' }) => {
-          return (
+        const matchedProp = item.properties?.filter(
+          ({ name, displayName, value = '' }) =>
             name.toLowerCase().includes(lowerKeyword) ||
             value.toLowerCase().includes(lowerKeyword) ||
             displayName?.toLowerCase().includes(lowerKeyword)
-          )
-        })
+        )
 
         if (matchedProp && matchedProp.length > 0) {
           return {
@@ -112,63 +107,12 @@
       .filter(Boolean) as ServiceConfig[]
   }
 
-  const generateConfigsMap = (arr: ServiceConfig[]): Record<string, Record<string, any>> => {
-    const treeMap: Record<string, Record<string, any>> = {}
-
-    for (const { name, properties } of arr) {
-      if (!name) continue
-
-      const propMap: Record<string, any> = {}
-
-      for (const prop of properties ?? []) {
-        if (prop.isManual) continue
-        const key = prop.name
-        propMap[key] = {
-          name: prop.name,
-          value: prop.value,
-          ...(prop.id !== undefined && { id: prop.id }),
-          ...(prop.displayName !== undefined && { displayName: prop.displayName })
-        }
-      }
-
-      treeMap[name] = propMap
-    }
-
-    return treeMap
-  }
-
-  const getDiffConfigs = (configs: ServiceConfig[]) => {
-    const configMap = generateConfigsMap(snapshotConfigs.value)
-    const filterConfig = [] as ServiceConfig[]
-
-    for (const c of configs) {
-      const configName = c.name
-      if (!configName || !configMap[configName]) continue
-      const oldPropsMap = configMap[configName]
-
-      const diffProps = (c.properties ?? []).filter((prop) => {
-        if (prop.name === '') return false
-        const oldProp = oldPropsMap[prop.name]
-        if (!oldProp) return true
-        return oldProp && oldProp.value !== prop.value
-      })
-
-      if (diffProps.length > 0) {
-        filterConfig.push({
-          name: configName,
-          properties: diffProps.map(({ name, value }) => ({ name, value }))
-        })
-      }
-    }
-
-    return filterConfig
-  }
-
   const saveConfigs = async () => {
     try {
       const { id, clusterId } = attrs
       loading.value = true
-      const data = await updateServiceConfigs({ id, clusterId }, [...getDiffConfigs(configs.value)])
+      const params = createStore.getDiffConfigs(configs.value, snapshotConfigs.value)
+      const data = await updateServiceConfigs({ id, clusterId }, params)
       if (data) {
         message.success(t('common.update_success'))
         getServiceDetail()
@@ -192,9 +136,9 @@
 
   onActivated(async () => {
     await getServiceDetail()
-    configs.value = attrs.configs as ServiceConfig[]
+    configs.value = createStore.injectKeysToConfigs(attrs.configs)
     snapshotConfigs.value = JSON.parse(JSON.stringify(attrs.configs))
-    filterConfigs.value = [...configs.value]
+    filterConfigurations()
     debouncedOnSearch.value = debounce(filterConfigurations, 300)
   })
 
@@ -222,6 +166,7 @@
     </header>
     <section>
       <a-empty v-if="filterConfigs.length === 0" :image="Empty.PRESENTED_IMAGE_SIMPLE" />
+      <!-- configs -->
       <a-form v-else :label-wrap="true" :disabled="loading">
         <a-collapse v-model:active-key="activeKey" :bordered="false" :ghost="true">
           <a-collapse-panel v-for="config in filterConfigs" :key="config.id">
@@ -235,36 +180,33 @@
             <template #header>
               <span>{{ config.name }}</span>
             </template>
-            <a-row
-              v-for="(property, idx) in config.properties"
-              :key="idx"
-              justify="space-between"
-              :gutter="[16, 0]"
-              :wrap="true"
-            >
-              <a-col v-bind="layout.labelCol">
-                <a-form-item>
-                  <a-textarea
-                    v-if="property.isManual"
-                    v-model:value="property.name"
-                    :auto-size="{ minRows: 1, maxRows: 30 }"
-                  />
-                  <span v-else style="overflow-wrap: break-word" :title="property.displayName ?? property.name">
-                    {{ property.displayName ?? property.name }}
-                  </span>
-                </a-form-item>
-              </a-col>
-              <a-col v-bind="layout.wrapperCol">
-                <a-form-item>
-                  <a-textarea v-model:value="property.value" :rows="property?.attrs?.type === 'longtext' ? 10 : 1" />
-                </a-form-item>
-              </a-col>
-              <a-button type="text" shape="circle" @click="removeProperty(property, config)">
-                <template #icon>
-                  <svg-icon name="remove" />
-                </template>
-              </a-button>
-            </a-row>
+            <!-- properties -->
+            <template v-for="property in config.properties" :key="property.__key">
+              <a-row v-if="property.action != 'delete'" justify="space-between" :gutter="[16, 0]" :wrap="true">
+                <a-col v-bind="layout.labelCol">
+                  <a-form-item>
+                    <a-textarea
+                      v-if="property.isManual"
+                      v-model:value="property.name"
+                      :auto-size="{ minRows: 1, maxRows: 30 }"
+                    />
+                    <span v-else style="overflow-wrap: break-word" :title="property.displayName ?? property.name">
+                      {{ property.displayName ?? property.name }}
+                    </span>
+                  </a-form-item>
+                </a-col>
+                <a-col v-bind="layout.wrapperCol">
+                  <a-form-item>
+                    <a-textarea v-model:value="property.value" :rows="property?.attrs?.type === 'longtext' ? 10 : 1" />
+                  </a-form-item>
+                </a-col>
+                <a-button type="text" shape="circle" @click="deleteProperty(property, config)">
+                  <template #icon>
+                    <svg-icon name="remove" />
+                  </template>
+                </a-button>
+              </a-row>
+            </template>
           </a-collapse-panel>
         </a-collapse>
       </a-form>

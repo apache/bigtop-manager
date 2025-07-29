@@ -22,10 +22,11 @@ import useSteps from '@/composables/use-steps'
 import { useValidations } from './validation'
 import { cloneDeep } from 'lodash-es'
 import { execCommand } from '@/api/command'
+import { createKeyedItem } from '@/utils/tools'
 
 import { type ExpandServiceVO, useStackStore } from '@/store/stack'
 
-import type { ServiceConfig, ServiceVO } from '@/api/service/types'
+import type { Property, ServiceConfig, ServiceVO } from '@/api/service/types'
 import type {
   CommandRequest,
   CommandVO,
@@ -125,7 +126,7 @@ export const useCreateServiceStore = defineStore(
           }
 
           if (!p[s.name]) {
-            s.configs && (p[s.name] = { configMap: generateConfigsMap(s.configs ?? []) })
+            s.configs && (p[s.name] = s.configs)
           }
 
           return p
@@ -134,16 +135,47 @@ export const useCreateServiceStore = defineStore(
       )
     )
 
+    function generateProperty(): Property {
+      return createKeyedItem({
+        name: '',
+        displayName: undefined,
+        value: '',
+        isManual: true,
+        action: 'add'
+      })
+    }
+
     function getServiceMap(services: ServiceVO[]) {
       return new Map(services.map((s) => [s.name as string, s as ExpandServiceVO]))
     }
 
-    function updateSelectedService(data: ExpandServiceVO[]) {
-      selectedServices.value = data
+    function injectKeysToConfigs(configs: ServiceConfig[]): ServiceConfig[] {
+      return configs.map((c) => {
+        if (!c.properties) return c
+        return {
+          ...c,
+          properties: c.properties.map((p) => createKeyedItem(p))
+        }
+      })
     }
 
-    function setTempData(data: ExpandServiceVO[]) {
-      snapshotSelectedServices.value = cloneDeep(data)
+    function injectPropertyKeys(data: ExpandServiceVO[]) {
+      return data.map((s) => {
+        if (!s.configs) return s
+
+        return {
+          ...s,
+          configs: injectKeysToConfigs(s.configs)
+        }
+      })
+    }
+
+    function updateSelectedService(data: ExpandServiceVO[], updateSnapshot = false) {
+      selectedServices.value = injectPropertyKeys(data)
+
+      if (updateSnapshot) {
+        snapshotSelectedServices.value = cloneDeep(toRaw(data))
+      }
     }
 
     function setStepContext(data: StepContext) {
@@ -160,7 +192,7 @@ export const useCreateServiceStore = defineStore(
       for (const { name, properties } of arr) {
         if (!name) continue
 
-        const propMap: Record<string, any> = {}
+        const propMap: Record<string, Property> = {}
 
         for (const prop of properties ?? []) {
           if (prop.isManual) continue
@@ -168,6 +200,7 @@ export const useCreateServiceStore = defineStore(
           propMap[key] = {
             name: prop.name,
             value: prop.value,
+            __key: prop.__key,
             ...(prop.id !== undefined && { id: prop.id }),
             ...(prop.displayName !== undefined && { displayName: prop.displayName })
           }
@@ -184,6 +217,7 @@ export const useCreateServiceStore = defineStore(
       if (!requiredServices && type === 'add') {
         return [preSelectedService]
       }
+
       const valid = validations.validServiceFromInfra(preSelectedService, requiredServices!, infraServiceNames.value)
       if (type === 'add' && creationMode.value === 'internal' && valid) {
         return []
@@ -264,52 +298,71 @@ export const useCreateServiceStore = defineStore(
       return { success: true }
     }
 
-    function getUninstalledDiffs(services: ExpandServiceVO[]) {
-      const diffRes = [] as ServiceCommandReq[]
-      const filterConfigMap = {} as Record<string, ServiceConfig[]>
+    const getDiffConfigs = (configs: ServiceConfig[], snapshotConfigs: ServiceConfig[]) => {
+      const configMap = generateConfigsMap(snapshotConfigs)
+      const filterConfig = [] as ServiceConfig[]
 
-      for (const s of services) {
-        if (s.isInstalled || !s.name) continue
+      for (const c of configs) {
+        const { name: configName, id } = c
+        if (!configName || !configMap[configName]) continue
+        const oldPropsMap = configMap[configName]
 
-        const serviceName = s.name
-        const snapshot = snapshotSelectedServiceMap.value[serviceName]
+        const diffProps = (c.properties ?? []).filter((prop) => {
+          if (prop.name === '') return false
+
+          if (prop.action === 'delete' || prop.action === 'add') return true
+
+          const oldProp = oldPropsMap[prop.name]
+          return oldProp && oldProp.value !== prop.value
+        })
+
+        if (diffProps.length > 0) {
+          filterConfig.push({
+            id,
+            name: configName,
+            properties: diffProps.map(({ name, value, action }) => ({ name, value, action: action ?? 'update' }))
+          })
+        }
+      }
+
+      return filterConfig
+    }
+
+    function extractComponentHosts(components: ComponentVO[]) {
+      return components.map((component) => ({
+        componentName: component.name,
+        hostnames: (component.hosts ?? []).map((host) => host.hostname)
+      })) as ComponentHostReq[]
+    }
+
+    /**
+     * Get modified configuration diffs for uninstalled services.
+     *
+     * @param services - Uninstalled services to be checked for config changes
+     * @returns A list of services with config differences to be sent to backend
+     */
+    function getUninstalledConfigDiffs(services: ExpandServiceVO[]) {
+      const diffs: ServiceCommandReq[] = []
+
+      for (const service of services) {
+        const { name, isInstalled, configs, components } = service
+        if (isInstalled || !name || !configs) continue
+
+        const snapshot = snapshotSelectedServiceMap.value[name]
         if (!snapshot) continue
 
-        const configMap = snapshot.configMap
+        const configDiffs = getDiffConfigs(configs, snapshot)
+        if (!configDiffs.length) continue
 
-        for (const c of s.configs ?? []) {
-          const configName = c.name
-          if (!configName || !configMap[configName]) continue
-          const oldPropsMap = configMap[configName]
-
-          const diffProps = (c.properties ?? []).filter((prop) => {
-            if (prop.name === '') return false
-            const oldProp = oldPropsMap[prop.name]
-            if (!oldProp) return true
-            return oldProp && oldProp.value !== prop.value
-          })
-
-          if (diffProps.length > 0) {
-            filterConfigMap[serviceName] = []
-            filterConfigMap[serviceName].push({
-              name: configName,
-              properties: diffProps.map(({ name, value }) => ({ name, value }))
-            })
-          }
-        }
-
-        diffRes.push({
-          serviceName: s.name,
+        diffs.push({
+          serviceName: name,
           installed: false,
-          componentHosts: (s.components || []).map((component) => ({
-            componentName: component.name,
-            hostnames: (component.hosts || []).map((host: HostVO) => host.hostname)
-          })) as ComponentHostReq[],
-          configs: filterConfigMap[s.name] as ServiceConfigReq[]
+          componentHosts: extractComponentHosts(components ?? []),
+          configs: configDiffs as ServiceConfigReq[]
         })
       }
 
-      return diffRes
+      return diffs
     }
 
     function formatComponentData(components: Map<string, CompItem>) {
@@ -334,7 +387,7 @@ export const useCreateServiceStore = defineStore(
 
     async function createService() {
       try {
-        commandRequest.value.serviceCommands = getUninstalledDiffs(toRaw(selectedServices.value))
+        commandRequest.value.serviceCommands = getUninstalledConfigDiffs(toRaw(selectedServices.value))
         createdPayload.value = await execCommand({ ...commandRequest.value, clusterId: clusterId.value })
         Object.assign(createdPayload.value, { clusterId: clusterId.value })
         return true
@@ -388,11 +441,13 @@ export const useCreateServiceStore = defineStore(
       updateSelectedService,
       updateInstalledStatus,
       setStepContext,
-      setTempData,
       confirmServiceDependencyAction,
       setComponentHosts,
       createService,
       createdPayload,
+      generateProperty,
+      getDiffConfigs,
+      injectKeysToConfigs,
       attachComponentToService,
       $reset,
       validCardinality: validations.validCardinality

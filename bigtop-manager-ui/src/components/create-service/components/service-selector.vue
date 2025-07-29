@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onActivated, reactive, ref, toRaw, shallowRef, toRefs } from 'vue'
+  import { computed, onActivated, reactive, ref, shallowRef, toRefs } from 'vue'
   import { usePngImage } from '@/utils/tools'
   import { useStackStore } from '@/store/stack'
   import { useServiceStore } from '@/store/service'
@@ -89,9 +89,7 @@
   const handleInstallItem = (item: ExpandServiceVO, from: ExpandServiceVO[], to: ExpandServiceVO[]) => {
     item.components = item.components?.map((v) => ({ ...v, hosts: [] }))
     moveItem(from, to, item)
-    const rawData = toRaw(state.selectedData)
-    createStore.updateSelectedService(state.selectedData)
-    createStore.setTempData(rawData)
+    createStore.updateSelectedService(state.selectedData, true)
   }
 
   const modifyInstallItems = async (type: 'add' | 'remove', item: ExpandServiceVO) => {
@@ -204,10 +202,7 @@
       }
     }
 
-    const rawData = toRaw(state.selectedData)
-
-    createStore.updateSelectedService(rawData)
-    createStore.setTempData(rawData)
+    createStore.updateSelectedService(state.selectedData, true)
   }
 
   onActivated(async () => {
