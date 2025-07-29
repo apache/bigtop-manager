@@ -252,18 +252,15 @@ export const useJobProgress = defineStore('job-progress', () => {
    * @returns void
    */
   const processCommand = (params: CommandRequest, nextAction?: (...args: any) => void, payLoad?: PayLoad) => {
-    const { displayName = '' } = payLoad as PayLoad
+    const { displayName = '', tips } = payLoad as PayLoad
     const action = t(`common.${params.command.toLowerCase()}`).toLowerCase()
 
-    let target = ''
-
-    if (typeof displayName === 'string') {
-      target = displayName
-    }
+    let title = tips ?? 'common.confirm_action'
+    let target = typeof displayName === 'string' ? displayName : ''
 
     if (Array.isArray(displayName)) {
       if (displayName.length > 1) {
-        target = t(`common.${params.commandLevel}`).toLowerCase() + 's'
+        title = 'common.confirm_comp_action'
       } else {
         target = displayName[0]
       }
@@ -273,7 +270,7 @@ export const useJobProgress = defineStore('job-progress', () => {
       title: () =>
         h('div', { style: { display: 'flex' } }, [
           h(SvgIcon, { name: 'unknown', style: { width: '24px', height: '24px' } }),
-          h('p', t('common.confirm_action', { action, target }))
+          h('p', t(`${title}`, target === '' ? { action } : { action, target }))
         ]),
       style: { top: '30vh' },
       icon: null,
