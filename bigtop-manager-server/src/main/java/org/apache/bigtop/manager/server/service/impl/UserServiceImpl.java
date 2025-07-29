@@ -24,9 +24,12 @@ import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.holder.SessionUserHolder;
 import org.apache.bigtop.manager.server.model.converter.UserConverter;
+import org.apache.bigtop.manager.server.model.dto.ResetPasswordDTO;
 import org.apache.bigtop.manager.server.model.dto.UserDTO;
 import org.apache.bigtop.manager.server.model.vo.UserVO;
 import org.apache.bigtop.manager.server.service.UserService;
+import org.apache.bigtop.manager.server.utils.PasswordUtils;
+import org.apache.bigtop.manager.server.utils.Pbkdf2Utils;
 
 import org.springframework.stereotype.Service;
 
@@ -50,6 +53,30 @@ public class UserServiceImpl implements UserService {
         Long id = SessionUserHolder.getUserId();
         UserPO userPO = userDao.findOptionalById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.NEED_LOGIN));
         userPO.setNickname(userDTO.getNickname());
+        userDao.partialUpdateById(userPO);
+        return UserConverter.INSTANCE.fromPO2VO(userPO);
+    }
+
+    @Override
+    public UserVO resetPassword(ResetPasswordDTO resetPasswordDTO) {
+        if (resetPasswordDTO.getPassword().equals(resetPasswordDTO.getNewPassword())) {
+            throw new ApiException(ApiExceptionEnum.ORIGINAL_PASSWORD_SAME_AS_NEW_PASSWORD);
+        }
+
+        if (!resetPasswordDTO.getNewPassword().equals(resetPasswordDTO.getConfirmPassword())) {
+            throw new ApiException(ApiExceptionEnum.TWO_PASSWORDS_NOT_MATCH);
+        }
+
+        Long id = SessionUserHolder.getUserId();
+        UserPO userPO = userDao.findOptionalById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.NEED_LOGIN));
+
+        String password = Pbkdf2Utils.getPbkdf2Password(userPO.getUsername(), resetPasswordDTO.getPassword());
+        if (!PasswordUtils.checkBcryptPassword(password, userPO.getPassword())) {
+            throw new ApiException(ApiExceptionEnum.ORIGINAL_PASSWORD_INCORRECT);
+        }
+
+        String newPassword = Pbkdf2Utils.getBcryptPassword(userPO.getUsername(), resetPasswordDTO.getNewPassword());
+        userPO.setPassword(newPassword);
         userDao.partialUpdateById(userPO);
         return UserConverter.INSTANCE.fromPO2VO(userPO);
     }

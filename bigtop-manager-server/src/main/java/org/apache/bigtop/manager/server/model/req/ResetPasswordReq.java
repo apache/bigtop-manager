@@ -16,32 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.service;
+package org.apache.bigtop.manager.server.model.req;
 
-import org.apache.bigtop.manager.server.model.dto.ResetPasswordDTO;
-import org.apache.bigtop.manager.server.model.dto.UserDTO;
-import org.apache.bigtop.manager.server.model.vo.UserVO;
+import lombok.Data;
 
-public interface UserService {
+@Data
+public class ResetPasswordReq {
 
-    /**
-     * Get current login user
-     *
-     * @return User
-     */
-    UserVO current();
+    private String password;
 
-    /**
-     * Update a user
-     *
-     * @return user
-     */
-    UserVO update(UserDTO userDTO);
+    private String newPassword;
 
-    /**
-     * Reset password
-     *
-     * @param resetPasswordDTO resetPasswordDTO
-     */
-    UserVO resetPassword(ResetPasswordDTO resetPasswordDTO);
+    private String confirmPassword;
 }

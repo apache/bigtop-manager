@@ -33,6 +33,10 @@ public enum LocaleKeys {
     LOGIN_ACCOUNT_REQUIRED("login.account.required"),
     LOGIN_ACCOUNT_INCORRECT("login.account.incorrect"),
     LOGIN_ACCOUNT_DISABLED("login.account.disabled"),
+    PASSWORD_NOT_EMPTY("password.not.empty"),
+    ORIGINAL_PASSWORD_SAME_AS_NEW_PASSWORD("original.password.same.as.new.password"),
+    TWO_PASSWORDS_NOT_MATCH("two.passwords.not.match"),
+    ORIGINAL_PASSWORD_INCORRECT("original.password.incorrect"),
 
     CLUSTER_NOT_FOUND("cluster.not.found"),
     CLUSTER_EXISTS("cluster.exists"),
