@@ -22,9 +22,9 @@ import org.apache.bigtop.manager.server.annotations.Audit;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.model.converter.UserConverter;
-import org.apache.bigtop.manager.server.model.dto.ResetPasswordDTO;
+import org.apache.bigtop.manager.server.model.dto.ChangePasswordDTO;
 import org.apache.bigtop.manager.server.model.dto.UserDTO;
-import org.apache.bigtop.manager.server.model.req.ResetPasswordReq;
+import org.apache.bigtop.manager.server.model.req.ChangePasswordReq;
 import org.apache.bigtop.manager.server.model.req.UserReq;
 import org.apache.bigtop.manager.server.model.vo.UserVO;
 import org.apache.bigtop.manager.server.service.UserService;
@@ -66,17 +66,17 @@ public class UserController {
     }
 
     @Audit
-    @Operation(summary = "resetPassword", description = "Reset password")
-    @PutMapping("/reset-password")
-    public ResponseEntity<UserVO> resetPassword(@RequestBody @Validated ResetPasswordReq resetPasswordReq) {
-        if (!StringUtils.hasText(resetPasswordReq.getPassword())
-                || !StringUtils.hasText(resetPasswordReq.getNewPassword())
-                || !StringUtils.hasText(resetPasswordReq.getConfirmPassword())) {
+    @Operation(summary = "changePassword", description = "Change password")
+    @PutMapping("/change-password")
+    public ResponseEntity<UserVO> changePassword(@RequestBody @Validated ChangePasswordReq changePasswordReq) {
+        if (!StringUtils.hasText(changePasswordReq.getPassword())
+                || !StringUtils.hasText(changePasswordReq.getNewPassword())
+                || !StringUtils.hasText(changePasswordReq.getConfirmPassword())) {
             throw new ApiException(ApiExceptionEnum.PASSWORD_NOT_EMPTY);
         }
 
-        ResetPasswordDTO resetPasswordDTO = UserConverter.INSTANCE.fromReq2DTO(resetPasswordReq);
-        UserVO result = userService.resetPassword(resetPasswordDTO);
+        ChangePasswordDTO changePasswordDTO = UserConverter.INSTANCE.fromReq2DTO(changePasswordReq);
+        UserVO result = userService.changePassword(changePasswordDTO);
         return ResponseEntity.success(result);
     }
 }

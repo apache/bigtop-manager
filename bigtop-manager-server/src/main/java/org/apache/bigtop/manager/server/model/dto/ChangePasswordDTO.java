@@ -21,7 +21,7 @@ package org.apache.bigtop.manager.server.model.dto;
 import lombok.Data;
 
 @Data
-public class ResetPasswordDTO {
+public class ChangePasswordDTO {
 
     private String password;
 
