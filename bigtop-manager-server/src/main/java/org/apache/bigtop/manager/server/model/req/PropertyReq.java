@@ -18,6 +18,8 @@
  */
 package org.apache.bigtop.manager.server.model.req;
 
+import org.apache.bigtop.manager.server.enums.PropertyAction;
+
 import lombok.Data;
 
 import jakarta.validation.constraints.NotBlank;
@@ -35,4 +37,10 @@ public class PropertyReq {
     private String desc;
 
     private AttrsReq attrs;
+
+    /**
+     * Action to be performed on the property.
+     * This could be used to indicate operations like 'add', 'update', or 'delete'.
+     */
+    private PropertyAction action;
 }

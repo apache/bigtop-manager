@@ -18,6 +18,7 @@
  */
 package org.apache.bigtop.manager.server.utils;
 
+import org.apache.bigtop.manager.server.enums.PropertyAction;
 import org.apache.bigtop.manager.server.model.dto.AttrsDTO;
 import org.apache.bigtop.manager.server.model.dto.PropertyDTO;
 import org.apache.bigtop.manager.server.model.dto.ServiceConfigDTO;
@@ -26,7 +27,6 @@ import org.apache.bigtop.manager.server.stack.model.PropertyModel;
 import org.apache.bigtop.manager.server.stack.xml.ConfigurationXml;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import org.springframework.beans.BeanUtils;
@@ -87,41 +87,58 @@ public class StackConfigUtils {
             return mergedConfigs;
         }
 
-        // Assign id for each service config
-        for (ServiceConfigDTO config : mergedConfigs) {
-            config.setId(overrideConfigs.stream()
-                    .filter(x -> x.getName().equals(config.getName()))
-                    .findFirst()
-                    .map(ServiceConfigDTO::getId)
-                    .orElse(null));
+        Map<String, Map<String, PropertyDTO>> mergedConfigsMap = serviceConfig2Map(mergedConfigs);
+        for (ServiceConfigDTO overrideConfig : overrideConfigs) {
+            String configName = overrideConfig.getName();
+
+            // Merge properties from override config to existing config
+            Map<String, PropertyDTO> mergedPropertiesMap = mergedConfigsMap.get(configName);
+            for (PropertyDTO property : overrideConfig.getProperties()) {
+                String propertyName = property.getName();
+                PropertyAction action = property.getAction();
+                if (action == null) {
+                    // null means property does not come from request body, but from config xml or database.
+                    // the logic the same as `UPDATE` action.
+                    action = PropertyAction.UPDATE;
+                }
+                switch (action) {
+                    case ADD, UPDATE -> {
+                        PropertyDTO propertyDTO = mergedPropertiesMap.get(propertyName);
+                        if (propertyDTO == null) {
+                            propertyDTO = new PropertyDTO();
+                            propertyDTO.setName(propertyName);
+                        }
+
+                        propertyDTO.setValue(property.getValue());
+                        mergedPropertiesMap.put(propertyName, propertyDTO);
+                    }
+                    case DELETE -> mergedPropertiesMap.remove(propertyName);
+                }
+            }
         }
 
-        Map<String, Map<String, String>> overrideConfigsMap = serviceConfig2Map(overrideConfigs);
-        for (ServiceConfigDTO mergedConfig : mergedConfigs) {
-            String configName = mergedConfig.getName();
-            if (!overrideConfigsMap.containsKey(configName)) {
-                continue;
-            }
+        mergedConfigs = map2ServiceConfig(mergedConfigsMap);
 
-            // Override existing properties
-            Map<String, String> overridePropertiesMap = overrideConfigsMap.get(configName);
-            for (PropertyDTO property : mergedConfig.getProperties()) {
-                String propertyName = property.getName();
-                String value = overridePropertiesMap.remove(propertyName);
-                if (value != null) {
-                    property.setValue(value);
-                }
+        // Assign id for each service config
+        Map<String, Long> configIdMap = new HashMap<>();
+        for (ServiceConfigDTO config : oriConfigs) {
+            String name = config.getName();
+            Long id = config.getId();
+            if (id != null) {
+                configIdMap.put(name, id);
             }
+        }
 
-            // We may still have some properties added by user manually
-            if (MapUtils.isNotEmpty(overridePropertiesMap)) {
-                for (Map.Entry<String, String> entry : overridePropertiesMap.entrySet()) {
-                    PropertyDTO property = new PropertyDTO();
-                    property.setName(entry.getKey());
-                    property.setValue(entry.getValue());
-                    mergedConfig.getProperties().add(property);
-                }
+        for (ServiceConfigDTO config : overrideConfigs) {
+            String name = config.getName();
+            Long id = config.getId();
+            if (id != null) {
+                configIdMap.put(name, id);
             }
+        }
+
+        for (ServiceConfigDTO config : mergedConfigs) {
+            config.setId(configIdMap.get(config.getName()));
         }
 
         return mergedConfigs;
@@ -133,21 +150,36 @@ public class StackConfigUtils {
      * @param configs List<ServiceConfigDTO>
      * @return Map<String, Map<String, String>>
      */
-    private static Map<String, Map<String, String>> serviceConfig2Map(List<ServiceConfigDTO> configs) {
-        Map<String, Map<String, String>> outerMap = new HashMap<>();
+    private static Map<String, Map<String, PropertyDTO>> serviceConfig2Map(List<ServiceConfigDTO> configs) {
+        Map<String, Map<String, PropertyDTO>> outerMap = new HashMap<>();
         if (CollectionUtils.isEmpty(configs)) {
             return outerMap;
         }
 
         for (ServiceConfigDTO config : configs) {
-            Map<String, String> innerMap = new HashMap<>();
+            Map<String, PropertyDTO> innerMap = new HashMap<>();
             for (PropertyDTO property : config.getProperties()) {
-                innerMap.put(property.getName(), property.getValue());
+                innerMap.put(property.getName(), property);
             }
 
             outerMap.put(config.getName(), innerMap);
         }
 
         return outerMap;
+    }
+
+    private static List<ServiceConfigDTO> map2ServiceConfig(Map<String, Map<String, PropertyDTO>> configMap) {
+        List<ServiceConfigDTO> configs = new ArrayList<>();
+        for (Map.Entry<String, Map<String, PropertyDTO>> entry : configMap.entrySet()) {
+            ServiceConfigDTO serviceConfig = new ServiceConfigDTO();
+            String name = entry.getKey();
+            List<PropertyDTO> properties = new ArrayList<>(entry.getValue().values());
+
+            serviceConfig.setName(name);
+            serviceConfig.setProperties(properties);
+            configs.add(serviceConfig);
+        }
+
+        return configs;
     }
 }

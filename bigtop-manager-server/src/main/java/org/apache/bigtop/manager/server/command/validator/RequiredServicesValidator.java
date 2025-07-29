@@ -20,7 +20,6 @@ package org.apache.bigtop.manager.server.command.validator;
 
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.dao.po.ServicePO;
-import org.apache.bigtop.manager.dao.repository.ClusterDao;
 import org.apache.bigtop.manager.dao.repository.ServiceDao;
 import org.apache.bigtop.manager.server.command.CommandIdentifier;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
@@ -36,14 +35,12 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.Resource;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
 @Component
 public class RequiredServicesValidator implements CommandValidator {
-
-    @Resource
-    private ClusterDao clusterDao;
 
     @Resource
     private ServiceDao serviceDao;
@@ -67,16 +64,19 @@ public class RequiredServicesValidator implements CommandValidator {
             ServiceDTO serviceDTO = StackUtils.getServiceDTO(serviceName);
             List<String> requiredServices = serviceDTO.getRequiredServices();
             if (CollectionUtils.isEmpty(requiredServices)) {
-                return;
+                continue;
             }
 
-            List<ServicePO> servicePOList = serviceDao.findByClusterIdAndNames(clusterId, requiredServices);
-            List<String> list = servicePOList.stream().map(ServicePO::getName).toList();
+            List<ServicePO> services = serviceDao.findByClusterId(clusterId);
+            List<ServicePO> infraServices = serviceDao.findByClusterId(0L);
+            services.addAll(infraServices);
 
-            requiredServices.removeAll(list);
-
-            if (!new HashSet<>(serviceNames).containsAll(requiredServices)) {
-                throw new ApiException(ApiExceptionEnum.SERVICE_REQUIRED_NOT_FOUND, String.join(",", requiredServices));
+            List<String> allServices =
+                    new ArrayList<>(services.stream().map(ServicePO::getName).toList());
+            allServices.addAll(serviceNames);
+            if (!new HashSet<>(allServices).containsAll(requiredServices)) {
+                requiredServices.removeAll(allServices);
+                throw new ApiException(ApiExceptionEnum.SERVICE_NOT_FOUND, String.join(",", requiredServices));
             }
         }
     }

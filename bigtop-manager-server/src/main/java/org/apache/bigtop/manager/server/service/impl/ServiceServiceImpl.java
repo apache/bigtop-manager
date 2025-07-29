@@ -169,7 +169,7 @@ public class ServiceServiceImpl implements ServiceService {
         List<ServiceConfigDTO> newConfigs;
         List<ServiceConfigDTO> mergedConfigs;
 
-        // Merge stack config with existing config first, in case new property has been added to stack config.
+        // Merge stack config with existing config first, in case new property has been added to config xml.
         oriConfigs = StackUtils.SERVICE_CONFIG_MAP.get(servicePO.getName());
         newConfigs = ServiceConfigConverter.INSTANCE.fromPO2DTO(configs);
         mergedConfigs = StackConfigUtils.mergeServiceConfigs(oriConfigs, newConfigs);
