@@ -46,4 +46,7 @@ public class UserPO extends BasePO implements Serializable {
 
     @Column(name = "status")
     private Boolean status;
+
+    @Column(name = "token_version")
+    private Integer tokenVersion;
 }

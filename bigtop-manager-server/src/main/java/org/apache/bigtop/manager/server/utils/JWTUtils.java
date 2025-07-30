@@ -22,8 +22,8 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
-import java.util.Calendar;
-import java.util.Date;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 public class JWTUtils {
 
@@ -31,17 +31,21 @@ public class JWTUtils {
 
     public static final String CLAIM_USERNAME = "username";
 
+    public static final String CLAIM_TOKEN_VERSION = "token_version";
+
     protected static final String SIGN = "r0PGVyvjKOxUBwGt";
 
-    public static String generateToken(Long id, String username) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DAY_OF_MONTH, 7);
-        Date date = calendar.getTime();
+    // Token validity period (days)
+    private static final int TOKEN_EXPIRATION_DAYS = 7;
+
+    public static String generateToken(Long userId, String username, Integer tokenVersion) {
+        Instant expireTime = Instant.now().plus(TOKEN_EXPIRATION_DAYS, ChronoUnit.DAYS);
 
         return JWT.create()
-                .withClaim(CLAIM_ID, id)
+                .withClaim(CLAIM_ID, userId)
                 .withClaim(CLAIM_USERNAME, username)
-                .withExpiresAt(date)
+                .withClaim(CLAIM_TOKEN_VERSION, tokenVersion)
+                .withExpiresAt(expireTime)
                 .sign(Algorithm.HMAC256(SIGN));
     }
 

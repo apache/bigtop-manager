@@ -65,7 +65,7 @@ public class LoginServiceImpl implements LoginService {
 
         CacheUtils.removeCache(username);
 
-        String token = JWTUtils.generateToken(user.getId(), user.getUsername());
+        String token = JWTUtils.generateToken(user.getId(), user.getUsername(), user.getTokenVersion());
         LoginVO loginVO = new LoginVO();
         loginVO.setToken(token);
         return loginVO;

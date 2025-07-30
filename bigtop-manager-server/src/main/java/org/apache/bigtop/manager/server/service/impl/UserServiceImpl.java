@@ -49,6 +49,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserVO get(Long id) {
+        UserPO userPO = userDao.findById(id);
+        return UserConverter.INSTANCE.fromPO2VO(userPO);
+    }
+
+    @Override
     public UserVO update(UserDTO userDTO) {
         Long id = SessionUserHolder.getUserId();
         UserPO userPO = userDao.findOptionalById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.NEED_LOGIN));
@@ -77,6 +83,7 @@ public class UserServiceImpl implements UserService {
 
         String newPassword = Pbkdf2Utils.getBcryptPassword(userPO.getUsername(), changePasswordDTO.getNewPassword());
         userPO.setPassword(newPassword);
+        userPO.setTokenVersion(userPO.getTokenVersion() + 1);
         userDao.partialUpdateById(userPO);
         return UserConverter.INSTANCE.fromPO2VO(userPO);
     }
