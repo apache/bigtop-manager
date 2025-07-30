@@ -26,7 +26,7 @@
   import { useUserStore } from '@/store/user'
   import { useMenuStore } from '@/store/menu'
 
-  const i18n = useI18n()
+  const { t } = useI18n()
   const userStore = useUserStore()
   const menuStore = useMenuStore()
 
@@ -43,7 +43,7 @@
 
   const submit = async () => {
     submitLoading.value = true
-    const hide = message.loading(i18n.t('login.logging_in'), 0)
+    const hide = message.loading(t('login.logging_in'), 0)
     try {
       await formRef.value?.validate()
       const username = loginModel.username
@@ -72,7 +72,7 @@
       userStore.getUserInfo()
       menuStore.setupMenu()
 
-      message.success(i18n.t('login.login_success'))
+      message.success(t('login.login_success'))
       router.push('/')
     } catch (e) {
       console.warn(e)
@@ -92,7 +92,7 @@
           <div class="login-header-left">
             <img class="login-logo" src="@/assets/logo.svg" alt="logo" />
             <div class="login-title">Bigtop Manager</div>
-            <div class="login-desc">{{ $t('login.desc') }}</div>
+            <div class="login-desc">{{ t('login.desc') }}</div>
           </div>
           <div class="login-header-right"><login-lang /></div>
         </div>
@@ -106,10 +106,10 @@
           <a-divider class="login-body-divider m-0" type="vertical" />
           <!-- Right side of the login box -->
           <div class="login-body-right">
-            <div class="login-body-right-tips">{{ $t('login.tips') }}</div>
+            <div class="login-body-right-tips">{{ t('login.tips') }}</div>
             <a-form ref="formRef" class="login-body-right-form" :model="loginModel">
               <a-tabs v-model:active-key="loginModel.type" centered>
-                <a-tab-pane key="account" :tab="$t('login.tab_account')" />
+                <a-tab-pane key="account" :tab="t('login.tab_account')" />
               </a-tabs>
               <template v-if="loginModel.type === 'account'">
                 <a-form-item
@@ -117,14 +117,14 @@
                   :rules="[
                     {
                       required: true,
-                      message: $t('login.username_required')
+                      message: t('login.username_required')
                     }
                   ]"
                 >
                   <a-input
                     v-model:value="loginModel.username"
                     allow-clear
-                    :placeholder="$t('login.username_placeholder')"
+                    :placeholder="t('login.username_placeholder')"
                     size="large"
                     @press-enter="submit"
                   >
@@ -138,14 +138,14 @@
                   :rules="[
                     {
                       required: true,
-                      message: $t('login.password_required')
+                      message: t('login.password_required')
                     }
                   ]"
                 >
                   <a-input-password
                     v-model:value="loginModel.password"
                     allow-clear
-                    :placeholder="$t('login.password_placeholder')"
+                    :placeholder="t('login.password_placeholder')"
                     size="large"
                     @press-enter="submit"
                   >
@@ -157,11 +157,11 @@
               </template>
               <div class="login-body-right-form-bottom">
                 <a-checkbox v-model:checked="loginModel.remember">
-                  {{ $t('login.remember_me') }}
+                  {{ t('login.remember_me') }}
                 </a-checkbox>
               </div>
               <a-button type="primary" block :loading="submitLoading" size="large" @click="submit">
-                {{ $t('login.submit') }}
+                {{ t('login.submit') }}
               </a-button>
             </a-form>
           </div>

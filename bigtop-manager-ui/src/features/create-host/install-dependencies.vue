@@ -271,11 +271,11 @@
     <a-modal
       :open="open"
       width="60%"
-      :title="$t('cluster.install_dependencies')"
+      :title="t('cluster.install_dependencies')"
       :mask-closable="false"
       :centered="true"
       :confirm-loading="installing"
-      :ok-text="allInstallSuccess ? $t('common.confirm') : installing ? $t('common.installing') : t('common.install')"
+      :ok-text="allInstallSuccess ? t('common.confirm') : installing ? t('common.installing') : t('common.install')"
       :destroy-on-close="true"
       @ok="handleInstalled"
       @cancel="handleCancel"
@@ -292,16 +292,16 @@
           <div class="search">
             <a-input
               ref="searchInputRef"
-              :placeholder="$t('common.enter_error', [column.title])"
+              :placeholder="t('common.enter_error', [column.title])"
               :value="selectedKeys[0]"
               @change="(e: any) => setSelectedKeys(e.target?.value ? [e.target?.value] : [])"
               @press-enter="handleSearch(selectedKeys, confirm, column.dataIndex)"
             />
             <a-space :size="16">
               <a-button type="primary" size="small" @click="handleSearch(selectedKeys, confirm, column.dataIndex)">
-                {{ $t('common.search') }}
+                {{ t('common.search') }}
               </a-button>
-              <a-button size="small" @click="handleReset(clearFilters)"> {{ $t('common.reset') }}</a-button>
+              <a-button size="small" @click="handleReset(clearFilters)"> {{ t('common.reset') }}</a-button>
             </a-space>
           </div>
         </template>
@@ -318,7 +318,7 @@
           <template v-if="column.key === 'status'">
             <svg-icon :name="record.status.toLowerCase()" />
             <span :title="`${record.message ? record.message : ''}`">
-              {{ `${$t(`common.${record.status.toLowerCase()}`)}` }}
+              {{ `${t(`common.${record.status.toLowerCase()}`)}` }}
               {{ record.message && record.status.toLowerCase() === 'failed' ? `:  ${record.message}` : '' }}
             </span>
           </template>

@@ -157,7 +157,7 @@
     <a-modal
       :open="open"
       :width="480"
-      :title="Mode[mode] && $t(Mode[mode])"
+      :title="Mode[mode] && t(Mode[mode])"
       :mask-closable="false"
       :centered="true"
       :destroy-on-close="true"
@@ -174,7 +174,7 @@
           <a-select
             v-model:value="item[item.field]"
             :options="item.props?.options"
-            :placeholder="$t('common.select_error', [t('llmConfig.model').toLowerCase()])"
+            :placeholder="t('common.select_error', [t('llmConfig.model').toLowerCase()])"
             @change="onPlatformChange"
           ></a-select>
         </template>
@@ -183,15 +183,15 @@
         <footer>
           <a-space size="middle">
             <a-button :disabled="loading" :loading="loadingTest" type="primary" @click="handleTest">
-              {{ $t('llmConfig.test') }}
+              {{ t('llmConfig.test') }}
             </a-button>
           </a-space>
           <a-space size="middle">
             <a-button :disabled="isDisabled" @click="handleCancel">
-              {{ $t('common.cancel') }}
+              {{ t('common.cancel') }}
             </a-button>
             <a-button :disabled="loadingTest" :loading="loading" type="primary" @click="handleOk">
-              {{ $t('common.confirm') }}
+              {{ t('common.confirm') }}
             </a-button>
           </a-space>
         </footer>

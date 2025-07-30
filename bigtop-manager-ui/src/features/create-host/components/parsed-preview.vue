@@ -35,6 +35,7 @@
   const props = defineProps<{ data: Data; isPublic: boolean | undefined }>()
   const emits = defineEmits<{ (event: 'parsed', value: ParsedRes): void }>()
 
+  const { t } = useI18n()
   const open = ref(false)
   const showConflictList = ref(false)
   const parsedHostNames = ref<string[]>([])
@@ -102,8 +103,8 @@
         <span class="title">
           {{
             showConflictList
-              ? $t('cluster.duplicate_hostname', [`${duplicateHostnames.length}`])
-              : $t('cluster.show_hosts_resolved')
+              ? t('cluster.duplicate_hostname', [`${duplicateHostnames.length}`])
+              : t('cluster.show_hosts_resolved')
           }}
         </span>
       </div>
@@ -118,13 +119,13 @@
       <footer>
         <a-space size="middle">
           <a-button @click="handleCancel">
-            {{ $t('common.cancel') }}
+            {{ t('common.cancel') }}
           </a-button>
           <a-button v-if="showConflictList" @click="() => (showConflictList = false)">
-            {{ $t('common.prev') }}
+            {{ t('common.prev') }}
           </a-button>
           <a-button type="primary" @click="handleOk">
-            {{ $t('common.confirm') }}
+            {{ t('common.confirm') }}
           </a-button>
         </a-space>
       </footer>

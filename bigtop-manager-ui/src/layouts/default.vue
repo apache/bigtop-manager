@@ -19,15 +19,16 @@
 
 <script setup lang="ts">
   import { usePngImage } from '@/utils/tools'
+  const { t } = useI18n()
 </script>
 
 <template>
   <a-card>
     <div class="default">
       <img :src="usePngImage('default')" />
-      <a-typography-text>{{ $t('cluster.cluster_unavailable_message') }}</a-typography-text>
+      <a-typography-text>{{ t('cluster.cluster_unavailable_message') }}</a-typography-text>
       <a-typography-link underline @click="() => $router.push({ name: 'CreateCluster' })">
-        {{ $t('menu.create') }}
+        {{ t('menu.create') }}
       </a-typography-link>
     </div>
   </a-card>

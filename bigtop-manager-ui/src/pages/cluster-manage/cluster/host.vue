@@ -224,10 +224,10 @@
 <template>
   <div class="host">
     <header>
-      <div class="header-title">{{ $t('host.host_list') }}</div>
+      <div class="header-title">{{ t('host.host_list') }}</div>
       <a-space :size="16">
-        <a-button type="primary" danger @click="bulkRemove">{{ $t('common.bulk_remove') }}</a-button>
-        <a-button type="primary" @click="addHost">{{ $t('cluster.add_host') }}</a-button>
+        <a-button type="primary" danger @click="bulkRemove">{{ t('common.bulk_remove') }}</a-button>
+        <a-button type="primary" @click="addHost">{{ t('cluster.add_host') }}</a-button>
       </a-space>
     </header>
     <a-table
@@ -242,17 +242,17 @@
         <div class="search">
           <a-input
             ref="searchInputRef"
-            :placeholder="$t('common.enter_error', [column.title])"
+            :placeholder="t('common.enter_error', [column.title])"
             :value="selectedKeys[0]"
             @change="(e: any) => setSelectedKeys(e.target?.value ? [e.target?.value] : [])"
             @press-enter="handleSearch(selectedKeys, confirm, column.dataIndex)"
           />
           <div class="search-option">
             <a-button size="small" @click="handleReset(clearFilters)">
-              {{ $t('common.reset') }}
+              {{ t('common.reset') }}
             </a-button>
             <a-button type="primary" size="small" @click="handleSearch(selectedKeys, confirm, column.dataIndex)">
-              {{ $t('common.search') }}
+              {{ t('common.search') }}
             </a-button>
           </div>
         </div>
@@ -267,7 +267,7 @@
         </template>
         <template v-if="column.key === 'status'">
           <svg-icon style="margin-left: 0" :name="hostStatus[record.status].toLowerCase()" />
-          <span>{{ $t(`common.${hostStatus[record.status].toLowerCase()}`) }}</span>
+          <span>{{ t(`common.${hostStatus[record.status].toLowerCase()}`) }}</span>
         </template>
         <template v-if="column.key === 'operation'">
           <button-group

@@ -148,16 +148,16 @@
 <template>
   <div class="service-configurator">
     <header>
-      <div class="header-title">{{ $t('common.configs') }}</div>
+      <div class="header-title">{{ t('common.configs') }}</div>
       <div class="list-operation">
         <a-space>
-          <a-button type="primary" @click="onCaptureSnapshot">{{ $t('service.capture_snapshot') }}</a-button>
-          <a-button @click="openSnapshotManagement">{{ $t('service.snapshot_management') }}</a-button>
+          <a-button type="primary" @click="onCaptureSnapshot">{{ t('service.capture_snapshot') }}</a-button>
+          <a-button @click="openSnapshotManagement">{{ t('service.snapshot_management') }}</a-button>
         </a-space>
         <a-input
           v-model:value="searchStr"
           :allow-clear="true"
-          :placeholder="$t('service.please_enter_search_keyword')"
+          :placeholder="t('service.please_enter_search_keyword')"
           @input="debouncedOnSearch"
         />
       </div>
@@ -211,7 +211,7 @@
     </section>
     <div style="text-align: end">
       <a-button type="primary" :loading="loading" @click="saveConfigs">
-        {{ $t('common.save') }}
+        {{ t('common.save') }}
       </a-button>
     </div>
     <capture-snapshot ref="captureRef" @success="getServiceDetail" />

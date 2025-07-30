@@ -24,6 +24,7 @@
 
   import type { ClusterStatusType } from '@/api/cluster/types'
 
+  const { t } = useI18n()
   const router = useRouter()
   const route = useRoute()
   const stackStore = useStackStore()
@@ -125,7 +126,7 @@
             />
           </template>
           <template #title>
-            <span>{{ $t(menuItem.meta!.title!) }}</span>
+            <span>{{ t(menuItem.meta!.title!) }}</span>
           </template>
           <a-menu-item
             v-for="child of clusterMap"
@@ -150,7 +151,7 @@
                 :name="toggleActivatedIcon({ key: menuItem.redirect as string, icon: menuItem.meta?.icon || '' })"
               />
             </template>
-            <span>{{ $t(menuItem.meta!.title!) }}</span>
+            <span>{{ t(menuItem.meta!.title!) }}</span>
           </a-menu-item>
         </template>
       </template>
@@ -160,7 +161,7 @@
       <div class="create-option">
         <a-button type="primary" ghost @click="addCluster">
           <div>
-            <label>{{ $t('menu.create') }}</label>
+            <label>{{ t('menu.create') }}</label>
           </div>
         </a-button>
       </div>

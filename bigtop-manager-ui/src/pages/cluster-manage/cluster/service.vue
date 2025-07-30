@@ -154,15 +154,15 @@
               <a-tag :color="CommonStatus[statusColors[item.status]]">
                 <div class="header-base-status-inner">
                   <status-dot :color="CommonStatus[statusColors[item.status]]" />
-                  <span class="small">{{ $t(`common.${statusColors[item.status]}`) }}</span>
+                  <span class="small">{{ t(`common.${statusColors[item.status]}`) }}</span>
                 </div>
               </a-tag>
             </div>
           </div>
           <div class="header-restart-status">
-            <span class="small-gray">{{ `${$t('common.restart')}` }}</span>
+            <span class="small-gray">{{ `${t('common.restart')}` }}</span>
             <status-dot :color="item.restartFlag ? 'error' : 'success'" />
-            <span class="small">{{ `${item.restartFlag ? $t('common.required') : $t('common.not_required')}` }}</span>
+            <span class="small">{{ `${item.restartFlag ? t('common.required') : t('common.not_required')}` }}</span>
           </div>
         </div>
         <div class="item-content" @click.stop>

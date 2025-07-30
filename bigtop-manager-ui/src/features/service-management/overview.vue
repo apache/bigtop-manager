@@ -97,14 +97,14 @@
       <a-col :xs="24" :sm="24" :md="24" :lg="10" :xl="7" style="display: flex; flex-direction: column; gap: 24px">
         <div class="base-info">
           <div class="box-title">
-            <a-typography-text strong :content="$t('overview.basic_info')" />
+            <a-typography-text strong :content="t('overview.basic_info')" />
           </div>
           <div>
             <a-descriptions layout="vertical" bordered>
               <a-descriptions-item>
                 <template #label>
                   <div class="desc-sub-label">
-                    <a-typography-text strong :content="$t('overview.detail')" />
+                    <a-typography-text strong :content="t('overview.detail')" />
                   </div>
                 </template>
                 <div class="desc-sub-item-wrp">
@@ -122,7 +122,7 @@
                           :color="CommonStatus[statusColors[attrs[key]]]"
                         >
                           <status-dot :color="CommonStatus[statusColors[attrs[key]]]" />
-                          {{ attrs[key] && $t(`common.${statusColors[attrs[key]]}`) }}
+                          {{ attrs[key] && t(`common.${statusColors[attrs[key]]}`) }}
                         </a-tag>
                         <a-typography-text
                           v-else-if="key === 'stack'"
@@ -132,12 +132,12 @@
                         <a-typography-text
                           v-else-if="key === 'restartFlag'"
                           class="desc-sub-item-desc-column"
-                          :content="attrs[key] ? $t('common.yes') : $t('common.no')"
+                          :content="attrs[key] ? t('common.yes') : t('common.no')"
                         />
                         <a-typography-text
                           v-else-if="['kerberos', 'metrics'].includes(key)"
                           class="desc-sub-item-desc-column"
-                          :content="$t('common.disabled')"
+                          :content="t('common.disabled')"
                         />
                         <a-typography-text v-else class="desc-sub-item-desc-column" :content="`${attrs[key] ?? ''}`" />
                       </div>
@@ -151,7 +151,7 @@
       </a-col>
       <a-col :xs="24" :sm="24" :md="24" :lg="14" :xl="17">
         <div class="box-title">
-          <a-typography-text strong :content="$t('overview.chart')" />
+          <a-typography-text strong :content="t('overview.chart')" />
           <a-space :size="12">
             <div
               v-for="time in timeRanges"
@@ -173,22 +173,22 @@
         <a-row v-else class="box-content">
           <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
             <div class="chart-item-wrp">
-              <gauge-chart chart-id="chart1" :title="$t('overview.memory_usage')" />
+              <gauge-chart chart-id="chart1" :title="t('overview.memory_usage')" />
             </div>
           </a-col>
           <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
             <div class="chart-item-wrp">
-              <gauge-chart chart-id="chart2" :title="$t('overview.cpu_usage')" />
+              <gauge-chart chart-id="chart2" :title="t('overview.cpu_usage')" />
             </div>
           </a-col>
           <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
             <div class="chart-item-wrp">
-              <category-chart chart-id="chart4" :title="$t('overview.cpu_usage')" />
+              <category-chart chart-id="chart4" :title="t('overview.cpu_usage')" />
             </div>
           </a-col>
           <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
             <div class="chart-item-wrp">
-              <category-chart chart-id="chart3" :title="$t('overview.memory_usage')" />
+              <category-chart chart-id="chart3" :title="t('overview.memory_usage')" />
             </div>
           </a-col>
         </a-row>

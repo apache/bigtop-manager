@@ -73,6 +73,7 @@
     llmConfig: () => ({})
   })
 
+  const { t } = useI18n()
   const emits = defineEmits<Emits>()
   const { llmConfig, isConfig, loading } = toRefs(props)
 
@@ -181,7 +182,7 @@
               :content="`${llmConfig?.name}`"
             />
             <a-tag :color="llmStatus?.type">
-              {{ $t(llmStatus?.text || '--') }}
+              {{ t(llmStatus?.text || '--') }}
             </a-tag>
           </div>
           <a-dropdown :trigger="['click']">
@@ -197,9 +198,9 @@
                   :key="key"
                   :danger="danger"
                   :disabled="disabled"
-                  :title="$t(label)"
+                  :title="t(label)"
                 >
-                  {{ $t(label) }}
+                  {{ t(label) }}
                 </a-menu-item>
               </a-menu>
             </template>
@@ -207,7 +208,7 @@
         </div>
         <div class="llm-card-body">
           <a-typography-paragraph v-for="{ label, code } in llmDescriptions" :key="code" class="llm-card-desc">
-            <a-typography-text>{{ $t(label) }}</a-typography-text>
+            <a-typography-text>{{ t(label) }}</a-typography-text>
             <a-typography-paragraph
               type="secondary"
               class="llm-card-desc-text"
@@ -221,7 +222,7 @@
     <template v-else>
       <div class="llm-card-action" @click="handleCreateLlmConfig">
         <svg-icon name="plus-dark" />
-        <a-typography-text type="secondary" :content="$t('llmConfig.add_authorization')" />
+        <a-typography-text type="secondary" :content="t('llmConfig.add_authorization')" />
       </div>
     </template>
   </div>

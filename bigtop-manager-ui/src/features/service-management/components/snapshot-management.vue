@@ -160,7 +160,7 @@
       v-model:open="open"
       width="800px"
       :centered="true"
-      :title="$t('service.snapshot_management')"
+      :title="t('service.snapshot_management')"
       :destroy-on-close="true"
       @ok="handleOk"
       @cancel="handleCancel"

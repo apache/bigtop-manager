@@ -89,7 +89,7 @@
 <template>
   <div class="user">
     <header>
-      <div class="header-title">{{ $t('user.user_list') }}</div>
+      <div class="header-title">{{ t('user.user_list') }}</div>
     </header>
     <a-table
       :loading="loading"

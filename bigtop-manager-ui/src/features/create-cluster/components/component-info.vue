@@ -91,7 +91,7 @@
           {{ stackGroup[idx].replace(/^\w/, (c) => c.toUpperCase()) }}
         </a-radio-button>
       </a-radio-group>
-      <a-button type="primary" @click="handleSetSource">{{ $t('cluster.config_source') }}</a-button>
+      <a-button type="primary" @click="handleSetSource">{{ t('cluster.config_source') }}</a-button>
     </header>
     <a-table :loading="loading" :data-source="data" :columns="columns" :pagination="paginationProps" @change="onChange">
       <template #bodyCell="{ column }">

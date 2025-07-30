@@ -159,7 +159,7 @@
     :mask="false"
     :open="open"
     :z-index="99999"
-    :title="$t(`job.${title}`)"
+    :title="t(`job.${title}`)"
     @ok="handleOk"
     @cancel="handleOk"
   >
@@ -169,10 +169,10 @@
     <template #footer>
       <div class="log-load">
         <div>
-          <span v-show="loading" class="text-loading">{{ $t('job.log_loading') }}</span>
+          <span v-show="loading" class="text-loading">{{ t('job.log_loading') }}</span>
         </div>
         <a-button key="submit" type="primary" @click="handleOk">
-          {{ $t('common.confirm') }}
+          {{ t('common.confirm') }}
         </a-button>
       </div>
     </template>
@@ -181,7 +181,7 @@
       <a-space :size="16" class="options">
         <div v-for="option in options" :key="option.icon" v-on="option.on">
           <svg-icon :name="option.icon" />
-          <a-typography-link underline :content="$t(option.text)" />
+          <a-typography-link underline :content="t(option.text)" />
         </div>
       </a-space>
     </section>

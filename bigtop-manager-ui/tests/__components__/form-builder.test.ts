@@ -19,23 +19,20 @@
 
 import { mount } from '@vue/test-utils'
 import { describe, it, expect, vi } from 'vitest'
-import { createI18n, useI18n } from 'vue-i18n'
+import { useI18n } from 'vue-i18n'
 import { computed, defineComponent, h, ref } from 'vue'
+import { i18nPlugins } from '../test-util.ts'
 import FormBuilder from '../../src/components/common/form-builder/index.vue'
 import Antd from 'ant-design-vue'
 
-const i18n = createI18n({
-  legacy: false, // Use Composition API style
-  locale: 'en',
-  messages: {
-    en: {
-      form: {
-        name: 'Translated Name'
-      },
-      common: {
-        select_error: 'Please select ',
-        enter_error: 'Please enter '
-      }
+const i18n = i18nPlugins({
+  en: {
+    form: {
+      name: 'Translated Name'
+    },
+    common: {
+      select_error: 'Please select ',
+      enter_error: 'Please enter '
     }
   }
 })

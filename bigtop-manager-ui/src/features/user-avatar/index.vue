@@ -22,17 +22,17 @@
   import { message } from 'ant-design-vue'
   import { useUserStore } from '@/store/user'
 
-  const i18n = useI18n()
+  const { t } = useI18n()
   const router = useRouter()
 
   const userStore = useUserStore()
   const { userVO } = storeToRefs(userStore)
 
   const logout = async () => {
-    const hide = message.loading(i18n.t('login.logging_out'), 0)
+    const hide = message.loading(t('login.logging_out'), 0)
     try {
       await userStore.logout()
-      message.success(i18n.t('login.logout_success'))
+      message.success(t('login.logout_success'))
       await router.push({ path: '/login' })
     } catch (e) {
       console.warn(e)
@@ -55,7 +55,7 @@
             <user-outlined />
           </template>
           <router-link to="/user/profile">
-            {{ $t('user.profile') }}
+            {{ t('user.profile') }}
           </router-link>
         </a-menu-item>
         <a-menu-item key="settings">
@@ -63,7 +63,7 @@
             <profile-outlined />
           </template>
           <router-link to="/user/settings">
-            {{ $t('user.settings') }}
+            {{ t('user.settings') }}
           </router-link>
         </a-menu-item>
         <a-menu-divider />
@@ -71,7 +71,7 @@
           <template #icon>
             <logout-outlined />
           </template>
-          {{ $t('user.logout') }}
+          {{ t('user.logout') }}
         </a-menu-item>
       </a-menu>
     </template>

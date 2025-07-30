@@ -359,12 +359,12 @@
     <a-modal
       :open="open"
       :width="600"
-      :title="titleMap[mode] && $t(titleMap[mode])"
+      :title="titleMap[mode] && t(titleMap[mode])"
       :mask-closable="false"
       :confirm-loading="loading"
       :centered="true"
       :destroy-on-close="true"
-      :ok-text="$t('common.confirm')"
+      :ok-text="t('common.confirm')"
       @cancel="handleCancel"
       @ok="handleOk"
     >
@@ -379,7 +379,7 @@
             >
               <a-button>
                 <upload-outlined></upload-outlined>
-                {{ $t('common.upload_file') }}
+                {{ t('common.upload_file') }}
               </a-button>
             </a-upload>
             <span class="filename">{{ fileName ? fileName : mode === 'EDIT' ? formValue[item.field] : '' }}</span>

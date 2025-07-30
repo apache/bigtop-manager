@@ -64,7 +64,7 @@
 
 <template>
   <div>
-    <header-card :title="$t('menu.infra')" :show-avatar="false" :desc="$t('infra.info')" :action-groups="actionGroup" />
+    <header-card :title="t('menu.infra')" :show-avatar="false" :desc="t('infra.info')" :action-groups="actionGroup" />
     <main-card v-model:active-key="activeKey" :tabs="tabs">
       <template #tab-item>
         <keep-alive>

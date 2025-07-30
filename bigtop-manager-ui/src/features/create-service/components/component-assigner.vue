@@ -177,14 +177,14 @@
   <div class="component-assigner">
     <section>
       <div class="list-title">
-        <div>{{ $t('service.service_list') }}</div>
+        <div>{{ t('service.service_list') }}</div>
       </div>
       <tree-selector :tree="serviceList" :field-names="fieldNames" @change="treeSelectedChange" />
     </section>
     <a-divider type="vertical" class="divider" />
     <section>
       <div class="list-title">
-        <div>{{ $t('service.select_host') }}</div>
+        <div>{{ t('service.select_host') }}</div>
       </div>
       <a-table
         row-key="hostname"
@@ -203,17 +203,17 @@
           <div class="search">
             <a-input
               ref="searchInputRef"
-              :placeholder="$t('common.enter_error', [column.title])"
+              :placeholder="t('common.enter_error', [column.title])"
               :value="selectedKeys[0]"
               @change="(e: any) => setSelectedKeys(e.target?.value ? [e.target?.value] : [])"
               @press-enter="handleSearch(selectedKeys, confirm, column.dataIndex)"
             />
             <div class="search-option">
               <a-button size="small" @click="handleReset(clearFilters)">
-                {{ $t('common.reset') }}
+                {{ t('common.reset') }}
               </a-button>
               <a-button type="primary" size="small" @click="handleSearch(selectedKeys, confirm, column.dataIndex)">
-                {{ $t('common.search') }}
+                {{ t('common.search') }}
               </a-button>
             </div>
           </div>
@@ -223,7 +223,7 @@
     <a-divider type="vertical" class="divider" />
     <section>
       <div class="list-title">
-        <div>{{ $t('service.host_preview') }}</div>
+        <div>{{ t('service.host_preview') }}</div>
       </div>
       <div class="preview">
         <a-empty v-if="hostsOfCurrComp.length === 0" :image="Empty.PRESENTED_IMAGE_SIMPLE" />

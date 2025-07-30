@@ -220,8 +220,8 @@
   <div class="host-config">
     <header>
       <a-space :size="16">
-        <a-button type="primary" @click="updateHost('ADD')">{{ $t('cluster.add_host') }}</a-button>
-        <a-button type="primary" danger @click="deleteHost">{{ $t('common.bulk_remove') }}</a-button>
+        <a-button type="primary" @click="updateHost('ADD')">{{ t('cluster.add_host') }}</a-button>
+        <a-button type="primary" danger @click="deleteHost">{{ t('common.bulk_remove') }}</a-button>
       </a-space>
     </header>
     <a-table
@@ -236,16 +236,16 @@
         <div class="search">
           <a-input
             ref="searchInputRef"
-            :placeholder="$t('common.enter_error', [column.title])"
+            :placeholder="t('common.enter_error', [column.title])"
             :value="selectedKeys[0]"
             @change="(e: any) => setSelectedKeys(e.target?.value ? [e.target?.value] : [])"
             @press-enter="handleSearch(selectedKeys, confirm, column.dataIndex)"
           />
           <a-space :size="16">
             <a-button type="primary" size="small" @click="handleSearch(selectedKeys, confirm, column.dataIndex)">
-              {{ $t('common.search') }}
+              {{ t('common.search') }}
             </a-button>
-            <a-button size="small" @click="handleReset(clearFilters)"> {{ $t('common.reset') }} </a-button>
+            <a-button size="small" @click="handleReset(clearFilters)"> {{ t('common.reset') }} </a-button>
           </a-space>
         </div>
       </template>
@@ -256,7 +256,7 @@
         <template v-if="column.key === 'status'">
           <svg-icon :name="record.status.toLowerCase()" />
           <span :title="`${record.message ? record.message : ''}`">
-            {{ `${$t(`common.${record.status.toLowerCase()}`)}` }}
+            {{ `${t(`common.${record.status.toLowerCase()}`)}` }}
             {{ record.message && record.status.toLowerCase() === 'failed' ? `:  ${record.message}` : '' }}
           </span>
         </template>

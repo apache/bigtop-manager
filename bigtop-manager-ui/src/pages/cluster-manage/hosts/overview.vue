@@ -170,14 +170,14 @@
       <a-col :xs="24" :sm="24" :md="24" :lg="10" :xl="7" style="display: flex; flex-direction: column; gap: 24px">
         <div class="base-info">
           <div class="box-title">
-            <a-typography-text strong :content="$t('overview.basic_info')" />
+            <a-typography-text strong :content="t('overview.basic_info')" />
           </div>
           <div>
             <a-descriptions layout="vertical" bordered>
               <a-descriptions-item>
                 <template #label>
                   <div class="desc-sub-label">
-                    <a-typography-text strong :content="$t('overview.detail')" />
+                    <a-typography-text strong :content="t('overview.detail')" />
                   </div>
                 </template>
                 <div class="desc-sub-item-wrp">
@@ -195,7 +195,7 @@
                           :color="CommonStatus[statusColors[hostInfo[base] as ClusterStatusType]]"
                         >
                           <status-dot :color="CommonStatus[statusColors[hostInfo[base] as ClusterStatusType]]" />
-                          {{ hostInfo[base] && $t(`common.${statusColors[hostInfo[base] as ClusterStatusType]}`) }}
+                          {{ hostInfo[base] && t(`common.${statusColors[hostInfo[base] as ClusterStatusType]}`) }}
                         </a-tag>
                         <a-typography-text v-else class="desc-sub-item-desc-column">
                           <span v-if="Object.keys(unitOfBaseConfig).includes(base as string)">
@@ -223,7 +223,7 @@
         <template v-if="componentsFromCurrentHost.size === 0">
           <div class="component-info">
             <div class="box-title">
-              <a-typography-text strong :content="$t('overview.component_info')" />
+              <a-typography-text strong :content="t('overview.component_info')" />
             </div>
             <div class="box-empty">
               <a-empty :image="Empty.PRESENTED_IMAGE_SIMPLE" />
@@ -232,7 +232,7 @@
         </template>
         <a-descriptions v-else layout="vertical" bordered :column="1">
           <template #title>
-            <a-typography-text strong :content="$t('overview.component_info')" />
+            <a-typography-text strong :content="t('overview.component_info')" />
           </template>
           <a-descriptions-item v-for="stack in componentsFromCurrentHost.keys()" :key="stack">
             <template #label>
@@ -265,7 +265,7 @@
       </a-col>
       <a-col :xs="24" :sm="24" :md="24" :lg="14" :xl="17">
         <div class="box-title">
-          <a-typography-text strong :content="$t('overview.chart')" />
+          <a-typography-text strong :content="t('overview.chart')" />
           <a-space :size="12">
             <div
               v-for="time in timeRanges"
@@ -287,16 +287,12 @@
         <a-row v-else class="box-content">
           <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
             <div class="chart-item-wrp">
-              <gauge-chart
-                chart-id="chart1"
-                :percent="chartData?.memoryUsageCur"
-                :title="$t('overview.memory_usage')"
-              />
+              <gauge-chart chart-id="chart1" :percent="chartData?.memoryUsageCur" :title="t('overview.memory_usage')" />
             </div>
           </a-col>
           <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
             <div class="chart-item-wrp">
-              <gauge-chart chart-id="chart2" :percent="chartData?.cpuUsageCur" :title="$t('overview.cpu_usage')" />
+              <gauge-chart chart-id="chart2" :percent="chartData?.cpuUsageCur" :title="t('overview.cpu_usage')" />
             </div>
           </a-col>
           <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
@@ -305,7 +301,7 @@
                 chart-id="chart3"
                 :x-axis-data="chartData?.timestamps"
                 :data="chartData?.memoryUsage"
-                :title="$t('overview.memory_usage')"
+                :title="t('overview.memory_usage')"
               />
             </div>
           </a-col>
@@ -315,7 +311,7 @@
                 chart-id="chart4"
                 :x-axis-data="chartData?.timestamps"
                 :data="chartData?.cpuUsage"
-                :title="$t('overview.cpu_usage')"
+                :title="t('overview.cpu_usage')"
               />
             </div>
           </a-col>
@@ -325,7 +321,7 @@
                 chart-id="chart5"
                 :x-axis-data="chartData?.timestamps"
                 :data="chartData"
-                :title="$t('overview.system_load')"
+                :title="t('overview.system_load')"
                 :formatter="{
                   tooltip: (val) => `${val == null || val == '' ? '--' : val}`,
                   yAxis: (val) => `${val}`
@@ -344,7 +340,7 @@
                 chart-id="chart6"
                 :x-axis-data="chartData?.timestamps"
                 :data="chartData"
-                :title="$t('overview.disk_io')"
+                :title="t('overview.disk_io')"
                 :formatter="{
                   tooltip: (val) => `${val == null || val == '' ? '--' : formatFromByte(val as number, 0)}`,
                   yAxis: (val) => formatFromByte(val as number, 0)

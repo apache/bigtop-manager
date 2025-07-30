@@ -29,10 +29,12 @@
   const props = defineProps<{ stepData: CommandVO }>()
   const { stepData } = toRefs(props)
 
+  const { t } = useI18n()
   const createStore = useCreateServiceStore()
   const activeKey = ref<number[]>([])
   const jobDetail = ref<JobVO>({})
   const spinning = ref(false)
+
   const logsViewState = reactive<LogViewProps>({
     open: false
   })
@@ -43,6 +45,7 @@
     Canceled: 'canceled',
     Successful: 'success'
   })
+
   const stages = computed(() => {
     if (jobDetail.value.stages) {
       return [...jobDetail.value.stages].sort((a, b) => a.order! - b.order!)
@@ -131,7 +134,7 @@
     <div v-else class="component-installer">
       <div class="retry">
         <a-button v-if="jobDetail.state === 'Failed'" type="link" @click="handleRetryJob">
-          {{ $t('common.retry') }}
+          {{ t('common.retry') }}
         </a-button>
       </div>
       <a-collapse v-model:active-key="activeKey" :bordered="false" :ghost="true">
@@ -154,7 +157,7 @@
                   type="link"
                   @click="viewLogs(stage, task)"
                 >
-                  {{ $t('cluster.view_log') }}
+                  {{ t('cluster.view_log') }}
                 </a-button>
               </div>
             </a-space>

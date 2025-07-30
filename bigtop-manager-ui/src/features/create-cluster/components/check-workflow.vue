@@ -31,6 +31,7 @@
 
   const { stepData } = toRefs(props)
 
+  const { t } = useI18n()
   const activeKey = ref<number[]>([])
   const jobDetail = ref<JobVO>({})
   const spinning = ref(false)
@@ -134,7 +135,7 @@
     <div v-else class="check-workflow">
       <div class="retry">
         <a-button v-if="stepData.state === 'Failed'" type="link" @click="handleRetryJob">
-          {{ $t('common.retry') }}
+          {{ t('common.retry') }}
         </a-button>
       </div>
       <a-collapse v-model:active-key="activeKey" :bordered="false" :ghost="true">
@@ -157,7 +158,7 @@
                   type="link"
                   @click="viewLogs(stage, task)"
                 >
-                  {{ $t('cluster.view_log') }}
+                  {{ t('cluster.view_log') }}
                 </a-button>
               </div>
             </a-space>

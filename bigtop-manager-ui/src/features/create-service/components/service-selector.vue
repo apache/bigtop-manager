@@ -32,6 +32,7 @@
     selectedData: ExpandServiceVO[]
   }
 
+  const { t } = useI18n()
   const stackStore = useStackStore()
   const createStore = useCreateServiceStore()
   const serviceStore = useServiceStore()
@@ -219,14 +220,14 @@
   <div class="service-selector">
     <a-spin :spinning="spinning">
       <div class="list-title">
-        <div>{{ $t('service.select_service') }}</div>
-        <a-input v-model:value="searchStr" :placeholder="$t('service.please_enter_search_keyword')" />
+        <div>{{ t('service.select_service') }}</div>
+        <a-input v-model:value="searchStr" :placeholder="t('service.please_enter_search_keyword')" />
       </div>
       <a-list item-layout="horizontal" :data-source="filterAddableData">
         <template #renderItem="{ item }">
           <a-list-item>
             <template #actions>
-              <a-button type="primary" @click="modifyInstallItems('add', item)">{{ $t('common.add') }}</a-button>
+              <a-button type="primary" @click="modifyInstallItems('add', item)">{{ t('common.add') }}</a-button>
             </template>
             <a-list-item-meta>
               <template #title>
@@ -270,14 +271,14 @@
     <a-divider type="vertical" class="divider" />
     <a-spin :spinning="spinning">
       <div class="list-title">
-        <div>{{ $t('service.pending_installation_services') }}</div>
+        <div>{{ t('service.pending_installation_services') }}</div>
       </div>
       <a-list item-layout="horizontal" :data-source="state.selectedData">
         <template #renderItem="{ item }">
           <a-list-item>
             <template #actions>
               <a-button danger :disabled="item.isInstalled" type="primary" @click="modifyInstallItems('remove', item)">
-                {{ $t('common.remove') }}
+                {{ t('common.remove') }}
               </a-button>
             </template>
             <a-list-item-meta>

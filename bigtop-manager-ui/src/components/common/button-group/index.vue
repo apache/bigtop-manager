@@ -63,7 +63,7 @@
               <slot name="icon" :item="item" />
             </template>
             <span v-if="item.text">
-              {{ $props.i18n && item.text ? $t(`${$props.i18n}.${item.text}`) : item.text }}
+              {{ $props.i18n && item.text ? t(`${$props.i18n}.${item.text}`) : item.text }}
             </span>
           </a-button>
           <template #overlay>
@@ -87,7 +87,7 @@
             <slot name="icon" :item="item" />
           </template>
           <span v-if="item.text">
-            {{ $props.i18n && item.text ? $t(`${$props.i18n}.${item.text}`) : item.text }}
+            {{ $props.i18n && item.text ? t(`${$props.i18n}.${item.text}`) : item.text }}
           </span>
         </a-button>
       </template>

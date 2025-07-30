@@ -172,7 +172,7 @@
       width="60%"
       :centered="true"
       :mask="false"
-      :title="$t('cluster.source')"
+      :title="t('cluster.source')"
       :mask-closable="false"
       :destroy-on-close="true"
       :after-close="handleCancel"
@@ -183,7 +183,7 @@
             {{ label }}
           </a-radio-button>
         </a-radio-group>
-        <a-button type="primary" @click="setNewAddress">{{ $t('component.update_all') }}</a-button>
+        <a-button type="primary" @click="setNewAddress">{{ t('component.update_all') }}</a-button>
       </div>
       <a-form ref="formRef" :model="form">
         <a-table
@@ -243,10 +243,10 @@
       </a-form>
       <template #footer>
         <div class="set-source-footer">
-          <a-typography-text class="set-source-tip" type="danger">{{ `*${$t('component.note')}` }}</a-typography-text>
+          <a-typography-text class="set-source-tip" type="danger">{{ `*${t('component.note')}` }}</a-typography-text>
           <a-space>
-            <a-button @click="handleCancel">{{ $t('common.cancel') }}</a-button>
-            <a-button type="primary" @click="handleOk">{{ $t('common.confirm') }}</a-button>
+            <a-button @click="handleCancel">{{ t('common.cancel') }}</a-button>
+            <a-button type="primary" @click="handleOk">{{ t('common.confirm') }}</a-button>
           </a-space>
         </div>
       </template>

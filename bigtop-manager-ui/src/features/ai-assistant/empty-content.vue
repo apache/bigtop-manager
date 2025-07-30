@@ -30,6 +30,7 @@
     height: '200px',
     marginBottom: '16px'
   })
+  const { t } = useI18n()
   const aiChatStore = useAiChatStore()
   const { hasActivePlatform, threads, chatRecords } = storeToRefs(aiChatStore)
   const emptyState = usePngImage('ai-helper')
@@ -55,27 +56,27 @@
         <template v-if="hasActivePlatform">
           <div class="say-hello">
             <a-typography-title :level="5">
-              <div> {{ $t('aiAssistant.greeting') }} </div>
-              <div> {{ $t('aiAssistant.help') }} </div>
+              <div> {{ t('aiAssistant.greeting') }} </div>
+              <div> {{ t('aiAssistant.help') }} </div>
             </a-typography-title>
           </div>
           <div class="feature-desc">
-            <a-typography-link underline @click="quickAsk($t('aiAssistant.bigtop_manager'))">
-              {{ $t('aiAssistant.bigtop_manager') }}
+            <a-typography-link underline @click="quickAsk(t('aiAssistant.bigtop_manager'))">
+              {{ t('aiAssistant.bigtop_manager') }}
             </a-typography-link>
-            <a-typography-link underline @click="quickAsk($t('aiAssistant.can_do_for_you'))">
-              {{ $t('aiAssistant.can_do_for_you') }}
+            <a-typography-link underline @click="quickAsk(t('aiAssistant.can_do_for_you'))">
+              {{ t('aiAssistant.can_do_for_you') }}
             </a-typography-link>
-            <a-typography-link underline @click="quickAsk($t('aiAssistant.big_data_news'))">
-              {{ $t('aiAssistant.big_data_news') }}
+            <a-typography-link underline @click="quickAsk(t('aiAssistant.big_data_news'))">
+              {{ t('aiAssistant.big_data_news') }}
             </a-typography-link>
           </div>
         </template>
         <template v-else>
           <a-typography-text>
-            <div> {{ $t('aiAssistant.ai_disabled_msg') }} </div>
+            <div> {{ t('aiAssistant.ai_disabled_msg') }} </div>
           </a-typography-text>
-          <a-typography-link underline @click="goSetUpLlmConfig"> {{ $t('aiAssistant.go_set_up') }} </a-typography-link>
+          <a-typography-link underline @click="goSetUpLlmConfig"> {{ t('aiAssistant.go_set_up') }} </a-typography-link>
         </template>
       </template>
     </a-empty>

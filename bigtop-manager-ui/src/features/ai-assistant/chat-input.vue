@@ -45,7 +45,7 @@
       v-model:value="chatMessage"
       :bordered="false"
       :auto-size="{ minRows: 1, maxRows: 6 }"
-      :placeholder="$t('aiAssistant.enter_question')"
+      :placeholder="t('aiAssistant.enter_question')"
     />
     <a-button :disabled="isSending" :type="isSending ? 'default' : 'text'" shape="circle" @click="sendMessage">
       <template #icon>

@@ -98,7 +98,7 @@
   <a-spin :spinning="loading">
     <div class="llm-config">
       <a-typography-title :level="5">
-        {{ $t('menu.llm_config') }}
+        {{ t('menu.llm_config') }}
       </a-typography-title>
       <div class="llm-config-content">
         <llm-item

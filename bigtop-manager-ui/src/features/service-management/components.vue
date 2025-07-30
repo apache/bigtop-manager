@@ -332,9 +332,9 @@
 <template>
   <div class="component">
     <header>
-      <div class="header-title">{{ $t('common.component') }}</div>
+      <div class="header-title">{{ t('common.component') }}</div>
       <div class="list-operation">
-        <a-button type="primary" @click="addComponent">{{ $t('common.add', [`${$t('common.component')}`]) }}</a-button>
+        <a-button type="primary" @click="addComponent">{{ t('common.add', [`${t('common.component')}`]) }}</a-button>
         <button-group :groups="batchOperations" group-shape="default" />
       </div>
     </header>
@@ -352,17 +352,17 @@
         <div class="search">
           <a-input
             ref="searchInputRef"
-            :placeholder="$t('common.enter_error', [column.title])"
+            :placeholder="t('common.enter_error', [column.title])"
             :value="selectedKeys[0]"
             @change="(e: any) => setSelectedKeys(e.target?.value ? [e.target?.value] : [])"
             @press-enter="handleSearch(selectedKeys, confirm, column.dataIndex)"
           />
           <div class="search-option">
             <a-button size="small" @click="handleReset(clearFilters)">
-              {{ $t('common.reset') }}
+              {{ t('common.reset') }}
             </a-button>
             <a-button type="primary" size="small" @click="handleSearch(selectedKeys, confirm, column.dataIndex)">
-              {{ $t('common.search') }}
+              {{ t('common.search') }}
             </a-button>
           </div>
         </div>
@@ -374,10 +374,10 @@
       <template #bodyCell="{ record, column }">
         <template v-if="['status'].includes(column.key as string)">
           <svg-icon style="margin-left: 0" :name="componentStatus[record.status].toLowerCase()" />
-          <span>{{ $t(`common.${componentStatus[record.status].toLowerCase()}`) }}</span>
+          <span>{{ t(`common.${componentStatus[record.status].toLowerCase()}`) }}</span>
         </template>
         <template v-if="column.key === 'quickLink'">
-          <span v-if="!record.quickLink">{{ $t('common.no_link') }}</span>
+          <span v-if="!record.quickLink">{{ t('common.no_link') }}</span>
           <a-typography-link v-else :href="record.quickLink.url" target="_blank">
             {{ record.quickLink.displayName }}
           </a-typography-link>

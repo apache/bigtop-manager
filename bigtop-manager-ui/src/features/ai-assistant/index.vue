@@ -40,6 +40,7 @@
 
   type ActionType = keyof typeof Action
 
+  const { t } = useI18n()
   const aiChatStore = useAiChatStore()
   const llmConfigStore = useLlmConfigStore()
   const menuStore = useMenuStore()
@@ -161,7 +162,7 @@
     <chat-history :visible="historyVisible" :history-type="historyType" />
     <a-drawer
       v-model:open="open"
-      :title="$t(title)"
+      :title="t(title)"
       :width="width"
       :mask="false"
       :closable="false"

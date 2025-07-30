@@ -37,6 +37,7 @@
     isView: false
   })
 
+  const { t } = useI18n()
   const createStore = useCreateServiceStore()
   const serviceStore = useServiceStore()
   const { stepContext, selectedServices } = storeToRefs(createStore)
@@ -149,17 +150,17 @@
   <div class="service-configurator" :class="{ 'service-configurator-view': $props.isView }">
     <section>
       <div class="list-title">
-        <div>{{ $t('service.service_list') }}</div>
+        <div>{{ t('service.service_list') }}</div>
       </div>
       <tree-selector :tree="serviceList" :field-names="fieldNames" @change="handleSelect" />
     </section>
     <a-divider type="vertical" class="divider" />
     <section>
       <div class="list-title">
-        <div>{{ $t('service.host_preview') }}</div>
+        <div>{{ t('service.host_preview') }}</div>
         <a-input
           v-model:value="searchStr"
-          :placeholder="$t('service.please_enter_search_keyword')"
+          :placeholder="t('service.please_enter_search_keyword')"
           @input="debouncedOnSearch"
         />
       </div>
@@ -223,7 +224,7 @@
       <a-divider type="vertical" class="divider" />
       <section>
         <div class="list-title">
-          <div>{{ $t('service.host_preview') }}</div>
+          <div>{{ t('service.host_preview') }}</div>
         </div>
         <tree-selector
           :tree="hostPreviewList"

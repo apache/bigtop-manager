@@ -97,13 +97,13 @@
 <template>
   <div class="cluster-components">
     <div>
-      <div class="menu-title">{{ $t('menu.stacks') }}</div>
+      <div class="menu-title">{{ t('menu.stacks') }}</div>
     </div>
     <div class="cluster-components-header">
       <a-radio-group v-model:value="store.stackSelected" button-style="solid">
         <a-radio-button v-for="(stack, idx) in store.stackGroup" :key="idx" :value="stack">{{ stack }}</a-radio-button>
       </a-radio-group>
-      <a-button type="primary" @click="handleSetSource">{{ $t('cluster.config_source') }}</a-button>
+      <a-button type="primary" @click="handleSetSource">{{ t('cluster.config_source') }}</a-button>
     </div>
     <div>
       <a-table

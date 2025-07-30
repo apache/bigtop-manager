@@ -141,7 +141,7 @@
     <a-drawer
       v-if="historyType === 'small'"
       v-model:open="open"
-      :title="$t(title)"
+      :title="t(title)"
       :closable="false"
       :mask="false"
       :get-container="false"
@@ -173,7 +173,7 @@
     <template v-else>
       <div v-if="visible" class="chat-history-large">
         <header>
-          <a-typography-title :level="5">{{ $t(title) }}</a-typography-title>
+          <a-typography-title :level="5">{{ t(title) }}</a-typography-title>
         </header>
         <main>
           <a-empty v-if="threads.length == 0" :image="Empty.PRESENTED_IMAGE_SIMPLE" />
@@ -202,7 +202,7 @@
                     <template #overlay>
                       <a-menu @click="handleThreadActions(thread, idx, $event)">
                         <a-menu-item v-for="action in threadOperations" :key="action.key" :danger="action.danger">
-                          <span>{{ $t(`common.${action.key}`) }}</span>
+                          <span>{{ t(`common.${action.key}`) }}</span>
                         </a-menu-item>
                       </a-menu>
                     </template>
@@ -212,12 +212,12 @@
             </a-menu-item>
           </a-menu>
           <div class="chat-history-limit">
-            <a-typography-text size="small" type="secondary" :content="$t('aiAssistant.show_only10_records')" />
+            <a-typography-text size="small" type="secondary" :content="t('aiAssistant.show_only10_records')" />
           </div>
         </main>
         <footer>
           <a-button type="primary" :disabled="threadLimit" @click="aiChatStore.createChatThread(false)">
-            {{ $t('aiAssistant.new_chat') }}
+            {{ t('aiAssistant.new_chat') }}
           </a-button>
         </footer>
       </div>

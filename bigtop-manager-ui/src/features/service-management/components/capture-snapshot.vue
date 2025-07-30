@@ -84,7 +84,7 @@
       :open="open"
       width="600px"
       :centered="true"
-      :title="$t('service.capture_snapshot')"
+      :title="t('service.capture_snapshot')"
       :destroy-on-close="true"
       :confirm-loading="loading"
       @ok="handleOk"

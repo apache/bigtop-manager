@@ -162,7 +162,7 @@
         <a-steps :current="current">
           <a-step v-for="step in createStore.steps" :key="step" :disabled="true">
             <template #title>
-              <span>{{ $t(step) }}</span>
+              <span>{{ t(step) }}</span>
             </template>
           </a-step>
         </a-steps>
@@ -171,7 +171,7 @@
     <main-card>
       <template v-for="stepItem in createStore.steps" :key="stepItem.title">
         <div v-show="createStore.steps[current] === stepItem" class="step-title">
-          <h5>{{ $t(stepItem) }}</h5>
+          <h5>{{ t(stepItem) }}</h5>
           <section :class="{ 'step-content': current < stepsLimit }"></section>
         </div>
       </template>
@@ -181,17 +181,17 @@
       <component-installer v-if="current == stepsLimit" :step-data="createdPayload" />
       <div class="step-action">
         <a-space>
-          <a-button v-show="current != stepsLimit" @click="() => $router.go(-1)">{{ $t('common.exit') }}</a-button>
+          <a-button v-show="current != stepsLimit" @click="() => $router.go(-1)">{{ t('common.exit') }}</a-button>
           <a-button v-show="current > 0 && current < stepsLimit" type="primary" @click="createStore.previousStep">
-            {{ $t('common.prev') }}
+            {{ t('common.prev') }}
           </a-button>
           <template v-if="current >= 0 && current <= stepsLimit - 1">
             <a-button :disabled="false" type="primary" @click="proceedToNextStep">
-              {{ $t('common.next') }}
+              {{ t('common.next') }}
             </a-button>
           </template>
           <a-button v-show="current === stepsLimit && isDone" type="primary" @click="$router.go(-1)">
-            {{ $t('common.done') }}
+            {{ t('common.done') }}
           </a-button>
         </a-space>
       </div>
