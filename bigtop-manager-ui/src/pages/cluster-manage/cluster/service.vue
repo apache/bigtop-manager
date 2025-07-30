@@ -28,7 +28,7 @@
   import { useJobProgress } from '@/store/job-progress'
 
   import type { GroupItem } from '@/components/common/button-group/types'
-  import type { FilterFormItem } from '@/components/common/form-filter'
+  import type { FilterFormItem } from '@/components/common/form-filter/types'
   import type { ServiceListParams, ServiceStatusType, ServiceVO } from '@/api/service/types'
   import type { ClusterVO } from '@/api/cluster/types'
   import type { Command, CommandRequest } from '@/api/command/types'

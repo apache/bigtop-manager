@@ -56,7 +56,7 @@ export default defineConfig(({ mode }) => {
         ]
       }),
       AutoImport({
-        imports: [],
+        imports: ['vue'],
         resolvers: [
           IconsResolver({
             customCollections: ['svg'],

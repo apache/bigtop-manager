@@ -25,8 +25,8 @@ import { useClusterStore } from '@/store/cluster'
 import { execCommand } from '@/api/command'
 import { getJobDetails } from '@/api/job'
 
-import SvgIcon from '@/components/common/svg-icon/index.vue'
-import JobModal from '@/components/job-modal/index.vue'
+import SvgIcon from '@/components/base/svg-icon/index.vue'
+import JobModal from '@/features/job-modal/index.vue'
 
 import { type CommandRequest } from '@/api/command/types'
 import type { JobParams, JobVO } from '@/api/job/types'

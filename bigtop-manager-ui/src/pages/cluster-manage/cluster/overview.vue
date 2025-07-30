@@ -33,8 +33,8 @@
   import { getClusterMetricsInfo } from '@/api/metrics'
   import { useIntervalFn } from '@vueuse/core'
 
-  import GaugeChart from '@/components/charts/gauge-chart.vue'
-  import CategoryChart from '@/components/charts/category-chart.vue'
+  import GaugeChart from '@/features/metric/gauge-chart.vue'
+  import CategoryChart from '@/features/metric/category-chart.vue'
 
   import type { ClusterStatusType, ClusterVO } from '@/api/cluster/types'
   import type { ServiceVO } from '@/api/service/types'

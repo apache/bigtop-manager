@@ -27,9 +27,9 @@
   import * as hostApi from '@/api/hosts'
 
   import useBaseTable from '@/composables/use-base-table'
-  import HostCreate from '@/components/create-host/index.vue'
-  import InstallDependencies from '@/components/create-host/install-dependencies.vue'
-  import SvgIcon from '@/components/common/svg-icon/index.vue'
+  import HostCreate from '@/features/create-host/index.vue'
+  import InstallDependencies from '@/features/create-host/install-dependencies.vue'
+  import SvgIcon from '@/components/base/svg-icon/index.vue'
 
   import type { FilterConfirmProps, FilterResetProps, TableRowSelection } from 'ant-design-vue/es/table/interface'
   import type { HostReq } from '@/api/command/types'

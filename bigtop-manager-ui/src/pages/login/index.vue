@@ -24,7 +24,7 @@
   import { getSalt, getNonce, login } from '@/api/login'
   import { message } from 'ant-design-vue'
   import { useI18n } from 'vue-i18n'
-  import SelectLang from '@/components/select-lang/login-lang.vue'
+  import LoginLang from '@/features/login-lang/index.vue'
   import { deriveKey } from '@/utils/pbkdf2.ts'
   import { useUserStore } from '@/store/user'
   import { useMenuStore } from '@/store/menu'
@@ -97,7 +97,7 @@
             <div class="login-title">Bigtop Manager</div>
             <div class="login-desc">{{ $t('login.desc') }}</div>
           </div>
-          <div class="login-header-right"><select-lang /></div>
+          <div class="login-header-right"><login-lang /></div>
         </div>
         <a-divider class="m-0" />
         <!-- Login box body -->

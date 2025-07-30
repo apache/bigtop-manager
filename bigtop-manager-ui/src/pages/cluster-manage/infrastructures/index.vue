@@ -22,9 +22,9 @@
   import { useI18n } from 'vue-i18n'
   import { useRouter } from 'vue-router'
   import Service from './service.vue'
-  import Job from '@/components/job/index.vue'
+  import Job from '@/features/job/index.vue'
 
-  import type { TabItem } from '@/components/common/main-card/types'
+  import type { TabItem } from '@/components/base/main-card/types'
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { ClusterVO } from '@/api/cluster/types'
 

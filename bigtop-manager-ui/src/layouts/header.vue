@@ -21,9 +21,9 @@
   import { ref } from 'vue'
   import { storeToRefs } from 'pinia'
   import { useMenuStore } from '@/store/menu/index'
-  import SelectLang from '@/components/select-lang/index.vue'
-  import UserAvatar from '@/components/user-avatar/index.vue'
-  import AiAssistant from '@/components/ai-assistant/index.vue'
+  import SelectLang from '@/features/select-lang/index.vue'
+  import UserAvatar from '@/features/user-avatar/index.vue'
+  import AiAssistant from '@/features/ai-assistant/index.vue'
 
   const githubUrl = import.meta.env.VITE_GITHUB_URL
   const bigtopMangerDocURL = import.meta.env.VITE_BIGTOP_MANAGER_DOC_URL

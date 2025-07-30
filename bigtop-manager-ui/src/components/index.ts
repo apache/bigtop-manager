@@ -18,27 +18,31 @@
  */
 
 import type { App } from 'vue'
-import router from '@/router'
-import pinia from '@/store'
-import i18n from '@/locales'
-import Antd, { message } from 'ant-design-vue'
-import components from '@/components'
-import directives from '@/directives'
-import VueDOMPurifyHTML from 'vue-dompurify-html'
 
-interface PluginOptions {
-  antdMessageMaxCount: number
+const kebabToCamel = (kebab: string): string => {
+  return kebab.replace(/-./g, (match) => match.charAt(1).toUpperCase()).replace(/^./, (match) => match.toUpperCase())
+}
+
+const install = (app: App) => {
+  const commons = import.meta.glob('../../components/common/**/index.vue', {
+    eager: true
+  }) as any
+
+  const bases = import.meta.glob('../../components/base/**/index.vue', {
+    eager: true
+  }) as any
+
+  const components = { ...commons, ...bases }
+
+  for (const path in components) {
+    const component = components[path].default
+    const componentName = kebabToCamel(path.split('/')[1])
+    if (componentName) {
+      app.component(componentName, component)
+    }
+  }
 }
 
 export default {
-  install(app: App, options: PluginOptions) {
-    app.use(pinia)
-    app.use(Antd)
-    app.use(router)
-    app.use(i18n)
-    app.use(directives)
-    app.use(components)
-    app.use(VueDOMPurifyHTML) // xss defense
-    message.config({ maxCount: options.antdMessageMaxCount })
-  }
+  install
 }

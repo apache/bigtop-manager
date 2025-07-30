@@ -16,32 +16,26 @@
   ~ specific language governing permissions and limitations
   ~ under the License.
 -->
+
 <script setup lang="ts">
-  import { ref, reactive, computed, onMounted, watchEffect } from 'vue'
-  import useBaseTable from '@/composables/use-base-table'
-  import SetSource from '@/features/set-source/index.vue'
-  import { useI18n } from 'vue-i18n'
+  import { computed, ref, shallowRef, watchEffect } from 'vue'
   import { useStackStore } from '@/store/stack'
   import { storeToRefs } from 'pinia'
-  import type { ServiceVO } from '@/api/service/types'
+  import { ServiceVO } from '@/api/service/types'
+  import { useI18n } from 'vue-i18n'
+  import useBaseTable from '@/composables/use-base-table'
+  import SetSource from '@/features/set-source/index.vue'
   import type { TableColumnType } from 'ant-design-vue'
 
   const { t } = useI18n()
   const stackStore = useStackStore()
   const { stacks } = storeToRefs(stackStore)
 
-  const store = reactive({
-    loading: false,
-    stackSelected: 'Bigtop',
-    stackGroup: ['Bigtop', 'Infra', 'Extra']
-  })
-
   const data = ref<ServiceVO[]>([])
+  const stackSelected = ref('bigtop')
   const setSourceRef = ref<InstanceType<typeof SetSource>>()
-
-  const currentStack = computed(() =>
-    stacks.value.find((stack) => stack.stackName.toUpperCase() === store.stackSelected.toUpperCase())
-  )
+  const stackGroup = shallowRef(['bigtop', 'infra', 'extra'])
+  const currentStack = computed(() => stacks.value.find((stack) => stack.stackName === stackSelected.value))
   const columns = computed((): TableColumnType[] => [
     {
       title: '#',
@@ -84,61 +78,40 @@
 
   watchEffect(() => {
     resetState()
-    data.value = currentStack.value?.services || []
+    data.value = stacks.value.find((v) => v.stackName === stackSelected.value)?.services || []
   })
 
   const handleSetSource = () => {
     setSourceRef.value?.handleOpen()
   }
-
-  onMounted(() => {
-    stackStore.loadStacks()
-  })
 </script>
 
 <template>
-  <div class="cluster-components">
-    <div>
-      <div class="menu-title">{{ $t('menu.stacks') }}</div>
-    </div>
-    <div class="cluster-components-header">
-      <a-radio-group v-model:value="store.stackSelected" button-style="solid">
-        <a-radio-button v-for="(stack, idx) in store.stackGroup" :key="idx" :value="stack">{{ stack }}</a-radio-button>
+  <div class="component-info">
+    <header>
+      <a-radio-group v-model:value="stackSelected" button-style="solid">
+        <a-radio-button v-for="(stack, idx) in stackGroup" :key="idx" :value="stack">
+          {{ stackGroup[idx].replace(/^\w/, (c) => c.toUpperCase()) }}
+        </a-radio-button>
       </a-radio-group>
       <a-button type="primary" @click="handleSetSource">{{ $t('cluster.config_source') }}</a-button>
-    </div>
-    <div>
-      <a-table
-        :loading="loading"
-        :data-source="data"
-        :columns="columns"
-        :pagination="paginationProps"
-        @change="onChange"
-      >
-        <template #bodyCell="{ column }">
-          <template v-if="column.key === 'stack'">
-            <span> {{ `${store.stackSelected}-${currentStack?.stackVersion}` }} </span>
-          </template>
+    </header>
+    <a-table :loading="loading" :data-source="data" :columns="columns" :pagination="paginationProps" @change="onChange">
+      <template #bodyCell="{ column }">
+        <template v-if="column.key === 'stack'">
+          <span> {{ `${stackSelected}-${currentStack?.stackVersion}` }} </span>
         </template>
-      </a-table>
-    </div>
+      </template>
+    </a-table>
     <set-source ref="setSourceRef" />
   </div>
 </template>
 
 <style lang="scss" scoped>
-  .cluster-components {
-    padding: 16px;
-    background-color: #fff;
-    .menu-title {
-      font-size: 16px;
-      font-weight: 500;
-      line-height: 24px;
-    }
-    .cluster-components-header {
-      display: flex;
-      justify-content: space-between;
-      margin: $space-md 0;
+  .component-info {
+    header {
+      @include flexbox($justify: space-between);
+      margin-bottom: $space-md;
     }
   }
 </style>

@@ -32,8 +32,8 @@
   import { getHostMetricsInfo } from '@/api/metrics'
   import { useIntervalFn } from '@vueuse/core'
 
-  import GaugeChart from '@/components/charts/gauge-chart.vue'
-  import CategoryChart from '@/components/charts/category-chart.vue'
+  import GaugeChart from '@/features/metric/gauge-chart.vue'
+  import CategoryChart from '@/features/metric/category-chart.vue'
 
   import type { MenuItem } from '@/store/menu/types'
   import type { HostStatusType, HostVO } from '@/api/hosts/types.ts'

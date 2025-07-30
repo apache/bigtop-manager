@@ -26,7 +26,7 @@
   import LlmItem, { type ActionKeys, type ExtraItem } from './components/llm-item.vue'
 
   import addLlmItem from './components/add-llm-item.vue'
-  import SvgIcon from '@/components/common/svg-icon/index.vue'
+  import SvgIcon from '@/components/base/svg-icon/index.vue'
 
   import type { AuthorizedPlatform } from '@/api/llm-config/types'
 
