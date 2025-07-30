@@ -17,12 +17,10 @@
   ~ under the License.
 -->
 <script setup lang="ts">
-  import { ref, reactive, computed, onMounted, watchEffect } from 'vue'
-  import useBaseTable from '@/composables/use-base-table'
-  import SetSource from '@/features/set-source/index.vue'
-  import { useI18n } from 'vue-i18n'
   import { useStackStore } from '@/store/stack'
-  import { storeToRefs } from 'pinia'
+
+  import SetSource from '@/features/set-source/index.vue'
+
   import type { ServiceVO } from '@/api/service/types'
   import type { TableColumnType } from 'ant-design-vue'
 

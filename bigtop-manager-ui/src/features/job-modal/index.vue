@@ -18,15 +18,12 @@
 -->
 
 <script setup lang="ts">
-  import { computed, Reactive, reactive, ref, shallowRef, toRefs, watch } from 'vue'
-  import { useI18n } from 'vue-i18n'
   import { TableColumnType } from 'ant-design-vue'
-  import useBaseTable from '@/composables/use-base-table'
   import LogsView, { type LogViewProps } from '@/features/log-view/index.vue'
-  import JobProgress from '@/features/job-progress/index.vue'
 
   import type { JobVO, StageVO, StateType, TaskListParams, TaskVO } from '@/api/job/types'
   import type { CommandRes, JobStageProgressItem } from '@/store/job-progress'
+  import type { Reactive } from 'vue'
 
   interface BreadcrumbItem {
     id: string

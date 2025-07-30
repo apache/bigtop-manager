@@ -17,16 +17,16 @@
   ~ under the License.
   -->
 <script setup lang="ts">
-  import { computed, ref, watch } from 'vue'
   import { DrawerProps } from 'ant-design-vue'
   import { useAiChatStore } from '@/store/ai-assistant'
   import { useLlmConfigStore } from '@/store/llm-config'
-  import { storeToRefs } from 'pinia'
   import { useMenuStore } from '@/store/menu'
+
   import EmptyContent from './empty-content.vue'
   import ChatInput from './chat-input.vue'
   import ChatHistory from './chat-history.vue'
   import ChatMessage from './chat-message.vue'
+
   import type { ChatMessageItem } from '@/api/ai-assistant/types'
   import type { GroupItem } from '@/components/common/button-group/types'
 

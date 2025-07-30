@@ -18,10 +18,8 @@
 -->
 
 <script setup lang="ts">
-  import { computed, ref, shallowRef } from 'vue'
   import { Rule } from 'ant-design-vue/es/form'
   import { message } from 'ant-design-vue'
-  import { useI18n } from 'vue-i18n'
   import { UploadOutlined } from '@ant-design/icons-vue'
   import { useClusterStore } from '@/store/cluster'
   import { uploadFile } from '@/api/upload-file'
@@ -325,7 +323,7 @@
     return true
   }
 
-  const customRequest = async (options: { file: any; onSuccess: any; onError: any }) => {
+  const customRequest = async (options: any) => {
     const { file, onSuccess, onError } = options
     try {
       const formData = new FormData()

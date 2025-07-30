@@ -18,10 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onMounted, ref, watch } from 'vue'
-  import { useRouter, useRoute } from 'vue-router'
   import { useMenuStore } from '@/store/menu/index'
-  import { storeToRefs } from 'pinia'
   import { useClusterStore } from '@/store/cluster'
   import { useStackStore } from '@/store/stack'
 
@@ -112,7 +109,7 @@
       :open-keys="openKeys"
       :selected-keys="[siderMenuSelectedKey]"
       mode="inline"
-      @click="({ key }) => menuStore.onSiderClick(key)"
+      @click="({ key }) => menuStore.onSiderClick(key as string)"
     >
       <template v-for="menuItem in siderMenus" :key="menuItem.path">
         <a-sub-menu v-if="menuItem.name === 'Clusters'" :key="menuItem.path">
@@ -146,7 +143,7 @@
           </a-menu-item>
         </a-sub-menu>
         <template v-else>
-          <a-menu-item v-if="!menuItem.meta?.hidden" :key="menuItem.redirect">
+          <a-menu-item v-if="!menuItem.meta?.hidden" :key="menuItem.redirect as string">
             <template #icon>
               <svg-icon
                 style="height: 16px; width: 16px"

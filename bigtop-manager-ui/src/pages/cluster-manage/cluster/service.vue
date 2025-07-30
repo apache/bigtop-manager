@@ -18,14 +18,11 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onActivated, shallowRef, toRefs, useAttrs } from 'vue'
   import { Empty } from 'ant-design-vue'
-  import { usePngImage } from '@/utils/tools'
-  import { useI18n } from 'vue-i18n'
   import { useServiceStore } from '@/store/service'
   import { CommonStatus, CommonStatusTexts } from '@/enums/state'
-  import { useRouter } from 'vue-router'
   import { useJobProgress } from '@/store/job-progress'
+  import { usePngImage } from '@/utils/tools'
 
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { FilterFormItem } from '@/components/common/form-filter/types'

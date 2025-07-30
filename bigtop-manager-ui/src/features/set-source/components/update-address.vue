@@ -17,9 +17,6 @@
   ~ under the License.
   -->
 <script setup lang="ts">
-  import { computed, ref } from 'vue'
-  import { useI18n } from 'vue-i18n'
-
   import type { FormItem } from '@/components/common/form-builder/types'
 
   const emits = defineEmits<{ (event: 'onOk', value: string): void }>()

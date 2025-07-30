@@ -28,4 +28,5 @@ export interface FilterFormItem {
   key: string
   label: string
   options?: FilterFormItemOptionItem[]
+  [propkey: string]: any
 }

@@ -18,10 +18,8 @@
 -->
 
 <script setup lang="ts">
-  import { computed, ref, watch } from 'vue'
   import { copyText, scrollToBottom } from '@/utils/tools'
   import { message } from 'ant-design-vue'
-  import { useI18n } from 'vue-i18n'
   import { getTaskLog } from '@/api/job'
   import type { AxiosProgressEvent, Canceler } from 'axios'
 

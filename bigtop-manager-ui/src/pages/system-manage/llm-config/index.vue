@@ -18,7 +18,6 @@
 -->
 
 <script setup lang="ts">
-  import { onMounted, ref, h } from 'vue'
   import { storeToRefs } from 'pinia'
   import { useLlmConfigStore } from '@/store/llm-config/index'
   import { message, Modal } from 'ant-design-vue'

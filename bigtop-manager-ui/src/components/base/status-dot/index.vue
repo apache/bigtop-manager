@@ -19,7 +19,6 @@
 
 <script setup lang="ts">
   import { StatusType, StatusColors } from '@/enums/state'
-  import { computed } from 'vue'
 
   interface StatusDot {
     size?: number

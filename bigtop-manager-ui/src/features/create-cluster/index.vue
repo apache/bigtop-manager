@@ -20,15 +20,11 @@
 <script setup lang="ts">
   import { useMenuStore } from '@/store/menu'
   import { message, Modal } from 'ant-design-vue'
-  import { computed, h, ref, shallowRef } from 'vue'
-  import { useI18n } from 'vue-i18n'
   import { getInstalledStatus, installDependencies } from '@/api/hosts'
   import { execCommand } from '@/api/command'
-  import { onBeforeRouteLeave } from 'vue-router'
 
   import SvgIcon from '@/components/base/svg-icon/index.vue'
 
-  import useSteps from '@/composables/use-steps'
   import ClusterBase from './components/cluster-base.vue'
   import ComponentInfo from './components/component-info.vue'
   import HostManage from './components/host-manage.vue'

@@ -18,9 +18,6 @@
  */
 
 import { notification, Progress, Avatar, Button, Modal } from 'ant-design-vue'
-import { computed, getCurrentInstance, h, reactive, shallowRef } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { defineStore } from 'pinia'
 import { useClusterStore } from '@/store/cluster'
 import { execCommand } from '@/api/command'
 import { getJobDetails } from '@/api/job'

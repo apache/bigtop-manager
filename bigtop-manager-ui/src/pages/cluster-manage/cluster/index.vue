@@ -18,12 +18,8 @@
 -->
 
 <script setup lang="ts">
-  import { computed, ref, shallowRef } from 'vue'
-  import { useI18n } from 'vue-i18n'
   import { useClusterStore } from '@/store/cluster'
-  import { storeToRefs } from 'pinia'
   import { CommonStatus, CommonStatusTexts } from '@/enums/state'
-  import { useRouter } from 'vue-router'
   import { useJobProgress } from '@/store/job-progress'
 
   import Overview from './overview.vue'

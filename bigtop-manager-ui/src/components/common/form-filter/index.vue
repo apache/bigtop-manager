@@ -19,7 +19,6 @@
 
 <script setup lang="ts">
   import { MenuProps } from 'ant-design-vue'
-  import { ref, toRefs, computed, shallowRef, toRaw } from 'vue'
   import { isEqual, cloneDeep } from 'lodash-es'
   import type { FilterFormItem } from './types'
 
@@ -98,7 +97,7 @@
                 <a-menu-item
                   v-for="menuItem in item.options"
                   :id="item.key"
-                  :key="menuItem.key"
+                  :key="menuItem.key as any"
                   :title="menuItem.label"
                   @click.stop
                 >

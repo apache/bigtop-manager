@@ -18,15 +18,10 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onActivated, h, onDeactivated, reactive, ref, shallowRef, useAttrs } from 'vue'
-  import { storeToRefs } from 'pinia'
-  import { useI18n } from 'vue-i18n'
-  import { useRoute, useRouter } from 'vue-router'
+  import { message, Modal, type TableColumnType, type TableProps } from 'ant-design-vue'
   import { deleteComponent, getComponents } from '@/api/component'
   import { useStackStore } from '@/store/stack'
   import { useJobProgress } from '@/store/job-progress'
-  import useBaseTable from '@/composables/use-base-table'
-  import { message, Modal, type TableColumnType, type TableProps } from 'ant-design-vue'
   import SvgIcon from '@/components/base/svg-icon/index.vue'
 
   import type { GroupItem } from '@/components/common/button-group/types'
@@ -377,7 +372,7 @@
         <svg-icon v-else :name="filtered ? 'filter-activated' : 'filter'" />
       </template>
       <template #bodyCell="{ record, column }">
-        <template v-if="['status'].includes(column.key)">
+        <template v-if="['status'].includes(column.key as string)">
           <svg-icon style="margin-left: 0" :name="componentStatus[record.status].toLowerCase()" />
           <span>{{ $t(`common.${componentStatus[record.status].toLowerCase()}`) }}</span>
         </template>

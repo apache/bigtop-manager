@@ -18,9 +18,6 @@
 -->
 
 <script setup lang="ts">
-  import { computed, ref, shallowRef } from 'vue'
-  import { useI18n } from 'vue-i18n'
-  import { useRouter } from 'vue-router'
   import Service from './service.vue'
   import Job from '@/features/job/index.vue'
 

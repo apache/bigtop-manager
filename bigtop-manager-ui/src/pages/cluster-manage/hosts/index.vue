@@ -19,9 +19,6 @@
 
 <script setup lang="ts">
   import { message, Modal, TableColumnType, TableProps } from 'ant-design-vue'
-  import { computed, onMounted, onUnmounted, reactive, h, ref, shallowRef } from 'vue'
-  import { useRouter } from 'vue-router'
-  import { useI18n } from 'vue-i18n'
 
   import { useClusterStore } from '@/store/cluster'
   import * as hostApi from '@/api/hosts'

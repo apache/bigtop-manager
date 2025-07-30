@@ -18,8 +18,6 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onUnmounted, ref, shallowRef, toRefs, watch } from 'vue'
-  import { useI18n } from 'vue-i18n'
   import { Empty } from 'ant-design-vue'
   import { formatFromByte } from '@/utils/storage.ts'
   import { usePngImage } from '@/utils/tools'
@@ -30,12 +28,10 @@
   import { getComponentsByHost } from '@/api/hosts'
   import { Command } from '@/api/command/types'
   import { getHostMetricsInfo } from '@/api/metrics'
-  import { useIntervalFn } from '@vueuse/core'
 
   import GaugeChart from '@/features/metric/gauge-chart.vue'
   import CategoryChart from '@/features/metric/category-chart.vue'
 
-  import type { MenuItem } from '@/store/menu/types'
   import type { HostStatusType, HostVO } from '@/api/hosts/types.ts'
   import type { ClusterStatusType } from '@/api/cluster/types.ts'
   import type { ComponentVO } from '@/api/component/types.ts'
@@ -97,7 +93,7 @@
   const detailKeys = computed((): (keyof HostVO)[] => Object.keys(baseConfig.value))
   const noChartData = computed(() => Object.values(chartData.value).length === 0)
 
-  const handleHostOperate = (item: MenuItem, component: ComponentVO) => {
+  const handleHostOperate = (item: any, component: ComponentVO) => {
     const { serviceName } = component
     const installedServiceMap = Object.values(serviceStore.serviceMap)
       .flat()

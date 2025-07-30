@@ -18,9 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { onActivated, inject, useAttrs, shallowRef, ref, onDeactivated } from 'vue'
   import { debounce } from 'lodash-es'
-  import { useI18n } from 'vue-i18n'
   import { Empty, message } from 'ant-design-vue'
   import { updateServiceConfigs } from '@/api/service'
   import { useCreateServiceStore } from '@/store/create-service'

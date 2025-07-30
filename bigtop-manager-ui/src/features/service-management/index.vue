@@ -18,13 +18,10 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onMounted, provide, ref, shallowRef } from 'vue'
-  import { useI18n } from 'vue-i18n'
-  import { storeToRefs } from 'pinia'
   import { useServiceStore } from '@/store/service'
   import { useJobProgress } from '@/store/job-progress'
-  import { useRoute } from 'vue-router'
   import { Command } from '@/api/command/types'
+
   import Overview from './overview.vue'
   import Components from './components.vue'
   import Configs from './configs.vue'

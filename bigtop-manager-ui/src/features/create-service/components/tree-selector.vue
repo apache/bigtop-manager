@@ -18,7 +18,6 @@
 -->
 
 <script setup lang="ts">
-  import { ref, watch } from 'vue'
   import { type TreeProps, Empty } from 'ant-design-vue'
   import type { DataNode, FieldNames, Key } from 'ant-design-vue/es/vc-tree/interface'
 

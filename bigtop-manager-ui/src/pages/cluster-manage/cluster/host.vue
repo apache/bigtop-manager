@@ -19,13 +19,9 @@
 
 <script setup lang="ts">
   import { message, Modal, TableColumnType, TableProps } from 'ant-design-vue'
-  import { computed, onActivated, reactive, ref, h, useAttrs } from 'vue'
-  import { useI18n } from 'vue-i18n'
   import { getHosts } from '@/api/hosts'
   import * as hostApi from '@/api/hosts'
-  import { useRouter } from 'vue-router'
 
-  import useBaseTable from '@/composables/use-base-table'
   import HostCreate from '@/features/create-host/index.vue'
   import InstallDependencies from '@/features/create-host/install-dependencies.vue'
   import SvgIcon from '@/components/base/svg-icon/index.vue'

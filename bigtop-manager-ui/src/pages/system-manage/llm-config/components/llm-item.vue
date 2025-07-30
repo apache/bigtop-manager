@@ -18,7 +18,6 @@
 -->
 
 <script setup lang="ts">
-  import { computed, shallowRef, toRefs } from 'vue'
   import {
     AuthPlatformStatus,
     LlmLogo,
@@ -161,7 +160,7 @@
     emits('createLlmConfig')
   }
 
-  const handleClickAction = ({ key }: { key: ActionKeys }) => {
+  const handleClickAction = ({ key }) => {
     emits('extraActionClick', {
       llmConfig: llmConfig.value as AuthorizedPlatform,
       action: key

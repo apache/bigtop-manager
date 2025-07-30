@@ -18,11 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { ref } from 'vue'
-  import { storeToRefs } from 'pinia'
   import { useMenuStore } from '@/store/menu/index'
-  import SelectLang from '@/features/select-lang/index.vue'
-  import UserAvatar from '@/features/user-avatar/index.vue'
   import AiAssistant from '@/features/ai-assistant/index.vue'
 
   const githubUrl = import.meta.env.VITE_GITHUB_URL
@@ -47,7 +43,7 @@
         :selected-keys="[headerSelectedKey]"
         theme="dark"
         mode="horizontal"
-        @select="({ key }) => menuStore.onHeaderClick(key)"
+        @select="({ key }) => menuStore.onHeaderClick(key as string)"
       >
         <a-menu-item v-for="route of headerMenus" :key="route.path">
           {{ $t(route.meta?.title || '') }}

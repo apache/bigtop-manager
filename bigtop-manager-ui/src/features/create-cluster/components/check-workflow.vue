@@ -18,7 +18,6 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onMounted, reactive, ref, shallowRef, toRefs } from 'vue'
   import { Empty } from 'ant-design-vue'
   import { getJobDetails, retryJob } from '@/api/job'
 

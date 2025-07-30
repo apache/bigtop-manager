@@ -18,8 +18,6 @@
 -->
 
 <script setup lang="ts">
-  import { onMounted, shallowRef, toRefs, watchEffect } from 'vue'
-
   import { type EChartsOption, useChart } from '@/composables/use-chart'
   import { roundFixed } from '@/utils/storage'
 

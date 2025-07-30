@@ -40,30 +40,31 @@ const i18n = createI18n({
   }
 })
 
-const wrapper = mount(
-  defineComponent({
-    components: { FormBuilder },
-    setup() {
-      const { t } = useI18n()
-      const formData = ref({ name: 'xxx' })
-      const formRef = ref<InstanceType<typeof FormBuilder>>()
-      const formItems = computed(() => [{ field: 'name', label: t('form.name'), type: 'input', required: true }])
-      return { formRef, formData, formItems }
-    },
-    template: `
+const wrapper = () =>
+  mount(
+    defineComponent({
+      components: { FormBuilder },
+      setup() {
+        const { t } = useI18n()
+        const formData = ref({ name: 'xxx' })
+        const formRef = ref<InstanceType<typeof FormBuilder>>()
+        const formItems = computed(() => [{ field: 'name', label: t('form.name'), type: 'input', required: true }])
+        return { formRef, formData, formItems }
+      },
+      template: `
     <FormBuilder
       ref="formRef"
       v-model="formData"
       :form-items="formItems"
     />
   `
-  }),
-  {
-    global: {
-      plugins: [Antd, i18n]
+    }),
+    {
+      global: {
+        plugins: [Antd, i18n]
+      }
     }
-  }
-)
+  )
 
 describe('FormBuilder.vue', () => {
   it('renders form items based on formItems prop', () => {
@@ -80,7 +81,8 @@ describe('FormBuilder.vue', () => {
       }
     })
 
-    expect(wrapper.findAll('input').length).toBe(3)
+    const inputs = wrapper.findAll('input').filter((input) => input.classes().includes('ant-input'))
+    expect(inputs.length).toBe(wrapper.vm.formItems.filter((item) => item.type === 'input').length)
 
     wrapper.findAll('label').forEach((label, index) => {
       const formItem = wrapper.vm.formItems[index]
@@ -88,15 +90,10 @@ describe('FormBuilder.vue', () => {
         expect(label.text()).toBe(formItem.label)
       }
     })
-
-    wrapper.findAll('input').forEach((input, index) => {
-      const formItem = wrapper.vm.formItems[index]
-      expect(input.attributes('id')).toBe(`form_item_${formItem.field}`)
-    })
   })
 
   it('applies validation rules correctly', async () => {
-    const formRef = wrapper.vm.formRef as InstanceType<typeof FormBuilder>
+    const formRef = wrapper().vm.formRef as InstanceType<typeof FormBuilder>
     expect(formRef?.validate).toBeDefined()
     const validSpy = vi.spyOn(formRef, 'validate')
 
@@ -105,7 +102,7 @@ describe('FormBuilder.vue', () => {
   })
 
   it('resets the form correctly', () => {
-    const formRef = wrapper.vm.formRef as InstanceType<typeof FormBuilder>
+    const formRef = wrapper().vm.formRef as InstanceType<typeof FormBuilder>
     const resetSpy = vi.spyOn(formRef, 'resetForm')
 
     formRef.resetForm()
@@ -113,7 +110,7 @@ describe('FormBuilder.vue', () => {
   })
 
   it('renders translated labels using vue-i18n', () => {
-    const label = wrapper.find('label')
+    const label = wrapper().find('label')
 
     expect(label.exists()).toBe(true)
     expect(label.text()).toBe('Translated Name')

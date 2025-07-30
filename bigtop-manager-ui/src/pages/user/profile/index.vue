@@ -18,10 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { ref, reactive, watch, onMounted } from 'vue'
   import { FormInstance, message } from 'ant-design-vue'
-  import { storeToRefs } from 'pinia'
-  import { useI18n } from 'vue-i18n'
   import { useUserStore } from '@/store/user'
   import { UserReq } from '@/api/user/types.ts'
 
@@ -77,19 +74,19 @@
         {{ $t('common.edit') }}
       </a-button>
     </template>
-    <a-descriptions-item :label="$t('user.username')" span="3">
+    <a-descriptions-item :label="$t('user.username')" :span="3">
       {{ userVO?.username }}
     </a-descriptions-item>
-    <a-descriptions-item :label="$t('user.nickname')" span="3">
+    <a-descriptions-item :label="$t('user.nickname')" :span="3">
       {{ userVO?.nickname }}
     </a-descriptions-item>
-    <a-descriptions-item :label="$t('common.create_time')" span="3">
+    <a-descriptions-item :label="$t('common.create_time')" :span="3">
       {{ userVO?.createTime }}
     </a-descriptions-item>
-    <a-descriptions-item :label="$t('common.update_time')" span="3">
+    <a-descriptions-item :label="$t('common.update_time')" :span="3">
       {{ userVO?.updateTime }}
     </a-descriptions-item>
-    <a-descriptions-item :label="$t('common.status')" span="3">
+    <a-descriptions-item :label="$t('common.status')" :span="3">
       {{ userVO?.status }}
     </a-descriptions-item>
   </a-descriptions>

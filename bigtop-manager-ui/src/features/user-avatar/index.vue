@@ -21,11 +21,9 @@
   import { UserOutlined, ProfileOutlined, LogoutOutlined } from '@ant-design/icons-vue'
   import { message } from 'ant-design-vue'
   import { useUserStore } from '@/store/user'
-  import { storeToRefs } from 'pinia'
-  import router from '@/router'
-  import { useI18n } from 'vue-i18n'
 
   const i18n = useI18n()
+  const router = useRouter()
 
   const userStore = useUserStore()
   const { userVO } = storeToRefs(userStore)

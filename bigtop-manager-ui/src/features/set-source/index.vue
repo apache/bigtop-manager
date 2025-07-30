@@ -18,9 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { computed, nextTick, reactive, ref, shallowRef, toRefs } from 'vue'
   import { getRepoList, updateRepo } from '@/api/repo'
-  import { useI18n } from 'vue-i18n'
   import UpdateAddress from './components/update-address.vue'
 
   import { type FormInstance, message, type TableColumnType } from 'ant-design-vue'

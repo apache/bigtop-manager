@@ -18,8 +18,6 @@
 -->
 
 <script setup lang="ts">
-  import { computed } from 'vue'
-
   const icons = {
     avatar: IconSvgAvatar,
     'bm-logo': IconSvgBmLogo,

@@ -18,9 +18,6 @@
 -->
 
 <script setup lang="ts">
-  import { computed } from 'vue'
-  import { useI18n } from 'vue-i18n'
-
   import type { HostReq } from '@/api/command/types'
   import type { TableColumnType } from 'ant-design-vue'
 

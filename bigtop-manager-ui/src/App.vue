@@ -18,10 +18,9 @@
 -->
 
 <script setup lang="ts">
-  import { storeToRefs } from 'pinia'
-  import { onMounted } from 'vue'
   import { useLocaleStore } from '@/store/locale'
   import { useThemeStore } from './store/theme'
+
   const themeStore = useThemeStore()
   const localeStore = useLocaleStore()
   const { antd } = storeToRefs(localeStore)

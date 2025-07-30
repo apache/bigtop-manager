@@ -17,8 +17,6 @@
  * under the License.
  */
 
-import { computed, ref } from 'vue'
-
 const useSteps = (stepList: string[]) => {
   const current = ref(0)
 

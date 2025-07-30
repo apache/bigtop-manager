@@ -18,7 +18,6 @@
   -->
 <script setup lang="ts">
   import type { ChatMessageItem } from '@/api/ai-assistant/types'
-  import { computed } from 'vue'
 
   interface Props {
     record: ChatMessageItem

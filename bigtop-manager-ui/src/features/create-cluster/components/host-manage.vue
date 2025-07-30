@@ -19,11 +19,8 @@
 
 <script setup lang="ts">
   import { PaginationProps, TableColumnType } from 'ant-design-vue'
-  import { computed, reactive, ref, watch } from 'vue'
   import { generateRandomId } from '@/utils/tools'
-  import { useI18n } from 'vue-i18n'
 
-  import useBaseTable from '@/composables/use-base-table'
   import HostCreate from '@/features/create-host/index.vue'
 
   import type { FilterConfirmProps, FilterResetProps } from 'ant-design-vue/es/table/interface'

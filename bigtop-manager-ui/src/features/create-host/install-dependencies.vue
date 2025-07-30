@@ -19,16 +19,12 @@
 
 <script setup lang="ts">
   import { message, TableColumnType } from 'ant-design-vue'
-  import { storeToRefs } from 'pinia'
-  import { computed, reactive, ref, shallowRef } from 'vue'
-  import { useI18n } from 'vue-i18n'
   import { getInstalledStatus, installDependencies } from '@/api/hosts'
   import { useClusterStore } from '@/store/cluster'
   import { generateRandomId } from '@/utils/tools'
   import { execCommand } from '@/api/command'
 
   import HostCreate from './index.vue'
-  import useBaseTable from '@/composables/use-base-table'
 
   import { type InstalledStatusVO, Status } from '@/api/hosts/types'
   import type { FilterConfirmProps, FilterResetProps } from 'ant-design-vue/es/table/interface'

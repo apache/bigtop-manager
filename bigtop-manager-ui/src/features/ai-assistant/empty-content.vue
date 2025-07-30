@@ -17,10 +17,8 @@
   ~ under the License.
   -->
 <script setup lang="ts">
-  import { shallowRef } from 'vue'
   import { usePngImage } from '@/utils/tools'
   import { useAiChatStore } from '@/store/ai-assistant'
-  import { storeToRefs } from 'pinia'
 
   interface Emits {
     (event: 'goSetUp'): void

@@ -17,13 +17,10 @@
   ~ under the License.
   -->
 <script setup lang="ts">
-  import { ref, shallowReactive, shallowRef, h, toRefs, watch } from 'vue'
   import { useAiChatStore } from '@/store/ai-assistant'
-  import { storeToRefs } from 'pinia'
   import { formatTime } from '@/utils/transform'
   import { EllipsisOutlined } from '@ant-design/icons-vue'
   import { message, Modal, Empty } from 'ant-design-vue'
-  import { useI18n } from 'vue-i18n'
 
   import SvgIcon from '@/components/base/svg-icon/index.vue'
 
@@ -130,7 +127,7 @@
     })
   }
 
-  const handleThreadActions = (thread: ChatThread, idx: number, { key }: { key: 'delete' | 'rename' }) => {
+  const handleThreadActions = (thread: ChatThread, idx: number, { key }: any) => {
     threadOperationHandlers[key](thread, idx)
   }
 
@@ -187,7 +184,7 @@
                   v-if="isRename && editThread.threadId === thread.threadId"
                   :key="thread.threadId"
                   :ref="
-                    (el: HTMLElement) => {
+                    (el: any) => {
                       isRename && el.focus()
                     }
                   "

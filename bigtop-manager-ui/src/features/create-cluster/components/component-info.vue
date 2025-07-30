@@ -18,12 +18,9 @@
 -->
 
 <script setup lang="ts">
-  import { computed, ref, shallowRef, watchEffect } from 'vue'
   import { useStackStore } from '@/store/stack'
-  import { storeToRefs } from 'pinia'
   import { ServiceVO } from '@/api/service/types'
-  import { useI18n } from 'vue-i18n'
-  import useBaseTable from '@/composables/use-base-table'
+
   import SetSource from '@/features/set-source/index.vue'
   import type { TableColumnType } from 'ant-design-vue'
 

@@ -18,11 +18,11 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onMounted, reactive, ref, shallowRef, toRefs } from 'vue'
   import { Empty } from 'ant-design-vue'
   import { getJobDetails, retryJob } from '@/api/job'
   import { CommandVO } from '@/api/command/types'
   import { useCreateServiceStore } from '@/store/create-service'
+
   import LogsView, { type LogViewProps } from '@/features/log-view/index.vue'
   import type { JobVO, StageVO, StateType, TaskVO } from '@/api/job/types'
 

@@ -18,8 +18,6 @@
 -->
 
 <script setup lang="ts">
-  import { useI18n } from 'vue-i18n'
-  import { computed, ref, shallowRef } from 'vue'
   import { takeServiceConfigSnapshot } from '@/api/service'
   import { message } from 'ant-design-vue'
 

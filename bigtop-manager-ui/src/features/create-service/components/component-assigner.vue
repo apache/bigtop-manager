@@ -18,15 +18,14 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onActivated, reactive, ref, shallowRef } from 'vue'
-  import { useI18n } from 'vue-i18n'
   import { TableColumnType, Empty } from 'ant-design-vue'
   import { getHosts } from '@/api/hosts'
+
   import { useCreateServiceStore } from '@/store/create-service'
   import { useServiceStore } from '@/store/service'
-  import { storeToRefs } from 'pinia'
-  import useBaseTable from '@/composables/use-base-table'
+
   import TreeSelector from './tree-selector.vue'
+
   import type { HostVO } from '@/api/hosts/types'
   import type { FilterConfirmProps, FilterResetProps, TableRowSelection } from 'ant-design-vue/es/table/interface'
   import type { Key } from 'ant-design-vue/es/_util/type'

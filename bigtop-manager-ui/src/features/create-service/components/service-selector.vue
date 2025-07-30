@@ -18,12 +18,10 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onActivated, reactive, ref, shallowRef, toRefs } from 'vue'
   import { usePngImage } from '@/utils/tools'
   import { useStackStore } from '@/store/stack'
   import { useServiceStore } from '@/store/service'
   import { useCreateServiceStore } from '@/store/create-service'
-  import { storeToRefs } from 'pinia'
 
   import type { ExpandServiceVO } from '@/store/stack'
   import type { ComponentVO } from '@/api/component/types.ts'

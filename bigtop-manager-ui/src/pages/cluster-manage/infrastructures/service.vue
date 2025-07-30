@@ -18,12 +18,9 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onActivated, shallowRef, toRefs, useAttrs } from 'vue'
   import { usePngImage } from '@/utils/tools'
-  import { useI18n } from 'vue-i18n'
   import { CommonStatus, CommonStatusTexts } from '@/enums/state'
   import { useServiceStore } from '@/store/service'
-  import { useRouter } from 'vue-router'
   import { useJobProgress } from '@/store/job-progress'
   import { Empty } from 'ant-design-vue'
 

@@ -20,13 +20,12 @@
 <script setup lang="ts">
   import { useLocaleStore } from '@/store/locale'
   import { Locale } from '@/store/locale/types.ts'
-  import { storeToRefs } from 'pinia'
 
   const localeStore = useLocaleStore()
   const { locale } = storeToRefs(localeStore)
 
-  const handleClick = ({ key }: { key: Locale }) => {
-    localeStore.setLocale(key)
+  const handleClick = ({ key }: any) => {
+    localeStore.setLocale(key as Locale)
   }
 </script>
 

@@ -18,11 +18,8 @@
 -->
 
 <script setup lang="ts">
-  import { computed, ref, watchEffect, shallowRef } from 'vue'
   import { useLlmConfigStore } from '@/store/llm-config/index'
   import { message } from 'ant-design-vue'
-  import { useI18n } from 'vue-i18n'
-  import { storeToRefs } from 'pinia'
 
   import type { FormItem } from '@/components/common/form-builder/types'
   import type { AuthorizedPlatform } from '@/api/llm-config/types'

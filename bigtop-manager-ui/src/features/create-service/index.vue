@@ -18,11 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { computed, h, onUnmounted, ref, shallowRef, watch } from 'vue'
   import { message, Modal } from 'ant-design-vue'
-  import { useI18n } from 'vue-i18n'
-  import { storeToRefs } from 'pinia'
-  import { onBeforeRouteLeave, useRoute } from 'vue-router'
   import { StepContext, useCreateServiceStore } from '@/store/create-service'
 
   import ServiceSelector from './components/service-selector.vue'

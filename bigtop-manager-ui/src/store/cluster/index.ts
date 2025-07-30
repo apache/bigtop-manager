@@ -17,10 +17,9 @@
  * under the License.
  */
 
-import { computed, ref } from 'vue'
-import { defineStore } from 'pinia'
 import { getCluster, getClusterList } from '@/api/cluster'
 import { useServiceStore } from '@/store/service'
+
 import type { ClusterVO } from '@/api/cluster/types.ts'
 
 export const useClusterStore = defineStore(

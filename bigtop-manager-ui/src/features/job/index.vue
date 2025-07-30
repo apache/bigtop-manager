@@ -18,13 +18,10 @@
 -->
 
 <script setup lang="ts">
-  import { computed, ComputedRef, onActivated, onDeactivated, reactive, ref, shallowRef, useAttrs } from 'vue'
-  import { useI18n } from 'vue-i18n'
   import { TableColumnType, TableProps } from 'ant-design-vue'
   import { getJobList, getStageList, getTaskList } from '@/api/job'
-  import useBaseTable from '@/composables/use-base-table'
+
   import LogsView, { type LogViewProps } from '@/features/log-view/index.vue'
-  import JobProgress from '@/features/job-progress/index.vue'
 
   import type { JobVO, StageVO, StateType, TaskListParams, TaskVO } from '@/api/job/types'
   import type { ClusterVO } from '@/api/cluster/types'
@@ -254,7 +251,7 @@
     >
       <template #bodyCell="{ record, text, column }">
         <template v-if="column.key === 'name'">
-          <a-typography-link underline @click="updateBreadcrumbs(record)">
+          <a-typography-link underline @click="updateBreadcrumbs(record as BreadcrumbItem)">
             <span :title="record.name">{{ record.name }}</span>
           </a-typography-link>
         </template>

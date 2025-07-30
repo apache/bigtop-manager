@@ -18,12 +18,9 @@
 -->
 
 <script setup lang="ts">
-  import { useRouter } from 'vue-router'
-  import { reactive, shallowRef } from 'vue'
   import { UserOutlined, LockOutlined } from '@ant-design/icons-vue'
   import { getSalt, getNonce, login } from '@/api/login'
   import { message } from 'ant-design-vue'
-  import { useI18n } from 'vue-i18n'
   import LoginLang from '@/features/login-lang/index.vue'
   import { deriveKey } from '@/utils/pbkdf2.ts'
   import { useUserStore } from '@/store/user'

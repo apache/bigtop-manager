@@ -18,27 +18,21 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onActivated, onDeactivated, onUnmounted, ref, shallowRef, toRefs, watchEffect } from 'vue'
-  import { useI18n } from 'vue-i18n'
-  import { storeToRefs } from 'pinia'
   import { formatFromByte } from '@/utils/storage'
   import { usePngImage } from '@/utils/tools'
+
   import { CommonStatus, CommonStatusTexts } from '@/enums/state'
+
   import { useServiceStore } from '@/store/service'
   import { useJobProgress } from '@/store/job-progress'
   import { useStackStore } from '@/store/stack'
   import { useClusterStore } from '@/store/cluster'
-  import { Empty } from 'ant-design-vue'
-  import { useRoute } from 'vue-router'
-  import { getClusterMetricsInfo } from '@/api/metrics'
-  import { useIntervalFn } from '@vueuse/core'
 
-  import GaugeChart from '@/features/metric/gauge-chart.vue'
-  import CategoryChart from '@/features/metric/category-chart.vue'
+  import { Empty } from 'ant-design-vue'
+  import { getClusterMetricsInfo } from '@/api/metrics'
 
   import type { ClusterStatusType, ClusterVO } from '@/api/cluster/types'
   import type { ServiceVO } from '@/api/service/types'
-  import type { MenuItem } from '@/store/menu/types'
   import type { StackVO } from '@/api/stack/types'
   import type { Command } from '@/api/command/types'
   import type { MetricsData, TimeRangeType } from '@/api/metrics/types'
@@ -105,7 +99,7 @@
   const noChartData = computed(() => Object.values(chartData.value).length === 0)
   const detailKeys = computed(() => Object.keys(baseConfig.value) as (keyof ClusterVO)[])
 
-  const handleServiceOperate = (item: MenuItem, service: ServiceVO) => {
+  const handleServiceOperate = (item: any, service: ServiceVO) => {
     jobProgressStore.processCommand(
       {
         command: item.key as keyof typeof Command,

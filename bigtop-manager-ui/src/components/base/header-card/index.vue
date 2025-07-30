@@ -18,7 +18,6 @@
 -->
 
 <script setup lang="ts">
-  import { computed } from 'vue'
   import { usePngImage } from '@/utils/tools'
 
   import type { GroupItem } from '@/components/common/button-group/types'

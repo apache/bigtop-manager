@@ -19,7 +19,6 @@
 
 <script setup lang="ts">
   import dayjs from 'dayjs'
-  import { computed, onMounted, toRefs, watchEffect } from 'vue'
   import { roundFixed } from '@/utils/storage'
   import { type EChartsOption, useChart } from '@/composables/use-chart'
 

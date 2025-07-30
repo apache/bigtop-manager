@@ -18,11 +18,11 @@
 -->
 
 <script setup lang="ts">
-  import { computed, ref, shallowRef, useAttrs } from 'vue'
-  import { useI18n } from 'vue-i18n'
   import { CommonStatus, CommonStatusTexts } from '@/enums/state'
+
   import GaugeChart from '@/features/metric/gauge-chart.vue'
   import CategoryChart from '@/features/metric/category-chart.vue'
+
   import { Empty } from 'ant-design-vue'
   import type { ServiceVO, ServiceStatusType } from '@/api/service/types'
 
@@ -139,7 +139,7 @@
                           class="desc-sub-item-desc-column"
                           :content="$t('common.disabled')"
                         />
-                        <a-typography-text v-else class="desc-sub-item-desc-column" :content="attrs[key]" />
+                        <a-typography-text v-else class="desc-sub-item-desc-column" :content="`${attrs[key] ?? ''}`" />
                       </div>
                     </template>
                   </div>

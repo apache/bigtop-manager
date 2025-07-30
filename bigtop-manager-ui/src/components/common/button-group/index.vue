@@ -18,9 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { toRefs } from 'vue'
   import type { GroupItem, Props } from './types'
-  import { useI18n } from 'vue-i18n'
 
   const props = withDefaults(defineProps<Props>(), {
     i18n: '',

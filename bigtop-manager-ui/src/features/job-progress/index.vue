@@ -18,7 +18,6 @@
 -->
 
 <script lang="ts" setup>
-  import { computed } from 'vue'
   import { JobState } from '@/enums/state'
 
   interface ProgressProps {
@@ -26,11 +25,18 @@
     progressData: number
   }
 
+  interface ProgressConfig {
+    status: 'success' | 'normal' | 'active' | 'exception' | undefined
+    progress: number
+    icon?: string
+    strokeColor?: string
+  }
+
   const props = withDefaults(defineProps<ProgressProps>(), {
     progressData: 1
   })
 
-  const progressConfig = computed(() => {
+  const progressConfig = computed((): ProgressConfig => {
     if (props.state === 'Pending') {
       return {
         progress: 0,
@@ -63,7 +69,7 @@
     } else {
       return {
         progress: 0,
-        status: 'status'
+        status: 'normal'
       }
     }
   })

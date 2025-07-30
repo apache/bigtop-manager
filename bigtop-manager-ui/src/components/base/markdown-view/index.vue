@@ -18,12 +18,10 @@
 -->
 
 <script setup lang="ts">
-  import { computed, toRefs, nextTick } from 'vue'
   import { Marked } from 'marked'
   import { markedHighlight } from 'marked-highlight'
   import { copyText } from '@/utils/tools'
   import { message } from 'ant-design-vue'
-  import { useI18n } from 'vue-i18n'
   import hljs from 'highlight.js'
 
   type Props = {
