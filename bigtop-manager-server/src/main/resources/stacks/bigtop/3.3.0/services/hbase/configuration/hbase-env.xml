@@ -101,9 +101,9 @@ export HBASE_CONF_DIR=${hbase_conf_dir}
 # Below are what we set by default. May only work with SUN JVM.
 # For more on why as well as other possible settings,
 # see http://wiki.apache.org/hadoop/PerformanceTuning
-export SERVER_GC_OPTS="-verbose:gc -XX:+PrintGCDetails -Xlog:gc:${hbase_log_dir}/gc.log-`date +'%Y%m%d%H%M'`"
+export SERVER_GC_OPTS="-verbose:gc -XX:+PrintGCDetails -Xloggc:${hbase_log_dir}/gc.log-`date +'%Y%m%d%H%M'`"
 # Uncomment below to enable java garbage collection logging.
-export HBASE_OPTS="$HBASE_OPTS -verbose:gc -XX:+PrintGCDetails -Xlog:gc:${hbase_log_dir}/gc-hbase.log"
+export HBASE_OPTS="$HBASE_OPTS -verbose:gc -XX:+PrintGCDetails -Xloggc:${hbase_log_dir}/gc-hbase.log"
 
 # Uncomment and adjust to enable JMX exporting
 # See jmxremote.password and jmxremote.access in $JRE_HOME/lib/management to configure remote password access.
