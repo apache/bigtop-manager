@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
   import { ref, shallowRef } from 'vue'
-  import { parseHostNamesAsPatternExpression } from '@/utils/array'
+  import { parseHostNamesAsPatternExpression } from '@/utils/transform'
   import ConflictResolver from './conflict-resolver.vue'
 
   import type { HostReq } from '@/api/command/types'

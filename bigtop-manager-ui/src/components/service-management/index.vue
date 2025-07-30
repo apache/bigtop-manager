@@ -28,6 +28,7 @@
   import Overview from './overview.vue'
   import Components from './components.vue'
   import Configs from './configs.vue'
+
   import type { TabItem } from '@/components/common/main-card/types'
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { ServiceVO } from '@/api/service/types'
@@ -42,8 +43,10 @@
   const serviceStore = useServiceStore()
   const jobProgressStore = useJobProgress()
   const { loading, serviceMap } = storeToRefs(serviceStore)
+
   const activeKey = ref('1')
   const serviceDetail = shallowRef<ServiceVO>()
+
   const routeParams = computed(() => route.params as unknown as RouteParams)
   const tabs = computed((): TabItem[] => [
     {
@@ -59,6 +62,7 @@
       title: t('common.configs')
     }
   ])
+
   const actionGroup = computed<GroupItem[]>(() => [
     {
       shape: 'default',
@@ -87,22 +91,21 @@
     return components[parseInt(activeKey.value) - 1]
   })
 
-  const dropdownMenuClick: GroupItem['dropdownMenuClickEvent'] = async ({ key }) => {
+  const dropdownMenuClick: GroupItem['dropdownMenuClickEvent'] = ({ key }) => {
     const { id: clusterId, serviceId } = routeParams.value
-    const serviceName = serviceMap.value[clusterId].filter((service) => Number(serviceId) === service.id)[0].name!
-    try {
-      await jobProgressStore.processCommand(
-        {
-          command: key as keyof typeof Command,
-          clusterId,
-          commandLevel: 'service',
-          serviceCommands: [{ serviceName, installed: true }]
-        },
-        getServiceDetail
-      )
-    } catch (error) {
-      console.log('error :>> ', error)
-    }
+    const service = serviceMap.value[clusterId].filter((service) => Number(serviceId) === service.id)[0]
+    jobProgressStore.processCommand(
+      {
+        command: key as keyof typeof Command,
+        clusterId,
+        commandLevel: 'service',
+        serviceCommands: [{ serviceName: service.name!, installed: true }]
+      },
+      getServiceDetail,
+      {
+        displayName: service.displayName
+      }
+    )
   }
 
   const getServiceDetail = async () => {

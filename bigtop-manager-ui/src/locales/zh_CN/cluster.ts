@@ -26,7 +26,7 @@ export default {
   name: '集群名',
   display_name: '集群显示名',
   description: '集群描述',
-  root_directory: '集群根目录',
+  root_dir: '集群根目录',
   user_group: '集群用户组',
   config_source: '配置源',
   install_dependencies: '安装依赖',

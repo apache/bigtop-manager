@@ -23,10 +23,13 @@
   import { useMenuStore } from '@/store/menu/index'
   import { storeToRefs } from 'pinia'
   import { useClusterStore } from '@/store/cluster'
+  import { useStackStore } from '@/store/stack'
+
   import type { ClusterStatusType } from '@/api/cluster/types'
 
   const router = useRouter()
   const route = useRoute()
+  const stackStore = useStackStore()
   const menuStore = useMenuStore()
   const clusterStore = useClusterStore()
   const routeParamsLen = ref(0)
@@ -89,6 +92,7 @@
   }
 
   onMounted(() => {
+    stackStore.loadStacks()
     clusterStore.loadClusters()
   })
 

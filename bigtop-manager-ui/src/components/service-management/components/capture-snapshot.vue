@@ -21,53 +21,31 @@
   import { useI18n } from 'vue-i18n'
   import { computed, ref, shallowRef } from 'vue'
   import { takeServiceConfigSnapshot } from '@/api/service'
-  import type { FormItemState } from '@/components/common/auto-form/types'
-  import type { ServiceParams, SnapshotData } from '@/api/service/types'
   import { message } from 'ant-design-vue'
+
+  import type { FormItem } from '@/components/common/form-builder/types'
+  import type { ServiceParams, SnapshotData } from '@/api/service/types'
+
+  const emits = defineEmits(['success'])
 
   const { t } = useI18n()
   const open = ref(false)
   const loading = ref(false)
   const serviceInfo = shallowRef<ServiceParams>()
-  const autoFormRef = ref<Comp.AutoFormInstance | null>(null)
+  const formRef = ref<Comp.FormBuilderInstance | null>(null)
   const formValue = ref<SnapshotData>({})
-  const emits = defineEmits(['success'])
-  const formItems = computed((): FormItemState[] => [
+  const formItems = computed((): FormItem[] => [
     {
       type: 'input',
       field: 'name',
-      formItemProps: {
-        name: 'name',
-        label: t('service.snapshot_name'),
-        rules: [
-          {
-            required: true,
-            message: t('common.enter_error', [`${t('service.snapshot_name')}`.toLowerCase()]),
-            trigger: 'blur'
-          }
-        ]
-      },
-      controlProps: {
-        placeholder: t('common.enter_error', [`${t('service.snapshot_name')}`.toLowerCase()])
-      }
+      label: t('service.snapshot_name'),
+      required: true
     },
     {
       type: 'textarea',
       field: 'desc',
-      formItemProps: {
-        name: 'desc',
-        label: t('service.snapshot_description'),
-        rules: [
-          {
-            required: true,
-            message: t('common.enter_error', [`${t('service.snapshot_description')}`.toLowerCase()]),
-            trigger: 'blur'
-          }
-        ]
-      },
-      controlProps: {
-        placeholder: t('common.enter_error', [`${t('service.snapshot_description')}`.toLowerCase()])
-      }
+      label: t('service.snapshot_description'),
+      required: true
     }
   ])
 
@@ -77,7 +55,7 @@
   }
 
   const handleOk = async () => {
-    const validate = await autoFormRef.value?.getFormValidation()
+    const validate = await formRef.value?.validate()
     if (!validate || !serviceInfo.value) return
     loading.value = true
     try {
@@ -105,18 +83,16 @@
 <template>
   <div class="set-source">
     <a-modal
-      v-model:open="open"
-      width="50%"
+      :open="open"
+      width="600px"
       :centered="true"
-      :mask="false"
       :title="$t('service.capture_snapshot')"
-      :mask-closable="false"
       :destroy-on-close="true"
       :confirm-loading="loading"
       @ok="handleOk"
       @cancel="handleCancel"
     >
-      <auto-form ref="autoFormRef" v-model:form-value="formValue" :show-button="false" :form-items="formItems" />
+      <form-builder ref="formRef" v-model="formValue" :form-items="formItems" />
     </a-modal>
   </div>
 </template>

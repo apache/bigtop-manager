@@ -124,5 +124,7 @@ export default {
   restore: '恢复',
   selected: '选中',
   feature_not_supported: '功能暂不支持',
-  installing_exit_confirm_content: '正在安装中，退出页面将导致安装失败。是否确定退出？'
+  installing_exit_confirm_content: '正在安装中，退出页面将导致安装失败。是否确定退出？',
+  confirm_action: '确定要{action} {target} 吗？',
+  confirm_comp_action: '确定要{action}选中的组件吗？'
 }

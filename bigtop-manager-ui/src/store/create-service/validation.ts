@@ -18,7 +18,7 @@
  */
 
 import { message, Modal } from 'ant-design-vue'
-import { createVNode } from 'vue'
+import { h } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useServiceStore } from '@/store/service'
 import SvgIcon from '@/components/common/svg-icon/index.vue'
@@ -67,10 +67,15 @@ export function useValidations() {
 
     return new Promise((resolve) => {
       Modal.confirm({
-        content: t(`service.${content}`, [targetService.displayName, requiredService.displayName]),
-        icon: createVNode(SvgIcon, { name: 'unknown' }),
+        icon: null,
+        title: () =>
+          h('div', { style: { display: 'flex' } }, [
+            h(SvgIcon, { name: 'unknown', style: { width: '24px', height: '24px' } }),
+            h('p', t(`service.${content}`, [targetService.displayName, requiredService.displayName]))
+          ]),
         cancelText: t('common.no'),
         okText: t('common.yes'),
+        style: { top: '30vh' },
         onOk: () => resolve(true),
         onCancel: () => {
           Modal.destroyAll()

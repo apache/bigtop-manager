@@ -154,7 +154,7 @@
   }
 
   const setNewAddress = () => {
-    updateAddressRef.value?.show()
+    updateAddressRef.value?.toggleVisible(true)
   }
 
   const handleSetAddress = (newAddress: string) => {

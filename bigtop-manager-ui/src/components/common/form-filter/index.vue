@@ -20,7 +20,7 @@
 <script setup lang="ts">
   import { MenuProps } from 'ant-design-vue'
   import { ref, toRefs, computed, shallowRef, toRaw } from 'vue'
-  import { isEqual, cloneDeep } from 'lodash'
+  import { isEqual, cloneDeep } from 'lodash-es'
   import type { FilterFormItem } from './types'
 
   interface FilterFormPops {

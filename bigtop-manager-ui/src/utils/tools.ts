@@ -17,13 +17,6 @@
  * under the License.
  */
 
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
-import timezone from 'dayjs/plugin/timezone'
-
-dayjs.extend(utc)
-dayjs.extend(timezone)
-
 export const copyText = (text: string): Promise<any> => {
   if (navigator.clipboard) {
     return navigator.clipboard.writeText(text)
@@ -72,10 +65,6 @@ export const getRandomFromTimestamp = (len: number = 6) => {
   return Date.now().toString().slice(-len)
 }
 
-export const formatTime = (time: string | undefined, formatRule: string = 'YYYY-MM-DD HH:mm:ss') => {
-  return typeof time === 'string' && dayjs(time).tz(dayjs.tz.guess(), true).format(formatRule)
-}
-
 export const generateRandomId = (length = 8) => {
   return Math.random()
     .toString(36)
@@ -92,24 +81,4 @@ export const pick = <T extends object, K extends keyof T>(obj: T, keys: K[]): Pi
     },
     {} as Pick<T, K>
   )
-}
-
-type Data = { [key: string]: any }
-type Result = { [key: string]: any | undefined }
-
-export const processData = (data: Data): Result => {
-  const result: Result = {}
-  if (!data) {
-    return result
-  }
-  for (const [key, value] of Object.entries(data)) {
-    if (value === null) {
-      result[key] = undefined
-    } else if (Array.isArray(value)) {
-      result[key] = value[0] || undefined
-    } else {
-      result[key] = value
-    }
-  }
-  return result
 }

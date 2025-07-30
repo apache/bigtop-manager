@@ -129,7 +129,6 @@
 
   const createTooltipFormatter = (formatValue?: (value: unknown) => string) => {
     const format = formatValue ?? defaultTooltipFormatter
-    console.log('format :>> ', format)
     return (params: any) => {
       const title = params[0]?.axisValueLabel ?? ''
       const lines = params

@@ -97,25 +97,22 @@
   const detailKeys = computed((): (keyof HostVO)[] => Object.keys(baseConfig.value))
   const noChartData = computed(() => Object.values(chartData.value).length === 0)
 
-  const handleHostOperate = async (item: MenuItem, component: ComponentVO) => {
+  const handleHostOperate = (item: MenuItem, component: ComponentVO) => {
     const { serviceName } = component
     const installedServiceMap = Object.values(serviceStore.serviceMap)
       .flat()
       .filter((v) => v.name === serviceName)
     if (installedServiceMap.length > 0) {
-      try {
-        await jobProgressStore.processCommand(
-          {
-            command: item.key as keyof typeof Command,
-            clusterId: installedServiceMap[0].clusterId,
-            commandLevel: 'component',
-            componentCommands: [{ componentName: component.name!, hostnames: [component.hostname!] }]
-          },
-          getComponentInfo
-        )
-      } catch (error) {
-        console.log('error :>> ', error)
-      }
+      jobProgressStore.processCommand(
+        {
+          command: item.key as keyof typeof Command,
+          clusterId: installedServiceMap[0].clusterId,
+          commandLevel: 'component',
+          componentCommands: [{ componentName: component.name!, hostnames: [component.hostname!] }]
+        },
+        getComponentInfo,
+        { displayName: component.displayName }
+      )
     }
   }
 

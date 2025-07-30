@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { computed, ref, shallowRef } from 'vue'
+  import { computed, ref, h, shallowRef } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { message, Modal, TableColumnType } from 'ant-design-vue'
   import useBaseTable from '@/composables/use-base-table'
@@ -27,6 +27,8 @@
     getServiceConfigSnapshotsList,
     recoveryServiceConfigSnapshot
   } from '@/api/service'
+  import SvgIcon from '@/components/common/svg-icon/index.vue'
+
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { ServiceConfigSnapshot, ServiceParams, SnapshotRecovery } from '@/api/service/types'
 
@@ -58,7 +60,7 @@
     {
       title: t('common.operation'),
       dataIndex: 'operation',
-      width: '160px',
+      width: '180px',
       key: 'operation',
       ellipsis: true
     }
@@ -100,7 +102,13 @@
   const handleTableOperation = (item: GroupItem<OperationType>, payLoad: ServiceConfigSnapshot) => {
     const currOperation = operationMap.value[item.action!]
     Modal.confirm({
-      title: currOperation.modalTitle,
+      title: () =>
+        h('div', { style: { display: 'flex' } }, [
+          h(SvgIcon, { name: 'unknown', style: { width: '24px', height: '24px' } }),
+          h('p', currOperation.modalTitle)
+        ]),
+      icon: null,
+      style: { top: '30vh' },
       async onOk() {
         try {
           const data = await currOperation.api({ ...serviceInfo.value, snapshotId: payLoad.id } as SnapshotRecovery)
@@ -155,9 +163,7 @@
       v-model:open="open"
       width="800px"
       :centered="true"
-      :mask="false"
       :title="$t('service.snapshot_management')"
-      :mask-closable="false"
       :destroy-on-close="true"
       @ok="handleOk"
       @cancel="handleCancel"

@@ -18,16 +18,12 @@
 -->
 
 <script setup lang="ts">
-  import { computed, nextTick, ref, watch } from 'vue'
+  import { computed, ref, shallowRef } from 'vue'
   import { Rule } from 'ant-design-vue/es/form'
   import { message } from 'ant-design-vue'
-  import { storeToRefs } from 'pinia'
   import { useI18n } from 'vue-i18n'
   import { UploadOutlined } from '@ant-design/icons-vue'
-
-  import { useLocaleStore } from '@/store/locale'
   import { useClusterStore } from '@/store/cluster'
-
   import { uploadFile } from '@/api/upload-file'
   import { updateHost } from '@/api/hosts'
 
@@ -36,17 +32,14 @@
   import type { UploadProps } from 'ant-design-vue'
   import type { HostReq } from '@/api/command/types'
   import type { HostParams, HostVO } from '@/api/hosts/types'
-  import type { FormItemState } from '@/components/common/auto-form/types'
+  import type { FormItem } from '@/components/common/form-builder'
 
-  enum Mode {
-    EDIT = 'cluster.edit_host',
-    ADD = 'cluster.add_host'
-  }
+  type ModeType = 'EDIT' | 'ADD'
 
   interface Emits {
     (
       event: 'onOk',
-      type: keyof typeof Mode,
+      type: ModeType,
       value: HostReq | HostVO,
       duplicateHosts?: HostReq & { strategy: 'override' | 'keep' }[]
     ): void
@@ -62,18 +55,20 @@
   const emits = defineEmits<Emits>()
 
   const { t } = useI18n()
-  const localeStore = useLocaleStore()
   const clusterStore = useClusterStore()
-  const { locale } = storeToRefs(localeStore)
 
   const open = ref(false)
   const loading = ref(false)
-  const mode = ref<keyof typeof Mode>('ADD')
-  const hiddenItems = ref<string[]>([])
-  const autoFormRef = ref<Comp.AutoFormInstance | null>(null)
-  const formValue = ref<HostReq & { hostname?: string }>({})
   const fileName = ref('')
+  const mode = ref<ModeType>('ADD')
+  const formRef = ref<Comp.FormBuilderInstance | null>(null)
+  const formValue = ref<HostReq & { hostname?: string }>({})
   const previewRef = ref<InstanceType<typeof ParsedPreview> | null>()
+
+  const titleMap = shallowRef<Record<ModeType, string>>({
+    ADD: 'cluster.add_host',
+    EDIT: 'cluster.edit_host'
+  })
 
   const isEdit = computed(() => mode.value === 'EDIT')
 
@@ -102,282 +97,175 @@
     }
   }
 
-  const formItemsForSshPassword = computed((): FormItemState[] => [
-    {
-      type: 'inputPassword',
-      field: 'sshPassword',
-      formItemProps: {
-        name: 'sshPassword',
-        label: t('host.password_auth'),
-        rules: [
-          {
-            required: true,
-            message: t('common.enter_error', [`${t('host.password_auth')}`.toLowerCase()]),
-            trigger: 'blur'
-          }
-        ]
-      },
-      controlProps: {
-        placeholder: t('common.enter_error', [`${t('host.password_auth')}`.toLowerCase()])
+  const rules = computed(() => ({
+    sshPasswordAgain: [
+      {
+        required: true,
+        validator: checkSshPassword,
+        trigger: 'blur'
       }
+    ],
+    sshKeyFilename: [
+      {
+        required: true,
+        message: t('common.add_error', [`${t('host.key_file')}`.toLowerCase()]),
+        trigger: 'blur'
+      }
+    ],
+    sshKeyPasswordAgain: [
+      {
+        required: true,
+        validator: checkSshKeyPassword,
+        trigger: 'blur'
+      }
+    ]
+  }))
+
+  const formItemsForSshPassword = computed((): FormItem[] => [
+    {
+      type: 'password',
+      field: 'sshPassword',
+      label: t('host.password_auth'),
+      required: true
     },
     {
-      type: 'inputPassword',
+      type: 'password',
       field: 'sshPasswordAgain',
-      formItemProps: {
-        name: 'sshPasswordAgain',
-        label: t('host.confirm_password'),
-        rules: [
-          {
-            required: true,
-            validator: checkSshPassword,
-            trigger: 'blur'
-          }
-        ]
-      },
-      controlProps: {
-        placeholder: t('common.enter_error', [`${t('host.confirm_password')}`.toLowerCase()])
-      }
+      label: t('host.confirm_password'),
+      required: true
     }
   ])
 
-  const formItemsForSshKeyPassword = computed((): FormItemState[] => [
+  const formItemsForSshKeyPassword = computed((): FormItem[] => [
     {
-      type: 'radio',
+      type: 'radioGroup',
       field: 'inputType',
-      defaultValue: '1',
-      defaultOptionsMap: [
-        { value: '1', label: t('host.file') },
-        { value: '2', label: t('host.text') }
-      ],
-      formItemProps: {
-        name: 'inputType',
-        label: t('host.input_method'),
-        rules: [
-          {
-            required: true,
-            message: t('common.select_error', [`${t('host.input_method')}`.toLowerCase()]),
-            trigger: 'blur'
-          }
+      label: t('host.input_method'),
+      required: true,
+      props: {
+        options: [
+          { value: '1', label: t('host.file') },
+          { value: '2', label: t('host.text') }
         ]
       }
     },
-
     {
       type: 'input',
       field: 'sshKeyFilename',
-      slot: 'sshKeyFilenameSlot',
-      formItemProps: {
-        name: 'sshKeyFilename',
-        label: t('host.key_file'),
-        rules: [
-          {
-            required: true,
-            message: t('common.add_error', [`${t('host.key_file')}`.toLowerCase()]),
-            trigger: 'blur'
-          }
-        ]
-      }
+      hidden: formValue.value.inputType === '2',
+      label: t('host.key_file'),
+      required: true
     },
     {
       type: 'textarea',
       field: 'sshKeyString',
-      formItemProps: {
-        name: 'sshKeyString',
-        label: t('host.key_text'),
-        rules: [
-          { required: true, message: t('common.enter_error', [`${t('host.key_text')}`.toLowerCase()]), trigger: 'blur' }
-        ]
-      },
-      controlProps: {
-        placeholder: t('common.enter_error', [`${t('host.key_text')}`.toLowerCase()])
-      }
+      hidden: formValue.value.inputType === '1',
+      label: t('host.key_text'),
+      required: true
     },
     {
-      type: 'inputPassword',
+      type: 'password',
       field: 'sshKeyPassword',
-      formItemProps: {
-        name: 'sshKeyPassword',
-        label: t('host.key_password')
-      },
-      controlProps: {
-        placeholder: t('common.enter_error', [`${t('host.key_password')}`.toLowerCase()])
-      }
+      label: t('host.key_password'),
+      required: true
     },
     {
-      type: 'inputPassword',
+      type: 'password',
       field: 'sshKeyPasswordAgain',
-      formItemProps: {
-        name: 'sshKeyPasswordAgain',
-        label: t('host.confirm_key_password'),
-        rules: [
-          {
-            required: false,
-            validator: checkSshKeyPassword,
-            trigger: 'blur'
-          }
-        ]
-      },
-      controlProps: {
-        placeholder: t('common.enter_error', [`${t('host.confirm_key_password')}`.toLowerCase()])
-      }
+      label: t('host.confirm_key_password'),
+      required: true
     }
   ])
 
-  const formItemsOfPublicHost = computed((): FormItemState[] => [
+  const formItemsOfPublicHost = computed((): FormItem[] => [
     {
       type: 'select',
       field: 'clusterId',
-      defaultValue: '',
-      fieldMap: {
-        label: 'displayName',
-        value: 'clusterId'
-      },
-      formItemProps: {
-        name: 'clusterId',
-        label: t('common.cluster'),
-        rules: [
-          {
-            required: true,
-            message: t('common.select_error', [`${t('common.cluster')}`.toLowerCase()]),
-            trigger: 'blur'
-          }
-        ]
-      },
-      controlProps: {
-        disabled: isEdit.value,
-        placeholder: t('common.select_error', [`${t('common.cluster')}`.toLowerCase()])
+      label: t('common.cluster'),
+      required: true,
+      props: {
+        options: Object.values(clusterStore.clusterMap).map((v) => ({ value: v.id, label: v.displayName })),
+        disabled: isEdit.value
       }
     }
   ])
 
-  const formItems = computed((): FormItemState[] => [
+  const formItems = computed((): FormItem[] => [
     {
       type: 'input',
       field: 'sshUser',
-      formItemProps: {
-        name: 'sshUser',
-        label: t('host.username'),
-        rules: [
-          { required: true, message: t('common.enter_error', [`${t('host.username')}`.toLowerCase()]), trigger: 'blur' }
-        ]
-      },
-      controlProps: {
-        disabled: isEdit.value,
-        placeholder: t('common.enter_error', [`${t('host.username')}`.toLowerCase()])
+      label: t('host.username'),
+      required: true,
+      props: {
+        disabled: isEdit.value
       }
     },
     {
-      type: 'radio',
+      type: 'radioGroup',
       field: 'authType',
-      defaultValue: '1',
-      defaultOptionsMap: [
-        { value: '1', label: t('host.password_auth') },
-        { value: '2', label: t('host.key_auth') },
-        { value: '3', label: t('host.no_auth') }
-      ],
-      formItemProps: {
-        name: 'authType',
-        label: t('host.auth_method'),
-        rules: [
-          {
-            required: true,
-            message: t('common.select_error', [`${t('host.auth_method')}`.toLowerCase()]),
-            trigger: 'blur'
-          }
+      label: t('host.auth_method'),
+      required: true,
+      props: {
+        options: [
+          { value: '1', label: t('host.password_auth') },
+          { value: '2', label: t('host.key_auth') },
+          { value: '3', label: t('host.no_auth') }
         ]
       }
     },
     {
       type: mode.value == 'ADD' ? 'textarea' : 'input',
       field: 'hostname',
-      formItemProps: {
-        name: 'hostname',
-        label: t('host.hostname'),
-        rules: [
-          { required: true, message: t('common.enter_error', [`${t('host.hostname')}`.toLowerCase()]), trigger: 'blur' }
-        ]
-      },
-      controlProps: {
-        disabled: isEdit.value,
-        placeholder: t('common.enter_error', [`${t('host.hostname')}`.toLowerCase()])
+      required: true,
+      label: t('host.hostname'),
+      props: {
+        disabled: isEdit.value
       }
     },
 
     {
       type: 'input',
       field: 'agentDir',
-      formItemProps: {
-        name: 'agentDir',
-        label: t('host.agent_path')
-      },
-      controlProps: {
-        disabled: isEdit.value,
-        placeholder: t('host.default_agent_path')
+      label: t('host.agent_path'),
+      placeholder: t('host.default_agent_path'),
+      props: {
+        disabled: isEdit.value
       }
     },
     {
       type: 'input',
       field: 'sshPort',
-      formItemProps: {
-        name: 'sshPort',
-        label: t('host.ssh_port')
-      },
-      controlProps: {
-        placeholder: t('host.default_ssh_port')
-      }
+      label: t('host.ssh_port'),
+      placeholder: t('host.default_ssh_port')
     },
     {
       type: 'input',
       field: 'grpcPort',
-      formItemProps: {
-        name: 'grpcPort',
-        label: t('host.grpc_port')
-      },
-      controlProps: {
-        placeholder: t('host.default_grpc_port')
-      }
+      name: 'grpcPort',
+      label: t('host.grpc_port'),
+      placeholder: t('host.default_grpc_port')
     },
     {
       type: 'textarea',
       field: 'desc',
-      formItemProps: {
-        name: 'desc',
-        label: t('host.description')
-      },
-      controlProps: {
-        placeholder: t('common.enter_error', [`${t('host.description')}`.toLowerCase()])
-      }
+      label: t('host.description')
     }
   ])
 
-  const filterFormItems = computed((): FormItemState[] => {
+  const filterFormItems = computed((): FormItem[] => {
     const baseItems = [...formItems.value]
-    const isPublic = props.isPublic
 
     if (formValue.value.authType === '1') {
       baseItems.splice(2, 0, ...formItemsForSshPassword.value)
-    } else if (formValue.value.authType === '2') {
+    }
+
+    if (formValue.value.authType === '2') {
       baseItems.splice(2, 0, ...formItemsForSshKeyPassword.value)
     }
 
-    return isPublic ? [...formItemsOfPublicHost.value, ...baseItems] : baseItems
+    return props.isPublic ? [...formItemsOfPublicHost.value, ...baseItems] : baseItems
   })
 
-  watch(
-    () => formValue.value.inputType,
-    (inputType) => {
-      const hiddenMap: Record<string, string[]> = {
-        '1': ['sshKeyString'],
-        '2': ['sshKeyFilename']
-      }
-      hiddenItems.value = hiddenMap[inputType] ?? []
-    }
-  )
-
-  /**
-   * Handles host editing.
-   */
   const editHost = async (hostConfig: HostReq) => {
     try {
       const data = await updateHost(hostConfig)
@@ -405,17 +293,21 @@
   }
 
   const handleOk = async () => {
-    const validate = await autoFormRef.value?.getFormValidation()
-    if (!validate) return
+    try {
+      const validate = await formRef.value?.validate()
+      if (!validate) return
 
-    if (!isEdit.value) {
-      previewRef.value?.parsed(props.currentHosts)
-    } else if (props.apiEditCaller) {
-      loading.value = true
-      await editHost(formValue.value)
-    } else {
-      emits('onOk', mode.value, formValue.value)
-      handleCancel()
+      if (!isEdit.value) {
+        previewRef.value?.parsed(props.currentHosts)
+      } else if (props.apiEditCaller) {
+        loading.value = true
+        await editHost(formValue.value)
+      } else {
+        emits('onOk', mode.value, formValue.value)
+        handleCancel()
+      }
+    } catch (error) {
+      console.log('error', error)
     }
   }
 
@@ -450,23 +342,13 @@
     }
   }
 
-  const handleOpen = async (type: keyof typeof Mode, payload?: HostParams) => {
+  const handleOpen = async (type: ModeType, payload?: HostParams) => {
     open.value = true
     mode.value = type
 
     formValue.value = payload
       ? { ...payload, authType: `${payload?.authType ?? 1}`, inputType: `${payload?.inputType ?? 1}` }
       : { authType: '1', inputType: '1' }
-
-    if (props.isPublic) {
-      await getClusterSelectOptions()
-    }
-  }
-
-  const getClusterSelectOptions = async () => {
-    await nextTick()
-    const formatClusters = Object.values(clusterStore.clusterMap).map((v) => ({ ...v, clusterId: v.id }))
-    autoFormRef.value?.setOptions('clusterId', formatClusters)
   }
 
   defineExpose({
@@ -479,26 +361,18 @@
     <a-modal
       :open="open"
       :width="600"
-      :title="Mode[mode] && $t(Mode[mode])"
+      :title="titleMap[mode] && $t(titleMap[mode])"
       :mask-closable="false"
       :confirm-loading="loading"
       :centered="true"
       :destroy-on-close="true"
-      @ok="handleOk"
+      :ok-text="$t('common.confirm')"
       @cancel="handleCancel"
+      @ok="handleOk"
     >
-      <auto-form
-        ref="autoFormRef"
-        v-model:form-value="formValue"
-        :label-col="{
-          span: locale === 'zh_CN' ? 5 : 7
-        }"
-        :hidden-items="hiddenItems"
-        :show-button="false"
-        :form-items="filterFormItems"
-      >
-        <template #sshKeyFilenameSlot="{ item }">
-          <a-form-item v-bind="item.formItemProps">
+      <div class="add-host-content">
+        <form-builder ref="formRef" v-model="formValue" :form-items="filterFormItems" :rules="rules">
+          <template #sshKeyFilename="{ item }">
             <a-upload
               accept="text/plain"
               :before-upload="beforeUpload"
@@ -511,21 +385,9 @@
               </a-button>
             </a-upload>
             <span class="filename">{{ fileName ? fileName : mode === 'EDIT' ? formValue[item.field] : '' }}</span>
-          </a-form-item>
-        </template>
-      </auto-form>
-      <template #footer>
-        <footer>
-          <a-space size="middle">
-            <a-button @click="handleCancel">
-              {{ $t('common.cancel') }}
-            </a-button>
-            <a-button type="primary" @click="handleOk">
-              {{ $t('common.confirm') }}
-            </a-button>
-          </a-space>
-        </footer>
-      </template>
+          </template>
+        </form-builder>
+      </div>
     </a-modal>
     <parsed-preview ref="previewRef" :is-public="$props.isPublic" :data="formValue" @parsed="handleParsed" />
   </div>
@@ -535,9 +397,5 @@
   .filename {
     color: $color-primary;
     padding-inline: $space-sm;
-  }
-  footer {
-    width: 100%;
-    @include flexbox($justify: flex-end);
   }
 </style>

@@ -21,16 +21,18 @@
   import { computed, ref, shallowRef, watch } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { pick } from '@/utils/tools'
+
   import type { ClusterCommandReq } from '@/api/command/types'
-  import type { FormItemState } from '@/components/common/auto-form/types'
+  import type { FormItem } from '@/components/common/form-builder/types'
 
   type ClusterCommandReqKey = keyof ClusterCommandReq
 
   const { t } = useI18n()
-  const activeKey = ref(['1', '2'])
-  const autoFormRefMap = shallowRef<Map<string, Comp.AutoFormInstance>>(new Map())
   const props = defineProps<{ stepData: ClusterCommandReq }>()
   const emits = defineEmits(['updateData'])
+
+  const activeKey = ref(['1', '2'])
+  const autoFormRefMap = shallowRef<Map<string, Comp.FormBuilderInstance>>(new Map())
   const collapses = ref([
     {
       title: computed(() => t('cluster.base_info')),
@@ -43,100 +45,40 @@
       formItems: computed(() => clusterConfigFormItems.value)
     }
   ])
-  const formLayout = computed(() => ({
-    labelCol: { xs: 5, sm: 5, md: 5, lg: 4, xl: 3 },
-    wrapperCol: { xs: 10, sm: 10, md: 10, lg: 10, xl: { xl: 10, pull: 1 } }
-  }))
 
-  const baseInfoFormItems = computed((): FormItemState[] => [
+  const baseInfoFormItems = computed((): FormItem[] => [
     {
       type: 'input',
       field: 'name',
-      formItemProps: {
-        name: 'name',
-        label: t('cluster.name'),
-        rules: [
-          { required: true, message: t('common.enter_error', [`${t('cluster.name')}`.toLowerCase()]), trigger: 'blur' }
-        ]
-      },
-      controlProps: {
-        placeholder: t('common.enter_error', [`${t('cluster.name')}`.toLowerCase()])
-      }
+      label: t('cluster.name'),
+      required: true
     },
     {
       type: 'input',
       field: 'displayName',
-      formItemProps: {
-        name: 'displayName',
-        label: t('cluster.display_name'),
-        rules: [
-          {
-            required: true,
-            message: t('common.enter_error', [`${t('cluster.display_name')}`.toLowerCase()]),
-            trigger: 'blur'
-          }
-        ]
-      },
-      controlProps: {
-        placeholder: t('common.enter_error', [`${t('cluster.display_name')}`.toLowerCase()])
-      }
+      label: t('cluster.display_name'),
+      required: true
     },
     {
       type: 'textarea',
       field: 'desc',
-      formItemProps: {
-        name: 'desc',
-        label: t('cluster.description'),
-        rules: [
-          {
-            required: true,
-            message: t('common.enter_error', [`${t('cluster.description')}`.toLowerCase()]),
-            trigger: 'blur'
-          }
-        ]
-      },
-      controlProps: {
-        placeholder: t('common.enter_error', [`${t('cluster.description')}`.toLowerCase()])
-      }
+      label: t('cluster.description'),
+      required: true
     }
   ])
 
-  const clusterConfigFormItems = computed((): FormItemState[] => [
+  const clusterConfigFormItems = computed((): FormItem[] => [
     {
       type: 'input',
       field: 'rootDir',
-      formItemProps: {
-        name: 'rootDir',
-        label: t('cluster.root_directory'),
-        rules: [
-          {
-            required: true,
-            message: t('common.enter_error', [`${t('cluster.root_directory')}`.toLowerCase()]),
-            trigger: 'blur'
-          }
-        ]
-      },
-      controlProps: {
-        placeholder: t('common.enter_error', [`${t('cluster.root_directory')}`.toLowerCase()])
-      }
+      label: t('cluster.root_dir'),
+      required: true
     },
     {
       type: 'input',
       field: 'userGroup',
-      formItemProps: {
-        name: 'userGroup',
-        label: t('cluster.user_group'),
-        rules: [
-          {
-            required: true,
-            message: t('common.enter_error', [`${t('cluster.user_group')}`.toLowerCase()]),
-            trigger: 'blur'
-          }
-        ]
-      },
-      controlProps: {
-        placeholder: t('common.enter_error', [`${t('cluster.user_group')}`.toLowerCase()])
-      }
+      label: t('cluster.user_group'),
+      required: true
     }
   ])
 
@@ -155,7 +97,7 @@
   const check = async () => {
     try {
       const autoFormRefs = [...autoFormRefMap.value.values()]
-      const validation = await Promise.all(autoFormRefs.map((formRef) => formRef?.getFormValidation()))
+      const validation = await Promise.all(autoFormRefs.map((formRef) => formRef?.validate()))
       const allValid = validation.every((res) => res)
       autoFormRefs.forEach((_formRef, index) => {
         !validation[index] && !activeKey.value.includes(`${index + 1}`) && activeKey.value.push(`${index + 1}`)
@@ -186,17 +128,16 @@
   <div class="cluster-base">
     <a-collapse v-model:active-key="activeKey" :bordered="false" :ghost="true">
       <a-collapse-panel v-for="(collapse, idx) in collapses" :key="`${idx + 1}`" :header="collapse.title">
-        <auto-form
+        <form-builder
           :key="collapse.title"
           :ref="
             (el) => {
               collectAutoFormRefs(el, collapse.title)
             }
           "
-          v-bind="formLayout"
-          v-model:form-value="collapse.formValue"
+          v-model="collapse.formValue"
           :form-items="collapse.formItems"
-          :show-button="false"
+          :span="14"
         />
       </a-collapse-panel>
     </a-collapse>

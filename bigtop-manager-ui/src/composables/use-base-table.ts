@@ -19,10 +19,11 @@
 
 import { ref, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { processData } from '@/utils/tools'
 import type { PaginationProps, TableColumnType, TableProps } from 'ant-design-vue'
 import type { FilterValue } from 'ant-design-vue/es/table/interface'
 
+type Data = { [key: string]: any }
+type Result = { [key: string]: any | undefined }
 type PaginationType = PaginationProps | false | undefined
 
 export interface UseBaseTableProps<T = any> {
@@ -57,6 +58,23 @@ const useBaseTable = <T>(props: UseBaseTableProps<T>) => {
     Object.assign(paginationProps.value, pagination)
   } else {
     paginationProps.value = false
+  }
+
+  const processData = (data: Data): Result => {
+    const result: Result = {}
+    if (!data) {
+      return result
+    }
+    for (const [key, value] of Object.entries(data)) {
+      if (value === null) {
+        result[key] = undefined
+      } else if (Array.isArray(value)) {
+        result[key] = value[0] || undefined
+      } else {
+        result[key] = value
+      }
+    }
+    return result
   }
 
   const onChange: TableProps['onChange'] = (pagination, filters) => {
