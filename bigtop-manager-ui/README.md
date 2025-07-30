@@ -51,9 +51,9 @@ Editor: VsCode
 │   ├── styles/                # Global styles
 │   ├── types/                 # Global TypeScript declarations (.d.ts)
 │   ├── utils/                 # Utility functions
-│   ├── tests/                 # Unit and integration tests
 │   ├── App.vue                # Root component
 │   └── main.ts                # Project entry point
+├── tests/                     # Unit and integration tests
 ├── index.html                 # HTML template
 ├── package.json               # Project metadata and dependencies
 ├── tsconfig.json              # TypeScript config file

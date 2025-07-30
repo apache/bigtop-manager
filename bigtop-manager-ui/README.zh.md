@@ -51,9 +51,9 @@ Vue：版本3.4.37
 │   ├── styles/                # 全局样式
 │   ├── types/                 # 全局类型声明（.d.ts）
 │   ├── utils/                 # 工具函数
-│   ├── tests/                 # 单元测试或集成测试用例
 │   ├── App.vue                # 根组件
 │   └── main.ts                # 项目入口文件
+├── tests/                     # 单元测试或集成测试用例
 ├── index.html                 # HTML 模板文件
 ├── package.json               # 包管理与脚本配置文件
 ├── tsconfig.json              # TypeScript 配置文件
