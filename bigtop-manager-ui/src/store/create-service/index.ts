@@ -352,7 +352,6 @@ export const useCreateServiceStore = defineStore(
         if (!snapshot) continue
 
         const configDiffs = getDiffConfigs(configs, snapshot)
-        if (!configDiffs.length) continue
 
         diffs.push({
           serviceName: name,
