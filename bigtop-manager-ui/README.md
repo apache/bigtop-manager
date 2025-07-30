@@ -21,37 +21,43 @@ Bigtop-Manager-ui is the front-end UI of the Manager platform, which stores code
 
 ## Prerequisites
 
-Vite: Version 4.4.5
+Vite: Version 5.4.19
 
-Typescript: Version 5.0.2
+Typescript: Version 5.8.3
 
-Vue: Version 3.3.4
+Vue: Version 3.4.37
 
 Editor: VsCode
 
 ## Project Structure
 
-```
-—————————————————— public               static resources
-—————————————————— src                  project source code
-——————————— api                         calls the backend interface
-——————————— assets                      static assets
-——————————— components                  customize components
-——————————— composables                 composable
-——————————— directives                  customize directive
-——————————— layouts                     overall page layout
-——————————— locales                     internationalization
-——————————— pages                       components
-——————————— plugins                     global registration configuration
-——————————— router                      router
-——————————— store                       global persistence
-——————————— styles                      style file
-——————————— types                       data type
-——————————— utils                       utility function
-——————————— App.vue                     project root component
-——————————— main.ts                     Project packaging portal
-—————————————————— index.html           Project page
-—————————————————— package.json         Package management profile for your project
-—————————————————— vite.config.ts       Project configuration file
-—————————————————— postcss.config.ts    postcss configuration file
+```plaintext
+├── public/                    # Static assets
+├── src/                       # Source code root
+│   ├── api/                   # API request functions
+│   ├── assets/                # Static assets 
+│   ├── components/            # Reusable component directory
+│   │   ├── base/              # Basic UI components
+│   │   ├── common/            # Common composite components
+│   ├── composables/           # Vue composables 
+│   ├── directives/            # Custom directives
+│   ├── features/              # Feature-based components
+│   ├── layouts/               # Layout components
+│   ├── locales/               # locale files (i18n)
+│   ├── pages/                 # Page components
+│   ├── plugins/               # Plugins and global registrations
+│   ├── router/                # Routing configuration
+│   ├── store/                 # Global state management
+│   ├── styles/                # Global styles
+│   ├── types/                 # Global TypeScript declarations (.d.ts)
+│   ├── utils/                 # Utility functions
+│   ├── tests/                 # Unit and integration tests
+│   ├── App.vue                # Root component
+│   └── main.ts                # Project entry point
+├── index.html                 # HTML template
+├── package.json               # Project metadata and dependencies
+├── tsconfig.json              # TypeScript config file
+├── vite.config.ts             # Vite config
+├── postcss.config.ts          # PostCSS config
+└── vitest.config.ts           # Vitest config
 ```

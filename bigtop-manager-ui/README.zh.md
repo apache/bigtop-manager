@@ -21,37 +21,43 @@ Bigtop-Manager-ui是Manager平台的前端UI，存放有关平台与用户交互
 
 ## 先决条件
 
-Vite：版本4.4.5
+Vite：版本5.4.19
 
-Typescript：版本5.0.2
+Typescript：版本5.8.3
 
-Vue：版本3.3.4
+Vue：版本3.4.37
 
 编辑器：VsCode
 
 ## 项目结构
 
-```
-——————————————————public                公共静态资源
-——————————————————src                   项目源代码
-——————————— api                         调用后端接口
-——————————— assets                      静态资源
-——————————— components                  自定义组件
-——————————— composables                 组合式函数
-——————————— directives                  自定义指令
-——————————— layouts                     整体页面布局
-——————————— locales                     国际化
-——————————— pages                       组件
-——————————— plugins                     全局注册配置
-——————————— router                      路由
-——————————— store                       全局持久化
-——————————— styles                      样式文件
-——————————— types                       数据类型
-——————————— utils                       工具函数
-——————————— App.vue                     项目根组件
-——————————— main.ts                     项目打包入口
-—————————————————— index.html           项目页面
-—————————————————— package.json         项目的包管理配置文件
-—————————————————— vite.config.ts       项目配置文件
-—————————————————— postcss.config.ts    postcss 配置文件
+```plaintext
+├── public/                    # 公共静态资源
+├── src/                       # 项目源代码目录
+│   ├── api/                   # 后端接口封装
+│   ├── assets/                # 静态资源
+│   ├── components/            # 可复用组件目录
+│   │   ├── base/              # 基础组件
+│   │   ├── common/            # 常用复合组件
+│   ├── composables/           # Vue 组合式函数
+│   ├── directives/            # 自定义指令
+│   ├── features/              # 业务组件
+│   ├── layouts/               # 页面布局组件
+│   ├── locales/               # 国际化资源（i18n）
+│   ├── pages/                 # 页面级组件
+│   ├── plugins/               # 插件与全局注册逻辑
+│   ├── router/                # 路由配置
+│   ├── store/                 # 全局状态管理
+│   ├── styles/                # 全局样式
+│   ├── types/                 # 全局类型声明（.d.ts）
+│   ├── utils/                 # 工具函数
+│   ├── tests/                 # 单元测试或集成测试用例
+│   ├── App.vue                # 根组件
+│   └── main.ts                # 项目入口文件
+├── index.html                 # HTML 模板文件
+├── package.json               # 包管理与脚本配置文件
+├── tsconfig.json              # TypeScript 配置文件
+├── vite.config.ts             # Vite 配置文件
+├── postcss.config.ts          # PostCSS 配置
+└── vitest.config.ts           # Vitest 测试配置文件
 ```
