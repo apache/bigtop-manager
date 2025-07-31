@@ -15,19 +15,23 @@
    limitations under the License.
 --->
 
-# Bigtop-Manager-ui
+# Bigtop Manager UI 
 
-Bigtop-Manager-ui是Manager平台的前端UI，存放有关平台与用户交互，界面展示，控件样式等代码。
+Bigtop Manager UI 是 Manager 平台的前端 UI，存放有关平台与用户交互，界面展示，控件样式等代码。
 
 ## 先决条件
 
-Vite：版本5.4.19
+- Node.js：`v18.17.0`
 
-Typescript：版本5.8.3
+- pnpm: `v8.6.9`
 
-Vue：版本3.4.37
+- Vite：`v5.4.19`
 
-编辑器：VsCode
+- Typescript：`v5.8.3`
+
+- Vue：`v3.4.37`
+
+- 推荐编辑器：[Visual Studio Code](https://code.visualstudio.com/)
 
 ## 项目结构
 

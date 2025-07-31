@@ -15,19 +15,23 @@
    limitations under the License.
 --->
 
-# Bigtop-Manager-ui
+# Bigtop Manager UI 
 
-Bigtop-Manager-ui is the front-end UI of the Manager platform, which stores code about the interaction between the platform and users, interface display, control styles, etc.
+Bigtop Manager UI is the front-end UI of the Manager platform, which stores code about the interaction between the platform and users, interface display, control styles, etc.
 
 ## Prerequisites
 
-Vite: Version 5.4.19
+- Node.js：`v18.17.0`
 
-Typescript: Version 5.8.3
+- pnpm: `v8.6.9`
 
-Vue: Version 3.4.37
+- Vite：`v5.4.19`
 
-Editor: VsCode
+- Typescript：`v5.8.3`
+
+- Vue：`v3.4.37`
+
+- Editor Recommendation: [Visual Studio Code](https://code.visualstudio.com/)
 
 ## Project Structure
 
