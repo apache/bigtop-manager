@@ -20,7 +20,9 @@ package org.apache.bigtop.manager.server.model.converter;
 
 import org.apache.bigtop.manager.dao.po.UserPO;
 import org.apache.bigtop.manager.server.config.MapStructSharedConfig;
+import org.apache.bigtop.manager.server.model.dto.ChangePasswordDTO;
 import org.apache.bigtop.manager.server.model.dto.UserDTO;
+import org.apache.bigtop.manager.server.model.req.ChangePasswordReq;
 import org.apache.bigtop.manager.server.model.req.UserReq;
 import org.apache.bigtop.manager.server.model.vo.UserVO;
 
@@ -38,4 +40,6 @@ public interface UserConverter {
     UserVO fromPO2VO(UserPO userPO);
 
     UserDTO fromReq2DTO(UserReq userReq);
+
+    ChangePasswordDTO fromReq2DTO(ChangePasswordReq changePasswordReq);
 }

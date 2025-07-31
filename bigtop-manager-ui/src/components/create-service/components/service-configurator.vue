@@ -50,7 +50,6 @@
   const debouncedOnSearch = ref()
   const hostPreviewList = ref<ComponentVO[]>([])
   const filterConfigs = ref<ServiceConfig[]>([])
-
   const fieldNames = shallowRef({
     title: 'displayName',
     key: 'name'
