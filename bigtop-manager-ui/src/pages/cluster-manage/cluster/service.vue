@@ -28,7 +28,7 @@
   import { useJobProgress } from '@/store/job-progress'
 
   import type { GroupItem } from '@/components/common/button-group/types'
-  import type { FilterFormItem } from '@/components/common/filter-form/types'
+  import type { FilterFormItem } from '@/components/common/form-filter'
   import type { ServiceListParams, ServiceStatusType, ServiceVO } from '@/api/service/types'
   import type { ClusterVO } from '@/api/cluster/types'
   import type { Command, CommandRequest } from '@/api/command/types'
@@ -52,29 +52,29 @@
     {
       action: 'Start',
       icon: 'start',
-      clickEvent: (item, args) => {
-        handleServiceOperate(item!.action!, args)
+      clickEvent: (item, payload) => {
+        handleServiceOperate(item!.action!, payload)
       }
     },
     {
       action: 'Stop',
       icon: 'stop',
-      clickEvent: (item, args) => {
-        handleServiceOperate(item!.action!, args)
+      clickEvent: (item, payload) => {
+        handleServiceOperate(item!.action!, payload)
       }
     },
     {
       action: 'Restart',
       icon: 'restart',
-      clickEvent: (item, args) => {
-        handleServiceOperate(item!.action!, args)
+      clickEvent: (item, payload) => {
+        handleServiceOperate(item!.action!, payload)
       }
     },
     {
       action: 'More',
       icon: 'more-line',
-      clickEvent: (item, args) => {
-        handleServiceOperate(item!.action!, args)
+      clickEvent: (item, payload) => {
+        handleServiceOperate(item!.action!, payload)
       }
     }
   ])
@@ -99,9 +99,9 @@
       key: 'status',
       label: t('common.status'),
       options: [
-        { label: t(`common.${statusColors.value[1]}`), value: 1 },
-        { label: t(`common.${statusColors.value[2]}`), value: 2 },
-        { label: t(`common.${statusColors.value[3]}`), value: 3 }
+        { label: t('common.healthy'), value: 1 },
+        { label: t('common.unhealthy'), value: 2 },
+        { label: t('common.unknown'), value: 3 }
       ]
     }
   ])
@@ -114,7 +114,7 @@
         commandLevel: 'service',
         serviceCommands: [{ serviceName: service.name, installed: true }]
       } as CommandRequest
-      jobProgressStore.processCommand(execCommandParams, getServices)
+      jobProgressStore.processCommand(execCommandParams, getServices, { displayName: service.displayName })
     }
   }
 
@@ -136,7 +136,7 @@
 
 <template>
   <a-spin :spinning="loading" class="service">
-    <filter-form :filter-items="filterFormItems" @filter="getServices" />
+    <form-filter :filter-items="filterFormItems" @filter="getServices" />
     <a-empty v-if="services.length == 0" style="width: 100%" :image="Empty.PRESENTED_IMAGE_SIMPLE" />
     <div v-else class="service-item-wrp">
       <a-card

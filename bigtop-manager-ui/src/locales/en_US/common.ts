@@ -125,5 +125,7 @@ export default {
   selected: 'Selected',
   feature_not_supported: 'Feature not supported yet',
   installing_exit_confirm_content:
-    'Installation is in progress, exiting the page will cause the installation to fail. Are you sure you want to exit?'
+    'Installation is in progress, exiting the page will cause the installation to fail. Are you sure you want to exit?',
+  confirm_action: 'Are you sure you want to {action} {target} ?',
+  confirm_comp_action: 'Are you sure you want to {action} selected components ?'
 }

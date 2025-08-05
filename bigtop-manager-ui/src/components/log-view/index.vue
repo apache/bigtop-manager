@@ -157,6 +157,7 @@
   <a-modal
     :width="$props.width || '60%'"
     style="min-width: 400px"
+    :centered="true"
     :mask="false"
     :open="open"
     :z-index="99999"

@@ -19,9 +19,9 @@
 
 import { mount } from '@vue/test-utils'
 import { describe, it, expect } from 'vitest'
-import FilterForm from '../../src/components/common/filter-form/index.vue'
+import FormFilter from '../../src/components/common/form-filter/index.vue'
 
-describe('FilterForm.vue', () => {
+describe('FormFilter.vue', () => {
   const filterItems = [
     {
       key: 'status',
@@ -40,7 +40,7 @@ describe('FilterForm.vue', () => {
   ]
 
   it('renders filter items correctly', () => {
-    const wrapper = mount(FilterForm, {
+    const wrapper = mount(FormFilter, {
       props: {
         filterItems
       },
@@ -57,7 +57,7 @@ describe('FilterForm.vue', () => {
   })
 
   it('emits filter event with correct parameters', async () => {
-    const wrapper = mount(FilterForm, {
+    const wrapper = mount(FormFilter, {
       props: {
         filterItems
       },
@@ -79,7 +79,7 @@ describe('FilterForm.vue', () => {
   })
 
   it('resets filter correctly', async () => {
-    const wrapper = mount(FilterForm, {
+    const wrapper = mount(FormFilter, {
       props: {
         filterItems
       },

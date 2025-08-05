@@ -16,13 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.bigtop.manager.server.model.dto;
 
-import AutoForm from '@/components/common/auto-form/index.vue'
-import { FormBuilder } from '@/components/common/form-builder'
+import lombok.Data;
 
-declare global {
-  namespace Comp {
-    type AutoFormInstance = InstanceType<typeof AutoForm>
-    type FormBuilderInstance = InstanceType<typeof FormBuilder>
-  }
+@Data
+public class ChangePasswordDTO {
+
+    private String password;
+
+    private String newPassword;
+
+    private String confirmPassword;
 }

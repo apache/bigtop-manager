@@ -26,6 +26,7 @@ export default defineConfig((configEnv) =>
     viteConfig(configEnv),
     defineConfig({
       test: {
+        // silent: false, // Show test results in console
         globals: true, // Open global testing API similar to jest
         include: ['**/tests/**/*.test.ts'], //  Match directory structure
         environment: 'happy-dom' // Use happy-dom to simulate DOM

@@ -89,6 +89,10 @@ html {
   max-width: 100% !important;
 }
 
+:where(.ant-modal-header) {
+  margin-bottom: 24px !important;
+}
+
 .ellipsis {
   white-space: nowrap;
   overflow: hidden;

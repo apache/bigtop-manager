@@ -27,7 +27,7 @@ export default {
   name: 'Name',
   display_name: 'Display Name',
   description: 'Description',
-  root_directory: 'Root Directory',
+  root_dir: 'Root Dir',
   user_group: 'User Group',
   config_source: 'Repository',
   install_dependencies: 'Install Dependencies',

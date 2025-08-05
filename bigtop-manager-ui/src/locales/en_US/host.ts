@@ -30,7 +30,7 @@ export default {
   key_password: 'Key Password',
   confirm_key_password: 'Confirm Key Password',
   username: 'Username',
-  auth_method: 'Authentication Method',
+  auth_method: 'Auth Method',
   password_auth: 'Password',
   key_auth: 'Key',
   ip_address: 'IP Address',

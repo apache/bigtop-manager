@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
   import { message, Modal, TableColumnType, TableProps } from 'ant-design-vue'
-  import { computed, onMounted, onUnmounted, reactive, ref, shallowRef } from 'vue'
+  import { computed, onMounted, onUnmounted, reactive, h, ref, shallowRef } from 'vue'
   import { useRouter } from 'vue-router'
   import { useI18n } from 'vue-i18n'
 
@@ -29,6 +29,7 @@
   import useBaseTable from '@/composables/use-base-table'
   import HostCreate from '@/components/create-host/index.vue'
   import InstallDependencies from '@/components/create-host/install-dependencies.vue'
+  import SvgIcon from '@/components/common/svg-icon/index.vue'
 
   import type { FilterConfirmProps, FilterResetProps, TableRowSelection } from 'ant-design-vue/es/table/interface'
   import type { HostReq } from '@/api/command/types'
@@ -222,7 +223,13 @@
 
   const deleteHost = (ids: number[]) => {
     Modal.confirm({
-      title: ids.length > 1 ? t('common.delete_msgs') : t('common.delete_msg'),
+      title: () =>
+        h('div', { style: { display: 'flex' } }, [
+          h(SvgIcon, { name: 'unknown', style: { width: '24px', height: '24px' } }),
+          h('p', ids.length > 1 ? t('common.delete_msgs') : t('common.delete_msg'))
+        ]),
+      style: { top: '30vh' },
+      icon: null,
       async onOk() {
         try {
           const data = await hostApi.removeHost({ ids })

@@ -17,14 +17,17 @@
   ~ under the License.
   -->
 <script setup lang="ts">
-  import { ref, shallowReactive, shallowRef, toRefs, watch } from 'vue'
+  import { ref, shallowReactive, shallowRef, h, toRefs, watch } from 'vue'
   import { useAiChatStore } from '@/store/ai-assistant'
   import { storeToRefs } from 'pinia'
-  import { formatTime } from '@/utils/tools'
+  import { formatTime } from '@/utils/transform'
   import { EllipsisOutlined } from '@ant-design/icons-vue'
-  import type { ChatThread, ThreadId } from '@/api/ai-assistant/types'
   import { message, Modal, Empty } from 'ant-design-vue'
   import { useI18n } from 'vue-i18n'
+
+  import SvgIcon from '@/components/common/svg-icon/index.vue'
+
+  import type { ChatThread, ThreadId } from '@/api/ai-assistant/types'
 
   interface Props {
     historyType: 'large' | 'small'
@@ -99,7 +102,13 @@
 
   const handleDeleteConfirm = (thread: ChatThread, idx: number) => {
     Modal.confirm({
-      title: t('common.delete_msg'),
+      title: () =>
+        h('div', { style: { display: 'flex' } }, [
+          h(SvgIcon, { name: 'unknown', style: { width: '24px', height: '24px' } }),
+          h('p', t('common.delete_msg'))
+        ]),
+      style: { top: '30vh' },
+      icon: null,
       async onOk() {
         const success = await aiChatStore.deleteChatThread(thread)
         if (success) {

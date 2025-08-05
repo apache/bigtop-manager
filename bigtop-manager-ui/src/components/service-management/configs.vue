@@ -19,17 +19,20 @@
 
 <script setup lang="ts">
   import { onActivated, inject, useAttrs, shallowRef, ref, onDeactivated } from 'vue'
-  import { debounce } from 'lodash'
+  import { debounce } from 'lodash-es'
   import { useI18n } from 'vue-i18n'
   import { Empty, message } from 'ant-design-vue'
   import { updateServiceConfigs } from '@/api/service'
   import CaptureSnapshot from './components/capture-snapshot.vue'
   import SnapshotManagement from './components/snapshot-management.vue'
+
   import type { Property, ServiceConfig, ServiceVO } from '@/api/service/types'
 
   const { t } = useI18n()
   const attrs = useAttrs() as unknown as Required<ServiceVO> & { clusterId: number }
+
   const getServiceDetail = inject('getServiceDetail') as () => any
+
   const searchStr = ref('')
   const loading = ref(false)
   const activeKey = ref<number[]>([])
@@ -38,6 +41,7 @@
   const captureRef = ref<InstanceType<typeof CaptureSnapshot>>()
   const snapshotRef = ref<InstanceType<typeof SnapshotManagement>>()
   const debouncedOnSearch = ref()
+
   const layout = shallowRef({
     labelCol: {
       xs: { span: 23 },
@@ -76,17 +80,35 @@
   const filterConfigurations = () => {
     if (!searchStr.value) {
       filterConfigs.value = configs.value
+      return
     }
-    const lowerSearchTerm = searchStr.value.toLowerCase()
-    filterConfigs.value = configs.value.filter((config) => {
-      return config.properties?.some((property) => {
-        return (
-          (property.displayName || '').toLowerCase().includes(lowerSearchTerm) ||
-          property.name.toLowerCase().includes(lowerSearchTerm) ||
-          (property.value && property.value.toString().toLowerCase().includes(lowerSearchTerm))
-        )
+
+    filterConfigs.value = getSearchConfig(configs.value, searchStr.value)
+  }
+
+  const getSearchConfig = (data: ServiceConfig[], keyword: string): ServiceConfig[] => {
+    const lowerKeyword = keyword.toLowerCase()
+
+    return data
+      .map((item) => {
+        const matchedProp = item.properties?.filter(({ name, displayName, value = '' }) => {
+          return (
+            name.toLowerCase().includes(lowerKeyword) ||
+            value.toLowerCase().includes(lowerKeyword) ||
+            displayName?.toLowerCase().includes(lowerKeyword)
+          )
+        })
+
+        if (matchedProp && matchedProp.length > 0) {
+          return {
+            ...item,
+            properties: matchedProp
+          }
+        }
+
+        return null
       })
-    })
+      .filter(Boolean) as ServiceConfig[]
   }
 
   const saveConfigs = async () => {
@@ -138,6 +160,7 @@
         </a-space>
         <a-input
           v-model:value="searchStr"
+          :allow-clear="true"
           :placeholder="$t('service.please_enter_search_keyword')"
           @input="debouncedOnSearch"
         />
@@ -170,7 +193,7 @@
                   <a-textarea
                     v-if="property.isManual"
                     v-model:value="property.name"
-                    :auto-size="{ minRows: 1, maxRows: 5 }"
+                    :auto-size="{ minRows: 1, maxRows: 30 }"
                   />
                   <span v-else style="overflow-wrap: break-word" :title="property.displayName ?? property.name">
                     {{ property.displayName ?? property.name }}
@@ -179,7 +202,7 @@
               </a-col>
               <a-col v-bind="layout.wrapperCol">
                 <a-form-item>
-                  <a-textarea v-model:value="property.value" :auto-size="{ minRows: 1, maxRows: 5 }" />
+                  <a-textarea v-model:value="property.value" :rows="property?.attrs?.type === 'longtext' ? 10 : 1" />
                 </a-form-item>
               </a-col>
               <a-button type="text" shape="circle" @click="removeProperty(property, config)">
@@ -215,8 +238,8 @@
       display: flex;
       justify-content: space-between;
       gap: 16px;
-      .ant-input {
-        flex: 0 1 160px;
+      .ant-input-affix-wrapper {
+        flex: 0 1 260px;
       }
     }
     :deep(.ant-collapse-header) {

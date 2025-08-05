@@ -88,9 +88,9 @@
   /**
    * Handles dropdown menu click events for cluster operations.
    */
-  const dropdownMenuClick: GroupItem['dropdownMenuClickEvent'] = async ({ key }) => {
+  const dropdownMenuClick: GroupItem['dropdownMenuClickEvent'] = ({ key }) => {
     try {
-      await jobProgressStore.processCommand(
+      jobProgressStore.processCommand(
         {
           command: key as keyof typeof Command,
           clusterId: clusterInfo.value.id,
@@ -98,12 +98,12 @@
         },
         async () => {
           await clusterStore.loadClusters()
-        }
+          await clusterStore.getClusterDetail(clusterInfo.value.id!)
+        },
+        { displayName: clusterInfo.value.displayName }
       )
     } catch (error) {
       console.error('Error processing command:', error)
-    } finally {
-      await clusterStore.getClusterDetail(clusterInfo.value.id!)
     }
   }
 

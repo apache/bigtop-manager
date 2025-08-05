@@ -26,12 +26,10 @@
   import { useI18n } from 'vue-i18n'
   import SelectLang from '@/components/select-lang/login-lang.vue'
   import { deriveKey } from '@/utils/pbkdf2.ts'
-  import { useStackStore } from '@/store/stack'
   import { useUserStore } from '@/store/user'
   import { useMenuStore } from '@/store/menu'
 
   const i18n = useI18n()
-  const stackStore = useStackStore()
   const userStore = useUserStore()
   const menuStore = useMenuStore()
 
@@ -75,7 +73,6 @@
         sessionStorage.setItem('Token', res.token)
       }
       userStore.getUserInfo()
-      stackStore.loadStacks()
       menuStore.setupMenu()
 
       message.success(i18n.t('login.login_success'))

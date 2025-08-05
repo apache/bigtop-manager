@@ -18,6 +18,7 @@
  */
 package org.apache.bigtop.manager.server.service;
 
+import org.apache.bigtop.manager.server.model.dto.ChangePasswordDTO;
 import org.apache.bigtop.manager.server.model.dto.UserDTO;
 import org.apache.bigtop.manager.server.model.vo.UserVO;
 
@@ -36,4 +37,11 @@ public interface UserService {
      * @return user
      */
     UserVO update(UserDTO userDTO);
+
+    /**
+     * Change password
+     *
+     * @param changePasswordDTO changePasswordDTO
+     */
+    UserVO changePassword(ChangePasswordDTO changePasswordDTO);
 }

@@ -96,6 +96,7 @@
   <div>
     <a-modal
       v-model:open="open"
+      :centered="true"
       :title="$t('common.edit')"
       :mask-closable="false"
       :closable="false"

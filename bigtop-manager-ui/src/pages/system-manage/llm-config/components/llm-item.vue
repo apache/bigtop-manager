@@ -22,7 +22,6 @@
   import {
     AuthPlatformStatus,
     LlmLogo,
-    type LlmLogoFlag,
     type AuthorizedPlatform,
     type AuthorizedPlatformDesc,
     type AuthPlatformStatusType
@@ -176,12 +175,7 @@
       <a-skeleton active :loading="loading">
         <div class="llm-card-header">
           <div class="llm-card-header-left">
-            <a-image
-              :width="24"
-              :height="24"
-              :preview="false"
-              :src="usePngImage(LlmLogo[llmConfig.platformId as LlmLogoFlag])"
-            />
+            <a-image :width="24" :height="24" :preview="false" :src="usePngImage(LlmLogo[llmConfig.platformId])" />
             <a-typography-text
               class="llm-card-header-left-text"
               :ellipsis="llmConfig?.name ? { tooltip: llmConfig?.name } : false"
