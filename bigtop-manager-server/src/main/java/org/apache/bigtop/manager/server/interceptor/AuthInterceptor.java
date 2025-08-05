@@ -23,6 +23,7 @@ import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.holder.SessionUserHolder;
 import org.apache.bigtop.manager.server.model.vo.UserVO;
 import org.apache.bigtop.manager.server.service.UserService;
+import org.apache.bigtop.manager.server.utils.CacheUtils;
 import org.apache.bigtop.manager.server.utils.JWTUtils;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
 
@@ -38,6 +39,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class AuthInterceptor implements HandlerInterceptor {
@@ -92,14 +94,20 @@ public class AuthInterceptor implements HandlerInterceptor {
                     decodedJWT.getClaim(JWTUtils.CLAIM_TOKEN_VERSION).asInt();
 
             // Check if the user exists
-            UserVO userVO = userService.get(userId);
+            CacheUtils.initCache(1, TimeUnit.DAYS);
+            UserVO userVO = CacheUtils.getCache(userId.toString(), UserVO.class);
             if (userVO == null) {
-                responseEntity = ResponseEntity.error(ApiExceptionEnum.NEED_LOGIN);
-                return false;
+                userVO = userService.get(userId);
+                if (userVO == null) {
+                    responseEntity = ResponseEntity.error(ApiExceptionEnum.NEED_LOGIN);
+                    return false;
+                }
+                CacheUtils.setCache(userId.toString(), userVO);
             }
 
             // Check if the token version matches
             if (!Objects.equals(tokenVersion, userVO.getTokenVersion())) {
+                CacheUtils.removeCache(userId.toString());
                 responseEntity = ResponseEntity.error(ApiExceptionEnum.NEED_LOGIN);
                 return false;
             }

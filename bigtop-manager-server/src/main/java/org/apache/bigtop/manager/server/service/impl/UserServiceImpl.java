@@ -28,6 +28,7 @@ import org.apache.bigtop.manager.server.model.dto.ChangePasswordDTO;
 import org.apache.bigtop.manager.server.model.dto.UserDTO;
 import org.apache.bigtop.manager.server.model.vo.UserVO;
 import org.apache.bigtop.manager.server.service.UserService;
+import org.apache.bigtop.manager.server.utils.CacheUtils;
 import org.apache.bigtop.manager.server.utils.PasswordUtils;
 import org.apache.bigtop.manager.server.utils.Pbkdf2Utils;
 
@@ -85,6 +86,9 @@ public class UserServiceImpl implements UserService {
         userPO.setPassword(newPassword);
         userPO.setTokenVersion(userPO.getTokenVersion() + 1);
         userDao.partialUpdateById(userPO);
+
+        // Proactively clear the user's cache to ensure that the next request takes effect immediately
+        CacheUtils.removeCache(id.toString());
         return UserConverter.INSTANCE.fromPO2VO(userPO);
     }
 }

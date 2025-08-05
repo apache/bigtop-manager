@@ -31,12 +31,55 @@ import java.util.concurrent.TimeUnit;
 public class CacheUtils {
 
     /**
-     * Create cache, expires in 5 minutes, maximum capacity 10000
+     * Default cache configuration
      */
-    private static final Cache<String, String> CACHE = CacheBuilder.newBuilder()
-            .expireAfterWrite(5, TimeUnit.MINUTES)
-            .maximumSize(10000)
-            .build();
+    private static final int DEFAULT_EXPIRE_TIME = 5;
+
+    private static final TimeUnit DEFAULT_TIME_UNIT = TimeUnit.MINUTES;
+    private static final int DEFAULT_MAXIMUM_SIZE = 10000;
+
+    /**
+     * Cache instance
+     */
+    private static Cache<String, Object> CACHE;
+
+    static {
+        // Static init with default configuration
+        initCache(DEFAULT_EXPIRE_TIME, DEFAULT_TIME_UNIT, DEFAULT_MAXIMUM_SIZE);
+    }
+
+    /**
+     * Initialize cache with custom configuration
+     *
+     * @param expireTime  expire time
+     * @param timeUnit    time unit
+     * @param maximumSize maximum cache size
+     */
+    public static synchronized void initCache(int expireTime, TimeUnit timeUnit, int maximumSize) {
+        CACHE = CacheBuilder.newBuilder()
+                .expireAfterWrite(expireTime, timeUnit)
+                .maximumSize(maximumSize)
+                .build();
+    }
+
+    /**
+     * Initialize cache with custom expire time (in minutes) and default size
+     *
+     * @param expireMinutes expire time in minutes
+     */
+    public static void initCache(int expireMinutes) {
+        initCache(expireMinutes, TimeUnit.MINUTES, DEFAULT_MAXIMUM_SIZE);
+    }
+
+    /**
+     * Initialize cache with custom expire time and time unit, using default size
+     *
+     * @param expireTime expire time
+     * @param timeUnit   time unit
+     */
+    public static void initCache(int expireTime, TimeUnit timeUnit) {
+        initCache(expireTime, timeUnit, DEFAULT_MAXIMUM_SIZE);
+    }
 
     /**
      * Store cache
@@ -44,7 +87,7 @@ public class CacheUtils {
      * @param key   cache key
      * @param value cache value
      */
-    public static void setCache(String key, String value) {
+    public static void setCache(String key, Object value) {
         if (StringUtils.isBlank(key) || value == null) {
             return;
         }
@@ -57,11 +100,31 @@ public class CacheUtils {
      * @param key cache key
      * @return cache value (returns null if not found or expired)
      */
-    public static String getCache(String key) {
+    public static Object getCache(String key) {
         if (StringUtils.isBlank(key)) {
             return null;
         }
         return CACHE.getIfPresent(key);
+    }
+
+    /**
+     * Get cache with type safety
+     *
+     * @param key   cache key
+     * @param clazz expected class type
+     * @param <T>   generic type
+     * @return cache value of specified type (returns null if not found, expired or type mismatch)
+     */
+    public static <T> T getCache(String key, Class<T> clazz) {
+        if (StringUtils.isBlank(key) || clazz == null) {
+            return null;
+        }
+
+        Object value = getCache(key);
+        if (clazz.isInstance(value)) {
+            return clazz.cast(value);
+        }
+        return null;
     }
 
     /**

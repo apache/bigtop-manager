@@ -54,7 +54,7 @@ public class LoginServiceImpl implements LoginService {
             throw new ApiException(ApiExceptionEnum.USER_IS_DISABLED);
         }
 
-        String cache = CacheUtils.getCache(username);
+        String cache = CacheUtils.getCache(username, String.class);
         if (cache == null || !cache.equals(nonce)) {
             throw new ApiException(ApiExceptionEnum.INCORRECT_USERNAME_OR_PASSWORD);
         }
