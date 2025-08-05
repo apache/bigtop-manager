@@ -19,7 +19,6 @@
 
 <script setup lang="ts">
   import { MenuProps } from 'ant-design-vue'
-  import { ref, toRefs, computed, shallowRef, toRaw } from 'vue'
   import { isEqual, cloneDeep } from 'lodash-es'
   import type { FilterFormItem } from './types'
 
@@ -27,6 +26,7 @@
     filterItems: FilterFormItem[]
   }
 
+  const { t } = useI18n()
   const props = defineProps<FilterFormPops>()
   const emits = defineEmits(['filter'])
   const { filterItems } = toRefs(props)
@@ -98,7 +98,7 @@
                 <a-menu-item
                   v-for="menuItem in item.options"
                   :id="item.key"
-                  :key="menuItem.key"
+                  :key="menuItem.key as any"
                   :title="menuItem.label"
                   @click.stop
                 >
@@ -113,10 +113,10 @@
                     type="link"
                     @click.stop="resetFilter(item)"
                   >
-                    {{ $t('common.reset') }}
+                    {{ t('common.reset') }}
                   </a-button>
                   <a-button size="small" type="primary" @click="confirmFilterParams">
-                    {{ $t('common.ok') }}
+                    {{ t('common.ok') }}
                   </a-button>
                 </a-space>
               </a-menu>
@@ -126,12 +126,12 @@
             <div class="search" @click.stop>
               <a-input
                 v-model:value="filterParams[item.key]"
-                :placeholder="`${$t('common.enter_error')}${item.label.toLowerCase()}`"
+                :placeholder="`${t('common.enter_error')}${item.label.toLowerCase()}`"
                 @click.stop
               />
               <a-space class="search-option">
-                <a-button size="small" @click.stop="resetFilter(item)">{{ $t('common.reset') }}</a-button>
-                <a-button size="small" type="primary" @click="confirmFilterParams">{{ $t('common.search') }}</a-button>
+                <a-button size="small" @click.stop="resetFilter(item)">{{ t('common.reset') }}</a-button>
+                <a-button size="small" type="primary" @click="confirmFilterParams">{{ t('common.search') }}</a-button>
               </a-space>
             </div>
           </template>

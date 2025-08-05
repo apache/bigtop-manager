@@ -17,9 +17,7 @@
  * under the License.
  */
 
-import { defineStore } from 'pinia'
 import { getCurrentUser, updateUser } from '@/api/user'
-import { shallowRef } from 'vue'
 import { UserReq, UserVO } from '@/api/user/types.ts'
 
 export const useUserStore = defineStore(

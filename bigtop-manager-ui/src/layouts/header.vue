@@ -18,16 +18,15 @@
 -->
 
 <script setup lang="ts">
-  import { ref } from 'vue'
-  import { storeToRefs } from 'pinia'
   import { useMenuStore } from '@/store/menu/index'
-  import SelectLang from '@/components/select-lang/index.vue'
-  import UserAvatar from '@/components/user-avatar/index.vue'
-  import AiAssistant from '@/components/ai-assistant/index.vue'
+  import AiAssistant from '@/features/ai-assistant/index.vue'
 
   const githubUrl = import.meta.env.VITE_GITHUB_URL
   const bigtopMangerDocURL = import.meta.env.VITE_BIGTOP_MANAGER_DOC_URL
+
+  const { t } = useI18n()
   const menuStore = useMenuStore()
+
   const spaceSize = ref(16)
   const aiAssistantRef = ref<InstanceType<typeof AiAssistant> | null>(null)
   const { headerSelectedKey, headerMenus } = storeToRefs(menuStore)
@@ -47,10 +46,10 @@
         :selected-keys="[headerSelectedKey]"
         theme="dark"
         mode="horizontal"
-        @select="({ key }) => menuStore.onHeaderClick(key)"
+        @select="({ key }) => menuStore.onHeaderClick(key as string)"
       >
         <a-menu-item v-for="route of headerMenus" :key="route.path">
-          {{ $t(route.meta?.title || '') }}
+          {{ t(route.meta?.title || '') }}
         </a-menu-item>
       </a-menu>
     </div>

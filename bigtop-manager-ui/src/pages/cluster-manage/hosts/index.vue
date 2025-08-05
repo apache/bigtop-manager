@@ -19,17 +19,14 @@
 
 <script setup lang="ts">
   import { message, Modal, TableColumnType, TableProps } from 'ant-design-vue'
-  import { computed, onMounted, onUnmounted, reactive, h, ref, shallowRef } from 'vue'
-  import { useRouter } from 'vue-router'
-  import { useI18n } from 'vue-i18n'
 
   import { useClusterStore } from '@/store/cluster'
   import * as hostApi from '@/api/hosts'
 
   import useBaseTable from '@/composables/use-base-table'
-  import HostCreate from '@/components/create-host/index.vue'
-  import InstallDependencies from '@/components/create-host/install-dependencies.vue'
-  import SvgIcon from '@/components/common/svg-icon/index.vue'
+  import HostCreate from '@/features/create-host/index.vue'
+  import InstallDependencies from '@/features/create-host/install-dependencies.vue'
+  import SvgIcon from '@/components/base/svg-icon/index.vue'
 
   import type { FilterConfirmProps, FilterResetProps, TableRowSelection } from 'ant-design-vue/es/table/interface'
   import type { HostReq } from '@/api/command/types'
@@ -287,10 +284,10 @@
 
 <template>
   <div class="host-list">
-    <div class="title">{{ $t('host.host_list') }}</div>
+    <div class="title">{{ t('host.host_list') }}</div>
     <a-space :size="16">
-      <a-button type="primary" @click="addHost">{{ $t('cluster.add_host') }}</a-button>
-      <a-button type="primary" danger @click="bulkRemove">{{ $t('common.bulk_remove') }}</a-button>
+      <a-button type="primary" @click="addHost">{{ t('cluster.add_host') }}</a-button>
+      <a-button type="primary" danger @click="bulkRemove">{{ t('common.bulk_remove') }}</a-button>
     </a-space>
     <a-table
       :loading="loading"
@@ -306,17 +303,17 @@
         <div class="search">
           <a-input
             ref="searchInputRef"
-            :placeholder="$t('common.enter_error', [column.title])"
+            :placeholder="t('common.enter_error', [column.title])"
             :value="selectedKeys[0]"
             @change="(e: any) => setSelectedKeys(e.target?.value ? [e.target?.value] : [])"
             @press-enter="handleSearch(selectedKeys, confirm, column.dataIndex)"
           />
           <div class="search-option">
             <a-button size="small" @click="handleReset(clearFilters)">
-              {{ $t('common.reset') }}
+              {{ t('common.reset') }}
             </a-button>
             <a-button type="primary" size="small" @click="handleSearch(selectedKeys, confirm, column.dataIndex)">
-              {{ $t('common.search') }}
+              {{ t('common.search') }}
             </a-button>
           </div>
         </div>
@@ -336,12 +333,12 @@
         </template>
         <template v-if="column.key === 'componentNum'">
           <span :title="record.componentNum">
-            {{ `${record.componentNum} ${$t('host.component_count_quantifier')}` }}
+            {{ `${record.componentNum} ${t('host.component_count_quantifier')}` }}
           </span>
         </template>
         <template v-if="column.key === 'status'">
           <svg-icon style="margin-left: 0" :name="hostStatus[record.status].toLowerCase()" />
-          <span>{{ $t(`common.${hostStatus[record.status].toLowerCase()}`) }}</span>
+          <span>{{ t(`common.${hostStatus[record.status].toLowerCase()}`) }}</span>
         </template>
         <template v-if="column.key === 'operation'">
           <button-group

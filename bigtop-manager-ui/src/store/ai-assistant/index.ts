@@ -19,11 +19,10 @@
 
 import dayjs from 'dayjs'
 import * as ai from '@/api/ai-assistant/index'
-import { defineStore, storeToRefs } from 'pinia'
-import { computed, ref, watch } from 'vue'
 import { SenderType } from '@/api/ai-assistant/types'
 import { getRandomFromTimestamp } from '@/utils/tools'
 import { useLlmConfigStore } from '../llm-config'
+
 import type { AxiosProgressEvent, Canceler } from 'axios'
 import type { ChatMessageItem, ChatThread, ReceivedMessageItem, ThreadId } from '@/api/ai-assistant/types'
 

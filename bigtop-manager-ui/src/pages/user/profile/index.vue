@@ -18,14 +18,11 @@
 -->
 
 <script setup lang="ts">
-  import { ref, reactive, watch, onMounted } from 'vue'
   import { FormInstance, message } from 'ant-design-vue'
-  import { storeToRefs } from 'pinia'
-  import { useI18n } from 'vue-i18n'
   import { useUserStore } from '@/store/user'
   import { UserReq } from '@/api/user/types.ts'
 
-  const i18n = useI18n()
+  const { t } = useI18n()
   const userStore = useUserStore()
   const { userVO } = storeToRefs(userStore)
   const editUser = reactive<UserReq>({} as UserReq)
@@ -48,9 +45,9 @@
       await formRef.value?.validate()
       await userStore.updateUserInfo(editUser)
       open.value = false
-      message.success(i18n.t('common.update_success'))
+      message.success(t('common.update_success'))
     } catch (e) {
-      message.error(i18n.t('common.update_fail'))
+      message.error(t('common.update_fail'))
     } finally {
       loading.value = false
     }
@@ -71,25 +68,25 @@
 </script>
 
 <template>
-  <a-descriptions :title="$t('user.profile')" bordered>
+  <a-descriptions :title="t('user.profile')" bordered>
     <template #extra>
       <a-button type="primary" @click="editProfile">
-        {{ $t('common.edit') }}
+        {{ t('common.edit') }}
       </a-button>
     </template>
-    <a-descriptions-item :label="$t('user.username')" span="3">
+    <a-descriptions-item :label="t('user.username')" :span="3">
       {{ userVO?.username }}
     </a-descriptions-item>
-    <a-descriptions-item :label="$t('user.nickname')" span="3">
+    <a-descriptions-item :label="t('user.nickname')" :span="3">
       {{ userVO?.nickname }}
     </a-descriptions-item>
-    <a-descriptions-item :label="$t('common.create_time')" span="3">
+    <a-descriptions-item :label="t('common.create_time')" :span="3">
       {{ userVO?.createTime }}
     </a-descriptions-item>
-    <a-descriptions-item :label="$t('common.update_time')" span="3">
+    <a-descriptions-item :label="t('common.update_time')" :span="3">
       {{ userVO?.updateTime }}
     </a-descriptions-item>
-    <a-descriptions-item :label="$t('common.status')" span="3">
+    <a-descriptions-item :label="t('common.status')" :span="3">
       {{ userVO?.status }}
     </a-descriptions-item>
   </a-descriptions>
@@ -97,7 +94,7 @@
     <a-modal
       v-model:open="open"
       :centered="true"
-      :title="$t('common.edit')"
+      :title="t('common.edit')"
       :mask-closable="false"
       :closable="false"
       @cancel="cancelEdit"
@@ -105,12 +102,12 @@
       <br />
       <a-form ref="formRef" name="profileForm" :model="editUser" layout="vertical">
         <a-form-item
-          :label="$t('user.nickname')"
+          :label="t('user.nickname')"
           name="nickname"
           :rules="[
             {
               required: true,
-              message: $t('user.set_nickname_valid')
+              message: t('user.set_nickname_valid')
             }
           ]"
         >
@@ -119,7 +116,7 @@
       </a-form>
       <template #footer>
         <a-button key="cancel" @click="cancelEdit">
-          {{ $t('common.cancel') }}
+          {{ t('common.cancel') }}
         </a-button>
         <a-button
           key="submit"
@@ -128,7 +125,7 @@
           html-type="submit"
           @click="updateCurrentUser(editUser)"
         >
-          {{ $t('common.submit') }}
+          {{ t('common.submit') }}
         </a-button>
       </template>
 

@@ -18,13 +18,13 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onMounted, ref, shallowRef } from 'vue'
-  import { useI18n } from 'vue-i18n'
-  import { useRoute } from 'vue-router'
+  import { message } from 'ant-design-vue'
+
   import { getHost } from '@/api/hosts'
   import { CommonStatus, CommonStatusTexts } from '@/enums/state'
-  import { message } from 'ant-design-vue'
+
   import Overview from './overview.vue'
+
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { HostStatusType, HostVO } from '@/api/hosts/types.ts'
 

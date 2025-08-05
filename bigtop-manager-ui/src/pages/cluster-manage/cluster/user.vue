@@ -18,11 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onActivated, useAttrs } from 'vue'
-  import { useI18n } from 'vue-i18n'
   import { getUserListOfService } from '@/api/cluster'
-
-  import useBaseTable from '@/composables/use-base-table'
 
   import type { TableColumnType } from 'ant-design-vue'
   import type { ClusterVO, ServiceUserVO } from '@/api/cluster/types'
@@ -93,7 +89,7 @@
 <template>
   <div class="user">
     <header>
-      <div class="header-title">{{ $t('user.user_list') }}</div>
+      <div class="header-title">{{ t('user.user_list') }}</div>
     </header>
     <a-table
       :loading="loading"

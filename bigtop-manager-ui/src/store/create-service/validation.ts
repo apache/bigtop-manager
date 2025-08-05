@@ -18,10 +18,9 @@
  */
 
 import { message, Modal } from 'ant-design-vue'
-import { h } from 'vue'
-import { useI18n } from 'vue-i18n'
 import { useServiceStore } from '@/store/service'
-import SvgIcon from '@/components/common/svg-icon/index.vue'
+import SvgIcon from '@/components/base/svg-icon/index.vue'
+
 import type { ExpandServiceVO } from '@/store/stack'
 
 export function useValidations() {

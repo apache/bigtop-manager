@@ -17,8 +17,6 @@
  * under the License.
  */
 
-import { defineStore } from 'pinia'
-import { computed, ref } from 'vue'
 import { getService, getServiceList } from '@/api/service'
 import type { ServiceListParams, ServiceVO } from '@/api/service/types'
 

@@ -17,22 +17,19 @@
  * under the License.
  */
 
-import { computed, ref } from 'vue'
-
 const useSteps = (stepList: string[]) => {
   const current = ref(0)
+
   const stepsLimit = computed(() => stepList.length - 1)
+  const hasPrev = computed(() => current.value > 0)
+  const hasNext = computed(() => current.value < stepsLimit.value)
 
   const previousStep = () => {
-    if (current.value > 0) {
-      current.value = current.value - 1
-    }
+    if (hasPrev.value) current.value--
   }
 
   const nextStep = () => {
-    if (current.value < stepsLimit.value) {
-      current.value = current.value + 1
-    }
+    if (hasNext.value) current.value++
   }
 
   return {
