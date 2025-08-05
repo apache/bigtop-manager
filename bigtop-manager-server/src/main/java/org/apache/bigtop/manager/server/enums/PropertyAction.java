@@ -16,27 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.dto;
+package org.apache.bigtop.manager.server.enums;
 
-import org.apache.bigtop.manager.server.enums.PropertyAction;
+import com.fasterxml.jackson.annotation.JsonCreator;
 
-import lombok.Data;
+public enum PropertyAction {
+    ADD,
+    UPDATE,
+    DELETE;
 
-import java.io.Serializable;
-
-@Data
-public class PropertyDTO implements Serializable {
-
-    private String name;
-
-    private String value;
-
-    private String displayName;
-
-    private String desc;
-
-    private AttrsDTO attrs;
-
-    // Only exists in request body
-    private PropertyAction action;
+    @JsonCreator
+    public static PropertyAction fromString(String value) {
+        return PropertyAction.valueOf(value.toUpperCase());
+    }
 }
