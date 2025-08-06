@@ -17,11 +17,10 @@
  * under the License.
  */
 
-import { computed, nextTick, ref, shallowRef } from 'vue'
-import { RouteRecordRaw, useRoute, useRouter } from 'vue-router'
 import { dynamicRoutes as dr } from '@/router/routes/index'
-import { defineStore } from 'pinia'
 import { useClusterStore } from '../cluster'
+
+import type { RouteRecordRaw } from 'vue-router'
 
 export const useMenuStore = defineStore(
   'menu',

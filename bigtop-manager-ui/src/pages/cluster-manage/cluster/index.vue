@@ -18,22 +18,18 @@
 -->
 
 <script setup lang="ts">
-  import { computed, ref, shallowRef } from 'vue'
-  import { useI18n } from 'vue-i18n'
   import { useClusterStore } from '@/store/cluster'
-  import { storeToRefs } from 'pinia'
   import { CommonStatus, CommonStatusTexts } from '@/enums/state'
-  import { useRouter } from 'vue-router'
   import { useJobProgress } from '@/store/job-progress'
 
   import Overview from './overview.vue'
   import Service from './service.vue'
   import Host from './host.vue'
   import User from './user.vue'
-  import Job from '@/components/job/index.vue'
+  import Job from '@/features/job/index.vue'
 
   import type { Command } from '@/api/command/types'
-  import type { TabItem } from '@/components/common/main-card/types'
+  import type { TabItem } from '@/components/base/main-card/types'
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { ClusterStatusType, ClusterVO } from '@/api/cluster/types'
 

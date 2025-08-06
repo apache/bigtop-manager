@@ -18,15 +18,13 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onMounted, ref, watch } from 'vue'
-  import { useRouter, useRoute } from 'vue-router'
   import { useMenuStore } from '@/store/menu/index'
-  import { storeToRefs } from 'pinia'
   import { useClusterStore } from '@/store/cluster'
   import { useStackStore } from '@/store/stack'
 
   import type { ClusterStatusType } from '@/api/cluster/types'
 
+  const { t } = useI18n()
   const router = useRouter()
   const route = useRoute()
   const stackStore = useStackStore()
@@ -112,7 +110,7 @@
       :open-keys="openKeys"
       :selected-keys="[siderMenuSelectedKey]"
       mode="inline"
-      @click="({ key }) => menuStore.onSiderClick(key)"
+      @click="({ key }) => menuStore.onSiderClick(key as string)"
     >
       <template v-for="menuItem in siderMenus" :key="menuItem.path">
         <a-sub-menu v-if="menuItem.name === 'Clusters'" :key="menuItem.path">
@@ -128,7 +126,7 @@
             />
           </template>
           <template #title>
-            <span>{{ $t(menuItem.meta!.title!) }}</span>
+            <span>{{ t(menuItem.meta!.title!) }}</span>
           </template>
           <a-menu-item
             v-for="child of clusterMap"
@@ -146,14 +144,14 @@
           </a-menu-item>
         </a-sub-menu>
         <template v-else>
-          <a-menu-item v-if="!menuItem.meta?.hidden" :key="menuItem.redirect">
+          <a-menu-item v-if="!menuItem.meta?.hidden" :key="menuItem.redirect as string">
             <template #icon>
               <svg-icon
                 style="height: 16px; width: 16px"
                 :name="toggleActivatedIcon({ key: menuItem.redirect as string, icon: menuItem.meta?.icon || '' })"
               />
             </template>
-            <span>{{ $t(menuItem.meta!.title!) }}</span>
+            <span>{{ t(menuItem.meta!.title!) }}</span>
           </a-menu-item>
         </template>
       </template>
@@ -163,7 +161,7 @@
       <div class="create-option">
         <a-button type="primary" ghost @click="addCluster">
           <div>
-            <label>{{ $t('menu.create') }}</label>
+            <label>{{ t('menu.create') }}</label>
           </div>
         </a-button>
       </div>

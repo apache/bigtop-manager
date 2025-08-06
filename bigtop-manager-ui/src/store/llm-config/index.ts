@@ -17,8 +17,6 @@
  * under the License.
  */
 
-import { defineStore } from 'pinia'
-import { computed, ref, shallowRef, watch } from 'vue'
 import * as llmServer from '@/api/llm-config/index'
 
 import type { AuthorizedPlatform, PlatformCredential, UpdateAuthorizedPlatformConfig } from '@/api/llm-config/types'

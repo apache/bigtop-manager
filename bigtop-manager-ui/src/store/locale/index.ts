@@ -17,14 +17,14 @@
  * under the License.
  */
 
-import { watch, ref, computed } from 'vue'
 import i18n from '@/locales'
 import en_US from 'ant-design-vue/es/locale/en_US'
 import zh_CN from 'ant-design-vue/es/locale/zh_CN'
 import dayjs from 'dayjs'
+
 import 'dayjs/locale/zh-cn'
 import 'dayjs/locale/en'
-import { defineStore } from 'pinia'
+
 import { Locale, defaultLocale } from './types'
 
 export const useLocaleStore = defineStore(

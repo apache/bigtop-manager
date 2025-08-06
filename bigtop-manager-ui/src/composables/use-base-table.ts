@@ -17,8 +17,6 @@
  * under the License.
  */
 
-import { ref, onUnmounted } from 'vue'
-import { useI18n } from 'vue-i18n'
 import type { PaginationProps, TableColumnType, TableProps } from 'ant-design-vue'
 import type { FilterValue } from 'ant-design-vue/es/table/interface'
 

@@ -17,8 +17,6 @@
  * under the License.
  */
 
-import { defineStore } from 'pinia'
-import { computed, ref, watch } from 'vue'
 import { theme as antdTheme } from 'ant-design-vue'
 import { GlobalToken } from 'ant-design-vue/es/theme'
 import { componentsConfigProvider } from './config'

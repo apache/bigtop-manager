@@ -18,27 +18,21 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onActivated, onDeactivated, onUnmounted, ref, shallowRef, toRefs, watchEffect } from 'vue'
-  import { useI18n } from 'vue-i18n'
-  import { storeToRefs } from 'pinia'
   import { formatFromByte } from '@/utils/storage'
   import { usePngImage } from '@/utils/tools'
+
   import { CommonStatus, CommonStatusTexts } from '@/enums/state'
+
   import { useServiceStore } from '@/store/service'
   import { useJobProgress } from '@/store/job-progress'
   import { useStackStore } from '@/store/stack'
   import { useClusterStore } from '@/store/cluster'
-  import { Empty } from 'ant-design-vue'
-  import { useRoute } from 'vue-router'
-  import { getClusterMetricsInfo } from '@/api/metrics'
-  import { useIntervalFn } from '@vueuse/core'
 
-  import GaugeChart from '@/components/charts/gauge-chart.vue'
-  import CategoryChart from '@/components/charts/category-chart.vue'
+  import { Empty } from 'ant-design-vue'
+  import { getClusterMetricsInfo } from '@/api/metrics'
 
   import type { ClusterStatusType, ClusterVO } from '@/api/cluster/types'
   import type { ServiceVO } from '@/api/service/types'
-  import type { MenuItem } from '@/store/menu/types'
   import type { StackVO } from '@/api/stack/types'
   import type { Command } from '@/api/command/types'
   import type { MetricsData, TimeRangeType } from '@/api/metrics/types'
@@ -105,7 +99,7 @@
   const noChartData = computed(() => Object.values(chartData.value).length === 0)
   const detailKeys = computed(() => Object.keys(baseConfig.value) as (keyof ClusterVO)[])
 
-  const handleServiceOperate = (item: MenuItem, service: ServiceVO) => {
+  const handleServiceOperate = (item: any, service: ServiceVO) => {
     jobProgressStore.processCommand(
       {
         command: item.key as keyof typeof Command,
@@ -165,14 +159,14 @@
       <a-col :xs="24" :sm="24" :md="24" :lg="10" :xl="7" style="display: flex; flex-direction: column; gap: 24px">
         <div class="base-info">
           <div class="box-title">
-            <a-typography-text strong :content="$t('overview.basic_info')" />
+            <a-typography-text strong :content="t('overview.basic_info')" />
           </div>
           <div>
             <a-descriptions layout="vertical" bordered>
               <a-descriptions-item>
                 <template #label>
                   <div class="desc-sub-label">
-                    <a-typography-text strong :content="$t('overview.detail')" />
+                    <a-typography-text strong :content="t('overview.detail')" />
                   </div>
                 </template>
                 <div class="desc-sub-item-wrp">
@@ -191,8 +185,7 @@
                         >
                           <status-dot :color="CommonStatus[statusColors[clusterDetail[base] as ClusterStatusType]]" />
                           {{
-                            clusterDetail[base] &&
-                            $t(`common.${statusColors[clusterDetail[base] as ClusterStatusType]}`)
+                            clusterDetail[base] && t(`common.${statusColors[clusterDetail[base] as ClusterStatusType]}`)
                           }}
                         </a-tag>
                         <a-typography-text
@@ -216,7 +209,7 @@
         <template v-if="locateStackWithService.length == 0">
           <div class="service-info">
             <div class="box-title">
-              <a-typography-text strong :content="$t('overview.service_info')" />
+              <a-typography-text strong :content="t('overview.service_info')" />
             </div>
             <div class="box-empty">
               <a-empty :image="Empty.PRESENTED_IMAGE_SIMPLE" />
@@ -225,7 +218,7 @@
         </template>
         <a-descriptions v-else layout="vertical" bordered :column="1">
           <template #title>
-            <a-typography-text strong :content="$t('overview.service_info')" />
+            <a-typography-text strong :content="t('overview.service_info')" />
           </template>
           <a-descriptions-item v-for="stack in locateStackWithService" :key="stack.stackName">
             <template #label>
@@ -258,7 +251,7 @@
       </a-col>
       <a-col :xs="24" :sm="24" :md="24" :lg="14" :xl="17">
         <div class="box-title">
-          <a-typography-text strong :content="$t('overview.chart')" />
+          <a-typography-text strong :content="t('overview.chart')" />
           <a-space :size="12">
             <div
               v-for="time in timeRanges"
@@ -280,16 +273,12 @@
         <a-row v-else class="box-content">
           <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
             <div class="chart-item-wrp">
-              <gauge-chart
-                chart-id="chart1"
-                :percent="chartData?.memoryUsageCur"
-                :title="$t('overview.memory_usage')"
-              />
+              <gauge-chart chart-id="chart1" :percent="chartData?.memoryUsageCur" :title="t('overview.memory_usage')" />
             </div>
           </a-col>
           <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
             <div class="chart-item-wrp">
-              <gauge-chart chart-id="chart2" :percent="chartData?.cpuUsageCur" :title="$t('overview.cpu_usage')" />
+              <gauge-chart chart-id="chart2" :percent="chartData?.cpuUsageCur" :title="t('overview.cpu_usage')" />
             </div>
           </a-col>
           <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
@@ -298,7 +287,7 @@
                 chart-id="chart3"
                 :x-axis-data="chartData?.timestamps"
                 :data="chartData?.memoryUsage ?? []"
-                :title="$t('overview.memory_usage')"
+                :title="t('overview.memory_usage')"
               />
             </div>
           </a-col>
@@ -308,7 +297,7 @@
                 chart-id="chart4"
                 :x-axis-data="chartData?.timestamps"
                 :data="chartData?.cpuUsage ?? []"
-                :title="$t('overview.cpu_usage')"
+                :title="t('overview.cpu_usage')"
               />
             </div>
           </a-col>

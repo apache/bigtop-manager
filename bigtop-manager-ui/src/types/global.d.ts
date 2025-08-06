@@ -17,12 +17,10 @@
  * under the License.
  */
 
-import AutoForm from '@/components/common/auto-form/index.vue'
-import { FormBuilder } from '@/components/common/form-builder'
+import FormBuilder from '@/components/common/form-builder/index.vue'
 
 declare global {
   namespace Comp {
-    type AutoFormInstance = InstanceType<typeof AutoForm>
     type FormBuilderInstance = InstanceType<typeof FormBuilder>
   }
 }

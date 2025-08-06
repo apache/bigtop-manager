@@ -18,10 +18,8 @@
 -->
 
 <script lang="ts" setup>
-  import { h, ref, computed } from 'vue'
   import { getFormItemComponent } from './config'
   import { isString } from 'lodash-es'
-  import { useI18n } from 'vue-i18n'
 
   import type { FormInstance, FormProps } from 'ant-design-vue'
   import type { FormItem } from './types'

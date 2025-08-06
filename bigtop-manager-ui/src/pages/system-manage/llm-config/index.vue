@@ -18,7 +18,6 @@
 -->
 
 <script setup lang="ts">
-  import { onMounted, ref, h } from 'vue'
   import { storeToRefs } from 'pinia'
   import { useLlmConfigStore } from '@/store/llm-config/index'
   import { message, Modal } from 'ant-design-vue'
@@ -26,7 +25,7 @@
   import LlmItem, { type ActionKeys, type ExtraItem } from './components/llm-item.vue'
 
   import addLlmItem from './components/add-llm-item.vue'
-  import SvgIcon from '@/components/common/svg-icon/index.vue'
+  import SvgIcon from '@/components/base/svg-icon/index.vue'
 
   import type { AuthorizedPlatform } from '@/api/llm-config/types'
 
@@ -99,7 +98,7 @@
   <a-spin :spinning="loading">
     <div class="llm-config">
       <a-typography-title :level="5">
-        {{ $t('menu.llm_config') }}
+        {{ t('menu.llm_config') }}
       </a-typography-title>
       <div class="llm-config-content">
         <llm-item

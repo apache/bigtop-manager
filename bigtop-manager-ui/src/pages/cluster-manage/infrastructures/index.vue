@@ -18,13 +18,10 @@
 -->
 
 <script setup lang="ts">
-  import { computed, ref, shallowRef } from 'vue'
-  import { useI18n } from 'vue-i18n'
-  import { useRouter } from 'vue-router'
   import Service from './service.vue'
-  import Job from '@/components/job/index.vue'
+  import Job from '@/features/job/index.vue'
 
-  import type { TabItem } from '@/components/common/main-card/types'
+  import type { TabItem } from '@/components/base/main-card/types'
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { ClusterVO } from '@/api/cluster/types'
 
@@ -67,7 +64,7 @@
 
 <template>
   <div>
-    <header-card :title="$t('menu.infra')" :show-avatar="false" :desc="$t('infra.info')" :action-groups="actionGroup" />
+    <header-card :title="t('menu.infra')" :show-avatar="false" :desc="t('infra.info')" :action-groups="actionGroup" />
     <main-card v-model:active-key="activeKey" :tabs="tabs">
       <template #tab-item>
         <keep-alive>
