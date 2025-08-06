@@ -21,8 +21,8 @@
   import { useMenuStore } from '@/store/menu/index'
   import AiAssistant from '@/features/ai-assistant/index.vue'
 
-  const githubUrl = import.meta.env.VITE_GITHUB_URL
-  const bigtopMangerDocURL = import.meta.env.VITE_BIGTOP_MANAGER_DOC_URL
+  const githubUrl = 'https://github.com/apache/bigtop-manager'
+  const bigtopMangerDocURL = 'https://github.com/apache/bigtop-manager/tree/main/docs'
 
   const { t } = useI18n()
   const menuStore = useMenuStore()
