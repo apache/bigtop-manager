@@ -18,8 +18,6 @@
  */
 
 import { getStacks } from '@/api/stack'
-import { defineStore } from 'pinia'
-import { shallowRef } from 'vue'
 import type { ComponentVO } from '@/api/component/types'
 import type { ServiceConfig, ServiceVO } from '@/api/service/types'
 import type { StackVO } from '@/api/stack/types'

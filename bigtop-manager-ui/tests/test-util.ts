@@ -18,6 +18,7 @@
  */
 
 import { createApp } from 'vue'
+import { createI18n } from 'vue-i18n'
 
 export function withSetup<T>(composable: any, payload?: T) {
   let result: any
@@ -29,4 +30,12 @@ export function withSetup<T>(composable: any, payload?: T) {
   })
   app.mount(document.createElement('div'))
   return [result, app]
+}
+
+export function i18nPlugins(messages?: Record<string, any>) {
+  return createI18n({
+    legacy: false, // Use Composition API style
+    locale: 'en',
+    messages: messages ?? {}
+  })
 }

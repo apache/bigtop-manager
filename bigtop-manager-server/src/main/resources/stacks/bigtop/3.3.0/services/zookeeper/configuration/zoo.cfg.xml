@@ -90,6 +90,16 @@
         <description>The port the embedded Jetty server listens on. Defaults to 8080.</description>
     </property>
     <property>
+        <name>metricsProvider.className</name>
+        <value>org.apache.zookeeper.metrics.prometheus.PrometheusMetricsProvider</value>
+        <description>ZooKeeper prometheus metrics provider.</description>
+    </property>
+    <property>
+        <name>metricsProvider.httpPort</name>
+        <value>7000</value>
+        <description>ZooKeeper prometheus metrics provider http port.</description>
+    </property>
+    <property>
         <name>content</name>
         <description>The port the embedded Jetty server listens on. Defaults to 8080.</description>
         <value><![CDATA[

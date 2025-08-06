@@ -20,11 +20,12 @@
 import { loadEnv, defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import path from 'node:path'
-import Icons from 'unplugin-icons/vite'
 import Components from 'unplugin-vue-components/vite'
 import AutoImport from 'unplugin-auto-import/vite'
+import Icons from 'unplugin-icons/vite'
 import IconsResolver from 'unplugin-icons/resolver'
 import { FileSystemIconLoader } from 'unplugin-icons/loaders'
+import { AntDesignVueResolver } from 'unplugin-vue-components/resolvers'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -47,8 +48,12 @@ export default defineConfig(({ mode }) => {
         }
       }),
       Components({
+        dirs: ['src/components', 'src/features'],
         dts: 'src/types/components.d.ts',
         resolvers: [
+          AntDesignVueResolver({
+            importStyle: false // css in js
+          }),
           IconsResolver({
             customCollections: ['svg'],
             componentPrefix: 'icon'
@@ -56,13 +61,14 @@ export default defineConfig(({ mode }) => {
         ]
       }),
       AutoImport({
-        imports: [],
+        imports: ['vue', 'vue-i18n', 'vue-router', '@vueuse/core', 'pinia'],
         resolvers: [
           IconsResolver({
             customCollections: ['svg'],
             componentPrefix: 'icon'
           })
         ],
+        dirs: ['src/composables/**'],
         dts: 'src/types/auto-imports.d.ts'
       })
     ],

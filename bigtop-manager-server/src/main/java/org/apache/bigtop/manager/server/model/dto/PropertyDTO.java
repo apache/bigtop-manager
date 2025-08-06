@@ -18,6 +18,8 @@
  */
 package org.apache.bigtop.manager.server.model.dto;
 
+import org.apache.bigtop.manager.server.enums.PropertyAction;
+
 import lombok.Data;
 
 import java.io.Serializable;
@@ -34,4 +36,7 @@ public class PropertyDTO implements Serializable {
     private String desc;
 
     private AttrsDTO attrs;
+
+    // Only exists in request body
+    private PropertyAction action;
 }

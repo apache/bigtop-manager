@@ -18,18 +18,15 @@
 -->
 
 <script setup lang="ts">
-  import { computed, onActivated, shallowRef, toRefs, useAttrs } from 'vue'
   import { usePngImage } from '@/utils/tools'
-  import { useI18n } from 'vue-i18n'
   import { CommonStatus, CommonStatusTexts } from '@/enums/state'
   import { useServiceStore } from '@/store/service'
-  import { useRouter } from 'vue-router'
   import { useJobProgress } from '@/store/job-progress'
   import { Empty } from 'ant-design-vue'
 
   import type { ServiceListParams, ServiceStatusType, ServiceVO } from '@/api/service/types'
   import type { GroupItem } from '@/components/common/button-group/types'
-  import type { FilterFormItem } from '@/components/common/form-filter'
+  import type { FilterFormItem } from '@/components/common/form-filter/types'
   import type { Command, CommandRequest } from '@/api/command/types'
 
   type GroupItemActionType = keyof typeof Command | 'More'
@@ -154,15 +151,15 @@
                 <a-tag :color="CommonStatus[statusColors[item.status]]">
                   <div class="header-base-status-inner">
                     <status-dot :color="CommonStatus[statusColors[item.status]]" />
-                    <span class="small">{{ $t(`common.${statusColors[item.status]}`) }}</span>
+                    <span class="small">{{ t(`common.${statusColors[item.status]}`) }}</span>
                   </div>
                 </a-tag>
               </div>
             </div>
             <div class="header-restart-status">
-              <span class="small-gray">{{ `${$t('common.restart')}` }}</span>
+              <span class="small-gray">{{ `${t('common.restart')}` }}</span>
               <status-dot :color="item.restartFlag ? 'error' : 'success'" />
-              <span class="small">{{ `${item.restartFlag ? $t('common.required') : $t('common.not_required')}` }}</span>
+              <span class="small">{{ `${item.restartFlag ? t('common.required') : t('common.not_required')}` }}</span>
             </div>
           </div>
           <div class="item-content" @click.stop>

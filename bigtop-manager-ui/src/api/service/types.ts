@@ -56,12 +56,15 @@ export interface ServiceConfig {
   properties?: Property[]
 }
 
+type PropertyAction = 'add' | 'update' | 'delete'
+
 export interface Property {
   attrs?: Attr
   desc?: string
   displayName?: string
   name: string
   value?: string
+  action?: PropertyAction
   [property: string]: any
 }
 

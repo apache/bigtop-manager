@@ -19,7 +19,10 @@
 
 import { mount } from '@vue/test-utils'
 import { describe, it, expect } from 'vitest'
+import { i18nPlugins } from '../test-util.ts'
 import FormFilter from '../../src/components/common/form-filter/index.vue'
+
+const i18n = i18nPlugins()
 
 describe('FormFilter.vue', () => {
   const filterItems = [
@@ -45,9 +48,7 @@ describe('FormFilter.vue', () => {
         filterItems
       },
       global: {
-        mocks: {
-          $t: (key: string) => key
-        }
+        plugins: [i18n]
       }
     })
 
@@ -62,9 +63,7 @@ describe('FormFilter.vue', () => {
         filterItems
       },
       global: {
-        mocks: {
-          $t: (key: string) => key
-        }
+        plugins: [i18n]
       }
     })
 
@@ -84,9 +83,7 @@ describe('FormFilter.vue', () => {
         filterItems
       },
       global: {
-        mocks: {
-          $t: (key: string) => key
-        }
+        plugins: [i18n]
       }
     })
 

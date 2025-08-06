@@ -17,9 +17,6 @@
  * under the License.
  */
 
-import { ref } from 'vue'
-import { defineStore } from 'pinia'
-
 export const useUIStore = defineStore(
   'ui',
   () => {

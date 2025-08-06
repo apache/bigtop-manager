@@ -18,9 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { toRefs } from 'vue'
   import type { GroupItem, Props } from './types'
-  import { useI18n } from 'vue-i18n'
 
   const props = withDefaults(defineProps<Props>(), {
     i18n: '',
@@ -65,7 +63,7 @@
               <slot name="icon" :item="item" />
             </template>
             <span v-if="item.text">
-              {{ $props.i18n && item.text ? $t(`${$props.i18n}.${item.text}`) : item.text }}
+              {{ $props.i18n && item.text ? t(`${$props.i18n}.${item.text}`) : item.text }}
             </span>
           </a-button>
           <template #overlay>
@@ -89,7 +87,7 @@
             <slot name="icon" :item="item" />
           </template>
           <span v-if="item.text">
-            {{ $props.i18n && item.text ? $t(`${$props.i18n}.${item.text}`) : item.text }}
+            {{ $props.i18n && item.text ? t(`${$props.i18n}.${item.text}`) : item.text }}
           </span>
         </a-button>
       </template>
