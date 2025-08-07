@@ -4,7 +4,6 @@ import { defineComponent, h } from 'vue'
 import { useChart } from '../../src/composables/use-chart'
 import { withSetup } from '../test-util'
 
-// ✅ 1. Mock echarts/core 模块
 vi.mock('echarts/core', async () => {
   const setOption = vi.fn()
   const resize = vi.fn()
