@@ -28,7 +28,7 @@ async function formatCode(code: string) {
   return prettier.format(code, { ...options, parser: 'typescript' })
 }
 
-async function generateMetaMap() {
+export async function generateMetaMap() {
   const entries = await fg('src/assets/images/**/*.png')
 
   const lines = entries.map((filePath) => {
@@ -60,8 +60,3 @@ const imgMap = {\n${lines.join('\n')}\n}\n\nexport default imgMap\n`
   const formatted = formatCode(rawContent)
   await fs.writeFile('src/utils/img-map.ts', await formatted, 'utf-8')
 }
-
-generateMetaMap().catch((err) => {
-  console.error(err)
-  process.exit(1)
-})

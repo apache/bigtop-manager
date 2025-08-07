@@ -26,7 +26,7 @@ import Icons from 'unplugin-icons/vite'
 import IconsResolver from 'unplugin-icons/resolver'
 import { FileSystemIconLoader } from 'unplugin-icons/loaders'
 import { AntDesignVueResolver } from 'unplugin-vue-components/resolvers'
-import ImageManifest from './src/plugins/unplugin-image-manifest/index'
+import ImageManifest from './plugins/unplugin-image-manifest/index'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {

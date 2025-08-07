@@ -18,9 +18,9 @@
  */
 
 import type { Plugin } from 'vite'
-import { execFile } from 'node:child_process'
 import path from 'node:path'
 import micromatch from 'micromatch'
+import { generateMetaMap } from './generate'
 
 interface PluginPayload {
   matchPath: string // watch target path
@@ -64,13 +64,8 @@ async function onChange(filePath: string, payload: PluginPayload) {
 }
 
 function updateNoteMeta() {
-  const scriptPath = path.resolve('scripts/generate-img-map.ts')
-  execFile('npx', ['tsx', scriptPath], (error, stdout, stderr) => {
-    if (error) {
-      console.error('[image-map] error:', error)
-      console.error(stderr)
-      return
-    }
-    console.log(stdout)
+  generateMetaMap().catch((err: any) => {
+    console.error(err)
+    process.exit(1)
   })
 }
