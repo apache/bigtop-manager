@@ -22,11 +22,14 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheStats;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Cache utility class
+ * Multi-cache utility class supporting different expiration times and enhanced generic support
  */
 public class CacheUtils {
 
@@ -39,118 +42,291 @@ public class CacheUtils {
     private static final int DEFAULT_MAXIMUM_SIZE = 10000;
 
     /**
-     * Cache instance
+     * Multiple cache instances mapped by cache name
      */
-    private static Cache<String, Object> CACHE;
+    private static final ConcurrentHashMap<String, Cache<String, Object>> CACHES = new ConcurrentHashMap<>();
 
-    static {
-        // Static init with default configuration
-        initCache(DEFAULT_EXPIRE_TIME, DEFAULT_TIME_UNIT, DEFAULT_MAXIMUM_SIZE);
+    /**
+     * Create or get cache with specific configuration
+     * Note: If a cache with the same name already exists, it will be returned regardless
+     * of the provided configuration parameters.
+     *
+     * @param cacheName   cache name/identifier
+     * @param expireTime  expire time
+     * @param timeUnit    time unit
+     * @param maximumSize maximum cache size
+     * @return cache instance
+     */
+    public static Cache<String, Object> getOrCreateCache(
+            String cacheName, int expireTime, TimeUnit timeUnit, int maximumSize) {
+        if (StringUtils.isBlank(cacheName)) {
+            throw new IllegalArgumentException("Cache name cannot be blank");
+        }
+
+        return CACHES.computeIfAbsent(cacheName, name -> CacheBuilder.newBuilder()
+                .expireAfterWrite(expireTime, timeUnit)
+                .maximumSize(maximumSize)
+                .recordStats()
+                .build());
     }
 
     /**
-     * Initialize cache with custom configuration
+     * Create or get cache with custom expire time (in minutes) and default size
      *
+     * @param cacheName     cache name/identifier
+     * @param expireMinutes expire time in minutes
+     * @return cache instance
+     */
+    public static Cache<String, Object> getOrCreateCache(String cacheName, int expireMinutes) {
+        return getOrCreateCache(cacheName, expireMinutes, DEFAULT_TIME_UNIT, DEFAULT_MAXIMUM_SIZE);
+    }
+
+    /**
+     * Create or get cache with custom expire time and time unit, using default size
+     *
+     * @param cacheName  cache name/identifier
+     * @param expireTime expire time
+     * @param timeUnit   time unit
+     * @return cache instance
+     */
+    public static Cache<String, Object> getOrCreateCache(String cacheName, int expireTime, TimeUnit timeUnit) {
+        return getOrCreateCache(cacheName, expireTime, timeUnit, DEFAULT_MAXIMUM_SIZE);
+    }
+
+    /**
+     * Get cache with default configuration
+     *
+     * @param cacheName cache name/identifier
+     * @return cache instance
+     */
+    public static Cache<String, Object> getOrCreateCache(String cacheName) {
+        return getOrCreateCache(cacheName, DEFAULT_EXPIRE_TIME, DEFAULT_TIME_UNIT, DEFAULT_MAXIMUM_SIZE);
+    }
+
+    /**
+     * Store cache value
+     *
+     * @param cacheName cache name/identifier
+     * @param key       cache key
+     * @param value     cache value
+     */
+    public static void setCache(String cacheName, String key, Object value) {
+        if (StringUtils.isAnyBlank(cacheName, key) || value == null) {
+            return;
+        }
+        getOrCreateCache(cacheName).put(key, value);
+    }
+
+    /**
+     * Store cache value with specific cache configuration
+     *
+     * @param cacheName  cache name/identifier
+     * @param key        cache key
+     * @param value      cache value
+     * @param expireTime expire time
+     */
+    public static void setCache(String cacheName, String key, Object value, int expireTime) {
+        if (StringUtils.isAnyBlank(cacheName, key) || value == null) {
+            return;
+        }
+        getOrCreateCache(cacheName, expireTime).put(key, value);
+    }
+
+    /**
+     * Store cache value with specific cache configuration
+     *
+     * @param cacheName  cache name/identifier
+     * @param key        cache key
+     * @param value      cache value
+     * @param expireTime expire time
+     * @param timeUnit   time unit
+     */
+    public static void setCache(String cacheName, String key, Object value, int expireTime, TimeUnit timeUnit) {
+        if (StringUtils.isAnyBlank(cacheName, key) || value == null) {
+            return;
+        }
+        getOrCreateCache(cacheName, expireTime, timeUnit).put(key, value);
+    }
+
+    /**
+     * Store cache value with specific cache configuration
+     *
+     * @param cacheName   cache name/identifier
+     * @param key         cache key
+     * @param value       cache value
      * @param expireTime  expire time
      * @param timeUnit    time unit
      * @param maximumSize maximum cache size
      */
-    public static synchronized void initCache(int expireTime, TimeUnit timeUnit, int maximumSize) {
-        CACHE = CacheBuilder.newBuilder()
-                .expireAfterWrite(expireTime, timeUnit)
-                .maximumSize(maximumSize)
-                .build();
-    }
-
-    /**
-     * Initialize cache with custom expire time (in minutes) and default size
-     *
-     * @param expireMinutes expire time in minutes
-     */
-    public static void initCache(int expireMinutes) {
-        initCache(expireMinutes, TimeUnit.MINUTES, DEFAULT_MAXIMUM_SIZE);
-    }
-
-    /**
-     * Initialize cache with custom expire time and time unit, using default size
-     *
-     * @param expireTime expire time
-     * @param timeUnit   time unit
-     */
-    public static void initCache(int expireTime, TimeUnit timeUnit) {
-        initCache(expireTime, timeUnit, DEFAULT_MAXIMUM_SIZE);
-    }
-
-    /**
-     * Store cache
-     *
-     * @param key   cache key
-     * @param value cache value
-     */
-    public static void setCache(String key, Object value) {
-        if (StringUtils.isBlank(key) || value == null) {
+    public static void setCache(
+            String cacheName, String key, Object value, int expireTime, TimeUnit timeUnit, int maximumSize) {
+        if (StringUtils.isAnyBlank(cacheName, key) || value == null) {
             return;
         }
-        CACHE.put(key, value);
+        getOrCreateCache(cacheName, expireTime, timeUnit, maximumSize).put(key, value);
     }
 
     /**
-     * Get cache
+     * Batch set cache values
      *
-     * @param key cache key
-     * @return cache value (returns null if not found or expired)
+     * @param cacheName cache name/identifier
+     * @param values    map of key-value pairs to cache
      */
-    public static Object getCache(String key) {
-        if (StringUtils.isBlank(key)) {
-            return null;
+    public static void setCacheBatch(String cacheName, Map<String, Object> values) {
+        if (StringUtils.isBlank(cacheName) || values == null || values.isEmpty()) {
+            return;
         }
-        return CACHE.getIfPresent(key);
+        Cache<String, Object> cache = getOrCreateCache(cacheName);
+        cache.putAll(values);
     }
 
     /**
-     * Get cache with type safety
+     * Get cache value with type safety
      *
-     * @param key   cache key
-     * @param clazz expected class type
-     * @param <T>   generic type
+     * @param cacheName cache name/identifier
+     * @param key       cache key
+     * @param clazz     expected class type
+     * @param <T>       generic type
      * @return cache value of specified type (returns null if not found, expired or type mismatch)
      */
-    public static <T> T getCache(String key, Class<T> clazz) {
-        if (StringUtils.isBlank(key) || clazz == null) {
+    public static <T> T getCache(String cacheName, String key, Class<T> clazz) {
+        if (StringUtils.isAnyBlank(cacheName, key) || clazz == null) {
             return null;
         }
 
-        Object value = getCache(key);
-        if (clazz.isInstance(value)) {
+        Object value = getCache(cacheName, key);
+        if (value != null && clazz.isInstance(value)) {
             return clazz.cast(value);
         }
         return null;
     }
 
     /**
-     * Remove specified cache
+     * Generic version of getCache method
      *
-     * @param key cache key
+     * @param cacheName cache name/identifier
+     * @param key       cache key
+     * @param <T>       generic type
+     * @return cache value (returns null if not found or expired)
      */
-    public static void removeCache(String key) {
-        if (StringUtils.isBlank(key)) {
+    @SuppressWarnings("unchecked")
+    public static <T> T getCache(String cacheName, String key) {
+        if (StringUtils.isAnyBlank(cacheName, key)) {
+            return null;
+        }
+        Cache<String, Object> cache = CACHES.get(cacheName);
+        return cache != null ? (T) cache.getIfPresent(key) : null;
+    }
+
+    /**
+     * Check if cache with given name exists
+     *
+     * @param cacheName cache name/identifier
+     * @return true if cache exists, false otherwise
+     */
+    public static boolean exists(String cacheName) {
+        return StringUtils.isNotBlank(cacheName) && CACHES.containsKey(cacheName);
+    }
+
+    /**
+     * Remove specified cache entry
+     *
+     * @param cacheName cache name/identifier
+     * @param key       cache key
+     */
+    public static void removeCache(String cacheName, String key) {
+        if (StringUtils.isAnyBlank(cacheName, key)) {
             return;
         }
-        CACHE.invalidate(key);
+        Cache<String, Object> cache = CACHES.get(cacheName);
+        if (cache != null) {
+            cache.invalidate(key);
+        }
+    }
+
+    /**
+     * Clear all entries in specific cache
+     *
+     * @param cacheName cache name/identifier
+     */
+    public static void clearCache(String cacheName) {
+        if (StringUtils.isBlank(cacheName)) {
+            return;
+        }
+        Cache<String, Object> cache = CACHES.get(cacheName);
+        if (cache != null) {
+            cache.invalidateAll();
+            cache.cleanUp();
+        }
     }
 
     /**
      * Clear all caches
      */
     public static void clearAll() {
-        CACHE.invalidateAll();
-        CACHE.cleanUp();
+        CACHES.values().forEach(cache -> {
+            cache.invalidateAll();
+            cache.cleanUp();
+        });
+        CACHES.clear();
     }
 
     /**
-     * Get cache size
+     * Get cache size for specific cache
+     *
+     * @param cacheName cache name/identifier
+     * @return cache size
      */
-    public static long size() {
-        return CACHE.size();
+    public static long size(String cacheName) {
+        if (StringUtils.isBlank(cacheName)) {
+            return 0;
+        }
+        Cache<String, Object> cache = CACHES.get(cacheName);
+        return cache != null ? cache.size() : 0;
+    }
+
+    /**
+     * Get total size of all caches
+     *
+     * @return total cache size
+     */
+    public static long totalSize() {
+        return CACHES.values().stream().mapToLong(Cache::size).sum();
+    }
+
+    /**
+     * Get cache statistics
+     *
+     * @param cacheName cache name/identifier
+     * @return cache statistics
+     */
+    public static CacheStats getStats(String cacheName) {
+        if (StringUtils.isBlank(cacheName)) {
+            return null;
+        }
+        Cache<String, Object> cache = CACHES.get(cacheName);
+        return cache != null ? cache.stats() : null;
+    }
+
+    /**
+     * Force cleanup of expired entries in all caches
+     */
+    public static void cleanupAll() {
+        CACHES.values().forEach(Cache::cleanUp);
+    }
+
+    /**
+     * Force cleanup of expired entries in specific cache
+     *
+     * @param cacheName cache name/identifier
+     */
+    public static void cleanup(String cacheName) {
+        if (StringUtils.isBlank(cacheName)) {
+            return;
+        }
+        Cache<String, Object> cache = CACHES.get(cacheName);
+        if (cache != null) {
+            cache.cleanUp();
+        }
     }
 }

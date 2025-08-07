@@ -18,6 +18,7 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
+import org.apache.bigtop.manager.common.constants.Caches;
 import org.apache.bigtop.manager.dao.po.UserPO;
 import org.apache.bigtop.manager.dao.repository.UserDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
@@ -35,6 +36,7 @@ import org.apache.bigtop.manager.server.utils.Pbkdf2Utils;
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.Resource;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -61,7 +63,11 @@ public class UserServiceImpl implements UserService {
         UserPO userPO = userDao.findOptionalById(id).orElseThrow(() -> new ApiException(ApiExceptionEnum.NEED_LOGIN));
         userPO.setNickname(userDTO.getNickname());
         userDao.partialUpdateById(userPO);
-        return UserConverter.INSTANCE.fromPO2VO(userPO);
+
+        // Update user information in cache
+        UserVO userVO = UserConverter.INSTANCE.fromPO2VO(userPO);
+        CacheUtils.setCache(Caches.CACHE_USER, id.toString(), userVO, Caches.USER_EXPIRE_TIME_DAYS, TimeUnit.DAYS);
+        return userVO;
     }
 
     @Override
@@ -87,8 +93,9 @@ public class UserServiceImpl implements UserService {
         userPO.setTokenVersion(userPO.getTokenVersion() + 1);
         userDao.partialUpdateById(userPO);
 
-        // Proactively clear the user's cache to ensure that the next request takes effect immediately
-        CacheUtils.removeCache(id.toString());
-        return UserConverter.INSTANCE.fromPO2VO(userPO);
+        // Update user information in cache
+        UserVO userVO = UserConverter.INSTANCE.fromPO2VO(userPO);
+        CacheUtils.setCache(Caches.CACHE_USER, id.toString(), userVO, Caches.USER_EXPIRE_TIME_DAYS, TimeUnit.DAYS);
+        return userVO;
     }
 }

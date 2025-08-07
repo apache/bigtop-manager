@@ -18,6 +18,7 @@
  */
 package org.apache.bigtop.manager.server.interceptor;
 
+import org.apache.bigtop.manager.common.constants.Caches;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.holder.SessionUserHolder;
@@ -94,20 +95,21 @@ public class AuthInterceptor implements HandlerInterceptor {
                     decodedJWT.getClaim(JWTUtils.CLAIM_TOKEN_VERSION).asInt();
 
             // Check if the user exists
-            CacheUtils.initCache(1, TimeUnit.DAYS);
-            UserVO userVO = CacheUtils.getCache(userId.toString(), UserVO.class);
+            UserVO userVO = CacheUtils.getCache(Caches.CACHE_USER, userId.toString(), UserVO.class);
             if (userVO == null) {
                 userVO = userService.get(userId);
                 if (userVO == null) {
                     responseEntity = ResponseEntity.error(ApiExceptionEnum.NEED_LOGIN);
                     return false;
                 }
-                CacheUtils.setCache(userId.toString(), userVO);
+                // Explicitly set cache expiration time
+                CacheUtils.setCache(
+                        Caches.CACHE_USER, userId.toString(), userVO, Caches.USER_EXPIRE_TIME_DAYS, TimeUnit.DAYS);
             }
 
             // Check if the token version matches
             if (!Objects.equals(tokenVersion, userVO.getTokenVersion())) {
-                CacheUtils.removeCache(userId.toString());
+                CacheUtils.removeCache(Caches.CACHE_USER, userId.toString());
                 responseEntity = ResponseEntity.error(ApiExceptionEnum.NEED_LOGIN);
                 return false;
             }

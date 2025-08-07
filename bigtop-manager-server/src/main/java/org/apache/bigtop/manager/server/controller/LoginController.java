@@ -18,6 +18,7 @@
  */
 package org.apache.bigtop.manager.server.controller;
 
+import org.apache.bigtop.manager.common.constants.Caches;
 import org.apache.bigtop.manager.server.annotations.Audit;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
@@ -41,6 +42,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.annotation.Resource;
+import java.util.concurrent.TimeUnit;
 
 @Tag(name = "Login Controller")
 @RestController
@@ -60,7 +62,8 @@ public class LoginController {
     @GetMapping(value = "/nonce")
     public ResponseEntity<String> nonce(String username) {
         String nonce = PasswordUtils.randomString(16);
-        CacheUtils.setCache(username, nonce);
+        String cacheKey = username + ":" + nonce;
+        CacheUtils.setCache(Caches.CACHE_NONCE, cacheKey, nonce, Caches.NONCE_EXPIRE_TIME_MINUTES, TimeUnit.MINUTES);
         return ResponseEntity.success(nonce);
     }
 
