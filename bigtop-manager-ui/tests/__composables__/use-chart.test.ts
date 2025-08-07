@@ -65,4 +65,19 @@ describe('useChart', () => {
 
     expect(removeEventListenerSpy).toHaveBeenCalledWith('resize', expect.any(Function), true)
   })
+
+  it('should dispose chart and remove event listener on unmount', async () => {
+    const echarts = vi.mocked(await import('echarts/core'), true)
+    const el = document.createElement('div')
+    const [chart, app] = withSetup(useChart, { title: { text: 'test' } })
+
+    chart.initChart(el, { title: { text: 'test' } })
+    const instance = echarts.init.mock.results[0].value
+
+    await app.mount()
+    expect(instance.dispose).not.toHaveBeenCalled()
+
+    await app.unmount()
+    expect(instance.dispose).toHaveBeenCalled()
+  })
 })

@@ -89,6 +89,7 @@ export const useChart = () => {
   return {
     chartsRef,
     initChart,
-    setOptions
+    setOptions,
+    disposeChart
   }
 }
