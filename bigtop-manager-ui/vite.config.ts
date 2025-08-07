@@ -97,7 +97,7 @@ export default defineConfig(({ mode }) => {
     },
     build: {
       outDir: 'dist',
-      sourcemap: true,
+      sourcemap: false,
       reportCompressedSize: true,
       chunkSizeWarningLimit: 1024,
       rollupOptions: {
