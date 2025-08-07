@@ -3,14 +3,14 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --open --mode development",
-    "build": "vite build && vue-tsc --noEmit",
+    "dev": "pnpm img-map && vite --open --mode development",
+    "build": "pnpm img-map && vite build && vue-tsc --noEmit",
     "preview": "vite preview",
     "lint": "eslint src --ext .ts,.tsx,.vue",
     "prettier": "prettier --write \"src/**/*.{vue,ts,tsx}\"",
     "test": "vitest",
     "test:run": "vitest run",
-    "img": "tsx scripts/image-manifest.ts"
+    "img-map": "tsx scripts/generate-img-map.ts"
   },
   "dependencies": {
     "@ant-design/icons-vue": "^6.1.0",

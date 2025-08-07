@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import imageMap from '@/assets/generated/image-map'
+import imgMap from '@/utils/img-map'
 
 export function copyText(text: string): Promise<any> {
   if (navigator.clipboard) {
@@ -51,7 +51,7 @@ export function copyText(text: string): Promise<any> {
 }
 
 export function usePngImage(imageName: string): string {
-  return imageMap[imageName]
+  return imgMap[imageName] ?? imgMap['bm-logo']
 }
 
 export function scrollToBottom(container: HTMLElement | null) {
