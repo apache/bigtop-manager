@@ -35,7 +35,7 @@
         <spring-boot.version>3.1.1</spring-boot.version>
         <springdoc.version>2.2.0</springdoc.version>
         <freemarker.version>2.3.32</freemarker.version>
-        <common-lang3.version>3.14.0</common-lang3.version>
+        <common-lang3.version>3.18.0</common-lang3.version>
         <snakeyaml.version>2.0</snakeyaml.version>
         <commons-io.version>2.16.1</commons-io.version>
         <guava.version>32.1.1-jre</guava.version>
