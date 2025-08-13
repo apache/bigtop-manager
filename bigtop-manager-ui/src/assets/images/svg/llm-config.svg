@@ -21,24 +21,24 @@
   viewBox="0 0 16 16" fill="none">
   <path
     d="M5.16667 3.00004L2.33334 4.66671L2.33334 8.00004L2.33334 11.3334L5.16667 13L8 14.6667L10.8334 13L13.6667 11.3334L13.6667 8.00004L13.6667 4.66671L10.8334 3.00004L8 1.33337L5.16667 3.00004Z"
-    stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round">
+    stroke="currentColor" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round">
   </path>
-  <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
+  <path stroke="currentColor" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
     d="M8 1.33337L8 8.00004">
   </path>
-  <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
+  <path stroke="currentColor" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
     d="M13.6667 11.3333L8 8">
   </path>
-  <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
+  <path stroke="currentColor" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
     d="M2.33334 11.3333L8 8">
   </path>
-  <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
+  <path stroke="currentColor" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
     d="M8 14.6667L8 11.3334">
   </path>
-  <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
+  <path stroke="currentColor" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
     d="M13.6667 4.66663L11 6.33329">
   </path>
-  <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
+  <path stroke="currentColor" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
     d="M2.33334 4.66663L5 6.33329">
   </path>
 </svg>

@@ -17,9 +17,8 @@
   ~ specific language governing permissions and limitations
   ~ under the License.
 -->
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="9.33349609375"
-  height="5.33331298828125" viewBox="0 0 9.33349609375 5.33331298828125" fill="none">
-  <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
+<svg xmlns="http://www.w3.org/2000/svg" width="9.333" height="5.333" viewBox="0 0 9.333 5.333" fill="none">
+  <path stroke="currentColor" stroke-width="1.333" stroke-linejoin="round" stroke-linecap="round"
     d="M8.66675 0.666656L4.66675 4.66666L0.666748 0.666656">
   </path>
 </svg>

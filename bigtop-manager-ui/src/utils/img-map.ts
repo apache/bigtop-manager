@@ -20,7 +20,6 @@
 const imgMap = {
   'ai-disabled': new URL('../assets/images/ai-disabled.png', import.meta.url).href,
   'ai-helper': new URL('../assets/images/ai-helper.png', import.meta.url).href,
-  'bm-logo': new URL('../assets/images/bm-logo.png', import.meta.url).href,
   cluster: new URL('../assets/images/cluster.png', import.meta.url).href,
   dashscope: new URL('../assets/images/dashscope.png', import.meta.url).href,
   deepseek: new URL('../assets/images/deepseek.png', import.meta.url).href,
@@ -35,6 +34,7 @@ const imgMap = {
   host: new URL('../assets/images/host.png', import.meta.url).href,
   kafka: new URL('../assets/images/kafka.png', import.meta.url).href,
   login: new URL('../assets/images/login.png', import.meta.url).href,
+  logo: new URL('../assets/images/logo.png', import.meta.url).href,
   mysql: new URL('../assets/images/mysql.png', import.meta.url).href,
   openai: new URL('../assets/images/openai.png', import.meta.url).href,
   prometheus: new URL('../assets/images/prometheus.png', import.meta.url).href,
