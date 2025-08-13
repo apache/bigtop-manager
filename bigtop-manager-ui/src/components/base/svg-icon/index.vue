@@ -67,14 +67,14 @@
   interface Props {
     name: SvgNameType | undefined | string
     color?: string
-    hightlight?: boolean
+    highlight?: boolean
     hightlightColor?: string
   }
 
   const props = withDefaults(defineProps<Props>(), {
     name: 'bm-logo',
     color: '#333',
-    hightlight: false,
+    highlight: false,
     hightlightColor: '#1677ff'
   })
 
@@ -85,7 +85,7 @@
   <component
     :is="svgComp"
     v-if="props.name"
-    :style="{ color: props.hightlight ? props.hightlightColor : props.color }"
+    :style="{ color: props.highlight ? props.hightlightColor : props.color }"
   />
 </template>
 

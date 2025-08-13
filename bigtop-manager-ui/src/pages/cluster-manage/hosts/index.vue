@@ -319,8 +319,8 @@
         </div>
       </template>
       <template #customFilterIcon="{ filtered, column }">
-        <svg-icon v-if="!['status', 'clusterDisplayName'].includes(column.key)" name="search" :hightlight="filtered" />
-        <svg-icon v-else name="filter" :hightlight="filtered" />
+        <svg-icon v-if="!['status', 'clusterDisplayName'].includes(column.key)" name="search" :highlight="filtered" />
+        <svg-icon v-else name="filter" :highlight="filtered" />
       </template>
       <template #bodyCell="{ record, column }">
         <template v-if="column.key === 'hostname'">

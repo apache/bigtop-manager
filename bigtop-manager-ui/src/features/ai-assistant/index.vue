@@ -173,7 +173,7 @@
         <button-group i18n="aiAssistant" :groups="checkActions" @on-click="onActions">
           <template #icon="{ item }">
             <template v-if="item.icon">
-              <svg-icon v-if="item.action === 'ADD'" :name="item.icon" color="#33333340" :hightlight="!addLimit" />
+              <svg-icon v-if="item.action === 'ADD'" :name="item.icon" color="#33333340" :highlight="!addLimit" />
               <svg-icon v-else :name="item.icon" />
             </template>
           </template>

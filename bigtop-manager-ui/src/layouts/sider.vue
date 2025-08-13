@@ -116,7 +116,7 @@
             <svg-icon
               color="inherit"
               style="height: 16px; width: 16px"
-              :hightlight="toggleActivatedIcon({ key: menuItem.path, icon: menuItem.meta?.icon || '' })"
+              :highlight="toggleActivatedIcon({ key: menuItem.path, icon: menuItem.meta?.icon || '' })"
               :name="menuItem.meta?.icon || ''"
             />
           </template>
@@ -143,7 +143,7 @@
             <template #icon>
               <svg-icon
                 style="height: 16px; width: 16px"
-                :hightlight="toggleActivatedIcon({ key: menuItem.redirect as string, icon: menuItem.meta?.icon || '' })"
+                :highlight="toggleActivatedIcon({ key: menuItem.redirect as string, icon: menuItem.meta?.icon || '' })"
                 :name="menuItem.meta?.icon || ''"
               />
             </template>

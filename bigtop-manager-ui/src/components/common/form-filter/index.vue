@@ -87,7 +87,7 @@
             </span>
             <svg-icon
               name="bottom"
-              :hightlight="filterParams[`${item.key}`] !== undefined"
+              :highlight="filterParams[`${item.key}`] !== undefined"
               style="padding: 6px 4px; margin-left: 8px"
             />
           </div>
