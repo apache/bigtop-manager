@@ -82,11 +82,7 @@
 </script>
 
 <template>
-  <component
-    :is="svgComp"
-    v-if="props.name"
-    :style="{ color: props.highlight ? props.highlightColor : props.color }"
-  />
+  <component :is="svgComp" v-if="props.name" :style="{ color: props.highlight ? props.highlightColor : props.color }" />
 </template>
 
 <style scoped></style>
