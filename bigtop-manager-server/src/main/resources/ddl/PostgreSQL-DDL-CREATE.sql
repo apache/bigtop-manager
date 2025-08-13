@@ -351,6 +351,8 @@ CREATE INDEX idx_message_user_id ON llm_chat_message (user_id);
 INSERT INTO "user" (username, password, nickname, status)
 VALUES ('admin', '$2b$10$bdTvADKA0dSJYT3wMU3LFeIEnxzKQHeWN3XcHJ5jQpsIo7ju1U5Yi', 'Administrator', true);
 
+ALTER TABLE "user" ADD token_version INT DEFAULT 1;
+
 INSERT INTO repo (name, arch, base_url, pkg_name, checksum, type)
 VALUES
 ('general', 'x86_64,aarch64', 'http://your-repo/', null, null, 1),

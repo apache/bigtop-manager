@@ -18,12 +18,15 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
+import org.apache.bigtop.manager.common.constants.Caches;
 import org.apache.bigtop.manager.dao.po.UserPO;
 import org.apache.bigtop.manager.dao.repository.UserDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
+import org.apache.bigtop.manager.server.model.converter.UserConverter;
 import org.apache.bigtop.manager.server.model.dto.LoginDTO;
 import org.apache.bigtop.manager.server.model.vo.LoginVO;
+import org.apache.bigtop.manager.server.model.vo.UserVO;
 import org.apache.bigtop.manager.server.service.LoginService;
 import org.apache.bigtop.manager.server.utils.CacheUtils;
 import org.apache.bigtop.manager.server.utils.JWTUtils;
@@ -32,6 +35,7 @@ import org.apache.bigtop.manager.server.utils.PasswordUtils;
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.Resource;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class LoginServiceImpl implements LoginService {
@@ -54,7 +58,8 @@ public class LoginServiceImpl implements LoginService {
             throw new ApiException(ApiExceptionEnum.USER_IS_DISABLED);
         }
 
-        String cache = CacheUtils.getCache(username);
+        String cacheKey = username + ":" + nonce;
+        String cache = CacheUtils.getCache(Caches.CACHE_NONCE, cacheKey, String.class);
         if (cache == null || !cache.equals(nonce)) {
             throw new ApiException(ApiExceptionEnum.INCORRECT_USERNAME_OR_PASSWORD);
         }
@@ -63,9 +68,14 @@ public class LoginServiceImpl implements LoginService {
             throw new ApiException(ApiExceptionEnum.INCORRECT_USERNAME_OR_PASSWORD);
         }
 
-        CacheUtils.removeCache(username);
+        CacheUtils.removeCache(Caches.CACHE_NONCE, username);
 
-        String token = JWTUtils.generateToken(user.getId(), user.getUsername());
+        // After successful login, update the user cache to ensure that the information in the cache is up-to-date
+        UserVO userVO = UserConverter.INSTANCE.fromPO2VO(user);
+        CacheUtils.setCache(
+                Caches.CACHE_USER, user.getId().toString(), userVO, Caches.USER_EXPIRE_TIME_DAYS, TimeUnit.DAYS);
+
+        String token = JWTUtils.generateToken(user.getId(), user.getUsername(), user.getTokenVersion());
         LoginVO loginVO = new LoginVO();
         loginVO.setToken(token);
         return loginVO;

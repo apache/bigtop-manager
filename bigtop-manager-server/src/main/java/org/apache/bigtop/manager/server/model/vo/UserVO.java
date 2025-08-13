@@ -34,4 +34,6 @@ public class UserVO {
     private String updateTime;
 
     private Boolean status;
+
+    private Integer tokenVersion;
 }

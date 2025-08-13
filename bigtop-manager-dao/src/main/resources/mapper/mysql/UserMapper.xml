@@ -24,7 +24,7 @@
 <mapper namespace="org.apache.bigtop.manager.dao.repository.UserDao">
 
     <sql id="baseColumns">
-        id, username, password, nickname, status
+        id, username, password, nickname, status, token_version
     </sql>
 
     <select id="findByUsername" resultType="org.apache.bigtop.manager.dao.po.UserPO">
