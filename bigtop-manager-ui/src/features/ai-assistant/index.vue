@@ -68,12 +68,12 @@
       ? filterActions(['EXITSCREEN', 'CLOSE'])
       : filterActions(['ADD', 'RECORDS', 'FULLSCREEN', 'CLOSE'])
   })
-  const addIcon = computed(() => (threads.value.length >= 10 ? 'plus-gray' : 'plus'))
+  const addLimit = computed(() => threads.value.length >= 10)
   const addState = computed(() => threads.value.length >= 10 || loadingChatRecords.value || !hasActivePlatform.value)
   const actionGroup = computed((): GroupItem<ActionType>[] => [
     {
       tip: 'new_chat',
-      icon: addIcon.value,
+      icon: 'plus',
       action: 'ADD',
       clickEvent: () => aiChatStore.createChatThread(),
       disabled: addState.value
@@ -172,7 +172,10 @@
       <template #extra>
         <button-group i18n="aiAssistant" :groups="checkActions" @on-click="onActions">
           <template #icon="{ item }">
-            <svg-icon v-if="item.icon" :name="item.icon" />
+            <template v-if="item.icon">
+              <svg-icon v-if="item.action === 'ADD'" :name="item.icon" color="#33333340" :highlight="!addLimit" />
+              <svg-icon v-else :name="item.icon" />
+            </template>
           </template>
         </button-group>
       </template>

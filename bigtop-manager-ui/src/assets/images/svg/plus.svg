@@ -19,10 +19,10 @@
 -->
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
   viewBox="0 0 16 16" fill="none">
-  <path stroke="rgba(22, 119, 255, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
+  <path stroke="currentColor" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
     d="M8.02017 3.33334L8.00797 12.6667">
   </path>
-  <path stroke="rgba(22, 119, 255, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
+  <path stroke="currentColor" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
     d="M3.33333 8L12.6667 8">
   </path>
 </svg>

@@ -19,13 +19,13 @@
 -->
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
   viewBox="0 0 16 16" fill="none">
-  <path fill="rgba(51, 51, 51, 1)"
+  <path fill="currentColor"
     d="M3 1.33333L13 1.33333C13.9205 1.33333 14.6667 2.07953 14.6667 3L14.6667 10.3333C14.6667 11.2538 13.9205 12 13 12L3 12C2.07953 12 1.33333 11.2538 1.33333 10.3333L1.33333 3C1.33333 2.07953 2.07953 1.33333 3 1.33333ZM3 2.66667C2.81591 2.66667 2.66667 2.81591 2.66667 3L2.66667 10.3333C2.66667 10.5174 2.81591 10.6667 3 10.6667L13 10.6667C13.1841 10.6667 13.3333 10.5174 13.3333 10.3333L13.3333 3C13.3333 2.81591 13.1841 2.66667 13 2.66667L3 2.66667Z">
   </path>
-  <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
+  <path stroke="currentColor" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
     d="M4.66667 14L11.3333 14">
   </path>
-  <path stroke="rgba(51, 51, 51, 1)" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
+  <path stroke="currentColor" stroke-width="1.3333333333333333" stroke-linejoin="round" stroke-linecap="round"
     d="M8 11.3333L8 14">
   </path>
 </svg>
