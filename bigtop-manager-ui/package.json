@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "pnpm img-map && vite --open --mode development",
-    "build": "pnpm img-map && vite build && vue-tsc --noEmit",
+    "dev": "vite --open --mode development",
+    "build": "vite build && vue-tsc --noEmit",
     "preview": "vite preview",
     "lint": "eslint src --ext .ts,.tsx,.vue",
     "prettier": "prettier --write \"src/**/*.{vue,ts,tsx}\"",
