@@ -80,7 +80,10 @@ export default defineConfig(({ mode }) => {
     css: {
       preprocessorOptions: {
         scss: {
-          additionalData: '@import "@/styles/index.scss";'
+          api: 'modern',
+          additionalData: `
+            @use "@/styles/variables.scss" as *;
+          `
         }
       }
     },

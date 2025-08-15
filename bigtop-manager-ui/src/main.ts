@@ -20,9 +20,12 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import plugins from '@/plugins'
+
 import 'ant-design-vue/dist/reset.css'
+import 'github-markdown-css/github-markdown.css'
+import 'highlight.js/styles/github-dark.css'
 import '@/styles/scrollbar.scss'
-import '@/styles/marked.scss'
+import '@/styles/index.scss'
 
 const app = createApp(App)
 app.use(plugins, { antdMessageMaxCount: 1 })

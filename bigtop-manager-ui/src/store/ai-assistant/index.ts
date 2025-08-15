@@ -95,7 +95,7 @@ export const useAiChatStore = defineStore(
         await ai.updateThread(threadId, { name: newName })
         return true
       } catch (error) {
-        console.log('error', error)
+        console.log('error :>> ', error)
         return false
       }
     }
@@ -106,7 +106,7 @@ export const useAiChatStore = defineStore(
         await ai.deleteThread(threadId)
         return true
       } catch (error) {
-        console.log('error', error)
+        console.log('error :>> ', error)
         return false
       }
     }
