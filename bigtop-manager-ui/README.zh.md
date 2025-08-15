@@ -21,13 +21,13 @@ Bigtop Manager UI 是 Manager 平台的前端 UI，存放有关平台与用户�
 
 ## 先决条件
 
-- Node.js：`v18.17.0`
+- Node.js：`v20.9.0`
 
-- pnpm: `v8.6.9`
+- pnpm: `v10.12.3`
 
 - Vite：`v5.4.19`
 
-- Typescript：`v5.8.3`
+- Typescript：`v5.9.2`
 
 - Vue：`v3.4.37`
 

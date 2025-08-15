@@ -21,13 +21,13 @@ Bigtop Manager UI is the front-end UI of the Manager platform, which stores code
 
 ## Prerequisites
 
-- Node.js：`v18.17.0`
+- Node.js：`v20.9.0`
 
-- pnpm: `v8.6.9`
+- pnpm: `v10.12.3`
 
 - Vite：`v5.4.19`
 
-- Typescript：`v5.8.3`
+- Typescript：`v5.9.2`
 
 - Vue：`v3.4.37`
 

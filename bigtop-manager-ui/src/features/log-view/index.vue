@@ -86,8 +86,12 @@
   watch(
     () => props.open,
     (val) => {
-      val ? getLogMessage() : cancelSseConnect()
-      !val && (logMessage.value = '')
+      if (val) {
+        getLogMessage()
+      } else {
+        cancelSseConnect()
+        logMessage.value = ''
+      }
     }
   )
 
@@ -117,7 +121,9 @@
   }
 
   const cancelSseConnect = () => {
-    canceler.value && canceler.value()
+    if (canceler.value) {
+      canceler.value()
+    }
   }
 
   const copyLogs = () => {

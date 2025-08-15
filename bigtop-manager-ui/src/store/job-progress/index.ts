@@ -206,12 +206,14 @@ export const useJobProgress = defineStore('job-progress', () => {
         if (state === 'Successful' || state === 'Failed') {
           Object.assign(progressEntry!, targetProgress)
           if (state === 'Successful') {
-            nextAction && nextAction()
+            if (nextAction) {
+              nextAction()
+            }
             closeNotification(params.jobId)
           }
           cleanup()
-        } else if (state === 'Processing') {
-          oldPercent < 90 && Object.assign(progressEntry, mergeProgressPercent)
+        } else if (state === 'Processing' && oldPercent < 90) {
+          Object.assign(progressEntry, mergeProgressPercent)
         }
       } catch (error) {
         console.log('error :>> ', error)

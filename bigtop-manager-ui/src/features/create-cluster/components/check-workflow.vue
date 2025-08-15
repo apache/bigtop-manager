@@ -83,6 +83,7 @@
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   const pollJobDetails = (execFunc: Function, interval: number = 1000): void => {
     let firstPoll = true
     let firstPollCompleted = false

@@ -82,7 +82,9 @@
         await resolveInstallDependencies()
       } else {
         const isClusterExisting = await createCluster()
-        isClusterExisting && nextStep()
+        if (isClusterExisting) {
+          nextStep()
+        }
       }
     } else {
       nextStep()

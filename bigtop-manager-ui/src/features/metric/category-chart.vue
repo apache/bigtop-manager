@@ -157,7 +157,9 @@
 
   onMounted(() => {
     const selector = document.getElementById(`${chartId.value}`)
-    selector && initChart(selector!, option.value)
+    if (selector) {
+      initChart(selector!, option.value)
+    }
   })
 
   watchEffect(() => {

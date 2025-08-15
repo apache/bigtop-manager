@@ -56,6 +56,7 @@ export const getTaskList = (pathParams: TaskListParams, params: ListParams) => {
   )
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export const getTaskLog = (pathParams: TaskLogParams, func: Function): LogsRes => {
   const source: CancelTokenSource = axios.CancelToken.source()
 

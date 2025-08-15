@@ -123,7 +123,9 @@ export const useCreateServiceStore = defineStore(
           }
 
           if (!p[s.name]) {
-            s.configs && (p[s.name] = s.configs)
+            if (s.configs) {
+              p[s.name] = s.configs
+            }
           }
 
           return p

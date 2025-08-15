@@ -101,7 +101,9 @@
   }
 
   const onFilterDropdownOpenChange = (visible: boolean) => {
-    visible && setTimeout(searchInputRef.value.focus(), 100)
+    if (visible) {
+      setTimeout(searchInputRef.value.focus(), 100)
+    }
   }
 
   const onSelectChange = (selectedRowKeys: Key[]) => {

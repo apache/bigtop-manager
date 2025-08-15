@@ -69,7 +69,9 @@
     async ([open, visible]) => {
       if (open || visible) {
         await aiChatStore.getThreadsFromAuthPlatform()
-        Object.keys(currThread.value || {}).length <= 0 && (currThread.value = threads.value[0])
+        if (Object.keys(currThread.value || {}).length <= 0) {
+          currThread.value = threads.value[0]
+        }
         selectKey.value = [currThread.value?.threadId || '']
       }
     },
@@ -116,7 +118,9 @@
             currThread.value = {}
           } else {
             const isEqual = thread.threadId === currThread.value.threadId
-            idx >= threadCounts && (currThread.value = threads.value[0])
+            if (idx >= threadCounts) {
+              currThread.value = threads.value[0]
+            }
             if (isEqual) {
               currThread.value = threads.value[idx]
               aiChatStore.getThread(currThread.value.threadId as ThreadId)
