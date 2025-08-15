@@ -78,11 +78,9 @@
    * Toggles the activated icon for menu items.
    */
   const toggleActivatedIcon = (menuItem: { key: string; icon: string }) => {
-    const { key, icon } = menuItem
+    const { key } = menuItem
     const matchedRouteFromClusters = selectMenuKeyFromClusters.value && routeParamsLen.value > 0
     return key === siderMenuSelectedKey.value || (matchedRouteFromClusters && key === 'clusters')
-      ? `${icon}-activated`
-      : icon
   }
 
   const addCluster = () => {
@@ -116,13 +114,10 @@
         <a-sub-menu v-if="menuItem.name === 'Clusters'" :key="menuItem.path">
           <template #icon>
             <svg-icon
+              color="inherit"
               style="height: 16px; width: 16px"
-              :name="
-                toggleActivatedIcon({
-                  key: (menuItem.redirect as string) || menuItem.path,
-                  icon: menuItem.meta?.icon || ''
-                })
-              "
+              :highlight="toggleActivatedIcon({ key: menuItem.path, icon: menuItem.meta?.icon || '' })"
+              :name="menuItem.meta?.icon || ''"
             />
           </template>
           <template #title>
@@ -148,7 +143,8 @@
             <template #icon>
               <svg-icon
                 style="height: 16px; width: 16px"
-                :name="toggleActivatedIcon({ key: menuItem.redirect as string, icon: menuItem.meta?.icon || '' })"
+                :highlight="toggleActivatedIcon({ key: menuItem.redirect as string, icon: menuItem.meta?.icon || '' })"
+                :name="menuItem.meta?.icon || ''"
               />
             </template>
             <span>{{ t(menuItem.meta!.title!) }}</span>

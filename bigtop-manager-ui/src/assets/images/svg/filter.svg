@@ -19,7 +19,7 @@
 -->
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
   viewBox="0 0 16 16" fill="none">
-  <path d="M2 3L6.8 8.60593L6.8 12.8148L9.2 14L9.2 8.60593L14 3L2 3Z" stroke="rgba(51, 51, 51, 1)"
+  <path d="M2 3L6.8 8.60593L6.8 12.8148L9.2 14L9.2 8.60593L14 3L2 3Z" stroke="currentColor"
     stroke-width="1.3333333333333333" stroke-linejoin="round">
   </path>
 </svg>

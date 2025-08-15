@@ -86,7 +86,8 @@
               {{ item.label }}
             </span>
             <svg-icon
-              :name="filterParams[`${item.key}`] === undefined ? 'bottom' : 'bottom-activated'"
+              name="bottom"
+              :highlight="filterParams[`${item.key}`] !== undefined"
               style="padding: 6px 4px; margin-left: 8px"
             />
           </div>

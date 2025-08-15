@@ -51,7 +51,7 @@ export function copyText(text: string): Promise<any> {
 }
 
 export function usePngImage(imageName: string): string {
-  return imgMap[imageName] ?? imgMap['bm-logo']
+  return imgMap[imageName] ?? imgMap['logo']
 }
 
 export function scrollToBottom(container: HTMLElement | null) {
