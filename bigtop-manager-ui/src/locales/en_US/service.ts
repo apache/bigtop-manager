@@ -41,5 +41,6 @@ export default {
   snapshot_notes: 'Snapshot Notes',
   exact: '{0} requires exactly {1} host(s).',
   range: '{0} requires between {1} and {2} host(s).',
-  minOnly: '{0} requires at least {1} host(s).'
+  minOnly: '{0} requires at least {1} host(s).',
+  required: 'Field cannot be empty.'
 }

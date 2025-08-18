@@ -41,5 +41,6 @@ export default {
   snapshot_notes: '快照备注',
   exact: '{0} 需要 {1} 个主机',
   range: '{0} 需要 {1} 到 {2} 个主机',
-  minOnly: '{0} 至少需要 {1} 个主机'
+  minOnly: '{0} 至少需要 {1} 个主机',
+  required: '该字段不能为空。'
 }
