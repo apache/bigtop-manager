@@ -16,37 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.dao.po;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import { generateMetaMap } from '../plugins/unplugin-image-manifest/generate'
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import java.io.Serializable;
-
-@Data
-@EqualsAndHashCode(callSuper = true)
-@Table(name = "user")
-public class UserPO extends BasePO implements Serializable {
-
-    @Id
-    @Column(name = "id")
-    private Long id;
-
-    @Column(name = "username")
-    private String username;
-
-    @Column(name = "password")
-    private String password;
-
-    @Column(name = "nickname")
-    private String nickname;
-
-    @Column(name = "status")
-    private Boolean status;
-
-    @Column(name = "token_version")
-    private Integer tokenVersion;
-}
+generateMetaMap().catch((err) => {
+  console.error(err)
+  process.exit(1)
+})

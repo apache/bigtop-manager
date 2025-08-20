@@ -57,6 +57,8 @@ Bigtop Manager UI is the front-end UI of the Manager platform, which stores code
 │   ├── utils/                 # Utility functions
 │   ├── App.vue                # Root component
 │   └── main.ts                # Project entry point
+├── plugins/                   # Vite plugins
+├── cli/                       # CLI scripts 
 ├── tests/                     # Unit and integration tests
 ├── index.html                 # HTML template
 ├── package.json               # Project metadata and dependencies

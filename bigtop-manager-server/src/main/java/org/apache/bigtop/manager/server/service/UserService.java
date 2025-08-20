@@ -32,6 +32,14 @@ public interface UserService {
     UserVO current();
 
     /**
+     * Get a user
+     *
+     * @param id user id
+     * @return user
+     */
+    UserVO get(Long id);
+
+    /**
      * Update a user
      *
      * @return user

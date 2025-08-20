@@ -258,8 +258,8 @@
         </div>
       </template>
       <template #customFilterIcon="{ filtered, column }">
-        <svg-icon v-if="column.key != 'status'" :name="filtered ? 'search-activated' : 'search'" />
-        <svg-icon v-else :name="filtered ? 'filter-activated' : 'filter'" />
+        <svg-icon v-if="column.key != 'status'" name="search" :highlight="filtered" />
+        <svg-icon v-else name="filter" :highlight="filtered" />
       </template>
       <template #bodyCell="{ record, column }">
         <template v-if="column.key === 'hostname'">

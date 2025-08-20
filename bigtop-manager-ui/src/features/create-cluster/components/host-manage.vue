@@ -250,7 +250,7 @@
         </div>
       </template>
       <template #customFilterIcon="{ filtered }">
-        <svg-icon :name="filtered ? 'search-activated' : 'search'" />
+        <svg-icon name="search" :highlight="filtered" />
       </template>
       <template #bodyCell="{ record, column }">
         <template v-if="column.key === 'status'">

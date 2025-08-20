@@ -22,46 +22,36 @@
     avatar: IconSvgAvatar,
     'bm-logo': IconSvgBmLogo,
     book: IconSvgBook,
-    'bottom-activated': IconSvgBottomActivated,
     bottom: IconSvgBottom,
     canceled: IconSvgCanceled,
     'chat-avatar': IconSvgChatAvatar,
     chatbot: IconSvgChatbot,
     close: IconSvgClose,
-    'clusters-activated': IconSvgClustersActivated,
     clusters: IconSvgClusters,
     communication: IconSvgCommunication,
-    'components-activated': IconSvgComponentsActivated,
     components: IconSvgComponents,
     copy: IconSvgCopy,
     download: IconSvgDownload,
     error: IconSvgError,
     'exit-screen': IconSvgExitScreen,
     failed: IconSvgFailed,
-    'filter-activated': IconSvgFilterActivated,
     filter: IconSvgFilter,
     'full-screen': IconSvgFullScreen,
     github: IconSvgGithub,
     history: IconSvgHistory,
-    'hosts-activated': IconSvgHostsActivated,
     hosts: IconSvgHosts,
-    'infrastructures-activated': IconSvgInfrastructuresActivated,
     infrastructures: IconSvgInfrastructures,
     installing: IconSvgInstalling,
     language: IconSvgLanguage,
-    'llm-config-activated': IconSvgLlmConfigActivated,
     'llm-config': IconSvgLlmConfig,
     'more-line': IconSvgMoreLine,
     more: IconSvgMore,
-    'plus-dark': IconSvgPlusDark,
-    'plus-gray': IconSvgPlusGray,
     plus: IconSvgPlus,
     processing: IconSvgProcessing,
     question: IconSvgQuestion,
     remove: IconSvgRemove,
     restart: IconSvgRestart,
     retry: IconSvgRetry,
-    'search-activated': IconSvgSearchActivated,
     search: IconSvgSearch,
     send: IconSvgSend,
     start: IconSvgStart,
@@ -70,12 +60,29 @@
     unknown: IconSvgUnknown,
     'carbon-language': IconSvgCarbonLanguage,
     warn: IconSvgWarn
+  } as const
+
+  type SvgNameType = keyof typeof icons
+
+  interface Props {
+    name: SvgNameType | undefined | string
+    color?: string
+    highlight?: boolean
+    highlightColor?: string
   }
 
-  const props = defineProps<{ name: string | undefined }>()
-  const isIcon = computed(() => props.name && icons[props.name])
+  const props = withDefaults(defineProps<Props>(), {
+    name: 'bm-logo',
+    color: '#333',
+    highlight: false,
+    highlightColor: '#1677ff'
+  })
+
+  const svgComp = computed(() => props.name && icons[props.name])
 </script>
 
 <template>
-  <component :is="isIcon" v-if="props.name" />
+  <component :is="svgComp" v-if="props.name" :style="{ color: props.highlight ? props.highlightColor : props.color }" />
 </template>
+
+<style scoped></style>

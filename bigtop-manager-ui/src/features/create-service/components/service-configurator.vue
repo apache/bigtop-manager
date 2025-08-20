@@ -176,7 +176,7 @@
                 @click.stop="manualAddProperty(config)"
               >
                 <template #icon>
-                  <svg-icon name="plus-dark" />
+                  <svg-icon name="plus" />
                 </template>
               </a-button>
             </template>

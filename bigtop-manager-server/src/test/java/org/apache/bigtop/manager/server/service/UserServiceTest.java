@@ -23,6 +23,7 @@ import org.apache.bigtop.manager.dao.po.UserPO;
 import org.apache.bigtop.manager.dao.repository.UserDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
+import org.apache.bigtop.manager.server.holder.SessionUserHolder;
 import org.apache.bigtop.manager.server.model.dto.UserDTO;
 import org.apache.bigtop.manager.server.service.impl.UserServiceImpl;
 
@@ -30,6 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
@@ -37,6 +39,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -50,12 +53,19 @@ public class UserServiceTest {
 
     @Test
     public void testCurrentAndUpdate() {
-        when(userDao.findOptionalById(any())).thenReturn(Optional.of(new UserPO()));
-        assert userService.current() != null;
+        // Behavior of Mock SessionUserHolder
+        try (MockedStatic<SessionUserHolder> mockedSessionHolder = mockStatic(SessionUserHolder.class)) {
 
-        UserDTO userDTO = new UserDTO();
-        userDTO.setNickname("test");
-        assert userService.update(userDTO).getNickname().equals("test");
+            // Set SessionUserHolder. getUserId() to return 1L
+            mockedSessionHolder.when(SessionUserHolder::getUserId).thenReturn(1L);
+
+            when(userDao.findOptionalById(1L)).thenReturn(Optional.of(new UserPO()));
+            assert userService.current() != null;
+
+            UserDTO userDTO = new UserDTO();
+            userDTO.setNickname("test");
+            assert userService.update(userDTO).getNickname().equals("test");
+        }
     }
 
     @Test

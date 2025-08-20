@@ -39,12 +39,15 @@ public class JWTUtilsTest {
     public void testGenerateTokenNormal() {
         Long id = 1L;
         String username = "testUser";
-        String token = JWTUtils.generateToken(id, username);
+        Integer tokenVersion = 1;
+        String token = JWTUtils.generateToken(id, username, tokenVersion);
         assertNotNull(token);
 
         DecodedJWT decodedJWT = JWTUtils.resolveToken(token);
-        assertEquals(decodedJWT.getClaim(JWTUtils.CLAIM_ID).asLong(), id);
-        assertEquals(decodedJWT.getClaim(JWTUtils.CLAIM_USERNAME).asString(), username);
+        assertEquals(id, decodedJWT.getClaim(JWTUtils.CLAIM_ID).asLong());
+        assertEquals(username, decodedJWT.getClaim(JWTUtils.CLAIM_USERNAME).asString());
+        assertEquals(
+                tokenVersion, decodedJWT.getClaim(JWTUtils.CLAIM_TOKEN_VERSION).asInt());
     }
 
     @Test
@@ -79,10 +82,10 @@ public class JWTUtilsTest {
 
     @Test
     public void testGenerateTokenUsernameEmpty() {
-        String token = JWTUtils.generateToken(1L, "");
+        String token = JWTUtils.generateToken(1L, "", 1);
         assertNotNull(token);
 
         DecodedJWT decodedJWT = JWTUtils.resolveToken(token);
-        assertEquals(decodedJWT.getClaim(JWTUtils.CLAIM_USERNAME).asString(), "");
+        assertEquals("", decodedJWT.getClaim(JWTUtils.CLAIM_USERNAME).asString());
     }
 }

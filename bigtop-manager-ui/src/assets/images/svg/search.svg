@@ -19,19 +19,19 @@
 -->
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
   viewBox="0 0 16 16" fill="none">
-  <path stroke="rgba(0, 0, 0, 1)" stroke-width="1.3333333333333333" stroke-linecap="round"
+  <path stroke="currentColor" stroke-width="1.3333333333333333" stroke-linecap="round"
     d="M1.33301 2.33331L14.6663 2.33331">
   </path>
-  <path stroke="rgba(0, 0, 0, 1)" stroke-width="1.3333333333333333" stroke-linecap="round"
+  <path stroke="currentColor" stroke-width="1.3333333333333333" stroke-linecap="round"
     d="M1.33301 7.66669L4.99967 7.66669">
   </path>
-  <path stroke="rgba(0, 0, 0, 1)" stroke-width="1.3333333333333333" stroke-linecap="round" d="M1.33301 13L4.99967 13">
+  <path stroke="currentColor" stroke-width="1.3333333333333333" stroke-linecap="round" d="M1.33301 13L4.99967 13">
   </path>
   <path
     d="M10.5003 11.3334C12.0651 11.3334 13.3337 10.0648 13.3337 8.50002C13.3337 6.93522 12.0651 5.66669 10.5003 5.66669C8.93553 5.66669 7.66699 6.93522 7.66699 8.50002C7.66699 10.0648 8.93553 11.3334 10.5003 11.3334Z"
-    stroke="rgba(0, 0, 0, 1)" stroke-width="1.3333333333333333">
+    stroke="currentColor" stroke-width="1.3333333333333333">
   </path>
-  <path stroke="rgba(0, 0, 0, 1)" stroke-width="1.3333333333333333" stroke-linecap="round"
+  <path stroke="currentColor" stroke-width="1.3333333333333333" stroke-linecap="round"
     d="M12.333 10.6667L14.6663 13.0169">
   </path>
 </svg>

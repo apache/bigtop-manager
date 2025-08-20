@@ -16,37 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.dao.po;
+package org.apache.bigtop.manager.common.constants;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+public class Caches {
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import java.io.Serializable;
+    public static final String CACHE_NONCE = "auth:nonce";
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-@Table(name = "user")
-public class UserPO extends BasePO implements Serializable {
+    public static final int NONCE_EXPIRE_TIME_MINUTES = 5;
 
-    @Id
-    @Column(name = "id")
-    private Long id;
+    public static final String CACHE_USER = "auth:user";
 
-    @Column(name = "username")
-    private String username;
-
-    @Column(name = "password")
-    private String password;
-
-    @Column(name = "nickname")
-    private String nickname;
-
-    @Column(name = "status")
-    private Boolean status;
-
-    @Column(name = "token_version")
-    private Integer tokenVersion;
+    public static final int USER_EXPIRE_TIME_DAYS = 1;
 }

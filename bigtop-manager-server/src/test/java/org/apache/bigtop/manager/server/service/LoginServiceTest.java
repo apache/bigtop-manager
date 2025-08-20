@@ -19,6 +19,7 @@
 
 package org.apache.bigtop.manager.server.service;
 
+import org.apache.bigtop.manager.common.constants.Caches;
 import org.apache.bigtop.manager.dao.po.UserPO;
 import org.apache.bigtop.manager.dao.repository.UserDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
@@ -35,6 +36,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -60,9 +63,11 @@ public class LoginServiceTest {
     @BeforeEach
     public void setUp() {
         nonce = PasswordUtils.randomString(16);
-        CacheUtils.setCache(USERNAME, nonce);
+        String cacheKey = USERNAME + ":" + nonce;
+        CacheUtils.setCache(Caches.CACHE_NONCE, cacheKey, nonce, Caches.NONCE_EXPIRE_TIME_MINUTES, TimeUnit.MINUTES);
 
         mockUser = new UserPO();
+        mockUser.setId(1L);
         mockUser.setUsername(USERNAME);
         mockUser.setPassword(Pbkdf2Utils.getBcryptPassword(USERNAME, RAW_PASSWORD));
         mockUser.setStatus(true);
