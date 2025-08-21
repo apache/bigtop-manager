@@ -262,8 +262,7 @@ public class HadoopParams extends BigtopParams {
             pb.redirectErrorStream(true);
             Process process = pb.start();
 
-            try (BufferedReader reader =
-                         new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     // Look for lines containing glibc version information
@@ -304,7 +303,7 @@ public class HadoopParams extends BigtopParams {
             Process process = pb.start();
 
             try (java.io.BufferedReader reader =
-                         new java.io.BufferedReader(new java.io.InputStreamReader(process.getInputStream()))) {
+                    new java.io.BufferedReader(new java.io.InputStreamReader(process.getInputStream()))) {
                 String line = reader.readLine();
                 if (line != null && line.startsWith("glibc ")) {
                     String version = line.substring(6).trim();
@@ -391,11 +390,7 @@ public class HadoopParams extends BigtopParams {
      */
     private String findOptimalDomainSocketPath() {
         // Candidate paths in priority order
-        String[] candidatePaths = {
-                "/var/run/hadoop",
-                "/tmp/hadoop",
-                "/tmp"
-        };
+        String[] candidatePaths = {"/var/run/hadoop", "/tmp/hadoop", "/tmp"};
 
         // Check availability of existing paths
         for (String path : candidatePaths) {
@@ -493,8 +488,9 @@ public class HadoopParams extends BigtopParams {
         globalParamsMap.put("native_lib_detection_method", detectionMethod);
         globalParamsMap.put("auto_configured_shortcircuit", nativeLibAvailable);
 
-        log.debug("Native library detection result recorded - available: {}, method: {}",
-                nativeLibAvailable, detectionMethod);
+        log.debug(
+                "Native library detection result recorded - available: {}, method: {}",
+                nativeLibAvailable,
+                detectionMethod);
     }
-
 }
