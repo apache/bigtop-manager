@@ -49,32 +49,6 @@ public abstract class InfraParams extends BaseParams {
         return "infra";
     }
 
-    /**
-     * Infra stack do not belong to any cluster, we cannot use stack home of cluster
-     *
-     * @return group name
-     */
-    @Override
-    public String stackHome() {
-        // Parent path of agent dir, which is bigtop-manager-agent/../
-        String parentPath;
-        if (Environments.isDevMode()) {
-            return SystemUtils.getUserDir().getParentFile().getPath();
-        } else {
-            parentPath = new File(InfraParams.class
-                            .getProtectionDomain()
-                            .getCodeSource()
-                            .getLocation()
-                            .getPath())
-                    .getParentFile()
-                    .getParentFile()
-                    .getParentFile()
-                    .getPath();
-        }
-
-        return parentPath + "/infras";
-    }
-
     public Map<String, List<String>> getClusterHosts() {
         // In Component Status stage, clusterHosts is null
         return payload.getClusterHosts();

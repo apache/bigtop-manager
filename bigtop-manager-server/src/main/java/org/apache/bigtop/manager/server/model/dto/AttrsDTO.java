@@ -25,5 +25,7 @@ import java.io.Serializable;
 @Data
 public class AttrsDTO implements Serializable {
 
+    private Boolean required;
+
     private String type;
 }

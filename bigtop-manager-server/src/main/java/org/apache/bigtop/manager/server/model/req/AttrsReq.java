@@ -23,5 +23,7 @@ import lombok.Data;
 @Data
 public class AttrsReq {
 
+    private Boolean required;
+
     private String type;
 }
