@@ -46,9 +46,6 @@ public class StackMcpTool implements McpTool {
         for (Map.Entry<StackDTO, List<ServiceDTO>> entry : StackUtils.STACK_SERVICE_MAP.entrySet()) {
             StackDTO stackDTO = entry.getKey();
             List<ServiceDTO> serviceDTOList = entry.getValue();
-            for (ServiceDTO serviceDTO : serviceDTOList) {
-                serviceDTO.setConfigs(StackUtils.SERVICE_CONFIG_MAP.get(serviceDTO.getName()));
-            }
 
             StackVO stackVO = StackConverter.INSTANCE.fromDTO2VO(stackDTO);
             stackVO.setServices(ServiceConverter.INSTANCE.fromDTO2VO(serviceDTOList));

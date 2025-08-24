@@ -18,16 +18,12 @@
  */
 package org.apache.bigtop.manager.stack.infra.param;
 
-import org.apache.bigtop.manager.common.utils.Environments;
 import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
 import org.apache.bigtop.manager.stack.core.spi.param.BaseParams;
-
-import org.apache.commons.lang3.SystemUtils;
 
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.File;
 import java.util.List;
 import java.util.Map;
 
