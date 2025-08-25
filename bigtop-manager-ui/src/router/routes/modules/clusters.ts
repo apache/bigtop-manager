@@ -18,7 +18,6 @@
  */
 
 import { RouteRecordRaw } from 'vue-router'
-import { RouteExceptions } from '@/enums'
 import pageView from '@/layouts/index.vue'
 
 const routes: RouteRecordRaw[] = [
@@ -199,4 +198,4 @@ const routes: RouteRecordRaw[] = [
   }
 ]
 
-export { routes, RouteExceptions }
+export { routes }

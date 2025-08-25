@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { type TreeProps, Empty } from 'ant-design-vue'
+  import { Empty } from 'ant-design-vue'
   import type { DataNode, FieldNames, Key } from 'ant-design-vue/es/vc-tree/interface'
 
   interface Props {
@@ -63,14 +63,14 @@
     return pathParts.join('/')
   }
 
-  const handleSelect: TreeProps['onSelect'] = (selectedKeys, e) => {
+  const handleSelect = (selectedKeys: Key[], info?: any) => {
     const selectedKey = selectedKeys[0]
     if (!selectedKey) {
       return
     }
     const checkSelectedKey = checkSelectedKeys.value[0]
     if (selectedKey !== checkSelectedKey) {
-      const keyPath = e.node.parent?.key ? `${e.node.parent?.key}/${selectedKey}` : `${selectedKey}`
+      const keyPath = info?.node.parent?.key ? `${info.node.parent?.key}/${selectedKey}` : `${selectedKey}`
       checkSelectedKeys.value = selectedKeys
       emits('change', keyPath)
     }
@@ -90,6 +90,10 @@
       immediate: true
     }
   )
+
+  defineExpose({
+    handleSelect
+  })
 </script>
 
 <template>

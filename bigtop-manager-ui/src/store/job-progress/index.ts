@@ -135,13 +135,12 @@ export const useJobProgress = defineStore('job-progress', () => {
           onClick: (e: Event) => retryJob(e, execRes, nextAction)
         },
         {
-          default: () => [
-            h('span', {}, t('common.retry')),
+          icon: () =>
             h(SvgIcon, {
               name: 'retry',
               style: { margin: 0 }
-            })
-          ]
+            }),
+          default: () => h('span', {}, t('common.retry'))
         }
       )
     }
