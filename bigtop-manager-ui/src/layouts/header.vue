@@ -25,11 +25,23 @@
   const bigtopMangerDocURL = 'https://github.com/apache/bigtop-manager/tree/main/docs'
 
   const { t } = useI18n()
+  const route = useRoute()
   const menuStore = useMenuStore()
 
   const spaceSize = ref(16)
   const aiAssistantRef = ref<InstanceType<typeof AiAssistant> | null>(null)
   const { headerSelectedKey, headerMenus } = storeToRefs(menuStore)
+
+  watch(
+    () => route,
+    (val) => {
+      const isHeader = headerMenus.value.some((v) => v.path === val.matched[0].path)
+      if (!isHeader) {
+        headerSelectedKey.value = ''
+      }
+    },
+    { deep: true, immediate: true }
+  )
 
   const handleCommunication = () => {
     aiAssistantRef.value?.controlVisible()
