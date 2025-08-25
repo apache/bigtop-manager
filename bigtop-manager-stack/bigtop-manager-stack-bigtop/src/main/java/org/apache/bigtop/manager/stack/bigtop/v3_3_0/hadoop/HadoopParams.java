@@ -18,13 +18,13 @@
  */
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.hadoop;
 
+import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
 import org.apache.bigtop.manager.stack.bigtop.param.BigtopParams;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
 import org.apache.bigtop.manager.stack.core.utils.linux.LinuxOSUtils;
-import org.apache.bigtop.manager.common.shell.ShellResult;
 
 import org.apache.commons.lang3.StringUtils;
 
