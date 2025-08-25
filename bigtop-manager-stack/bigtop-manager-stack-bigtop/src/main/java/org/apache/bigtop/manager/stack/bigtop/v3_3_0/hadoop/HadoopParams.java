@@ -23,6 +23,8 @@ import org.apache.bigtop.manager.stack.bigtop.param.BigtopParams;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
+import org.apache.bigtop.manager.stack.core.utils.linux.LinuxOSUtils;
+import org.apache.bigtop.manager.common.shell.ShellResult;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -31,8 +33,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -258,13 +258,11 @@ public class HadoopParams extends BigtopParams {
     private boolean isGlibcVersionCompatible() {
         try {
             // Method 1: Use ldd command to detect glibc version
-            ProcessBuilder pb = new ProcessBuilder("ldd", "--version");
-            pb.redirectErrorStream(true);
-            Process process = pb.start();
-
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
+            ShellResult result = LinuxOSUtils.execCmd("ldd --version");
+            if (result.getExitCode() == 0) {
+                String output = result.getOutput();
+                String[] lines = output.split("\n");
+                for (String line : lines) {
                     // Look for lines containing glibc version information
                     if (line.contains("GNU libc") || line.contains("GLIBC")) {
                         String version = extractGlibcVersionFromLine(line);
@@ -275,11 +273,8 @@ public class HadoopParams extends BigtopParams {
                         }
                     }
                 }
-            }
-
-            int exitCode = process.waitFor();
-            if (exitCode != 0) {
-                log.debug("ldd --version command failed with exit code: {}", exitCode);
+            } else {
+                log.debug("ldd --version command failed with exit code: {}", result.getExitCode());
             }
 
             // Method 2: Try getconf as fallback detection method
@@ -298,22 +293,16 @@ public class HadoopParams extends BigtopParams {
      */
     private boolean detectGlibcVersionViaGetconf() {
         try {
-            ProcessBuilder pb = new ProcessBuilder("getconf", "GNU_LIBC_VERSION");
-            pb.redirectErrorStream(true);
-            Process process = pb.start();
-
-            try (java.io.BufferedReader reader =
-                    new java.io.BufferedReader(new java.io.InputStreamReader(process.getInputStream()))) {
-                String line = reader.readLine();
-                if (line != null && line.startsWith("glibc ")) {
-                    String version = line.substring(6).trim();
+            ShellResult result = LinuxOSUtils.execCmd("getconf GNU_LIBC_VERSION");
+            if (result.getExitCode() == 0) {
+                String output = result.getOutput().trim();
+                if (output.startsWith("glibc ")) {
+                    String version = output.substring(6).trim();
                     boolean supported = compareVersionStrings(version, "2.34") >= 0;
                     log.debug("Detected glibc version via getconf: {}, supported: {}", version, supported);
                     return supported;
                 }
             }
-
-            process.waitFor();
         } catch (Exception e) {
             log.debug("getconf method detection failed: {}", e.getMessage());
         }
