@@ -42,14 +42,14 @@ export function useValidations() {
     infraNames: string[]
   ) {
     const installedInfra = new Set(serviceStore.getInstalledNamesOrIdsOfServiceByKey('0', 'names'))
-    const missingServiceNams = (requireds ?? []).filter(
+    const missingServiceNames = (requireds ?? []).filter(
       (name) => !installedInfra.has(name) && infraNames.includes(name)
     )
 
-    if (missingServiceNams.length === 0) return false
+    if (missingServiceNames.length === 0) return false
 
     // Get service's displayName
-    const missingDisplayNames = missingServiceNams.map((name) => serviceMap.value?.[name]?.displayName ?? name)
+    const missingDisplayNames = missingServiceNames.map((name) => serviceMap.value?.[name]?.displayName ?? name)
 
     if (!infraNames.includes(targetService.name!)) {
       message.error(t('service.dependencies_conflict_msg', [targetService.displayName!, missingDisplayNames.join(',')]))
