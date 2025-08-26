@@ -16,14 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.req;
+package org.apache.bigtop.manager.server.config;
 
-import lombok.Data;
+import org.apache.bigtop.manager.server.utils.StackUtils;
 
-@Data
-public class AttrsReq {
+import org.springframework.boot.context.event.ApplicationStartedEvent;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.EventListener;
 
-    private Boolean required;
+@Configuration
+public class ServerEventsListener {
 
-    private String type;
+    @EventListener(ApplicationStartedEvent.class)
+    public void onApplicationReadyEvent() {
+        // Init stacks
+        StackUtils.parseStack();
+    }
 }

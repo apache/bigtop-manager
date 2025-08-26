@@ -78,11 +78,13 @@ public class StackUtils {
 
     public static final DAG<String, ComponentCommandWrapper, DagGraphEdge> DAG = new DAG<>();
 
-    static {
-        parseStack();
-    }
+    private static boolean parsed = false;
 
-    private static void parseStack() {
+    public static synchronized void parseStack() {
+        if (parsed) {
+            return;
+        }
+
         File stacksFolder = loadStacksFolder();
         File[] stackFolders = Optional.ofNullable(stacksFolder.listFiles()).orElse(new File[0]);
 
@@ -95,6 +97,8 @@ public class StackUtils {
                 parseService(new StackDTO(stackName, stackVersion), versionFolder);
             }
         }
+
+        parsed = true;
     }
 
     /**

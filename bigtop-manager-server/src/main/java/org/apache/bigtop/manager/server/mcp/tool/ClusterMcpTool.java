@@ -18,40 +18,30 @@
  */
 package org.apache.bigtop.manager.server.mcp.tool;
 
+import org.apache.bigtop.manager.dao.po.ClusterPO;
+import org.apache.bigtop.manager.dao.repository.ClusterDao;
 import org.apache.bigtop.manager.server.mcp.converter.JsonToolCallResultConverter;
-import org.apache.bigtop.manager.server.model.converter.ServiceConverter;
-import org.apache.bigtop.manager.server.model.converter.StackConverter;
-import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
-import org.apache.bigtop.manager.server.model.dto.StackDTO;
-import org.apache.bigtop.manager.server.model.vo.StackVO;
-import org.apache.bigtop.manager.server.utils.StackUtils;
+import org.apache.bigtop.manager.server.model.converter.ClusterConverter;
+import org.apache.bigtop.manager.server.model.vo.ClusterVO;
 
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
+import jakarta.annotation.Resource;
 import java.util.List;
-import java.util.Map;
 
 @Component
-public class StackMcpTool implements McpTool {
+public class ClusterMcpTool implements McpTool {
+
+    @Resource
+    private ClusterDao clusterDao;
 
     @Tool(
-            name = "ListStacks",
-            description = "List supported stacks",
+            name = "ListClusters",
+            description = "List created Clusters",
             resultConverter = JsonToolCallResultConverter.class)
-    public List<StackVO> listStacks() {
-        List<StackVO> stackVOList = new ArrayList<>();
-
-        for (Map.Entry<StackDTO, List<ServiceDTO>> entry : StackUtils.STACK_SERVICE_MAP.entrySet()) {
-            StackDTO stackDTO = entry.getKey();
-            List<ServiceDTO> serviceDTOList = entry.getValue();
-
-            StackVO stackVO = StackConverter.INSTANCE.fromDTO2VO(stackDTO);
-            stackVO.setServices(ServiceConverter.INSTANCE.fromDTO2VO(serviceDTOList));
-            stackVOList.add(stackVO);
-        }
-
-        return stackVOList;
+    public List<ClusterVO> listClusters() {
+        List<ClusterPO> clusterPOList = clusterDao.findAll();
+        return ClusterConverter.INSTANCE.fromPO2VO(clusterPOList);
     }
 }
