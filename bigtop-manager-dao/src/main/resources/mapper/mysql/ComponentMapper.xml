@@ -99,6 +99,25 @@
         </where>
     </select>
 
+    <select id="findByServiceNameAndHostname" resultType="org.apache.bigtop.manager.dao.po.ComponentPO">
+        select
+        <include refid="baseColumnsV2">
+            <property name="alias" value="comp"/>
+        </include>, s.name as service_name, s.user as service_user, s.display_name as service_display_name, s.stack, h.hostname
+        from
+        component comp
+        left join service s on comp.service_id = s.id
+        left join host h on comp.host_id = h.id
+        <where>
+            <if test="serviceName != null and serviceName != ''">
+                and s.name = #{serviceName}
+            </if>
+            <if test="hostname != null and hostname != ''">
+                and h.hostname = #{hostname}
+            </if>
+        </where>
+    </select>
+
     <select id="findDetailsById" resultType="org.apache.bigtop.manager.dao.po.ComponentPO">
         select
         <include refid="baseColumnsV2">

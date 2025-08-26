@@ -66,6 +66,7 @@ public class StackConfigUtils {
         if (propertyModel.getAttrs() != null) {
             AttrsModel attrsModel = propertyModel.getAttrs();
             AttrsDTO attrsDTO = new AttrsDTO();
+            attrsDTO.setRequired(attrsModel.getRequired());
             attrsDTO.setType(attrsModel.getType());
             propertyDTO.setAttrs(attrsDTO);
         }

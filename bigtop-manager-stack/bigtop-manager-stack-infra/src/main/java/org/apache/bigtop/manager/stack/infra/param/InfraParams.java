@@ -18,16 +18,12 @@
  */
 package org.apache.bigtop.manager.stack.infra.param;
 
-import org.apache.bigtop.manager.common.utils.Environments;
 import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
 import org.apache.bigtop.manager.stack.core.spi.param.BaseParams;
-
-import org.apache.commons.lang3.SystemUtils;
 
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -47,32 +43,6 @@ public abstract class InfraParams extends BaseParams {
     @Override
     public String group() {
         return "infra";
-    }
-
-    /**
-     * Infra stack do not belong to any cluster, we cannot use stack home of cluster
-     *
-     * @return group name
-     */
-    @Override
-    public String stackHome() {
-        // Parent path of agent dir, which is bigtop-manager-agent/../
-        String parentPath;
-        if (Environments.isDevMode()) {
-            return SystemUtils.getUserDir().getParentFile().getPath();
-        } else {
-            parentPath = new File(InfraParams.class
-                            .getProtectionDomain()
-                            .getCodeSource()
-                            .getLocation()
-                            .getPath())
-                    .getParentFile()
-                    .getParentFile()
-                    .getParentFile()
-                    .getPath();
-        }
-
-        return parentPath + "/infras";
     }
 
     public Map<String, List<String>> getClusterHosts() {
