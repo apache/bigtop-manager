@@ -174,7 +174,8 @@ public class StackUtils {
             if (file.isDirectory()) {
                 parseTemplateFiles(templateRoot, file, templateMap);
             } else {
-                String relativePath = templateRoot.toURI().relativize(file.toURI()).getPath();
+                String relativePath =
+                        templateRoot.toURI().relativize(file.toURI()).getPath();
                 String content = FileUtils.readFile2Str(file);
                 templateMap.put(relativePath, content);
             }
