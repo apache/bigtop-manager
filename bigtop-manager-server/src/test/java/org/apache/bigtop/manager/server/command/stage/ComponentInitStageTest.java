@@ -21,7 +21,10 @@ package org.apache.bigtop.manager.server.command.stage;
 import org.apache.bigtop.manager.common.utils.Environments;
 import org.apache.bigtop.manager.server.command.task.ComponentInitTask;
 import org.apache.bigtop.manager.server.command.task.Task;
+import org.apache.bigtop.manager.server.utils.StackUtils;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -44,6 +47,21 @@ public class ComponentInitStageTest {
     @Mock
     private ComponentInitStage stage;
 
+    private static MockedStatic<Environments> mocked;
+
+    @BeforeAll
+    public static void setup() {
+        mocked = mockStatic(Environments.class);
+        when(Environments.isDevMode()).thenReturn(true);
+
+        StackUtils.parseStack();
+    }
+
+    @AfterAll
+    public static void teardown() {
+        mocked.close();
+    }
+
     @Test
     public void testCreateTask() {
         MockedConstruction<?> mocked = mockConstruction(ComponentInitTask.class);
@@ -65,12 +83,7 @@ public class ComponentInitStageTest {
 
         ReflectionTestUtils.setField(stage, "stageContext", stageContext);
 
-        MockedStatic<Environments> mocked = mockStatic(Environments.class);
-        when(Environments.isDevMode()).thenReturn(true);
-
         doCallRealMethod().when(stage).getName();
         assertEquals("Init ZooKeeper Server", stage.getName());
-
-        mocked.close();
     }
 }

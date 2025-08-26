@@ -21,17 +21,16 @@ package org.apache.bigtop.manager.server.command.stage;
 import org.apache.bigtop.manager.common.utils.Environments;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.server.command.task.TaskContext;
+import org.apache.bigtop.manager.server.utils.StackUtils;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -44,6 +43,21 @@ public class AbstractComponentStageTest {
 
     @Mock
     private AbstractComponentStage stage;
+
+    private static MockedStatic<Environments> mocked;
+
+    @BeforeAll
+    public static void setup() {
+        mocked = mockStatic(Environments.class);
+        when(Environments.isDevMode()).thenReturn(true);
+
+        StackUtils.parseStack();
+    }
+
+    @AfterAll
+    public static void teardown() {
+        mocked.close();
+    }
 
     @Test
     @SuppressWarnings("unchecked")
@@ -61,13 +75,6 @@ public class AbstractComponentStageTest {
         ReflectionTestUtils.setField(stage, "stageContext", stageContext);
         ReflectionTestUtils.setField(stage, "clusterPO", clusterPO);
 
-        MockedStatic<Environments> mocked = mockStatic(Environments.class);
-        when(Environments.isDevMode()).thenReturn(true);
-
-        Map<String, List<String>> componentHosts = new HashMap<>();
-        componentHosts.put("test", List.of("host1"));
-
-        when(stage.getClusterHosts()).thenReturn(componentHosts);
         doCallRealMethod().when(stage).createTaskContext(any());
         TaskContext taskContext = stage.createTaskContext("host1");
 
@@ -79,13 +86,5 @@ public class AbstractComponentStageTest {
         assertEquals("zookeeper", taskContext.getServiceUser());
         assertEquals("test", taskContext.getUserGroup());
         assertEquals("/opt", taskContext.getRootDir());
-
-        Map<String, Object> properties = taskContext.getProperties();
-        Map<String, List<String>> clusterHosts = (Map<String, List<String>>) properties.get("clusterHosts");
-        assertEquals(1, taskContext.getProperties().size());
-        assertEquals(1, clusterHosts.size());
-        assertEquals("host1", clusterHosts.get("test").get(0));
-
-        mocked.close();
     }
 }
