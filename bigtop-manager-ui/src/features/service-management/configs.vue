@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { Empty, message } from 'ant-design-vue'
+  import { Empty, FormInstance, message } from 'ant-design-vue'
   import { updateServiceConfigs } from '@/api/service'
   import { useCreateServiceStore } from '@/store/create-service'
 
@@ -26,6 +26,8 @@
   import SnapshotManagement from './components/snapshot-management.vue'
 
   import type { Property, ServiceConfig, ServiceVO } from '@/api/service/types'
+
+  type FormStateType = { configs: ServiceConfig[] }
 
   const { t } = useI18n()
   const createStore = useCreateServiceStore()
@@ -36,10 +38,15 @@
   const searchStr = ref('')
   const loading = ref(false)
   const activeKey = ref<number[]>([])
-  const configs = ref<ServiceConfig[]>([])
+  const formRef = ref<FormInstance>()
   const snapshotConfigs = ref<ServiceConfig[]>([])
   const captureRef = ref<InstanceType<typeof CaptureSnapshot>>()
   const snapshotRef = ref<InstanceType<typeof SnapshotManagement>>()
+  const formState = reactive<FormStateType>({
+    configs: []
+  })
+
+  const { configs } = toRefs(formState)
 
   const layout = shallowRef({
     labelCol: {
@@ -80,7 +87,7 @@
    * Adds a new property to the given service configuration.
    * @param config
    */
-  const manualAddPropertyForConfig = (config: ServiceConfig) => {
+  const manualAddProperty = (config: ServiceConfig) => {
     config.properties?.push(createStore.generateProperty())
   }
 
@@ -125,6 +132,10 @@
 
   const saveConfigs = async () => {
     try {
+      const valid = await validate()
+      if (!valid) {
+        return
+      }
       const { id, clusterId } = attrs
       loading.value = true
       const params = createStore.getDiffConfigs(configs.value, snapshotConfigs.value)
@@ -137,6 +148,19 @@
       console.log('error :>> ', error)
     } finally {
       loading.value = false
+    }
+  }
+
+  const validate = async () => {
+    try {
+      searchStr.value = ''
+      await nextTick()
+      await formRef.value?.validate()
+      return true
+    } catch (error: any) {
+      activeKey.value.push(error.errorFields[0].name[1])
+      formRef.value?.scrollToField(error.errorFields[0].name)
+      return false
     }
   }
 
@@ -175,48 +199,84 @@
     </header>
     <section>
       <!-- configs -->
-      <a-form :label-wrap="true" :disabled="loading">
+      <a-form ref="formRef" :model="formState" :label-wrap="true" :disabled="loading">
         <a-empty v-if="filterConfigs.length === 0" :image="Empty.PRESENTED_IMAGE_SIMPLE" />
         <a-collapse v-else v-model:active-key="activeKey" :bordered="false" :ghost="true">
-          <a-collapse-panel v-for="config in filterConfigs" :key="config.id">
-            <template #extra>
-              <a-button type="text" shape="circle" @click.stop="manualAddPropertyForConfig(config)">
-                <template #icon>
-                  <svg-icon name="plus" />
-                </template>
-              </a-button>
-            </template>
-            <template #header>
-              <span>{{ config.name }}</span>
-            </template>
-            <!-- properties -->
-            <template v-for="property in config.properties" :key="property.__key">
-              <a-row v-if="property.action != 'delete'" justify="space-between" :gutter="[16, 0]" :wrap="true">
-                <a-col v-bind="layout.labelCol">
-                  <a-form-item>
-                    <a-textarea
-                      v-if="property.isManual"
-                      v-model:value="property.name"
-                      :auto-size="{ minRows: 1, maxRows: 30 }"
-                    />
-                    <span v-else style="overflow-wrap: break-word" :title="property.displayName ?? property.name">
-                      {{ property.displayName ?? property.name }}
-                    </span>
-                  </a-form-item>
-                </a-col>
-                <a-col v-bind="layout.wrapperCol">
-                  <a-form-item>
-                    <a-textarea v-model:value="property.value" :rows="property?.attrs?.type === 'longtext' ? 10 : 1" />
-                  </a-form-item>
-                </a-col>
-                <a-button type="text" shape="circle" @click="manualDeleteProperty(property, config)">
+          <template v-for="(config, configIdx) in filterConfigs" :key="configIdx">
+            <a-collapse-panel>
+              <template #extra>
+                <a-button type="text" shape="circle" @click.stop="manualAddProperty(config)">
                   <template #icon>
-                    <svg-icon name="remove" />
+                    <svg-icon name="plus" />
                   </template>
                 </a-button>
-              </a-row>
-            </template>
-          </a-collapse-panel>
+              </template>
+              <template #header>
+                <span>{{ config.name }}</span>
+              </template>
+              <!-- properties -->
+              <template v-for="(property, propertyIdx) in config.properties" :key="property.__key">
+                <a-row v-if="property.action != 'delete'" justify="space-between" :gutter="[16, 0]" :wrap="true">
+                  <a-col v-bind="layout.labelCol">
+                    <a-form-item
+                      :key="property.__key"
+                      :name="['configs', configIdx, 'properties', propertyIdx, 'name']"
+                      :rules="{
+                        required: property.attrs?.required,
+                        message: t('service.required')
+                      }"
+                    >
+                      <a-textarea
+                        v-if="property.isManual"
+                        v-model:value="property.name"
+                        :auto-size="{ minRows: 1, maxRows: 30 }"
+                      />
+                      <div
+                        v-else
+                        :title="property.displayName ?? property.name"
+                        class="property-name"
+                        :class="{ 'required-mark': property.attrs?.required }"
+                      >
+                        <span>
+                          {{ property.displayName ?? property.name }}
+                        </span>
+                      </div>
+                    </a-form-item>
+                  </a-col>
+                  <a-col v-bind="layout.wrapperCol">
+                    <a-form-item
+                      :key="property.__key"
+                      :name="['configs', configIdx, 'properties', propertyIdx, 'value']"
+                      :rules="{
+                        required: property.attrs?.required,
+                        message: t('service.required')
+                      }"
+                    >
+                      <a-tooltip v-if="property.desc" placement="topLeft">
+                        <template #title>
+                          <span>{{ property.desc }}</span>
+                        </template>
+                        <a-textarea
+                          v-model:value="property.value"
+                          :rows="property?.attrs?.type === 'longtext' ? 10 : 1"
+                        />
+                      </a-tooltip>
+                      <a-textarea
+                        v-else
+                        v-model:value="property.value"
+                        :rows="property?.attrs?.type === 'longtext' ? 10 : 1"
+                      />
+                    </a-form-item>
+                  </a-col>
+                  <a-button type="text" shape="circle" @click="manualDeleteProperty(property, config)">
+                    <template #icon>
+                      <svg-icon name="remove" />
+                    </template>
+                  </a-button>
+                </a-row>
+              </template>
+            </a-collapse-panel>
+          </template>
         </a-collapse>
       </a-form>
     </section>
@@ -281,6 +341,24 @@
     .divider {
       height: 100%;
       margin-inline: 16px;
+    }
+  }
+
+  .property-name {
+    display: flex;
+    span {
+      flex: 1;
+      min-width: 0;
+      overflow-wrap: break-word;
+      word-break: break-all;
+    }
+  }
+
+  .required-mark {
+    &::before {
+      content: '*';
+      color: $red;
+      padding-right: 4px;
     }
   }
 </style>
