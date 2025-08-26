@@ -48,7 +48,7 @@ public class ZookeeperSetup {
         String zookeeperGroup = zookeeperParams.group();
         Map<String, Object> zookeeperEnv = zookeeperParams.zookeeperEnv();
         Map<String, Object> zooCfg = zookeeperParams.zooCfg();
-        List<String> zkHostList = LocalSettings.hosts("zookeeper_server");
+        List<String> zkHostList = LocalSettings.componentHosts("zookeeper_server");
 
         LinuxFileUtils.createDirectories(
                 zookeeperParams.getZookeeperDataDir(), zookeeperUser, zookeeperGroup, Constants.PERMISSION_755, true);

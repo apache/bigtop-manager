@@ -19,6 +19,7 @@
 package org.apache.bigtop.manager.stack.infra.v1_0_0.prometheus;
 
 import org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload;
+import org.apache.bigtop.manager.grpc.pojo.ClusterInfo;
 import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
@@ -48,6 +49,7 @@ public class PrometheusParams extends InfraParams {
 
     private Map<String, Object> prometheusScrapeJob;
     private Map<String, Object> agentScrapeJob;
+    private List<Map<String, Object>> zookeeperScrapeJobs;
     private List<Map<String, Object>> scrapeJobs;
     private String prometheusPort;
     private String prometheusContent;
@@ -67,9 +69,12 @@ public class PrometheusParams extends InfraParams {
         super.initGlobalParams();
 
         setAgentScrapeJob();
+        setZookeeperScrapeJob();
+
         scrapeJobs = new ArrayList<>();
         scrapeJobs.add(prometheusScrapeJob);
         scrapeJobs.add(agentScrapeJob);
+        scrapeJobs.addAll(zookeeperScrapeJobs);
         globalParamsMap.put("scrape_jobs", scrapeJobs);
         globalParamsMap.put("rules_file_name", prometheusRulesFilename);
     }
@@ -146,5 +151,34 @@ public class PrometheusParams extends InfraParams {
         }
 
         agentScrapeJob.put("targets_list", agentTargets);
+    }
+
+    public void setZookeeperScrapeJob() {
+        zookeeperScrapeJobs = new ArrayList<>();
+        Map<String, Map<String, Object>> configurations = configurations("zookeeper", "zoo.cfg");
+        for (ClusterInfo clusterInfo : clusters()) {
+            Map<String, Object> zooCfg = configurations.get(clusterInfo.getName());
+            Object metricsClass = zooCfg.get("metricsProvider.className");
+            String defaultProvider = "org.apache.zookeeper.metrics.prometheus.PrometheusMetricsProvider";
+            if (metricsClass == null || !metricsClass.equals(defaultProvider)) {
+                continue;
+            }
+
+            String clusterName = clusterInfo.getName();
+            String jobName = MessageFormat.format("{0}-zookeeper", clusterName);
+            Map<String, Object> job = new HashMap<>();
+            job.put("name", jobName);
+            job.put("targets_file", targetsConfigFile(jobName));
+
+            Map<String, Object> target = new HashMap<>();
+            List<String> zkServers = getComponentHosts("zookeeper_server").get(clusterName);
+            Object port = zooCfg.getOrDefault("metricsProvider.httpPort", 7000L);
+
+            List<String> targets = zkServers.stream().map(s -> s + ":" + port).toList();
+            target.put("targets", targets);
+            job.put("targets_list", List.of(target));
+
+            zookeeperScrapeJobs.add(job);
+        }
     }
 }

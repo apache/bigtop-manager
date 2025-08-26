@@ -39,7 +39,6 @@ import org.apache.bigtop.manager.server.utils.StackUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public abstract class AbstractComponentTask extends AbstractTask {
 
@@ -82,12 +81,6 @@ public abstract class AbstractComponentTask extends AbstractTask {
 
         payload.setTemplates(convertTemplateInfo(serviceDTO.getName(), serviceDTO.getTemplates()));
         payload.setPackageSpecifics(convertPackageSpecificInfo(serviceDTO.getPackageSpecifics()));
-
-        Map<String, Object> properties = taskContext.getProperties();
-        if (stackDTO.getStackName().equals("infra")) {
-            Map<String, List<String>> clusterHosts = (Map<String, List<String>>) properties.get("clusterHosts");
-            payload.setClusterHosts(clusterHosts);
-        }
 
         ComponentCommandRequest.Builder requestBuilder = ComponentCommandRequest.newBuilder();
         requestBuilder.setPayload(JsonUtils.writeAsString(payload));

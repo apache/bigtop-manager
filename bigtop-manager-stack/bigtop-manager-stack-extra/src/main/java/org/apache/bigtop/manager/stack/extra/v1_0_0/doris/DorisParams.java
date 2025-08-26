@@ -90,7 +90,7 @@ public class DorisParams extends ExtraParams {
     }
 
     public List<String> dorisFeHosts() {
-        return LocalSettings.hosts("doris_fe");
+        return LocalSettings.componentHosts("doris_fe");
     }
 
     public int dorisFeHttpPort() {
