@@ -27,5 +27,7 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class AttrsModel {
 
+    private Boolean required;
+
     private String type;
 }

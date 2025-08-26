@@ -44,6 +44,9 @@
         <value>2181</value>
         <display-name>Port for running ZK Server</display-name>
         <description>Port for running ZK Server.</description>
+        <attrs>
+            <required>true</required>
+        </attrs>
     </property>
     <property>
         <name>dataDir</name>
