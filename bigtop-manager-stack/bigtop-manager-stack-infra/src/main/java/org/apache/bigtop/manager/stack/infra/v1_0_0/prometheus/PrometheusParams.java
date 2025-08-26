@@ -53,8 +53,6 @@ public class PrometheusParams extends InfraParams {
     private List<Map<String, Object>> scrapeJobs;
     private String prometheusPort;
     private String prometheusContent;
-    private String prometheusRulesFilename;
-    private String prometheusRulesFileContent;
 
     public PrometheusParams(ComponentCommandPayload componentCommandPayload) {
         super(componentCommandPayload);
@@ -76,7 +74,6 @@ public class PrometheusParams extends InfraParams {
         scrapeJobs.add(agentScrapeJob);
         scrapeJobs.addAll(zookeeperScrapeJobs);
         globalParamsMap.put("scrape_jobs", scrapeJobs);
-        globalParamsMap.put("rules_file_name", prometheusRulesFilename);
     }
 
     public String dataDir() {
@@ -113,15 +110,6 @@ public class PrometheusParams extends InfraParams {
         Map<String, Object> configuration = LocalSettings.configurations(getServiceName(), "prometheus");
 
         prometheusContent = (String) configuration.get("content");
-        return configuration;
-    }
-
-    @GlobalParams
-    public Map<String, Object> rules() {
-        Map<String, Object> configuration = LocalSettings.configurations(getServiceName(), "prometheus-rule");
-
-        prometheusRulesFilename = (String) configuration.get("rules_file_name");
-        prometheusRulesFileContent = (String) configuration.get("content");
         return configuration;
     }
 

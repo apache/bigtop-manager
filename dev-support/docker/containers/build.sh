@@ -65,7 +65,7 @@ create_container() {
     container_name="bm-$i"
     log "Create ${container_name}"
     if [ $i -eq 1 ]; then
-      docker run -itd -p 19090:9090 -p 15005:5005 -p 15006:5006 -p 18080:8080 --name ${container_name} --hostname ${container_name} --network bigtop-manager --cap-add=SYS_TIME bigtop-manager/develop:${OS}
+      docker run -itd -p 15005:5005 -p 15006:5006 -p 18080:8080 --name ${container_name} --hostname ${container_name} --network bigtop-manager --cap-add=SYS_TIME bigtop-manager/develop:${OS}
       docker cp ../../../bigtop-manager-dist/target/apache-bigtop-manager-*-server.tar.gz ${container_name}:/opt/bigtop-manager-server.tar.gz
       docker exec ${container_name} bash -c "cd /opt && tar -zxvf bigtop-manager-server.tar.gz"
       docker exec ${container_name} bash -c "ssh-keygen -f '/root/.ssh/id_rsa' -N '' -t rsa"

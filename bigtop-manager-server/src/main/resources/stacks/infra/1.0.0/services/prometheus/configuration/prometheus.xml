@@ -39,9 +39,7 @@ global:
 # Rule files specifies a list of globs. Rules and alerts are read from
 # all matching files.
 rule_files:
-<#if rules_file_name??>
-  - ${rules_file_name}
-</#if>
+  - rules/zookeeper.yml
 
 # A scrape configuration containing exactly one endpoint to scrape:
 # Here it's Prometheus itself.

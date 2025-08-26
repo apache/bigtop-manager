@@ -77,8 +77,8 @@ public abstract class AbstractScript implements Script {
     public ShellResult configure(Params params) {
         List<TemplateInfo> templates = params.templates();
         for (TemplateInfo template : templates) {
-            String dir = params.serviceHome() + "/" + template.getDest();
-            String filename = dir + "/" + template.getSrc();
+            String filename = params.serviceHome() + "/" + template.getDest();
+            String dir = Path.of(filename).getParent().toString();
             LinuxFileUtils.createDirectories(dir, params.user(), params.group(), PERMISSION_755, true);
             LinuxFileUtils.toFile(
                     ConfigType.CONTENT,

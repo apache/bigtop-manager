@@ -160,12 +160,19 @@ public class StackUtils {
     private static void parseServiceTemplates(File file, String serviceName) {
         File templateFolder = new File(file.getAbsolutePath(), TEMPLATE_FOLDER);
         if (templateFolder.exists()) {
-            for (File templateFile :
-                    Optional.ofNullable(templateFolder.listFiles()).orElse(new File[0])) {
-                String filename = templateFile.getName();
-                String content = FileUtils.readFile2Str(templateFile);
-                Map<String, String> map = SERVICE_TEMPLATE_MAP.computeIfAbsent(serviceName, k -> new HashMap<>());
-                map.put(filename, content);
+            Map<String, String> map = SERVICE_TEMPLATE_MAP.computeIfAbsent(serviceName, k -> new HashMap<>());
+            parseTemplateFiles(templateFolder, templateFolder, map);
+        }
+    }
+
+    private static void parseTemplateFiles(File templateRoot, File currentFolder, Map<String, String> templateMap) {
+        for (File file : Optional.ofNullable(currentFolder.listFiles()).orElse(new File[0])) {
+            if (file.isDirectory()) {
+                parseTemplateFiles(templateRoot, file, templateMap);
+            } else {
+                String relativePath = templateRoot.toURI().relativize(file.toURI()).getPath();
+                String content = FileUtils.readFile2Str(file);
+                templateMap.put(relativePath, content);
             }
         }
     }
