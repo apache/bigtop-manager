@@ -70,7 +70,7 @@ public class HadoopParams extends BigtopParams {
         super(componentCommandPayload);
         globalParamsMap.put("hdfs_user", user());
         globalParamsMap.put("hdfs_group", group());
-        globalParamsMap.put("datanode_hosts", LocalSettings.hosts("datanode"));
+        globalParamsMap.put("datanode_hosts", LocalSettings.componentHosts("datanode"));
         globalParamsMap.put("java_home", javaHome());
         globalParamsMap.put("hadoop_home", serviceHome());
         globalParamsMap.put("hadoop_conf_dir", confDir());
@@ -96,7 +96,7 @@ public class HadoopParams extends BigtopParams {
     @GlobalParams
     public Map<String, Object> coreSite() {
         Map<String, Object> coreSite = LocalSettings.configurations(getServiceName(), "core-site");
-        List<String> namenodeList = LocalSettings.hosts("namenode");
+        List<String> namenodeList = LocalSettings.componentHosts("namenode");
         if (!namenodeList.isEmpty()) {
             coreSite.put(
                     "fs.defaultFS", ((String) coreSite.get("fs.defaultFS")).replace("localhost", namenodeList.get(0)));
@@ -112,7 +112,7 @@ public class HadoopParams extends BigtopParams {
     @GlobalParams
     public Map<String, Object> hdfsSite() {
         Map<String, Object> hdfsSite = LocalSettings.configurations(getServiceName(), "hdfs-site");
-        List<String> namenodeList = LocalSettings.hosts("namenode");
+        List<String> namenodeList = LocalSettings.componentHosts("namenode");
         if (!namenodeList.isEmpty()) {
             hdfsSite.put(
                     "dfs.namenode.rpc-address",
@@ -147,7 +147,7 @@ public class HadoopParams extends BigtopParams {
     @GlobalParams
     public Map<String, Object> yarnSite() {
         Map<String, Object> yarnSite = LocalSettings.configurations(getServiceName(), "yarn-site");
-        List<String> resourcemanagerList = LocalSettings.hosts("resourcemanager");
+        List<String> resourcemanagerList = LocalSettings.componentHosts("resourcemanager");
         if (!resourcemanagerList.isEmpty()) {
             yarnSite.put("yarn.resourcemanager.hostname", MessageFormat.format("{0}", resourcemanagerList.get(0)));
         }

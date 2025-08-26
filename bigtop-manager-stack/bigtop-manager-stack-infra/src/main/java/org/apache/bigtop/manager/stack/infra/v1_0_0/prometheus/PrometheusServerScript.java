@@ -54,7 +54,7 @@ public class PrometheusServerScript extends AbstractServerScript {
         PrometheusParams prometheusParams = (PrometheusParams) params;
         String cmd = MessageFormat.format(
                 "nohup {0}/prometheus --config.file={1}/prometheus.yml --web.listen-address={2} --storage.tsdb.path={0}/data > {0}/nohup.out 2>&1 &",
-                prometheusParams.serviceHome(), prometheusParams.confDir(), prometheusParams.listenAddress());
+                prometheusParams.serviceHome(), prometheusParams.serviceHome(), prometheusParams.listenAddress());
         try {
             ShellResult shellResult = LinuxOSUtils.sudoExecCmd(cmd, prometheusParams.user());
             if (shellResult.getExitCode() != 0) {

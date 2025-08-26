@@ -29,6 +29,8 @@ import java.util.Map;
 @Data
 public class JobCachePayload {
 
+    private Long currentClusterId;
+
     private Long clusterId;
 
     private ClusterInfo clusterInfo;
@@ -40,4 +42,6 @@ public class JobCachePayload {
     private Map<String, Map<String, String>> configurations;
 
     private Map<String, List<String>> componentHosts;
+
+    private List<String> hosts;
 }

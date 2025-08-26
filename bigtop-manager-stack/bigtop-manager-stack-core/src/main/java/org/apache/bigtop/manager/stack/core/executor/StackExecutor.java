@@ -44,7 +44,7 @@ public class StackExecutor {
 
     private static final Map<String, Hook> HOOK_MAP = new PrioritySPIFactory<>(Hook.class).getSPIMap();
 
-    private static Script getCommandScript(org.apache.bigtop.manager.grpc.payload.ComponentCommandPayload payload) {
+    private static Script getCommandScript(ComponentCommandPayload payload) {
         String componentName = payload.getComponentName();
         Script script = SCRIPT_MAP.get(componentName);
         if (script == null) {

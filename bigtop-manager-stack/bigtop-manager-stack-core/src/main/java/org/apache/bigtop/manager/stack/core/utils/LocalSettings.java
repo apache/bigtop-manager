@@ -19,6 +19,7 @@
 package org.apache.bigtop.manager.stack.core.utils;
 
 import org.apache.bigtop.manager.common.constants.CacheFiles;
+import org.apache.bigtop.manager.common.utils.FileUtils;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.common.utils.ProjectPathUtils;
 import org.apache.bigtop.manager.common.utils.os.OSDetection;
@@ -30,6 +31,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +46,7 @@ public class LocalSettings {
 
     public static Map<String, Object> configurations(String service, String type) {
         Map<String, Object> configDataMap = new HashMap<>();
-        File file = createFile(ProjectPathUtils.getAgentCachePath() + CacheFiles.CONFIGURATIONS_INFO);
+        File file = createFile(clusterCacheDir() + CacheFiles.CONFIGURATIONS_INFO);
         try {
             if (file.exists()) {
                 Map<String, Map<String, Object>> configJson = JsonUtils.readFromFile(file, new TypeReference<>() {});
@@ -61,22 +63,31 @@ public class LocalSettings {
         return configDataMap;
     }
 
-    public static List<String> hosts(String componentName) {
-        return hosts().getOrDefault(componentName, List.of());
+    public static List<String> componentHosts(String componentName) {
+        return componentHosts().getOrDefault(componentName, List.of());
     }
 
-    public static Map<String, List<String>> hosts() {
+    public static Map<String, List<String>> componentHosts() {
         Map<String, List<String>> hostJson = new HashMap<>();
-        File file = createFile(ProjectPathUtils.getAgentCachePath() + CacheFiles.HOSTS_INFO);
+        File file = createFile(clusterCacheDir() + CacheFiles.COMPONENTS_INFO);
         if (file.exists()) {
             hostJson = JsonUtils.readFromFile(file, new TypeReference<>() {});
         }
         return hostJson;
     }
 
+    public static List<String> clusterHosts() {
+        List<String> hosts = new ArrayList<>();
+        File file = createFile(clusterCacheDir() + CacheFiles.COMPONENTS_INFO);
+        if (file.exists()) {
+            hosts = JsonUtils.readFromFile(file, new TypeReference<>() {});
+        }
+        return hosts;
+    }
+
     public static Map<String, Object> basicInfo() {
         Map<String, Object> settings = new HashMap<>();
-        File file = createFile(ProjectPathUtils.getAgentCachePath() + CacheFiles.SETTINGS_INFO);
+        File file = createFile(clusterCacheDir() + CacheFiles.SETTINGS_INFO);
         if (file.exists()) {
             settings = JsonUtils.readFromFile(file, new TypeReference<>() {});
         }
@@ -85,7 +96,7 @@ public class LocalSettings {
 
     public static Map<String, String> users() {
         Map<String, String> userMap = new HashMap<>();
-        File file = createFile(ProjectPathUtils.getAgentCachePath() + CacheFiles.USERS_INFO);
+        File file = createFile(clusterCacheDir() + CacheFiles.USERS_INFO);
         if (file.exists()) {
             userMap = JsonUtils.readFromFile(file, new TypeReference<>() {});
         }
@@ -110,7 +121,7 @@ public class LocalSettings {
 
     public static List<RepoInfo> repos() {
         List<RepoInfo> repoInfoList = List.of();
-        File file = createFile(ProjectPathUtils.getAgentCachePath() + CacheFiles.REPOS_INFO);
+        File file = createFile(clusterCacheDir() + CacheFiles.REPOS_INFO);
         if (file.exists()) {
             repoInfoList = JsonUtils.readFromFile(file, new TypeReference<>() {});
         }
@@ -119,11 +130,17 @@ public class LocalSettings {
 
     public static ClusterInfo cluster() {
         ClusterInfo clusterInfo = new ClusterInfo();
-        File file = createFile(ProjectPathUtils.getAgentCachePath() + CacheFiles.CLUSTER_INFO);
+        File file = createFile(clusterCacheDir() + CacheFiles.CLUSTER_INFO);
         if (file.exists()) {
             clusterInfo = JsonUtils.readFromFile(file, new TypeReference<>() {});
         }
         return clusterInfo;
+    }
+
+    protected static String clusterCacheDir() {
+        String agentCachePath = ProjectPathUtils.getAgentCachePath();
+        String clusterId = FileUtils.readFile2Str(agentCachePath + File.separator + "current");
+        return agentCachePath + File.separator + clusterId;
     }
 
     protected static File createFile(String fileName) {

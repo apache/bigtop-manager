@@ -51,7 +51,7 @@ public class SolrSetup {
         LinuxFileUtils.createDirectories(solrParams.getSolrLogDir(), solrUser, solrGroup, PERMISSION_755, true);
         LinuxFileUtils.createDirectories(solrParams.getSolrPidDir(), solrUser, solrGroup, PERMISSION_755, true);
 
-        List<String> zookeeperServerHosts = LocalSettings.hosts("zookeeper_server");
+        List<String> zookeeperServerHosts = LocalSettings.componentHosts("zookeeper_server");
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("zookeeper_quorum", zookeeperServerHosts);
         paramMap.put("host", solrParams.hostname());

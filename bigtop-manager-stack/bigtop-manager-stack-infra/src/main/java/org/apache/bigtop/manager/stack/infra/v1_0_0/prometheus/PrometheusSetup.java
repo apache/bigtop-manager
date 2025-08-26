@@ -45,16 +45,7 @@ public class PrometheusSetup {
 
         LinuxFileUtils.toFileByTemplate(
                 prometheusParams.getPrometheusContent(),
-                MessageFormat.format("{0}/prometheus.yml", prometheusParams.confDir()),
-                user,
-                group,
-                Constants.PERMISSION_644,
-                prometheusParams.getGlobalParamsMap());
-
-        LinuxFileUtils.toFileByTemplate(
-                prometheusParams.getPrometheusRulesFileContent(),
-                MessageFormat.format(
-                        "{0}/{1}", prometheusParams.confDir(), prometheusParams.getPrometheusRulesFilename()),
+                MessageFormat.format("{0}/prometheus.yml", prometheusParams.serviceHome()),
                 user,
                 group,
                 Constants.PERMISSION_644,

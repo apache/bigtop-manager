@@ -115,7 +115,7 @@ public class GrafanaParams extends InfraParams {
     @GlobalParams
     public Map<String, Object> prometheus() {
         Map<String, Object> configuration = LocalSettings.configurations(getServiceName(), "grafana-datasources");
-        List<String> prometheusServers = LocalSettings.hosts().get("prometheus_server");
+        List<String> prometheusServers = LocalSettings.componentHosts().get("prometheus_server");
         if (prometheusServers == null || prometheusServers.isEmpty()) {
             return configuration;
         }

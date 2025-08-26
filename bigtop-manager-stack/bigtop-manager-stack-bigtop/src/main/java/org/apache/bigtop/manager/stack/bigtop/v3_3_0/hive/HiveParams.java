@@ -82,13 +82,13 @@ public class HiveParams extends BigtopParams {
 
         // Auto generate zookeeper properties for hive-site.xml
         Map<String, Object> zooCfg = LocalSettings.configurations("zookeeper", "zoo.cfg");
-        List<String> zookeeperQuorum = LocalSettings.hosts("zookeeper_server");
+        List<String> zookeeperQuorum = LocalSettings.componentHosts("zookeeper_server");
 
         configurations.put("hive.zookeeper.client.port", zooCfg.get("clientPort"));
         configurations.put("hive.zookeeper.quorum", String.join(",", zookeeperQuorum));
 
         // Auto generate database properties for hive-site.xml
-        String mysqlHost = LocalSettings.hosts("mysql_server").get(0);
+        String mysqlHost = LocalSettings.componentHosts("mysql_server").get(0);
         String mysqlPassword = LocalSettings.configurations("mysql", "common")
                 .get("root_password")
                 .toString();

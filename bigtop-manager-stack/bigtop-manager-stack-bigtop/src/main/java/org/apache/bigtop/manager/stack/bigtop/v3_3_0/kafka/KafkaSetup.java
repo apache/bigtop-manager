@@ -53,7 +53,7 @@ public class KafkaSetup {
         LinuxFileUtils.createDirectories(kafkaParams.getKafkaLogDir(), kafkaUser, kafkaGroup, PERMISSION_755, true);
         LinuxFileUtils.createDirectories(kafkaParams.getKafkaPidDir(), kafkaUser, kafkaGroup, PERMISSION_755, true);
 
-        List<String> zookeeperServerHosts = LocalSettings.hosts("zookeeper_server");
+        List<String> zookeeperServerHosts = LocalSettings.componentHosts("zookeeper_server");
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("zk_server_list", zookeeperServerHosts);
         paramMap.put("host", kafkaParams.hostname());
