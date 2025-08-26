@@ -72,4 +72,11 @@
             </package-specific>
         </package-specifics>
     </service>
+
+    <templates>
+        <template>
+            <src>rules-zookeeper.yml</src>
+            <dest>rules/zookeeper.yml</dest>
+        </template>
+    </templates>
 </metainfo>
