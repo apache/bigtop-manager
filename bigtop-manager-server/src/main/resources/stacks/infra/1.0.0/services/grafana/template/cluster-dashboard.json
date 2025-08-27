@@ -871,8 +871,8 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "${cluster_dashboard_name}",
-  "uid": "dbuid_${cluster_dashboard_name}",
+  "title": "Cluster",
+  "uid": "dbuid_cluster",
   "version": 4,
   "weekStart": ""
 }

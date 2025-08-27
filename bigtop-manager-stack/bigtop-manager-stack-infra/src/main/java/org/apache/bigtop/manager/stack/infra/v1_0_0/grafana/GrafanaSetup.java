@@ -59,7 +59,7 @@ public class GrafanaSetup {
 
         LinuxFileUtils.toFileByTemplate(
                 grafanaParams.getGrafanaDashboardContent(),
-                MessageFormat.format("{0}/bm-dashboards.yaml", grafanaParams.dashboardsDir()),
+                MessageFormat.format("{0}/dashboards.yaml", grafanaParams.dashboardsDir()),
                 user,
                 group,
                 Constants.PERMISSION_644,
