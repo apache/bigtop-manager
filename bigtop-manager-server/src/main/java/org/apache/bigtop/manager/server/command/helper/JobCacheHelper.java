@@ -99,10 +99,12 @@ public class JobCacheHelper {
             }
 
             for (Long clusterId : clusterIds) {
-                genClusterPayload(payload, clusterId);
+                JobCachePayload copiedPayload =
+                        JsonUtils.readFromString(JsonUtils.writeAsString(payload), JobCachePayload.class);
+                genClusterPayload(copiedPayload, clusterId);
                 JobCacheRequest request = JobCacheRequest.newBuilder()
                         .setJobId(jobId)
-                        .setPayload(JsonUtils.writeAsString(payload))
+                        .setPayload(JsonUtils.writeAsString(copiedPayload))
                         .build();
                 futures.add(CompletableFuture.supplyAsync(() -> {
                     JobCacheServiceGrpc.JobCacheServiceBlockingStub stub = GrpcClient.getBlockingStub(

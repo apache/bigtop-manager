@@ -46,8 +46,6 @@ public class GrafanaParams extends InfraParams {
     private String grafanaContent;
     private String grafanaDashboardContent;
     private String prometheusDashboardPath;
-    private String bmAgentClusterDashboardConfig;
-    private String bmAgentHostDashboardConfig;
     private String grafanaPort;
     private String grafanaLogLevel;
     private String dataSourceContent;
@@ -133,8 +131,6 @@ public class GrafanaParams extends InfraParams {
     public Map<String, Object> dashboards() {
         Map<String, Object> configuration = LocalSettings.configurations(getServiceName(), "grafana-dashboard");
         grafanaDashboardContent = (String) configuration.get("content");
-        bmAgentClusterDashboardConfig = (String) configuration.get("bm_agent_cluster_dashboard");
-        bmAgentHostDashboardConfig = (String) configuration.get("bm_agent_host_dashboard");
         prometheusDashboardPath = MessageFormat.format("{0}/prometheus", dashboardsDir());
         return configuration;
     }
@@ -158,13 +154,16 @@ public class GrafanaParams extends InfraParams {
         hostDashboard.put("name", "Host");
         hostDashboard.put("path", dashboardConfigDir("host"));
 
+        Map<String, Object> zookeeperDashboard = new HashMap<>();
+        zookeeperDashboard.put("name", "ZooKeeper");
+        zookeeperDashboard.put("path", dashboardConfigDir("zookeeper"));
+
         dashboards.add(clusterDashboard);
         dashboards.add(hostDashboard);
+        dashboards.add(zookeeperDashboard);
 
         // Used for dashboard json configuration
         globalParamsMap.put("cluster_label", PrometheusParams.AGENT_TARGET_LABEL);
-        globalParamsMap.put("cluster_dashboard_name", "Cluster");
-        globalParamsMap.put("host_dashboard_name", "Host");
 
         Map<String, List<String>> clusterHost = getClusterHosts();
         if (clusterHost != null && !clusterHost.isEmpty()) {
