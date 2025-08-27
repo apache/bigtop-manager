@@ -70,6 +70,7 @@ export interface Property {
 
 export interface Attr {
   type?: string
+  required?: boolean
 }
 
 export interface ServiceConfigSnapshot {

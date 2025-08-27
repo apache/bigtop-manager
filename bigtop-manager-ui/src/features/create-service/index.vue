@@ -94,7 +94,11 @@
     return true
   }
 
-  const stepValidators = [validateServiceSelection, validateComponentAssignments, () => true, () => true]
+  const validateServiceConfigs = (): Promise<boolean> => {
+    return compRef.value.validate()
+  }
+
+  const stepValidators = [validateServiceSelection, validateComponentAssignments, validateServiceConfigs, () => true]
 
   const proceedToNextStep = async () => {
     const { type } = stepContext.value

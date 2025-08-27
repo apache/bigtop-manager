@@ -18,8 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { debounce } from 'lodash-es'
-  import { Empty } from 'ant-design-vue'
+  import { Empty, FormInstance } from 'ant-design-vue'
   import { useCreateServiceStore } from '@/store/create-service'
   import { useServiceStore } from '@/store/service'
 
@@ -33,6 +32,8 @@
     isView?: boolean
   }
 
+  type FormStateType = { configs: ServiceConfig[] }
+
   withDefaults(defineProps<Props>(), {
     isView: false
   })
@@ -44,11 +45,15 @@
 
   const searchStr = ref('')
   const currService = ref<Key>('')
-  const currConfigs = ref<ServiceConfig[]>([])
   const activeKey = ref<number[]>([])
   const debouncedOnSearch = ref()
   const hostPreviewList = ref<ComponentVO[]>([])
-  const filterConfigs = ref<ServiceConfig[]>([])
+  const formRef = ref<FormInstance>()
+  const treeSelectorRef = ref<InstanceType<typeof TreeSelector> | null>(null)
+  const formState = ref<FormStateType>({
+    configs: []
+  })
+
   const fieldNames = shallowRef({
     title: 'displayName',
     key: 'name'
@@ -78,22 +83,71 @@
       .includes(currService.value.toString().split('/').at(-1)!)
   )
 
+  /**
+   * Computes a map of selected services with their required configurations.
+   * Only includes services with required properties that have empty values.
+   *
+   * @returns A map where the key is the service name and the value is its required configurations.
+   */
+  const selectedServiceMap = computed(() => {
+    const map = new Map<string, ServiceConfig[]>()
+
+    for (const service of selectedServices.value) {
+      if (!service.name || map.has(service.name)) continue
+
+      const requireds = extractRequireds(service.configs)
+      if (requireds.length > 0) map.set(service.name, requireds)
+    }
+
+    return map
+  })
+
+  /**
+   * Filters service configurations based on a search keyword.
+   * Only includes configurations with properties matching the keyword.
+   *
+   * @returns A list of filtered service configurations.
+   */
+  const filterConfigs = computed(() => {
+    const configs = formState.value.configs
+    if (!searchStr.value) return [...configs]
+
+    const result: ServiceConfig[] = []
+    for (const item of configs) {
+      const matchedProp = item.properties?.filter((prop) => matchKeyword(searchStr.value, prop, item))
+      if (matchedProp?.length) {
+        result.push({ ...item, properties: matchedProp })
+      }
+    }
+
+    return result
+  })
+
   const handleSelect = (expandSelectedKeyPath: string) => {
     const name = expandSelectedKeyPath.split('/').at(-1)
     const service = selectedServices.value.find((v) => v.name === name)
 
     currService.value = expandSelectedKeyPath
-    currConfigs.value = service?.configs ?? []
+    formState.value.configs = service?.configs ?? []
     hostPreviewList.value = service?.components ?? []
-
-    filterConfigurations()
   }
 
+  /**
+   * Adds a new property to the given service configuration.
+   * @param config
+   */
   const manualAddProperty = (config: ServiceConfig) => {
     config.properties?.push(createStore.generateProperty())
   }
 
-  const deleteProperty = (property: Property, config: ServiceConfig) => {
+  /**
+   * Marks a property as deleted in the given service configuration.
+   * The property is identified by its name, and its action is set to 'delete'.
+   *
+   * @param property - The property to be marked as deleted.
+   * @param config - The service configuration containing the property.
+   */
+  const manualDeleteProperty = (property: Property, config: ServiceConfig) => {
     const props = config.properties
     if (!Array.isArray(props)) return
 
@@ -103,45 +157,87 @@
     }
   }
 
-  const filterConfigurations = () => {
-    filterConfigs.value = getSearchConfig(currConfigs.value, searchStr.value)
-  }
+  /**
+   * Checks if a keyword matches a property or service configuration.
+   *
+   * @param keyword - The keyword to search for.
+   * @param prop - The property to check.
+   * @param config - Optional service configuration to check.
+   * @returns True if the keyword matches, otherwise false.
+   */
+  const matchKeyword = (keyword: string, prop: Property, config?: ServiceConfig) => {
+    const lowerKeyword = keyword.toLowerCase()
+    const includesProp =
+      prop.name?.toLowerCase().includes(lowerKeyword) ||
+      prop.value?.toLowerCase().includes(lowerKeyword) ||
+      prop.displayName?.toLowerCase().includes(lowerKeyword)
 
-  const getSearchConfig = (data: ServiceConfig[], keyword: string): ServiceConfig[] => {
-    if (keyword === '') {
-      return [...data]
+    if (config != undefined) {
+      return config.name?.toLowerCase().includes(lowerKeyword) || includesProp
     }
 
-    const lowerKeyword = keyword.toLowerCase()
-
-    return data
-      .map((item) => {
-        const matchedProp = item.properties?.filter(
-          ({ name, displayName, value = '' }) =>
-            name.toLowerCase().includes(lowerKeyword) ||
-            value.toLowerCase().includes(lowerKeyword) ||
-            displayName?.toLowerCase().includes(lowerKeyword)
-        )
-
-        if (matchedProp && matchedProp.length > 0) {
-          return {
-            ...item,
-            properties: matchedProp
-          }
-        }
-
-        return null
-      })
-      .filter(Boolean) as ServiceConfig[]
+    return includesProp
   }
 
-  onActivated(() => {
-    filterConfigurations()
-    debouncedOnSearch.value = debounce(filterConfigurations, 300)
-  })
+  /**
+   * Extracts required properties from the given service configurations.
+   * Only properties marked as required and with empty values are included.
+   *
+   * @param configs - The service configurations to check.
+   * @returns A list of configurations with their required properties.
+   */
+  const extractRequireds = (configs?: ServiceConfig[]) => {
+    const result: ServiceConfig[] = []
+
+    for (const config of configs ?? []) {
+      const requireds = config.properties?.filter((p) => p.attrs?.required && p.value == '') ?? []
+      if (requireds.length > 0) {
+        result.push({ [config.name!]: requireds })
+      }
+    }
+
+    return result
+  }
+
+  /**
+   * Checks if there are any required configurations in the selected services.
+   * If required configurations exist, it selects the key in the tree.
+   *
+   * @returns True if no required configurations are found, otherwise false.
+   */
+  const checkRequiredOfConfigs = () => {
+    if (selectedServiceMap.value.size === 0) {
+      return true
+    }
+
+    const key = [...selectedServiceMap.value.keys()][0]
+    treeSelectorRef.value?.handleSelect([key])
+
+    return false
+  }
+
+  const validate = async () => {
+    try {
+      const hasError = checkRequiredOfConfigs()
+      searchStr.value = ''
+      await nextTick()
+      await formRef.value?.validate()
+      return true && hasError
+    } catch (error: any) {
+      activeKey.value.push(error.errorFields[0].name[1])
+      formRef.value?.scrollToField(error.errorFields[0].name)
+      return false
+    }
+  }
 
   onDeactivated(() => {
-    debouncedOnSearch.value.cancel()
+    searchStr.value = ''
+    activeKey.value = []
+    formRef.value?.clearValidate()
+  })
+
+  defineExpose({
+    validate
   })
 </script>
 
@@ -151,7 +247,7 @@
       <div class="list-title">
         <div>{{ t('service.service_list') }}</div>
       </div>
-      <tree-selector :tree="serviceList" :field-names="fieldNames" @change="handleSelect" />
+      <tree-selector ref="treeSelectorRef" :tree="serviceList" :field-names="fieldNames" @change="handleSelect" />
     </section>
     <a-divider type="vertical" class="divider" />
     <section>
@@ -163,59 +259,95 @@
           @input="debouncedOnSearch"
         />
       </div>
-      <a-empty v-if="filterConfigs.length === 0" :image="Empty.PRESENTED_IMAGE_SIMPLE" />
       <!-- configs -->
-      <a-form v-else :disabled="$props.isView || disabled" :label-wrap="true">
-        <a-collapse v-model:active-key="activeKey" :bordered="false" :ghost="true">
-          <a-collapse-panel v-for="config in filterConfigs" :key="config.id">
-            <template #extra>
-              <a-button
-                v-if="!$props.isView && !disabled"
-                type="text"
-                shape="circle"
-                @click.stop="manualAddProperty(config)"
-              >
-                <template #icon>
-                  <svg-icon name="plus" />
-                </template>
-              </a-button>
-            </template>
-            <template #header>
-              <span>{{ config.name }}</span>
-            </template>
-            <!-- properties -->
-            <template v-for="property in config.properties" :key="property.__key">
-              <a-row v-if="property.action != 'delete'" justify="space-between" :gutter="[16, 0]" :wrap="true">
-                <a-col v-bind="layout.labelCol">
-                  <a-form-item>
-                    <a-textarea
-                      v-if="property.isManual"
-                      v-model:value="property.name"
-                      :auto-size="{ minRows: 1, maxRows: 5 }"
-                    />
-                    <span v-else style="overflow-wrap: break-word" :title="property.displayName ?? property.name">
-                      {{ property.displayName ?? property.name }}
-                    </span>
-                  </a-form-item>
-                </a-col>
-                <a-col v-bind="layout.wrapperCol">
-                  <a-form-item>
-                    <a-textarea v-model:value="property.value" :rows="property?.attrs?.type === 'longtext' ? 10 : 1" />
-                  </a-form-item>
-                </a-col>
+      <a-form ref="formRef" :model="formState" :disabled="$props.isView || disabled" :label-wrap="true">
+        <a-empty v-if="filterConfigs.length === 0" :image="Empty.PRESENTED_IMAGE_SIMPLE" />
+        <a-collapse v-else v-model:active-key="activeKey" :bordered="false" :ghost="true">
+          <template v-for="(config, configIdx) in filterConfigs" :key="configIdx">
+            <a-collapse-panel>
+              <template #extra>
                 <a-button
                   v-if="!$props.isView && !disabled"
                   type="text"
                   shape="circle"
-                  @click="deleteProperty(property, config)"
+                  @click.stop="manualAddProperty(config)"
                 >
                   <template #icon>
-                    <svg-icon name="remove" />
+                    <svg-icon name="plus" />
                   </template>
                 </a-button>
-              </a-row>
-            </template>
-          </a-collapse-panel>
+              </template>
+              <template #header>
+                <span>{{ config.name }}</span>
+              </template>
+              <!-- properties -->
+              <template v-for="(property, propertyIdx) in config.properties" :key="property.__key">
+                <a-row v-show="property.action != 'delete'" justify="space-between" :gutter="[16, 0]" :wrap="true">
+                  <a-col v-bind="layout.labelCol">
+                    <a-form-item
+                      :key="property.__key"
+                      :name="['configs', configIdx, 'properties', propertyIdx, 'name']"
+                      :rules="{
+                        required: property.attrs?.required,
+                        message: t('service.required')
+                      }"
+                    >
+                      <a-textarea
+                        v-if="property.isManual"
+                        v-model:value="property.name"
+                        :auto-size="{ minRows: 1, maxRows: 5 }"
+                      />
+                      <div
+                        v-else
+                        :title="property.displayName ?? property.name"
+                        class="property-name"
+                        :class="{ 'required-mark': property.attrs?.required }"
+                      >
+                        <span>
+                          {{ property.displayName ?? property.name }}
+                        </span>
+                      </div>
+                    </a-form-item>
+                  </a-col>
+                  <a-col v-bind="layout.wrapperCol">
+                    <a-form-item
+                      :key="property.__key"
+                      :name="['configs', configIdx, 'properties', propertyIdx, 'value']"
+                      :rules="{
+                        required: property.attrs?.required,
+                        message: t('service.required')
+                      }"
+                    >
+                      <a-tooltip v-if="property.desc" placement="topLeft">
+                        <template #title>
+                          <span>{{ property.desc }}</span>
+                        </template>
+                        <a-textarea
+                          v-model:value="property.value"
+                          :rows="property?.attrs?.type === 'longtext' ? 10 : 1"
+                        />
+                      </a-tooltip>
+                      <a-textarea
+                        v-else
+                        v-model:value="property.value"
+                        :rows="property?.attrs?.type === 'longtext' ? 10 : 1"
+                      />
+                    </a-form-item>
+                  </a-col>
+                  <a-button
+                    v-if="!$props.isView && !disabled"
+                    type="text"
+                    shape="circle"
+                    @click="manualDeleteProperty(property, config)"
+                  >
+                    <template #icon>
+                      <svg-icon name="remove" />
+                    </template>
+                  </a-button>
+                </a-row>
+              </template>
+            </a-collapse-panel>
+          </template>
         </a-collapse>
       </a-form>
     </section>
@@ -283,6 +415,24 @@
     .divider {
       height: 100%;
       margin-inline: 16px;
+    }
+  }
+
+  .property-name {
+    display: flex;
+    span {
+      flex: 1;
+      min-width: 0;
+      overflow-wrap: break-word;
+      word-break: break-all;
+    }
+  }
+
+  .required-mark {
+    &::before {
+      content: '*';
+      color: $red;
+      padding-right: 4px;
     }
   }
 </style>

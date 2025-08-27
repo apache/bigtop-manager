@@ -73,9 +73,9 @@
 
   const props = withDefaults(defineProps<Props>(), {
     name: 'bm-logo',
-    color: '#333',
+    color: 'inherit',
     highlight: false,
-    highlightColor: '#1677ff'
+    highlightColor: 'var(--color-primary)'
   })
 
   const svgComp = computed(() => props.name && icons[props.name])

@@ -28,6 +28,7 @@
   import type { MenuItemType } from 'ant-design-vue/es/menu/src/interface'
   import { usePngImage } from '@/utils/tools'
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   enum Actions {
     DISABLE = '1',
     ENABLE = '2',

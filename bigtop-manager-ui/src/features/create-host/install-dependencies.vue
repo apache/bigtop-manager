@@ -153,7 +153,9 @@
     try {
       installing.value = true
       const data = await installDependencies((dataSource.value = setHostStatusToInstalling()))
-      data && pollUntilInstalled()
+      if (data) {
+        pollUntilInstalled()
+      }
     } catch (error) {
       installing.value = false
       console.log('error :>> ', error)
@@ -228,7 +230,11 @@
   }
 
   const handleInstalled = () => {
-    allInstallSuccess.value ? startAddHosts() : startInstallDependencies()
+    if (allInstallSuccess.value) {
+      startAddHosts()
+    } else {
+      startInstallDependencies()
+    }
   }
 
   const handleOpen = (payLoad: HostReq) => {

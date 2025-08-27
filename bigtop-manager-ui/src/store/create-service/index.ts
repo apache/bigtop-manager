@@ -88,10 +88,10 @@ export const useCreateServiceStore = defineStore(
     const clusterId = computed(() => (creationMode.value === 'internal' ? stepContext.value.clusterId : 0))
 
     const infraServices = computed(() => stackStore.getServicesByExclude(['bigtop', 'extra']) as ExpandServiceVO[])
-    const infraServiceNames = computed(() => infraServices.value.map((v) => v.name!))
+    const infraNames = computed(() => infraServices.value.map((v) => v.name!))
     const excludeInfraServices = computed(() => stackStore.getServicesByExclude(['infra']))
 
-    const processedServices = computed(() => new Set(selectedServices.value.map((v) => v.name)))
+    const processedServices = ref(computed(() => new Set(selectedServices.value.map((v) => v.name))))
 
     const allComps = computed(() => {
       return new Map(
@@ -123,7 +123,9 @@ export const useCreateServiceStore = defineStore(
           }
 
           if (!p[s.name]) {
-            s.configs && (p[s.name] = s.configs)
+            if (s.configs) {
+              p[s.name] = s.configs
+            }
           }
 
           return p
@@ -215,7 +217,7 @@ export const useCreateServiceStore = defineStore(
         return [preSelectedService]
       }
 
-      const valid = validations.validServiceFromInfra(preSelectedService, requiredServices!, infraServiceNames.value)
+      const valid = validations.validServiceFromInfra(preSelectedService, requiredServices!, infraNames.value)
       if (type === 'add' && creationMode.value === 'internal' && valid) {
         return []
       } else {
@@ -269,7 +271,7 @@ export const useCreateServiceStore = defineStore(
     ): Promise<ProcessResult> {
       const dependencies = targetService.requiredServices || []
 
-      const valid = validations.validServiceFromInfra(targetService, dependencies, infraServiceNames.value)
+      const valid = validations.validServiceFromInfra(targetService, dependencies, infraNames.value)
       if (creationMode.value === 'internal' && valid) {
         return { success: false, conflictService: targetService }
       }
@@ -430,17 +432,17 @@ export const useCreateServiceStore = defineStore(
       excludeInfraServices,
       current,
       stepsLimit,
-      nextStep,
-      previousStep,
+      createdPayload,
       allComps,
       componentSnapshot,
+      nextStep,
+      previousStep,
       updateSelectedService,
       updateInstalledStatus,
       setStepContext,
       confirmServiceDependencyAction,
       setComponentHosts,
       createService,
-      createdPayload,
       generateProperty,
       getDiffConfigs,
       injectKeysToConfigs,

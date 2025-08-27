@@ -116,7 +116,9 @@
   }
 
   const getServices = (filters?: ServiceListParams) => {
-    attrs.id != undefined && serviceStore.getServices(attrs.id, filters)
+    if (attrs.id != undefined) {
+      serviceStore.getServices(attrs.id, filters)
+    }
   }
 
   const viewServiceDetail = (payload: ServiceVO) => {

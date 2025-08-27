@@ -35,7 +35,9 @@ const install = (app: App) => {
 
       const observer = new MutationObserver(() => {
         const lastChild = el.lastElementChild
-        lastChild && lastChild.scrollIntoView({ behavior: 'smooth', block: 'end' })
+        if (lastChild) {
+          lastChild.scrollIntoView({ behavior: 'smooth', block: 'end' })
+        }
       })
       observer.observe(el, observerConfig)
 

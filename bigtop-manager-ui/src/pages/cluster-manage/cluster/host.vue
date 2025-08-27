@@ -187,7 +187,11 @@
   }
 
   const afterSetupHostConfig = async (type: 'ADD' | 'EDIT', item: HostReq) => {
-    type === 'ADD' ? installRef.value?.handleOpen(item) : await getHostList(true)
+    if (type === 'ADD') {
+      installRef.value?.handleOpen(item)
+    } else {
+      await getHostList(true)
+    }
   }
 
   const getHostList = async (isReset = false) => {

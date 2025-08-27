@@ -24,6 +24,12 @@ type Data = { [key: string]: any }
 type Result = { [key: string]: any | undefined }
 type PaginationType = PaginationProps | false | undefined
 
+interface FiltersParamsType {
+  pageNum?: number
+  pageSize?: number
+  [propName: string]: FilterValue | null | number | undefined
+}
+
 export interface UseBaseTableProps<T = any> {
   columns: TableColumnType[]
   rows?: T[]
@@ -46,7 +52,8 @@ const useBaseTable = <T>(props: UseBaseTableProps<T>) => {
     pageSizeOptions: ['10', '20', '30', '40', '50'],
     showTotal: (total) => `${t('common.total', [total])}`
   })
-  const filtersParams = ref<Record<string, FilterValue | null | number | undefined>>({
+
+  const filtersParams = ref<FiltersParamsType>({
     pageNum: paginationProps.value ? paginationProps.value.current : undefined,
     pageSize: paginationProps.value ? paginationProps.value.pageSize : undefined
   })

@@ -131,7 +131,7 @@
 
   const validateHostIsCheck = (host: HostVO) => {
     const { type } = stepContext.value
-    const notAdd = currCompSnapshot.value?.hosts.findIndex((v) => v.hostname === host.hostname) == -1
+    const notAdd = (currCompSnapshot.value?.hosts ?? []).findIndex((v) => v.hostname === host.hostname) == -1
     if (type === 'component') {
       return !currCompInfo.value?.uninstall && !notAdd
     } else {

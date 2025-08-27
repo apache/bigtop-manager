@@ -56,7 +56,9 @@ export const useChart = () => {
     if (!selector) {
       new Error('Selector is required to initialize the chart.')
     }
-    chartsRef.value && chartsRef.value.dispose()
+    if (chartsRef.value) {
+      chartsRef.value.dispose()
+    }
     chartsRef.value = echarts.init(selector, null, opts.value)
     chartsRef.value?.setOption(option)
   }
@@ -89,6 +91,7 @@ export const useChart = () => {
   return {
     chartsRef,
     initChart,
-    setOptions
+    setOptions,
+    disposeChart
   }
 }

@@ -59,7 +59,9 @@
     if (open) {
       tempFilterParams.value = cloneDeep(toRaw(filterParams.value))
     } else {
-      !isEqual(tempFilterParams.value, filterParams.value) && confirmFilterParams()
+      if (!isEqual(tempFilterParams.value, filterParams.value)) {
+        confirmFilterParams()
+      }
     }
   }
 
