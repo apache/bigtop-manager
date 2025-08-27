@@ -24,7 +24,6 @@ import org.apache.bigtop.manager.grpc.pojo.TemplateInfo;
 import lombok.Data;
 
 import java.util.List;
-import java.util.Map;
 
 @Data
 public class ComponentCommandPayload {
@@ -46,10 +45,4 @@ public class ComponentCommandPayload {
     private List<PackageSpecificInfo> packageSpecifics;
 
     private List<TemplateInfo> templates;
-
-    /**
-     * This field is exclusively used for Prometheus and Grafana within the infra services.
-     * Includes cluster and corresponding hostname.
-     */
-    private Map<String, List<String>> clusterHosts;
 }

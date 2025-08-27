@@ -33,6 +33,11 @@ import java.nio.charset.StandardCharsets;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FileUtils {
 
+    public static String readFile2Str(String filename) {
+        File file = new File(filename);
+        return readFile2Str(file);
+    }
+
     /**
      * Get Content
      *

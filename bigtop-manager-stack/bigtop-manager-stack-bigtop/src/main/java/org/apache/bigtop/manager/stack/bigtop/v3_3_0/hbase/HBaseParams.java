@@ -56,7 +56,7 @@ public class HBaseParams extends BigtopParams {
         globalParamsMap.put("security_enabled", false);
         globalParamsMap.put("hbase_user", user());
         globalParamsMap.put("hbase_group", group());
-        globalParamsMap.put("regionserver_hosts", LocalSettings.hosts("hbase_regionserver"));
+        globalParamsMap.put("regionserver_hosts", LocalSettings.componentHosts("hbase_regionserver"));
 
         hbaseMasterPidFile = hbasePidDir + "/hbase-" + user() + "-master.pid";
         hbaseRegionServerPidFile = hbasePidDir + "/hbase-" + user() + "-regionserver.pid";
@@ -75,7 +75,7 @@ public class HBaseParams extends BigtopParams {
     @GlobalParams
     public Map<String, Object> hbaseSite() {
         Map<String, Object> configurations = LocalSettings.configurations(getServiceName(), "hbase-site");
-        List<String> zookeeperQuorum = LocalSettings.hosts("zookeeper_server");
+        List<String> zookeeperQuorum = LocalSettings.componentHosts("zookeeper_server");
         Map<String, Object> zooCfg = LocalSettings.configurations("zookeeper", "zoo.cfg");
 
         // Auto generate properties for hbase-site.xml

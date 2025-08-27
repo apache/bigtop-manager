@@ -71,7 +71,7 @@ public class SolrParams extends BigtopParams {
         solrPort = (String) solrEnv.get("solr_port");
         solrPidFile = solrPidDir + "/solr-" + solrPort + ".pid";
 
-        List<String> ZookeeperServerHosts = LocalSettings.hosts("zookeeper_server");
+        List<String> ZookeeperServerHosts = LocalSettings.componentHosts("zookeeper_server");
         Map<String, Object> ZKPort = LocalSettings.configurations("zookeeper", "zoo.cfg");
         String clientPort = (String) ZKPort.get("clientPort");
         zNode = (String) solrEnv.get("solr_znode");

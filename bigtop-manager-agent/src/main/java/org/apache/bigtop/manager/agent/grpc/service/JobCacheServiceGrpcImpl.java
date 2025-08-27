@@ -30,11 +30,13 @@ import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.apache.bigtop.manager.common.constants.CacheFiles.CLUSTER_INFO;
+import static org.apache.bigtop.manager.common.constants.CacheFiles.COMPONENTS_INFO;
 import static org.apache.bigtop.manager.common.constants.CacheFiles.CONFIGURATIONS_INFO;
 import static org.apache.bigtop.manager.common.constants.CacheFiles.HOSTS_INFO;
 import static org.apache.bigtop.manager.common.constants.CacheFiles.REPOS_INFO;
@@ -48,17 +50,21 @@ public class JobCacheServiceGrpcImpl extends JobCacheServiceGrpc.JobCacheService
     public void save(JobCacheRequest request, StreamObserver<JobCacheReply> responseObserver) {
         try {
             JobCachePayload payload = JsonUtils.readFromString(request.getPayload(), JobCachePayload.class);
-            String cacheDir = ProjectPathUtils.getAgentCachePath();
+            String cacheDir = ProjectPathUtils.getAgentCachePath() + File.separator + payload.getClusterId();
             Path p = Paths.get(cacheDir);
             if (!Files.exists(p)) {
                 Files.createDirectories(p);
             }
 
+            String dir = p.getParent().toFile().getAbsolutePath();
+            JsonUtils.writeToFile(dir + "/current", payload.getCurrentClusterId());
+
             JsonUtils.writeToFile(cacheDir + CONFIGURATIONS_INFO, payload.getConfigurations());
-            JsonUtils.writeToFile(cacheDir + HOSTS_INFO, payload.getComponentHosts());
+            JsonUtils.writeToFile(cacheDir + COMPONENTS_INFO, payload.getComponentHosts());
             JsonUtils.writeToFile(cacheDir + USERS_INFO, payload.getUserInfo());
             JsonUtils.writeToFile(cacheDir + REPOS_INFO, payload.getRepoInfo());
             JsonUtils.writeToFile(cacheDir + CLUSTER_INFO, payload.getClusterInfo());
+            JsonUtils.writeToFile(cacheDir + HOSTS_INFO, payload.getHosts());
 
             JobCacheReply reply = JobCacheReply.newBuilder()
                     .setCode(MessageConstants.SUCCESS_CODE)

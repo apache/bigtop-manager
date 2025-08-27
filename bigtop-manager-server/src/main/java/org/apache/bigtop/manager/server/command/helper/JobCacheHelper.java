@@ -54,8 +54,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
-import static org.apache.bigtop.manager.common.constants.Constants.ALL_HOST_KEY;
-
 public class JobCacheHelper {
 
     private static ClusterDao clusterDao;
@@ -90,19 +88,31 @@ public class JobCacheHelper {
 
         List<CompletableFuture<Boolean>> futures = new ArrayList<>();
         for (HostPO hostPO : hostPOList) {
-            genClusterPayload(payload, hostPO.getClusterId());
-            JobCacheRequest request = JobCacheRequest.newBuilder()
-                    .setJobId(jobId)
-                    .setPayload(JsonUtils.writeAsString(payload))
-                    .build();
-            futures.add(CompletableFuture.supplyAsync(() -> {
-                JobCacheServiceGrpc.JobCacheServiceBlockingStub stub = GrpcClient.getBlockingStub(
-                        hostPO.getHostname(),
-                        hostPO.getGrpcPort(),
-                        JobCacheServiceGrpc.JobCacheServiceBlockingStub.class);
-                JobCacheReply reply = stub.save(request);
-                return reply != null && reply.getCode() == MessageConstants.SUCCESS_CODE;
-            }));
+            payload.setCurrentClusterId(hostPO.getClusterId());
+
+            List<Long> clusterIds = new ArrayList<>();
+            if (hostRequiresAllData(hostPO.getHostname())) {
+                clusterIds.addAll(
+                        clusterDao.findAll().stream().map(ClusterPO::getId).toList());
+            } else {
+                clusterIds.add(hostPO.getClusterId());
+            }
+
+            for (Long clusterId : clusterIds) {
+                genClusterPayload(payload, clusterId);
+                JobCacheRequest request = JobCacheRequest.newBuilder()
+                        .setJobId(jobId)
+                        .setPayload(JsonUtils.writeAsString(payload))
+                        .build();
+                futures.add(CompletableFuture.supplyAsync(() -> {
+                    JobCacheServiceGrpc.JobCacheServiceBlockingStub stub = GrpcClient.getBlockingStub(
+                            hostPO.getHostname(),
+                            hostPO.getGrpcPort(),
+                            JobCacheServiceGrpc.JobCacheServiceBlockingStub.class);
+                    JobCacheReply reply = stub.save(request);
+                    return reply != null && reply.getCode() == MessageConstants.SUCCESS_CODE;
+                }));
+            }
         }
 
         List<Boolean> results = futures.stream()
@@ -139,22 +149,22 @@ public class JobCacheHelper {
         Map<String, List<String>> componentHostMap = payload.getComponentHosts();
         componentHostMap.putAll(getComponentHostMap(clusterId));
 
+        List<String> hosts = hostDao.findAllByClusterId(clusterId).stream()
+                .map(HostPO::getHostname)
+                .toList();
+
         payload.setClusterId(clusterId);
         payload.setClusterInfo(clusterInfo);
         payload.setConfigurations(serviceConfigMap);
         payload.setComponentHosts(componentHostMap);
+        payload.setHosts(hosts);
     }
 
     private static void genGlobalPayload(JobCachePayload payload) {
         List<RepoPO> repoPOList = repoDao.findAll();
-        List<HostPO> hostPOList = hostDao.findAll();
-
         Map<String, Map<String, String>> serviceConfigMap = getServiceConfigMap(0L);
 
-        Map<String, List<String>> componentHostMap = new HashMap<>();
-        List<String> allHostnames = hostPOList.stream().map(HostPO::getHostname).toList();
-        componentHostMap.put(ALL_HOST_KEY, allHostnames);
-        componentHostMap.putAll(getComponentHostMap(0L));
+        Map<String, List<String>> componentHostMap = new HashMap<>(getComponentHostMap(0L));
 
         List<RepoInfo> repoList = new ArrayList<>();
         repoPOList.forEach(repoPO -> {
@@ -222,6 +232,16 @@ public class JobCacheHelper {
 
     private static Boolean hostRequiresAllData(String hostname) {
         // Some services like prometheus requires all clusters info to collect metrics.
+        List<ComponentPO> components = componentDao.findByQuery(
+                ComponentQuery.builder().hostname(hostname).build());
+        for (ComponentPO component : components) {
+            ServiceDTO serviceDTO = StackUtils.getServiceDTOByComponentName(component.getName());
+            StackDTO stack = StackUtils.getServiceStack(serviceDTO.getName());
+            if (stack.getStackName().equals("infra")) {
+                return true;
+            }
+        }
+
         return false;
     }
 }
