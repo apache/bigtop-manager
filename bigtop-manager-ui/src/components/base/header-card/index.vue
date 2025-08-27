@@ -73,7 +73,7 @@
       </div>
       <div class="header-card-action">
         <slot name="actions">
-          <button-group :groups="$props.actionGroups" @on-click="onActions" />
+          <button-group :groups="$props.actionGroups ?? []" @on-click="onActions" />
         </slot>
       </div>
     </slot>

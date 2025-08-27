@@ -24,5 +24,6 @@ export default {
   pending: '等待中',
   processing: '运行中',
   success: '运行成功！',
-  failed: '运行失败！'
+  failed: '运行失败！',
+  retry: '确认要重试该作业吗？'
 }

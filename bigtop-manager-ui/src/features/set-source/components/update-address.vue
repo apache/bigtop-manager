@@ -48,7 +48,9 @@
 
   const toggleVisible = (visible = false) => {
     open.value = visible
-    !visible && formRef.value?.resetForm()
+    if (visible) {
+      formRef.value?.resetForm()
+    }
   }
 
   defineExpose({ toggleVisible })

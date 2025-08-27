@@ -31,9 +31,9 @@
     <description>Bigtop Manager UI</description>
 
     <properties>
-        <node.version>v18.17.0</node.version>
-        <pnpm.version>v8.6.9</pnpm.version>
-        <frontend-maven-plugin.version>1.13.4</frontend-maven-plugin.version>
+        <node.version>v20.9.0</node.version>
+        <pnpm.version>v10.12.3</pnpm.version>
+        <frontend-maven-plugin.version>1.15.1</frontend-maven-plugin.version>
         <skip.pnpm.test>false</skip.pnpm.test>
     </properties>
 

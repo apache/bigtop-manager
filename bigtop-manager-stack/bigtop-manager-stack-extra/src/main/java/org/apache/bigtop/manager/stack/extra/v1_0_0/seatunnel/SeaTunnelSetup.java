@@ -141,7 +141,7 @@ public class SeaTunnelSetup {
 
     private static List<String> hostPort(String componentName, String port, int spacesNum) {
         String spaces = " ".repeat(spacesNum);
-        List<String> hostList = LocalSettings.hosts(componentName);
+        List<String> hostList = LocalSettings.componentHosts(componentName);
         hostList.sort(String::compareToIgnoreCase);
         List<String> hostPortList = new ArrayList<>();
         for (String host : hostList) {

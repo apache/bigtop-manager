@@ -113,7 +113,7 @@
       <div v-for="(name, index) in parsedHostNames" :key="index" class="item">{{ name }}</div>
     </div>
     <div v-else>
-      <conflict-resolver v-model:parsedHosts="parsedHosts" :duplicate-hostnames="duplicateHostnames" />
+      <conflict-resolver v-model:parsed-hosts="parsedHosts" :duplicate-hostnames="duplicateHostnames" />
     </div>
     <template #footer>
       <footer>

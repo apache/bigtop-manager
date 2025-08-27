@@ -73,7 +73,7 @@ export interface ChatMessagesRes<T> {
 export const talkWithChatbot = (
   threadId: ThreadId,
   data: { message: string },
-  func: Function
+  func: (progressEvent: AxiosProgressEvent) => void
 ): ChatMessagesRes<AxiosResponse<ChatMessageItem[], any>> => {
   const source: CancelTokenSource = axios.CancelToken.source()
 

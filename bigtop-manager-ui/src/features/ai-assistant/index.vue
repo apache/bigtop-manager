@@ -30,6 +30,7 @@
   import type { ChatMessageItem } from '@/api/ai-assistant/types'
   import type { GroupItem } from '@/components/common/button-group/types'
 
+  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
   enum Action {
     ADD,
     RECORDS,
@@ -113,7 +114,9 @@
   })
 
   watch(open, (val) => {
-    val && initConfig()
+    if (val) {
+      initConfig()
+    }
   })
 
   const controlVisible = (visible: boolean = true) => {
@@ -131,9 +134,13 @@
 
   const initConfig = async () => {
     actionGroup.value.forEach(({ action, clickEvent }) => {
-      action && actionHandlers.value.set(action, clickEvent || (() => {}))
+      if (action) {
+        actionHandlers.value.set(action, clickEvent || (() => {}))
+      }
     })
-    !hasActivePlatform.value && (await llmConfigStore.getAuthorizedPlatforms(false))
+    if (!hasActivePlatform.value) {
+      await llmConfigStore.getAuthorizedPlatforms(false)
+    }
     aiChatStore.initCurrThread()
   }
 
@@ -144,7 +151,11 @@
 
   const onActions = (item: GroupItem<ActionType>) => {
     const handler = item.action && actionHandlers.value.get(item.action)
-    handler ? handler() : console.warn(`Unknown action: ${item.action}`)
+    if (handler) {
+      handler()
+    } else {
+      console.warn(`Unknown action: ${item.action}`)
+    }
   }
 
   const goSetUpLlmConfig = () => {

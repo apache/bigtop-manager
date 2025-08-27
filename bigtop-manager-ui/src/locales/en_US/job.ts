@@ -24,5 +24,6 @@ export default {
   pending: 'Waiting to run',
   processing: 'Running',
   success: 'Run succeeded!',
-  failed: 'Run failed!'
+  failed: 'Run failed!',
+  retry: 'Are you sure you want to retry this job?'
 }

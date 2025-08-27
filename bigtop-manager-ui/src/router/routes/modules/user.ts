@@ -22,7 +22,7 @@ import pageView from '@/layouts/index.vue'
 
 const routes: RouteRecordRaw[] = [
   {
-    path: '/user/',
+    path: '/user',
     redirect: '/user/profile',
     component: pageView,
     meta: {
@@ -33,14 +33,16 @@ const routes: RouteRecordRaw[] = [
         path: 'profile',
         component: () => import('@/pages/user/profile/index.vue'),
         meta: {
-          title: 'Profile'
+          title: 'Profile',
+          activeMenu: ''
         }
       },
       {
         path: 'settings',
         component: () => import('@/pages/user/settings/index.vue'),
         meta: {
-          title: 'Settings'
+          title: 'Settings',
+          activeMenu: ''
         }
       }
     ]

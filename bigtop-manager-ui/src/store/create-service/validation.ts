@@ -20,33 +20,40 @@
 import { message, Modal } from 'ant-design-vue'
 import { useServiceStore } from '@/store/service'
 import SvgIcon from '@/components/base/svg-icon/index.vue'
-
-import type { ExpandServiceVO } from '@/store/stack'
+import { useStackStore, type ExpandServiceVO } from '@/store/stack'
 
 export function useValidations() {
   const { t } = useI18n()
   const serviceStore = useServiceStore()
+  const stackStore = useStackStore()
+
+  const serviceMap = computed(() => stackStore.stackRelationMap?.services)
 
   /**
    * Validate services from infrastructure
    * @param targetService - The service being validated
-   * @param requiredServices - List of required services
-   * @param infraServiceNames - List of available infrastructure services
+   * @param requireds - List of required services
+   * @param infraNames - List of available infrastructure services
    * @returns Whether there are missing services
    */
   function validServiceFromInfra(
     targetService: ExpandServiceVO,
-    requiredServices: string[] | undefined,
-    infraServiceNames: string[]
+    requireds: string[] | undefined,
+    infraNames: string[]
   ) {
     const installedInfra = new Set(serviceStore.getInstalledNamesOrIdsOfServiceByKey('0', 'names'))
-    const missingServices = (requiredServices ?? []).filter(
-      (name) => !installedInfra.has(name) && infraServiceNames.includes(name)
+    const missingServiceNames = (requireds ?? []).filter(
+      (name) => !installedInfra.has(name) && infraNames.includes(name)
     )
 
-    if (missingServices.length === 0) return false
+    if (missingServiceNames.length === 0) return false
 
-    message.error(t('service.dependencies_conflict_msg', [targetService.displayName!, missingServices.join(',')]))
+    // Get service's displayName
+    const missingDisplayNames = missingServiceNames.map((name) => serviceMap.value?.[name]?.displayName ?? name)
+
+    if (!infraNames.includes(targetService.name!)) {
+      message.error(t('service.dependencies_conflict_msg', [targetService.displayName!, missingDisplayNames.join(',')]))
+    }
     return true
   }
 
@@ -54,13 +61,13 @@ export function useValidations() {
    * Confirm dependency addition or removal
    * @param type - The action type ('add' or 'remove')
    * @param targetService - The target service
-   * @param requiredService - The required service
+   * @param requireds - The required service
    * @returns A promise resolving to the user's decision
    */
   function confirmDependencyAddition(
     type: 'add' | 'remove',
     targetService: ExpandServiceVO,
-    requiredService: ExpandServiceVO
+    requireds: ExpandServiceVO
   ) {
     const content = type === 'add' ? 'dependencies_add_msg' : 'dependencies_remove_msg'
 
@@ -70,7 +77,7 @@ export function useValidations() {
         title: () =>
           h('div', { style: { display: 'flex' } }, [
             h(SvgIcon, { name: 'unknown', style: { width: '24px', height: '24px' } }),
-            h('p', t(`service.${content}`, [targetService.displayName, requiredService.displayName]))
+            h('p', t(`service.${content}`, [targetService.displayName, requireds.displayName]))
           ]),
         cancelText: t('common.no'),
         okText: t('common.yes'),

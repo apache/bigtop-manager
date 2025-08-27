@@ -89,7 +89,11 @@
 
   const collectAutoFormRefs = (el: any, title: string) => {
     // Synchronous I18n switch
-    el ? autoFormRefMap.value.set(title, el) : autoFormRefMap.value.delete(title)
+    if (el) {
+      autoFormRefMap.value.set(title, el)
+    } else {
+      autoFormRefMap.value.delete(title)
+    }
   }
 
   const check = async () => {
@@ -98,7 +102,9 @@
       const validation = await Promise.all(autoFormRefs.map((formRef) => formRef?.validate()))
       const allValid = validation.every((res) => res)
       autoFormRefs.forEach((_formRef, index) => {
-        !validation[index] && !activeKey.value.includes(`${index + 1}`) && activeKey.value.push(`${index + 1}`)
+        if (!validation[index] && !activeKey.value.includes(`${index + 1}`)) {
+          activeKey.value.push(`${index + 1}`)
+        }
       })
       return allValid
     } catch (error) {

@@ -29,23 +29,23 @@
 
 ::-webkit-scrollbar-track {
   display: none;
-  -webkit-box-shadow: inset 0 0 2px #b18933;
+  -webkit-box-shadow: $scrollbar-track-shadow;
 }
 
 ::scrollbar-track {
   display: none;
-  box-shadow: inset 0 0 2px #98f165;
+  box-shadow: $scrollbar-track-shadow;
   border-radius: 1px;
 }
 
 ::-webkit-scrollbar-thumb {
   border-radius: 10px;
-  background: #c1c1c1;
+  background: $scrollbar-bg-color;
   -webkit-box-shadow: inset 0 0 1px rgba(0, 102, 102, 0.144);
 }
 
 ::scrollbar-thumb {
   border-radius: 10px;
-  background: #c1c1c1;
+  background: $scrollbar-bg-color;
   box-shadow: inset 0 0 1px rgba(0, 102, 102, 0.144);
 }

@@ -108,7 +108,7 @@ public class LocalSettingsTest {
     }
 
     @Test
-    public void testHosts() {
+    public void testComponentHosts() {
         String componentName = "componentA";
 
         Map<String, List<String>> hostJson = new HashMap<>();
@@ -123,11 +123,13 @@ public class LocalSettingsTest {
         localSettingsMockedStatic
                 .when(() -> JsonUtils.readFromFile(any(File.class), any(TypeReference.class)))
                 .thenReturn(hostJson);
-        localSettingsMockedStatic.when(() -> LocalSettings.hosts(anyString())).thenCallRealMethod();
-        localSettingsMockedStatic.when(LocalSettings::hosts).thenCallRealMethod();
+        localSettingsMockedStatic
+                .when(() -> LocalSettings.componentHosts(anyString()))
+                .thenCallRealMethod();
+        localSettingsMockedStatic.when(LocalSettings::componentHosts).thenCallRealMethod();
 
         List<String> expectedHosts = List.of("host1", "host2");
-        assertEquals(expectedHosts, LocalSettings.hosts(componentName));
+        assertEquals(expectedHosts, LocalSettings.componentHosts(componentName));
     }
 
     @Test

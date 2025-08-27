@@ -84,11 +84,9 @@
     >
       <template #format="percent">
         <span v-if="['Processing', 'Pending'].includes(props.state)"> {{ percent }} % </span>
-        <svg-icon
-          v-else-if="progressConfig.icon"
-          :style="{ margin: 0, 'vertical-align': '-0.5em' }"
-          :name="progressConfig.icon"
-        />
+        <slot v-else-if="progressConfig.icon" name="icon">
+          <svg-icon :style="{ margin: 0, 'vertical-align': '-0.5em' }" :name="progressConfig.icon" />
+        </slot>
       </template>
     </a-progress>
   </div>

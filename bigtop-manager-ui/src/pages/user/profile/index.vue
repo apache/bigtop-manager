@@ -46,7 +46,8 @@
       await userStore.updateUserInfo(editUser)
       open.value = false
       message.success(t('common.update_success'))
-    } catch (e) {
+    } catch (error) {
+      console.log('error', error)
       message.error(t('common.update_fail'))
     } finally {
       loading.value = false

@@ -1,0 +1,111 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#    https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
+groups:
+  - name: zookeeper-alerts
+    rules:
+      - alert: ZooKeeper server is down
+        expr: up{job=~".*-zookeeper"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Instance {{ $labels.instance }} ZooKeeper server is down"
+          description: "{{ $labels.instance }} of job {{$labels.job}} ZooKeeper server is down: [{{ $value }}]."
+
+      - alert: create too many znodes
+        expr: znode_count{job=~".*-zookeeper"} > 1000000
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Instance {{ $labels.instance }} create too many znodes"
+          description: "{{ $labels.instance }} of job {{$labels.job}} create too many znodes: [{{ $value }}]."
+
+      - alert: create too many connections
+        expr: num_alive_connections{job=~".*-zookeeper"} > 50 # suppose we use the default maxClientCnxns: 60
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Instance {{ $labels.instance }} create too many connections"
+          description: "{{ $labels.instance }} of job {{$labels.job}} create too many connections: [{{ $value }}]."
+
+      - alert: znode total occupied memory is too big
+        expr: approximate_data_size{job=~".*-zookeeper"} /1024 /1024 > 1 * 1024 # more than 1024 MB(1 GB)
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Instance {{ $labels.instance }} znode total occupied memory is too big"
+          description: "{{ $labels.instance }} of job {{$labels.job}} znode total occupied memory is too big: [{{ $value }}] MB."
+
+      - alert: set too many watch
+        expr: watch_count{job=~".*-zookeeper"} > 10000
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Instance {{ $labels.instance }} set too many watch"
+          description: "{{ $labels.instance }} of job {{$labels.job}} set too many watch: [{{ $value }}]."
+
+      - alert: a leader election happens
+        expr: increase(election_time_count{job=~".*-zookeeper"}[5m]) > 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Instance {{ $labels.instance }} a leader election happens"
+          description: "{{ $labels.instance }} of job {{$labels.job}} a leader election happens: [{{ $value }}]."
+
+      - alert: open too many files
+        expr: open_file_descriptor_count{job=~".*-zookeeper"} > 300
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Instance {{ $labels.instance }} open too many files"
+          description: "{{ $labels.instance }} of job {{$labels.job}} open too many files: [{{ $value }}]."
+
+      - alert: fsync time is too long
+        expr: rate(fsynctime_sum{job=~".*-zookeeper"}[1m]) > 100
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Instance {{ $labels.instance }} fsync time is too long"
+          description: "{{ $labels.instance }} of job {{$labels.job}} fsync time is too long: [{{ $value }}]."
+
+      - alert: take snapshot time is too long
+        expr: rate(snapshottime_sum{job=~".*-zookeeper"}[5m]) > 100
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Instance {{ $labels.instance }} take snapshot time is too long"
+          description: "{{ $labels.instance }} of job {{$labels.job}} take snapshot time is too long: [{{ $value }}]."
+
+      - alert: avg latency is too high
+        expr: avg_latency{job=~".*-zookeeper"} > 100
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Instance {{ $labels.instance }} avg latency is too high"
+          description: "{{ $labels.instance }} of job {{$labels.job}} avg latency is too high: [{{ $value }}]."

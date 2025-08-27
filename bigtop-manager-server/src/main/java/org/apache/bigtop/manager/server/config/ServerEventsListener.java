@@ -16,5 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.bigtop.manager.server.config;
 
-export * from './route-exceptions'
+import org.apache.bigtop.manager.server.utils.StackUtils;
+
+import org.springframework.boot.context.event.ApplicationStartedEvent;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.EventListener;
+
+@Configuration
+public class ServerEventsListener {
+
+    @EventListener(ApplicationStartedEvent.class)
+    public void onApplicationReadyEvent() {
+        // Init stacks
+        StackUtils.parseStack();
+    }
+}

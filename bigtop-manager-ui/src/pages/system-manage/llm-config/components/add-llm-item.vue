@@ -101,7 +101,9 @@
   )
 
   watchEffect(() => {
-    !open.value && llmConfigStore.resetState()
+    if (!open.value) {
+      llmConfigStore.resetState()
+    }
   })
 
   const handleOpen = async (payload?: AuthorizedPlatform) => {

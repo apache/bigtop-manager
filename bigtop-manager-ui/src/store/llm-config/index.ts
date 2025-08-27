@@ -86,7 +86,9 @@ export const useLlmConfigStore = defineStore(
 
     const getAuthorizedPlatforms = async (hasLoading = true) => {
       try {
-        hasLoading && (loading.value = true)
+        if (hasLoading) {
+          loading.value = true
+        }
         authorizedPlatforms.value = await llmServer.getAuthorizedPlatforms()
       } catch (error) {
         console.log('error :>> ', error)

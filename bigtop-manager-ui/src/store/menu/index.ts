@@ -43,7 +43,9 @@ export const useMenuStore = defineStore(
      */
     const buildMenuMap = () => {
       baseRoutesMap.value = dr.reduce((buildRes, { path, name, meta, children }) => {
-        !meta?.hidden && (buildRes[path] = { path, name, meta, children })
+        if (!meta?.hidden) {
+          buildRes[path] = { path, name, meta, children }
+        }
         return buildRes
       }, {})
     }

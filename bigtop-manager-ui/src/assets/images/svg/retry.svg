@@ -17,12 +17,10 @@
   ~ specific language governing permissions and limitations
   ~ under the License.
 -->
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="12" height="12"
-  viewBox="0 0 12 12" fill="none">
-  <path stroke="rgba(22, 119, 255, 1)" stroke-width="1" stroke-linejoin="round" stroke-linecap="round"
-    d="M9.18197 9.18197C8.36765 9.99632 7.24265 10.5 6 10.5C3.51472 10.5 1.5 8.48528 1.5 6C1.5 3.51472 3.51472 1.5 6 1.5C7.24265 1.5 8.36765 2.00368 9.18197 2.81803C9.59647 3.23252 10.5 4.25 10.5 4.25">
-  </path>
-  <path stroke="rgba(22, 119, 255, 1)" stroke-width="1" stroke-linejoin="round" stroke-linecap="round"
-    d="M10.5 2L10.5 4.25L8.25 4.25">
-  </path>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 12 12" fill="none"
+  preserveAspectRatio="xMidYMid meet">
+  <path stroke="currentColor" stroke-width="1" stroke-linejoin="round" stroke-linecap="round"
+    d="M9.18197 9.18197C8.36765 9.99632 7.24265 10.5 6 10.5C3.51472 10.5 1.5 8.48528 1.5 6C1.5 3.51472 3.51472 1.5 6 1.5C7.24265 1.5 8.36765 2.00368 9.18197 2.81803C9.59647 3.23252 10.5 4.25 10.5 4.25" />
+  <path stroke="currentColor" stroke-width="1" stroke-linejoin="round" stroke-linecap="round"
+    d="M10.5 2L10.5 4.25L8.25 4.25" />
 </svg>

@@ -35,6 +35,8 @@ const useSteps = (stepList: string[]) => {
   return {
     current,
     stepsLimit,
+    hasPrev,
+    hasNext,
     previousStep,
     nextStep
   }
