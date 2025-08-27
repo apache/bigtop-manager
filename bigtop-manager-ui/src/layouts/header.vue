@@ -60,8 +60,8 @@
         mode="horizontal"
         @select="({ key }) => menuStore.onHeaderClick(key as string)"
       >
-        <a-menu-item v-for="route of headerMenus" :key="route.path">
-          {{ t(route.meta?.title || '') }}
+        <a-menu-item v-for="menuRoute of headerMenus" :key="menuRoute.path">
+          {{ t(menuRoute.meta?.title || '') }}
         </a-menu-item>
       </a-menu>
     </div>
