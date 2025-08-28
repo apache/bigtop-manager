@@ -235,13 +235,9 @@ public class HadoopParams extends BigtopParams {
             // Apply short-circuit read configuration
             applyShortCircuitConfiguration(hdfsSite, enableShortCircuit, domainSocketPath);
 
-            // Record configuration results to global parameter map for monitoring and debugging
-            recordNativeLibraryDetectionResult(enableShortCircuit, "glibc_version_check");
-
         } catch (Exception e) {
             log.error("Error occurred during glibc version detection, disabling short-circuit reads for safety", e);
             applyShortCircuitConfiguration(hdfsSite, false, null);
-            recordNativeLibraryDetectionResult(false, "detection_error");
         }
     }
 
@@ -268,20 +264,20 @@ public class HadoopParams extends BigtopParams {
                         String version = extractGlibcVersionFromLine(line);
                         if (version != null) {
                             boolean supported = compareVersionStrings(version, "2.34") >= 0;
-                            log.debug("Detected glibc version via ldd: {}, supported: {}", version, supported);
+                            log.info("Detected glibc version via ldd: {}, supported: {}", version, supported);
                             return supported;
                         }
                     }
                 }
             } else {
-                log.debug("ldd --version command failed with exit code: {}", result.getExitCode());
+                log.info("ldd --version command failed with exit code: {}", result.getExitCode());
             }
 
             // Method 2: Try getconf as fallback detection method
             return detectGlibcVersionViaGetconf();
 
         } catch (Exception e) {
-            log.debug("Exception during glibc version detection: {}", e.getMessage());
+            log.info("Exception during glibc version detection: {}", e.getMessage());
             return detectGlibcVersionViaGetconf();
         }
     }
@@ -299,12 +295,12 @@ public class HadoopParams extends BigtopParams {
                 if (output.startsWith("glibc ")) {
                     String version = output.substring(6).trim();
                     boolean supported = compareVersionStrings(version, "2.34") >= 0;
-                    log.debug("Detected glibc version via getconf: {}, supported: {}", version, supported);
+                    log.info("Detected glibc version via getconf: {}, supported: {}", version, supported);
                     return supported;
                 }
             }
         } catch (Exception e) {
-            log.debug("getconf method detection failed: {}", e.getMessage());
+            log.info("getconf method detection failed: {}", e.getMessage());
         }
 
         // Default to false for safety
@@ -385,7 +381,7 @@ public class HadoopParams extends BigtopParams {
         for (String path : candidatePaths) {
             java.io.File dir = new java.io.File(path);
             if (dir.exists() && dir.canWrite()) {
-                log.debug("Selected domain socket path: {}", path);
+                log.info("Selected domain socket path: {}", path);
                 return path;
             }
         }
@@ -395,7 +391,7 @@ public class HadoopParams extends BigtopParams {
         if (!defaultDir.exists()) {
             try {
                 if (defaultDir.mkdirs()) {
-                    log.debug("Created and using domain socket path: /tmp/hadoop");
+                    log.info("Created and using domain socket path: /tmp/hadoop");
                     return "/tmp/hadoop";
                 }
             } catch (Exception e) {
@@ -403,7 +399,7 @@ public class HadoopParams extends BigtopParams {
             }
         }
 
-        log.debug("Using fallback domain socket path: /tmp");
+        log.info("Using fallback domain socket path: /tmp");
         return "/tmp";
     }
 
@@ -456,30 +452,12 @@ public class HadoopParams extends BigtopParams {
             Object currentCacheSize = hdfsSite.get("dfs.client.read.shortcircuit.streams.cache.size");
             if (currentCacheSize == null || "0".equals(currentCacheSize.toString())) {
                 hdfsSite.put("dfs.client.read.shortcircuit.streams.cache.size", "4096");
-                log.debug("Configured short-circuit read stream cache size to 4096");
+                log.info("Configured short-circuit read stream cache size to 4096");
             }
         } else {
             // Set cache to 0 when short-circuit reads are disabled to save memory
             hdfsSite.put("dfs.client.read.shortcircuit.streams.cache.size", "0");
-            log.debug("Short-circuit read stream cache disabled");
+            log.info("Short-circuit read stream cache disabled");
         }
-    }
-
-    /**
-     * Record native library detection results to global parameter map.
-     * Used for system monitoring, debugging and operational analysis.
-     *
-     * @param nativeLibAvailable Whether native library is available
-     * @param detectionMethod    Detection method identifier
-     */
-    private void recordNativeLibraryDetectionResult(boolean nativeLibAvailable, String detectionMethod) {
-        globalParamsMap.put("native_lib_available", nativeLibAvailable);
-        globalParamsMap.put("native_lib_detection_method", detectionMethod);
-        globalParamsMap.put("auto_configured_shortcircuit", nativeLibAvailable);
-
-        log.debug(
-                "Native library detection result recorded - available: {}, method: {}",
-                nativeLibAvailable,
-                detectionMethod);
     }
 }
