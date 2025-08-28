@@ -75,11 +75,15 @@
         <templates>
             <template>
                 <src>cluster-dashboard.json</src>
-                <dest>conf/provisioning/dashboards/cluster/cluster-dashboard.json</dest>
+                <dest>conf/provisioning/dashboards/cluster/dashboard.json</dest>
             </template>
             <template>
                 <src>host-dashboard.json</src>
-                <dest>conf/provisioning/dashboards/host/host-dashboard.json</dest>
+                <dest>conf/provisioning/dashboards/host/dashboard.json</dest>
+            </template>
+            <template>
+                <src>zookeeper-dashboard.json</src>
+                <dest>conf/provisioning/dashboards/zookeeper/dashboard.json</dest>
             </template>
         </templates>
 

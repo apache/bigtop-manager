@@ -979,8 +979,8 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "${host_dashboard_name}",
-  "uid": "dbuid_${host_dashboard_name}",
+  "title": "Host",
+  "uid": "dbuid_host",
   "version": 19,
   "weekStart": ""
 }

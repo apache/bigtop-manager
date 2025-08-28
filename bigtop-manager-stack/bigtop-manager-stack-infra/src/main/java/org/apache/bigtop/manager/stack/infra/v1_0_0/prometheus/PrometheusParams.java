@@ -153,10 +153,13 @@ public class PrometheusParams extends InfraParams {
             }
 
             String clusterName = clusterInfo.getName();
-            String jobName = MessageFormat.format("{0}-zookeeper", clusterName);
+            String jobName = clusterName + "-zookeeper";
             Map<String, Object> job = new HashMap<>();
             job.put("name", jobName);
             job.put("targets_file", targetsConfigFile(jobName));
+            Map<String, String> labels = new HashMap<>();
+            labels.put("cluster", clusterName);
+            job.put("labels", labels);
 
             Map<String, Object> target = new HashMap<>();
             List<String> zkServers = getComponentHosts("zookeeper_server").get(clusterName);

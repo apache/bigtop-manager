@@ -50,9 +50,15 @@ scrape_configs:
 <#if job.metrics_path??>
     metrics_path: "${job.metrics_path}"
 </#if>
+<#if job.labels?? && job.labels?has_content>
+    relabel_configs:
+<#list job.labels?keys as key>
+      - target_label: ${key}
+        replacement: '${job.labels[key]}'
+</#list>
+</#if>
     file_sd_configs:
       - files: ['${job.targets_file}']
-
 </#list>
 ]]>
         </value>

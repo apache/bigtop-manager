@@ -93,7 +93,7 @@ public abstract class InfraParams extends BaseParams {
                     JsonUtils.readFromFile(subDir + CacheFiles.CONFIGURATIONS_INFO);
 
             Object configData =
-                    configJson.getOrDefault(service, new HashMap<>()).get(type);
+                    configJson.getOrDefault(service, new HashMap<>()).getOrDefault(type, new HashMap<>());
             Map<String, Object> map = JsonUtils.readFromString(configData.toString());
             configurations.put(clusterInfo.get("name"), map);
         }
