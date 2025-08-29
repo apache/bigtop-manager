@@ -6,5 +6,5 @@
     "moduleResolution": "Node16",
     "allowSyntheticDefaultImports": true
   },
-  "include": ["vite.config.ts", "vitest.config.ts", "scripts/**/*.ts"]
+  "include": ["vite.config.ts",]
 }
