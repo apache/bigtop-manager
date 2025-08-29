@@ -11,8 +11,7 @@
     "skipLibCheck": true,
     "types": ["vitest", "vitest/globals", "vite/client"],
     /* Bundler mode */
-    //     "moduleResolution": "Bundler",
-    "moduleResolution": "Node",
+    "moduleResolution": "Bundler",
     "allowImportingTsExtensions": true,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
