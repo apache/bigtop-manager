@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -132,6 +133,24 @@ public class HostController {
     @GetMapping("/installed-status")
     public ResponseEntity<List<InstalledStatusVO>> installedStatus() {
         return ResponseEntity.success(hostService.installedStatus());
+    }
+
+    @Operation(summary = "Start agent", description = "Start agent on the host")
+    @PostMapping("/{id}/start-agent")
+    public ResponseEntity<Boolean> startAgent(@PathVariable("id") Long id) {
+        return ResponseEntity.success(hostService.startAgent(id));
+    }
+
+    @Operation(summary = "Stop agent", description = "Stop agent on the host")
+    @PostMapping("/{id}/stop-agent")
+    public ResponseEntity<Boolean> stopAgent(@PathVariable("id") Long id) {
+        return ResponseEntity.success(hostService.stopAgent(id));
+    }
+
+    @Operation(summary = "Restart agent", description = "Restart agent on the host")
+    @PostMapping("/{id}/restart-agent")
+    public ResponseEntity<Boolean> restartAgent(@PathVariable("id") Long id) {
+        return ResponseEntity.success(hostService.restartAgent(id));
     }
 
     @Operation(summary = "check-duplicate", description = "check hostname duplicate")
