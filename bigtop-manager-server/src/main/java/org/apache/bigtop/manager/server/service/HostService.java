@@ -104,6 +104,30 @@ public interface HostService {
     List<InstalledStatusVO> installedStatus();
 
     /**
+     * Start agent on the host
+     *
+     * @param hostId host id
+     * @return true if started successfully
+     */
+    Boolean startAgent(Long hostId);
+
+    /**
+     * Stop agent on the host
+     *
+     * @param hostId host id
+     * @return true if stopped successfully
+     */
+    Boolean stopAgent(Long hostId);
+
+    /**
+     * Restart agent on the host
+     *
+     * @param hostId host id
+     * @return true if restarted successfully
+     */
+    Boolean restartAgent(Long hostId);
+
+    /**
      * validate host exists
      * @param hostDTO hostnames
      */

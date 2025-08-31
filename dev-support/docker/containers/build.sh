@@ -112,7 +112,7 @@ create_container() {
         docker exec ${container} bash -c "PGPASSWORD=postgres psql -h bm-postgres -p5432 -U postgres -d bigtop_manager -f /opt/bigtop-manager-server/ddl/PostgreSQL-DDL-CREATE.sql"
         docker exec ${container} bash -c "sed -i 's/localhost:5432/bm-postgres:5432/' /opt/bigtop-manager-server/conf/application.yml"
       fi
-      docker exec ${container} bash -c "nohup /bin/bash /opt/bigtop-manager-server/bin/start.sh --debug > /dev/null 2>&1 &"
+      docker exec ${container} bash -c "nohup /bin/bash /opt/bigtop-manager-server/bin/server.sh start --debug > /dev/null 2>&1 &"
     fi
     log "All Service Started!!!"
   done

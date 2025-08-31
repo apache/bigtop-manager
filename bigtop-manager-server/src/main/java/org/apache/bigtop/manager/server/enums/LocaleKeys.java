@@ -37,6 +37,8 @@ public enum LocaleKeys {
     ORIGINAL_PASSWORD_SAME_AS_NEW_PASSWORD("original.password.same.as.new.password"),
     TWO_PASSWORDS_NOT_MATCH("two.passwords.not.match"),
     ORIGINAL_PASSWORD_INCORRECT("original.password.incorrect"),
+    OPERATION_SUCCESS("operation.success"),
+    OPERATION_FAILED("operation.failed"),
 
     CLUSTER_NOT_FOUND("cluster.not.found"),
     CLUSTER_EXISTS("cluster.exists"),
