@@ -37,6 +37,7 @@
 
   const { t } = useI18n()
   const route = useRoute()
+  const router = useRouter()
   const serviceStore = useServiceStore()
   const jobProgressStore = useJobProgress()
   const { loading, serviceMap } = storeToRefs(serviceStore)
@@ -66,18 +67,10 @@
       type: 'primary',
       text: t('common.operation'),
       dropdownMenu: [
-        {
-          action: 'Start',
-          text: t('common.start', [t('common.service')])
-        },
-        {
-          action: 'Restart',
-          text: t('common.restart', [t('common.service')])
-        },
-        {
-          action: 'Stop',
-          text: t('common.stop', [t('common.service')])
-        }
+        { action: 'Start', text: t('common.start', [t('common.service')]) },
+        { action: 'Restart', text: t('common.restart', [t('common.service')]) },
+        { action: 'Stop', text: t('common.stop', [t('common.service')]) },
+        { action: 'Remove', text: t('common.remove', [t('common.service')]), divider: true, danger: true }
       ],
       dropdownMenuClickEvent: (info) => dropdownMenuClick && dropdownMenuClick(info)
     }
@@ -88,21 +81,28 @@
     return components[parseInt(activeKey.value) - 1]
   })
 
-  const dropdownMenuClick: GroupItem['dropdownMenuClickEvent'] = ({ key }) => {
+  const dropdownMenuClick: GroupItem['dropdownMenuClickEvent'] = async ({ key }) => {
     const { id: clusterId, serviceId } = routeParams.value
     const service = serviceMap.value[clusterId].filter((service) => Number(serviceId) === service.id)[0]
-    jobProgressStore.processCommand(
-      {
-        command: key as keyof typeof Command,
-        clusterId,
-        commandLevel: 'service',
-        serviceCommands: [{ serviceName: service.name!, installed: true }]
-      },
-      getServiceDetail,
-      {
-        displayName: service.displayName
-      }
-    )
+
+    if (key === 'Remove') {
+      serviceStore.removeService(service, clusterId, () => {
+        router.replace({ path: `/cluster-manage/clusters/${clusterId}` })
+      })
+    } else {
+      jobProgressStore.processCommand(
+        {
+          command: key as keyof typeof Command,
+          clusterId,
+          commandLevel: 'service',
+          serviceCommands: [{ serviceName: service.name!, installed: true }]
+        },
+        getServiceDetail,
+        {
+          displayName: service.displayName
+        }
+      )
+    }
   }
 
   const getServiceDetail = async () => {
