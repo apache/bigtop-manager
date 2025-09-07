@@ -124,6 +124,7 @@ public class BaseParamsTest {
         globalParamsMap.put("key3", "${key1}");
         globalParamsMap.put("key4", "${not_exists}");
         mockBaseParams.initGlobalParams();
+        mockBaseParams.resolveGlobalParamsIfNeeded();
         assertEquals("kk1_k3", globalParamsMap.get("key"));
         assertEquals("kk1_k3", globalParamsMap.get("key1"));
         assertEquals("value", mockBaseParams.getGlobalParamsMap().get("key2"));
