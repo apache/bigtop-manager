@@ -68,18 +68,10 @@ public abstract class BaseParams implements Params {
     }
 
     public Object getGlobalParam(String key) {
-        if (!globalParamsResolved) {
-            recursivelyResolveGlobalParams();
-        }
-
         return globalParamsMap.get(key);
     }
 
     public Map<String, Object> getGlobalParamsMap() {
-        if (!globalParamsResolved) {
-            recursivelyResolveGlobalParams();
-        }
-
         return globalParamsMap;
     }
 
@@ -99,9 +91,17 @@ public abstract class BaseParams implements Params {
         }
 
         globalParamsMap.remove("content");
+    }
 
-        recursivelyResolveGlobalParams();
-        globalParamsResolved = true;
+    /**
+     * Resolve global parameters if not already resolved.
+     * This method is called after FreeMarker processing to handle remaining ${...} parameters.
+     */
+    public void resolveGlobalParamsIfNeeded() {
+        if (!globalParamsResolved) {
+            recursivelyResolveGlobalParams();
+            globalParamsResolved = true;
+        }
     }
 
     private void recursivelyResolveGlobalParams() {

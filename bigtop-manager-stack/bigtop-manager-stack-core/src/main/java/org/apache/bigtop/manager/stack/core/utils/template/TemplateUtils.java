@@ -19,11 +19,13 @@
 package org.apache.bigtop.manager.stack.core.utils.template;
 
 import org.apache.bigtop.manager.stack.core.enums.ConfigType;
+import org.apache.bigtop.manager.stack.core.spi.param.BaseParams;
 
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 @Slf4j
 public class TemplateUtils {
@@ -42,8 +44,8 @@ public class TemplateUtils {
             if (paramMap == null) {
                 BaseTemplate.writeTemplate(fileName, modelMap, configType.name());
             } else {
-                String paramTemplate = BaseTemplate.writeTemplateAsString(modelMap, configType.name());
-                BaseTemplate.writeCustomTemplate(fileName, paramMap, paramTemplate);
+                processTemplateWithOrderedResolution(
+                        () -> BaseTemplate.writeTemplateAsString(modelMap, configType.name()), fileName, paramMap);
             }
         } catch (Exception e) {
             log.error("writeProperties error", e);
@@ -58,11 +60,37 @@ public class TemplateUtils {
             if (paramMap == null) {
                 BaseTemplate.writeCustomTemplate(fileName, configMap, template);
             } else {
-                String paramTemplate = BaseTemplate.writeCustomTemplateAsString(configMap, template);
-                BaseTemplate.writeCustomTemplate(fileName, paramMap, paramTemplate);
+                processTemplateWithOrderedResolution(
+                        () -> BaseTemplate.writeCustomTemplateAsString(configMap, template), fileName, paramMap);
             }
         } catch (Exception e) {
             log.error("writeProperties error", e);
         }
+    }
+
+    /**
+     * Process template with ordered resolution: FreeMarker first, then BaseParams.
+     *
+     * This ensures that FreeMarker syntax (e.g., &lt;#if host??&gt;) is processed before
+     * BaseParams parameter resolution (e.g., ${host}), preventing false warnings about
+     * missing parameters.
+     *
+     * @param freeMarkerProcessor Supplier that processes FreeMarker template and returns processed string
+     * @param fileName Target file name for the template
+     * @param paramMap Parameters for BaseParams resolution
+     */
+    private static void processTemplateWithOrderedResolution(
+            Supplier<String> freeMarkerProcessor, String fileName, Object paramMap) {
+
+        // Step 1: Process FreeMarker template syntax (<#if>, <#list>, etc.)
+        String freeMarkerProcessed = freeMarkerProcessor.get();
+
+        // Step 2: Resolve BaseParams parameters for remaining ${...} placeholders
+        if (paramMap instanceof BaseParams baseParams) {
+            baseParams.resolveGlobalParamsIfNeeded();
+        }
+
+        // Step 3: Write final template with resolved parameters
+        BaseTemplate.writeCustomTemplate(fileName, paramMap, freeMarkerProcessed);
     }
 }
