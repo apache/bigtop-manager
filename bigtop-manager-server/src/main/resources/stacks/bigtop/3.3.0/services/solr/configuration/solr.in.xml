@@ -140,8 +140,7 @@
 
     <property>
         <name>solr_zookeeper_quorum</name>
-        <value>
-            <![CDATA[<#if zookeeper_quorum?? ><#list zookeeper_quorum as host>${host}:2181<#sep>,</#sep></#list><#else>localhost:2181</#if>]]></value>
+        <value>localhost:2181</value>
         <description>Placeholder for Solr Zookeeper connection string. (Use the cluster one by default, you can override
             this with a custom one if ZK needs to be external)
         </description>
@@ -187,7 +186,7 @@
 
     <property>
         <name>solr_extra_java_opts</name>
-        <value />
+        <value/>
         <description>Extra Solr java options (e.g.: -Dproperty=value), that will be added to SOLR_OPTS environment
             variable
         </description>
@@ -195,11 +194,11 @@
 
     <property>
         <name>solr_gc_log_opts</name>
-        <value />
+        <value/>
     </property>
     <property>
         <name>solr_gc_tune</name>
-        <value />
+        <value/>
     </property>
     <property>
         <name>solr_min_mem</name>

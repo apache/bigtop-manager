@@ -21,7 +21,6 @@ package org.apache.bigtop.manager.stack.bigtop.v3_3_0.kafka;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.stack.core.enums.ConfigType;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
-import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
 import org.apache.bigtop.manager.stack.core.utils.linux.LinuxFileUtils;
 
 import lombok.AccessLevel;
@@ -29,9 +28,6 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static org.apache.bigtop.manager.common.constants.Constants.PERMISSION_644;
 import static org.apache.bigtop.manager.common.constants.Constants.PERMISSION_755;
@@ -53,10 +49,6 @@ public class KafkaSetup {
         LinuxFileUtils.createDirectories(kafkaParams.getKafkaLogDir(), kafkaUser, kafkaGroup, PERMISSION_755, true);
         LinuxFileUtils.createDirectories(kafkaParams.getKafkaPidDir(), kafkaUser, kafkaGroup, PERMISSION_755, true);
 
-        List<String> zookeeperServerHosts = LocalSettings.componentHosts("zookeeper_server");
-        Map<String, Object> paramMap = new HashMap<>();
-        paramMap.put("zk_server_list", zookeeperServerHosts);
-        paramMap.put("host", kafkaParams.hostname());
         LinuxFileUtils.toFile(
                 ConfigType.PROPERTIES,
                 MessageFormat.format("{0}/server.properties", confDir),
@@ -64,7 +56,7 @@ public class KafkaSetup {
                 kafkaGroup,
                 PERMISSION_644,
                 kafkaParams.kafkaBroker(),
-                paramMap);
+                kafkaParams.getGlobalParamsMap());
 
         LinuxFileUtils.toFileByTemplate(
                 kafkaParams.getKafkaEnvContent(),
