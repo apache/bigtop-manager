@@ -25,6 +25,7 @@ export default {
   exit: 'Exit',
   action: 'Action',
   operation: 'Operation',
+  operate_success: 'Operation successful',
   status: 'Status',
   healthy: 'Healthy',
   unhealthy: 'Unhealthy',

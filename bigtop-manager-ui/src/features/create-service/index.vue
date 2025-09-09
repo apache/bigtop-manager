@@ -25,9 +25,10 @@
   import ComponentAssigner from './components/component-assigner.vue'
   import ServiceConfigurator from './components/service-configurator.vue'
   import ComponentInstaller from './components/component-installer.vue'
-  import SvgIcon from '@/components/base/svg-icon/index.vue'
 
   const { t } = useI18n()
+  const { confirmModal } = useModal()
+
   const route = useRoute()
   const createStore = useCreateServiceStore()
   const { current, stepsLimit, stepContext, selectedServices, createdPayload } = storeToRefs(createStore)
@@ -136,12 +137,8 @@
 
   onBeforeRouteLeave((_to, _from, next) => {
     if (current.value === stepsLimit.value && !isDone.value) {
-      Modal.confirm({
-        title: () =>
-          h('div', { style: { display: 'flex' } }, [
-            h(SvgIcon, { name: 'unknown', style: { width: '24px', height: '24px' } }),
-            h('span', t('common.exit_confirm'))
-          ]),
+      confirmModal({
+        tipText: t('common.exit_confirm'),
         content: h('div', { style: { paddingLeft: '36px' } }, t('common.installing_exit_confirm_content')),
         cancelText: t('common.no'),
         style: { top: '30vh' },

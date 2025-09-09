@@ -20,16 +20,17 @@
 <script setup lang="ts">
   import { storeToRefs } from 'pinia'
   import { useLlmConfigStore } from '@/store/llm-config/index'
-  import { message, Modal } from 'ant-design-vue'
+  import { message } from 'ant-design-vue'
   import { useI18n } from 'vue-i18n'
   import LlmItem, { type ActionKeys, type ExtraItem } from './components/llm-item.vue'
 
   import addLlmItem from './components/add-llm-item.vue'
-  import SvgIcon from '@/components/base/svg-icon/index.vue'
 
   import type { AuthorizedPlatform } from '@/api/llm-config/types'
 
   const { t } = useI18n()
+  const { confirmModal } = useModal()
+
   const llmConfigStore = useLlmConfigStore()
   const addLlmItemRef = ref<InstanceType<typeof addLlmItem> | null>(null)
   const { loading, authorizedPlatforms } = storeToRefs(llmConfigStore)
@@ -71,14 +72,8 @@
   }
 
   const handleDeleteLlmConfig = (authId: string | number) => {
-    Modal.confirm({
-      title: () =>
-        h('div', { style: { display: 'flex' } }, [
-          h(SvgIcon, { name: 'unknown', style: { width: '24px', height: '24px' } }),
-          h('p', t('common.delete_msg'))
-        ]),
-      icon: null,
-      style: { top: '30vh' },
+    confirmModal({
+      tipText: t('common.delete_msg'),
       async onOk() {
         const success = await llmConfigStore.deleteAuthPlatform(authId)
         if (success) {

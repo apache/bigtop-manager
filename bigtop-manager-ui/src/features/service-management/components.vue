@@ -18,11 +18,10 @@
 -->
 
 <script setup lang="ts">
-  import { message, Modal, type TableColumnType, type TableProps } from 'ant-design-vue'
+  import { message, type TableColumnType, type TableProps } from 'ant-design-vue'
   import { deleteComponent, getComponents } from '@/api/component'
   import { useStackStore } from '@/store/stack'
   import { useJobProgress } from '@/store/job-progress'
-  import SvgIcon from '@/components/base/svg-icon/index.vue'
 
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { ComponentVO } from '@/api/component/types'
@@ -39,7 +38,10 @@
   }
 
   const POLLING_INTERVAL = 3000
+
   const { t } = useI18n()
+  const { confirmModal } = useModal()
+
   const jobProgressStore = useJobProgress()
   const stackStore = useStackStore()
   const route = useRoute()
@@ -245,14 +247,8 @@
   }
 
   const handleDelete = async (row: ComponentVO) => {
-    Modal.confirm({
-      title: () =>
-        h('div', { style: { display: 'flex' } }, [
-          h(SvgIcon, { name: 'unknown', style: { width: '24px', height: '24px' } }),
-          h('p', t('common.delete_msg'))
-        ]),
-      style: { top: '30vh' },
-      icon: null,
+    confirmModal({
+      tipText: t('common.delete_msg'),
       async onOk() {
         try {
           const data = await deleteComponent({ clusterId: attrs.clusterId, id: row.id! })

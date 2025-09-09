@@ -18,10 +18,9 @@
 -->
 
 <script setup lang="ts">
-  import { message } from 'ant-design-vue'
-
-  import { getHost } from '@/api/host'
+  import { getHost, restartAgent, startAgent, stopAgent } from '@/api/host'
   import { CommonStatus, CommonStatusTexts } from '@/enums/state'
+  import { message } from 'ant-design-vue'
 
   import Overview from './overview.vue'
 
@@ -29,14 +28,23 @@
   import type { HostStatusType, HostVO } from '@/api/host/types'
 
   const { t } = useI18n()
+  const { confirmModal } = useModal()
+
   const route = useRoute()
-  const hostInfo = shallowRef<HostVO>({})
   const loading = ref(false)
+  const hostInfo = shallowRef<HostVO>({})
+  const apiMap = shallowRef({
+    start: startAgent,
+    restart: restartAgent,
+    stop: stopAgent
+  })
+
   const statusColors = shallowRef<Record<HostStatusType, keyof typeof CommonStatusTexts>>({
     1: 'healthy',
     2: 'unhealthy',
     3: 'unknown'
   })
+
   const actionGroup = computed<GroupItem[]>(() => [
     {
       shape: 'default',
@@ -44,38 +52,51 @@
       text: t('common.more_operations'),
       dropdownMenu: [
         {
-          action: 'Start',
-          text: t('common.start', [t('common.all')])
+          action: 'start',
+          text: t('common.start', [t('host.agent')])
         },
         {
-          action: 'Restart',
-          text: t('common.restart', [t('common.all')])
+          action: 'restart',
+          text: t('common.restart', [t('host.agent')])
         },
         {
-          action: 'Stop',
-          text: t('common.stop', [t('common.all')])
+          action: 'stop',
+          text: t('common.stop', [t('host.agent')])
         }
       ],
-      dropdownMenuClickEvent: (info) => dropdownMenuClick && dropdownMenuClick(info)
+      dropdownMenuClickEvent: ({ key }) => {
+        const action = t(`common.${key.toString()}`).toLowerCase()
+        const tipText = t('host.operate_agent', { action, target: hostInfo.value.hostname })
+        confirmModal({
+          tipText,
+          async onOk() {
+            handleOperateAgent(key as string)
+          }
+        })
+      }
     }
   ])
 
-  const dropdownMenuClick: GroupItem['dropdownMenuClickEvent'] = async () => {
-    message.error(t('common.feature_not_supported'))
+  const handleOperateAgent = async (action: string) => {
+    try {
+      const res = await apiMap.value[`${action}`]({ id: hostInfo.value.id })
+      if (res) {
+        message.success(t('common.operate_success'))
+      }
+    } finally {
+      setupHostInfo()
+    }
   }
 
   const setupHostInfo = async () => {
     try {
+      const { hostId, clusterId } = route.query
       loading.value = true
-      const hostId = route.query.hostId
-      const clusterId = route.query.clusterId
       const data = await getHost({ id: Number(hostId) })
       hostInfo.value = {
         ...data,
         clusterId
       }
-    } catch (error) {
-      console.log(error)
     } finally {
       loading.value = false
     }

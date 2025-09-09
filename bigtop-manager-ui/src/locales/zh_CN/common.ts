@@ -25,6 +25,7 @@ export default {
   exit: '退出',
   action: '操作',
   operation: '操作',
+  operate_success: '操作成功',
   status: '状态',
   healthy: '健康',
   unhealthy: '不健康',
