@@ -20,7 +20,7 @@
 <script setup lang="ts">
   import { useMenuStore } from '@/store/menu'
   import { message, Modal } from 'ant-design-vue'
-  import { getInstalledStatus, installDependencies } from '@/api/hosts'
+  import { getInstalledStatus, installDependencies } from '@/api/host'
   import { execCommand } from '@/api/command'
 
   import SvgIcon from '@/components/base/svg-icon/index.vue'
@@ -30,7 +30,7 @@
   import HostManage from './components/host-manage.vue'
   import CheckWorkflow from './components/check-workflow.vue'
 
-  import { type InstalledStatusVO, Status } from '@/api/hosts/types'
+  import { type InstalledStatusVO, Status } from '@/api/host/types'
   import type { ClusterCommandReq, CommandRequest, CommandVO, HostReq } from '@/api/command/types'
 
   const { t } = useI18n()

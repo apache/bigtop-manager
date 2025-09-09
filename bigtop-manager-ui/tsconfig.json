@@ -11,13 +11,15 @@
     "skipLibCheck": true,
     "types": ["vitest", "vitest/globals", "vite/client"],
     /* Bundler mode */
-    "moduleResolution": "Bundler",
+    //     "moduleResolution": "Bundler",
+    "moduleResolution": "Node",
     "allowImportingTsExtensions": true,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "preserve",
+    "ignoreDeprecations": "6.0",
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,

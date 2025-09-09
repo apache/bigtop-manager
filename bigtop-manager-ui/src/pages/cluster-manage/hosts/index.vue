@@ -21,7 +21,7 @@
   import { message, Modal, TableColumnType, TableProps } from 'ant-design-vue'
 
   import { useClusterStore } from '@/store/cluster'
-  import * as hostApi from '@/api/hosts'
+  import * as hostApi from '@/api/host'
 
   import useBaseTable from '@/composables/use-base-table'
   import HostCreate from '@/features/create-host/index.vue'
@@ -31,7 +31,7 @@
   import type { FilterConfirmProps, FilterResetProps, TableRowSelection } from 'ant-design-vue/es/table/interface'
   import type { HostReq } from '@/api/command/types'
   import type { GroupItem } from '@/components/common/button-group/types'
-  import type { HostVO } from '@/api/hosts/types'
+  import type { HostVO } from '@/api/host/types'
 
   const POLLING_INTERVAL = 30000
   type Key = string | number

@@ -19,14 +19,14 @@
 
 <script setup lang="ts">
   import { TableColumnType, Empty } from 'ant-design-vue'
-  import { getHosts } from '@/api/hosts'
+  import { getHosts } from '@/api/host'
 
   import { useCreateServiceStore } from '@/store/create-service'
   import { useServiceStore } from '@/store/service'
 
   import TreeSelector from './tree-selector.vue'
 
-  import type { HostVO } from '@/api/hosts/types'
+  import type { HostVO } from '@/api/host/types'
   import type { FilterConfirmProps, FilterResetProps, TableRowSelection } from 'ant-design-vue/es/table/interface'
   import type { Key } from 'ant-design-vue/es/_util/type'
 

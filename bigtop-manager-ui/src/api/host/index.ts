@@ -18,7 +18,7 @@
  */
 
 import request from '@/api/request.ts'
-import type { HostListParams, HostParams, HostVO, HostVOList, InstalledStatusVO } from '@/api/hosts/types.ts'
+import type { HostListParams, HostParams, HostVO, HostVOList, InstalledStatusVO } from '@/api/host/types'
 import type { ComponentVO } from '@/api/component/types.ts'
 
 export const getHosts = (params?: HostListParams): Promise<HostVOList> => {
