@@ -92,7 +92,7 @@ export const useServiceStore = defineStore(
     }
 
     async function removeService(service: ServiceVO, clusterId: number, callBack: (...args: any) => void) {
-      const actionI18n = t('common.remove')
+      const actionI18n = t('common.remove').toLowerCase()
       const target = service.displayName ?? service.name
       return Modal.confirm({
         title: () =>

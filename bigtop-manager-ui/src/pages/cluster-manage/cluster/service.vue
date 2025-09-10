@@ -50,6 +50,7 @@
     {
       action: 'Start',
       icon: 'start',
+      tip: t('common.start', [t('common.service')]),
       clickEvent: (item, payload) => {
         handleServiceOperate(item!.action!, payload)
       }
@@ -57,6 +58,7 @@
     {
       action: 'Stop',
       icon: 'stop',
+      tip: t('common.stop', [t('common.service')]),
       clickEvent: (item, payload) => {
         handleServiceOperate(item!.action!, payload)
       }
@@ -64,6 +66,7 @@
     {
       action: 'Restart',
       icon: 'restart',
+      tip: t('common.restart', [t('common.service')]),
       clickEvent: (item, payload) => {
         handleServiceOperate(item!.action!, payload)
       }
@@ -75,7 +78,7 @@
         {
           danger: true,
           action: 'remove',
-          text: t('common.remove')
+          text: t('common.remove', [t('common.service')])
         }
       ],
       dropdownMenuClickEvent: (_item, payload) => {
