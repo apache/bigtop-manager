@@ -23,13 +23,20 @@ import org.apache.bigtop.manager.stack.core.exception.StackException;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.spi.script.AbstractServerScript;
 import org.apache.bigtop.manager.stack.core.spi.script.Script;
+import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
 import org.apache.bigtop.manager.stack.core.utils.linux.LinuxOSUtils;
 
 import com.google.auto.service.AutoService;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.MessageFormat;
+import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 @Slf4j
 @AutoService(Script.class)
@@ -54,15 +61,84 @@ public class NameNodeScript extends AbstractServerScript {
     public ShellResult start(Params params) {
         configure(params);
         HadoopParams hadoopParams = (HadoopParams) params;
-
-        HadoopSetup.formatNameNode(hadoopParams);
-
-        String cmd = MessageFormat.format("{0}/hdfs --daemon start namenode", hadoopParams.binDir());
+        String hostname = hadoopParams.hostname();
+        List<String> namenodeList = LocalSettings.componentHosts("namenode");
         try {
-            return LinuxOSUtils.sudoExecCmd(cmd, hadoopParams.user());
+            if (namenodeList != null && !namenodeList.isEmpty() && hostname.equals(namenodeList.get(0))) {
+                HadoopSetup.formatNameNode(hadoopParams);
+                String startCmd = MessageFormat.format("{0}/hdfs --daemon start namenode", hadoopParams.binDir());
+                ShellResult result = LinuxOSUtils.sudoExecCmd(startCmd, hadoopParams.user());
+                if (result.getExitCode() != 0) {
+                    throw new StackException("Failed to start primary NameNode: " + result.getErrMsg());
+                }
+                return result;
+            }
+            else if (namenodeList != null && namenodeList.size() >= 2 && hostname.equals(namenodeList.get(1))) {
+                boolean isPrimaryReady = waitForNameNodeReady(namenodeList.get(0), hadoopParams);
+                if (!isPrimaryReady) {
+                    throw new StackException("Primary NameNode is not ready, cannot bootstrap standby");
+                }
+                String bootstrapCmd = MessageFormat.format(
+                        "{0}/hdfs namenode -bootstrapStandby -nonInteractive",
+                        hadoopParams.binDir()
+                );
+                ShellResult bootstrapResult = LinuxOSUtils.sudoExecCmd(bootstrapCmd, hadoopParams.user());
+                if (bootstrapResult.getExitCode() != 0) {
+                    throw new StackException("Failed to bootstrap standby NameNode: " + bootstrapResult.getErrMsg());
+                }
+
+                String startCmd = MessageFormat.format("{0}/hdfs --daemon start namenode", hadoopParams.binDir());
+                ShellResult startResult = LinuxOSUtils.sudoExecCmd(startCmd, hadoopParams.user());
+                if (startResult.getExitCode() != 0) {
+                    throw new StackException("Failed to start standby NameNode: " + startResult.getErrMsg());
+                }
+                return startResult;
+            } else {
+                throw new StackException("Current host is not in NameNode HA list: " + hostname);
+            }
         } catch (Exception e) {
             throw new StackException(e);
         }
+    }
+
+    private boolean waitForNameNodeReady(String namenodeHost, HadoopParams hadoopParams) {
+        String httpPort = hadoopParams.getDfsHttpPort();
+        long timeout = 5 * 60 * 1000;
+        long interval = 3000;
+        long deadline = System.currentTimeMillis() + timeout;
+        log.warn("namenode port: " + httpPort);
+
+        while (System.currentTimeMillis() < deadline) {
+            try {
+                URL url = new URL("http://" + namenodeHost + ":" + httpPort + "/jmx?qry=Hadoop:service=NameNode,name=NameNodeStatus");
+                log.warn("namenode URL: " + url);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setConnectTimeout(2000);
+                connection.setReadTimeout(2000);
+                connection.setRequestMethod("GET");
+
+                if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                    try (BufferedReader reader = new BufferedReader(
+                            new InputStreamReader(connection.getInputStream()))) {
+                        String response = reader.lines().collect(Collectors.joining());
+                        log.warn("response: " + response);
+                        if (response.contains("active")) {
+                            log.warn("retrun true");
+                            return true;
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                log.warn("Waiting for NameNode to be ready: " + e.getMessage());
+            }
+            try {
+                Thread.sleep(interval);
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+                return false;
+            }
+        }
+        return false;
     }
 
     @Override

@@ -53,10 +53,22 @@
                 <cardinality>1+</cardinality>
             </component>
             <component>
+                <name>zkfc</name>
+                <display-name>zkfc</display-name>
+                <category>server</category>
+                <cardinality>0-2</cardinality>
+            </component>
+            <component>
+                <name>journalnode</name>
+                <display-name>journalnode</display-name>
+                <category>server</category>
+                <cardinality>0-3</cardinality>
+            </component>
+            <component>
                 <name>secondarynamenode</name>
                 <display-name>SNameNode</display-name>
                 <category>server</category>
-                <cardinality>1</cardinality>
+                <cardinality>0-1</cardinality>
             </component>
 
             <!-- Yarn Components -->

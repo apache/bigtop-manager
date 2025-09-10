@@ -75,6 +75,14 @@ public class HadoopSetup {
                             Constants.PERMISSION_755,
                             true);
                 }
+                case "journalnode": {
+                    LinuxFileUtils.createDirectories(
+                            hadoopParams.getDfsJourNalNodeDir(),
+                            hadoopUser,
+                            hadoopGroup,
+                            Constants.PERMISSION_755,
+                            true);
+                }
                 case "datanode": {
                     LinuxFileUtils.createDirectories(
                             hadoopParams.getDfsDomainSocketPathPrefix(),
