@@ -18,14 +18,15 @@
  */
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.hadoop;
 
-import com.google.auto.service.AutoService;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.stack.core.exception.StackException;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.spi.script.AbstractServerScript;
 import org.apache.bigtop.manager.stack.core.spi.script.Script;
 import org.apache.bigtop.manager.stack.core.utils.linux.LinuxOSUtils;
+
+import com.google.auto.service.AutoService;
+import lombok.extern.slf4j.Slf4j;
 
 import java.text.MessageFormat;
 import java.util.Properties;
@@ -54,8 +55,7 @@ public class ZkfcScript extends AbstractServerScript {
         HadoopParams hadoopParams = (HadoopParams) params;
 
         String formatCmd = MessageFormat.format(
-                "{0}/hdfs --config {1} zkfc -formatZK",
-                hadoopParams.binDir(), hadoopParams.confDir());
+                "{0}/hdfs --config {1} zkfc -formatZK", hadoopParams.binDir(), hadoopParams.confDir());
         try {
             return LinuxOSUtils.sudoExecCmd(formatCmd, hadoopParams.user());
         } catch (Exception e) {
