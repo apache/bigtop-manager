@@ -232,6 +232,7 @@ public class HadoopSetup {
                     "{0}/hdfs --config {1} namenode -format -nonInteractive -force",
                     hadoopParams.binDir(), hadoopParams.confDir());
             try {
+                Thread.sleep(180000);
                 LinuxOSUtils.sudoExecCmd(formatCmd, hadoopParams.user());
             } catch (Exception e) {
                 throw new StackException(e);
