@@ -19,6 +19,7 @@
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.hadoop;
 
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
