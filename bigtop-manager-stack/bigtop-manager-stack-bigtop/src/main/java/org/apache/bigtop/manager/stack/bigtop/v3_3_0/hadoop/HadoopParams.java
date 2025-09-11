@@ -177,9 +177,7 @@ public class HadoopParams extends BigtopParams {
         if (dfsHttpAddress != null && dfsHttpAddress.contains(":")) {
             String[] parts = dfsHttpAddress.split(":");
             if (parts.length >= 2) {
-                log.warn("parts: " + parts);
                 dfsHttpPort = parts[1].trim();
-                log.warn("dfsHttpPort: "+ dfsHttpPort);
             }
         }
         String dfsDomainSocketPath = (String) hdfsSite.get("dfs.domain.socket.path");
