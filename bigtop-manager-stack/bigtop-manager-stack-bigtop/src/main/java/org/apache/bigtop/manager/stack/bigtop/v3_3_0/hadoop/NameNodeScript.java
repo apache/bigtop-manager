@@ -72,16 +72,13 @@ public class NameNodeScript extends AbstractServerScript {
                     throw new StackException("Failed to start primary NameNode: " + result.getErrMsg());
                 }
                 return result;
-            }
-            else if (namenodeList != null && namenodeList.size() >= 2 && hostname.equals(namenodeList.get(1))) {
+            } else if (namenodeList != null && namenodeList.size() >= 2 && hostname.equals(namenodeList.get(1))) {
                 boolean isPrimaryReady = waitForNameNodeReady(namenodeList.get(0), hadoopParams);
                 if (!isPrimaryReady) {
                     throw new StackException("Primary NameNode is not ready, cannot bootstrap standby");
                 }
                 String bootstrapCmd = MessageFormat.format(
-                        "{0}/hdfs namenode -bootstrapStandby -nonInteractive",
-                        hadoopParams.binDir()
-                );
+                        "{0}/hdfs namenode -bootstrapStandby -nonInteractive", hadoopParams.binDir());
                 ShellResult bootstrapResult = LinuxOSUtils.sudoExecCmd(bootstrapCmd, hadoopParams.user());
                 if (bootstrapResult.getExitCode() != 0) {
                     throw new StackException("Failed to bootstrap standby NameNode: " + bootstrapResult.getErrMsg());
@@ -109,17 +106,17 @@ public class NameNodeScript extends AbstractServerScript {
 
         while (System.currentTimeMillis() < deadline) {
             try {
-                URL url = new URL("http://" + namenodeHost + ":" + httpPort + "/jmx?qry=Hadoop:service=NameNode,name=NameNodeStatus");
+                URL url = new URL("http://" + namenodeHost + ":" + httpPort
+                        + "/jmx?qry=Hadoop:service=NameNode,name=NameNodeStatus");
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setConnectTimeout(2000);
                 connection.setReadTimeout(2000);
                 connection.setRequestMethod("GET");
 
                 if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                    try (BufferedReader reader = new BufferedReader(
-                            new InputStreamReader(connection.getInputStream()))) {
+                    try (BufferedReader reader =
+                            new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
                         String response = reader.lines().collect(Collectors.joining());
-                        log.warn("response: " + response);
                         if (response.contains("active")) {
                             return true;
                         }
