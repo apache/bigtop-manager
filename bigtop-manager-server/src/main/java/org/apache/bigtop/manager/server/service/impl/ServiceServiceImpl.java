@@ -32,6 +32,7 @@ import org.apache.bigtop.manager.dao.repository.ServiceConfigDao;
 import org.apache.bigtop.manager.dao.repository.ServiceConfigSnapshotDao;
 import org.apache.bigtop.manager.dao.repository.ServiceDao;
 import org.apache.bigtop.manager.server.enums.ApiExceptionEnum;
+import org.apache.bigtop.manager.server.enums.HealthyStatusEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
 import org.apache.bigtop.manager.server.model.converter.ComponentConverter;
 import org.apache.bigtop.manager.server.model.converter.ServiceConfigConverter;
@@ -55,6 +56,7 @@ import org.apache.bigtop.manager.server.utils.StackUtils;
 import org.apache.commons.collections4.CollectionUtils;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -66,6 +68,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -140,13 +143,47 @@ public class ServiceServiceImpl implements ServiceService {
     }
 
     @Override
+    @Transactional
     public Boolean remove(Long id) {
-        ComponentQuery query = ComponentQuery.builder().serviceId(id).build();
-        List<ComponentPO> componentPOList = componentDao.findByQuery(query);
-        if (CollectionUtils.isNotEmpty(componentPOList)) {
-            throw new ApiException(ApiExceptionEnum.SERVICE_HAS_COMPONENTS);
+        ServicePO servicePO = serviceDao.findById(id);
+        if (servicePO == null) {
+            throw new ApiException(ApiExceptionEnum.SERVICE_NOT_FOUND);
         }
 
+        // Check service status - only allow deletion when service is stopped
+        if (!Objects.equals(servicePO.getStatus(), HealthyStatusEnum.UNHEALTHY.getCode())) {
+            throw new ApiException(ApiExceptionEnum.SERVICE_IS_RUNNING);
+        }
+
+        ComponentQuery query = ComponentQuery.builder().serviceId(id).build();
+        List<ComponentPO> componentPOList = componentDao.findByQuery(query);
+
+        // Check all components status - only allow deletion when all components are stopped
+        // Skip client components as they are always healthy
+        for (ComponentPO componentPO : componentPOList) {
+            if (StackUtils.isClientComponent(componentPO.getName())) {
+                continue;
+            }
+            if (!Objects.equals(componentPO.getStatus(), HealthyStatusEnum.UNHEALTHY.getCode())) {
+                throw new ApiException(ApiExceptionEnum.SERVICE_IS_RUNNING);
+            }
+        }
+
+        // Delete all components first
+        componentDao.deleteByIds(
+                componentPOList.stream().map(ComponentPO::getId).toList());
+
+        // Delete all service configurations
+        List<ServiceConfigPO> configPOList = serviceConfigDao.findByServiceId(id);
+        serviceConfigDao.deleteByIds(
+                configPOList.stream().map(ServiceConfigPO::getId).toList());
+
+        // Delete all service config snapshots
+        List<ServiceConfigSnapshotPO> snapshotPOList = serviceConfigSnapshotDao.findByServiceId(id);
+        serviceConfigSnapshotDao.deleteByIds(
+                snapshotPOList.stream().map(ServiceConfigSnapshotPO::getId).toList());
+
+        // Finally delete the service
         return serviceDao.deleteById(id);
     }
 
