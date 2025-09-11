@@ -116,14 +116,13 @@ public class HadoopParams extends BigtopParams {
                 zkString.append(",");
             }
         }
-        if (!namenodeList.isEmpty() && namenodeList.size()==1) {
+        if (!namenodeList.isEmpty() && namenodeList.size() == 1) {
             coreSite.put(
                     "fs.defaultFS", ((String) coreSite.get("fs.defaultFS")).replace("localhost", namenodeList.get(0)));
-        } else if (!namenodeList.isEmpty() && namenodeList.size()==2) {
+        } else if (!namenodeList.isEmpty() && namenodeList.size() == 2) {
             coreSite.put(
-                    "fs.defaultFS", ((String) coreSite.get("fs.defaultFS")).replace("localhost:8020","nameservice1"));
+                    "fs.defaultFS", ((String) coreSite.get("fs.defaultFS")).replace("localhost:8020", "nameservice1"));
             coreSite.put("ha.zookeeper.quorum", zkString);
-
         }
         return coreSite;
     }
@@ -138,7 +137,7 @@ public class HadoopParams extends BigtopParams {
         Map<String, Object> hdfsSite = LocalSettings.configurations(getServiceName(), "hdfs-site");
         List<String> namenodeList = LocalSettings.componentHosts("namenode");
         List<String> journalNodeList = LocalSettings.componentHosts("journalnode");
-        if (!namenodeList.isEmpty() && namenodeList.size()==1) {
+        if (!namenodeList.isEmpty() && namenodeList.size() == 1) {
             hdfsSite.put(
                     "dfs.namenode.rpc-address",
                     ((String) hdfsSite.get("dfs.namenode.rpc-address")).replace("0.0.0.0", namenodeList.get(0)));
@@ -148,21 +147,26 @@ public class HadoopParams extends BigtopParams {
             hdfsSite.put(
                     "dfs.namenode.https-address",
                     ((String) hdfsSite.get("dfs.namenode.https-address")).replace("0.0.0.0", namenodeList.get(0)));
-        } else if (!namenodeList.isEmpty() && namenodeList.size()==2) {
+        } else if (!namenodeList.isEmpty() && namenodeList.size() == 2) {
             hdfsSite.remove("dfs.namenode.http-address");
-            hdfsSite.put("dfs.ha.automatic-failover.enabled","true");
-            hdfsSite.put("dfs.nameservices","nameservice1");
-            hdfsSite.put("dfs.ha.namenodes.nameservice1","nn1,nn2");
-            hdfsSite.put("dfs.namenode.rpc-address.nameservice1.nn1",namenodeList.get(0)+":8020");
-            hdfsSite.put("dfs.namenode.rpc-address.nameservice1.nn2",namenodeList.get(1)+":8020");
-            hdfsSite.put("dfs.namenode.http-address.nameservice1.nn1",namenodeList.get(0)+":50070");
-            hdfsSite.put("dfs.namenode.http-address.nameservice1.nn2",namenodeList.get(1)+":50070");
-            hdfsSite.put("dfs.namenode.shared.edits.dir","qjournal://"+journalNodeList.get(0)+":8485;"+journalNodeList.get(1)+":8485;"+journalNodeList.get(2)+":8485"+"/nameservice1");
-            hdfsSite.put("dfs.journalnode.edits.dir","/hadoop/dfs/journal");
-            hdfsSite.put("dfs.client.failover.proxy.provider.nameservice1","org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider");
-            hdfsSite.put("dfs.journalnode.edits.dir","/hadoop/dfs/journal");
-            hdfsSite.put("dfs.ha.fencing.methods","shell(/bin/true)");
-            hdfsSite.put("dfs.replication","3");
+            hdfsSite.put("dfs.ha.automatic-failover.enabled", "true");
+            hdfsSite.put("dfs.nameservices", "nameservice1");
+            hdfsSite.put("dfs.ha.namenodes.nameservice1", "nn1,nn2");
+            hdfsSite.put("dfs.namenode.rpc-address.nameservice1.nn1", namenodeList.get(0) + ":8020");
+            hdfsSite.put("dfs.namenode.rpc-address.nameservice1.nn2", namenodeList.get(1) + ":8020");
+            hdfsSite.put("dfs.namenode.http-address.nameservice1.nn1", namenodeList.get(0) + ":50070");
+            hdfsSite.put("dfs.namenode.http-address.nameservice1.nn2", namenodeList.get(1) + ":50070");
+            hdfsSite.put(
+                    "dfs.namenode.shared.edits.dir",
+                    "qjournal://" + journalNodeList.get(0) + ":8485;" + journalNodeList.get(1) + ":8485;"
+                            + journalNodeList.get(2) + ":8485" + "/nameservice1");
+            hdfsSite.put("dfs.journalnode.edits.dir", "/hadoop/dfs/journal");
+            hdfsSite.put(
+                    "dfs.client.failover.proxy.provider.nameservice1",
+                    "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider");
+            hdfsSite.put("dfs.journalnode.edits.dir", "/hadoop/dfs/journal");
+            hdfsSite.put("dfs.ha.fencing.methods", "shell(/bin/true)");
+            hdfsSite.put("dfs.replication", "3");
         }
 
         // Configure native library dependent settings
@@ -177,14 +181,16 @@ public class HadoopParams extends BigtopParams {
         if (dfsHttpAddress != null && dfsHttpAddress.contains(":")) {
             String[] parts = dfsHttpAddress.split(":");
             if (parts.length >= 2) {
+                log.warn("parts: " + parts);
                 dfsHttpPort = parts[1].trim();
+                log.warn("dfsHttpPort: " + dfsHttpPort);
             }
         }
         String dfsDomainSocketPath = (String) hdfsSite.get("dfs.domain.socket.path");
         if (StringUtils.isNotBlank(dfsDomainSocketPath)) {
             File file = new File(dfsDomainSocketPath);
             dfsDomainSocketPathPrefix = file.getParent();
-//            dfsDomainSocketPathPrefix = dfsDomainSocketPath.replace("dn._PORT", "");
+            //            dfsDomainSocketPathPrefix = dfsDomainSocketPath.replace("dn._PORT", "");
         }
         dfsNameNodeCheckPointDir = (String) hdfsSite.get("dfs.namenode.checkpoint.dir");
         dfsJourNalNodeDir = (String) hdfsSite.get("dfs.journalnode.edits.dir");
