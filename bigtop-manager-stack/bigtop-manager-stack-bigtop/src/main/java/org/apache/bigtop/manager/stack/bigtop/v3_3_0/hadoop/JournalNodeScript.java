@@ -18,8 +18,6 @@
  */
 package org.apache.bigtop.manager.stack.bigtop.v3_3_0.hadoop;
 
-import com.google.auto.service.AutoService;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.stack.core.exception.StackException;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
@@ -27,12 +25,15 @@ import org.apache.bigtop.manager.stack.core.spi.script.AbstractServerScript;
 import org.apache.bigtop.manager.stack.core.spi.script.Script;
 import org.apache.bigtop.manager.stack.core.utils.linux.LinuxOSUtils;
 
+import com.google.auto.service.AutoService;
+import lombok.extern.slf4j.Slf4j;
+
 import java.text.MessageFormat;
 import java.util.Properties;
 
 @Slf4j
 @AutoService(Script.class)
-public class JournalNodeScript extends AbstractServerScript{
+public class JournalNodeScript extends AbstractServerScript {
     @Override
     public ShellResult add(Params params) {
         Properties properties = new Properties();
