@@ -24,22 +24,20 @@
 
   interface FilterFormPops {
     filterItems: FilterFormItem[]
+    filterValue?: Record<string, any>
   }
 
   const { t } = useI18n()
-  const props = defineProps<FilterFormPops>()
-  const emits = defineEmits(['filter'])
-  const { filterItems } = toRefs(props)
+  const props = withDefaults(defineProps<FilterFormPops>(), {
+    filterValue: () => {
+      return {}
+    }
+  })
+  const emits = defineEmits(['filter', 'update:filterValue'])
+  const { filterItems, filterValue } = toRefs(props)
 
   const tempFilterParams = shallowRef({})
-  const filterParams = ref(
-    filterItems.value.reduce(
-      (pre, value) => {
-        return Object.assign(pre, { [`${value.key}`]: undefined })
-      },
-      {} as Record<string, any>
-    )
-  )
+  const filterParams = ref<Record<string, any>>({})
 
   const formatFilterFormItems = computed(() =>
     filterItems.value.map((v) => {
@@ -67,15 +65,24 @@
 
   const confirmFilterParams = () => {
     emits('filter', filterParams.value)
+    emits('update:filterValue', filterParams.value)
   }
 
   const onSelect: MenuProps['onSelect'] = ({ item, key }) => {
     filterParams.value[`${item.id}`] = key
+    emits('update:filterValue', filterParams.value)
   }
 
   const resetFilter = (item: any) => {
     filterParams.value[item.key] = undefined
+    emits('update:filterValue', filterParams.value)
   }
+
+  onMounted(() => {
+    filterItems.value.forEach((item) => {
+      filterParams.value[item.key] = filterValue.value[item.key] ?? undefined
+    })
+  })
 </script>
 
 <template>

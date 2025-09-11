@@ -32,7 +32,7 @@ export default {
   success: '正常',
   failed: '异常',
   edit: '编辑',
-  delete: '删除',
+  delete: '删除{0}',
   remove: '移除{0}',
   bulk_remove: '批量删除',
   batch_operation: '批量操作',

@@ -17,12 +17,17 @@
  * under the License.
  */
 
-import { getService, getServiceList } from '@/api/service'
+import { getService, getServiceList, removeService as remove } from '@/api/service'
+import { Modal, message } from 'ant-design-vue'
+
+import SvgIcon from '@/components/base/svg-icon/index.vue'
+
 import type { ServiceListParams, ServiceVO } from '@/api/service/types'
 
 export const useServiceStore = defineStore(
   'service',
   () => {
+    const { t } = useI18n()
     const services = ref<ServiceVO[]>([])
     const serviceMap = ref<Record<string, (ServiceVO & { clusterId: number })[]>>({})
     const total = ref(0)
@@ -86,6 +91,31 @@ export const useServiceStore = defineStore(
       }
     }
 
+    async function removeService(service: ServiceVO, clusterId: number, callBack: (...args: any) => void) {
+      const actionI18n = t('common.remove').toLowerCase()
+      const target = service.displayName ?? service.name
+      return Modal.confirm({
+        title: () =>
+          h('div', { style: { display: 'flex' } }, [
+            h(SvgIcon, { name: 'unknown', style: { width: '24px', height: '24px' } }),
+            h('p', t('common.confirm_action', { action: actionI18n, target }))
+          ]),
+        style: { top: '30vh' },
+        icon: null,
+        async onOk() {
+          try {
+            const res = await remove({ clusterId, id: service.id! })
+            if (res) {
+              message.success(t('common.delete_success'))
+              return Promise.resolve(callBack())
+            }
+          } catch (error) {
+            console.log('error :>> ', error)
+          }
+        }
+      })
+    }
+
     return {
       serviceMap,
       services,
@@ -96,7 +126,8 @@ export const useServiceStore = defineStore(
       getServiceDetail,
       getServicesOfInfra,
       getInstalledServicesDetailByKey,
-      getInstalledNamesOrIdsOfServiceByKey
+      getInstalledNamesOrIdsOfServiceByKey,
+      removeService
     }
   },
   {

@@ -20,13 +20,13 @@
 <script setup lang="ts">
   import { message } from 'ant-design-vue'
 
-  import { getHost } from '@/api/hosts'
+  import { getHost } from '@/api/host'
   import { CommonStatus, CommonStatusTexts } from '@/enums/state'
 
   import Overview from './overview.vue'
 
   import type { GroupItem } from '@/components/common/button-group/types'
-  import type { HostStatusType, HostVO } from '@/api/hosts/types.ts'
+  import type { HostStatusType, HostVO } from '@/api/host/types'
 
   const { t } = useI18n()
   const route = useRoute()

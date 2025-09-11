@@ -19,14 +19,14 @@
 
 <script setup lang="ts">
   import { message, TableColumnType } from 'ant-design-vue'
-  import { getInstalledStatus, installDependencies } from '@/api/hosts'
+  import { getInstalledStatus, installDependencies } from '@/api/host'
   import { useClusterStore } from '@/store/cluster'
   import { generateRandomId } from '@/utils/tools'
   import { execCommand } from '@/api/command'
 
   import HostCreate from './index.vue'
 
-  import { type InstalledStatusVO, Status } from '@/api/hosts/types'
+  import { type InstalledStatusVO, Status } from '@/api/host/types'
   import type { FilterConfirmProps, FilterResetProps } from 'ant-design-vue/es/table/interface'
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { CommandRequest, HostReq } from '@/api/command/types'
