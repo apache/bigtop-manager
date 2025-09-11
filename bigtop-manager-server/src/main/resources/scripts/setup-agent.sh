@@ -123,7 +123,7 @@ start() {
     info "Prepare to start agent"
     if ! pgrep -f "${PROCESS_NAME}" > /dev/null; then
         info "Starting agent"
-        nohup ${TARGET_DIR}/bin/start.sh --debug > /dev/null 2>>setup-agent.log &
+        nohup ${TARGET_DIR}/bin/agent.sh start --debug > /dev/null 2>>setup-agent.log &
         sleep 10
         if ! pgrep -f "${PROCESS_NAME}" > /dev/null; then
           error "Failed to start agent, please check the log"

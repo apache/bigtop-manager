@@ -262,6 +262,21 @@ public class HostServiceImpl implements HostService {
     }
 
     @Override
+    public Boolean startAgent(Long hostId) {
+        return execAgentScript(hostId, "start");
+    }
+
+    @Override
+    public Boolean stopAgent(Long hostId) {
+        return execAgentScript(hostId, "stop");
+    }
+
+    @Override
+    public Boolean restartAgent(Long hostId) {
+        return execAgentScript(hostId, "restart");
+    }
+
+    @Override
     public Boolean checkDuplicate(HostDTO hostDTO) {
         List<HostPO> existsHostList = hostDao.findAllByHostnames(hostDTO.getHostnames());
         if (CollectionUtils.isNotEmpty(existsHostList)) {
@@ -306,6 +321,37 @@ public class HostServiceImpl implements HostService {
         }
 
         installedStatusVO.setStatus(InstalledStatusEnum.SUCCESS);
+    }
+
+    private Boolean execAgentScript(Long hostId, String action) {
+        HostPO hostPO = hostDao.findById(hostId);
+        if (hostPO == null) {
+            throw new ApiException(ApiExceptionEnum.HOST_NOT_FOUND);
+        }
+
+        HostDTO hostDTO = HostConverter.INSTANCE.fromPO2DTO(hostPO);
+        String path = hostDTO.getAgentDir();
+        String hostname = hostDTO.getHostname();
+        int grpcPort = hostDTO.getGrpcPort();
+
+        String command = path + "/bigtop-manager-agent/bin/agent.sh " + action;
+        command = "export GRPC_PORT=" + grpcPort + " ; " + command;
+
+        ShellResult result = execCommandOnRemoteHost(hostDTO, hostname, command);
+        if (result.getExitCode() != MessageConstants.SUCCESS_CODE) {
+            log.error("Unable to {} agent, hostname: {}, msg: {}", action, hostname, result);
+            throw new ApiException(ApiExceptionEnum.OPERATION_FAILED);
+        }
+
+        // Update host status
+        if (action.equals("stop")) {
+            hostPO.setStatus(HealthyStatusEnum.UNHEALTHY.getCode());
+        } else {
+            hostPO.setStatus(HealthyStatusEnum.HEALTHY.getCode());
+        }
+
+        hostDao.updateById(hostPO);
+        return true;
     }
 
     private ShellResult execCommandOnRemoteHost(HostDTO hostDTO, String hostname, String command) {
