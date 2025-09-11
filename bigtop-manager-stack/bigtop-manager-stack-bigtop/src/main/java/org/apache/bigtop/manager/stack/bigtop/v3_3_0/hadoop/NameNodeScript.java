@@ -106,12 +106,10 @@ public class NameNodeScript extends AbstractServerScript {
         long timeout = 5 * 60 * 1000;
         long interval = 3000;
         long deadline = System.currentTimeMillis() + timeout;
-        log.warn("namenode port: " + httpPort);
 
         while (System.currentTimeMillis() < deadline) {
             try {
                 URL url = new URL("http://" + namenodeHost + ":" + httpPort + "/jmx?qry=Hadoop:service=NameNode,name=NameNodeStatus");
-                log.warn("namenode URL: " + url);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setConnectTimeout(2000);
                 connection.setReadTimeout(2000);
@@ -123,7 +121,6 @@ public class NameNodeScript extends AbstractServerScript {
                         String response = reader.lines().collect(Collectors.joining());
                         log.warn("response: " + response);
                         if (response.contains("active")) {
-                            log.warn("retrun true");
                             return true;
                         }
                     }
