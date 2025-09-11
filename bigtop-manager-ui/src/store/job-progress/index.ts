@@ -294,7 +294,6 @@ export const useJobProgress = defineStore('job-progress', () => {
       zIndex: 9999,
       mask: false,
       closable: true,
-      style: { top: '30vh' },
       appContext: instance?.appContext,
       content: () => h(JobModal, { execRes, jobInfo: progressMap })
     })
