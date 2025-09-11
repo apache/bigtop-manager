@@ -229,7 +229,7 @@ public class HadoopSetup {
     public static void formatNameNode(HadoopParams hadoopParams) {
         if (!isNameNodeFormatted(hadoopParams)) {
             String formatCmd = MessageFormat.format(
-                    "{0}/hdfs --config {1} namenode -format -nonInteractive",
+                    "{0}/hdfs --config {1} namenode -format -nonInteractive -force",
                     hadoopParams.binDir(), hadoopParams.confDir());
             try {
                 LinuxOSUtils.sudoExecCmd(formatCmd, hadoopParams.user());
