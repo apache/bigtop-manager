@@ -19,8 +19,8 @@
 
 <script setup lang="ts">
   import { getHost, restartAgent, startAgent, stopAgent } from '@/api/host'
-  import { CommonStatus, CommonStatusTexts } from '@/enums/state'
   import { message } from 'ant-design-vue'
+  import { CommonStatus, CommonStatusTexts } from '@/enums/state'
 
   import Overview from './overview.vue'
 

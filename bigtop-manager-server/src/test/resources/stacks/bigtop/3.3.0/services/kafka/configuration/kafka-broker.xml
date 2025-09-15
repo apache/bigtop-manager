@@ -31,7 +31,7 @@
     </property>
     <property>
         <name>zookeeper.connect</name>
-        <value><![CDATA[<#if zk_server_list?? ><#list zk_server_list as host>${host}:2181<#sep>,</#sep></#list><#else>localhost:2181</#if>]]></value>
+        <value>localhost:2181</value>
         <description>
             Zookeeper also allows you to add a "chroot" path which will make all kafka data for this cluster appear
             under a particular path.
@@ -43,14 +43,14 @@
     </property>
     <property>
         <name>listeners</name>
-        <value><![CDATA[PLAINTEXT://<#if host?? >${host}:9092<#else>localhost:9092</#if>]]></value>
+        <value>PLAINTEXT://${host}:9092</value>
         <description>
             host and port where kafka broker will be accepting connections. localhost will be substituted with hostname.
         </description>
     </property>
     <property>
         <name>advertised.listeners</name>
-        <value><![CDATA[PLAINTEXT://<#if host?? >${host}:9092<#else>localhost:9092</#if>]]></value>
+        <value>PLAINTEXT://${host}:9092</value>
         <description>
             Listeners to publish to ZooKeeper for clients to use, if different than the listeners config property.
         </description>

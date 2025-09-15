@@ -18,17 +18,19 @@
 -->
 
 <script setup lang="ts">
-  import { TableColumnType } from 'ant-design-vue'
+  import { TableColumnType, TableProps } from 'ant-design-vue'
   import LogsView, { type LogViewProps } from '@/features/log-view/index.vue'
 
   import type { JobVO, StageVO, StateType, TaskListParams, TaskVO } from '@/api/job/types'
   import type { CommandRes, JobStageProgressItem } from '@/store/job-progress'
   import type { Reactive } from 'vue'
+  import type { ListParams } from '@/api/types'
 
   interface BreadcrumbItem {
     id: string
     name: string
     tableData: (JobVO | StageVO | TaskVO)[]
+    pagination: ListParams
   }
 
   interface Props {
@@ -48,53 +50,25 @@
     Canceled: 'canceled',
     Successful: 'success'
   })
-  const apiMap = shallowRef([
-    {
-      key: 'jobId'
-    },
-    {
-      key: 'stageId'
-    }
-  ])
-  const logsViewState = reactive<LogViewProps>({
-    open: false
-  })
+  const apiMap = shallowRef([{ key: 'jobId' }, { key: 'stageId' }])
+
+  const logsViewState = reactive<LogViewProps>({ open: false })
   const breadcrumbLen = computed(() => breadcrumbs.value.length)
   const currBreadcrumb = computed(() => breadcrumbs.value.at(-1))
+
   const columns = computed((): TableColumnType[] => [
-    {
-      title: '#',
-      width: '48px',
-      key: 'index',
-      customRender: ({ index }) => `${index + 1}`
-    },
-    {
-      title: t('common.name'),
-      key: 'name',
-      dataIndex: 'name',
-      ellipsis: true
-    },
-    {
-      title: t('common.status'),
-      key: 'state',
-      dataIndex: 'state'
-    },
-    {
-      title: t('common.create_time'),
-      dataIndex: 'createTime',
-      ellipsis: true
-    },
-    {
-      title: t('common.update_time'),
-      dataIndex: 'updateTime',
-      ellipsis: true
-    }
+    { title: '#', width: '48px', key: 'index', customRender: ({ index }) => `${index + 1}` },
+    { title: t('common.name'), key: 'name', dataIndex: 'name', ellipsis: true },
+    { title: t('common.status'), key: 'state', dataIndex: 'state' },
+    { title: t('common.create_time'), dataIndex: 'createTime', ellipsis: true },
+    { title: t('common.update_time'), dataIndex: 'updateTime', ellipsis: true }
   ])
+
   const apiParams = computed(() =>
     breadcrumbs.value.reduce((pre, val, index) => {
-      const apiMapKey = apiMap.value[index].key
+      const key = apiMap.value[index].key
       return Object.assign(pre, {
-        [`${apiMapKey}`]: val.id.replace(`${apiMapKey}-`, '')
+        [`${key}`]: val.id.replace(`${key}-`, '')
       })
     }, {} as TaskListParams)
   )
@@ -109,13 +83,26 @@
   watch(
     () => currJobInfo.value?.payLoad,
     (val) => {
-      if (val) {
-        breadcrumbs.value[0] = {
-          name: val.name!,
-          id: `jobId-${val.id}`,
-          tableData: val.stages || []
-        }
+      if (!val) return
+
+      breadcrumbs.value[0] = {
+        name: val.name!,
+        id: `jobId-${val.id}`,
+        tableData: val.stages || [],
+        pagination: { pageNum: 1, pageSize: 10 }
+      }
+
+      if (breadcrumbLen.value === 1) {
         dataSource.value = val.stages || []
+      }
+
+      if (breadcrumbLen.value === 2) {
+        const stageId = breadcrumbs.value[1].id.replace('stageId-', '')
+        const stage = val.stages?.find((s) => String(s.id) === stageId)
+        if (stage) {
+          breadcrumbs.value[1].tableData = stage.tasks || []
+          dataSource.value = stage.tasks || []
+        }
       }
     },
     {
@@ -130,6 +117,7 @@
       breadcrumbs.value.splice(index + 1, breadcrumbLen.value - index - 1)
     }
     dataSource.value = breadcrumb.tableData
+    updataPaginationsInBaseTable(currBreadcrumb.value?.pagination)
   }
 
   const updateBreadcrumbs = (data: JobVO | StageVO | TaskVO) => {
@@ -147,18 +135,49 @@
     const breadcrumbKey = apiMap.value[breadcrumbLen.value].key
     const currId = `${breadcrumbKey}-${data.id}`
     const index = breadcrumbs.value.findIndex((v) => v.id === currId)
-    const newBreadcrumbItem = { id: currId, name: data.name! }
+
+    const newBreadcrumbItem: BreadcrumbItem = {
+      id: currId,
+      name: data.name!,
+      tableData: [],
+      pagination: { pageNum: 1, pageSize: 10 }
+    }
+
     if (index === -1) {
       if (breadcrumbKey === 'jobId') {
-        breadcrumbs.value.push(Object.assign(newBreadcrumbItem, { tableData: data.stages }))
+        newBreadcrumbItem.tableData = data.stages
+        breadcrumbs.value.push(newBreadcrumbItem)
         dataSource.value = data.stages
       } else if (breadcrumbKey === 'stageId') {
-        breadcrumbs.value.push(Object.assign(newBreadcrumbItem, { tableData: data.tasks }))
+        newBreadcrumbItem.tableData = data.tasks
+        breadcrumbs.value.push(newBreadcrumbItem)
         dataSource.value = data.tasks
       }
+      updataPaginationsInBaseTable()
     } else {
       dataSource.value = breadcrumbs.value[index].tableData
     }
+  }
+
+  const updataPaginationsInBaseTable = (pagination: ListParams = { pageNum: 1, pageSize: 10 }) => {
+    const { pageNum: current, pageSize } = pagination
+    paginationProps.value = { ...paginationProps.value, current, pageSize }
+  }
+
+  const updataPaginationsInBreadcrumbs = (pagination: ListParams) => {
+    const { pageNum, pageSize } = pagination
+    const index = breadcrumbs.value.findIndex((v) => v.id === currBreadcrumb.value?.id)
+    const targetPagination = breadcrumbs.value[index].pagination
+
+    if (index != -1) {
+      breadcrumbs.value[index].pagination = { ...targetPagination, pageNum, pageSize }
+    }
+  }
+
+  const tableChange: TableProps['onChange'] = (...args) => {
+    const { current: pageNum, pageSize } = args[0]
+    updataPaginationsInBreadcrumbs({ pageNum, pageSize })
+    onChange(...args)
   }
 </script>
 
@@ -183,7 +202,7 @@
       :data-source="dataSource"
       :columns="columns"
       :pagination="paginationProps"
-      @change="onChange"
+      @change="tableChange"
     >
       <template #bodyCell="{ record, text, column }">
         <template v-if="column.key === 'name'">

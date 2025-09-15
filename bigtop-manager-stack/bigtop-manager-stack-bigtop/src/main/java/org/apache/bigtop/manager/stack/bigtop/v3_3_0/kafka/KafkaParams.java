@@ -24,11 +24,15 @@ import org.apache.bigtop.manager.stack.core.annotations.GlobalParams;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
 import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
 
+import org.springframework.util.CollectionUtils;
+
 import com.google.auto.service.AutoService;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Getter
 @AutoService(Params.class)
@@ -49,12 +53,20 @@ public class KafkaParams extends BigtopParams {
         globalParamsMap.put("java_home", javaHome());
         globalParamsMap.put("kafka_conf_dir", confDir());
         globalParamsMap.put("security_enabled", false);
+        globalParamsMap.put("host", hostname());
     }
 
     @GlobalParams
     public Map<String, Object> kafkaBroker() {
         Map<String, Object> kafkaBroker = LocalSettings.configurations(getServiceName(), "kafka-broker");
         kafkaDataDir = (String) kafkaBroker.get("log.dirs");
+
+        List<String> zookeeperServerHosts = LocalSettings.componentHosts("zookeeper_server");
+        if (!CollectionUtils.isEmpty(zookeeperServerHosts)) {
+            String zkServerListStr =
+                    zookeeperServerHosts.stream().map(s -> s + ":2181").collect(Collectors.joining(","));
+            kafkaBroker.put("zookeeper.connect", zkServerListStr);
+        }
         return kafkaBroker;
     }
 
