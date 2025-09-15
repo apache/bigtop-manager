@@ -154,8 +154,8 @@ public class HadoopParams extends BigtopParams {
             hdfsSite.put("dfs.ha.namenodes.nameservice1", "nn1,nn2");
             hdfsSite.put("dfs.namenode.rpc-address.nameservice1.nn1", namenodeList.get(0) + ":8020");
             hdfsSite.put("dfs.namenode.rpc-address.nameservice1.nn2", namenodeList.get(1) + ":8020");
-            hdfsSite.put("dfs.namenode.http-address.nameservice1.nn1", namenodeList.get(0) + ":50070");
-            hdfsSite.put("dfs.namenode.http-address.nameservice1.nn2", namenodeList.get(1) + ":50070");
+            hdfsSite.put("dfs.namenode.http-address.nameservice1.nn1", namenodeList.get(0) + ":9870");
+            hdfsSite.put("dfs.namenode.http-address.nameservice1.nn2", namenodeList.get(1) + ":9870");
             hdfsSite.put(
                     "dfs.namenode.shared.edits.dir",
                     "qjournal://" + journalNodeList.get(0) + ":8485;" + journalNodeList.get(1) + ":8485;"
