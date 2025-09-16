@@ -31,7 +31,7 @@
   const { confirmModal } = useModal()
 
   const route = useRoute()
-  const loading = ref(false)
+  const spinning = ref(false)
   const hostInfo = shallowRef<HostVO>({})
   const apiMap = shallowRef({
     start: startAgent,
@@ -70,7 +70,7 @@
         confirmModal({
           tipText,
           async onOk() {
-            handleOperateAgent(key as string)
+            await handleOperateAgent(key as string)
           }
         })
       }
@@ -91,14 +91,14 @@
   const setupHostInfo = async () => {
     try {
       const { hostId, clusterId } = route.query
-      loading.value = true
+      spinning.value = true
       const data = await getHost({ id: Number(hostId) })
       hostInfo.value = {
         ...data,
         clusterId
       }
     } finally {
-      loading.value = false
+      spinning.value = false
     }
   }
 
@@ -108,7 +108,7 @@
 </script>
 
 <template>
-  <a-spin :spinning="loading">
+  <a-spin :spinning="spinning">
     <header-card
       :title="hostInfo.hostname"
       avatar="host"

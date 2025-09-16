@@ -285,7 +285,7 @@ export const useJobProgress = defineStore('job-progress', () => {
   const onClick = (execRes: CommandRes) => {
     destroyAllModal()
     confirmModal({
-      icon: null,
+      title: undefined,
       width: '980px',
       zIndex: 9999,
       mask: false,
