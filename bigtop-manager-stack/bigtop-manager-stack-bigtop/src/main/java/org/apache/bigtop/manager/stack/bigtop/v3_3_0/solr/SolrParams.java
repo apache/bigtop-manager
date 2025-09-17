@@ -32,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Getter
 @Slf4j
@@ -71,12 +72,17 @@ public class SolrParams extends BigtopParams {
         solrPort = (String) solrEnv.get("solr_port");
         solrPidFile = solrPidDir + "/solr-" + solrPort + ".pid";
 
-        List<String> ZookeeperServerHosts = LocalSettings.componentHosts("zookeeper_server");
-        Map<String, Object> ZKPort = LocalSettings.configurations("zookeeper", "zoo.cfg");
-        String clientPort = (String) ZKPort.get("clientPort");
+        List<String> zookeeperServerHosts = LocalSettings.componentHosts("zookeeper_server");
+        Map<String, Object> zKPort = LocalSettings.configurations("zookeeper", "zoo.cfg");
+        String clientPort = (String) zKPort.get("clientPort");
         zNode = (String) solrEnv.get("solr_znode");
-        zkString = MessageFormat.format("{0}:{1}", ZookeeperServerHosts.get(0), clientPort);
+        zkString = MessageFormat.format("{0}:{1}", zookeeperServerHosts.get(0), clientPort);
         zkHost = MessageFormat.format("{0}{1}", zkString, zNode);
+
+        String zkServerListStr =
+                zookeeperServerHosts.stream().map(s -> s + ":2181").collect(Collectors.joining(","));
+        solrEnv.put("solr_zookeeper_quorum", zkServerListStr);
+
         return solrEnv;
     }
 

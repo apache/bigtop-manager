@@ -26,29 +26,31 @@
 
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { FilterFormItem } from '@/components/common/form-filter/types'
-  import type { ServiceListParams, ServiceStatusType, ServiceVO } from '@/api/service/types'
+  import type { ServiceStatusType, ServiceVO } from '@/api/service/types'
   import type { ClusterVO } from '@/api/cluster/types'
   import type { Command, CommandRequest } from '@/api/command/types'
 
   type GroupItemActionType = keyof typeof Command | 'More'
 
   const { t } = useI18n()
-  const attrs = useAttrs() as ClusterVO
   const router = useRouter()
+  const attrs = useAttrs() as ClusterVO
   const jobProgressStore = useJobProgress()
   const serviceStore = useServiceStore()
   const { services, loading } = toRefs(serviceStore)
 
+  const filterValue = ref({})
   const statusColors = shallowRef<Record<ServiceStatusType, keyof typeof CommonStatusTexts>>({
     1: 'healthy',
     2: 'unhealthy',
     3: 'unknown'
   })
 
-  const actionGroups = shallowRef<GroupItem<GroupItemActionType>[]>([
+  const actionGroups = computed((): GroupItem<GroupItemActionType, ServiceVO>[] => [
     {
       action: 'Start',
       icon: 'start',
+      tip: t('common.start', [t('common.service')]),
       clickEvent: (item, payload) => {
         handleServiceOperate(item!.action!, payload)
       }
@@ -56,6 +58,7 @@
     {
       action: 'Stop',
       icon: 'stop',
+      tip: t('common.stop', [t('common.service')]),
       clickEvent: (item, payload) => {
         handleServiceOperate(item!.action!, payload)
       }
@@ -63,6 +66,7 @@
     {
       action: 'Restart',
       icon: 'restart',
+      tip: t('common.restart', [t('common.service')]),
       clickEvent: (item, payload) => {
         handleServiceOperate(item!.action!, payload)
       }
@@ -70,8 +74,15 @@
     {
       action: 'More',
       icon: 'more-line',
-      clickEvent: (item, payload) => {
-        handleServiceOperate(item!.action!, payload)
+      dropdownMenu: [
+        {
+          danger: true,
+          action: 'remove',
+          text: t('common.remove', [t('common.service')])
+        }
+      ],
+      dropdownMenuClickEvent: (_item, payload) => {
+        handleServiceOperate('Remove', payload)
       }
     }
   ])
@@ -103,8 +114,8 @@
     }
   ])
 
-  const handleServiceOperate = (command: GroupItemActionType, service: ServiceVO) => {
-    if (command !== 'More') {
+  const handleServiceOperate = (command: GroupItemActionType | 'Remove', service: ServiceVO) => {
+    if (!['More', 'Remove'].includes(command)) {
       const execCommandParams = {
         command: command,
         clusterId: attrs.id,
@@ -112,12 +123,14 @@
         serviceCommands: [{ serviceName: service.name, installed: true }]
       } as CommandRequest
       jobProgressStore.processCommand(execCommandParams, getServices, { displayName: service.displayName })
+    } else {
+      serviceStore.removeService(service, attrs.id!, getServices)
     }
   }
 
-  const getServices = (filters?: ServiceListParams) => {
+  const getServices = () => {
     if (attrs.id != undefined) {
-      serviceStore.getServices(attrs.id, filters)
+      serviceStore.getServices(attrs.id, filterValue.value)
     }
   }
 
@@ -135,7 +148,7 @@
 
 <template>
   <a-spin :spinning="loading" class="service">
-    <form-filter :filter-items="filterFormItems" @filter="getServices" />
+    <form-filter v-model:filter-value="filterValue" :filter-items="filterFormItems" @filter="getServices" />
     <a-empty v-if="services.length == 0" style="width: 100%" :image="Empty.PRESENTED_IMAGE_SIMPLE" />
     <div v-else class="service-item-wrp">
       <a-card

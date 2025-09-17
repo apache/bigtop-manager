@@ -69,10 +69,10 @@ wget https://maven.aliyun.com/repository/central/com/mysql/mysql-connector-j/8.0
 cd /opt/bigtop-manager-server
 
 # Start service
-./bin/start.sh
+./bin/server.sh start
 
 # Or run in background
-nohup bin/start.sh > /dev/null 2>&1 &
+nohup bin/server.sh start > /dev/null 2>&1 &
 ```
 
 ## 7. Admin Page

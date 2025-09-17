@@ -249,7 +249,7 @@ export const useJobProgress = defineStore('job-progress', () => {
    * @param payLoad additional payload for the command
    * @returns void
    */
-  const processCommand = (params: CommandRequest, nextAction?: (...args: any) => void, payLoad?: PayLoad) => {
+  const processCommand = (params: CommandRequest, nextAction?: (...args: any[]) => void, payLoad?: PayLoad) => {
     const { displayName = '', tips } = payLoad as PayLoad
     const action = t(`common.${params.command.toLowerCase()}`).toLowerCase()
 
@@ -294,7 +294,6 @@ export const useJobProgress = defineStore('job-progress', () => {
       zIndex: 9999,
       mask: false,
       closable: true,
-      style: { top: '30vh' },
       appContext: instance?.appContext,
       content: () => h(JobModal, { execRes, jobInfo: progressMap })
     })

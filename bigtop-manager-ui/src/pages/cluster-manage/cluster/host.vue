@@ -19,8 +19,8 @@
 
 <script setup lang="ts">
   import { message, Modal, TableColumnType, TableProps } from 'ant-design-vue'
-  import { getHosts } from '@/api/hosts'
-  import * as hostApi from '@/api/hosts'
+  import { getHosts } from '@/api/host'
+  import * as hostApi from '@/api/host'
 
   import HostCreate from '@/features/create-host/index.vue'
   import InstallDependencies from '@/features/create-host/install-dependencies.vue'
@@ -28,7 +28,7 @@
 
   import type { FilterConfirmProps, FilterResetProps } from 'ant-design-vue/es/table/interface'
   import type { GroupItem } from '@/components/common/button-group/types'
-  import type { HostVO } from '@/api/hosts/types'
+  import type { HostVO } from '@/api/host/types'
   import type { ClusterVO } from '@/api/cluster/types'
   import type { HostReq } from '@/api/command/types'
 

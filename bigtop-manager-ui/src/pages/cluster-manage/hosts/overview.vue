@@ -25,14 +25,14 @@
   import { useServiceStore } from '@/store/service'
   import { useJobProgress } from '@/store/job-progress'
   import { useStackStore } from '@/store/stack'
-  import { getComponentsByHost } from '@/api/hosts'
+  import { getComponentsByHost } from '@/api/host'
   import { Command } from '@/api/command/types'
   import { getHostMetricsInfo } from '@/api/metrics'
 
   import GaugeChart from '@/features/metric/gauge-chart.vue'
   import CategoryChart from '@/features/metric/category-chart.vue'
 
-  import type { HostStatusType, HostVO } from '@/api/hosts/types.ts'
+  import type { HostStatusType, HostVO } from '@/api/host/types'
   import type { ClusterStatusType } from '@/api/cluster/types.ts'
   import type { ComponentVO } from '@/api/component/types.ts'
   import type { MetricsData, TimeRangeType } from '@/api/metrics/types'

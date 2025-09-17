@@ -25,20 +25,21 @@ type ShapeType = 'default' | 'circle' | 'round'
 export interface DropdownMenu extends MenuItemProps {
   action: string
   text: string
+  divider?: boolean
 }
-export interface GroupItem<T = any> {
+export interface GroupItem<T = any, R = any> {
   icon?: string
   tip?: string
   text?: string
   action?: T
-  hidden?: boolean | ((item?: GroupItem<T>, ...payload: any[]) => boolean)
+  hidden?: boolean | ((item?: GroupItem<T>, ...payload: R[]) => boolean)
   type?: BtnType
   shape?: ShapeType
   disabled?: boolean
   danger?: boolean
   dropdownMenu?: DropdownMenu[]
-  clickEvent?: (item?: GroupItem<T>, ...payload: any[]) => void
-  dropdownMenuClickEvent?: MenuProps['onClick']
+  clickEvent?: (item?: GroupItem<T>, ...payload: R[]) => void
+  dropdownMenuClickEvent?: (info: Parameters<NonNullable<MenuProps['onClick']>>[0], ...payload: R[]) => void
 }
 
 export interface Props {

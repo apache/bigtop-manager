@@ -23,13 +23,13 @@
   import { UploadOutlined } from '@ant-design/icons-vue'
   import { useClusterStore } from '@/store/cluster'
   import { uploadFile } from '@/api/upload-file'
-  import { updateHost } from '@/api/hosts'
+  import { updateHost } from '@/api/host'
 
   import ParsedPreview from './components/parsed-preview.vue'
 
   import type { UploadProps } from 'ant-design-vue'
   import type { HostReq } from '@/api/command/types'
-  import type { HostParams, HostVO } from '@/api/hosts/types'
+  import type { HostParams, HostVO } from '@/api/host/types'
   import type { FormItem } from '@/components/common/form-builder/types'
 
   type ModeType = 'EDIT' | 'ADD'

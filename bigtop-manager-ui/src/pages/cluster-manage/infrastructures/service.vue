@@ -24,7 +24,7 @@
   import { useJobProgress } from '@/store/job-progress'
   import { Empty } from 'ant-design-vue'
 
-  import type { ServiceListParams, ServiceStatusType, ServiceVO } from '@/api/service/types'
+  import type { ServiceStatusType, ServiceVO } from '@/api/service/types'
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { FilterFormItem } from '@/components/common/form-filter/types'
   import type { Command, CommandRequest } from '@/api/command/types'
@@ -38,6 +38,7 @@
   const { services, loading } = toRefs(serviceStore)
   const clusterInfo = useAttrs() as { id: number; name: string }
 
+  const filterValue = ref({})
   const statusColors = shallowRef<Record<ServiceStatusType, keyof typeof CommonStatusTexts>>({
     1: 'healthy',
     2: 'unhealthy',
@@ -69,6 +70,7 @@
     {
       action: 'Start',
       icon: 'start',
+      tip: t('common.start', [t('common.service')]),
       clickEvent: (item, args) => {
         infraAction(item!.action!, args)
       }
@@ -76,6 +78,7 @@
     {
       action: 'Stop',
       icon: 'stop',
+      tip: t('common.stop', [t('common.service')]),
       clickEvent: (item, args) => {
         infraAction(item!.action!, args)
       }
@@ -83,6 +86,7 @@
     {
       action: 'Restart',
       icon: 'restart',
+      tip: t('common.restart', [t('common.service')]),
       clickEvent: (item, args) => {
         infraAction(item!.action!, args)
       }
@@ -90,26 +94,36 @@
     {
       action: 'More',
       icon: 'more-line',
-      clickEvent: (item, args) => {
-        infraAction(item!.action!, args)
+      dropdownMenu: [
+        {
+          danger: true,
+          action: 'remove',
+          text: t('common.remove', [t('common.service')])
+        }
+      ],
+      dropdownMenuClickEvent: (_item, payload) => {
+        infraAction('Remove', payload)
       }
     }
   ])
 
-  const infraAction = async (command: GroupItemActionType, service: ServiceVO) => {
-    if (command !== 'More') {
+  const infraAction = async (command: GroupItemActionType | 'Remove', service: ServiceVO) => {
+    const { id: clusterId } = clusterInfo
+    if (!['More', 'Remove'].includes(command)) {
       const execCommandParams = {
         command: command,
-        clusterId: clusterInfo.id,
+        clusterId,
         commandLevel: 'service',
         serviceCommands: [{ serviceName: service.name, installed: true }]
       } as CommandRequest
       jobProgressStore.processCommand(execCommandParams, getServices, { displayName: service.displayName })
+    } else {
+      serviceStore.removeService(service, clusterId, getServices)
     }
   }
 
-  const getServices = async (filters?: ServiceListParams) => {
-    await serviceStore.getServices(clusterInfo.id, filters)
+  const getServices = async () => {
+    await serviceStore.getServices(clusterInfo.id, filterValue.value)
   }
 
   const viewServiceDetail = (payload: ServiceVO) => {
@@ -130,7 +144,7 @@
 <template>
   <a-spin :spinning="loading" class="service">
     <div class="infra-body">
-      <form-filter :filter-items="filterFormItems" @filter="getServices" />
+      <form-filter v-model:filter-value="filterValue" :filter-items="filterFormItems" @filter="getServices" />
       <a-empty v-if="services.length == 0" style="width: 100%" :image="Empty.PRESENTED_IMAGE_SIMPLE" />
       <div v-else class="service-item-wrp">
         <a-card

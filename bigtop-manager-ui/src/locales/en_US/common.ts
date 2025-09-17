@@ -33,7 +33,7 @@ export default {
   success: 'Normal',
   edit: 'Edit',
   rename: 'Rename',
-  delete: 'Delete',
+  delete: 'Delete {0}',
   remove: 'Remove {0}',
   bulk_remove: 'Bulk Remove',
   batch_operation: 'Batch Operation',

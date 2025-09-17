@@ -67,10 +67,16 @@
             </span>
           </a-button>
           <template #overlay>
-            <a-menu v-if="!item.disabled" @click="item.dropdownMenuClickEvent">
-              <a-menu-item v-for="actionItem in item.dropdownMenu" v-bind="actionItem" :key="actionItem.action">
-                {{ actionItem.text }}
-              </a-menu-item>
+            <a-menu
+              v-if="!item.disabled && item.dropdownMenuClickEvent"
+              @click="item.dropdownMenuClickEvent($event, payload)"
+            >
+              <template v-for="actionItem in item.dropdownMenu" :key="actionItem.action">
+                <a-menu-divider v-if="actionItem.divider" />
+                <a-menu-item v-bind="{ key: actionItem.action, ...actionItem }">
+                  {{ actionItem.text }}
+                </a-menu-item>
+              </template>
             </a-menu>
           </template>
         </a-dropdown>

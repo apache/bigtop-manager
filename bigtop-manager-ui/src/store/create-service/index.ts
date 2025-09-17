@@ -32,7 +32,7 @@ import type {
   ServiceCommandReq,
   ServiceConfigReq
 } from '@/api/command/types'
-import type { HostVO } from '@/api/hosts/types'
+import type { HostVO } from '@/api/host/types'
 import type { ComponentVO } from '@/api/component/types'
 
 const STEPS_TITLES = [

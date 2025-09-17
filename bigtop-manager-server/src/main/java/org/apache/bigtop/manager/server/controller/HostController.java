@@ -134,6 +134,24 @@ public class HostController {
         return ResponseEntity.success(hostService.installedStatus());
     }
 
+    @Operation(summary = "Start agent", description = "Start agent on the host")
+    @PostMapping("/{id}/start-agent")
+    public ResponseEntity<Boolean> startAgent(@PathVariable("id") Long id) {
+        return ResponseEntity.success(hostService.startAgent(id));
+    }
+
+    @Operation(summary = "Stop agent", description = "Stop agent on the host")
+    @PostMapping("/{id}/stop-agent")
+    public ResponseEntity<Boolean> stopAgent(@PathVariable("id") Long id) {
+        return ResponseEntity.success(hostService.stopAgent(id));
+    }
+
+    @Operation(summary = "Restart agent", description = "Restart agent on the host")
+    @PostMapping("/{id}/restart-agent")
+    public ResponseEntity<Boolean> restartAgent(@PathVariable("id") Long id) {
+        return ResponseEntity.success(hostService.restartAgent(id));
+    }
+
     @Operation(summary = "check-duplicate", description = "check hostname duplicate")
     @PostMapping("/check-duplicate")
     public ResponseEntity<Boolean> checkDuplicate(@RequestBody @Validated HostReq hostReq) {

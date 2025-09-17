@@ -38,6 +38,10 @@ export const getService = (pathParams: ServiceParams) => {
   return get<ServiceVO>(`/clusters/${pathParams.clusterId}/services/${pathParams.id}`)
 }
 
+export const removeService = (pathParams: ServiceParams) => {
+  return del<boolean>(`/clusters/${pathParams.clusterId}/services/${pathParams.id}`)
+}
+
 export const getServiceConfigs = (pathParams: ServiceParams) => {
   return get<ServiceConfig[]>(`/clusters/${pathParams.clusterId}/services/${pathParams.id}/configs`)
 }
@@ -57,11 +61,13 @@ export const takeServiceConfigSnapshot = (pathParams: ServiceParams, data: Snaps
   )
 }
 
-export const recoveryServiceConfigSnapshot = (pathParams: SnapshotRecovery): Promise<ServiceConfig[]> => {
+export const recoveryServiceConfigSnapshot = (pathParams: SnapshotRecovery) => {
   return post<ServiceConfig[]>(
     `/clusters/${pathParams.clusterId}/services/${pathParams.id}/config-snapshots/${pathParams.snapshotId}`
   )
 }
-export const deleteServiceConfigSnapshot = (pathParams: SnapshotRecovery): Promise<boolean> => {
-  return del(`/clusters/${pathParams.clusterId}/services/${pathParams.id}/config-snapshots/${pathParams.snapshotId}`)
+export const deleteServiceConfigSnapshot = (pathParams: SnapshotRecovery) => {
+  return del<boolean>(
+    `/clusters/${pathParams.clusterId}/services/${pathParams.id}/config-snapshots/${pathParams.snapshotId}`
+  )
 }
