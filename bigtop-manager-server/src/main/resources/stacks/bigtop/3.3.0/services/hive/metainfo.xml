@@ -72,7 +72,7 @@
         <templates>
             <template>
                 <src>hive-service.sh</src>
-                <dest>bin</dest>
+                <dest>bin/hive-service.sh</dest>
             </template>
         </templates>
 
