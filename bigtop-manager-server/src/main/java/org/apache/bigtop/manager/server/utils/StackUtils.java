@@ -272,6 +272,20 @@ public class StackUtils {
         throw new ServerException("Service not found: " + serviceName);
     }
 
+    public static List<String> getServiceRequiredBy(String serviceName) {
+        List<String> requiredBy = new ArrayList<>();
+        for (Map.Entry<StackDTO, List<ServiceDTO>> entry : STACK_SERVICE_MAP.entrySet()) {
+            for (ServiceDTO serviceDTO : entry.getValue()) {
+                if (serviceDTO.getRequiredServices() != null
+                        && serviceDTO.getRequiredServices().contains(serviceName)) {
+                    requiredBy.add(serviceDTO.getName());
+                }
+            }
+        }
+
+        return requiredBy;
+    }
+
     public static ComponentDTO getComponentDTO(String componentName) {
         for (Map.Entry<StackDTO, List<ServiceDTO>> entry : STACK_SERVICE_MAP.entrySet()) {
             for (ServiceDTO serviceDTO : entry.getValue()) {
