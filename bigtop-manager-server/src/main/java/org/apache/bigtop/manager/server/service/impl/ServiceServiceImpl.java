@@ -39,8 +39,6 @@ import org.apache.bigtop.manager.server.model.converter.ServiceConfigConverter;
 import org.apache.bigtop.manager.server.model.converter.ServiceConfigSnapshotConverter;
 import org.apache.bigtop.manager.server.model.converter.ServiceConverter;
 import org.apache.bigtop.manager.server.model.dto.ServiceConfigDTO;
-import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
-import org.apache.bigtop.manager.server.model.dto.StackDTO;
 import org.apache.bigtop.manager.server.model.query.PageQuery;
 import org.apache.bigtop.manager.server.model.req.ServiceConfigReq;
 import org.apache.bigtop.manager.server.model.req.ServiceConfigSnapshotReq;
@@ -164,7 +162,9 @@ public class ServiceServiceImpl implements ServiceService {
             }
 
             if (CollectionUtils.isNotEmpty(servicePOList)) {
-                throw new ApiException(ApiExceptionEnum.SERVICE_REQUIRED_BY, servicePOList.get(0).getDisplayName());
+                throw new ApiException(
+                        ApiExceptionEnum.SERVICE_REQUIRED_BY,
+                        servicePOList.get(0).getDisplayName());
             }
         }
 

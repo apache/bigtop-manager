@@ -276,7 +276,8 @@ public class StackUtils {
         List<String> requiredBy = new ArrayList<>();
         for (Map.Entry<StackDTO, List<ServiceDTO>> entry : STACK_SERVICE_MAP.entrySet()) {
             for (ServiceDTO serviceDTO : entry.getValue()) {
-                if (serviceDTO.getRequiredServices() != null && serviceDTO.getRequiredServices().contains(serviceName)) {
+                if (serviceDTO.getRequiredServices() != null
+                        && serviceDTO.getRequiredServices().contains(serviceName)) {
                     requiredBy.add(serviceDTO.getName());
                 }
             }
