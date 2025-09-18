@@ -20,9 +20,7 @@
   import { useAiChatStore } from '@/store/ai-assistant'
   import { formatTime } from '@/utils/transform'
   import { EllipsisOutlined } from '@ant-design/icons-vue'
-  import { message, Modal, Empty } from 'ant-design-vue'
-
-  import SvgIcon from '@/components/base/svg-icon/index.vue'
+  import { message, Empty } from 'ant-design-vue'
 
   import type { ChatThread, ThreadId } from '@/api/ai-assistant/types'
 
@@ -39,6 +37,7 @@
   type ThreadOperationHandler = Record<'delete' | 'rename', (thread: ChatThread, idx: number) => void>
 
   const { t } = useI18n()
+  const { confirmModal } = useModal()
   const aiChatStore = useAiChatStore()
   const { threads, currThread, threadLimit } = storeToRefs(aiChatStore)
   const props = defineProps<Props>()
@@ -100,14 +99,8 @@
   }
 
   const handleDeleteConfirm = (thread: ChatThread, idx: number) => {
-    Modal.confirm({
-      title: () =>
-        h('div', { style: { display: 'flex' } }, [
-          h(SvgIcon, { name: 'unknown', style: { width: '24px', height: '24px' } }),
-          h('p', t('common.delete_msg'))
-        ]),
-      style: { top: '30vh' },
-      icon: null,
+    confirmModal({
+      tipText: t('common.delete_msg'),
       async onOk() {
         const success = await aiChatStore.deleteChatThread(thread)
         if (success) {

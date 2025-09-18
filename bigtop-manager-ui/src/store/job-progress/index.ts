@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import { notification, Progress, Avatar, Button, Modal } from 'ant-design-vue'
+import { notification, Progress, Avatar, Button } from 'ant-design-vue'
 import { useClusterStore } from '@/store/cluster'
 import { execCommand } from '@/api/command'
 import { getJobDetails } from '@/api/job'
@@ -45,6 +45,8 @@ type JobStageProgress = Record<StatusType, () => JobStageProgressItem>
 
 export const useJobProgress = defineStore('job-progress', () => {
   const { t } = useI18n()
+  const { confirmModal, destroyAllModal } = useModal()
+
   const instance = getCurrentInstance()
   const clusterStore = useClusterStore()
   const progressMap = reactive<Map<number, JobStageProgressItem>>(new Map())
@@ -264,14 +266,8 @@ export const useJobProgress = defineStore('job-progress', () => {
       }
     }
 
-    Modal.confirm({
-      title: () =>
-        h('div', { style: { display: 'flex' } }, [
-          h(SvgIcon, { name: 'unknown', style: { width: '24px', height: '24px' } }),
-          h('p', t(`${title}`, target === '' ? { action } : { action, target }))
-        ]),
-      style: { top: '30vh' },
-      icon: null,
+    confirmModal({
+      tipText: t(`${title}`, target === '' ? { action } : { action, target }),
       async onOk() {
         try {
           const { id: jobId, name } = await execCommand(params)
@@ -287,9 +283,9 @@ export const useJobProgress = defineStore('job-progress', () => {
   }
 
   const onClick = (execRes: CommandRes) => {
-    Modal.destroyAll()
-    Modal.confirm({
-      icon: null,
+    destroyAllModal()
+    confirmModal({
+      title: undefined,
       width: '980px',
       zIndex: 9999,
       mask: false,

@@ -18,13 +18,12 @@
 -->
 
 <script setup lang="ts">
-  import { message, Modal, TableColumnType } from 'ant-design-vue'
+  import { message, TableColumnType } from 'ant-design-vue'
   import {
     deleteServiceConfigSnapshot,
     getServiceConfigSnapshotsList,
     recoveryServiceConfigSnapshot
   } from '@/api/service'
-  import SvgIcon from '@/components/base/svg-icon/index.vue'
 
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { ServiceConfigSnapshot, ServiceParams, SnapshotRecovery } from '@/api/service/types'
@@ -32,6 +31,8 @@
   type OperationType = 'Restore' | 'Remove'
 
   const { t } = useI18n()
+  const { confirmModal } = useModal()
+
   const open = ref(false)
   const serviceInfo = shallowRef<ServiceParams>()
 
@@ -98,14 +99,8 @@
 
   const handleTableOperation = (item: GroupItem<OperationType>, payLoad: ServiceConfigSnapshot) => {
     const currOperation = operationMap.value[item.action!]
-    Modal.confirm({
-      title: () =>
-        h('div', { style: { display: 'flex' } }, [
-          h(SvgIcon, { name: 'unknown', style: { width: '24px', height: '24px' } }),
-          h('p', currOperation.modalTitle)
-        ]),
-      icon: null,
-      style: { top: '30vh' },
+    confirmModal({
+      tipText: currOperation.modalTitle,
       async onOk() {
         try {
           const data = await currOperation.api({ ...serviceInfo.value, snapshotId: payLoad.id } as SnapshotRecovery)

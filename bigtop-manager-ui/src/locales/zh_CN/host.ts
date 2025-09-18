@@ -41,6 +41,8 @@ export default {
   ssh_port: 'SSH端口',
   grpc_port: 'GRPC端口',
   description: '备注',
+  operate_agent: '确定要{action}主机{target}上的代理吗？',
+  agent: '代理',
   key_password_not_match: '密钥口令不一致。',
   default_agent_path: '代理应用程序安装路径，默认为/opt',
   default_grpc_port: '代理应用程序gRPC端口，默认为8835',

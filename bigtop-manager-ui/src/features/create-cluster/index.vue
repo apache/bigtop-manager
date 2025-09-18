@@ -23,8 +23,6 @@
   import { getInstalledStatus, installDependencies } from '@/api/host'
   import { execCommand } from '@/api/command'
 
-  import SvgIcon from '@/components/base/svg-icon/index.vue'
-
   import ClusterBase from './components/cluster-base.vue'
   import ComponentInfo from './components/component-info.vue'
   import HostManage from './components/host-manage.vue'
@@ -34,6 +32,7 @@
   import type { ClusterCommandReq, CommandRequest, CommandVO, HostReq } from '@/api/command/types'
 
   const { t } = useI18n()
+  const { confirmModal } = useModal()
   const menuStore = useMenuStore()
 
   const compRef = ref<any>()
@@ -201,12 +200,8 @@
 
   onBeforeRouteLeave((_to, _from, next) => {
     if (current.value === stepsLimit.value && !isDone.value) {
-      Modal.confirm({
-        title: () =>
-          h('div', { style: { display: 'flex' } }, [
-            h(SvgIcon, { name: 'unknown', style: { width: '24px', height: '24px' } }),
-            h('span', t('common.exit_confirm'))
-          ]),
+      confirmModal({
+        tipText: t('common.exit_confirm'),
         content: h('div', { style: { paddingLeft: '36px' } }, t('common.installing_exit_confirm_content')),
         cancelText: t('common.no'),
         style: { top: '30vh' },

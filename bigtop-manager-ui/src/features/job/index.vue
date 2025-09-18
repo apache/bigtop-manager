@@ -18,10 +18,9 @@
 -->
 
 <script setup lang="ts">
-  import { Modal, TableColumnType, TableProps } from 'ant-design-vue'
+  import { TableColumnType, TableProps } from 'ant-design-vue'
   import { getJobList, getStageList, getTaskList, retryJob } from '@/api/job'
 
-  import SvgIcon from '@/components/base/svg-icon/index.vue'
   import LogsView, { type LogViewProps } from '@/features/log-view/index.vue'
 
   import type { JobVO, StageVO, StateType, TaskListParams, TaskVO } from '@/api/job/types'
@@ -36,6 +35,8 @@
 
   const POLLING_INTERVAL = 3000
   const { t } = useI18n()
+  const { confirmModal } = useModal()
+
   const clusterInfo = useAttrs() as ClusterVO
   const pollingIntervalId = ref<any>(null)
   const breadcrumbs = ref<BreadcrumbItem[]>([
@@ -227,14 +228,8 @@
   }
 
   const onRetry = (row: JobVO | StageVO | TaskVO) => {
-    Modal.confirm({
-      title: () =>
-        h('div', { style: { display: 'flex' } }, [
-          h(SvgIcon, { name: 'unknown', style: { width: '24px', height: '24px' } }),
-          h('p', t('job.retry'))
-        ]),
-      style: { top: '30vh' },
-      icon: null,
+    confirmModal({
+      tipText: t('job.retry'),
       async onOk() {
         try {
           const state = await retryJob({ jobId: row.id!, clusterId: clusterInfo.id! })

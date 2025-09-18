@@ -18,13 +18,12 @@
 -->
 
 <script setup lang="ts">
-  import { message, Modal, TableColumnType, TableProps } from 'ant-design-vue'
+  import { message, TableColumnType, TableProps } from 'ant-design-vue'
   import { getHosts } from '@/api/host'
   import * as hostApi from '@/api/host'
 
   import HostCreate from '@/features/create-host/index.vue'
   import InstallDependencies from '@/features/create-host/install-dependencies.vue'
-  import SvgIcon from '@/components/base/svg-icon/index.vue'
 
   import type { FilterConfirmProps, FilterResetProps } from 'ant-design-vue/es/table/interface'
   import type { GroupItem } from '@/components/common/button-group/types'
@@ -41,6 +40,8 @@
   }
 
   const { t } = useI18n()
+  const { confirmModal } = useModal()
+
   const router = useRouter()
   const attrs = useAttrs() as ClusterVO
 
@@ -155,14 +156,8 @@
   }
 
   const deleteHost = (ids: number[]) => {
-    Modal.confirm({
-      title: () =>
-        h('div', { style: { display: 'flex' } }, [
-          h(SvgIcon, { name: 'unknown', style: { width: '24px', height: '24px' } }),
-          h('p', ids.length > 1 ? t('common.delete_msgs') : t('common.delete_msg'))
-        ]),
-      style: { top: '30vh' },
-      icon: null,
+    confirmModal({
+      tipText: ids.length > 1 ? t('common.delete_msgs') : t('common.delete_msg'),
       async onOk() {
         try {
           const data = await hostApi.removeHost({ ids })
