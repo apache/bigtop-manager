@@ -222,10 +222,12 @@ public class HadoopParams extends BigtopParams {
                 log.info("Detected glibc version >= 2.34, enabling short-circuit read optimization");
 
                 // Get recommended domain socket path and append port placeholder
-                domainSocketPath = findOptimalDomainSocketPath();
+                domainSocketPath = (String) hdfsSite.get("dfs.domain.socket.path");
                 if (domainSocketPath != null) {
                     // _PORT placeholder will be replaced with actual port number by DataNode at runtime
-                    domainSocketPath = domainSocketPath + "/dn._PORT";
+                    if (!domainSocketPath.endsWith("dn._PORT")) {
+                        domainSocketPath = domainSocketPath + "/dn._PORT";
+                    }
                     log.info("Enabling short-circuit reads with domain socket path: {}", domainSocketPath);
                 }
             } else {
@@ -361,46 +363,6 @@ public class HadoopParams extends BigtopParams {
         }
         // Compare minor version when major versions are equal
         return minor1 - minor2;
-    }
-
-    /**
-     * Find the optimal domain socket path.
-     * <p>
-     * Path selection strategy:
-     * 1. Check candidate paths in priority order for existence and writability
-     * 2. If none are available, attempt to create default directory
-     * 3. Finally fall back to /tmp directory
-     *
-     * @return Recommended domain socket base path
-     */
-    private String findOptimalDomainSocketPath() {
-        // Candidate paths in priority order
-        String[] candidatePaths = {"/var/run/hadoop", "/tmp/hadoop", "/tmp"};
-
-        // Check availability of existing paths
-        for (String path : candidatePaths) {
-            java.io.File dir = new java.io.File(path);
-            if (dir.exists() && dir.canWrite()) {
-                log.info("Selected domain socket path: {}", path);
-                return path;
-            }
-        }
-
-        // Try to create default hadoop directory
-        java.io.File defaultDir = new java.io.File("/tmp/hadoop");
-        if (!defaultDir.exists()) {
-            try {
-                if (defaultDir.mkdirs()) {
-                    log.info("Created and using domain socket path: /tmp/hadoop");
-                    return "/tmp/hadoop";
-                }
-            } catch (Exception e) {
-                log.warn("Cannot create directory /tmp/hadoop, using /tmp as fallback", e);
-            }
-        }
-
-        log.info("Using fallback domain socket path: /tmp");
-        return "/tmp";
     }
 
     /**

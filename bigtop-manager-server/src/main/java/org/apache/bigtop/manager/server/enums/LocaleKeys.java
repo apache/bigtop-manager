@@ -62,6 +62,7 @@ public enum LocaleKeys {
     SERVICE_REQUIRED_NOT_FOUND("service.required.not.found"),
     SERVICE_HAS_COMPONENTS("service.has.components"),
     SERVICE_IS_RUNNING("service.is.running"),
+    SERVICE_REQUIRED_BY("service.required.by"),
 
     COMPONENT_NOT_FOUND("component.not.found"),
     COMPONENT_IS_RUNNING("component.is.running"),

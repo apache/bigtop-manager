@@ -150,6 +150,24 @@ public class ServiceServiceImpl implements ServiceService {
             throw new ApiException(ApiExceptionEnum.SERVICE_NOT_FOUND);
         }
 
+        // Check if required by other installed services
+        List<String> requiredBy = StackUtils.getServiceRequiredBy(servicePO.getName());
+        if (CollectionUtils.isNotEmpty(requiredBy)) {
+            boolean isInfra = servicePO.getClusterId() == 0;
+            List<ServicePO> servicePOList;
+            if (isInfra) {
+                servicePOList = serviceDao.findByClusterIdAndNames(null, requiredBy);
+            } else {
+                servicePOList = serviceDao.findByClusterIdAndNames(servicePO.getClusterId(), requiredBy);
+            }
+
+            if (CollectionUtils.isNotEmpty(servicePOList)) {
+                throw new ApiException(
+                        ApiExceptionEnum.SERVICE_REQUIRED_BY,
+                        servicePOList.get(0).getDisplayName());
+            }
+        }
+
         // Check service status - only allow deletion when service is stopped
         if (!Objects.equals(servicePO.getStatus(), HealthyStatusEnum.UNHEALTHY.getCode())) {
             throw new ApiException(ApiExceptionEnum.SERVICE_IS_RUNNING);
@@ -165,7 +183,7 @@ public class ServiceServiceImpl implements ServiceService {
                 continue;
             }
             if (!Objects.equals(componentPO.getStatus(), HealthyStatusEnum.UNHEALTHY.getCode())) {
-                throw new ApiException(ApiExceptionEnum.SERVICE_IS_RUNNING);
+                throw new ApiException(ApiExceptionEnum.COMPONENT_IS_RUNNING);
             }
         }
 
