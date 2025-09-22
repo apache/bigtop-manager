@@ -75,6 +75,14 @@ public class HadoopSetup {
                             Constants.PERMISSION_755,
                             true);
                 }
+                case "journalnode": {
+                    LinuxFileUtils.createDirectories(
+                            hadoopParams.getDfsJourNalNodeDir(),
+                            hadoopUser,
+                            hadoopGroup,
+                            Constants.PERMISSION_755,
+                            true);
+                }
                 case "datanode": {
                     LinuxFileUtils.createDirectories(
                             hadoopParams.getDfsDomainSocketPathPrefix(),
@@ -221,9 +229,10 @@ public class HadoopSetup {
     public static void formatNameNode(HadoopParams hadoopParams) {
         if (!isNameNodeFormatted(hadoopParams)) {
             String formatCmd = MessageFormat.format(
-                    "{0}/hdfs --config {1} namenode -format -nonInteractive",
+                    "{0}/hdfs --config {1} namenode -format -nonInteractive -force",
                     hadoopParams.binDir(), hadoopParams.confDir());
             try {
+                Thread.sleep(180000);
                 LinuxOSUtils.sudoExecCmd(formatCmd, hadoopParams.user());
             } catch (Exception e) {
                 throw new StackException(e);
