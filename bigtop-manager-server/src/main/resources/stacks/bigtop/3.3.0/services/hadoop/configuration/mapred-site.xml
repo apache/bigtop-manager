@@ -253,7 +253,7 @@
     </property>
     <property>
         <name>mapreduce.application.classpath</name>
-        <value>${hadoop_conf_dir!},${hadoop_home!}/*,${hadoop_home!}/lib/*</value>
+        <value>${hadoop_conf_dir},${hadoop_home}/*,${hadoop_home}/lib/*</value>
         <description>CLASSPATH for MR applications. A comma-separated list of CLASSPATH entries.</description>
     </property>
     <property>
@@ -296,7 +296,7 @@
     </property>
     <property>
         <name>mapreduce.admin.user.env</name>
-        <value>LD_LIBRARY_PATH=${hadoop_home!}/lib/native</value>
+        <value>LD_LIBRARY_PATH=${hadoop_home}/lib/native</value>
         <description>
             Additional execution environment entries for map and reduce task processes.
             This is not an additive property. You must preserve the original value if

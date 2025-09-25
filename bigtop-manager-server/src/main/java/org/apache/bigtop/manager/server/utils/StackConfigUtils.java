@@ -18,6 +18,8 @@
  */
 package org.apache.bigtop.manager.server.utils;
 
+import org.apache.bigtop.manager.common.utils.JsonUtils;
+import org.apache.bigtop.manager.grpc.payload.JobCachePayload;
 import org.apache.bigtop.manager.server.enums.PropertyAction;
 import org.apache.bigtop.manager.server.model.dto.AttrsDTO;
 import org.apache.bigtop.manager.server.model.dto.PropertyDTO;
@@ -79,8 +81,9 @@ public class StackConfigUtils {
         // To avoid to change the original configs, we use cloned object
         List<ServiceConfigDTO> mergedConfigs = new ArrayList<>();
         for (ServiceConfigDTO oriConfig : oriConfigs) {
-            ServiceConfigDTO mergedConfig = new ServiceConfigDTO();
-            BeanUtils.copyProperties(oriConfig, mergedConfig);
+            // Deep clone via JSON serialization/deserialization
+            ServiceConfigDTO mergedConfig =
+                    JsonUtils.readFromString(JsonUtils.writeAsString(oriConfig), ServiceConfigDTO.class);
             mergedConfigs.add(mergedConfig);
         }
 

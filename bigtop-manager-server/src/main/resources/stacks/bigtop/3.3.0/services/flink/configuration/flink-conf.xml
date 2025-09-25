@@ -345,19 +345,19 @@ rest.bind-address: localhost
 
 # Directory to upload completed jobs to. Add this directory to the list of
 # monitored directories of the HistoryServer as well (see below).
-jobmanager.archive.fs.dir: ${jobmanager_archive_fs_dir}
+jobmanager.archive.fs.dir: ${jobmanager.archive.fs.dir}
 
 # The address under which the web-based HistoryServer listens.
 #historyserver.web.address: 0.0.0.0
 
 # The port under which the web-based HistoryServer listens.
-historyserver.web.port: ${historyserver_web_port}
+historyserver.web.port: ${historyserver.web.port}
 
 # Comma separated list of directories to monitor for completed jobs.
-historyserver.archive.fs.dir: ${historyserver_archive_fs_dir}
+historyserver.archive.fs.dir: ${historyserver.archive.fs.dir}
 
 # Interval in milliseconds for refreshing the monitored directories.
-historyserver.archive.fs.refresh-interval: ${historyserver_archive_fs_refresh_interval}
+historyserver.archive.fs.refresh-interval: ${historyserver.archive.fs.refresh-interval}
 ]]>
         </value>
         <attrs>
