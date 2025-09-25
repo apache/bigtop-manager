@@ -20,34 +20,24 @@
 
 <configuration>
     <property>
-        <name>jobmanager.archive.fs.dir</name>
+        <name>jobmanager_archive_fs_dir</name>
         <value>hdfs:///completed-jobs/</value>
         <description>Directory for JobManager to store the archives of completed jobs.</description>
     </property>
     <property>
-        <name>historyserver.archive.fs.dir</name>
+        <name>historyserver_archive_fs_dir</name>
         <value>hdfs:///completed-jobs/</value>
         <description>Comma separated list of directories to fetch archived jobs from.</description>
     </property>
     <property>
-        <name>historyserver.web.port</name>
+        <name>historyserver_web_port</name>
         <value>8082</value>
         <description>The port under which the web-based HistoryServer listens.</description>
     </property>
     <property>
-        <name>historyserver.archive.fs.refresh-interval</name>
+        <name>historyserver_archive_fs_refresh_interval</name>
         <value>10000</value>
         <description>Interval in milliseconds for refreshing the monitored directories.</description>
-    </property>
-    <property>
-        <name>security.kerberos.login.keytab</name>
-        <description>Flink keytab path</description>
-        <value>none</value>
-    </property>
-    <property>
-        <name>security.kerberos.login.principal</name>
-        <description>Flink principal name</description>
-        <value>none</value>
     </property>
     <!-- flink-conf.yaml -->
     <property>
@@ -345,19 +335,19 @@ rest.bind-address: localhost
 
 # Directory to upload completed jobs to. Add this directory to the list of
 # monitored directories of the HistoryServer as well (see below).
-jobmanager.archive.fs.dir: ${jobmanager.archive.fs.dir}
+jobmanager.archive.fs.dir: ${jobmanager_archive_fs_dir}
 
 # The address under which the web-based HistoryServer listens.
 #historyserver.web.address: 0.0.0.0
 
 # The port under which the web-based HistoryServer listens.
-historyserver.web.port: ${historyserver.web.port}
+historyserver.web.port: ${historyserver_web_port}
 
 # Comma separated list of directories to monitor for completed jobs.
-historyserver.archive.fs.dir: ${historyserver.archive.fs.dir}
+historyserver.archive.fs.dir: ${historyserver_archive_fs_dir}
 
 # Interval in milliseconds for refreshing the monitored directories.
-historyserver.archive.fs.refresh-interval: ${historyserver.archive.fs.refresh-interval}
+historyserver.archive.fs.refresh-interval: ${historyserver_archive_fs_refresh_interval}
 ]]>
         </value>
         <attrs>

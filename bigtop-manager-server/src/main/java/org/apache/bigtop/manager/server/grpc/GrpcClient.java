@@ -43,7 +43,7 @@ public class GrpcClient {
 
     private static final Map<String, ManagedChannel> CHANNELS = new ConcurrentHashMap<>();
 
-    // The key of outer map is hostname, inner map is stub class name
+    // The key of outer map is hostname:grpc_port, inner map is stub class name
     private static final Map<String, Map<String, AbstractBlockingStub<?>>> BLOCKING_STUBS = new ConcurrentHashMap<>();
     private static final Map<String, Map<String, AbstractAsyncStub<?>>> ASYNC_STUBS = new ConcurrentHashMap<>();
     private static final Map<String, Map<String, AbstractFutureStub<?>>> FUTURE_STUBS = new ConcurrentHashMap<>();
@@ -56,7 +56,7 @@ public class GrpcClient {
     @SuppressWarnings("unchecked")
     public static <T extends AbstractBlockingStub<T>> T getBlockingStub(String host, Integer grpcPort, Class<T> clazz) {
         Map<String, AbstractBlockingStub<?>> innerMap =
-                BLOCKING_STUBS.computeIfAbsent(host, k -> new ConcurrentHashMap<>());
+                BLOCKING_STUBS.computeIfAbsent(getKey(host, grpcPort), k -> new ConcurrentHashMap<>());
         return (T) innerMap.computeIfAbsent(clazz.getName(), k -> {
             T instance = T.newStub(getFactory(clazz), getChannel(host, grpcPort));
             log.info("Instance: {} created.", k);
@@ -66,7 +66,7 @@ public class GrpcClient {
 
     @SuppressWarnings("unchecked")
     public static <T extends AbstractAsyncStub<T>> T getAsyncStub(String host, Integer grpcPort, Class<T> clazz) {
-        Map<String, AbstractAsyncStub<?>> innerMap = ASYNC_STUBS.computeIfAbsent(host, k -> new ConcurrentHashMap<>());
+        Map<String, AbstractAsyncStub<?>> innerMap = ASYNC_STUBS.computeIfAbsent(getKey(host, grpcPort), k -> new ConcurrentHashMap<>());
         return (T) innerMap.computeIfAbsent(clazz.getName(), k -> {
             T instance = T.newStub(getFactory(clazz), getChannel(host, grpcPort));
             log.info("Instance: {} created.", k);
@@ -77,12 +77,16 @@ public class GrpcClient {
     @SuppressWarnings("unchecked")
     public static <T extends AbstractFutureStub<T>> T getFutureStub(String host, Integer grpcPort, Class<T> clazz) {
         Map<String, AbstractFutureStub<?>> innerMap =
-                FUTURE_STUBS.computeIfAbsent(host, k -> new ConcurrentHashMap<>());
+                FUTURE_STUBS.computeIfAbsent(getKey(host, grpcPort), k -> new ConcurrentHashMap<>());
         return (T) innerMap.computeIfAbsent(clazz.getName(), k -> {
             T instance = T.newStub(getFactory(clazz), getChannel(host, grpcPort));
             log.info("Instance: {} created.", k);
             return instance;
         });
+    }
+
+    private static String getKey(String host, Integer grpcPort) {
+        return host + ":" + grpcPort;
     }
 
     private static ManagedChannel createChannel(String host, Integer port) {
