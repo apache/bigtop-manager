@@ -77,7 +77,7 @@ public class SparkThriftServerScript extends AbstractServerScript {
     @Override
     public ShellResult status(Params params) {
         SparkParams sparkParams = (SparkParams) params;
-        return LinuxOSUtils.checkProcess(sparkParams.getSparkHistoryServerPidFile());
+        return LinuxOSUtils.checkProcess(sparkParams.getSparkThriftServerPidFile());
     }
 
     @Override
