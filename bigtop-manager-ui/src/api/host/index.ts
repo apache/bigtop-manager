@@ -42,7 +42,7 @@ export const getInstalledStatus = () => {
 }
 
 export const updateHost = (data: HostParams) => {
-  return put<HostVO[]>(`/hosts/${data.id}`, { data })
+  return put<HostVO[]>(`/hosts/${data.id}`, data)
 }
 
 export const removeHost = (data: { ids: number[] }) => {
