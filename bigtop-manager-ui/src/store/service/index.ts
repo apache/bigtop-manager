@@ -18,9 +18,7 @@
  */
 
 import { getService, getServiceList, removeService as remove } from '@/api/service'
-import { Modal, message } from 'ant-design-vue'
-
-import SvgIcon from '@/components/base/svg-icon/index.vue'
+import { message } from 'ant-design-vue'
 
 import type { ServiceListParams, ServiceVO } from '@/api/service/types'
 
@@ -28,6 +26,8 @@ export const useServiceStore = defineStore(
   'service',
   () => {
     const { t } = useI18n()
+    const { confirmModal } = useModal()
+
     const services = ref<ServiceVO[]>([])
     const serviceMap = ref<Record<string, (ServiceVO & { clusterId: number })[]>>({})
     const total = ref(0)
@@ -60,11 +60,7 @@ export const useServiceStore = defineStore(
     }
 
     const getServiceDetail = async (clusterId: number, serviceId: number) => {
-      try {
-        return await getService({ clusterId, id: serviceId })
-      } catch (error) {
-        console.log(error)
-      }
+      return await getService({ clusterId, id: serviceId })
     }
 
     const getServicesOfInfra = async () => {
@@ -73,11 +69,7 @@ export const useServiceStore = defineStore(
 
     const getInstalledNamesOrIdsOfServiceByKey = (key: string, flag: 'names' | 'ids' = 'names') => {
       return Object.values(serviceMap.value[key] || {}).map((service: ServiceVO) => {
-        if (flag === 'ids') {
-          return service.id
-        } else {
-          return service.name
-        }
+        return flag === 'ids' ? service.id : service.name
       })
     }
 
@@ -91,26 +83,16 @@ export const useServiceStore = defineStore(
       }
     }
 
-    async function removeService(service: ServiceVO, clusterId: number, callBack: (...args: any) => void) {
-      const actionI18n = t('common.remove').toLowerCase()
+    function removeService(service: ServiceVO, clusterId: number, callBack: (...args: any) => void) {
       const target = service.displayName ?? service.name
-      return Modal.confirm({
-        title: () =>
-          h('div', { style: { display: 'flex' } }, [
-            h(SvgIcon, { name: 'unknown', style: { width: '24px', height: '24px' } }),
-            h('p', t('common.confirm_action', { action: actionI18n, target }))
-          ]),
-        style: { top: '30vh' },
-        icon: null,
+      const tipText = t('common.confirm_action', { action: t('common.remove').toLowerCase(), target })
+      return confirmModal({
+        tipText,
         async onOk() {
-          try {
-            const res = await remove({ clusterId, id: service.id! })
-            if (res) {
-              message.success(t('common.delete_success'))
-              return Promise.resolve(callBack())
-            }
-          } catch (error) {
-            console.log('error :>> ', error)
+          const res = await remove({ clusterId, id: service.id! })
+          if (res) {
+            message.success(t('common.delete_success'))
+            return Promise.resolve(callBack())
           }
         }
       })

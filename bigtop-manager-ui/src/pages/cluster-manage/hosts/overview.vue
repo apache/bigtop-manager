@@ -93,7 +93,7 @@
   const detailKeys = computed((): (keyof HostVO)[] => Object.keys(baseConfig.value))
   const noChartData = computed(() => Object.values(chartData.value).length === 0)
 
-  const handleHostOperate = (item: any, component: ComponentVO) => {
+  const handleComponentOperate = (item: any, component: ComponentVO) => {
     const { serviceName } = component
     const installedServiceMap = Object.values(serviceStore.serviceMap)
       .flat()
@@ -252,7 +252,7 @@
                   <svg-icon name="more" style="margin: 0" />
                 </a-button>
                 <template #overlay>
-                  <a-menu @click="handleHostOperate($event, comp)">
+                  <a-menu @click="handleComponentOperate($event, comp)">
                     <a-menu-item v-for="[operate, text] of Object.entries(componentOperates)" :key="operate">
                       <span>{{ text }}</span>
                     </a-menu-item>

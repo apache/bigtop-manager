@@ -142,9 +142,7 @@
     resume()
   })
 
-  onDeactivated(() => pause())
-
-  onUnmounted(() => pause())
+  onDeactivated(pause)
 
   watchEffect(() => {
     locateStackWithService.value = stackStore.stacks.filter((item) =>

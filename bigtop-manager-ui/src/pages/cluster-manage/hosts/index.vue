@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { message, Modal, TableColumnType, TableProps } from 'ant-design-vue'
+  import { message, TableColumnType, TableProps } from 'ant-design-vue'
 
   import { useClusterStore } from '@/store/cluster'
   import * as hostApi from '@/api/host'
@@ -26,7 +26,6 @@
   import useBaseTable from '@/composables/use-base-table'
   import HostCreate from '@/features/create-host/index.vue'
   import InstallDependencies from '@/features/create-host/install-dependencies.vue'
-  import SvgIcon from '@/components/base/svg-icon/index.vue'
 
   import type { FilterConfirmProps, FilterResetProps, TableRowSelection } from 'ant-design-vue/es/table/interface'
   import type { HostReq } from '@/api/command/types'
@@ -43,6 +42,8 @@
   }
 
   const { t } = useI18n()
+  const { confirmModal } = useModal()
+
   const router = useRouter()
   const clusterStore = useClusterStore()
   const searchInputRef = ref()
@@ -135,15 +136,8 @@
   ])
 
   const operations = computed((): GroupItem[] => [
-    {
-      text: 'edit',
-      clickEvent: (_item, args) => editHost(args)
-    },
-    {
-      text: 'remove',
-      danger: true,
-      clickEvent: (_item, args) => deleteHost([args.id])
-    }
+    { text: 'edit', clickEvent: (_item, args) => editHost(args) },
+    { text: 'remove', danger: true, clickEvent: (_item, args) => deleteHost([args.id]) }
   ])
 
   const { loading, dataSource, filtersParams, paginationProps, onChange } = useBaseTable<HostVO>({
@@ -214,19 +208,16 @@
 
   const editHost = (row: HostVO) => {
     const cluster = Object.values(clusterStore.clusterMap).find((v) => v.name === row.clusterName)
-    const formatHost = { ...row, displayName: row.clusterDisplayName, clusterId: cluster?.id }
-    hostCreateRef.value?.handleOpen('EDIT', formatHost)
+    hostCreateRef.value?.handleOpen('EDIT', {
+      ...row,
+      displayName: row.clusterDisplayName,
+      clusterId: cluster?.id
+    })
   }
 
   const deleteHost = (ids: number[]) => {
-    Modal.confirm({
-      title: () =>
-        h('div', { style: { display: 'flex' } }, [
-          h(SvgIcon, { name: 'unknown', style: { width: '24px', height: '24px' } }),
-          h('p', ids.length > 1 ? t('common.delete_msgs') : t('common.delete_msg'))
-        ]),
-      style: { top: '30vh' },
-      icon: null,
+    confirmModal({
+      tipText: ids.length > 1 ? t('common.delete_msgs') : t('common.delete_msg'),
       async onOk() {
         try {
           const data = await hostApi.removeHost({ ids })

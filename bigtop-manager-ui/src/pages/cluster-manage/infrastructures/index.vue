@@ -27,20 +27,14 @@
 
   const { t } = useI18n()
   const router = useRouter()
-  const activeKey = ref('1')
-  const currCluster = shallowRef<ClusterVO>({
-    id: 0
-  })
+  const route = useRoute()
+  const { activeTab } = useTabState(route.path, '1')
+
+  const currCluster = shallowRef<ClusterVO>({ id: 0 })
 
   const tabs = computed((): TabItem[] => [
-    {
-      key: '1',
-      title: t('common.service')
-    },
-    {
-      key: '2',
-      title: t('common.job')
-    }
+    { key: '1', title: t('common.service') },
+    { key: '2', title: t('common.job') }
   ])
 
   const actionGroup = computed<GroupItem[]>(() => [
@@ -52,10 +46,7 @@
     }
   ])
 
-  const getCompName = computed(() => {
-    const components = [Service, Job]
-    return components[parseInt(activeKey.value) - 1]
-  })
+  const getCompName = computed(() => [Service, Job][parseInt(activeTab.value) - 1])
 
   const addService: GroupItem['clickEvent'] = () => {
     router.push({ name: 'CreateInfraService', params: { id: 0, creationMode: 'public' } })
@@ -65,10 +56,10 @@
 <template>
   <div>
     <header-card :title="t('menu.infra')" :show-avatar="false" :desc="t('infra.info')" :action-groups="actionGroup" />
-    <main-card v-model:active-key="activeKey" :tabs="tabs">
+    <main-card v-model:active-key="activeTab" :tabs="tabs">
       <template #tab-item>
         <keep-alive>
-          <component :is="getCompName" v-bind="currCluster"></component>
+          <component :is="getCompName" :key="activeTab" v-bind="currCluster"></component>
         </keep-alive>
       </template>
     </main-card>

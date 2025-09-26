@@ -31,16 +31,16 @@
   import type { Command } from '@/api/command/types'
   import type { TabItem } from '@/components/base/main-card/types'
   import type { GroupItem } from '@/components/common/button-group/types'
-  import type { ClusterStatusType, ClusterVO } from '@/api/cluster/types'
+  import type { ClusterStatusType } from '@/api/cluster/types'
 
   const { t } = useI18n()
   const router = useRouter()
+  const route = useRoute()
   const jobProgressStore = useJobProgress()
   const clusterStore = useClusterStore()
-  const { loading } = storeToRefs(clusterStore)
+  const { loading, currCluster } = storeToRefs(clusterStore)
 
-  const activeKey = ref('1')
-  const clusterInfo = ref<ClusterVO>({})
+  const { activeTab } = useTabState(route.path, '1')
 
   const statusColors = shallowRef<Record<ClusterStatusType, keyof typeof CommonStatusTexts>>({
     1: 'healthy',
@@ -51,7 +51,7 @@
   /**
    * Determines the component to render based on the active tab.
    */
-  const getCompName = computed(() => [Overview, Service, Host, User, Job][parseInt(activeKey.value) - 1])
+  const getCompName = computed(() => [Overview, Service, Host, User, Job][parseInt(activeTab.value) - 1])
 
   const tabs = computed((): TabItem[] => [
     { key: '1', title: t('common.overview') },
@@ -89,14 +89,14 @@
       jobProgressStore.processCommand(
         {
           command: key as keyof typeof Command,
-          clusterId: clusterInfo.value.id,
+          clusterId: currCluster.value.id,
           commandLevel: 'cluster'
         },
         async () => {
           await clusterStore.loadClusters()
-          await clusterStore.getClusterDetail(clusterInfo.value.id!)
+          await clusterStore.getClusterDetail(currCluster.value.id!)
         },
-        { displayName: clusterInfo.value.displayName }
+        { displayName: currCluster.value.displayName }
       )
     } catch (error) {
       console.error('Error processing command:', error)
@@ -104,23 +104,23 @@
   }
 
   const addService: GroupItem['clickEvent'] = () => {
-    router.push({ name: 'CreateService', params: { id: clusterInfo.value.id, creationMode: 'internal' } })
+    router.push({ name: 'CreateService', params: { id: currCluster.value.id, creationMode: 'internal' } })
   }
 </script>
 
 <template>
   <a-spin :spinning="loading">
     <header-card
-      :title="clusterInfo.displayName"
+      :title="currCluster.displayName"
       avatar="cluster"
-      :status="CommonStatus[statusColors[clusterInfo.status as ClusterStatusType]]"
-      :desc="clusterInfo.desc"
+      :status="CommonStatus[statusColors[currCluster.status as ClusterStatusType]]"
+      :desc="currCluster.desc"
       :action-groups="actionGroup"
     />
-    <main-card v-model:active-key="activeKey" :tabs="tabs">
+    <main-card v-model:active-key="activeTab" :tabs="tabs">
       <template #tab-item>
         <keep-alive>
-          <component :is="getCompName" v-bind="clusterInfo" v-model:payload="clusterInfo"></component>
+          <component :is="getCompName" :key="activeTab" v-bind="currCluster" v-model:payload="currCluster"></component>
         </keep-alive>
       </template>
     </main-card>
