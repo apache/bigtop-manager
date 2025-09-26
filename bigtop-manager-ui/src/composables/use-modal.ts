@@ -37,9 +37,15 @@ export const useModal = () => {
       style: DEFAULT_STYLE,
       icon: null,
       ...rest,
-      onOk: () => {
-        Modal.destroyAll()
-        onOk?.()
+      onOk: async () => {
+        try {
+          if (onOk) {
+            await onOk()
+          }
+        } catch (e) {
+          console.error('Modal onOk error:', e)
+        }
+        return Promise.resolve()
       }
     })
   }
