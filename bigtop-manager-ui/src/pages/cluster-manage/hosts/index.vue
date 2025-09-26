@@ -136,15 +136,8 @@
   ])
 
   const operations = computed((): GroupItem[] => [
-    {
-      text: 'edit',
-      clickEvent: (_item, args) => editHost(args)
-    },
-    {
-      text: 'remove',
-      danger: true,
-      clickEvent: (_item, args) => deleteHost([args.id])
-    }
+    { text: 'edit', clickEvent: (_item, args) => editHost(args) },
+    { text: 'remove', danger: true, clickEvent: (_item, args) => deleteHost([args.id]) }
   ])
 
   const { loading, dataSource, filtersParams, paginationProps, onChange } = useBaseTable<HostVO>({
@@ -215,8 +208,11 @@
 
   const editHost = (row: HostVO) => {
     const cluster = Object.values(clusterStore.clusterMap).find((v) => v.name === row.clusterName)
-    const formatHost = { ...row, displayName: row.clusterDisplayName, clusterId: cluster?.id }
-    hostCreateRef.value?.handleOpen('EDIT', formatHost)
+    hostCreateRef.value?.handleOpen('EDIT', {
+      ...row,
+      displayName: row.clusterDisplayName,
+      clusterId: cluster?.id
+    })
   }
 
   const deleteHost = (ids: number[]) => {

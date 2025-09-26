@@ -83,7 +83,7 @@ export const useServiceStore = defineStore(
       }
     }
 
-    async function removeService(service: ServiceVO, clusterId: number, callBack: (...args: any) => void) {
+    function removeService(service: ServiceVO, clusterId: number, callBack: (...args: any) => void) {
       const target = service.displayName ?? service.name
       const tipText = t('common.confirm_action', { action: t('common.remove').toLowerCase(), target })
       return confirmModal({

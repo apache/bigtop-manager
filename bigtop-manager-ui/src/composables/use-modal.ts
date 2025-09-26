@@ -20,26 +20,32 @@
 import SvgIcon from '@/components/base/svg-icon/index.vue'
 import { Modal, ModalFuncProps } from 'ant-design-vue'
 
+interface ConfirmModalProps extends ModalFuncProps {
+  tipText?: string
+}
+
+const DEFAULT_STYLE = { top: '30vh' }
+
 export const useModal = () => {
-  function confirmModal(payload: ModalFuncProps & { tipText?: string }) {
+  function confirmModal({ tipText, onOk, ...rest }: ConfirmModalProps) {
     return Modal.confirm({
       title: () =>
         h('div', { style: { display: 'flex' } }, [
           h(SvgIcon, { name: 'unknown', style: { width: '24px', height: '24px' } }),
-          h('p', payload.tipText)
+          h('p', tipText ?? '')
         ]),
-      style: { top: '30vh' },
+      style: DEFAULT_STYLE,
       icon: null,
-      ...payload
+      ...rest,
+      onOk: () => {
+        Modal.destroyAll()
+        onOk?.()
+      }
     })
-  }
-
-  function destroyAllModal() {
-    Modal.destroyAll()
   }
 
   return {
     confirmModal,
-    destroyAllModal
+    destroyAllModal: Modal.destroyAll
   }
 }
