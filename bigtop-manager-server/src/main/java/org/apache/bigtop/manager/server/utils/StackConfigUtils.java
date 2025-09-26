@@ -19,7 +19,6 @@
 package org.apache.bigtop.manager.server.utils;
 
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.grpc.payload.JobCachePayload;
 import org.apache.bigtop.manager.server.enums.PropertyAction;
 import org.apache.bigtop.manager.server.model.dto.AttrsDTO;
 import org.apache.bigtop.manager.server.model.dto.PropertyDTO;
@@ -30,8 +29,6 @@ import org.apache.bigtop.manager.server.stack.xml.ConfigurationXml;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-
-import org.springframework.beans.BeanUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
