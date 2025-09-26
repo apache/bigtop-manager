@@ -155,6 +155,30 @@ public class HadoopParams extends BigtopParams {
         List<String> resourcemanagerList = LocalSettings.componentHosts("resourcemanager");
         if (!resourcemanagerList.isEmpty()) {
             yarnSite.put("yarn.resourcemanager.hostname", MessageFormat.format("{0}", resourcemanagerList.get(0)));
+            yarnSite.put(
+                    "yarn.resourcemanager.resource-tracker.address",
+                    ((String) yarnSite.get("yarn.resourcemanager.resource-tracker.address"))
+                            .replace("0.0.0.0", resourcemanagerList.get(0)));
+            yarnSite.put(
+                    "yarn.resourcemanager.scheduler.address",
+                    ((String) yarnSite.get("yarn.resourcemanager.scheduler.address"))
+                            .replace("0.0.0.0", resourcemanagerList.get(0)));
+            yarnSite.put(
+                    "yarn.resourcemanager.address",
+                    ((String) yarnSite.get("yarn.resourcemanager.address"))
+                            .replace("0.0.0.0", resourcemanagerList.get(0)));
+            yarnSite.put(
+                    "yarn.resourcemanager.admin.address",
+                    ((String) yarnSite.get("yarn.resourcemanager.admin.address"))
+                            .replace("0.0.0.0", resourcemanagerList.get(0)));
+            yarnSite.put(
+                    "yarn.resourcemanager.webapp.address",
+                    ((String) yarnSite.get("yarn.resourcemanager.webapp.address"))
+                            .replace("0.0.0.0", resourcemanagerList.get(0)));
+            yarnSite.put(
+                    "yarn.resourcemanager.webapp.https.address",
+                    ((String) yarnSite.get("yarn.resourcemanager.webapp.https.address"))
+                            .replace("0.0.0.0", resourcemanagerList.get(0)));
         }
 
         nodeManagerLogDir = (String) yarnSite.get("yarn.nodemanager.log-dirs");
