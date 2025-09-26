@@ -93,7 +93,7 @@
     </property>
     <property>
         <name>yarn.application.classpath</name>
-        <value>${hadoop_conf_dir!},${hadoop_home!}/*,${hadoop_home!}/lib/*</value>
+        <value>${hadoop_conf_dir},${hadoop_home}/*,${hadoop_home}/lib/*</value>
         <description>Classpath for typical applications.</description>
     </property>
     <property>
@@ -308,7 +308,7 @@
     </property>
     <property>
         <name>yarn.timeline-service.enabled</name>
-        <value>true</value>
+        <value>false</value>
         <description>
             Indicate to clients whether timeline service is enabled or not.
             If enabled, clients will put entities and events to the timeline server.

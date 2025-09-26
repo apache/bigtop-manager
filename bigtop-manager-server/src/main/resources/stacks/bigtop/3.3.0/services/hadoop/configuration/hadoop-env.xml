@@ -63,9 +63,9 @@
 # Set Hadoop-specific environment variables here.
 
 USER="$(whoami)"
-export JAVA_HOME=${java_home!}
-export HADOOP_HOME=${hadoop_home!}
-export HADOOP_CONF_DIR=${hadoop_conf_dir!}
+export JAVA_HOME=${java_home}
+export HADOOP_HOME=${hadoop_home}
+export HADOOP_CONF_DIR=${hadoop_conf_dir}
 export HADOOP_LOG_DIR=${hadoop_log_dir}
 export HADOOP_PID_DIR=${hadoop_pid_dir}
 export HADOOP_HEAPSIZE_MAX=${hadoop_heapsize_max}
@@ -79,7 +79,7 @@ export HADOOP_OS_TYPE=${HADOOP_OS_TYPE:-$(uname -s)}
 
 export HADOOP_ROOT_LOGGER=${hadoop_root_logger}
 export HADOOP_LIBEXEC_DIR=${hadoop_libexec_dir}
-export LD_LIBRARY_PATH=${hadoop_home!}/lib/native
+export LD_LIBRARY_PATH=${hadoop_home}/lib/native
 ]]>
         </value>
         <attrs>

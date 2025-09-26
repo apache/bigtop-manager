@@ -89,7 +89,7 @@
 # Set environment variables here.
 
 # The java implementation to use. Java 1.6 required.
-export JAVA_HOME=${java_home!}
+export JAVA_HOME=${java_home}
 
 # HBase Configuration directory
 export HBASE_CONF_DIR=${hbase_conf_dir}

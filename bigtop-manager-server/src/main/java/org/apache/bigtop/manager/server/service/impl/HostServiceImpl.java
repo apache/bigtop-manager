@@ -34,6 +34,7 @@ import org.apache.bigtop.manager.server.enums.HealthyStatusEnum;
 import org.apache.bigtop.manager.server.enums.HostAuthTypeEnum;
 import org.apache.bigtop.manager.server.enums.InstalledStatusEnum;
 import org.apache.bigtop.manager.server.exception.ApiException;
+import org.apache.bigtop.manager.server.grpc.GrpcClient;
 import org.apache.bigtop.manager.server.model.converter.ComponentConverter;
 import org.apache.bigtop.manager.server.model.converter.HostConverter;
 import org.apache.bigtop.manager.server.model.dto.HostDTO;
@@ -336,6 +337,9 @@ public class HostServiceImpl implements HostService {
 
         String command = path + "/bigtop-manager-agent/bin/agent.sh " + action;
         command = "export GRPC_PORT=" + grpcPort + " ; " + command;
+
+        // Remove channel before operations
+        GrpcClient.removeChannel(hostname);
 
         ShellResult result = execCommandOnRemoteHost(hostDTO, hostname, command);
         if (result.getExitCode() != MessageConstants.SUCCESS_CODE) {

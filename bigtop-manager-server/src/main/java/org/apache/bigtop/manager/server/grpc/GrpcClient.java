@@ -129,6 +129,22 @@ public class GrpcClient {
         }
     }
 
+    public static void removeChannel(String host) {
+        ManagedChannel channel = CHANNELS.remove(host);
+        if (channel != null) {
+            try {
+                channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                log.warn("Channel shutdown interrupted", e);
+            }
+
+            BLOCKING_STUBS.remove(host);
+            ASYNC_STUBS.remove(host);
+            FUTURE_STUBS.remove(host);
+            log.info("Channel to host: {} removed.", host);
+        }
+    }
+
     private static <T extends AbstractStub<T>> AbstractStub.StubFactory<T> getFactory(Class<T> clazz) {
         return (channel, callOptions) -> {
             try {
