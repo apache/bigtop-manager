@@ -168,10 +168,7 @@
   const matchKeyword = (keyword: string, prop: Property, config?: ServiceConfig) => {
     const lowerKeyword = keyword.toLowerCase()
     const includesProp =
-      prop.name?.toLowerCase().includes(lowerKeyword) ||
-      prop.value?.toLowerCase().includes(lowerKeyword) ||
-      prop.displayName?.toLowerCase().includes(lowerKeyword)
-
+      prop.name?.toLowerCase().includes(lowerKeyword) || prop.value?.toLowerCase().includes(lowerKeyword)
     if (config != undefined) {
       return config.name?.toLowerCase().includes(lowerKeyword) || includesProp
     }
@@ -299,12 +296,12 @@
                       />
                       <div
                         v-else
-                        :title="property.displayName ?? property.name"
+                        :title="property.name"
                         class="property-name"
                         :class="{ 'required-mark': property.attrs?.required }"
                       >
                         <span>
-                          {{ property.displayName ?? property.name }}
+                          {{ property.name }}
                         </span>
                       </div>
                     </a-form-item>
