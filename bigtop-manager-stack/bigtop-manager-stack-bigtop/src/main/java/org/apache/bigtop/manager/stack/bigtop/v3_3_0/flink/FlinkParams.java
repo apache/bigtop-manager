@@ -47,11 +47,6 @@ public class FlinkParams extends BigtopParams {
     private String flinkLog4jConsolePropertiesContent;
     private String flinkLog4jSessionPropertiesContent;
 
-    private String jobManagerArchiveFsDir;
-    private String historyServerWebPort;
-    private String historyServerArchiveFsDir;
-    private String historyServerArchiveFsRefreshInterval;
-
     public FlinkParams(ComponentCommandPayload componentCommandPayload) {
         super(componentCommandPayload);
         globalParamsMap.put("flink_user", user());
@@ -59,23 +54,12 @@ public class FlinkParams extends BigtopParams {
         globalParamsMap.put("java_home", javaHome());
         globalParamsMap.put("hadoop_home", hadoopHome());
         globalParamsMap.put("hadoop_conf_dir", hadoopConfDir());
-
-        globalParamsMap.put("jobmanager_archive_fs_dir", jobManagerArchiveFsDir);
-        globalParamsMap.put("historyserver_web_port", historyServerWebPort);
-        globalParamsMap.put("historyserver_archive_fs_dir", historyServerArchiveFsDir);
-        globalParamsMap.put("historyserver_archive_fs_refresh_interval", historyServerArchiveFsRefreshInterval);
     }
 
     @GlobalParams
     public Map<String, Object> flinkConf() {
         Map<String, Object> configurations = LocalSettings.configurations(getServiceName(), "flink-conf");
         flinkConfContent = (String) configurations.get("content");
-
-        jobManagerArchiveFsDir = (String) configurations.get("jobmanager.archive.fs.dir");
-        historyServerWebPort = (String) configurations.get("historyserver.web.port");
-        historyServerArchiveFsDir = (String) configurations.get("historyserver.archive.fs.dir");
-        historyServerArchiveFsRefreshInterval =
-                (String) configurations.get("historyserver.archive.fs.refresh-interval");
         return configurations;
     }
 

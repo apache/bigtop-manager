@@ -26,13 +26,13 @@
         <description>This is the freemarker template for tez-env.sh file</description>
         <value><![CDATA[
 # Tez specific configuration
-export TEZ_CONF_DIR=${tez_conf_dir!}
+export TEZ_CONF_DIR=${tez_conf_dir}
 
 # Set HADOOP_HOME to point to a specific hadoop install directory
-export HADOOP_HOME=${hadoop_home!}
+export HADOOP_HOME=${hadoop_home}
 
 # The java implementation to use.
-export JAVA_HOME=${java_home!}
+export JAVA_HOME=${java_home}
 ]]>
         </value>
         <attrs>
