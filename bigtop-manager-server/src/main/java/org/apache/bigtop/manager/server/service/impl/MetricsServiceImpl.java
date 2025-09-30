@@ -18,18 +18,23 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
+import org.apache.bigtop.manager.dao.po.ClusterPO;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
+import org.apache.bigtop.manager.dao.po.ServicePO;
 import org.apache.bigtop.manager.dao.query.ComponentQuery;
+import org.apache.bigtop.manager.dao.repository.ClusterDao;
 import org.apache.bigtop.manager.dao.repository.ComponentDao;
 import org.apache.bigtop.manager.dao.repository.HostDao;
 import org.apache.bigtop.manager.dao.repository.ServiceConfigDao;
+import org.apache.bigtop.manager.dao.repository.ServiceDao;
 import org.apache.bigtop.manager.server.model.converter.ServiceConfigConverter;
 import org.apache.bigtop.manager.server.model.dto.PropertyDTO;
 import org.apache.bigtop.manager.server.model.dto.ServiceConfigDTO;
 import org.apache.bigtop.manager.server.model.vo.ClusterMetricsVO;
 import org.apache.bigtop.manager.server.model.vo.HostMetricsVO;
+import org.apache.bigtop.manager.server.model.vo.ServiceMetricsVO;
 import org.apache.bigtop.manager.server.prometheus.PrometheusProxy;
 import org.apache.bigtop.manager.server.service.MetricsService;
 
@@ -45,27 +50,33 @@ import java.util.List;
 public class MetricsServiceImpl implements MetricsService {
 
     @Resource
+    private ClusterDao clusterDao;
+
+    @Resource
     private HostDao hostDao;
 
     @Resource
     private ComponentDao componentDao;
 
     @Resource
+    private ServiceDao serviceDao;
+
+    @Resource
     private ServiceConfigDao serviceConfigDao;
 
     @Override
-    public HostMetricsVO queryAgentsInfo(Long id, String interval) {
+    public HostMetricsVO hostMetrics(Long id, String interval) {
         PrometheusProxy proxy = getProxy();
         if (proxy == null) {
             return new HostMetricsVO();
         }
 
         String ipv4 = hostDao.findById(id).getIpv4();
-        return proxy.queryAgentsInfo(ipv4, interval);
+        return proxy.queryHostMetrics(ipv4, interval);
     }
 
     @Override
-    public ClusterMetricsVO queryClustersInfo(Long clusterId, String interval) {
+    public ClusterMetricsVO clusterMetrics(Long clusterId, String interval) {
         PrometheusProxy proxy = getProxy();
         if (proxy == null) {
             return new ClusterMetricsVO();
@@ -74,7 +85,19 @@ public class MetricsServiceImpl implements MetricsService {
         List<String> ipv4s = hostDao.findAllByClusterId(clusterId).stream()
                 .map(HostPO::getIpv4)
                 .toList();
-        return proxy.queryClustersInfo(ipv4s, interval);
+        return proxy.queryClusterMetrics(ipv4s, interval);
+    }
+
+    @Override
+    public ServiceMetricsVO serviceMetrics(Long serviceId, String interval) {
+        PrometheusProxy proxy = getProxy();
+        if (proxy == null) {
+            return new ServiceMetricsVO();
+        }
+
+        ServicePO servicePO = serviceDao.findById(serviceId);
+        ClusterPO clusterPO = clusterDao.findById(servicePO.getClusterId());
+        return proxy.queryServiceMetrics(clusterPO.getName(), servicePO.getName(), interval);
     }
 
     private PrometheusProxy getProxy() {

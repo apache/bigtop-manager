@@ -20,6 +20,7 @@ package org.apache.bigtop.manager.server.controller;
 
 import org.apache.bigtop.manager.server.model.vo.ClusterMetricsVO;
 import org.apache.bigtop.manager.server.model.vo.HostMetricsVO;
+import org.apache.bigtop.manager.server.model.vo.ServiceMetricsVO;
 import org.apache.bigtop.manager.server.service.MetricsService;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
 
@@ -42,17 +43,24 @@ public class MetricsController {
     @Resource
     private MetricsService metricsService;
 
-    @Operation(summary = "host info", description = "host info query")
+    @Operation(summary = "host metrics", description = "host metrics")
     @GetMapping("/hosts/{id}")
-    public ResponseEntity<HostMetricsVO> queryAgentInfo(
+    public ResponseEntity<HostMetricsVO> hostMetrics(
             @RequestParam(value = "interval", defaultValue = "1m") String interval, @PathVariable Long id) {
-        return ResponseEntity.success(metricsService.queryAgentsInfo(id, interval));
+        return ResponseEntity.success(metricsService.hostMetrics(id, interval));
     }
 
-    @Operation(summary = "cluster info", description = "cluster info query")
+    @Operation(summary = "cluster metrics", description = "cluster metrics")
     @GetMapping("/clusters/{id}")
-    public ResponseEntity<ClusterMetricsVO> queryCluster(
+    public ResponseEntity<ClusterMetricsVO> clusterMetrics(
             @RequestParam(value = "interval", defaultValue = "1m") String interval, @PathVariable Long id) {
-        return ResponseEntity.success(metricsService.queryClustersInfo(id, interval));
+        return ResponseEntity.success(metricsService.clusterMetrics(id, interval));
+    }
+
+    @Operation(summary = "service metrics", description = "service metrics")
+    @GetMapping("/services/{id}")
+    public ResponseEntity<ServiceMetricsVO> serviceMetrics(
+            @RequestParam(value = "interval", defaultValue = "1m") String interval, @PathVariable Long id) {
+        return ResponseEntity.success(metricsService.serviceMetrics(id, interval));
     }
 }

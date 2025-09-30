@@ -58,6 +58,8 @@ public class HadoopParams extends BigtopParams {
     private final String nodeManagerPidFile = hadoopPidDir + "/hadoop-hadoop-nodemanager.pid";
     private final String historyServerPidFile = hadoopPidDir + "/hadoop-hadoop-historyserver.pid";
 
+    private String hadoopConfContent;
+
     private String dfsDataDir;
     private String dfsNameNodeDir;
     private String dfsNameNodeCheckPointDir;
@@ -70,8 +72,8 @@ public class HadoopParams extends BigtopParams {
 
     public HadoopParams(ComponentCommandPayload componentCommandPayload) {
         super(componentCommandPayload);
-        globalParamsMap.put("hdfs_user", user());
-        globalParamsMap.put("hdfs_group", group());
+        globalParamsMap.put("hadoop_user", user());
+        globalParamsMap.put("hadoop_group", group());
         globalParamsMap.put("datanode_hosts", LocalSettings.componentHosts("datanode"));
         globalParamsMap.put("java_home", javaHome());
         globalParamsMap.put("hadoop_home", serviceHome());
@@ -80,9 +82,11 @@ public class HadoopParams extends BigtopParams {
         globalParamsMap.put("exclude_hosts", new ArrayList<>());
     }
 
-    public String hadoopLimits() {
+    @GlobalParams
+    public Map<String, Object> hadoopLimits() {
         Map<String, Object> hadoopConf = LocalSettings.configurations(getServiceName(), "hadoop.conf");
-        return (String) hadoopConf.get("content");
+        hadoopConfContent = hadoopConf.get("content").toString();
+        return hadoopConf;
     }
 
     public String workers() {

@@ -16,17 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.service;
+package org.apache.bigtop.manager.server.enums;
 
-import org.apache.bigtop.manager.server.model.vo.ClusterMetricsVO;
-import org.apache.bigtop.manager.server.model.vo.HostMetricsVO;
-import org.apache.bigtop.manager.server.model.vo.ServiceMetricsVO;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
-public interface MetricsService {
+public enum ChartValueTypeEnum {
+    NUMBER,
+    PERCENT,
+    BYTE,
+    MILLISECOND,
+    BPS, // Byte per second
+    NPS // Number per second
+;
 
-    HostMetricsVO hostMetrics(Long id, String interval);
+    @JsonCreator
+    public static ChartValueTypeEnum fromString(String value) {
+        return ChartValueTypeEnum.valueOf(value.toUpperCase());
+    }
 
-    ClusterMetricsVO clusterMetrics(Long clusterId, String interval);
-
-    ServiceMetricsVO serviceMetrics(Long serviceId, String interval);
+    @JsonValue
+    public String toLowerCase() {
+        return name().toLowerCase();
+    }
 }

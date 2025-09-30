@@ -109,7 +109,7 @@ public class HadoopSetup {
                 hadoopParams.getHadoopPidDir(), hadoopUser, hadoopGroup, Constants.PERMISSION_755, true);
 
         LinuxFileUtils.toFileByTemplate(
-                hadoopParams.hadoopLimits(),
+                hadoopParams.getHadoopConfContent(),
                 MessageFormat.format("{0}/hadoop.conf", HadoopParams.LIMITS_CONF_DIR),
                 Constants.ROOT_USER,
                 Constants.ROOT_USER,
