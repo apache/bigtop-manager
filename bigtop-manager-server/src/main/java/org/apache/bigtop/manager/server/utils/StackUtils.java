@@ -18,7 +18,6 @@
  */
 package org.apache.bigtop.manager.server.utils;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.bigtop.manager.common.constants.ComponentCategories;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.utils.CaseUtils;
@@ -43,6 +42,7 @@ import org.apache.bigtop.manager.server.stack.xml.ServiceMetainfoXml;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

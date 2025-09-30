@@ -28,7 +28,7 @@ public enum ChartValueTypeEnum {
     MILLISECOND,
     BPS, // Byte per second
     NPS // Number per second
-    ;
+;
 
     @JsonCreator
     public static ChartValueTypeEnum fromString(String value) {

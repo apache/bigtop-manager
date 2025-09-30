@@ -20,7 +20,6 @@ package org.apache.bigtop.manager.server.controller;
 
 import org.apache.bigtop.manager.server.model.vo.ClusterMetricsVO;
 import org.apache.bigtop.manager.server.model.vo.HostMetricsVO;
-import org.apache.bigtop.manager.server.model.vo.ServiceMetricsChartVO;
 import org.apache.bigtop.manager.server.model.vo.ServiceMetricsVO;
 import org.apache.bigtop.manager.server.service.MetricsService;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
@@ -35,8 +34,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.annotation.Resource;
-
-import java.util.List;
 
 @Tag(name = "Metrics Controller")
 @RestController

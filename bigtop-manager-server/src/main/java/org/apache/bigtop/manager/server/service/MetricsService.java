@@ -20,10 +20,7 @@ package org.apache.bigtop.manager.server.service;
 
 import org.apache.bigtop.manager.server.model.vo.ClusterMetricsVO;
 import org.apache.bigtop.manager.server.model.vo.HostMetricsVO;
-import org.apache.bigtop.manager.server.model.vo.ServiceMetricsChartVO;
 import org.apache.bigtop.manager.server.model.vo.ServiceMetricsVO;
-
-import java.util.List;
 
 public interface MetricsService {
 

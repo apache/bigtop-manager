@@ -18,8 +18,9 @@
  */
 package org.apache.bigtop.manager.server.model.vo;
 
-import lombok.Data;
 import org.apache.bigtop.manager.server.enums.ChartValueTypeEnum;
+
+import lombok.Data;
 
 import java.util.List;
 

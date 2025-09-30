@@ -18,17 +18,14 @@
  */
 package org.apache.bigtop.manager.server.prometheus;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.server.enums.ChartValueTypeEnum;
 import org.apache.bigtop.manager.server.model.dto.ServiceChartDTO;
 import org.apache.bigtop.manager.server.model.vo.ClusterMetricsVO;
 import org.apache.bigtop.manager.server.model.vo.HostMetricsVO;
-
-import org.apache.bigtop.manager.server.model.vo.ServiceMetricsSeriesVO;
 import org.apache.bigtop.manager.server.model.vo.ServiceMetricsChartVO;
+import org.apache.bigtop.manager.server.model.vo.ServiceMetricsSeriesVO;
 import org.apache.bigtop.manager.server.model.vo.ServiceMetricsVO;
 import org.apache.bigtop.manager.server.utils.StackUtils;
+
 import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -286,7 +283,9 @@ public class PrometheusProxy {
                 for (List<String> value : result.getValues()) {
                     String timestamp = value.get(0);
                     int index = timestamps.indexOf(timestamp);
-                    String roundValue = new BigDecimal(value.get(1)).setScale(chart.getDataScale(), RoundingMode.HALF_UP).toString();
+                    String roundValue = new BigDecimal(value.get(1))
+                            .setScale(chart.getDataScale(), RoundingMode.HALF_UP)
+                            .toString();
                     emptyList.set(index, roundValue);
                 }
 
@@ -537,52 +536,5 @@ public class PrometheusProxy {
     private <T> List<T> getEmptyList() {
         int size = timestampCache.get().size();
         return new ArrayList<>(Collections.nCopies(size, null));
-    }
-
-    public static void main(String[] args) {
-        String interval = "1h";
-        String charts = """
-                [
-                  {
-                    "title": "Max Latency",
-                    "valueType": "millisecond",
-                    "type": "line",
-                    "dataExpression": "max_latency{cluster=\\"$cluster\\"}"
-                  },
-                  {
-                    "title": "Min Latency",
-                    "valueType": "millisecond",
-                    "type": "line",
-                    "dataExpression": "min_latency{cluster=\\"$cluster\\"}"
-                  },
-                  {
-                    "title": "Avg Latency",
-                    "valueType": "millisecond",
-                    "type": "line",
-                    "dataExpression": "avg_latency{cluster=\\"$cluster\\"}"
-                  },
-                  {
-                    "title": "Packets Received",
-                    "valueType": "nps",
-                    "type": "line",
-                    "dataExpression": "increase(packets_received{cluster=\\"$cluster\\"}[1m])",
-                    "dataScale": 2
-                  },
-                  {
-                    "title": "Packets Sent",
-                    "valueType": "nps",
-                    "type": "line",
-                    "dataExpression": "increase(packets_sent{cluster=\\"$cluster\\"}[1m])",
-                    "dataScale": 2
-                  }
-                ]
-                """;
-
-        List<ServiceChartDTO> list = JsonUtils.readFromString(charts, new TypeReference<>() {});
-        StackUtils.SERVICE_CHARTS_MAP.put("zookeeper", list);
-
-        PrometheusProxy prometheusProxy = new PrometheusProxy("localhost",19090);
-        ServiceMetricsVO serviceMetricsVO = prometheusProxy.queryServiceMetrics("hadoop", "zookeeper", interval);
-        System.out.println();
     }
 }
