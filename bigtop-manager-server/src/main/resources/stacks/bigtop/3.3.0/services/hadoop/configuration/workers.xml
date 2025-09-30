@@ -21,7 +21,6 @@
 <configuration>
     <property>
         <name>content</name>
-        <display-name>hdfs workers template</display-name>
         <description>This is the freemarker template for hdfs file</description>
         <value><![CDATA[
 #

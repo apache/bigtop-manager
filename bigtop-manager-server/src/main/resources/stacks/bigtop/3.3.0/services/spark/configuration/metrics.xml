@@ -21,7 +21,6 @@
 <configuration>
     <property>
         <name>content</name>
-        <display-name>metrics template</display-name>
         <description>Custom metrics.properties</description>
         <value><![CDATA[
 # Licensed to the Apache Software Foundation (ASF) under one or more

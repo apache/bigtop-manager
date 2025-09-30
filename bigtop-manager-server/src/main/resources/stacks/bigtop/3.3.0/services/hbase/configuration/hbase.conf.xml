@@ -31,7 +31,6 @@
     </property>
     <property>
         <name>content</name>
-        <display-name>hbase.conf template</display-name>
         <description>This is the freemarker template for HBase file</description>
         <value><![CDATA[
 #

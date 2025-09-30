@@ -22,7 +22,6 @@
     <property>
         <name>hive.server2.thrift.port</name>
         <value>10015</value>
-        <display-name>Spark ThriftServer Port</display-name>
         <description>TCP port number to listen on, default 10015.</description>
     </property>
 </configuration>

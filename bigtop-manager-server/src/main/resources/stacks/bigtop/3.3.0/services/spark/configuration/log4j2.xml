@@ -21,7 +21,6 @@
 <configuration>
     <property>
         <name>content</name>
-        <display-name>log4j2 template</display-name>
         <description>Custom log4j2.properties</description>
         <value><![CDATA[
 # Licensed to the Apache Software Foundation (ASF) under one or more

@@ -42,7 +42,6 @@
     <!-- flink-conf.yaml -->
     <property>
         <name>content</name>
-        <display-name>flink-conf template</display-name>
         <description>This is the freemarker template for flink-conf.xml file</description>
         <value><![CDATA[
 #==============================================================================

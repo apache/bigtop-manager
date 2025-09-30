@@ -22,19 +22,16 @@
     <property>
         <name>zookeeper_log_dir</name>
         <value>/var/log/zookeeper</value>
-        <display-name>ZooKeeper Log Dir</display-name>
         <description>ZooKeeper Log Dir</description>
     </property>
     <property>
         <name>zookeeper_pid_dir</name>
         <value>/var/run/zookeeper</value>
-        <display-name>ZooKeeper PID Dir</display-name>
         <description>ZooKeeper Pid Dir</description>
     </property>
     <!-- zookeeper-env.sh -->
     <property>
         <name>content</name>
-        <display-name>zookeeper-env template</display-name>
         <description>This is the freemarker template for zookeeper-env.sh file</description>
         <value><![CDATA[
 export JAVA_HOME=${java_home}

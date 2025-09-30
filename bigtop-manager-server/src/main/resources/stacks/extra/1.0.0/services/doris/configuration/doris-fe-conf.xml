@@ -21,7 +21,6 @@
 <configuration>
     <property>
         <name>meta_dir</name>
-        <display-name>meta_dir</display-name>
         <value>${doris_fe_home}/doris-meta</value>
         <description>Default: DORIS_HOME_DIR + "/doris-meta".
             Doris meta data will be saved here.The storage of this dir is highly recommended as to be.</description>

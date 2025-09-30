@@ -24,7 +24,6 @@
         <name>dfs.namenode.name.dir</name>
         <!-- cluster variant -->
         <value>/hadoop/dfs/name</value>
-        <display-name>NameNode directories</display-name>
         <description>Determines where on the local filesystem the DFS name node
             should store the name table. If this is a comma-delimited list
             of directories then the name table is replicated in all of the
@@ -35,12 +34,10 @@
         <name>dfs.datanode.failed.volumes.tolerated</name>
         <value>0</value>
         <description>Number of failed disks a DataNode would tolerate before it stops offering service</description>
-        <display-name>DataNode failed disk tolerance</display-name>
     </property>
     <property>
         <name>dfs.datanode.data.dir</name>
         <value>/hadoop/dfs/data</value>
-        <display-name>DataNode directories</display-name>
         <description>Determines where on the local filesystem an DFS data node
             should store its blocks. If this is a comma-delimited
             list of directories, then data will be stored in all named
@@ -60,7 +57,6 @@
     <property>
         <name>dfs.namenode.checkpoint.dir</name>
         <value>/hadoop/dfs/namesecondary</value>
-        <display-name>SecondaryNameNode Checkpoint directories</display-name>
         <description>Determines where on the local filesystem the DFS secondary
             name node should store the temporary images to merge.
             If this is a comma-delimited list of directories then the image is
@@ -69,7 +65,6 @@
     </property>
     <property>
         <name>dfs.namenode.checkpoint.edits.dir</name>
-        <display-name>NameNode Checkpoint Edits directory</display-name>
         <value>${dfs.namenode.checkpoint.dir}</value>
         <description>Determines where on the local filesystem the DFS secondary
             name node should store the temporary edits to merge.
@@ -81,7 +76,6 @@
     <property>
         <name>dfs.namenode.checkpoint.period</name>
         <value>3600</value>
-        <display-name>HDFS Maximum Checkpoint Delay</display-name>
         <description>The number of seconds between two periodic checkpoints.</description>
     </property>
     <property>
@@ -105,7 +99,6 @@
     <property>
         <name>dfs.replication</name>
         <value>3</value>
-        <display-name>Block replication</display-name>
         <description>Default block replication.</description>
     </property>
     <property>
@@ -122,7 +115,6 @@
             Values less than or equal to 0 mean not to start in safe mode.
             Values greater than 1 will make safe mode permanent.
         </description>
-        <display-name>Minimum replicated blocks %</display-name>
     </property>
     <property>
         <name>dfs.datanode.balance.bandwidthPerSec</name>
@@ -189,7 +181,6 @@
         <name>dfs.datanode.du.reserved</name>
         <!-- cluster variant -->
         <value>1073741824</value>
-        <display-name>Reserved space for HDFS</display-name>
         <description>Reserved space in bytes per volume. Always leave this much space free for non dfs use.
         </description>
     </property>
@@ -203,7 +194,6 @@
         <value>4096</value>
         <description>Specifies the maximum number of threads to use for transferring data in and out of the datanode.
         </description>
-        <display-name>DataNode max data transfer threads</display-name>
     </property>
     <!-- Permissions configuration -->
     <property>
@@ -226,7 +216,6 @@
         <name>dfs.namenode.handler.count</name>
         <value>100</value>
         <description>Added to grow Queue size so that more client connections are allowed</description>
-        <display-name>NameNode Server threads</display-name>
     </property>
     <property>
         <name>dfs.block.access.token.enable</name>
@@ -239,7 +228,6 @@
     <property>
         <name>dfs.datanode.data.dir.perm</name>
         <value>700</value>
-        <display-name>DataNode directories permission</display-name>
         <description>The permissions that should be there on dfs.datanode.data.dir
             directories. The datanode will not come up if the permissions are
             different on existing dfs.datanode.data.dir directories. If the directories
@@ -249,7 +237,6 @@
     <property>
         <name>dfs.namenode.accesstime.precision</name>
         <value>0</value>
-        <display-name>Access time precision</display-name>
         <description>The access time for HDFS file is precise up to this value.
             The default value is 1 hour. Setting a value of 0 disables
             access times for HDFS.
@@ -312,7 +299,6 @@
     </property>
     <property>
         <name>dfs.journalnode.edits.dir</name>
-        <display-name>JournalNode Edits directory</display-name>
         <value>/hadoop/dfs/journalnode</value>
         <description>The path where the JournalNode daemon will store its local state.</description>
     </property>
@@ -320,7 +306,6 @@
     <property>
         <name>dfs.client.read.shortcircuit</name>
         <value>true</value>
-        <display-name>HDFS Short-circuit read</display-name>
         <description>
             This configuration parameter turns on short-circuit local reads.
         </description>

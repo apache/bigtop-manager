@@ -21,13 +21,11 @@
 <configuration>
     <property>
         <name>spark_log_dir</name>
-        <display-name>Spark Log directory</display-name>
         <value>/var/log/spark</value>
         <description>Spark Log Dir</description>
     </property>
     <property>
         <name>spark_pid_dir</name>
-        <display-name>Spark PID directory</display-name>
         <value>/var/run/spark</value>
     </property>
     <!-- spark-env.sh -->

@@ -31,7 +31,6 @@
     </property>
     <property>
         <name>content</name>
-        <display-name>hadoop.conf template</display-name>
         <description>This is the freemarker template for hadoop file</description>
         <value><![CDATA[
 #

@@ -21,7 +21,6 @@
 <configuration>
     <property>
         <name>content</name>
-        <display-name>fairscheduler template</display-name>
         <description>Custom fairscheduler.xml</description>
         <value><![CDATA[
 <?xml version="1.0"?>

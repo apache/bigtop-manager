@@ -32,9 +32,6 @@ public class PropertyModel {
 
     private String value;
 
-    @XmlElement(name = "display-name")
-    private String displayName;
-
     @XmlElement(name = "description")
     private String desc;
 

@@ -31,7 +31,6 @@
     </property>
     <property>
         <name>content</name>
-        <display-name>hive.conf template</display-name>
         <description>This is the freemarker template for Hive file</description>
         <value><![CDATA[
 #

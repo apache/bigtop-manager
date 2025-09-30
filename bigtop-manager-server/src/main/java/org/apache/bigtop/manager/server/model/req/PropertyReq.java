@@ -32,8 +32,6 @@ public class PropertyReq {
 
     private String value;
 
-    private String displayName;
-
     private String desc;
 
     private AttrsReq attrs;

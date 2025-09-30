@@ -58,7 +58,6 @@ public class StackConfigUtils {
 
     private static PropertyDTO getPropertyDTO(PropertyModel propertyModel) {
         PropertyDTO propertyDTO = new PropertyDTO();
-        propertyDTO.setDisplayName(propertyModel.getDisplayName());
         propertyDTO.setDesc(StringUtils.strip(propertyModel.getDesc()));
         propertyDTO.setName(propertyModel.getName());
         propertyDTO.setValue(StringUtils.strip(propertyModel.getValue()));

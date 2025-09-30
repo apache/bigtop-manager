@@ -21,7 +21,6 @@
 <configuration>
     <property>
         <name>hbase.rootdir</name>
-        <display-name>HBase root directory</display-name>
         <value>/hadoop/hbase</value>
         <description>
             The directory shared by region servers and into
@@ -47,13 +46,11 @@
     <property>
         <name>hbase.master.port</name>
         <value>16000</value>
-        <display-name>HBase Master Port</display-name>
         <description>The port the HBase Master should bind to.</description>
     </property>
     <property>
         <name>hbase.tmp.dir</name>
         <value>/tmp/hbase</value>
-        <display-name>HBase tmp directory</display-name>
         <description>
             Temporary directory on the local filesystem.
             Change this setting to point to a location more permanent
@@ -63,7 +60,6 @@
     </property>
     <property>
         <name>hbase.local.dir</name>
-        <display-name>HBase Local directory</display-name>
         <value>${hbase.tmp.dir}/local</value>
         <description>Directory on the local filesystem to be used as a local storage</description>
     </property>
@@ -85,7 +81,6 @@
     <property>
         <name>hbase.regionserver.handler.count</name>
         <value>30</value>
-        <display-name>Number of Handlers per RegionServer</display-name>
         <description>
             Count of RPC Listener instances spun up on RegionServers.
             Same property is used by the Master for count of master handlers.
@@ -104,7 +99,6 @@
             time-based major compactions by setting this parameter to 0, and run major compactions in a
             cron job or by another external mechanism.
         </description>
-        <display-name>Major Compaction Interval</display-name>
     </property>
     <property>
         <name>hbase.hregion.memstore.block.multiplier</name>
@@ -117,7 +111,6 @@
             resultant flush files take a long time to compact or split, or
             worse, we OOME.
         </description>
-        <display-name>HBase Region Block Multiplier</display-name>
     </property>
     <property>
         <name>hbase.hregion.memstore.flush.size</name>
@@ -125,7 +118,6 @@
         <description>
             The size of an individual memstore. Each column family within each region is allocated its own memstore.
         </description>
-        <display-name>Memstore Flush Size</display-name>
     </property>
     <property>
         <name>hbase.hregion.memstore.mslab.enabled</name>
@@ -144,7 +136,6 @@
             Maximum HFile size. If the sum of the sizes of a region's HFiles has grown to exceed this
             value, the region is split in two.
         </description>
-        <display-name>Maximum Region File Size</display-name>
     </property>
     <property>
         <name>hbase.client.scanner.caching</name>
@@ -157,7 +148,6 @@
             Do not set this value such that the time between invocations is greater
             than the scanner timeout; i.e. hbase.regionserver.lease.period
         </description>
-        <display-name>Number of Fetched Rows when Scanning from Disk</display-name>
     </property>
     <property>
         <name>zookeeper.session.timeout</name>
@@ -173,7 +163,6 @@
             even though HBase might propose using 90 seconds, the ensemble can have a max timeout lower than this and
             it will take precedence.
         </description>
-        <display-name>Zookeeper Session Timeout</display-name>
     </property>
     <property>
         <name>hbase.client.keyvalue.maxsize</name>
@@ -186,7 +175,6 @@
             to set this to a fraction of the maximum region size. Setting it to zero
             or less disables the check.
         </description>
-        <display-name>Maximum Record Size</display-name>
     </property>
     <property>
         <name>hbase.hstore.compactionThreshold</name>
@@ -198,11 +186,9 @@
             complete. Setting it larger means that more StoreFiles are included in a compaction. For most
             cases, the default value is appropriate.
         </description>
-        <display-name>Maximum Store Files before Minor Compaction</display-name>
     </property>
     <property>
         <name>hbase.hstore.blockingStoreFiles</name>
-        <display-name>hstore blocking storefiles</display-name>
         <value>100</value>
         <description>
             If more than this number of StoreFiles in any one Store
@@ -215,7 +201,6 @@
         <name>hfile.block.cache.size</name>
         <value>0.40</value>
         <description>Percentage of RegionServer memory to allocate to read buffers.</description>
-        <display-name>% of RegionServer Allocated to Read Buffers</display-name>
     </property>
 
     <!-- Additional configuration specific to HBase security -->
@@ -234,13 +219,11 @@
         <description>
             Select Simple or Kerberos authentication. Note: Kerberos must be set up before the Kerberos option will take effect.
         </description>
-        <display-name>Enable Authentication</display-name>
     </property>
     <property>
         <name>hbase.security.authorization</name>
         <value>false</value>
         <description>Set Authorization Method.</description>
-        <display-name>Enable Authorization</display-name>
     </property>
     <property>
         <name>hbase.coprocessor.region.classes</name>
@@ -267,7 +250,6 @@
     </property>
     <property>
         <name>zookeeper.znode.parent</name>
-        <display-name>ZooKeeper Znode Parent</display-name>
         <value>/hbase-unsecure</value>
         <description>
             Root ZNode for HBase in ZooKeeper. All of HBase's ZooKeeper
@@ -287,7 +269,6 @@
             retrying every ten seconds.  See HConstants#RETRY_BACKOFF for how the backup
             ramps up.  Change this setting and hbase.client.pause to suit your workload.
         </description>
-        <display-name>Maximum Client Retries</display-name>
     </property>
     <property>
         <name>hbase.rpc.timeout</name>
@@ -297,7 +278,6 @@
             take for a remote call to time out. It uses pings to check connections
             but will eventually throw a TimeoutException.
         </description>
-        <display-name>HBase RPC Timeout</display-name>
     </property>
     <property>
         <name>hbase.defaults.for.version.skip</name>
@@ -343,7 +323,6 @@
     </property>
     <property>
         <name>hbase.regionserver.wal.codec</name>
-        <display-name>RegionServer WAL Codec</display-name>
         <value>org.apache.hadoop.hbase.regionserver.wal.WALCellCodec</value>
     </property>
     <property>
@@ -368,7 +347,6 @@
             complete. Setting it larger means that more StoreFiles are included in a compaction. For most
             cases, the default value is appropriate.
         </description>
-        <display-name>Maximum Files for Compaction</display-name>
     </property>
     <property>
         <name>hbase.regionserver.global.memstore.size</name>
@@ -379,7 +357,6 @@
             If this buffer is full, updates are blocked and data is flushed from memstores until a global low watermark
             (hbase.regionserver.global.memstore.size.lower.limit) is reached.
         </description>
-        <display-name>% of RegionServer Allocated to Write Buffers</display-name>
     </property>
     <property>
         <name>hbase.regionserver.port</name>

@@ -21,7 +21,6 @@
 <configuration>
     <property>
         <name>content</name>
-        <display-name>doris-sysctl.conf template</display-name>
         <description>This is the freemarker template for /etc/sysctl.d/doris-sysctl.conf file</description>
         <value><![CDATA[
 #

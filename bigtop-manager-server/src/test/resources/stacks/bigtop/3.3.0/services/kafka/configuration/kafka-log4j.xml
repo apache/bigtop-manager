@@ -23,29 +23,24 @@
         <name>kafkaLogMaxFileSize</name>
         <value>256</value>
         <description>The maximum size of backup file before the log is rotated</description>
-        <display-name>Kafka Log: backup file size</display-name>
     </property>
     <property>
         <name>kafkaLogMaxBackupIndex</name>
         <value>20</value>
         <description>The number of backup files</description>
-        <display-name>Kafka Log: # of backup files</display-name>
     </property>
     <property>
         <name>controllerLogMaxFileSize</name>
         <value>256</value>
         <description>The maximum size of backup file before the log is rotated</description>
-        <display-name>Kafka Controller Log: backup file size</display-name>
     </property>
     <property>
         <name>controllerLogMaxBackupIndex</name>
         <value>20</value>
         <description>The number of backup files</description>
-        <display-name>Kafka Controller Log: # of backup files</display-name>
     </property>
     <property>
         <name>content</name>
-        <display-name>kafka-log4j template</display-name>
         <description>Custom log4j.properties</description>
         <value><![CDATA[
 #
