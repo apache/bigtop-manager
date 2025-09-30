@@ -21,7 +21,6 @@
 <configuration>
     <property>
         <name>content</name>
-        <display-name>hbase regionservers template</display-name>
         <description>This is the freemarker template for hbase file</description>
         <value><![CDATA[
 #

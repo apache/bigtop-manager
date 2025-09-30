@@ -23,7 +23,6 @@
     <property>
         <name>mapreduce.task.io.sort.mb</name>
         <value>512</value>
-        <display-name>Sort Allocation Memory</display-name>
         <description>
             The total amount of buffer memory to use while sorting files, in megabytes.
             By default, gives each merge stream 1MB, which should minimize seeks.
@@ -145,13 +144,11 @@
         <name>mapreduce.map.memory.mb</name>
         <value>512</value>
         <description>Virtual memory for single Map task</description>
-        <display-name>Map Memory</display-name>
     </property>
     <property>
         <name>mapreduce.reduce.memory.mb</name>
         <value>512</value>
         <description>Virtual memory for single Reduce task</description>
-        <display-name>Reduce Memory</display-name>
     </property>
     <property>
         <name>mapreduce.shuffle.port</name>
@@ -164,13 +161,11 @@
     </property>
     <property>
         <name>mapreduce.jobhistory.intermediate-done-dir</name>
-        <display-name>Mapreduce JobHistory Intermediate Done directory</display-name>
         <value>/apps/mapred/history/tmp</value>
         <description>Directory where history files are written by MapReduce jobs.</description>
     </property>
     <property>
         <name>mapreduce.jobhistory.done-dir</name>
-        <display-name>Mapreduce JobHistory Done directory</display-name>
         <value>/apps/mapred/history/done</value>
         <description>Directory where history files are managed by the MR JobHistory Server.</description>
     </property>
@@ -193,13 +188,11 @@
     </property>
     <property>
         <name>yarn.app.mapreduce.am.staging-dir</name>
-        <display-name>YARN App Mapreduce AM Staging directory</display-name>
         <value>/apps/mapred/staging</value>
         <description>The staging dir used while submitting jobs.</description>
     </property>
     <property>
         <name>yarn.app.mapreduce.am.resource.mb</name>
-        <display-name>AppMaster Memory</display-name>
         <value>512</value>
         <description>The amount of memory the MR AppMaster needs.</description>
     </property>
@@ -219,7 +212,6 @@
             of LD_LIBRARY_PATH in the map / reduce JVM env using the mapreduce.map.env and
             mapreduce.reduce.env config settings.
         </description>
-        <display-name>MR AppMaster Java Heap Size</display-name>
     </property>
     <property>
         <name>yarn.app.mapreduce.am.admin-command-opts</name>
@@ -234,7 +226,6 @@
             of LD_LIBRARY_PATH in the map / reduce JVM env using the mapreduce.map.env and
             mapreduce.reduce.env config settings.
         </description>
-        <display-name>MR AppMaster Java Heap Size</display-name>
     </property>
     <property>
         <name>yarn.app.mapreduce.am.log.level</name>
@@ -268,13 +259,11 @@
     </property>
     <property>
         <name>mapreduce.map.java.opts</name>
-        <display-name>MR Map Java Heap Size</display-name>
         <value>-Xmx1024m</value>
         <description>Larger heap-size for child jvms of maps.</description>
     </property>
     <property>
         <name>mapreduce.reduce.java.opts</name>
-        <display-name>MR Reduce Java Heap Size</display-name>
         <value>-Xmx1024m</value>
         <description>Larger heap-size for child jvms of reduces.</description>
     </property>

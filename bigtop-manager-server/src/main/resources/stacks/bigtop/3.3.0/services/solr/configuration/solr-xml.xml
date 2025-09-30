@@ -20,7 +20,6 @@
 <configuration>
     <property>
         <name>content</name>
-        <display-name>solr-xml template</display-name>
         <description>This is the freemarker template for solr.xml file</description>
         <attrs>
             <type>longtext</type>

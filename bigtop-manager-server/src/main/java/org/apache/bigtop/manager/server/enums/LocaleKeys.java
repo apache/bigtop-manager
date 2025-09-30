@@ -55,6 +55,7 @@ public enum LocaleKeys {
     HOST_UNABLE_TO_CONNECT("host.unable.to.connect"),
     HOST_UNABLE_TO_EXEC_COMMAND("host.unable.to.exec.command"),
     HOST_HAS_COMPONENTS("host.has.components"),
+    HOST_AGENT_STILL_RUNNING("host.agent.still.running"),
 
     STACK_NOT_FOUND("stack.not.found"),
 

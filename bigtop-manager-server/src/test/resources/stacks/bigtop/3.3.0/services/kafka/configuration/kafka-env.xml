@@ -21,14 +21,12 @@
 <configuration>
     <property>
         <name>kafka_log_dir</name>
-        <display-name>Kafka Log directory</display-name>
         <value>/var/log/kafka</value>
         <description />
     </property>
     <property>
         <name>kafka_pid_dir</name>
         <value>/var/run/kafka</value>
-        <display-name>Kafka PID dir</display-name>
         <description />
     </property>
     <property>
@@ -44,7 +42,6 @@
 
     <property>
         <name>content</name>
-        <display-name>kafka-env template</display-name>
         <description>This is the freemarker template for kafka-env.sh file</description>
         <value><![CDATA[
 #!/bin/bash

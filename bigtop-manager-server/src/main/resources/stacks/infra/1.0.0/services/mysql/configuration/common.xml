@@ -22,7 +22,6 @@
     <property>
         <name>root_password</name>
         <value>root</value>
-        <display-name>Root Password</display-name>
         <description>Password for MySQL root user.</description>
     </property>
 </configuration>

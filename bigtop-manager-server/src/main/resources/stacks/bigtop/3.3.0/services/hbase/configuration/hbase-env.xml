@@ -22,25 +22,21 @@
     <property>
         <name>hbase_log_dir</name>
         <value>/var/log/hbase</value>
-        <display-name>HBase Log Dir Prefix</display-name>
         <description>Log Directories for HBase.</description>
     </property>
     <property>
         <name>hbase_pid_dir</name>
         <value>/var/run/hbase</value>
-        <display-name>HBase PID Dir</display-name>
         <description>Pid Directory for HBase.</description>
     </property>
     <property>
         <name>regionserver_heapsize</name>
         <value>4096</value>
         <description>Maximum amount of memory each HBase RegionServer can use.</description>
-        <display-name>HBase RegionServer Maximum Memory</display-name>
     </property>
     <property>
         <name>regionserver_xmn_max</name>
         <value>4000</value>
-        <display-name>RegionServers maximum value for -Xmn</display-name>
         <description>
             Sets the upper bound on HBase RegionServers' young generation size.
             This value is used in case the young generation size (-Xmn) calculated based on the max heapsize (regionserver_heapsize)
@@ -50,31 +46,26 @@
     <property>
         <name>regionserver_xmn_ratio</name>
         <value>0.2</value>
-        <display-name>RegionServers -Xmn in -Xmx ratio</display-name>
         <description>Percentage of max heap size (-Xmx) which used for young generation heap (-Xmn).</description>
     </property>
     <property>
         <name>master_heapsize</name>
         <value>4096</value>
-        <display-name>HBase Master Maximum Memory</display-name>
         <description>Maximum amount of memory each HBase Master can use.</description>
     </property>
     <property>
         <name>parallel_gc_threads</name>
         <value>8</value>
-        <display-name>HBase Parallel GC Threads</display-name>
         <description>The number of JVM parallel garbage collection threads (e.g. -XX:ParallelGCThreads)</description>
     </property>
     <property>
         <name>java_io_tmpdir</name>
-        <display-name>HBase Java IO Tmpdir</display-name>
         <value>/tmp</value>
         <description>Used in hbase-env.sh as HBASE_OPTS=-Djava.io.tmpdir=java_io_tmpdir</description>
     </property>
     <property>
         <name>regionserver_shutdown_timeout</name>
         <value>30</value>
-        <display-name>HBase RegionServer shutdown timeout</display-name>
         <description>
             After this number of seconds waiting for graceful stop of HBase Master it will be forced to exit with SIGKILL.
             The timeout is introduced because there is a known bug when from time to time HBase RegionServer hangs forever on stop if NN safemode is on.
@@ -83,7 +74,6 @@
     <!-- hbase-env.sh -->
     <property>
         <name>content</name>
-        <display-name>hbase-env template</display-name>
         <description>This is the freemarker template for hbase-env.sh file</description>
         <value><![CDATA[
 # Set environment variables here.

@@ -22,7 +22,6 @@
     <property>
         <name>tickTime</name>
         <value>3000</value>
-        <display-name>Length of single Tick</display-name>
         <description>
             The length of a single tick in milliseconds, which is the basic time unit used by ZooKeeper
         </description>
@@ -30,25 +29,21 @@
     <property>
         <name>initLimit</name>
         <value>10</value>
-        <display-name>Ticks to allow for sync at Init</display-name>
         <description>Ticks to allow for sync at Init.</description>
     </property>
     <property>
         <name>syncLimit</name>
         <value>5</value>
-        <display-name>Ticks to allow for sync at Runtime</display-name>
         <description>Ticks to allow for sync at Runtime.</description>
     </property>
     <property>
         <name>clientPort</name>
         <value>2181</value>
-        <display-name>Port for running ZK Server</display-name>
         <description>Port for running ZK Server.</description>
     </property>
     <property>
         <name>dataDir</name>
         <value>/hadoop/zookeeper</value>
-        <display-name>ZooKeeper directory</display-name>
         <description>Data directory for ZooKeeper.</description>
     </property>
     <property>

@@ -57,7 +57,6 @@
             in MBs. Memory requests lower than this won't take effect,
             and the specified value will get allocated at minimum.
         </description>
-        <display-name>Minimum Container Size (Memory)</display-name>
     </property>
     <property>
         <name>yarn.scheduler.maximum-allocation-mb</name>
@@ -67,7 +66,6 @@
             in MBs. Memory requests higher than this won't take effect,
             and will get capped to this value.
         </description>
-        <display-name>Maximum Container Size (Memory)</display-name>
     </property>
     <property>
         <name>yarn.acl.enable</name>
@@ -89,7 +87,6 @@
         <name>yarn.nodemanager.resource.memory-mb</name>
         <value>5120</value>
         <description>Amount of physical memory, in MB, that can be allocated for containers.</description>
-        <display-name>Memory allocated for all YARN containers on a node</display-name>
     </property>
     <property>
         <name>yarn.application.classpath</name>
@@ -105,7 +102,6 @@
             expressed in terms of physical memory, and virtual memory usage
             is allowed to exceed this allocation by this ratio.
         </description>
-        <display-name>Virtual Memory Ratio</display-name>
     </property>
     <property>
         <name>yarn.nodemanager.container-executor.class</name>
@@ -132,7 +128,6 @@
     </property>
     <property>
         <name>yarn.nodemanager.log-dirs</name>
-        <display-name>YARN NodeManager Log directories</display-name>
         <value>/hadoop/yarn/log</value>
         <description>
             Where to store container logs. An application's localized log directory
@@ -144,7 +139,6 @@
     </property>
     <property>
         <name>yarn.nodemanager.local-dirs</name>
-        <display-name>YARN NodeManager Local directories</display-name>
         <value>/hadoop/yarn/local</value>
         <description>
             List of directories to store localized files in. An
@@ -183,11 +177,9 @@
         <name>yarn.log-aggregation-enable</name>
         <value>true</value>
         <description>Whether to enable log aggregation.</description>
-        <display-name>Enable Log Aggregation</display-name>
     </property>
     <property>
         <name>yarn.nodemanager.remote-app-log-dir</name>
-        <display-name>YARN NodeManager Remote App Log directory</display-name>
         <value>/app-logs</value>
         <description>Location to aggregate logs to.</description>
     </property>

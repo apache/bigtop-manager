@@ -22,12 +22,10 @@
     <property>
         <name>flink_log_dir</name>
         <value>/var/log/flink</value>
-        <display-name>Flink Log Dir Prefix</display-name>
         <description>Log Directories for Flink.</description>
     </property>
     <property>
         <name>flink_pid_dir</name>
-        <display-name>Flink PID directory</display-name>
         <value>/var/run/flink</value>
     </property>
 </configuration>

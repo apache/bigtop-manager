@@ -23,29 +23,24 @@
         <name>hbase_log_maxfilesize</name>
         <value>256</value>
         <description>The maximum size of backup file before the log is rotated</description>
-        <display-name>HBase Log: backup file size</display-name>
     </property>
     <property>
         <name>hbase_log_maxbackupindex</name>
         <value>20</value>
         <description>The number of backup files</description>
-        <display-name>HBase Log: # of backup files</display-name>
     </property>
     <property>
         <name>hbase_security_log_maxfilesize</name>
         <value>256</value>
         <description>The maximum size of security backup file before the log is rotated</description>
-        <display-name>HBase Security Log: backup file size</display-name>
     </property>
     <property>
         <name>hbase_security_log_maxbackupindex</name>
         <value>20</value>
         <description>The number of security backup files</description>
-        <display-name>HBase Security Log: # of backup files</display-name>
     </property>
     <property>
         <name>content</name>
-        <display-name>hbase-log4j template</display-name>
         <description>This is the freemarker template for log4j.properties file</description>
         <value><![CDATA[
 # Licensed to the Apache Software Foundation (ASF) under one
