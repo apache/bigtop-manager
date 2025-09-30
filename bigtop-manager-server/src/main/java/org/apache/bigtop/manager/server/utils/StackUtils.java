@@ -18,6 +18,7 @@
  */
 package org.apache.bigtop.manager.server.utils;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.bigtop.manager.common.constants.ComponentCategories;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.utils.CaseUtils;
@@ -29,6 +30,7 @@ import org.apache.bigtop.manager.server.exception.ServerException;
 import org.apache.bigtop.manager.server.model.converter.ServiceConverter;
 import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
 import org.apache.bigtop.manager.server.model.dto.PropertyDTO;
+import org.apache.bigtop.manager.server.model.dto.ServiceChartDTO;
 import org.apache.bigtop.manager.server.model.dto.ServiceConfigDTO;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.model.dto.StackDTO;
@@ -70,6 +72,8 @@ public class StackUtils {
 
     private static final String DEPENDENCY_FILE_NAME = "order.json";
 
+    private static final String CHARTS_FILE_NAME = "charts.json";
+
     public static final Map<String, List<ServiceConfigDTO>> SERVICE_CONFIG_MAP = new HashMap<>();
 
     public static final Map<String, Map<String, String>> SERVICE_TEMPLATE_MAP = new HashMap<>();
@@ -77,6 +81,8 @@ public class StackUtils {
     public static final Map<StackDTO, List<ServiceDTO>> STACK_SERVICE_MAP = new HashMap<>();
 
     public static final DAG<String, ComponentCommandWrapper, DagGraphEdge> DAG = new DAG<>();
+
+    public static final Map<String, List<ServiceChartDTO>> SERVICE_CHARTS_MAP = new HashMap<>();
 
     private static boolean parsed = false;
 
@@ -122,6 +128,7 @@ public class StackUtils {
                 parseServiceTemplates(file, serviceDTO.getName());
 
                 parseDag(file);
+                parseCharts(file, serviceDTO.getName());
             }
         }
 
@@ -202,6 +209,14 @@ public class StackUtils {
                     DAG.addEdge(blocker, blocked, new DagGraphEdge(blocker, blocked), false);
                 }
             }
+        }
+    }
+
+    private static void parseCharts(File file, String serviceName) {
+        File chartsFile = new File(file.getAbsolutePath(), CHARTS_FILE_NAME);
+        if (chartsFile.exists()) {
+            List<ServiceChartDTO> charts = JsonUtils.readFromFile(chartsFile, new TypeReference<>() {});
+            SERVICE_CHARTS_MAP.put(serviceName, charts);
         }
     }
 

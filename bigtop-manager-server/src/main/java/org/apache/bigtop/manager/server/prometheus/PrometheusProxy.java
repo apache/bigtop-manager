@@ -18,9 +18,17 @@
  */
 package org.apache.bigtop.manager.server.prometheus;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import org.apache.bigtop.manager.common.utils.JsonUtils;
+import org.apache.bigtop.manager.server.enums.ChartValueTypeEnum;
+import org.apache.bigtop.manager.server.model.dto.ServiceChartDTO;
 import org.apache.bigtop.manager.server.model.vo.ClusterMetricsVO;
 import org.apache.bigtop.manager.server.model.vo.HostMetricsVO;
 
+import org.apache.bigtop.manager.server.model.vo.ServiceMetricsSeriesVO;
+import org.apache.bigtop.manager.server.model.vo.ServiceMetricsChartVO;
+import org.apache.bigtop.manager.server.model.vo.ServiceMetricsVO;
+import org.apache.bigtop.manager.server.utils.StackUtils;
 import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -93,7 +101,7 @@ public class PrometheusProxy {
                 .block();
     }
 
-    public HostMetricsVO queryAgentsInfo(String agentIpv4, String interval) {
+    public HostMetricsVO queryHostMetrics(String agentIpv4, String interval) {
         timestampCache.set(getTimestampsList(processInternal(interval)));
 
         HostMetricsVO res = new HostMetricsVO();
@@ -147,7 +155,7 @@ public class PrometheusProxy {
         return res;
     }
 
-    public ClusterMetricsVO queryClustersInfo(List<String> agentIpv4s, String interval) {
+    public ClusterMetricsVO queryClusterMetrics(List<String> agentIpv4s, String interval) {
         timestampCache.set(getTimestampsList(processInternal(interval)));
 
         ClusterMetricsVO res = new ClusterMetricsVO();
@@ -250,6 +258,53 @@ public class PrometheusProxy {
 
         res.setTimestamps(timestampCache.get());
         timestampCache.remove();
+        return res;
+    }
+
+    public ServiceMetricsVO queryServiceMetrics(String clusterName, String serviceName, String interval) {
+        List<ServiceChartDTO> charts = StackUtils.SERVICE_CHARTS_MAP.get(serviceName);
+        if (CollectionUtils.isEmpty(charts)) {
+            return new ServiceMetricsVO();
+        }
+
+        List<String> timestamps = getTimestampsList(processInternal(interval));
+        ServiceMetricsVO res = new ServiceMetricsVO();
+        List<ServiceMetricsChartVO> resultCharts = new ArrayList<>();
+        for (ServiceChartDTO chart : charts) {
+            String params = chart.getDataExpression().replace("$cluster", clusterName);
+            PrometheusResponse response = queryRange(
+                    params,
+                    timestamps.get(0),
+                    timestamps.get(timestamps.size() - 1),
+                    number2Param(processInternal(interval)));
+
+            ServiceMetricsChartVO metrics = new ServiceMetricsChartVO();
+            List<ServiceMetricsSeriesVO> series = new ArrayList<>();
+            for (PrometheusResult result : response.getData().getResult()) {
+                List<String> emptyList = new ArrayList<>(Collections.nCopies(timestamps.size(), null));
+                String key = result.getMetric().get("instance");
+                for (List<String> value : result.getValues()) {
+                    String timestamp = value.get(0);
+                    int index = timestamps.indexOf(timestamp);
+                    String roundValue = new BigDecimal(value.get(1)).setScale(chart.getDataScale(), RoundingMode.HALF_UP).toString();
+                    emptyList.set(index, roundValue);
+                }
+
+                ServiceMetricsSeriesVO seriesItem = new ServiceMetricsSeriesVO();
+                seriesItem.setName(key);
+                seriesItem.setData(emptyList);
+                seriesItem.setType(chart.getType());
+                series.add(seriesItem);
+            }
+
+            metrics.setSeries(series);
+            metrics.setTitle(chart.getTitle());
+            metrics.setValueType(chart.getValueType());
+            resultCharts.add(metrics);
+        }
+
+        res.setCharts(resultCharts);
+        res.setTimestamps(timestamps);
         return res;
     }
 
@@ -482,5 +537,52 @@ public class PrometheusProxy {
     private <T> List<T> getEmptyList() {
         int size = timestampCache.get().size();
         return new ArrayList<>(Collections.nCopies(size, null));
+    }
+
+    public static void main(String[] args) {
+        String interval = "1h";
+        String charts = """
+                [
+                  {
+                    "title": "Max Latency",
+                    "valueType": "millisecond",
+                    "type": "line",
+                    "dataExpression": "max_latency{cluster=\\"$cluster\\"}"
+                  },
+                  {
+                    "title": "Min Latency",
+                    "valueType": "millisecond",
+                    "type": "line",
+                    "dataExpression": "min_latency{cluster=\\"$cluster\\"}"
+                  },
+                  {
+                    "title": "Avg Latency",
+                    "valueType": "millisecond",
+                    "type": "line",
+                    "dataExpression": "avg_latency{cluster=\\"$cluster\\"}"
+                  },
+                  {
+                    "title": "Packets Received",
+                    "valueType": "nps",
+                    "type": "line",
+                    "dataExpression": "increase(packets_received{cluster=\\"$cluster\\"}[1m])",
+                    "dataScale": 2
+                  },
+                  {
+                    "title": "Packets Sent",
+                    "valueType": "nps",
+                    "type": "line",
+                    "dataExpression": "increase(packets_sent{cluster=\\"$cluster\\"}[1m])",
+                    "dataScale": 2
+                  }
+                ]
+                """;
+
+        List<ServiceChartDTO> list = JsonUtils.readFromString(charts, new TypeReference<>() {});
+        StackUtils.SERVICE_CHARTS_MAP.put("zookeeper", list);
+
+        PrometheusProxy prometheusProxy = new PrometheusProxy("localhost",19090);
+        ServiceMetricsVO serviceMetricsVO = prometheusProxy.queryServiceMetrics("hadoop", "zookeeper", interval);
+        System.out.println();
     }
 }

@@ -16,20 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.service;
+package org.apache.bigtop.manager.server.model.vo;
 
-import org.apache.bigtop.manager.server.model.vo.ClusterMetricsVO;
-import org.apache.bigtop.manager.server.model.vo.HostMetricsVO;
-import org.apache.bigtop.manager.server.model.vo.ServiceMetricsChartVO;
-import org.apache.bigtop.manager.server.model.vo.ServiceMetricsVO;
+import lombok.Data;
+import org.apache.bigtop.manager.server.enums.ChartValueTypeEnum;
 
 import java.util.List;
 
-public interface MetricsService {
+@Data
+public class ServiceMetricsChartVO {
 
-    HostMetricsVO hostMetrics(Long id, String interval);
+    private String title;
 
-    ClusterMetricsVO clusterMetrics(Long clusterId, String interval);
+    private ChartValueTypeEnum valueType;
 
-    ServiceMetricsVO serviceMetrics(Long serviceId, String interval);
+    private List<ServiceMetricsSeriesVO> series;
 }
