@@ -189,7 +189,6 @@
                 :data="chart"
                 :title="chart.title"
                 :formatter="getChartFormatter(chart)"
-                :legend-map="chart.series.map((v) => [v.name, v.name])"
               />
             </div>
           </a-col>
