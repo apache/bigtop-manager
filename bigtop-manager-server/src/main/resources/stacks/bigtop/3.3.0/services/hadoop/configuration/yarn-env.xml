@@ -21,25 +21,21 @@
     <property>
         <name>yarn_heapsize</name>
         <value>1024</value>
-        <display-name>YARN Java heap size</display-name>
         <description>Max heapsize for all YARN components using a numerical value in the scale of MB</description>
     </property>
     <property>
         <name>resourcemanager_heapsize</name>
         <value>1024</value>
-        <display-name>ResourceManager Java heap size</display-name>
         <description>Max heapsize for ResourceManager using a numerical value in the scale of MB</description>
     </property>
     <property>
         <name>nodemanager_heapsize</name>
         <value>1024</value>
-        <display-name>NodeManager Java heap size</display-name>
         <description>Max heapsize for NodeManager using a numerical value in the scale of MB</description>
     </property>
     <property>
         <name>min_user_id</name>
         <value>1000</value>
-        <display-name>Minimum user ID for submitting job</display-name>
         <description>Set to 0 to disallow root from submitting jobs. Set to 1000 to disallow all superusers from submitting jobs</description>
     </property>
     <property>
@@ -50,7 +46,6 @@
     <!-- yarn-env.sh -->
     <property>
         <name>content</name>
-        <display-name>yarn-env template</display-name>
         <description>This is the freemarker template for yarn-env.sh file</description>
         <value><![CDATA[
 export HADOOP_HOME=${hadoop_home}

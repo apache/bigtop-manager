@@ -22,25 +22,21 @@
     <property>
         <name>mysql_log_dir</name>
         <value>/var/log/mysql</value>
-        <display-name>MySQL Log Dir</display-name>
         <description>MySQL Log Dir</description>
     </property>
     <property>
         <name>mysql_pid_dir</name>
         <value>/var/run/mysql</value>
-        <display-name>MySQL PID Dir</display-name>
         <description>MySQL Pid Dir</description>
     </property>
     <property>
         <name>mysql_data_dir</name>
         <value>${mysql_home}/data</value>
-        <display-name>MySQL Data Dir</display-name>
         <description>MySQL Data Dir</description>
     </property>
     <!-- my.cnf -->
     <property>
         <name>content</name>
-        <display-name>my.cnf template</display-name>
         <description>This is the freemarker template for my.cnf file</description>
         <value><![CDATA[
 [mysqld]

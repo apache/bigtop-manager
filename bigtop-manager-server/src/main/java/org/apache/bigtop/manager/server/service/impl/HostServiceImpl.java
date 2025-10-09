@@ -198,9 +198,14 @@ public class HostServiceImpl implements HostService {
     @Override
     public Boolean batchRemove(List<Long> ids) {
         for (Long id : ids) {
+            HostPO hostPO = hostDao.findById(id);
             if (componentDao.countByHostId(id) > 0) {
-                HostPO hostPO = hostDao.findById(id);
                 throw new ApiException(ApiExceptionEnum.HOST_HAS_COMPONENTS, hostPO.getHostname());
+            }
+
+            // Check if agent is stopped before removing host
+            if (!HealthyStatusEnum.UNHEALTHY.getCode().equals(hostPO.getStatus())) {
+                throw new ApiException(ApiExceptionEnum.AGENT_STILL_RUNNING, hostPO.getHostname());
             }
         }
 

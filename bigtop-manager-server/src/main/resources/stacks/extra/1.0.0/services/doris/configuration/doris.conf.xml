@@ -21,7 +21,6 @@
 <configuration>
     <property>
         <name>content</name>
-        <display-name>doris.conf template</display-name>
         <description>This is the freemarker template for doris file</description>
         <value><![CDATA[
 #

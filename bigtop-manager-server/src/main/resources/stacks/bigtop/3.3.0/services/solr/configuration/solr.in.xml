@@ -216,7 +216,6 @@
     <!-- solr.in.sh -->
     <property>
         <name>content</name>
-        <display-name>solr.in template</display-name>
         <description>This is the freemarker template for solr.in.sh file</description>
         <attrs>
             <type>longtext</type>

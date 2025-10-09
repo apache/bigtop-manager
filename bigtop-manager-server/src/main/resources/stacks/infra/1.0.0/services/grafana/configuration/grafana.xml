@@ -22,13 +22,11 @@
     <property>
         <name>port</name>
         <value>3000</value>
-        <display-name>Port</display-name>
         <description>HTTP port for Grafana to listen on.</description>
     </property>
     <property>
         <name>log_level</name>
         <value>info</value>
-        <display-name>Log level</display-name>
         <description>Log level, can be: trace, debug, info, warn, error, critical.</description>
     </property>
     <property>
