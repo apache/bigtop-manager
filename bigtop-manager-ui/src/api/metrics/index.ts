@@ -18,7 +18,7 @@
  */
 
 import { get } from '@/api/request-util'
-import type { MetricsData, TimeRangeType } from './types'
+import type { MetricsData, ServiceMetrics, TimeRangeType } from './types'
 
 export const getClusterMetricsInfo = (paramsPath: { id: number }, params: { interval: TimeRangeType }) => {
   return get<MetricsData>(`/metrics/clusters/${paramsPath.id}`, params)
@@ -26,4 +26,8 @@ export const getClusterMetricsInfo = (paramsPath: { id: number }, params: { inte
 
 export const getHostMetricsInfo = (paramsPath: { id: number }, params: { interval: TimeRangeType }) => {
   return get<MetricsData>(`/metrics/hosts/${paramsPath.id}`, params)
+}
+
+export const getServiceMetricsInfo = (paramsPath: { id: number }, params: { interval: TimeRangeType }) => {
+  return get<ServiceMetrics>(`/metrics/services/${paramsPath.id}`, params)
 }

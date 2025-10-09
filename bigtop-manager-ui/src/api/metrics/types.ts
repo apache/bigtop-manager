@@ -18,6 +18,7 @@
  */
 
 export type TimeRangeType = '1m' | '5m' | '15m' | '30m' | '1h' | '2h'
+
 export type MetricsData = {
   cpuUsageCur: string
   memoryUsageCur: string
@@ -32,5 +33,31 @@ export type MetricsData = {
   memoryUsage: string[]
   diskRead: string[]
   diskWrite: string[]
+  timestamps: string[]
+}
+
+export type ServiceMetricType =
+  | 'NUMBER' // Numeric value, unitless
+  | 'PERCENT' // Percent, followed by %
+  | 'BYTE' // Byte, the front end can convert it through formatFromByte in storage util, the unit is B/KB/MB, etc.
+  | 'MILLISECOND' // milliseconds, followed by ms
+  | 'BPS' // Bytes per second, followed by B/s
+  | 'NPS' // Numeric value per second, followed by N/s
+
+type ServiceMetricItemSeries = {
+  name: string
+  type: string
+  data: any[]
+  [propName: string]: any
+}
+
+export type ServiceMetricItem = {
+  title: string
+  valueType: Lowercase<ServiceMetricType>
+  series: ServiceMetricItemSeries[]
+}
+
+export type ServiceMetrics = {
+  charts: ServiceMetricItem[]
   timestamps: string[]
 }

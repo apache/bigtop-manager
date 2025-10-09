@@ -95,8 +95,8 @@
     for (const service of selectedServices.value) {
       if (!service.name || map.has(service.name)) continue
 
-      const requireds = extractRequireds(service.configs)
-      if (requireds.length > 0) map.set(service.name, requireds)
+      const requires = extractRequireds(service.configs)
+      if (requires.length > 0) map.set(service.name, requires)
     }
 
     return map
@@ -187,9 +187,9 @@
     const result: ServiceConfig[] = []
 
     for (const config of configs ?? []) {
-      const requireds = config.properties?.filter((p) => p.attrs?.required && p.value == '') ?? []
-      if (requireds.length > 0) {
-        result.push({ [config.name!]: requireds })
+      const requires = config.properties?.filter((p) => p.attrs?.required && p.value == '') ?? []
+      if (requires.length > 0) {
+        result.push({ [config.name!]: requires })
       }
     }
 
