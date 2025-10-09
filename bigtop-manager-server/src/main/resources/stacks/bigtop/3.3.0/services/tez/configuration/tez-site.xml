@@ -22,7 +22,7 @@
     <property>
         <name>tez.lib.uris.classpath</name>
         <display-name>TEZ Lib URIs Classpath</display-name>
-        <value>${hadoop_conf_dir!},${hadoop_home!}/*,${hadoop_home!}/lib/*,${tez_home!}/*,${tez_home!}/lib/*,${tez_conf_dir!}</value>
+        <value>${hadoop_conf_dir},${hadoop_home}/*,${hadoop_home}/lib/*,${tez_home}/*,${tez_home}/lib/*,${tez_conf_dir}</value>
         <description>
             Comma-delimited list of the location of the Tez libraries Classpath which will be localized for DAGs.
         </description>
@@ -30,7 +30,7 @@
     <property>
         <name>tez.lib.uris</name>
         <display-name>TEZ Lib URIs</display-name>
-        <value>${tez_lib_uris!}</value>
+        <value>${tez_lib_uris}</value>
         <description>Comma-delimited list of the location of the Tez libraries which will be localized for DAGs.
             Specifying a single .tar.gz or .tgz assumes that a compressed version of the tez libs is being used. This is
             uncompressed into a tezlibs directory when running containers, and tezlibs/;tezlibs/lib/ are added to the
@@ -69,7 +69,7 @@
     </property>
     <property>
         <name>tez.am.launch.cmd-opts</name>
-        <value>-XX:+PrintGCDetails -verbose:gc -XX:+PrintGCTimeStamps -XX:+UseNUMA -XX:+UseG1GC -XX:+ResizeTLAB ${heap_dump_opts!}</value>
+        <value>-XX:+PrintGCDetails -verbose:gc -XX:+PrintGCTimeStamps -XX:+UseNUMA -XX:+UseG1GC -XX:+ResizeTLAB ${heap_dump_opts}</value>
         <description>Java options for the Tez AppMaster process. The Xmx value is derived based on
             tez.am.resource.memory.mb and is 80% of the value by default.
             Used only if the value is not specified explicitly by the DAG definition.
@@ -84,7 +84,7 @@
     </property>
     <property>
         <name>tez.am.launch.env</name>
-        <value>LD_LIBRARY_PATH=${hadoop_home!}/lib/native</value>
+        <value>LD_LIBRARY_PATH=${hadoop_home}/lib/native</value>
         <description>
             Additional execution environment entries for tez. This is not an additive property. You must preserve the
             original value if
@@ -101,7 +101,7 @@
     </property>
     <property>
         <name>tez.task.launch.cmd-opts</name>
-        <value>-XX:+PrintGCDetails -verbose:gc -XX:+PrintGCTimeStamps -XX:+UseNUMA -XX:+UseG1GC -XX:+ResizeTLAB ${heap_dump_opts!}</value>
+        <value>-XX:+PrintGCDetails -verbose:gc -XX:+PrintGCTimeStamps -XX:+UseNUMA -XX:+UseG1GC -XX:+ResizeTLAB ${heap_dump_opts}</value>
         <description>Java options for tasks. The Xmx value is derived based on tez.task.resource.memory.mb and is 80% of
             this value by default.
             Used only if the value is not specified explicitly by the DAG definition.
@@ -116,7 +116,7 @@
     </property>
     <property>
         <name>tez.task.launch.env</name>
-        <value>LD_LIBRARY_PATH=${hadoop_home!}/lib/native</value>
+        <value>LD_LIBRARY_PATH=${hadoop_home}/lib/native</value>
         <description>
             Additional execution environment entries for tez. This is not an additive property. You must preserve the
             original value if

@@ -30,7 +30,7 @@
         <display-name>mapred-env template</display-name>
         <description>This is the freemarker template for mapred-env.sh file</description>
         <value><![CDATA[
-export HADOOP_JOB_HISTORYSERVER_HEAPSIZE=${jobhistory_heapsize!}
+export HADOOP_JOB_HISTORYSERVER_HEAPSIZE=${jobhistory_heapsize}
 
 export HADOOP_ROOT_LOGGER=INFO,RFA
 
