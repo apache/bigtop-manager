@@ -39,6 +39,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Getter
 @Slf4j
@@ -65,6 +67,7 @@ public class HadoopParams extends BigtopParams {
     private String dfsDomainSocketPathPrefix;
     private String dfsJourNalNodeDir;
     private String dfsHttpPort;
+    private String journalHttpPort;
 
     private String nodeManagerLogDir = "/hadoop/yarn/log";
     private String nodeManagerLocalDir = "/hadoop/yarn/local";
@@ -181,10 +184,17 @@ public class HadoopParams extends BigtopParams {
         if (dfsHttpAddress != null && dfsHttpAddress.contains(":")) {
             String[] parts = dfsHttpAddress.split(":");
             if (parts.length >= 2) {
-                log.warn("parts: " + parts);
                 dfsHttpPort = parts[1].trim();
-                log.warn("dfsHttpPort: " + dfsHttpPort);
             }
+        }
+        String journalHttpAddress = (String) hdfsSite.get("dfs.namenode.shared.edits.dir");
+        Pattern pattern = Pattern.compile(":(\\d{1,5})");
+        Matcher matcher = pattern.matcher(journalHttpAddress);
+        if (matcher.find()) {
+            journalHttpPort = matcher.group(1);
+            log.info("find jounalnode port: " + journalHttpPort);
+        } else {
+            log.warn("not found journalnode port!");
         }
         String dfsDomainSocketPath = (String) hdfsSite.get("dfs.domain.socket.path");
         if (StringUtils.isNotBlank(dfsDomainSocketPath)) {
