@@ -16,29 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.req;
-
-import org.apache.bigtop.manager.server.enums.PropertyAction;
+package org.apache.bigtop.manager.server.model.vo;
 
 import lombok.Data;
 
-import jakarta.validation.constraints.NotBlank;
+import java.util.List;
 
 @Data
-public class PropertyReq {
+public class ServiceMetricsSeriesVO {
 
-    @NotBlank
     private String name;
 
-    private String value;
+    private String type;
 
-    private String desc;
-
-    private AttrsReq attrs;
-
-    /**
-     * Action to be performed on the property.
-     * This could be used to indicate operations like 'add', 'update', or 'delete'.
-     */
-    private PropertyAction action;
+    private List<String> data;
 }

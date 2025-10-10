@@ -69,9 +69,9 @@ class MetricsControllerTest {
         mockResponse.setCpuUsageCur("50%");
         mockResponse.setMemoryUsageCur("70%");
 
-        when(metricsService.queryAgentsInfo(hostId, interval)).thenReturn(mockResponse);
+        when(metricsService.hostMetrics(hostId, interval)).thenReturn(mockResponse);
 
-        ResponseEntity<HostMetricsVO> response = metricsController.queryAgentInfo(interval, hostId);
+        ResponseEntity<HostMetricsVO> response = metricsController.hostMetrics(interval, hostId);
 
         assertEquals("Mocked message", response.getMessage());
         assertTrue(response.isSuccess());
@@ -86,9 +86,9 @@ class MetricsControllerTest {
         mockResponse.setCpuUsageCur("60%");
         mockResponse.setMemoryUsageCur("80%");
 
-        when(metricsService.queryClustersInfo(clusterId, interval)).thenReturn(mockResponse);
+        when(metricsService.clusterMetrics(clusterId, interval)).thenReturn(mockResponse);
 
-        ResponseEntity<ClusterMetricsVO> response = metricsController.queryCluster(interval, clusterId);
+        ResponseEntity<ClusterMetricsVO> response = metricsController.clusterMetrics(interval, clusterId);
 
         assertEquals("Mocked message", response.getMessage());
         assertTrue(response.isSuccess());

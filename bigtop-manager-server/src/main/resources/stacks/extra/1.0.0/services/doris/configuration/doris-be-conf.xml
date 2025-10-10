@@ -21,7 +21,6 @@
 <configuration>
     <property>
         <name>storage_root_path</name>
-        <display-name>storage_root_path</display-name>
         <value>${doris_be_home}/storage</value>
         <description>
             data root path, separate by ';'.you can specify the storage medium of each root path, HDD or SSD.

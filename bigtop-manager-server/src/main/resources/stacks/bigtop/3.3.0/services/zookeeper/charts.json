@@ -1,0 +1,34 @@
+[
+  {
+    "title": "Max Latency",
+    "valueType": "millisecond",
+    "type": "line",
+    "dataExpression": "max_latency{cluster=\"$cluster\"}"
+  },
+  {
+    "title": "Min Latency",
+    "valueType": "millisecond",
+    "type": "line",
+    "dataExpression": "min_latency{cluster=\"$cluster\"}"
+  },
+  {
+    "title": "Avg Latency",
+    "valueType": "millisecond",
+    "type": "line",
+    "dataExpression": "avg_latency{cluster=\"$cluster\"}"
+  },
+  {
+    "title": "Packets Received",
+    "valueType": "nps",
+    "type": "line",
+    "dataExpression": "increase(packets_received{cluster=\"$cluster\"}[1m])",
+    "dataScale": 2
+  },
+  {
+    "title": "Packets Sent",
+    "valueType": "nps",
+    "type": "line",
+    "dataExpression": "increase(packets_sent{cluster=\"$cluster\"}[1m])",
+    "dataScale": 2
+  }
+]

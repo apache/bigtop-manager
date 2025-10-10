@@ -16,29 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.req;
+package org.apache.bigtop.manager.server.model.dto;
 
-import org.apache.bigtop.manager.server.enums.PropertyAction;
+import org.apache.bigtop.manager.server.enums.ChartValueTypeEnum;
 
 import lombok.Data;
 
-import jakarta.validation.constraints.NotBlank;
-
 @Data
-public class PropertyReq {
+public class ServiceChartDTO {
 
-    @NotBlank
-    private String name;
+    private String title;
 
-    private String value;
+    private ChartValueTypeEnum valueType;
 
-    private String desc;
+    // line, number etc.
+    private String type;
 
-    private AttrsReq attrs;
+    private String dataExpression;
 
-    /**
-     * Action to be performed on the property.
-     * This could be used to indicate operations like 'add', 'update', or 'delete'.
-     */
-    private PropertyAction action;
+    private Integer dataScale = 0;
 }

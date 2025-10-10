@@ -16,29 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.model.req;
+package org.apache.bigtop.manager.server.enums;
 
-import org.apache.bigtop.manager.server.enums.PropertyAction;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
-import lombok.Data;
+public enum ChartValueTypeEnum {
+    NUMBER,
+    PERCENT,
+    BYTE,
+    MILLISECOND,
+    BPS, // Byte per second
+    NPS // Number per second
+;
 
-import jakarta.validation.constraints.NotBlank;
+    @JsonCreator
+    public static ChartValueTypeEnum fromString(String value) {
+        return ChartValueTypeEnum.valueOf(value.toUpperCase());
+    }
 
-@Data
-public class PropertyReq {
-
-    @NotBlank
-    private String name;
-
-    private String value;
-
-    private String desc;
-
-    private AttrsReq attrs;
-
-    /**
-     * Action to be performed on the property.
-     * This could be used to indicate operations like 'add', 'update', or 'delete'.
-     */
-    private PropertyAction action;
+    @JsonValue
+    public String toLowerCase() {
+        return name().toLowerCase();
+    }
 }

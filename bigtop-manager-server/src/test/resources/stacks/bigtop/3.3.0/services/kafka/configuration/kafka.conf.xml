@@ -21,7 +21,6 @@
 <configuration>
     <property>
         <name>content</name>
-        <display-name>kafka.conf template</display-name>
         <description>This is the freemarker template for kafka-env.sh file</description>
         <value><![CDATA[
 #

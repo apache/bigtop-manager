@@ -21,7 +21,6 @@
 <configuration>
     <property>
         <name>content</name>
-        <display-name>llap-cli-log4j2 template</display-name>
         <description>Custom llap-cli-log4j2.properties</description>
         <value><![CDATA[
 

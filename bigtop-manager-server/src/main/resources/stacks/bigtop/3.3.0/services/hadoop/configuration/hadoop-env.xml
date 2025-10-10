@@ -22,25 +22,21 @@
     <property>
         <name>hadoop_root_logger</name>
         <value>INFO,RFA</value>
-        <display-name>Hadoop Root Logger</display-name>
         <description>Hadoop Root Logger</description>
     </property>
     <property>
         <name>hadoop_heapsize_max</name>
         <value>1024</value>
         <description>Hadoop maximum Java heap size</description>
-        <display-name>Hadoop maximum Java heap size</display-name>
     </property>
     <property>
         <name>hadoop_heapsize_min</name>
         <value>1024</value>
         <description>Hadoop minimum Java heap size</description>
-        <display-name>Hadoop minimum Java heap size</display-name>
     </property>
     <!-- hadoop-env.sh -->
     <property>
         <name>content</name>
-        <display-name>hadoop-env template</display-name>
         <description>This is the freemarker template for hadoop-env.sh file</description>
         <value><![CDATA[
 #

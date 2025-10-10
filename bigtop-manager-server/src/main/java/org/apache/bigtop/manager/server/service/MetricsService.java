@@ -20,10 +20,13 @@ package org.apache.bigtop.manager.server.service;
 
 import org.apache.bigtop.manager.server.model.vo.ClusterMetricsVO;
 import org.apache.bigtop.manager.server.model.vo.HostMetricsVO;
+import org.apache.bigtop.manager.server.model.vo.ServiceMetricsVO;
 
 public interface MetricsService {
 
-    HostMetricsVO queryAgentsInfo(Long id, String interval);
+    HostMetricsVO hostMetrics(Long id, String interval);
 
-    ClusterMetricsVO queryClustersInfo(Long clusterId, String interval);
+    ClusterMetricsVO clusterMetrics(Long clusterId, String interval);
+
+    ServiceMetricsVO serviceMetrics(Long serviceId, String interval);
 }

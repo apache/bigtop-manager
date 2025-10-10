@@ -25,7 +25,6 @@
     </property>
     <property>
         <name>content</name>
-        <display-name>spark-defaults template</display-name>
         <description>Custom spark-defaults.conf</description>
         <value><![CDATA[
 # Licensed to the Apache Software Foundation (ASF) under one or more
