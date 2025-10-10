@@ -89,15 +89,15 @@
     }
   }
 
-  const { pause, resume } = useIntervalFn(getServiceMetrics, 30000, { immediate: true })
+  // const { pause, resume } = useIntervalFn(getServiceMetrics, 30000, { immediate: true })
 
   onActivated(() => {
-    getServiceMetrics()
-    resume()
+    // getServiceMetrics()
+    // resume()
   })
 
   onDeactivated(() => {
-    pause()
+    // pause()
   })
 </script>
 
