@@ -50,6 +50,7 @@
     nps: 'N/s'
   }
 
+  const clusterId = computed(() => attrs.id)
   const noChartData = computed(() => Object.values(chartData.value).length === 0)
   const serviceKeys = computed(() => Object.keys(baseConfig.value) as (keyof ServiceVO)[])
   const baseConfig = computed(
@@ -66,7 +67,6 @@
 
   const handleTimeRange = (time: TimeRangeType) => {
     if (currTimeRange.value === time) return
-
     currTimeRange.value = time
     getServiceMetrics()
   }
@@ -89,15 +89,17 @@
     }
   }
 
-  // const { pause, resume } = useIntervalFn(getServiceMetrics, 30000, { immediate: true })
+  const { pause, resume } = useIntervalFn(getServiceMetrics, 30000, { immediate: true })
 
   onActivated(() => {
-    // getServiceMetrics()
-    // resume()
+    if (clusterId.value == 0) return
+    getServiceMetrics()
+    resume()
   })
 
   onDeactivated(() => {
-    // pause()
+    if (clusterId.value == 0) return
+    pause()
   })
 </script>
 
