@@ -119,8 +119,8 @@
     />
     <main-card v-model:active-key="activeTab" :tabs="tabs">
       <template #tab-item>
-        <keep-alive>
-          <component :is="getCompName" :key="activeTab" v-bind="currCluster" v-model:payload="currCluster"></component>
+        <keep-alive :key="activeTab">
+          <component :is="getCompName" v-bind="currCluster" v-model:payload="currCluster"></component>
         </keep-alive>
       </template>
     </main-card>

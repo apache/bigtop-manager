@@ -147,10 +147,10 @@
    * @param legendMap - An array of [key, displayName] pairs.
    * @returns An array of ECharts series config objects with populated and formatted data.
    */
-  const generateChartSeries = <T,>(data: Partial<T>, legendMap: [string, string][]) => {
+  const generateChartSeries = <T,>(data: Partial<T>, legendMap: [string, string][], config = baseConfig) => {
     return legendMap.map(([key, name]) => ({
       name,
-      ...baseConfig,
+      ...config,
       data: (data[key] || []).map((v: unknown) => roundFixed(v))
     }))
   }
@@ -164,24 +164,25 @@
 
   watchEffect(() => {
     let series = [] as any,
-      legend = [] as any
+      legend = { data: [] } as any
+
+    const { series: temp_series = [] } = data.value
+    const xAxis = xAxisData.value?.map((v) => dayjs(Number(v) * 1000).format('HH:mm')) ?? []
 
     if (legendMap.value) {
       legend = new Map(legendMap.value).values()
       series = generateChartSeries(data.value, legendMap.value)
     } else {
-      series = [
-        {
-          name: title.value.toLowerCase(),
-          data: data.value.map((v) => roundFixed(v))
-        }
-      ]
+      if (temp_series.length > 1) {
+        legend.data = temp_series.map((s) => s.name)
+        series = [...temp_series]
+      } else {
+        series = [{ name: title.value.toLowerCase(), data: data.value.map((v) => roundFixed(v)) }]
+      }
     }
 
     setOptions({
-      xAxis: xAxisData.value
-        ? [{ data: xAxisData.value?.map((v) => dayjs(Number(v) * 1000).format('HH:mm')) || [] }]
-        : [],
+      xAxis: [{ data: xAxis ?? xAxis }],
       ...config.value,
       legend,
       series

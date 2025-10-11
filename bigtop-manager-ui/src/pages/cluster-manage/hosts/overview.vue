@@ -20,7 +20,7 @@
 <script setup lang="ts">
   import { Empty } from 'ant-design-vue'
   import { formatFromByte } from '@/utils/storage.ts'
-  import { usePngImage } from '@/utils/tools'
+  import { usePngImage, isEmpty } from '@/utils/tools'
   import { CommonStatus, CommonStatusTexts } from '@/enums/state.ts'
   import { useServiceStore } from '@/store/service'
   import { useJobProgress } from '@/store/job-progress'
@@ -323,7 +323,7 @@
                 :data="chartData"
                 :title="t('overview.system_load')"
                 :formatter="{
-                  tooltip: (val) => `${val == null || val == '' ? '--' : val}`,
+                  tooltip: (val) => `${isEmpty(val) ? '--' : val}`,
                   yAxis: (val) => `${val}`
                 }"
                 :legend-map="[
@@ -342,7 +342,7 @@
                 :data="chartData"
                 :title="t('overview.disk_io')"
                 :formatter="{
-                  tooltip: (val) => `${val == null || val == '' ? '--' : formatFromByte(val as number, 0)}`,
+                  tooltip: (val) => `${isEmpty(val) ? '--' : formatFromByte(val as number, 0)}`,
                   yAxis: (val) => formatFromByte(val as number, 0)
                 }"
                 :legend-map="[

@@ -95,8 +95,8 @@
     for (const service of selectedServices.value) {
       if (!service.name || map.has(service.name)) continue
 
-      const requireds = extractRequireds(service.configs)
-      if (requireds.length > 0) map.set(service.name, requireds)
+      const requires = extractRequires(service.configs)
+      if (requires.length > 0) map.set(service.name, requires)
     }
 
     return map
@@ -168,10 +168,7 @@
   const matchKeyword = (keyword: string, prop: Property, config?: ServiceConfig) => {
     const lowerKeyword = keyword.toLowerCase()
     const includesProp =
-      prop.name?.toLowerCase().includes(lowerKeyword) ||
-      prop.value?.toLowerCase().includes(lowerKeyword) ||
-      prop.displayName?.toLowerCase().includes(lowerKeyword)
-
+      prop.name?.toLowerCase().includes(lowerKeyword) || prop.value?.toLowerCase().includes(lowerKeyword)
     if (config != undefined) {
       return config.name?.toLowerCase().includes(lowerKeyword) || includesProp
     }
@@ -186,13 +183,13 @@
    * @param configs - The service configurations to check.
    * @returns A list of configurations with their required properties.
    */
-  const extractRequireds = (configs?: ServiceConfig[]) => {
+  const extractRequires = (configs?: ServiceConfig[]) => {
     const result: ServiceConfig[] = []
 
     for (const config of configs ?? []) {
-      const requireds = config.properties?.filter((p) => p.attrs?.required && p.value == '') ?? []
-      if (requireds.length > 0) {
-        result.push({ [config.name!]: requireds })
+      const requires = config.properties?.filter((p) => p.attrs?.required && p.value == '') ?? []
+      if (requires.length > 0) {
+        result.push({ [config.name!]: requires })
       }
     }
 
@@ -299,12 +296,12 @@
                       />
                       <div
                         v-else
-                        :title="property.displayName ?? property.name"
+                        :title="property.name"
                         class="property-name"
                         :class="{ 'required-mark': property.attrs?.required }"
                       >
                         <span>
-                          {{ property.displayName ?? property.name }}
+                          {{ property.name }}
                         </span>
                       </div>
                     </a-form-item>

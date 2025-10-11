@@ -19,63 +19,42 @@
 
 <script setup lang="ts">
   import { CommonStatus, CommonStatusTexts } from '@/enums/state'
+  import { Empty } from 'ant-design-vue'
+  import { formatFromByte } from '@/utils/storage.ts'
+  import { getServiceMetricsInfo } from '@/api/metrics'
+  import { isEmpty } from '@/utils/tools'
 
-  import GaugeChart from '@/features/metric/gauge-chart.vue'
   import CategoryChart from '@/features/metric/category-chart.vue'
 
-  import { Empty } from 'ant-design-vue'
   import type { ServiceVO, ServiceStatusType } from '@/api/service/types'
-
-  type TimeRangeText = '1m' | '15m' | '30m' | '1h' | '6h' | '30h'
-  type TimeRangeItem = {
-    text: TimeRangeText
-    time: string
-  }
+  import type { ServiceMetricItem, ServiceMetrics, ServiceMetricType, TimeRangeType } from '@/api/metrics/types'
 
   const { t } = useI18n()
-  const attrs = useAttrs() as unknown as Required<ServiceVO> & { clusterId: number }
-  const currTimeRange = ref<TimeRangeText>('15m')
-  const chartData = ref({
-    chart1: [],
-    chart2: [],
-    chart3: [],
-    chart4: []
-  })
+  const attrs = useAttrs() as any
+  const currTimeRange = ref<TimeRangeType>('5m')
+  const chartData = ref<Partial<ServiceMetrics>>({})
+
+  const timeRanges = shallowRef<TimeRangeType[]>(['1m', '5m', '15m', '30m', '1h', '2h'])
   const statusColors = shallowRef<Record<ServiceStatusType, keyof typeof CommonStatusTexts>>({
     1: 'healthy',
     2: 'unhealthy',
     3: 'unknown'
   })
+
+  const unitMap: Record<Lowercase<ServiceMetricType>, string | ((value: number) => string)> = {
+    number: '',
+    percent: '%',
+    byte: (val) => formatFromByte(val, 0),
+    millisecond: 'ms',
+    bps: 'B/s',
+    nps: 'N/s'
+  }
+
+  const clusterId = computed(() => attrs.id)
+  const noChartData = computed(() => Object.values(chartData.value).length === 0)
   const serviceKeys = computed(() => Object.keys(baseConfig.value) as (keyof ServiceVO)[])
-  const noChartData = computed(() => Object.values(chartData.value).every((v) => v.length === 0))
-  const timeRanges = computed((): TimeRangeItem[] => [
-    {
-      text: '1m',
-      time: ''
-    },
-    {
-      text: '15m',
-      time: ''
-    },
-    {
-      text: '30m',
-      time: ''
-    },
-    {
-      text: '1h',
-      time: ''
-    },
-    {
-      text: '6h',
-      time: ''
-    },
-    {
-      text: '30h',
-      time: ''
-    }
-  ])
-  const baseConfig = computed((): Partial<Record<keyof ServiceVO, string>> => {
-    return {
+  const baseConfig = computed(
+    (): Partial<Record<keyof ServiceVO, string>> => ({
       status: t('overview.service_status'),
       displayName: t('overview.service_name'),
       version: t('overview.service_version'),
@@ -83,12 +62,45 @@
       restartFlag: t('service.required_restart'),
       metrics: t('overview.metrics'),
       kerberos: t('overview.kerberos')
+    })
+  )
+
+  const handleTimeRange = (time: TimeRangeType) => {
+    if (currTimeRange.value === time) return
+    currTimeRange.value = time
+    getServiceMetrics()
+  }
+
+  const getServiceMetrics = async () => {
+    try {
+      const res = await getServiceMetricsInfo({ id: attrs.serviceId }, { interval: currTimeRange.value })
+      chartData.value = { ...res }
+    } catch (error) {
+      console.log('Failed to fetch service metrics:', error)
     }
+  }
+
+  const getChartFormatter = (chart: ServiceMetricItem) => {
+    const unit = unitMap[chart.valueType]
+    const valueWithUnit = (val: any) => (typeof unit === 'function' ? unit(val as number) : `${val} ${unit}`)
+    return {
+      tooltip: (val: any) => `${isEmpty(val) ? '--' : valueWithUnit(val)}`,
+      yAxis: valueWithUnit
+    }
+  }
+
+  const { pause, resume } = useIntervalFn(getServiceMetrics, 30000, { immediate: true })
+
+  onActivated(() => {
+    if (clusterId.value == 0) return
+    getServiceMetrics()
+    resume()
   })
 
-  const handleTimeRange = (time: TimeRangeItem) => {
-    currTimeRange.value = time.text
-  }
+  onDeactivated(() => {
+    if (clusterId.value == 0) return
+    pause()
+  })
 </script>
 
 <template>
@@ -155,13 +167,13 @@
           <a-space :size="12">
             <div
               v-for="time in timeRanges"
-              :key="time.text"
+              :key="time"
               tabindex="0"
               class="time-range"
-              :class="{ 'time-range-activated': currTimeRange === time.text }"
+              :class="{ 'time-range-activated': currTimeRange === time }"
               @click="handleTimeRange(time)"
             >
-              {{ time.text }}
+              {{ time }}
             </div>
           </a-space>
         </div>
@@ -171,24 +183,15 @@
           </div>
         </template>
         <a-row v-else class="box-content">
-          <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
+          <a-col v-for="(chart, index) in chartData.charts" :key="index" :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
             <div class="chart-item-wrp">
-              <gauge-chart chart-id="chart1" :title="t('overview.memory_usage')" />
-            </div>
-          </a-col>
-          <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-            <div class="chart-item-wrp">
-              <gauge-chart chart-id="chart2" :title="t('overview.cpu_usage')" />
-            </div>
-          </a-col>
-          <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-            <div class="chart-item-wrp">
-              <category-chart chart-id="chart4" :title="t('overview.cpu_usage')" />
-            </div>
-          </a-col>
-          <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-            <div class="chart-item-wrp">
-              <category-chart chart-id="chart3" :title="t('overview.memory_usage')" />
+              <category-chart
+                :chart-id="`chart${index}`"
+                :x-axis-data="chartData?.timestamps"
+                :data="chart"
+                :title="chart.title"
+                :formatter="getChartFormatter(chart)"
+              />
             </div>
           </a-col>
         </a-row>

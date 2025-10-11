@@ -17,6 +17,13 @@
  * under the License.
  */
 
+/**
+ * Copies the given text to the clipboard.
+ * Uses the Clipboard API if available, otherwise falls back to ClipboardJS.
+ *
+ * @param text - The text to copy.
+ * @returns A promise that resolves on success or rejects on failure.
+ */
 export function copyText(text: string): Promise<any> {
   if (navigator.clipboard) {
     return navigator.clipboard.writeText(text)
@@ -25,7 +32,7 @@ export function copyText(text: string): Promise<any> {
     try {
       const { default: ClipboardJS } = await import('clipboard')
       if (!ClipboardJS.isSupported()) {
-        reject(new Error('ClipboardJS not support!'))
+        reject(new Error('ClipboardJS not supported!'))
         return
       }
       const btn = document.createElement('button')
@@ -43,15 +50,26 @@ export function copyText(text: string): Promise<any> {
       })
       btn.click()
     } catch (error) {
-      console.log('copytext :>> ', error)
+      console.log('copyText :>> ', error)
     }
   })
 }
 
+/**
+ * Returns the URL of a PNG image from the assets folder.
+ *
+ * @param imageName - The name of the image (default is 'logo').
+ * @returns The URL of the image.
+ */
 export function usePngImage(imageName: string = 'logo'): string {
   return new URL(`../assets/images/${imageName}.png`, import.meta.url).href
 }
 
+/**
+ * Scrolls the given container element to the bottom.
+ *
+ * @param container - The container element to scroll.
+ */
 export function scrollToBottom(container: HTMLElement | null) {
   if (!container) {
     return
@@ -61,16 +79,35 @@ export function scrollToBottom(container: HTMLElement | null) {
   })
 }
 
+/**
+ * Generates a random number string based on the current timestamp.
+ *
+ * @param len - The length of the random string (default is 6).
+ * @returns A random string derived from the timestamp.
+ */
 export function getRandomFromTimestamp(len: number = 6) {
   return Date.now().toString().slice(-len)
 }
 
+/**
+ * Generates a random alphanumeric string of the specified length.
+ *
+ * @param length - The length of the random string (default is 8).
+ * @returns A random alphanumeric string.
+ */
 export function generateRandomId(length = 8) {
   return Math.random()
     .toString(36)
     .substring(2, length + 2)
 }
 
+/**
+ * Picks specific keys from an object and returns a new object with those keys.
+ *
+ * @param obj - The source object.
+ * @param keys - The keys to pick from the object.
+ * @returns A new object with the picked keys.
+ */
 export function pick<T extends object, K extends keyof T>(obj: T, keys: K[]): Pick<T, K> {
   return keys.reduce(
     (acc, key) => {
@@ -83,9 +120,25 @@ export function pick<T extends object, K extends keyof T>(obj: T, keys: K[]): Pi
   )
 }
 
+/**
+ * Creates a new object with a unique key added to it.
+ *
+ * @param item - The source object.
+ * @returns A new object with an added `__key` property.
+ */
 export function createKeyedItem<T extends object>(item: T): T & { __key: string } {
   return {
     ...item,
     __key: crypto.randomUUID?.() ?? `${Date.now()}-${Math.random()}`
   }
+}
+
+/**
+ * Checks if a value is empty (undefined, null, or an empty string).
+ *
+ * @param value - The value to check.
+ * @returns True if the value is empty, otherwise false.
+ */
+export function isEmpty<T>(value: T): boolean {
+  return value === undefined || value === null || value === ''
 }

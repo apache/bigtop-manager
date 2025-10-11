@@ -135,7 +135,10 @@
     <main-card v-model:active-key="activeKey" :tabs="tabs">
       <template #tab-item>
         <keep-alive>
-          <component :is="getCompName" v-bind="{ ...serviceDetail, clusterId: routeParams.id }"></component>
+          <component
+            :is="getCompName"
+            v-bind="{ ...serviceDetail, clusterId: routeParams.id, ...routeParams }"
+          ></component>
         </keep-alive>
       </template>
     </main-card>
