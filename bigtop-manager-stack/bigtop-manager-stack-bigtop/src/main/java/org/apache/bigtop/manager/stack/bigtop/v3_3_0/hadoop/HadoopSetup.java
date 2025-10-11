@@ -256,7 +256,7 @@ public class HadoopSetup {
             }
         }
     }
-    
+
     private static boolean checkAllJournalNodesPortReachable(HadoopParams hadoopParams) throws InterruptedException {
         List<String> journalNodeList = LocalSettings.componentHosts("journalnode");
         String port = hadoopParams.getJournalHttpPort();
@@ -309,7 +309,7 @@ public class HadoopSetup {
         log.error("Failed to reach all JournalNodes after {} retries. JournalNode list: {}", maxRetry, journalNodeList);
         return false;
     }
-    
+
     public static boolean isNameNodeFormatted(HadoopParams hadoopParams) {
 
         boolean isFormatted = false;
