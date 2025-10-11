@@ -49,7 +49,7 @@
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
     "eslint-plugin-vue": "^9.17.0",
-    "happy-dom": "^18.0.1",
+    "happy-dom": "^20.0.0",
     "postcss": "^8.4.41",
     "prettier": "^3.0.2",
     "sass-embedded": "^1.90.0",
