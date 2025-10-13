@@ -19,11 +19,12 @@
 
 import { message, Modal } from 'ant-design-vue'
 import { useServiceStore } from '@/store/service'
-import SvgIcon from '@/components/base/svg-icon/index.vue'
 import { useStackStore, type ExpandServiceVO } from '@/store/stack'
 
 export function useValidations() {
   const { t } = useI18n()
+  const { confirmModal } = useModal()
+
   const serviceStore = useServiceStore()
   const stackStore = useStackStore()
 
@@ -32,17 +33,13 @@ export function useValidations() {
   /**
    * Validate services from infrastructure
    * @param targetService - The service being validated
-   * @param requireds - List of required services
+   * @param requires - List of required services
    * @param infraNames - List of available infrastructure services
    * @returns Whether there are missing services
    */
-  function validServiceFromInfra(
-    targetService: ExpandServiceVO,
-    requireds: string[] | undefined,
-    infraNames: string[]
-  ) {
+  function validServiceFromInfra(targetService: ExpandServiceVO, requires: string[] | undefined, infraNames: string[]) {
     const installedInfra = new Set(serviceStore.getInstalledNamesOrIdsOfServiceByKey('0', 'names'))
-    const missingServiceNames = (requireds ?? []).filter(
+    const missingServiceNames = (requires ?? []).filter(
       (name) => !installedInfra.has(name) && infraNames.includes(name)
     )
 
@@ -61,27 +58,21 @@ export function useValidations() {
    * Confirm dependency addition or removal
    * @param type - The action type ('add' or 'remove')
    * @param targetService - The target service
-   * @param requireds - The required service
+   * @param requires - The required service
    * @returns A promise resolving to the user's decision
    */
   function confirmDependencyAddition(
     type: 'add' | 'remove',
     targetService: ExpandServiceVO,
-    requireds: ExpandServiceVO
+    requires: ExpandServiceVO
   ) {
     const content = type === 'add' ? 'dependencies_add_msg' : 'dependencies_remove_msg'
 
     return new Promise((resolve) => {
-      Modal.confirm({
-        icon: null,
-        title: () =>
-          h('div', { style: { display: 'flex' } }, [
-            h(SvgIcon, { name: 'unknown', style: { width: '24px', height: '24px' } }),
-            h('p', t(`service.${content}`, [targetService.displayName, requireds.displayName]))
-          ]),
+      confirmModal({
+        tipText: t(`service.${content}`, [targetService.displayName, requires.displayName]),
         cancelText: t('common.no'),
         okText: t('common.yes'),
-        style: { top: '30vh' },
         onOk: () => resolve(true),
         onCancel: () => {
           Modal.destroyAll()
