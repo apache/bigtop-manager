@@ -38,21 +38,21 @@
   const route = useRoute()
   const jobProgressStore = useJobProgress()
   const clusterStore = useClusterStore()
+  const { activeTab } = useTabState(route.path, '1')
   const { loading, currCluster } = storeToRefs(clusterStore)
 
-  const { activeTab } = useTabState(route.path, '1')
-
+  const clusterId = ref(Number(route.params.id))
   const statusColors = shallowRef<Record<ClusterStatusType, keyof typeof CommonStatusTexts>>({
     1: 'healthy',
     2: 'unhealthy',
     3: 'unknown'
   })
 
+  const getCompName = computed(() => [Overview, Service, Host, User, Job][Number(activeTab.value) - 1])
+
   /**
    * Determines the component to render based on the active tab.
    */
-  const getCompName = computed(() => [Overview, Service, Host, User, Job][parseInt(activeTab.value) - 1])
-
   const tabs = computed((): TabItem[] => [
     { key: '1', title: t('common.overview') },
     { key: '2', title: t('common.service') },
@@ -89,12 +89,12 @@
       jobProgressStore.processCommand(
         {
           command: key as keyof typeof Command,
-          clusterId: currCluster.value.id,
+          clusterId: clusterId.value,
           commandLevel: 'cluster'
         },
         async () => {
           await clusterStore.loadClusters()
-          await clusterStore.getClusterDetail(currCluster.value.id!)
+          await getClusterInfo()
         },
         { displayName: currCluster.value.displayName }
       )
@@ -104,8 +104,16 @@
   }
 
   const addService: GroupItem['clickEvent'] = () => {
-    router.push({ name: 'CreateService', params: { id: currCluster.value.id, creationMode: 'internal' } })
+    router.push({ name: 'CreateService', params: { id: clusterId.value, creationMode: 'internal' } })
   }
+
+  const getClusterInfo = async () => {
+    await clusterStore.getClusterDetail(clusterId.value)
+  }
+
+  onMounted(async () => {
+    await getClusterInfo()
+  })
 </script>
 
 <template>
@@ -113,14 +121,14 @@
     <header-card
       :title="currCluster.displayName"
       avatar="cluster"
-      :status="CommonStatus[statusColors[currCluster.status as ClusterStatusType]]"
+      :status="CommonStatus[statusColors[currCluster.status!]]"
       :desc="currCluster.desc"
       :action-groups="actionGroup"
     />
     <main-card v-model:active-key="activeTab" :tabs="tabs">
       <template #tab-item>
-        <keep-alive :key="activeTab">
-          <component :is="getCompName" v-bind="currCluster" v-model:payload="currCluster"></component>
+        <keep-alive :key="clusterId">
+          <component :is="getCompName" :payload="currCluster" />
         </keep-alive>
       </template>
     </main-card>

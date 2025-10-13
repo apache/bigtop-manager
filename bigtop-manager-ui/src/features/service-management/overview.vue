@@ -29,8 +29,10 @@
   import type { ServiceVO, ServiceStatusType } from '@/api/service/types'
   import type { ServiceMetricItem, ServiceMetrics, ServiceMetricType, TimeRangeType } from '@/api/metrics/types'
 
+  type AttrsType = Partial<ServiceVO> & { componentPayload: { clusterId: number; serviceId: number } }
+
   const { t } = useI18n()
-  const attrs = useAttrs() as any
+  const attrs = useAttrs() as AttrsType
   const currTimeRange = ref<TimeRangeType>('5m')
   const chartData = ref<Partial<ServiceMetrics>>({})
 
@@ -50,7 +52,7 @@
     nps: 'N/s'
   }
 
-  const clusterId = computed(() => attrs.id)
+  const isInfra = computed(() => attrs.componentPayload.clusterId == 0)
   const noChartData = computed(() => Object.values(chartData.value).length === 0)
   const serviceKeys = computed(() => Object.keys(baseConfig.value) as (keyof ServiceVO)[])
   const baseConfig = computed(
@@ -68,12 +70,17 @@
   const handleTimeRange = (time: TimeRangeType) => {
     if (currTimeRange.value === time) return
     currTimeRange.value = time
+    pause()
     getServiceMetrics()
+    resume()
   }
 
   const getServiceMetrics = async () => {
     try {
-      const res = await getServiceMetricsInfo({ id: attrs.serviceId }, { interval: currTimeRange.value })
+      const res = await getServiceMetricsInfo(
+        { id: attrs.componentPayload.serviceId },
+        { interval: currTimeRange.value }
+      )
       chartData.value = { ...res }
     } catch (error) {
       console.log('Failed to fetch service metrics:', error)
@@ -92,13 +99,13 @@
   const { pause, resume } = useIntervalFn(getServiceMetrics, 30000, { immediate: true })
 
   onActivated(() => {
-    if (clusterId.value == 0) return
+    if (isInfra.value) return
     getServiceMetrics()
     resume()
   })
 
   onDeactivated(() => {
-    if (clusterId.value == 0) return
+    if (isInfra.value) return
     pause()
   })
 </script>
@@ -131,9 +138,9 @@
                         <a-tag
                           v-if="key === 'status'"
                           class="reset-tag"
-                          :color="CommonStatus[statusColors[attrs[key]]]"
+                          :color="CommonStatus[statusColors[attrs[key]!]]"
                         >
-                          <status-dot :color="CommonStatus[statusColors[attrs[key]]]" />
+                          <status-dot :color="CommonStatus[statusColors[attrs[key]!]]" />
                           {{ attrs[key] && t(`common.${statusColors[attrs[key]]}`) }}
                         </a-tag>
                         <a-typography-text

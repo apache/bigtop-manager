@@ -21,11 +21,11 @@
   import { getUserListOfService } from '@/api/cluster'
 
   import type { TableColumnType } from 'ant-design-vue'
-  import type { ClusterVO, ServiceUserVO } from '@/api/cluster/types'
+  import type { ServiceUserVO } from '@/api/cluster/types'
 
   const { t } = useI18n()
-  const attrs = useAttrs() as ClusterVO
-
+  const route = useRoute()
+  const clusterId = ref(Number(route.params.id))
   const columns = computed((): TableColumnType[] => [
     {
       title: '#',
@@ -66,12 +66,12 @@
   })
 
   const loadUserListOfService = async () => {
-    if (attrs.id == undefined || !paginationProps.value) {
+    if (clusterId.value == undefined || !paginationProps.value) {
       loading.value = false
       return
     }
     try {
-      const data = await getUserListOfService(attrs.id, filtersParams.value)
+      const data = await getUserListOfService(clusterId.value, filtersParams.value)
       dataSource.value = data.content
       paginationProps.value.total = data.total
     } catch (error) {

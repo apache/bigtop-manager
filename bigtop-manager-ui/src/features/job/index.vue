@@ -24,7 +24,6 @@
   import LogsView, { type LogViewProps } from '@/features/log-view/index.vue'
 
   import type { JobVO, StageVO, StateType, TaskListParams, TaskVO } from '@/api/job/types'
-  import type { ClusterVO } from '@/api/cluster/types'
   import type { ListParams } from '@/api/types'
 
   interface BreadcrumbItem {
@@ -34,15 +33,17 @@
   }
 
   const POLLING_INTERVAL = 3000
+
   const { t } = useI18n()
+  const route = useRoute()
   const { confirmModal } = useModal()
 
-  const clusterInfo = useAttrs() as ClusterVO
+  const clusterId = ref(Number(route.params.id ?? 0))
   const pollingIntervalId = ref<any>(null)
   const breadcrumbs = ref<BreadcrumbItem[]>([
     {
       name: computed(() => t('job.job_list')),
-      id: `clusterId-${clusterInfo.id}`,
+      id: `clusterId-${clusterId.value}`,
       pagination: {
         pageNum: 1,
         pageSize: 10,
@@ -51,19 +52,15 @@
     }
   ])
   const apiMap = ref([
-    {
-      key: 'clusterId',
-      api: getJobList
-    },
-    {
-      key: 'jobId',
-      api: getStageList
-    },
-    {
-      key: 'stageId',
-      api: getTaskList
-    }
+    { key: 'clusterId', api: getJobList },
+    { key: 'jobId', api: getStageList },
+    { key: 'stageId', api: getTaskList }
   ])
+
+  const logsViewState = reactive<LogViewProps>({
+    open: false
+  })
+
   const status = shallowRef<Record<StateType, string>>({
     Pending: 'installing',
     Processing: 'processing',
@@ -71,9 +68,7 @@
     Canceled: 'canceled',
     Successful: 'success'
   })
-  const logsViewState = reactive<LogViewProps>({
-    open: false
-  })
+
   const breadcrumbLen = computed(() => breadcrumbs.value.length)
   const currBreadcrumb = computed(() => breadcrumbs.value.at(-1))
   const columns = computed((): TableColumnType[] => [
@@ -232,7 +227,7 @@
       tipText: t('job.retry'),
       async onOk() {
         try {
-          const state = await retryJob({ jobId: row.id!, clusterId: clusterInfo.id! })
+          const state = await retryJob({ jobId: row.id!, clusterId: clusterId.value! })
           row.state = state.state
         } catch (error) {
           console.log('error :>> ', error)

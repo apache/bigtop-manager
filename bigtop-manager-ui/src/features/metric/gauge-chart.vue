@@ -90,12 +90,13 @@
     ]
   })
 
-  onMounted(() => {
-    const selector = document.getElementById(`${chartId.value}`)
-    if (selector) {
-      initChart(document.getElementById(`${chartId.value}`)!, option.value)
-    }
-  })
+  const renderChart = () => {
+    const el = document.getElementById(chartId.value)
+    if (el) initChart(el, option.value)
+  }
+
+  onMounted(renderChart)
+  onActivated(renderChart)
 
   watchEffect(() => {
     setOptions({ series: [{ data: [{ value: percent.value }] }] })

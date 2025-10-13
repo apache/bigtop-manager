@@ -44,21 +44,17 @@
 
   const activeKey = ref('1')
   const serviceDetail = shallowRef<ServiceVO>()
+  const stepPages = shallowRef([Overview, Components, Configs])
 
-  const routeParams = computed(() => route.params as unknown as RouteParams)
+  const componentPayload = computed(() => {
+    const { id: clusterId, serviceId } = route.params as unknown as RouteParams
+    return { clusterId, serviceId }
+  })
+
   const tabs = computed((): TabItem[] => [
-    {
-      key: '1',
-      title: t('common.overview')
-    },
-    {
-      key: '2',
-      title: t('common.component')
-    },
-    {
-      key: '3',
-      title: t('common.configs')
-    }
+    { key: '1', title: t('common.overview') },
+    { key: '2', title: t('common.component') },
+    { key: '3', title: t('common.configs') }
   ])
 
   const actionGroup = computed<GroupItem[]>(() => [
@@ -72,17 +68,14 @@
         { action: 'Stop', text: t('common.stop', [t('common.service')]) },
         { action: 'Remove', text: t('common.remove', [t('common.service')]), divider: true, danger: true }
       ],
-      dropdownMenuClickEvent: (info) => dropdownMenuClick && dropdownMenuClick(info)
+      dropdownMenuClickEvent: (info) => dropdownMenuClick!(info)
     }
   ])
 
-  const getCompName = computed(() => {
-    const components = [Overview, Components, Configs]
-    return components[parseInt(activeKey.value) - 1]
-  })
+  const getCompName = computed(() => stepPages.value[parseInt(activeKey.value) - 1])
 
   const dropdownMenuClick: GroupItem['dropdownMenuClickEvent'] = async ({ key }) => {
-    const { id: clusterId, serviceId } = routeParams.value
+    const { clusterId, serviceId } = componentPayload.value
     const service = serviceMap.value[clusterId].filter((service) => Number(serviceId) === service.id)[0]
 
     if (key === 'Remove') {
@@ -108,7 +101,7 @@
   const getServiceDetail = async () => {
     try {
       loading.value = true
-      const { id: clusterId, serviceId } = routeParams.value
+      const { clusterId, serviceId } = componentPayload.value
       serviceDetail.value = await serviceStore.getServiceDetail(clusterId, serviceId)
     } catch (error) {
       console.log('error :>> ', error)
@@ -135,10 +128,7 @@
     <main-card v-model:active-key="activeKey" :tabs="tabs">
       <template #tab-item>
         <keep-alive>
-          <component
-            :is="getCompName"
-            v-bind="{ ...serviceDetail, clusterId: routeParams.id, ...routeParams }"
-          ></component>
+          <component :is="getCompName" v-bind="{ ...serviceDetail, componentPayload }"></component>
         </keep-alive>
       </template>
     </main-card>

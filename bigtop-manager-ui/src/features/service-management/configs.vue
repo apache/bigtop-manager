@@ -28,10 +28,11 @@
   import type { Property, ServiceConfig, ServiceVO } from '@/api/service/types'
 
   type FormStateType = { configs: ServiceConfig[] }
+  type AttrsType = Partial<ServiceVO> & { componentPayload: { clusterId: number; serviceId: number } }
 
   const { t } = useI18n()
   const createStore = useCreateServiceStore()
-  const attrs = useAttrs() as unknown as Required<ServiceVO> & { clusterId: number }
+  const attrs = useAttrs() as AttrsType
 
   const getServiceDetail = inject('getServiceDetail') as () => any
 
@@ -62,6 +63,8 @@
       lg: { span: 17 }
     }
   })
+
+  const payload = computed(() => attrs.componentPayload)
 
   /**
    * Filters service configurations based on a search keyword.
@@ -133,7 +136,7 @@
       if (!valid) {
         return
       }
-      const { id, clusterId } = attrs
+      const { serviceId: id, clusterId } = payload.value
       loading.value = true
       const params = createStore.getDiffConfigs(configs.value, snapshotConfigs.value)
       const data = await updateServiceConfigs({ id, clusterId }, params)
@@ -162,18 +165,18 @@
   }
 
   const onCaptureSnapshot = () => {
-    const { id, clusterId } = attrs
+    const { serviceId: id, clusterId } = payload.value
     captureRef.value?.handleOpen({ id, clusterId })
   }
 
   const openSnapshotManagement = () => {
-    const { id, clusterId } = attrs
+    const { serviceId: id, clusterId } = payload.value
     snapshotRef.value?.handleOpen({ id, clusterId })
   }
 
   onActivated(async () => {
     await getServiceDetail()
-    configs.value = createStore.injectKeysToConfigs(attrs.configs)
+    configs.value = createStore.injectKeysToConfigs(attrs.configs ?? [])
     snapshotConfigs.value = JSON.parse(JSON.stringify(attrs.configs))
   })
 </script>

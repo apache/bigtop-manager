@@ -30,6 +30,8 @@
   import type { ServiceVO } from '@/api/service/types'
 
   type Key = string | number
+  type AttrsType = Partial<ServiceVO> & { componentPayload: { clusterId: number; serviceId: number } }
+
   interface TableState {
     selectedRowKeys: Key[]
     searchText: string
@@ -46,7 +48,7 @@
   const stackStore = useStackStore()
   const route = useRoute()
   const router = useRouter()
-  const attrs = useAttrs() as unknown as Required<ServiceVO> & { clusterId: number }
+  const attrs = useAttrs() as AttrsType
 
   const { stacks, stackRelationMap } = storeToRefs(stackStore)
   const searchInputRef = ref()
@@ -65,6 +67,8 @@
     selectedRowKeys: [],
     selectedRows: []
   })
+
+  const payload = computed(() => attrs.componentPayload)
 
   const componentsFromStack = computed(
     () =>
@@ -85,7 +89,7 @@
       key: 'name',
       ellipsis: true,
       filterMultiple: false,
-      filters: [...(componentsFromStack.value.get(attrs.name)?.values() || [])]?.map((v) => ({
+      filters: [...(componentsFromStack.value.get(attrs.name!)?.values() || [])]?.map((v) => ({
         text: v?.displayName || '',
         value: v?.name || ''
       }))
@@ -182,7 +186,7 @@
           text: t('common.stop', [t('common.selected')])
         }
       ],
-      dropdownMenuClickEvent: (info) => dropdownMenuClick && dropdownMenuClick(info)
+      dropdownMenuClickEvent: (info) => dropdownMenuClick!(info)
     }
   ])
 
@@ -236,7 +240,7 @@
   const execOperation = (rows?: ComponentVO[]) => {
     const displayNameOfRows: string[] = rows ? rows.map((v) => v.displayName ?? '').filter((v) => v) : []
     jobProgressStore.processCommand(
-      { ...commandRequest.value, clusterId: attrs.clusterId },
+      { ...commandRequest.value, clusterId: payload.value.clusterId },
       async () => {
         getComponentList(true, true)
         state.selectedRowKeys = []
@@ -251,7 +255,7 @@
       tipText: t('common.delete_msg'),
       async onOk() {
         try {
-          const data = await deleteComponent({ clusterId: attrs.clusterId, id: row.id! })
+          const data = await deleteComponent({ clusterId: payload.value.clusterId, id: row.id! })
           if (data) {
             message.success(t('common.delete_success'))
             getComponentList(true, true)
@@ -264,7 +268,7 @@
   }
 
   const getComponentList = async (isReset = false, isFirstCall = false) => {
-    const { clusterId, id: serviceId } = attrs
+    const { clusterId, serviceId } = payload.value
     if (!paginationProps.value) {
       loading.value = false
       return
@@ -308,8 +312,8 @@
   }
 
   const addComponent = () => {
-    const creationMode = Number(attrs.clusterId) === 0 ? 'public' : 'internal'
-    const routerName = Number(attrs.clusterId) === 0 ? 'CreateInfraComponent' : 'CreateComponent'
+    const creationMode = Number(payload.value.clusterId) === 0 ? 'public' : 'internal'
+    const routerName = Number(payload.value.clusterId) === 0 ? 'CreateInfraComponent' : 'CreateComponent'
     router.push({
       name: routerName,
       params: { ...route.params, creationMode, type: 'component' }

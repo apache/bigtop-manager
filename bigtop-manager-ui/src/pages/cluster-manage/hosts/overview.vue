@@ -113,11 +113,12 @@
   }
 
   const handleTimeRange = (time: TimeRangeType) => {
-    if (currTimeRange.value == time) {
-      return
+    if (currTimeRange.value !== time) {
+      currTimeRange.value = time
+      pause()
+      getHostMetrics()
+      resume()
     }
-    currTimeRange.value = time
-    getHostMetrics()
   }
 
   const getHostMetrics = async () => {
@@ -150,6 +151,7 @@
     () => hostInfo.value,
     (val) => {
       if (val.id) {
+        pause()
         getComponentInfo()
         getHostMetrics()
         resume()

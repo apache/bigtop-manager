@@ -28,15 +28,17 @@
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { FilterFormItem } from '@/components/common/form-filter/types'
   import type { Command, CommandRequest } from '@/api/command/types'
+  import type { ClusterVO } from '@/api/cluster/types'
 
   type GroupItemActionType = keyof typeof Command | 'More'
+
+  const props = defineProps<{ payload: ClusterVO }>()
 
   const { t } = useI18n()
   const router = useRouter()
   const jobProgressStore = useJobProgress()
   const serviceStore = useServiceStore()
   const { services, loading } = toRefs(serviceStore)
-  const clusterInfo = useAttrs() as { id: number; name: string }
 
   const filterValue = ref({})
   const statusColors = shallowRef<Record<ServiceStatusType, keyof typeof CommonStatusTexts>>({
@@ -44,6 +46,7 @@
     2: 'unhealthy',
     3: 'unknown'
   })
+  const clusterId = computed(() => props.payload.id)
   const filterFormItems = computed((): FilterFormItem[] => [
     { type: 'search', key: 'name', label: t('service.name') },
     {
@@ -108,29 +111,29 @@
   ])
 
   const infraAction = async (command: GroupItemActionType | 'Remove', service: ServiceVO) => {
-    const { id: clusterId } = clusterInfo
     if (!['More', 'Remove'].includes(command)) {
+      const { name: serviceName, displayName } = service
       const execCommandParams = {
-        command: command,
-        clusterId,
+        command,
+        clusterId: clusterId.value,
         commandLevel: 'service',
-        serviceCommands: [{ serviceName: service.name, installed: true }]
+        serviceCommands: [{ serviceName, installed: true }]
       } as CommandRequest
-      jobProgressStore.processCommand(execCommandParams, getServices, { displayName: service.displayName })
+      jobProgressStore.processCommand(execCommandParams, getServices, { displayName })
     } else {
-      serviceStore.removeService(service, clusterId, getServices)
+      serviceStore.removeService(service, clusterId.value!, getServices)
     }
   }
 
   const getServices = async () => {
-    await serviceStore.getServices(clusterInfo.id, filterValue.value)
+    await serviceStore.getServices(clusterId.value!, filterValue.value)
   }
 
   const viewServiceDetail = (payload: ServiceVO) => {
     router.push({
       name: 'InfraServiceDetail',
       params: {
-        id: clusterInfo.id,
+        id: clusterId.value,
         serviceId: payload.id
       }
     })

@@ -27,25 +27,25 @@
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { FilterFormItem } from '@/components/common/form-filter/types'
   import type { ServiceStatusType, ServiceVO } from '@/api/service/types'
-  import type { ClusterVO } from '@/api/cluster/types'
   import type { Command, CommandRequest } from '@/api/command/types'
 
   type GroupItemActionType = keyof typeof Command | 'More'
 
   const { t } = useI18n()
   const router = useRouter()
-  const attrs = useAttrs() as ClusterVO
+  const route = useRoute()
   const jobProgressStore = useJobProgress()
   const serviceStore = useServiceStore()
-  const { services, loading } = toRefs(serviceStore)
+
+  const { services, loading } = storeToRefs(serviceStore)
 
   const filterValue = ref({})
+  const clusterId = ref(Number(route.params.id))
   const statusColors = shallowRef<Record<ServiceStatusType, keyof typeof CommonStatusTexts>>({
     1: 'healthy',
     2: 'unhealthy',
     3: 'unknown'
   })
-
   const actionGroups = computed((): GroupItem<GroupItemActionType, ServiceVO>[] => [
     {
       action: 'Start',
@@ -118,19 +118,19 @@
     if (!['More', 'Remove'].includes(command)) {
       const execCommandParams = {
         command: command,
-        clusterId: attrs.id,
+        clusterId: clusterId.value,
         commandLevel: 'service',
         serviceCommands: [{ serviceName: service.name, installed: true }]
       } as CommandRequest
       jobProgressStore.processCommand(execCommandParams, getServices, { displayName: service.displayName })
     } else {
-      serviceStore.removeService(service, attrs.id!, getServices)
+      serviceStore.removeService(service, clusterId.value!, getServices)
     }
   }
 
   const getServices = () => {
-    if (attrs.id != undefined) {
-      serviceStore.getServices(attrs.id, filterValue.value)
+    if (clusterId.value != undefined) {
+      serviceStore.getServices(clusterId.value, filterValue.value)
     }
   }
 

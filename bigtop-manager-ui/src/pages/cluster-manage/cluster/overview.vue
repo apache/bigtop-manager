@@ -26,7 +26,6 @@
   import { useServiceStore } from '@/store/service'
   import { useJobProgress } from '@/store/job-progress'
   import { useStackStore } from '@/store/stack'
-  import { useClusterStore } from '@/store/cluster'
 
   import { Empty } from 'ant-design-vue'
   import { getClusterMetricsInfo } from '@/api/metrics'
@@ -34,29 +33,26 @@
   import type { ClusterStatusType, ClusterVO } from '@/api/cluster/types'
   import type { ServiceVO } from '@/api/service/types'
   import type { StackVO } from '@/api/stack/types'
-  import type { Command } from '@/api/command/types'
   import type { MetricsData, TimeRangeType } from '@/api/metrics/types'
+  import type { CommandRequest } from '@/api/command/types'
+
+  type StatusText = keyof typeof CommonStatusTexts
 
   const props = defineProps<{ payload: ClusterVO }>()
-  const emits = defineEmits<{ (event: 'update:payload', value: ClusterVO): void }>()
 
   const { t } = useI18n()
   const route = useRoute()
   const jobProgressStore = useJobProgress()
   const stackStore = useStackStore()
   const serviceStore = useServiceStore()
-  const clusterStore = useClusterStore()
 
   const currTimeRange = ref<TimeRangeType>('5m')
+  const clusterId = ref(Number(route.params.id))
   const chartData = ref<Partial<MetricsData>>({})
 
-  const timeRanges = shallowRef<TimeRangeType[]>(['1m', '5m', '15m', '30m', '1h', '2h'])
   const locateStackWithService = shallowRef<StackVO[]>([])
-  const statusColors = shallowRef<Record<ClusterStatusType, keyof typeof CommonStatusTexts>>({
-    1: 'healthy',
-    2: 'unhealthy',
-    3: 'unknown'
-  })
+  const timeRanges = shallowRef<TimeRangeType[]>(['1m', '5m', '15m', '30m', '1h', '2h'])
+  const statusColors = shallowRef<Record<ClusterStatusType, StatusText>>({ 1: 'healthy', 2: 'unhealthy', 3: 'unknown' })
 
   const { serviceNames } = storeToRefs(serviceStore)
   const { payload } = toRefs(props)
@@ -95,35 +91,39 @@
     Stop: t('common.stop', [t('common.service')])
   }))
 
-  const clusterId = computed(() => route.params.id as unknown as number)
   const noChartData = computed(() => Object.values(chartData.value).length === 0)
   const detailKeys = computed(() => Object.keys(baseConfig.value) as (keyof ClusterVO)[])
 
-  const handleServiceOperate = (item: any, service: ServiceVO) => {
-    jobProgressStore.processCommand(
-      {
-        command: item.key as keyof typeof Command,
-        clusterId: clusterId.value,
-        commandLevel: 'service',
-        serviceCommands: [{ serviceName: service.name!, installed: true }]
-      },
-      undefined,
-      {
-        displayName: service.displayName
-      }
+  watchEffect(() => {
+    locateStackWithService.value = stackStore.stacks.filter((item) =>
+      item.services.some((service) => service.name && serviceNames.value.includes(service.name))
     )
+  })
+
+  const handleServiceOperate = (item: any, service: ServiceVO) => {
+    const { name, displayName } = service
+    const { key: command } = item
+    const params = {
+      command,
+      clusterId: clusterId.value,
+      commandLevel: 'service',
+      serviceCommands: [{ serviceName: name!, installed: true }]
+    } as CommandRequest
+
+    jobProgressStore.processCommand(params, undefined, { displayName })
   }
 
   const handleTimeRange = (time: TimeRangeType) => {
-    if (currTimeRange.value !== time) {
-      currTimeRange.value = time
-      getClusterMetrics()
-    }
+    if (currTimeRange.value === time) return
+
+    currTimeRange.value = time
+    pause()
+    getClusterMetrics()
+    resume()
   }
 
-  const servicesFromCurrentCluster = (stack: StackVO) => {
-    return stack.services.filter((v) => serviceNames.value.includes(v.name))
-  }
+  const servicesFromCurrentCluster = (stack: StackVO) =>
+    stack.services.filter((v) => serviceNames.value.includes(v.name))
 
   const getClusterMetrics = async () => {
     try {
@@ -133,22 +133,15 @@
     }
   }
 
-  const { pause, resume } = useIntervalFn(getClusterMetrics, 30000, { immediate: true })
+  const { pause, resume } = useIntervalFn(getClusterMetrics, 5000, { immediate: false })
 
   onActivated(async () => {
-    await clusterStore.getClusterDetail(clusterId.value)
-    emits('update:payload', clusterStore.currCluster)
-    getClusterMetrics()
+    pause()
+    await getClusterMetrics()
     resume()
   })
 
-  onDeactivated(pause)
-
-  watchEffect(() => {
-    locateStackWithService.value = stackStore.stacks.filter((item) =>
-      item.services.some((service) => service.name && serviceNames.value.includes(service.name))
-    )
-  })
+  onDeactivated(() => pause())
 </script>
 
 <template>

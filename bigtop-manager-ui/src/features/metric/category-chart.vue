@@ -155,12 +155,13 @@
     }))
   }
 
-  onMounted(() => {
-    const selector = document.getElementById(`${chartId.value}`)
-    if (selector) {
-      initChart(selector!, option.value)
-    }
-  })
+  const renderChart = () => {
+    const el = document.getElementById(chartId.value)
+    if (el) initChart(el, option.value)
+  }
+
+  onMounted(renderChart)
+  onActivated(renderChart)
 
   watchEffect(() => {
     let series = [] as any,
