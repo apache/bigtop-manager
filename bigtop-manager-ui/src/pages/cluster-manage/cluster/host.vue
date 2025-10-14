@@ -21,6 +21,7 @@
   import { message, TableColumnType, TableProps } from 'ant-design-vue'
   import { getHosts } from '@/api/host'
   import * as hostApi from '@/api/host'
+  import { HOST_STATUS } from '@/utils/constant'
 
   import HostCreate from '@/features/create-host/index.vue'
   import InstallDependencies from '@/features/create-host/install-dependencies.vue'
@@ -28,7 +29,6 @@
   import type { FilterConfirmProps, FilterResetProps } from 'ant-design-vue/es/table/interface'
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { HostVO } from '@/api/host/types'
-  import type { ClusterVO } from '@/api/cluster/types'
   import type { HostReq } from '@/api/command/types'
 
   type Key = string | number
@@ -40,15 +40,14 @@
   }
 
   const { t } = useI18n()
+  const router = useRouter()
+  const route = useRoute()
   const { confirmModal } = useModal()
 
-  const router = useRouter()
-  const attrs = useAttrs() as ClusterVO
-
   const searchInputRef = ref()
+  const clusterId = ref(Number(route.params.id))
   const hostCreateRef = ref<InstanceType<typeof HostCreate> | null>(null)
   const installRef = ref<InstanceType<typeof InstallDependencies> | null>(null)
-  const hostStatus = ref(['INSTALLING', 'SUCCESS', 'FAILED', 'UNKNOWN'])
 
   const state = reactive<TableState>({
     searchText: '',
@@ -143,7 +142,7 @@
   }
 
   const handleEdit = (row: HostVO) => {
-    const formatHost = { ...row, displayName: row.clusterDisplayName, clusterId: attrs?.id }
+    const formatHost = { ...row, displayName: row.clusterDisplayName, clusterId: clusterId.value }
     hostCreateRef.value?.handleOpen('EDIT', formatHost)
   }
 
@@ -174,11 +173,11 @@
 
   const viewHostDetail = (row: HostVO) => {
     const { id: hostId } = row
-    router.push({ name: 'HostDetail', query: { hostId, clusterId: attrs.id } })
+    router.push({ name: 'HostDetail', query: { hostId, clusterId: clusterId.value } })
   }
 
   const addHost = () => {
-    hostCreateRef.value?.handleOpen('ADD', { clusterId: attrs.id })
+    hostCreateRef.value?.handleOpen('ADD', { clusterId: clusterId.value })
   }
 
   const afterSetupHostConfig = async (type: 'ADD' | 'EDIT', item: HostReq) => {
@@ -191,7 +190,7 @@
 
   const getHostList = async (isReset = false) => {
     loading.value = true
-    if (attrs.id == undefined || !paginationProps.value) {
+    if (clusterId.value == undefined || !paginationProps.value) {
       loading.value = false
       return
     }
@@ -199,7 +198,7 @@
       paginationProps.value.current = 1
     }
     try {
-      const res = await getHosts({ ...filtersParams.value, clusterId: attrs.id })
+      const res = await getHosts({ ...filtersParams.value, clusterId: clusterId.value })
       dataSource.value = res.content
       paginationProps.value.total = res.total
       loading.value = false
@@ -265,8 +264,8 @@
           <a-typography-link underline @click="viewHostDetail(record)"> {{ record.hostname }} </a-typography-link>
         </template>
         <template v-if="column.key === 'status'">
-          <svg-icon style="margin-left: 0" :name="hostStatus[record.status].toLowerCase()" />
-          <span>{{ t(`common.${hostStatus[record.status].toLowerCase()}`) }}</span>
+          <svg-icon style="margin-left: 0" :name="HOST_STATUS[record.status].toLowerCase()" />
+          <span>{{ t(`common.${HOST_STATUS[record.status].toLowerCase()}`) }}</span>
         </template>
         <template v-if="column.key === 'operation'">
           <button-group

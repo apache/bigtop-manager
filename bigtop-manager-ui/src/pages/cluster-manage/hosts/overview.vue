@@ -21,10 +21,13 @@
   import { Empty } from 'ant-design-vue'
   import { formatFromByte } from '@/utils/storage.ts'
   import { usePngImage, isEmpty } from '@/utils/tools'
-  import { CommonStatus, CommonStatusTexts } from '@/enums/state.ts'
+  import { TIME_RANGES, STATUS_COLOR, POLLING_INTERVAL } from '@/utils/constant'
+  import { CommonStatus } from '@/enums/state.ts'
+
   import { useServiceStore } from '@/store/service'
   import { useJobProgress } from '@/store/job-progress'
   import { useStackStore } from '@/store/stack'
+
   import { getComponentsByHost } from '@/api/host'
   import { Command } from '@/api/command/types'
   import { getHostMetricsInfo } from '@/api/metrics'
@@ -32,12 +35,10 @@
   import GaugeChart from '@/features/metric/gauge-chart.vue'
   import CategoryChart from '@/features/metric/category-chart.vue'
 
-  import type { HostStatusType, HostVO } from '@/api/host/types'
+  import type { HostVO } from '@/api/host/types'
   import type { ClusterStatusType } from '@/api/cluster/types.ts'
   import type { ComponentVO } from '@/api/component/types.ts'
   import type { MetricsData, TimeRangeType } from '@/api/metrics/types'
-
-  type StatusColorType = Record<HostStatusType, keyof typeof CommonStatusTexts>
 
   interface Props {
     hostInfo: HostVO
@@ -50,13 +51,12 @@
   const serviceStore = useServiceStore()
   const jobProgressStore = useJobProgress()
 
+  const isRunning = ref(false)
   const currTimeRange = ref<TimeRangeType>('5m')
   const chartData = ref<Partial<MetricsData>>({})
 
   const componentsFromCurrentHost = shallowRef<Map<string, ComponentVO[]>>(new Map())
   const needFormatFormByte = shallowRef(['totalMemorySize', 'totalDisk'])
-  const timeRanges = shallowRef<TimeRangeType[]>(['1m', '5m', '15m', '30m', '1h', '2h'])
-  const statusColors = shallowRef<StatusColorType>({ 1: 'healthy', 2: 'unhealthy', 3: 'unknown' })
 
   const { hostInfo } = toRefs(props)
 
@@ -113,18 +113,27 @@
   }
 
   const handleTimeRange = (time: TimeRangeType) => {
-    if (currTimeRange.value == time) {
-      return
+    if (currTimeRange.value !== time) {
+      currTimeRange.value = time
+      pause()
+      getHostMetrics()
+      resume()
     }
-    currTimeRange.value = time
-    getHostMetrics()
   }
 
   const getHostMetrics = async () => {
+    if (isRunning.value) {
+      return
+    }
+
+    isRunning.value = true
+
     try {
       chartData.value = await getHostMetricsInfo({ id: hostInfo.value.id! }, { interval: currTimeRange.value })
     } catch (error) {
       console.log('Failed to fetch host metrics:', error)
+    } finally {
+      isRunning.value = false
     }
   }
 
@@ -144,12 +153,13 @@
     }
   }
 
-  const { pause, resume } = useIntervalFn(getHostMetrics, 30000, { immediate: true })
+  const { pause, resume } = useIntervalFn(getHostMetrics, POLLING_INTERVAL, { immediate: true })
 
   watch(
     () => hostInfo.value,
-    (val) => {
+    async (val) => {
       if (val.id) {
+        pause()
         getComponentInfo()
         getHostMetrics()
         resume()
@@ -192,10 +202,10 @@
                         <a-tag
                           v-if="base === 'status'"
                           class="reset-tag"
-                          :color="CommonStatus[statusColors[hostInfo[base] as ClusterStatusType]]"
+                          :color="CommonStatus[STATUS_COLOR[hostInfo[base] as ClusterStatusType]]"
                         >
-                          <status-dot :color="CommonStatus[statusColors[hostInfo[base] as ClusterStatusType]]" />
-                          {{ hostInfo[base] && t(`common.${statusColors[hostInfo[base] as ClusterStatusType]}`) }}
+                          <status-dot :color="CommonStatus[STATUS_COLOR[hostInfo[base] as ClusterStatusType]]" />
+                          {{ hostInfo[base] && t(`common.${STATUS_COLOR[hostInfo[base] as ClusterStatusType]}`) }}
                         </a-tag>
                         <a-typography-text v-else class="desc-sub-item-desc-column">
                           <span v-if="Object.keys(unitOfBaseConfig).includes(base as string)">
@@ -268,7 +278,7 @@
           <a-typography-text strong :content="t('overview.chart')" />
           <a-space :size="12">
             <div
-              v-for="time in timeRanges"
+              v-for="time in TIME_RANGES"
               :key="time"
               tabindex="0"
               class="time-range"

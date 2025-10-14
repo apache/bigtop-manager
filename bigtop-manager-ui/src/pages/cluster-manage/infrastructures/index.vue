@@ -59,7 +59,7 @@
     <main-card v-model:active-key="activeTab" :tabs="tabs">
       <template #tab-item>
         <keep-alive>
-          <component :is="getCompName" :key="activeTab" v-bind="currCluster"></component>
+          <component :is="getCompName" :key="activeTab" :payload="currCluster"></component>
         </keep-alive>
       </template>
     </main-card>

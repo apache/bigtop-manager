@@ -155,25 +155,26 @@
     }))
   }
 
-  onMounted(() => {
-    const selector = document.getElementById(`${chartId.value}`)
-    if (selector) {
-      initChart(selector!, option.value)
-    }
-  })
+  const renderChart = () => {
+    const el = document.getElementById(chartId.value)
+    if (el) initChart(el, option.value)
+  }
+
+  onMounted(renderChart)
+  onActivated(renderChart)
 
   watchEffect(() => {
     let series = [] as any,
       legend = { data: [] } as any
 
-    const { series: temp_series = [] } = data.value
+    const { series: temp_series = [], valueType } = data.value
     const xAxis = xAxisData.value?.map((v) => dayjs(Number(v) * 1000).format('HH:mm')) ?? []
 
     if (legendMap.value) {
       legend = new Map(legendMap.value).values()
       series = generateChartSeries(data.value, legendMap.value)
     } else {
-      if (temp_series.length > 1) {
+      if (valueType) {
         legend.data = temp_series.map((s) => s.name)
         series = [...temp_series]
       } else {

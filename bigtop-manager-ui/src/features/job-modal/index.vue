@@ -20,6 +20,7 @@
 <script setup lang="ts">
   import { TableColumnType, TableProps } from 'ant-design-vue'
   import LogsView, { type LogViewProps } from '@/features/log-view/index.vue'
+  import { JOB_STATUS } from '@/utils/constant'
 
   import type { JobVO, StageVO, StateType, TaskListParams, TaskVO } from '@/api/job/types'
   import type { CommandRes, JobStageProgressItem } from '@/store/job-progress'
@@ -43,13 +44,6 @@
 
   const { t } = useI18n()
   const breadcrumbs = ref<BreadcrumbItem[]>([])
-  const status = shallowRef<Record<StateType, string>>({
-    Pending: 'installing',
-    Processing: 'processing',
-    Failed: 'failed',
-    Canceled: 'canceled',
-    Successful: 'success'
-  })
   const apiMap = shallowRef([{ key: 'jobId' }, { key: 'stageId' }])
 
   const logsViewState = reactive<LogViewProps>({ open: false })
@@ -212,7 +206,7 @@
         </template>
         <template v-if="column.key === 'state'">
           <job-progress v-if="breadcrumbLen === 1" :key="record.id" :state="text" :progress-data="record.progress" />
-          <svg-icon v-else :name="status[record.state as StateType]"></svg-icon>
+          <svg-icon v-else :name="JOB_STATUS[record.state as StateType]"></svg-icon>
         </template>
       </template>
     </a-table>

@@ -29,9 +29,15 @@
 
   type FormStateType = { configs: ServiceConfig[] }
 
+  interface RouteParams {
+    id: number
+    serviceId: number
+  }
+
   const { t } = useI18n()
   const createStore = useCreateServiceStore()
-  const attrs = useAttrs() as unknown as Required<ServiceVO> & { clusterId: number }
+  const attrs = useAttrs() as Partial<ServiceVO>
+  const route = useRoute()
 
   const getServiceDetail = inject('getServiceDetail') as () => any
 
@@ -61,6 +67,11 @@
       md: { span: 15 },
       lg: { span: 17 }
     }
+  })
+
+  const payload = computed(() => {
+    const { id: clusterId, serviceId: id } = route.params as unknown as RouteParams
+    return { clusterId, id }
   })
 
   /**
@@ -130,13 +141,11 @@
   const saveConfigs = async () => {
     try {
       const valid = await validate()
-      if (!valid) {
-        return
-      }
-      const { id, clusterId } = attrs
+      if (!valid) return
+
       loading.value = true
       const params = createStore.getDiffConfigs(configs.value, snapshotConfigs.value)
-      const data = await updateServiceConfigs({ id, clusterId }, params)
+      const data = await updateServiceConfigs({ ...payload.value }, params)
       if (data) {
         message.success(t('common.update_success'))
         getServiceDetail()
@@ -162,18 +171,16 @@
   }
 
   const onCaptureSnapshot = () => {
-    const { id, clusterId } = attrs
-    captureRef.value?.handleOpen({ id, clusterId })
+    captureRef.value?.handleOpen({ ...payload.value })
   }
 
   const openSnapshotManagement = () => {
-    const { id, clusterId } = attrs
-    snapshotRef.value?.handleOpen({ id, clusterId })
+    snapshotRef.value?.handleOpen({ ...payload.value })
   }
 
   onActivated(async () => {
     await getServiceDetail()
-    configs.value = createStore.injectKeysToConfigs(attrs.configs)
+    configs.value = createStore.injectKeysToConfigs(attrs.configs ?? [])
     snapshotConfigs.value = JSON.parse(JSON.stringify(attrs.configs))
   })
 </script>

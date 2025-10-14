@@ -22,6 +22,7 @@
 
   import { useClusterStore } from '@/store/cluster'
   import * as hostApi from '@/api/host'
+  import { HOST_STATUS, POLLING_INTERVAL } from '@/utils/constant'
 
   import useBaseTable from '@/composables/use-base-table'
   import HostCreate from '@/features/create-host/index.vue'
@@ -32,7 +33,6 @@
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { HostVO } from '@/api/host/types'
 
-  const POLLING_INTERVAL = 30000
   type Key = string | number
 
   interface TableState {
@@ -42,20 +42,20 @@
   }
 
   const { t } = useI18n()
-  const { confirmModal } = useModal()
-
   const router = useRouter()
   const clusterStore = useClusterStore()
+  const { confirmModal } = useModal()
+
   const searchInputRef = ref()
   const pollingIntervalId = ref<any>(null)
   const hostCreateRef = ref<InstanceType<typeof HostCreate> | null>(null)
   const installRef = ref<InstanceType<typeof InstallDependencies> | null>(null)
-  const hostStatus = shallowRef(['INSTALLING', 'SUCCESS', 'FAILED', 'UNKNOWN'])
   const state = reactive<TableState>({
     searchText: '',
     searchedColumn: '',
     selectedRowKeys: []
   })
+
   const filtersOfClusterDisplayName = computed(() =>
     Object.values(clusterStore.clusterMap).map((v) => ({
       text: v.displayName || v.name,
@@ -329,8 +329,8 @@
           </span>
         </template>
         <template v-if="column.key === 'status'">
-          <svg-icon style="margin-left: 0" :name="hostStatus[record.status].toLowerCase()" />
-          <span>{{ t(`common.${hostStatus[record.status].toLowerCase()}`) }}</span>
+          <svg-icon style="margin-left: 0" :name="HOST_STATUS[record.status].toLowerCase()" />
+          <span>{{ t(`common.${HOST_STATUS[record.status].toLowerCase()}`) }}</span>
         </template>
         <template v-if="column.key === 'operation'">
           <button-group

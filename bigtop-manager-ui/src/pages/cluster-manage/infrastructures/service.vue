@@ -18,32 +18,33 @@
 -->
 
 <script setup lang="ts">
-  import { usePngImage } from '@/utils/tools'
-  import { CommonStatus, CommonStatusTexts } from '@/enums/state'
+  import { Empty } from 'ant-design-vue'
   import { useServiceStore } from '@/store/service'
   import { useJobProgress } from '@/store/job-progress'
-  import { Empty } from 'ant-design-vue'
 
-  import type { ServiceStatusType, ServiceVO } from '@/api/service/types'
+  import { CommonStatus } from '@/enums/state'
+  import { usePngImage } from '@/utils/tools'
+  import { STATUS_COLOR } from '@/utils/constant'
+
+  import type { ServiceVO } from '@/api/service/types'
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { FilterFormItem } from '@/components/common/form-filter/types'
   import type { Command, CommandRequest } from '@/api/command/types'
+  import type { ClusterVO } from '@/api/cluster/types'
 
   type GroupItemActionType = keyof typeof Command | 'More'
+
+  const props = defineProps<{ payload: ClusterVO }>()
 
   const { t } = useI18n()
   const router = useRouter()
   const jobProgressStore = useJobProgress()
   const serviceStore = useServiceStore()
   const { services, loading } = toRefs(serviceStore)
-  const clusterInfo = useAttrs() as { id: number; name: string }
 
   const filterValue = ref({})
-  const statusColors = shallowRef<Record<ServiceStatusType, keyof typeof CommonStatusTexts>>({
-    1: 'healthy',
-    2: 'unhealthy',
-    3: 'unknown'
-  })
+
+  const clusterId = computed(() => props.payload.id)
   const filterFormItems = computed((): FilterFormItem[] => [
     { type: 'search', key: 'name', label: t('service.name') },
     {
@@ -60,9 +61,9 @@
       key: 'status',
       label: t('common.status'),
       options: [
-        { label: t(`common.${statusColors.value[1]}`), value: 1 },
-        { label: t(`common.${statusColors.value[2]}`), value: 2 },
-        { label: t(`common.${statusColors.value[3]}`), value: 3 }
+        { label: t(`common.${STATUS_COLOR[1]}`), value: 1 },
+        { label: t(`common.${STATUS_COLOR[2]}`), value: 2 },
+        { label: t(`common.${STATUS_COLOR[3]}`), value: 3 }
       ]
     }
   ])
@@ -108,29 +109,29 @@
   ])
 
   const infraAction = async (command: GroupItemActionType | 'Remove', service: ServiceVO) => {
-    const { id: clusterId } = clusterInfo
     if (!['More', 'Remove'].includes(command)) {
+      const { name: serviceName, displayName } = service
       const execCommandParams = {
-        command: command,
-        clusterId,
+        command,
+        clusterId: clusterId.value,
         commandLevel: 'service',
-        serviceCommands: [{ serviceName: service.name, installed: true }]
+        serviceCommands: [{ serviceName, installed: true }]
       } as CommandRequest
-      jobProgressStore.processCommand(execCommandParams, getServices, { displayName: service.displayName })
+      jobProgressStore.processCommand(execCommandParams, getServices, { displayName })
     } else {
-      serviceStore.removeService(service, clusterId, getServices)
+      serviceStore.removeService(service, clusterId.value!, getServices)
     }
   }
 
   const getServices = async () => {
-    await serviceStore.getServices(clusterInfo.id, filterValue.value)
+    await serviceStore.getServices(clusterId.value!, filterValue.value)
   }
 
   const viewServiceDetail = (payload: ServiceVO) => {
     router.push({
       name: 'InfraServiceDetail',
       params: {
-        id: clusterInfo.id,
+        id: clusterId.value,
         serviceId: payload.id
       }
     })
@@ -162,10 +163,10 @@
                 <span class="small-gray">{{ item.version }}</span>
               </div>
               <div class="header-base-status">
-                <a-tag :color="CommonStatus[statusColors[item.status]]">
+                <a-tag :color="CommonStatus[STATUS_COLOR[item.status]]">
                   <div class="header-base-status-inner">
-                    <status-dot :color="CommonStatus[statusColors[item.status]]" />
-                    <span class="small">{{ t(`common.${statusColors[item.status]}`) }}</span>
+                    <status-dot :color="CommonStatus[STATUS_COLOR[item.status]]" />
+                    <span class="small">{{ t(`common.${STATUS_COLOR[item.status]}`) }}</span>
                   </div>
                 </a-tag>
               </div>

@@ -20,13 +20,13 @@
 <script setup lang="ts">
   import { formatFromByte } from '@/utils/storage'
   import { usePngImage } from '@/utils/tools'
-
-  import { CommonStatus, CommonStatusTexts } from '@/enums/state'
+  import { CommonStatus } from '@/enums/state'
+  import { TIME_RANGES, STATUS_COLOR, POLLING_INTERVAL } from '@/utils/constant'
 
   import { useServiceStore } from '@/store/service'
   import { useJobProgress } from '@/store/job-progress'
   import { useStackStore } from '@/store/stack'
-  import { useClusterStore } from '@/store/cluster'
+  import { useTabStore } from '@/store/tab-state'
 
   import { Empty } from 'ant-design-vue'
   import { getClusterMetricsInfo } from '@/api/metrics'
@@ -34,31 +34,26 @@
   import type { ClusterStatusType, ClusterVO } from '@/api/cluster/types'
   import type { ServiceVO } from '@/api/service/types'
   import type { StackVO } from '@/api/stack/types'
-  import type { Command } from '@/api/command/types'
   import type { MetricsData, TimeRangeType } from '@/api/metrics/types'
+  import type { CommandRequest } from '@/api/command/types'
 
   const props = defineProps<{ payload: ClusterVO }>()
-  const emits = defineEmits<{ (event: 'update:payload', value: ClusterVO): void }>()
 
   const { t } = useI18n()
   const route = useRoute()
+  const tabStore = useTabStore()
   const jobProgressStore = useJobProgress()
   const stackStore = useStackStore()
   const serviceStore = useServiceStore()
-  const clusterStore = useClusterStore()
 
+  const isRunning = ref(false)
   const currTimeRange = ref<TimeRangeType>('5m')
+  const clusterId = ref(Number(route.params.id))
   const chartData = ref<Partial<MetricsData>>({})
 
-  const timeRanges = shallowRef<TimeRangeType[]>(['1m', '5m', '15m', '30m', '1h', '2h'])
   const locateStackWithService = shallowRef<StackVO[]>([])
-  const statusColors = shallowRef<Record<ClusterStatusType, keyof typeof CommonStatusTexts>>({
-    1: 'healthy',
-    2: 'unhealthy',
-    3: 'unknown'
-  })
-
   const { serviceNames } = storeToRefs(serviceStore)
+
   const { payload } = toRefs(props)
 
   const clusterDetail = computed(() => ({
@@ -95,59 +90,66 @@
     Stop: t('common.stop', [t('common.service')])
   }))
 
-  const clusterId = computed(() => route.params.id as unknown as number)
   const noChartData = computed(() => Object.values(chartData.value).length === 0)
   const detailKeys = computed(() => Object.keys(baseConfig.value) as (keyof ClusterVO)[])
-
-  const handleServiceOperate = (item: any, service: ServiceVO) => {
-    jobProgressStore.processCommand(
-      {
-        command: item.key as keyof typeof Command,
-        clusterId: clusterId.value,
-        commandLevel: 'service',
-        serviceCommands: [{ serviceName: service.name!, installed: true }]
-      },
-      undefined,
-      {
-        displayName: service.displayName
-      }
-    )
-  }
-
-  const handleTimeRange = (time: TimeRangeType) => {
-    if (currTimeRange.value !== time) {
-      currTimeRange.value = time
-      getClusterMetrics()
-    }
-  }
-
-  const servicesFromCurrentCluster = (stack: StackVO) => {
-    return stack.services.filter((v) => serviceNames.value.includes(v.name))
-  }
-
-  const getClusterMetrics = async () => {
-    try {
-      chartData.value = await getClusterMetricsInfo({ id: clusterId.value }, { interval: currTimeRange.value })
-    } catch (error) {
-      console.log('Failed to fetch cluster metrics:', error)
-    }
-  }
-
-  const { pause, resume } = useIntervalFn(getClusterMetrics, 30000, { immediate: true })
-
-  onActivated(async () => {
-    await clusterStore.getClusterDetail(clusterId.value)
-    emits('update:payload', clusterStore.currCluster)
-    getClusterMetrics()
-    resume()
-  })
-
-  onDeactivated(pause)
 
   watchEffect(() => {
     locateStackWithService.value = stackStore.stacks.filter((item) =>
       item.services.some((service) => service.name && serviceNames.value.includes(service.name))
     )
+  })
+
+  const handleServiceOperate = (item: any, service: ServiceVO) => {
+    const { name, displayName } = service
+    const { key: command } = item
+    const params = {
+      command,
+      clusterId: clusterId.value,
+      commandLevel: 'service',
+      serviceCommands: [{ serviceName: name!, installed: true }]
+    } as CommandRequest
+
+    jobProgressStore.processCommand(params, undefined, { displayName })
+  }
+
+  const handleTimeRange = (time: TimeRangeType) => {
+    if (currTimeRange.value === time) return
+    currTimeRange.value = time
+    getClusterMetrics()
+    pause()
+    resume()
+  }
+
+  const servicesFromCurrentCluster = (stack: StackVO) =>
+    stack.services.filter((v) => serviceNames.value.includes(v.name))
+
+  const getClusterMetrics = async () => {
+    if (isRunning.value) {
+      return
+    }
+
+    isRunning.value = true
+
+    try {
+      chartData.value = await getClusterMetricsInfo({ id: clusterId.value }, { interval: currTimeRange.value })
+    } catch (error) {
+      console.log('Failed to fetch cluster metrics:', error)
+    } finally {
+      isRunning.value = false
+    }
+  }
+
+  const { pause, resume } = useIntervalFn(getClusterMetrics, POLLING_INTERVAL, { immediate: true })
+
+  onActivated(() => {
+    const currTab = tabStore.getActiveTab(route.path) ?? '1'
+    if (currTab != '1') return
+    getClusterMetrics()
+    resume()
+  })
+
+  onDeactivated(() => {
+    pause()
   })
 </script>
 
@@ -179,11 +181,11 @@
                         <a-tag
                           v-if="base === 'status'"
                           class="reset-tag"
-                          :color="CommonStatus[statusColors[clusterDetail[base] as ClusterStatusType]]"
+                          :color="CommonStatus[STATUS_COLOR[clusterDetail[base] as ClusterStatusType]]"
                         >
-                          <status-dot :color="CommonStatus[statusColors[clusterDetail[base] as ClusterStatusType]]" />
+                          <status-dot :color="CommonStatus[STATUS_COLOR[clusterDetail[base] as ClusterStatusType]]" />
                           {{
-                            clusterDetail[base] && t(`common.${statusColors[clusterDetail[base] as ClusterStatusType]}`)
+                            clusterDetail[base] && t(`common.${STATUS_COLOR[clusterDetail[base] as ClusterStatusType]}`)
                           }}
                         </a-tag>
                         <a-typography-text
@@ -252,7 +254,7 @@
           <a-typography-text strong :content="t('overview.chart')" />
           <a-space :size="12">
             <div
-              v-for="time in timeRanges"
+              v-for="time in TIME_RANGES"
               :key="time"
               tabindex="0"
               class="time-range"

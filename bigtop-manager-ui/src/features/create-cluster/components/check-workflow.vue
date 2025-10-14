@@ -20,6 +20,7 @@
 <script setup lang="ts">
   import { Empty } from 'ant-design-vue'
   import { getJobDetails, retryJob } from '@/api/job'
+  import { JOB_STATUS } from '@/utils/constant'
 
   import LogsView, { type LogViewProps } from '@/features/log-view/index.vue'
 
@@ -37,14 +38,6 @@
   const spinning = ref(false)
   const logsViewState = reactive<LogViewProps>({
     open: false
-  })
-
-  const status = shallowRef<Record<StateType, string>>({
-    Pending: 'installing',
-    Processing: 'processing',
-    Failed: 'failed',
-    Canceled: 'canceled',
-    Successful: 'success'
   })
 
   const stages = computed(() => {
@@ -144,14 +137,14 @@
             <div class="stage-item">
               <span>{{ stage.name }}</span>
               <div style="min-width: 100px">
-                <svg-icon :name="stage.state && status[stage.state]"></svg-icon>
+                <svg-icon :name="stage.state && JOB_STATUS[stage.state]"></svg-icon>
               </div>
             </div>
           </template>
           <div v-for="task in stage.tasks" :key="task.id" class="task-item">
             <span>{{ task.name }}</span>
             <a-space :size="16">
-              <svg-icon :name="task.state && status[task.state]"></svg-icon>
+              <svg-icon :name="task.state && JOB_STATUS[task.state]"></svg-icon>
               <div style="min-width: 62px">
                 <a-button
                   v-if="task.state && !['Canceled', 'Pending'].includes(task.state)"
