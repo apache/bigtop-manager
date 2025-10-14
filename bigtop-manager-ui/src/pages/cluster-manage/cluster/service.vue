@@ -20,13 +20,15 @@
 <script setup lang="ts">
   import { Empty } from 'ant-design-vue'
   import { useServiceStore } from '@/store/service'
-  import { CommonStatus, CommonStatusTexts } from '@/enums/state'
+  import { CommonStatus } from '@/enums/state'
   import { useJobProgress } from '@/store/job-progress'
+  import { useTabStore } from '@/store/tab-state'
   import { usePngImage } from '@/utils/tools'
+  import { STATUS_COLOR } from '@/utils/constant'
 
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { FilterFormItem } from '@/components/common/form-filter/types'
-  import type { ServiceStatusType, ServiceVO } from '@/api/service/types'
+  import type { ServiceVO } from '@/api/service/types'
   import type { Command, CommandRequest } from '@/api/command/types'
 
   type GroupItemActionType = keyof typeof Command | 'More'
@@ -34,6 +36,7 @@
   const { t } = useI18n()
   const router = useRouter()
   const route = useRoute()
+  const tabStore = useTabStore()
   const jobProgressStore = useJobProgress()
   const serviceStore = useServiceStore()
 
@@ -41,11 +44,7 @@
 
   const filterValue = ref({})
   const clusterId = ref(Number(route.params.id))
-  const statusColors = shallowRef<Record<ServiceStatusType, keyof typeof CommonStatusTexts>>({
-    1: 'healthy',
-    2: 'unhealthy',
-    3: 'unknown'
-  })
+
   const actionGroups = computed((): GroupItem<GroupItemActionType, ServiceVO>[] => [
     {
       action: 'Start',
@@ -142,6 +141,8 @@
   }
 
   onActivated(() => {
+    const currTab = tabStore.getActiveTab(route.path ?? '2')
+    if (currTab != '2') return
     getServices()
   })
 </script>
@@ -166,10 +167,10 @@
               <span class="small-gray">{{ item.version }}</span>
             </div>
             <div class="header-base-status">
-              <a-tag :color="CommonStatus[statusColors[item.status]]">
+              <a-tag :color="CommonStatus[STATUS_COLOR[item.status]]">
                 <div class="header-base-status-inner">
-                  <status-dot :color="CommonStatus[statusColors[item.status]]" />
-                  <span class="small">{{ t(`common.${statusColors[item.status]}`) }}</span>
+                  <status-dot :color="CommonStatus[STATUS_COLOR[item.status]]" />
+                  <span class="small">{{ t(`common.${STATUS_COLOR[item.status]}`) }}</span>
                 </div>
               </a-tag>
             </div>

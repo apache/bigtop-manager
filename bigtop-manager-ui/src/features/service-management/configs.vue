@@ -28,11 +28,16 @@
   import type { Property, ServiceConfig, ServiceVO } from '@/api/service/types'
 
   type FormStateType = { configs: ServiceConfig[] }
-  type AttrsType = Partial<ServiceVO> & { componentPayload: { clusterId: number; serviceId: number } }
+
+  interface RouteParams {
+    id: number
+    serviceId: number
+  }
 
   const { t } = useI18n()
   const createStore = useCreateServiceStore()
-  const attrs = useAttrs() as AttrsType
+  const attrs = useAttrs() as Partial<ServiceVO>
+  const route = useRoute()
 
   const getServiceDetail = inject('getServiceDetail') as () => any
 
@@ -64,7 +69,10 @@
     }
   })
 
-  const payload = computed(() => attrs.componentPayload)
+  const payload = computed(() => {
+    const { id: clusterId, serviceId: id } = route.params as unknown as RouteParams
+    return { clusterId, id }
+  })
 
   /**
    * Filters service configurations based on a search keyword.
@@ -133,13 +141,11 @@
   const saveConfigs = async () => {
     try {
       const valid = await validate()
-      if (!valid) {
-        return
-      }
-      const { serviceId: id, clusterId } = payload.value
+      if (!valid) return
+
       loading.value = true
       const params = createStore.getDiffConfigs(configs.value, snapshotConfigs.value)
-      const data = await updateServiceConfigs({ id, clusterId }, params)
+      const data = await updateServiceConfigs({ ...payload.value }, params)
       if (data) {
         message.success(t('common.update_success'))
         getServiceDetail()
@@ -165,13 +171,11 @@
   }
 
   const onCaptureSnapshot = () => {
-    const { serviceId: id, clusterId } = payload.value
-    captureRef.value?.handleOpen({ id, clusterId })
+    captureRef.value?.handleOpen({ ...payload.value })
   }
 
   const openSnapshotManagement = () => {
-    const { serviceId: id, clusterId } = payload.value
-    snapshotRef.value?.handleOpen({ id, clusterId })
+    snapshotRef.value?.handleOpen({ ...payload.value })
   }
 
   onActivated(async () => {

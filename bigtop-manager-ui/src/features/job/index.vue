@@ -20,6 +20,7 @@
 <script setup lang="ts">
   import { TableColumnType, TableProps } from 'ant-design-vue'
   import { getJobList, getStageList, getTaskList, retryJob } from '@/api/job'
+  import { POLLING_INTERVAL } from '@/utils/constant'
 
   import LogsView, { type LogViewProps } from '@/features/log-view/index.vue'
 
@@ -31,8 +32,6 @@
     name: ComputedRef<string> | string
     pagination: ListParams
   }
-
-  const POLLING_INTERVAL = 3000
 
   const { t } = useI18n()
   const route = useRoute()
@@ -212,7 +211,7 @@
     getListData(true)
     pollingIntervalId.value = setInterval(() => {
       getListData()
-    }, POLLING_INTERVAL)
+    }, POLLING_INTERVAL / 10)
   }
 
   const stopPolling = () => {

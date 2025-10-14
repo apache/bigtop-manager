@@ -174,7 +174,7 @@
       legend = new Map(legendMap.value).values()
       series = generateChartSeries(data.value, legendMap.value)
     } else {
-      if (temp_series.length > 1) {
+      if (temp_series.length > 0) {
         legend.data = temp_series.map((s) => s.name)
         series = [...temp_series]
       } else {

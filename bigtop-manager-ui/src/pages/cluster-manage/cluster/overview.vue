@@ -20,12 +20,13 @@
 <script setup lang="ts">
   import { formatFromByte } from '@/utils/storage'
   import { usePngImage } from '@/utils/tools'
-
-  import { CommonStatus, CommonStatusTexts } from '@/enums/state'
+  import { CommonStatus } from '@/enums/state'
+  import { TIME_RANGES, STATUS_COLOR, POLLING_INTERVAL } from '@/utils/constant'
 
   import { useServiceStore } from '@/store/service'
   import { useJobProgress } from '@/store/job-progress'
   import { useStackStore } from '@/store/stack'
+  import { useTabStore } from '@/store/tab-state'
 
   import { Empty } from 'ant-design-vue'
   import { getClusterMetricsInfo } from '@/api/metrics'
@@ -36,25 +37,23 @@
   import type { MetricsData, TimeRangeType } from '@/api/metrics/types'
   import type { CommandRequest } from '@/api/command/types'
 
-  type StatusText = keyof typeof CommonStatusTexts
-
   const props = defineProps<{ payload: ClusterVO }>()
 
   const { t } = useI18n()
   const route = useRoute()
+  const tabStore = useTabStore()
   const jobProgressStore = useJobProgress()
   const stackStore = useStackStore()
   const serviceStore = useServiceStore()
 
+  const isRunning = ref(false)
   const currTimeRange = ref<TimeRangeType>('5m')
   const clusterId = ref(Number(route.params.id))
   const chartData = ref<Partial<MetricsData>>({})
 
   const locateStackWithService = shallowRef<StackVO[]>([])
-  const timeRanges = shallowRef<TimeRangeType[]>(['1m', '5m', '15m', '30m', '1h', '2h'])
-  const statusColors = shallowRef<Record<ClusterStatusType, StatusText>>({ 1: 'healthy', 2: 'unhealthy', 3: 'unknown' })
-
   const { serviceNames } = storeToRefs(serviceStore)
+
   const { payload } = toRefs(props)
 
   const clusterDetail = computed(() => ({
@@ -115,10 +114,9 @@
 
   const handleTimeRange = (time: TimeRangeType) => {
     if (currTimeRange.value === time) return
-
     currTimeRange.value = time
-    pause()
     getClusterMetrics()
+    pause()
     resume()
   }
 
@@ -126,22 +124,33 @@
     stack.services.filter((v) => serviceNames.value.includes(v.name))
 
   const getClusterMetrics = async () => {
+    if (isRunning.value) {
+      return
+    }
+
+    isRunning.value = true
+
     try {
       chartData.value = await getClusterMetricsInfo({ id: clusterId.value }, { interval: currTimeRange.value })
     } catch (error) {
       console.log('Failed to fetch cluster metrics:', error)
+    } finally {
+      isRunning.value = false
     }
   }
 
-  const { pause, resume } = useIntervalFn(getClusterMetrics, 5000, { immediate: false })
+  const { pause, resume } = useIntervalFn(getClusterMetrics, POLLING_INTERVAL, { immediate: true })
 
-  onActivated(async () => {
-    pause()
-    await getClusterMetrics()
+  onActivated(() => {
+    const currTab = tabStore.getActiveTab(route.path) ?? '1'
+    if (currTab != '1') return
+    getClusterMetrics()
     resume()
   })
 
-  onDeactivated(() => pause())
+  onDeactivated(() => {
+    pause()
+  })
 </script>
 
 <template>
@@ -172,11 +181,11 @@
                         <a-tag
                           v-if="base === 'status'"
                           class="reset-tag"
-                          :color="CommonStatus[statusColors[clusterDetail[base] as ClusterStatusType]]"
+                          :color="CommonStatus[STATUS_COLOR[clusterDetail[base] as ClusterStatusType]]"
                         >
-                          <status-dot :color="CommonStatus[statusColors[clusterDetail[base] as ClusterStatusType]]" />
+                          <status-dot :color="CommonStatus[STATUS_COLOR[clusterDetail[base] as ClusterStatusType]]" />
                           {{
-                            clusterDetail[base] && t(`common.${statusColors[clusterDetail[base] as ClusterStatusType]}`)
+                            clusterDetail[base] && t(`common.${STATUS_COLOR[clusterDetail[base] as ClusterStatusType]}`)
                           }}
                         </a-tag>
                         <a-typography-text
@@ -245,7 +254,7 @@
           <a-typography-text strong :content="t('overview.chart')" />
           <a-space :size="12">
             <div
-              v-for="time in timeRanges"
+              v-for="time in TIME_RANGES"
               :key="time"
               tabindex="0"
               class="time-range"

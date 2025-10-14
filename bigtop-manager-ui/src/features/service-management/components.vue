@@ -22,6 +22,9 @@
   import { deleteComponent, getComponents } from '@/api/component'
   import { useStackStore } from '@/store/stack'
   import { useJobProgress } from '@/store/job-progress'
+  import { useTabStore } from '@/store/tab-state'
+
+  import { COMPONENT_STATUS, POLLING_INTERVAL } from '@/utils/constant'
 
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { ComponentVO } from '@/api/component/types'
@@ -30,7 +33,6 @@
   import type { ServiceVO } from '@/api/service/types'
 
   type Key = string | number
-  type AttrsType = Partial<ServiceVO> & { componentPayload: { clusterId: number; serviceId: number } }
 
   interface TableState {
     selectedRowKeys: Key[]
@@ -39,21 +41,25 @@
     selectedRows: ComponentVO[]
   }
 
-  const POLLING_INTERVAL = 3000
+  interface RouteParams {
+    id: number
+    serviceId: number
+  }
 
   const { t } = useI18n()
-  const { confirmModal } = useModal()
-
-  const jobProgressStore = useJobProgress()
-  const stackStore = useStackStore()
+  const attrs = useAttrs() as Partial<ServiceVO>
   const route = useRoute()
   const router = useRouter()
-  const attrs = useAttrs() as AttrsType
+  const tabStore = useTabStore()
+  const jobProgressStore = useJobProgress()
+  const stackStore = useStackStore()
+  const { confirmModal } = useModal()
 
   const { stacks, stackRelationMap } = storeToRefs(stackStore)
+
   const searchInputRef = ref()
   const pollingIntervalId = ref<any>(null)
-  const componentStatus = ref(['INSTALLING', 'SUCCESS', 'FAILED', 'UNKNOWN'])
+  const currTab = ref(tabStore.getActiveTab(route.path) ?? '1')
 
   const commandRequest = shallowRef<CommandRequest>({
     command: 'Add',
@@ -68,19 +74,24 @@
     selectedRows: []
   })
 
-  const payload = computed(() => attrs.componentPayload)
+  const payload = computed(() => {
+    const { id, serviceId } = route.params as unknown as RouteParams
+    return [id, serviceId] as [number, number]
+  })
 
-  const componentsFromStack = computed(
-    () =>
-      new Map(
-        stacks.value.flatMap(
-          (stack) =>
-            stack.services?.flatMap((service) =>
-              service.name && service.components ? [[service.name, service.components]] : []
-            ) ?? []
-        )
-      )
-  )
+  const componentsFromStack = computed(() => {
+    const entries: [string, ComponentVO[]][] = []
+
+    stacks.value.forEach(({ services = [] }) => {
+      services.forEach(({ name, components }) => {
+        if (name && components) {
+          entries.push([name, components])
+        }
+      })
+    })
+
+    return new Map(entries)
+  })
 
   const columns = computed((): TableColumnType<ComponentVO>[] => [
     {
@@ -238,9 +249,10 @@
   }
 
   const execOperation = (rows?: ComponentVO[]) => {
+    const [clusterId] = payload.value
     const displayNameOfRows: string[] = rows ? rows.map((v) => v.displayName ?? '').filter((v) => v) : []
     jobProgressStore.processCommand(
-      { ...commandRequest.value, clusterId: payload.value.clusterId },
+      { ...commandRequest.value, clusterId },
       async () => {
         getComponentList(true, true)
         state.selectedRowKeys = []
@@ -255,7 +267,8 @@
       tipText: t('common.delete_msg'),
       async onOk() {
         try {
-          const data = await deleteComponent({ clusterId: payload.value.clusterId, id: row.id! })
+          const [clusterId] = payload.value
+          const data = await deleteComponent({ clusterId, id: row.id! })
           if (data) {
             message.success(t('common.delete_success'))
             getComponentList(true, true)
@@ -268,7 +281,7 @@
   }
 
   const getComponentList = async (isReset = false, isFirstCall = false) => {
-    const { clusterId, serviceId } = payload.value
+    const [clusterId, serviceId] = payload.value
     if (!paginationProps.value) {
       loading.value = false
       return
@@ -301,7 +314,7 @@
     getComponentList(isReset, isFirstCall)
     pollingIntervalId.value = setInterval(() => {
       getComponentList()
-    }, POLLING_INTERVAL)
+    }, POLLING_INTERVAL / 10)
   }
 
   const stopPolling = () => {
@@ -312,8 +325,9 @@
   }
 
   const addComponent = () => {
-    const creationMode = Number(payload.value.clusterId) === 0 ? 'public' : 'internal'
-    const routerName = Number(payload.value.clusterId) === 0 ? 'CreateInfraComponent' : 'CreateComponent'
+    const [clusterId] = payload.value
+    const creationMode = clusterId === 0 ? 'public' : 'internal'
+    const routerName = clusterId === 0 ? 'CreateInfraComponent' : 'CreateComponent'
     router.push({
       name: routerName,
       params: { ...route.params, creationMode, type: 'component' }
@@ -321,6 +335,7 @@
   }
 
   onActivated(() => {
+    if (currTab.value != '2') return
     startPolling()
   })
 
@@ -373,8 +388,8 @@
       </template>
       <template #bodyCell="{ record, column }">
         <template v-if="['status'].includes(column.key as string)">
-          <svg-icon style="margin-left: 0" :name="componentStatus[record.status].toLowerCase()" />
-          <span>{{ t(`common.${componentStatus[record.status].toLowerCase()}`) }}</span>
+          <svg-icon style="margin-left: 0" :name="COMPONENT_STATUS[record.status].toLowerCase()" />
+          <span>{{ t(`common.${COMPONENT_STATUS[record.status].toLowerCase()}`) }}</span>
         </template>
         <template v-if="column.key === 'quickLink'">
           <span v-if="!record.quickLink">{{ t('common.no_link') }}</span>

@@ -21,6 +21,7 @@
   import { message, TableColumnType, TableProps } from 'ant-design-vue'
   import { getHosts } from '@/api/host'
   import * as hostApi from '@/api/host'
+  import { HOST_STATUS } from '@/utils/constant'
 
   import HostCreate from '@/features/create-host/index.vue'
   import InstallDependencies from '@/features/create-host/install-dependencies.vue'
@@ -47,7 +48,6 @@
   const clusterId = ref(Number(route.params.id))
   const hostCreateRef = ref<InstanceType<typeof HostCreate> | null>(null)
   const installRef = ref<InstanceType<typeof InstallDependencies> | null>(null)
-  const hostStatus = ref(['INSTALLING', 'SUCCESS', 'FAILED', 'UNKNOWN'])
 
   const state = reactive<TableState>({
     searchText: '',
@@ -264,8 +264,8 @@
           <a-typography-link underline @click="viewHostDetail(record)"> {{ record.hostname }} </a-typography-link>
         </template>
         <template v-if="column.key === 'status'">
-          <svg-icon style="margin-left: 0" :name="hostStatus[record.status].toLowerCase()" />
-          <span>{{ t(`common.${hostStatus[record.status].toLowerCase()}`) }}</span>
+          <svg-icon style="margin-left: 0" :name="HOST_STATUS[record.status].toLowerCase()" />
+          <span>{{ t(`common.${HOST_STATUS[record.status].toLowerCase()}`) }}</span>
         </template>
         <template v-if="column.key === 'operation'">
           <button-group

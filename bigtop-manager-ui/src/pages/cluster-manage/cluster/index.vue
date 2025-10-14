@@ -19,7 +19,8 @@
 
 <script setup lang="ts">
   import { useClusterStore } from '@/store/cluster'
-  import { CommonStatus, CommonStatusTexts } from '@/enums/state'
+  import { STATUS_COLOR } from '@/utils/constant'
+  import { CommonStatus } from '@/enums/state'
   import { useJobProgress } from '@/store/job-progress'
 
   import Overview from './overview.vue'
@@ -31,7 +32,6 @@
   import type { Command } from '@/api/command/types'
   import type { TabItem } from '@/components/base/main-card/types'
   import type { GroupItem } from '@/components/common/button-group/types'
-  import type { ClusterStatusType } from '@/api/cluster/types'
 
   const { t } = useI18n()
   const router = useRouter()
@@ -42,11 +42,6 @@
   const { loading, currCluster } = storeToRefs(clusterStore)
 
   const clusterId = ref(Number(route.params.id))
-  const statusColors = shallowRef<Record<ClusterStatusType, keyof typeof CommonStatusTexts>>({
-    1: 'healthy',
-    2: 'unhealthy',
-    3: 'unknown'
-  })
 
   const getCompName = computed(() => [Overview, Service, Host, User, Job][Number(activeTab.value) - 1])
 
@@ -121,7 +116,7 @@
     <header-card
       :title="currCluster.displayName"
       avatar="cluster"
-      :status="CommonStatus[statusColors[currCluster.status!]]"
+      :status="CommonStatus[STATUS_COLOR[currCluster.status!]]"
       :desc="currCluster.desc"
       :action-groups="actionGroup"
     />

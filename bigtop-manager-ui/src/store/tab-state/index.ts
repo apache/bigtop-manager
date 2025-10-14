@@ -17,16 +17,25 @@
  * under the License.
  */
 
-export const useTabStore = defineStore('tab', () => {
-  const activeTabs = ref<Record<string, string>>({})
+export const useTabStore = defineStore(
+  'tab',
+  () => {
+    const activeTabs = ref<Record<string, string>>({})
 
-  function setActiveTab(pageKey: string, tabIndex: string) {
-    activeTabs.value[pageKey] = tabIndex
+    function setActiveTab(pageKey: string, tabIndex: string) {
+      activeTabs.value[pageKey] = tabIndex
+    }
+
+    function getActiveTab(pageKey: string) {
+      return activeTabs.value[pageKey]
+    }
+
+    return { activeTabs, setActiveTab, getActiveTab }
+  },
+  {
+    persist: {
+      storage: sessionStorage,
+      paths: ['activeTabs']
+    }
   }
-
-  function getActiveTab(pageKey: string) {
-    return activeTabs.value[pageKey]
-  }
-
-  return { activeTabs, setActiveTab, getActiveTab }
-})
+)

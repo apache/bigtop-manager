@@ -18,32 +18,28 @@
 -->
 
 <script setup lang="ts">
-  import { CommonStatus, CommonStatusTexts } from '@/enums/state'
   import { Empty } from 'ant-design-vue'
-  import { formatFromByte } from '@/utils/storage.ts'
   import { getServiceMetricsInfo } from '@/api/metrics'
+
+  import { CommonStatus } from '@/enums/state'
+  import { formatFromByte } from '@/utils/storage.ts'
   import { isEmpty } from '@/utils/tools'
+  import { STATUS_COLOR, TIME_RANGES, POLLING_INTERVAL } from '@/utils/constant'
+
+  import { useTabStore } from '@/store/tab-state'
 
   import CategoryChart from '@/features/metric/category-chart.vue'
 
-  import type { ServiceVO, ServiceStatusType } from '@/api/service/types'
+  import type { ServiceVO } from '@/api/service/types'
   import type { ServiceMetricItem, ServiceMetrics, ServiceMetricType, TimeRangeType } from '@/api/metrics/types'
 
-  type AttrsType = Partial<ServiceVO> & { componentPayload: { clusterId: number; serviceId: number } }
+  type RouteParams = { id: number; serviceId: number }
 
-  const { t } = useI18n()
-  const attrs = useAttrs() as AttrsType
-  const currTimeRange = ref<TimeRangeType>('5m')
-  const chartData = ref<Partial<ServiceMetrics>>({})
+  type BaseConfigType = Partial<Record<keyof ServiceVO, string>>
 
-  const timeRanges = shallowRef<TimeRangeType[]>(['1m', '5m', '15m', '30m', '1h', '2h'])
-  const statusColors = shallowRef<Record<ServiceStatusType, keyof typeof CommonStatusTexts>>({
-    1: 'healthy',
-    2: 'unhealthy',
-    3: 'unknown'
-  })
+  type UnitMapType = Record<Lowercase<ServiceMetricType>, string | ((value: number) => string)>
 
-  const unitMap: Record<Lowercase<ServiceMetricType>, string | ((value: number) => string)> = {
+  const UNIT_MAP: UnitMapType = {
     number: '',
     percent: '%',
     byte: (val) => formatFromByte(val, 0),
@@ -52,11 +48,25 @@
     nps: 'N/s'
   }
 
-  const isInfra = computed(() => attrs.componentPayload.clusterId == 0)
+  const { t } = useI18n()
+  const route = useRoute()
+  const tabStore = useTabStore()
+  const attrs = useAttrs() as Partial<ServiceVO>
+
+  const isRunning = ref(false)
+  const interval = ref<TimeRangeType>('5m')
+  const chartData = ref<Partial<ServiceMetrics>>({})
+
   const noChartData = computed(() => Object.values(chartData.value).length === 0)
   const serviceKeys = computed(() => Object.keys(baseConfig.value) as (keyof ServiceVO)[])
+
+  const payload = computed(() => {
+    const { id: clusterId, serviceId } = route.params as unknown as RouteParams
+    return { clusterId, serviceId }
+  })
+
   const baseConfig = computed(
-    (): Partial<Record<keyof ServiceVO, string>> => ({
+    (): BaseConfigType => ({
       status: t('overview.service_status'),
       displayName: t('overview.service_name'),
       version: t('overview.service_version'),
@@ -67,28 +77,8 @@
     })
   )
 
-  const handleTimeRange = (time: TimeRangeType) => {
-    if (currTimeRange.value === time) return
-    currTimeRange.value = time
-    pause()
-    getServiceMetrics()
-    resume()
-  }
-
-  const getServiceMetrics = async () => {
-    try {
-      const res = await getServiceMetricsInfo(
-        { id: attrs.componentPayload.serviceId },
-        { interval: currTimeRange.value }
-      )
-      chartData.value = { ...res }
-    } catch (error) {
-      console.log('Failed to fetch service metrics:', error)
-    }
-  }
-
   const getChartFormatter = (chart: ServiceMetricItem) => {
-    const unit = unitMap[chart.valueType]
+    const unit = UNIT_MAP[chart.valueType]
     const valueWithUnit = (val: any) => (typeof unit === 'function' ? unit(val as number) : `${val} ${unit}`)
     return {
       tooltip: (val: any) => `${isEmpty(val) ? '--' : valueWithUnit(val)}`,
@@ -96,16 +86,51 @@
     }
   }
 
-  const { pause, resume } = useIntervalFn(getServiceMetrics, 30000, { immediate: true })
+  const shouldRunMetrics = () => {
+    const currTab = tabStore.getActiveTab(route.path) ?? '1'
+    const clusterId = payload.value.clusterId ?? 0
+    return clusterId != 0 && currTab === '1'
+  }
+
+  const getServiceMetrics = async () => {
+    if (isRunning.value) {
+      return
+    }
+
+    isRunning.value = true
+
+    try {
+      const { serviceId: id } = payload.value
+      const data = await getServiceMetricsInfo({ id }, { interval: interval.value })
+      chartData.value = { ...data }
+    } catch (error) {
+      console.log('Failed to fetch service metrics:', error)
+    } finally {
+      isRunning.value = false
+    }
+  }
+
+  const { pause, resume } = useIntervalFn(getServiceMetrics, POLLING_INTERVAL, { immediate: true })
+
+  const handleTimeRange = (time: TimeRangeType) => {
+    if (interval.value === time) return
+    interval.value = time
+    getServiceMetrics()
+    restartMetrics()
+  }
+
+  const restartMetrics = () => {
+    pause()
+    resume()
+  }
 
   onActivated(() => {
-    if (isInfra.value) return
+    if (!shouldRunMetrics()) return
     getServiceMetrics()
     resume()
   })
 
   onDeactivated(() => {
-    if (isInfra.value) return
     pause()
   })
 </script>
@@ -138,10 +163,10 @@
                         <a-tag
                           v-if="key === 'status'"
                           class="reset-tag"
-                          :color="CommonStatus[statusColors[attrs[key]!]]"
+                          :color="CommonStatus[STATUS_COLOR[attrs[key]!]]"
                         >
-                          <status-dot :color="CommonStatus[statusColors[attrs[key]!]]" />
-                          {{ attrs[key] && t(`common.${statusColors[attrs[key]]}`) }}
+                          <status-dot :color="CommonStatus[STATUS_COLOR[attrs[key]!]]" />
+                          {{ attrs[key] && t(`common.${STATUS_COLOR[attrs[key]]}`) }}
                         </a-tag>
                         <a-typography-text
                           v-else-if="key === 'stack'"
@@ -173,11 +198,11 @@
           <a-typography-text strong :content="t('overview.chart')" />
           <a-space :size="12">
             <div
-              v-for="time in timeRanges"
+              v-for="time in TIME_RANGES"
               :key="time"
               tabindex="0"
               class="time-range"
-              :class="{ 'time-range-activated': currTimeRange === time }"
+              :class="{ 'time-range-activated': interval === time }"
               @click="handleTimeRange(time)"
             >
               {{ time }}

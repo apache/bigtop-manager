@@ -20,7 +20,7 @@
 <script setup lang="ts">
   import { useServiceStore } from '@/store/service'
   import { useJobProgress } from '@/store/job-progress'
-  import { Command } from '@/api/command/types'
+  import { Command, type CommandRequest } from '@/api/command/types'
 
   import Overview from './overview.vue'
   import Components from './components.vue'
@@ -35,20 +35,24 @@
     serviceId: number
   }
 
+  type Key = keyof typeof Command | 'Remove'
+
   const { t } = useI18n()
   const route = useRoute()
   const router = useRouter()
   const serviceStore = useServiceStore()
   const jobProgressStore = useJobProgress()
+  const { activeTab } = useTabState(route.path, '1')
   const { loading, serviceMap } = storeToRefs(serviceStore)
 
-  const activeKey = ref('1')
   const serviceDetail = shallowRef<ServiceVO>()
   const stepPages = shallowRef([Overview, Components, Configs])
 
+  const getCompName = computed(() => stepPages.value[parseInt(activeTab.value) - 1])
+
   const componentPayload = computed(() => {
-    const { id: clusterId, serviceId } = route.params as unknown as RouteParams
-    return { clusterId, serviceId }
+    const { id, serviceId } = route.params as unknown as RouteParams
+    return [id, serviceId] as [number, number]
   })
 
   const tabs = computed((): TabItem[] => [
@@ -72,37 +76,33 @@
     }
   ])
 
-  const getCompName = computed(() => stepPages.value[parseInt(activeKey.value) - 1])
+  const onServiceDeleted = (clusterId: number) => {
+    router.replace({ path: `/cluster-manage/clusters/${clusterId}` })
+  }
 
   const dropdownMenuClick: GroupItem['dropdownMenuClickEvent'] = async ({ key }) => {
-    const { clusterId, serviceId } = componentPayload.value
-    const service = serviceMap.value[clusterId].filter((service) => Number(serviceId) === service.id)[0]
+    const [clusterId, serviceId] = componentPayload.value
+    const service = serviceMap.value[clusterId].filter((s) => Number(serviceId) == s.id)[0]
+    const { name: serviceName, displayName } = service
+
+    const processParams = {
+      command: key as Key,
+      clusterId,
+      commandLevel: 'service',
+      serviceCommands: [{ serviceName, installed: true }]
+    } as CommandRequest
 
     if (key === 'Remove') {
-      serviceStore.removeService(service, clusterId, () => {
-        router.replace({ path: `/cluster-manage/clusters/${clusterId}` })
-      })
+      serviceStore.removeService(service, clusterId, () => onServiceDeleted(clusterId))
     } else {
-      jobProgressStore.processCommand(
-        {
-          command: key as keyof typeof Command,
-          clusterId,
-          commandLevel: 'service',
-          serviceCommands: [{ serviceName: service.name!, installed: true }]
-        },
-        getServiceDetail,
-        {
-          displayName: service.displayName
-        }
-      )
+      jobProgressStore.processCommand(processParams, getServiceDetail, { displayName })
     }
   }
 
   const getServiceDetail = async () => {
     try {
       loading.value = true
-      const { clusterId, serviceId } = componentPayload.value
-      serviceDetail.value = await serviceStore.getServiceDetail(clusterId, serviceId)
+      serviceDetail.value = await serviceStore.getServiceDetail(...componentPayload.value)
     } catch (error) {
       console.log('error :>> ', error)
     } finally {
@@ -125,10 +125,10 @@
       :desc="serviceDetail?.desc"
       :action-groups="actionGroup"
     />
-    <main-card v-model:active-key="activeKey" :tabs="tabs">
+    <main-card v-model:active-key="activeTab" :tabs="tabs">
       <template #tab-item>
         <keep-alive>
-          <component :is="getCompName" v-bind="{ ...serviceDetail, componentPayload }"></component>
+          <component :is="getCompName" v-bind="{ ...serviceDetail }"></component>
         </keep-alive>
       </template>
     </main-card>

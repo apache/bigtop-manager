@@ -20,7 +20,8 @@
 <script setup lang="ts">
   import { getHost, restartAgent, startAgent, stopAgent } from '@/api/host'
   import { message } from 'ant-design-vue'
-  import { CommonStatus, CommonStatusTexts } from '@/enums/state'
+  import { CommonStatus } from '@/enums/state'
+  import { STATUS_COLOR } from '@/utils/constant'
 
   import Overview from './overview.vue'
 
@@ -37,12 +38,6 @@
     start: startAgent,
     restart: restartAgent,
     stop: stopAgent
-  })
-
-  const statusColors = shallowRef<Record<HostStatusType, keyof typeof CommonStatusTexts>>({
-    1: 'healthy',
-    2: 'unhealthy',
-    3: 'unknown'
   })
 
   const actionGroup = computed<GroupItem[]>(() => [
@@ -112,7 +107,7 @@
     <header-card
       :title="hostInfo.hostname"
       avatar="host"
-      :status="CommonStatus[statusColors[hostInfo.status as HostStatusType]]"
+      :status="CommonStatus[STATUS_COLOR[hostInfo.status as HostStatusType]]"
       :desc="hostInfo.desc"
       :action-groups="actionGroup"
     />
