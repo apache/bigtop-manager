@@ -115,6 +115,7 @@
   const handleTimeRange = (time: TimeRangeType) => {
     if (interval.value === time) return
     interval.value = time
+    if (!shouldRunMetrics()) return
     getServiceMetrics()
     restartMetrics()
   }

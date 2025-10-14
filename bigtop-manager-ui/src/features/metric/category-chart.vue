@@ -167,14 +167,14 @@
     let series = [] as any,
       legend = { data: [] } as any
 
-    const { series: temp_series = [] } = data.value
+    const { series: temp_series = [], valueType } = data.value
     const xAxis = xAxisData.value?.map((v) => dayjs(Number(v) * 1000).format('HH:mm')) ?? []
 
     if (legendMap.value) {
       legend = new Map(legendMap.value).values()
       series = generateChartSeries(data.value, legendMap.value)
     } else {
-      if (temp_series.length > 0) {
+      if (valueType) {
         legend.data = temp_series.map((s) => s.name)
         series = [...temp_series]
       } else {
