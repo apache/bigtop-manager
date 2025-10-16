@@ -82,8 +82,7 @@ public class HadoopSetup {
                             hadoopGroup,
                             Constants.PERMISSION_755,
                             true);
-                    if (hadoopParams.getDfsDataDir() != null
-                            && !hadoopParams.getDfsDataDir().isEmpty()) {
+                    if (StringUtils.isNotBlank(hadoopParams.getDfsDataDir())) {
                         String[] dfsDataDirs = hadoopParams.getDfsDataDir().split("\\s*,\\s*");
                         for (String dir : dfsDataDirs) {
                             LinuxFileUtils.createDirectories(
@@ -92,16 +91,14 @@ public class HadoopSetup {
                     }
                 }
                 case "nodemanager": {
-                    if (hadoopParams.getNodeManagerLogDir() != null
-                            && !hadoopParams.getNodeManagerLogDir().isEmpty()) {
+                    if (StringUtils.isNotBlank(hadoopParams.getNodeManagerLogDir())) {
                         String[] nmLogDirs = hadoopParams.getNodeManagerLogDir().split("\\s*,\\s*");
                         for (String dir : nmLogDirs) {
                             LinuxFileUtils.createDirectories(
                                     dir, hadoopUser, hadoopGroup, Constants.PERMISSION_755, true);
                         }
                     }
-                    if (hadoopParams.getNodeManagerLocalDir() != null
-                            && !hadoopParams.getNodeManagerLocalDir().isEmpty()) {
+                    if (StringUtils.isNotBlank(hadoopParams.getNodeManagerLocalDir())) {
                         String[] nmLocalDirs =
                                 hadoopParams.getNodeManagerLocalDir().split("\\s*,\\s*");
                         for (String dir : nmLocalDirs) {
