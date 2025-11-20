@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
   import { formatFromByte } from '@/utils/storage'
-  import { usePngImage } from '@/utils/tools'
+  import { usePngImage } from '@/composables/use-png-image'
   import { CommonStatus } from '@/enums/state'
   import { TIME_RANGES, STATUS_COLOR, POLLING_INTERVAL } from '@/utils/constant'
 

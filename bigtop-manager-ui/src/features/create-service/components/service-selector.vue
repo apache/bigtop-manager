@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { usePngImage } from '@/utils/tools'
+  import { usePngImage } from '@/composables/use-png-image'
   import { useStackStore } from '@/store/stack'
   import { useServiceStore } from '@/store/service'
   import { useCreateServiceStore } from '@/store/create-service'
@@ -104,7 +104,7 @@
     }
   }
 
-  const splitSearchStr = (splitStr: string) => {
+  const splitSearchStr = (splitStr: string = '--') => {
     return splitStr.toString().split(new RegExp(`(?<=${searchStr.value})|(?=${searchStr.value})`, 'i'))
   }
 
@@ -241,7 +241,7 @@
                     </template>
                   </div>
                   <a-tag :color="licenseOfConflictService.includes(item.license) ? 'error' : 'success'">
-                    <span class="item-tag">{{ item.license }}</span>
+                    <span class="item-tag">{{ item.license ?? '--' }}</span>
                   </a-tag>
                 </div>
               </template>
@@ -256,12 +256,7 @@
                 </div>
               </template>
               <template #avatar>
-                <a-avatar
-                  v-if="item.displayName"
-                  :src="usePngImage(item.displayName.toLowerCase())"
-                  :size="54"
-                  class="header-icon"
-                />
+                <a-avatar :src="usePngImage(item.name.toLowerCase())" :size="54" class="header-icon" />
               </template>
             </a-list-item-meta>
           </a-list-item>
@@ -288,7 +283,7 @@
                     {{ item.displayName }}
                   </div>
                   <a-tag :color="licenseOfConflictService.includes(item.license) ? 'error' : 'success'">
-                    <span class="item-tag">{{ item.license }}</span>
+                    <span class="item-tag">{{ item.license ?? '--' }}</span>
                   </a-tag>
                 </div>
               </template>
@@ -298,12 +293,7 @@
                 </div>
               </template>
               <template #avatar>
-                <a-avatar
-                  v-if="item.displayName"
-                  :src="usePngImage(item.displayName.toLowerCase())"
-                  :size="54"
-                  class="header-icon"
-                />
+                <a-avatar :src="usePngImage(item.name.toLowerCase())" :size="54" class="header-icon" />
               </template>
             </a-list-item-meta>
           </a-list-item>

@@ -26,7 +26,7 @@
     type AuthPlatformStatusType
   } from '@/api/llm-config/types'
   import type { MenuItemType } from 'ant-design-vue/es/menu/src/interface'
-  import { usePngImage } from '@/utils/tools'
+  import { usePngImage } from '@/composables/use-png-image'
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   enum Actions {

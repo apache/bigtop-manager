@@ -18,7 +18,7 @@
 -->
 
 <script setup lang="ts">
-  import { usePngImage } from '@/utils/tools'
+  import { usePngImage } from '@/composables/use-png-image'
   const { t } = useI18n()
 </script>
 
