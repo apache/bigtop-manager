@@ -56,16 +56,6 @@ export function copyText(text: string): Promise<any> {
 }
 
 /**
- * Returns the URL of a PNG image from the assets folder.
- *
- * @param imageName - The name of the image (default is 'logo').
- * @returns The URL of the image.
- */
-export function usePngImage(imageName: string = 'logo'): string {
-  return new URL(`../assets/images/${imageName}.png`, import.meta.url).href
-}
-
-/**
  * Scrolls the given container element to the bottom.
  *
  * @param container - The container element to scroll.

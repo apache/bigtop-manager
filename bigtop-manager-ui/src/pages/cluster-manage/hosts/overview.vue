@@ -20,8 +20,9 @@
 <script setup lang="ts">
   import { Empty } from 'ant-design-vue'
   import { formatFromByte } from '@/utils/storage.ts'
-  import { usePngImage, isEmpty } from '@/utils/tools'
+  import { isEmpty } from '@/utils/tools'
   import { TIME_RANGES, STATUS_COLOR, POLLING_INTERVAL } from '@/utils/constant'
+  import { usePngImage } from '@/composables/use-png-image'
   import { CommonStatus } from '@/enums/state.ts'
 
   import { useServiceStore } from '@/store/service'

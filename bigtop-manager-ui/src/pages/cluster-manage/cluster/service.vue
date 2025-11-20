@@ -23,7 +23,7 @@
   import { CommonStatus } from '@/enums/state'
   import { useJobProgress } from '@/store/job-progress'
   import { useTabStore } from '@/store/tab-state'
-  import { usePngImage } from '@/utils/tools'
+  import { usePngImage } from '@/composables/use-png-image'
   import { STATUS_COLOR } from '@/utils/constant'
 
   import type { GroupItem } from '@/components/common/button-group/types'
