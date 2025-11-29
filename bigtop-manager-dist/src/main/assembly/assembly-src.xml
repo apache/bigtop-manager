@@ -60,6 +60,9 @@
                 <exclude>**/.project</exclude>
                 <exclude>**/.classpath</exclude>
 
+                <!-- claude ignore -->
+                <exclude>**/.claude/**</exclude>
+
                 <!-- idea ignore -->
                 <exclude>**/.idea/**</exclude>
                 <exclude>**/*.ipr</exclude>
@@ -73,6 +76,10 @@
                 <exclude>**/node/**</exclude>
                 <exclude>**/node_modules/**</exclude>
                 <exclude>**/dist/**</exclude>
+
+                <!-- frontend auto generated files -->
+                <exclude>**/auto-imports.d.ts</exclude>
+                <exclude>**/components.d.ts</exclude>
 
                 <!-- temp ignore -->
                 <exclude>**/logs/**</exclude>
