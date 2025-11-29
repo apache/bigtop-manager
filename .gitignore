@@ -38,6 +38,9 @@ build/
 ### VS Code ###
 .vscode/
 
+### Claude ###
+.claude/
+
 ### Log ###
 logs
 tasklogs
