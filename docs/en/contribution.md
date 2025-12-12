@@ -19,7 +19,7 @@
 ## Setup
 
 ### Get the Code
-First, you need to pull the Bigtop Manager source code from Github using the following command:
+First, you need to pull the Bigtop Manager source code from GitHub using the following command:
 
 `git clone git@github.com:apache/bigtop-manager.git`
 
@@ -107,16 +107,11 @@ Vue:
 ./mvnw -pl bigtop-manager-ui test
 ```
 
-## Create an Issue
-1. First, go to the [Bigtop](https://issues.apache.org/jira/projects/BIGTOP) project in Apache Jira.
-2. Create an Issue.
-3. Ensure that the Summary of the Issue is described in English. If possible, write the details in the Description, which also needs to be in English.
-4. If you are submitting an issue for Bigtop Manager, click the Components option, select bigtop-manager, and also select the corresponding version for the Fix Version. Bigtop Manager starts with bm-, for example, bm-1.0.0 means this issue will be fixed in Bigtop Manager 1.0.0. The Affects Version is optional, and the rules are the same as above.
-
 ## Submit Code
-1. Get the Issue number. You can get the number from the Jira page or the URL. For example, if the current URL is: [https://issues.apache.org/jira/browse/BIGTOP-4162](https://issues.apache.org/jira/browse/BIGTOP-4162), then the number is BIGTOP-4162.
-2. Create a local branch. It is recommended that one Issue corresponds to one branch, for example, `git checkout -b bigtop-4162`.
-3. Submit your code to this branch and push the branch to your forked repository on Github.
-4. Create a Pull Request. The naming rule for the Title is `ISSUE number: Description`, for example, `BIGTOP-4162: Add health check for components`. If the PR is complex, it is recommended to write a Description for both the Issue and the PR to explain the specific purpose.
-5. Ensure that all Github CIs pass. If one fails, the PR will not be reviewed.
-6. After the CIs pass normally, wait for the Maintainer to review your PR. If there are comments, please handle them in time. After the review passes, it can be merged.
+1. Fork the project on GitHub.
+2. Clone your Forked repository locally, e.g., `git clone git@github.com:your-username/bigtop-manager.git`.
+3. Create a local branch, e.g., `git checkout -b your-branch-name`.
+4. Commit your code to that branch and push the branch to your Forked repository on GitHub.
+5. Create a Pull Request, ensuring that the Title follows the [Conventional Commits Specification](https://www.conventionalcommits.org/).
+6. Ensure that all GitHub CI checks pass; if any fail, the PR will not be reviewed.
+7. After CI passes, wait for a Maintainer to review your PR. If there are comments, address them promptly. Once the review is approved, it can be merged.
