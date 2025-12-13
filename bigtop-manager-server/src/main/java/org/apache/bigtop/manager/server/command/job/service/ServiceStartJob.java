@@ -39,7 +39,12 @@ public class ServiceStartJob extends AbstractServiceJob {
         CommandDTO commandDTO = jobContext.getCommandDTO();
         Map<String, List<String>> componentHostsMap = getComponentHostsMap();
 
-        stages.addAll(ComponentStageHelper.createComponentStages(componentHostsMap, commandDTO));
+        // Order services by required-services for START
+        List<String> orderedServices = getOrderedServiceNamesForCommand(org.apache.bigtop.manager.common.enums.Command.START);
+        for (String serviceName : orderedServices) {
+            Map<String, List<String>> perServiceHosts = filterComponentHostsByService(componentHostsMap, serviceName);
+            stages.addAll(ComponentStageHelper.createComponentStages(perServiceHosts, commandDTO));
+        }
     }
 
     @Override
