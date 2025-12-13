@@ -40,7 +40,8 @@ public class ServiceStopJob extends AbstractServiceJob {
         Map<String, List<String>> componentHostsMap = getComponentHostsMap();
 
         // Order services by required-services for STOP (reverse dependencies)
-        List<String> orderedServices = getOrderedServiceNamesForCommand(org.apache.bigtop.manager.common.enums.Command.STOP);
+        List<String> orderedServices =
+                getOrderedServiceNamesForCommand(org.apache.bigtop.manager.common.enums.Command.STOP);
         for (String serviceName : orderedServices) {
             Map<String, List<String>> perServiceHosts = filterComponentHostsByService(componentHostsMap, serviceName);
             stages.addAll(ComponentStageHelper.createComponentStages(perServiceHosts, commandDTO));

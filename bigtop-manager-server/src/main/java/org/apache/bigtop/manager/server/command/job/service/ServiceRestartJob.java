@@ -41,13 +41,15 @@ public class ServiceRestartJob extends AbstractServiceJob {
         Map<String, List<String>> componentHostsMap = getComponentHostsMap();
 
         // STOP in reverse order
-        List<String> stopServices = getOrderedServiceNamesForCommand(org.apache.bigtop.manager.common.enums.Command.STOP);
+        List<String> stopServices =
+                getOrderedServiceNamesForCommand(org.apache.bigtop.manager.common.enums.Command.STOP);
         for (String serviceName : stopServices) {
             Map<String, List<String>> perServiceHosts = filterComponentHostsByService(componentHostsMap, serviceName);
             stages.addAll(ComponentStageHelper.createComponentStages(perServiceHosts, Command.STOP, commandDTO));
         }
         // START in forward order
-        List<String> startServices = getOrderedServiceNamesForCommand(org.apache.bigtop.manager.common.enums.Command.START);
+        List<String> startServices =
+                getOrderedServiceNamesForCommand(org.apache.bigtop.manager.common.enums.Command.START);
         for (String serviceName : startServices) {
             Map<String, List<String>> perServiceHosts = filterComponentHostsByService(componentHostsMap, serviceName);
             stages.addAll(ComponentStageHelper.createComponentStages(perServiceHosts, Command.START, commandDTO));

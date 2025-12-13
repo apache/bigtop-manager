@@ -38,19 +38,22 @@ public class ServiceConfigureJob extends AbstractServiceJob {
         Map<String, List<String>> componentHostsMap = getComponentHostsMap();
 
         // Order services for CONFIGURE and restart
-        List<String> orderedServices = getOrderedServiceNamesForCommand(org.apache.bigtop.manager.common.enums.Command.CONFIGURE);
+        List<String> orderedServices =
+                getOrderedServiceNamesForCommand(org.apache.bigtop.manager.common.enums.Command.CONFIGURE);
         for (String serviceName : orderedServices) {
             Map<String, List<String>> perServiceHosts = filterComponentHostsByService(componentHostsMap, serviceName);
             stages.addAll(ComponentStageHelper.createComponentStages(perServiceHosts, Command.CONFIGURE, commandDTO));
         }
 
         // Restart services stop then start respecting ordering
-        List<String> stopServices = getOrderedServiceNamesForCommand(org.apache.bigtop.manager.common.enums.Command.STOP);
+        List<String> stopServices =
+                getOrderedServiceNamesForCommand(org.apache.bigtop.manager.common.enums.Command.STOP);
         for (String serviceName : stopServices) {
             Map<String, List<String>> perServiceHosts = filterComponentHostsByService(componentHostsMap, serviceName);
             stages.addAll(ComponentStageHelper.createComponentStages(perServiceHosts, Command.STOP, commandDTO));
         }
-        List<String> startServices = getOrderedServiceNamesForCommand(org.apache.bigtop.manager.common.enums.Command.START);
+        List<String> startServices =
+                getOrderedServiceNamesForCommand(org.apache.bigtop.manager.common.enums.Command.START);
         for (String serviceName : startServices) {
             Map<String, List<String>> perServiceHosts = filterComponentHostsByService(componentHostsMap, serviceName);
             stages.addAll(ComponentStageHelper.createComponentStages(perServiceHosts, Command.START, commandDTO));

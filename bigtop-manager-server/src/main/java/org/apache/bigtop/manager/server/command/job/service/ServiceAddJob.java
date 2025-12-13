@@ -65,7 +65,8 @@ public class ServiceAddJob extends AbstractServiceJob {
         Map<String, List<String>> componentHostsMap = getComponentHostsMap();
 
         // Order services by required-services for ADD
-        List<String> orderedServices = getOrderedServiceNamesForCommand(org.apache.bigtop.manager.common.enums.Command.ADD);
+        List<String> orderedServices =
+                getOrderedServiceNamesForCommand(org.apache.bigtop.manager.common.enums.Command.ADD);
         for (String serviceName : orderedServices) {
             Map<String, List<String>> perServiceHosts = filterComponentHostsByService(componentHostsMap, serviceName);
 

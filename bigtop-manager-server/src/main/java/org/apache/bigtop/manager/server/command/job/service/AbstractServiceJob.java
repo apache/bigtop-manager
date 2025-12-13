@@ -87,11 +87,14 @@ public abstract class AbstractServiceJob extends AbstractJob {
     /**
      * Filter component-hosts map for a single service by component membership.
      */
-    protected Map<String, List<String>> filterComponentHostsByService(Map<String, List<String>> all, String serviceName) {
+    protected Map<String, List<String>> filterComponentHostsByService(
+            Map<String, List<String>> all, String serviceName) {
         Map<String, List<String>> result = new HashMap<>();
         ServiceDTO serviceDTO = StackUtils.getServiceDTO(serviceName);
         // Collect component names for this service
-        List<String> componentNames = serviceDTO.getComponents().stream().map(c -> c.getName().toLowerCase()).toList();
+        List<String> componentNames = serviceDTO.getComponents().stream()
+                .map(c -> c.getName().toLowerCase())
+                .toList();
         for (Map.Entry<String, List<String>> entry : all.entrySet()) {
             String comp = entry.getKey();
             if (componentNames.contains(comp.toLowerCase())) {
