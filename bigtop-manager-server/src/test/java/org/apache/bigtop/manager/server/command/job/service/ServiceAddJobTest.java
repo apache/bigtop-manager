@@ -83,6 +83,10 @@ public class ServiceAddJobTest {
         when(ComponentStageHelper.createComponentStages(any(), eq(Command.CHECK), any()))
                 .thenReturn(stageList4);
 
+        // Ensure ordered services is non-empty to trigger stage aggregation in createStages
+        when(serviceAddJob.getOrderedServiceNamesForCommand(any())).thenReturn(List.of("dummy-service"));
+
+        // Use real method for createStages
         doCallRealMethod().when(serviceAddJob).createStages();
         serviceAddJob.createStages();
 
