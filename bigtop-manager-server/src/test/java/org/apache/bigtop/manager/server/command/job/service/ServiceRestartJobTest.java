@@ -71,6 +71,9 @@ public class ServiceRestartJobTest {
         when(ComponentStageHelper.createComponentStages(any(), eq(Command.START), any()))
                 .thenReturn(stageList2);
 
+        // Ensure ordered services is non-empty to trigger stage aggregation in createStages
+        when(serviceRestartJob.getOrderedServiceNamesForCommand(any())).thenReturn(List.of("dummy-service"));
+
         doCallRealMethod().when(serviceRestartJob).createStages();
         serviceRestartJob.createStages();
 
