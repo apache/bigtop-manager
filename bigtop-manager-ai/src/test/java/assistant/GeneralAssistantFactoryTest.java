@@ -58,7 +58,6 @@ class GeneralAssistantFactoryTest {
         when(mockBuilder.id(any())).thenReturn(mockBuilder);
         when(mockBuilder.memoryStore(any())).thenReturn(mockBuilder);
         when(mockBuilder.withConfig(any())).thenReturn(mockBuilder);
-        when(mockBuilder.withToolProvider(any())).thenReturn(mockBuilder);
         when(mockBuilder.withSystemPrompt(any())).thenReturn(mockBuilder);
         when(mockBuilder.build()).thenReturn(mock(AIAssistant.class));
 

@@ -22,10 +22,10 @@ import org.apache.bigtop.manager.ai.assistant.store.PersistentChatMemoryStore;
 import org.apache.bigtop.manager.dao.repository.ChatMessageDao;
 import org.apache.bigtop.manager.dao.repository.ChatThreadDao;
 
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.stereotype.Component;
-
-import dev.langchain4j.store.memory.chat.ChatMemoryStore;
-import dev.langchain4j.store.memory.chat.InMemoryChatMemoryStore;
 
 import jakarta.annotation.Resource;
 
@@ -37,11 +37,16 @@ public class ChatMemoryStoreProvider {
     @Resource
     private ChatMessageDao chatMessageDao;
 
-    public ChatMemoryStore createPersistentChatMemoryStore() {
-        return new PersistentChatMemoryStore(chatThreadDao, chatMessageDao);
+    public ChatMemory createPersistentChatMemoryStore(Object conversationId) {
+        PersistentChatMemoryStore repository = new PersistentChatMemoryStore((Long)conversationId, chatThreadDao, chatMessageDao);
+        return MessageWindowChatMemory.builder()
+                .chatMemoryRepository(repository)
+                .build();
     }
 
-    public ChatMemoryStore createInMemoryChatMemoryStore() {
-        return new InMemoryChatMemoryStore();
+    public ChatMemory createInMemoryChatMemoryStore() {
+        return MessageWindowChatMemory.builder()
+                .chatMemoryRepository(new InMemoryChatMemoryRepository())
+                .build();
     }
 }

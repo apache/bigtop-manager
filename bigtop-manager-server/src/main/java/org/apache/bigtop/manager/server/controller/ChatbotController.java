@@ -62,7 +62,7 @@ public class ChatbotController {
     @Operation(summary = "update thread", description = "Update a chat thread")
     @PutMapping("/threads/{threadId}")
     public ResponseEntity<ChatThreadVO> updateChatThread(
-            @PathVariable Long threadId, @RequestBody ChatbotThreadReq chatbotThreadReq) {
+            @PathVariable(name = "threadId") Long threadId, @RequestBody ChatbotThreadReq chatbotThreadReq) {
         ChatThreadDTO chatThreadDTO = ChatThreadConverter.INSTANCE.fromReq2DTO(chatbotThreadReq);
         chatThreadDTO.setId(threadId);
         return ResponseEntity.success(chatbotService.updateChatThread(chatThreadDTO));
@@ -70,13 +70,13 @@ public class ChatbotController {
 
     @Operation(summary = "delete thread", description = "Delete a chat thread")
     @DeleteMapping("/threads/{threadId}")
-    public ResponseEntity<Boolean> deleteChatThread(@PathVariable Long threadId) {
+    public ResponseEntity<Boolean> deleteChatThread(@PathVariable(name = "threadId") Long threadId) {
         return ResponseEntity.success(chatbotService.deleteChatThread(threadId));
     }
 
     @Operation(summary = "get thread", description = "Get a chat thread")
     @GetMapping("/threads/{threadId}")
-    public ResponseEntity<ChatThreadVO> getChatThread(@PathVariable Long threadId) {
+    public ResponseEntity<ChatThreadVO> getChatThread(@PathVariable(name = "threadId") Long threadId) {
         return ResponseEntity.success(chatbotService.getChatThread(threadId));
     }
 
@@ -88,7 +88,7 @@ public class ChatbotController {
 
     @Operation(summary = "talk", description = "Talk with Chatbot")
     @PostMapping("/threads/{threadId}/talk")
-    public SseEmitter talk(@PathVariable Long threadId, @RequestBody ChatbotMessageReq messageReq) {
+    public SseEmitter talk(@PathVariable(name = "threadId") Long threadId, @RequestBody ChatbotMessageReq messageReq) {
         ChatbotCommand command = ChatbotCommand.getCommandFromMessage(messageReq.getMessage());
         if (command != null) {
             messageReq.setMessage(
@@ -99,7 +99,7 @@ public class ChatbotController {
 
     @Operation(summary = "history", description = "Get chat records")
     @GetMapping("/threads/{threadId}/history")
-    public ResponseEntity<List<ChatMessageVO>> history(@PathVariable Long threadId) {
+    public ResponseEntity<List<ChatMessageVO>> history(@PathVariable(name = "threadId") Long threadId) {
         return ResponseEntity.success(chatbotService.history(threadId));
     }
 

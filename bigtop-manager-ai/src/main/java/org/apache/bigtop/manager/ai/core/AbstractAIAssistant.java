@@ -21,18 +21,19 @@ package org.apache.bigtop.manager.ai.core;
 import org.apache.bigtop.manager.ai.core.config.AIAssistantConfig;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 
-import dev.langchain4j.memory.ChatMemory;
-import dev.langchain4j.memory.chat.MessageWindowChatMemory;
-import dev.langchain4j.service.tool.ToolProvider;
-import dev.langchain4j.store.memory.chat.ChatMemoryStore;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import reactor.core.publisher.Flux;
 
 public abstract class AbstractAIAssistant implements AIAssistant {
     protected final AIAssistant.Service aiServices;
     protected static final Integer MEMORY_LEN = 10;
     protected final ChatMemory chatMemory;
+    protected final Object memoryId;
 
-    protected AbstractAIAssistant(ChatMemory chatMemory, AIAssistant.Service aiServices) {
+    protected AbstractAIAssistant(Object memoryId, ChatMemory chatMemory, AIAssistant.Service aiServices) {
+        this.memoryId = memoryId;
         this.chatMemory = chatMemory;
         this.aiServices = aiServices;
     }
@@ -44,7 +45,7 @@ public abstract class AbstractAIAssistant implements AIAssistant {
 
     @Override
     public Object getId() {
-        return chatMemory.id();
+        return memoryId;
     }
 
     @Override
@@ -60,18 +61,12 @@ public abstract class AbstractAIAssistant implements AIAssistant {
     public abstract static class Builder implements AIAssistant.Builder {
         protected Object id;
 
-        protected ChatMemoryStore chatMemoryStore;
+        protected ChatMemory chatMemory;
         protected AIAssistantConfig config;
 
-        protected ToolProvider toolProvider;
         protected String systemPrompt;
 
         public Builder() {}
-
-        public Builder withToolProvider(ToolProvider toolProvider) {
-            this.toolProvider = toolProvider;
-            return this;
-        }
 
         public Builder withSystemPrompt(String systemPrompt) {
             this.systemPrompt = systemPrompt;
@@ -88,19 +83,18 @@ public abstract class AbstractAIAssistant implements AIAssistant {
             return this;
         }
 
-        public Builder memoryStore(ChatMemoryStore chatMemoryStore) {
-            this.chatMemoryStore = chatMemoryStore;
+        public Builder memoryStore(ChatMemory chatMemory) {
+            this.chatMemory = chatMemory;
             return this;
         }
 
-        public MessageWindowChatMemory getChatMemory() {
-            MessageWindowChatMemory.Builder builder = MessageWindowChatMemory.builder()
-                    .chatMemoryStore(chatMemoryStore)
-                    .maxMessages(MEMORY_LEN);
-            if (id != null) {
-                builder.id(id);
+        public ChatMemory getChatMemory() {
+            if (chatMemory == null) {
+                chatMemory = MessageWindowChatMemory.builder()
+                        .chatMemoryRepository(new InMemoryChatMemoryRepository())
+                        .build();
             }
-            return builder.build();
+            return chatMemory;
         }
     }
 }
