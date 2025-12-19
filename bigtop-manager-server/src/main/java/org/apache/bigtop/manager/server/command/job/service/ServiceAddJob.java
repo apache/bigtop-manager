@@ -93,7 +93,9 @@ public class ServiceAddJob extends AbstractServiceJob {
                         String componentName = componentHost.getComponentName();
                         List<String> hostnames = componentHost.getHostnames();
                         if (CollectionUtils.isEmpty(hostnames)) {
-                            throw new RuntimeException("No hostnames found for component " + componentName);
+                            //                            throw new RuntimeException("No hostnames found for component "
+                            // + componentName);
+                            continue;
                         }
                         componentHostsMap.put(componentName, hostnames);
                     }

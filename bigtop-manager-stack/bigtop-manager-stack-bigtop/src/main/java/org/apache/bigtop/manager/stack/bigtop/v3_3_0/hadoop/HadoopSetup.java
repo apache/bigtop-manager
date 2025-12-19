@@ -23,6 +23,7 @@ import org.apache.bigtop.manager.common.shell.ShellResult;
 import org.apache.bigtop.manager.stack.core.enums.ConfigType;
 import org.apache.bigtop.manager.stack.core.exception.StackException;
 import org.apache.bigtop.manager.stack.core.spi.param.Params;
+import org.apache.bigtop.manager.stack.core.utils.LocalSettings;
 import org.apache.bigtop.manager.stack.core.utils.linux.LinuxFileUtils;
 import org.apache.bigtop.manager.stack.core.utils.linux.LinuxOSUtils;
 
@@ -33,8 +34,12 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.text.MessageFormat;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -70,6 +75,14 @@ public class HadoopSetup {
                 case "secondarynamenode": {
                     LinuxFileUtils.createDirectories(
                             hadoopParams.getDfsNameNodeCheckPointDir(),
+                            hadoopUser,
+                            hadoopGroup,
+                            Constants.PERMISSION_755,
+                            true);
+                }
+                case "journalnode": {
+                    LinuxFileUtils.createDirectories(
+                            hadoopParams.getDfsJourNalNodeDir(),
                             hadoopUser,
                             hadoopGroup,
                             Constants.PERMISSION_755,
@@ -229,9 +242,13 @@ public class HadoopSetup {
     public static void formatNameNode(HadoopParams hadoopParams) {
         if (!isNameNodeFormatted(hadoopParams)) {
             String formatCmd = MessageFormat.format(
-                    "{0}/hdfs --config {1} namenode -format -nonInteractive",
+                    "{0}/hdfs --config {1} namenode -format -nonInteractive -force",
                     hadoopParams.binDir(), hadoopParams.confDir());
             try {
+                boolean allJnReachable = checkAllJournalNodesPortReachable(hadoopParams);
+                if (!allJnReachable) {
+                    throw new StackException("Cannot format NameNode: Some JournalNodes are unreachable.");
+                }
                 LinuxOSUtils.sudoExecCmd(formatCmd, hadoopParams.user());
             } catch (Exception e) {
                 throw new StackException(e);
@@ -246,6 +263,59 @@ public class HadoopSetup {
                         true);
             }
         }
+    }
+
+    private static boolean checkAllJournalNodesPortReachable(HadoopParams hadoopParams) throws InterruptedException {
+        List<String> journalNodeList = LocalSettings.componentHosts("journalnode");
+        String port = hadoopParams.getJournalHttpPort();
+        if (journalNodeList == null || journalNodeList.isEmpty()) {
+            throw new IllegalArgumentException("JournalNode host list cannot be empty!");
+        }
+        int retryCount = 0;
+        int maxRetry = 100;
+        long retryIntervalMs = 2000;
+        int connectTimeoutMs = 1000;
+        while (retryCount < maxRetry) {
+            boolean allReachable = true;
+            for (String host : journalNodeList) {
+                boolean isReachable = false;
+                Socket socket = null;
+                try {
+                    socket = new Socket();
+                    socket.connect(new InetSocketAddress(host, Integer.parseInt(port)), connectTimeoutMs);
+                    isReachable = true;
+                    log.info("JournalNode [{}:{}] is reachable.", host, port);
+                } catch (Exception e) {
+                    allReachable = false;
+                    log.warn(
+                            "JournalNode [{}:{}] is NOT reachable (retry {}/{}). Error: {}",
+                            host,
+                            port,
+                            retryCount + 1,
+                            maxRetry,
+                            e.getMessage());
+                } finally {
+                    if (socket != null && !socket.isClosed()) {
+                        try {
+                            socket.close();
+                        } catch (Exception e) {
+                            log.debug("Failed to close socket for [{}:{}].", host, port, e);
+                        }
+                    }
+                }
+            }
+            if (allReachable) {
+                log.info("All {} JournalNodes are reachable. Proceeding to format NameNode.", journalNodeList.size());
+                return true;
+            }
+            retryCount++;
+            if (retryCount < maxRetry) {
+                log.info("Waiting {}ms before next retry ({} remaining).", retryIntervalMs, maxRetry - retryCount);
+                TimeUnit.MILLISECONDS.sleep(retryIntervalMs);
+            }
+        }
+        log.error("Failed to reach all JournalNodes after {} retries. JournalNode list: {}", maxRetry, journalNodeList);
+        return false;
     }
 
     public static boolean isNameNodeFormatted(HadoopParams hadoopParams) {
