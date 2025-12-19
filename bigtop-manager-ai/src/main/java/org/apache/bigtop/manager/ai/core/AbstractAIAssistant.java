@@ -24,6 +24,7 @@ import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
+
 import reactor.core.publisher.Flux;
 
 public abstract class AbstractAIAssistant implements AIAssistant {

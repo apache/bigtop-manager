@@ -27,10 +27,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
@@ -130,7 +128,7 @@ class PersistentChatMemoryStoreTest {
         systemMessagePO.setMessage("Hello from System");
 
         when(chatMessageDao.findAllByThreadId(threadId)).thenReturn(List.of(systemMessagePO));
-        
+
         List<Message> result = persistentChatMemoryStore.findByConversationId(String.valueOf(threadId));
 
         assertEquals(1, result.size());

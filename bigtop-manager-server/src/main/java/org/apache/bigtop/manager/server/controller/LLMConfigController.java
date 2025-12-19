@@ -64,7 +64,8 @@ public class LLMConfigController {
 
     @Operation(summary = "platform credentials", description = "Get platform auth credentials")
     @GetMapping("/platforms/{platformId}/auth-credentials")
-    public ResponseEntity<List<PlatformAuthCredentialVO>> platformsAuthCredential(@PathVariable(name = "platformId") Long platformId) {
+    public ResponseEntity<List<PlatformAuthCredentialVO>> platformsAuthCredential(
+            @PathVariable(name = "platformId") Long platformId) {
         return ResponseEntity.success(llmConfigService.platformsAuthCredentials(platformId));
     }
 

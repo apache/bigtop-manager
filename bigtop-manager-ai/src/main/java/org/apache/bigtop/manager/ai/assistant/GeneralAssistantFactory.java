@@ -68,8 +68,7 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
     }
 
     @Override
-    public AIAssistant createWithPrompt(
-            AIAssistantConfig config, Object toolProvider, SystemPrompt systemPrompt) {
+    public AIAssistant createWithPrompt(AIAssistantConfig config, Object toolProvider, SystemPrompt systemPrompt) {
         GeneralAssistantConfig generalAssistantConfig = (GeneralAssistantConfig) config;
         PlatformType platformType = generalAssistantConfig.getPlatformType();
         Object id = generalAssistantConfig.getId();

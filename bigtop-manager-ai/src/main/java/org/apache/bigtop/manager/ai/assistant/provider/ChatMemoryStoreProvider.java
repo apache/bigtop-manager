@@ -38,7 +38,8 @@ public class ChatMemoryStoreProvider {
     private ChatMessageDao chatMessageDao;
 
     public ChatMemory createPersistentChatMemoryStore(Object conversationId) {
-        PersistentChatMemoryStore repository = new PersistentChatMemoryStore((Long)conversationId, chatThreadDao, chatMessageDao);
+        PersistentChatMemoryStore repository =
+                new PersistentChatMemoryStore((Long) conversationId, chatThreadDao, chatMessageDao);
         return MessageWindowChatMemory.builder()
                 .chatMemoryRepository(repository)
                 .build();

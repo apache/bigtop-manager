@@ -33,6 +33,7 @@ import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.util.Assert;
+
 import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
@@ -63,14 +64,10 @@ public class OpenAIAssistant extends AbstractAIAssistant {
             Assert.notNull(model, "model must not be null");
             String apiKey = config.getCredentials().get("apiKey");
             Assert.notNull(apiKey, "apiKey must not be null");
-            
-            OpenAiApi openAiApi = OpenAiApi.builder()
-                    .baseUrl(BASE_URL)
-                    .apiKey(apiKey)
-                    .build();
-            OpenAiChatOptions options = OpenAiChatOptions.builder()
-                    .model(model)
-                    .build();
+
+            OpenAiApi openAiApi =
+                    OpenAiApi.builder().baseUrl(BASE_URL).apiKey(apiKey).build();
+            OpenAiChatOptions options = OpenAiChatOptions.builder().model(model).build();
             return OpenAiChatModel.builder()
                     .openAiApi(openAiApi)
                     .defaultOptions(options)
@@ -87,7 +84,7 @@ public class OpenAIAssistant extends AbstractAIAssistant {
             ChatModel chatModel = getChatModel();
             StreamingChatModel streamingChatModel = getStreamingChatModel();
             ChatMemory memory = getChatMemory();
-            
+
             AIAssistant.Service aiService = new AIAssistant.Service() {
                 @Override
                 public String chat(String userMessage) {
@@ -102,13 +99,18 @@ public class OpenAIAssistant extends AbstractAIAssistant {
                     // Add new user message
                     UserMessage newUserMessage = new UserMessage(userMessage);
                     messages.add(newUserMessage);
-                    
+
                     Prompt prompt = new Prompt(messages);
-                    String response = chatModel.call(prompt).getResult().getOutput().getText();
-                    
+                    String response =
+                            chatModel.call(prompt).getResult().getOutput().getText();
+
                     // Save to memory
-                    memory.add(convId, List.of(newUserMessage, new org.springframework.ai.chat.messages.AssistantMessage(response)));
-                    
+                    memory.add(
+                            convId,
+                            List.of(
+                                    newUserMessage,
+                                    new org.springframework.ai.chat.messages.AssistantMessage(response)));
+
                     return response;
                 }
 
@@ -125,13 +127,14 @@ public class OpenAIAssistant extends AbstractAIAssistant {
                     // Add new user message
                     UserMessage newUserMessage = new UserMessage(userMessage);
                     messages.add(newUserMessage);
-                    
+
                     Prompt prompt = new Prompt(messages);
-                    
+
                     StringBuilder responseBuilder = new StringBuilder();
                     return streamingChatModel.stream(prompt)
                             .map(chatResponse -> {
-                                String content = chatResponse.getResult().getOutput().getText();
+                                String content =
+                                        chatResponse.getResult().getOutput().getText();
                                 if (content != null) {
                                     responseBuilder.append(content);
                                 }
@@ -139,11 +142,16 @@ public class OpenAIAssistant extends AbstractAIAssistant {
                             })
                             .doOnComplete(() -> {
                                 // Save to memory when streaming completes
-                                memory.add(convId, List.of(newUserMessage, new org.springframework.ai.chat.messages.AssistantMessage(responseBuilder.toString())));
+                                memory.add(
+                                        convId,
+                                        List.of(
+                                                newUserMessage,
+                                                new org.springframework.ai.chat.messages.AssistantMessage(
+                                                        responseBuilder.toString())));
                             });
                 }
             };
-            
+
             return new OpenAIAssistant(id, memory, aiService);
         }
     }
