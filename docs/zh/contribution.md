@@ -16,7 +16,7 @@
 
 ## 设置
 ### 获取代码
-首先，您需要通过以下命令从 Github 中拉取 Bigtop Manager 源码:
+首先，您需要通过以下命令从 GitHub 中拉取 Bigtop Manager 源码:
 
 `git clone git@github.com:apache/bigtop-manager.git`
 
@@ -103,24 +103,17 @@ Vue:
 ./mvnw -pl bigtop-manager-ui test
 ```
 
-## 创建 Issue
-1、首先进入 Apache Jira 中的 [Bigtop](https://issues.apache.org/jira/projects/BIGTOP) 项目
-
-2、创建 Issue
-
-3、确保 Issue 的 Summary 是英文描述，如果可以的话请将细节写到 Description 下，也需要使用英文
-
-4、如果是给 Bigtop Manager 提交项目，点击 Components 选项，选中 bigtop-manager，并且 Fix Version 也需要选择对应的版本，Bigtop Manager 以 bm- 开头，如 bm-1.0.0 代表这个 issue 将在 Bigtop Manager 1.0.0 版本修复。Affects Version 可选，规则同上
-
 ## 提交代码
-1、获取 Issue 编号，编号可从 Jira 页面或者 URL 中获取，如当前的 URL 为: [https://issues.apache.org/jira/browse/BIGTOP-4162](https://issues.apache.org/jira/browse/BIGTOP-4162)，则编号为 BIGTOP-4162
+1、在 GitHub 上 Fork 该项目
 
-2、创建本地分支，建议一个 Issue 对应一个分支，如 `git checkout -b bigtop-4162`
+2、在本地克隆你 Fork 的仓库，如 `git clone git@github.com:your-username/bigtop-manager.git`
 
-3、提交代码至该分支中，并且将分支推到你的 Github 上的 Fork 的仓库中
+3、创建本地分支，如 `git checkout -b your-branch-name`
 
-4、创建 Pull Request，其中 Title 的命名规则为 `ISSUE编号: 描述`，如 `BIGTOP-4162: Add health check for components`，若 PR 较复杂，建议 Issue 和 PR 都编写 Description 来解释具体用途
+4、提交代码至该分支中，并且将分支推到你的 GitHub 上的 Fork 的仓库中
 
-5、确保 Github CI 均通过，若有一个失败则 PR 将不会被 Review
+5、创建 Pull Request，其中 Title 的命名规则需遵守 [Conventional Commits Specification](https://www.conventionalcommits.org/) 规范
 
-6、CI 正常后等待 Maintainer Review 你的 PR，若有 Comment 请及时处理，Review 通过后即可被合并
+6、确保 GitHub CI 均通过，若有一个失败则 PR 将不会被 Review
+
+7、CI 正常后等待 Maintainer Review 你的 PR，若有 Comment 请及时处理，Review 通过后即可被合并
