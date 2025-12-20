@@ -37,11 +37,27 @@ public class ServiceConfigureJob extends AbstractServiceJob {
         CommandDTO commandDTO = jobContext.getCommandDTO();
         Map<String, List<String>> componentHostsMap = getComponentHostsMap();
 
-        stages.addAll(ComponentStageHelper.createComponentStages(componentHostsMap, Command.CONFIGURE, commandDTO));
+        // Order services for CONFIGURE and restart
+        List<String> orderedServices =
+                getOrderedServiceNamesForCommand(org.apache.bigtop.manager.common.enums.Command.CONFIGURE);
+        for (String serviceName : orderedServices) {
+            Map<String, List<String>> perServiceHosts = filterComponentHostsByService(componentHostsMap, serviceName);
+            stages.addAll(ComponentStageHelper.createComponentStages(perServiceHosts, Command.CONFIGURE, commandDTO));
+        }
 
-        // Restart services
-        stages.addAll(ComponentStageHelper.createComponentStages(componentHostsMap, Command.STOP, commandDTO));
-        stages.addAll(ComponentStageHelper.createComponentStages(componentHostsMap, Command.START, commandDTO));
+        // Restart services stop then start respecting ordering
+        List<String> stopServices =
+                getOrderedServiceNamesForCommand(org.apache.bigtop.manager.common.enums.Command.STOP);
+        for (String serviceName : stopServices) {
+            Map<String, List<String>> perServiceHosts = filterComponentHostsByService(componentHostsMap, serviceName);
+            stages.addAll(ComponentStageHelper.createComponentStages(perServiceHosts, Command.STOP, commandDTO));
+        }
+        List<String> startServices =
+                getOrderedServiceNamesForCommand(org.apache.bigtop.manager.common.enums.Command.START);
+        for (String serviceName : startServices) {
+            Map<String, List<String>> perServiceHosts = filterComponentHostsByService(componentHostsMap, serviceName);
+            stages.addAll(ComponentStageHelper.createComponentStages(perServiceHosts, Command.START, commandDTO));
+        }
     }
 
     @Override

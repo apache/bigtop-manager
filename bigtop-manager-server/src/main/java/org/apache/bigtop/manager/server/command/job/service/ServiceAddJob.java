@@ -64,21 +64,25 @@ public class ServiceAddJob extends AbstractServiceJob {
         CommandDTO commandDTO = jobContext.getCommandDTO();
         Map<String, List<String>> componentHostsMap = getComponentHostsMap();
 
-        // Install components
-        stages.addAll(ComponentStageHelper.createComponentStages(componentHostsMap, Command.ADD, commandDTO));
+        // Order services by required-services for ADD
+        List<String> orderedServices =
+                getOrderedServiceNamesForCommand(org.apache.bigtop.manager.common.enums.Command.ADD);
+        for (String serviceName : orderedServices) {
+            Map<String, List<String>> perServiceHosts = filterComponentHostsByService(componentHostsMap, serviceName);
 
-        // Configure components
-        stages.addAll(ComponentStageHelper.createComponentStages(componentHostsMap, Command.CONFIGURE, commandDTO));
+            // Install components
+            stages.addAll(ComponentStageHelper.createComponentStages(perServiceHosts, Command.ADD, commandDTO));
 
-        // Init/Start/Prepare components
-        // Since the order of these stages might be mixed up, we need to sort and add them together.
-        // For example, the order usually is init -> start -> prepare, but Hive Metastore init requires MySQL Server to
-        // be prepared.
-        List<Command> commands = List.of(Command.INIT, Command.START, Command.PREPARE);
-        stages.addAll(ComponentStageHelper.createComponentStages(componentHostsMap, commands, commandDTO));
+            // Configure components
+            stages.addAll(ComponentStageHelper.createComponentStages(perServiceHosts, Command.CONFIGURE, commandDTO));
 
-        // Check all master components after started
-        stages.addAll(ComponentStageHelper.createComponentStages(componentHostsMap, Command.CHECK, commandDTO));
+            // Init/Start/Prepare components (combined ordering handled in helper)
+            List<Command> commands = List.of(Command.INIT, Command.START, Command.PREPARE);
+            stages.addAll(ComponentStageHelper.createComponentStages(perServiceHosts, commands, commandDTO));
+
+            // Check all master components after started
+            stages.addAll(ComponentStageHelper.createComponentStages(perServiceHosts, Command.CHECK, commandDTO));
+        }
     }
 
     @Override
