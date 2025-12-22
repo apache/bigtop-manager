@@ -174,10 +174,17 @@
       >
         <template #platformId="{ item }">
           <a-select
-            v-model:value="item[item.field]"
-            :options="item.props?.options"
-            :placeholder="t('common.select_error', [t('llmConfig.model').toLowerCase()])"
+            v-model:value="currPlatform[item.field]"
+            :options="item?.props?.options"
+            :placeholder="t('common.select_error', [t('llmConfig.platform_name').toLowerCase()])"
             @change="onPlatformChange"
+          ></a-select>
+        </template>
+        <template #model="{ item }">
+          <a-select
+            v-model:value="currPlatform[item.field]"
+            :options="item?.props?.options"
+            :placeholder="t('common.select_error', [t('llmConfig.model').toLowerCase()])"
           ></a-select>
         </template>
       </form-builder>
