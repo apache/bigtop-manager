@@ -50,8 +50,7 @@ export const useLlmConfigStore = defineStore(
     const formKeys = computed(() => formCredentials.value.map((v) => v.name))
     const isDisabled = computed(() => loading.value || loadingTest.value)
     const supportModels = computed(() => {
-      const { platformId } = currPlatform.value
-      return platforms.value.find((item) => item.id === platformId)?.supportModels
+      return platforms.value.find((item) => item.id === currPlatform.value.platformId)?.supportModels
     })
     const authCredentials = computed(() =>
       formCredentials.value.map((v) => ({
