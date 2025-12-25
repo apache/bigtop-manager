@@ -24,12 +24,12 @@ import org.apache.bigtop.manager.dao.po.ChatThreadPO;
 import org.apache.bigtop.manager.dao.repository.ChatMessageDao;
 import org.apache.bigtop.manager.dao.repository.ChatThreadDao;
 
-import dev.langchain4j.data.message.AiMessage;
-import dev.langchain4j.data.message.ChatMessage;
-import dev.langchain4j.data.message.ChatMessageType;
-import dev.langchain4j.data.message.SystemMessage;
-import dev.langchain4j.data.message.UserMessage;
-import dev.langchain4j.store.memory.chat.ChatMemoryStore;
+import org.springframework.ai.chat.memory.ChatMemoryRepository;
+import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.SystemMessage;
+import org.springframework.ai.chat.messages.UserMessage;
+
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -38,41 +38,49 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class PersistentChatMemoryStore implements ChatMemoryStore {
+public class PersistentChatMemoryStore implements ChatMemoryRepository {
 
-    private final List<ChatMessage> messagesInMemory = new ArrayList<>();
+    private final List<Message> messagesInMemory = new ArrayList<>();
     private final ChatThreadDao chatThreadDao;
     private final ChatMessageDao chatMessageDao;
+    private final Long conversationId;
 
-    public PersistentChatMemoryStore(ChatThreadDao chatThreadDao, ChatMessageDao chatMessageDao) {
+    public PersistentChatMemoryStore(Long conversationId, ChatThreadDao chatThreadDao, ChatMessageDao chatMessageDao) {
+        this.conversationId = conversationId;
         this.chatThreadDao = chatThreadDao;
         this.chatMessageDao = chatMessageDao;
     }
 
-    private ChatMessage convertToChatMessage(ChatMessagePO chatMessagePO) {
+    private Message convertToChatMessage(ChatMessagePO chatMessagePO) {
         String sender = chatMessagePO.getSender().toLowerCase();
         if (sender.equals(MessageType.AI.getValue())) {
-            return new AiMessage(chatMessagePO.getMessage());
+            return new AssistantMessage(chatMessagePO.getMessage());
         } else if (sender.equals(MessageType.USER.getValue())) {
             return new UserMessage(chatMessagePO.getMessage());
+        } else if (sender.equals(MessageType.SYSTEM.getValue())) {
+            return new SystemMessage(chatMessagePO.getMessage());
         } else {
             return null;
         }
     }
 
-    private ChatMessagePO convertToChatMessagePO(ChatMessage chatMessage, Long chatThreadId) {
+    private ChatMessagePO convertToChatMessagePO(Message message, Long chatThreadId) {
         ChatMessagePO chatMessagePO = new ChatMessagePO();
-        if (chatMessage.type().equals(ChatMessageType.AI)) {
+        if (message.getMessageType() == org.springframework.ai.chat.messages.MessageType.ASSISTANT) {
             chatMessagePO.setSender(MessageType.AI.getValue());
-            AiMessage aiMessage = (AiMessage) chatMessage;
-            if (aiMessage.text() == null) {
+            AssistantMessage assistantMessage = (AssistantMessage) message;
+            if (assistantMessage.getText() == null) {
                 return null;
             }
-            chatMessagePO.setMessage(aiMessage.text());
-        } else if (chatMessage.type().equals(ChatMessageType.USER)) {
+            chatMessagePO.setMessage(assistantMessage.getText());
+        } else if (message.getMessageType() == org.springframework.ai.chat.messages.MessageType.USER) {
             chatMessagePO.setSender(MessageType.USER.getValue());
-            UserMessage userMessage = (UserMessage) chatMessage;
-            chatMessagePO.setMessage(userMessage.singleText());
+            UserMessage userMessage = (UserMessage) message;
+            chatMessagePO.setMessage(userMessage.getText());
+        } else if (message.getMessageType() == org.springframework.ai.chat.messages.MessageType.SYSTEM) {
+            chatMessagePO.setSender(MessageType.SYSTEM.getValue());
+            SystemMessage systemMessage = (SystemMessage) message;
+            chatMessagePO.setMessage(systemMessage.getText());
         } else {
             return null;
         }
@@ -82,11 +90,11 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
         return chatMessagePO;
     }
 
-    private List<ChatMessage> sortMessages(List<ChatMessage> messages) {
-        List<ChatMessage> systemMessages = messages.stream()
+    private List<Message> sortMessages(List<Message> messages) {
+        List<Message> systemMessages = messages.stream()
                 .filter(message -> message instanceof SystemMessage)
                 .collect(Collectors.toList());
-        List<ChatMessage> otherMessages = messages.stream()
+        List<Message> otherMessages = messages.stream()
                 .filter(message -> !(message instanceof SystemMessage))
                 .toList();
 
@@ -95,9 +103,15 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
     }
 
     @Override
-    public List<ChatMessage> getMessages(Object threadId) {
-        List<ChatMessagePO> chatMessages = chatMessageDao.findAllByThreadId((Long) threadId);
-        List<ChatMessage> allChatMessages = new ArrayList<>();
+    public List<String> findConversationIds() {
+        // Return the current conversation ID as a list
+        return List.of(String.valueOf(conversationId));
+    }
+
+    @Override
+    public List<Message> findByConversationId(String conversationId) {
+        List<ChatMessagePO> chatMessages = chatMessageDao.findAllByThreadId(this.conversationId);
+        List<Message> allChatMessages = new ArrayList<>();
         if (!chatMessages.isEmpty()) {
             allChatMessages.addAll(chatMessages.stream()
                     .map(this::convertToChatMessage)
@@ -111,20 +125,22 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
     }
 
     @Override
-    public void updateMessages(Object threadId, List<ChatMessage> messages) {
-        ChatMessage newMessage = messages.get(messages.size() - 1);
-        ChatMessagePO chatMessagePO = convertToChatMessagePO(newMessage, (Long) threadId);
-        if (chatMessagePO == null) {
-            messagesInMemory.add(newMessage);
-            return;
+    public void saveAll(String conversationId, List<Message> messages) {
+        for (Message message : messages) {
+            ChatMessagePO chatMessagePO = convertToChatMessagePO(message, this.conversationId);
+            if (chatMessagePO == null) {
+                messagesInMemory.add(message);
+                continue;
+            }
+            chatMessageDao.save(chatMessagePO);
         }
-        chatMessageDao.save(chatMessagePO);
     }
 
     @Override
-    public void deleteMessages(Object threadId) {
-        List<ChatMessagePO> chatMessagePOS = chatMessageDao.findAllByThreadId((Long) threadId);
+    public void deleteByConversationId(String conversationId) {
+        List<ChatMessagePO> chatMessagePOS = chatMessageDao.findAllByThreadId(this.conversationId);
         chatMessagePOS.forEach(chatMessage -> chatMessage.setIsDeleted(true));
         chatMessageDao.partialUpdateByIds(chatMessagePOS);
+        messagesInMemory.clear();
     }
 }

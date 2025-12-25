@@ -34,8 +34,6 @@ import org.apache.bigtop.manager.ai.platform.QianFanAssistant;
 
 import org.springframework.stereotype.Component;
 
-import dev.langchain4j.service.tool.ToolProvider;
-
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,8 +68,7 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
     }
 
     @Override
-    public AIAssistant createWithPrompt(
-            AIAssistantConfig config, ToolProvider toolProvider, SystemPrompt systemPrompt) {
+    public AIAssistant createWithPrompt(AIAssistantConfig config, Object toolProvider, SystemPrompt systemPrompt) {
         GeneralAssistantConfig generalAssistantConfig = (GeneralAssistantConfig) config;
         PlatformType platformType = generalAssistantConfig.getPlatformType();
         Object id = generalAssistantConfig.getId();
@@ -81,9 +78,8 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
 
         AIAssistant.Builder builder = initializeBuilder(platformType);
         builder.id(id)
-                .memoryStore(chatMemoryStoreProvider.createPersistentChatMemoryStore())
-                .withConfig(generalAssistantConfig)
-                .withToolProvider(toolProvider);
+                .memoryStore(chatMemoryStoreProvider.createPersistentChatMemoryStore(id))
+                .withConfig(generalAssistantConfig);
 
         configureSystemPrompt(builder, systemPrompt, generalAssistantConfig.getLanguage());
 
@@ -91,15 +87,14 @@ public class GeneralAssistantFactory extends AbstractAIAssistantFactory {
     }
 
     @Override
-    public AIAssistant createForTest(AIAssistantConfig config, ToolProvider toolProvider) {
+    public AIAssistant createForTest(AIAssistantConfig config, Object toolProvider) {
         GeneralAssistantConfig generalAssistantConfig = (GeneralAssistantConfig) config;
         PlatformType platformType = generalAssistantConfig.getPlatformType();
         AIAssistant.Builder builder = initializeBuilder(platformType);
 
         builder.id(null)
                 .memoryStore(chatMemoryStoreProvider.createInMemoryChatMemoryStore())
-                .withConfig(generalAssistantConfig)
-                .withToolProvider(toolProvider);
+                .withConfig(generalAssistantConfig);
 
         return builder.build();
     }

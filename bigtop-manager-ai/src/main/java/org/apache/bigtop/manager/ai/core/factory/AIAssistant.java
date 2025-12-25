@@ -21,11 +21,10 @@ package org.apache.bigtop.manager.ai.core.factory;
 import org.apache.bigtop.manager.ai.core.config.AIAssistantConfig;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 
-import dev.langchain4j.memory.ChatMemory;
-import dev.langchain4j.model.chat.ChatModel;
-import dev.langchain4j.model.chat.StreamingChatModel;
-import dev.langchain4j.service.tool.ToolProvider;
-import dev.langchain4j.store.memory.chat.ChatMemoryStore;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.model.StreamingChatModel;
+
 import reactor.core.publisher.Flux;
 
 public interface AIAssistant {
@@ -72,11 +71,9 @@ public interface AIAssistant {
     interface Builder {
         Builder id(Object id);
 
-        Builder memoryStore(ChatMemoryStore memoryStore);
+        Builder memoryStore(ChatMemory memoryStore);
 
         Builder withConfig(AIAssistantConfig configProvider);
-
-        Builder withToolProvider(ToolProvider toolProvider);
 
         Builder withSystemPrompt(String systemPrompt);
 

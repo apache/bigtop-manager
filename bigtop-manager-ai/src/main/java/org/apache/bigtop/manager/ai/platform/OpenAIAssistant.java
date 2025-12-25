@@ -22,20 +22,29 @@ import org.apache.bigtop.manager.ai.core.AbstractAIAssistant;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 
-import dev.langchain4j.internal.ValidationUtils;
-import dev.langchain4j.memory.ChatMemory;
-import dev.langchain4j.model.chat.ChatModel;
-import dev.langchain4j.model.chat.StreamingChatModel;
-import dev.langchain4j.model.openai.OpenAiChatModel;
-import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
-import dev.langchain4j.service.AiServices;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.SystemMessage;
+import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.model.StreamingChatModel;
+import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.util.Assert;
+
+import reactor.core.publisher.Flux;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class OpenAIAssistant extends AbstractAIAssistant {
 
-    private static final String BASE_URL = "https://api.openai.com/v1";
+    private static final String BASE_URL = "https://api.openai.com";
 
-    public OpenAIAssistant(ChatMemory chatMemory, AIAssistant.Service aiServices) {
-        super(chatMemory, aiServices);
+    public OpenAIAssistant(Object memoryId, ChatMemory chatMemory, AIAssistant.Service aiServices) {
+        super(memoryId, chatMemory, aiServices);
     }
 
     @Override
@@ -51,42 +60,99 @@ public class OpenAIAssistant extends AbstractAIAssistant {
 
         @Override
         public ChatModel getChatModel() {
-            String model = ValidationUtils.ensureNotNull(config.getModel(), "model");
-            String apiKey =
-                    ValidationUtils.ensureNotNull(config.getCredentials().get("apiKey"), "apiKey");
+            String model = config.getModel();
+            Assert.notNull(model, "model must not be null");
+            String apiKey = config.getCredentials().get("apiKey");
+            Assert.notNull(apiKey, "apiKey must not be null");
+
+            OpenAiApi openAiApi =
+                    OpenAiApi.builder().baseUrl(BASE_URL).apiKey(apiKey).build();
+            OpenAiChatOptions options = OpenAiChatOptions.builder().model(model).build();
             return OpenAiChatModel.builder()
-                    .apiKey(apiKey)
-                    .baseUrl(BASE_URL)
-                    .modelName(model)
+                    .openAiApi(openAiApi)
+                    .defaultOptions(options)
                     .build();
         }
 
         @Override
         public StreamingChatModel getStreamingChatModel() {
-            String model = ValidationUtils.ensureNotNull(config.getModel(), "model");
-            String apiKey =
-                    ValidationUtils.ensureNotNull(config.getCredentials().get("apiKey"), "apiKey");
-            return OpenAiStreamingChatModel.builder()
-                    .apiKey(apiKey)
-                    .baseUrl(BASE_URL)
-                    .modelName(model)
-                    .build();
+            // In Spring AI, OpenAiChatModel handles both sync and streaming
+            return getChatModel();
         }
 
         public AIAssistant build() {
-            AIAssistant.Service aiService = AiServices.builder(AIAssistant.Service.class)
-                    .chatModel(getChatModel())
-                    .streamingChatModel(getStreamingChatModel())
-                    .chatMemory(getChatMemory())
-                    .toolProvider(toolProvider)
-                    .systemMessageProvider(threadId -> {
-                        if (threadId != null) {
-                            return systemPrompt;
-                        }
-                        return null;
-                    })
-                    .build();
-            return new OpenAIAssistant(getChatMemory(), aiService);
+            ChatModel chatModel = getChatModel();
+            StreamingChatModel streamingChatModel = getStreamingChatModel();
+            ChatMemory memory = getChatMemory();
+
+            AIAssistant.Service aiService = new AIAssistant.Service() {
+                @Override
+                public String chat(String userMessage) {
+                    List<Message> messages = new ArrayList<>();
+                    if (systemPrompt != null) {
+                        messages.add(new SystemMessage(systemPrompt));
+                    }
+                    // Add conversation history
+                    String convId = String.valueOf(id);
+                    List<Message> history = memory.get(convId);
+                    messages.addAll(history);
+                    // Add new user message
+                    UserMessage newUserMessage = new UserMessage(userMessage);
+                    messages.add(newUserMessage);
+
+                    Prompt prompt = new Prompt(messages);
+                    String response =
+                            chatModel.call(prompt).getResult().getOutput().getText();
+
+                    // Save to memory
+                    memory.add(
+                            convId,
+                            List.of(
+                                    newUserMessage,
+                                    new org.springframework.ai.chat.messages.AssistantMessage(response)));
+
+                    return response;
+                }
+
+                @Override
+                public Flux<String> streamChat(String userMessage) {
+                    List<Message> messages = new ArrayList<>();
+                    if (systemPrompt != null) {
+                        messages.add(new SystemMessage(systemPrompt));
+                    }
+                    // Add conversation history
+                    String convId = String.valueOf(id);
+                    List<Message> history = memory.get(convId);
+                    messages.addAll(history);
+                    // Add new user message
+                    UserMessage newUserMessage = new UserMessage(userMessage);
+                    messages.add(newUserMessage);
+
+                    Prompt prompt = new Prompt(messages);
+
+                    StringBuilder responseBuilder = new StringBuilder();
+                    return streamingChatModel.stream(prompt)
+                            .map(chatResponse -> {
+                                String content =
+                                        chatResponse.getResult().getOutput().getText();
+                                if (content != null) {
+                                    responseBuilder.append(content);
+                                }
+                                return content;
+                            })
+                            .doOnComplete(() -> {
+                                // Save to memory when streaming completes
+                                memory.add(
+                                        convId,
+                                        List.of(
+                                                newUserMessage,
+                                                new org.springframework.ai.chat.messages.AssistantMessage(
+                                                        responseBuilder.toString())));
+                            });
+                }
+            };
+
+            return new OpenAIAssistant(id, memory, aiService);
         }
     }
 }

@@ -58,13 +58,14 @@ public class LLMConfigController {
 
     @Operation(summary = "get platform", description = "Get platform")
     @GetMapping("/platforms/{id}")
-    public ResponseEntity<PlatformVO> getPlatform(@PathVariable Long id) {
+    public ResponseEntity<PlatformVO> getPlatform(@PathVariable(name = "id") Long id) {
         return ResponseEntity.success(llmConfigService.getPlatform(id));
     }
 
     @Operation(summary = "platform credentials", description = "Get platform auth credentials")
     @GetMapping("/platforms/{platformId}/auth-credentials")
-    public ResponseEntity<List<PlatformAuthCredentialVO>> platformsAuthCredential(@PathVariable Long platformId) {
+    public ResponseEntity<List<PlatformAuthCredentialVO>> platformsAuthCredential(
+            @PathVariable(name = "platformId") Long platformId) {
         return ResponseEntity.success(llmConfigService.platformsAuthCredentials(platformId));
     }
 
@@ -91,7 +92,7 @@ public class LLMConfigController {
     @Operation(summary = "update auth platform", description = "Update authorized platform")
     @PutMapping("/auth-platforms/{authId}")
     public ResponseEntity<AuthPlatformVO> updateAuthorizedPlatform(
-            @PathVariable Long authId, @RequestBody AuthPlatformReq authPlatformReq) {
+            @PathVariable(name = "authId") Long authId, @RequestBody AuthPlatformReq authPlatformReq) {
         AuthPlatformDTO authPlatformDTO = AuthPlatformConverter.INSTANCE.fromReq2DTO(authPlatformReq);
         authPlatformDTO.setId(authId);
         return ResponseEntity.success(llmConfigService.updateAuthorizedPlatform(authPlatformDTO));
@@ -99,25 +100,25 @@ public class LLMConfigController {
 
     @Operation(summary = "get auth platform", description = "Get a authorized platform")
     @GetMapping("/auth-platforms/{authId}")
-    public ResponseEntity<AuthPlatformVO> getAuthorizedPlatform(@PathVariable Long authId) {
+    public ResponseEntity<AuthPlatformVO> getAuthorizedPlatform(@PathVariable(name = "authId") Long authId) {
         return ResponseEntity.success(llmConfigService.getAuthorizedPlatform(authId));
     }
 
     @Operation(summary = "delete auth platform", description = "Delete a authorized platform")
     @DeleteMapping("/auth-platforms/{authId}")
-    public ResponseEntity<Boolean> deleteAuthorizedPlatform(@PathVariable Long authId) {
+    public ResponseEntity<Boolean> deleteAuthorizedPlatform(@PathVariable(name = "authId") Long authId) {
         return ResponseEntity.success(llmConfigService.deleteAuthorizedPlatform(authId));
     }
 
     @Operation(summary = "activate auth platform", description = "Activate authorized platform")
     @PostMapping("/auth-platforms/{authId}/activate")
-    public ResponseEntity<Boolean> activateAuthorizedPlatform(@PathVariable Long authId) {
+    public ResponseEntity<Boolean> activateAuthorizedPlatform(@PathVariable(name = "authId") Long authId) {
         return ResponseEntity.success(llmConfigService.activateAuthorizedPlatform(authId));
     }
 
     @Operation(summary = "deactivate auth platform", description = "Deactivate authorized platform")
     @PostMapping("/auth-platforms/{authId}/deactivate")
-    public ResponseEntity<Boolean> deactivateAuthorizedPlatform(@PathVariable Long authId) {
+    public ResponseEntity<Boolean> deactivateAuthorizedPlatform(@PathVariable(name = "authId") Long authId) {
         return ResponseEntity.success(llmConfigService.deactivateAuthorizedPlatform(authId));
     }
 }
