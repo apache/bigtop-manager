@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.apache.bigtop.manager.ai.platform;
 
 import org.apache.bigtop.manager.ai.core.AbstractAIAssistant;
@@ -29,9 +30,9 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.StreamingChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.openai.OpenAiChatModel;
-import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.ai.deepseek.DeepSeekChatModel;
+import org.springframework.ai.deepseek.DeepSeekChatOptions;
+import org.springframework.ai.deepseek.api.DeepSeekApi;
 import org.springframework.util.Assert;
 
 import reactor.core.publisher.Flux;
@@ -40,8 +41,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DeepSeekAssistant extends AbstractAIAssistant {
-
-    private static final String BASE_URL = "https://api.deepseek.com";
 
     public DeepSeekAssistant(Object memoryId, ChatMemory chatMemory, AIAssistant.Service aiServices) {
         super(memoryId, chatMemory, aiServices);
@@ -65,18 +64,18 @@ public class DeepSeekAssistant extends AbstractAIAssistant {
             String apiKey = config.getCredentials().get("apiKey");
             Assert.notNull(apiKey, "apiKey must not be null");
 
-            OpenAiApi openAiApi =
-                    OpenAiApi.builder().baseUrl(BASE_URL).apiKey(apiKey).build();
-            OpenAiChatOptions options = OpenAiChatOptions.builder().model(model).build();
-            return OpenAiChatModel.builder()
-                    .openAiApi(openAiApi)
+            DeepSeekApi deepSeekApi = DeepSeekApi.builder().apiKey(apiKey).build();
+            DeepSeekChatOptions options =
+                    DeepSeekChatOptions.builder().model(model).build();
+            return DeepSeekChatModel.builder()
+                    .deepSeekApi(deepSeekApi)
                     .defaultOptions(options)
                     .build();
         }
 
         @Override
         public StreamingChatModel getStreamingChatModel() {
-            // In Spring AI, OpenAiChatModel handles both sync and streaming
+            // DeepSeekChatModel handles both sync and streaming
             return getChatModel();
         }
 

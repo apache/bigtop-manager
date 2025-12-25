@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.apache.bigtop.manager.ai.platform;
 
 import org.apache.bigtop.manager.ai.core.AbstractAIAssistant;
@@ -33,15 +34,18 @@ import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.util.Assert;
+import org.springframework.web.client.RestClient;
 
 import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class QianFanAssistant extends AbstractAIAssistant {
 
     private static final String BASE_URL = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat";
+    private static final String TOKEN_URL = "https://aip.baidubce.com/oauth/2.0/token";
 
     public QianFanAssistant(Object memoryId, ChatMemory chatMemory, AIAssistant.Service aiServices) {
         super(memoryId, chatMemory, aiServices);
@@ -58,16 +62,39 @@ public class QianFanAssistant extends AbstractAIAssistant {
 
     public static class Builder extends AbstractAIAssistant.Builder {
 
+        private String getAccessToken(String apiKey, String secretKey) {
+            RestClient restClient = RestClient.create();
+            Map<String, Object> response = restClient
+                    .get()
+                    .uri(
+                            TOKEN_URL + "?grant_type=client_credentials&client_id={apiKey}&client_secret={secretKey}",
+                            apiKey,
+                            secretKey)
+                    .retrieve()
+                    .body(Map.class);
+
+            if (response != null && response.containsKey("access_token")) {
+                return (String) response.get("access_token");
+            }
+            throw new RuntimeException("Failed to obtain QianFan access token");
+        }
+
         @Override
         public ChatModel getChatModel() {
             String model = config.getModel();
             Assert.notNull(model, "model must not be null");
             String apiKey = config.getCredentials().get("apiKey");
             Assert.notNull(apiKey, "apiKey must not be null");
+            String secretKey = config.getCredentials().get("secretKey");
+            Assert.notNull(secretKey, "secretKey must not be null");
 
-            // Using OpenAI API structure as fallback - QianFan may need custom implementation
+            // Get access token from QianFan using apiKey and secretKey
+            String accessToken = getAccessToken(apiKey, secretKey);
+
+            // QianFan uses OpenAI-compatible API with access token
+            String qianfanUrl = BASE_URL + "/" + model + "?access_token=" + accessToken;
             OpenAiApi openAiApi =
-                    OpenAiApi.builder().baseUrl(BASE_URL).apiKey(apiKey).build();
+                    OpenAiApi.builder().baseUrl(qianfanUrl).apiKey("dummy").build();
             OpenAiChatOptions options = OpenAiChatOptions.builder().model(model).build();
             return OpenAiChatModel.builder()
                     .openAiApi(openAiApi)
@@ -77,7 +104,7 @@ public class QianFanAssistant extends AbstractAIAssistant {
 
         @Override
         public StreamingChatModel getStreamingChatModel() {
-            // In Spring AI, OpenAiChatModel handles both sync and streaming
+            // OpenAiChatModel handles both sync and streaming
             return getChatModel();
         }
 
