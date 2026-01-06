@@ -54,7 +54,6 @@
         <sshd.version>2.15.0</sshd.version>
         <langchain4j.version>1.0.1</langchain4j.version>
         <jetbrains-annotations.version>24.0.1</jetbrains-annotations.version>
-
         <mybatis-spring-boot-starter.version>3.0.3</mybatis-spring-boot-starter.version>
         <pagehelper-spring-boot-starter.version>2.1.0</pagehelper-spring-boot-starter.version>
         <victools.version>4.29.0</victools.version>

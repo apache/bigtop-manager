@@ -20,7 +20,6 @@ package org.apache.bigtop.manager.server.mcp.converter;
 
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.execution.ToolCallResultConverter;
@@ -43,7 +42,7 @@ public class JsonToolCallResultConverter implements ToolCallResultConverter {
 
     private static final Logger logger = LoggerFactory.getLogger(JsonToolCallResultConverter.class);
 
-    @NotNull @Override
+    @Override
     public String convert(@Nullable Object result, @Nullable Type returnType) {
         if (returnType == Void.TYPE) {
             logger.debug("The tool has no return type. Converting to conventional response.");
