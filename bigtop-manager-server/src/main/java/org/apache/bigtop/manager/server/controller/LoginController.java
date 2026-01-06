@@ -36,6 +36,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,14 +54,14 @@ public class LoginController {
 
     @Operation(summary = "salt", description = "Generate salt")
     @GetMapping(value = "/salt")
-    public ResponseEntity<String> salt(String username) {
+    public ResponseEntity<String> salt(@RequestParam("username") String username) {
         String salt = Pbkdf2Utils.generateSalt(username);
         return ResponseEntity.success(salt);
     }
 
     @Operation(summary = "nonce", description = "Generate nonce")
     @GetMapping(value = "/nonce")
-    public ResponseEntity<String> nonce(String username) {
+    public ResponseEntity<String> nonce(@RequestParam("username") String username) {
         String nonce = PasswordUtils.randomString(16);
         String cacheKey = username + ":" + nonce;
         CacheUtils.setCache(Caches.CACHE_NONCE, cacheKey, nonce, Caches.NONCE_EXPIRE_TIME_MINUTES, TimeUnit.MINUTES);

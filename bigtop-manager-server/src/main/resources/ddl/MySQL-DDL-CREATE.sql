@@ -356,7 +356,7 @@ INSERT INTO llm_platform (credential, name, support_models)
 VALUES
 ('{"apiKey": "API Key"}', 'OpenAI', 'gpt-3.5-turbo,gpt-4,gpt-4o,gpt-3.5-turbo-16k,gpt-4-turbo-preview,gpt-4-32k,gpt-4o-mini'),
 ('{"apiKey": "API Key"}', 'DashScope', 'qwen-max,qwen-plus,qwen-turbo,qwen3-235b-a22b,qwen3-30b-a3b,qwen-plus-latest,qwen-turbo-latest'),
-('{"apiKey": "API Key", "secretKey": "Secret Key"}', 'QianFan','Yi-34B-Chat,ERNIE-4.0-8K,ERNIE-3.5-128K,ERNIE-Speed-8K,Llama-2-7B-Chat,Fuyu-8B'),
+('{"apiKey": "API Key"}', 'QianFan','ernie-speed-8k'),
 ('{"apiKey": "API Key"}','DeepSeek','deepseek-chat,deepseek-reasoner');
 
 UPDATE `llm_platform`
@@ -368,7 +368,7 @@ SET `desc` = 'Get your API Key in https://bailian.console.aliyun.com/?apiKey=1#/
 WHERE `name` = 'DashScope';
 
 UPDATE `llm_platform`
-SET `desc` = 'Get API Key and Secret Key in https://console.bce.baidu.com/qianfan/ais/console/applicationConsole/application/v1'
+SET `desc` = 'Get API Key and Secret Key in https://console.bce.baidu.com/iam/#/iam/apikey/list'
 WHERE `name` = 'QianFan';
 
 UPDATE `llm_platform`
