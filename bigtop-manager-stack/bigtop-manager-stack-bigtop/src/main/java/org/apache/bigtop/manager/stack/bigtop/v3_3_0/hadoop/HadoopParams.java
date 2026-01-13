@@ -221,13 +221,17 @@ public class HadoopParams extends BigtopParams {
             }
         }
         String journalHttpAddress = (String) hdfsSite.get("dfs.namenode.shared.edits.dir");
-        Pattern pattern = Pattern.compile(":(\\d{1,5})");
-        Matcher matcher = pattern.matcher(journalHttpAddress);
-        if (matcher.find()) {
-            journalHttpPort = matcher.group(1);
-            log.info("find jounalnode port: " + journalHttpPort);
+        if (StringUtils.isNotBlank(journalHttpAddress)) {
+            Pattern pattern = Pattern.compile(":(\\d{1,5})");
+            Matcher matcher = pattern.matcher(journalHttpAddress);
+            if (matcher.find()) {
+                journalHttpPort = matcher.group(1);
+                log.info("find jounalnode port: " + journalHttpPort);
+            } else {
+                log.warn("not found journalnode port!");
+            }
         } else {
-            log.warn("not found journalnode port!");
+            log.warn("dfs.namenode.shared.edits.dir is empty, skip journalnode port parsing");
         }
         String dfsDomainSocketPath = (String) hdfsSite.get("dfs.domain.socket.path");
         if (StringUtils.isNotBlank(dfsDomainSocketPath)) {

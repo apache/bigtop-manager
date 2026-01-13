@@ -30,12 +30,14 @@
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { ServiceVO } from '@/api/service/types'
 
+  import { enableHdfsHa, enableYarnRmHa, getServiceList, type EnableHdfsHaReq, type EnableYarnRmHaReq } from '@/api/service'
+
   interface RouteParams {
     id: number
     serviceId: number
   }
 
-  type Key = keyof typeof Command | 'Remove'
+  type Key = keyof typeof Command | 'Remove' | 'EnableHdfsHa' | 'EnableYarnHa'
 
   const { t } = useI18n()
   const route = useRoute()
@@ -61,29 +63,132 @@
     { key: '3', title: t('common.configs') }
   ])
 
-  const actionGroup = computed<GroupItem[]>(() => [
-    {
-      shape: 'default',
-      type: 'primary',
-      text: t('common.operation'),
-      dropdownMenu: [
-        { action: 'Start', text: t('common.start', [t('common.service')]) },
-        { action: 'Restart', text: t('common.restart', [t('common.service')]) },
-        { action: 'Stop', text: t('common.stop', [t('common.service')]) },
-        { action: 'Remove', text: t('common.remove', [t('common.service')]), divider: true, danger: true }
-      ],
-      dropdownMenuClickEvent: (info) => dropdownMenuClick!(info)
+  const isHadoopService = computed(() => (serviceDetail.value?.name ?? '').toLowerCase() === 'hadoop')
+
+  const actionGroup = computed<GroupItem[]>(() => {
+    const baseMenu: any[] = [
+      { action: 'Start', text: t('common.start', [t('common.service')]) },
+      { action: 'Restart', text: t('common.restart', [t('common.service')]) },
+      { action: 'Stop', text: t('common.stop', [t('common.service')]) }
+    ]
+
+    if (isHadoopService.value) {
+      baseMenu.push(
+        { action: 'EnableHdfsHa', text: '启用 HDFS HA' },
+        { action: 'EnableYarnHa', text: '启用 YARN HA' }
+      )
     }
-  ])
+
+    baseMenu.push({ action: 'Remove', text: t('common.remove', [t('common.service')]), divider: true, danger: true })
+
+    return [
+      {
+        shape: 'default',
+        type: 'primary',
+        text: t('common.operation'),
+        dropdownMenu: baseMenu,
+        dropdownMenuClickEvent: (info) => dropdownMenuClick!(info)
+      }
+    ]
+  })
 
   const onServiceDeleted = (clusterId: number) => {
     router.replace({ path: `/cluster-manage/clusters/${clusterId}` })
+  }
+
+  const hdfsHaModalOpen = ref(false)
+  const yarnHaModalOpen = ref(false)
+
+  const zookeeperServices = ref<{ id: number; displayName?: string; name?: string }[]>([])
+
+  const hdfsHaForm = reactive<EnableHdfsHaReq>({
+    activeNameNodeHost: '',
+    standbyNameNodeHost: '',
+    journalNodeHosts: [],
+    zookeeperServiceId: 0,
+    zkfcHosts: [],
+    nameservice: 'nameservice1'
+  })
+
+  const yarnHaForm = reactive<EnableYarnRmHaReq>({
+    activeResourceManagerHost: '',
+    standbyResourceManagerHost: '',
+    rmIds: ['rm1', 'rm2'],
+    yarnClusterId: 'yarn-cluster',
+    zookeeperServiceId: 0
+  })
+
+  const getComponentHosts = (compName: string) => {
+    const comps = serviceDetail.value?.components ?? []
+    return comps
+      .filter((c) => (c.name ?? '').toLowerCase() === compName)
+      .map((c) => c.hostname)
+      .filter(Boolean) as string[]
+  }
+
+  const loadZookeeperServices = async () => {
+    const [clusterId] = componentPayload.value
+    const data: any = await getServiceList(clusterId, { pageNum: 1, pageSize: 200 })
+    const list = (data?.data?.list ?? data?.list ?? []) as any[]
+    zookeeperServices.value = list.filter((s) => (s.name ?? '').toLowerCase() === 'zookeeper')
+  }
+
+  const openHdfsHaModal = async () => {
+    await loadZookeeperServices()
+    const nnHosts = getComponentHosts('namenode')
+    const jnHosts = getComponentHosts('journalnode')
+
+    hdfsHaForm.activeNameNodeHost = nnHosts[0] ?? ''
+    hdfsHaForm.standbyNameNodeHost = nnHosts[1] ?? ''
+    hdfsHaForm.journalNodeHosts = jnHosts
+    hdfsHaForm.zkfcHosts = [hdfsHaForm.activeNameNodeHost, hdfsHaForm.standbyNameNodeHost].filter(Boolean)
+    hdfsHaForm.zookeeperServiceId = zookeeperServices.value[0]?.id ?? 0
+
+    hdfsHaModalOpen.value = true
+  }
+
+  const openYarnHaModal = async () => {
+    await loadZookeeperServices()
+    const rmHosts = getComponentHosts('resourcemanager')
+
+    yarnHaForm.activeResourceManagerHost = rmHosts[0] ?? ''
+    yarnHaForm.standbyResourceManagerHost = rmHosts[1] ?? ''
+    yarnHaForm.zookeeperServiceId = zookeeperServices.value[0]?.id ?? 0
+
+    yarnHaModalOpen.value = true
+  }
+
+  const submitHdfsHa = async () => {
+    const [clusterId, serviceId] = componentPayload.value
+    const res: any = await enableHdfsHa(clusterId, serviceId, hdfsHaForm)
+    if (res?.id) {
+      jobProgressStore.trackJob(clusterId, res.id, res.name ?? 'Enable HDFS HA', getServiceDetail)
+    }
+    hdfsHaModalOpen.value = false
+  }
+
+  const submitYarnHa = async () => {
+    const [clusterId, serviceId] = componentPayload.value
+    const res: any = await enableYarnRmHa(clusterId, serviceId, yarnHaForm)
+    if (res?.id) {
+      jobProgressStore.trackJob(clusterId, res.id, res.name ?? 'Enable YARN HA', getServiceDetail)
+    }
+    yarnHaModalOpen.value = false
   }
 
   const dropdownMenuClick: GroupItem['dropdownMenuClickEvent'] = async ({ key }) => {
     const [clusterId, serviceId] = componentPayload.value
     const service = serviceMap.value[clusterId].filter((s) => Number(serviceId) == s.id)[0]
     const { name: serviceName, displayName } = service
+
+    if (key === 'EnableHdfsHa') {
+      await openHdfsHaModal()
+      return
+    }
+    if (key === 'EnableYarnHa') {
+      await openYarnHaModal()
+      return
+    }
 
     const processParams = {
       command: key as Key,
@@ -125,6 +230,79 @@
       :desc="serviceDetail?.desc"
       :action-groups="actionGroup"
     />
+
+    <a-modal v-model:open="hdfsHaModalOpen" title="启用 HDFS HA" :ok-text="'确定'" :cancel-text="'取消'" @ok="submitHdfsHa">
+      <a-form layout="vertical">
+        <a-form-item label="Nameservice">
+          <a-input v-model:value="hdfsHaForm.nameservice" />
+        </a-form-item>
+
+        <a-form-item label="Active NameNode">
+          <a-select v-model:value="hdfsHaForm.activeNameNodeHost" :options="getComponentHosts('namenode').map((h) => ({ value: h }))" />
+        </a-form-item>
+
+        <a-form-item label="Standby NameNode">
+          <a-select v-model:value="hdfsHaForm.standbyNameNodeHost" :options="getComponentHosts('namenode').map((h) => ({ value: h }))" />
+        </a-form-item>
+
+        <a-form-item label="JournalNode Hosts">
+          <a-select
+            v-model:value="hdfsHaForm.journalNodeHosts"
+            mode="multiple"
+            :options="getComponentHosts('journalnode').map((h) => ({ value: h }))"
+          />
+        </a-form-item>
+
+        <a-form-item label="ZKFC Hosts">
+          <a-select
+            v-model:value="hdfsHaForm.zkfcHosts"
+            mode="multiple"
+            :options="getComponentHosts('zkfc').map((h) => ({ value: h }))"
+          />
+        </a-form-item>
+
+        <a-form-item label="ZooKeeper 服务">
+          <a-select
+            v-model:value="hdfsHaForm.zookeeperServiceId"
+            :options="zookeeperServices.map((s) => ({ value: s.id, label: s.displayName || s.name || String(s.id) }))"
+          />
+        </a-form-item>
+      </a-form>
+    </a-modal>
+
+    <a-modal v-model:open="yarnHaModalOpen" title="启用 YARN HA" :ok-text="'确定'" :cancel-text="'取消'" @ok="submitYarnHa">
+      <a-form layout="vertical">
+        <a-form-item label="YARN ClusterId">
+          <a-input v-model:value="yarnHaForm.yarnClusterId" />
+        </a-form-item>
+
+        <a-form-item label="RM IDs (默认 rm1,rm2)">
+          <a-select v-model:value="yarnHaForm.rmIds" mode="multiple" :options="['rm1','rm2'].map((x) => ({ value: x }))" />
+        </a-form-item>
+
+        <a-form-item label="Active ResourceManager">
+          <a-select
+            v-model:value="yarnHaForm.activeResourceManagerHost"
+            :options="getComponentHosts('resourcemanager').map((h) => ({ value: h }))"
+          />
+        </a-form-item>
+
+        <a-form-item label="Standby ResourceManager">
+          <a-select
+            v-model:value="yarnHaForm.standbyResourceManagerHost"
+            :options="getComponentHosts('resourcemanager').map((h) => ({ value: h }))"
+          />
+        </a-form-item>
+
+        <a-form-item label="ZooKeeper 服务">
+          <a-select
+            v-model:value="yarnHaForm.zookeeperServiceId"
+            :options="zookeeperServices.map((s) => ({ value: s.id, label: s.displayName || s.name || String(s.id) }))"
+          />
+        </a-form-item>
+      </a-form>
+    </a-modal>
+
     <main-card v-model:active-key="activeTab" :tabs="tabs">
       <template #tab-item>
         <keep-alive>
