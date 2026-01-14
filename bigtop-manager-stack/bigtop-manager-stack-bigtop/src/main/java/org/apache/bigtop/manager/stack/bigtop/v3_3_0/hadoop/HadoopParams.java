@@ -222,13 +222,13 @@ public class HadoopParams extends BigtopParams {
         }
         String journalHttpAddress = (String) hdfsSite.get("dfs.namenode.shared.edits.dir");
         if (StringUtils.isNotBlank(journalHttpAddress)) {
-            Pattern pattern = Pattern.compile(":(\\d{1,5})");
-            Matcher matcher = pattern.matcher(journalHttpAddress);
-            if (matcher.find()) {
-                journalHttpPort = matcher.group(1);
-                log.info("find jounalnode port: " + journalHttpPort);
-            } else {
-                log.warn("not found journalnode port!");
+        Pattern pattern = Pattern.compile(":(\\d{1,5})");
+        Matcher matcher = pattern.matcher(journalHttpAddress);
+        if (matcher.find()) {
+            journalHttpPort = matcher.group(1);
+            log.info("find jounalnode port: " + journalHttpPort);
+        } else {
+            log.warn("not found journalnode port!");
             }
         } else {
             log.warn("dfs.namenode.shared.edits.dir is empty, skip journalnode port parsing");
@@ -357,31 +357,31 @@ public class HadoopParams extends BigtopParams {
         } else {
             // Single ResourceManager
             if (resourcemanagerList != null && !resourcemanagerList.isEmpty()) {
-                yarnSite.put("yarn.resourcemanager.hostname", MessageFormat.format("{0}", resourcemanagerList.get(0)));
-                yarnSite.put(
-                        "yarn.resourcemanager.resource-tracker.address",
-                        ((String) yarnSite.get("yarn.resourcemanager.resource-tracker.address"))
-                                .replace("0.0.0.0", resourcemanagerList.get(0)));
-                yarnSite.put(
-                        "yarn.resourcemanager.scheduler.address",
-                        ((String) yarnSite.get("yarn.resourcemanager.scheduler.address"))
-                                .replace("0.0.0.0", resourcemanagerList.get(0)));
-                yarnSite.put(
-                        "yarn.resourcemanager.address",
-                        ((String) yarnSite.get("yarn.resourcemanager.address"))
-                                .replace("0.0.0.0", resourcemanagerList.get(0)));
-                yarnSite.put(
-                        "yarn.resourcemanager.admin.address",
-                        ((String) yarnSite.get("yarn.resourcemanager.admin.address"))
-                                .replace("0.0.0.0", resourcemanagerList.get(0)));
-                yarnSite.put(
-                        "yarn.resourcemanager.webapp.address",
-                        ((String) yarnSite.get("yarn.resourcemanager.webapp.address"))
-                                .replace("0.0.0.0", resourcemanagerList.get(0)));
-                yarnSite.put(
-                        "yarn.resourcemanager.webapp.https.address",
-                        ((String) yarnSite.get("yarn.resourcemanager.webapp.https.address"))
-                                .replace("0.0.0.0", resourcemanagerList.get(0)));
+            yarnSite.put("yarn.resourcemanager.hostname", MessageFormat.format("{0}", resourcemanagerList.get(0)));
+            yarnSite.put(
+                    "yarn.resourcemanager.resource-tracker.address",
+                    ((String) yarnSite.get("yarn.resourcemanager.resource-tracker.address"))
+                            .replace("0.0.0.0", resourcemanagerList.get(0)));
+            yarnSite.put(
+                    "yarn.resourcemanager.scheduler.address",
+                    ((String) yarnSite.get("yarn.resourcemanager.scheduler.address"))
+                            .replace("0.0.0.0", resourcemanagerList.get(0)));
+            yarnSite.put(
+                    "yarn.resourcemanager.address",
+                    ((String) yarnSite.get("yarn.resourcemanager.address"))
+                            .replace("0.0.0.0", resourcemanagerList.get(0)));
+            yarnSite.put(
+                    "yarn.resourcemanager.admin.address",
+                    ((String) yarnSite.get("yarn.resourcemanager.admin.address"))
+                            .replace("0.0.0.0", resourcemanagerList.get(0)));
+            yarnSite.put(
+                    "yarn.resourcemanager.webapp.address",
+                    ((String) yarnSite.get("yarn.resourcemanager.webapp.address"))
+                            .replace("0.0.0.0", resourcemanagerList.get(0)));
+            yarnSite.put(
+                    "yarn.resourcemanager.webapp.https.address",
+                    ((String) yarnSite.get("yarn.resourcemanager.webapp.https.address"))
+                            .replace("0.0.0.0", resourcemanagerList.get(0)));
             }
         }
 

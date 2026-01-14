@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class YarnHaServiceImpl implements YarnHaService {
@@ -72,7 +73,8 @@ public class YarnHaServiceImpl implements YarnHaService {
             throw new ServerException("Service not found: " + serviceId);
         }
         if (!HADOOP_SERVICE_NAME.equalsIgnoreCase(servicePO.getName())) {
-            throw new ServerException("enable-yarn-rm-ha only supports service 'hadoop', but got: " + servicePO.getName());
+            throw new ServerException(
+                    "enable-yarn-rm-ha only supports service 'hadoop', but got: " + servicePO.getName());
         }
 
         // 1) 写入 yarn-site 推荐 key
@@ -80,7 +82,6 @@ public class YarnHaServiceImpl implements YarnHaService {
         upsertServiceConfigProperties(clusterId, serviceId, "yarn-site", yarnSiteUpdates);
 
         // 2) 触发一次 service configure（会走 ServiceConfigureJob: configure + stop + start）
-        //    注意：这里是最小可用实现；如果需要更细粒度（只滚动 RM），可改为 component 级别 restart。
         CommandDTO commandDTO = new CommandDTO();
         commandDTO.setClusterId(clusterId);
         commandDTO.setCommandLevel(CommandLevel.SERVICE);
@@ -98,7 +99,8 @@ public class YarnHaServiceImpl implements YarnHaService {
     }
 
     private Map<String, String> buildYarnSiteUpdates(Long clusterId, Long serviceId, EnableYarnRmHaReq req) {
-        if (StringUtils.isBlank(req.getActiveResourceManagerHost()) || StringUtils.isBlank(req.getStandbyResourceManagerHost())) {
+        if (StringUtils.isBlank(req.getActiveResourceManagerHost())
+                || StringUtils.isBlank(req.getStandbyResourceManagerHost())) {
             throw new ServerException("active/standby resourcemanager host must not be blank");
         }
         if (CollectionUtils.isEmpty(req.getRmIds()) || req.getRmIds().size() < 2) {
@@ -122,18 +124,11 @@ public class YarnHaServiceImpl implements YarnHaService {
         m.put("yarn.resourcemanager.webapp.address." + rm1Id, req.getActiveResourceManagerHost() + ":" + webappPort);
         m.put("yarn.resourcemanager.webapp.address." + rm2Id, req.getStandbyResourceManagerHost() + ":" + webappPort);
 
-        // zk-address：通过 zookeeperServiceId 查询 zookeeper 的 zoo.cfg，并拼接 host:clientPort
-        String zkAddress = buildZkAddress(clusterId, req.getZookeeperServiceId());
+        // zk-address：优先使用 zookeeperHosts（推荐）；否则回退到 zookeeperServiceId 逻辑
+        String zkAddress = buildZkAddress(clusterId, req);
         if (StringUtils.isNotBlank(zkAddress)) {
             m.put("yarn.resourcemanager.zk-address", zkAddress);
         }
-
-        // 其它 address.rmX：由 stack 侧 HadoopParams.yarnSite() 自动生成。
-        // 如果你希望由 server 强制写入，可以在此处补齐：
-        // - yarn.resourcemanager.address.rmX
-        // - yarn.resourcemanager.admin.address.rmX
-        // - yarn.resourcemanager.resource-tracker.address.rmX
-        // - yarn.resourcemanager.scheduler.address.rmX
 
         // 避免混杂：服务端侧也清理单 RM key（DB 侧清理，避免 UI/渲染混杂）
         m.put("__delete__.yarn.resourcemanager.hostname", "");
@@ -147,8 +142,6 @@ public class YarnHaServiceImpl implements YarnHaService {
     }
 
     private int resolveWebappPort(Long clusterId, Long serviceId) {
-        // Try reading existing yarn.resourcemanager.webapp.address from current hadoop service yarn-site
-        // Default: 8088
         int defaultPort = 8088;
         try {
             ServiceConfigPO yarnSite = serviceConfigDao.findByServiceIdAndName(serviceId, "yarn-site");
@@ -166,7 +159,21 @@ public class YarnHaServiceImpl implements YarnHaService {
         return defaultPort;
     }
 
-    private String buildZkAddress(Long clusterId, Long zookeeperServiceId) {
+    private String buildZkAddress(Long clusterId, EnableYarnRmHaReq req) {
+        // Preferred: zookeeperHosts from request
+        if (CollectionUtils.isNotEmpty(req.getZookeeperHosts())) {
+            return req.getZookeeperHosts().stream()
+                    .filter(StringUtils::isNotBlank)
+                    .map(h -> h.trim() + ":2181")
+                    .distinct()
+                    .collect(Collectors.joining(","));
+        }
+
+        Long zookeeperServiceId = req.getZookeeperServiceId();
+        if (zookeeperServiceId == null) {
+            return "";
+        }
+
         ServicePO zkService = serviceDao.findById(zookeeperServiceId);
         if (zkService == null) {
             throw new ServerException("zookeeper service not found: " + zookeeperServiceId);
@@ -185,7 +192,6 @@ public class YarnHaServiceImpl implements YarnHaService {
             }
         }
         if (zooCfg == null || StringUtils.isBlank(zooCfg.getPropertiesJson())) {
-            // 允许为空：stack 侧会尝试自动生成；但 server 侧最好能写入
             return "";
         }
 
@@ -193,7 +199,6 @@ public class YarnHaServiceImpl implements YarnHaService {
         Object clientPortObj = props.get("clientPort");
         String clientPort = clientPortObj == null ? "2181" : clientPortObj.toString().trim();
 
-        // ZooKeeper hosts: query component table by serviceId + component name
         ComponentQuery query = ComponentQuery.builder()
                 .serviceId(zookeeperServiceId)
                 .name("zookeeper_server")
@@ -205,11 +210,10 @@ public class YarnHaServiceImpl implements YarnHaService {
                 .toList();
 
         if (CollectionUtils.isEmpty(zkHosts)) {
-            // 允许为空：stack 侧会尝试自动生成；但 server 侧最好能写入
             return "";
         }
 
-        return String.join(",", zkHosts.stream().map(h -> h.trim() + ":" + clientPort).toList());
+        return zkHosts.stream().map(h -> h.trim() + ":" + clientPort).collect(Collectors.joining(","));
     }
 
     private void upsertServiceConfigProperties(Long clusterId, Long serviceId, String configName, Map<String, String> updates) {
@@ -273,4 +277,3 @@ public class YarnHaServiceImpl implements YarnHaService {
         return StackConfigUtils.mergeServiceConfigs(oriConfigs, newConfigs);
     }
 }
-

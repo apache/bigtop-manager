@@ -72,7 +72,8 @@ public class HdfsHaServiceImpl implements HdfsHaService {
 
     @Override
     @Transactional
-    public org.apache.bigtop.manager.server.model.vo.CommandVO buildEnableHdfsHaCommand(Long clusterId, Long serviceId, EnableHdfsHaReq req) {
+    public org.apache.bigtop.manager.server.model.vo.CommandVO buildEnableHdfsHaCommand(
+            Long clusterId, Long serviceId, EnableHdfsHaReq req) {
         // 0. Validate prerequisites (components exist, ZK is available, etc.)
         validatePrerequisites(clusterId, serviceId, req);
 
@@ -81,7 +82,6 @@ public class HdfsHaServiceImpl implements HdfsHaService {
 
         // 2. Orchestrate a sequence of commands to enable HA
         // The commandService.command() is asynchronous. The JobScheduler will execute them sequentially.
-        // We return the first command's VO to the frontend for tracking.
 
         // Stage 1: Start JournalNodes first
         submitStartJournalNodes(clusterId, req.getJournalNodeHosts());
@@ -143,9 +143,9 @@ public class HdfsHaServiceImpl implements HdfsHaService {
         assertComponentExists(clusterId, "zkfc", req.getActiveNameNodeHost());
 
         // Validate ZK quorum can be generated (must for automatic failover)
-        String zk = buildZkAddress(clusterId, req.getZookeeperServiceId());
+        String zk = buildZkAddress(clusterId, req);
         if (StringUtils.isBlank(zk)) {
-            throw new ServerException("Failed to build ha.zookeeper.quorum, please check zookeeper service and components");
+            throw new ServerException("Failed to build ha.zookeeper.quorum, please check zookeeper hosts/service and components");
         }
     }
 
@@ -176,7 +176,7 @@ public class HdfsHaServiceImpl implements HdfsHaService {
         Map<String, String> m = new HashMap<>();
         m.put("fs.defaultFS", "hdfs://" + req.getNameservice());
 
-        String zkAddress = buildZkAddress(clusterId, req.getZookeeperServiceId());
+        String zkAddress = buildZkAddress(clusterId, req);
         if (StringUtils.isNotBlank(zkAddress)) {
             m.put("ha.zookeeper.quorum", zkAddress);
         }
@@ -201,7 +201,9 @@ public class HdfsHaServiceImpl implements HdfsHaService {
         m.put("dfs.namenode.http-address." + nameservice + ".nn1", nn1Host + ":9870");
         m.put("dfs.namenode.http-address." + nameservice + ".nn2", nn2Host + ":9870");
         m.put("dfs.namenode.shared.edits.dir", "qjournal://" + journalQuorum + "/" + nameservice);
-        m.put("dfs.client.failover.proxy.provider." + nameservice, "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider");
+        m.put(
+                "dfs.client.failover.proxy.provider." + nameservice,
+                "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider");
         m.put("dfs.ha.automatic-failover.enabled", "true");
         m.put("dfs.ha.fencing.methods", "shell(/bin/true)");
 
@@ -267,7 +269,21 @@ public class HdfsHaServiceImpl implements HdfsHaService {
         return commandService.command(commandDTO);
     }
 
-    private String buildZkAddress(Long clusterId, Long zookeeperServiceId) {
+    private String buildZkAddress(Long clusterId, EnableHdfsHaReq req) {
+        // Preferred: zookeeperHosts from request
+        if (CollectionUtils.isNotEmpty(req.getZookeeperHosts())) {
+            return req.getZookeeperHosts().stream()
+                    .filter(StringUtils::isNotBlank)
+                    .map(h -> h.trim() + ":2181")
+                    .distinct()
+                    .collect(Collectors.joining(","));
+        }
+
+        Long zookeeperServiceId = req.getZookeeperServiceId();
+        if (zookeeperServiceId == null) {
+            return "";
+        }
+
         ServicePO zkService = serviceDao.findById(zookeeperServiceId);
         if (zkService == null || !ZOOKEEPER_SERVICE_NAME.equalsIgnoreCase(zkService.getName())) {
             throw new ServerException("zookeeperServiceId must point to a valid Zookeeper service.");
@@ -289,7 +305,7 @@ public class HdfsHaServiceImpl implements HdfsHaService {
                 .toList();
 
         if (CollectionUtils.isEmpty(zkHosts)) {
-            return ""; // Let stack side handle it
+            return "";
         }
 
         return zkHosts.stream().map(h -> h.trim() + ":" + clientPort).collect(Collectors.joining(","));

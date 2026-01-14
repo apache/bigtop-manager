@@ -21,7 +21,6 @@ package org.apache.bigtop.manager.server.model.req;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.util.List;
@@ -45,8 +44,11 @@ public class EnableYarnRmHaReq {
     @Schema(description = "YARN cluster id (yarn.resourcemanager.cluster-id)", example = "yarn-cluster")
     private String yarnClusterId;
 
-    @NotNull
-    @Schema(description = "Zookeeper service id", example = "12")
+    @Schema(description = "Zookeeper service id (legacy, optional)", example = "12")
     private Long zookeeperServiceId;
-}
 
+    @Schema(
+            description = "Zookeeper hosts (preferred). If specified, server will build zk-address as host:2181 and ignore zookeeperServiceId.",
+            example = "[\"zk-1\",\"zk-2\",\"zk-3\"]")
+    private List<String> zookeeperHosts;
+}

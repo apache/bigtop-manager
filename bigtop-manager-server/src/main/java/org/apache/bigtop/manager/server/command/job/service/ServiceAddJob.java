@@ -169,7 +169,13 @@ public class ServiceAddJob extends AbstractServiceJob {
         List<ComponentPO> componentPOList = new ArrayList<>();
         for (ComponentHostDTO componentHostDTO : serviceCommand.getComponentHosts()) {
             String componentName = componentHostDTO.getComponentName();
-            List<HostPO> hostPOList = hostDao.findAllByHostnames(componentHostDTO.getHostnames());
+            List<String> hostnames = componentHostDTO.getHostnames();
+            if (CollectionUtils.isEmpty(hostnames)) {
+                log.info("Skipping component [{}] because no hosts are assigned.", componentName);
+                continue;
+            }
+
+            List<HostPO> hostPOList = hostDao.findAllByHostnames(hostnames);
 
             for (HostPO hostPO : hostPOList) {
                 ComponentDTO componentDTO = StackUtils.getComponentDTO(componentName);

@@ -65,7 +65,8 @@ export interface EnableHdfsHaReq {
   activeNameNodeHost: string
   standbyNameNodeHost: string
   journalNodeHosts: string[]
-  zookeeperServiceId: number
+  zookeeperServiceId?: number
+  zookeeperHosts?: string[]
   zkfcHosts: string[]
   nameservice: string
 }
@@ -83,8 +84,10 @@ export interface EnableYarnRmHaReq {
   rmIds: string[]
   /** yarn.resourcemanager.cluster-id */
   yarnClusterId: string
-  /** zookeeper service id，用于拼接/下发 yarn.resourcemanager.zk-address */
-  zookeeperServiceId: number
+  /** zookeeper service id（兼容旧逻辑） */
+  zookeeperServiceId?: number
+  /** zookeeper hosts（推荐，优先使用） */
+  zookeeperHosts?: string[]
 }
 
 export const enableYarnRmHa = (clusterId: number, serviceId: number, data: EnableYarnRmHaReq) => {
