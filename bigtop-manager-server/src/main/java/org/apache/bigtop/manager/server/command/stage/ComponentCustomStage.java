@@ -21,6 +21,7 @@ package org.apache.bigtop.manager.server.command.stage;
 import org.apache.bigtop.manager.server.command.task.ComponentCustomTask;
 import org.apache.bigtop.manager.server.command.task.Task;
 import org.apache.bigtop.manager.server.utils.StackUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Stage for component custom command.
@@ -40,10 +41,12 @@ public class ComponentCustomStage extends AbstractComponentStage {
     }
 
     @Override
+    @Override
     public String getName() {
-        return "Custom "
-                + StackUtils.getComponentDTO(stageContext.getComponentName()).getDisplayName()
-                + " (" + customCommand + ")";
+        String componentDisplay = StackUtils.getComponentDTO(stageContext.getComponentName()).getDisplayName();
+        String stageName = String.format("Custom: %s (%s)", componentDisplay, customCommand);
+        // Limit the length to prevent DataTruncation
+        return StringUtils.abbreviate(stageName, 32);
     }
 }
 

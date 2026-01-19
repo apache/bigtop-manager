@@ -165,22 +165,24 @@ public class HadoopParams extends BigtopParams {
         Map<String, Object> hdfsSite = LocalSettings.configurations(getServiceName(), "hdfs-site");
         List<String> namenodeList = LocalSettings.componentHosts("namenode");
         List<String> journalNodeList = LocalSettings.componentHosts("journalnode");
-        if (!namenodeList.isEmpty() && namenodeList.size() == 1) {
-            hdfsSite.put(
-                    "dfs.namenode.rpc-address",
-                    ((String) hdfsSite.get("dfs.namenode.rpc-address")).replace("0.0.0.0", namenodeList.get(0)));
-            hdfsSite.put(
-                    "dfs.datanode.https.address",
-                    ((String) hdfsSite.get("dfs.datanode.https.address")).replace("0.0.0.0", namenodeList.get(0)));
-            hdfsSite.put(
-                    "dfs.namenode.https-address",
-                    ((String) hdfsSite.get("dfs.namenode.https-address")).replace("0.0.0.0", namenodeList.get(0)));
-        } else if (!namenodeList.isEmpty() && namenodeList.size() == 2) {
+
+        String nameservice = resolveNameService();
+        boolean haByConfig = false;
+        Object haNn = hdfsSite.get("dfs.ha.namenodes." + nameservice);
+        Object haRpc1 = hdfsSite.get("dfs.namenode.rpc-address." + nameservice + ".nn1");
+        Object haRpc2 = hdfsSite.get("dfs.namenode.rpc-address." + nameservice + ".nn2");
+        if ((haNn != null && StringUtils.isNotBlank(haNn.toString()))
+                || (haRpc1 != null && StringUtils.isNotBlank(haRpc1.toString()))
+                || (haRpc2 != null && StringUtils.isNotBlank(haRpc2.toString()))) {
+            haByConfig = true;
+        }
+
+        if (haByConfig) {
+            // HA mode: do not rely on components.json namenode list, because it may be stale.
             if (journalNodeList == null || journalNodeList.size() < 3) {
                 throw new IllegalArgumentException("JournalNode host list must be at least 3 for HDFS HA");
             }
 
-            String nameservice = resolveNameService();
             String journalQuorum = journalNodeList.stream().map(x -> x + ":8485").collect(Collectors.joining(";"));
 
             // 清理单机模式可能存在的 key，避免与 HA 配置混杂
@@ -190,19 +192,66 @@ public class HadoopParams extends BigtopParams {
 
             hdfsSite.put("dfs.ha.automatic-failover.enabled", "true");
             hdfsSite.put("dfs.nameservices", nameservice);
-            hdfsSite.put("dfs.ha.namenodes." + nameservice, "nn1,nn2");
-            hdfsSite.put("dfs.namenode.rpc-address." + nameservice + ".nn1", namenodeList.get(0) + ":8020");
-            hdfsSite.put("dfs.namenode.rpc-address." + nameservice + ".nn2", namenodeList.get(1) + ":8020");
-            hdfsSite.put("dfs.namenode.http-address." + nameservice + ".nn1", namenodeList.get(0) + ":9870");
-            hdfsSite.put("dfs.namenode.http-address." + nameservice + ".nn2", namenodeList.get(1) + ":9870");
+            if (hdfsSite.get("dfs.ha.namenodes." + nameservice) == null) {
+                hdfsSite.put("dfs.ha.namenodes." + nameservice, "nn1,nn2");
+            }
             hdfsSite.put("dfs.namenode.shared.edits.dir", "qjournal://" + journalQuorum + "/" + nameservice);
 
-            hdfsSite.put("dfs.journalnode.edits.dir", "/hadoop/dfs/journal");
-            hdfsSite.put(
-                    "dfs.client.failover.proxy.provider." + nameservice,
-                    "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider");
-            hdfsSite.put("dfs.ha.fencing.methods", "shell(/bin/true)");
-            hdfsSite.put("dfs.replication", "3");
+            // Ensure required HA keys exist (respect existing values if present)
+            if (hdfsSite.get("dfs.namenode.rpc-address." + nameservice + ".nn1") == null
+                    && namenodeList != null
+                    && namenodeList.size() >= 1) {
+                hdfsSite.put("dfs.namenode.rpc-address." + nameservice + ".nn1", namenodeList.get(0) + ":8020");
+            }
+            if (hdfsSite.get("dfs.namenode.rpc-address." + nameservice + ".nn2") == null
+                    && namenodeList != null
+                    && namenodeList.size() >= 2) {
+                hdfsSite.put("dfs.namenode.rpc-address." + nameservice + ".nn2", namenodeList.get(1) + ":8020");
+            }
+            if (hdfsSite.get("dfs.namenode.http-address." + nameservice + ".nn1") == null
+                    && namenodeList != null
+                    && namenodeList.size() >= 1) {
+                hdfsSite.put("dfs.namenode.http-address." + nameservice + ".nn1", namenodeList.get(0) + ":9870");
+            }
+            if (hdfsSite.get("dfs.namenode.http-address." + nameservice + ".nn2") == null
+                    && namenodeList != null
+                    && namenodeList.size() >= 2) {
+                hdfsSite.put("dfs.namenode.http-address." + nameservice + ".nn2", namenodeList.get(1) + ":9870");
+            }
+
+            if (hdfsSite.get("dfs.client.failover.proxy.provider." + nameservice) == null) {
+                hdfsSite.put(
+                        "dfs.client.failover.proxy.provider." + nameservice,
+                        "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider");
+            }
+            if (hdfsSite.get("dfs.ha.fencing.methods") == null) {
+                hdfsSite.put("dfs.ha.fencing.methods", "shell(/bin/true)");
+            }
+            if (hdfsSite.get("dfs.replication") == null) {
+                hdfsSite.put("dfs.replication", "3");
+            }
+
+        } else if (namenodeList != null && !namenodeList.isEmpty()) {
+            // Single NN mode
+            String nnHost = namenodeList.get(0);
+
+            Object rpcAddr = hdfsSite.get("dfs.namenode.rpc-address");
+            if (rpcAddr == null) {
+                throw new IllegalArgumentException("Missing required hdfs-site key: dfs.namenode.rpc-address");
+            }
+            hdfsSite.put("dfs.namenode.rpc-address", rpcAddr.toString().replace("0.0.0.0", nnHost));
+
+            Object dnHttpsAddr = hdfsSite.get("dfs.datanode.https.address");
+            if (dnHttpsAddr == null) {
+                throw new IllegalArgumentException("Missing required hdfs-site key: dfs.datanode.https.address");
+            }
+            hdfsSite.put("dfs.datanode.https.address", dnHttpsAddr.toString().replace("0.0.0.0", nnHost));
+
+            Object nnHttpsAddr = hdfsSite.get("dfs.namenode.https-address");
+            if (nnHttpsAddr == null) {
+                throw new IllegalArgumentException("Missing required hdfs-site key: dfs.namenode.https-address");
+            }
+            hdfsSite.put("dfs.namenode.https-address", nnHttpsAddr.toString().replace("0.0.0.0", nnHost));
         }
 
         // Configure native library dependent settings
@@ -210,10 +259,21 @@ public class HadoopParams extends BigtopParams {
 
         dfsDataDir = (String) hdfsSite.get("dfs.datanode.data.dir");
         dfsNameNodeDir = (String) hdfsSite.get("dfs.namenode.name.dir");
-        nameNodeFormattedDirs = Arrays.stream(dfsNameNodeDir.split(","))
-                .map(x -> x + "/namenode-formatted/")
-                .toList();
-        String dfsHttpAddress = (String) hdfsSite.get("dfs.namenode.http-address.nameservice1.nn1");
+        if (StringUtils.isNotBlank(dfsNameNodeDir)) {
+            nameNodeFormattedDirs = Arrays.stream(dfsNameNodeDir.split(","))
+                    .map(x -> x + "/namenode-formatted/")
+                    .toList();
+        } else {
+            nameNodeFormattedDirs = List.of();
+            log.warn("dfs.namenode.name.dir is empty, skip namenode formatted dirs generation");
+        }
+
+        String resolvedNameService = resolveNameService();
+        String dfsHttpAddress = (String) hdfsSite.get("dfs.namenode.http-address." + resolvedNameService + ".nn1");
+        if (StringUtils.isBlank(dfsHttpAddress)) {
+            // backward compatibility / older templates
+            dfsHttpAddress = (String) hdfsSite.get("dfs.namenode.http-address.nameservice1.nn1");
+        }
         if (dfsHttpAddress != null && dfsHttpAddress.contains(":")) {
             String[] parts = dfsHttpAddress.split(":");
             if (parts.length >= 2) {

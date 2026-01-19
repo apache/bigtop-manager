@@ -18,6 +18,7 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
@@ -51,6 +52,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -311,32 +313,39 @@ public class HdfsHaServiceImpl implements HdfsHaService {
         return zkHosts.stream().map(h -> h.trim() + ":" + clientPort).collect(Collectors.joining(","));
     }
 
-    private void upsertServiceConfigProperties(Long clusterId, Long serviceId, String configName, Map<String, String> updates) {
+    private void upsertServiceConfigProperties(
+            Long clusterId, Long serviceId, String configName, Map<String, String> updates) {
         ServiceConfigPO po = serviceConfigDao.findByServiceIdAndName(serviceId, configName);
         if (po == null) {
             po = new ServiceConfigPO();
             po.setClusterId(clusterId);
             po.setServiceId(serviceId);
             po.setName(configName);
-            po.setPropertiesJson("{}");
+            po.setPropertiesJson("[]"); // Initialize with empty JSON array
             serviceConfigDao.save(po);
             po = serviceConfigDao.findByServiceIdAndName(serviceId, configName);
         }
 
-        Map<String, Object> props = new HashMap<>();
+        List<PropertyDTO> properties = new ArrayList<>();
         if (StringUtils.isNotBlank(po.getPropertiesJson())) {
-            props.putAll(JsonUtils.readFromString(po.getPropertiesJson()));
+            properties.addAll(JsonUtils.readFromString(po.getPropertiesJson(), new TypeReference<>() {}));
         }
+
+        Map<String, PropertyDTO> propsMap =
+                properties.stream().collect(Collectors.toMap(PropertyDTO::getName, Function.identity(), (a, b) -> b));
 
         for (Map.Entry<String, String> e : updates.entrySet()) {
             String k = e.getKey();
             if (k != null && k.startsWith("__delete__.")) {
-                props.remove(k.substring("__delete__.".length()));
+                propsMap.remove(k.substring("__delete__.".length()));
             } else {
-                props.put(k, e.getValue());
+                PropertyDTO prop = propsMap.getOrDefault(k, new PropertyDTO());
+                prop.setName(k);
+                prop.setValue(e.getValue());
+                propsMap.put(k, prop);
             }
         }
-        po.setPropertiesJson(JsonUtils.writeAsString(props));
+        po.setPropertiesJson(JsonUtils.writeAsString(new ArrayList<>(propsMap.values())));
         serviceConfigDao.partialUpdateByIds(List.of(po));
     }
 
@@ -353,18 +362,11 @@ public class HdfsHaServiceImpl implements HdfsHaService {
             dto.setId(po.getId());
             dto.setName(po.getName());
 
-            Map<String, Object> props = StringUtils.isBlank(po.getPropertiesJson())
-                    ? Map.of()
-                    : JsonUtils.readFromString(po.getPropertiesJson());
-
-            List<PropertyDTO> propertyDTOS = new ArrayList<>();
-            for (Map.Entry<String, Object> e : props.entrySet()) {
-                PropertyDTO p = new PropertyDTO();
-                p.setName(e.getKey());
-                p.setValue(e.getValue() == null ? null : e.getValue().toString());
-                propertyDTOS.add(p);
+            List<PropertyDTO> properties = new ArrayList<>();
+            if (StringUtils.isNotBlank(po.getPropertiesJson())) {
+                properties.addAll(JsonUtils.readFromString(po.getPropertiesJson(), new TypeReference<>() {}));
             }
-            dto.setProperties(propertyDTOS);
+            dto.setProperties(properties);
             dbConfigsDTO.add(dto);
         }
 

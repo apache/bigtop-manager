@@ -31,12 +31,7 @@
   import type { GroupItem } from '@/components/common/button-group/types'
   import type { ServiceVO } from '@/api/service/types'
 
-  import {
-    enableHdfsHa,
-    enableYarnRmHa,
-    type EnableHdfsHaReq,
-    type EnableYarnRmHaReq
-  } from '@/api/service'
+  import { enableHdfsHa, enableYarnRmHa, type EnableHdfsHaReq, type EnableYarnRmHaReq } from '@/api/service'
   import { getHosts } from '@/api/host'
   import type { HostVO } from '@/api/host/types'
 
@@ -87,13 +82,13 @@
     baseMenu.push({ action: 'Remove', text: t('common.remove', [t('common.service')]), divider: true, danger: true })
 
     return [
-      {
-        shape: 'default',
-        type: 'primary',
-        text: t('common.operation'),
+    {
+      shape: 'default',
+      type: 'primary',
+      text: t('common.operation'),
         dropdownMenu: baseMenu,
-        dropdownMenuClickEvent: (info) => dropdownMenuClick!(info)
-      }
+      dropdownMenuClickEvent: (info) => dropdownMenuClick!(info)
+    }
     ]
   })
 
@@ -129,9 +124,7 @@
     clusterHosts.value = res.content ?? []
   }
 
-  const allHostOptions = computed(() =>
-    clusterHosts.value.map((h) => ({ value: h.hostname })).filter((x) => !!x.value)
-  )
+  const allHostOptions = computed(() => clusterHosts.value.map((h) => ({ value: h.hostname })).filter((x) => !!x.value))
 
   const openHdfsHaModal = async () => {
     await loadClusterHosts()

@@ -232,7 +232,7 @@ CREATE INDEX idx_job_cluster_id ON job (cluster_id);
 CREATE TABLE stage
 (
     id             BIGINT CHECK (id > 0)     NOT NULL GENERATED ALWAYS AS IDENTITY,
-    name           VARCHAR(32)               NOT NULL,
+    name           VARCHAR(255)               NOT NULL,
     service_name   VARCHAR(255),
     component_name VARCHAR(255),
     context        TEXT,

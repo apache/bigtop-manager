@@ -18,8 +18,10 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
+import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
 import org.apache.bigtop.manager.dao.po.ServicePO;
 import org.apache.bigtop.manager.dao.query.ComponentQuery;
@@ -48,6 +50,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -148,11 +151,12 @@ public class YarnHaServiceImpl implements YarnHaService {
             if (yarnSite == null || StringUtils.isBlank(yarnSite.getPropertiesJson())) {
                 return defaultPort;
             }
-            Map<String, Object> props = JsonUtils.readFromString(yarnSite.getPropertiesJson());
-            Object addr = props.get("yarn.resourcemanager.webapp.address");
-            if (addr != null && addr.toString().contains(":")) {
-                String portStr = addr.toString().split(":")[1].trim();
-                return Integer.parseInt(portStr);
+            List<PropertyDTO> properties = JsonUtils.readFromString(yarnSite.getPropertiesJson(), new TypeReference<>() {});
+            for (PropertyDTO prop : properties) {
+                if ("yarn.resourcemanager.webapp.address".equals(prop.getName()) && prop.getValue() != null && prop.getValue().contains(":")) {
+                    String portStr = prop.getValue().split(":")[1].trim();
+                    return Integer.parseInt(portStr);
+                }
             }
         } catch (Exception ignored) {
         }
@@ -164,11 +168,12 @@ public class YarnHaServiceImpl implements YarnHaService {
         if (CollectionUtils.isNotEmpty(req.getZookeeperHosts())) {
             return req.getZookeeperHosts().stream()
                     .filter(StringUtils::isNotBlank)
-                    .map(h -> h.trim() + ":2181")
+                    .map(h -> h.trim() + ":2181") // Assume default port 2181
                     .distinct()
                     .collect(Collectors.joining(","));
         }
 
+        // Fallback: zookeeperServiceId
         Long zookeeperServiceId = req.getZookeeperServiceId();
         if (zookeeperServiceId == null) {
             return "";
@@ -183,21 +188,19 @@ public class YarnHaServiceImpl implements YarnHaService {
                     "zookeeperServiceId must point to service 'zookeeper', but got: " + zkService.getName());
         }
 
-        List<ServiceConfigPO> zkConfigs = serviceConfigDao.findByServiceId(zookeeperServiceId);
-        ServiceConfigPO zooCfg = null;
-        for (ServiceConfigPO po : zkConfigs) {
-            if ("zoo.cfg".equals(po.getName())) {
-                zooCfg = po;
-                break;
-            }
-        }
+        ServiceConfigPO zooCfg = serviceConfigDao.findByServiceIdAndName(zookeeperServiceId, "zoo.cfg");
         if (zooCfg == null || StringUtils.isBlank(zooCfg.getPropertiesJson())) {
             return "";
         }
 
-        Map<String, Object> props = JsonUtils.readFromString(zooCfg.getPropertiesJson());
-        Object clientPortObj = props.get("clientPort");
-        String clientPort = clientPortObj == null ? "2181" : clientPortObj.toString().trim();
+        List<PropertyDTO> props = JsonUtils.readFromString(zooCfg.getPropertiesJson(), new TypeReference<>() {});
+        String clientPort = "2181";
+        for (PropertyDTO prop : props) {
+            if ("clientPort".equals(prop.getName())) {
+                clientPort = prop.getValue();
+                break;
+            }
+        }
 
         ComponentQuery query = ComponentQuery.builder()
                 .serviceId(zookeeperServiceId)
@@ -213,36 +216,43 @@ public class YarnHaServiceImpl implements YarnHaService {
             return "";
         }
 
-        return zkHosts.stream().map(h -> h.trim() + ":" + clientPort).collect(Collectors.joining(","));
+        String finalClientPort = clientPort;
+        return zkHosts.stream().map(h -> h.trim() + ":" + finalClientPort).collect(Collectors.joining(","));
     }
 
-    private void upsertServiceConfigProperties(Long clusterId, Long serviceId, String configName, Map<String, String> updates) {
+    private void upsertServiceConfigProperties(
+            Long clusterId, Long serviceId, String configName, Map<String, String> updates) {
         ServiceConfigPO po = serviceConfigDao.findByServiceIdAndName(serviceId, configName);
         if (po == null) {
             po = new ServiceConfigPO();
             po.setClusterId(clusterId);
             po.setServiceId(serviceId);
             po.setName(configName);
-            po.setPropertiesJson("{}");
+            po.setPropertiesJson("[]"); // Initialize with empty JSON array
             serviceConfigDao.save(po);
             po = serviceConfigDao.findByServiceIdAndName(serviceId, configName);
         }
 
-        Map<String, Object> props = new HashMap<>();
+        List<PropertyDTO> properties = new ArrayList<>();
         if (StringUtils.isNotBlank(po.getPropertiesJson())) {
-            props.putAll(JsonUtils.readFromString(po.getPropertiesJson()));
+            properties.addAll(JsonUtils.readFromString(po.getPropertiesJson(), new TypeReference<>() {}));
         }
 
-        // Support in-method delete semantics: keys prefixed with "__delete__." will be removed.
+        Map<String, PropertyDTO> propsMap =
+                properties.stream().collect(Collectors.toMap(PropertyDTO::getName, Function.identity(), (a, b) -> b));
+
         for (Map.Entry<String, String> e : updates.entrySet()) {
             String k = e.getKey();
             if (k != null && k.startsWith("__delete__.")) {
-                props.remove(k.substring("__delete__.".length()));
+                propsMap.remove(k.substring("__delete__.".length()));
             } else {
-                props.put(k, e.getValue());
+                PropertyDTO prop = propsMap.getOrDefault(k, new PropertyDTO());
+                prop.setName(k);
+                prop.setValue(e.getValue());
+                propsMap.put(k, prop);
             }
         }
-        po.setPropertiesJson(JsonUtils.writeAsString(props));
+        po.setPropertiesJson(JsonUtils.writeAsString(new ArrayList<>(propsMap.values())));
         serviceConfigDao.partialUpdateByIds(List.of(po));
     }
 
@@ -259,18 +269,11 @@ public class YarnHaServiceImpl implements YarnHaService {
             dto.setId(po.getId());
             dto.setName(po.getName());
 
-            Map<String, Object> props = StringUtils.isBlank(po.getPropertiesJson())
-                    ? Map.of()
-                    : JsonUtils.readFromString(po.getPropertiesJson());
-
-            List<PropertyDTO> propertyDTOS = new ArrayList<>();
-            for (Map.Entry<String, Object> e : props.entrySet()) {
-                PropertyDTO p = new PropertyDTO();
-                p.setName(e.getKey());
-                p.setValue(e.getValue() == null ? null : e.getValue().toString());
-                propertyDTOS.add(p);
+            List<PropertyDTO> properties = new ArrayList<>();
+            if (StringUtils.isNotBlank(po.getPropertiesJson())) {
+                properties.addAll(JsonUtils.readFromString(po.getPropertiesJson(), new TypeReference<>() {}));
             }
-            dto.setProperties(propertyDTOS);
+            dto.setProperties(properties);
             newConfigs.add(dto);
         }
 
