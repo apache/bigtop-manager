@@ -21,7 +21,6 @@ package org.apache.bigtop.manager.server.service.impl;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
-import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
 import org.apache.bigtop.manager.dao.po.ServicePO;
 import org.apache.bigtop.manager.dao.query.ComponentQuery;
@@ -32,12 +31,9 @@ import org.apache.bigtop.manager.server.enums.CommandLevel;
 import org.apache.bigtop.manager.server.exception.ServerException;
 import org.apache.bigtop.manager.server.model.dto.CommandDTO;
 import org.apache.bigtop.manager.server.model.dto.PropertyDTO;
-import org.apache.bigtop.manager.server.model.dto.ServiceConfigDTO;
-import org.apache.bigtop.manager.server.model.dto.command.ServiceCommandDTO;
+import org.apache.bigtop.manager.server.model.dto.command.ComponentCommandDTO;
 import org.apache.bigtop.manager.server.model.req.EnableYarnRmHaReq;
 import org.apache.bigtop.manager.server.service.YarnHaService;
-import org.apache.bigtop.manager.server.utils.StackConfigUtils;
-import org.apache.bigtop.manager.server.utils.StackUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -80,24 +76,22 @@ public class YarnHaServiceImpl implements YarnHaService {
                     "enable-yarn-rm-ha only supports service 'hadoop', but got: " + servicePO.getName());
         }
 
-        // 1) 写入 yarn-site 推荐 key
+        // 1) 写入 yarn-site 推荐 key（仅 YARN HA 相关，不触碰 HDFS）
         Map<String, String> yarnSiteUpdates = buildYarnSiteUpdates(clusterId, serviceId, req);
         upsertServiceConfigProperties(clusterId, serviceId, "yarn-site", yarnSiteUpdates);
 
-        // 2) 触发一次 service configure（会走 ServiceConfigureJob: configure + stop + start）
+        // 2) 触发专用的 EnableYarnRmHaJob（单 Job 多 Stage），仅影响 YARN 相关组件
         CommandDTO commandDTO = new CommandDTO();
         commandDTO.setClusterId(clusterId);
         commandDTO.setCommandLevel(CommandLevel.SERVICE);
-        commandDTO.setCommand(Command.CONFIGURE);
+        commandDTO.setCommand(Command.ENABLE_YARN_RM_HA);
 
-        ServiceCommandDTO serviceCommandDTO = new ServiceCommandDTO();
-        serviceCommandDTO.setServiceName(servicePO.getName());
+        // 仅选择 resourcemanager 两台主机作为本次 job 的目标组件，避免触碰 HDFS 组件
+        ComponentCommandDTO rmCmd = new ComponentCommandDTO();
+        rmCmd.setComponentName("resourcemanager");
+        rmCmd.setHostnames(List.of(req.getActiveResourceManagerHost(), req.getStandbyResourceManagerHost()));
+        commandDTO.setComponentCommands(List.of(rmCmd));
 
-        // 从数据库取出最新配置，并与 stack 配置合并后塞入 command
-        List<ServiceConfigDTO> mergedConfigs = mergeStackAndDbConfigs(serviceId, servicePO.getName());
-        serviceCommandDTO.setConfigs(mergedConfigs);
-
-        commandDTO.setServiceCommands(List.of(serviceCommandDTO));
         return commandDTO;
     }
 
@@ -123,9 +117,27 @@ public class YarnHaServiceImpl implements YarnHaService {
         m.put("yarn.resourcemanager.hostname." + rm2Id, req.getStandbyResourceManagerHost());
 
         // webapp.address.rmX：优先复用现有 yarn.resourcemanager.webapp.address 的端口，否则默认 8088
-        int webappPort = resolveWebappPort(clusterId, serviceId);
+        int webappPort = resolvePortFromExistingKey(serviceId, "yarn-site", "yarn.resourcemanager.webapp.address", 8088);
         m.put("yarn.resourcemanager.webapp.address." + rm1Id, req.getActiveResourceManagerHost() + ":" + webappPort);
         m.put("yarn.resourcemanager.webapp.address." + rm2Id, req.getStandbyResourceManagerHost() + ":" + webappPort);
+
+        // 补齐 RM HA 必需的地址类 key（从现有单机 key 推断端口，否则使用默认值）
+        int rmAddressPort = resolvePortFromExistingKey(serviceId, "yarn-site", "yarn.resourcemanager.address", 8032);
+        int rmAdminPort = resolvePortFromExistingKey(serviceId, "yarn-site", "yarn.resourcemanager.admin.address", 8033);
+        int rmRtPort = resolvePortFromExistingKey(serviceId, "yarn-site", "yarn.resourcemanager.resource-tracker.address", 8031);
+        int rmSchedulerPort = resolvePortFromExistingKey(serviceId, "yarn-site", "yarn.resourcemanager.scheduler.address", 8030);
+
+        m.put("yarn.resourcemanager.address." + rm1Id, req.getActiveResourceManagerHost() + ":" + rmAddressPort);
+        m.put("yarn.resourcemanager.address." + rm2Id, req.getStandbyResourceManagerHost() + ":" + rmAddressPort);
+
+        m.put("yarn.resourcemanager.admin.address." + rm1Id, req.getActiveResourceManagerHost() + ":" + rmAdminPort);
+        m.put("yarn.resourcemanager.admin.address." + rm2Id, req.getStandbyResourceManagerHost() + ":" + rmAdminPort);
+
+        m.put("yarn.resourcemanager.resource-tracker.address." + rm1Id, req.getActiveResourceManagerHost() + ":" + rmRtPort);
+        m.put("yarn.resourcemanager.resource-tracker.address." + rm2Id, req.getStandbyResourceManagerHost() + ":" + rmRtPort);
+
+        m.put("yarn.resourcemanager.scheduler.address." + rm1Id, req.getActiveResourceManagerHost() + ":" + rmSchedulerPort);
+        m.put("yarn.resourcemanager.scheduler.address." + rm2Id, req.getStandbyResourceManagerHost() + ":" + rmSchedulerPort);
 
         // zk-address：优先使用 zookeeperHosts（推荐）；否则回退到 zookeeperServiceId 逻辑
         String zkAddress = buildZkAddress(clusterId, req);
@@ -144,23 +156,36 @@ public class YarnHaServiceImpl implements YarnHaService {
         return m;
     }
 
-    private int resolveWebappPort(Long clusterId, Long serviceId) {
-        int defaultPort = 8088;
+    private int resolvePortFromExistingKey(Long serviceId, String configName, String key, int defaultPort) {
         try {
-            ServiceConfigPO yarnSite = serviceConfigDao.findByServiceIdAndName(serviceId, "yarn-site");
-            if (yarnSite == null || StringUtils.isBlank(yarnSite.getPropertiesJson())) {
+            Map<String, String> existing = getExistingConfigAsMap(serviceId, configName);
+            String value = existing.get(key);
+            if (StringUtils.isBlank(value) || !value.contains(":")) {
                 return defaultPort;
             }
-            List<PropertyDTO> properties = JsonUtils.readFromString(yarnSite.getPropertiesJson(), new TypeReference<>() {});
-            for (PropertyDTO prop : properties) {
-                if ("yarn.resourcemanager.webapp.address".equals(prop.getName()) && prop.getValue() != null && prop.getValue().contains(":")) {
-                    String portStr = prop.getValue().split(":")[1].trim();
-                    return Integer.parseInt(portStr);
+            String portStr = value.split(":")[1].trim();
+            return Integer.parseInt(portStr);
+        } catch (Exception ignored) {
+        }
+        return defaultPort;
+    }
+
+    private Map<String, String> getExistingConfigAsMap(Long serviceId, String configName) {
+        Map<String, String> map = new HashMap<>();
+        try {
+            ServiceConfigPO cfg = serviceConfigDao.findByServiceIdAndName(serviceId, configName);
+            if (cfg == null || StringUtils.isBlank(cfg.getPropertiesJson())) {
+                return map;
+            }
+            List<PropertyDTO> properties = JsonUtils.readFromString(cfg.getPropertiesJson(), new TypeReference<>() {});
+            for (PropertyDTO p : properties) {
+                if (p.getName() != null && p.getValue() != null) {
+                    map.put(p.getName(), p.getValue().toString());
                 }
             }
         } catch (Exception ignored) {
         }
-        return defaultPort;
+        return map;
     }
 
     private String buildZkAddress(Long clusterId, EnableYarnRmHaReq req) {
@@ -256,27 +281,4 @@ public class YarnHaServiceImpl implements YarnHaService {
         serviceConfigDao.partialUpdateByIds(List.of(po));
     }
 
-    private List<ServiceConfigDTO> mergeStackAndDbConfigs(Long serviceId, String serviceName) {
-        List<ServiceConfigPO> dbConfigs = serviceConfigDao.findByServiceId(serviceId);
-        List<ServiceConfigDTO> oriConfigs = StackUtils.SERVICE_CONFIG_MAP.get(serviceName);
-        if (oriConfigs == null) {
-            oriConfigs = List.of();
-        }
-
-        List<ServiceConfigDTO> newConfigs = new ArrayList<>();
-        for (ServiceConfigPO po : dbConfigs) {
-            ServiceConfigDTO dto = new ServiceConfigDTO();
-            dto.setId(po.getId());
-            dto.setName(po.getName());
-
-            List<PropertyDTO> properties = new ArrayList<>();
-            if (StringUtils.isNotBlank(po.getPropertiesJson())) {
-                properties.addAll(JsonUtils.readFromString(po.getPropertiesJson(), new TypeReference<>() {}));
-            }
-            dto.setProperties(properties);
-            newConfigs.add(dto);
-        }
-
-        return StackConfigUtils.mergeServiceConfigs(oriConfigs, newConfigs);
-    }
 }

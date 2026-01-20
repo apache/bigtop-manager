@@ -32,14 +32,10 @@ import org.apache.bigtop.manager.server.enums.CommandLevel;
 import org.apache.bigtop.manager.server.exception.ServerException;
 import org.apache.bigtop.manager.server.model.dto.CommandDTO;
 import org.apache.bigtop.manager.server.model.dto.PropertyDTO;
-import org.apache.bigtop.manager.server.model.dto.ServiceConfigDTO;
 import org.apache.bigtop.manager.server.model.dto.command.ComponentCommandDTO;
-import org.apache.bigtop.manager.server.model.dto.command.ServiceCommandDTO;
 import org.apache.bigtop.manager.server.model.req.EnableHdfsHaReq;
 import org.apache.bigtop.manager.server.service.CommandService;
 import org.apache.bigtop.manager.server.service.HdfsHaService;
-import org.apache.bigtop.manager.server.utils.StackConfigUtils;
-import org.apache.bigtop.manager.server.utils.StackUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -82,29 +78,66 @@ public class HdfsHaServiceImpl implements HdfsHaService {
         // 1. Write HA configurations to core-site.xml and hdfs-site.xml
         writeHaConfiguration(clusterId, serviceId, req);
 
-        // 2. Orchestrate a sequence of commands to enable HA
-        // The commandService.command() is asynchronous. The JobScheduler will execute them sequentially.
+        // 2. Trigger a single service-level job (EnableHdfsHaJob) which orchestrates stages internally.
+        // IMPORTANT: Do NOT use SERVICE CONFIGURE here, otherwise it will restart all hadoop components (including YARN).
+        CommandDTO commandDTO = new CommandDTO();
+        commandDTO.setClusterId(clusterId);
+        commandDTO.setCommandLevel(CommandLevel.SERVICE);
+        commandDTO.setCommand(Command.ENABLE_HDFS_HA);
 
-        // Stage 1: Start JournalNodes first
-        submitStartJournalNodes(clusterId, req.getJournalNodeHosts());
+        // Embed request payload into customCommand for the service job to consume.
+        commandDTO.setCustomCommand("enableHdfsHa:" + JsonUtils.writeAsString(req));
 
-        // Stage 2: Start Active NameNode
-        submitStartComponent(clusterId, "namenode", req.getActiveNameNodeHost());
+        // Component host map used by EnableHdfsHaJob
+        List<ComponentCommandDTO> componentCommands = new ArrayList<>();
 
-        // Stage 3: Initialize Active NameNode
-        submitCustomCommand(clusterId, "namenode", req.getActiveNameNodeHost(), "initializeSharedEdits");
+        // HDFS components
+        componentCommands.add(componentCommand("journalnode", req.getJournalNodeHosts()));
+        componentCommands.add(componentCommand("namenode", List.of(req.getActiveNameNodeHost(), req.getStandbyNameNodeHost())));
+        componentCommands.add(componentCommand("zkfc", req.getZkfcHosts()));
 
-        // Stage 4: Format ZKFC on Active NameNode host
-        submitCustomCommand(clusterId, "zkfc", req.getActiveNameNodeHost(), "formatZk");
+        // DataNode hosts: restart to pick up HA config
+        List<String> datanodeHosts = getHostsByComponent(clusterId, "datanode");
+        if (CollectionUtils.isNotEmpty(datanodeHosts)) {
+            componentCommands.add(componentCommand("datanode", datanodeHosts));
+        }
 
-        // Stage 5: Start Standby NameNode (NameNodeScript.start() may bootstrap standby automatically)
-        submitStartComponent(clusterId, "namenode", req.getStandbyNameNodeHost());
+        // YARN components: configure only (EnableHdfsHaJob will not stop/start them)
+        List<String> rmHosts = getHostsByComponent(clusterId, "resourcemanager");
+        if (CollectionUtils.isNotEmpty(rmHosts)) {
+            componentCommands.add(componentCommand("resourcemanager", rmHosts));
+        }
+        List<String> nmHosts = getHostsByComponent(clusterId, "nodemanager");
+        if (CollectionUtils.isNotEmpty(nmHosts)) {
+            componentCommands.add(componentCommand("nodemanager", nmHosts));
+        }
+        List<String> hsHosts = getHostsByComponent(clusterId, "history_server");
+        if (CollectionUtils.isNotEmpty(hsHosts)) {
+            componentCommands.add(componentCommand("history_server", hsHosts));
+        }
 
-        // Stage 6: Start all ZKFCs
-        submitStartComponent(clusterId, "zkfc", req.getZkfcHosts());
+        commandDTO.setComponentCommands(componentCommands);
 
-        // Final Stage: Trigger a service-level CONFIGURE to apply settings to all other components (e.g., DataNodes)
-        return submitFinalConfigure(clusterId, serviceId);
+        return commandService.command(commandDTO);
+    }
+
+    private ComponentCommandDTO componentCommand(String name, List<String> hosts) {
+        ComponentCommandDTO cc = new ComponentCommandDTO();
+        cc.setComponentName(name);
+        cc.setHostnames(hosts == null ? List.of() : hosts);
+        return cc;
+    }
+
+    private List<String> getHostsByComponent(Long clusterId, String componentName) {
+        ComponentQuery q = ComponentQuery.builder()
+                .clusterId(clusterId)
+                .name(componentName)
+                .build();
+        List<ComponentPO> list = componentDao.findByQuery(q);
+        if (CollectionUtils.isEmpty(list)) {
+            return List.of();
+        }
+        return list.stream().map(ComponentPO::getHostname).filter(StringUtils::isNotBlank).distinct().toList();
     }
 
     private void validatePrerequisites(Long clusterId, Long serviceId, EnableHdfsHaReq req) {
@@ -147,7 +180,8 @@ public class HdfsHaServiceImpl implements HdfsHaService {
         // Validate ZK quorum can be generated (must for automatic failover)
         String zk = buildZkAddress(clusterId, req);
         if (StringUtils.isBlank(zk)) {
-            throw new ServerException("Failed to build ha.zookeeper.quorum, please check zookeeper hosts/service and components");
+            throw new ServerException(
+                    "Failed to build ha.zookeeper.quorum, please check zookeeper hosts/service and components");
         }
     }
 
@@ -215,60 +249,6 @@ public class HdfsHaServiceImpl implements HdfsHaService {
         m.put("__delete__.dfs.namenode.https-address", "");
 
         return m;
-    }
-
-    private void submitStartJournalNodes(Long clusterId, List<String> hosts) {
-        submitStartComponent(clusterId, "journalnode", hosts);
-    }
-
-    private void submitStartComponent(Long clusterId, String componentName, String host) {
-        submitStartComponent(clusterId, componentName, List.of(host));
-    }
-
-    private void submitStartComponent(Long clusterId, String componentName, List<String> hosts) {
-        CommandDTO commandDTO = new CommandDTO();
-        commandDTO.setClusterId(clusterId);
-        commandDTO.setCommand(Command.START);
-        commandDTO.setCommandLevel(CommandLevel.COMPONENT);
-
-        ComponentCommandDTO componentCommand = new ComponentCommandDTO();
-        componentCommand.setComponentName(componentName);
-        componentCommand.setHostnames(hosts);
-        commandDTO.setComponentCommands(List.of(componentCommand));
-
-        commandService.command(commandDTO);
-    }
-
-    private void submitCustomCommand(Long clusterId, String componentName, String host, String customCommand) {
-        CommandDTO commandDTO = new CommandDTO();
-        commandDTO.setClusterId(clusterId);
-        commandDTO.setCommand(Command.CUSTOM);
-        commandDTO.setCustomCommand(customCommand);
-        commandDTO.setCommandLevel(CommandLevel.COMPONENT);
-
-        ComponentCommandDTO componentCommand = new ComponentCommandDTO();
-        componentCommand.setComponentName(componentName);
-        componentCommand.setHostnames(List.of(host));
-        commandDTO.setComponentCommands(List.of(componentCommand));
-
-        commandService.command(commandDTO);
-    }
-
-    private org.apache.bigtop.manager.server.model.vo.CommandVO submitFinalConfigure(Long clusterId, Long serviceId) {
-        ServicePO servicePO = serviceDao.findById(serviceId);
-
-        CommandDTO commandDTO = new CommandDTO();
-        commandDTO.setClusterId(clusterId);
-        commandDTO.setCommand(Command.CONFIGURE);
-        commandDTO.setCommandLevel(CommandLevel.SERVICE);
-
-        ServiceCommandDTO serviceCommand = new ServiceCommandDTO();
-        serviceCommand.setServiceName(servicePO.getName());
-        List<ServiceConfigDTO> mergedConfigs = mergeStackAndDbConfigs(serviceId, servicePO.getName());
-        serviceCommand.setConfigs(mergedConfigs);
-        commandDTO.setServiceCommands(List.of(serviceCommand));
-
-        return commandService.command(commandDTO);
     }
 
     private String buildZkAddress(Long clusterId, EnableHdfsHaReq req) {
@@ -347,29 +327,5 @@ public class HdfsHaServiceImpl implements HdfsHaService {
         }
         po.setPropertiesJson(JsonUtils.writeAsString(new ArrayList<>(propsMap.values())));
         serviceConfigDao.partialUpdateByIds(List.of(po));
-    }
-
-    private List<ServiceConfigDTO> mergeStackAndDbConfigs(Long serviceId, String serviceName) {
-        List<ServiceConfigPO> dbConfigs = serviceConfigDao.findByServiceId(serviceId);
-        List<ServiceConfigDTO> stackConfigs = StackUtils.SERVICE_CONFIG_MAP.get(serviceName);
-        if (stackConfigs == null) {
-            stackConfigs = List.of();
-        }
-
-        List<ServiceConfigDTO> dbConfigsDTO = new ArrayList<>();
-        for (ServiceConfigPO po : dbConfigs) {
-            ServiceConfigDTO dto = new ServiceConfigDTO();
-            dto.setId(po.getId());
-            dto.setName(po.getName());
-
-            List<PropertyDTO> properties = new ArrayList<>();
-            if (StringUtils.isNotBlank(po.getPropertiesJson())) {
-                properties.addAll(JsonUtils.readFromString(po.getPropertiesJson(), new TypeReference<>() {}));
-            }
-            dto.setProperties(properties);
-            dbConfigsDTO.add(dto);
-        }
-
-        return StackConfigUtils.mergeServiceConfigs(stackConfigs, dbConfigsDTO);
     }
 }

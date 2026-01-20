@@ -76,9 +76,30 @@ public class ZkfcScript extends AbstractServerScript {
         configure(params);
         HadoopParams hadoopParams = (HadoopParams) params;
 
-        String cmd = MessageFormat.format("{0}/hdfs --daemon start zkfc", hadoopParams.binDir());
+        // Ensure ZKFC is formatted before starting.
+        // If the parent znode does not exist, zkfc will fail with:
+        // "Parent znode does not exist. Run with -formatZK flag to initialize ZooKeeper."
+        // Make this step idempotent: try start, if it indicates not formatted then format and retry.
+        String startCmd = MessageFormat.format("{0}/hdfs --daemon start zkfc", hadoopParams.binDir());
         try {
-            return LinuxOSUtils.sudoExecCmd(cmd, hadoopParams.user());
+            ShellResult startRes = LinuxOSUtils.sudoExecCmd(startCmd, hadoopParams.user());
+            if (startRes.getExitCode() == 0) {
+                return startRes;
+            }
+
+            String err = (startRes.getErrMsg() == null ? "" : startRes.getErrMsg());
+            String out = (startRes.getOutput() == null ? "" : startRes.getOutput());
+            String combined = out + "\n" + err;
+            if (combined.contains("Parent znode does not exist") || combined.contains("-formatZK")) {
+                log.warn("ZKFC not formatted, attempting to formatZK and retry start. stdout/stderr: {}", combined);
+                ShellResult fmt = formatZk(params);
+                if (fmt.getExitCode() != 0) {
+                    return fmt;
+                }
+                return LinuxOSUtils.sudoExecCmd(startCmd, hadoopParams.user());
+            }
+
+            return startRes;
         } catch (Exception e) {
             throw new StackException(e);
         }

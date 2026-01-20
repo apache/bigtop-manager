@@ -82,13 +82,13 @@
     baseMenu.push({ action: 'Remove', text: t('common.remove', [t('common.service')]), divider: true, danger: true })
 
     return [
-    {
-      shape: 'default',
-      type: 'primary',
-      text: t('common.operation'),
+      {
+        shape: 'default',
+        type: 'primary',
+        text: t('common.operation'),
         dropdownMenu: baseMenu,
-      dropdownMenuClickEvent: (info) => dropdownMenuClick!(info)
-    }
+        dropdownMenuClickEvent: (info) => dropdownMenuClick!(info)
+      }
     ]
   })
 

@@ -41,7 +41,6 @@ public class ComponentCustomStage extends AbstractComponentStage {
     }
 
     @Override
-    @Override
     public String getName() {
         String componentDisplay = StackUtils.getComponentDTO(stageContext.getComponentName()).getDisplayName();
         String stageName = String.format("Custom: %s (%s)", componentDisplay, customCommand);
