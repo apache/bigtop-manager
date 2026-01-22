@@ -167,15 +167,11 @@ public class HdfsHaServiceImpl implements HdfsHaService {
         }
 
         // Verify required components exist on specified hosts
+        // NameNode is required before enabling HA.
         assertComponentExists(clusterId, "namenode", req.getActiveNameNodeHost());
         assertComponentExists(clusterId, "namenode", req.getStandbyNameNodeHost());
 
-        for (String jnHost : req.getJournalNodeHosts()) {
-            assertComponentExists(clusterId, "journalnode", jnHost);
-        }
-
-        // zkfc should exist on active host at least (as we run formatZk there)
-        assertComponentExists(clusterId, "zkfc", req.getActiveNameNodeHost());
+        // journalnode/zkfc may not exist before enable HA, because this action will ADD/install them.
 
         // Validate ZK quorum can be generated (must for automatic failover)
         String zk = buildZkAddress(clusterId, req);

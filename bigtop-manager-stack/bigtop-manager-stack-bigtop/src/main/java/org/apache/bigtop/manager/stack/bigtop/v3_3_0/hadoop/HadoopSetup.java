@@ -273,11 +273,19 @@ public class HadoopSetup {
     }
 
     private static boolean checkAllJournalNodesPortReachable(HadoopParams hadoopParams) throws InterruptedException {
+        // Only required for HDFS HA (qjournal). In single NameNode mode, JournalNode is not used.
         List<String> journalNodeList = LocalSettings.componentHosts("journalnode");
-        String port = hadoopParams.getJournalHttpPort();
         if (journalNodeList == null || journalNodeList.isEmpty()) {
-            throw new IllegalArgumentException("JournalNode host list cannot be empty!");
+            log.info("JournalNode host list is empty, skip JournalNode reachability check (single NameNode mode)");
+            return true;
         }
+
+        String port = hadoopParams.getJournalHttpPort();
+        if (StringUtils.isBlank(port)) {
+            log.warn("JournalNode http port is empty, skip JournalNode reachability check");
+            return true;
+        }
+
         int retryCount = 0;
         int maxRetry = 100;
         long retryIntervalMs = 2000;
@@ -285,12 +293,10 @@ public class HadoopSetup {
         while (retryCount < maxRetry) {
             boolean allReachable = true;
             for (String host : journalNodeList) {
-                boolean isReachable = false;
                 Socket socket = null;
                 try {
                     socket = new Socket();
                     socket.connect(new InetSocketAddress(host, Integer.parseInt(port)), connectTimeoutMs);
-                    isReachable = true;
                     log.info("JournalNode [{}:{}] is reachable.", host, port);
                 } catch (Exception e) {
                     allReachable = false;

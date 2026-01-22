@@ -326,7 +326,7 @@
     <main-card v-model:active-key="activeTab" :tabs="tabs">
       <template #tab-item>
         <keep-alive>
-          <component :is="getCompName" v-bind="{ ...serviceDetail }"></component>
+          <component :is="getCompName" v-bind="{ ...serviceDetail }" />
         </keep-alive>
       </template>
     </main-card>

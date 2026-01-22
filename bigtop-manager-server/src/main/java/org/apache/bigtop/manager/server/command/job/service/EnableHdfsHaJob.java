@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
  * Enable HDFS HA job.
  *
  * 约束：
- * - HDFS 相关组件：执行 START / CUSTOM / RESTART（journalnode/namenode/zkfc/datanode）
+ * - HDFS 相关组件：执行 ADD/CONFIGURE/START/CUSTOM/RESTART（journalnode/namenode/zkfc/datanode）
  * - YARN 相关组件：仅执行 CONFIGURE（不 STOP/START），避免影响线上 YARN 任务
  */
 public class EnableHdfsHaJob extends AbstractServiceJob {
@@ -61,39 +61,47 @@ public class EnableHdfsHaJob extends AbstractServiceJob {
 
         Map<String, List<String>> componentHostsMap = getComponentHostsMap();
 
-        // 1) Start JournalNode
+        // 0) Ensure required HA components are installed and running
+        // Install/prepare JournalNodes first
         Map<String, List<String>> jn = pick(componentHostsMap, "journalnode");
+        stages.addAll(ComponentStageHelper.createComponentStages(jn, Command.ADD, commandDTO));
+        stages.addAll(ComponentStageHelper.createComponentStages(jn, Command.CONFIGURE, commandDTO));
         stages.addAll(ComponentStageHelper.createComponentStages(jn, Command.START, commandDTO));
 
-        // 2) Start Active NameNode
+        // Install/prepare ZKFC on selected hosts (do not start here, will start after formatting)
+        Map<String, List<String>> zkfcHosts = pick(componentHostsMap, "zkfc");
+        stages.addAll(ComponentStageHelper.createComponentStages(zkfcHosts, Command.ADD, commandDTO));
+        stages.addAll(ComponentStageHelper.createComponentStages(zkfcHosts, Command.CONFIGURE, commandDTO));
+
+        // 1) Start Active NameNode
         Map<String, List<String>> activeNN = Map.of("namenode", List.of(req.getActiveNameNodeHost()));
         stages.addAll(ComponentStageHelper.createComponentStages(activeNN, Command.START, commandDTO));
 
-        // 3) Custom: initializeSharedEdits on Active NameNode
+        // 2) Custom: initializeSharedEdits on Active NameNode
         stages.add(new ComponentCustomStage(
                 createStageContext("namenode", List.of(req.getActiveNameNodeHost()), commandDTO),
                 "initializeSharedEdits"));
 
-        // 4) Custom: formatZk on Active NameNode host, component=zkfc
+        // 3) Custom: formatZk on Active NameNode host, component=zkfc
         stages.add(new ComponentCustomStage(
                 createStageContext("zkfc", List.of(req.getActiveNameNodeHost()), commandDTO),
                 "formatZk"));
 
-        // 5) Start Standby NameNode
+        // 4) Start Standby NameNode
         Map<String, List<String>> standbyNN = Map.of("namenode", List.of(req.getStandbyNameNodeHost()));
         stages.addAll(ComponentStageHelper.createComponentStages(standbyNN, Command.START, commandDTO));
 
-        // 6) Start ZKFC(s)
+        // 5) Start ZKFC(s)
         if (CollectionUtils.isNotEmpty(req.getZkfcHosts())) {
             Map<String, List<String>> zkfc = Map.of("zkfc", req.getZkfcHosts());
             stages.addAll(ComponentStageHelper.createComponentStages(zkfc, Command.START, commandDTO));
         }
 
-        // 7) Restart DataNode(s) - chosen option 2
+        // 6) Restart DataNode(s) - chosen option 2
         Map<String, List<String>> dn = pick(componentHostsMap, "datanode");
         stages.addAll(ComponentStageHelper.createComponentStages(dn, Command.RESTART, commandDTO));
 
-        // 8) Configure YARN components only (no restart)
+        // 7) Configure YARN components only (no restart)
         Map<String, List<String>> yarn = pick(componentHostsMap, "resourcemanager", "nodemanager", "history_server");
         stages.addAll(ComponentStageHelper.createComponentStages(yarn, Command.CONFIGURE, commandDTO));
 
