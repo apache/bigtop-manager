@@ -26,6 +26,12 @@ import org.apache.bigtop.manager.server.enums.HealthyStatusEnum;
 import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
 import org.apache.bigtop.manager.server.utils.StackUtils;
 
+import org.apache.commons.collections4.CollectionUtils;
+import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
+
+@Slf4j
 public class ComponentAddTask extends AbstractComponentTask {
 
     public ComponentAddTask(TaskContext taskContext) {
@@ -48,7 +54,18 @@ public class ComponentAddTask extends AbstractComponentTask {
                 .hostname(hostname)
                 .name(componentName)
                 .build();
-        ComponentPO componentPO = componentDao.findByQuery(componentQuery).get(0);
+        List<ComponentPO> componentPOList = componentDao.findByQuery(componentQuery);
+        ComponentPO componentPO;
+        if (CollectionUtils.isEmpty(componentPOList)) {
+            log.info("Component [{}] on host [{}] not found in DB, creating new entry.", componentName, hostname);
+            componentPO = new ComponentPO();
+            componentPO.setName(componentName);
+            componentPO.setHostname(hostname);
+            componentPO.setClusterId(taskContext.getClusterId());
+            componentPO.setServiceId(taskContext.getServiceId());
+        } else {
+            componentPO = componentPOList.get(0);
+        }
 
         ComponentDTO componentDTO = StackUtils.getComponentDTO(componentName);
         if (componentDTO.getCategory().equalsIgnoreCase(ComponentCategories.CLIENT)) {
@@ -59,7 +76,11 @@ public class ComponentAddTask extends AbstractComponentTask {
             componentPO.setStatus(HealthyStatusEnum.UNHEALTHY.getCode());
         }
 
-        componentDao.partialUpdateById(componentPO);
+        if (componentPO.getId() == null) {
+            componentDao.save(componentPO);
+        } else {
+            componentDao.partialUpdateById(componentPO);
+        }
     }
 
     @Override

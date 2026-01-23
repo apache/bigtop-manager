@@ -179,8 +179,11 @@ public class HadoopParams extends BigtopParams {
 
         if (haByConfig) {
             // HA mode: do not rely on components.json namenode list, because it may be stale.
+            // During enable-ha bootstrap, journalnode components may be in the process of being installed,
+            // so allow falling back when journalnode list is not ready yet.
             if (journalNodeList == null || journalNodeList.size() < 3) {
-                throw new IllegalArgumentException("JournalNode host list must be at least 3 for HDFS HA");
+                log.warn("JournalNode host list is not ready (size < 3), skip HA hdfs-site generation for now and fall back to non-HA config. journalNodeList={}", journalNodeList);
+                haByConfig = false;
             }
 
             String journalQuorum = journalNodeList.stream().map(x -> x + ":8485").collect(Collectors.joining(";"));
