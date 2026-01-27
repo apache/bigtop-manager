@@ -31,6 +31,9 @@ public class ComponentCustomTask extends AbstractComponentTask {
 
     public ComponentCustomTask(TaskContext taskContext, String customCommand) {
         super(taskContext);
+        if (customCommand == null || customCommand.isBlank()) {
+            throw new IllegalArgumentException("customCommand must not be blank for ComponentCustomTask");
+        }
         this.customCommand = customCommand;
     }
 
@@ -47,7 +50,7 @@ public class ComponentCustomTask extends AbstractComponentTask {
     @Override
     public String getName() {
         return "Custom " + taskContext.getComponentDisplayName()
-                + " (" + customCommand + ") on " + taskContext.getHostname();
+                + " (" + String.valueOf(customCommand) + ") on " + taskContext.getHostname();
     }
 }
 

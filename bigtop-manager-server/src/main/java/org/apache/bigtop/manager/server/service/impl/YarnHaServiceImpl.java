@@ -164,7 +164,7 @@ public class YarnHaServiceImpl implements YarnHaService {
                 return defaultPort;
             }
             String portStr = value.split(":")[1].trim();
-            return Integer.parseInt(portStr);
+                    return Integer.parseInt(portStr);
         } catch (Exception ignored) {
         }
         return defaultPort;

@@ -73,35 +73,38 @@ public class EnableHdfsHaJob extends AbstractServiceJob {
         stages.addAll(ComponentStageHelper.createComponentStages(zkfcHosts, Command.ADD, commandDTO));
         stages.addAll(ComponentStageHelper.createComponentStages(zkfcHosts, Command.CONFIGURE, commandDTO));
 
-        // 1) Start Active NameNode
+        // 1) Stop existing Active NameNode before re-configuring and starting in HA mode
         Map<String, List<String>> activeNN = Map.of("namenode", List.of(req.getActiveNameNodeHost()));
+        stages.addAll(ComponentStageHelper.createComponentStages(activeNN, Command.STOP, commandDTO));
+
+        // 2) Start Active NameNode
         stages.addAll(ComponentStageHelper.createComponentStages(activeNN, Command.START, commandDTO));
 
-        // 2) Custom: initializeSharedEdits on Active NameNode
+        // 3) Custom: initializeSharedEdits on Active NameNode
         stages.add(new ComponentCustomStage(
                 createStageContext("namenode", List.of(req.getActiveNameNodeHost()), commandDTO),
                 "initializeSharedEdits"));
 
-        // 3) Custom: formatZk on Active NameNode host, component=zkfc
+        // 4) Custom: formatZk on Active NameNode host, component=zkfc
         stages.add(new ComponentCustomStage(
                 createStageContext("zkfc", List.of(req.getActiveNameNodeHost()), commandDTO),
                 "formatZk"));
 
-        // 4) Start Standby NameNode
+        // 5) Start Standby NameNode
         Map<String, List<String>> standbyNN = Map.of("namenode", List.of(req.getStandbyNameNodeHost()));
         stages.addAll(ComponentStageHelper.createComponentStages(standbyNN, Command.START, commandDTO));
 
-        // 5) Start ZKFC(s)
+        // 6) Start ZKFC(s)
         if (CollectionUtils.isNotEmpty(req.getZkfcHosts())) {
             Map<String, List<String>> zkfc = Map.of("zkfc", req.getZkfcHosts());
             stages.addAll(ComponentStageHelper.createComponentStages(zkfc, Command.START, commandDTO));
         }
 
-        // 6) Restart DataNode(s) - chosen option 2
+        // 7) Restart DataNode(s) - chosen option 2
         Map<String, List<String>> dn = pick(componentHostsMap, "datanode");
         stages.addAll(ComponentStageHelper.createComponentStages(dn, Command.RESTART, commandDTO));
 
-        // 7) Configure YARN components only (no restart)
+        // 8) Configure YARN components only (no restart)
         Map<String, List<String>> yarn = pick(componentHostsMap, "resourcemanager", "nodemanager", "history_server");
         stages.addAll(ComponentStageHelper.createComponentStages(yarn, Command.CONFIGURE, commandDTO));
 

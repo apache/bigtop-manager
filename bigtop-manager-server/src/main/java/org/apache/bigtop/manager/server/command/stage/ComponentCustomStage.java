@@ -32,6 +32,9 @@ public class ComponentCustomStage extends AbstractComponentStage {
 
     public ComponentCustomStage(StageContext stageContext, String customCommand) {
         super(stageContext);
+        if (customCommand == null || customCommand.isBlank()) {
+            throw new IllegalArgumentException("customCommand must not be blank for ComponentCustomStage");
+        }
         this.customCommand = customCommand;
     }
 

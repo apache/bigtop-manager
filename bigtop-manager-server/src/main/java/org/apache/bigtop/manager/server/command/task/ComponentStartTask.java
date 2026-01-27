@@ -23,6 +23,12 @@ import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.query.ComponentQuery;
 import org.apache.bigtop.manager.server.enums.HealthyStatusEnum;
 
+import org.apache.commons.collections4.CollectionUtils;
+import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
+
+@Slf4j
 public class ComponentStartTask extends AbstractComponentTask {
 
     public ComponentStartTask(TaskContext taskContext) {
@@ -45,9 +51,26 @@ public class ComponentStartTask extends AbstractComponentTask {
                 .hostname(hostname)
                 .name(componentName)
                 .build();
-        ComponentPO componentPO = componentDao.findByQuery(componentQuery).get(0);
+        List<ComponentPO> componentPOList = componentDao.findByQuery(componentQuery);
+        ComponentPO componentPO;
+        if (CollectionUtils.isEmpty(componentPOList)) {
+            log.warn("Component [{}] on host [{}] not found in DB during START, creating new entry. This may indicate an issue in the ADD task.", componentName, hostname);
+            componentPO = new ComponentPO();
+            componentPO.setName(componentName);
+            componentPO.setHostname(hostname);
+            componentPO.setClusterId(taskContext.getClusterId());
+            componentPO.setServiceId(taskContext.getServiceId());
+        } else {
+            componentPO = componentPOList.get(0);
+        }
+
         componentPO.setStatus(HealthyStatusEnum.HEALTHY.getCode());
-        componentDao.partialUpdateById(componentPO);
+
+        if (componentPO.getId() == null) {
+            componentDao.save(componentPO);
+        } else {
+            componentDao.partialUpdateById(componentPO);
+        }
     }
 
     @Override

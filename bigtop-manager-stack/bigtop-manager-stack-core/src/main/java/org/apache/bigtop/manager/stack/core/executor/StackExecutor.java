@@ -73,6 +73,9 @@ public class StackExecutor {
             String command = payload.getCommand().equalsIgnoreCase(Command.CUSTOM.getCode())
                     ? payload.getCustomCommand()
                     : payload.getCommand();
+            if (command == null || command.isBlank()) {
+                throw new StackException("CUSTOM command requires non-blank customCommand, payload: {0}", payload);
+            }
             Script script = getCommandScript(payload);
 
             String methodName = CaseUtils.toCamelCase(command, CaseUtils.SEPARATOR_UNDERSCORE, false);

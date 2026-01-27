@@ -196,7 +196,7 @@ public class HadoopParams extends BigtopParams {
             hdfsSite.put("dfs.ha.automatic-failover.enabled", "true");
             hdfsSite.put("dfs.nameservices", nameservice);
             if (hdfsSite.get("dfs.ha.namenodes." + nameservice) == null) {
-                hdfsSite.put("dfs.ha.namenodes." + nameservice, "nn1,nn2");
+            hdfsSite.put("dfs.ha.namenodes." + nameservice, "nn1,nn2");
             }
             hdfsSite.put("dfs.namenode.shared.edits.dir", "qjournal://" + journalQuorum + "/" + nameservice);
 
@@ -204,34 +204,34 @@ public class HadoopParams extends BigtopParams {
             if (hdfsSite.get("dfs.namenode.rpc-address." + nameservice + ".nn1") == null
                     && namenodeList != null
                     && namenodeList.size() >= 1) {
-                hdfsSite.put("dfs.namenode.rpc-address." + nameservice + ".nn1", namenodeList.get(0) + ":8020");
+            hdfsSite.put("dfs.namenode.rpc-address." + nameservice + ".nn1", namenodeList.get(0) + ":8020");
             }
             if (hdfsSite.get("dfs.namenode.rpc-address." + nameservice + ".nn2") == null
                     && namenodeList != null
                     && namenodeList.size() >= 2) {
-                hdfsSite.put("dfs.namenode.rpc-address." + nameservice + ".nn2", namenodeList.get(1) + ":8020");
+            hdfsSite.put("dfs.namenode.rpc-address." + nameservice + ".nn2", namenodeList.get(1) + ":8020");
             }
             if (hdfsSite.get("dfs.namenode.http-address." + nameservice + ".nn1") == null
                     && namenodeList != null
                     && namenodeList.size() >= 1) {
-                hdfsSite.put("dfs.namenode.http-address." + nameservice + ".nn1", namenodeList.get(0) + ":9870");
+            hdfsSite.put("dfs.namenode.http-address." + nameservice + ".nn1", namenodeList.get(0) + ":9870");
             }
             if (hdfsSite.get("dfs.namenode.http-address." + nameservice + ".nn2") == null
                     && namenodeList != null
                     && namenodeList.size() >= 2) {
-                hdfsSite.put("dfs.namenode.http-address." + nameservice + ".nn2", namenodeList.get(1) + ":9870");
+            hdfsSite.put("dfs.namenode.http-address." + nameservice + ".nn2", namenodeList.get(1) + ":9870");
             }
 
             if (hdfsSite.get("dfs.client.failover.proxy.provider." + nameservice) == null) {
-                hdfsSite.put(
-                        "dfs.client.failover.proxy.provider." + nameservice,
-                        "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider");
+            hdfsSite.put(
+                    "dfs.client.failover.proxy.provider." + nameservice,
+                    "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider");
             }
             if (hdfsSite.get("dfs.ha.fencing.methods") == null) {
-                hdfsSite.put("dfs.ha.fencing.methods", "shell(/bin/true)");
+            hdfsSite.put("dfs.ha.fencing.methods", "shell(/bin/true)");
             }
             if (hdfsSite.get("dfs.replication") == null) {
-                hdfsSite.put("dfs.replication", "3");
+            hdfsSite.put("dfs.replication", "3");
             }
 
         } else if (namenodeList != null && !namenodeList.isEmpty()) {
@@ -263,9 +263,9 @@ public class HadoopParams extends BigtopParams {
         dfsDataDir = (String) hdfsSite.get("dfs.datanode.data.dir");
         dfsNameNodeDir = (String) hdfsSite.get("dfs.namenode.name.dir");
         if (StringUtils.isNotBlank(dfsNameNodeDir)) {
-            nameNodeFormattedDirs = Arrays.stream(dfsNameNodeDir.split(","))
-                    .map(x -> x + "/namenode-formatted/")
-                    .toList();
+        nameNodeFormattedDirs = Arrays.stream(dfsNameNodeDir.split(","))
+                .map(x -> x + "/namenode-formatted/")
+                .toList();
         } else {
             nameNodeFormattedDirs = List.of();
             log.warn("dfs.namenode.name.dir is empty, skip namenode formatted dirs generation");
