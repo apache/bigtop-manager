@@ -43,7 +43,27 @@ public class EnableHdfsHaJobFactory extends AbstractServiceJobFactory {
 
     @Override
     public Job createJob(JobContext jobContext) {
+        log.info("EnableHdfsHaJobFactory creating job, jobFactoryClassSource={}, jobClassSource={}, stageClassSource={}, taskClassSource={}, commandDTO.command={}, commandDTO.customCommandLen={}",
+                getCodeSource(EnableHdfsHaJobFactory.class),
+                getCodeSource(EnableHdfsHaJob.class),
+                getCodeSource(org.apache.bigtop.manager.server.command.stage.ComponentCustomStage.class),
+                getCodeSource(org.apache.bigtop.manager.server.command.task.ComponentCustomTask.class),
+                jobContext == null || jobContext.getCommandDTO() == null ? null : jobContext.getCommandDTO().getCommand(),
+                jobContext == null || jobContext.getCommandDTO() == null || jobContext.getCommandDTO().getCustomCommand() == null
+                        ? null
+                        : jobContext.getCommandDTO().getCustomCommand().length());
         return new EnableHdfsHaJob(jobContext);
+    }
+
+    private static String getCodeSource(Class<?> clazz) {
+        try {
+            if (clazz == null || clazz.getProtectionDomain() == null || clazz.getProtectionDomain().getCodeSource() == null) {
+                return "null";
+            }
+            return String.valueOf(clazz.getProtectionDomain().getCodeSource().getLocation());
+        } catch (Exception e) {
+            return "error:" + e.getMessage();
+        }
     }
 }
 

@@ -20,11 +20,14 @@ package org.apache.bigtop.manager.server.command.task;
 
 import org.apache.bigtop.manager.common.enums.Command;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Component custom command task.
  *
  * It will send Command=CUSTOM and customCommand to agent.
  */
+@Slf4j
 public class ComponentCustomTask extends AbstractComponentTask {
 
     private final String customCommand;

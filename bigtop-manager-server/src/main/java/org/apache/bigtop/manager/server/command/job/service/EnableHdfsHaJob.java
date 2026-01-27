@@ -32,6 +32,8 @@ import org.apache.bigtop.manager.server.model.req.EnableHdfsHaReq;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,9 +46,21 @@ import java.util.stream.Collectors;
  * - HDFS 相关组件：执行 ADD/CONFIGURE/START/CUSTOM/RESTART（journalnode/namenode/zkfc/datanode）
  * - YARN 相关组件：仅执行 CONFIGURE（不 STOP/START），避免影响线上 YARN 任务
  */
+@Slf4j
 public class EnableHdfsHaJob extends AbstractServiceJob {
 
     private static final String CUSTOM_COMMAND_PREFIX = "enableHdfsHa:";
+
+    private static String getCodeSource(Class<?> clazz) {
+        try {
+            if (clazz == null || clazz.getProtectionDomain() == null || clazz.getProtectionDomain().getCodeSource() == null) {
+                return "null";
+            }
+            return String.valueOf(clazz.getProtectionDomain().getCodeSource().getLocation());
+        } catch (Exception e) {
+            return "error:" + e.getMessage();
+        }
+    }
 
     public EnableHdfsHaJob(JobContext jobContext) {
         super(jobContext);
@@ -81,14 +95,19 @@ public class EnableHdfsHaJob extends AbstractServiceJob {
         stages.addAll(ComponentStageHelper.createComponentStages(activeNN, Command.START, commandDTO));
 
         // 3) Custom: initializeSharedEdits on Active NameNode
-        stages.add(new ComponentCustomStage(
-                createStageContext("namenode", List.of(req.getActiveNameNodeHost()), commandDTO),
-                "initializeSharedEdits"));
+        String nnCustom = "initializeSharedEdits";
+        StageContext nnStageContext = createStageContext("namenode", List.of(req.getActiveNameNodeHost()), commandDTO);
+        log.info("EnableHdfsHaJob creating custom stage, component={}, hosts={}, customCommand={}, jobClassSource={}",
+                nnStageContext.getComponentName(), nnStageContext.getHostnames(), nnCustom, getCodeSource(getClass()));
+        stages.add(new ComponentCustomStage(nnStageContext, nnCustom));
 
         // 4) Custom: formatZk on Active NameNode host, component=zkfc
-        stages.add(new ComponentCustomStage(
-                createStageContext("zkfc", List.of(req.getActiveNameNodeHost()), commandDTO),
-                "formatZk"));
+        String zkfcCustom = "formatZk";
+        StageContext zkfcStageContext = createStageContext("zkfc", List.of(req.getActiveNameNodeHost()), commandDTO);
+        log.info("EnableHdfsHaJob creating custom stage, component={}, hosts={}, customCommand={}, jobClassSource={}",
+                zkfcStageContext.getComponentName(), zkfcStageContext.getHostnames(), zkfcCustom, getCodeSource(getClass()));
+        stages.add(new ComponentCustomStage(zkfcStageContext, zkfcCustom));
+
 
         // 5) Start Standby NameNode
         Map<String, List<String>> standbyNN = Map.of("namenode", List.of(req.getStandbyNameNodeHost()));

@@ -23,9 +23,12 @@ import org.apache.bigtop.manager.server.command.task.Task;
 import org.apache.bigtop.manager.server.utils.StackUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Stage for component custom command.
  */
+@Slf4j
 public class ComponentCustomStage extends AbstractComponentStage {
 
     private final String customCommand;
@@ -33,13 +36,20 @@ public class ComponentCustomStage extends AbstractComponentStage {
     public ComponentCustomStage(StageContext stageContext, String customCommand) {
         super(stageContext);
         if (customCommand == null || customCommand.isBlank()) {
-            throw new IllegalArgumentException("customCommand must not be blank for ComponentCustomStage");
+            throw new IllegalArgumentException("customCommand must not be blank for ComponentCustomStage, stageContext=" + stageContext);
         }
         this.customCommand = customCommand;
     }
 
     @Override
     protected Task createTask(String hostname) {
+        log.info("ComponentCustomStage.createTask: this={}, customCommand='{}', len={}, blank={}, stageContext={}, hostname={}",
+                System.identityHashCode(this),
+                customCommand,
+                customCommand == null ? null : customCommand.length(),
+                customCommand == null ? null : customCommand.isBlank(),
+                getStageContext(),
+                hostname);
         return new ComponentCustomTask(createTaskContext(hostname), customCommand);
     }
 

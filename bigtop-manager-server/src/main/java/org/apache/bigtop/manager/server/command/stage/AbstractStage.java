@@ -57,7 +57,11 @@ public abstract class AbstractStage implements Stage {
         injectBeans();
 
         beforeCreateTasks();
+    }
 
+    @Override
+    public void init()
+    {
         for (String hostname : stageContext.getHostnames()) {
             tasks.add(createTask(hostname));
         }

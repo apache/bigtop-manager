@@ -75,6 +75,10 @@ public abstract class AbstractJob implements Job {
         if (CollectionUtils.isEmpty(stages)) {
             throw new ApiException(ApiExceptionEnum.JOB_HAS_NO_STAGES);
         }
+
+        for (Stage stage : stages) {
+            stage.init();
+        }
     }
 
     protected void injectBeans() {

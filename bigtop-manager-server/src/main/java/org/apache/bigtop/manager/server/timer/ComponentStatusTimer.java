@@ -110,8 +110,9 @@ public class ComponentStatusTimer {
         componentDao.partialUpdateByIds(componentPOList);
 
         // Update services
-        Map<Long, List<ComponentPO>> componentPOMap =
-                componentPOList.stream().collect(Collectors.groupingBy(ComponentPO::getServiceId));
+        Map<Long, List<ComponentPO>> componentPOMap = componentPOList.stream()
+                .filter(c -> c.getServiceId() != null)
+                .collect(Collectors.groupingBy(ComponentPO::getServiceId));
         for (Map.Entry<Long, List<ComponentPO>> entry : componentPOMap.entrySet()) {
             Long serviceId = entry.getKey();
             List<ComponentPO> components = entry.getValue();
