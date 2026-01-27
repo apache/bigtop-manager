@@ -79,7 +79,14 @@ public class StackExecutor {
             Script script = getCommandScript(payload);
 
             String methodName = CaseUtils.toCamelCase(command, CaseUtils.SEPARATOR_UNDERSCORE, false);
-            Method method = script.getClass().getMethod(methodName, Params.class);
+            Method method;
+            try {
+                method = script.getClass().getMethod(methodName, Params.class);
+            } catch (NoSuchMethodException e) {
+                // Backward/forward compatibility: allow customCommand to be already in camelCase.
+                methodName = command;
+                method = script.getClass().getMethod(methodName, Params.class);
+            }
 
             Params params = PARAMS_MAP
                     .get(payload.getServiceName())

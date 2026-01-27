@@ -63,6 +63,9 @@ public class ComponentAddTask extends AbstractComponentTask {
             componentPO.setHostname(hostname);
             componentPO.setClusterId(taskContext.getClusterId());
             componentPO.setServiceId(taskContext.getServiceId());
+            componentPO.setServiceName(taskContext.getServiceName());
+            componentPO.setServiceUser(taskContext.getServiceUser());
+            componentPO.setStack(taskContext.getStackName() + "-" + taskContext.getStackVersion());
         } else {
             componentPO = componentPOList.get(0);
         }

@@ -186,7 +186,18 @@ public class HadoopParams extends BigtopParams {
                 haByConfig = false;
             }
 
-            String journalQuorum = journalNodeList.stream().map(x -> x + ":8485").collect(Collectors.joining(";"));
+            List<String> filteredJournalNodes = journalNodeList.stream()
+                    .filter(StringUtils::isNotBlank)
+                    .map(String::trim)
+                    .distinct()
+                    .toList();
+            if (filteredJournalNodes.size() < 3) {
+                log.warn("JournalNode host list is invalid after filtering blanks (size < 3), skip HA hdfs-site generation for now and fall back to non-HA config. journalNodeList={} filteredJournalNodes={}",
+                        journalNodeList, filteredJournalNodes);
+                haByConfig = false;
+            }
+
+            String journalQuorum = filteredJournalNodes.stream().map(x -> x + ":8485").collect(Collectors.joining(";"));
 
             // 清理单机模式可能存在的 key，避免与 HA 配置混杂
             hdfsSite.remove("dfs.namenode.rpc-address");

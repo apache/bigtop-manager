@@ -44,6 +44,8 @@ import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.model.dto.StackDTO;
 import org.apache.bigtop.manager.server.utils.StackUtils;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -220,13 +222,10 @@ public class JobCacheHelper {
         List<ComponentPO> componentPOList = componentDao.findByQuery(query);
         Map<String, List<String>> hostMap = new HashMap<>();
         componentPOList.forEach(x -> {
-            if (hostMap.containsKey(x.getName())) {
-                hostMap.get(x.getName()).add(x.getHostname());
-            } else {
-                List<String> list = new ArrayList<>();
-                list.add(x.getHostname());
-                hostMap.put(x.getName(), list);
+            if (StringUtils.isBlank(x.getHostname())) {
+                return;
             }
+            hostMap.computeIfAbsent(x.getName(), k -> new ArrayList<>()).add(x.getHostname().trim());
         });
 
         return hostMap;
