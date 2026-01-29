@@ -29,17 +29,16 @@ import java.util.List;
  */
 public class WaitPortStage extends AbstractStage {
 
-    private final List<String> hosts;
     private final int port;
     private final long timeoutMs;
     private final long intervalMs;
 
     public WaitPortStage(StageContext stageContext, List<String> hosts, int port, long timeoutMs, long intervalMs) {
         super(stageContext);
-        this.hosts = hosts;
         this.port = port;
         this.timeoutMs = timeoutMs;
         this.intervalMs = intervalMs;
+        this.stageContext.setHostnames(hosts);
     }
 
     @Override
@@ -67,10 +66,5 @@ public class WaitPortStage extends AbstractStage {
         return "Wait ports " + port;
     }
 
-    @Override
-    public StageContext getStageContext() {
-        stageContext.setHostnames(hosts);
-        return stageContext;
-    }
 }
 

@@ -26,8 +26,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 
 /**
- * A server-side task to check if a specific port on a target host is open and listening.
- * It retries until a timeout is reached.
+ * Server-side task: wait for a TCP port to become reachable on a host.
  */
 @Slf4j
 public class PortCheckTask extends AbstractTask {
@@ -47,7 +46,7 @@ public class PortCheckTask extends AbstractTask {
 
     @Override
     protected Command getCommand() {
-        // This is a server-side task, not sent to an agent.
+        // Server-side only
         return Command.CUSTOM;
     }
 
@@ -58,55 +57,47 @@ public class PortCheckTask extends AbstractTask {
 
     @Override
     protected Boolean doRun(String hostname, Integer grpcPort) {
-        // The logic is entirely within the run() method as it executes on the server.
+        // Not used
         return true;
     }
 
-    /**
-     * Executes the port check logic directly on the server.
-     */
     @Override
     public Boolean run() {
-        log.info("Starting port check for {}:{} with timeout {}ms", targetHost, targetPort, timeoutMs);
-        boolean isPortOpen = waitForPortOpen();
-        if (isPortOpen) {
-            log.info("Port {}:{} is now open.", targetHost, targetPort);
+        boolean ok = waitForPortOpen(targetHost, targetPort, timeoutMs, intervalMs);
+        if (ok) {
             onSuccess();
         } else {
-            log.error("Port check timed out for {}:{}. It did not become available within {}ms.", targetHost, targetPort, timeoutMs);
             onFailure();
         }
-        return isPortOpen;
+        return ok;
     }
 
-    private boolean waitForPortOpen() {
+    private static boolean waitForPortOpen(String host, int port, long timeoutMs, long intervalMs) {
         long deadline = System.currentTimeMillis() + timeoutMs;
-        Throwable lastException = null;
+        Throwable last = null;
 
         while (System.currentTimeMillis() < deadline) {
             try (Socket socket = new Socket()) {
-                // Use a short connect timeout for each attempt
-                socket.connect(new InetSocketAddress(targetHost, targetPort), 2000);
+                socket.connect(new InetSocketAddress(host, port), 2000);
                 return true;
-            } catch (Exception e) {
-                lastException = e;
+            } catch (Throwable t) {
+                last = t;
                 try {
                     Thread.sleep(intervalMs);
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
-                    log.warn("Port check for {}:{} was interrupted.", targetHost, targetPort);
-                    return false;
+                    break;
                 }
             }
         }
 
-        log.warn("Port check failed for {}:{}. Last error: {}", targetHost, targetPort, lastException != null ? lastException.getMessage() : "N/A");
+        log.warn("Port check timeout for {}:{}, lastError={}", host, port, last == null ? null : last.getMessage());
         return false;
     }
 
     @Override
     public String getName() {
-        return "Wait for port " + targetHost + ":" + targetPort;
+        return "Wait port " + targetHost + ":" + targetPort;
     }
 }
 

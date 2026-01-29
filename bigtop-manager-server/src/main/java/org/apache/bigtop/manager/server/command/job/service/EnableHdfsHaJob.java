@@ -24,6 +24,7 @@ import org.apache.bigtop.manager.server.command.helper.ComponentStageHelper;
 import org.apache.bigtop.manager.server.command.job.JobContext;
 import org.apache.bigtop.manager.server.command.stage.ComponentCustomStage;
 import org.apache.bigtop.manager.server.command.stage.StageContext;
+import org.apache.bigtop.manager.server.command.stage.WaitPortStage;
 import org.apache.bigtop.manager.server.exception.ServerException;
 import org.apache.bigtop.manager.server.model.dto.CommandDTO;
 import org.apache.bigtop.manager.server.model.dto.command.ComponentCommandDTO;
@@ -34,9 +35,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -95,8 +93,9 @@ public class EnableHdfsHaJob extends AbstractServiceJob {
         stages.addAll(ComponentStageHelper.createComponentStages(activeNN, Command.STOP, commandDTO));
 
         // 2) Wait for JournalNode IPC ports to be reachable before initializing shared edits
-        // This avoids QJM "Connection refused" / "not ready for formatting" errors when JNs are still starting.
-        waitForPorts(req.getJournalNodeHosts(), 8485, 10 * 60_000L, 1000L);
+        // Run as a job stage to avoid blocking the HTTP request thread.
+        StageContext jnPortStageContext = createStageContext("journalnode", req.getJournalNodeHosts(), commandDTO);
+        stages.add(new WaitPortStage(jnPortStageContext, req.getJournalNodeHosts(), 8485, 10 * 60_000L, 1000L));
 
         // 3) Custom: initializeSharedEdits on Active NameNode
         // IMPORTANT: NameNode must NOT be running when executing -initializeSharedEdits.
@@ -205,41 +204,6 @@ public class EnableHdfsHaJob extends AbstractServiceJob {
         }
     }
 
-    private static void waitForPorts(List<String> hosts, int port, long timeoutMs, long intervalMs) {
-        if (hosts == null || hosts.isEmpty()) {
-            throw new ServerException("journalNodeHosts is empty, cannot wait for JournalNode ports");
-        }
-
-        long deadline = System.currentTimeMillis() + timeoutMs;
-        List<String> pending = new ArrayList<>(hosts);
-
-        while (System.currentTimeMillis() < deadline) {
-            pending.removeIf(h -> isPortOpen(h, port, 1000));
-            if (pending.isEmpty()) {
-                return;
-            }
-            try {
-                Thread.sleep(intervalMs);
-            } catch (InterruptedException ie) {
-                Thread.currentThread().interrupt();
-                break;
-            }
-        }
-
-        throw new ServerException("JournalNode port check timeout (" + timeoutMs + "ms), unreachable hosts=" + pending + ", port=" + port);
-    }
-
-    private static boolean isPortOpen(String host, int port, int connectTimeoutMs) {
-        if (StringUtils.isBlank(host)) {
-            return false;
-        }
-        try (Socket socket = new Socket()) {
-            socket.connect(new InetSocketAddress(host.trim(), port), connectTimeoutMs);
-            return true;
-        } catch (Exception ignored) {
-            return false;
-        }
-    }
 
     private StageContext createStageContext(String componentName, List<String> hostnames, CommandDTO commandDTO) {
         StageContext stageContext = StageContext.fromCommandDTO(commandDTO);
