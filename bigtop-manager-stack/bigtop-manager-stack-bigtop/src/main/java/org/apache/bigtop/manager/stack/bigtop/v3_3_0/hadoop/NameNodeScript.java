@@ -74,16 +74,7 @@ public class NameNodeScript extends AbstractServerScript {
                 }
                 return result;
             } else if (namenodeList != null && namenodeList.size() >= 2 && hostname.equals(namenodeList.get(1))) {
-                // Standby NN：此处保留“自动 bootstrap 后启动”的逻辑，兼容初装直接选 2 个 NN 的 HA 模式
-                boolean isPrimaryReady = waitForNameNodeReady(namenodeList.get(0), hadoopParams);
-                if (!isPrimaryReady) {
-                    throw new StackException("Primary NameNode is not ready, cannot bootstrap standby");
-                }
-                ShellResult bootstrapResult = bootstrapStandby(hadoopParams);
-                if (bootstrapResult.getExitCode() != 0) {
-                    throw new StackException("Failed to bootstrap standby NameNode: " + bootstrapResult.getErrMsg());
-                }
-
+                // Standby NN：enable-ha 流程由 server 侧显式执行 bootstrapStandby，这里仅启动进程
                 String startCmd = MessageFormat.format("{0}/hdfs --daemon start namenode", hadoopParams.binDir());
                 ShellResult startResult = LinuxOSUtils.sudoExecCmd(startCmd, hadoopParams.user());
                 if (startResult.getExitCode() != 0) {

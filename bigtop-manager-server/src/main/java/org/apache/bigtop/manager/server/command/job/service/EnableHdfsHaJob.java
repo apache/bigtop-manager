@@ -25,6 +25,7 @@ import org.apache.bigtop.manager.server.command.job.JobContext;
 import org.apache.bigtop.manager.server.command.stage.ComponentCustomStage;
 import org.apache.bigtop.manager.server.command.stage.StageContext;
 import org.apache.bigtop.manager.server.command.stage.WaitPortStage;
+import org.apache.bigtop.manager.server.command.stage.WaitUrlStage;
 import org.apache.bigtop.manager.server.exception.ServerException;
 import org.apache.bigtop.manager.server.model.dto.CommandDTO;
 import org.apache.bigtop.manager.server.model.dto.command.ComponentCommandDTO;
@@ -101,23 +102,27 @@ public class EnableHdfsHaJob extends AbstractServiceJob {
         // IMPORTANT: NameNode must NOT be running when executing -initializeSharedEdits.
         String nnCustom = "initializeSharedEdits";
         StageContext nnStageContext = createStageContext("namenode", List.of(req.getActiveNameNodeHost()), commandDTO);
-        log.info("EnableHdfsHaJob creating custom stage, component={}, hosts={}, customCommand={}, jobClassSource={}",
-                nnStageContext.getComponentName(), nnStageContext.getHostnames(), nnCustom, getCodeSource(getClass()));
         stages.add(new ComponentCustomStage(nnStageContext, nnCustom));
-
-        // 3) Start Active NameNode
-        stages.addAll(ComponentStageHelper.createComponentStages(activeNN, Command.START, commandDTO));
 
         // 4) Custom: formatZk on Active NameNode host, component=zkfc
         String zkfcCustom = "formatZk";
         StageContext zkfcStageContext = createStageContext("zkfc", List.of(req.getActiveNameNodeHost()), commandDTO);
-        log.info("EnableHdfsHaJob creating custom stage, component={}, hosts={}, customCommand={}, jobClassSource={}",
-                zkfcStageContext.getComponentName(), zkfcStageContext.getHostnames(), zkfcCustom, getCodeSource(getClass()));
         stages.add(new ComponentCustomStage(zkfcStageContext, zkfcCustom));
 
+        // 5) Start Active NameNode
+        stages.addAll(ComponentStageHelper.createComponentStages(activeNN, Command.START, commandDTO));
 
-        // 5) Start Standby NameNode
+        // 6) Wait for Active NameNode to become ACTIVE via JMX
+        StageContext nnWaitContext = createStageContext("namenode", List.of(req.getActiveNameNodeHost()), commandDTO);
+        stages.add(new WaitUrlStage(nnWaitContext, List.of(req.getActiveNameNodeHost()),
+                "http://{host}:9870/jmx?qry=Hadoop:service=NameNode,name=NameNodeStatus", "active", 10 * 60_000L, 3000L));
+
+        // 7) Bootstrap Standby NameNode (NN2) before starting it
         Map<String, List<String>> standbyNN = Map.of("namenode", List.of(req.getStandbyNameNodeHost()));
+        StageContext bootstrapCtx = createStageContext("namenode", List.of(req.getStandbyNameNodeHost()), commandDTO);
+        stages.add(new ComponentCustomStage(bootstrapCtx, "bootstrapStandby"));
+
+        // 8) Start Standby NameNode
         stages.addAll(ComponentStageHelper.createComponentStages(standbyNN, Command.START, commandDTO));
 
         // 6) Start ZKFC(s)
