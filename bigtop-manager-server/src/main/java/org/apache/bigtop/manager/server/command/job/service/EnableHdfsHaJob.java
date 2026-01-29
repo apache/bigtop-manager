@@ -34,6 +34,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,19 +90,24 @@ public class EnableHdfsHaJob extends AbstractServiceJob {
         stages.addAll(ComponentStageHelper.createComponentStages(zkfcHosts, Command.ADD, commandDTO));
         stages.addAll(ComponentStageHelper.createComponentStages(zkfcHosts, Command.CONFIGURE, commandDTO));
 
-        // 1) Stop existing Active NameNode before re-configuring and starting in HA mode
+        // 1) Stop existing Active NameNode before initializing shared edits
         Map<String, List<String>> activeNN = Map.of("namenode", List.of(req.getActiveNameNodeHost()));
         stages.addAll(ComponentStageHelper.createComponentStages(activeNN, Command.STOP, commandDTO));
 
-        // 2) Start Active NameNode
-        stages.addAll(ComponentStageHelper.createComponentStages(activeNN, Command.START, commandDTO));
+        // 2) Wait for JournalNode IPC ports to be reachable before initializing shared edits
+        // This avoids QJM "Connection refused" / "not ready for formatting" errors when JNs are still starting.
+        waitForPorts(req.getJournalNodeHosts(), 8485, 10 * 60_000L, 1000L);
 
         // 3) Custom: initializeSharedEdits on Active NameNode
+        // IMPORTANT: NameNode must NOT be running when executing -initializeSharedEdits.
         String nnCustom = "initializeSharedEdits";
         StageContext nnStageContext = createStageContext("namenode", List.of(req.getActiveNameNodeHost()), commandDTO);
         log.info("EnableHdfsHaJob creating custom stage, component={}, hosts={}, customCommand={}, jobClassSource={}",
                 nnStageContext.getComponentName(), nnStageContext.getHostnames(), nnCustom, getCodeSource(getClass()));
         stages.add(new ComponentCustomStage(nnStageContext, nnCustom));
+
+        // 3) Start Active NameNode
+        stages.addAll(ComponentStageHelper.createComponentStages(activeNN, Command.START, commandDTO));
 
         // 4) Custom: formatZk on Active NameNode host, component=zkfc
         String zkfcCustom = "formatZk";
@@ -194,6 +202,42 @@ public class EnableHdfsHaJob extends AbstractServiceJob {
         }
         if (CollectionUtils.isEmpty(req.getZkfcHosts())) {
             throw new ServerException("zkfcHosts must not be empty");
+        }
+    }
+
+    private static void waitForPorts(List<String> hosts, int port, long timeoutMs, long intervalMs) {
+        if (hosts == null || hosts.isEmpty()) {
+            throw new ServerException("journalNodeHosts is empty, cannot wait for JournalNode ports");
+        }
+
+        long deadline = System.currentTimeMillis() + timeoutMs;
+        List<String> pending = new ArrayList<>(hosts);
+
+        while (System.currentTimeMillis() < deadline) {
+            pending.removeIf(h -> isPortOpen(h, port, 1000));
+            if (pending.isEmpty()) {
+                return;
+            }
+            try {
+                Thread.sleep(intervalMs);
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
+
+        throw new ServerException("JournalNode port check timeout (" + timeoutMs + "ms), unreachable hosts=" + pending + ", port=" + port);
+    }
+
+    private static boolean isPortOpen(String host, int port, int connectTimeoutMs) {
+        if (StringUtils.isBlank(host)) {
+            return false;
+        }
+        try (Socket socket = new Socket()) {
+            socket.connect(new InetSocketAddress(host.trim(), port), connectTimeoutMs);
+            return true;
+        } catch (Exception ignored) {
+            return false;
         }
     }
 

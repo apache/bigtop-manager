@@ -104,6 +104,15 @@ public class NameNodeScript extends AbstractServerScript {
     public ShellResult initializeSharedEdits(Params params) {
         configure(params);
         HadoopParams hadoopParams = (HadoopParams) params;
+        try {
+            boolean allJnReachable = HadoopSetup.checkAllJournalNodesPortReachable(hadoopParams);
+            if (!allJnReachable) {
+                throw new StackException("Cannot initializeSharedEdits: Some JournalNodes are unreachable.");
+            }
+        } catch (Exception e) {
+            throw new StackException(e);
+        }
+
         String cmd = MessageFormat.format(
                 "{0}/hdfs --config {1} namenode -initializeSharedEdits -nonInteractive",
                 hadoopParams.binDir(),

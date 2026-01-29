@@ -40,7 +40,9 @@ import org.apache.bigtop.manager.server.service.HdfsHaService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.annotation.Resource;
@@ -69,14 +71,13 @@ public class HdfsHaServiceImpl implements HdfsHaService {
     private CommandService commandService;
 
     @Override
-    @Transactional
     public org.apache.bigtop.manager.server.model.vo.CommandVO buildEnableHdfsHaCommand(
             Long clusterId, Long serviceId, EnableHdfsHaReq req) {
         // 0. Validate prerequisites (components exist, ZK is available, etc.)
         validatePrerequisites(clusterId, serviceId, req);
 
         // 1. Write HA configurations to core-site.xml and hdfs-site.xml
-        writeHaConfiguration(clusterId, serviceId, req);
+        writeHaConfigurationWithRetry(clusterId, serviceId, req);
 
         // 2. Trigger a single service-level job (EnableHdfsHaJob) which orchestrates stages internally.
         // IMPORTANT: Do NOT use SERVICE CONFIGURE here, otherwise it will restart all hadoop components (including YARN).
@@ -119,6 +120,36 @@ public class HdfsHaServiceImpl implements HdfsHaService {
         commandDTO.setComponentCommands(componentCommands);
 
         return commandService.command(commandDTO);
+    }
+
+    private void writeHaConfigurationWithRetry(Long clusterId, Long serviceId, EnableHdfsHaReq req) {
+        int maxAttempts = 3;
+        long sleepMs = 200;
+        CannotAcquireLockException last = null;
+        for (int i = 1; i <= maxAttempts; i++) {
+            try {
+                writeHaConfigurationInNewTx(clusterId, serviceId, req);
+                return;
+            } catch (CannotAcquireLockException e) {
+                last = e;
+                if (i == maxAttempts) {
+                    break;
+                }
+                try {
+                    Thread.sleep(sleepMs);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw e;
+                }
+                sleepMs *= 2;
+            }
+        }
+        throw last;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    protected void writeHaConfigurationInNewTx(Long clusterId, Long serviceId, EnableHdfsHaReq req) {
+        writeHaConfiguration(clusterId, serviceId, req);
     }
 
     private ComponentCommandDTO componentCommand(String name, List<String> hosts) {
@@ -246,6 +277,8 @@ public class HdfsHaServiceImpl implements HdfsHaService {
 
         return m;
     }
+
+    private static final String CUSTOM_COMMAND_PREFIX = "enableHdfsHa:";
 
     private String buildZkAddress(Long clusterId, EnableHdfsHaReq req) {
         // Preferred: zookeeperHosts from request

@@ -77,6 +77,11 @@ public class JobCacheHelper {
     }
 
     public static void sendJobCache(Long jobId, List<String> hostnames) {
+        sendJobCache(jobId, hostnames, null);
+    }
+
+    public static void sendJobCache(Long jobId, List<String> hostnames, Map<String, List<String>> overrideComponentHosts) {
+        final Map<String, List<String>> finalOverrideComponentHosts = overrideComponentHosts;
         if (!INITIALIZED.get()) {
             initialize();
         }
@@ -104,6 +109,7 @@ public class JobCacheHelper {
                 JobCachePayload copiedPayload =
                         JsonUtils.readFromString(JsonUtils.writeAsString(payload), JobCachePayload.class);
                 genClusterPayload(copiedPayload, clusterId);
+                mergeOverrideComponentHosts(copiedPayload, finalOverrideComponentHosts);
                 JobCacheRequest request = JobCacheRequest.newBuilder()
                         .setJobId(jobId)
                         .setPayload(JsonUtils.writeAsString(copiedPayload))
@@ -162,6 +168,30 @@ public class JobCacheHelper {
         payload.setConfigurations(serviceConfigMap);
         payload.setComponentHosts(componentHostMap);
         payload.setHosts(hosts);
+    }
+
+    private static void mergeOverrideComponentHosts(JobCachePayload payload, Map<String, List<String>> overrideComponentHosts) {
+        if (overrideComponentHosts == null || overrideComponentHosts.isEmpty()) {
+            return;
+        }
+        if (payload.getComponentHosts() == null) {
+            payload.setComponentHosts(new HashMap<>());
+        }
+        final Map<String, List<String>> target = payload.getComponentHosts();
+
+        overrideComponentHosts.forEach((component, hosts) -> {
+            if (StringUtils.isBlank(component) || hosts == null || hosts.isEmpty()) {
+                return;
+            }
+            List<String> filtered = hosts.stream()
+                    .filter(StringUtils::isNotBlank)
+                    .map(String::trim)
+                    .distinct()
+                    .toList();
+            if (!filtered.isEmpty()) {
+                target.put(component.toLowerCase(), new ArrayList<>(filtered));
+            }
+        });
     }
 
     private static void genGlobalPayload(JobCachePayload payload) {

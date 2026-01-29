@@ -272,7 +272,7 @@ public class HadoopSetup {
         }
     }
 
-    private static boolean checkAllJournalNodesPortReachable(HadoopParams hadoopParams) throws InterruptedException {
+    public static boolean checkAllJournalNodesPortReachable(HadoopParams hadoopParams) throws InterruptedException {
         // Only required for HDFS HA (qjournal). In single NameNode mode, JournalNode is not used.
         List<String> journalNodeList = LocalSettings.componentHosts("journalnode");
         if (journalNodeList == null || journalNodeList.isEmpty()) {
