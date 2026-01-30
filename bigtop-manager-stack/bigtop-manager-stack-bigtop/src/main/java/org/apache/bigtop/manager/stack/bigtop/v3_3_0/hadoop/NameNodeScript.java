@@ -63,27 +63,17 @@ public class NameNodeScript extends AbstractServerScript {
         HadoopParams hadoopParams = (HadoopParams) params;
         String hostname = hadoopParams.hostname();
         List<String> namenodeList = LocalSettings.componentHosts("namenode");
+        // The first namenode in the list is the one that formats the cluster.
+        if (namenodeList != null && !namenodeList.isEmpty() && hostname.equals(namenodeList.get(0))) {
+            // Only format if not already formatted.
+            HadoopSetup.formatNameNode(hadoopParams);
+        }
+
+        // For both active and standby, the start command is the same.
+        // The role is determined by ZKFC at runtime.
+        String startCmd = MessageFormat.format("{0}/hdfs --daemon start namenode", hadoopParams.binDir());
         try {
-            if (namenodeList != null && !namenodeList.isEmpty() && hostname.equals(namenodeList.get(0))) {
-                // 主 NN：仅在“全新部署未格式化”时 format；升级启用 HA 时不能 format
-                HadoopSetup.formatNameNode(hadoopParams);
-                String startCmd = MessageFormat.format("{0}/hdfs --daemon start namenode", hadoopParams.binDir());
-                ShellResult result = LinuxOSUtils.sudoExecCmd(startCmd, hadoopParams.user());
-                if (result.getExitCode() != 0) {
-                    throw new StackException("Failed to start primary NameNode: " + result.getErrMsg());
-                }
-                return result;
-            } else if (namenodeList != null && namenodeList.size() >= 2 && hostname.equals(namenodeList.get(1))) {
-                // Standby NN：enable-ha 流程由 server 侧显式执行 bootstrapStandby，这里仅启动进程
-                String startCmd = MessageFormat.format("{0}/hdfs --daemon start namenode", hadoopParams.binDir());
-                ShellResult startResult = LinuxOSUtils.sudoExecCmd(startCmd, hadoopParams.user());
-                if (startResult.getExitCode() != 0) {
-                    throw new StackException("Failed to start standby NameNode: " + startResult.getErrMsg());
-                }
-                return startResult;
-            } else {
-                throw new StackException("Current host is not in NameNode HA list: " + hostname);
-            }
+            return LinuxOSUtils.sudoExecCmd(startCmd, hadoopParams.user());
         } catch (Exception e) {
             throw new StackException(e);
         }

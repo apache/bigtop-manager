@@ -71,71 +71,46 @@ public class EnableHdfsHaJob extends AbstractServiceJob {
     @Override
     protected void createStages() {
         CommandDTO commandDTO = jobContext.getCommandDTO();
-
         EnableHdfsHaReq req = parseReq(commandDTO);
         validateReq(req);
 
         Map<String, List<String>> componentHostsMap = getComponentHostsMap();
+        Map<String, List<String>> activeNN = Map.of("namenode", List.of(req.getActiveNameNodeHost()));
+        Map<String, List<String>> standbyNN = Map.of("namenode", List.of(req.getStandbyNameNodeHost()));
 
-        // 0) Ensure required HA components are installed and running
-        // Install/prepare JournalNodes first
+        // 1. Prepare JournalNodes and ZKFCs (install/configure)
         Map<String, List<String>> jn = pick(componentHostsMap, "journalnode");
         stages.addAll(ComponentStageHelper.createComponentStages(jn, Command.ADD, commandDTO));
         stages.addAll(ComponentStageHelper.createComponentStages(jn, Command.CONFIGURE, commandDTO));
         stages.addAll(ComponentStageHelper.createComponentStages(jn, Command.START, commandDTO));
+        stages.add(new WaitPortStage(createStageContext("journalnode", req.getJournalNodeHosts(), commandDTO),
+                req.getJournalNodeHosts(), 8485, 10 * 60_000L, 1000L));
 
-        // Install/prepare ZKFC on selected hosts (do not start here, will start after formatting)
         Map<String, List<String>> zkfcHosts = pick(componentHostsMap, "zkfc");
         stages.addAll(ComponentStageHelper.createComponentStages(zkfcHosts, Command.ADD, commandDTO));
         stages.addAll(ComponentStageHelper.createComponentStages(zkfcHosts, Command.CONFIGURE, commandDTO));
 
-        // 1) Stop existing Active NameNode before initializing shared edits
-        Map<String, List<String>> activeNN = Map.of("namenode", List.of(req.getActiveNameNodeHost()));
+        // 2. Initialize Active NameNode (NN1)
         stages.addAll(ComponentStageHelper.createComponentStages(activeNN, Command.STOP, commandDTO));
+        stages.add(new ComponentCustomStage(createStageContext("namenode", List.of(req.getActiveNameNodeHost()), commandDTO), "initializeSharedEdits"));
+        stages.add(new ComponentCustomStage(createStageContext("zkfc", List.of(req.getActiveNameNodeHost()), commandDTO), "formatZk"));
 
-        // 2) Wait for JournalNode IPC ports to be reachable before initializing shared edits
-        // Run as a job stage to avoid blocking the HTTP request thread.
-        StageContext jnPortStageContext = createStageContext("journalnode", req.getJournalNodeHosts(), commandDTO);
-        stages.add(new WaitPortStage(jnPortStageContext, req.getJournalNodeHosts(), 8485, 10 * 60_000L, 1000L));
-
-        // 3) Custom: initializeSharedEdits on Active NameNode
-        // IMPORTANT: NameNode must NOT be running when executing -initializeSharedEdits.
-        String nnCustom = "initializeSharedEdits";
-        StageContext nnStageContext = createStageContext("namenode", List.of(req.getActiveNameNodeHost()), commandDTO);
-        stages.add(new ComponentCustomStage(nnStageContext, nnCustom));
-
-        // 4) Custom: formatZk on Active NameNode host, component=zkfc
-        String zkfcCustom = "formatZk";
-        StageContext zkfcStageContext = createStageContext("zkfc", List.of(req.getActiveNameNodeHost()), commandDTO);
-        stages.add(new ComponentCustomStage(zkfcStageContext, zkfcCustom));
-
-        // 5) Start Active NameNode
+        // 3. Start Active NameNode and its ZKFC, then wait for it to become active
         stages.addAll(ComponentStageHelper.createComponentStages(activeNN, Command.START, commandDTO));
+        stages.addAll(ComponentStageHelper.createComponentStages(Map.of("zkfc", List.of(req.getActiveNameNodeHost())), Command.START, commandDTO));
+        stages.add(new WaitUrlStage(createStageContext("namenode", List.of(req.getActiveNameNodeHost()), commandDTO),
+                List.of(req.getActiveNameNodeHost()), "http://{host}:9870/jmx?qry=Hadoop:service=NameNode,name=NameNodeStatus",
+                "active", 10 * 60_000L, 3000L));
 
-        // 6) Wait for Active NameNode to become ACTIVE via JMX
-        StageContext nnWaitContext = createStageContext("namenode", List.of(req.getActiveNameNodeHost()), commandDTO);
-        stages.add(new WaitUrlStage(nnWaitContext, List.of(req.getActiveNameNodeHost()),
-                "http://{host}:9870/jmx?qry=Hadoop:service=NameNode,name=NameNodeStatus", "active", 10 * 60_000L, 3000L));
-
-        // 7) Bootstrap Standby NameNode (NN2) before starting it
-        Map<String, List<String>> standbyNN = Map.of("namenode", List.of(req.getStandbyNameNodeHost()));
-        StageContext bootstrapCtx = createStageContext("namenode", List.of(req.getStandbyNameNodeHost()), commandDTO);
-        stages.add(new ComponentCustomStage(bootstrapCtx, "bootstrapStandby"));
-
-        // 8) Start Standby NameNode
+        // 4. Initialize and Start Standby NameNode (NN2) and its ZKFC
+        stages.add(new ComponentCustomStage(createStageContext("namenode", List.of(req.getStandbyNameNodeHost()), commandDTO), "bootstrapStandby"));
         stages.addAll(ComponentStageHelper.createComponentStages(standbyNN, Command.START, commandDTO));
+        stages.addAll(ComponentStageHelper.createComponentStages(Map.of("zkfc", List.of(req.getStandbyNameNodeHost())), Command.START, commandDTO));
 
-        // 6) Start ZKFC(s)
-        if (CollectionUtils.isNotEmpty(req.getZkfcHosts())) {
-            Map<String, List<String>> zkfc = Map.of("zkfc", req.getZkfcHosts());
-            stages.addAll(ComponentStageHelper.createComponentStages(zkfc, Command.START, commandDTO));
-        }
-
-        // 7) Restart DataNode(s) - chosen option 2
+        // 5. Finalize
         Map<String, List<String>> dn = pick(componentHostsMap, "datanode");
         stages.addAll(ComponentStageHelper.createComponentStages(dn, Command.RESTART, commandDTO));
 
-        // 8) Configure YARN components only (no restart)
         Map<String, List<String>> yarn = pick(componentHostsMap, "resourcemanager", "nodemanager", "history_server");
         stages.addAll(ComponentStageHelper.createComponentStages(yarn, Command.CONFIGURE, commandDTO));
 
