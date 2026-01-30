@@ -21,7 +21,11 @@ package org.apache.bigtop.manager.server.command.task;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
 import org.apache.bigtop.manager.dao.query.ComponentQuery;
+import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.server.enums.HealthyStatusEnum;
+import org.apache.bigtop.manager.server.exception.ServerException;
+import org.apache.bigtop.manager.server.model.dto.StackDTO;
+import org.apache.bigtop.manager.server.utils.StackUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -53,15 +57,31 @@ public class ComponentStartTask extends AbstractComponentTask {
                 .build();
         List<ComponentPO> componentPOList = componentDao.findByQuery(componentQuery);
         ComponentPO componentPO;
-        if (CollectionUtils.isEmpty(componentPOList)) {
+        boolean isNew = CollectionUtils.isEmpty(componentPOList);
+        if (isNew) {
             log.warn("Component [{}] on host [{}] not found in DB during START, creating new entry. This may indicate an issue in the ADD task.", componentName, hostname);
             componentPO = new ComponentPO();
+        } else {
+            componentPO = componentPOList.get(0);
+        }
+
+        // If new or existing but incomplete, fill in the details
+        if (isNew || componentPO.getHostId() == null) {
+            log.info("Populating full component details for component [{}] on host [{}]. New entry: {}", componentName, hostname, isNew);
+            HostPO hostPO = hostDao.findByHostname(hostname);
+            if (hostPO == null) {
+                throw new ServerException("Host not found in database: " + hostname);
+            }
+            StackDTO stackDTO = StackUtils.getServiceStack(taskContext.getServiceName());
+
             componentPO.setName(componentName);
             componentPO.setHostname(hostname);
             componentPO.setClusterId(taskContext.getClusterId());
+            componentPO.setHostId(hostPO.getId());
             componentPO.setServiceId(taskContext.getServiceId());
-        } else {
-            componentPO = componentPOList.get(0);
+            componentPO.setServiceName(taskContext.getServiceName());
+            componentPO.setServiceUser(taskContext.getServiceUser());
+            componentPO.setStack(stackDTO.getStackName() + "-" + stackDTO.getStackVersion());
         }
 
         componentPO.setStatus(HealthyStatusEnum.HEALTHY.getCode());
