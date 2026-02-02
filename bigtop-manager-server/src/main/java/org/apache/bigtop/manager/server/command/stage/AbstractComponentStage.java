@@ -19,8 +19,11 @@
 package org.apache.bigtop.manager.server.command.stage;
 
 import org.apache.bigtop.manager.dao.po.ClusterPO;
+import org.apache.bigtop.manager.dao.po.ServicePO;
 import org.apache.bigtop.manager.dao.repository.ClusterDao;
+import org.apache.bigtop.manager.dao.repository.ServiceDao;
 import org.apache.bigtop.manager.server.command.task.TaskContext;
+import org.apache.bigtop.manager.server.holder.SessionUserHolder;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
@@ -29,6 +32,8 @@ import org.apache.bigtop.manager.server.utils.StackUtils;
 public abstract class AbstractComponentStage extends AbstractStage {
 
     private ClusterDao clusterDao;
+
+    private ServiceDao serviceDao;
 
     private ClusterPO clusterPO;
 
@@ -41,6 +46,7 @@ public abstract class AbstractComponentStage extends AbstractStage {
         super.injectBeans();
 
         this.clusterDao = SpringContextHolder.getBean(ClusterDao.class);
+        this.serviceDao = SpringContextHolder.getBean(ServiceDao.class);
     }
 
     @Override
@@ -63,9 +69,12 @@ public abstract class AbstractComponentStage extends AbstractStage {
         ComponentDTO componentDTO = StackUtils.getComponentDTO(stageContext.getComponentName());
 
         TaskContext taskContext = new TaskContext();
+        taskContext.setOperatorId(SessionUserHolder.getUserId());
         taskContext.setHostname(hostname);
         taskContext.setClusterId(clusterPO == null ? null : clusterPO.getId());
         taskContext.setClusterName(clusterPO == null ? null : clusterPO.getName());
+        ServicePO servicePO = serviceDao.findByClusterIdAndName(taskContext.getClusterId(), serviceDTO.getName());
+        taskContext.setServiceId(servicePO == null ? null : servicePO.getId());
         taskContext.setServiceName(serviceDTO.getName());
         taskContext.setComponentName(componentDTO.getName());
         taskContext.setComponentDisplayName(componentDTO.getDisplayName());

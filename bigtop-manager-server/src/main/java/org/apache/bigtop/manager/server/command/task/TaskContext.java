@@ -31,6 +31,8 @@ public class TaskContext {
 
     private String hostname;
 
+    private Long operatorId;
+
     private Long serviceId;
 
     private String serviceName;

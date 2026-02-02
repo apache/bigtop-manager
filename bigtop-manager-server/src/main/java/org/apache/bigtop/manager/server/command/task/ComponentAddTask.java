@@ -67,8 +67,10 @@ public class ComponentAddTask extends AbstractComponentTask {
             componentPO = componentPOList.get(0);
         }
 
+        ComponentDTO componentDTO = StackUtils.getComponentDTO(componentName);
+
         // If new or existing but incomplete, fill in the details
-        if (isNew || componentPO.getHostId() == null) {
+        if (isNew || componentPO.getHostId() == null || componentPO.getDisplayName() == null) {
             log.info("Populating full component details for component [{}] on host [{}]. New entry: {}", componentName, hostname, isNew);
             HostPO hostPO = hostDao.findByHostname(hostname);
             if (hostPO == null) {
@@ -77,6 +79,7 @@ public class ComponentAddTask extends AbstractComponentTask {
             StackDTO stackDTO = StackUtils.getServiceStack(taskContext.getServiceName());
 
             componentPO.setName(componentName);
+            componentPO.setDisplayName(componentDTO.getDisplayName());
             componentPO.setHostname(hostname);
             componentPO.setClusterId(taskContext.getClusterId());
             componentPO.setHostId(hostPO.getId());
@@ -86,7 +89,6 @@ public class ComponentAddTask extends AbstractComponentTask {
             componentPO.setStack(stackDTO.getStackName() + "-" + stackDTO.getStackVersion());
         }
 
-        ComponentDTO componentDTO = StackUtils.getComponentDTO(componentName);
         if (componentDTO.getCategory().equalsIgnoreCase(ComponentCategories.CLIENT)) {
             // Client components should always be healthy after added
             componentPO.setStatus(HealthyStatusEnum.HEALTHY.getCode());

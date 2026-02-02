@@ -103,6 +103,8 @@ public class EnableHdfsHaJob extends AbstractServiceJob {
                 "active", 10 * 60_000L, 3000L));
 
         // 4. Initialize and Start Standby NameNode (NN2) and its ZKFC
+        stages.addAll(ComponentStageHelper.createComponentStages(standbyNN, Command.ADD, commandDTO));
+        stages.addAll(ComponentStageHelper.createComponentStages(standbyNN, Command.CONFIGURE, commandDTO));
         stages.add(new ComponentCustomStage(createStageContext("namenode", List.of(req.getStandbyNameNodeHost()), commandDTO), "bootstrapStandby"));
         stages.addAll(ComponentStageHelper.createComponentStages(standbyNN, Command.START, commandDTO));
         stages.addAll(ComponentStageHelper.createComponentStages(Map.of("zkfc", List.of(req.getStandbyNameNodeHost())), Command.START, commandDTO));
