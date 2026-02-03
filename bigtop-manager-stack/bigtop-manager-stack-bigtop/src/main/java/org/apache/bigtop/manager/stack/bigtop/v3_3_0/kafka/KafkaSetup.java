@@ -28,9 +28,6 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.apache.bigtop.manager.common.constants.Constants.PERMISSION_644;
 import static org.apache.bigtop.manager.common.constants.Constants.PERMISSION_755;
@@ -40,28 +37,6 @@ import static org.apache.bigtop.manager.common.constants.Constants.ROOT_USER;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class KafkaSetup {
 
-    private static void createKafkaDataDirs(String kafkaDataDir, String kafkaUser, String kafkaGroup) {
-        // 兼容以下两种写法：
-        // 1) 单目录：/data/kafka
-        // 2) 多目录（Kafka 常见配置）：/data1/kafka,/data2/kafka
-        // 同时容忍空格和重复逗号
-        List<String> dirs = Arrays.stream(kafkaDataDir == null ? new String[0] : kafkaDataDir.split(","))
-                .map(String::trim)
-                .filter(s -> !s.isEmpty())
-                .distinct()
-                .collect(Collectors.toList());
-
-        // 若未解析出任何目录，则保持原行为（可能由上层保证非空）
-        if (dirs.isEmpty()) {
-            LinuxFileUtils.createDirectories(kafkaDataDir, kafkaUser, kafkaGroup, PERMISSION_755, true);
-            return;
-        }
-
-        for (String dir : dirs) {
-            LinuxFileUtils.createDirectories(dir, kafkaUser, kafkaGroup, PERMISSION_755, true);
-        }
-    }
-
     public static ShellResult configure(Params params) {
         log.info("Configuring Kafka");
         KafkaParams kafkaParams = (KafkaParams) params;
@@ -70,8 +45,7 @@ public class KafkaSetup {
         String kafkaUser = kafkaParams.user();
         String kafkaGroup = kafkaParams.group();
 
-        // 支持多数据盘：当配置为逗号分隔的多个目录时，逐个创建
-        createKafkaDataDirs(kafkaParams.getKafkaDataDir(), kafkaUser, kafkaGroup);
+        LinuxFileUtils.createDirectories(kafkaParams.getKafkaDataDir(), kafkaUser, kafkaGroup, PERMISSION_755, true);
         LinuxFileUtils.createDirectories(kafkaParams.getKafkaLogDir(), kafkaUser, kafkaGroup, PERMISSION_755, true);
         LinuxFileUtils.createDirectories(kafkaParams.getKafkaPidDir(), kafkaUser, kafkaGroup, PERMISSION_755, true);
 
