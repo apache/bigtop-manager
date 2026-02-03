@@ -24,6 +24,7 @@ import org.apache.bigtop.manager.dao.query.ComponentQuery;
 import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.server.enums.HealthyStatusEnum;
 import org.apache.bigtop.manager.server.exception.ServerException;
+import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
 import org.apache.bigtop.manager.server.model.dto.StackDTO;
 import org.apache.bigtop.manager.server.utils.StackUtils;
 
@@ -65,8 +66,10 @@ public class ComponentStartTask extends AbstractComponentTask {
             componentPO = componentPOList.get(0);
         }
 
+        ComponentDTO componentDTO = StackUtils.getComponentDTO(componentName);
+
         // If new or existing but incomplete, fill in the details
-        if (isNew || componentPO.getHostId() == null) {
+        if (isNew || componentPO.getHostId() == null || componentPO.getDisplayName() == null) {
             log.info("Populating full component details for component [{}] on host [{}]. New entry: {}", componentName, hostname, isNew);
             HostPO hostPO = hostDao.findByHostname(hostname);
             if (hostPO == null) {
@@ -75,6 +78,7 @@ public class ComponentStartTask extends AbstractComponentTask {
             StackDTO stackDTO = StackUtils.getServiceStack(taskContext.getServiceName());
 
             componentPO.setName(componentName);
+            componentPO.setDisplayName(componentDTO.getDisplayName());
             componentPO.setHostname(hostname);
             componentPO.setClusterId(taskContext.getClusterId());
             componentPO.setHostId(hostPO.getId());

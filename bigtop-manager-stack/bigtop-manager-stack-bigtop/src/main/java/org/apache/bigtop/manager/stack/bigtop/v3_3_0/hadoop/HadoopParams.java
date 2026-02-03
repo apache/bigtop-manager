@@ -431,31 +431,38 @@ public class HadoopParams extends BigtopParams {
         } else {
             // Single ResourceManager
             if (resourcemanagerList != null && !resourcemanagerList.isEmpty()) {
-            yarnSite.put("yarn.resourcemanager.hostname", MessageFormat.format("{0}", resourcemanagerList.get(0)));
-            yarnSite.put(
-                    "yarn.resourcemanager.resource-tracker.address",
-                    ((String) yarnSite.get("yarn.resourcemanager.resource-tracker.address"))
-                            .replace("0.0.0.0", resourcemanagerList.get(0)));
-            yarnSite.put(
-                    "yarn.resourcemanager.scheduler.address",
-                    ((String) yarnSite.get("yarn.resourcemanager.scheduler.address"))
-                            .replace("0.0.0.0", resourcemanagerList.get(0)));
-            yarnSite.put(
-                    "yarn.resourcemanager.address",
-                    ((String) yarnSite.get("yarn.resourcemanager.address"))
-                            .replace("0.0.0.0", resourcemanagerList.get(0)));
-            yarnSite.put(
-                    "yarn.resourcemanager.admin.address",
-                    ((String) yarnSite.get("yarn.resourcemanager.admin.address"))
-                            .replace("0.0.0.0", resourcemanagerList.get(0)));
-            yarnSite.put(
-                    "yarn.resourcemanager.webapp.address",
-                    ((String) yarnSite.get("yarn.resourcemanager.webapp.address"))
-                            .replace("0.0.0.0", resourcemanagerList.get(0)));
-            yarnSite.put(
-                    "yarn.resourcemanager.webapp.https.address",
-                    ((String) yarnSite.get("yarn.resourcemanager.webapp.https.address"))
-                            .replace("0.0.0.0", resourcemanagerList.get(0)));
+                String rmHost = resourcemanagerList.get(0);
+                yarnSite.put("yarn.resourcemanager.hostname", MessageFormat.format("{0}", rmHost));
+
+                String rt = (String) yarnSite.get("yarn.resourcemanager.resource-tracker.address");
+                if (rt != null) {
+                    yarnSite.put("yarn.resourcemanager.resource-tracker.address", rt.replace("0.0.0.0", rmHost));
+                }
+
+                String scheduler = (String) yarnSite.get("yarn.resourcemanager.scheduler.address");
+                if (scheduler != null) {
+                    yarnSite.put("yarn.resourcemanager.scheduler.address", scheduler.replace("0.0.0.0", rmHost));
+                }
+
+                String addr = (String) yarnSite.get("yarn.resourcemanager.address");
+                if (addr != null) {
+                    yarnSite.put("yarn.resourcemanager.address", addr.replace("0.0.0.0", rmHost));
+                }
+
+                String admin = (String) yarnSite.get("yarn.resourcemanager.admin.address");
+                if (admin != null) {
+                    yarnSite.put("yarn.resourcemanager.admin.address", admin.replace("0.0.0.0", rmHost));
+                }
+
+                String webapp = (String) yarnSite.get("yarn.resourcemanager.webapp.address");
+                if (webapp != null) {
+                    yarnSite.put("yarn.resourcemanager.webapp.address", webapp.replace("0.0.0.0", rmHost));
+                }
+
+                String https = (String) yarnSite.get("yarn.resourcemanager.webapp.https.address");
+                if (https != null) {
+                    yarnSite.put("yarn.resourcemanager.webapp.https.address", https.replace("0.0.0.0", rmHost));
+                }
             }
         }
 

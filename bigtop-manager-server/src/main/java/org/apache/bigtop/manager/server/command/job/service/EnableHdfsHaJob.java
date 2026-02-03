@@ -20,12 +20,18 @@ package org.apache.bigtop.manager.server.command.job.service;
 
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
+import org.apache.bigtop.manager.dao.po.ComponentPO;
+import org.apache.bigtop.manager.dao.po.HostPO;
+import org.apache.bigtop.manager.dao.po.ServicePO;
 import org.apache.bigtop.manager.server.command.helper.ComponentStageHelper;
 import org.apache.bigtop.manager.server.command.job.JobContext;
 import org.apache.bigtop.manager.server.command.stage.ComponentCustomStage;
 import org.apache.bigtop.manager.server.command.stage.StageContext;
 import org.apache.bigtop.manager.server.command.stage.WaitPortStage;
 import org.apache.bigtop.manager.server.command.stage.WaitUrlStage;
+import org.apache.bigtop.manager.dao.po.ComponentPO;
+import org.apache.bigtop.manager.dao.po.HostPO;
+import org.apache.bigtop.manager.dao.po.ServicePO;
 import org.apache.bigtop.manager.server.exception.ServerException;
 import org.apache.bigtop.manager.server.model.dto.CommandDTO;
 import org.apache.bigtop.manager.server.model.dto.command.ComponentCommandDTO;
@@ -51,6 +57,10 @@ import java.util.stream.Collectors;
 @Slf4j
 public class EnableHdfsHaJob extends AbstractServiceJob {
 
+    private static final String HADOOP_SERVICE_NAME = "hadoop";
+    private static final String NAMENODE_COMPONENT_NAME = "namenode";
+    private static final String SECONDARY_NAMENODE_COMPONENT_NAME = "secondarynamenode";
+
     private static final String CUSTOM_COMMAND_PREFIX = "enableHdfsHa:";
 
     private static String getCodeSource(Class<?> clazz) {
@@ -75,8 +85,8 @@ public class EnableHdfsHaJob extends AbstractServiceJob {
         validateReq(req);
 
         Map<String, List<String>> componentHostsMap = getComponentHostsMap();
-        Map<String, List<String>> activeNN = Map.of("namenode", List.of(req.getActiveNameNodeHost()));
-        Map<String, List<String>> standbyNN = Map.of("namenode", List.of(req.getStandbyNameNodeHost()));
+        Map<String, List<String>> activeNN = Map.of(NAMENODE_COMPONENT_NAME, List.of(req.getActiveNameNodeHost()));
+        Map<String, List<String>> standbyNN = Map.of(NAMENODE_COMPONENT_NAME, List.of(req.getStandbyNameNodeHost()));
 
         // 1. Prepare JournalNodes and ZKFCs (install/configure)
         Map<String, List<String>> jn = pick(componentHostsMap, "journalnode");
@@ -110,6 +120,13 @@ public class EnableHdfsHaJob extends AbstractServiceJob {
         stages.addAll(ComponentStageHelper.createComponentStages(Map.of("zkfc", List.of(req.getStandbyNameNodeHost())), Command.START, commandDTO));
 
         // 5. Finalize
+        // Convert secondarynamenode on standby host to standby namenode
+        removeSecondaryNameNode(req.getStandbyNameNodeHost());
+
+        // Ensure standby host has namenode component record
+        ensureStandbyNameNodeComponent(req.getStandbyNameNodeHost());
+
+
         Map<String, List<String>> dn = pick(componentHostsMap, "datanode");
         stages.addAll(ComponentStageHelper.createComponentStages(dn, Command.RESTART, commandDTO));
 
@@ -190,8 +207,48 @@ public class EnableHdfsHaJob extends AbstractServiceJob {
     private StageContext createStageContext(String componentName, List<String> hostnames, CommandDTO commandDTO) {
         StageContext stageContext = StageContext.fromCommandDTO(commandDTO);
         stageContext.setHostnames(hostnames);
-        stageContext.setServiceName("hadoop");
+        stageContext.setServiceName(HADOOP_SERVICE_NAME);
         stageContext.setComponentName(componentName);
         return stageContext;
+    }
+
+    private void removeSecondaryNameNode(String hostname) {
+        log.info("Attempting to remove Secondary NameNode on host: {}", hostname);
+        ComponentPO secondaryNameNode = componentDao.findByNameAndHostname(SECONDARY_NAMENODE_COMPONENT_NAME, hostname);
+        if (secondaryNameNode != null) {
+            log.info("Found Secondary NameNode component with ID {} on host {}. Deleting it.", secondaryNameNode.getId(), hostname);
+            componentDao.deleteById(secondaryNameNode.getId());
+        } else {
+            log.info("No Secondary NameNode component found on host {}. Nothing to remove.", hostname);
+        }
+    }
+
+    private void ensureStandbyNameNodeComponent(String hostname) {
+        log.info("Ensuring NameNode component exists on standby host: {}", hostname);
+        ComponentPO nameNode = componentDao.findByNameAndHostname(NAMENODE_COMPONENT_NAME, hostname);
+        if (nameNode == null) {
+            log.info("NameNode component not found on standby host {}. Creating a new entry.", hostname);
+            Long clusterId = jobContext.getCommandDTO().getClusterId();
+            HostPO hostPO = hostDao.findByHostname(hostname);
+            if (hostPO == null) {
+                throw new ServerException("Host not found in database: " + hostname);
+            }
+            ServicePO servicePO = serviceDao.findByClusterIdAndName(clusterId, HADOOP_SERVICE_NAME);
+            if (servicePO == null) {
+                throw new ServerException("Service 'hadoop' not found for clusterId: " + clusterId);
+            }
+
+            ComponentPO standbyNameNodePO = new ComponentPO();
+            standbyNameNodePO.setName(NAMENODE_COMPONENT_NAME);
+            standbyNameNodePO.setDisplayName("NameNode");
+            standbyNameNodePO.setClusterId(clusterId);
+            standbyNameNodePO.setHostId(hostPO.getId());
+            standbyNameNodePO.setServiceId(servicePO.getId());
+            standbyNameNodePO.setStatus(org.apache.bigtop.manager.server.enums.HealthyStatusEnum.UNKNOWN.getCode());
+            componentDao.save(standbyNameNodePO);
+            log.info("Successfully created NameNode component entry for standby host {}.", hostname);
+        } else {
+            log.info("NameNode component already exists on standby host {}. Nothing to do.", hostname);
+        }
     }
 }

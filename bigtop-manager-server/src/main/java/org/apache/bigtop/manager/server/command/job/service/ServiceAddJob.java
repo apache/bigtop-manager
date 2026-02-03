@@ -161,11 +161,16 @@ public class ServiceAddJob extends AbstractServiceJob {
         // Persist services
         StackDTO stackDTO = StackUtils.getServiceStack(serviceName);
         ServiceDTO serviceDTO = StackUtils.getServiceDTO(serviceName);
-        ServicePO servicePO = ServiceConverter.INSTANCE.fromDTO2PO(serviceDTO);
-        servicePO.setClusterId(clusterId);
-        servicePO.setStack(StackUtils.getFullStackName(stackDTO));
-        servicePO.setStatus(HealthyStatusEnum.UNHEALTHY.getCode());
-        serviceDao.save(servicePO);
+        ServicePO servicePO = serviceDao.findByClusterIdAndName(clusterId, serviceName);
+        if (servicePO == null) {
+            servicePO = ServiceConverter.INSTANCE.fromDTO2PO(serviceDTO);
+            servicePO.setClusterId(clusterId);
+            servicePO.setStack(StackUtils.getFullStackName(stackDTO));
+            servicePO.setStatus(HealthyStatusEnum.UNHEALTHY.getCode());
+            serviceDao.save(servicePO);
+        } else {
+            log.warn("Service [{}] already exists in cluster [{}], skipping creation.", serviceName, clusterId);
+        }
 
         // Persist components
         List<ComponentPO> componentPOList = new ArrayList<>();

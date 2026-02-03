@@ -45,7 +45,11 @@ public class ComponentStopTask extends AbstractComponentTask {
                 .hostname(hostname)
                 .name(componentName)
                 .build();
-        ComponentPO componentPO = componentDao.findByQuery(componentQuery).get(0);
+        java.util.List<ComponentPO> componentPOList = componentDao.findByQuery(componentQuery);
+        if (componentPOList == null || componentPOList.isEmpty()) {
+            return;
+        }
+        ComponentPO componentPO = componentPOList.get(0);
         componentPO.setStatus(HealthyStatusEnum.UNHEALTHY.getCode());
         componentDao.partialUpdateById(componentPO);
     }
