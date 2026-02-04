@@ -18,7 +18,6 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.ServiceConfigPO;
@@ -40,6 +39,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
@@ -113,14 +114,18 @@ public class YarnHaServiceImpl implements YarnHaService {
         m.put("yarn.resourcemanager.hostname." + rm1Id, req.getActiveResourceManagerHost());
         m.put("yarn.resourcemanager.hostname." + rm2Id, req.getStandbyResourceManagerHost());
 
-        int webappPort = resolvePortFromExistingKey(serviceId, "yarn-site", "yarn.resourcemanager.webapp.address", 8088);
+        int webappPort =
+                resolvePortFromExistingKey(serviceId, "yarn-site", "yarn.resourcemanager.webapp.address", 8088);
         m.put("yarn.resourcemanager.webapp.address." + rm1Id, req.getActiveResourceManagerHost() + ":" + webappPort);
         m.put("yarn.resourcemanager.webapp.address." + rm2Id, req.getStandbyResourceManagerHost() + ":" + webappPort);
 
         int rmAddressPort = resolvePortFromExistingKey(serviceId, "yarn-site", "yarn.resourcemanager.address", 8032);
-        int rmAdminPort = resolvePortFromExistingKey(serviceId, "yarn-site", "yarn.resourcemanager.admin.address", 8033);
-        int rmRtPort = resolvePortFromExistingKey(serviceId, "yarn-site", "yarn.resourcemanager.resource-tracker.address", 8031);
-        int rmSchedulerPort = resolvePortFromExistingKey(serviceId, "yarn-site", "yarn.resourcemanager.scheduler.address", 8030);
+        int rmAdminPort =
+                resolvePortFromExistingKey(serviceId, "yarn-site", "yarn.resourcemanager.admin.address", 8033);
+        int rmRtPort = resolvePortFromExistingKey(
+                serviceId, "yarn-site", "yarn.resourcemanager.resource-tracker.address", 8031);
+        int rmSchedulerPort =
+                resolvePortFromExistingKey(serviceId, "yarn-site", "yarn.resourcemanager.scheduler.address", 8030);
 
         m.put("yarn.resourcemanager.address." + rm1Id, req.getActiveResourceManagerHost() + ":" + rmAddressPort);
         m.put("yarn.resourcemanager.address." + rm2Id, req.getStandbyResourceManagerHost() + ":" + rmAddressPort);
@@ -128,11 +133,19 @@ public class YarnHaServiceImpl implements YarnHaService {
         m.put("yarn.resourcemanager.admin.address." + rm1Id, req.getActiveResourceManagerHost() + ":" + rmAdminPort);
         m.put("yarn.resourcemanager.admin.address." + rm2Id, req.getStandbyResourceManagerHost() + ":" + rmAdminPort);
 
-        m.put("yarn.resourcemanager.resource-tracker.address." + rm1Id, req.getActiveResourceManagerHost() + ":" + rmRtPort);
-        m.put("yarn.resourcemanager.resource-tracker.address." + rm2Id, req.getStandbyResourceManagerHost() + ":" + rmRtPort);
+        m.put(
+                "yarn.resourcemanager.resource-tracker.address." + rm1Id,
+                req.getActiveResourceManagerHost() + ":" + rmRtPort);
+        m.put(
+                "yarn.resourcemanager.resource-tracker.address." + rm2Id,
+                req.getStandbyResourceManagerHost() + ":" + rmRtPort);
 
-        m.put("yarn.resourcemanager.scheduler.address." + rm1Id, req.getActiveResourceManagerHost() + ":" + rmSchedulerPort);
-        m.put("yarn.resourcemanager.scheduler.address." + rm2Id, req.getStandbyResourceManagerHost() + ":" + rmSchedulerPort);
+        m.put(
+                "yarn.resourcemanager.scheduler.address." + rm1Id,
+                req.getActiveResourceManagerHost() + ":" + rmSchedulerPort);
+        m.put(
+                "yarn.resourcemanager.scheduler.address." + rm2Id,
+                req.getStandbyResourceManagerHost() + ":" + rmSchedulerPort);
 
         String zkAddress = buildZkAddress(clusterId, req);
         if (StringUtils.isNotBlank(zkAddress)) {
@@ -157,7 +170,7 @@ public class YarnHaServiceImpl implements YarnHaService {
                 return defaultPort;
             }
             String portStr = value.split(":")[1].trim();
-                    return Integer.parseInt(portStr);
+            return Integer.parseInt(portStr);
         } catch (Exception ignored) {
         }
         return defaultPort;
@@ -273,5 +286,4 @@ public class YarnHaServiceImpl implements YarnHaService {
         po.setPropertiesJson(JsonUtils.writeAsString(new ArrayList<>(propsMap.values())));
         serviceConfigDao.partialUpdateByIds(List.of(po));
     }
-
 }

@@ -47,9 +47,9 @@ public class ComponentCustomValidator implements CommandValidator {
         if (StringUtils.isBlank(customCommand)) {
             throw new ApiException(ApiExceptionEnum.OPERATION_FAILED, "customCommand must not be blank");
         }
-        if (context.getCommandDTO().getComponentCommands() == null || context.getCommandDTO().getComponentCommands().isEmpty()) {
+        if (context.getCommandDTO().getComponentCommands() == null
+                || context.getCommandDTO().getComponentCommands().isEmpty()) {
             throw new ApiException(ApiExceptionEnum.OPERATION_FAILED, "componentCommands must not be empty");
         }
     }
 }
-

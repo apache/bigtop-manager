@@ -25,16 +25,17 @@ import org.apache.bigtop.manager.server.service.CommandService;
 import org.apache.bigtop.manager.server.service.HdfsHaService;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
-
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 
 @Tag(name = "HDFS HA Controller")
 @RestController
@@ -51,9 +52,7 @@ public class HdfsHaController {
     @Operation(summary = "enableHdfsHa", description = "Enable HDFS HA for an existing single NameNode cluster")
     @PostMapping("/enable-hdfs-ha")
     public ResponseEntity<CommandVO> enableHdfsHa(
-            @PathVariable Long clusterId,
-            @PathVariable Long serviceId,
-            @RequestBody @Valid EnableHdfsHaReq req) {
+            @PathVariable Long clusterId, @PathVariable Long serviceId, @RequestBody @Valid EnableHdfsHaReq req) {
         return ResponseEntity.success(hdfsHaService.buildEnableHdfsHaCommand(clusterId, serviceId, req));
     }
 }

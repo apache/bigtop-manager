@@ -46,4 +46,3 @@ public class ComponentConfigureJobFactory extends AbstractComponentJobFactory {
         return new ComponentConfigureJob(jobContext);
     }
 }
-

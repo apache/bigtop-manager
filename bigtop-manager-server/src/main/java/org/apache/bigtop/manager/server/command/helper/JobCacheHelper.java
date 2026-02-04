@@ -80,7 +80,8 @@ public class JobCacheHelper {
         sendJobCache(jobId, hostnames, null);
     }
 
-    public static void sendJobCache(Long jobId, List<String> hostnames, Map<String, List<String>> overrideComponentHosts) {
+    public static void sendJobCache(
+            Long jobId, List<String> hostnames, Map<String, List<String>> overrideComponentHosts) {
         final Map<String, List<String>> finalOverrideComponentHosts = overrideComponentHosts;
         if (!INITIALIZED.get()) {
             initialize();
@@ -170,7 +171,8 @@ public class JobCacheHelper {
         payload.setHosts(hosts);
     }
 
-    private static void mergeOverrideComponentHosts(JobCachePayload payload, Map<String, List<String>> overrideComponentHosts) {
+    private static void mergeOverrideComponentHosts(
+            JobCachePayload payload, Map<String, List<String>> overrideComponentHosts) {
         if (overrideComponentHosts == null || overrideComponentHosts.isEmpty()) {
             return;
         }
@@ -255,7 +257,8 @@ public class JobCacheHelper {
             if (StringUtils.isBlank(x.getHostname())) {
                 return;
             }
-            hostMap.computeIfAbsent(x.getName(), k -> new ArrayList<>()).add(x.getHostname().trim());
+            hostMap.computeIfAbsent(x.getName(), k -> new ArrayList<>())
+                    .add(x.getHostname().trim());
         });
 
         return hostMap;

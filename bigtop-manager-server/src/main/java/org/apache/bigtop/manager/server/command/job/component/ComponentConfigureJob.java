@@ -45,4 +45,3 @@ public class ComponentConfigureJob extends AbstractComponentJob {
         return "Configure components";
     }
 }
-

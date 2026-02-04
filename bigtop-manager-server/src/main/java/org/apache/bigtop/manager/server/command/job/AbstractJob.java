@@ -99,11 +99,17 @@ public abstract class AbstractJob implements Job {
 
     protected Map<String, List<String>> buildOverrideComponentHosts() {
         Map<String, List<String>> m = new java.util.HashMap<>();
-        if (jobContext == null || jobContext.getCommandDTO() == null || jobContext.getCommandDTO().getComponentCommands() == null) {
+        if (jobContext == null
+                || jobContext.getCommandDTO() == null
+                || jobContext.getCommandDTO().getComponentCommands() == null) {
             return m;
         }
-        for (org.apache.bigtop.manager.server.model.dto.command.ComponentCommandDTO cc : jobContext.getCommandDTO().getComponentCommands()) {
-            if (cc == null || cc.getComponentName() == null || cc.getHostnames() == null || cc.getHostnames().isEmpty()) {
+        for (org.apache.bigtop.manager.server.model.dto.command.ComponentCommandDTO cc :
+                jobContext.getCommandDTO().getComponentCommands()) {
+            if (cc == null
+                    || cc.getComponentName() == null
+                    || cc.getHostnames() == null
+                    || cc.getHostnames().isEmpty()) {
                 continue;
             }
             m.put(cc.getComponentName().toLowerCase(), cc.getHostnames());

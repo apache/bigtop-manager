@@ -65,9 +65,6 @@ public class EnableYarnRmHaJob extends AbstractServiceJob {
     protected Map<String, List<String>> getComponentHostsMap() {
         return jobContext.getCommandDTO().getComponentCommands().stream()
                 .collect(java.util.stream.Collectors.toMap(
-                        cc -> cc.getComponentName().toLowerCase(),
-                        cc -> cc.getHostnames()
-                ));
+                        cc -> cc.getComponentName().toLowerCase(), cc -> cc.getHostnames()));
     }
 }
-

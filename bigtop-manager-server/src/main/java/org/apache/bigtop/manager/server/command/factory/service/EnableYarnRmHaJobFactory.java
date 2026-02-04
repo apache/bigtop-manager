@@ -46,4 +46,3 @@ public class EnableYarnRmHaJobFactory extends AbstractServiceJobFactory {
         return new EnableYarnRmHaJob(jobContext);
     }
 }
-

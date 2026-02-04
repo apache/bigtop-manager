@@ -65,6 +65,4 @@ public class WaitPortStage extends AbstractStage {
     public String getName() {
         return "Wait ports " + port;
     }
-
 }
-

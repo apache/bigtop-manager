@@ -24,4 +24,3 @@ import org.apache.bigtop.manager.server.model.req.EnableYarnRmHaReq;
 public interface YarnHaService {
     CommandDTO buildEnableYarnRmHaCommand(Long clusterId, Long serviceId, EnableYarnRmHaReq req);
 }
-

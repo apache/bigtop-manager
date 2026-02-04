@@ -60,8 +60,7 @@ public abstract class AbstractStage implements Stage {
     }
 
     @Override
-    public void init()
-    {
+    public void init() {
         for (String hostname : stageContext.getHostnames()) {
             tasks.add(createTask(hostname));
         }

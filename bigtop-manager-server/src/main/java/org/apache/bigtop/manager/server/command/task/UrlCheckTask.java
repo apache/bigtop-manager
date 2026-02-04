@@ -19,6 +19,7 @@
 package org.apache.bigtop.manager.server.command.task;
 
 import org.apache.bigtop.manager.common.enums.Command;
+
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
@@ -35,7 +36,8 @@ public class UrlCheckTask extends AbstractTask {
     private final long timeoutMs;
     private final long intervalMs;
 
-    public UrlCheckTask(TaskContext taskContext, String targetUrl, String expectedContent, long timeoutMs, long intervalMs) {
+    public UrlCheckTask(
+            TaskContext taskContext, String targetUrl, String expectedContent, long timeoutMs, long intervalMs) {
         super(taskContext);
         this.targetUrl = targetUrl;
         this.expectedContent = expectedContent;
@@ -60,7 +62,11 @@ public class UrlCheckTask extends AbstractTask {
 
     @Override
     public Boolean run() {
-        log.info("Starting URL check for [{}] with timeout {}ms, waiting for content: [{}]", targetUrl, timeoutMs, expectedContent);
+        log.info(
+                "Starting URL check for [{}] with timeout {}ms, waiting for content: [{}]",
+                targetUrl,
+                timeoutMs,
+                expectedContent);
         boolean isReady = waitForUrlContent();
         if (isReady) {
             log.info("URL [{}] is now ready.", targetUrl);
@@ -86,7 +92,8 @@ public class UrlCheckTask extends AbstractTask {
                 connection.setRequestMethod("GET");
 
                 if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                    try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                    try (BufferedReader reader =
+                            new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
                         String response = reader.lines().collect(Collectors.joining());
                         if (response.contains(expectedContent)) {
                             return true;
@@ -110,7 +117,10 @@ public class UrlCheckTask extends AbstractTask {
             }
         }
 
-        log.warn("URL check failed for [{}]. Last error: {}", targetUrl, lastException != null ? lastException.getMessage() : "N/A");
+        log.warn(
+                "URL check failed for [{}]. Last error: {}",
+                targetUrl,
+                lastException != null ? lastException.getMessage() : "N/A");
         return false;
     }
 
@@ -119,4 +129,3 @@ public class UrlCheckTask extends AbstractTask {
         return "Wait for URL " + targetUrl;
     }
 }
-

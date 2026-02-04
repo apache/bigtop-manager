@@ -19,10 +19,10 @@
 package org.apache.bigtop.manager.server.model.req;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import java.util.List;
 
 @Data
@@ -44,7 +44,8 @@ public class EnableHdfsHaReq {
     private Long zookeeperServiceId;
 
     @Schema(
-            description = "Zookeeper hosts (preferred). If specified, server will build quorum as host:2181 and ignore zookeeperServiceId.",
+            description =
+                    "Zookeeper hosts (preferred). If specified, server will build quorum as host:2181 and ignore zookeeperServiceId.",
             example = "[\"zk-1\",\"zk-2\",\"zk-3\"]")
     private List<String> zookeeperHosts;
 

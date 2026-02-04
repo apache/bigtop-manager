@@ -29,9 +29,6 @@ import org.apache.bigtop.manager.server.command.stage.ComponentCustomStage;
 import org.apache.bigtop.manager.server.command.stage.StageContext;
 import org.apache.bigtop.manager.server.command.stage.WaitPortStage;
 import org.apache.bigtop.manager.server.command.stage.WaitUrlStage;
-import org.apache.bigtop.manager.dao.po.ComponentPO;
-import org.apache.bigtop.manager.dao.po.HostPO;
-import org.apache.bigtop.manager.dao.po.ServicePO;
 import org.apache.bigtop.manager.server.exception.ServerException;
 import org.apache.bigtop.manager.server.model.dto.CommandDTO;
 import org.apache.bigtop.manager.server.model.dto.command.ComponentCommandDTO;
@@ -65,7 +62,9 @@ public class EnableHdfsHaJob extends AbstractServiceJob {
 
     private static String getCodeSource(Class<?> clazz) {
         try {
-            if (clazz == null || clazz.getProtectionDomain() == null || clazz.getProtectionDomain().getCodeSource() == null) {
+            if (clazz == null
+                    || clazz.getProtectionDomain() == null
+                    || clazz.getProtectionDomain().getCodeSource() == null) {
                 return "null";
             }
             return String.valueOf(clazz.getProtectionDomain().getCodeSource().getLocation());
@@ -93,8 +92,12 @@ public class EnableHdfsHaJob extends AbstractServiceJob {
         stages.addAll(ComponentStageHelper.createComponentStages(jn, Command.ADD, commandDTO));
         stages.addAll(ComponentStageHelper.createComponentStages(jn, Command.CONFIGURE, commandDTO));
         stages.addAll(ComponentStageHelper.createComponentStages(jn, Command.START, commandDTO));
-        stages.add(new WaitPortStage(createStageContext("journalnode", req.getJournalNodeHosts(), commandDTO),
-                req.getJournalNodeHosts(), 8485, 10 * 60_000L, 1000L));
+        stages.add(new WaitPortStage(
+                createStageContext("journalnode", req.getJournalNodeHosts(), commandDTO),
+                req.getJournalNodeHosts(),
+                8485,
+                10 * 60_000L,
+                1000L));
 
         Map<String, List<String>> zkfcHosts = pick(componentHostsMap, "zkfc");
         stages.addAll(ComponentStageHelper.createComponentStages(zkfcHosts, Command.ADD, commandDTO));
@@ -102,22 +105,32 @@ public class EnableHdfsHaJob extends AbstractServiceJob {
 
         // 2. Initialize Active NameNode (NN1)
         stages.addAll(ComponentStageHelper.createComponentStages(activeNN, Command.STOP, commandDTO));
-        stages.add(new ComponentCustomStage(createStageContext("namenode", List.of(req.getActiveNameNodeHost()), commandDTO), "initializeSharedEdits"));
-        stages.add(new ComponentCustomStage(createStageContext("zkfc", List.of(req.getActiveNameNodeHost()), commandDTO), "formatZk"));
+        stages.add(new ComponentCustomStage(
+                createStageContext("namenode", List.of(req.getActiveNameNodeHost()), commandDTO),
+                "initializeSharedEdits"));
+        stages.add(new ComponentCustomStage(
+                createStageContext("zkfc", List.of(req.getActiveNameNodeHost()), commandDTO), "formatZk"));
 
         // 3. Start Active NameNode and its ZKFC, then wait for it to become active
         stages.addAll(ComponentStageHelper.createComponentStages(activeNN, Command.START, commandDTO));
-        stages.addAll(ComponentStageHelper.createComponentStages(Map.of("zkfc", List.of(req.getActiveNameNodeHost())), Command.START, commandDTO));
-        stages.add(new WaitUrlStage(createStageContext("namenode", List.of(req.getActiveNameNodeHost()), commandDTO),
-                List.of(req.getActiveNameNodeHost()), "http://{host}:9870/jmx?qry=Hadoop:service=NameNode,name=NameNodeStatus",
-                "active", 10 * 60_000L, 3000L));
+        stages.addAll(ComponentStageHelper.createComponentStages(
+                Map.of("zkfc", List.of(req.getActiveNameNodeHost())), Command.START, commandDTO));
+        stages.add(new WaitUrlStage(
+                createStageContext("namenode", List.of(req.getActiveNameNodeHost()), commandDTO),
+                List.of(req.getActiveNameNodeHost()),
+                "http://{host}:9870/jmx?qry=Hadoop:service=NameNode,name=NameNodeStatus",
+                "active",
+                10 * 60_000L,
+                3000L));
 
         // 4. Initialize and Start Standby NameNode (NN2) and its ZKFC
         stages.addAll(ComponentStageHelper.createComponentStages(standbyNN, Command.ADD, commandDTO));
         stages.addAll(ComponentStageHelper.createComponentStages(standbyNN, Command.CONFIGURE, commandDTO));
-        stages.add(new ComponentCustomStage(createStageContext("namenode", List.of(req.getStandbyNameNodeHost()), commandDTO), "bootstrapStandby"));
+        stages.add(new ComponentCustomStage(
+                createStageContext("namenode", List.of(req.getStandbyNameNodeHost()), commandDTO), "bootstrapStandby"));
         stages.addAll(ComponentStageHelper.createComponentStages(standbyNN, Command.START, commandDTO));
-        stages.addAll(ComponentStageHelper.createComponentStages(Map.of("zkfc", List.of(req.getStandbyNameNodeHost())), Command.START, commandDTO));
+        stages.addAll(ComponentStageHelper.createComponentStages(
+                Map.of("zkfc", List.of(req.getStandbyNameNodeHost())), Command.START, commandDTO));
 
         // 5. Finalize
         // Convert secondarynamenode on standby host to standby namenode
@@ -125,7 +138,6 @@ public class EnableHdfsHaJob extends AbstractServiceJob {
 
         // Ensure standby host has namenode component record
         ensureStandbyNameNodeComponent(req.getStandbyNameNodeHost());
-
 
         Map<String, List<String>> dn = pick(componentHostsMap, "datanode");
         stages.addAll(ComponentStageHelper.createComponentStages(dn, Command.RESTART, commandDTO));
@@ -149,10 +161,11 @@ public class EnableHdfsHaJob extends AbstractServiceJob {
         if (ccs == null) {
             return new HashMap<>();
         }
-        return ccs.stream().collect(Collectors.toMap(
-                cc -> cc.getComponentName().toLowerCase(),
-                cc -> cc.getHostnames() == null ? List.of() : cc.getHostnames(),
-                (a, b) -> a));
+        return ccs.stream()
+                .collect(Collectors.toMap(
+                        cc -> cc.getComponentName().toLowerCase(),
+                        cc -> cc.getHostnames() == null ? List.of() : cc.getHostnames(),
+                        (a, b) -> a));
     }
 
     private static Map<String, List<String>> pick(Map<String, List<String>> all, String... componentNames) {
@@ -169,7 +182,8 @@ public class EnableHdfsHaJob extends AbstractServiceJob {
     private EnableHdfsHaReq parseReq(CommandDTO commandDTO) {
         String cc = commandDTO.getCustomCommand();
         if (StringUtils.isBlank(cc) || !cc.startsWith(CUSTOM_COMMAND_PREFIX)) {
-            throw new ServerException("EnableHdfsHaJob requires customCommand with prefix '" + CUSTOM_COMMAND_PREFIX + "'");
+            throw new ServerException(
+                    "EnableHdfsHaJob requires customCommand with prefix '" + CUSTOM_COMMAND_PREFIX + "'");
         }
         String json = cc.substring(CUSTOM_COMMAND_PREFIX.length());
         if (StringUtils.isBlank(json)) {
@@ -195,14 +209,14 @@ public class EnableHdfsHaJob extends AbstractServiceJob {
         if (StringUtils.isBlank(req.getNameservice())) {
             throw new ServerException("nameservice must not be blank");
         }
-        if (CollectionUtils.isEmpty(req.getJournalNodeHosts()) || req.getJournalNodeHosts().size() < 3) {
+        if (CollectionUtils.isEmpty(req.getJournalNodeHosts())
+                || req.getJournalNodeHosts().size() < 3) {
             throw new ServerException("journalNodeHosts must be provided and have at least 3 nodes");
         }
         if (CollectionUtils.isEmpty(req.getZkfcHosts())) {
             throw new ServerException("zkfcHosts must not be empty");
         }
     }
-
 
     private StageContext createStageContext(String componentName, List<String> hostnames, CommandDTO commandDTO) {
         StageContext stageContext = StageContext.fromCommandDTO(commandDTO);
@@ -216,7 +230,10 @@ public class EnableHdfsHaJob extends AbstractServiceJob {
         log.info("Attempting to remove Secondary NameNode on host: {}", hostname);
         ComponentPO secondaryNameNode = componentDao.findByNameAndHostname(SECONDARY_NAMENODE_COMPONENT_NAME, hostname);
         if (secondaryNameNode != null) {
-            log.info("Found Secondary NameNode component with ID {} on host {}. Deleting it.", secondaryNameNode.getId(), hostname);
+            log.info(
+                    "Found Secondary NameNode component with ID {} on host {}. Deleting it.",
+                    secondaryNameNode.getId(),
+                    hostname);
             componentDao.deleteById(secondaryNameNode.getId());
         } else {
             log.info("No Secondary NameNode component found on host {}. Nothing to remove.", hostname);

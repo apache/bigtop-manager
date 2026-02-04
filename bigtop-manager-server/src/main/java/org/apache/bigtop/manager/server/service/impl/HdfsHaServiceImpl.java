@@ -18,7 +18,6 @@
  */
 package org.apache.bigtop.manager.server.service.impl;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
@@ -44,6 +43,8 @@ import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
@@ -80,7 +81,8 @@ public class HdfsHaServiceImpl implements HdfsHaService {
         writeHaConfigurationWithRetry(clusterId, serviceId, req);
 
         // 2. Trigger a single service-level job (EnableHdfsHaJob) which orchestrates stages internally.
-        // IMPORTANT: Do NOT use SERVICE CONFIGURE here, otherwise it will restart all hadoop components (including YARN).
+        // IMPORTANT: Do NOT use SERVICE CONFIGURE here, otherwise it will restart all hadoop components (including
+        // YARN).
         CommandDTO commandDTO = new CommandDTO();
         commandDTO.setClusterId(clusterId);
         commandDTO.setCommandLevel(CommandLevel.SERVICE);
@@ -94,7 +96,8 @@ public class HdfsHaServiceImpl implements HdfsHaService {
 
         // HDFS components
         componentCommands.add(componentCommand("journalnode", req.getJournalNodeHosts()));
-        componentCommands.add(componentCommand("namenode", List.of(req.getActiveNameNodeHost(), req.getStandbyNameNodeHost())));
+        componentCommands.add(
+                componentCommand("namenode", List.of(req.getActiveNameNodeHost(), req.getStandbyNameNodeHost())));
         componentCommands.add(componentCommand("zkfc", req.getZkfcHosts()));
 
         // DataNode hosts: restart to pick up HA config
@@ -168,7 +171,11 @@ public class HdfsHaServiceImpl implements HdfsHaService {
         if (CollectionUtils.isEmpty(list)) {
             return List.of();
         }
-        return list.stream().map(ComponentPO::getHostname).filter(StringUtils::isNotBlank).distinct().toList();
+        return list.stream()
+                .map(ComponentPO::getHostname)
+                .filter(StringUtils::isNotBlank)
+                .distinct()
+                .toList();
     }
 
     private void validatePrerequisites(Long clusterId, Long serviceId, EnableHdfsHaReq req) {
@@ -190,7 +197,8 @@ public class HdfsHaServiceImpl implements HdfsHaService {
         if (StringUtils.isBlank(req.getNameservice())) {
             throw new ServerException("nameservice must not be blank");
         }
-        if (CollectionUtils.isEmpty(req.getJournalNodeHosts()) || req.getJournalNodeHosts().size() < 3) {
+        if (CollectionUtils.isEmpty(req.getJournalNodeHosts())
+                || req.getJournalNodeHosts().size() < 3) {
             throw new ServerException("journalNodeHosts must be provided and have at least 3 nodes");
         }
         if (CollectionUtils.isEmpty(req.getZkfcHosts())) {
@@ -220,8 +228,8 @@ public class HdfsHaServiceImpl implements HdfsHaService {
                 .build();
         List<ComponentPO> list = componentDao.findByQuery(q);
         if (CollectionUtils.isEmpty(list)) {
-            throw new ServerException(
-                    "Component not found in DB: component=" + componentName + ", host=" + hostname + ", clusterId=" + clusterId);
+            throw new ServerException("Component not found in DB: component=" + componentName + ", host=" + hostname
+                    + ", clusterId=" + clusterId);
         }
     }
 
@@ -251,10 +259,12 @@ public class HdfsHaServiceImpl implements HdfsHaService {
         String nn1Host = req.getActiveNameNodeHost();
         String nn2Host = req.getStandbyNameNodeHost();
 
-        if (CollectionUtils.isEmpty(req.getJournalNodeHosts()) || req.getJournalNodeHosts().size() < 3) {
+        if (CollectionUtils.isEmpty(req.getJournalNodeHosts())
+                || req.getJournalNodeHosts().size() < 3) {
             throw new ServerException("JournalNode hosts must be provided and have at least 3 nodes.");
         }
-        String journalQuorum = req.getJournalNodeHosts().stream().map(h -> h + ":8485").collect(Collectors.joining(";"));
+        String journalQuorum =
+                req.getJournalNodeHosts().stream().map(h -> h + ":8485").collect(Collectors.joining(";"));
 
         Map<String, String> m = new HashMap<>();
         m.put("dfs.nameservices", nameservice);
@@ -308,7 +318,10 @@ public class HdfsHaServiceImpl implements HdfsHaService {
         Map<String, Object> props = JsonUtils.readFromString(zooCfg.getPropertiesJson());
         String clientPort = props.getOrDefault("clientPort", "2181").toString().trim();
 
-        ComponentQuery query = ComponentQuery.builder().serviceId(zookeeperServiceId).name("zookeeper_server").build();
+        ComponentQuery query = ComponentQuery.builder()
+                .serviceId(zookeeperServiceId)
+                .name("zookeeper_server")
+                .build();
         List<String> zkHosts = componentDao.findByQuery(query).stream()
                 .map(ComponentPO::getHostname)
                 .filter(StringUtils::isNotBlank)

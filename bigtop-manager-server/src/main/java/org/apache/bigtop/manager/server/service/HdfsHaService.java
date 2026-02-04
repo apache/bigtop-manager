@@ -21,6 +21,6 @@ package org.apache.bigtop.manager.server.service;
 import org.apache.bigtop.manager.server.model.req.EnableHdfsHaReq;
 
 public interface HdfsHaService {
-    org.apache.bigtop.manager.server.model.vo.CommandVO buildEnableHdfsHaCommand(Long clusterId, Long serviceId, EnableHdfsHaReq req);
+    org.apache.bigtop.manager.server.model.vo.CommandVO buildEnableHdfsHaCommand(
+            Long clusterId, Long serviceId, EnableHdfsHaReq req);
 }
-

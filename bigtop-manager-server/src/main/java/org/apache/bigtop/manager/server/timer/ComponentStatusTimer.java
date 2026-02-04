@@ -75,14 +75,20 @@ public class ComponentStatusTimer {
             ComponentPO componentDetailsPO = componentDao.findDetailsById(componentPO.getId());
             HostPO hostPO = hostDao.findById(componentPO.getHostId());
             if (hostPO == null) {
-                log.warn("Component [{}] has an invalid hostId [{}], skipping status check.", componentPO.getName(), componentPO.getHostId());
+                log.warn(
+                        "Component [{}] has an invalid hostId [{}], skipping status check.",
+                        componentPO.getName(),
+                        componentPO.getHostId());
                 continue;
             }
 
             String stack = componentDetailsPO.getStack();
             if (stack == null || !stack.contains("-")) {
-                log.warn("Component [{}] on host [{}] has invalid stack: [{}], skipping status check.",
-                        componentPO.getName(), hostPO.getHostname(), stack);
+                log.warn(
+                        "Component [{}] on host [{}] has invalid stack: [{}], skipping status check.",
+                        componentPO.getName(),
+                        hostPO.getHostname(),
+                        stack);
                 continue;
             }
 

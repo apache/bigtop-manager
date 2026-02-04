@@ -21,15 +21,16 @@ package org.apache.bigtop.manager.server.command.task;
 import org.apache.bigtop.manager.common.constants.ComponentCategories;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
+import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.query.ComponentQuery;
 import org.apache.bigtop.manager.server.enums.HealthyStatusEnum;
-import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.server.exception.ServerException;
 import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
 import org.apache.bigtop.manager.server.model.dto.StackDTO;
 import org.apache.bigtop.manager.server.utils.StackUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
+
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -71,7 +72,11 @@ public class ComponentAddTask extends AbstractComponentTask {
 
         // If new or existing but incomplete, fill in the details
         if (isNew || componentPO.getHostId() == null || componentPO.getDisplayName() == null) {
-            log.info("Populating full component details for component [{}] on host [{}]. New entry: {}", componentName, hostname, isNew);
+            log.info(
+                    "Populating full component details for component [{}] on host [{}]. New entry: {}",
+                    componentName,
+                    hostname,
+                    isNew);
             HostPO hostPO = hostDao.findByHostname(hostname);
             if (hostPO == null) {
                 throw new ServerException("Host not found in database: " + hostname);

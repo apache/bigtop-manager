@@ -52,8 +52,7 @@ public class ComponentCustomTask extends AbstractComponentTask {
 
     @Override
     public String getName() {
-        return "Custom " + taskContext.getComponentDisplayName()
-                + " (" + String.valueOf(customCommand) + ") on " + taskContext.getHostname();
+        return "Custom " + taskContext.getComponentDisplayName() + " (" + String.valueOf(customCommand) + ") on "
+                + taskContext.getHostname();
     }
 }
-

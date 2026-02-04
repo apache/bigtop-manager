@@ -18,9 +18,9 @@
  */
 package org.apache.bigtop.manager.server.command.job.component;
 
+import org.apache.bigtop.manager.server.command.job.JobContext;
 import org.apache.bigtop.manager.server.command.stage.ComponentCustomStage;
 import org.apache.bigtop.manager.server.command.stage.StageContext;
-import org.apache.bigtop.manager.server.command.job.JobContext;
 import org.apache.bigtop.manager.server.exception.ServerException;
 import org.apache.bigtop.manager.server.model.dto.ServiceDTO;
 import org.apache.bigtop.manager.server.utils.StackUtils;
@@ -59,7 +59,8 @@ public class ComponentCustomJob extends AbstractComponentJob {
             stageContext.setHostnames(hostnames);
             stageContext.setComponentName(componentName);
 
-            // AbstractComponentStage#createTaskContext() will call StackUtils.getServiceDTO(stageContext.getServiceName()).
+            // AbstractComponentStage#createTaskContext() will call
+            // StackUtils.getServiceDTO(stageContext.getServiceName()).
             // So serviceName must be set here.
             ServiceDTO serviceDTO = StackUtils.getServiceDTOByComponentName(componentName);
             stageContext.setServiceName(serviceDTO.getName());
@@ -73,4 +74,3 @@ public class ComponentCustomJob extends AbstractComponentJob {
         return "Custom component command";
     }
 }
-

@@ -100,4 +100,3 @@ public class PortCheckTask extends AbstractTask {
         return "Wait port " + targetHost + ":" + targetPort;
     }
 }
-

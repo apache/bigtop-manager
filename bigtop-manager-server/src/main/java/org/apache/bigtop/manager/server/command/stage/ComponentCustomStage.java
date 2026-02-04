@@ -21,6 +21,7 @@ package org.apache.bigtop.manager.server.command.stage;
 import org.apache.bigtop.manager.server.command.task.ComponentCustomTask;
 import org.apache.bigtop.manager.server.command.task.Task;
 import org.apache.bigtop.manager.server.utils.StackUtils;
+
 import org.apache.commons.lang3.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -36,14 +37,16 @@ public class ComponentCustomStage extends AbstractComponentStage {
     public ComponentCustomStage(StageContext stageContext, String customCommand) {
         super(stageContext);
         if (customCommand == null || customCommand.isBlank()) {
-            throw new IllegalArgumentException("customCommand must not be blank for ComponentCustomStage, stageContext=" + stageContext);
+            throw new IllegalArgumentException(
+                    "customCommand must not be blank for ComponentCustomStage, stageContext=" + stageContext);
         }
         this.customCommand = customCommand;
     }
 
     @Override
     protected Task createTask(String hostname) {
-        log.info("ComponentCustomStage.createTask: this={}, customCommand='{}', len={}, blank={}, stageContext={}, hostname={}",
+        log.info(
+                "ComponentCustomStage.createTask: this={}, customCommand='{}', len={}, blank={}, stageContext={}, hostname={}",
                 System.identityHashCode(this),
                 customCommand,
                 customCommand == null ? null : customCommand.length(),
@@ -55,10 +58,10 @@ public class ComponentCustomStage extends AbstractComponentStage {
 
     @Override
     public String getName() {
-        String componentDisplay = StackUtils.getComponentDTO(stageContext.getComponentName()).getDisplayName();
+        String componentDisplay =
+                StackUtils.getComponentDTO(stageContext.getComponentName()).getDisplayName();
         String stageName = String.format("Custom: %s (%s)", componentDisplay, customCommand);
         // Limit the length to prevent DataTruncation
         return StringUtils.abbreviate(stageName, 32);
     }
 }
-

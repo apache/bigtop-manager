@@ -26,16 +26,17 @@ import org.apache.bigtop.manager.server.service.CommandService;
 import org.apache.bigtop.manager.server.service.YarnHaService;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
-
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 
 @Tag(name = "YARN HA Controller")
 @RestController
@@ -52,12 +53,9 @@ public class YarnHaController {
     @Operation(summary = "enableYarnRmHa", description = "Enable YARN ResourceManager HA")
     @PostMapping("/enable-yarn-rm-ha")
     public ResponseEntity<CommandVO> enableYarnRmHa(
-            @PathVariable Long clusterId,
-            @PathVariable Long serviceId,
-            @RequestBody @Valid EnableYarnRmHaReq req) {
+            @PathVariable Long clusterId, @PathVariable Long serviceId, @RequestBody @Valid EnableYarnRmHaReq req) {
 
         CommandDTO commandDTO = yarnHaService.buildEnableYarnRmHaCommand(clusterId, serviceId, req);
         return ResponseEntity.success(commandService.command(commandDTO));
     }
 }
-
