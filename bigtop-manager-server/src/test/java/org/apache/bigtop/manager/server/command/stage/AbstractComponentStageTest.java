@@ -20,11 +20,17 @@ package org.apache.bigtop.manager.server.command.stage;
 
 import org.apache.bigtop.manager.common.utils.Environments;
 import org.apache.bigtop.manager.dao.po.ClusterPO;
+import org.apache.bigtop.manager.dao.po.ServicePO;
+import org.apache.bigtop.manager.dao.repository.ClusterDao;
+import org.apache.bigtop.manager.dao.repository.ServiceDao;
 import org.apache.bigtop.manager.server.command.task.TaskContext;
+import org.apache.bigtop.manager.server.holder.SessionUserHolder;
+import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 import org.apache.bigtop.manager.server.utils.StackUtils;
 
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -44,14 +50,39 @@ public class AbstractComponentStageTest {
     @Mock
     private AbstractComponentStage stage;
 
-    private static MockedStatic<Environments> mocked;
+    @Mock
+    private ClusterDao clusterDao;
 
-    @BeforeAll
-    public static void setup() {
+    @Mock
+    private ServiceDao serviceDao;
+
+    private static MockedStatic<Environments> mocked;
+    private MockedStatic<SpringContextHolder> springContextHolderMocked;
+    private MockedStatic<SessionUserHolder> sessionUserHolderMocked;
+
+    @BeforeEach
+    public void setup() {
         mocked = mockStatic(Environments.class);
         when(Environments.isDevMode()).thenReturn(true);
 
+        springContextHolderMocked = mockStatic(SpringContextHolder.class);
+        when(SpringContextHolder.getBean(ClusterDao.class)).thenReturn(clusterDao);
+        when(SpringContextHolder.getBean(ServiceDao.class)).thenReturn(serviceDao);
+
+        sessionUserHolderMocked = mockStatic(SessionUserHolder.class);
+        when(SessionUserHolder.getUserId()).thenReturn(1001L);
+
         StackUtils.parseStack();
+    }
+
+    @AfterEach
+    public void tearDown() {
+        if (springContextHolderMocked != null) {
+            springContextHolderMocked.close();
+        }
+        if (sessionUserHolderMocked != null) {
+            sessionUserHolderMocked.close();
+        }
     }
 
     @AfterAll
@@ -75,6 +106,11 @@ public class AbstractComponentStageTest {
         ReflectionTestUtils.setField(stage, "stageContext", stageContext);
         ReflectionTestUtils.setField(stage, "clusterPO", clusterPO);
 
+        // Mock serviceDao.findByClusterIdAndName to avoid NPE in createTaskContext
+        ServicePO servicePO = new ServicePO();
+        servicePO.setId(2L);
+        when(serviceDao.findByClusterIdAndName(any(), any())).thenReturn(servicePO);
+
         doCallRealMethod().when(stage).createTaskContext(any());
         TaskContext taskContext = stage.createTaskContext("host1");
 
@@ -86,5 +122,7 @@ public class AbstractComponentStageTest {
         assertEquals("zookeeper", taskContext.getServiceUser());
         assertEquals("test", taskContext.getUserGroup());
         assertEquals("/opt", taskContext.getRootDir());
+        assertEquals(1001L, taskContext.getOperatorId());
+        assertEquals(2L, taskContext.getServiceId());
     }
 }
