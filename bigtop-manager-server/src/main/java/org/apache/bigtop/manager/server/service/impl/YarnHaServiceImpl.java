@@ -76,17 +76,14 @@ public class YarnHaServiceImpl implements YarnHaService {
                     "enable-yarn-rm-ha only supports service 'hadoop', but got: " + servicePO.getName());
         }
 
-        // 1) 写入 yarn-site 推荐 key（仅 YARN HA 相关，不触碰 HDFS）
         Map<String, String> yarnSiteUpdates = buildYarnSiteUpdates(clusterId, serviceId, req);
         upsertServiceConfigProperties(clusterId, serviceId, "yarn-site", yarnSiteUpdates);
 
-        // 2) 触发专用的 EnableYarnRmHaJob（单 Job 多 Stage），仅影响 YARN 相关组件
         CommandDTO commandDTO = new CommandDTO();
         commandDTO.setClusterId(clusterId);
         commandDTO.setCommandLevel(CommandLevel.SERVICE);
         commandDTO.setCommand(Command.ENABLE_YARN_RM_HA);
 
-        // 仅选择 resourcemanager 两台主机作为本次 job 的目标组件，避免触碰 HDFS 组件
         ComponentCommandDTO rmCmd = new ComponentCommandDTO();
         rmCmd.setComponentName("resourcemanager");
         rmCmd.setHostnames(List.of(req.getActiveResourceManagerHost(), req.getStandbyResourceManagerHost()));
@@ -116,12 +113,10 @@ public class YarnHaServiceImpl implements YarnHaService {
         m.put("yarn.resourcemanager.hostname." + rm1Id, req.getActiveResourceManagerHost());
         m.put("yarn.resourcemanager.hostname." + rm2Id, req.getStandbyResourceManagerHost());
 
-        // webapp.address.rmX：优先复用现有 yarn.resourcemanager.webapp.address 的端口，否则默认 8088
         int webappPort = resolvePortFromExistingKey(serviceId, "yarn-site", "yarn.resourcemanager.webapp.address", 8088);
         m.put("yarn.resourcemanager.webapp.address." + rm1Id, req.getActiveResourceManagerHost() + ":" + webappPort);
         m.put("yarn.resourcemanager.webapp.address." + rm2Id, req.getStandbyResourceManagerHost() + ":" + webappPort);
 
-        // 补齐 RM HA 必需的地址类 key（从现有单机 key 推断端口，否则使用默认值）
         int rmAddressPort = resolvePortFromExistingKey(serviceId, "yarn-site", "yarn.resourcemanager.address", 8032);
         int rmAdminPort = resolvePortFromExistingKey(serviceId, "yarn-site", "yarn.resourcemanager.admin.address", 8033);
         int rmRtPort = resolvePortFromExistingKey(serviceId, "yarn-site", "yarn.resourcemanager.resource-tracker.address", 8031);
@@ -139,13 +134,11 @@ public class YarnHaServiceImpl implements YarnHaService {
         m.put("yarn.resourcemanager.scheduler.address." + rm1Id, req.getActiveResourceManagerHost() + ":" + rmSchedulerPort);
         m.put("yarn.resourcemanager.scheduler.address." + rm2Id, req.getStandbyResourceManagerHost() + ":" + rmSchedulerPort);
 
-        // zk-address：优先使用 zookeeperHosts（推荐）；否则回退到 zookeeperServiceId 逻辑
         String zkAddress = buildZkAddress(clusterId, req);
         if (StringUtils.isNotBlank(zkAddress)) {
             m.put("yarn.resourcemanager.zk-address", zkAddress);
         }
 
-        // 避免混杂：服务端侧也清理单 RM key（DB 侧清理，避免 UI/渲染混杂）
         m.put("__delete__.yarn.resourcemanager.hostname", "");
         m.put("__delete__.yarn.resourcemanager.address", "");
         m.put("__delete__.yarn.resourcemanager.admin.address", "");
