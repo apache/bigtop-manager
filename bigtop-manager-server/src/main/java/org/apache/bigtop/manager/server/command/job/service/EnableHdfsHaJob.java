@@ -44,13 +44,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/**
- * Enable HDFS HA job.
- *
- * 约束：
- * - HDFS 相关组件：执行 ADD/CONFIGURE/START/CUSTOM/RESTART（journalnode/namenode/zkfc/datanode）
- * - YARN 相关组件：仅执行 CONFIGURE（不 STOP/START），避免影响线上 YARN 任务
- */
 @Slf4j
 public class EnableHdfsHaJob extends AbstractServiceJob {
 
