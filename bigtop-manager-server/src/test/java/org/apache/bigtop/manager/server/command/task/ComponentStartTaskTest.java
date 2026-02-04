@@ -21,11 +21,14 @@ package org.apache.bigtop.manager.server.command.task;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
+import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.dao.repository.ComponentDao;
 import org.apache.bigtop.manager.dao.repository.HostDao;
 import org.apache.bigtop.manager.dao.repository.TaskDao;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
+import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
+import org.apache.bigtop.manager.server.model.dto.StackDTO;
 import org.apache.bigtop.manager.server.utils.StackUtils;
 
 import org.junit.jupiter.api.AfterEach;
@@ -83,6 +86,18 @@ public class ComponentStartTaskTest {
         when(SpringContextHolder.getBean(TaskDao.class)).thenReturn(taskDao);
         when(SpringContextHolder.getBean(ComponentDao.class)).thenReturn(componentDao);
 
+        // Mock StackUtils static methods
+        stackUtilsMocked = mockStatic(StackUtils.class);
+        ComponentDTO componentDTO = new ComponentDTO();
+        componentDTO.setName("TestComponentName");
+        componentDTO.setDisplayName("TestComponentDisplayName");
+        stackUtilsMocked.when(() -> StackUtils.getComponentDTO("TestComponentName")).thenReturn(componentDTO);
+        
+        StackDTO stackDTO = new StackDTO();
+        stackDTO.setStackName("test-stack");
+        stackDTO.setStackVersion("1.0.0");
+        stackUtilsMocked.when(() -> StackUtils.getServiceStack("TestServiceName")).thenReturn(stackDTO);
+
         componentStartTask = mock(ComponentStartTask.class);
 
         taskContext.setComponentDisplayName("TestComponentDisplayName");
@@ -105,6 +120,9 @@ public class ComponentStartTaskTest {
     @AfterEach
     public void tearDown() {
         springContextHolderMockedStatic.close();
+        if (stackUtilsMocked != null) {
+            stackUtilsMocked.close();
+        }
     }
 
     @Test
@@ -123,8 +141,12 @@ public class ComponentStartTaskTest {
     @Test
     public void testOnSuccess() {
         doCallRealMethod().when(componentStartTask).onSuccess();
+
         List<ComponentPO> componentPOS = new ArrayList<>();
-        componentPOS.add(new ComponentPO());
+        ComponentPO existing = new ComponentPO();
+        existing.setId(1L);
+        existing.setName("TestComponentName");
+        componentPOS.add(existing);
         when(componentDao.findByQuery(any())).thenReturn(componentPOS);
 
         componentStartTask.onSuccess();
