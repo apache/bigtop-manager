@@ -51,13 +51,9 @@ public class ZkfcScript extends AbstractServerScript {
 
     @Override
     public ShellResult init(Params params) {
-        // 保持原有 init 行为：formatZK
         return formatZk(params);
     }
 
-    /**
-     * 在启用 HA 流程中由 server 侧通过 custom command 调用：formatZK
-     */
     public ShellResult formatZk(Params params) {
         configure(params);
         HadoopParams hadoopParams = (HadoopParams) params;
