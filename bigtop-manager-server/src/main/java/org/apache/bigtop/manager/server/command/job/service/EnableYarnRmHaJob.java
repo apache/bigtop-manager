@@ -26,12 +26,6 @@ import org.apache.bigtop.manager.server.model.dto.CommandDTO;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Job for enabling YARN ResourceManager HA. It assumes yarn-site 已经写入 HA 配置，
- * 此 Job 只负责对 resourcemanager 组件执行
- *   CONFIGURE -> STOP -> START 三步，确保 HA RM 生效。
- * 若前端同时要求重启 NodeManager，可在 CommandDTO 的 componentCommands 中附带 "nodemanager"。
- */
 public class EnableYarnRmHaJob extends AbstractServiceJob {
 
     public EnableYarnRmHaJob(JobContext jobContext) {
@@ -43,14 +37,13 @@ public class EnableYarnRmHaJob extends AbstractServiceJob {
         CommandDTO commandDTO = jobContext.getCommandDTO();
         Map<String, List<String>> componentHostsMap = getComponentHostsMap();
 
-        // 1. CONFIGURE resourcemanager (及可能的 nodemanager)
+        // 1. CONFIGURE resourcemanager
         stages.addAll(ComponentStageHelper.createComponentStages(componentHostsMap, Command.CONFIGURE, commandDTO));
         // 2. STOP resourcemanager
         stages.addAll(ComponentStageHelper.createComponentStages(componentHostsMap, Command.STOP, commandDTO));
         // 3. START resourcemanager
         stages.addAll(ComponentStageHelper.createComponentStages(componentHostsMap, Command.START, commandDTO));
 
-        // 若没有 Stage 被创建（理论上不应该），抛异常
         if (stages.isEmpty()) {
             throw new IllegalStateException("EnableYarnRmHaJob has no stages to execute. Check componentHostsMap");
         }
