@@ -111,9 +111,9 @@ public class AbstractComponentStageTest {
         servicePO.setId(2L);
         when(serviceDao.findByClusterIdAndName(any(), any())).thenReturn(servicePO);
 
-        // Call injectBeans() to set up the serviceDao and clusterDao in the stage
-        doCallRealMethod().when(stage).injectBeans();
-        stage.injectBeans();
+        // Directly set the mocked serviceDao and clusterDao to avoid injection issues
+        ReflectionTestUtils.setField(stage, "serviceDao", serviceDao);
+        ReflectionTestUtils.setField(stage, "clusterDao", clusterDao);
 
         doCallRealMethod().when(stage).createTaskContext(any());
         TaskContext taskContext = stage.createTaskContext("host1");
