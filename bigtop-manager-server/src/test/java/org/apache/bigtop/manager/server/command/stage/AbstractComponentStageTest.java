@@ -111,6 +111,10 @@ public class AbstractComponentStageTest {
         servicePO.setId(2L);
         when(serviceDao.findByClusterIdAndName(any(), any())).thenReturn(servicePO);
 
+        // Call injectBeans() to set up the serviceDao and clusterDao in the stage
+        doCallRealMethod().when(stage).injectBeans();
+        stage.injectBeans();
+
         doCallRealMethod().when(stage).createTaskContext(any());
         TaskContext taskContext = stage.createTaskContext("host1");
 
