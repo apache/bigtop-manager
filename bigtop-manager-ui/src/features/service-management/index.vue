@@ -332,5 +332,4 @@
     </main-card>
   </a-spin>
 </template>
-
 <style lang="scss" scoped></style>
