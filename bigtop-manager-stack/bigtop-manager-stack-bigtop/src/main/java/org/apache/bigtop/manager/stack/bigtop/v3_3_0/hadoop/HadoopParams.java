@@ -198,7 +198,6 @@ public class HadoopParams extends BigtopParams {
             String journalQuorum =
                     filteredJournalNodes.stream().map(x -> x + ":8485").collect(Collectors.joining(";"));
 
-            // 清理单机模式可能存在的 key，避免与 HA 配置混杂
             hdfsSite.remove("dfs.namenode.rpc-address");
             hdfsSite.remove("dfs.namenode.https-address");
             hdfsSite.remove("dfs.namenode.http-address");
