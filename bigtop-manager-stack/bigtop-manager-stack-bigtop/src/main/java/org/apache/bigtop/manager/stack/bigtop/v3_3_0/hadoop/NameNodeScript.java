@@ -79,9 +79,6 @@ public class NameNodeScript extends AbstractServerScript {
         }
     }
 
-    /**
-     * 在启用 HA 流程中由 server 侧通过 custom command 调用：初始化 shared edits
-     */
     public ShellResult initializeSharedEdits(Params params) {
         configure(params);
         HadoopParams hadoopParams = (HadoopParams) params;
@@ -96,8 +93,7 @@ public class NameNodeScript extends AbstractServerScript {
 
         String cmd = MessageFormat.format(
                 "{0}/hdfs --config {1} namenode -initializeSharedEdits -nonInteractive",
-                hadoopParams.binDir(),
-                hadoopParams.confDir());
+                hadoopParams.binDir(), hadoopParams.confDir());
         try {
             return LinuxOSUtils.sudoExecCmd(cmd, hadoopParams.user());
         } catch (Exception e) {
@@ -105,9 +101,6 @@ public class NameNodeScript extends AbstractServerScript {
         }
     }
 
-    /**
-     * 在启用 HA 流程中由 server 侧通过 custom command 调用：bootstrap standby
-     */
     public ShellResult bootstrapStandby(Params params) {
         configure(params);
         HadoopParams hadoopParams = (HadoopParams) params;
