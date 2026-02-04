@@ -22,10 +22,6 @@ import org.apache.bigtop.manager.server.model.dto.CommandDTO;
 import org.apache.bigtop.manager.server.model.req.EnableYarnRmHaReq;
 
 public interface YarnHaService {
-
-    /**
-     * 启用 YARN ResourceManager HA：写入 yarn-site 推荐 key，并触发 service configure/restart。
-     */
     CommandDTO buildEnableYarnRmHaCommand(Long clusterId, Long serviceId, EnableYarnRmHaReq req);
 }
 
