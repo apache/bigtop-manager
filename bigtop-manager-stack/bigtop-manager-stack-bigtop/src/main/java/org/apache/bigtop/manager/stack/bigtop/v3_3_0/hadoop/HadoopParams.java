@@ -49,16 +49,11 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class HadoopParams extends BigtopParams {
 
-    /**
-     * nameservice 默认值为 nameservice1；当配置中存在 dfs.nameservices 时优先使用。
-     * 这样在“单 NN -> 启用 HA”流程中前端修改 nameservice 后，只要写入配置即可生效。
-     */
     private String resolveNameService() {
         try {
             Map<String, Object> hdfsSite = LocalSettings.configurations(getServiceName(), "hdfs-site");
             Object ns = hdfsSite.get("dfs.nameservices");
             if (ns != null && StringUtils.isNotBlank(ns.toString())) {
-                // 若包含逗号（多 nameservice），当前仅取第一个
                 return ns.toString().split("\\s*,\\s*")[0].trim();
             }
         } catch (Exception e) {
@@ -148,8 +143,7 @@ public class HadoopParams extends BigtopParams {
         } else if (!namenodeList.isEmpty() && namenodeList.size() == 2) {
             String nameservice = resolveNameService();
             coreSite.put(
-                    "fs.defaultFS",
-                    ((String) coreSite.get("fs.defaultFS")).replace("localhost:8020", nameservice));
+                    "fs.defaultFS", ((String) coreSite.get("fs.defaultFS")).replace("localhost:8020", nameservice));
             coreSite.put("ha.zookeeper.quorum", zkString);
         }
         return coreSite;
@@ -182,7 +176,9 @@ public class HadoopParams extends BigtopParams {
             // During enable-ha bootstrap, journalnode components may be in the process of being installed,
             // so allow falling back when journalnode list is not ready yet.
             if (journalNodeList == null || journalNodeList.size() < 3) {
-                log.warn("JournalNode host list is not ready (size < 3), skip HA hdfs-site generation for now and fall back to non-HA config. journalNodeList={}", journalNodeList);
+                log.warn(
+                        "JournalNode host list is not ready (size < 3), skip HA hdfs-site generation for now and fall back to non-HA config. journalNodeList={}",
+                        journalNodeList);
                 haByConfig = false;
             }
 
@@ -192,12 +188,15 @@ public class HadoopParams extends BigtopParams {
                     .distinct()
                     .toList();
             if (filteredJournalNodes.size() < 3) {
-                log.warn("JournalNode host list is invalid after filtering blanks (size < 3), skip HA hdfs-site generation for now and fall back to non-HA config. journalNodeList={} filteredJournalNodes={}",
-                        journalNodeList, filteredJournalNodes);
+                log.warn(
+                        "JournalNode host list is invalid after filtering blanks (size < 3), skip HA hdfs-site generation for now and fall back to non-HA config. journalNodeList={} filteredJournalNodes={}",
+                        journalNodeList,
+                        filteredJournalNodes);
                 haByConfig = false;
             }
 
-            String journalQuorum = filteredJournalNodes.stream().map(x -> x + ":8485").collect(Collectors.joining(";"));
+            String journalQuorum =
+                    filteredJournalNodes.stream().map(x -> x + ":8485").collect(Collectors.joining(";"));
 
             // 清理单机模式可能存在的 key，避免与 HA 配置混杂
             hdfsSite.remove("dfs.namenode.rpc-address");
@@ -207,7 +206,7 @@ public class HadoopParams extends BigtopParams {
             hdfsSite.put("dfs.ha.automatic-failover.enabled", "true");
             hdfsSite.put("dfs.nameservices", nameservice);
             if (hdfsSite.get("dfs.ha.namenodes." + nameservice) == null) {
-            hdfsSite.put("dfs.ha.namenodes." + nameservice, "nn1,nn2");
+                hdfsSite.put("dfs.ha.namenodes." + nameservice, "nn1,nn2");
             }
             hdfsSite.put("dfs.namenode.shared.edits.dir", "qjournal://" + journalQuorum + "/" + nameservice);
 
@@ -215,34 +214,34 @@ public class HadoopParams extends BigtopParams {
             if (hdfsSite.get("dfs.namenode.rpc-address." + nameservice + ".nn1") == null
                     && namenodeList != null
                     && namenodeList.size() >= 1) {
-            hdfsSite.put("dfs.namenode.rpc-address." + nameservice + ".nn1", namenodeList.get(0) + ":8020");
+                hdfsSite.put("dfs.namenode.rpc-address." + nameservice + ".nn1", namenodeList.get(0) + ":8020");
             }
             if (hdfsSite.get("dfs.namenode.rpc-address." + nameservice + ".nn2") == null
                     && namenodeList != null
                     && namenodeList.size() >= 2) {
-            hdfsSite.put("dfs.namenode.rpc-address." + nameservice + ".nn2", namenodeList.get(1) + ":8020");
+                hdfsSite.put("dfs.namenode.rpc-address." + nameservice + ".nn2", namenodeList.get(1) + ":8020");
             }
             if (hdfsSite.get("dfs.namenode.http-address." + nameservice + ".nn1") == null
                     && namenodeList != null
                     && namenodeList.size() >= 1) {
-            hdfsSite.put("dfs.namenode.http-address." + nameservice + ".nn1", namenodeList.get(0) + ":9870");
+                hdfsSite.put("dfs.namenode.http-address." + nameservice + ".nn1", namenodeList.get(0) + ":9870");
             }
             if (hdfsSite.get("dfs.namenode.http-address." + nameservice + ".nn2") == null
                     && namenodeList != null
                     && namenodeList.size() >= 2) {
-            hdfsSite.put("dfs.namenode.http-address." + nameservice + ".nn2", namenodeList.get(1) + ":9870");
+                hdfsSite.put("dfs.namenode.http-address." + nameservice + ".nn2", namenodeList.get(1) + ":9870");
             }
 
             if (hdfsSite.get("dfs.client.failover.proxy.provider." + nameservice) == null) {
-            hdfsSite.put(
-                    "dfs.client.failover.proxy.provider." + nameservice,
-                    "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider");
+                hdfsSite.put(
+                        "dfs.client.failover.proxy.provider." + nameservice,
+                        "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider");
             }
             if (hdfsSite.get("dfs.ha.fencing.methods") == null) {
-            hdfsSite.put("dfs.ha.fencing.methods", "shell(/bin/true)");
+                hdfsSite.put("dfs.ha.fencing.methods", "shell(/bin/true)");
             }
             if (hdfsSite.get("dfs.replication") == null) {
-            hdfsSite.put("dfs.replication", "3");
+                hdfsSite.put("dfs.replication", "3");
             }
 
         } else if (namenodeList != null && !namenodeList.isEmpty()) {
@@ -274,9 +273,9 @@ public class HadoopParams extends BigtopParams {
         dfsDataDir = (String) hdfsSite.get("dfs.datanode.data.dir");
         dfsNameNodeDir = (String) hdfsSite.get("dfs.namenode.name.dir");
         if (StringUtils.isNotBlank(dfsNameNodeDir)) {
-        nameNodeFormattedDirs = Arrays.stream(dfsNameNodeDir.split(","))
-                .map(x -> x + "/namenode-formatted/")
-                .toList();
+            nameNodeFormattedDirs = Arrays.stream(dfsNameNodeDir.split(","))
+                    .map(x -> x + "/namenode-formatted/")
+                    .toList();
         } else {
             nameNodeFormattedDirs = List.of();
             log.warn("dfs.namenode.name.dir is empty, skip namenode formatted dirs generation");
@@ -296,13 +295,13 @@ public class HadoopParams extends BigtopParams {
         }
         String journalHttpAddress = (String) hdfsSite.get("dfs.namenode.shared.edits.dir");
         if (StringUtils.isNotBlank(journalHttpAddress)) {
-        Pattern pattern = Pattern.compile(":(\\d{1,5})");
-        Matcher matcher = pattern.matcher(journalHttpAddress);
-        if (matcher.find()) {
-            journalHttpPort = matcher.group(1);
-            log.info("find jounalnode port: " + journalHttpPort);
-        } else {
-            log.warn("not found journalnode port!");
+            Pattern pattern = Pattern.compile(":(\\d{1,5})");
+            Matcher matcher = pattern.matcher(journalHttpAddress);
+            if (matcher.find()) {
+                journalHttpPort = matcher.group(1);
+                log.info("find jounalnode port: " + journalHttpPort);
+            } else {
+                log.warn("not found journalnode port!");
             }
         } else {
             log.warn("dfs.namenode.shared.edits.dir is empty, skip journalnode port parsing");
@@ -335,7 +334,8 @@ public class HadoopParams extends BigtopParams {
         boolean haEnabledByConfig = false;
         Object haEnabledValue = yarnSite.get("yarn.resourcemanager.ha.enabled");
         if (haEnabledValue != null) {
-            haEnabledByConfig = "true".equalsIgnoreCase(haEnabledValue.toString().trim());
+            haEnabledByConfig =
+                    "true".equalsIgnoreCase(haEnabledValue.toString().trim());
         }
         boolean haMode = (resourcemanagerList != null && resourcemanagerList.size() >= 2) || haEnabledByConfig;
 
@@ -358,7 +358,8 @@ public class HadoopParams extends BigtopParams {
 
             // cluster-id: Respect if set by server, otherwise provide a stable default
             if (yarnSite.get("yarn.resourcemanager.cluster-id") == null
-                    || StringUtils.isBlank(yarnSite.get("yarn.resourcemanager.cluster-id").toString())) {
+                    || StringUtils.isBlank(
+                            yarnSite.get("yarn.resourcemanager.cluster-id").toString())) {
                 yarnSite.put("yarn.resourcemanager.cluster-id", "yarn-cluster");
             }
 
@@ -409,15 +410,8 @@ public class HadoopParams extends BigtopParams {
             generateHaAddress(yarnSite, "yarn.resourcemanager.address", rm1Id, rm1Host, rm2Id, rm2Host, 8032);
             generateHaAddress(yarnSite, "yarn.resourcemanager.admin.address", rm1Id, rm1Host, rm2Id, rm2Host, 8033);
             generateHaAddress(
-                    yarnSite,
-                    "yarn.resourcemanager.resource-tracker.address",
-                    rm1Id,
-                    rm1Host,
-                    rm2Id,
-                    rm2Host,
-                    8031);
-            generateHaAddress(
-                    yarnSite, "yarn.resourcemanager.scheduler.address", rm1Id, rm1Host, rm2Id, rm2Host, 8030);
+                    yarnSite, "yarn.resourcemanager.resource-tracker.address", rm1Id, rm1Host, rm2Id, rm2Host, 8031);
+            generateHaAddress(yarnSite, "yarn.resourcemanager.scheduler.address", rm1Id, rm1Host, rm2Id, rm2Host, 8030);
 
             // Remove single-RM keys to avoid conflicts
             yarnSite.remove("yarn.resourcemanager.hostname");
