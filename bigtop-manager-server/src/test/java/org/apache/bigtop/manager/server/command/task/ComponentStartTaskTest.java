@@ -91,12 +91,16 @@ public class ComponentStartTaskTest {
         ComponentDTO componentDTO = new ComponentDTO();
         componentDTO.setName("TestComponentName");
         componentDTO.setDisplayName("TestComponentDisplayName");
-        stackUtilsMocked.when(() -> StackUtils.getComponentDTO("TestComponentName")).thenReturn(componentDTO);
-        
+        stackUtilsMocked
+                .when(() -> StackUtils.getComponentDTO("TestComponentName"))
+                .thenReturn(componentDTO);
+
         StackDTO stackDTO = new StackDTO();
         stackDTO.setStackName("test-stack");
         stackDTO.setStackVersion("1.0.0");
-        stackUtilsMocked.when(() -> StackUtils.getServiceStack("TestServiceName")).thenReturn(stackDTO);
+        stackUtilsMocked
+                .when(() -> StackUtils.getServiceStack("TestServiceName"))
+                .thenReturn(stackDTO);
 
         componentStartTask = mock(ComponentStartTask.class);
 
@@ -141,6 +145,12 @@ public class ComponentStartTaskTest {
     @Test
     public void testOnSuccess() {
         doCallRealMethod().when(componentStartTask).onSuccess();
+
+        // Mock hostDao.findByHostname to avoid Host not found exception
+        HostPO hostPO = new HostPO();
+        hostPO.setId(1L);
+        hostPO.setHostname("TestHostname");
+        when(hostDao.findByHostname("TestHostname")).thenReturn(hostPO);
 
         List<ComponentPO> componentPOS = new ArrayList<>();
         ComponentPO existing = new ComponentPO();
