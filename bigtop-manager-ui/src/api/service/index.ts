@@ -80,13 +80,13 @@ export interface EnableYarnRmHaReq {
   activeResourceManagerHost: string
   /** rm2 host */
   standbyResourceManagerHost: string
-  /** yarn.resourcemanager.ha.rm-ids，例如 rm1,rm2 */
+  /** yarn.resourcemanager.ha.rm-ids，rm1,rm2 */
   rmIds: string[]
   /** yarn.resourcemanager.cluster-id */
   yarnClusterId: string
-  /** zookeeper service id（兼容旧逻辑） */
+  /** zookeeper service id */
   zookeeperServiceId?: number
-  /** zookeeper hosts（推荐，优先使用） */
+  /** zookeeper hosts */
   zookeeperHosts?: string[]
 }
 
