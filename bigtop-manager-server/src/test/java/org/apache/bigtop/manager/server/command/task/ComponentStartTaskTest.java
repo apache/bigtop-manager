@@ -95,9 +95,7 @@ public class ComponentStartTaskTest {
                 .when(() -> StackUtils.getComponentDTO("TestComponentName"))
                 .thenReturn(componentDTO);
 
-        StackDTO stackDTO = new StackDTO();
-        stackDTO.setStackName("test-stack");
-        stackDTO.setStackVersion("1.0.0");
+        StackDTO stackDTO = new StackDTO("test-stack", "1.0.0");
         stackUtilsMocked
                 .when(() -> StackUtils.getServiceStack("TestServiceName"))
                 .thenReturn(stackDTO);
