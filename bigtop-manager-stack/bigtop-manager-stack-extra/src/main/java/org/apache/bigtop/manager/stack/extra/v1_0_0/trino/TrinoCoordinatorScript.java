@@ -18,9 +18,10 @@
  */
 package org.apache.bigtop.manager.stack.extra.v1_0_0.trino;
 
+import org.apache.bigtop.manager.stack.core.spi.script.Script;
+
 import com.google.auto.service.AutoService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.bigtop.manager.stack.core.spi.script.Script;
 
 @Slf4j
 @AutoService(Script.class)

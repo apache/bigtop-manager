@@ -18,12 +18,14 @@
  */
 package org.apache.bigtop.manager.stack.core.tarball;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.bigtop.manager.stack.core.exception.StackException;
+
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
+
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
