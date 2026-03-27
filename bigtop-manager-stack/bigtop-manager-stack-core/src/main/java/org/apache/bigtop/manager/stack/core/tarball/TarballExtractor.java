@@ -126,7 +126,7 @@ public class TarballExtractor {
         try {
             Files.createSymbolicLink(linkPath, targetLink);
         } catch (IOException e) {
-            log.error("Failed to create symbolic link from {} to {}", new Object[]{linkPath, targetLink, e});
+            log.error("Failed to create symbolic link from {} to {}", new Object[] {linkPath, targetLink, e});
             throw new StackException(e);
         }
     }
@@ -137,7 +137,7 @@ public class TarballExtractor {
         try {
             Files.createLink(linkPath, targetLink);
         } catch (IOException e) {
-            log.error("Failed to create link from {} to {}", new Object[]{linkPath, targetLink, e});
+            log.error("Failed to create link from {} to {}", new Object[] {linkPath, targetLink, e});
             throw new StackException(e);
         }
     }
