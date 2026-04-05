@@ -42,6 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
 @Slf4j
@@ -75,6 +76,10 @@ public abstract class AbstractJob implements Job {
         if (CollectionUtils.isEmpty(stages)) {
             throw new ApiException(ApiExceptionEnum.JOB_HAS_NO_STAGES);
         }
+
+        for (Stage stage : stages) {
+            stage.init();
+        }
     }
 
     protected void injectBeans() {
@@ -91,6 +96,26 @@ public abstract class AbstractJob implements Job {
     }
 
     protected abstract void createStages();
+
+    protected Map<String, List<String>> buildOverrideComponentHosts() {
+        Map<String, List<String>> m = new java.util.HashMap<>();
+        if (jobContext == null
+                || jobContext.getCommandDTO() == null
+                || jobContext.getCommandDTO().getComponentCommands() == null) {
+            return m;
+        }
+        for (org.apache.bigtop.manager.server.model.dto.command.ComponentCommandDTO cc :
+                jobContext.getCommandDTO().getComponentCommands()) {
+            if (cc == null
+                    || cc.getComponentName() == null
+                    || cc.getHostnames() == null
+                    || cc.getHostnames().isEmpty()) {
+                continue;
+            }
+            m.put(cc.getComponentName().toLowerCase(), cc.getHostnames());
+        }
+        return m;
+    }
 
     @Override
     public void beforeRun() {
@@ -113,7 +138,7 @@ public abstract class AbstractJob implements Job {
                     .flatMap(List::stream)
                     .distinct()
                     .toList();
-            JobCacheHelper.sendJobCache(jobPO.getId(), hostnames);
+            JobCacheHelper.sendJobCache(jobPO.getId(), hostnames, buildOverrideComponentHosts());
 
             LinkedBlockingQueue<Stage> queue = new LinkedBlockingQueue<>(stages);
             while (!queue.isEmpty()) {

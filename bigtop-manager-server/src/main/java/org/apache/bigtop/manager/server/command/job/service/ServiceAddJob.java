@@ -43,11 +43,14 @@ import org.apache.bigtop.manager.server.utils.StackUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 public class ServiceAddJob extends AbstractServiceJob {
 
     public ServiceAddJob(JobContext jobContext) {
@@ -159,17 +162,28 @@ public class ServiceAddJob extends AbstractServiceJob {
         // Persist services
         StackDTO stackDTO = StackUtils.getServiceStack(serviceName);
         ServiceDTO serviceDTO = StackUtils.getServiceDTO(serviceName);
-        ServicePO servicePO = ServiceConverter.INSTANCE.fromDTO2PO(serviceDTO);
-        servicePO.setClusterId(clusterId);
-        servicePO.setStack(StackUtils.getFullStackName(stackDTO));
-        servicePO.setStatus(HealthyStatusEnum.UNHEALTHY.getCode());
-        serviceDao.save(servicePO);
+        ServicePO servicePO = serviceDao.findByClusterIdAndName(clusterId, serviceName);
+        if (servicePO == null) {
+            servicePO = ServiceConverter.INSTANCE.fromDTO2PO(serviceDTO);
+            servicePO.setClusterId(clusterId);
+            servicePO.setStack(StackUtils.getFullStackName(stackDTO));
+            servicePO.setStatus(HealthyStatusEnum.UNHEALTHY.getCode());
+            serviceDao.save(servicePO);
+        } else {
+            log.warn("Service [{}] already exists in cluster [{}], skipping creation.", serviceName, clusterId);
+        }
 
         // Persist components
         List<ComponentPO> componentPOList = new ArrayList<>();
         for (ComponentHostDTO componentHostDTO : serviceCommand.getComponentHosts()) {
             String componentName = componentHostDTO.getComponentName();
-            List<HostPO> hostPOList = hostDao.findAllByHostnames(componentHostDTO.getHostnames());
+            List<String> hostnames = componentHostDTO.getHostnames();
+            if (CollectionUtils.isEmpty(hostnames)) {
+                log.info("Skipping component [{}] because no hosts are assigned.", componentName);
+                continue;
+            }
+
+            List<HostPO> hostPOList = hostDao.findAllByHostnames(hostnames);
 
             for (HostPO hostPO : hostPOList) {
                 ComponentDTO componentDTO = StackUtils.getComponentDTO(componentName);

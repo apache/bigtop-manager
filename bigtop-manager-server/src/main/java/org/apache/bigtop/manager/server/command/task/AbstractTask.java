@@ -25,6 +25,7 @@ import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.po.TaskPO;
 import org.apache.bigtop.manager.dao.repository.HostDao;
 import org.apache.bigtop.manager.dao.repository.TaskDao;
+import org.apache.bigtop.manager.server.holder.SessionUserHolder;
 import org.apache.bigtop.manager.server.holder.SpringContextHolder;
 
 import lombok.extern.slf4j.Slf4j;
@@ -62,6 +63,9 @@ public abstract class AbstractTask implements Task {
 
     @Override
     public void beforeRun() {
+        if (taskContext.getOperatorId() != null && SessionUserHolder.getUserId() == null) {
+            SessionUserHolder.setUserId(taskContext.getOperatorId());
+        }
         taskPO.setState(JobState.PROCESSING.getName());
         taskDao.partialUpdateById(taskPO);
     }

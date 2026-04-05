@@ -74,10 +74,27 @@ public class ComponentStatusTimer {
 
             ComponentPO componentDetailsPO = componentDao.findDetailsById(componentPO.getId());
             HostPO hostPO = hostDao.findById(componentPO.getHostId());
+            if (hostPO == null) {
+                log.warn(
+                        "Component [{}] has an invalid hostId [{}], skipping status check.",
+                        componentPO.getName(),
+                        componentPO.getHostId());
+                continue;
+            }
+
+            String stack = componentDetailsPO.getStack();
+            if (stack == null || !stack.contains("-")) {
+                log.warn(
+                        "Component [{}] on host [{}] has invalid stack: [{}], skipping status check.",
+                        componentPO.getName(),
+                        hostPO.getHostname(),
+                        stack);
+                continue;
+            }
+
             ComponentStatusRequest request = ComponentStatusRequest.newBuilder()
-                    .setStackName(
-                            CaseUtils.toLowerCase(componentDetailsPO.getStack().split("-")[0]))
-                    .setStackVersion(componentDetailsPO.getStack().split("-")[1])
+                    .setStackName(CaseUtils.toLowerCase(stack.split("-")[0]))
+                    .setStackVersion(stack.split("-")[1])
                     .setServiceName(componentDetailsPO.getServiceName())
                     .setServiceUser(componentDetailsPO.getServiceUser())
                     .setComponentName(componentDetailsPO.getName())
@@ -99,8 +116,9 @@ public class ComponentStatusTimer {
         componentDao.partialUpdateByIds(componentPOList);
 
         // Update services
-        Map<Long, List<ComponentPO>> componentPOMap =
-                componentPOList.stream().collect(Collectors.groupingBy(ComponentPO::getServiceId));
+        Map<Long, List<ComponentPO>> componentPOMap = componentPOList.stream()
+                .filter(c -> c.getServiceId() != null)
+                .collect(Collectors.groupingBy(ComponentPO::getServiceId));
         for (Map.Entry<Long, List<ComponentPO>> entry : componentPOMap.entrySet()) {
             Long serviceId = entry.getKey();
             List<ComponentPO> components = entry.getValue();

@@ -25,6 +25,8 @@ import java.util.List;
 
 public interface Stage {
 
+    void init();
+
     String getName();
 
     void beforeRun();

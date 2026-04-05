@@ -295,7 +295,13 @@ export const useJobProgress = defineStore('job-progress', () => {
     })
   }
 
+  const trackJob = (clusterId: number, jobId: number, name: string, nextAction?: (...args: any[]) => void) => {
+    progressMap.set(jobId, Object.assign({ clusterId, jobId, name }, jobStageProgress.value.processing()))
+    openNotification({ jobId, clusterId, name }, nextAction)
+  }
+
   return {
-    processCommand
+    processCommand,
+    trackJob
   }
 })

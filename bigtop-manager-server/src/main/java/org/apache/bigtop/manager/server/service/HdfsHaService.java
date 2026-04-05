@@ -16,38 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.bigtop.manager.server.command.task;
+package org.apache.bigtop.manager.server.service;
 
-import lombok.Data;
+import org.apache.bigtop.manager.server.model.req.EnableHdfsHaReq;
 
-import java.util.Map;
-
-@Data
-public class TaskContext {
-
-    private Long clusterId;
-
-    private String clusterName;
-
-    private String hostname;
-
-    private Long operatorId;
-
-    private Long serviceId;
-
-    private String serviceName;
-
-    private String serviceUser;
-
-    private String componentName;
-
-    // This is for display purpose for task info(eg. task name) only
-    private String componentDisplayName;
-
-    private String userGroup;
-
-    private String rootDir;
-
-    // Extra properties for specific tasks
-    protected Map<String, Object> properties;
+public interface HdfsHaService {
+    org.apache.bigtop.manager.server.model.vo.CommandVO buildEnableHdfsHaCommand(
+            Long clusterId, Long serviceId, EnableHdfsHaReq req);
 }

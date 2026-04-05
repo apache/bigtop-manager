@@ -63,39 +63,57 @@ public class NameNodeScript extends AbstractServerScript {
         HadoopParams hadoopParams = (HadoopParams) params;
         String hostname = hadoopParams.hostname();
         List<String> namenodeList = LocalSettings.componentHosts("namenode");
-        try {
-            if (namenodeList != null && !namenodeList.isEmpty() && hostname.equals(namenodeList.get(0))) {
-                HadoopSetup.formatNameNode(hadoopParams);
-                String startCmd = MessageFormat.format("{0}/hdfs --daemon start namenode", hadoopParams.binDir());
-                ShellResult result = LinuxOSUtils.sudoExecCmd(startCmd, hadoopParams.user());
-                if (result.getExitCode() != 0) {
-                    throw new StackException("Failed to start primary NameNode: " + result.getErrMsg());
-                }
-                return result;
-            } else if (namenodeList != null && namenodeList.size() >= 2 && hostname.equals(namenodeList.get(1))) {
-                boolean isPrimaryReady = waitForNameNodeReady(namenodeList.get(0), hadoopParams);
-                if (!isPrimaryReady) {
-                    throw new StackException("Primary NameNode is not ready, cannot bootstrap standby");
-                }
-                String bootstrapCmd = MessageFormat.format(
-                        "{0}/hdfs namenode -bootstrapStandby -nonInteractive", hadoopParams.binDir());
-                ShellResult bootstrapResult = LinuxOSUtils.sudoExecCmd(bootstrapCmd, hadoopParams.user());
-                if (bootstrapResult.getExitCode() != 0) {
-                    throw new StackException("Failed to bootstrap standby NameNode: " + bootstrapResult.getErrMsg());
-                }
+        // The first namenode in the list is the one that formats the cluster.
+        if (namenodeList != null && !namenodeList.isEmpty() && hostname.equals(namenodeList.get(0))) {
+            // Only format if not already formatted.
+            HadoopSetup.formatNameNode(hadoopParams);
+        }
 
-                String startCmd = MessageFormat.format("{0}/hdfs --daemon start namenode", hadoopParams.binDir());
-                ShellResult startResult = LinuxOSUtils.sudoExecCmd(startCmd, hadoopParams.user());
-                if (startResult.getExitCode() != 0) {
-                    throw new StackException("Failed to start standby NameNode: " + startResult.getErrMsg());
-                }
-                return startResult;
-            } else {
-                throw new StackException("Current host is not in NameNode HA list: " + hostname);
+        // For both active and standby, the start command is the same.
+        // The role is determined by ZKFC at runtime.
+        String startCmd = MessageFormat.format("{0}/hdfs --daemon start namenode", hadoopParams.binDir());
+        try {
+            return LinuxOSUtils.sudoExecCmd(startCmd, hadoopParams.user());
+        } catch (Exception e) {
+            throw new StackException(e);
+        }
+    }
+
+    public ShellResult initializeSharedEdits(Params params) {
+        configure(params);
+        HadoopParams hadoopParams = (HadoopParams) params;
+        try {
+            boolean allJnReachable = HadoopSetup.checkAllJournalNodesPortReachable(hadoopParams);
+            if (!allJnReachable) {
+                throw new StackException("Cannot initializeSharedEdits: Some JournalNodes are unreachable.");
             }
         } catch (Exception e) {
             throw new StackException(e);
         }
+
+        String cmd = MessageFormat.format(
+                "{0}/hdfs --config {1} namenode -initializeSharedEdits -nonInteractive",
+                hadoopParams.binDir(), hadoopParams.confDir());
+        try {
+            return LinuxOSUtils.sudoExecCmd(cmd, hadoopParams.user());
+        } catch (Exception e) {
+            throw new StackException(e);
+        }
+    }
+
+    public ShellResult bootstrapStandby(Params params) {
+        configure(params);
+        HadoopParams hadoopParams = (HadoopParams) params;
+        try {
+            return bootstrapStandby(hadoopParams);
+        } catch (Exception e) {
+            throw new StackException(e);
+        }
+    }
+
+    private ShellResult bootstrapStandby(HadoopParams hadoopParams) throws Exception {
+        String cmd = MessageFormat.format("{0}/hdfs namenode -bootstrapStandby -nonInteractive", hadoopParams.binDir());
+        return LinuxOSUtils.sudoExecCmd(cmd, hadoopParams.user());
     }
 
     private boolean waitForNameNodeReady(String namenodeHost, HadoopParams hadoopParams) {

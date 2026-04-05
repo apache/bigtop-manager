@@ -212,7 +212,7 @@ CREATE TABLE `job`
 (
     `id`          BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
     `name`        VARCHAR(255),
-    `context`     TEXT    NOT NULL,
+    `context`     LONGTEXT    NOT NULL,
     `state`       VARCHAR(32) NOT NULL,
     `cluster_id`  BIGINT(20) UNSIGNED DEFAULT NULL,
     `create_time` DATETIME    DEFAULT CURRENT_TIMESTAMP,
@@ -226,10 +226,10 @@ CREATE TABLE `job`
 CREATE TABLE `stage`
 (
     `id`             BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `name`           VARCHAR(32) NOT NULL,
+    `name`           VARCHAR(255) NOT NULL,
     `service_name`   VARCHAR(255),
     `component_name` VARCHAR(255),
-    `context`        TEXT,
+    `context`        LONGTEXT,
     `order`          INTEGER,
     `state`          VARCHAR(32) NOT NULL,
     `cluster_id`     BIGINT(20) UNSIGNED DEFAULT NULL,
@@ -253,7 +253,7 @@ CREATE TABLE `task`
     `component_name`  VARCHAR(255),
     `command`         VARCHAR(255),
     `custom_command`  VARCHAR(255),
-    `content`         TEXT,
+    `content`         LONGTEXT,
     `context`         TEXT NOT NULL,
     `state`           VARCHAR(255),
     `cluster_id`      BIGINT,

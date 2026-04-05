@@ -73,10 +73,20 @@ public class StackExecutor {
             String command = payload.getCommand().equalsIgnoreCase(Command.CUSTOM.getCode())
                     ? payload.getCustomCommand()
                     : payload.getCommand();
+            if (command == null || command.isBlank()) {
+                throw new StackException("CUSTOM command requires non-blank customCommand, payload: {0}", payload);
+            }
             Script script = getCommandScript(payload);
 
             String methodName = CaseUtils.toCamelCase(command, CaseUtils.SEPARATOR_UNDERSCORE, false);
-            Method method = script.getClass().getMethod(methodName, Params.class);
+            Method method;
+            try {
+                method = script.getClass().getMethod(methodName, Params.class);
+            } catch (NoSuchMethodException e) {
+                // Backward/forward compatibility: allow customCommand to be already in camelCase.
+                methodName = command;
+                method = script.getClass().getMethod(methodName, Params.class);
+            }
 
             Params params = PARAMS_MAP
                     .get(payload.getServiceName())

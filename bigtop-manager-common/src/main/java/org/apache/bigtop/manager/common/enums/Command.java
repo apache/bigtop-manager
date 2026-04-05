@@ -39,6 +39,8 @@ public enum Command {
     CHECK("check", "Check"),
     CONFIGURE("configure", "Configure"),
     CUSTOM("custom", "Custom"),
+    ENABLE_YARN_RM_HA("enable-yarn-rm-ha", "EnableYarnRmHa"),
+    ENABLE_HDFS_HA("enable-hdfs-ha", "EnableHdfsHa"),
 
     // Internal use only, not available for API call
     INIT("init", "Init"),

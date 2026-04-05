@@ -41,12 +41,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Getter
 @Slf4j
 @AutoService(Params.class)
 @NoArgsConstructor
 public class HadoopParams extends BigtopParams {
+
+    private String resolveNameService() {
+        try {
+            Map<String, Object> hdfsSite = LocalSettings.configurations(getServiceName(), "hdfs-site");
+            Object ns = hdfsSite.get("dfs.nameservices");
+            if (ns != null && StringUtils.isNotBlank(ns.toString())) {
+                return ns.toString().split("\\s*,\\s*")[0].trim();
+            }
+        } catch (Exception e) {
+            // ignore and fallback
+        }
+        return "nameservice1";
+    }
 
     private final String hadoopLogDir = "/var/log/hadoop";
     private final String hadoopPidDir = "/var/run/hadoop";
@@ -127,8 +141,9 @@ public class HadoopParams extends BigtopParams {
             coreSite.put(
                     "fs.defaultFS", ((String) coreSite.get("fs.defaultFS")).replace("localhost", namenodeList.get(0)));
         } else if (!namenodeList.isEmpty() && namenodeList.size() == 2) {
+            String nameservice = resolveNameService();
             coreSite.put(
-                    "fs.defaultFS", ((String) coreSite.get("fs.defaultFS")).replace("localhost:8020", "nameservice1"));
+                    "fs.defaultFS", ((String) coreSite.get("fs.defaultFS")).replace("localhost:8020", nameservice));
             coreSite.put("ha.zookeeper.quorum", zkString);
         }
         return coreSite;
@@ -144,36 +159,111 @@ public class HadoopParams extends BigtopParams {
         Map<String, Object> hdfsSite = LocalSettings.configurations(getServiceName(), "hdfs-site");
         List<String> namenodeList = LocalSettings.componentHosts("namenode");
         List<String> journalNodeList = LocalSettings.componentHosts("journalnode");
-        if (!namenodeList.isEmpty() && namenodeList.size() == 1) {
-            hdfsSite.put(
-                    "dfs.namenode.rpc-address",
-                    ((String) hdfsSite.get("dfs.namenode.rpc-address")).replace("0.0.0.0", namenodeList.get(0)));
-            hdfsSite.put(
-                    "dfs.datanode.https.address",
-                    ((String) hdfsSite.get("dfs.datanode.https.address")).replace("0.0.0.0", namenodeList.get(0)));
-            hdfsSite.put(
-                    "dfs.namenode.https-address",
-                    ((String) hdfsSite.get("dfs.namenode.https-address")).replace("0.0.0.0", namenodeList.get(0)));
-        } else if (!namenodeList.isEmpty() && namenodeList.size() == 2) {
+
+        String nameservice = resolveNameService();
+        boolean haByConfig = false;
+        Object haNn = hdfsSite.get("dfs.ha.namenodes." + nameservice);
+        Object haRpc1 = hdfsSite.get("dfs.namenode.rpc-address." + nameservice + ".nn1");
+        Object haRpc2 = hdfsSite.get("dfs.namenode.rpc-address." + nameservice + ".nn2");
+        if ((haNn != null && StringUtils.isNotBlank(haNn.toString()))
+                || (haRpc1 != null && StringUtils.isNotBlank(haRpc1.toString()))
+                || (haRpc2 != null && StringUtils.isNotBlank(haRpc2.toString()))) {
+            haByConfig = true;
+        }
+
+        if (haByConfig) {
+            // HA mode: do not rely on components.json namenode list, because it may be stale.
+            // During enable-ha bootstrap, journalnode components may be in the process of being installed,
+            // so allow falling back when journalnode list is not ready yet.
+            if (journalNodeList == null || journalNodeList.size() < 3) {
+                log.warn(
+                        "JournalNode host list is not ready (size < 3), skip HA hdfs-site generation for now and fall back to non-HA config. journalNodeList={}",
+                        journalNodeList);
+                haByConfig = false;
+            }
+
+            List<String> filteredJournalNodes = journalNodeList.stream()
+                    .filter(StringUtils::isNotBlank)
+                    .map(String::trim)
+                    .distinct()
+                    .toList();
+            if (filteredJournalNodes.size() < 3) {
+                log.warn(
+                        "JournalNode host list is invalid after filtering blanks (size < 3), skip HA hdfs-site generation for now and fall back to non-HA config. journalNodeList={} filteredJournalNodes={}",
+                        journalNodeList,
+                        filteredJournalNodes);
+                haByConfig = false;
+            }
+
+            String journalQuorum =
+                    filteredJournalNodes.stream().map(x -> x + ":8485").collect(Collectors.joining(";"));
+
+            hdfsSite.remove("dfs.namenode.rpc-address");
+            hdfsSite.remove("dfs.namenode.https-address");
             hdfsSite.remove("dfs.namenode.http-address");
+
             hdfsSite.put("dfs.ha.automatic-failover.enabled", "true");
-            hdfsSite.put("dfs.nameservices", "nameservice1");
-            hdfsSite.put("dfs.ha.namenodes.nameservice1", "nn1,nn2");
-            hdfsSite.put("dfs.namenode.rpc-address.nameservice1.nn1", namenodeList.get(0) + ":8020");
-            hdfsSite.put("dfs.namenode.rpc-address.nameservice1.nn2", namenodeList.get(1) + ":8020");
-            hdfsSite.put("dfs.namenode.http-address.nameservice1.nn1", namenodeList.get(0) + ":9870");
-            hdfsSite.put("dfs.namenode.http-address.nameservice1.nn2", namenodeList.get(1) + ":9870");
-            hdfsSite.put(
-                    "dfs.namenode.shared.edits.dir",
-                    "qjournal://" + journalNodeList.get(0) + ":8485;" + journalNodeList.get(1) + ":8485;"
-                            + journalNodeList.get(2) + ":8485" + "/nameservice1");
-            hdfsSite.put("dfs.journalnode.edits.dir", "/hadoop/dfs/journal");
-            hdfsSite.put(
-                    "dfs.client.failover.proxy.provider.nameservice1",
-                    "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider");
-            hdfsSite.put("dfs.journalnode.edits.dir", "/hadoop/dfs/journal");
-            hdfsSite.put("dfs.ha.fencing.methods", "shell(/bin/true)");
-            hdfsSite.put("dfs.replication", "3");
+            hdfsSite.put("dfs.nameservices", nameservice);
+            if (hdfsSite.get("dfs.ha.namenodes." + nameservice) == null) {
+                hdfsSite.put("dfs.ha.namenodes." + nameservice, "nn1,nn2");
+            }
+            hdfsSite.put("dfs.namenode.shared.edits.dir", "qjournal://" + journalQuorum + "/" + nameservice);
+
+            // Ensure required HA keys exist (respect existing values if present)
+            if (hdfsSite.get("dfs.namenode.rpc-address." + nameservice + ".nn1") == null
+                    && namenodeList != null
+                    && namenodeList.size() >= 1) {
+                hdfsSite.put("dfs.namenode.rpc-address." + nameservice + ".nn1", namenodeList.get(0) + ":8020");
+            }
+            if (hdfsSite.get("dfs.namenode.rpc-address." + nameservice + ".nn2") == null
+                    && namenodeList != null
+                    && namenodeList.size() >= 2) {
+                hdfsSite.put("dfs.namenode.rpc-address." + nameservice + ".nn2", namenodeList.get(1) + ":8020");
+            }
+            if (hdfsSite.get("dfs.namenode.http-address." + nameservice + ".nn1") == null
+                    && namenodeList != null
+                    && namenodeList.size() >= 1) {
+                hdfsSite.put("dfs.namenode.http-address." + nameservice + ".nn1", namenodeList.get(0) + ":9870");
+            }
+            if (hdfsSite.get("dfs.namenode.http-address." + nameservice + ".nn2") == null
+                    && namenodeList != null
+                    && namenodeList.size() >= 2) {
+                hdfsSite.put("dfs.namenode.http-address." + nameservice + ".nn2", namenodeList.get(1) + ":9870");
+            }
+
+            if (hdfsSite.get("dfs.client.failover.proxy.provider." + nameservice) == null) {
+                hdfsSite.put(
+                        "dfs.client.failover.proxy.provider." + nameservice,
+                        "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider");
+            }
+            if (hdfsSite.get("dfs.ha.fencing.methods") == null) {
+                hdfsSite.put("dfs.ha.fencing.methods", "shell(/bin/true)");
+            }
+            if (hdfsSite.get("dfs.replication") == null) {
+                hdfsSite.put("dfs.replication", "3");
+            }
+
+        } else if (namenodeList != null && !namenodeList.isEmpty()) {
+            // Single NN mode
+            String nnHost = namenodeList.get(0);
+
+            Object rpcAddr = hdfsSite.get("dfs.namenode.rpc-address");
+            if (rpcAddr == null) {
+                throw new IllegalArgumentException("Missing required hdfs-site key: dfs.namenode.rpc-address");
+            }
+            hdfsSite.put("dfs.namenode.rpc-address", rpcAddr.toString().replace("0.0.0.0", nnHost));
+
+            Object dnHttpsAddr = hdfsSite.get("dfs.datanode.https.address");
+            if (dnHttpsAddr == null) {
+                throw new IllegalArgumentException("Missing required hdfs-site key: dfs.datanode.https.address");
+            }
+            hdfsSite.put("dfs.datanode.https.address", dnHttpsAddr.toString().replace("0.0.0.0", nnHost));
+
+            Object nnHttpsAddr = hdfsSite.get("dfs.namenode.https-address");
+            if (nnHttpsAddr == null) {
+                throw new IllegalArgumentException("Missing required hdfs-site key: dfs.namenode.https-address");
+            }
+            hdfsSite.put("dfs.namenode.https-address", nnHttpsAddr.toString().replace("0.0.0.0", nnHost));
         }
 
         // Configure native library dependent settings
@@ -181,10 +271,21 @@ public class HadoopParams extends BigtopParams {
 
         dfsDataDir = (String) hdfsSite.get("dfs.datanode.data.dir");
         dfsNameNodeDir = (String) hdfsSite.get("dfs.namenode.name.dir");
-        nameNodeFormattedDirs = Arrays.stream(dfsNameNodeDir.split(","))
-                .map(x -> x + "/namenode-formatted/")
-                .toList();
-        String dfsHttpAddress = (String) hdfsSite.get("dfs.namenode.http-address.nameservice1.nn1");
+        if (StringUtils.isNotBlank(dfsNameNodeDir)) {
+            nameNodeFormattedDirs = Arrays.stream(dfsNameNodeDir.split(","))
+                    .map(x -> x + "/namenode-formatted/")
+                    .toList();
+        } else {
+            nameNodeFormattedDirs = List.of();
+            log.warn("dfs.namenode.name.dir is empty, skip namenode formatted dirs generation");
+        }
+
+        String resolvedNameService = resolveNameService();
+        String dfsHttpAddress = (String) hdfsSite.get("dfs.namenode.http-address." + resolvedNameService + ".nn1");
+        if (StringUtils.isBlank(dfsHttpAddress)) {
+            // backward compatibility / older templates
+            dfsHttpAddress = (String) hdfsSite.get("dfs.namenode.http-address.nameservice1.nn1");
+        }
         if (dfsHttpAddress != null && dfsHttpAddress.contains(":")) {
             String[] parts = dfsHttpAddress.split(":");
             if (parts.length >= 2) {
@@ -192,13 +293,17 @@ public class HadoopParams extends BigtopParams {
             }
         }
         String journalHttpAddress = (String) hdfsSite.get("dfs.namenode.shared.edits.dir");
-        Pattern pattern = Pattern.compile(":(\\d{1,5})");
-        Matcher matcher = pattern.matcher(journalHttpAddress);
-        if (matcher.find()) {
-            journalHttpPort = matcher.group(1);
-            log.info("find jounalnode port: " + journalHttpPort);
+        if (StringUtils.isNotBlank(journalHttpAddress)) {
+            Pattern pattern = Pattern.compile(":(\\d{1,5})");
+            Matcher matcher = pattern.matcher(journalHttpAddress);
+            if (matcher.find()) {
+                journalHttpPort = matcher.group(1);
+                log.info("find jounalnode port: " + journalHttpPort);
+            } else {
+                log.warn("not found journalnode port!");
+            }
         } else {
-            log.warn("not found journalnode port!");
+            log.warn("dfs.namenode.shared.edits.dir is empty, skip journalnode port parsing");
         }
         String dfsDomainSocketPath = (String) hdfsSite.get("dfs.domain.socket.path");
         if (StringUtils.isNotBlank(dfsDomainSocketPath)) {
@@ -220,32 +325,138 @@ public class HadoopParams extends BigtopParams {
     public Map<String, Object> yarnSite() {
         Map<String, Object> yarnSite = LocalSettings.configurations(getServiceName(), "yarn-site");
         List<String> resourcemanagerList = LocalSettings.componentHosts("resourcemanager");
-        if (!resourcemanagerList.isEmpty()) {
-            yarnSite.put("yarn.resourcemanager.hostname", MessageFormat.format("{0}", resourcemanagerList.get(0)));
-            yarnSite.put(
-                    "yarn.resourcemanager.resource-tracker.address",
-                    ((String) yarnSite.get("yarn.resourcemanager.resource-tracker.address"))
-                            .replace("0.0.0.0", resourcemanagerList.get(0)));
-            yarnSite.put(
-                    "yarn.resourcemanager.scheduler.address",
-                    ((String) yarnSite.get("yarn.resourcemanager.scheduler.address"))
-                            .replace("0.0.0.0", resourcemanagerList.get(0)));
-            yarnSite.put(
-                    "yarn.resourcemanager.address",
-                    ((String) yarnSite.get("yarn.resourcemanager.address"))
-                            .replace("0.0.0.0", resourcemanagerList.get(0)));
-            yarnSite.put(
-                    "yarn.resourcemanager.admin.address",
-                    ((String) yarnSite.get("yarn.resourcemanager.admin.address"))
-                            .replace("0.0.0.0", resourcemanagerList.get(0)));
-            yarnSite.put(
-                    "yarn.resourcemanager.webapp.address",
-                    ((String) yarnSite.get("yarn.resourcemanager.webapp.address"))
-                            .replace("0.0.0.0", resourcemanagerList.get(0)));
-            yarnSite.put(
-                    "yarn.resourcemanager.webapp.https.address",
-                    ((String) yarnSite.get("yarn.resourcemanager.webapp.https.address"))
-                            .replace("0.0.0.0", resourcemanagerList.get(0)));
+
+        // YARN ResourceManager HA
+        // When there are >= 2 RMs, or `yarn.resourcemanager.ha.enabled=true` is explicitly set,
+        // enter HA mode. In HA mode, do not set single-RM keys like `yarn.resourcemanager.hostname`
+        // to avoid conflicts.
+        boolean haEnabledByConfig = false;
+        Object haEnabledValue = yarnSite.get("yarn.resourcemanager.ha.enabled");
+        if (haEnabledValue != null) {
+            haEnabledByConfig =
+                    "true".equalsIgnoreCase(haEnabledValue.toString().trim());
+        }
+        boolean haMode = (resourcemanagerList != null && resourcemanagerList.size() >= 2) || haEnabledByConfig;
+
+        if (haMode && resourcemanagerList != null && resourcemanagerList.size() >= 2) {
+            String rm1Host = resourcemanagerList.get(0);
+            String rm2Host = resourcemanagerList.get(1);
+
+            // rm-ids: Use existing config if present, otherwise default to rm1,rm2
+            String rmIds = "rm1,rm2";
+            Object rmIdsObj = yarnSite.get("yarn.resourcemanager.ha.rm-ids");
+            if (rmIdsObj != null && StringUtils.isNotBlank(rmIdsObj.toString())) {
+                rmIds = rmIdsObj.toString().trim();
+            }
+            String[] rmIdArr = rmIds.split("\\s*,\\s*");
+            String rm1Id = rmIdArr.length > 0 && StringUtils.isNotBlank(rmIdArr[0]) ? rmIdArr[0] : "rm1";
+            String rm2Id = rmIdArr.length > 1 && StringUtils.isNotBlank(rmIdArr[1]) ? rmIdArr[1] : "rm2";
+
+            yarnSite.put("yarn.resourcemanager.ha.enabled", "true");
+            yarnSite.put("yarn.resourcemanager.ha.rm-ids", rm1Id + "," + rm2Id);
+
+            // cluster-id: Respect if set by server, otherwise provide a stable default
+            if (yarnSite.get("yarn.resourcemanager.cluster-id") == null
+                    || StringUtils.isBlank(
+                            yarnSite.get("yarn.resourcemanager.cluster-id").toString())) {
+                yarnSite.put("yarn.resourcemanager.cluster-id", "yarn-cluster");
+            }
+
+            // zk-address: Respect if set by server, otherwise auto-generate like in coreSite()
+            Object zkAddr = yarnSite.get("yarn.resourcemanager.zk-address");
+            if (zkAddr == null || StringUtils.isBlank(zkAddr.toString())) {
+                try {
+                    List<String> zookeeperServerHosts = LocalSettings.componentHosts("zookeeper_server");
+                    Map<String, Object> ZKPort = LocalSettings.configurations("zookeeper", "zoo.cfg");
+                    String clientPort = (String) ZKPort.get("clientPort");
+                    StringBuilder zkString = new StringBuilder();
+                    for (int i = 0; i < zookeeperServerHosts.size(); i++) {
+                        String host = zookeeperServerHosts.get(i);
+                        if (host == null || host.trim().isEmpty()) {
+                            continue;
+                        }
+                        zkString.append(host.trim()).append(":").append(clientPort);
+                        if (i != zookeeperServerHosts.size() - 1) {
+                            zkString.append(",");
+                        }
+                    }
+                    if (zkString.length() > 0) {
+                        yarnSite.put("yarn.resourcemanager.zk-address", zkString.toString());
+                    }
+                } catch (Exception e) {
+                    log.warn("Failed to auto-generate yarn.resourcemanager.zk-address", e);
+                }
+            }
+
+            // Set hostname.rmX
+            yarnSite.put("yarn.resourcemanager.hostname." + rm1Id, rm1Host);
+            yarnSite.put("yarn.resourcemanager.hostname." + rm2Id, rm2Host);
+
+            // webapp.address.rmX: Extract port from existing webapp.address, or default to 8088
+            int webappPort = 8088;
+            Object webappAddress = yarnSite.get("yarn.resourcemanager.webapp.address");
+            if (webappAddress != null && webappAddress.toString().contains(":")) {
+                try {
+                    String portStr = webappAddress.toString().split(":")[1].trim();
+                    webappPort = Integer.parseInt(portStr);
+                } catch (Exception ignored) {
+                }
+            }
+            yarnSite.put("yarn.resourcemanager.webapp.address." + rm1Id, rm1Host + ":" + webappPort);
+            yarnSite.put("yarn.resourcemanager.webapp.address." + rm2Id, rm2Host + ":" + webappPort);
+
+            // Auto-generate other HA addresses by extracting ports from single-node configs
+            generateHaAddress(yarnSite, "yarn.resourcemanager.address", rm1Id, rm1Host, rm2Id, rm2Host, 8032);
+            generateHaAddress(yarnSite, "yarn.resourcemanager.admin.address", rm1Id, rm1Host, rm2Id, rm2Host, 8033);
+            generateHaAddress(
+                    yarnSite, "yarn.resourcemanager.resource-tracker.address", rm1Id, rm1Host, rm2Id, rm2Host, 8031);
+            generateHaAddress(yarnSite, "yarn.resourcemanager.scheduler.address", rm1Id, rm1Host, rm2Id, rm2Host, 8030);
+
+            // Remove single-RM keys to avoid conflicts
+            yarnSite.remove("yarn.resourcemanager.hostname");
+            yarnSite.remove("yarn.resourcemanager.address");
+            yarnSite.remove("yarn.resourcemanager.admin.address");
+            yarnSite.remove("yarn.resourcemanager.resource-tracker.address");
+            yarnSite.remove("yarn.resourcemanager.scheduler.address");
+            yarnSite.remove("yarn.resourcemanager.webapp.address");
+            yarnSite.remove("yarn.resourcemanager.webapp.https.address");
+
+        } else {
+            // Single ResourceManager
+            if (resourcemanagerList != null && !resourcemanagerList.isEmpty()) {
+                String rmHost = resourcemanagerList.get(0);
+                yarnSite.put("yarn.resourcemanager.hostname", MessageFormat.format("{0}", rmHost));
+
+                String rt = (String) yarnSite.get("yarn.resourcemanager.resource-tracker.address");
+                if (rt != null) {
+                    yarnSite.put("yarn.resourcemanager.resource-tracker.address", rt.replace("0.0.0.0", rmHost));
+                }
+
+                String scheduler = (String) yarnSite.get("yarn.resourcemanager.scheduler.address");
+                if (scheduler != null) {
+                    yarnSite.put("yarn.resourcemanager.scheduler.address", scheduler.replace("0.0.0.0", rmHost));
+                }
+
+                String addr = (String) yarnSite.get("yarn.resourcemanager.address");
+                if (addr != null) {
+                    yarnSite.put("yarn.resourcemanager.address", addr.replace("0.0.0.0", rmHost));
+                }
+
+                String admin = (String) yarnSite.get("yarn.resourcemanager.admin.address");
+                if (admin != null) {
+                    yarnSite.put("yarn.resourcemanager.admin.address", admin.replace("0.0.0.0", rmHost));
+                }
+
+                String webapp = (String) yarnSite.get("yarn.resourcemanager.webapp.address");
+                if (webapp != null) {
+                    yarnSite.put("yarn.resourcemanager.webapp.address", webapp.replace("0.0.0.0", rmHost));
+                }
+
+                String https = (String) yarnSite.get("yarn.resourcemanager.webapp.https.address");
+                if (https != null) {
+                    yarnSite.put("yarn.resourcemanager.webapp.https.address", https.replace("0.0.0.0", rmHost));
+                }
+            }
         }
 
         nodeManagerLogDir = (String) yarnSite.get("yarn.nodemanager.log-dirs");
@@ -303,6 +514,29 @@ public class HadoopParams extends BigtopParams {
      *
      * @param hdfsSite The HDFS site configuration map to be modified
      */
+    private static void generateHaAddress(
+            Map<String, Object> yarnSite,
+            String baseKey,
+            String rm1Id,
+            String rm1Host,
+            String rm2Id,
+            String rm2Host,
+            int defaultPort) {
+
+        int port = defaultPort;
+        Object base = yarnSite.get(baseKey);
+        if (base != null && base.toString().contains(":")) {
+            try {
+                String portStr = base.toString().split(":")[1].trim();
+                port = Integer.parseInt(portStr);
+            } catch (Exception ignored) {
+            }
+        }
+
+        yarnSite.put(baseKey + "." + rm1Id, rm1Host + ":" + port);
+        yarnSite.put(baseKey + "." + rm2Id, rm2Host + ":" + port);
+    }
+
     private void configureNativeLibraryDependentSettings(Map<String, Object> hdfsSite) {
         try {
             // Detect system glibc version to determine native library support

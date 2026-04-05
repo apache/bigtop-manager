@@ -21,11 +21,21 @@ package org.apache.bigtop.manager.server.command.task;
 import org.apache.bigtop.manager.common.constants.ComponentCategories;
 import org.apache.bigtop.manager.common.enums.Command;
 import org.apache.bigtop.manager.dao.po.ComponentPO;
+import org.apache.bigtop.manager.dao.po.HostPO;
 import org.apache.bigtop.manager.dao.query.ComponentQuery;
 import org.apache.bigtop.manager.server.enums.HealthyStatusEnum;
+import org.apache.bigtop.manager.server.exception.ServerException;
 import org.apache.bigtop.manager.server.model.dto.ComponentDTO;
+import org.apache.bigtop.manager.server.model.dto.StackDTO;
 import org.apache.bigtop.manager.server.utils.StackUtils;
 
+import org.apache.commons.collections4.CollectionUtils;
+
+import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
+
+@Slf4j
 public class ComponentAddTask extends AbstractComponentTask {
 
     public ComponentAddTask(TaskContext taskContext) {
@@ -48,9 +58,42 @@ public class ComponentAddTask extends AbstractComponentTask {
                 .hostname(hostname)
                 .name(componentName)
                 .build();
-        ComponentPO componentPO = componentDao.findByQuery(componentQuery).get(0);
+        List<ComponentPO> componentPOList = componentDao.findByQuery(componentQuery);
+        ComponentPO componentPO;
+        boolean isNew = CollectionUtils.isEmpty(componentPOList);
+        if (isNew) {
+            log.info("Component [{}] on host [{}] not found in DB, creating new entry.", componentName, hostname);
+            componentPO = new ComponentPO();
+        } else {
+            componentPO = componentPOList.get(0);
+        }
 
         ComponentDTO componentDTO = StackUtils.getComponentDTO(componentName);
+
+        // If new or existing but incomplete, fill in the details
+        if (isNew || componentPO.getHostId() == null || componentPO.getDisplayName() == null) {
+            log.info(
+                    "Populating full component details for component [{}] on host [{}]. New entry: {}",
+                    componentName,
+                    hostname,
+                    isNew);
+            HostPO hostPO = hostDao.findByHostname(hostname);
+            if (hostPO == null) {
+                throw new ServerException("Host not found in database: " + hostname);
+            }
+            StackDTO stackDTO = StackUtils.getServiceStack(taskContext.getServiceName());
+
+            componentPO.setName(componentName);
+            componentPO.setDisplayName(componentDTO.getDisplayName());
+            componentPO.setHostname(hostname);
+            componentPO.setClusterId(taskContext.getClusterId());
+            componentPO.setHostId(hostPO.getId());
+            componentPO.setServiceId(taskContext.getServiceId());
+            componentPO.setServiceName(taskContext.getServiceName());
+            componentPO.setServiceUser(taskContext.getServiceUser());
+            componentPO.setStack(stackDTO.getStackName() + "-" + stackDTO.getStackVersion());
+        }
+
         if (componentDTO.getCategory().equalsIgnoreCase(ComponentCategories.CLIENT)) {
             // Client components should always be healthy after added
             componentPO.setStatus(HealthyStatusEnum.HEALTHY.getCode());
@@ -59,7 +102,11 @@ public class ComponentAddTask extends AbstractComponentTask {
             componentPO.setStatus(HealthyStatusEnum.UNHEALTHY.getCode());
         }
 
-        componentDao.partialUpdateById(componentPO);
+        if (componentPO.getId() == null) {
+            componentDao.save(componentPO);
+        } else {
+            componentDao.partialUpdateById(componentPO);
+        }
     }
 
     @Override
