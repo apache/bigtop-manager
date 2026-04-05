@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one
+  ~ or more contributor license agreements.  See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership.  The ASF licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License.  You may obtain a copy of the License at
+  ~
+  ~    https://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+-->
+<configuration>
+
+    <property>
+        <name>content</name>
+        <description>Freemarker template for atlas-env.sh</description>
+        <value><![CDATA[
+#!/bin/bash
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Java
+export JAVA_HOME=${java_home}
+export PATH=$PATH:${JAVA_HOME}/bin
+
+# Atlas directories
+export ATLAS_LOG_DIR=${atlas_log_dir}
+export ATLAS_PID_DIR=${atlas_pid_dir}
+export ATLAS_PORT=${atlas_port}
+
+# External components
+export HBASE_CONF_DIR=${hbase_conf_dir}
+export HADOOP_HOME=${hadoop_home}
+
+# Local component flags
+export MANAGE_LOCAL_HBASE=${manage_local_hbase}
+export MANAGE_LOCAL_SOLR=${manage_local_solr}
+export MANAGE_EMBEDDED_CASSANDRA=${manage_embedded_cassandra}
+export MANAGE_LOCAL_ELASTICSEARCH=${manage_local_elasticsearch}
+
+# JVM options (only if provided)
+<#if atlas_server_heap?has_content>
+export ATLAS_SERVER_HEAP="${atlas_server_heap}"
+</#if>
+<#if atlas_server_opts?has_content>
+export ATLAS_SERVER_OPTS="${atlas_server_opts}"
+</#if>
+<#if atlas_client_heap?has_content>
+export ATLAS_CLIENT_HEAP="${atlas_client_heap}"
+</#if>
+<#if atlas_client_opts?has_content>
+export ATLAS_CLIENT_OPTS="${atlas_client_opts}"
+</#if>
+
+# Solr / ES address
+<#if solr_zk_quorum?has_content>
+export SOLR_ZK_QUORUM=${solr_zk_quorum}
+</#if>
+<#if es_hosts?has_content>
+export ES_HOSTS=${es_hosts}
+export ES_HTTP_URLS=${es_http_urls}
+</#if>
+]]>
+        </value>
+        <attrs>
+            <type>longtext</type>
+        </attrs>
+    </property>
+</configuration>
