@@ -24,6 +24,7 @@ import org.apache.bigtop.manager.server.model.vo.PlatformAuthCredentialVO;
 import org.apache.bigtop.manager.server.model.vo.PlatformVO;
 
 import java.util.List;
+import java.util.Map;
 
 public interface LLMConfigService {
 
@@ -48,4 +49,6 @@ public interface LLMConfigService {
     AuthPlatformVO getAuthorizedPlatform(Long authId);
 
     PlatformVO getPlatform(Long id);
+
+    List<String> platformModels(Long platformId, Map<String, String> authCredentials);
 }

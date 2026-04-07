@@ -24,8 +24,17 @@ import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
+import org.springframework.web.reactive.function.client.WebClient;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import reactor.core.publisher.Flux;
+
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 
 public abstract class AbstractAIAssistant implements AIAssistant {
     protected final AIAssistant.Service aiServices;
@@ -67,10 +76,22 @@ public abstract class AbstractAIAssistant implements AIAssistant {
 
         protected String systemPrompt;
 
+        protected io.modelcontextprotocol.client.McpAsyncClient mcpAsyncClient;
+        protected List<io.modelcontextprotocol.client.McpAsyncClient> mcpAsyncClients = new ArrayList<>();
+        protected Consumer<AIAssistant.ToolExecutionEvent> toolExecutionListener;
+
+        private static final String AUTHORIZATION_HEADER = "Authorization";
+
         public Builder() {}
 
         public Builder withSystemPrompt(String systemPrompt) {
             this.systemPrompt = systemPrompt;
+            return this;
+        }
+
+        @Override
+        public Builder withToolExecutionListener(Consumer<AIAssistant.ToolExecutionEvent> toolExecutionListener) {
+            this.toolExecutionListener = toolExecutionListener;
             return this;
         }
 
@@ -89,6 +110,44 @@ public abstract class AbstractAIAssistant implements AIAssistant {
             return this;
         }
 
+        public Builder withMcpClient(io.modelcontextprotocol.client.McpAsyncClient mcpAsyncClient) {
+            this.mcpAsyncClient = mcpAsyncClient;
+            if (mcpAsyncClient != null) {
+                this.mcpAsyncClients = List.of(mcpAsyncClient);
+            }
+            return this;
+        }
+
+        @Override
+        public Builder withMcpClients(List<io.modelcontextprotocol.client.McpAsyncClient> mcpAsyncClients) {
+            if (mcpAsyncClients == null || mcpAsyncClients.isEmpty()) {
+                this.mcpAsyncClients = Collections.emptyList();
+                this.mcpAsyncClient = null;
+                return this;
+            }
+
+            this.mcpAsyncClients = List.copyOf(mcpAsyncClients);
+            this.mcpAsyncClient = this.mcpAsyncClients.get(0);
+            return this;
+        }
+
+        protected List<io.modelcontextprotocol.client.McpAsyncClient> getMcpAsyncClients() {
+            if (mcpAsyncClients != null && !mcpAsyncClients.isEmpty()) {
+                return mcpAsyncClients;
+            }
+            if (mcpAsyncClient != null) {
+                return List.of(mcpAsyncClient);
+            }
+            return Collections.emptyList();
+        }
+
+        protected void emitToolExecutionEvent(String executionId, String toolName, String status, String payload) {
+            if (toolExecutionListener != null) {
+                toolExecutionListener.accept(
+                        new AIAssistant.ToolExecutionEvent(executionId, toolName, status, payload));
+            }
+        }
+
         public ChatMemory getChatMemory() {
             if (chatMemory == null) {
                 chatMemory = MessageWindowChatMemory.builder()
@@ -96,6 +155,82 @@ public abstract class AbstractAIAssistant implements AIAssistant {
                         .build();
             }
             return chatMemory;
+        }
+
+        protected String resolveModelsBaseUrl() {
+            return null;
+        }
+
+        protected String resolveModelsPath() {
+            return "/v1/models";
+        }
+
+        protected String resolveApiKey(Map<String, String> credentials) {
+            if (credentials == null) {
+                return null;
+            }
+            String apiKey = credentials.get("apiKey");
+            if (apiKey == null) {
+                return null;
+            }
+            apiKey = apiKey.trim();
+            if (apiKey.startsWith("Bearer ")) {
+                apiKey = apiKey.substring("Bearer ".length()).trim();
+            }
+            return apiKey;
+        }
+
+        protected void applyModelRequestAuth(WebClient.RequestHeadersSpec<?> requestSpec, String apiKey) {
+            if (apiKey != null && !apiKey.isBlank()) {
+                requestSpec.header(AUTHORIZATION_HEADER, "Bearer " + apiKey);
+            }
+        }
+
+        protected List<String> parseModelsResponse(JsonNode response) {
+            if (response == null || !response.has("data")) {
+                return Collections.emptyList();
+            }
+            List<String> models = new ArrayList<>();
+            for (JsonNode node : response.get("data")) {
+                JsonNode idNode = node.get("id");
+                if (idNode != null && !idNode.isNull()) {
+                    models.add(idNode.asText());
+                }
+            }
+            return models;
+        }
+
+        @Override
+        public List<String> getModels() {
+            String baseUrl = resolveModelsBaseUrl();
+            if (baseUrl == null || baseUrl.isBlank()) {
+                return Collections.emptyList();
+            }
+
+            String path = resolveModelsPath();
+            if (path == null || path.isBlank()) {
+                path = "/v1/models";
+            }
+
+            Map<String, String> credentials = config == null ? Collections.emptyMap() : config.getCredentials();
+            String apiKey = resolveApiKey(credentials);
+
+            try {
+                WebClient webClient =
+                        WebClient.builder().baseUrl(baseUrl.trim()).build();
+                WebClient.RequestHeadersSpec<?> requestSpec = webClient.get().uri(path);
+                applyModelRequestAuth(requestSpec, apiKey);
+
+                JsonNode response = requestSpec
+                        .retrieve()
+                        .bodyToMono(JsonNode.class)
+                        .timeout(Duration.ofSeconds(10))
+                        .block();
+
+                return parseModelsResponse(response);
+            } catch (Exception ignored) {
+                return Collections.emptyList();
+            }
         }
     }
 }

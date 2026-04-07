@@ -42,6 +42,7 @@
   const mode = ref<keyof typeof Mode>('ADD')
   const formRef = ref<Comp.FormBuilderInstance | null>(null)
   const disabledFormKeys = shallowRef(['platformId'])
+  const loadingModels = ref(false)
 
   const { loading, loadingTest, currPlatform, platforms, isDisabled, formKeys, formCredentials, supportModels } =
     storeToRefs(llmConfigStore)
@@ -137,6 +138,20 @@
     }
   }
 
+  const handleRefreshModels = async () => {
+    loadingModels.value = true
+    const models = await llmConfigStore.refreshPlatformModels()
+    if (models.length > 0) {
+      if (!models.includes(currPlatform.value.model as string)) {
+        currPlatform.value.model = undefined
+      }
+      message.success(t('llmConfig.models_loaded'))
+    } else {
+      message.error(t('llmConfig.models_load_failed'))
+    }
+    loadingModels.value = false
+  }
+
   const handleCancel = () => {
     formRef.value?.resetForm()
     open.value = false
@@ -181,11 +196,17 @@
           ></a-select>
         </template>
         <template #model="{ item }">
-          <a-select
-            v-model:value="currPlatform[item.field]"
-            :options="item?.props?.options"
-            :placeholder="t('common.select_error', [t('llmConfig.model').toLowerCase()])"
-          ></a-select>
+          <div style="display: flex; gap: 8px; width: 100%">
+            <a-select
+              v-model:value="currPlatform[item.field]"
+              style="width: calc(100% - 96px)"
+              :options="item?.props?.options"
+              :placeholder="t('common.select_error', [t('llmConfig.model').toLowerCase()])"
+            ></a-select>
+            <a-button style="width: 96px" :loading="loadingModels" @click="handleRefreshModels">
+              {{ t('llmConfig.fetch_models') }}
+            </a-button>
+          </div>
         </template>
       </form-builder>
       <template #footer>

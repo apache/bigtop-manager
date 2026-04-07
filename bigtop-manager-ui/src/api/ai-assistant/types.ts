@@ -47,9 +47,22 @@ export interface ChatMessageItem {
   sender: SenderType
   message: string
   createTime?: string
+  messageType?: 'message' | 'tool'
+  executionId?: string
+  toolName?: string
+  toolStatus?: 'started' | 'completed' | 'failed'
+  toolPayload?: string
+  toolInput?: string
+  toolOutput?: string
+  toolError?: string
 }
 
 export interface ReceivedMessageItem {
   content?: string
-  finishReason?: 'completed' | null
+  finishReason?: 'completed' | string | null
+  eventType?: 'tool_execution' | null
+  executionId?: string
+  toolName?: string
+  toolStatus?: 'started' | 'completed' | 'failed'
+  toolPayload?: string
 }

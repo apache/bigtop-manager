@@ -26,5 +26,8 @@ export default {
   name: '名字',
   platform_name: '平台',
   model: '模型',
-  desc: '备注'
+  desc: '备注',
+  fetch_models: '拉取模型',
+  models_loaded: '模型列表已更新',
+  models_load_failed: '拉取模型失败'
 }

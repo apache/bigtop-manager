@@ -116,6 +116,30 @@ export const useLlmConfigStore = defineStore(
       }
     }
 
+    const refreshPlatformModels = async () => {
+      try {
+        const platformId = currPlatform.value.platformId
+        if (typeof platformId === 'undefined') {
+          return []
+        }
+
+        const credentials = authCredentials.value
+        const models = await llmServer.getPlatformModels(platformId, { authCredentials: credentials })
+
+        if (Array.isArray(models) && models.length > 0) {
+          const target = platforms.value.find((item) => item.id === platformId)
+          if (target) {
+            target.supportModels = models
+          }
+        }
+
+        return models
+      } catch (error) {
+        console.log('error :>> ', error)
+        return []
+      }
+    }
+
     const getAuthPlatformDetail = async () => {
       try {
         const authId = currPlatform.value.id as number
@@ -201,6 +225,7 @@ export const useLlmConfigStore = defineStore(
       getAuthPlatformDetail,
       getAuthorizedPlatforms,
       getPlatformCredentials,
+      refreshPlatformModels,
       addAuthorizedPlatform,
       updateAuthPlatform,
       testAuthorizedPlatform,

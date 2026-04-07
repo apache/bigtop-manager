@@ -27,6 +27,9 @@ import org.springframework.ai.chat.model.StreamingChatModel;
 
 import reactor.core.publisher.Flux;
 
+import java.util.List;
+import java.util.function.Consumer;
+
 public interface AIAssistant {
 
     /**
@@ -75,7 +78,13 @@ public interface AIAssistant {
 
         Builder withConfig(AIAssistantConfig configProvider);
 
+        Builder withMcpClient(io.modelcontextprotocol.client.McpAsyncClient mcpAsyncClient);
+
+        Builder withMcpClients(List<io.modelcontextprotocol.client.McpAsyncClient> mcpAsyncClients);
+
         Builder withSystemPrompt(String systemPrompt);
+
+        Builder withToolExecutionListener(Consumer<ToolExecutionEvent> toolExecutionListener);
 
         AIAssistant build();
 
@@ -84,5 +93,9 @@ public interface AIAssistant {
         StreamingChatModel getStreamingChatModel();
 
         ChatMemory getChatMemory();
+
+        List<String> getModels();
     }
+
+    record ToolExecutionEvent(String executionId, String toolName, String status, String payload) {}
 }
