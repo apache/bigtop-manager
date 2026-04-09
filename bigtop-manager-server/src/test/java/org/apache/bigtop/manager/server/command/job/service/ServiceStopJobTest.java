@@ -72,6 +72,9 @@ public class ServiceStopJobTest {
         mocked2.when(() -> ComponentStageHelper.createComponentStages(anyMap(), eq(Command.STOP), any()))
                 .thenReturn(stageList);
 
+        // Ensure ordered services is non-empty to trigger stage aggregation in createStages
+        when(serviceStopJob.getOrderedServiceNamesForCommand(any())).thenReturn(List.of("dummy-service"));
+
         doCallRealMethod().when(serviceStopJob).createStages();
         serviceStopJob.createStages();
 
