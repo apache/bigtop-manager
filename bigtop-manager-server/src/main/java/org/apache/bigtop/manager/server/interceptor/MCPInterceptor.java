@@ -19,8 +19,10 @@
 package org.apache.bigtop.manager.server.interceptor;
 
 import org.apache.bigtop.manager.common.utils.JsonUtils;
+import org.apache.bigtop.manager.server.holder.SessionUserHolder;
 import org.apache.bigtop.manager.server.utils.ResponseEntity;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -30,6 +32,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Component
 public class MCPInterceptor implements HandlerInterceptor {
+
+    @Autowired
+    private TokenAuthenticator tokenAuthenticator;
 
     private ResponseEntity<?> responseEntity;
 
@@ -55,11 +60,14 @@ public class MCPInterceptor implements HandlerInterceptor {
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
             throws Exception {
+        SessionUserHolder.clear();
+
         HandlerInterceptor.super.afterCompletion(request, response, handler, ex);
     }
 
     private Boolean checkAuthenticated(HttpServletRequest request) {
-        return true;
+        responseEntity = tokenAuthenticator.authenticate(request);
+        return responseEntity == null;
     }
 
     private Boolean checkPermission() {
