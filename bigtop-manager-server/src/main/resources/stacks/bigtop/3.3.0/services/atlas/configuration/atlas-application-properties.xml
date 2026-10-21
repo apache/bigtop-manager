@@ -1,0 +1,208 @@
+<?xml version="1.0"?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one
+  ~ or more contributor license agreements.  See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership.  The ASF licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License.  You may obtain a copy of the License at
+  ~
+  ~    https://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+-->
+<configuration>
+
+    <!-- Graph Database / Storage -->
+    <property>
+        <name>atlas.graph.storage.backend</name>
+        <value>hbase2</value>
+    </property>
+    <property>
+        <name>atlas.graph.storage.hbase.table</name>
+        <value>apache_atlas_janus</value>
+    </property>
+    <property>
+        <name>atlas.graph.storage.hostname</name>
+        <value>${atlas_graph_storage_hostname}</value>
+    </property>
+    <property>
+        <name>atlas.graph.storage.hbase.regions-per-server</name>
+        <value>1</value>
+    </property>
+
+    <!-- Search Index -->
+    <property>
+        <name>atlas.graph.index.search.backend</name>
+        <value>${atlas_graph_index_search_backend}</value>
+    </property>
+    <property>
+        <name>atlas.graph.index.search.hostname</name>
+        <value>${atlas_graph_index_search_hostname}</value>
+    </property>
+    <property>
+        <name>atlas.graph.index.search.elasticsearch.client-only</name>
+        <value>true</value>
+    </property>
+    <property>
+        <name>atlas.graph.index.search.elasticsearch.http.auth.type</name>
+        <value>basic</value>
+    </property>
+    <property>
+        <name>atlas.graph.index.search.elasticsearch.http.auth.basic.username</name>
+        <value>${atlas_elasticsearch_username}</value>
+    </property>
+    <property>
+        <name>atlas.graph.index.search.elasticsearch.http.auth.basic.password</name>
+        <value>${atlas_elasticsearch_password}</value>
+    </property>
+    <property>
+        <name>atlas.graph.index.search.max-result-set-size</name>
+        <value>150</value>
+    </property>
+
+    <!-- Audit Repository -->
+    <property>
+        <name>atlas.EntityAuditRepository.impl</name>
+        <value>org.apache.atlas.repository.audit.HBaseBasedAuditRepository</value>
+    </property>
+
+    <!-- Notification / Kafka -->
+    <property>
+        <name>atlas.notification.embedded</name>
+        <value>false</value>
+    </property>
+    <property>
+        <name>atlas.kafka.zookeeper.connect</name>
+        <value>${atlas_kafka_zookeeper_connect}</value>
+    </property>
+    <property>
+        <name>atlas.kafka.bootstrap.servers</name>
+        <value>${atlas_kafka_bootstrap_servers}</value>
+    </property>
+    <property>
+        <name>atlas.kafka.hook.group.id</name>
+        <value>atlas</value>
+    </property>
+    <property>
+        <name>atlas.notification.topics</name>
+        <value>ATLAS_HOOK,ATLAS_ENTITIES</value>
+    </property>
+    <property>
+        <name>atlas.notification.hook.topic.name</name>
+        <value>ATLAS_HOOK</value>
+    </property>
+    <property>
+        <name>atlas.notification.entities.topic.name</name>
+        <value>ATLAS_ENTITIES</value>
+    </property>
+
+    <!-- Server -->
+    <property>
+        <name>atlas.rest.address</name>
+        <value>${atlas_rest_address}</value>
+    </property>
+    <property>
+        <name>atlas.server.run.setup.on.start</name>
+        <value>false</value>
+    </property>
+
+    <!-- Audit HBase -->
+    <property>
+        <name>atlas.audit.hbase.tablename</name>
+        <value>apache_atlas_entity_audit</value>
+    </property>
+    <property>
+        <name>atlas.audit.hbase.zookeeper.quorum</name>
+        <value>${atlas_audit_hbase_zookeeper_quorum}</value>
+    </property>
+
+    <!-- Security -->
+    <property>
+        <name>atlas.enableTLS</name>
+        <value>false</value>
+    </property>
+    <property>
+        <name>atlas.authentication.method.file</name>
+        <value>true</value>
+    </property>
+    <property>
+        <name>atlas.authentication.method.kerberos</name>
+        <value>false</value>
+    </property>
+    <property>
+        <name>atlas.authentication.method.ldap.type</name>
+        <value>none</value>
+    </property>
+    <property>
+        <name>atlas.authentication.method.file.filename</name>
+        <value>${sys:atlas.home}/conf/users-credentials.properties</value>
+    </property>
+
+    <!-- Authorization -->
+    <property>
+        <name>atlas.authorizer.impl</name>
+        <value>simple</value>
+    </property>
+    <property>
+        <name>atlas.authorizer.simple.authz.policy.file</name>
+        <value>atlas-simple-authz-policy.json</value>
+    </property>
+
+    <!-- Search & Query -->
+    <property>
+        <name>atlas.search.gremlin.enable</name>
+        <value>false</value>
+    </property>
+    <property>
+        <name>atlas.query.gremlinOptimizerEnabled</name>
+        <value>true</value>
+    </property>
+
+    <!-- CSRF -->
+    <property>
+        <name>atlas.rest-csrf.enabled</name>
+        <value>true</value>
+    </property>
+    <property>
+        <name>atlas.rest-csrf.browser-useragents-regex</name>
+        <value>^Mozilla.*,^Opera.*,^Chrome.*</value>
+    </property>
+    <property>
+        <name>atlas.rest-csrf.methods-to-ignore</name>
+        <value>GET,OPTIONS,HEAD,TRACE</value>
+    </property>
+    <property>
+        <name>atlas.rest-csrf.custom-header</name>
+        <value>X-XSRF-HEADER</value>
+    </property>
+
+    <!-- UI -->
+    <property>
+        <name>atlas.ui.default.version</name>
+        <value>v1</value>
+    </property>
+
+    <!-- Hive Hook -->
+    <property>
+        <name>atlas.hook.hive.numRetries</name>
+        <value>3</value>
+    </property>
+    <property>
+        <name>atlas.hook.hive.queueSize</name>
+        <value>10000</value>
+    </property>
+
+    <!-- Cluster Name -->
+    <property>
+        <name>atlas.cluster.name</name>
+        <value>primary</value>
+    </property>
+
+</configuration>
