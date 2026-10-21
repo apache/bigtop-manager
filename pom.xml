@@ -161,6 +161,17 @@
         </dependency>
     </dependencies>
 
+    <repositories>
+        <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/milestone</url>
+        </repository>
+    </repositories>
+
     <build>
         <finalName>${project.artifactId}-${project.version}</finalName>
         <pluginManagement>

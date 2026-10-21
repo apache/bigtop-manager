@@ -45,23 +45,28 @@ import org.apache.bigtop.manager.server.model.vo.ChatMessageVO;
 import org.apache.bigtop.manager.server.model.vo.ChatThreadVO;
 import org.apache.bigtop.manager.server.model.vo.TalkVO;
 import org.apache.bigtop.manager.server.service.ChatbotService;
-import org.apache.bigtop.manager.server.tools.provider.AIServiceToolsProvider;
 
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 @Slf4j
 public class ChatbotServiceImpl implements ChatbotService {
+    private static final long CHAT_SSE_TIMEOUT_MILLIS = 30 * 60 * 1000L;
+
     @Resource
     private PlatformDao platformDao;
 
@@ -73,9 +78,6 @@ public class ChatbotServiceImpl implements ChatbotService {
 
     @Resource
     private ChatMessageDao chatMessageDao;
-
-    @Resource
-    private AIServiceToolsProvider aiServiceToolsProvider;
 
     @Resource
     private AIAssistantFactory aiAssistantFactory;
@@ -129,19 +131,49 @@ public class ChatbotServiceImpl implements ChatbotService {
 
     @Override
     public SseEmitter talk(Long threadId, ChatbotCommand command, String message) {
-        AIAssistant aiAssistant = prepareTalk(threadId, command);
+        SseEmitter emitter = new SseEmitter(CHAT_SSE_TIMEOUT_MILLIS);
+        AtomicBoolean emitterClosed = new AtomicBoolean(false);
+        AtomicReference<Disposable> subscriptionRef = new AtomicReference<>();
+        AIAssistant aiAssistant = prepareTalk(threadId, command, emitter, emitterClosed);
 
         Flux<String> stringFlux =
                 (command == null) ? aiAssistant.streamAsk(message) : Flux.just(aiAssistant.ask(message));
 
-        SseEmitter emitter = new SseEmitter();
+        Disposable subscription = stringFlux.subscribe(
+                s -> {
+                    if (!sendTalkVO(emitter, emitterClosed, s, null)) {
+                        disposeSubscription(subscriptionRef);
+                    }
+                },
+                throwable -> {
+                    disposeSubscription(subscriptionRef);
+                    handleError(emitter, emitterClosed, throwable);
+                },
+                () -> {
+                    disposeSubscription(subscriptionRef);
+                    completeEmitter(emitter, emitterClosed);
+                });
 
-        stringFlux.subscribe(
-                s -> sendTalkVO(emitter, s, null),
-                throwable -> handleError(emitter, throwable),
-                () -> completeEmitter(emitter));
+        subscriptionRef.set(subscription);
 
-        emitter.onTimeout(emitter::complete);
+        emitter.onCompletion(() -> {
+            emitterClosed.set(true);
+            disposeSubscription(subscriptionRef);
+        });
+
+        emitter.onTimeout(() -> {
+            emitterClosed.set(true);
+            disposeSubscription(subscriptionRef);
+            try {
+                emitter.complete();
+            } catch (Exception ignored) {
+            }
+        });
+
+        emitter.onError(error -> {
+            emitterClosed.set(true);
+            disposeSubscription(subscriptionRef);
+        });
 
         return emitter;
     }
@@ -233,13 +265,20 @@ public class ChatbotServiceImpl implements ChatbotService {
     }
 
     private AIAssistant buildAIAssistant(
-            String platformName, String model, Map<String, String> credentials, Long threadId, ChatbotCommand command) {
+            String platformName,
+            String model,
+            Map<String, String> credentials,
+            Long threadId,
+            ChatbotCommand command,
+            SseEmitter emitter,
+            AtomicBoolean emitterClosed) {
         return aiAssistantFactory.createAIService(
                 getAIAssistantConfig(platformName, model, credentials, threadId),
-                aiServiceToolsProvider.getToolsProvide(command));
+                event -> sendToolExecutionEvent(emitter, emitterClosed, event));
     }
 
-    private AIAssistant prepareTalk(Long threadId, ChatbotCommand command) {
+    private AIAssistant prepareTalk(
+            Long threadId, ChatbotCommand command, SseEmitter emitter, AtomicBoolean emitterClosed) {
         ChatThreadPO chatThreadPO = validateAndGetChatThread(threadId);
         AuthPlatformPO authPlatformPO = validateAndGetActiveAuthPlatform();
 
@@ -255,29 +294,112 @@ public class ChatbotServiceImpl implements ChatbotService {
                 authPlatformDTO.getModel(),
                 authPlatformDTO.getAuthCredentials(),
                 threadId,
-                command);
+                command,
+                emitter,
+                emitterClosed);
     }
 
-    private void sendTalkVO(SseEmitter emitter, String content, String finishReason) {
+    private void sendToolExecutionEvent(
+            SseEmitter emitter, AtomicBoolean emitterClosed, AIAssistant.ToolExecutionEvent event) {
+        if (emitterClosed.get()) {
+            return;
+        }
+
+        TalkVO talkVO = new TalkVO();
+        talkVO.setEventType("tool_execution");
+        talkVO.setExecutionId(event.executionId());
+        talkVO.setToolName(event.toolName());
+        talkVO.setToolStatus(event.status());
+        talkVO.setToolPayload(event.payload());
+        sendTalkVO(emitter, emitterClosed, talkVO);
+    }
+
+    private boolean sendTalkVO(SseEmitter emitter, AtomicBoolean emitterClosed, String content, String finishReason) {
+        TalkVO talkVO = new TalkVO();
+        talkVO.setContent(content);
+        talkVO.setFinishReason(finishReason);
+        return sendTalkVO(emitter, emitterClosed, talkVO);
+    }
+
+    private boolean sendTalkVO(SseEmitter emitter, AtomicBoolean emitterClosed, TalkVO talkVO) {
+        if (emitterClosed.get()) {
+            return false;
+        }
+
         try {
-            TalkVO talkVO = new TalkVO();
-            talkVO.setContent(content);
-            talkVO.setFinishReason(finishReason);
             emitter.send(talkVO);
+            return true;
+        } catch (IllegalStateException e) {
+            if (emitterClosed.compareAndSet(false, true)) {
+                log.warn("SSE emitter already closed, stop sending stream data: {}", e.getMessage());
+            }
+            return false;
         } catch (Exception e) {
-            log.error("Error sending data to SseEmitter", e);
-            emitter.completeWithError(e);
+            if (emitterClosed.compareAndSet(false, true)) {
+                log.error("Error sending data to SseEmitter", e);
+            }
+            try {
+                emitter.complete();
+            } catch (Exception ignored) {
+            }
+            return false;
         }
     }
 
-    private void handleError(SseEmitter emitter, Throwable throwable) {
+    private void handleError(SseEmitter emitter, AtomicBoolean emitterClosed, Throwable throwable) {
+        if (isStreamCancellation(throwable)) {
+            log.warn("SSE streaming cancelled: {}", throwable.getMessage());
+            if (emitterClosed.compareAndSet(false, true)) {
+                try {
+                    emitter.complete();
+                } catch (Exception ignored) {
+                }
+            }
+            return;
+        }
+
         log.error("Error during SSE streaming: {}", throwable.getMessage(), throwable);
-        sendTalkVO(emitter, null, "Error: " + throwable.getMessage());
-        emitter.completeWithError(throwable);
+
+        if (!sendTalkVO(emitter, emitterClosed, null, "Error: " + throwable.getMessage())) {
+            return;
+        }
+
+        if (emitterClosed.compareAndSet(false, true)) {
+            try {
+                emitter.complete();
+            } catch (Exception ignored) {
+            }
+        }
     }
 
-    private void completeEmitter(SseEmitter emitter) {
-        sendTalkVO(emitter, null, "completed");
-        emitter.complete();
+    private void completeEmitter(SseEmitter emitter, AtomicBoolean emitterClosed) {
+        if (!sendTalkVO(emitter, emitterClosed, null, "completed")) {
+            return;
+        }
+
+        if (emitterClosed.compareAndSet(false, true)) {
+            try {
+                emitter.complete();
+            } catch (Exception ignored) {
+            }
+        }
+    }
+
+    private void disposeSubscription(AtomicReference<Disposable> subscriptionRef) {
+        Disposable disposable = subscriptionRef.getAndSet(null);
+        if (disposable != null && !disposable.isDisposed()) {
+            disposable.dispose();
+        }
+    }
+
+    private boolean isStreamCancellation(Throwable throwable) {
+        Throwable current = throwable;
+        while (current != null) {
+            if (current instanceof InterruptedException || current instanceof CancellationException) {
+                return true;
+            }
+            current = current.getCause();
+        }
+        return false;
     }
 }

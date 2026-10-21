@@ -25,4 +25,14 @@ public class TalkVO {
     private String content;
 
     private String finishReason;
+
+    private String eventType;
+
+    private String executionId;
+
+    private String toolName;
+
+    private String toolStatus;
+
+    private String toolPayload;
 }

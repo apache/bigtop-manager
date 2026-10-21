@@ -54,6 +54,7 @@ public interface AuthPlatformConverter {
             return null;
         }
         return authCredentials.stream()
+                .filter(item -> item != null && item.getKey() != null)
                 .collect(Collectors.toMap(AuthCredentialReq::getKey, AuthCredentialReq::getValue));
     }
 

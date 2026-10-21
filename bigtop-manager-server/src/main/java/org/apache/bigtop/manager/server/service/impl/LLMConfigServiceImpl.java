@@ -22,7 +22,6 @@ import org.apache.bigtop.manager.ai.assistant.config.GeneralAssistantConfig;
 import org.apache.bigtop.manager.ai.core.enums.PlatformType;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistant;
 import org.apache.bigtop.manager.ai.core.factory.AIAssistantFactory;
-import org.apache.bigtop.manager.common.utils.JsonUtils;
 import org.apache.bigtop.manager.dao.po.AuthPlatformPO;
 import org.apache.bigtop.manager.dao.po.ChatMessagePO;
 import org.apache.bigtop.manager.dao.po.ChatThreadPO;
@@ -47,15 +46,11 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
-import dev.langchain4j.agent.tool.ToolSpecification;
-import dev.langchain4j.model.chat.request.json.JsonObjectSchema;
-import dev.langchain4j.service.tool.ToolExecutor;
-import dev.langchain4j.service.tool.ToolProvider;
-import dev.langchain4j.service.tool.ToolProviderResult;
 import lombok.extern.slf4j.Slf4j;
 
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,13 +73,59 @@ public class LLMConfigServiceImpl implements LLMConfigService {
     @Resource
     private AIAssistantFactory aiAssistantFactory;
 
-    private static final String TEST_FLAG = "ZmxhZw==";
-    private static final String TEST_KEY = "bm";
-
     @Override
     public List<PlatformVO> platforms() {
         List<PlatformPO> platformPOs = platformDao.findAll();
         return PlatformConverter.INSTANCE.fromPO2VO(platformPOs);
+    }
+
+    private List<String> getDynamicModels(PlatformPO platformPO, Map<String, String> explicitCreds) {
+        PlatformType platformType =
+                PlatformType.getPlatformType(platformPO.getName().toLowerCase());
+        if (platformType == null) {
+            return getDefaultModels(platformPO);
+        }
+
+        Map<String, String> creds = new HashMap<>();
+
+        if (explicitCreds != null && !explicitCreds.isEmpty()) {
+            creds.putAll(explicitCreds);
+        } else {
+            List<AuthPlatformPO> authPlatformPOs = authPlatformDao.findAll();
+            for (AuthPlatformPO auth : authPlatformPOs) {
+                if (auth.getPlatformId().equals(platformPO.getId()) && !auth.getIsDeleted()) {
+                    creds = AuthPlatformConverter.INSTANCE.fromPO2DTO(auth).getAuthCredentials();
+                    break;
+                }
+            }
+        }
+
+        GeneralAssistantConfig config = GeneralAssistantConfig.builder()
+                .setPlatformType(platformType)
+                .setModel("dummy")
+                .addCredentials(creds)
+                .build();
+
+        List<String> models = aiAssistantFactory.getModels(config);
+        if (models != null && !models.isEmpty()) {
+            return models;
+        }
+
+        return getDefaultModels(platformPO);
+    }
+
+    private List<String> getDefaultModels(PlatformPO platformPO) {
+        String supportModels = platformPO.getSupportModels();
+        if (supportModels == null || supportModels.isBlank()) {
+            return Collections.emptyList();
+        }
+        return List.of(supportModels.split(","));
+    }
+
+    @Override
+    public List<String> platformModels(Long platformId, Map<String, String> authCredentials) {
+        PlatformPO platformPO = validateAndGetPlatform(platformId);
+        return getDynamicModels(platformPO, authCredentials);
     }
 
     @Override
@@ -164,11 +205,6 @@ public class LLMConfigServiceImpl implements LLMConfigService {
 
         PlatformPO platformPO = validateAndGetPlatform(authPlatformDTO.getPlatformId());
 
-        List<String> supportModels = List.of(platformPO.getSupportModels().split(","));
-        if (supportModels.isEmpty() || !supportModels.contains(authPlatformDTO.getModel())) {
-            throw new ApiException(ApiExceptionEnum.MODEL_NOT_SUPPORTED);
-        }
-
         if (authPlatformDTO.getId() != null) {
             AuthPlatformPO authPlatformPO = validateAndGetAuthPlatform(authPlatformDTO.getId());
 
@@ -179,6 +215,11 @@ public class LLMConfigServiceImpl implements LLMConfigService {
 
         Map<String, String> credentialSet =
                 getStringMap(authPlatformDTO, PlatformConverter.INSTANCE.fromPO2DTO(platformPO));
+
+        List<String> dynamicModels = getDynamicModels(platformPO, credentialSet);
+        if (dynamicModels.isEmpty() || !dynamicModels.contains(authPlatformDTO.getModel())) {
+            throw new ApiException(ApiExceptionEnum.MODEL_NOT_SUPPORTED);
+        }
 
         if (!testAuthorization(platformPO.getName(), authPlatformDTO.getModel(), credentialSet)) {
             throw new ApiException(ApiExceptionEnum.CREDIT_INCORRECT);
@@ -260,7 +301,6 @@ public class LLMConfigServiceImpl implements LLMConfigService {
     @Override
     public PlatformVO getPlatform(Long id) {
         PlatformPO platformPO = validateAndGetPlatform(id);
-
         return PlatformConverter.INSTANCE.fromPO2VO(platformPO);
     }
 
@@ -302,48 +342,12 @@ public class LLMConfigServiceImpl implements LLMConfigService {
     }
 
     private Boolean testAuthorization(String platformName, String model, Map<String, String> credentials) {
-        Boolean result = testFuncCalling(platformName, model, credentials);
-        log.info("Test func calling result: {}", result);
         GeneralAssistantConfig generalAssistantConfig = getAIAssistantConfig(platformName, model, credentials);
-        AIAssistant aiAssistant = aiAssistantFactory.createForTest(generalAssistantConfig, null);
+        AIAssistant aiAssistant = aiAssistantFactory.createForTest(generalAssistantConfig);
         try {
             return aiAssistant.test();
         } catch (Exception e) {
             throw new ApiException(ApiExceptionEnum.CREDIT_INCORRECT, e.getMessage());
-        }
-    }
-
-    private Boolean testFuncCalling(String platformName, String model, Map<String, String> credentials) {
-        ToolProvider toolProvider = (toolProviderRequest) -> {
-            ToolSpecification toolSpecification = ToolSpecification.builder()
-                    .name("getFlag")
-                    .description("Get flag based on key")
-                    .parameters(JsonObjectSchema.builder()
-                            .addStringProperty("key")
-                            .description("Lowercase key to get flag")
-                            .build())
-                    .build();
-            ToolExecutor toolExecutor = (toolExecutionRequest, memoryId) -> {
-                Map<String, Object> arguments = JsonUtils.readFromString(toolExecutionRequest.arguments());
-                String key = arguments.get("key").toString();
-                if (key.equals(TEST_KEY)) {
-                    return TEST_FLAG;
-                }
-                return null;
-            };
-
-            return ToolProviderResult.builder()
-                    .add(toolSpecification, toolExecutor)
-                    .build();
-        };
-
-        GeneralAssistantConfig generalAssistantConfig = getAIAssistantConfig(platformName, model, credentials);
-        AIAssistant aiAssistant = aiAssistantFactory.createForTest(generalAssistantConfig, toolProvider);
-        try {
-            return aiAssistant.ask("What is the flag of " + TEST_KEY).contains(TEST_FLAG);
-        } catch (Exception e) {
-            log.error("Test function calling failed", e);
-            return false;
         }
     }
 

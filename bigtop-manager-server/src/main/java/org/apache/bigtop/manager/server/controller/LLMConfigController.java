@@ -41,6 +41,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 @Tag(name = "LLM Config Controller")
 @RestController
@@ -67,6 +68,15 @@ public class LLMConfigController {
     public ResponseEntity<List<PlatformAuthCredentialVO>> platformsAuthCredential(
             @PathVariable(name = "platformId") Long platformId) {
         return ResponseEntity.success(llmConfigService.platformsAuthCredentials(platformId));
+    }
+
+    @Operation(summary = "list platform models", description = "List models from /v1/models")
+    @PostMapping("/platforms/{platformId}/models")
+    public ResponseEntity<List<String>> platformModels(
+            @PathVariable(name = "platformId") Long platformId, @RequestBody AuthPlatformReq authPlatformReq) {
+        AuthPlatformDTO authPlatformDTO = AuthPlatformConverter.INSTANCE.fromReq2DTO(authPlatformReq);
+        Map<String, String> authCredentials = authPlatformDTO.getAuthCredentials();
+        return ResponseEntity.success(llmConfigService.platformModels(platformId, authCredentials));
     }
 
     @Operation(summary = "list auth platforms", description = "List authorized platforms")

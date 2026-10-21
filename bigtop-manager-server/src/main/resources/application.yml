@@ -25,6 +25,24 @@ spring:
         type: ASYNC
         sse-endpoint: /mcp/sse
         sse-message-endpoint: /mcp/messages
+      client:
+        enabled: true
+        request-timeout-seconds: 120
+        init-timeout-seconds: 20
+        # Optional multi-connection definition.
+        # Format:
+        #   name=<id>,type=<sse|streamable-http|local>,baseUrl=<url>,endpoint=<path>,command=<cmd>,args=<a|b>,env=<K:V|K2:V2>,requestTimeoutSeconds=<n>,initTimeoutSeconds=<n>;
+        # Notes:
+        #   - sse / streamable-http use baseUrl (+ optional endpoint)
+        #   - local uses command/args/env
+        #   - requestTimeoutSeconds/initTimeoutSeconds are optional per-connection overrides
+        # Example:
+        # connections: >
+        #   name=embedded,type=sse,baseUrl=http://localhost:8080,endpoint=/mcp/sse;
+        #   name=remote,type=streamable-http,baseUrl=http://127.0.0.1:9000,endpoint=/mcp,requestTimeoutSeconds=180;
+        #   name=memory,type=local,command=npx,args=-y|@modelcontextprotocol/server-memory,env=NODE_ENV:production
+        connections: >
+            name=bm,type=sse,baseUrl=http://localhost:8080,endpoint=/mcp/sse
   banner:
     charset: utf-8
   application:

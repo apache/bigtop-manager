@@ -26,5 +26,8 @@ export default {
   name: 'Name',
   platform_name: 'Platform',
   model: 'Model',
-  desc: 'Remark'
+  desc: 'Remark',
+  fetch_models: 'Fetch Models',
+  models_loaded: 'Models loaded',
+  models_load_failed: 'Failed to load models'
 }

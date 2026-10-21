@@ -27,7 +27,6 @@
   import ChatHistory from './chat-history.vue'
   import ChatMessage from './chat-message.vue'
 
-  import type { ChatMessageItem } from '@/api/ai-assistant/types'
   import type { GroupItem } from '@/components/common/button-group/types'
 
   /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
@@ -46,7 +45,7 @@
   const llmConfigStore = useLlmConfigStore()
   const menuStore = useMenuStore()
 
-  const { currThread, chatRecords, threads, messageReceiver, hasActivePlatform, loadingChatRecords } =
+  const { currThread, chatRecords, threads, hasActivePlatform, loadingChatRecords, streamRecords } =
     storeToRefs(aiChatStore)
   const { currAuthPlatform } = storeToRefs(llmConfigStore)
 
@@ -60,7 +59,6 @@
   const noChat = computed(() => Object.keys(currThread.value || {}).length === 0 || chatRecords.value.length === 0)
   const historyVisible = computed(() => fullScreen.value && open.value)
   const historyType = computed(() => (historyVisible.value ? 'large' : 'small'))
-  const recordReceiver = computed((): ChatMessageItem => ({ sender: 'AI', message: messageReceiver.value }))
   const checkActions = computed(() => {
     if (!hasActivePlatform.value) {
       return filterActions(['CLOSE'])
@@ -197,7 +195,11 @@
           <template v-else>
             <div v-if="open" v-auto-scroll class="chat-content">
               <chat-message v-for="(record, idx) in chatRecords" :key="idx" :record="record" />
-              <chat-message v-if="messageReceiver" :record="recordReceiver" />
+              <chat-message
+                v-for="(streamRecord, idx) in streamRecords"
+                :key="streamRecord.executionId || `stream-${idx}`"
+                :record="streamRecord"
+              />
             </div>
           </template>
         </a-spin>

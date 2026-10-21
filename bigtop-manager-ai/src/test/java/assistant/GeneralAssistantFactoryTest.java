@@ -64,8 +64,8 @@ class GeneralAssistantFactoryTest {
         try (MockedStatic<OpenAIAssistant> openAIAssistantMockedStatic = mockStatic(OpenAIAssistant.class)) {
             openAIAssistantMockedStatic.when(OpenAIAssistant::builder).thenReturn(mockBuilder);
 
-            generalAssistantFactory.createAIService(assistantConfigProvider, null);
-            generalAssistantFactory.createForTest(assistantConfigProvider, null);
+            generalAssistantFactory.createAIService(assistantConfigProvider);
+            generalAssistantFactory.createForTest(assistantConfigProvider);
         }
     }
 }

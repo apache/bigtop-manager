@@ -68,3 +68,7 @@ export interface UpdateAuthorizedPlatformConfig extends AuthorizedPlatform {
   authCredentials: AuthCredential[]
   testPassed: boolean
 }
+
+export interface PlatformModelsReq {
+  authCredentials: AuthCredential[]
+}

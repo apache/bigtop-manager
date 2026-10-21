@@ -29,18 +29,23 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.StreamingChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.mcp.AsyncMcpToolCallbackProvider;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.util.Assert;
 
 import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class DashScopeAssistant extends AbstractAIAssistant {
 
+    private static final String BASE_URL_ENV_KEY = "BIGTOP_MANAGER_AI_DASHSCOPE_BASE_URL";
     private static final String BASE_URL = "https://dashscope.aliyuncs.com/compatible-mode";
 
     public DashScopeAssistant(Object memoryId, ChatMemory chatMemory, AIAssistant.Service aiServices) {
@@ -59,15 +64,36 @@ public class DashScopeAssistant extends AbstractAIAssistant {
     public static class Builder extends AbstractAIAssistant.Builder {
 
         @Override
+        protected String resolveModelsBaseUrl() {
+            return resolveDefaultBaseUrl();
+        }
+
+        private String resolveDefaultBaseUrl() {
+            String envBaseUrl = System.getenv(BASE_URL_ENV_KEY);
+            if (envBaseUrl != null && !envBaseUrl.isBlank()) {
+                return envBaseUrl;
+            }
+            return BASE_URL;
+        }
+
+        @Override
         public ChatModel getChatModel() {
             String model = config.getModel();
             Assert.notNull(model, "model must not be null");
             String apiKey = config.getCredentials().get("apiKey");
             Assert.notNull(apiKey, "apiKey must not be null");
 
-            OpenAiApi openAiApi =
-                    OpenAiApi.builder().baseUrl(BASE_URL).apiKey(apiKey).build();
-            OpenAiChatOptions options = OpenAiChatOptions.builder().model(model).build();
+            OpenAiApi openAiApi = OpenAiApi.builder()
+                    .baseUrl(resolveDefaultBaseUrl())
+                    .apiKey(apiKey)
+                    .build();
+            OpenAiChatOptions.Builder optionsBuilder =
+                    OpenAiChatOptions.builder().model(model);
+            List<io.modelcontextprotocol.client.McpAsyncClient> mcpClients = getMcpAsyncClients();
+            if (!mcpClients.isEmpty()) {
+                optionsBuilder.toolCallbacks(buildObservedToolCallbacks(mcpClients));
+            }
+            OpenAiChatOptions options = optionsBuilder.build();
             return OpenAiChatModel.builder()
                     .openAiApi(openAiApi)
                     .defaultOptions(options)
@@ -78,6 +104,45 @@ public class DashScopeAssistant extends AbstractAIAssistant {
         public StreamingChatModel getStreamingChatModel() {
             // In Spring AI, OpenAiChatModel handles both sync and streaming
             return getChatModel();
+        }
+
+        private ToolCallback[] buildObservedToolCallbacks(
+                List<io.modelcontextprotocol.client.McpAsyncClient> mcpClients) {
+            ToolCallback[] callbacks = new AsyncMcpToolCallbackProvider(mcpClients).getToolCallbacks();
+            ToolCallback[] observedCallbacks = new ToolCallback[callbacks.length];
+            for (int i = 0; i < callbacks.length; i++) {
+                observedCallbacks[i] = wrapToolCallback(callbacks[i]);
+            }
+            return observedCallbacks;
+        }
+
+        private ToolCallback wrapToolCallback(ToolCallback delegate) {
+            return new ToolCallback() {
+                @Override
+                public ToolDefinition getToolDefinition() {
+                    return delegate.getToolDefinition();
+                }
+
+                @Override
+                public String call(String toolInput) {
+                    return call(toolInput, null);
+                }
+
+                @Override
+                public String call(String toolInput, org.springframework.ai.chat.model.ToolContext toolContext) {
+                    String toolName = getToolDefinition().name();
+                    String executionId = UUID.randomUUID().toString();
+                    emitToolExecutionEvent(executionId, toolName, "started", toolInput);
+                    try {
+                        String result = delegate.call(toolInput, toolContext);
+                        emitToolExecutionEvent(executionId, toolName, "completed", result);
+                        return result;
+                    } catch (Exception e) {
+                        emitToolExecutionEvent(executionId, toolName, "failed", e.getMessage());
+                        throw e;
+                    }
+                }
+            };
         }
 
         public AIAssistant build() {
@@ -132,13 +197,18 @@ public class DashScopeAssistant extends AbstractAIAssistant {
 
                     StringBuilder responseBuilder = new StringBuilder();
                     return streamingChatModel.stream(prompt)
-                            .map(chatResponse -> {
-                                String content =
-                                        chatResponse.getResult().getOutput().getText();
-                                if (content != null) {
-                                    responseBuilder.append(content);
+                            .concatMap(chatResponse -> {
+                                String content = null;
+                                if (chatResponse.getResult() != null
+                                        && chatResponse.getResult().getOutput() != null) {
+                                    content =
+                                            chatResponse.getResult().getOutput().getText();
                                 }
-                                return content;
+                                if (content != null && !content.isEmpty()) {
+                                    responseBuilder.append(content);
+                                    return Flux.just(content);
+                                }
+                                return Flux.empty();
                             })
                             .doOnComplete(() -> {
                                 // Save to memory when streaming completes

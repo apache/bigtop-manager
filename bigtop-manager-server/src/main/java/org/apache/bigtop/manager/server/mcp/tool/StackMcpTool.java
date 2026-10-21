@@ -29,11 +29,14 @@ import org.apache.bigtop.manager.server.utils.StackUtils;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 @Component
+@Slf4j
 public class StackMcpTool implements McpTool {
 
     @Tool(
@@ -51,7 +54,7 @@ public class StackMcpTool implements McpTool {
             stackVO.setServices(ServiceConverter.INSTANCE.fromDTO2VO(serviceDTOList));
             stackVOList.add(stackVO);
         }
-
+        log.info("ListStacks tool called, total stacks: {}", stackVOList.size());
         return stackVOList;
     }
 }

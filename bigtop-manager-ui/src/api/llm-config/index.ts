@@ -18,7 +18,13 @@
  */
 
 import request from '@/api/request.ts'
-import { Platform, PlatformCredential, AuthorizedPlatform, UpdateAuthorizedPlatformConfig } from './types'
+import {
+  Platform,
+  PlatformCredential,
+  AuthorizedPlatform,
+  UpdateAuthorizedPlatformConfig,
+  PlatformModelsReq
+} from './types'
 
 export const getPlatforms = (): Promise<Platform[]> => {
   return request({
@@ -38,6 +44,14 @@ export const getPlatformCredentials = (platformId: number): Promise<PlatformCred
   return request({
     method: 'get',
     url: `/llm/config/platforms/${platformId}/auth-credentials`
+  })
+}
+
+export const getPlatformModels = (platformId: number, data: PlatformModelsReq): Promise<string[]> => {
+  return request({
+    method: 'post',
+    url: `/llm/config/platforms/${platformId}/models`,
+    data
   })
 }
 

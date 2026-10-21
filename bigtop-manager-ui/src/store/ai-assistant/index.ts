@@ -39,6 +39,15 @@ export const useAiChatStore = defineStore(
     const messageReceiver = ref('')
     const isSending = ref(false)
     const loadingChatRecords = ref(false)
+    const toolExecutions = ref<ChatMessageItem[]>([])
+    const pendingAiRecord = ref<ChatMessageItem | null>(null)
+    const streamRecords = computed(() => {
+      const records = [...toolExecutions.value]
+      if (pendingAiRecord.value) {
+        records.push(pendingAiRecord.value)
+      }
+      return records
+    })
 
     const hasActivePlatform = computed(() => Object.keys(currAuthPlatform.value || {}).length > 0)
     const threadLimit = computed(() => threads.value.length >= 10)
@@ -57,6 +66,8 @@ export const useAiChatStore = defineStore(
       messageReceiver.value = ''
       isSending.value = false
       loadingChatRecords.value = false
+      toolExecutions.value = []
+      pendingAiRecord.value = null
     }
 
     const initCurrThread = () => {
@@ -162,11 +173,12 @@ export const useAiChatStore = defineStore(
 
     const collectReceiveMessage = async (message: string) => {
       try {
+        toolExecutions.value = []
+        pendingAiRecord.value = null
         if (threads.value.length === 0) {
           await createChatThread(true)
         }
-        const res = await talkWithChatbot(message)
-        setChatRecordForSender('AI', res?.message || '')
+        await talkWithChatbot(message)
       } catch (error) {
         console.log('error :>> ', error)
       }
@@ -180,21 +192,79 @@ export const useAiChatStore = defineStore(
       }
     }
 
+    const updateToolExecution = (item: ReceivedMessageItem) => {
+      const { executionId, toolName, toolStatus, toolPayload } = item
+      if (!executionId || !toolName || !toolStatus) {
+        return
+      }
+
+      const prevRecord = toolExecutions.value.find((execution) => execution.executionId === executionId)
+      const record = {
+        sender: 'AI' as const,
+        message: '',
+        messageType: 'tool' as const,
+        executionId,
+        toolName,
+        toolStatus,
+        toolPayload,
+        toolInput: toolStatus === 'started' ? toolPayload || '' : prevRecord?.toolInput || '',
+        toolOutput: toolStatus === 'completed' ? toolPayload || '' : prevRecord?.toolOutput || '',
+        toolError: toolStatus === 'failed' ? toolPayload || '' : prevRecord?.toolError || '',
+        createTime: dayjs().format()
+      }
+
+      const index = toolExecutions.value.findIndex((execution) => execution.executionId === executionId)
+
+      if (index === -1) {
+        toolExecutions.value.push(record)
+      } else {
+        toolExecutions.value.splice(index, 1, record)
+      }
+    }
+
     const onMessageReceive = ({ event }: AxiosProgressEvent) => {
+      if (!pendingAiRecord.value) {
+        pendingAiRecord.value = {
+          sender: 'AI',
+          message: '',
+          createTime: dayjs().format()
+        }
+      }
+
       messageReceiver.value = event.target.responseText
         .split('data:')
         .map((stream: string) => {
           if (stream.length > 0) {
             const parsedMsgInfo = JSON.parse(stream.trimEnd())
+            if (parsedMsgInfo.eventType === 'tool_execution') {
+              updateToolExecution(parsedMsgInfo)
+              return ''
+            }
             return checkReceiveMessageError(parsedMsgInfo)
           }
         })
         .join('')
+
+      if (pendingAiRecord.value) {
+        pendingAiRecord.value.message = messageReceiver.value
+      }
     }
 
     const onMessageComplete = () => {
-      const formatResultMsg = messageReceiver.value
+      const currentToolExecutions = toolExecutions.value.map((record) => ({ ...record }))
+      const currentAiRecord = pendingAiRecord.value ? { ...pendingAiRecord.value } : null
+      const formatResultMsg = currentAiRecord?.message || messageReceiver.value
+
+      if (currentToolExecutions.length > 0) {
+        chatRecords.value.push(...currentToolExecutions)
+      }
+      if (currentAiRecord && currentAiRecord.message) {
+        chatRecords.value.push(currentAiRecord)
+      }
+
       messageReceiver.value = ''
+      toolExecutions.value = []
+      pendingAiRecord.value = null
       cancelSseConnect()
       isSending.value = false
       return Promise.resolve({ message: formatResultMsg, state: true })
@@ -222,6 +292,9 @@ export const useAiChatStore = defineStore(
       messageReceiver,
       isSending,
       loadingChatRecords,
+      toolExecutions,
+      pendingAiRecord,
+      streamRecords,
       threadLimit,
       hasActivePlatform,
       initCurrThread,
