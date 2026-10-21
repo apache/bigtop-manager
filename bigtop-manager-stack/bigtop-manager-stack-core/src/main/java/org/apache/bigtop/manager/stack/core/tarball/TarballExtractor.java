@@ -93,7 +93,13 @@ public class TarballExtractor {
                 if (entry.isDirectory()) {
                     createDirectories(outputPath);
                 } else if (entry.isSymbolicLink()) {
-                    createSymbolicLink(outputPath, entry.getLinkName());
+                    Path linkNamePath = Paths.get(entry.getLinkName());
+                    Path targetLink = linkNamePath.subpath(skipLevels, linkNamePath.getNameCount());
+                    createSymbolicLink(outputPath, destDir.resolve(targetLink).normalize());
+                } else if (entry.isLink()) {
+                    Path linkNamePath = Paths.get(entry.getLinkName());
+                    Path targetLink = linkNamePath.subpath(skipLevels, linkNamePath.getNameCount());
+                    createLink(outputPath, destDir.resolve(targetLink).normalize());
                 } else {
                     createFile(outputPath, ais);
                 }
@@ -116,18 +122,24 @@ public class TarballExtractor {
         }
     }
 
-    private static void createSymbolicLink(Path linkPath, String targetName) {
-        Path targetPath = linkPath.getParent().resolve(targetName).normalize();
-        if (!targetPath.isAbsolute()) {
-            targetPath = linkPath.getParent().resolve(targetPath).normalize();
-        }
-
+    private static void createSymbolicLink(Path linkPath, Path targetLink) {
         createDirectories(linkPath.getParent());
 
         try {
-            Files.createSymbolicLink(linkPath, targetPath);
+            Files.createSymbolicLink(linkPath, targetLink);
         } catch (IOException e) {
-            log.error("Failed to create symbolic link from {} to {}", linkPath, targetPath, e);
+            log.error("Failed to create symbolic link from {} to {}", new Object[] {linkPath, targetLink, e});
+            throw new StackException(e);
+        }
+    }
+
+    private static void createLink(Path linkPath, Path targetLink) {
+        createDirectories(linkPath.getParent());
+
+        try {
+            Files.createLink(linkPath, targetLink);
+        } catch (IOException e) {
+            log.error("Failed to create link from {} to {}", new Object[] {linkPath, targetLink, e});
             throw new StackException(e);
         }
     }
