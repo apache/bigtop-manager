@@ -22,7 +22,7 @@ Provides an easy deployment solution not only for Apache Bigtop components, but 
 See [Documents](./docs).
 
 ## Stargazers
-![Stargazers](https://starchart.cc/apache/bigtop-manager.svg)
+[![Star History Chart](https://api.star-history.com/svg?repos=apache/bigtop-manager&type=Date)](https://star-history.com/#apache/bigtop-manager&Date)
 
 ## Code of Conduct
 Participate in this project in accordance with the Contributor Covenant [Code of Conduct](https://www.apache.org/foundation/policies/conduct).
