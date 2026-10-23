@@ -164,8 +164,7 @@ class MCPInterceptorTest {
     void afterCompletion_ClearsSessionUserHolder() throws Exception {
         SessionUserHolder.setUserId(123L);
 
-        mcpInterceptor.afterCompletion(
-                new MockHttpServletRequest(), new MockHttpServletResponse(), new Object(), null);
+        mcpInterceptor.afterCompletion(new MockHttpServletRequest(), new MockHttpServletResponse(), new Object(), null);
 
         assertNull(SessionUserHolder.getUserId());
     }
